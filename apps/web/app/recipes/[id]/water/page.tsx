@@ -47,6 +47,38 @@ type SpargeResult = {
   chlorideAddedPpm: number;
 };
 
+type RecipeWaterSettings = {
+  id: string;
+  accountId: string;
+  recipeId: string;
+
+  sourceWaterProfileId: string | null;
+  targetWaterProfileId: string | null;
+  dilutionWaterProfileId: string | null;
+
+  tapWaterVolumeLiters: number | null;
+  dilutionWaterVolumeLiters: number | null;
+
+  spargeStartingAlkalinityPpmCaCO3: number;
+  spargeStartingPh: number;
+  spargeTargetPh: number;
+  spargeVolumeLiters: number;
+  spargeAcidType: string;
+  spargeStrengthKind: string;
+  spargeStrengthValue: number | null;
+
+  spargeLastAcidRequiredMl: number | null;
+  spargeLastAcidRequiredTsp: number | null;
+  spargeLastAcidRequiredGrams: number | null;
+  spargeLastAcidRequiredKg: number | null;
+  spargeLastFinalAlkalinityPpmCaCO3: number | null;
+  spargeLastSulfateAddedPpm: number | null;
+  spargeLastChlorideAddedPpm: number | null;
+  spargeLastCalculatedAt: string | null;
+};
+
+type RecipeWaterSettingsResponse = { ok: true; settings: RecipeWaterSettings | null };
+
 function loadAuth(): DevAuth {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -92,6 +124,15 @@ export default function WaterCalculatorPage() {
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
   const [profilesError, setProfilesError] = useState<string | null>(null);
+
+  const [settingsLoadedOnce, setSettingsLoadedOnce] = useState(false);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [savingError, setSavingError] = useState<string | null>(null);
+  const [spargeSaveStatus, setSpargeSaveStatus] = useState<string | null>(null);
+  const [adjustmentSaveStatus, setAdjustmentSaveStatus] = useState<string | null>(null);
+  const [calcSaveStatus, setCalcSaveStatus] = useState<string | null>(null);
+  const [savingSparge, setSavingSparge] = useState(false);
+  const [savingAdjustment, setSavingAdjustment] = useState(false);
 
   const [spargeError, setSpargeError] = useState<string | null>(null);
   const [spargeStatus, setSpargeStatus] = useState<string | null>(null);
@@ -148,17 +189,119 @@ export default function WaterCalculatorPage() {
     }
   };
 
+  const loadSettings = async () => {
+    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    setSettingsError(null);
+    try {
+      const res = await apiFetch(`/api/recipes/${recipeId}/water-settings`, auth);
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const data = res.data as RecipeWaterSettingsResponse;
+      const s = data.settings;
+      if (!s) return;
+
+      // Apply once on load so we don't clobber edits.
+      setSourceProfileId(s.sourceWaterProfileId ?? "");
+      setTargetProfileId(s.targetWaterProfileId ?? "");
+      setDilutionProfileId(s.dilutionWaterProfileId ?? "");
+      setTapVolumeLiters(s.tapWaterVolumeLiters ?? 0);
+      setDilutionVolumeLiters(s.dilutionWaterVolumeLiters ?? 0);
+      setStartingAlk(s.spargeStartingAlkalinityPpmCaCO3 ?? 0);
+      setStartingPh(s.spargeStartingPh ?? 7.0);
+      setTargetPh(s.spargeTargetPh ?? 5.6);
+      setVolumeLiters(s.spargeVolumeLiters ?? 20);
+      setAcidType(s.spargeAcidType ?? "phosphoric");
+      setStrengthKind((s.spargeStrengthKind as any) ?? "percent");
+      setStrengthValue(s.spargeStrengthValue ?? 10);
+
+      if (s.spargeLastCalculatedAt) {
+        setSpargeResult({
+          acidRequiredMl: s.spargeLastAcidRequiredMl,
+          acidRequiredTsp: s.spargeLastAcidRequiredTsp,
+          acidRequiredGrams: s.spargeLastAcidRequiredGrams,
+          acidRequiredKg: s.spargeLastAcidRequiredKg,
+          finalAlkalinityPpmCaCO3: s.spargeLastFinalAlkalinityPpmCaCO3 ?? 0,
+          sulfateAddedPpm: s.spargeLastSulfateAddedPpm ?? 0,
+          chlorideAddedPpm: s.spargeLastChlorideAddedPpm ?? 0,
+        });
+        setSpargeStatus(`Last calculated: ${new Date(s.spargeLastCalculatedAt).toLocaleString()}`);
+      }
+    } catch (err) {
+      setSettingsError(String(err));
+    }
+  };
+
   useEffect(() => {
     if (!auth) return;
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth?.userId, auth?.activeAccountId]);
 
+  useEffect(() => {
+    if (!canCall || !recipeId) return;
+    if (settingsLoadedOnce) return;
+    setSettingsLoadedOnce(true);
+    void loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canCall, recipeId, settingsLoadedOnce]);
+
+  const saveSettings = async (patch: Record<string, unknown>) => {
+    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    const res = await apiFetch(`/api/recipes/${recipeId}/water-settings`, auth, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+  };
+
+  const onSaveSpargeInputs = async () => {
+    setSavingError(null);
+    setSpargeSaveStatus(null);
+    setSavingSparge(true);
+    try {
+      await saveSettings({
+        spargeStartingAlkalinityPpmCaCO3: startingAlk,
+        spargeStartingPh: startingPh,
+        spargeTargetPh: targetPh,
+        spargeVolumeLiters: volumeLiters,
+        spargeAcidType: acidType,
+        spargeStrengthKind: strengthKind,
+        spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
+      });
+      setSpargeSaveStatus("Saved sparge inputs.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingSparge(false);
+    }
+  };
+
+  const onSaveAdjustment = async () => {
+    setSavingError(null);
+    setAdjustmentSaveStatus(null);
+    setSavingAdjustment(true);
+    try {
+      await saveSettings({
+        sourceWaterProfileId: sourceProfileId || null,
+        targetWaterProfileId: targetProfileId || null,
+        dilutionWaterProfileId: dilutionProfileId || null,
+        tapWaterVolumeLiters: tapVolumeLiters,
+        dilutionWaterVolumeLiters: dilutionVolumeLiters,
+      });
+      setAdjustmentSaveStatus("Saved profile selections.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingAdjustment(false);
+    }
+  };
+
   const onSubmitSparge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth?.userId || !auth.activeAccountId) return;
     setSpargeError(null);
     setSpargeStatus(null);
+    setCalcSaveStatus(null);
     setSpargeResult(null);
     setSpargeSubmitting(true);
     try {
@@ -178,8 +321,29 @@ export default function WaterCalculatorPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      setSpargeResult((res.data as any).result as SpargeResult);
+      const result = (res.data as any).result as SpargeResult;
+      setSpargeResult(result);
+
+      // Calculate + Save Result (v0): persist inputs + snapshot.
+      await saveSettings({
+        spargeStartingAlkalinityPpmCaCO3: startingAlk,
+        spargeStartingPh: startingPh,
+        spargeTargetPh: targetPh,
+        spargeVolumeLiters: volumeLiters,
+        spargeAcidType: acidType,
+        spargeStrengthKind: strengthKind,
+        spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
+        spargeLastAcidRequiredMl: result.acidRequiredMl,
+        spargeLastAcidRequiredTsp: result.acidRequiredTsp,
+        spargeLastAcidRequiredGrams: result.acidRequiredGrams,
+        spargeLastAcidRequiredKg: result.acidRequiredKg,
+        spargeLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
+        spargeLastSulfateAddedPpm: result.sulfateAddedPpm,
+        spargeLastChlorideAddedPpm: result.chlorideAddedPpm,
+        spargeLastCalculatedAt: new Date().toISOString(),
+      });
       setSpargeStatus("Calculated.");
+      setCalcSaveStatus("Calculated and saved.");
     } catch (err) {
       setSpargeError(String(err));
     } finally {
@@ -241,11 +405,16 @@ export default function WaterCalculatorPage() {
     [allProfiles],
   );
 
+  const [sourceProfileId, setSourceProfileId] = useState<string>("");
   const [targetProfileId, setTargetProfileId] = useState<string>("");
   const [dilutionProfileId, setDilutionProfileId] = useState<string>("");
+  const [tapVolumeLiters, setTapVolumeLiters] = useState<number>(0);
+  const [dilutionVolumeLiters, setDilutionVolumeLiters] = useState<number>(0);
+  const [mixStatus, setMixStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!waterProfiles.length) return;
+    setSourceProfileId((prev) => prev || waterProfiles[0]?.id || "");
     setTargetProfileId((prev) => prev || waterProfiles[0]?.id || "");
   }, [waterProfiles]);
 
@@ -258,10 +427,34 @@ export default function WaterCalculatorPage() {
     () => waterProfiles.find((p) => p.id === targetProfileId) ?? null,
     [targetProfileId, waterProfiles],
   );
+  const selectedSource = useMemo(
+    () => waterProfiles.find((p) => p.id === sourceProfileId) ?? null,
+    [sourceProfileId, waterProfiles],
+  );
   const selectedDilution = useMemo(
     () => dilutionProfiles.find((p) => p.id === dilutionProfileId) ?? null,
     [dilutionProfileId, dilutionProfiles],
   );
+
+  const mixedSourceProfile = useMemo(() => {
+    if (!selectedSource || !selectedDilution) return null;
+    const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+    const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    const total = tap + dil;
+    if (total <= 0) return null;
+
+    const mix = (a: number, b: number) => (a * tap + b * dil) / total;
+    return {
+      name: `Mixed (${selectedSource.name} + ${selectedDilution.name})`,
+      totalVolumeLiters: total,
+      calcium: mix(selectedSource.calcium, selectedDilution.calcium),
+      magnesium: mix(selectedSource.magnesium, selectedDilution.magnesium),
+      sodium: mix(selectedSource.sodium, selectedDilution.sodium),
+      sulfate: mix(selectedSource.sulfate, selectedDilution.sulfate),
+      chloride: mix(selectedSource.chloride, selectedDilution.chloride),
+      bicarbonate: mix(selectedSource.bicarbonate, selectedDilution.bicarbonate),
+    };
+  }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
 
   const admin = isAdmin(me?.role ?? null);
 
@@ -418,11 +611,24 @@ export default function WaterCalculatorPage() {
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
               <button type="submit" disabled={!canCall || spargeSubmitting}>
-                {spargeSubmitting ? "Calculating…" : "Calculate"}
+                {spargeSubmitting ? "Calculating…" : "Calculate + Save result"}
+              </button>
+              <button type="button" onClick={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
+                {savingSparge ? "Saving…" : "Save sparge inputs"}
               </button>
               {spargeStatus ? (
                 <span className="muted" role="status" aria-live="polite">
                   {spargeStatus}
+                </span>
+              ) : null}
+              {spargeSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {spargeSaveStatus}
+                </span>
+              ) : null}
+              {calcSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {calcSaveStatus}
                 </span>
               ) : null}
             </div>
@@ -436,7 +642,7 @@ export default function WaterCalculatorPage() {
 
           {spargeResult ? (
             <div style={{ marginTop: 12 }}>
-              <h3 style={{ marginTop: 0 }}>Result</h3>
+              <h3 style={{ marginTop: 0 }}>Result (last calculated)</h3>
               <ul>
                 {spargeResult.acidRequiredMl !== null ? (
                   <li>
@@ -486,6 +692,27 @@ export default function WaterCalculatorPage() {
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
             <div>
               <label
+                htmlFor="source-profile"
+                className="muted"
+                style={{ display: "block", fontSize: 12 }}
+              >
+                Source water profile (starting water)
+              </label>
+              <select
+                id="source-profile"
+                value={sourceProfileId}
+                onChange={(e) => setSourceProfileId(e.target.value)}
+                style={{ width: "100%", padding: 8 }}
+              >
+                {waterProfiles.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} [{p.scope}/{p.verificationStatus}]
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
                 htmlFor="target-profile"
                 className="muted"
                 style={{ display: "block", fontSize: 12 }}
@@ -526,17 +753,87 @@ export default function WaterCalculatorPage() {
                 ))}
               </select>
             </div>
+            <div>
+              <label htmlFor="tap-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                Source water volume (L)
+              </label>
+              <input
+                id="tap-vol"
+                type="number"
+                inputMode="decimal"
+                step={0.1}
+                value={tapVolumeLiters}
+                onChange={(e) => setTapVolumeLiters(Number(e.target.value))}
+                style={{ width: "100%", padding: 8 }}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="dilution-vol"
+                className="muted"
+                style={{ display: "block", fontSize: 12 }}
+              >
+                Dilution water volume (L)
+              </label>
+              <input
+                id="dilution-vol"
+                type="number"
+                inputMode="decimal"
+                step={0.1}
+                value={dilutionVolumeLiters}
+                onChange={(e) => setDilutionVolumeLiters(Number(e.target.value))}
+                style={{ width: "100%", padding: 8 }}
+              />
+            </div>
           </div>
 
           <div style={{ marginTop: 12 }}>
             <button onClick={refresh} disabled={!canCall || loadingProfiles}>
               {loadingProfiles ? "Refreshing…" : "Refresh profiles"}
             </button>
+            <button
+              onClick={() => void onSaveAdjustment()}
+              disabled={!canCall || savingAdjustment}
+              style={{ marginLeft: 12 }}
+            >
+              {savingAdjustment ? "Saving…" : "Save Water Adjustment"}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setMixStatus(mixedSourceProfile ? "Mixed preview updated." : "Enter volumes to preview mixing.")
+              }
+              disabled={!canCall}
+              style={{ marginLeft: 12 }}
+            >
+              Mix (preview)
+            </button>
+            {adjustmentSaveStatus ? (
+              <span className="muted" role="status" aria-live="polite" style={{ marginLeft: 12 }}>
+                {adjustmentSaveStatus}
+              </span>
+            ) : null}
+            {mixStatus ? (
+              <span className="muted" role="status" aria-live="polite" style={{ marginLeft: 12 }}>
+                {mixStatus}
+              </span>
+            ) : null}
           </div>
 
           {profilesError ? (
             <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
               {profilesError}
+            </pre>
+          ) : null}
+
+          {settingsError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {settingsError}
+            </pre>
+          ) : null}
+          {savingError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {savingError}
             </pre>
           ) : null}
 
@@ -762,10 +1059,63 @@ export default function WaterCalculatorPage() {
               )}
             </li>
             <li>
+              Mixed source water (from Sheet 4 mixing):{" "}
+              {mixedSourceProfile ? (
+                <>
+                  <code>{mixedSourceProfile.name}</code>{" "}
+                  <span className="muted">
+                    (total <code>{mixedSourceProfile.totalVolumeLiters.toFixed(2)}</code> L)
+                  </span>
+                </>
+              ) : (
+                <span className="muted">(not mixed)</span>
+              )}
+            </li>
+            <li>
               Sparge acidification result:{" "}
               <span className="muted">{spargeResult ? "available" : "not calculated"}</span>
             </li>
           </ul>
+
+          {mixedSourceProfile ? (
+            <details style={{ marginTop: 12 }}>
+              <summary>Mixed water ions (and delta vs target)</summary>
+              <div style={{ overflowX: "auto", marginTop: 8 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th align="left">Ion</th>
+                      <th align="right">Mixed (ppm)</th>
+                      <th align="right">Target (ppm)</th>
+                      <th align="right">Δ (mixed - target)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(
+                      [
+                        ["Ca", mixedSourceProfile.calcium, selectedTarget?.calcium ?? null],
+                        ["Mg", mixedSourceProfile.magnesium, selectedTarget?.magnesium ?? null],
+                        ["Na", mixedSourceProfile.sodium, selectedTarget?.sodium ?? null],
+                        ["SO4", mixedSourceProfile.sulfate, selectedTarget?.sulfate ?? null],
+                        ["Cl", mixedSourceProfile.chloride, selectedTarget?.chloride ?? null],
+                        ["HCO3", mixedSourceProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                      ] as const
+                    ).map(([label, mixed, target]) => {
+                      const delta = target === null ? null : mixed - target;
+                      return (
+                        <tr key={label}>
+                          <td>{label}</td>
+                          <td align="right">{mixed.toFixed(2)}</td>
+                          <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
+                          <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          ) : null}
         </section>
 
         <section className="panel" aria-labelledby="nav-heading">

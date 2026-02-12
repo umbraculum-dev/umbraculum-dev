@@ -50,6 +50,7 @@ model Account {
   members   AccountMember[]
   recipes   Recipe[]
   waterProfiles WaterProfile[]
+  recipeWaterSettings RecipeWaterSettings[]
 }
 
 model AccountMember {
@@ -77,7 +78,51 @@ model Recipe {
   updatedAt DateTime @updatedAt
 
   account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  waterSettings RecipeWaterSettings?
 
+  @@index([accountId])
+}
+
+model RecipeWaterSettings {
+  id        String   @id @default(uuid())
+  accountId String
+  recipeId  String   @unique
+
+  // Profile selections
+  sourceWaterProfileId   String?
+  targetWaterProfileId   String?
+  dilutionWaterProfileId String?
+
+  // Mixing (sheet 4 v0): tap + dilution volumes to create a mixed source profile
+  tapWaterVolumeLiters      Float? @default(0)
+  dilutionWaterVolumeLiters Float? @default(0)
+
+  // Sparge acidification inputs (liters-first)
+  spargeStartingAlkalinityPpmCaCO3 Float @default(0)
+  spargeStartingPh                Float @default(7.0)
+  spargeTargetPh                  Float @default(5.6)
+  spargeVolumeLiters              Float @default(20)
+  spargeAcidType                  String @default("phosphoric")
+  spargeStrengthKind              String @default("percent")
+  spargeStrengthValue             Float?
+
+  // Last calculated snapshot (optional)
+  spargeLastAcidRequiredMl            Float?
+  spargeLastAcidRequiredTsp           Float?
+  spargeLastAcidRequiredGrams         Float?
+  spargeLastAcidRequiredKg            Float?
+  spargeLastFinalAlkalinityPpmCaCO3   Float?
+  spargeLastSulfateAddedPpm           Float?
+  spargeLastChlorideAddedPpm          Float?
+  spargeLastCalculatedAt              DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
   @@index([accountId])
 }
 

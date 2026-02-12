@@ -7,6 +7,7 @@ import { accountsRoutes } from "./routes/accounts.js";
 import { recipesRoutes } from "./routes/recipes.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { waterCalcRoutes } from "./routes/waterCalc.js";
+import { recipeWaterSettingsRoutes } from "./routes/recipeWaterSettings.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -20,6 +21,7 @@ export function buildApp() {
   app.register(recipesRoutes);
   app.register(waterProfilesRoutes);
   app.register(waterCalcRoutes);
+  app.register(recipeWaterSettingsRoutes);
 
   return app;
 }
