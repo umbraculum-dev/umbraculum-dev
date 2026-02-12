@@ -58,5 +58,8 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 
 Anything below this heading is **project-owned** and will not be overwritten by the sync tool.
 
-- `<fill_me>`
+- **Big picture**: `docs/architechture.md`
+- **Local dev entrypoint**: `docker compose up --build`
+- **Local ports** (repo-local `.env`, not committed):
+  - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 
