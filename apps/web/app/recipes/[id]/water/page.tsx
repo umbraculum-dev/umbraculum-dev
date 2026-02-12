@@ -996,6 +996,14 @@ export default function WaterCalculatorPage() {
           <hr style={{ margin: "16px 0" }} />
 
           <h3 style={{ marginTop: 0 }}>Mash water acidification (Sheet 4, v0)</h3>
+          <p className="muted" style={{ marginTop: 0 }}>
+            This is a <strong>calculator</strong>: enter your mash water volume, starting alkalinity/pH, and a target
+            pH. We compute the <strong>acid amount required</strong> (mL/tsp for liquids, g/kg for solids) and save a
+            snapshot when you click <strong>Calculate + Save</strong>.
+          </p>
+          <p className="muted" style={{ marginTop: 0 }}>
+            v0 limitation: we do <strong>not</strong> currently support “I added X mL, what pH does that produce?”.
+          </p>
           <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
             <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
               <div>

@@ -28,3 +28,11 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 - [ ] Assess i18n approach (locales, text translations, units formatting) and how it should work across web + mobile.
 
+## Web SEO / SSR assessment
+
+- [ ] Assess SEO with the current Next.js App Router usage (client components, hydration, view-source). If pages aren’t SEO-friendly, reassess what must become SSR/server components + metadata strategy.
+
+## Water calculator (BrunWater parity)
+
+- [ ] Mash acidification: add “manual entry” mode (user inputs acid addition amount; app estimates resulting alkalinity/pH and stores both input + calculated snapshot).
+
