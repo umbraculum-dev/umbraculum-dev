@@ -58,8 +58,27 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 
 Anything below this heading is **project-owned** and will not be overwritten by the sync tool.
 
+- **ACCESSIBILITY-FIRST (MANDATORY)**:
+  - Before implementing or modifying ANY UI, read: `docs/DEVELOPMENT-ACCESSIBILITY.md` and follow it as a hard constraint.
+  - Target: WCAG 2.2 AA + EN 301 549 outcomes (web + native).
+  - Prefer semantic HTML / native controls; avoid div-based interactive elements.
+  - All interactive controls MUST have accessible names:
+    - Web: visible `<label>` or `aria-label`/`aria-labelledby` for icon-only controls
+    - Mobile: `accessibilityLabel`/`accessibilityRole` as appropriate
+  - Keyboard: all flows must be operable via keyboard (web); never introduce focus traps; keep visible focus.
+  - Forms: label + error wiring is mandatory; errors must be perceivable and announced (`aria-describedby` + summary/live region).
+  - Modals/menus/popovers: correct roles + focus management (focus in, trap, return); ESC closes where appropriate.
+  - Respect reduced motion preferences (`prefers-reduced-motion` / OS settings).
+  - Color is never the only signal; maintain contrast for text/critical UI.
+  - Testing: add/maintain Playwright coverage for changed flows; use `getByRole`/`getByLabel` when stable and `data-testid` only for workflow-critical elements/custom widgets.
+  - CI hygiene: no new critical a11y lint issues; if axe checks exist for the flow, they must pass or be justified + tracked as tech debt.
+  - If accessibility requirements conflict with design, propose an accessible alternative—do not ship inaccessible UI.
+
 - **Big picture**: `docs/architechture.md`
+- **Roadmap**: `docs/ROADMAP.md`
+- **Work tracker**: `TODOs.md`
 - **Local dev entrypoint**: `docker compose up --build`
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
+- **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
 

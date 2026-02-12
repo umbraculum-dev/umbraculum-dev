@@ -7,9 +7,113 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Minimal baseline model just to validate migrations end-to-end.
-model HealthCheck {
+enum AccountRole {
+  owner
+  brewery_admin
+  member
+  viewer
+}
+
+enum WaterProfileScope {
+  system
+  account
+  public
+}
+
+enum WaterProfileType {
+  water
+  dilution
+}
+
+enum WaterProfileVerificationStatus {
+  unverified
+  verified
+}
+
+model User {
+  id        String          @id @default(uuid())
+  email     String          @unique
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  memberships AccountMember[]
+
+  @@index([email])
+}
+
+model Account {
+  id        String          @id @default(uuid())
+  name      String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  members   AccountMember[]
+  recipes   Recipe[]
+  waterProfiles WaterProfile[]
+}
+
+model AccountMember {
+  id        String      @id @default(uuid())
+  accountId String
+  userId    String
+  role      AccountRole @default(member)
+  createdAt DateTime    @default(now())
+
+  account   Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, userId])
+  @@index([userId])
+  @@index([accountId])
+}
+
+model Recipe {
   id        String   @id @default(uuid())
+  accountId String
+  name      String
+  style     String?
+  notes     String?  @db.Text
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+}
+
+model WaterProfile {
+  id        String   @id @default(uuid())
+  key       String   @unique
+
+  scope     WaterProfileScope
+  type      WaterProfileType
+
+  // `accountId` is only set for account-scoped profiles and for audit of admin-created public ones.
+  accountId String?
+  name      String
+
+  // ppm (mg/L) ions
+  calcium      Float
+  magnesium    Float
+  sodium       Float
+  sulfate      Float
+  chloride     Float
+  bicarbonate  Float
+
+  verificationStatus WaterProfileVerificationStatus @default(unverified)
+  submittedByUserId  String?
+  verifiedByUserId   String?
+  verifiedAt         DateTime?
+
+  source    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  @@index([scope])
+  @@index([type])
+  @@index([accountId])
 }
 

@@ -1,0 +1,26 @@
+# TODOs (living)
+
+This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
+
+## Authentication (important)
+
+- [ ] **Dev-only header auth is temporary** (current approach):
+  - API accepts `X-User-Id` and `X-Account-Id` in development.
+  - Local DB is bootstrapped via a seed script (stable IDs).
+- [ ] **Migrate to proper auth** after initial development:
+  - session/JWT scaffolding
+  - real login/logout
+  - remove reliance on dev headers (or confine them behind a dev-only gate)
+
+## Tenancy + ACL (always enforce)
+
+- [ ] All domain tables must include `account_id` (or `accountId`) and be scoped server-side.
+- [ ] Enforce membership/role checks centrally (service layer), not ad-hoc in routes.
+- [ ] Keep “active account” explicit (`activeAccountId`), never implicit.
+
+## Near-term milestones
+
+- [ ] Core schema: `User`, `Account`, `AccountMember` (+ roles)
+- [ ] Minimal endpoints: `/me`, `/accounts` (GET/POST)
+- [ ] Web thin shell: account list + create account (dev only)
+

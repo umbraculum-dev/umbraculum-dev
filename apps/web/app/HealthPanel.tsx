@@ -32,17 +32,10 @@ export function HealthPanel() {
   return (
     <section>
       <h2 style={{ marginTop: 24 }}>API health</h2>
-      <p style={{ marginTop: 0, color: "#444" }}>
+      <p className="muted" style={{ marginTop: 0 }}>
         Fetching <code>{apiBase}/health</code> from the browser (via Nginx).
       </p>
-      <pre
-        style={{
-          background: "#f6f8fa",
-          padding: 12,
-          borderRadius: 8,
-          overflow: "auto",
-        }}
-      >
+      <pre className="codeBlock">
         {JSON.stringify(state, null, 2)}
       </pre>
     </section>

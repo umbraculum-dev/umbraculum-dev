@@ -1,15 +1,9 @@
-import Fastify from "fastify";
+import { buildApp } from "./app.js";
 
-const server = Fastify({
-  logger: true,
-});
-
-server.get("/health", async () => {
-  return { ok: true };
-});
+const app = buildApp();
 
 const port = Number(process.env.PORT ?? 4000);
 const host = "0.0.0.0";
 
-await server.listen({ port, host });
+await app.listen({ port, host });
 

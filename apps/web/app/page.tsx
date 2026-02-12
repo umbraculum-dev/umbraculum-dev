@@ -1,14 +1,16 @@
 import { HealthPanel } from "./HealthPanel";
+import { DashboardClient } from "./DashboardClient";
 
 export default function Home() {
   return (
-    <main style={{ maxWidth: 900, margin: "40px auto", padding: 16 }}>
-      <h1 style={{ marginBottom: 8 }}>Brewing SaaS (WIP)</h1>
-      <p style={{ marginTop: 0, color: "#444" }}>
+    <>
+      <h1 style={{ marginBottom: 8 }}>Dashboard</h1>
+      <p className="muted" style={{ marginTop: 0 }}>
         Desktop-first web app + native mobile apps, offline-first brew-day logging.
       </p>
       <HealthPanel />
-    </main>
+      <DashboardClient />
+    </>
   );
 }
 
