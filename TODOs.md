@@ -24,3 +24,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [ ] Minimal endpoints: `/me`, `/accounts` (GET/POST)
 - [ ] Web thin shell: account list + create account (dev only)
 
+## Internationalization (i18n)
+
+- [ ] Assess i18n approach (locales, text translations, units formatting) and how it should work across web + mobile.
+

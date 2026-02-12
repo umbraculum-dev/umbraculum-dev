@@ -1,16 +1,11 @@
-import type {
-  PrismaClient,
-  WaterProfileScope,
-  WaterProfileType,
-  WaterProfileVerificationStatus,
-} from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { AccountsService } from "./accountsService.js";
 
 export type CreateWaterProfileInput = {
-  scope?: WaterProfileScope; // defaults to "account"
-  type: WaterProfileType;
+  scope?: "system" | "account" | "public"; // defaults to "account"
+  type: "water" | "dilution";
   name: string;
   calcium: number;
   magnesium: number;
@@ -21,7 +16,7 @@ export type CreateWaterProfileInput = {
 };
 
 export type UpdateWaterProfileInput = Partial<CreateWaterProfileInput> & {
-  verificationStatus?: WaterProfileVerificationStatus;
+  verificationStatus?: "unverified" | "verified";
 };
 
 function isAdminRole(role: string) {
@@ -154,7 +149,7 @@ export class WaterProfilesService {
     userId: string,
     accountId: string,
     profileId: string,
-    verificationStatus: WaterProfileVerificationStatus,
+    verificationStatus: "unverified" | "verified",
   ) {
     const role = await this.accounts.assertMembership(userId, accountId);
     if (!isAdminRole(role)) {
@@ -178,6 +173,28 @@ export class WaterProfilesService {
         verifiedAt: verificationStatus === "verified" ? new Date() : null,
       },
     });
+  }
+
+  async deleteProfile(userId: string, accountId: string, profileId: string) {
+    const role = await this.accounts.assertMembership(userId, accountId);
+    if (!isAdminRole(role)) {
+      throw new ForbiddenError("insufficient_role", "Only brewery admins can manage water profiles");
+    }
+
+    const existing = await this.prisma.waterProfile.findUnique({ where: { id: profileId } });
+    if (!existing) throw new NotFoundError("water_profile_not_found", "Water profile not found");
+
+    if (existing.scope === "system") {
+      throw new ForbiddenError("system_profile_readonly", "System water profiles are read-only");
+    }
+
+    // Only allow deleting profiles tied to this account (account scope) or admin-created public ones (audited).
+    if (existing.accountId !== accountId) {
+      throw new ForbiddenError("wrong_account", "Water profile does not belong to this account");
+    }
+
+    await this.prisma.waterProfile.delete({ where: { id: profileId } });
+    return { ok: true as const };
   }
 }
 

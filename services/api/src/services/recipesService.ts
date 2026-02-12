@@ -85,5 +85,15 @@ export class RecipesService {
       data,
     });
   }
+
+  async deleteRecipe(userId: string, accountId: string, recipeId: string) {
+    await this.accounts.assertMembership(userId, accountId);
+
+    // Enforce account scoping.
+    await this.getRecipe(userId, accountId, recipeId);
+
+    await this.prisma.recipe.delete({ where: { id: recipeId } });
+    return { ok: true as const };
+  }
 }
 

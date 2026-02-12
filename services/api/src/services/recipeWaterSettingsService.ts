@@ -1,4 +1,4 @@
-import type { PrismaClient, WaterProfileScope } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { BadRequestError, ForbiddenError } from "../errors.js";
 import { AccountsService } from "./accountsService.js";
 import { RecipesService } from "./recipesService.js";
@@ -10,6 +10,26 @@ export type UpsertRecipeWaterSettingsInput = {
 
   tapWaterVolumeLiters?: number | null;
   dilutionWaterVolumeLiters?: number | null;
+
+  mashStartingAlkalinityPpmCaCO3?: number;
+  mashStartingPh?: number;
+  mashTargetPh?: number;
+  mashWaterVolumeLiters?: number;
+  mashAcidType?: string;
+  mashStrengthKind?: string;
+  mashStrengthValue?: number | null;
+
+  mashLastAcidRequiredMl?: number | null;
+  mashLastAcidRequiredTsp?: number | null;
+  mashLastAcidRequiredGrams?: number | null;
+  mashLastAcidRequiredKg?: number | null;
+  mashLastFinalAlkalinityPpmCaCO3?: number | null;
+  mashLastSulfateAddedPpm?: number | null;
+  mashLastChlorideAddedPpm?: number | null;
+  mashLastCalculatedAt?: Date | null;
+
+  mashSaltAdditionsJson?: unknown;
+  mashSaltsLastResultJson?: unknown;
 
   spargeStartingAlkalinityPpmCaCO3?: number;
   spargeStartingPh?: number;
@@ -36,6 +56,41 @@ function ensureFinite(n: unknown, field: string) {
   return n;
 }
 
+const ALLOWED_MASH_SALT_KEYS = new Set([
+  "gypsum",
+  "calcium_chloride",
+  "epsom",
+  "table_salt",
+  "baking_soda",
+]);
+
+function validateMashSaltAdditionsJson(value: unknown) {
+  if (value === null) return null;
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) {
+    throw new BadRequestError("invalid_salt_additions", "Body.mashSaltAdditionsJson must be an array");
+  }
+
+  return value.map((row, idx) => {
+    const o = (row ?? {}) as Record<string, unknown>;
+    const saltKey = o.saltKey;
+    const grams = o.grams;
+    if (typeof saltKey !== "string" || !ALLOWED_MASH_SALT_KEYS.has(saltKey)) {
+      throw new BadRequestError(
+        "invalid_salt_key",
+        `Body.mashSaltAdditionsJson[${idx}].saltKey is invalid`,
+      );
+    }
+    if (typeof grams !== "number" || !Number.isFinite(grams) || grams < 0) {
+      throw new BadRequestError(
+        "invalid_salt_grams",
+        `Body.mashSaltAdditionsJson[${idx}].grams must be a number >= 0`,
+      );
+    }
+    return { saltKey, grams };
+  });
+}
+
 export class RecipeWaterSettingsService {
   private readonly accounts: AccountsService;
   private readonly recipes: RecipesService;
@@ -58,7 +113,7 @@ export class RecipeWaterSettingsService {
     const profile = await this.prisma.waterProfile.findUnique({ where: { id: profileId } });
     if (!profile) throw new BadRequestError("invalid_profile_id", "Unknown water profile id");
 
-    const scope = profile.scope satisfies WaterProfileScope;
+    const scope = profile.scope as "system" | "public" | "account";
     if (scope === "system" || scope === "public") return;
     if (scope === "account" && profile.accountId === accountId) return;
 
@@ -87,6 +142,59 @@ export class RecipeWaterSettingsService {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
       }
+    }
+
+    const mashNumericFields = [
+      "mashStartingAlkalinityPpmCaCO3",
+      "mashStartingPh",
+      "mashTargetPh",
+      "mashWaterVolumeLiters",
+    ] as const;
+    for (const f of mashNumericFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) data[f] = ensureFinite(v, f);
+    }
+
+    const mashStringFields = ["mashAcidType", "mashStrengthKind"] as const;
+    for (const f of mashStringFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (typeof v !== "string") throw new BadRequestError("invalid_string", `Body.${f} must be a string`);
+        data[f] = v;
+      }
+    }
+
+    if (input.mashStrengthValue !== undefined) {
+      if (input.mashStrengthValue === null) data.mashStrengthValue = null;
+      else data.mashStrengthValue = ensureFinite(input.mashStrengthValue, "mashStrengthValue");
+    }
+
+    const mashSnapshotFields = [
+      "mashLastAcidRequiredMl",
+      "mashLastAcidRequiredTsp",
+      "mashLastAcidRequiredGrams",
+      "mashLastAcidRequiredKg",
+      "mashLastFinalAlkalinityPpmCaCO3",
+      "mashLastSulfateAddedPpm",
+      "mashLastChlorideAddedPpm",
+    ] as const;
+    for (const f of mashSnapshotFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+    if (input.mashLastCalculatedAt !== undefined) {
+      data.mashLastCalculatedAt = input.mashLastCalculatedAt;
+    }
+
+    if (input.mashSaltAdditionsJson !== undefined) {
+      // accept null to clear
+      data.mashSaltAdditionsJson = validateMashSaltAdditionsJson(input.mashSaltAdditionsJson) as any;
+    }
+    if (input.mashSaltsLastResultJson !== undefined) {
+      data.mashSaltsLastResultJson = input.mashSaltsLastResultJson as any;
     }
 
     const numericFields = [

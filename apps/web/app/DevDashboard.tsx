@@ -3,40 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "brewery_dev_headers_v1";
-
-type DevAuth = {
-  userId: string;
-  activeAccountId: string;
-};
+import { loadDevAuthFromStorage, saveDevAuthToStorage, type DevAuth } from "./_lib/devAuth";
 
 type AccountListItem = { id: string; name: string; role: string };
 type RecipeListItem = { id: string; accountId: string; name: string; style: string | null };
-
-function loadAuth(): DevAuth {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return {
-        userId: "00000000-0000-0000-0000-000000000001",
-        activeAccountId: "00000000-0000-0000-0000-0000000000a1",
-      };
-    }
-
-    // Backwards-compatible: older versions stored `accountId`.
-    const parsed = JSON.parse(raw) as Partial<DevAuth> & { accountId?: string };
-    return {
-      userId: parsed.userId ?? "",
-      activeAccountId: parsed.activeAccountId ?? parsed.accountId ?? "",
-    };
-  } catch {
-    return { userId: "", activeAccountId: "" };
-  }
-}
-
-function saveAuth(a: DevAuth) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(a));
-}
 
 async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
   const res = await fetch(path, {
@@ -53,6 +23,7 @@ async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
 
 export function DevDashboard() {
   const [auth, setAuth] = useState<DevAuth | null>(null);
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [me, setMe] = useState<unknown>(null);
   const [accounts, setAccounts] = useState<AccountListItem[]>([]);
   const [newAccountName, setNewAccountName] = useState("");
@@ -61,9 +32,25 @@ export function DevDashboard() {
   const [newRecipeStyle, setNewRecipeStyle] = useState("");
   const [recipeFormError, setRecipeFormError] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [duplicateInstance, setDuplicateInstance] = useState(false);
 
   useEffect(() => {
-    setAuth(loadAuth());
+    setAuth(loadDevAuthFromStorage());
+    setAuthLoaded(true);
+  }, []);
+
+  // Hardening (dev-only): prevent accidental duplicate mounting (can happen with
+  // dev tooling + hydration recovery + browser extensions).
+  useEffect(() => {
+    const w = window as unknown as { __breweryDevDashboardMounted?: boolean };
+    if (w.__breweryDevDashboardMounted) {
+      setDuplicateInstance(true);
+      return;
+    }
+    w.__breweryDevDashboardMounted = true;
+    return () => {
+      w.__breweryDevDashboardMounted = false;
+    };
   }, []);
 
   const canCallUserScoped = useMemo(() => Boolean(auth?.userId), [auth]);
@@ -111,7 +98,7 @@ export function DevDashboard() {
 
   const onSaveHeaders = () => {
     if (!auth) return;
-    saveAuth(auth);
+    saveDevAuthToStorage(auth);
     void refresh();
   };
 
@@ -138,7 +125,7 @@ export function DevDashboard() {
 
       if (createdId) {
         setAuth((a) => (a ? { ...a, activeAccountId: createdId } : a));
-        saveAuth({ ...auth, activeAccountId: createdId });
+        saveDevAuthToStorage({ ...auth, activeAccountId: createdId });
       }
       setNewAccountName("");
       await refresh();
@@ -185,6 +172,24 @@ export function DevDashboard() {
     }
   };
 
+  const onDeleteRecipe = async (r: RecipeListItem) => {
+    if (!auth) return;
+    if (!auth.activeAccountId) return;
+    const ok = window.confirm(`Delete recipe "${r.name}"? This cannot be undone.`);
+    if (!ok) return;
+    setLastError(null);
+    try {
+      const res = await apiFetch(`/api/recipes/${r.id}`, auth, { method: "DELETE" });
+      if (!res.ok) {
+        setLastError(JSON.stringify(res, null, 2));
+        return;
+      }
+      await refresh();
+    } catch (err) {
+      setLastError(String(err));
+    }
+  };
+
   // Keep active account valid: if it doesn't exist, fall back to first.
   useEffect(() => {
     if (!auth) return;
@@ -194,8 +199,10 @@ export function DevDashboard() {
     const next = accounts[0]?.id ?? "";
     if (!next) return;
     setAuth((a) => (a ? { ...a, activeAccountId: next } : a));
-    saveAuth({ ...auth, activeAccountId: next });
+    saveDevAuthToStorage({ ...auth, activeAccountId: next });
   }, [accounts, auth]);
+
+  if (duplicateInstance) return null;
 
   return (
     <section style={{ marginTop: 24 }}>
@@ -220,6 +227,10 @@ export function DevDashboard() {
             value={auth?.userId ?? ""}
             onChange={(e) => setAuth((a) => (a ? { ...a, userId: e.target.value } : a))}
             placeholder="UUID"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
+            autoComplete="off"
           />
         </div>
 
@@ -240,11 +251,14 @@ export function DevDashboard() {
               setAuth((a) => {
                 if (!a) return a;
                 const next = { ...a, activeAccountId: nextId };
-                saveAuth(next);
+                saveDevAuthToStorage(next);
                 return next;
               });
             }}
             disabled={!accounts.length}
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
           >
             {accounts.length ? null : <option value="">No accounts yet</option>}
             {accounts.map((a) => (
@@ -288,6 +302,10 @@ export function DevDashboard() {
           value={newAccountName}
           onChange={(e) => setNewAccountName(e.target.value)}
           placeholder="Account name"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          data-bwignore="true"
+          autoComplete="off"
         />
         <button onClick={onCreateAccount} disabled={!newAccountName.trim() || !auth?.userId}>
           Create
@@ -306,9 +324,19 @@ export function DevDashboard() {
       {recipes.length ? (
         <ul>
           {recipes.map((r) => (
-            <li key={r.id}>
-              <Link href={`/recipes/${r.id}/edit`}>{r.name}</Link>{" "}
-              <span className="muted">{r.style ? `(${r.style})` : ""}</span>
+            <li key={r.id} style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <span style={{ flex: 1 }}>
+                <Link href={`/recipes/${r.id}/edit`}>{r.name}</Link>{" "}
+                <span className="muted">{r.style ? `(${r.style})` : ""}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => void onDeleteRecipe(r)}
+                aria-label={`Delete recipe ${r.name}`}
+                disabled={!canCallAccountScoped}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
@@ -337,6 +365,10 @@ export function DevDashboard() {
             value={newRecipeName}
             onChange={(e) => setNewRecipeName(e.target.value)}
             aria-describedby={recipeFormError ? "recipe-form-error" : undefined}
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
+            autoComplete="off"
           />
         </div>
         <div>
@@ -352,6 +384,10 @@ export function DevDashboard() {
             style={{ width: "100%", padding: 8 }}
             value={newRecipeStyle}
             onChange={(e) => setNewRecipeStyle(e.target.value)}
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
+            autoComplete="off"
           />
         </div>
       </div>

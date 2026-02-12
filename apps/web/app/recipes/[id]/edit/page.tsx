@@ -4,12 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "brewery_dev_headers_v1";
-
-type DevAuth = {
-  userId: string;
-  activeAccountId: string;
-};
+import { loadDevAuthFromStorage, type DevAuth } from "../../../_lib/devAuth";
 
 type Recipe = {
   id: string;
@@ -20,25 +15,6 @@ type Recipe = {
   createdAt: string;
   updatedAt: string;
 };
-
-function loadAuth(): DevAuth {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return {
-        userId: "00000000-0000-0000-0000-000000000001",
-        activeAccountId: "00000000-0000-0000-0000-0000000000a1",
-      };
-    }
-    const parsed = JSON.parse(raw) as Partial<DevAuth> & { accountId?: string };
-    return {
-      userId: parsed.userId ?? "",
-      activeAccountId: parsed.activeAccountId ?? parsed.accountId ?? "",
-    };
-  } catch {
-    return { userId: "", activeAccountId: "" };
-  }
-}
 
 async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
   const res = await fetch(path, {
@@ -67,6 +43,7 @@ export default function RecipeEditPage() {
     { id: "water", label: "Water chemistry" },
   ] as const;
 
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [auth, setAuth] = useState<DevAuth | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -80,7 +57,8 @@ export default function RecipeEditPage() {
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    setAuth(loadAuth());
+    setAuth(loadDevAuthFromStorage());
+    setAuthLoaded(true);
   }, []);
 
   const canCallAccountScoped = useMemo(
@@ -156,7 +134,7 @@ export default function RecipeEditPage() {
         dedicated calculator page.
       </p>
 
-      {!auth?.userId || !auth?.activeAccountId ? (
+      {authLoaded && (!auth?.userId || !auth?.activeAccountId) ? (
         <p role="alert" className="errorBox">
           Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User +
           Active account), then come back here.

@@ -1,0 +1,18 @@
+-- AlterTable
+ALTER TABLE "RecipeWaterSettings" ADD COLUMN     "mashAcidType" TEXT NOT NULL DEFAULT 'phosphoric',
+ADD COLUMN     "mashLastAcidRequiredGrams" DOUBLE PRECISION,
+ADD COLUMN     "mashLastAcidRequiredKg" DOUBLE PRECISION,
+ADD COLUMN     "mashLastAcidRequiredMl" DOUBLE PRECISION,
+ADD COLUMN     "mashLastAcidRequiredTsp" DOUBLE PRECISION,
+ADD COLUMN     "mashLastCalculatedAt" TIMESTAMP(3),
+ADD COLUMN     "mashLastChlorideAddedPpm" DOUBLE PRECISION,
+ADD COLUMN     "mashLastFinalAlkalinityPpmCaCO3" DOUBLE PRECISION,
+ADD COLUMN     "mashLastSulfateAddedPpm" DOUBLE PRECISION,
+ADD COLUMN     "mashSaltAdditionsJson" JSONB,
+ADD COLUMN     "mashSaltsLastResultJson" JSONB,
+ADD COLUMN     "mashStartingAlkalinityPpmCaCO3" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "mashStartingPh" DOUBLE PRECISION NOT NULL DEFAULT 7.0,
+ADD COLUMN     "mashStrengthKind" TEXT NOT NULL DEFAULT 'percent',
+ADD COLUMN     "mashStrengthValue" DOUBLE PRECISION,
+ADD COLUMN     "mashTargetPh" DOUBLE PRECISION NOT NULL DEFAULT 5.6,
+ADD COLUMN     "mashWaterVolumeLiters" DOUBLE PRECISION NOT NULL DEFAULT 20;

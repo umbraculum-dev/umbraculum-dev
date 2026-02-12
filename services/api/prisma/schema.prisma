@@ -97,6 +97,29 @@ model RecipeWaterSettings {
   tapWaterVolumeLiters      Float? @default(0)
   dilutionWaterVolumeLiters Float? @default(0)
 
+  // Mash water acidification inputs (liters-first)
+  mashStartingAlkalinityPpmCaCO3 Float @default(0)
+  mashStartingPh                Float @default(7.0)
+  mashTargetPh                  Float @default(5.6)
+  mashWaterVolumeLiters         Float @default(20)
+  mashAcidType                  String @default("phosphoric")
+  mashStrengthKind              String @default("percent")
+  mashStrengthValue             Float?
+
+  // Mash water acidification last snapshot (optional)
+  mashLastAcidRequiredMl            Float?
+  mashLastAcidRequiredTsp           Float?
+  mashLastAcidRequiredGrams         Float?
+  mashLastAcidRequiredKg            Float?
+  mashLastFinalAlkalinityPpmCaCO3   Float?
+  mashLastSulfateAddedPpm           Float?
+  mashLastChlorideAddedPpm          Float?
+  mashLastCalculatedAt              DateTime?
+
+  // Mash salt additions (manual)
+  mashSaltAdditionsJson   Json?
+  mashSaltsLastResultJson Json?
+
   // Sparge acidification inputs (liters-first)
   spargeStartingAlkalinityPpmCaCO3 Float @default(0)
   spargeStartingPh                Float @default(7.0)

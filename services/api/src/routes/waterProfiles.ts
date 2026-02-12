@@ -70,5 +70,14 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
     const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeAccountId, id, "unverified");
     return { ok: true, profile: updated };
   });
+
+  app.delete("/water-profiles/:id", async (req) => {
+    const ctx = requireActiveAccount(req);
+    const params = (req.params ?? {}) as { id?: unknown };
+    const id = typeof params.id === "string" ? params.id : "";
+
+    await svc.deleteProfile(ctx.userId, ctx.activeAccountId, id);
+    return { ok: true };
+  });
 }
 

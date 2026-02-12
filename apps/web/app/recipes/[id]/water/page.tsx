@@ -4,12 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "brewery_dev_headers_v1";
-
-type DevAuth = {
-  userId: string;
-  activeAccountId: string;
-};
+import { loadDevAuthFromStorage, type DevAuth } from "../../../_lib/devAuth";
 
 type MeResponse = { ok: true; userId: string; activeAccountId: string | null; role: string | null };
 
@@ -47,6 +42,27 @@ type SpargeResult = {
   chlorideAddedPpm: number;
 };
 
+type MashResult = SpargeResult;
+
+type IonProfilePpm = {
+  calcium: number;
+  magnesium: number;
+  sodium: number;
+  sulfate: number;
+  chloride: number;
+  bicarbonate: number;
+};
+
+type MashSaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";
+type MashSaltAddition = { saltKey: MashSaltKey; grams: number };
+
+type SaltAdditionsResult = {
+  baseProfile: IonProfilePpm;
+  resultingProfile: IonProfilePpm;
+  deltasPpm: IonProfilePpm;
+  breakdown: Array<{ saltKey: MashSaltKey; grams: number; deltasPpm: Partial<IonProfilePpm> }>;
+};
+
 type RecipeWaterSettings = {
   id: string;
   accountId: string;
@@ -58,6 +74,26 @@ type RecipeWaterSettings = {
 
   tapWaterVolumeLiters: number | null;
   dilutionWaterVolumeLiters: number | null;
+
+  mashStartingAlkalinityPpmCaCO3: number;
+  mashStartingPh: number;
+  mashTargetPh: number;
+  mashWaterVolumeLiters: number;
+  mashAcidType: string;
+  mashStrengthKind: string;
+  mashStrengthValue: number | null;
+
+  mashLastAcidRequiredMl: number | null;
+  mashLastAcidRequiredTsp: number | null;
+  mashLastAcidRequiredGrams: number | null;
+  mashLastAcidRequiredKg: number | null;
+  mashLastFinalAlkalinityPpmCaCO3: number | null;
+  mashLastSulfateAddedPpm: number | null;
+  mashLastChlorideAddedPpm: number | null;
+  mashLastCalculatedAt: string | null;
+
+  mashSaltAdditionsJson: unknown;
+  mashSaltsLastResultJson: unknown;
 
   spargeStartingAlkalinityPpmCaCO3: number;
   spargeStartingPh: number;
@@ -78,25 +114,6 @@ type RecipeWaterSettings = {
 };
 
 type RecipeWaterSettingsResponse = { ok: true; settings: RecipeWaterSettings | null };
-
-function loadAuth(): DevAuth {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return {
-        userId: "00000000-0000-0000-0000-000000000001",
-        activeAccountId: "00000000-0000-0000-0000-0000000000a1",
-      };
-    }
-    const parsed = JSON.parse(raw) as Partial<DevAuth> & { accountId?: string };
-    return {
-      userId: parsed.userId ?? "",
-      activeAccountId: parsed.activeAccountId ?? parsed.accountId ?? "",
-    };
-  } catch {
-    return { userId: "", activeAccountId: "" };
-  }
-}
 
 async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
   const res = await fetch(path, {
@@ -119,6 +136,7 @@ export default function WaterCalculatorPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [auth, setAuth] = useState<DevAuth | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
@@ -150,23 +168,38 @@ export default function WaterCalculatorPage() {
   );
   const [strengthValue, setStrengthValue] = useState(10);
 
-  // admin create profile
-  const [createName, setCreateName] = useState("");
-  const [createScope, setCreateScope] = useState<"account" | "public">("public");
-  const [createType, setCreateType] = useState<"water" | "dilution">("water");
-  const [createIon, setCreateIon] = useState({
-    calcium: 0,
-    magnesium: 0,
-    sodium: 0,
-    sulfate: 0,
-    chloride: 0,
-    bicarbonate: 0,
-  });
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [mashError, setMashError] = useState<string | null>(null);
+  const [mashStatus, setMashStatus] = useState<string | null>(null);
+  const [mashSaveStatus, setMashSaveStatus] = useState<string | null>(null);
+  const [mashCalcSaveStatus, setMashCalcSaveStatus] = useState<string | null>(null);
+  const [mashSubmitting, setMashSubmitting] = useState(false);
+  const [savingMash, setSavingMash] = useState(false);
+  const [mashResult, setMashResult] = useState<MashResult | null>(null);
+
+  const [mashStartingAlk, setMashStartingAlk] = useState(0);
+  const [mashStartingPh, setMashStartingPh] = useState(7.0);
+  const [mashTargetPh, setMashTargetPh] = useState(5.4);
+  const [mashWaterVolumeLiters, setMashWaterVolumeLiters] = useState(20);
+  const [mashAcidType, setMashAcidType] = useState("lactic");
+  const [mashStrengthKind, setMashStrengthKind] = useState<
+    "percent" | "normality" | "molarity" | "solid"
+  >("percent");
+  const [mashStrengthValue, setMashStrengthValue] = useState(88);
+
+  const [saltsError, setSaltsError] = useState<string | null>(null);
+  const [saltsStatus, setSaltsStatus] = useState<string | null>(null);
+  const [saltsSaveStatus, setSaltsSaveStatus] = useState<string | null>(null);
+  const [saltsCalcSaveStatus, setSaltsCalcSaveStatus] = useState<string | null>(null);
+  const [saltsSubmitting, setSaltsSubmitting] = useState(false);
+  const [savingSalts, setSavingSalts] = useState(false);
+  const [saltAdditions, setSaltAdditions] = useState<MashSaltAddition[]>([]);
+  const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
+
+  // Water profile creation/verification moved to `/water-profiles`.
 
   useEffect(() => {
-    setAuth(loadAuth());
+    setAuth(loadDevAuthFromStorage());
+    setAuthLoaded(true);
   }, []);
 
   const canCall = useMemo(() => Boolean(auth?.userId && auth?.activeAccountId), [auth]);
@@ -212,6 +245,41 @@ export default function WaterCalculatorPage() {
       setAcidType(s.spargeAcidType ?? "phosphoric");
       setStrengthKind((s.spargeStrengthKind as any) ?? "percent");
       setStrengthValue(s.spargeStrengthValue ?? 10);
+
+      setMashStartingAlk(s.mashStartingAlkalinityPpmCaCO3 ?? 0);
+      setMashStartingPh(s.mashStartingPh ?? 7.0);
+      setMashTargetPh(s.mashTargetPh ?? 5.4);
+      setMashWaterVolumeLiters(s.mashWaterVolumeLiters ?? 20);
+      setMashAcidType(s.mashAcidType ?? "lactic");
+      setMashStrengthKind((s.mashStrengthKind as any) ?? "percent");
+      setMashStrengthValue(s.mashStrengthValue ?? 88);
+
+      if (Array.isArray(s.mashSaltAdditionsJson)) {
+        // tolerate partial/invalid in UI; server validates on save.
+        setSaltAdditions(s.mashSaltAdditionsJson as any);
+      }
+      if (s.mashSaltsLastResultJson && typeof s.mashSaltsLastResultJson === "object") {
+        const v: any = s.mashSaltsLastResultJson as any;
+        if (v?.result && typeof v.result === "object") {
+          setSaltsResult(v.result as SaltAdditionsResult);
+          if (typeof v.calculatedAt === "string") {
+            setSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
+          }
+        }
+      }
+
+      if (s.mashLastCalculatedAt) {
+        setMashResult({
+          acidRequiredMl: s.mashLastAcidRequiredMl,
+          acidRequiredTsp: s.mashLastAcidRequiredTsp,
+          acidRequiredGrams: s.mashLastAcidRequiredGrams,
+          acidRequiredKg: s.mashLastAcidRequiredKg,
+          finalAlkalinityPpmCaCO3: s.mashLastFinalAlkalinityPpmCaCO3 ?? 0,
+          sulfateAddedPpm: s.mashLastSulfateAddedPpm ?? 0,
+          chlorideAddedPpm: s.mashLastChlorideAddedPpm ?? 0,
+        });
+        setMashStatus(`Last calculated: ${new Date(s.mashLastCalculatedAt).toLocaleString()}`);
+      }
 
       if (s.spargeLastCalculatedAt) {
         setSpargeResult({
@@ -296,6 +364,154 @@ export default function WaterCalculatorPage() {
     }
   };
 
+  const onSaveMashInputs = async () => {
+    setSavingError(null);
+    setMashSaveStatus(null);
+    setSavingMash(true);
+    try {
+      await saveSettings({
+        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+        mashStartingPh,
+        mashTargetPh,
+        mashWaterVolumeLiters,
+        mashAcidType,
+        mashStrengthKind,
+        mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
+      });
+      setMashSaveStatus("Saved mash inputs.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingMash(false);
+    }
+  };
+
+  const onSubmitMash = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!auth?.userId || !auth.activeAccountId) return;
+    setMashError(null);
+    setMashStatus(null);
+    setMashCalcSaveStatus(null);
+    setMashResult(null);
+    setMashSubmitting(true);
+    try {
+      const payload: Record<string, unknown> = {
+        acidType: mashAcidType,
+        strengthKind: mashStrengthKind,
+        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+        mashStartingPh,
+        mashTargetPh,
+        mashWaterVolumeLiters,
+      };
+      if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
+
+      const res = await apiFetch("/api/water-calc/mash-acidification", auth, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const result = (res.data as any).result as MashResult;
+      setMashResult(result);
+
+      await saveSettings({
+        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+        mashStartingPh,
+        mashTargetPh,
+        mashWaterVolumeLiters,
+        mashAcidType: mashAcidType,
+        mashStrengthKind: mashStrengthKind,
+        mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
+        mashLastAcidRequiredMl: result.acidRequiredMl,
+        mashLastAcidRequiredTsp: result.acidRequiredTsp,
+        mashLastAcidRequiredGrams: result.acidRequiredGrams,
+        mashLastAcidRequiredKg: result.acidRequiredKg,
+        mashLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
+        mashLastSulfateAddedPpm: result.sulfateAddedPpm,
+        mashLastChlorideAddedPpm: result.chlorideAddedPpm,
+        mashLastCalculatedAt: new Date().toISOString(),
+      });
+      setMashStatus("Calculated.");
+      setMashCalcSaveStatus("Calculated and saved.");
+    } catch (err) {
+      setMashError(String(err));
+    } finally {
+      setMashSubmitting(false);
+    }
+  };
+
+  const onSaveSaltAdditions = async () => {
+    setSavingError(null);
+    setSaltsSaveStatus(null);
+    setSavingSalts(true);
+    try {
+      await saveSettings({
+        mashSaltAdditionsJson: saltAdditions,
+      });
+      setSaltsSaveStatus("Saved salt additions.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingSalts(false);
+    }
+  };
+
+  const onCalcSalts = async () => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    setSaltsError(null);
+    setSaltsStatus(null);
+    setSaltsCalcSaveStatus(null);
+    setSaltsResult(null);
+    setSaltsSubmitting(true);
+    try {
+      if (!mixedSourceProfile) throw new Error("Mix source + dilution first (volumes must be > 0).");
+      const res = await apiFetch("/api/water-calc/salt-additions", auth, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          volumeLiters: mashWaterVolumeLiters,
+          baseProfile: {
+            calcium: mixedSourceProfile.calcium,
+            magnesium: mixedSourceProfile.magnesium,
+            sodium: mixedSourceProfile.sodium,
+            sulfate: mixedSourceProfile.sulfate,
+            chloride: mixedSourceProfile.chloride,
+            bicarbonate: mixedSourceProfile.bicarbonate,
+          },
+          additions: saltAdditions,
+        }),
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const result = (res.data as any).result as SaltAdditionsResult;
+      setSaltsResult(result);
+
+      await saveSettings({
+        mashSaltAdditionsJson: saltAdditions,
+        mashSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
+      });
+      setSaltsStatus("Calculated.");
+      setSaltsCalcSaveStatus("Calculated and saved.");
+    } catch (err) {
+      setSaltsError(String(err));
+    } finally {
+      setSaltsSubmitting(false);
+    }
+  };
+
+  const addSaltRow = () => {
+    setSaltAdditions((prev) => [...prev, { saltKey: "gypsum", grams: 0 }]);
+  };
+
+  const updateSaltRow = (idx: number, next: Partial<MashSaltAddition>) => {
+    setSaltAdditions((prev) =>
+      prev.map((row, i) => (i === idx ? { ...row, ...next } : row)),
+    );
+  };
+
+  const removeSaltRow = (idx: number) => {
+    setSaltAdditions((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const onSubmitSparge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth?.userId || !auth.activeAccountId) return;
@@ -349,47 +565,6 @@ export default function WaterCalculatorPage() {
     } finally {
       setSpargeSubmitting(false);
     }
-  };
-
-  const onCreateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!auth?.userId || !auth.activeAccountId) return;
-    setCreateError(null);
-    setCreateSubmitting(true);
-    try {
-      const res = await apiFetch("/api/water-profiles", auth, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scope: createScope,
-          type: createType,
-          name: createName,
-          ...createIon,
-        }),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      setCreateName("");
-      setCreateIon({
-        calcium: 0,
-        magnesium: 0,
-        sodium: 0,
-        sulfate: 0,
-        chloride: 0,
-        bicarbonate: 0,
-      });
-      await refresh();
-    } catch (err) {
-      setCreateError(String(err));
-    } finally {
-      setCreateSubmitting(false);
-    }
-  };
-
-  const onToggleVerify = async (p: WaterProfile) => {
-    if (!auth?.userId || !auth.activeAccountId) return;
-    const action = p.verificationStatus === "verified" ? "unverify" : "verify";
-    await apiFetch(`/api/water-profiles/${p.id}/${action}`, auth, { method: "POST" });
-    await refresh();
   };
 
   const allProfiles = useMemo(() => {
@@ -456,8 +631,6 @@ export default function WaterCalculatorPage() {
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
 
-  const admin = isAdmin(me?.role ?? null);
-
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>Water calculator</h1>
@@ -465,7 +638,7 @@ export default function WaterCalculatorPage() {
         Recipe ID: <code>{recipeId}</code>
       </p>
 
-      {!canCall ? (
+      {authLoaded && !canCall ? (
         <p role="alert" className="errorBox">
           Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User +
           Active account), then come back here.
@@ -820,6 +993,326 @@ export default function WaterCalculatorPage() {
             ) : null}
           </div>
 
+          <hr style={{ margin: "16px 0" }} />
+
+          <h3 style={{ marginTop: 0 }}>Mash water acidification (Sheet 4, v0)</h3>
+          <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
+            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+              <div>
+                <label htmlFor="mash-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Starting alkalinity (ppm as CaCO3)
+                </label>
+                <input
+                  id="mash-starting-alk"
+                  type="number"
+                  inputMode="decimal"
+                  value={mashStartingAlk}
+                  onChange={(e) => setMashStartingAlk(Number(e.target.value))}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+              <div>
+                <label htmlFor="mash-volume-l" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Mash water volume (L)
+                </label>
+                <input
+                  id="mash-volume-l"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.1}
+                  value={mashWaterVolumeLiters}
+                  onChange={(e) => setMashWaterVolumeLiters(Number(e.target.value))}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+              <div>
+                <label htmlFor="mash-starting-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Starting pH
+                </label>
+                <input
+                  id="mash-starting-ph"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  value={mashStartingPh}
+                  onChange={(e) => setMashStartingPh(Number(e.target.value))}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+              <div>
+                <label htmlFor="mash-target-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Target pH
+                </label>
+                <input
+                  id="mash-target-ph"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  value={mashTargetPh}
+                  onChange={(e) => setMashTargetPh(Number(e.target.value))}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+              <div>
+                <label htmlFor="mash-acid-type" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Acid type
+                </label>
+                <select
+                  id="mash-acid-type"
+                  value={mashAcidType}
+                  onChange={(e) => setMashAcidType(e.target.value)}
+                  style={{ width: "100%", padding: 8 }}
+                >
+                  <option value="phosphoric">Phosphoric</option>
+                  <option value="lactic">Lactic</option>
+                  <option value="hydrochloric">Hydrochloric</option>
+                  <option value="sulfuric">Sulfuric</option>
+                  <option value="acetic">Acetic</option>
+                  <option value="citric">Citric (solid)</option>
+                  <option value="tartaric">Tartaric (solid)</option>
+                  <option value="malic">Malic (solid)</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="mash-strength-kind" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Strength kind
+                </label>
+                <select
+                  id="mash-strength-kind"
+                  value={mashStrengthKind}
+                  onChange={(e) => setMashStrengthKind(e.target.value as any)}
+                  style={{ width: "100%", padding: 8 }}
+                >
+                  <option value="percent">Percent (%)</option>
+                  <option value="normality">Normality (N)</option>
+                  <option value="molarity">Molarity (M)</option>
+                  <option value="solid">Solid (pure)</option>
+                </select>
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label htmlFor="mash-strength-value" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Strength value {mashStrengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
+                </label>
+                <input
+                  id="mash-strength-value"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  value={mashStrengthValue}
+                  onChange={(e) => setMashStrengthValue(Number(e.target.value))}
+                  disabled={mashStrengthKind === "solid"}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+              <button type="submit" disabled={!canCall || mashSubmitting}>
+                {mashSubmitting ? "Calculating…" : "Calculate + Save mash result"}
+              </button>
+              <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
+                {savingMash ? "Saving…" : "Save mash inputs"}
+              </button>
+              {mashStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {mashStatus}
+                </span>
+              ) : null}
+              {mashSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {mashSaveStatus}
+                </span>
+              ) : null}
+              {mashCalcSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {mashCalcSaveStatus}
+                </span>
+              ) : null}
+            </div>
+
+            {mashError ? (
+              <pre id="mash-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                {mashError}
+              </pre>
+            ) : null}
+          </form>
+
+          {mashResult ? (
+            <div style={{ marginTop: 12 }}>
+              <h4 style={{ marginTop: 0 }}>Result (last calculated)</h4>
+              <ul>
+                {mashResult.acidRequiredMl !== null ? (
+                  <li>
+                    Acid required: <code>{mashResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    {mashResult.acidRequiredTsp !== null ? (
+                      <>
+                        (<code>{mashResult.acidRequiredTsp.toFixed(3)}</code> tsp)
+                      </>
+                    ) : null}
+                  </li>
+                ) : null}
+                {mashResult.acidRequiredGrams !== null ? (
+                  <li>
+                    Acid required: <code>{mashResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    {mashResult.acidRequiredKg !== null ? (
+                      <>
+                        (<code>{mashResult.acidRequiredKg.toFixed(6)}</code> kg)
+                      </>
+                    ) : null}
+                  </li>
+                ) : null}
+                <li>
+                  Final alkalinity: <code>{mashResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                </li>
+                <li>
+                  Sulfate added: <code>{mashResult.sulfateAddedPpm.toFixed(3)}</code> ppm
+                </li>
+                <li>
+                  Chloride added: <code>{mashResult.chlorideAddedPpm.toFixed(3)}</code> ppm
+                </li>
+              </ul>
+            </div>
+          ) : null}
+
+          <hr style={{ margin: "16px 0" }} />
+
+          <h3 style={{ marginTop: 0 }}>Salt additions (manual, v0)</h3>
+          <p className="muted" style={{ marginTop: 0 }}>
+            Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
+          </p>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            {saltAdditions.length ? (
+              <div style={{ display: "grid", gap: 12 }}>
+                {saltAdditions.map((row, idx) => (
+                  <div key={idx} style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr auto" }}>
+                    <div>
+                      <label
+                        htmlFor={`salt-key-${idx}`}
+                        className="muted"
+                        style={{ display: "block", fontSize: 12 }}
+                      >
+                        Salt
+                      </label>
+                      <select
+                        id={`salt-key-${idx}`}
+                        value={row.saltKey}
+                        onChange={(e) => updateSaltRow(idx, { saltKey: e.target.value as MashSaltKey })}
+                        style={{ width: "100%", padding: 8 }}
+                      >
+                        <option value="gypsum">Gypsum (CaSO4·2H2O)</option>
+                        <option value="calcium_chloride">Calcium chloride (CaCl2·2H2O)</option>
+                        <option value="epsom">Epsom (MgSO4·7H2O)</option>
+                        <option value="table_salt">Table salt (NaCl)</option>
+                        <option value="baking_soda">Baking soda (NaHCO3)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor={`salt-grams-${idx}`}
+                        className="muted"
+                        style={{ display: "block", fontSize: 12 }}
+                      >
+                        Amount (g)
+                      </label>
+                      <input
+                        id={`salt-grams-${idx}`}
+                        type="number"
+                        inputMode="decimal"
+                        step={0.1}
+                        value={row.grams}
+                        onChange={(e) => updateSaltRow(idx, { grams: Number(e.target.value) })}
+                        style={{ width: "100%", padding: 8 }}
+                      />
+                    </div>
+                    <div style={{ alignSelf: "end" }}>
+                      <button type="button" onClick={() => removeSaltRow(idx)}>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="muted" style={{ margin: 0 }}>
+                No salts added yet.
+              </p>
+            )}
+
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <button type="button" onClick={addSaltRow} disabled={!canCall}>
+                Add salt
+              </button>
+              <button type="button" onClick={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+                {savingSalts ? "Saving…" : "Save salt additions"}
+              </button>
+              <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+                {saltsSubmitting ? "Calculating…" : "Calculate + Save salts result"}
+              </button>
+              {saltsStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {saltsStatus}
+                </span>
+              ) : null}
+              {saltsSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {saltsSaveStatus}
+                </span>
+              ) : null}
+              {saltsCalcSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {saltsCalcSaveStatus}
+                </span>
+              ) : null}
+            </div>
+
+            {saltsError ? (
+              <pre className="errorBox" role="alert">
+                {saltsError}
+              </pre>
+            ) : null}
+
+            {saltsResult ? (
+              <details>
+                <summary>Resulting ions (after salts)</summary>
+                <div style={{ overflowX: "auto", marginTop: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th align="left">Ion</th>
+                        <th align="right">After salts (ppm)</th>
+                        <th align="right">Target (ppm)</th>
+                        <th align="right">Δ (after - target)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(
+                        [
+                          ["Ca", saltsResult.resultingProfile.calcium, selectedTarget?.calcium ?? null],
+                          ["Mg", saltsResult.resultingProfile.magnesium, selectedTarget?.magnesium ?? null],
+                          ["Na", saltsResult.resultingProfile.sodium, selectedTarget?.sodium ?? null],
+                          ["SO4", saltsResult.resultingProfile.sulfate, selectedTarget?.sulfate ?? null],
+                          ["Cl", saltsResult.resultingProfile.chloride, selectedTarget?.chloride ?? null],
+                          ["HCO3", saltsResult.resultingProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                        ] as const
+                      ).map(([label, after, target]) => {
+                        const delta = target === null ? null : after - target;
+                        return (
+                          <tr key={label}>
+                            <td>{label}</td>
+                            <td align="right">{after.toFixed(2)}</td>
+                            <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
+                            <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ) : null}
+          </div>
+
           {profilesError ? (
             <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
               {profilesError}
@@ -838,7 +1331,7 @@ export default function WaterCalculatorPage() {
           ) : null}
 
           <details style={{ marginTop: 12 }}>
-            <summary>View all profiles (table)</summary>
+            <summary>View all water profiles (table)</summary>
             <div style={{ overflowX: "auto", marginTop: 8 }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -855,8 +1348,16 @@ export default function WaterCalculatorPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {allProfiles.map((p) => (
-                    <tr key={p.id}>
+                  {allProfiles.map((p, idx) => (
+                    <tr
+                      key={p.id}
+                      style={{
+                        backgroundColor:
+                          idx % 2 === 1
+                            ? "color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
+                            : "transparent",
+                      }}
+                    >
                       <td>{p.name}</td>
                       <td className="muted">{p.scope}</td>
                       <td className="muted">{p.verificationStatus}</td>
@@ -874,154 +1375,14 @@ export default function WaterCalculatorPage() {
           </details>
         </section>
 
-        {admin ? (
-          <section className="panel" aria-labelledby="admin-profiles-heading">
-            <h2 id="admin-profiles-heading" style={{ marginTop: 0 }}>
-              Admin: add water profile
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              Created profiles start as <code>unverified</code>. Use the verify toggle below.
-            </p>
-
-            <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
-              <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label
-                    htmlFor="create-name"
-                    className="muted"
-                    style={{ display: "block", fontSize: 12 }}
-                  >
-                    Profile name
-                  </label>
-                  <input
-                    id="create-name"
-                    value={createName}
-                    onChange={(e) => setCreateName(e.target.value)}
-                    style={{ width: "100%", padding: 8 }}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="create-scope"
-                    className="muted"
-                    style={{ display: "block", fontSize: 12 }}
-                  >
-                    Scope
-                  </label>
-                  <select
-                    id="create-scope"
-                    value={createScope}
-                    onChange={(e) => setCreateScope(e.target.value as any)}
-                    style={{ width: "100%", padding: 8 }}
-                  >
-                    <option value="public">Public</option>
-                    <option value="account">Account</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="create-type"
-                    className="muted"
-                    style={{ display: "block", fontSize: 12 }}
-                  >
-                    Type
-                  </label>
-                  <select
-                    id="create-type"
-                    value={createType}
-                    onChange={(e) => setCreateType(e.target.value as any)}
-                    style={{ width: "100%", padding: 8 }}
-                  >
-                    <option value="water">Water</option>
-                    <option value="dilution">Dilution</option>
-                  </select>
-                </div>
-              </div>
-
-              <fieldset style={{ border: 0, padding: 0, marginTop: 12 }}>
-                <legend className="muted" style={{ fontSize: 12 }}>
-                  Ions (ppm)
-                </legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(3, 1fr)" }}>
-                  {(
-                    [
-                      ["calcium", "Calcium (Ca)"],
-                      ["magnesium", "Magnesium (Mg)"],
-                      ["sodium", "Sodium (Na)"],
-                      ["sulfate", "Sulfate (SO4)"],
-                      ["chloride", "Chloride (Cl)"],
-                      ["bicarbonate", "Bicarbonate (HCO3)"],
-                    ] as const
-                  ).map(([k, label]) => (
-                    <div key={k}>
-                      <label htmlFor={`ion-${k}`} className="muted" style={{ display: "block", fontSize: 12 }}>
-                        {label}
-                      </label>
-                      <input
-                        id={`ion-${k}`}
-                        type="number"
-                        inputMode="decimal"
-                        value={(createIon as any)[k]}
-                        onChange={(e) =>
-                          setCreateIon((prev) => ({ ...prev, [k]: Number(e.target.value) }))
-                        }
-                        style={{ width: "100%", padding: 8 }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-
-              <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-                <button type="submit" disabled={!createName.trim() || createSubmitting}>
-                  {createSubmitting ? "Creating…" : "Create profile"}
-                </button>
-                <span className="muted" role="status" aria-live="polite">
-                  Profiles in this section require admin privileges.
-                </span>
-              </div>
-
-              {createError ? (
-                <pre id="create-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
-                  {createError}
-                </pre>
-              ) : null}
-            </form>
-
-            <h3 style={{ marginTop: 16 }}>Verify/unverify (non-system)</h3>
-            <ul>
-              {allProfiles
-                .filter((p) => p.scope !== "system")
-                .slice(0, 30)
-                .map((p) => (
-                  <li key={p.id} style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                    <span>
-                      {p.name}{" "}
-                      <span className="muted">
-                        [{p.scope}/{p.verificationStatus}]
-                      </span>
-                    </span>
-                    <button type="button" onClick={() => void onToggleVerify(p)}>
-                      {p.verificationStatus === "verified" ? "Mark unverified" : "Mark verified"}
-                    </button>
-                  </li>
-                ))}
-            </ul>
-            <p className="muted" style={{ marginBottom: 0 }}>
-              (UI is capped to 30 items for now.)
-            </p>
-          </section>
-        ) : (
-          <section className="panel" aria-labelledby="admin-note-heading">
-            <h2 id="admin-note-heading" style={{ marginTop: 0 }}>
-              Admin actions
-            </h2>
-            <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
-              Only <code>owner</code> and <code>brewery_admin</code> can add/verify profiles.
-            </p>
-          </section>
-        )}
+        <section className="panel" aria-labelledby="profiles-admin-note-heading">
+          <h2 id="profiles-admin-note-heading" style={{ marginTop: 0 }}>
+            Water profiles
+          </h2>
+          <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
+            Adding/verifying profiles is now on <Link href="/water-profiles">Manage water profiles</Link>.
+          </p>
+        </section>
 
         <section className="panel" aria-labelledby="summary-heading">
           <h2 id="summary-heading" style={{ marginTop: 0 }}>
@@ -1125,6 +1486,9 @@ export default function WaterCalculatorPage() {
           <ul style={{ marginBottom: 0 }}>
             <li>
               <Link href={`/recipes/${recipeId}/edit`}>Back to recipe editor</Link>
+            </li>
+            <li>
+              <Link href="/water-profiles">Manage water profiles</Link>
             </li>
             <li>
               <Link href="/recipes">Back to Recipes</Link>

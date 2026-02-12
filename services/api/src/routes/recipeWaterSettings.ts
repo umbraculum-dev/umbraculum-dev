@@ -49,6 +49,77 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
             ? null
             : undefined,
 
+      mashStartingAlkalinityPpmCaCO3:
+        typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
+          ? body.mashStartingAlkalinityPpmCaCO3
+          : undefined,
+      mashStartingPh: typeof body.mashStartingPh === "number" ? body.mashStartingPh : undefined,
+      mashTargetPh: typeof body.mashTargetPh === "number" ? body.mashTargetPh : undefined,
+      mashWaterVolumeLiters:
+        typeof body.mashWaterVolumeLiters === "number" ? body.mashWaterVolumeLiters : undefined,
+      mashAcidType: typeof body.mashAcidType === "string" ? body.mashAcidType : undefined,
+      mashStrengthKind: typeof body.mashStrengthKind === "string" ? body.mashStrengthKind : undefined,
+      mashStrengthValue:
+        typeof body.mashStrengthValue === "number"
+          ? body.mashStrengthValue
+          : body.mashStrengthValue === null
+            ? null
+            : undefined,
+
+      mashLastAcidRequiredMl:
+        typeof body.mashLastAcidRequiredMl === "number"
+          ? body.mashLastAcidRequiredMl
+          : body.mashLastAcidRequiredMl === null
+            ? null
+            : undefined,
+      mashLastAcidRequiredTsp:
+        typeof body.mashLastAcidRequiredTsp === "number"
+          ? body.mashLastAcidRequiredTsp
+          : body.mashLastAcidRequiredTsp === null
+            ? null
+            : undefined,
+      mashLastAcidRequiredGrams:
+        typeof body.mashLastAcidRequiredGrams === "number"
+          ? body.mashLastAcidRequiredGrams
+          : body.mashLastAcidRequiredGrams === null
+            ? null
+            : undefined,
+      mashLastAcidRequiredKg:
+        typeof body.mashLastAcidRequiredKg === "number"
+          ? body.mashLastAcidRequiredKg
+          : body.mashLastAcidRequiredKg === null
+            ? null
+            : undefined,
+      mashLastFinalAlkalinityPpmCaCO3:
+        typeof body.mashLastFinalAlkalinityPpmCaCO3 === "number"
+          ? body.mashLastFinalAlkalinityPpmCaCO3
+          : body.mashLastFinalAlkalinityPpmCaCO3 === null
+            ? null
+            : undefined,
+      mashLastSulfateAddedPpm:
+        typeof body.mashLastSulfateAddedPpm === "number"
+          ? body.mashLastSulfateAddedPpm
+          : body.mashLastSulfateAddedPpm === null
+            ? null
+            : undefined,
+      mashLastChlorideAddedPpm:
+        typeof body.mashLastChlorideAddedPpm === "number"
+          ? body.mashLastChlorideAddedPpm
+          : body.mashLastChlorideAddedPpm === null
+            ? null
+            : undefined,
+      mashLastCalculatedAt:
+        typeof body.mashLastCalculatedAt === "string" ? new Date(body.mashLastCalculatedAt) : undefined,
+
+      mashSaltAdditionsJson:
+        body.mashSaltAdditionsJson === null || body.mashSaltAdditionsJson !== undefined
+          ? body.mashSaltAdditionsJson
+          : undefined,
+      mashSaltsLastResultJson:
+        body.mashSaltsLastResultJson === null || body.mashSaltsLastResultJson !== undefined
+          ? body.mashSaltsLastResultJson
+          : undefined,
+
       spargeStartingAlkalinityPpmCaCO3:
         typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
           ? body.spargeStartingAlkalinityPpmCaCO3

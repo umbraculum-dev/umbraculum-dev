@@ -44,5 +44,14 @@ export async function recipesRoutes(app: FastifyInstance) {
     const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, { name, style, notes });
     return { ok: true, recipe: updated };
   });
+
+  app.delete("/recipes/:id", async (req) => {
+    const ctx = requireActiveAccount(req);
+    const params = (req.params ?? {}) as { id?: unknown };
+    const id = typeof params.id === "string" ? params.id : "";
+
+    await recipes.deleteRecipe(ctx.userId, ctx.activeAccountId, id);
+    return { ok: true };
+  });
 }
 

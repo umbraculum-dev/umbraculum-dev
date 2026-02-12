@@ -1,9 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
 
-const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
-const DEV_ACCOUNT_A = "00000000-0000-0000-0000-0000000000a1";
-const DEV_ACCOUNT_B = "00000000-0000-0000-0000-0000000000b2";
+// Use test-only IDs so running tests doesn't pollute seeded dev data.
+const TEST_USER_ID = "11111111-1111-1111-1111-111111111112";
+const TEST_ACCOUNT_A = "22222222-2222-2222-2222-222222222223";
+const TEST_ACCOUNT_B = "33333333-3333-3333-3333-333333333334";
 
 describe("recipe water-settings", () => {
   const app = buildApp();
@@ -12,35 +13,44 @@ describe("recipe water-settings", () => {
     await app.ready();
 
     await app.prisma.user.upsert({
-      where: { id: DEV_USER_ID },
-      create: { id: DEV_USER_ID, email: "dev@brewery.local" },
-      update: { email: "dev@brewery.local" },
+      where: { id: TEST_USER_ID },
+      create: { id: TEST_USER_ID, email: "test-water-settings@brewery.local" },
+      update: { email: "test-water-settings@brewery.local" },
     });
 
     await app.prisma.account.upsert({
-      where: { id: DEV_ACCOUNT_A },
-      create: { id: DEV_ACCOUNT_A, name: "Dev Brewery A" },
-      update: { name: "Dev Brewery A" },
+      where: { id: TEST_ACCOUNT_A },
+      create: { id: TEST_ACCOUNT_A, name: "Test Brewery A (water-settings)" },
+      update: { name: "Test Brewery A (water-settings)" },
     });
     await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: DEV_ACCOUNT_A, userId: DEV_USER_ID } },
-      create: { accountId: DEV_ACCOUNT_A, userId: DEV_USER_ID, role: "owner" },
+      where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID } },
+      create: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "owner" },
       update: { role: "owner" },
     });
 
     await app.prisma.account.upsert({
-      where: { id: DEV_ACCOUNT_B },
-      create: { id: DEV_ACCOUNT_B, name: "Dev Brewery B" },
-      update: { name: "Dev Brewery B" },
+      where: { id: TEST_ACCOUNT_B },
+      create: { id: TEST_ACCOUNT_B, name: "Test Brewery B (water-settings)" },
+      update: { name: "Test Brewery B (water-settings)" },
     });
     await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: DEV_ACCOUNT_B, userId: DEV_USER_ID } },
-      create: { accountId: DEV_ACCOUNT_B, userId: DEV_USER_ID, role: "owner" },
+      where: { accountId_userId: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID } },
+      create: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "owner" },
       update: { role: "owner" },
     });
+
+    // Idempotence: wipe test data if it exists from earlier runs.
+    await app.prisma.recipeWaterSettings.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipe.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
   });
 
   afterAll(async () => {
+    // Cleanup: keep shared dev DB tidy.
+    await app.prisma.recipeWaterSettings.deleteMany({
+      where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } },
+    });
+    await app.prisma.recipe.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
     await app.close();
   });
 
@@ -48,7 +58,7 @@ describe("recipe water-settings", () => {
     const res = await app.inject({
       method: "GET",
       url: "/recipes/some-recipe-id/water-settings",
-      headers: { "x-user-id": DEV_USER_ID },
+      headers: { "x-user-id": TEST_USER_ID },
     });
     expect(res.statusCode).toBe(400);
     expect(res.json()).toEqual({
@@ -59,16 +69,25 @@ describe("recipe water-settings", () => {
 
   it("upserts then fetches water settings for a recipe", async () => {
     const recipe = await app.prisma.recipe.create({
-      data: { accountId: DEV_ACCOUNT_A, name: "Water Settings Recipe", style: null, notes: null },
+      data: { accountId: TEST_ACCOUNT_A, name: "Water Settings Recipe", style: null, notes: null },
     });
 
     const put = await app.inject({
       method: "PUT",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": DEV_USER_ID, "x-account-id": DEV_ACCOUNT_A },
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
       payload: {
         tapWaterVolumeLiters: 10,
         dilutionWaterVolumeLiters: 5,
+        mashStartingAlkalinityPpmCaCO3: 40,
+        mashStartingPh: 7.0,
+        mashTargetPh: 5.4,
+        mashWaterVolumeLiters: 12,
+        mashAcidType: "lactic",
+        mashStrengthKind: "percent",
+        mashStrengthValue: 88,
+        mashSaltAdditionsJson: [{ saltKey: "gypsum", grams: 2.5 }],
+
         spargeStartingAlkalinityPpmCaCO3: 12,
         spargeStartingPh: 7.1,
         spargeTargetPh: 5.6,
@@ -84,38 +103,45 @@ describe("recipe water-settings", () => {
     const putBody = put.json() as any;
     expect(putBody.ok).toBe(true);
     expect(putBody.settings.recipeId).toBe(recipe.id);
-    expect(putBody.settings.accountId).toBe(DEV_ACCOUNT_A);
+    expect(putBody.settings.accountId).toBe(TEST_ACCOUNT_A);
 
     const get = await app.inject({
       method: "GET",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": DEV_USER_ID, "x-account-id": DEV_ACCOUNT_A },
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
     });
     expect(get.statusCode).toBe(200);
     const body = get.json() as any;
     expect(body.ok).toBe(true);
     expect(body.settings.tapWaterVolumeLiters).toBe(10);
     expect(body.settings.dilutionWaterVolumeLiters).toBe(5);
+    expect(body.settings.mashStartingAlkalinityPpmCaCO3).toBe(40);
+    expect(body.settings.mashTargetPh).toBe(5.4);
+    expect(body.settings.mashWaterVolumeLiters).toBe(12);
+    expect(body.settings.mashAcidType).toBe("lactic");
+    expect(body.settings.mashStrengthKind).toBe("percent");
+    expect(body.settings.mashStrengthValue).toBe(88);
+    expect(body.settings.mashSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 2.5 }]);
     expect(body.settings.spargeStartingAlkalinityPpmCaCO3).toBe(12);
     expect(body.settings.spargeLastAcidRequiredMl).toBe(1.23);
   });
 
   it("does not leak settings across accounts", async () => {
     const recipeA = await app.prisma.recipe.create({
-      data: { accountId: DEV_ACCOUNT_A, name: "Scoped WS", style: null, notes: null },
+      data: { accountId: TEST_ACCOUNT_A, name: "Scoped WS", style: null, notes: null },
     });
 
     await app.inject({
       method: "PUT",
       url: `/recipes/${recipeA.id}/water-settings`,
-      headers: { "x-user-id": DEV_USER_ID, "x-account-id": DEV_ACCOUNT_A },
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
       payload: { spargeStartingAlkalinityPpmCaCO3: 1 },
     });
 
     const getB = await app.inject({
       method: "GET",
       url: `/recipes/${recipeA.id}/water-settings`,
-      headers: { "x-user-id": DEV_USER_ID, "x-account-id": DEV_ACCOUNT_B },
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_B },
     });
     expect(getB.statusCode).toBe(404);
     expect(getB.json()).toEqual({
@@ -126,14 +152,14 @@ describe("recipe water-settings", () => {
 
   it("rejects saving an account-scoped profile from another account", async () => {
     const recipe = await app.prisma.recipe.create({
-      data: { accountId: DEV_ACCOUNT_A, name: "Profile Validation", style: null, notes: null },
+      data: { accountId: TEST_ACCOUNT_A, name: "Profile Validation", style: null, notes: null },
     });
     const profileB = await app.prisma.waterProfile.create({
       data: {
         key: `test:accountB:${Date.now()}`,
         scope: "account",
         type: "water",
-        accountId: DEV_ACCOUNT_B,
+        accountId: TEST_ACCOUNT_B,
         name: "Account B Water",
         calcium: 1,
         magnesium: 1,
@@ -149,7 +175,7 @@ describe("recipe water-settings", () => {
     const put = await app.inject({
       method: "PUT",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": DEV_USER_ID, "x-account-id": DEV_ACCOUNT_A },
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
       payload: { targetWaterProfileId: profileB.id },
     });
     expect(put.statusCode).toBe(403);
