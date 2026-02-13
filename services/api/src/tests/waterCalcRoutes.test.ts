@@ -66,5 +66,29 @@ describe("water-calc routes", () => {
     expect(body.result).toBeTruthy();
     expect(body.result.acidRequiredMl).toBeCloseTo(0.361072950558936, 9);
   });
+
+  it("estimates achieved pH from a manual acid amount", async () => {
+    const acidAddedMl = 0.361072950558936;
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/sparge-acidification-manual",
+      headers: { "x-user-id": DEV_USER_ID, "x-account-id": DEV_ACCOUNT_A },
+      payload: {
+        startingAlkalinityPpmCaCO3: 0,
+        startingPh: 7,
+        volumeLiters: 3.785,
+        acidType: "phosphoric",
+        strengthKind: "percent",
+        strengthValue: 1,
+        acidAddedMl,
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.result).toBeTruthy();
+    expect(body.result.achievedPh).toBeCloseTo(5.6, 2);
+    expect(body.result.predicted.acidRequiredMl).toBeCloseTo(acidAddedMl, 3);
+  });
 });
 

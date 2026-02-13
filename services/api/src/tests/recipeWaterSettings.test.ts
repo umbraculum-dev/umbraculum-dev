@@ -155,6 +155,14 @@ describe("recipe water-settings", () => {
         spargeAcidType: "phosphoric",
         spargeStrengthKind: "percent",
         spargeStrengthValue: 10,
+        spargeAcidificationMode: "manual",
+        spargeManualAcidAddedMl: 1.1,
+        spargeManualLastAchievedPh: 5.65,
+        spargeManualLastFinalAlkalinityPpmCaCO3: 0.12,
+        spargeManualLastSulfateAddedPpm: 0,
+        spargeManualLastChlorideAddedPpm: 0,
+        spargeManualLastCalculatedAt: nowIso,
+        spargeSaltAdditionsJson: [{ saltKey: "gypsum", grams: 1.2 }],
         spargeLastAcidRequiredMl: 1.23,
         spargeLastFinalAlkalinityPpmCaCO3: 0.45,
       },
@@ -204,6 +212,10 @@ describe("recipe water-settings", () => {
     expect(body.settings.spargeWaterProfileId).toBe(spargeProfileA.id);
     expect(body.settings.spargeStartingAlkalinityPpmCaCO3).toBe(12);
     expect(body.settings.spargeLastAcidRequiredMl).toBe(1.23);
+    expect(body.settings.spargeAcidificationMode).toBe("manual");
+    expect(body.settings.spargeManualAcidAddedMl).toBe(1.1);
+    expect(body.settings.spargeManualLastAchievedPh).toBe(5.65);
+    expect(body.settings.spargeSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 1.2 }]);
   });
 
   it("does not leak settings across accounts", async () => {

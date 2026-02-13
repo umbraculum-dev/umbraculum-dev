@@ -160,6 +160,20 @@ model RecipeWaterSettings {
   spargeLastChlorideAddedPpm          Float?
   spargeLastCalculatedAt              DateTime?
 
+  // Sparge acidification manual-entry mode (v0): user enters amount added; we estimate achieved pH.
+  spargeAcidificationMode             String @default("targetPh") // "targetPh" | "manual"
+  spargeManualAcidAddedMl             Float?
+  spargeManualAcidAddedGrams          Float?
+  spargeManualLastAchievedPh          Float?
+  spargeManualLastFinalAlkalinityPpmCaCO3 Float?
+  spargeManualLastSulfateAddedPpm     Float?
+  spargeManualLastChlorideAddedPpm    Float?
+  spargeManualLastCalculatedAt        DateTime?
+
+  // Sparge salt additions (manual)
+  spargeSaltAdditionsJson   Json?
+  spargeSaltsLastResultJson Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

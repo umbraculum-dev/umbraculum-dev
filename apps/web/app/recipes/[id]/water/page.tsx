@@ -15,7 +15,7 @@ type WaterProfile = {
   type: "water" | "dilution";
   accountId: string | null;
   name: string;
-  ph: number | null;
+  ph?: number | null;
   calcium: number;
   magnesium: number;
   sodium: number;
@@ -48,6 +48,15 @@ type MashResult = SpargeResult;
 type MashManualCalcResult = {
   achievedPh: number;
   predicted: MashResult;
+  clamped: "none" | "low" | "high";
+  iterations: number;
+  targetAmount: number;
+  predictedAmount: number;
+};
+
+type SpargeManualCalcResult = {
+  achievedPh: number;
+  predicted: SpargeResult;
   clamped: "none" | "low" | "high";
   iterations: number;
   targetAmount: number;
@@ -159,6 +168,18 @@ type RecipeWaterSettings = {
   spargeLastChlorideAddedPpm: number | null;
   spargeLastCalculatedAt: string | null;
 
+  spargeAcidificationMode?: string;
+  spargeManualAcidAddedMl?: number | null;
+  spargeManualAcidAddedGrams?: number | null;
+  spargeManualLastAchievedPh?: number | null;
+  spargeManualLastFinalAlkalinityPpmCaCO3?: number | null;
+  spargeManualLastSulfateAddedPpm?: number | null;
+  spargeManualLastChlorideAddedPpm?: number | null;
+  spargeManualLastCalculatedAt?: string | null;
+
+  spargeSaltAdditionsJson?: unknown;
+  spargeSaltsLastResultJson?: unknown;
+
   // v0 overall snapshot (may be absent until persisted by API)
   mashOverallLastResultJson?: unknown;
   mashOverallLastCalculatedAt?: string | null;
@@ -268,6 +289,11 @@ export default function WaterCalculatorPage() {
   const [spargeStatus, setSpargeStatus] = useState<string | null>(null);
   const [spargeResult, setSpargeResult] = useState<SpargeResult | null>(null);
   const [spargeSubmitting, setSpargeSubmitting] = useState(false);
+  const [spargeAcidificationMode, setSpargeAcidificationMode] = useState<"targetPh" | "manual">(
+    "targetPh",
+  );
+  const [spargeManualAcidAdded, setSpargeManualAcidAdded] = useState(0);
+  const [spargeManualResult, setSpargeManualResult] = useState<SpargeManualCalcResult | null>(null);
 
   // liters-first inputs (v0)
   const [spargeWaterProfileId, setSpargeWaterProfileId] = useState<string>("");
@@ -320,6 +346,15 @@ export default function WaterCalculatorPage() {
   const [savingSalts, setSavingSalts] = useState(false);
   const [saltAdditions, setSaltAdditions] = useState<MashSaltAddition[]>([]);
   const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
+
+  const [spargeSaltsError, setSpargeSaltsError] = useState<string | null>(null);
+  const [spargeSaltsStatus, setSpargeSaltsStatus] = useState<string | null>(null);
+  const [spargeSaltsSaveStatus, setSpargeSaltsSaveStatus] = useState<string | null>(null);
+  const [spargeSaltsCalcSaveStatus, setSpargeSaltsCalcSaveStatus] = useState<string | null>(null);
+  const [spargeSaltsSubmitting, setSpargeSaltsSubmitting] = useState(false);
+  const [savingSpargeSalts, setSavingSpargeSalts] = useState(false);
+  const [spargeSaltAdditions, setSpargeSaltAdditions] = useState<MashSaltAddition[]>([]);
+  const [spargeSaltsResult, setSpargeSaltsResult] = useState<SaltAdditionsResult | null>(null);
 
   const [overallError, setOverallError] = useState<string | null>(null);
   const [overallStatus, setOverallStatus] = useState<string | null>(null);
@@ -394,9 +429,34 @@ export default function WaterCalculatorPage() {
       setTargetPh(s.spargeTargetPh ?? 5.6);
       setVolumeLiters(s.spargeVolumeLiters ?? 20);
       setAcidType(s.spargeAcidType ?? "phosphoric");
-      setStrengthKind((s.spargeStrengthKind as any) ?? "percent");
+      const savedSpargeStrengthKind = ((s.spargeStrengthKind as any) ?? "percent") as
+        | "percent"
+        | "normality"
+        | "molarity"
+        | "solid";
+      setStrengthKind(savedSpargeStrengthKind);
       setStrengthValue(s.spargeStrengthValue ?? 10);
       setSpargeWaterProfileId(s.spargeWaterProfileId ?? "");
+      setSpargeAcidificationMode(s.spargeAcidificationMode === "manual" ? "manual" : "targetPh");
+      setSpargeManualAcidAdded(
+        savedSpargeStrengthKind === "solid"
+          ? (s.spargeManualAcidAddedGrams ?? 0)
+          : (s.spargeManualAcidAddedMl ?? 0),
+      );
+
+      if (Array.isArray(s.spargeSaltAdditionsJson)) {
+        // tolerate partial/invalid in UI; server validates on save.
+        setSpargeSaltAdditions(s.spargeSaltAdditionsJson as any);
+      }
+      if (s.spargeSaltsLastResultJson && typeof s.spargeSaltsLastResultJson === "object") {
+        const v: any = s.spargeSaltsLastResultJson as any;
+        if (v?.result && typeof v.result === "object") {
+          setSpargeSaltsResult(v.result as SaltAdditionsResult);
+          if (typeof v.calculatedAt === "string") {
+            setSpargeSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
+          }
+        }
+      }
 
       setMashStartingAlk(s.mashStartingAlkalinityPpmCaCO3 ?? 0);
       setMashStartingPh(s.mashStartingPh ?? 7.0);
@@ -496,6 +556,24 @@ export default function WaterCalculatorPage() {
           chlorideAddedPpm: s.spargeLastChlorideAddedPpm ?? 0,
         });
         setSpargeStatus(`Last calculated: ${new Date(s.spargeLastCalculatedAt).toLocaleString()}`);
+      }
+      if (s.spargeManualLastCalculatedAt) {
+        setSpargeManualResult({
+          achievedPh: s.spargeManualLastAchievedPh ?? 0,
+          predicted: {
+            acidRequiredMl: null,
+            acidRequiredTsp: null,
+            acidRequiredGrams: null,
+            acidRequiredKg: null,
+            finalAlkalinityPpmCaCO3: s.spargeManualLastFinalAlkalinityPpmCaCO3 ?? 0,
+            sulfateAddedPpm: s.spargeManualLastSulfateAddedPpm ?? 0,
+            chlorideAddedPpm: s.spargeManualLastChlorideAddedPpm ?? 0,
+          },
+          clamped: "none",
+          iterations: 0,
+          targetAmount: Number.NaN,
+          predictedAmount: Number.NaN,
+        });
       }
     } catch (err) {
       setSettingsError(String(err));
@@ -749,6 +827,10 @@ export default function WaterCalculatorPage() {
         spargeAcidType: acidType,
         spargeStrengthKind: strengthKind,
         spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
+        spargeAcidificationMode,
+        spargeManualAcidAddedMl: strengthKind === "solid" ? null : spargeManualAcidAdded,
+        spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
+        spargeSaltAdditionsJson: spargeSaltAdditions,
       });
       setSpargeSaveStatus("Saved sparge inputs.");
     } catch (err) {
@@ -1016,6 +1098,84 @@ export default function WaterCalculatorPage() {
     setSaltAdditions((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const onSaveSpargeSaltsInputs = async () => {
+    setSavingError(null);
+    setSpargeSaltsSaveStatus(null);
+    setSavingSpargeSalts(true);
+    try {
+      await saveSettings({
+        spargeSaltAdditionsJson: spargeSaltAdditions,
+      });
+      setSpargeSaltsSaveStatus("Saved sparge salts inputs.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingSpargeSalts(false);
+    }
+  };
+
+  const onCalculateSpargeSalts = async () => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    setSpargeSaltsError(null);
+    setSpargeSaltsStatus(null);
+    setSpargeSaltsCalcSaveStatus(null);
+    setSpargeSaltsResult(null);
+    setSpargeSaltsSubmitting(true);
+    try {
+      if (!selectedSpargeProfile) {
+        throw new Error("Select a sparge water profile first (it provides the base ion profile).");
+      }
+      if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+        throw new Error("Water volume must be > 0.");
+      }
+
+      const res = await apiFetch("/api/water-calc/salt-additions", auth, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          volumeLiters,
+          baseProfile: {
+            calcium: selectedSpargeProfile.calcium,
+            magnesium: selectedSpargeProfile.magnesium,
+            sodium: selectedSpargeProfile.sodium,
+            sulfate: selectedSpargeProfile.sulfate,
+            chloride: selectedSpargeProfile.chloride,
+            bicarbonate: selectedSpargeProfile.bicarbonate,
+          },
+          additions: spargeSaltAdditions,
+        }),
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const result = (res.data as any).result as SaltAdditionsResult;
+      setSpargeSaltsResult(result);
+
+      await saveSettings({
+        spargeSaltAdditionsJson: spargeSaltAdditions,
+        spargeSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
+      });
+      setSpargeSaltsStatus("Calculated.");
+      setSpargeSaltsCalcSaveStatus("Calculated and saved.");
+    } catch (err) {
+      setSpargeSaltsError(String(err));
+    } finally {
+      setSpargeSaltsSubmitting(false);
+    }
+  };
+
+  const addSpargeSaltRow = () => {
+    setSpargeSaltAdditions((prev) => [...prev, { saltKey: "gypsum", grams: 0 }]);
+  };
+
+  const updateSpargeSaltRow = (idx: number, next: Partial<MashSaltAddition>) => {
+    setSpargeSaltAdditions((prev) =>
+      prev.map((row, i) => (i === idx ? { ...row, ...next } : row)),
+    );
+  };
+
+  const removeSpargeSaltRow = (idx: number) => {
+    setSpargeSaltAdditions((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const onSubmitSparge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth?.userId || !auth.activeAccountId) return;
@@ -1027,48 +1187,119 @@ export default function WaterCalculatorPage() {
     setSpargeStatus(null);
     setCalcSaveStatus(null);
     setSpargeResult(null);
+    setSpargeManualResult(null);
     setSpargeSubmitting(true);
     try {
-      const payload: Record<string, unknown> = {
-        startingAlkalinityPpmCaCO3: startingAlk,
-        startingPh: Number(startingPh),
-        targetPh,
-        volumeLiters,
-        acidType,
-        strengthKind,
-      };
-      if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+      if (spargeAcidificationMode === "manual") {
+        const acidAdded =
+          typeof spargeManualAcidAdded === "number" && Number.isFinite(spargeManualAcidAdded)
+            ? spargeManualAcidAdded
+            : NaN;
+        if (!Number.isFinite(acidAdded) || acidAdded < 0) {
+          setSpargeError("Manual acid amount must be a number ≥ 0.");
+          return;
+        }
 
-      const res = await apiFetch("/api/water-calc/sparge-acidification", auth, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const result = (res.data as any).result as SpargeResult;
-      setSpargeResult(result);
+        const payload: Record<string, unknown> = {
+          startingAlkalinityPpmCaCO3: startingAlk,
+          startingPh: Number(startingPh),
+          volumeLiters,
+          acidType,
+          strengthKind,
+          ...(strengthKind === "solid" ? { acidAddedGrams: acidAdded } : { acidAddedMl: acidAdded }),
+        };
+        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
 
-      // Calculate + Save Result (v0): persist inputs + snapshot.
-      await saveSettings({
-        spargeWaterProfileId: spargeWaterProfileId || null,
-        spargeStartingAlkalinityPpmCaCO3: startingAlk,
-        spargeStartingPh: Number(startingPh),
-        spargeTargetPh: targetPh,
-        spargeVolumeLiters: volumeLiters,
-        spargeAcidType: acidType,
-        spargeStrengthKind: strengthKind,
-        spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
-        spargeLastAcidRequiredMl: result.acidRequiredMl,
-        spargeLastAcidRequiredTsp: result.acidRequiredTsp,
-        spargeLastAcidRequiredGrams: result.acidRequiredGrams,
-        spargeLastAcidRequiredKg: result.acidRequiredKg,
-        spargeLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
-        spargeLastSulfateAddedPpm: result.sulfateAddedPpm,
-        spargeLastChlorideAddedPpm: result.chlorideAddedPpm,
-        spargeLastCalculatedAt: new Date().toISOString(),
-      });
-      setSpargeStatus("Calculated.");
-      setCalcSaveStatus("Calculated and saved.");
+        const res = await apiFetch("/api/water-calc/sparge-acidification-manual", auth, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const manual = (res.data as any).result as SpargeManualCalcResult;
+        setSpargeManualResult(manual);
+        setSpargeResult(manual.predicted);
+
+        const nowIso = new Date().toISOString();
+        await saveSettings({
+          spargeWaterProfileId: spargeWaterProfileId || null,
+          spargeStartingAlkalinityPpmCaCO3: startingAlk,
+          spargeStartingPh: Number(startingPh),
+          spargeTargetPh: targetPh,
+          spargeVolumeLiters: volumeLiters,
+          spargeAcidType: acidType,
+          spargeStrengthKind: strengthKind,
+          spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
+          spargeAcidificationMode,
+          spargeManualAcidAddedMl: strengthKind === "solid" ? null : spargeManualAcidAdded,
+          spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
+
+          // Keep generic sparge snapshot filled (useful for “last calculated” indicators).
+          spargeLastAcidRequiredMl: manual.predicted.acidRequiredMl,
+          spargeLastAcidRequiredTsp: manual.predicted.acidRequiredTsp,
+          spargeLastAcidRequiredGrams: manual.predicted.acidRequiredGrams,
+          spargeLastAcidRequiredKg: manual.predicted.acidRequiredKg,
+          spargeLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
+          spargeLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
+          spargeLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
+          spargeLastCalculatedAt: nowIso,
+
+          // Manual-mode snapshot.
+          spargeManualLastAchievedPh: manual.achievedPh,
+          spargeManualLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
+          spargeManualLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
+          spargeManualLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
+          spargeManualLastCalculatedAt: nowIso,
+        });
+
+        setSpargeStatus("Estimated (manual mode).");
+        setCalcSaveStatus("Estimated and saved.");
+      } else {
+        const payload: Record<string, unknown> = {
+          startingAlkalinityPpmCaCO3: startingAlk,
+          startingPh: Number(startingPh),
+          targetPh,
+          volumeLiters,
+          acidType,
+          strengthKind,
+        };
+        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+
+        const res = await apiFetch("/api/water-calc/sparge-acidification", auth, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const result = (res.data as any).result as SpargeResult;
+        setSpargeResult(result);
+
+        const nowIso = new Date().toISOString();
+        await saveSettings({
+          spargeWaterProfileId: spargeWaterProfileId || null,
+          spargeStartingAlkalinityPpmCaCO3: startingAlk,
+          spargeStartingPh: Number(startingPh),
+          spargeTargetPh: targetPh,
+          spargeVolumeLiters: volumeLiters,
+          spargeAcidType: acidType,
+          spargeStrengthKind: strengthKind,
+          spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
+          spargeAcidificationMode,
+          spargeManualAcidAddedMl: strengthKind === "solid" ? null : spargeManualAcidAdded,
+          spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
+
+          spargeLastAcidRequiredMl: result.acidRequiredMl,
+          spargeLastAcidRequiredTsp: result.acidRequiredTsp,
+          spargeLastAcidRequiredGrams: result.acidRequiredGrams,
+          spargeLastAcidRequiredKg: result.acidRequiredKg,
+          spargeLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
+          spargeLastSulfateAddedPpm: result.sulfateAddedPpm,
+          spargeLastChlorideAddedPpm: result.chlorideAddedPpm,
+          spargeLastCalculatedAt: nowIso,
+        });
+        setSpargeStatus("Calculated.");
+        setCalcSaveStatus("Calculated and saved.");
+      }
     } catch (err) {
       setSpargeError(String(err));
     } finally {
@@ -1272,6 +1503,42 @@ export default function WaterCalculatorPage() {
                   </p>
                 )}
               </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <fieldset
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: 8,
+                    padding: 12,
+                    marginBottom: 0,
+                  }}
+                >
+                  <legend className="muted" style={{ fontSize: 12, padding: "0 6px" }}>
+                    Mode
+                  </legend>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <input
+                        type="radio"
+                        name="sparge-mode"
+                        value="targetPh"
+                        checked={spargeAcidificationMode === "targetPh"}
+                        onChange={() => setSpargeAcidificationMode("targetPh")}
+                      />
+                      <span>Target pH (solve acid required)</span>
+                    </label>
+                    <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <input
+                        type="radio"
+                        name="sparge-mode"
+                        value="manual"
+                        checked={spargeAcidificationMode === "manual"}
+                        onChange={() => setSpargeAcidificationMode("manual")}
+                      />
+                      <span>Manual acid amount (estimate achieved pH)</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
               <div>
                 <label htmlFor="starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
                   Starting alkalinity (ppm as CaCO3)
@@ -1313,20 +1580,22 @@ export default function WaterCalculatorPage() {
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>
-              <div>
-                <label htmlFor="target-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  Target pH
-                </label>
-                <input
-                  id="target-ph"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={targetPh}
-                  onChange={(e) => setTargetPh(Number(e.target.value))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
+              {spargeAcidificationMode === "targetPh" ? (
+                <div>
+                  <label htmlFor="target-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    Target pH
+                  </label>
+                  <input
+                    id="target-ph"
+                    type="number"
+                    inputMode="decimal"
+                    step={0.01}
+                    value={targetPh}
+                    onChange={(e) => setTargetPh(Number(e.target.value))}
+                    style={{ width: "100%", padding: 8 }}
+                  />
+                </div>
+              ) : null}
               <div>
                 <label htmlFor="acid-type" className="muted" style={{ display: "block", fontSize: 12 }}>
                   Acid type
@@ -1386,11 +1655,35 @@ export default function WaterCalculatorPage() {
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>
+              {spargeAcidificationMode === "manual" ? (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label
+                    htmlFor="sparge-manual-acid-added"
+                    className="muted"
+                    style={{ display: "block", fontSize: 12 }}
+                  >
+                    Acid added ({strengthKind === "solid" ? "g" : "mL"})
+                  </label>
+                  <input
+                    id="sparge-manual-acid-added"
+                    type="number"
+                    inputMode="decimal"
+                    step={0.1}
+                    value={spargeManualAcidAdded}
+                    onChange={(e) => setSpargeManualAcidAdded(Number(e.target.value))}
+                    style={{ width: "100%", padding: 8 }}
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
               <button type="submit" disabled={!canCall || spargeSubmitting}>
-                {spargeSubmitting ? "Calculating…" : "Calculate + Save result"}
+                {spargeSubmitting
+                  ? "Working…"
+                  : spargeAcidificationMode === "manual"
+                    ? "Estimate + Save result"
+                    : "Calculate + Save result"}
               </button>
               <button type="button" onClick={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
                 {savingSparge ? "Saving…" : "Save sparge inputs"}
@@ -1419,7 +1712,7 @@ export default function WaterCalculatorPage() {
             ) : null}
           </form>
 
-          {spargeResult ? (
+          {spargeAcidificationMode === "targetPh" && spargeResult ? (
             <div style={{ marginTop: 12 }}>
               <h3 style={{ marginTop: 0 }}>Result (last calculated)</h3>
               <ul>
@@ -1454,8 +1747,234 @@ export default function WaterCalculatorPage() {
                   Chloride added: <code>{spargeResult.chlorideAddedPpm.toFixed(3)}</code> ppm
                 </li>
               </ul>
+              {selectedSpargeProfile?.ph == null ? (
+                <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+                  Note: this profile has no pH. The calculation uses only the manually entered{" "}
+                  <strong>Starting pH</strong>.
+                </p>
+              ) : null}
             </div>
           ) : null}
+
+          {spargeAcidificationMode === "manual" && spargeManualResult ? (
+            <div style={{ marginTop: 12 }}>
+              <h3 style={{ marginTop: 0 }}>Result (manual acid amount mode)</h3>
+              <ul>
+                <li>
+                  Estimated achieved pH: <code>{spargeManualResult.achievedPh.toFixed(3)}</code>
+                </li>
+                {Number.isFinite(spargeManualResult.targetAmount) &&
+                Number.isFinite(spargeManualResult.predictedAmount) ? (
+                  <li>
+                    Acid amount: <code>{spargeManualResult.targetAmount.toFixed(3)}</code>{" "}
+                    {strengthKind === "solid" ? "g" : "mL"} (solver check:{" "}
+                    <code>{spargeManualResult.predictedAmount.toFixed(3)}</code>)
+                  </li>
+                ) : null}
+                <li>
+                  Final alkalinity:{" "}
+                  <code>{spargeManualResult.predicted.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as
+                  CaCO3
+                </li>
+                <li>
+                  Sulfate added: <code>{spargeManualResult.predicted.sulfateAddedPpm.toFixed(3)}</code> ppm
+                </li>
+                <li>
+                  Chloride added: <code>{spargeManualResult.predicted.chlorideAddedPpm.toFixed(3)}</code> ppm
+                </li>
+              </ul>
+              {selectedSpargeProfile?.ph == null ? (
+                <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+                  Note: this profile has no pH. The calculation uses only the manually entered{" "}
+                  <strong>Starting pH</strong>.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          <hr style={{ margin: "16px 0" }} />
+
+          <h3 style={{ marginTop: 0 }}>Sparge salt additions (manual, v0)</h3>
+          <p className="muted" style={{ marginTop: 0 }}>
+            Base profile is the selected sparge water profile above. Add salts in grams; we compute resulting ions
+            (ppm) for the sparge water volume.
+          </p>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            {spargeSaltAdditions.length ? (
+              <div style={{ display: "grid", gap: 12 }}>
+                {spargeSaltAdditions.map((row, idx) => (
+                  <div key={idx} style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr auto" }}>
+                    <div>
+                      <label
+                        htmlFor={`sparge-salt-key-${idx}`}
+                        className="muted"
+                        style={{ display: "block", fontSize: 12 }}
+                      >
+                        Salt
+                      </label>
+                      <select
+                        id={`sparge-salt-key-${idx}`}
+                        value={row.saltKey}
+                        onChange={(e) => updateSpargeSaltRow(idx, { saltKey: e.target.value as MashSaltKey })}
+                        style={{ width: "100%", padding: 8 }}
+                      >
+                        <option value="gypsum">Gypsum (CaSO4·2H2O)</option>
+                        <option value="calcium_chloride">Calcium chloride (CaCl2·2H2O)</option>
+                        <option value="epsom">Epsom (MgSO4·7H2O)</option>
+                        <option value="table_salt">Table salt (NaCl)</option>
+                        <option value="baking_soda">Baking soda (NaHCO3)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor={`sparge-salt-grams-${idx}`}
+                        className="muted"
+                        style={{ display: "block", fontSize: 12 }}
+                      >
+                        Amount (g)
+                      </label>
+                      <input
+                        id={`sparge-salt-grams-${idx}`}
+                        type="number"
+                        inputMode="decimal"
+                        step={0.1}
+                        value={row.grams}
+                        onChange={(e) => updateSpargeSaltRow(idx, { grams: Number(e.target.value) })}
+                        style={{ width: "100%", padding: 8 }}
+                      />
+                    </div>
+                    <div style={{ alignSelf: "end" }}>
+                      <button type="button" onClick={() => removeSpargeSaltRow(idx)}>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="muted" style={{ margin: 0 }}>
+                No sparge salts added yet.
+              </p>
+            )}
+
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <button type="button" onClick={addSpargeSaltRow} disabled={!canCall}>
+                Add salt
+              </button>
+              <button
+                type="button"
+                onClick={() => void onSaveSpargeSaltsInputs()}
+                disabled={!canCall || savingSpargeSalts}
+              >
+                {savingSpargeSalts ? "Saving…" : "Save sparge salt additions"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void onCalculateSpargeSalts()}
+                disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}
+              >
+                {spargeSaltsSubmitting ? "Calculating…" : "Calculate + Save sparge salts result"}
+              </button>
+              {spargeSaltsStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {spargeSaltsStatus}
+                </span>
+              ) : null}
+              {spargeSaltsSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {spargeSaltsSaveStatus}
+                </span>
+              ) : null}
+              {spargeSaltsCalcSaveStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {spargeSaltsCalcSaveStatus}
+                </span>
+              ) : null}
+            </div>
+
+            {spargeSaltsError ? (
+              <pre className="errorBox" role="alert">
+                {spargeSaltsError}
+              </pre>
+            ) : null}
+
+            {spargeSaltsResult ? (
+              <details>
+                <summary>Resulting ions (after sparge salts only, v0)</summary>
+                <div style={{ overflowX: "auto", marginTop: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th align="left">Ion</th>
+                        <th align="right">After salts (ppm)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(
+                        [
+                          ["Ca", spargeSaltsResult.resultingProfile.calcium],
+                          ["Mg", spargeSaltsResult.resultingProfile.magnesium],
+                          ["Na", spargeSaltsResult.resultingProfile.sodium],
+                          ["SO4", spargeSaltsResult.resultingProfile.sulfate],
+                          ["Cl", spargeSaltsResult.resultingProfile.chloride],
+                          ["HCO3", spargeSaltsResult.resultingProfile.bicarbonate],
+                        ] as const
+                      ).map(([label, after]) => (
+                        <tr key={label}>
+                          <td>{label}</td>
+                          <td align="right">{after.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ) : null}
+
+            {spargeSaltsResult && spargeResult ? (
+              <details>
+                <summary>Resulting ions (after sparge salts + acid SO4/Cl only, v0)</summary>
+                <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+                  v0 note: acids only contribute modeled sulfate/chloride; salts do not affect the acid required
+                  calculation in v0.
+                </p>
+                <div style={{ overflowX: "auto", marginTop: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th align="left">Ion</th>
+                        <th align="right">After salts + acid (ppm)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const after = spargeSaltsResult.resultingProfile;
+                        const combined = {
+                          ...after,
+                          sulfate: after.sulfate + spargeResult.sulfateAddedPpm,
+                          chloride: after.chloride + spargeResult.chlorideAddedPpm,
+                        };
+                        return ([
+                          ["Ca", combined.calcium],
+                          ["Mg", combined.magnesium],
+                          ["Na", combined.sodium],
+                          ["SO4", combined.sulfate],
+                          ["Cl", combined.chloride],
+                          ["HCO3", combined.bicarbonate],
+                        ] as const).map(([label, v]) => (
+                          <tr key={label}>
+                            <td>{label}</td>
+                            <td align="right">{v.toFixed(2)}</td>
+                          </tr>
+                        ));
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ) : null}
+          </div>
         </section>
 
         <section className="panel" aria-labelledby="adjustment-heading">

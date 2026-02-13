@@ -213,6 +213,56 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
             ? null
             : undefined,
 
+      spargeAcidificationMode:
+        typeof body.spargeAcidificationMode === "string" ? body.spargeAcidificationMode : undefined,
+      spargeManualAcidAddedMl:
+        typeof body.spargeManualAcidAddedMl === "number"
+          ? body.spargeManualAcidAddedMl
+          : body.spargeManualAcidAddedMl === null
+            ? null
+            : undefined,
+      spargeManualAcidAddedGrams:
+        typeof body.spargeManualAcidAddedGrams === "number"
+          ? body.spargeManualAcidAddedGrams
+          : body.spargeManualAcidAddedGrams === null
+            ? null
+            : undefined,
+      spargeManualLastAchievedPh:
+        typeof body.spargeManualLastAchievedPh === "number"
+          ? body.spargeManualLastAchievedPh
+          : body.spargeManualLastAchievedPh === null
+            ? null
+            : undefined,
+      spargeManualLastFinalAlkalinityPpmCaCO3:
+        typeof body.spargeManualLastFinalAlkalinityPpmCaCO3 === "number"
+          ? body.spargeManualLastFinalAlkalinityPpmCaCO3
+          : body.spargeManualLastFinalAlkalinityPpmCaCO3 === null
+            ? null
+            : undefined,
+      spargeManualLastSulfateAddedPpm:
+        typeof body.spargeManualLastSulfateAddedPpm === "number"
+          ? body.spargeManualLastSulfateAddedPpm
+          : body.spargeManualLastSulfateAddedPpm === null
+            ? null
+            : undefined,
+      spargeManualLastChlorideAddedPpm:
+        typeof body.spargeManualLastChlorideAddedPpm === "number"
+          ? body.spargeManualLastChlorideAddedPpm
+          : body.spargeManualLastChlorideAddedPpm === null
+            ? null
+            : undefined,
+      spargeManualLastCalculatedAt:
+        typeof body.spargeManualLastCalculatedAt === "string"
+          ? new Date(body.spargeManualLastCalculatedAt)
+          : body.spargeManualLastCalculatedAt === null
+            ? null
+            : undefined,
+
+      spargeSaltAdditionsJson:
+        body.spargeSaltAdditionsJson !== undefined ? body.spargeSaltAdditionsJson : undefined,
+      spargeSaltsLastResultJson:
+        body.spargeSaltsLastResultJson !== undefined ? body.spargeSaltsLastResultJson : undefined,
+
       spargeLastAcidRequiredMl:
         typeof body.spargeLastAcidRequiredMl === "number"
           ? body.spargeLastAcidRequiredMl

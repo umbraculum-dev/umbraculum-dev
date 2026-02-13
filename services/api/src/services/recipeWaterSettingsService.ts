@@ -64,6 +64,18 @@ export type UpsertRecipeWaterSettingsInput = {
   spargeLastSulfateAddedPpm?: number | null;
   spargeLastChlorideAddedPpm?: number | null;
   spargeLastCalculatedAt?: Date | null;
+
+  spargeAcidificationMode?: string;
+  spargeManualAcidAddedMl?: number | null;
+  spargeManualAcidAddedGrams?: number | null;
+  spargeManualLastAchievedPh?: number | null;
+  spargeManualLastFinalAlkalinityPpmCaCO3?: number | null;
+  spargeManualLastSulfateAddedPpm?: number | null;
+  spargeManualLastChlorideAddedPpm?: number | null;
+  spargeManualLastCalculatedAt?: Date | null;
+
+  spargeSaltAdditionsJson?: unknown;
+  spargeSaltsLastResultJson?: unknown;
 };
 
 function ensureFinite(n: unknown, field: string) {
@@ -81,11 +93,11 @@ const ALLOWED_MASH_SALT_KEYS = new Set([
   "baking_soda",
 ]);
 
-function validateMashSaltAdditionsJson(value: unknown) {
+function validateSaltAdditionsJson(value: unknown, field: string) {
   if (value === null) return null;
   if (value === undefined) return undefined;
   if (!Array.isArray(value)) {
-    throw new BadRequestError("invalid_salt_additions", "Body.mashSaltAdditionsJson must be an array");
+    throw new BadRequestError("invalid_salt_additions", `Body.${field} must be an array`);
   }
 
   return value.map((row, idx) => {
@@ -95,13 +107,13 @@ function validateMashSaltAdditionsJson(value: unknown) {
     if (typeof saltKey !== "string" || !ALLOWED_MASH_SALT_KEYS.has(saltKey)) {
       throw new BadRequestError(
         "invalid_salt_key",
-        `Body.mashSaltAdditionsJson[${idx}].saltKey is invalid`,
+        `Body.${field}[${idx}].saltKey is invalid`,
       );
     }
     if (typeof grams !== "number" || !Number.isFinite(grams) || grams < 0) {
       throw new BadRequestError(
         "invalid_salt_grams",
-        `Body.mashSaltAdditionsJson[${idx}].grams must be a number >= 0`,
+        `Body.${field}[${idx}].grams must be a number >= 0`,
       );
     }
     return { saltKey, grams };
@@ -250,7 +262,7 @@ export class RecipeWaterSettingsService {
 
     if (input.mashSaltAdditionsJson !== undefined) {
       // accept null to clear
-      data.mashSaltAdditionsJson = validateMashSaltAdditionsJson(input.mashSaltAdditionsJson) as any;
+      data.mashSaltAdditionsJson = validateSaltAdditionsJson(input.mashSaltAdditionsJson, "mashSaltAdditionsJson") as any;
     }
     if (input.mashSaltsLastResultJson !== undefined) {
       data.mashSaltsLastResultJson = input.mashSaltsLastResultJson as any;
@@ -297,6 +309,54 @@ export class RecipeWaterSettingsService {
     if (input.spargeStrengthValue !== undefined) {
       if (input.spargeStrengthValue === null) data.spargeStrengthValue = null;
       else data.spargeStrengthValue = ensureFinite(input.spargeStrengthValue, "spargeStrengthValue");
+    }
+
+    if (input.spargeAcidificationMode !== undefined) {
+      const v = input.spargeAcidificationMode;
+      if (typeof v !== "string") {
+        throw new BadRequestError("invalid_string", "Body.spargeAcidificationMode must be a string");
+      }
+      if (v !== "targetPh" && v !== "manual") {
+        throw new BadRequestError(
+          "invalid_sparge_acidification_mode",
+          'Body.spargeAcidificationMode must be "targetPh" or "manual"',
+        );
+      }
+      data.spargeAcidificationMode = v;
+    }
+
+    const spargeManualInputFields = ["spargeManualAcidAddedMl", "spargeManualAcidAddedGrams"] as const;
+    for (const f of spargeManualInputFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+
+    const spargeManualSnapshotFields = [
+      "spargeManualLastAchievedPh",
+      "spargeManualLastFinalAlkalinityPpmCaCO3",
+      "spargeManualLastSulfateAddedPpm",
+      "spargeManualLastChlorideAddedPpm",
+    ] as const;
+    for (const f of spargeManualSnapshotFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+    if (input.spargeManualLastCalculatedAt !== undefined) {
+      data.spargeManualLastCalculatedAt = input.spargeManualLastCalculatedAt;
+    }
+
+    if (input.spargeSaltAdditionsJson !== undefined) {
+      // accept null to clear
+      data.spargeSaltAdditionsJson = validateSaltAdditionsJson(input.spargeSaltAdditionsJson, "spargeSaltAdditionsJson") as any;
+    }
+    if (input.spargeSaltsLastResultJson !== undefined) {
+      data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson as any;
     }
 
     const snapshotFields = [

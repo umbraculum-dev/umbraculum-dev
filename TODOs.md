@@ -36,4 +36,5 @@ This file tracks near-term implementation tasks and “migration reminders” as
 ## Water calculator (BrunWater parity)
 
 - [ ] Mash acidification: add “manual entry” mode (user inputs acid addition amount; app estimates resulting alkalinity/pH and stores both input + calculated snapshot).
+- [ ] If/when we add an overall brew-day water summary/profile, it must incorporate **sparge** salts + sparge acid ion contributions (not just mash).
 
