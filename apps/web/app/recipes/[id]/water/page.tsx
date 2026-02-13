@@ -1975,49 +1975,9 @@ export default function WaterCalculatorPage() {
             </pre>
           ) : null}
 
-          <details style={{ marginTop: 12 }}>
-            <summary>View all water profiles (table)</summary>
-            <div style={{ overflowX: "auto", marginTop: 8 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th align="left">Name</th>
-                    <th align="left">Scope</th>
-                    <th align="left">Verified</th>
-                    <th align="right">Ca</th>
-                    <th align="right">Mg</th>
-                    <th align="right">Na</th>
-                    <th align="right">SO4</th>
-                    <th align="right">Cl</th>
-                    <th align="right">HCO3</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allProfiles.map((p, idx) => (
-                    <tr
-                      key={p.id}
-                      style={{
-                        backgroundColor:
-                          idx % 2 === 1
-                            ? "color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
-                            : "transparent",
-                      }}
-                    >
-                      <td>{p.name}</td>
-                      <td className="muted">{p.scope}</td>
-                      <td className="muted">{p.verificationStatus}</td>
-                      <td align="right">{p.calcium}</td>
-                      <td align="right">{p.magnesium}</td>
-                      <td align="right">{p.sodium}</td>
-                      <td align="right">{p.sulfate}</td>
-                      <td align="right">{p.chloride}</td>
-                      <td align="right">{p.bicarbonate}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </details>
+          <p className="muted" style={{ marginTop: 12 }}>
+            Need to view/manage all profiles? Use <Link href="/water-profiles">Water profiles</Link>.
+          </p>
         </section>
 
         <section className="panel" aria-labelledby="grist-heading">
