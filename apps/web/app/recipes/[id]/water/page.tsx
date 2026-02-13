@@ -1137,6 +1137,44 @@ export default function WaterCalculatorPage() {
         Recipe ID: <code>{recipeId}</code>
       </p>
 
+      <div
+        className="panel"
+        style={{
+          marginTop: 12,
+          border: "1px solid color-mix(in srgb, var(--border) 85%, transparent)",
+          background: "color-mix(in srgb, var(--surface-2) 55%, var(--surface))",
+        }}
+        aria-label="Overall mash snapshot summary"
+      >
+        <a href="#overall-mash-water-result" style={{ color: "inherit", textDecoration: "none" }}>
+          <div style={{ display: "flex", gap: 16, alignItems: "baseline", flexWrap: "wrap" }}>
+            <strong>Overall mash snapshot</strong>
+            <span className="muted">
+              pH:{" "}
+              {overallResult ? (
+                <>
+                  {overallResult.ph.kind} <code>{overallResult.ph.value.toFixed(2)}</code>
+                </>
+              ) : (
+                <span className="muted">—</span>
+              )}
+              {" · "}
+              Final alkalinity:{" "}
+              {overallResult ? (
+                <>
+                  <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
+                </>
+              ) : (
+                <span className="muted">—</span>
+              )}
+            </span>
+            <span className="muted" style={{ marginLeft: "auto" }}>
+              Jump to details ↓
+            </span>
+          </div>
+        </a>
+      </div>
+
       {authLoaded && !canCall ? (
         <p role="alert" className="errorBox">
           Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User +
@@ -2144,7 +2182,9 @@ export default function WaterCalculatorPage() {
 
           <hr style={{ margin: "16px 0" }} />
 
-          <h3 style={{ marginTop: 0 }}>Overall mash water result (v0)</h3>
+          <h3 id="overall-mash-water-result" style={{ marginTop: 0 }}>
+            Overall mash water result (v0)
+          </h3>
           <p className="muted" style={{ marginTop: 0 }}>
             v0 assumptions: salts impact alkalinity via bicarbonate (ΔHCO₃) conversion; acids only
             contribute modeled ions (SO4/Cl). Click <strong>Calculate overall</strong> to preview, or{" "}
