@@ -7,6 +7,7 @@ export type CreateWaterProfileInput = {
   scope?: "system" | "account" | "public"; // defaults to "account"
   type: "water" | "dilution";
   name: string;
+  ph?: number | null;
   calcium: number;
   magnesium: number;
   sodium: number;
@@ -28,6 +29,17 @@ function toNumber(val: unknown, field: string) {
     throw new BadRequestError("invalid_number", `Body.${field} must be a number`);
   }
   return val;
+}
+
+function toOptionalPh(val: unknown) {
+  if (val === undefined) return undefined;
+  if (val === null) return null;
+  const n = toNumber(val, "ph");
+  // Keep validation light, but guard obviously invalid values.
+  if (n < 0 || n > 14) {
+    throw new BadRequestError("invalid_ph", "Body.ph must be between 0 and 14");
+  }
+  return n;
 }
 
 export class WaterProfilesService {
@@ -79,6 +91,7 @@ export class WaterProfilesService {
         type,
         accountId, // keep audit trail even if scope is "public"
         name,
+        ph: toOptionalPh(input.ph),
         calcium: toNumber(input.calcium, "calcium"),
         magnesium: toNumber(input.magnesium, "magnesium"),
         sodium: toNumber(input.sodium, "sodium"),
@@ -121,6 +134,7 @@ export class WaterProfilesService {
     if (input.type !== undefined) data.type = input.type;
 
     const numericFields = [
+      "ph",
       "calcium",
       "magnesium",
       "sodium",
@@ -130,7 +144,10 @@ export class WaterProfilesService {
     ] as const;
     for (const f of numericFields) {
       const v = (input as any)[f];
-      if (v !== undefined) data[f] = toNumber(v, f);
+      if (v !== undefined) {
+        if (f === "ph") data[f] = toOptionalPh(v);
+        else data[f] = toNumber(v, f);
+      }
     }
 
     if (input.verificationStatus !== undefined) data.verificationStatus = input.verificationStatus;

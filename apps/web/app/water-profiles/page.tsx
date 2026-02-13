@@ -17,6 +17,7 @@ type WaterProfile = {
   type: "water" | "dilution";
   name: string;
   verificationStatus: "verified" | "unverified";
+  ph?: number | null;
   calcium: number;
   magnesium: number;
   sodium: number;
@@ -61,6 +62,7 @@ export default function WaterProfilesPage() {
   const [createName, setCreateName] = useState("");
   const [createScope, setCreateScope] = useState<"account" | "public">("public");
   const [createType, setCreateType] = useState<"water" | "dilution">("water");
+  const [createPh, setCreatePh] = useState<string>("");
   const [createIon, setCreateIon] = useState({
     calcium: 0,
     magnesium: 0,
@@ -124,11 +126,13 @@ export default function WaterProfilesPage() {
           scope: createScope,
           type: createType,
           name: createName,
+          ph: createPh.trim() === "" ? null : Number(createPh),
           ...createIon,
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       setCreateName("");
+      setCreatePh("");
       setCreateIon({
         calcium: 0,
         magnesium: 0,
@@ -209,6 +213,7 @@ export default function WaterProfilesPage() {
                   <th align="left">Name</th>
                   <th align="left">Scope</th>
                   <th align="left">Status</th>
+                  <th align="right">pH</th>
                   <th align="right">Ca</th>
                   <th align="right">Mg</th>
                   <th align="right">Na</th>
@@ -234,6 +239,9 @@ export default function WaterProfilesPage() {
                       {p.scope}/{p.type}
                     </td>
                     <td className="muted">{p.verificationStatus}</td>
+                    <td align="right" className="muted">
+                      {p.ph == null ? "—" : p.ph.toFixed(2)}
+                    </td>
                     <td align="right">{p.calcium}</td>
                     <td align="right">{p.magnesium}</td>
                     <td align="right">{p.sodium}</td>
@@ -321,6 +329,21 @@ export default function WaterProfilesPage() {
                     <option value="water">Water</option>
                     <option value="dilution">Dilution</option>
                   </select>
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="create-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    pH (optional)
+                  </label>
+                  <input
+                    id="create-ph"
+                    type="number"
+                    inputMode="decimal"
+                    step={0.01}
+                    value={createPh}
+                    onChange={(e) => setCreatePh(e.target.value)}
+                    style={{ width: "100%", padding: 8 }}
+                    placeholder="e.g. 7.80"
+                  />
                 </div>
               </div>
 

@@ -141,6 +141,7 @@ model RecipeWaterSettings {
   mashGristSourceRecipeUpdatedAt  DateTime?
 
   // Sparge acidification inputs (liters-first)
+  spargeWaterProfileId             String?
   spargeStartingAlkalinityPpmCaCO3 Float @default(0)
   spargeStartingPh                Float @default(7.0)
   spargeTargetPh                  Float @default(5.6)
@@ -187,6 +188,9 @@ model WaterProfile {
   sulfate      Float
   chloride     Float
   bicarbonate  Float
+
+  // Optional pH (for sparge/mash UX; many water reports include it, but it may be unknown).
+  ph           Float?
 
   verificationStatus WaterProfileVerificationStatus @default(unverified)
   submittedByUserId  String?

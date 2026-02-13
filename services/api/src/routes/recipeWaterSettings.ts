@@ -191,6 +191,12 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
             ? null
             : undefined,
 
+      spargeWaterProfileId:
+        typeof body.spargeWaterProfileId === "string"
+          ? body.spargeWaterProfileId
+          : body.spargeWaterProfileId === null
+            ? null
+            : undefined,
       spargeStartingAlkalinityPpmCaCO3:
         typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
           ? body.spargeStartingAlkalinityPpmCaCO3

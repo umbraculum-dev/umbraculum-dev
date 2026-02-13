@@ -47,6 +47,7 @@ export type UpsertRecipeWaterSettingsInput = {
   mashGristImportedAt?: Date | null;
   mashGristSourceRecipeUpdatedAt?: Date | null;
 
+  spargeWaterProfileId?: string | null;
   spargeStartingAlkalinityPpmCaCO3?: number;
   spargeStartingPh?: number;
   spargeTargetPh?: number;
@@ -143,6 +144,7 @@ export class RecipeWaterSettingsService {
     if (input.sourceWaterProfileId) await this.assertProfileAccessible(accountId, input.sourceWaterProfileId);
     if (input.targetWaterProfileId) await this.assertProfileAccessible(accountId, input.targetWaterProfileId);
     if (input.dilutionWaterProfileId) await this.assertProfileAccessible(accountId, input.dilutionWaterProfileId);
+    if (input.spargeWaterProfileId) await this.assertProfileAccessible(accountId, input.spargeWaterProfileId);
 
     const data: Record<string, unknown> = { accountId, recipeId };
 
@@ -150,6 +152,7 @@ export class RecipeWaterSettingsService {
     if (input.targetWaterProfileId !== undefined) data.targetWaterProfileId = input.targetWaterProfileId;
     if (input.dilutionWaterProfileId !== undefined)
       data.dilutionWaterProfileId = input.dilutionWaterProfileId;
+    if (input.spargeWaterProfileId !== undefined) data.spargeWaterProfileId = input.spargeWaterProfileId;
 
     const mixingNumericFields = ["tapWaterVolumeLiters", "dilutionWaterVolumeLiters"] as const;
     for (const f of mixingNumericFields) {

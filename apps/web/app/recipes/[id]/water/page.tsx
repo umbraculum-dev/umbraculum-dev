@@ -15,6 +15,7 @@ type WaterProfile = {
   type: "water" | "dilution";
   accountId: string | null;
   name: string;
+  ph: number | null;
   calcium: number;
   magnesium: number;
   sodium: number;
@@ -140,6 +141,7 @@ type RecipeWaterSettings = {
   mashSaltAdditionsJson: unknown;
   mashSaltsLastResultJson: unknown;
 
+  spargeWaterProfileId?: string | null;
   spargeStartingAlkalinityPpmCaCO3: number;
   spargeStartingPh: number;
   spargeTargetPh: number;
@@ -268,8 +270,9 @@ export default function WaterCalculatorPage() {
   const [spargeSubmitting, setSpargeSubmitting] = useState(false);
 
   // liters-first inputs (v0)
+  const [spargeWaterProfileId, setSpargeWaterProfileId] = useState<string>("");
   const [startingAlk, setStartingAlk] = useState(0);
-  const [startingPh, setStartingPh] = useState(7.0);
+  const [startingPh, setStartingPh] = useState<string>("7.0");
   const [targetPh, setTargetPh] = useState(5.6);
   const [volumeLiters, setVolumeLiters] = useState(20);
   const [acidType, setAcidType] = useState("phosphoric");
@@ -387,12 +390,13 @@ export default function WaterCalculatorPage() {
       setTapVolumeLiters(s.tapWaterVolumeLiters ?? 0);
       setDilutionVolumeLiters(s.dilutionWaterVolumeLiters ?? 0);
       setStartingAlk(s.spargeStartingAlkalinityPpmCaCO3 ?? 0);
-      setStartingPh(s.spargeStartingPh ?? 7.0);
+      setStartingPh(String(s.spargeStartingPh ?? 7.0));
       setTargetPh(s.spargeTargetPh ?? 5.6);
       setVolumeLiters(s.spargeVolumeLiters ?? 20);
       setAcidType(s.spargeAcidType ?? "phosphoric");
       setStrengthKind((s.spargeStrengthKind as any) ?? "percent");
       setStrengthValue(s.spargeStrengthValue ?? 10);
+      setSpargeWaterProfileId(s.spargeWaterProfileId ?? "");
 
       setMashStartingAlk(s.mashStartingAlkalinityPpmCaCO3 ?? 0);
       setMashStartingPh(s.mashStartingPh ?? 7.0);
@@ -737,8 +741,9 @@ export default function WaterCalculatorPage() {
     setSavingSparge(true);
     try {
       await saveSettings({
+        spargeWaterProfileId: spargeWaterProfileId || null,
         spargeStartingAlkalinityPpmCaCO3: startingAlk,
-        spargeStartingPh: startingPh,
+        ...(startingPh.trim() === "" ? {} : { spargeStartingPh: Number(startingPh) }),
         spargeTargetPh: targetPh,
         spargeVolumeLiters: volumeLiters,
         spargeAcidType: acidType,
@@ -1014,6 +1019,10 @@ export default function WaterCalculatorPage() {
   const onSubmitSparge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth?.userId || !auth.activeAccountId) return;
+    if (startingPh.trim() === "" || !Number.isFinite(Number(startingPh))) {
+      setSpargeError("Starting pH is required (select a profile with pH or enter it manually).");
+      return;
+    }
     setSpargeError(null);
     setSpargeStatus(null);
     setCalcSaveStatus(null);
@@ -1022,7 +1031,7 @@ export default function WaterCalculatorPage() {
     try {
       const payload: Record<string, unknown> = {
         startingAlkalinityPpmCaCO3: startingAlk,
-        startingPh,
+        startingPh: Number(startingPh),
         targetPh,
         volumeLiters,
         acidType,
@@ -1041,8 +1050,9 @@ export default function WaterCalculatorPage() {
 
       // Calculate + Save Result (v0): persist inputs + snapshot.
       await saveSettings({
+        spargeWaterProfileId: spargeWaterProfileId || null,
         spargeStartingAlkalinityPpmCaCO3: startingAlk,
-        spargeStartingPh: startingPh,
+        spargeStartingPh: Number(startingPh),
         spargeTargetPh: targetPh,
         spargeVolumeLiters: volumeLiters,
         spargeAcidType: acidType,
@@ -1108,6 +1118,10 @@ export default function WaterCalculatorPage() {
   const selectedDilution = useMemo(
     () => dilutionProfiles.find((p) => p.id === dilutionProfileId) ?? null,
     [dilutionProfileId, dilutionProfiles],
+  );
+  const selectedSpargeProfile = useMemo(
+    () => waterProfiles.find((p) => p.id === spargeWaterProfileId) ?? null,
+    [spargeWaterProfileId, waterProfiles],
   );
 
   const mixedSourceProfile = useMemo(() => {
@@ -1203,6 +1217,61 @@ export default function WaterCalculatorPage() {
 
           <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
             <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label htmlFor="sparge-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Sparge water profile
+                </label>
+                <select
+                  id="sparge-profile"
+                  value={spargeWaterProfileId}
+                  onChange={(e) => setSpargeWaterProfileId(e.target.value)}
+                  style={{ width: "100%", padding: 8 }}
+                >
+                  <option value="">(none)</option>
+                  {waterProfiles.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} [{p.scope}/{p.verificationStatus}]
+                    </option>
+                  ))}
+                </select>
+                {selectedSpargeProfile ? (
+                  <div style={{ marginTop: 8, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                    <span className="muted">
+                      Bicarbonate: <code>{selectedSpargeProfile.bicarbonate.toFixed(2)}</code> ppm{" "}
+                      {" · "}Estimated alkalinity:{" "}
+                      <code>
+                        {bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate).toFixed(2)}
+                      </code>{" "}
+                      ppm as CaCO3
+                      {" · "}pH:{" "}
+                      {selectedSpargeProfile.ph == null ? (
+                        <span className="muted">—</span>
+                      ) : (
+                        <code>{selectedSpargeProfile.ph.toFixed(2)}</code>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStartingAlk(
+                          bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate),
+                        );
+                        setStartingPh(selectedSpargeProfile.ph == null ? "" : String(selectedSpargeProfile.ph));
+                      }}
+                      disabled={!canCall}
+                    >
+                      Use profile alkalinity + pH
+                    </button>
+                    <span className="muted">
+                      If profile pH is missing, we clear Starting pH so you can enter it.
+                    </span>
+                  </div>
+                ) : (
+                  <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+                    (Optional) Select a sparge water profile; you can then apply its alkalinity to the input.
+                  </p>
+                )}
+              </div>
               <div>
                 <label htmlFor="starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
                   Starting alkalinity (ppm as CaCO3)
@@ -1240,7 +1309,7 @@ export default function WaterCalculatorPage() {
                   inputMode="decimal"
                   step={0.01}
                   value={startingPh}
-                  onChange={(e) => setStartingPh(Number(e.target.value))}
+                  onChange={(e) => setStartingPh(e.target.value)}
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>

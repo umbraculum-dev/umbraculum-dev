@@ -71,6 +71,23 @@ describe("recipe water-settings", () => {
     const recipe = await app.prisma.recipe.create({
       data: { accountId: TEST_ACCOUNT_A, name: "Water Settings Recipe", style: null, notes: null },
     });
+    const spargeProfileA = await app.prisma.waterProfile.create({
+      data: {
+        key: `test:spargeProfileA:${Date.now()}`,
+        scope: "account",
+        type: "water",
+        accountId: TEST_ACCOUNT_A,
+        name: "Sparge Water A",
+        calcium: 1,
+        magnesium: 1,
+        sodium: 1,
+        sulfate: 1,
+        chloride: 1,
+        bicarbonate: 61,
+        verificationStatus: "unverified",
+        source: "test",
+      },
+    });
     const nowIso = new Date().toISOString();
     const overall = {
       calculatedAt: nowIso,
@@ -130,6 +147,7 @@ describe("recipe water-settings", () => {
         mashGristImportedAt: nowIso,
         mashGristSourceRecipeUpdatedAt: nowIso,
 
+        spargeWaterProfileId: spargeProfileA.id,
         spargeStartingAlkalinityPpmCaCO3: 12,
         spargeStartingPh: 7.1,
         spargeTargetPh: 5.6,
@@ -183,6 +201,7 @@ describe("recipe water-settings", () => {
       },
     ]);
     expect(body.settings.mashSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 2.5 }]);
+    expect(body.settings.spargeWaterProfileId).toBe(spargeProfileA.id);
     expect(body.settings.spargeStartingAlkalinityPpmCaCO3).toBe(12);
     expect(body.settings.spargeLastAcidRequiredMl).toBe(1.23);
   });
@@ -241,6 +260,21 @@ describe("recipe water-settings", () => {
     });
     expect(put.statusCode).toBe(403);
     expect(put.json()).toEqual({
+      ok: false,
+      error: {
+        code: "profile_not_accessible",
+        message: "Water profile is not accessible to this account",
+      },
+    });
+
+    const putSparge = await app.inject({
+      method: "PUT",
+      url: `/recipes/${recipe.id}/water-settings`,
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      payload: { spargeWaterProfileId: profileB.id },
+    });
+    expect(putSparge.statusCode).toBe(403);
+    expect(putSparge.json()).toEqual({
       ok: false,
       error: {
         code: "profile_not_accessible",
