@@ -71,6 +71,7 @@ describe("recipe water-settings", () => {
     const recipe = await app.prisma.recipe.create({
       data: { accountId: TEST_ACCOUNT_A, name: "Water Settings Recipe", style: null, notes: null },
     });
+    const nowIso = new Date().toISOString();
 
     const put = await app.inject({
       method: "PUT",
@@ -86,6 +87,13 @@ describe("recipe water-settings", () => {
         mashAcidType: "lactic",
         mashStrengthKind: "percent",
         mashStrengthValue: 88,
+        mashAcidificationMode: "manual",
+        mashManualAcidAddedMl: 2.2,
+        mashManualLastAchievedPh: 5.45,
+        mashManualLastFinalAlkalinityPpmCaCO3: 12.3,
+        mashManualLastSulfateAddedPpm: 0.1,
+        mashManualLastChlorideAddedPpm: 0.2,
+        mashManualLastCalculatedAt: nowIso,
         mashSaltAdditionsJson: [{ saltKey: "gypsum", grams: 2.5 }],
 
         spargeStartingAlkalinityPpmCaCO3: 12,
@@ -121,6 +129,12 @@ describe("recipe water-settings", () => {
     expect(body.settings.mashAcidType).toBe("lactic");
     expect(body.settings.mashStrengthKind).toBe("percent");
     expect(body.settings.mashStrengthValue).toBe(88);
+    expect(body.settings.mashAcidificationMode).toBe("manual");
+    expect(body.settings.mashManualAcidAddedMl).toBe(2.2);
+    expect(body.settings.mashManualLastAchievedPh).toBe(5.45);
+    expect(body.settings.mashManualLastFinalAlkalinityPpmCaCO3).toBe(12.3);
+    expect(body.settings.mashManualLastSulfateAddedPpm).toBe(0.1);
+    expect(body.settings.mashManualLastChlorideAddedPpm).toBe(0.2);
     expect(body.settings.mashSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 2.5 }]);
     expect(body.settings.spargeStartingAlkalinityPpmCaCO3).toBe(12);
     expect(body.settings.spargeLastAcidRequiredMl).toBe(1.23);

@@ -11,6 +11,12 @@ export function PrimaryNav() {
         <li>
           <Link href="/recipes">Recipes</Link>
         </li>
+        <li>
+          <Link href="/water-profiles">Water profiles</Link>
+        </li>
+        <li>
+          <Link href="/about">About</Link>
+        </li>
         <li style={{ marginLeft: "auto" }}>
           <DevAuthStatus />
         </li>

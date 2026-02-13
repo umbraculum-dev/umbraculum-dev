@@ -44,6 +44,15 @@ type SpargeResult = {
 
 type MashResult = SpargeResult;
 
+type MashManualCalcResult = {
+  achievedPh: number;
+  predicted: MashResult;
+  clamped: "none" | "low" | "high";
+  iterations: number;
+  targetAmount: number;
+  predictedAmount: number;
+};
+
 type IonProfilePpm = {
   calcium: number;
   magnesium: number;
@@ -91,6 +100,15 @@ type RecipeWaterSettings = {
   mashLastSulfateAddedPpm: number | null;
   mashLastChlorideAddedPpm: number | null;
   mashLastCalculatedAt: string | null;
+
+  mashAcidificationMode: string;
+  mashManualAcidAddedMl: number | null;
+  mashManualAcidAddedGrams: number | null;
+  mashManualLastAchievedPh: number | null;
+  mashManualLastFinalAlkalinityPpmCaCO3: number | null;
+  mashManualLastSulfateAddedPpm: number | null;
+  mashManualLastChlorideAddedPpm: number | null;
+  mashManualLastCalculatedAt: string | null;
 
   mashSaltAdditionsJson: unknown;
   mashSaltsLastResultJson: unknown;
@@ -170,6 +188,7 @@ export default function WaterCalculatorPage() {
 
   const [mashError, setMashError] = useState<string | null>(null);
   const [mashStatus, setMashStatus] = useState<string | null>(null);
+  const [mashManualStatus, setMashManualStatus] = useState<string | null>(null);
   const [mashSaveStatus, setMashSaveStatus] = useState<string | null>(null);
   const [mashCalcSaveStatus, setMashCalcSaveStatus] = useState<string | null>(null);
   const [mashSubmitting, setMashSubmitting] = useState(false);
@@ -185,6 +204,11 @@ export default function WaterCalculatorPage() {
     "percent" | "normality" | "molarity" | "solid"
   >("percent");
   const [mashStrengthValue, setMashStrengthValue] = useState(88);
+  const [mashAcidificationMode, setMashAcidificationMode] = useState<"targetPh" | "manual">(
+    "targetPh",
+  );
+  const [mashManualAcidAdded, setMashManualAcidAdded] = useState(0);
+  const [mashManualResult, setMashManualResult] = useState<MashManualCalcResult | null>(null);
 
   const [saltsError, setSaltsError] = useState<string | null>(null);
   const [saltsStatus, setSaltsStatus] = useState<string | null>(null);
@@ -251,8 +275,19 @@ export default function WaterCalculatorPage() {
       setMashTargetPh(s.mashTargetPh ?? 5.4);
       setMashWaterVolumeLiters(s.mashWaterVolumeLiters ?? 20);
       setMashAcidType(s.mashAcidType ?? "lactic");
-      setMashStrengthKind((s.mashStrengthKind as any) ?? "percent");
+      const savedMashStrengthKind = ((s.mashStrengthKind as any) ?? "percent") as
+        | "percent"
+        | "normality"
+        | "molarity"
+        | "solid";
+      setMashStrengthKind(savedMashStrengthKind);
       setMashStrengthValue(s.mashStrengthValue ?? 88);
+      setMashAcidificationMode(s.mashAcidificationMode === "manual" ? "manual" : "targetPh");
+      setMashManualAcidAdded(
+        savedMashStrengthKind === "solid"
+          ? (s.mashManualAcidAddedGrams ?? 0)
+          : (s.mashManualAcidAddedMl ?? 0),
+      );
 
       if (Array.isArray(s.mashSaltAdditionsJson)) {
         // tolerate partial/invalid in UI; server validates on save.
@@ -279,6 +314,27 @@ export default function WaterCalculatorPage() {
           chlorideAddedPpm: s.mashLastChlorideAddedPpm ?? 0,
         });
         setMashStatus(`Last calculated: ${new Date(s.mashLastCalculatedAt).toLocaleString()}`);
+      }
+      if (s.mashManualLastCalculatedAt) {
+        setMashManualResult({
+          achievedPh: s.mashManualLastAchievedPh ?? 0,
+          predicted: {
+            acidRequiredMl: null,
+            acidRequiredTsp: null,
+            acidRequiredGrams: null,
+            acidRequiredKg: null,
+            finalAlkalinityPpmCaCO3: s.mashManualLastFinalAlkalinityPpmCaCO3 ?? 0,
+            sulfateAddedPpm: s.mashManualLastSulfateAddedPpm ?? 0,
+            chlorideAddedPpm: s.mashManualLastChlorideAddedPpm ?? 0,
+          },
+          clamped: "none",
+          iterations: 0,
+          targetAmount: Number.NaN,
+          predictedAmount: Number.NaN,
+        });
+        setMashManualStatus(
+          `Last estimated: ${new Date(s.mashManualLastCalculatedAt).toLocaleString()}`,
+        );
       }
 
       if (s.spargeLastCalculatedAt) {
@@ -377,6 +433,9 @@ export default function WaterCalculatorPage() {
         mashAcidType,
         mashStrengthKind,
         mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
+        mashAcidificationMode,
+        mashManualAcidAddedMl: mashStrengthKind === "solid" ? null : mashManualAcidAdded,
+        mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
       });
       setMashSaveStatus("Saved mash inputs.");
     } catch (err) {
@@ -391,48 +450,95 @@ export default function WaterCalculatorPage() {
     if (!auth?.userId || !auth.activeAccountId) return;
     setMashError(null);
     setMashStatus(null);
+    setMashManualStatus(null);
     setMashCalcSaveStatus(null);
     setMashResult(null);
+    setMashManualResult(null);
     setMashSubmitting(true);
     try {
-      const payload: Record<string, unknown> = {
-        acidType: mashAcidType,
-        strengthKind: mashStrengthKind,
-        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-        mashStartingPh,
-        mashTargetPh,
-        mashWaterVolumeLiters,
-      };
-      if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
+      if (mashAcidificationMode === "manual") {
+        const payload: Record<string, unknown> = {
+          acidType: mashAcidType,
+          strengthKind: mashStrengthKind,
+          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+          mashStartingPh,
+          mashWaterVolumeLiters,
+        };
+        if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
+        if (mashStrengthKind === "solid") payload.acidAddedGrams = mashManualAcidAdded;
+        else payload.acidAddedMl = mashManualAcidAdded;
 
-      const res = await apiFetch("/api/water-calc/mash-acidification", auth, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const result = (res.data as any).result as MashResult;
-      setMashResult(result);
+        const res = await apiFetch("/api/water-calc/mash-acidification-manual", auth, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const result = (res.data as any).result as MashManualCalcResult;
+        setMashManualResult(result);
 
-      await saveSettings({
-        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-        mashStartingPh,
-        mashTargetPh,
-        mashWaterVolumeLiters,
-        mashAcidType: mashAcidType,
-        mashStrengthKind: mashStrengthKind,
-        mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
-        mashLastAcidRequiredMl: result.acidRequiredMl,
-        mashLastAcidRequiredTsp: result.acidRequiredTsp,
-        mashLastAcidRequiredGrams: result.acidRequiredGrams,
-        mashLastAcidRequiredKg: result.acidRequiredKg,
-        mashLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
-        mashLastSulfateAddedPpm: result.sulfateAddedPpm,
-        mashLastChlorideAddedPpm: result.chlorideAddedPpm,
-        mashLastCalculatedAt: new Date().toISOString(),
-      });
-      setMashStatus("Calculated.");
-      setMashCalcSaveStatus("Calculated and saved.");
+        await saveSettings({
+          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+          mashStartingPh,
+          mashTargetPh,
+          mashWaterVolumeLiters,
+          mashAcidType: mashAcidType,
+          mashStrengthKind: mashStrengthKind,
+          mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
+          mashAcidificationMode: "manual",
+          mashManualAcidAddedMl: mashStrengthKind === "solid" ? null : mashManualAcidAdded,
+          mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
+          mashManualLastAchievedPh: result.achievedPh,
+          mashManualLastFinalAlkalinityPpmCaCO3: result.predicted.finalAlkalinityPpmCaCO3,
+          mashManualLastSulfateAddedPpm: result.predicted.sulfateAddedPpm,
+          mashManualLastChlorideAddedPpm: result.predicted.chlorideAddedPpm,
+          mashManualLastCalculatedAt: new Date().toISOString(),
+        });
+        setMashManualStatus("Estimated.");
+        setMashCalcSaveStatus("Estimated and saved.");
+      } else {
+        const payload: Record<string, unknown> = {
+          acidType: mashAcidType,
+          strengthKind: mashStrengthKind,
+          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+          mashStartingPh,
+          mashTargetPh,
+          mashWaterVolumeLiters,
+        };
+        if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
+
+        const res = await apiFetch("/api/water-calc/mash-acidification", auth, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const result = (res.data as any).result as MashResult;
+        setMashResult(result);
+
+        await saveSettings({
+          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+          mashStartingPh,
+          mashTargetPh,
+          mashWaterVolumeLiters,
+          mashAcidType: mashAcidType,
+          mashStrengthKind: mashStrengthKind,
+          mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
+          mashAcidificationMode: "targetPh",
+          mashManualAcidAddedMl: mashStrengthKind === "solid" ? null : mashManualAcidAdded,
+          mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
+          mashLastAcidRequiredMl: result.acidRequiredMl,
+          mashLastAcidRequiredTsp: result.acidRequiredTsp,
+          mashLastAcidRequiredGrams: result.acidRequiredGrams,
+          mashLastAcidRequiredKg: result.acidRequiredKg,
+          mashLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
+          mashLastSulfateAddedPpm: result.sulfateAddedPpm,
+          mashLastChlorideAddedPpm: result.chlorideAddedPpm,
+          mashLastCalculatedAt: new Date().toISOString(),
+        });
+        setMashStatus("Calculated.");
+        setMashCalcSaveStatus("Calculated and saved.");
+      }
     } catch (err) {
       setMashError(String(err));
     } finally {
@@ -997,14 +1103,46 @@ export default function WaterCalculatorPage() {
 
           <h3 style={{ marginTop: 0 }}>Mash water acidification (Sheet 4, v0)</h3>
           <p className="muted" style={{ marginTop: 0 }}>
-            This is a <strong>calculator</strong>: enter your mash water volume, starting alkalinity/pH, and a target
-            pH. We compute the <strong>acid amount required</strong> (mL/tsp for liquids, g/kg for solids) and save a
-            snapshot when you click <strong>Calculate + Save</strong>.
-          </p>
-          <p className="muted" style={{ marginTop: 0 }}>
-            v0 limitation: we do <strong>not</strong> currently support “I added X mL, what pH does that produce?”.
+            This is a <strong>calculator</strong> with two modes:
+            <strong> Target pH</strong> (compute acid required) and <strong>Manual acid amount</strong> (estimate the
+            achieved pH from what you added). We save a snapshot when you click <strong>Calculate + Save</strong>.
           </p>
           <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
+            <fieldset
+              style={{
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 8,
+                padding: 12,
+                marginBottom: 12,
+              }}
+            >
+              <legend className="muted" style={{ fontSize: 12, padding: "0 6px" }}>
+                Mode
+              </legend>
+              <div style={{ display: "grid", gap: 8 }}>
+                <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input
+                    type="radio"
+                    name="mash-acid-mode"
+                    value="targetPh"
+                    checked={mashAcidificationMode === "targetPh"}
+                    onChange={() => setMashAcidificationMode("targetPh")}
+                  />
+                  <span>Target pH (compute acid required)</span>
+                </label>
+                <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input
+                    type="radio"
+                    name="mash-acid-mode"
+                    value="manual"
+                    checked={mashAcidificationMode === "manual"}
+                    onChange={() => setMashAcidificationMode("manual")}
+                  />
+                  <span>Manual acid amount (estimate achieved pH)</span>
+                </label>
+              </div>
+            </fieldset>
+
             <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
               <div>
                 <label htmlFor="mash-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
@@ -1058,6 +1196,7 @@ export default function WaterCalculatorPage() {
                   step={0.01}
                   value={mashTargetPh}
                   onChange={(e) => setMashTargetPh(Number(e.target.value))}
+                  disabled={mashAcidificationMode === "manual"}
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>
@@ -1112,11 +1251,31 @@ export default function WaterCalculatorPage() {
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>
+              {mashAcidificationMode === "manual" ? (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="mash-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    Acid added ({mashStrengthKind === "solid" ? "g" : "mL"})
+                  </label>
+                  <input
+                    id="mash-acid-added"
+                    type="number"
+                    inputMode="decimal"
+                    step={0.01}
+                    value={mashManualAcidAdded}
+                    onChange={(e) => setMashManualAcidAdded(Number(e.target.value))}
+                    style={{ width: "100%", padding: 8 }}
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
               <button type="submit" disabled={!canCall || mashSubmitting}>
-                {mashSubmitting ? "Calculating…" : "Calculate + Save mash result"}
+                {mashSubmitting
+                  ? "Calculating…"
+                  : mashAcidificationMode === "manual"
+                    ? "Estimate + Save mash result"
+                    : "Calculate + Save mash result"}
               </button>
               <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
                 {savingMash ? "Saving…" : "Save mash inputs"}
@@ -1124,6 +1283,11 @@ export default function WaterCalculatorPage() {
               {mashStatus ? (
                 <span className="muted" role="status" aria-live="polite">
                   {mashStatus}
+                </span>
+              ) : null}
+              {mashManualStatus ? (
+                <span className="muted" role="status" aria-live="polite">
+                  {mashManualStatus}
                 </span>
               ) : null}
               {mashSaveStatus ? (
@@ -1147,7 +1311,7 @@ export default function WaterCalculatorPage() {
 
           {mashResult ? (
             <div style={{ marginTop: 12 }}>
-              <h4 style={{ marginTop: 0 }}>Result (last calculated)</h4>
+              <h4 style={{ marginTop: 0 }}>Result (Target pH mode)</h4>
               <ul>
                 {mashResult.acidRequiredMl !== null ? (
                   <li>
@@ -1177,6 +1341,33 @@ export default function WaterCalculatorPage() {
                 </li>
                 <li>
                   Chloride added: <code>{mashResult.chlorideAddedPpm.toFixed(3)}</code> ppm
+                </li>
+              </ul>
+            </div>
+          ) : null}
+          {mashManualResult ? (
+            <div style={{ marginTop: 12 }}>
+              <h4 style={{ marginTop: 0 }}>Result (Manual acid amount mode)</h4>
+              <ul>
+                <li>
+                  Estimated achieved pH: <code>{mashManualResult.achievedPh.toFixed(3)}</code>
+                </li>
+                {Number.isFinite(mashManualResult.targetAmount) && Number.isFinite(mashManualResult.predictedAmount) ? (
+                  <li>
+                    Acid amount: <code>{mashManualResult.targetAmount.toFixed(3)}</code>{" "}
+                    {mashStrengthKind === "solid" ? "g" : "mL"} (solver check:{" "}
+                    <code>{mashManualResult.predictedAmount.toFixed(3)}</code>)
+                  </li>
+                ) : null}
+                <li>
+                  Final alkalinity: <code>{mashManualResult.predicted.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as
+                  CaCO3
+                </li>
+                <li>
+                  Sulfate added: <code>{mashManualResult.predicted.sulfateAddedPpm.toFixed(3)}</code> ppm
+                </li>
+                <li>
+                  Chloride added: <code>{mashManualResult.predicted.chlorideAddedPpm.toFixed(3)}</code> ppm
                 </li>
               </ul>
             </div>
@@ -1282,7 +1473,9 @@ export default function WaterCalculatorPage() {
 
             {saltsResult ? (
               <details>
-                <summary>Resulting ions (after salts)</summary>
+                <summary>
+                  Resulting ions (after salts only; this does not consider acid — see mash summary for overall result)
+                </summary>
                 <div style={{ overflowX: "auto", marginTop: 8 }}>
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>

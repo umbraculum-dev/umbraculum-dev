@@ -25,6 +25,7 @@ services:
     command: sh -c "npm install && npm run dev"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/brewapp
+      - DATABASE_URL_TEST=postgresql://postgres:postgres@postgres:5432/brewapp_test
       - STRIPE_WEBHOOK_SECRET=...
     ports:
       - "4000:4000"
@@ -43,6 +44,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
 
 volumes:
   pgdata:

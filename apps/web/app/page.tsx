@@ -1,6 +1,10 @@
 import { HealthPanel } from "./HealthPanel";
 import { DashboardClient } from "./DashboardClient";
 
+export const metadata = {
+  title: "Dashboard",
+};
+
 export default function Home() {
   return (
     <>

@@ -6,6 +6,7 @@ import {
   type AcidStrength,
   type SpargeAcidType,
 } from "../domain/waterCalc/spargeAcidification.js";
+import { mashAcidificationManual } from "../domain/waterCalc/mashAcidificationManual.js";
 import {
   applySaltAdditions,
   type IonProfilePpm,
@@ -119,6 +120,83 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       acidType,
       strength,
     });
+
+    return { ok: true, result };
+  });
+
+  // Mash water acidification manual-entry mode (Sheet 4, v0): user enters acid amount; we estimate achieved pH.
+  app.post("/water-calc/mash-acidification-manual", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const acidType = body.acidType as SpargeAcidType;
+    if (typeof acidType !== "string") {
+      throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
+    }
+
+    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+      | "percent"
+      | "normality"
+      | "molarity"
+      | "solid";
+    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+
+    let strength: AcidStrength;
+    if (strengthKind === "solid") {
+      strength = { kind: "solid" };
+    } else {
+      if (typeof strengthValue !== "number") {
+        throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
+      }
+      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+    }
+
+    // Accept mash-prefixed or generic field names.
+    const startingAlkalinityPpmCaCO3 =
+      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
+        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        : typeof body.startingAlkalinityPpmCaCO3 === "number"
+          ? (body.startingAlkalinityPpmCaCO3 as number)
+          : 0;
+    const startingPh =
+      typeof body.mashStartingPh === "number"
+        ? (body.mashStartingPh as number)
+        : typeof body.startingPh === "number"
+          ? (body.startingPh as number)
+          : 7.0;
+    const volumeLiters =
+      typeof body.mashWaterVolumeLiters === "number"
+        ? (body.mashWaterVolumeLiters as number)
+        : typeof body.volumeLiters === "number"
+          ? (body.volumeLiters as number)
+          : 1.0;
+
+    const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
+    const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+    if (strength.kind === "solid") {
+      if (typeof acidAddedGrams !== "number") {
+        throw new BadRequestError("invalid_acid_added", "Body.acidAddedGrams is required for solid acids");
+      }
+    } else {
+      if (typeof acidAddedMl !== "number") {
+        throw new BadRequestError("invalid_acid_added", "Body.acidAddedMl is required for liquid acids");
+      }
+    }
+
+    let result;
+    try {
+      result = mashAcidificationManual({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        volumeLiters,
+        acidType,
+        strength,
+        acidAddedMl,
+        acidAddedGrams,
+      });
+    } catch (e) {
+      throw new BadRequestError("invalid_manual_acid_input", (e as Error)?.message || "Invalid manual input");
+    }
 
     return { ok: true, result };
   });

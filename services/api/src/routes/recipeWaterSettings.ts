@@ -111,6 +111,49 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
       mashLastCalculatedAt:
         typeof body.mashLastCalculatedAt === "string" ? new Date(body.mashLastCalculatedAt) : undefined,
 
+      mashAcidificationMode:
+        typeof body.mashAcidificationMode === "string" ? body.mashAcidificationMode : undefined,
+      mashManualAcidAddedMl:
+        typeof body.mashManualAcidAddedMl === "number"
+          ? body.mashManualAcidAddedMl
+          : body.mashManualAcidAddedMl === null
+            ? null
+            : undefined,
+      mashManualAcidAddedGrams:
+        typeof body.mashManualAcidAddedGrams === "number"
+          ? body.mashManualAcidAddedGrams
+          : body.mashManualAcidAddedGrams === null
+            ? null
+            : undefined,
+      mashManualLastAchievedPh:
+        typeof body.mashManualLastAchievedPh === "number"
+          ? body.mashManualLastAchievedPh
+          : body.mashManualLastAchievedPh === null
+            ? null
+            : undefined,
+      mashManualLastFinalAlkalinityPpmCaCO3:
+        typeof body.mashManualLastFinalAlkalinityPpmCaCO3 === "number"
+          ? body.mashManualLastFinalAlkalinityPpmCaCO3
+          : body.mashManualLastFinalAlkalinityPpmCaCO3 === null
+            ? null
+            : undefined,
+      mashManualLastSulfateAddedPpm:
+        typeof body.mashManualLastSulfateAddedPpm === "number"
+          ? body.mashManualLastSulfateAddedPpm
+          : body.mashManualLastSulfateAddedPpm === null
+            ? null
+            : undefined,
+      mashManualLastChlorideAddedPpm:
+        typeof body.mashManualLastChlorideAddedPpm === "number"
+          ? body.mashManualLastChlorideAddedPpm
+          : body.mashManualLastChlorideAddedPpm === null
+            ? null
+            : undefined,
+      mashManualLastCalculatedAt:
+        typeof body.mashManualLastCalculatedAt === "string"
+          ? new Date(body.mashManualLastCalculatedAt)
+          : undefined,
+
       mashSaltAdditionsJson:
         body.mashSaltAdditionsJson === null || body.mashSaltAdditionsJson !== undefined
           ? body.mashSaltAdditionsJson

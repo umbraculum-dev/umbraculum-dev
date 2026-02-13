@@ -10,7 +10,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
-    "test": "vitest run",
+    "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST prisma migrate deploy && DATABASE_URL=$DATABASE_URL_TEST prisma db seed",
+    "test": "npm run test:db:prepare && vitest run",
     "seed:import": "tsx src/cli/seed-import.ts"
   },
   "dependencies": {

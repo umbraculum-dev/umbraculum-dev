@@ -28,6 +28,15 @@ export type UpsertRecipeWaterSettingsInput = {
   mashLastChlorideAddedPpm?: number | null;
   mashLastCalculatedAt?: Date | null;
 
+  mashAcidificationMode?: string;
+  mashManualAcidAddedMl?: number | null;
+  mashManualAcidAddedGrams?: number | null;
+  mashManualLastAchievedPh?: number | null;
+  mashManualLastFinalAlkalinityPpmCaCO3?: number | null;
+  mashManualLastSulfateAddedPpm?: number | null;
+  mashManualLastChlorideAddedPpm?: number | null;
+  mashManualLastCalculatedAt?: Date | null;
+
   mashSaltAdditionsJson?: unknown;
   mashSaltsLastResultJson?: unknown;
 
@@ -187,6 +196,46 @@ export class RecipeWaterSettingsService {
     }
     if (input.mashLastCalculatedAt !== undefined) {
       data.mashLastCalculatedAt = input.mashLastCalculatedAt;
+    }
+
+    if (input.mashAcidificationMode !== undefined) {
+      const v = input.mashAcidificationMode;
+      if (typeof v !== "string") {
+        throw new BadRequestError("invalid_string", "Body.mashAcidificationMode must be a string");
+      }
+      if (v !== "targetPh" && v !== "manual") {
+        throw new BadRequestError(
+          "invalid_mash_acidification_mode",
+          'Body.mashAcidificationMode must be "targetPh" or "manual"',
+        );
+      }
+      data.mashAcidificationMode = v;
+    }
+
+    const mashManualInputFields = ["mashManualAcidAddedMl", "mashManualAcidAddedGrams"] as const;
+    for (const f of mashManualInputFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+
+    const mashManualSnapshotFields = [
+      "mashManualLastAchievedPh",
+      "mashManualLastFinalAlkalinityPpmCaCO3",
+      "mashManualLastSulfateAddedPpm",
+      "mashManualLastChlorideAddedPpm",
+    ] as const;
+    for (const f of mashManualSnapshotFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+    if (input.mashManualLastCalculatedAt !== undefined) {
+      data.mashManualLastCalculatedAt = input.mashManualLastCalculatedAt;
     }
 
     if (input.mashSaltAdditionsJson !== undefined) {

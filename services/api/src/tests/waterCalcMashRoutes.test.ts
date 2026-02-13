@@ -25,6 +25,34 @@ describe("water calc: mash acidification + salt additions", () => {
     await app.close();
   });
 
+  it("estimates achieved pH for mash manual acid entry", async () => {
+    const app = buildApp();
+    await app.ready();
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-acidification-manual",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: {
+        acidType: "phosphoric",
+        strengthKind: "percent",
+        strengthValue: 10,
+        mashStartingAlkalinityPpmCaCO3: 50,
+        mashStartingPh: 7.0,
+        mashWaterVolumeLiters: 10,
+        acidAddedMl: 1.5,
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.result.achievedPh).toBeGreaterThan(3.0);
+    expect(body.result.achievedPh).toBeLessThan(8.0);
+    await app.close();
+  });
+
   it("computes salt additions", async () => {
     const app = buildApp();
     await app.ready();

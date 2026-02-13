@@ -116,6 +116,16 @@ model RecipeWaterSettings {
   mashLastChlorideAddedPpm          Float?
   mashLastCalculatedAt              DateTime?
 
+  // Mash water acidification manual-entry mode (v0): user enters amount added; we estimate achieved pH.
+  mashAcidificationMode             String @default("targetPh") // "targetPh" | "manual"
+  mashManualAcidAddedMl             Float?
+  mashManualAcidAddedGrams          Float?
+  mashManualLastAchievedPh          Float?
+  mashManualLastFinalAlkalinityPpmCaCO3 Float?
+  mashManualLastSulfateAddedPpm     Float?
+  mashManualLastChlorideAddedPpm    Float?
+  mashManualLastCalculatedAt        DateTime?
+
   // Mash salt additions (manual)
   mashSaltAdditionsJson   Json?
   mashSaltsLastResultJson Json?
