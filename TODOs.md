@@ -31,6 +31,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 ## Web SEO / SSR assessment
 
 - [ ] Assess SEO with the current Next.js App Router usage (client components, hydration, view-source). If pages aren’t SEO-friendly, reassess what must become SSR/server components + metadata strategy.
+  - Notes / approach: `docs/SEO.md`
 
 ## Water calculator (BrunWater parity)
 
