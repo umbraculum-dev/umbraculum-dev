@@ -1867,13 +1867,72 @@ export default function WaterCalculatorPage() {
           </details>
         </section>
 
-        <section className="panel" aria-labelledby="profiles-admin-note-heading">
-          <h2 id="profiles-admin-note-heading" style={{ marginTop: 0 }}>
-            Water profiles
+        <section className="panel" aria-labelledby="grist-heading">
+          <h2 id="grist-heading" style={{ marginTop: 0 }}>
+            Grist (imported from recipe)
           </h2>
-          <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
-            Adding/verifying profiles is now on <Link href="/water-profiles">Manage water profiles</Link>.
+          <p className="muted" style={{ marginTop: 0 }}>
+            This section is read-only. Use the button to import/update the grist snapshot from the recipe’s
+            Fermentables section.
           </p>
+
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button type="button" onClick={() => void onImportGristFromRecipe()} disabled={!canCall || importingGrist}>
+              {importingGrist ? "Importing…" : "Import/update grist from recipe"}
+            </button>
+            {gristImportStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {gristImportStatus}
+              </span>
+            ) : null}
+          </div>
+
+          {gristImportError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {gristImportError}
+            </pre>
+          ) : null}
+
+          {gristImportedRows.length ? (
+            <div style={{ overflowX: "auto", marginTop: 12 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th align="left">Name</th>
+                    <th align="right">kg</th>
+                    <th align="right">°L</th>
+                    <th align="left">Potential</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gristImportedRows.map((r) => (
+                    <tr key={r.id}>
+                      <td>{r.name}</td>
+                      <td align="right">{r.amountKg.toFixed(3)}</td>
+                      <td align="right">{r.colorLovibond === null ? "—" : r.colorLovibond.toFixed(1)}</td>
+                      <td className="muted">
+                        {r.potential
+                          ? `${r.potential.kind} ${r.potential.value}`
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              No imported grist yet.
+            </p>
+          )}
+
+          {gristSourceRecipeUpdatedAt && gristImportedAt ? (
+            new Date(gristSourceRecipeUpdatedAt).getTime() > new Date(gristImportedAt).getTime() ? (
+              <p className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                The recipe was updated after the last grist import. Click <strong>Import/update grist from recipe</strong> to refresh.
+              </p>
+            ) : null
+          ) : null}
         </section>
 
         <section className="panel" aria-labelledby="summary-heading">
@@ -2031,7 +2090,11 @@ export default function WaterCalculatorPage() {
                   <code>{saltAdditions.length}</code> · acid{" "}
                   <code>{mashAcidType}</code> ({mashStrengthKind}
                   {mashStrengthKind === "solid" ? "" : ` ${mashStrengthValue}`}) · grist import{" "}
-                  {gristImportedAt ? <code>{new Date(gristImportedAt).toLocaleString()}</code> : <span className="muted">none</span>}
+                  {gristImportedAt ? (
+                    <code>{new Date(gristImportedAt).toLocaleString()}</code>
+                  ) : (
+                    <span className="muted">none</span>
+                  )}
                 </span>
               </p>
               {overallDirty ? (
@@ -2096,72 +2159,13 @@ export default function WaterCalculatorPage() {
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="grist-heading">
-          <h2 id="grist-heading" style={{ marginTop: 0 }}>
-            Grist (imported from recipe)
+        <section className="panel" aria-labelledby="profiles-admin-note-heading">
+          <h2 id="profiles-admin-note-heading" style={{ marginTop: 0 }}>
+            Water profiles
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
-            This section is read-only. Use the button to import/update the grist snapshot from the recipe’s
-            Fermentables section.
+          <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
+            Adding/verifying profiles is now on <Link href="/water-profiles">Manage water profiles</Link>.
           </p>
-
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <button type="button" onClick={() => void onImportGristFromRecipe()} disabled={!canCall || importingGrist}>
-              {importingGrist ? "Importing…" : "Import/update grist from recipe"}
-            </button>
-            {gristImportStatus ? (
-              <span className="muted" role="status" aria-live="polite">
-                {gristImportStatus}
-              </span>
-            ) : null}
-          </div>
-
-          {gristImportError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
-              {gristImportError}
-            </pre>
-          ) : null}
-
-          {gristImportedRows.length ? (
-            <div style={{ overflowX: "auto", marginTop: 12 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th align="left">Name</th>
-                    <th align="right">kg</th>
-                    <th align="right">°L</th>
-                    <th align="left">Potential</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {gristImportedRows.map((r) => (
-                    <tr key={r.id}>
-                      <td>{r.name}</td>
-                      <td align="right">{r.amountKg.toFixed(3)}</td>
-                      <td align="right">{r.colorLovibond === null ? "—" : r.colorLovibond.toFixed(1)}</td>
-                      <td className="muted">
-                        {r.potential
-                          ? `${r.potential.kind} ${r.potential.value}`
-                          : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
-              No imported grist yet.
-            </p>
-          )}
-
-          {gristSourceRecipeUpdatedAt && gristImportedAt ? (
-            new Date(gristSourceRecipeUpdatedAt).getTime() > new Date(gristImportedAt).getTime() ? (
-              <p className="errorBox" role="alert" style={{ marginTop: 12 }}>
-                The recipe was updated after the last grist import. Click <strong>Import/update grist from recipe</strong> to refresh.
-              </p>
-            ) : null
-          ) : null}
         </section>
 
         <section className="panel" aria-labelledby="nav-heading">
