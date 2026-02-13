@@ -74,6 +74,7 @@ model Recipe {
   name      String
   style     String?
   notes     String?  @db.Text
+  gristJson Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -133,6 +134,11 @@ model RecipeWaterSettings {
   // Mash overall adjustment snapshot (Sheet 5, v0): combined salts + acid output for debugging/audit.
   mashOverallLastResultJson   Json?
   mashOverallLastCalculatedAt DateTime?
+
+  // Mash grist snapshot (imported from recipe; read-only in water calculator)
+  mashGristImportedJson           Json?
+  mashGristImportedAt             DateTime?
+  mashGristSourceRecipeUpdatedAt  DateTime?
 
   // Sparge acidification inputs (liters-first)
   spargeStartingAlkalinityPpmCaCO3 Float @default(0)

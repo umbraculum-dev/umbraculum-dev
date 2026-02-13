@@ -68,6 +68,16 @@ type MashOverallResultV0 = {
   };
 };
 
+type GristPotentialKind = "ppg" | "yieldPercent" | "sg";
+type GristPotential = { kind: GristPotentialKind; value: number } | null;
+type GristRow = {
+  id: string;
+  name: string;
+  amountKg: number;
+  colorLovibond: number | null;
+  potential: GristPotential;
+};
+
 type IonProfilePpm = {
   calcium: number;
   magnesium: number;
@@ -148,9 +158,22 @@ type RecipeWaterSettings = {
   // v0 overall snapshot (may be absent until persisted by API)
   mashOverallLastResultJson?: unknown;
   mashOverallLastCalculatedAt?: string | null;
+
+  mashGristImportedJson?: unknown;
+  mashGristImportedAt?: string | null;
+  mashGristSourceRecipeUpdatedAt?: string | null;
 };
 
 type RecipeWaterSettingsResponse = { ok: true; settings: RecipeWaterSettings | null };
+
+type RecipeResponse = {
+  ok: true;
+  recipe: {
+    id: string;
+    updatedAt: string;
+    gristJson?: unknown;
+  };
+};
 
 async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
   const res = await fetch(path, {
@@ -167,6 +190,40 @@ async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
 
 function isAdmin(role: string | null) {
   return role === "owner" || role === "brewery_admin";
+}
+
+function parseGristJson(value: unknown): GristRow[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((row) => {
+      const o = (row ?? {}) as Record<string, unknown>;
+      const id = typeof o.id === "string" ? o.id : "";
+      const name = typeof o.name === "string" ? o.name : "";
+      const amountKg = typeof o.amountKg === "number" && Number.isFinite(o.amountKg) ? o.amountKg : 0;
+      const colorLovibond =
+        o.colorLovibond === null
+          ? null
+          : typeof o.colorLovibond === "number" && Number.isFinite(o.colorLovibond)
+            ? o.colorLovibond
+            : null;
+      const potentialRaw = o.potential;
+      let potential: GristPotential = null;
+      if (potentialRaw && typeof potentialRaw === "object") {
+        const p = potentialRaw as Record<string, unknown>;
+        const kind = p.kind;
+        const v = p.value;
+        if (
+          (kind === "ppg" || kind === "yieldPercent" || kind === "sg") &&
+          typeof v === "number" &&
+          Number.isFinite(v)
+        ) {
+          potential = { kind, value: v };
+        }
+      }
+      if (!id || !name) return null;
+      return { id, name, amountKg, colorLovibond, potential } as GristRow;
+    })
+    .filter((r): r is GristRow => Boolean(r));
 }
 
 function bicarbonatePpmToAlkalinityPpmCaCO3(bicarbPpm: number) {
@@ -250,6 +307,24 @@ export default function WaterCalculatorPage() {
   const [overallSubmitting, setOverallSubmitting] = useState(false);
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<MashOverallResultV0 | null>(null);
+
+  const [gristImportedRows, setGristImportedRows] = useState<GristRow[]>([]);
+  const [gristImportStatus, setGristImportStatus] = useState<string | null>(null);
+  const [gristImportError, setGristImportError] = useState<string | null>(null);
+  const [importingGrist, setImportingGrist] = useState(false);
+  const [gristImportedAt, setGristImportedAt] = useState<string | null>(null);
+  const [gristSourceRecipeUpdatedAt, setGristSourceRecipeUpdatedAt] = useState<string | null>(null);
+
+  const overallDirty = useMemo(() => {
+    if (!overallResult) return false;
+    if (overallResult.debug.startingAlkalinityPpmCaCO3 !== mashStartingAlk) return true;
+    if (overallResult.debug.mashMode !== mashAcidificationMode) return true;
+    if (overallResult.debug.mashMode === "targetPh" && overallResult.ph.kind === "target") {
+      if (Number(overallResult.ph.value.toFixed(2)) !== Number(mashTargetPh.toFixed(2))) return true;
+    }
+    if (saltAdditions.length === 0 && overallResult.debug.saltsDeltaBicarbonatePpm !== 0) return true;
+    return false;
+  }, [overallResult, mashStartingAlk, mashAcidificationMode, mashTargetPh, saltAdditions.length]);
 
   // Water profile creation/verification moved to `/water-profiles`.
 
@@ -378,6 +453,17 @@ export default function WaterCalculatorPage() {
         setOverallStatus(`Last calculated: ${new Date(s.mashOverallLastCalculatedAt).toLocaleString()}`);
       }
 
+      if (Array.isArray(s.mashGristImportedJson)) {
+        setGristImportedRows(parseGristJson(s.mashGristImportedJson));
+      }
+      if (typeof s.mashGristImportedAt === "string") {
+        setGristImportedAt(s.mashGristImportedAt);
+        setGristImportStatus(`Imported: ${new Date(s.mashGristImportedAt).toLocaleString()}`);
+      }
+      if (typeof s.mashGristSourceRecipeUpdatedAt === "string") {
+        setGristSourceRecipeUpdatedAt(s.mashGristSourceRecipeUpdatedAt);
+      }
+
       if (s.spargeLastCalculatedAt) {
         setSpargeResult({
           acidRequiredMl: s.spargeLastAcidRequiredMl,
@@ -392,6 +478,37 @@ export default function WaterCalculatorPage() {
       }
     } catch (err) {
       setSettingsError(String(err));
+    }
+  };
+
+  const onImportGristFromRecipe = async () => {
+    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    setGristImportError(null);
+    setGristImportStatus(null);
+    setImportingGrist(true);
+    try {
+      const res = await apiFetch(`/api/recipes/${recipeId}`, auth);
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const data = res.data as RecipeResponse;
+      const recipe = (data as any).recipe as { updatedAt?: unknown; gristJson?: unknown };
+      const updatedAt = typeof recipe.updatedAt === "string" ? recipe.updatedAt : "";
+      const rows = parseGristJson(recipe.gristJson);
+
+      const nowIso = new Date().toISOString();
+      await saveSettings({
+        mashGristImportedJson: rows,
+        mashGristImportedAt: nowIso,
+        mashGristSourceRecipeUpdatedAt: updatedAt || null,
+      });
+
+      setGristImportedRows(rows);
+      setGristImportedAt(nowIso);
+      setGristSourceRecipeUpdatedAt(updatedAt || null);
+      setGristImportStatus(`Imported: ${new Date(nowIso).toLocaleString()}`);
+    } catch (err) {
+      setGristImportError(String(err));
+    } finally {
+      setImportingGrist(false);
     }
   };
 
@@ -1906,6 +2023,23 @@ export default function WaterCalculatorPage() {
                 Snapshot: <code>{new Date(overallResult.calculatedAt).toLocaleString()}</code>
               </p>
               <p className="muted" style={{ marginTop: 0 }}>
+                Computed from:{" "}
+                <span>
+                  mash vol <code>{mashWaterVolumeLiters.toFixed(2)}</code> L · start alk{" "}
+                  <code>{mashStartingAlk.toFixed(2)}</code> ppm as CaCO3 · start pH{" "}
+                  <code>{mashStartingPh.toFixed(2)}</code> · salts rows{" "}
+                  <code>{saltAdditions.length}</code> · acid{" "}
+                  <code>{mashAcidType}</code> ({mashStrengthKind}
+                  {mashStrengthKind === "solid" ? "" : ` ${mashStrengthValue}`}) · grist import{" "}
+                  {gristImportedAt ? <code>{new Date(gristImportedAt).toLocaleString()}</code> : <span className="muted">none</span>}
+                </span>
+              </p>
+              {overallDirty ? (
+                <p className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                  Inputs have changed since this overall snapshot was calculated. Recalculate to refresh.
+                </p>
+              ) : null}
+              <p className="muted" style={{ marginTop: 0 }}>
                 pH:{" "}
                 {overallResult.ph.kind === "target" ? (
                   <>
@@ -1959,6 +2093,74 @@ export default function WaterCalculatorPage() {
                 </div>
               </details>
             </div>
+          ) : null}
+        </section>
+
+        <section className="panel" aria-labelledby="grist-heading">
+          <h2 id="grist-heading" style={{ marginTop: 0 }}>
+            Grist (imported from recipe)
+          </h2>
+          <p className="muted" style={{ marginTop: 0 }}>
+            This section is read-only. Use the button to import/update the grist snapshot from the recipe’s
+            Fermentables section.
+          </p>
+
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button type="button" onClick={() => void onImportGristFromRecipe()} disabled={!canCall || importingGrist}>
+              {importingGrist ? "Importing…" : "Import/update grist from recipe"}
+            </button>
+            {gristImportStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {gristImportStatus}
+              </span>
+            ) : null}
+          </div>
+
+          {gristImportError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {gristImportError}
+            </pre>
+          ) : null}
+
+          {gristImportedRows.length ? (
+            <div style={{ overflowX: "auto", marginTop: 12 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th align="left">Name</th>
+                    <th align="right">kg</th>
+                    <th align="right">°L</th>
+                    <th align="left">Potential</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gristImportedRows.map((r) => (
+                    <tr key={r.id}>
+                      <td>{r.name}</td>
+                      <td align="right">{r.amountKg.toFixed(3)}</td>
+                      <td align="right">{r.colorLovibond === null ? "—" : r.colorLovibond.toFixed(1)}</td>
+                      <td className="muted">
+                        {r.potential
+                          ? `${r.potential.kind} ${r.potential.value}`
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              No imported grist yet.
+            </p>
+          )}
+
+          {gristSourceRecipeUpdatedAt && gristImportedAt ? (
+            new Date(gristSourceRecipeUpdatedAt).getTime() > new Date(gristImportedAt).getTime() ? (
+              <p className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                The recipe was updated after the last grist import. Click <strong>Import/update grist from recipe</strong> to refresh.
+              </p>
+            ) : null
           ) : null}
         </section>
 

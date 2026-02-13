@@ -72,12 +72,33 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
-      payload: { name: "Test Recipe", style: "IPA" },
+      payload: {
+        name: "Test Recipe",
+        style: "IPA",
+        gristJson: [
+          {
+            id: "row-1",
+            name: "Pale malt",
+            amountKg: 4.5,
+            colorLovibond: 2.0,
+            potential: { kind: "ppg", value: 37 },
+          },
+        ],
+      },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
     expect(created.ok).toBe(true);
     expect(created.recipe.accountId).toBe(TEST_ACCOUNT_A);
+    expect(created.recipe.gristJson).toEqual([
+      {
+        id: "row-1",
+        name: "Pale malt",
+        amountKg: 4.5,
+        colorLovibond: 2,
+        potential: { kind: "ppg", value: 37 },
+      },
+    ]);
 
     const list = await app.inject({
       method: "GET",
@@ -208,6 +229,22 @@ describe("recipes (account scoped)", () => {
       ok: false,
       error: { code: "recipe_not_found", message: "Recipe not found" },
     });
+  });
+
+  it("rejects invalid gristJson", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      payload: {
+        name: "Bad grist",
+        gristJson: [{ id: "x", name: "Malt", amountKg: -1, colorLovibond: 2, potential: null }],
+      },
+    });
+    expect(res.statusCode).toBe(400);
+    const body = res.json() as any;
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("invalid_grist_row_amount");
   });
 });
 

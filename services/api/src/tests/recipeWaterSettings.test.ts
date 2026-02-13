@@ -118,6 +118,17 @@ describe("recipe water-settings", () => {
         mashSaltAdditionsJson: [{ saltKey: "gypsum", grams: 2.5 }],
         mashOverallLastResultJson: overall,
         mashOverallLastCalculatedAt: nowIso,
+        mashGristImportedJson: [
+          {
+            id: "g1",
+            name: "Pilsner malt",
+            amountKg: 5.0,
+            colorLovibond: 1.5,
+            potential: { kind: "ppg", value: 37 },
+          },
+        ],
+        mashGristImportedAt: nowIso,
+        mashGristSourceRecipeUpdatedAt: nowIso,
 
         spargeStartingAlkalinityPpmCaCO3: 12,
         spargeStartingPh: 7.1,
@@ -160,6 +171,17 @@ describe("recipe water-settings", () => {
     expect(body.settings.mashManualLastChlorideAddedPpm).toBe(0.2);
     expect(body.settings.mashOverallLastCalculatedAt).toBe(nowIso);
     expect(body.settings.mashOverallLastResultJson).toEqual(overall);
+    expect(body.settings.mashGristImportedAt).toBe(nowIso);
+    expect(body.settings.mashGristSourceRecipeUpdatedAt).toBe(nowIso);
+    expect(body.settings.mashGristImportedJson).toEqual([
+      {
+        id: "g1",
+        name: "Pilsner malt",
+        amountKg: 5,
+        colorLovibond: 1.5,
+        potential: { kind: "ppg", value: 37 },
+      },
+    ]);
     expect(body.settings.mashSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 2.5 }]);
     expect(body.settings.spargeStartingAlkalinityPpmCaCO3).toBe(12);
     expect(body.settings.spargeLastAcidRequiredMl).toBe(1.23);

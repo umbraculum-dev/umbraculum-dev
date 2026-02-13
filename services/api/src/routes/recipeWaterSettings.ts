@@ -174,6 +174,23 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
             ? null
             : undefined,
 
+      mashGristImportedJson:
+        body.mashGristImportedJson === null || body.mashGristImportedJson !== undefined
+          ? body.mashGristImportedJson
+          : undefined,
+      mashGristImportedAt:
+        typeof body.mashGristImportedAt === "string"
+          ? new Date(body.mashGristImportedAt)
+          : body.mashGristImportedAt === null
+            ? null
+            : undefined,
+      mashGristSourceRecipeUpdatedAt:
+        typeof body.mashGristSourceRecipeUpdatedAt === "string"
+          ? new Date(body.mashGristSourceRecipeUpdatedAt)
+          : body.mashGristSourceRecipeUpdatedAt === null
+            ? null
+            : undefined,
+
       spargeStartingAlkalinityPpmCaCO3:
         typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
           ? body.spargeStartingAlkalinityPpmCaCO3

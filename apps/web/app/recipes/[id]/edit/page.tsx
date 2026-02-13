@@ -12,9 +12,61 @@ type Recipe = {
   name: string;
   style: string | null;
   notes: string | null;
+  gristJson?: unknown;
   createdAt: string;
   updatedAt: string;
 };
+
+type GristPotentialKind = "ppg" | "yieldPercent" | "sg";
+type GristPotential = { kind: GristPotentialKind; value: number } | null;
+type GristRow = {
+  id: string;
+  name: string;
+  amountKg: number;
+  colorLovibond: number | null;
+  potential: GristPotential;
+};
+
+function newRowId() {
+  try {
+    return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  } catch {
+    return `${Date.now()}-${Math.random()}`;
+  }
+}
+
+function parseGristJson(value: unknown): GristRow[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((row) => {
+      const o = (row ?? {}) as Record<string, unknown>;
+      const id = typeof o.id === "string" ? o.id : newRowId();
+      const name = typeof o.name === "string" ? o.name : "";
+      const amountKg = typeof o.amountKg === "number" && Number.isFinite(o.amountKg) ? o.amountKg : 0;
+      const colorLovibond =
+        o.colorLovibond === null
+          ? null
+          : typeof o.colorLovibond === "number" && Number.isFinite(o.colorLovibond)
+            ? o.colorLovibond
+            : null;
+      const potentialRaw = o.potential;
+      let potential: GristPotential = null;
+      if (potentialRaw && typeof potentialRaw === "object") {
+        const p = potentialRaw as Record<string, unknown>;
+        const kind = p.kind;
+        const v = p.value;
+        if (
+          (kind === "ppg" || kind === "yieldPercent" || kind === "sg") &&
+          typeof v === "number" &&
+          Number.isFinite(v)
+        ) {
+          potential = { kind, value: v };
+        }
+      }
+      return { id, name, amountKg, colorLovibond, potential } as GristRow;
+    })
+    .filter(Boolean);
+}
 
 async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
   const res = await fetch(path, {
@@ -55,6 +107,7 @@ export default function RecipeEditPage() {
   const [name, setName] = useState("");
   const [style, setStyle] = useState("");
   const [notes, setNotes] = useState("");
+  const [gristRows, setGristRows] = useState<GristRow[]>([]);
 
   useEffect(() => {
     setAuth(loadDevAuthFromStorage());
@@ -83,6 +136,7 @@ export default function RecipeEditPage() {
         setName(r.name ?? "");
         setStyle(r.style ?? "");
         setNotes(r.notes ?? "");
+        setGristRows(parseGristJson(r.gristJson));
       } catch (err) {
         if (cancelled) return;
         setLoadError(String(err));
@@ -109,6 +163,7 @@ export default function RecipeEditPage() {
           name,
           style: style || null,
           notes: notes || null,
+          gristJson: gristRows,
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
@@ -121,6 +176,34 @@ export default function RecipeEditPage() {
       setSaving(false);
     }
   };
+
+  const addGristRow = () => {
+    setGristRows((prev) => [
+      ...prev,
+      { id: newRowId(), name: "", amountKg: 0, colorLovibond: null, potential: null },
+    ]);
+  };
+  const removeGristRow = (id: string) => {
+    setGristRows((prev) => prev.filter((r) => r.id !== id));
+  };
+  const updateGristRow = (id: string, patch: Partial<GristRow>) => {
+    setGristRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  };
+
+  const gristTotals = useMemo(() => {
+    const totalKg = gristRows.reduce((acc, r) => acc + (Number.isFinite(r.amountKg) ? r.amountKg : 0), 0);
+    let colorSum = 0;
+    let colorWeight = 0;
+    for (const r of gristRows) {
+      if (r.colorLovibond === null) continue;
+      const w = Number.isFinite(r.amountKg) ? r.amountKg : 0;
+      if (w <= 0) continue;
+      colorSum += w * r.colorLovibond;
+      colorWeight += w;
+    }
+    const weightedAvgLovibond = colorWeight > 0 ? colorSum / colorWeight : null;
+    return { totalKg, weightedAvgLovibond };
+  }, [gristRows]);
 
   return (
     <>
@@ -240,8 +323,141 @@ export default function RecipeEditPage() {
               Fermentables
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
-              v0 will use a seedable fermentables database for pickers (malt/extract/sugar).
+              v0: enter your grist here. Water calculator can import a read-only snapshot.
             </p>
+
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <button type="button" onClick={addGristRow} disabled={!canCallAccountScoped}>
+                Add fermentable
+              </button>
+              <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                {saving ? "Saving…" : "Save (including grist)"}
+              </button>
+              <span className="muted" aria-live="polite">
+                Total: <code>{gristTotals.totalKg.toFixed(3)}</code> kg{" "}
+                {gristTotals.weightedAvgLovibond !== null ? (
+                  <>
+                    · Avg color: <code>{gristTotals.weightedAvgLovibond.toFixed(1)}</code> °L
+                  </>
+                ) : null}
+              </span>
+            </div>
+
+            {gristRows.length ? (
+              <div style={{ overflowX: "auto", marginTop: 12 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th align="left">Name</th>
+                      <th align="right">kg</th>
+                      <th align="right">°L</th>
+                      <th align="left">Potential</th>
+                      <th align="right">Value</th>
+                      <th align="left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gristRows.map((r, idx) => (
+                      <tr key={r.id}>
+                        <td>
+                          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-name-${r.id}`}>
+                            Fermentable name
+                          </label>
+                          <input
+                            id={`grist-name-${r.id}`}
+                            value={r.name}
+                            onChange={(e) => updateGristRow(r.id, { name: e.target.value })}
+                            style={{ width: "100%", padding: 8 }}
+                            autoComplete="off"
+                          />
+                        </td>
+                        <td align="right">
+                          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-kg-${r.id}`}>
+                            Amount (kg)
+                          </label>
+                          <input
+                            id={`grist-kg-${r.id}`}
+                            type="number"
+                            inputMode="decimal"
+                            step={0.001}
+                            value={r.amountKg}
+                            onChange={(e) => updateGristRow(r.id, { amountKg: Number(e.target.value) })}
+                            style={{ width: 140, padding: 8 }}
+                          />
+                        </td>
+                        <td align="right">
+                          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-lov-${r.id}`}>
+                            Color (°L)
+                          </label>
+                          <input
+                            id={`grist-lov-${r.id}`}
+                            type="number"
+                            inputMode="decimal"
+                            step={0.1}
+                            value={r.colorLovibond ?? ""}
+                            onChange={(e) =>
+                              updateGristRow(r.id, {
+                                colorLovibond: e.target.value === "" ? null : Number(e.target.value),
+                              })
+                            }
+                            style={{ width: 100, padding: 8 }}
+                          />
+                        </td>
+                        <td>
+                          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-pot-kind-${r.id}`}>
+                            Potential kind
+                          </label>
+                          <select
+                            id={`grist-pot-kind-${r.id}`}
+                            value={r.potential?.kind ?? ""}
+                            onChange={(e) => {
+                              const kind = e.target.value as GristPotentialKind | "";
+                              if (!kind) return updateGristRow(r.id, { potential: null });
+                              updateGristRow(r.id, { potential: { kind, value: r.potential?.value ?? 0 } });
+                            }}
+                            style={{ width: 160, padding: 8 }}
+                          >
+                            <option value="">(none)</option>
+                            <option value="ppg">PPG</option>
+                            <option value="yieldPercent">Yield %</option>
+                            <option value="sg">SG (e.g. 1.037)</option>
+                          </select>
+                        </td>
+                        <td align="right">
+                          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-pot-val-${r.id}`}>
+                            Potential value
+                          </label>
+                          <input
+                            id={`grist-pot-val-${r.id}`}
+                            type="number"
+                            inputMode="decimal"
+                            step={0.001}
+                            value={r.potential?.value ?? ""}
+                            onChange={(e) => {
+                              const v = e.target.value === "" ? null : Number(e.target.value);
+                              if (!r.potential) return;
+                              if (v === null) return updateGristRow(r.id, { potential: null });
+                              updateGristRow(r.id, { potential: { ...r.potential, value: v } });
+                            }}
+                            disabled={!r.potential}
+                            style={{ width: 140, padding: 8 }}
+                          />
+                        </td>
+                        <td>
+                          <button type="button" onClick={() => removeGristRow(r.id)} aria-label={`Remove fermentable row ${idx + 1}`}>
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                No fermentables yet.
+              </p>
+            )}
           </section>
 
           <section id="hops" className="panel" aria-labelledby="hops-heading">
