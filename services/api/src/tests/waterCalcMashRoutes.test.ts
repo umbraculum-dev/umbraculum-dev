@@ -53,6 +53,61 @@ describe("water calc: mash acidification + salt additions", () => {
     await app.close();
   });
 
+  it("estimates mash pH from grist + alkalinity", async () => {
+    const app = buildApp();
+    await app.ready();
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-ph-estimate",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: {
+        volumeLiters: 10,
+        alkalinityPpmCaCO3: 50,
+        grist: [{ amountKg: 5, colorLovibond: 2, maltClass: "base" }],
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.result.estimatedMashPhRoomTemp).toBeGreaterThan(0);
+    expect(body.result.estimatedMashPhRoomTemp).toBeLessThan(14);
+    await app.close();
+  });
+
+  it("solves acid amount for target mash pH (grist-driven)", async () => {
+    const app = buildApp();
+    await app.ready();
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-acidification-target-mash-ph",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: {
+        acidType: "lactic",
+        strengthKind: "percent",
+        strengthValue: 88,
+        mashStartingAlkalinityPpmCaCO3: 200,
+        mashStartingPh: 7.0,
+        mashWaterVolumeLiters: 10,
+        targetMashPh: 5.4,
+        grist: [{ amountKg: 5, colorLovibond: 2, maltClass: "base" }],
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.result.acidRequiredMl).toBeTypeOf("number");
+    expect(body.result.acidRequiredMl).toBeGreaterThan(0);
+    expect(body.result.estimatedMashPhRoomTemp).toBeTypeOf("number");
+    expect(Math.abs(body.result.estimatedMashPhRoomTemp - 5.4)).toBeLessThan(0.05);
+    await app.close();
+  });
+
   it("computes salt additions", async () => {
     const app = buildApp();
     await app.ready();

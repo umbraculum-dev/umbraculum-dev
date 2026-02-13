@@ -110,12 +110,15 @@ type GristPotential =
   | { kind: "yieldPercent"; value: number }
   | { kind: "sg"; value: number };
 
+type GristMaltClass = "base" | "crystal" | "roast" | "acid";
+
 type GristRow = {
   id: string;
   name: string;
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential | null;
+  maltClass: GristMaltClass;
 };
 
 function ensureFinite(n: unknown, field: string) {
@@ -164,6 +167,19 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
       );
     }
 
+    const maltClassRaw = o.maltClass;
+    const maltClass: GristMaltClass =
+      maltClassRaw === undefined || maltClassRaw === null
+        ? "base"
+        : maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
+          ? maltClassRaw
+          : (() => {
+              throw new BadRequestError(
+                "invalid_grist_row_malt_class",
+                `Body.gristJson[${idx}].maltClass must be one of: base, crystal, roast, acid`,
+              );
+            })();
+
     const potentialRaw = o.potential;
     let potential: GristPotential | null = null;
     if (potentialRaw === null || potentialRaw === undefined) {
@@ -198,6 +214,7 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
       amountKg,
       colorLovibond,
       potential,
+      maltClass,
     };
   });
 }

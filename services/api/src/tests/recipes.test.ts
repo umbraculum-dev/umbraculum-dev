@@ -96,6 +96,7 @@ describe("recipes (account scoped)", () => {
         name: "Pale malt",
         amountKg: 4.5,
         colorLovibond: 2,
+        maltClass: "base",
         potential: { kind: "ppg", value: 37 },
       },
     ]);

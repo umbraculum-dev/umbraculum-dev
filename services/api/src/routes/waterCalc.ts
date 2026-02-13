@@ -7,6 +7,8 @@ import {
   type SpargeAcidType,
 } from "../domain/waterCalc/spargeAcidification.js";
 import { mashAcidificationManual } from "../domain/waterCalc/mashAcidificationManual.js";
+import { mashPhEstimateV0 } from "../domain/waterCalc/mashPhEstimateV0.js";
+import { mashAcidificationTargetMashPhV0 } from "../domain/waterCalc/mashAcidificationTargetMashPhV0.js";
 import {
   applySaltAdditions,
   type IonProfilePpm,
@@ -196,6 +198,245 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       });
     } catch (e) {
       throw new BadRequestError("invalid_manual_acid_input", (e as Error)?.message || "Invalid manual input");
+    }
+
+    return { ok: true, result };
+  });
+
+  app.post("/water-calc/mash-ph-estimate", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const volumeLiters =
+      typeof body.mashWaterVolumeLiters === "number"
+        ? (body.mashWaterVolumeLiters as number)
+        : typeof body.volumeLiters === "number"
+          ? (body.volumeLiters as number)
+          : NaN;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
+    }
+
+    const alkalinityPpmCaCO3 =
+      typeof body.alkalinityPpmCaCO3 === "number"
+        ? (body.alkalinityPpmCaCO3 as number)
+        : typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
+          ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+          : typeof body.startingAlkalinityPpmCaCO3 === "number"
+            ? (body.startingAlkalinityPpmCaCO3 as number)
+            : NaN;
+    if (!Number.isFinite(alkalinityPpmCaCO3)) {
+      throw new BadRequestError(
+        "invalid_alkalinity",
+        "Body.alkalinityPpmCaCO3 (or starting alkalinity) must be a finite number",
+      );
+    }
+
+    const gristRaw = body.grist;
+    if (!Array.isArray(gristRaw)) {
+      throw new BadRequestError("invalid_grist", "Body.grist must be an array");
+    }
+    const grist = gristRaw.map((row, idx) => {
+      const o = (row ?? {}) as Record<string, unknown>;
+      const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+      if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
+        throw new BadRequestError(
+          "invalid_grist_row_amount",
+          `Body.grist[${idx}].amountKg must be a number > 0`,
+        );
+      }
+      const colorRaw = o.colorLovibond;
+      const colorLovibond =
+        colorRaw === null || colorRaw === undefined
+          ? null
+          : typeof colorRaw === "number"
+            ? colorRaw
+            : NaN;
+      if (typeof colorLovibond === "number" && (!Number.isFinite(colorLovibond) || colorLovibond < 0)) {
+        throw new BadRequestError(
+          "invalid_grist_row_color",
+          `Body.grist[${idx}].colorLovibond must be null or a number >= 0`,
+        );
+      }
+
+      const maltClassRaw = o.maltClass;
+      const maltClass =
+        maltClassRaw === "base" ||
+        maltClassRaw === "crystal" ||
+        maltClassRaw === "roast" ||
+        maltClassRaw === "acid"
+          ? maltClassRaw
+          : "base";
+
+      return { amountKg, colorLovibond, maltClass };
+    });
+
+    const waterToGristRatioQtPerLbOverride =
+      typeof body.waterToGristRatioQtPerLbOverride === "number"
+        ? body.waterToGristRatioQtPerLbOverride
+        : undefined;
+    if (
+      waterToGristRatioQtPerLbOverride !== undefined &&
+      (!Number.isFinite(waterToGristRatioQtPerLbOverride) || !(waterToGristRatioQtPerLbOverride > 0))
+    ) {
+      throw new BadRequestError(
+        "invalid_ratio_override",
+        "Body.waterToGristRatioQtPerLbOverride must be a number > 0",
+      );
+    }
+
+    const acidAdded_mEqPerL =
+      typeof body.acidAdded_mEqPerL === "number" ? (body.acidAdded_mEqPerL as number) : undefined;
+    if (
+      acidAdded_mEqPerL !== undefined &&
+      (!Number.isFinite(acidAdded_mEqPerL) || acidAdded_mEqPerL < 0)
+    ) {
+      throw new BadRequestError(
+        "invalid_acid_added_meq",
+        "Body.acidAdded_mEqPerL must be a finite number >= 0",
+      );
+    }
+
+    let result;
+    try {
+      result = mashPhEstimateV0({
+        volumeLiters,
+        alkalinityPpmCaCO3,
+        grist,
+        waterToGristRatioQtPerLbOverride,
+        acidAdded_mEqPerL,
+      });
+    } catch (e) {
+      throw new BadRequestError("invalid_mash_ph_estimate_input", (e as Error)?.message || "Invalid input");
+    }
+
+    return { ok: true, result };
+  });
+
+  app.post("/water-calc/mash-acidification-target-mash-ph", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const acidType = body.acidType as SpargeAcidType;
+    if (typeof acidType !== "string") {
+      throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
+    }
+
+    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+      | "percent"
+      | "normality"
+      | "molarity"
+      | "solid";
+    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+
+    let strength: AcidStrength;
+    if (strengthKind === "solid") {
+      strength = { kind: "solid" };
+    } else {
+      if (typeof strengthValue !== "number") {
+        throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
+      }
+      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+    }
+
+    const startingAlkalinityPpmCaCO3 =
+      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
+        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        : typeof body.startingAlkalinityPpmCaCO3 === "number"
+          ? (body.startingAlkalinityPpmCaCO3 as number)
+          : 0;
+    const startingPh =
+      typeof body.mashStartingPh === "number"
+        ? (body.mashStartingPh as number)
+        : typeof body.startingPh === "number"
+          ? (body.startingPh as number)
+          : 7.0;
+    const targetMashPh =
+      typeof body.targetMashPh === "number"
+        ? (body.targetMashPh as number)
+        : typeof body.mashTargetPh === "number"
+          ? (body.mashTargetPh as number)
+          : NaN;
+    if (!Number.isFinite(targetMashPh)) {
+      throw new BadRequestError("invalid_target_mash_ph", "Body.targetMashPh (or mashTargetPh) is required");
+    }
+    const volumeLiters =
+      typeof body.mashWaterVolumeLiters === "number"
+        ? (body.mashWaterVolumeLiters as number)
+        : typeof body.volumeLiters === "number"
+          ? (body.volumeLiters as number)
+          : NaN;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
+    }
+
+    const gristRaw = body.grist;
+    if (!Array.isArray(gristRaw)) {
+      throw new BadRequestError("invalid_grist", "Body.grist must be an array");
+    }
+    const grist = gristRaw.map((row, idx) => {
+      const o = (row ?? {}) as Record<string, unknown>;
+      const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+      if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
+        throw new BadRequestError(
+          "invalid_grist_row_amount",
+          `Body.grist[${idx}].amountKg must be a number > 0`,
+        );
+      }
+      const colorRaw = o.colorLovibond;
+      const colorLovibond =
+        colorRaw === null || colorRaw === undefined
+          ? null
+          : typeof colorRaw === "number"
+            ? colorRaw
+            : NaN;
+      if (typeof colorLovibond === "number" && (!Number.isFinite(colorLovibond) || colorLovibond < 0)) {
+        throw new BadRequestError(
+          "invalid_grist_row_color",
+          `Body.grist[${idx}].colorLovibond must be null or a number >= 0`,
+        );
+      }
+
+      const maltClassRaw = o.maltClass;
+      const maltClass =
+        maltClassRaw === "base" ||
+        maltClassRaw === "crystal" ||
+        maltClassRaw === "roast" ||
+        maltClassRaw === "acid"
+          ? maltClassRaw
+          : "base";
+
+      return { amountKg, colorLovibond, maltClass };
+    });
+
+    const waterToGristRatioQtPerLbOverride =
+      typeof body.waterToGristRatioQtPerLbOverride === "number"
+        ? body.waterToGristRatioQtPerLbOverride
+        : undefined;
+    if (
+      waterToGristRatioQtPerLbOverride !== undefined &&
+      (!Number.isFinite(waterToGristRatioQtPerLbOverride) || !(waterToGristRatioQtPerLbOverride > 0))
+    ) {
+      throw new BadRequestError(
+        "invalid_ratio_override",
+        "Body.waterToGristRatioQtPerLbOverride must be a number > 0",
+      );
+    }
+
+    let result;
+    try {
+      result = mashAcidificationTargetMashPhV0({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        volumeLiters,
+        targetMashPh,
+        acidType,
+        strength,
+        grist,
+        waterToGristRatioQtPerLbOverride,
+      });
+    } catch (e) {
+      throw new BadRequestError("invalid_mash_target_ph_input", (e as Error)?.message || "Invalid input");
     }
 
     return { ok: true, result };

@@ -70,12 +70,14 @@ type MashOverallResultV0 = {
 
 type GristPotentialKind = "ppg" | "yieldPercent" | "sg";
 type GristPotential = { kind: GristPotentialKind; value: number } | null;
+type GristMaltClass = "base" | "crystal" | "roast" | "acid";
 type GristRow = {
   id: string;
   name: string;
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential;
+  maltClass: GristMaltClass;
 };
 
 type IonProfilePpm = {
@@ -221,7 +223,15 @@ function parseGristJson(value: unknown): GristRow[] {
         }
       }
       if (!id || !name) return null;
-      return { id, name, amountKg, colorLovibond, potential } as GristRow;
+      const maltClassRaw = o.maltClass;
+      const maltClass: GristMaltClass =
+        maltClassRaw === "base" ||
+        maltClassRaw === "crystal" ||
+        maltClassRaw === "roast" ||
+        maltClassRaw === "acid"
+          ? maltClassRaw
+          : "base";
+      return { id, name, amountKg, colorLovibond, potential, maltClass } as GristRow;
     })
     .filter((r): r is GristRow => Boolean(r));
 }
@@ -291,6 +301,13 @@ export default function WaterCalculatorPage() {
   );
   const [mashManualAcidAdded, setMashManualAcidAdded] = useState(0);
   const [mashManualResult, setMashManualResult] = useState<MashManualCalcResult | null>(null);
+
+  const [mashNoAcidEstimatedMashPh, setMashNoAcidEstimatedMashPh] = useState<number | null>(null);
+  const [mashNoAcidEstimateStatus, setMashNoAcidEstimateStatus] = useState<string | null>(null);
+  const [mashNoAcidEstimateError, setMashNoAcidEstimateError] = useState<string | null>(null);
+  const [mashNoAcidEstimating, setMashNoAcidEstimating] = useState(false);
+
+  const [mashManualEstimatedMashPh, setMashManualEstimatedMashPh] = useState<number | null>(null);
 
   const [saltsError, setSaltsError] = useState<string | null>(null);
   const [saltsStatus, setSaltsStatus] = useState<string | null>(null);
@@ -536,6 +553,28 @@ export default function WaterCalculatorPage() {
     if (!res.ok) throw new Error(JSON.stringify(res.data));
   };
 
+  const calcMashEstimatedPhNoAcid = async (alkalinityPpmCaCO3: number, acidAdded_mEqPerL?: number) => {
+    if (!auth?.userId || !auth.activeAccountId) throw new Error("Missing auth headers.");
+    if (!gristImportedRows.length) throw new Error("Import grist to enable mash pH estimation.");
+
+    const res = await apiFetch("/api/water-calc/mash-ph-estimate", auth, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mashWaterVolumeLiters,
+        alkalinityPpmCaCO3,
+        acidAdded_mEqPerL: typeof acidAdded_mEqPerL === "number" ? acidAdded_mEqPerL : undefined,
+        grist: gristImportedRows.map((r) => ({
+          amountKg: r.amountKg,
+          colorLovibond: r.colorLovibond,
+          maltClass: r.maltClass,
+        })),
+      }),
+    });
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+    return (res.data as any).result as { estimatedMashPhRoomTemp: number };
+  };
+
   const computeOverallMash = async () => {
     if (!auth?.userId || !auth.activeAccountId) throw new Error("Missing auth headers.");
     if (!mixedSourceProfile) throw new Error("Mix source + dilution first (volumes must be > 0).");
@@ -592,14 +631,37 @@ export default function WaterCalculatorPage() {
       if (!acidRes.ok) throw new Error(JSON.stringify(acidRes.data));
       const result = (acidRes.data as any).result as MashManualCalcResult;
       acidFinal = result.predicted;
-      ph = { kind: "estimated", value: result.achievedPh };
+      if (gristImportedRows.length) {
+        const acidAdded_mEqPerL = (result.predicted as any)?.debug?.acidRequired_mEqPerL;
+        const est = await calcMashEstimatedPhNoAcid(startingAlkAfterSalts, acidAdded_mEqPerL);
+        ph = { kind: "estimated", value: est.estimatedMashPhRoomTemp };
+      } else {
+        ph = { kind: "estimated", value: result.achievedPh };
+      }
     } else {
-      const targetPayload = { ...strengthPayload, mashTargetPh };
-      const acidRes = await apiFetch("/api/water-calc/mash-acidification", auth, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(targetPayload),
-      });
+      const acidRes = await apiFetch(
+        gristImportedRows.length
+          ? "/api/water-calc/mash-acidification-target-mash-ph"
+          : "/api/water-calc/mash-acidification",
+        auth,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            gristImportedRows.length
+              ? {
+                  ...strengthPayload,
+                  targetMashPh: mashTargetPh,
+                  grist: gristImportedRows.map((r) => ({
+                    amountKg: r.amountKg,
+                    colorLovibond: r.colorLovibond,
+                    maltClass: r.maltClass,
+                  })),
+                }
+              : { ...strengthPayload, mashTargetPh },
+          ),
+        },
+      );
       if (!acidRes.ok) throw new Error(JSON.stringify(acidRes.data));
       acidFinal = (acidRes.data as any).result as MashResult;
       ph = { kind: "target", value: mashTargetPh };
@@ -736,6 +798,22 @@ export default function WaterCalculatorPage() {
     }
   };
 
+  const onEstimateMashPhNoAcid = async () => {
+    setMashNoAcidEstimateError(null);
+    setMashNoAcidEstimateStatus(null);
+    setMashNoAcidEstimatedMashPh(null);
+    setMashNoAcidEstimating(true);
+    try {
+      const est = await calcMashEstimatedPhNoAcid(mashStartingAlk);
+      setMashNoAcidEstimatedMashPh(est.estimatedMashPhRoomTemp);
+      setMashNoAcidEstimateStatus("Estimated mash pH calculated.");
+    } catch (err) {
+      setMashNoAcidEstimateError(String(err));
+    } finally {
+      setMashNoAcidEstimating(false);
+    }
+  };
+
   const onSubmitMash = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth?.userId || !auth.activeAccountId) return;
@@ -745,6 +823,7 @@ export default function WaterCalculatorPage() {
     setMashCalcSaveStatus(null);
     setMashResult(null);
     setMashManualResult(null);
+    setMashManualEstimatedMashPh(null);
     setMashSubmitting(true);
     try {
       if (mashAcidificationMode === "manual") {
@@ -767,6 +846,16 @@ export default function WaterCalculatorPage() {
         if (!res.ok) throw new Error(JSON.stringify(res.data));
         const result = (res.data as any).result as MashManualCalcResult;
         setMashManualResult(result);
+
+        if (gristImportedRows.length) {
+          try {
+            const acidAdded_mEqPerL = (result.predicted as any)?.debug?.acidRequired_mEqPerL;
+            const est = await calcMashEstimatedPhNoAcid(mashStartingAlk, acidAdded_mEqPerL);
+            setMashManualEstimatedMashPh(est.estimatedMashPhRoomTemp);
+          } catch {
+            // non-fatal; manual water-only estimate still displayed.
+          }
+        }
 
         await saveSettings({
           mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
@@ -793,12 +882,25 @@ export default function WaterCalculatorPage() {
           strengthKind: mashStrengthKind,
           mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
           mashStartingPh,
-          mashTargetPh,
           mashWaterVolumeLiters,
         };
         if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
 
-        const res = await apiFetch("/api/water-calc/mash-acidification", auth, {
+        const url = gristImportedRows.length
+          ? "/api/water-calc/mash-acidification-target-mash-ph"
+          : "/api/water-calc/mash-acidification";
+        if (gristImportedRows.length) {
+          payload.targetMashPh = mashTargetPh;
+          payload.grist = gristImportedRows.map((r) => ({
+            amountKg: r.amountKg,
+            colorLovibond: r.colorLovibond,
+            maltClass: r.maltClass,
+          }));
+        } else {
+          payload.mashTargetPh = mashTargetPh;
+        }
+
+        const res = await apiFetch(url, auth, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -1396,8 +1498,48 @@ export default function WaterCalculatorPage() {
           <p className="muted" style={{ marginTop: 0 }}>
             This is a <strong>calculator</strong> with two modes:
             <strong> Target pH</strong> (compute acid required) and <strong>Manual acid amount</strong> (estimate the
-            achieved pH from what you added). We save a snapshot when you click <strong>Calculate + Save</strong>.
+            achieved pH from what you added). When grist is imported, Target pH targets the{" "}
+            <strong>estimated mash pH</strong> (room temperature, BrunWater-style). We save a snapshot when you click{" "}
+            <strong>Calculate + Save</strong>.
           </p>
+
+          {gristImportedRows.length ? (
+            <div
+              style={{
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 8,
+                padding: 12,
+                marginBottom: 12,
+              }}
+              aria-live="polite"
+            >
+              <p className="muted" style={{ marginTop: 0 }}>
+                Grist is imported: mash pH estimation is enabled.
+              </p>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                <button type="button" onClick={() => void onEstimateMashPhNoAcid()} disabled={!canCall || mashNoAcidEstimating}>
+                  {mashNoAcidEstimating ? "Estimating…" : "Estimate mash pH (no mash acid)"}
+                </button>
+                {mashNoAcidEstimatedMashPh !== null ? (
+                  <span className="muted">
+                    Estimated mash pH: <code>{mashNoAcidEstimatedMashPh.toFixed(3)}</code>
+                  </span>
+                ) : null}
+                {mashNoAcidEstimateStatus ? <span className="muted">{mashNoAcidEstimateStatus}</span> : null}
+              </div>
+              {mashNoAcidEstimateError ? (
+                <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                  {mashNoAcidEstimateError}
+                </pre>
+              ) : null}
+            </div>
+          ) : (
+            <p className="muted" style={{ marginTop: 0 }}>
+              No grist imported yet. Import grist to enable mash pH estimation; otherwise Target pH uses a water-only
+              (legacy) calculation.
+            </p>
+          )}
+
           <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
             <fieldset
               style={{
@@ -1419,7 +1561,7 @@ export default function WaterCalculatorPage() {
                     checked={mashAcidificationMode === "targetPh"}
                     onChange={() => setMashAcidificationMode("targetPh")}
                   />
-                  <span>Target pH (compute acid required)</span>
+                  <span>Target mash pH (compute acid required)</span>
                 </label>
                 <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <input
@@ -1604,6 +1746,12 @@ export default function WaterCalculatorPage() {
             <div style={{ marginTop: 12 }}>
               <h4 style={{ marginTop: 0 }}>Result (Target pH mode)</h4>
               <ul>
+                {"estimatedMashPhRoomTemp" in (mashResult as any) ? (
+                  <li>
+                    Estimated mash pH:{" "}
+                    <code>{Number((mashResult as any).estimatedMashPhRoomTemp).toFixed(3)}</code>
+                  </li>
+                ) : null}
                 {mashResult.acidRequiredMl !== null ? (
                   <li>
                     Acid required: <code>{mashResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
@@ -1643,6 +1791,11 @@ export default function WaterCalculatorPage() {
                 <li>
                   Estimated achieved pH: <code>{mashManualResult.achievedPh.toFixed(3)}</code>
                 </li>
+                {mashManualEstimatedMashPh !== null ? (
+                  <li>
+                    Estimated mash pH (from grist): <code>{mashManualEstimatedMashPh.toFixed(3)}</code>
+                  </li>
+                ) : null}
                 {Number.isFinite(mashManualResult.targetAmount) && Number.isFinite(mashManualResult.predictedAmount) ? (
                   <li>
                     Acid amount: <code>{mashManualResult.targetAmount.toFixed(3)}</code>{" "}

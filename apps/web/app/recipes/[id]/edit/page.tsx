@@ -19,12 +19,14 @@ type Recipe = {
 
 type GristPotentialKind = "ppg" | "yieldPercent" | "sg";
 type GristPotential = { kind: GristPotentialKind; value: number } | null;
+type GristMaltClass = "base" | "crystal" | "roast" | "acid";
 type GristRow = {
   id: string;
   name: string;
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential;
+  maltClass: GristMaltClass;
 };
 
 function newRowId() {
@@ -63,7 +65,15 @@ function parseGristJson(value: unknown): GristRow[] {
           potential = { kind, value: v };
         }
       }
-      return { id, name, amountKg, colorLovibond, potential } as GristRow;
+      const maltClassRaw = o.maltClass;
+      const maltClass: GristMaltClass =
+        maltClassRaw === "base" ||
+        maltClassRaw === "crystal" ||
+        maltClassRaw === "roast" ||
+        maltClassRaw === "acid"
+          ? maltClassRaw
+          : "base";
+      return { id, name, amountKg, colorLovibond, potential, maltClass } as GristRow;
     })
     .filter(Boolean);
 }
@@ -180,7 +190,7 @@ export default function RecipeEditPage() {
   const addGristRow = () => {
     setGristRows((prev) => [
       ...prev,
-      { id: newRowId(), name: "", amountKg: 0, colorLovibond: null, potential: null },
+      { id: newRowId(), name: "", amountKg: 0, colorLovibond: null, potential: null, maltClass: "base" },
     ]);
   };
   const removeGristRow = (id: string) => {
@@ -351,6 +361,7 @@ export default function RecipeEditPage() {
                       <th align="left">Name</th>
                       <th align="right">kg</th>
                       <th align="right">°L</th>
+                      <th align="left">Malt class</th>
                       <th align="left">Potential</th>
                       <th align="right">Value</th>
                       <th align="left">Actions</th>
@@ -402,6 +413,22 @@ export default function RecipeEditPage() {
                             }
                             style={{ width: 100, padding: 8 }}
                           />
+                        </td>
+                        <td>
+                          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-class-${r.id}`}>
+                            Malt class
+                          </label>
+                          <select
+                            id={`grist-class-${r.id}`}
+                            value={r.maltClass}
+                            onChange={(e) => updateGristRow(r.id, { maltClass: e.target.value as any })}
+                            style={{ width: 160, padding: 8 }}
+                          >
+                            <option value="base">Base</option>
+                            <option value="crystal">Crystal</option>
+                            <option value="roast">Roast</option>
+                            <option value="acid">Acid malt</option>
+                          </select>
                         </td>
                         <td>
                           <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-pot-kind-${r.id}`}>
