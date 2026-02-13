@@ -130,6 +130,10 @@ model RecipeWaterSettings {
   mashSaltAdditionsJson   Json?
   mashSaltsLastResultJson Json?
 
+  // Mash overall adjustment snapshot (Sheet 5, v0): combined salts + acid output for debugging/audit.
+  mashOverallLastResultJson   Json?
+  mashOverallLastCalculatedAt DateTime?
+
   // Sparge acidification inputs (liters-first)
   spargeStartingAlkalinityPpmCaCO3 Float @default(0)
   spargeStartingPh                Float @default(7.0)

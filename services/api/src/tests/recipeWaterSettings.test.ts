@@ -72,6 +72,27 @@ describe("recipe water-settings", () => {
       data: { accountId: TEST_ACCOUNT_A, name: "Water Settings Recipe", style: null, notes: null },
     });
     const nowIso = new Date().toISOString();
+    const overall = {
+      calculatedAt: nowIso,
+      ionsPpm: {
+        calcium: 1,
+        magnesium: 2,
+        sodium: 3,
+        sulfate: 4,
+        chloride: 5,
+        bicarbonate: 6,
+      },
+      finalAlkalinityPpmCaCO3: 12.34,
+      ph: { kind: "target", value: 5.4 },
+      debug: {
+        startingAlkalinityPpmCaCO3: 40,
+        startingAlkalinityAfterSaltsPpmCaCO3: 41,
+        saltsDeltaBicarbonatePpm: 1,
+        acidSulfateAddedPpm: 0,
+        acidChlorideAddedPpm: 0,
+        mashMode: "targetPh",
+      },
+    };
 
     const put = await app.inject({
       method: "PUT",
@@ -95,6 +116,8 @@ describe("recipe water-settings", () => {
         mashManualLastChlorideAddedPpm: 0.2,
         mashManualLastCalculatedAt: nowIso,
         mashSaltAdditionsJson: [{ saltKey: "gypsum", grams: 2.5 }],
+        mashOverallLastResultJson: overall,
+        mashOverallLastCalculatedAt: nowIso,
 
         spargeStartingAlkalinityPpmCaCO3: 12,
         spargeStartingPh: 7.1,
@@ -135,6 +158,8 @@ describe("recipe water-settings", () => {
     expect(body.settings.mashManualLastFinalAlkalinityPpmCaCO3).toBe(12.3);
     expect(body.settings.mashManualLastSulfateAddedPpm).toBe(0.1);
     expect(body.settings.mashManualLastChlorideAddedPpm).toBe(0.2);
+    expect(body.settings.mashOverallLastCalculatedAt).toBe(nowIso);
+    expect(body.settings.mashOverallLastResultJson).toEqual(overall);
     expect(body.settings.mashSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 2.5 }]);
     expect(body.settings.spargeStartingAlkalinityPpmCaCO3).toBe(12);
     expect(body.settings.spargeLastAcidRequiredMl).toBe(1.23);

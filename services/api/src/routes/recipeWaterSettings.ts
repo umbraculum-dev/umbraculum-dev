@@ -163,6 +163,17 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
           ? body.mashSaltsLastResultJson
           : undefined,
 
+      mashOverallLastResultJson:
+        body.mashOverallLastResultJson === null || body.mashOverallLastResultJson !== undefined
+          ? body.mashOverallLastResultJson
+          : undefined,
+      mashOverallLastCalculatedAt:
+        typeof body.mashOverallLastCalculatedAt === "string"
+          ? new Date(body.mashOverallLastCalculatedAt)
+          : body.mashOverallLastCalculatedAt === null
+            ? null
+            : undefined,
+
       spargeStartingAlkalinityPpmCaCO3:
         typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
           ? body.spargeStartingAlkalinityPpmCaCO3

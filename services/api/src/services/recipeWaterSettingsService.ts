@@ -40,6 +40,9 @@ export type UpsertRecipeWaterSettingsInput = {
   mashSaltAdditionsJson?: unknown;
   mashSaltsLastResultJson?: unknown;
 
+  mashOverallLastResultJson?: unknown;
+  mashOverallLastCalculatedAt?: Date | null;
+
   spargeStartingAlkalinityPpmCaCO3?: number;
   spargeStartingPh?: number;
   spargeTargetPh?: number;
@@ -244,6 +247,14 @@ export class RecipeWaterSettingsService {
     }
     if (input.mashSaltsLastResultJson !== undefined) {
       data.mashSaltsLastResultJson = input.mashSaltsLastResultJson as any;
+    }
+
+    if (input.mashOverallLastResultJson !== undefined) {
+      // accept null to clear; otherwise pass through (Json column)
+      data.mashOverallLastResultJson = input.mashOverallLastResultJson as any;
+    }
+    if (input.mashOverallLastCalculatedAt !== undefined) {
+      data.mashOverallLastCalculatedAt = input.mashOverallLastCalculatedAt;
     }
 
     const numericFields = [

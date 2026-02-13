@@ -53,6 +53,21 @@ type MashManualCalcResult = {
   predictedAmount: number;
 };
 
+type MashOverallResultV0 = {
+  calculatedAt: string;
+  ionsPpm: IonProfilePpm;
+  finalAlkalinityPpmCaCO3: number;
+  ph: { kind: "target" | "estimated"; value: number };
+  debug: {
+    startingAlkalinityPpmCaCO3: number;
+    startingAlkalinityAfterSaltsPpmCaCO3: number;
+    saltsDeltaBicarbonatePpm: number;
+    acidSulfateAddedPpm: number;
+    acidChlorideAddedPpm: number;
+    mashMode: "targetPh" | "manual";
+  };
+};
+
 type IonProfilePpm = {
   calcium: number;
   magnesium: number;
@@ -129,6 +144,10 @@ type RecipeWaterSettings = {
   spargeLastSulfateAddedPpm: number | null;
   spargeLastChlorideAddedPpm: number | null;
   spargeLastCalculatedAt: string | null;
+
+  // v0 overall snapshot (may be absent until persisted by API)
+  mashOverallLastResultJson?: unknown;
+  mashOverallLastCalculatedAt?: string | null;
 };
 
 type RecipeWaterSettingsResponse = { ok: true; settings: RecipeWaterSettings | null };
@@ -148,6 +167,12 @@ async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
 
 function isAdmin(role: string | null) {
   return role === "owner" || role === "brewery_admin";
+}
+
+function bicarbonatePpmToAlkalinityPpmCaCO3(bicarbPpm: number) {
+  // Convert mg/L as HCO3 to mg/L as CaCO3.
+  // CaCO3 equivalent factor: 50/61.
+  return bicarbPpm * (50 / 61);
 }
 
 export default function WaterCalculatorPage() {
@@ -218,6 +243,13 @@ export default function WaterCalculatorPage() {
   const [savingSalts, setSavingSalts] = useState(false);
   const [saltAdditions, setSaltAdditions] = useState<MashSaltAddition[]>([]);
   const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
+
+  const [overallError, setOverallError] = useState<string | null>(null);
+  const [overallStatus, setOverallStatus] = useState<string | null>(null);
+  const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
+  const [overallSubmitting, setOverallSubmitting] = useState(false);
+  const [savingOverall, setSavingOverall] = useState(false);
+  const [overallResult, setOverallResult] = useState<MashOverallResultV0 | null>(null);
 
   // Water profile creation/verification moved to `/water-profiles`.
 
@@ -337,6 +369,15 @@ export default function WaterCalculatorPage() {
         );
       }
 
+      if (
+        s.mashOverallLastResultJson &&
+        typeof s.mashOverallLastResultJson === "object" &&
+        typeof s.mashOverallLastCalculatedAt === "string"
+      ) {
+        setOverallResult(s.mashOverallLastResultJson as any);
+        setOverallStatus(`Last calculated: ${new Date(s.mashOverallLastCalculatedAt).toLocaleString()}`);
+      }
+
       if (s.spargeLastCalculatedAt) {
         setSpargeResult({
           acidRequiredMl: s.spargeLastAcidRequiredMl,
@@ -376,6 +417,139 @@ export default function WaterCalculatorPage() {
       body: JSON.stringify(patch),
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
+  };
+
+  const computeOverallMash = async () => {
+    if (!auth?.userId || !auth.activeAccountId) throw new Error("Missing auth headers.");
+    if (!mixedSourceProfile) throw new Error("Mix source + dilution first (volumes must be > 0).");
+
+    // Always recompute salts for an up-to-date overall preview.
+    const saltsRes = await apiFetch("/api/water-calc/salt-additions", auth, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        volumeLiters: mashWaterVolumeLiters,
+        baseProfile: {
+          calcium: mixedSourceProfile.calcium,
+          magnesium: mixedSourceProfile.magnesium,
+          sodium: mixedSourceProfile.sodium,
+          sulfate: mixedSourceProfile.sulfate,
+          chloride: mixedSourceProfile.chloride,
+          bicarbonate: mixedSourceProfile.bicarbonate,
+        },
+        additions: saltAdditions,
+      }),
+    });
+    if (!saltsRes.ok) throw new Error(JSON.stringify(saltsRes.data));
+    const salts = (saltsRes.data as any).result as SaltAdditionsResult;
+
+    const saltsDeltaBicarb = salts.deltasPpm.bicarbonate;
+    const startingAlkAfterSalts =
+      mashStartingAlk + bicarbonatePpmToAlkalinityPpmCaCO3(saltsDeltaBicarb);
+
+    const strengthPayload: Record<string, unknown> = {
+      acidType: mashAcidType,
+      strengthKind: mashStrengthKind,
+      mashStartingAlkalinityPpmCaCO3: startingAlkAfterSalts,
+      mashStartingPh,
+      mashWaterVolumeLiters,
+    };
+    if (mashStrengthKind !== "solid") strengthPayload.strengthValue = mashStrengthValue;
+
+    let acidFinal: MashResult;
+    let ph: { kind: "target" | "estimated"; value: number };
+    let mashMode: "targetPh" | "manual" = mashAcidificationMode;
+
+    if (mashAcidificationMode === "manual") {
+      const manualPayload = {
+        ...strengthPayload,
+        ...(mashStrengthKind === "solid"
+          ? { acidAddedGrams: mashManualAcidAdded }
+          : { acidAddedMl: mashManualAcidAdded }),
+      };
+      const acidRes = await apiFetch("/api/water-calc/mash-acidification-manual", auth, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(manualPayload),
+      });
+      if (!acidRes.ok) throw new Error(JSON.stringify(acidRes.data));
+      const result = (acidRes.data as any).result as MashManualCalcResult;
+      acidFinal = result.predicted;
+      ph = { kind: "estimated", value: result.achievedPh };
+    } else {
+      const targetPayload = { ...strengthPayload, mashTargetPh };
+      const acidRes = await apiFetch("/api/water-calc/mash-acidification", auth, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(targetPayload),
+      });
+      if (!acidRes.ok) throw new Error(JSON.stringify(acidRes.data));
+      acidFinal = (acidRes.data as any).result as MashResult;
+      ph = { kind: "target", value: mashTargetPh };
+    }
+
+    const ionsPpm: IonProfilePpm = {
+      ...salts.resultingProfile,
+      sulfate: salts.resultingProfile.sulfate + acidFinal.sulfateAddedPpm,
+      chloride: salts.resultingProfile.chloride + acidFinal.chlorideAddedPpm,
+    };
+
+    const calculatedAt = new Date().toISOString();
+    const overall: MashOverallResultV0 = {
+      calculatedAt,
+      ionsPpm,
+      finalAlkalinityPpmCaCO3: acidFinal.finalAlkalinityPpmCaCO3,
+      ph,
+      debug: {
+        startingAlkalinityPpmCaCO3: mashStartingAlk,
+        startingAlkalinityAfterSaltsPpmCaCO3: startingAlkAfterSalts,
+        saltsDeltaBicarbonatePpm: saltsDeltaBicarb,
+        acidSulfateAddedPpm: acidFinal.sulfateAddedPpm,
+        acidChlorideAddedPpm: acidFinal.chlorideAddedPpm,
+        mashMode,
+      },
+    };
+
+    return overall;
+  };
+
+  const onCalcOverall = async () => {
+    setOverallError(null);
+    setOverallStatus(null);
+    setOverallSaveStatus(null);
+    setOverallResult(null);
+    setOverallSubmitting(true);
+    try {
+      const overall = await computeOverallMash();
+      setOverallResult(overall);
+      setOverallStatus("Calculated.");
+    } catch (err) {
+      setOverallError(String(err));
+    } finally {
+      setOverallSubmitting(false);
+    }
+  };
+
+  const onCalcAndSaveOverall = async () => {
+    setOverallError(null);
+    setOverallStatus(null);
+    setOverallSaveStatus(null);
+    setOverallResult(null);
+    setSavingOverall(true);
+    try {
+      const overall = await computeOverallMash();
+      setOverallResult(overall);
+      await saveSettings({
+        mashOverallLastResultJson: overall,
+        mashOverallLastCalculatedAt: overall.calculatedAt,
+      });
+      setOverallStatus("Calculated.");
+      setOverallSaveStatus("Calculated and saved.");
+    } catch (err) {
+      setOverallError(String(err));
+    } finally {
+      setSavingOverall(false);
+    }
   };
 
   const onSaveSpargeInputs = async () => {
@@ -1677,6 +1851,114 @@ export default function WaterCalculatorPage() {
                 </table>
               </div>
             </details>
+          ) : null}
+
+          <hr style={{ margin: "16px 0" }} />
+
+          <h3 style={{ marginTop: 0 }}>Overall mash water result (v0)</h3>
+          <p className="muted" style={{ marginTop: 0 }}>
+            v0 assumptions: salts impact alkalinity via bicarbonate (ΔHCO₃) conversion; acids only
+            contribute modeled ions (SO4/Cl). Click <strong>Calculate overall</strong> to preview, or{" "}
+            <strong>Calculate + Save</strong> to persist a snapshot for debugging.
+          </p>
+
+          <ul style={{ marginBottom: 0 }}>
+            <li>
+              Mixed base water:{" "}
+              <span className="muted">{mixedSourceProfile ? "ready" : "not mixed"}</span>
+            </li>
+            <li>
+              Salt additions: <span className="muted">{saltAdditions.length ? "present" : "none"}</span>
+            </li>
+            <li>
+              Mash acidification mode: <span className="muted">{mashAcidificationMode}</span>
+            </li>
+          </ul>
+
+          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+            <button type="button" onClick={() => void onCalcOverall()} disabled={!canCall || overallSubmitting}>
+              {overallSubmitting ? "Calculating…" : "Calculate overall (preview)"}
+            </button>
+            <button type="button" onClick={() => void onCalcAndSaveOverall()} disabled={!canCall || savingOverall}>
+              {savingOverall ? "Saving…" : "Calculate + Save overall snapshot"}
+            </button>
+            {overallStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {overallStatus}
+              </span>
+            ) : null}
+            {overallSaveStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {overallSaveStatus}
+              </span>
+            ) : null}
+          </div>
+
+          {overallError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {overallError}
+            </pre>
+          ) : null}
+
+          {overallResult ? (
+            <div style={{ marginTop: 12 }}>
+              <p className="muted" style={{ marginTop: 0 }}>
+                Snapshot: <code>{new Date(overallResult.calculatedAt).toLocaleString()}</code>
+              </p>
+              <p className="muted" style={{ marginTop: 0 }}>
+                pH:{" "}
+                {overallResult.ph.kind === "target" ? (
+                  <>
+                    target <code>{overallResult.ph.value.toFixed(2)}</code>
+                  </>
+                ) : (
+                  <>
+                    estimated <code>{overallResult.ph.value.toFixed(2)}</code>
+                  </>
+                )}
+                {" · "}
+                Final alkalinity:{" "}
+                <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
+              </p>
+
+              <details>
+                <summary>Resulting ions (after salts + acid, v0)</summary>
+                <div style={{ overflowX: "auto", marginTop: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th align="left">Ion</th>
+                        <th align="right">Overall (ppm)</th>
+                        <th align="right">Target (ppm)</th>
+                        <th align="right">Δ (overall - target)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(
+                        [
+                          ["Ca", overallResult.ionsPpm.calcium, selectedTarget?.calcium ?? null],
+                          ["Mg", overallResult.ionsPpm.magnesium, selectedTarget?.magnesium ?? null],
+                          ["Na", overallResult.ionsPpm.sodium, selectedTarget?.sodium ?? null],
+                          ["SO4", overallResult.ionsPpm.sulfate, selectedTarget?.sulfate ?? null],
+                          ["Cl", overallResult.ionsPpm.chloride, selectedTarget?.chloride ?? null],
+                          ["HCO3", overallResult.ionsPpm.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                        ] as const
+                      ).map(([label, overall, target]) => {
+                        const delta = target === null ? null : overall - target;
+                        return (
+                          <tr key={label}>
+                            <td>{label}</td>
+                            <td align="right">{overall.toFixed(2)}</td>
+                            <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
+                            <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            </div>
           ) : null}
         </section>
 
