@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
 import { AccountsService } from "./accountsService.js";
 
@@ -7,6 +7,8 @@ export type CreateRecipeInput = {
   style?: string | null;
   notes?: string | null;
   gristJson?: unknown;
+  hopsJson?: unknown;
+  yeastJson?: unknown;
 };
 
 export type UpdateRecipeInput = {
@@ -14,6 +16,8 @@ export type UpdateRecipeInput = {
   style?: string | null;
   notes?: string | null;
   gristJson?: unknown;
+  hopsJson?: unknown;
+  yeastJson?: unknown;
 };
 
 export class RecipesService {
@@ -51,6 +55,8 @@ export class RecipesService {
     const style = input.style?.trim() || null;
     const notes = input.notes?.trim() || null;
     const gristJson = validateGristJson(input.gristJson);
+    const hopsJson = validateHopsJson(input.hopsJson);
+    const yeastJson = validateYeastJson(input.yeastJson);
 
     return this.prisma.recipe.create({
       data: {
@@ -59,6 +65,8 @@ export class RecipesService {
         style,
         notes,
         gristJson: gristJson === undefined ? undefined : (gristJson as any),
+        hopsJson: hopsJson === undefined ? undefined : (hopsJson as any),
+        yeastJson: yeastJson === undefined ? undefined : (yeastJson as any),
       },
     });
   }
@@ -69,7 +77,7 @@ export class RecipesService {
     // Ensure account scoping is enforced even if IDs collide across accounts.
     await this.getRecipe(userId, accountId, recipeId);
 
-    const data: { name?: string; style?: string | null; notes?: string | null; gristJson?: unknown } = {};
+    const data: Prisma.RecipeUpdateInput = {};
 
     if (input.name !== undefined) {
       const name = (input.name ?? "").trim();
@@ -81,7 +89,35 @@ export class RecipesService {
     if (input.notes !== undefined) data.notes = input.notes?.trim() || null;
     if (input.gristJson !== undefined) {
       const gristJson = validateGristJson(input.gristJson);
-      data.gristJson = gristJson === undefined ? undefined : (gristJson as any);
+      if (gristJson === undefined) {
+        // no-op
+      } else if (gristJson === null) {
+        data.gristJson = Prisma.JsonNull;
+      } else {
+        data.gristJson = gristJson as unknown as Prisma.InputJsonValue;
+      }
+    }
+
+    if (input.hopsJson !== undefined) {
+      const hopsJson = validateHopsJson(input.hopsJson);
+      if (hopsJson === undefined) {
+        // no-op
+      } else if (hopsJson === null) {
+        data.hopsJson = Prisma.JsonNull;
+      } else {
+        data.hopsJson = hopsJson as unknown as Prisma.InputJsonValue;
+      }
+    }
+
+    if (input.yeastJson !== undefined) {
+      const yeastJson = validateYeastJson(input.yeastJson);
+      if (yeastJson === undefined) {
+        // no-op
+      } else if (yeastJson === null) {
+        data.yeastJson = Prisma.JsonNull;
+      } else {
+        data.yeastJson = yeastJson as unknown as Prisma.InputJsonValue;
+      }
     }
 
     if (Object.keys(data).length === 0) {
@@ -114,7 +150,9 @@ type GristMaltClass = "base" | "crystal" | "roast" | "acid";
 
 type GristRow = {
   id: string;
+  ingredientId?: string | null;
   name: string;
+  producer?: string | null;
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential | null;
@@ -138,7 +176,31 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
     const id = typeof o.id === "string" ? o.id.trim() : "";
+    const ingredientIdRaw = o.ingredientId;
+    const ingredientId =
+      ingredientIdRaw === null || ingredientIdRaw === undefined
+        ? null
+        : typeof ingredientIdRaw === "string"
+          ? ingredientIdRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_grist_row_ingredient_id",
+                `Body.gristJson[${idx}].ingredientId must be a string or null`,
+              );
+            })();
     const name = typeof o.name === "string" ? o.name.trim() : "";
+    const producerRaw = o.producer;
+    const producer =
+      producerRaw === null || producerRaw === undefined
+        ? null
+        : typeof producerRaw === "string"
+          ? producerRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_grist_row_producer",
+                `Body.gristJson[${idx}].producer must be a string or null`,
+              );
+            })();
     const amountKg = ensureFinite(o.amountKg, `gristJson[${idx}].amountKg`);
     const colorLovibondRaw = o.colorLovibond;
     const colorLovibond =
@@ -208,7 +270,7 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
       );
     }
 
-    return {
+    const out: any = {
       id,
       name,
       amountKg,
@@ -216,6 +278,167 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
       potential,
       maltClass,
     };
+    if (ingredientId) out.ingredientId = ingredientId;
+    if (producer) out.producer = producer;
+    return out as GristRow;
+  });
+}
+
+type HopUse = "boil" | "whirlpool" | "dryhop";
+
+type HopRow = {
+  id: string;
+  ingredientId?: string | null;
+  name: string;
+  country?: string | null;
+  amountGrams: number;
+  alphaAcidPercent: number | null;
+  use: HopUse;
+  timeMinutes: number | null;
+};
+
+function validateHopsJson(value: unknown): HopRow[] | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (!Array.isArray(value)) throw new BadRequestError("invalid_hops_json", "Body.hopsJson must be an array");
+
+  return value.map((row, idx) => {
+    const o = (row ?? {}) as Record<string, unknown>;
+    const id = typeof o.id === "string" ? o.id.trim() : "";
+    if (!id) throw new BadRequestError("invalid_hop_row_id", `Body.hopsJson[${idx}].id is required`);
+
+    const ingredientIdRaw = o.ingredientId;
+    const ingredientId =
+      ingredientIdRaw === null || ingredientIdRaw === undefined
+        ? null
+        : typeof ingredientIdRaw === "string"
+          ? ingredientIdRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_hop_row_ingredient_id",
+                `Body.hopsJson[${idx}].ingredientId must be a string or null`,
+              );
+            })();
+
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (!name) throw new BadRequestError("invalid_hop_row_name", `Body.hopsJson[${idx}].name is required`);
+
+    const countryRaw = o.country;
+    const country =
+      countryRaw === null || countryRaw === undefined
+        ? null
+        : typeof countryRaw === "string"
+          ? countryRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_hop_row_country",
+                `Body.hopsJson[${idx}].country must be a string or null`,
+              );
+            })();
+
+    const amountGrams = ensureFinite(o.amountGrams, `hopsJson[${idx}].amountGrams`);
+    if (!(amountGrams >= 0)) {
+      throw new BadRequestError("invalid_hop_row_amount", `Body.hopsJson[${idx}].amountGrams must be >= 0`);
+    }
+
+    const alphaRaw = o.alphaAcidPercent;
+    const alphaAcidPercent =
+      alphaRaw === null || alphaRaw === undefined
+        ? null
+        : typeof alphaRaw === "number"
+          ? alphaRaw
+          : NaN;
+    if (typeof alphaAcidPercent === "number" && (!Number.isFinite(alphaAcidPercent) || alphaAcidPercent < 0)) {
+      throw new BadRequestError(
+        "invalid_hop_row_alpha",
+        `Body.hopsJson[${idx}].alphaAcidPercent must be null or a number >= 0`,
+      );
+    }
+
+    const useRaw = o.use;
+    const use: HopUse =
+      useRaw === "boil" || useRaw === "whirlpool" || useRaw === "dryhop"
+        ? useRaw
+        : (() => {
+            throw new BadRequestError(
+              "invalid_hop_row_use",
+              `Body.hopsJson[${idx}].use must be one of: boil, whirlpool, dryhop`,
+            );
+          })();
+
+    const timeRaw = o.timeMinutes;
+    const timeMinutes =
+      timeRaw === null || timeRaw === undefined ? null : typeof timeRaw === "number" ? timeRaw : NaN;
+    if (typeof timeMinutes === "number" && (!Number.isFinite(timeMinutes) || timeMinutes < 0)) {
+      throw new BadRequestError(
+        "invalid_hop_row_time",
+        `Body.hopsJson[${idx}].timeMinutes must be null or a number >= 0`,
+      );
+    }
+
+    const out: any = {
+      id,
+      ingredientId,
+      name,
+      amountGrams,
+      alphaAcidPercent,
+      use,
+      timeMinutes,
+    };
+    if (country) out.country = country;
+    return out as HopRow;
+  });
+}
+
+type YeastRow = {
+  id: string;
+  ingredientId?: string | null;
+  name: string;
+  lab?: string | null;
+};
+
+function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (!Array.isArray(value)) throw new BadRequestError("invalid_yeast_json", "Body.yeastJson must be an array");
+
+  return value.map((row, idx) => {
+    const o = (row ?? {}) as Record<string, unknown>;
+    const id = typeof o.id === "string" ? o.id.trim() : "";
+    if (!id) throw new BadRequestError("invalid_yeast_row_id", `Body.yeastJson[${idx}].id is required`);
+
+    const ingredientIdRaw = o.ingredientId;
+    const ingredientId =
+      ingredientIdRaw === null || ingredientIdRaw === undefined
+        ? null
+        : typeof ingredientIdRaw === "string"
+          ? ingredientIdRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_yeast_row_ingredient_id",
+                `Body.yeastJson[${idx}].ingredientId must be a string or null`,
+              );
+            })();
+
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (!name) throw new BadRequestError("invalid_yeast_row_name", `Body.yeastJson[${idx}].name is required`);
+
+    const labRaw = o.lab;
+    const lab =
+      labRaw === null || labRaw === undefined
+        ? null
+        : typeof labRaw === "string"
+          ? labRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_yeast_row_lab",
+                `Body.yeastJson[${idx}].lab must be a string or null`,
+              );
+            })();
+
+    const out: any = { id, ingredientId, name };
+    if (lab) out.lab = lab;
+    return out as YeastRow;
   });
 }
 

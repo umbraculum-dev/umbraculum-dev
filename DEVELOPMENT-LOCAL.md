@@ -94,3 +94,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - **JSDoc**: required on exported/shared contracts when semantics aren’t obvious (units, ranges, invariants).
   - More detail: `docs/CODING-STANDARDS.md`
 
+- **Reverts (MANDATORY protocol)**:
+  - Before reverting any change(s), the assistant must provide a short list of exactly what will be reverted (files + a brief description).
+  - The assistant must then wait for explicit confirmation before proceeding with the revert.
+

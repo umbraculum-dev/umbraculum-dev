@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { loadDevAuthFromStorage, type DevAuth } from "../../../../_lib/devAuth";
-import { parseGristJson, type GristRow } from "../../../../_lib/grist";
+import { parseGristJson, type GristMaltClass, type GristRow } from "../../../../_lib/grist";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { apiFetch, type MeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";

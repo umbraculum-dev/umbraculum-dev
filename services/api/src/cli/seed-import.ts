@@ -9,9 +9,13 @@
  * - src/seed/README.md
  */
 
+import { PrismaClient } from "@prisma/client";
+import { importBeerprotoAll, importBeerprotoResource, type BeerprotoResourcePath } from "../seed/sources/beerproto/beerproto.js";
+
 type Args = {
   source?: string;
   path?: string;
+  resource?: string;
   dryRun: boolean;
 };
 
@@ -23,6 +27,7 @@ function parseArgs(argv: string[]): Args {
     if (a === "--dry-run") args.dryRun = true;
     else if (a === "--source") args.source = argv[++i];
     else if (a === "--path") args.path = argv[++i];
+    else if (a === "--resource") args.resource = argv[++i];
     else if (a === "--help" || a === "-h") {
       printHelp();
       process.exit(0);
@@ -36,19 +41,21 @@ function printHelp() {
   // eslint-disable-next-line no-console
   console.log(
     [
-      "seed-import (scaffold)",
+      "seed-import",
       "",
       "Usage:",
-      "  npm run seed:import -- --source beerproto --path ./seed-sources/beerproto",
+      "  npm run seed:import -- --source beerproto",
+      "  npm run seed:import -- --source beerproto --resource fermentables/malts.csv",
       "  npm run seed:import -- --help",
       "",
       "Flags:",
       "  --source   Source name (e.g. beerproto)",
-      "  --path     Local path to the dataset",
+      "  --resource BeerProto resource path (optional)",
+      "  --path     Reserved for future local dataset imports",
       "  --dry-run  Parse/validate only (no DB writes)",
       "",
       "Notes:",
-      "  - This command will later write into staging tables, normalize, and upsert canonical tables.",
+      "  - This command writes into staging tables, normalizes, and upserts canonical tables.",
       "  - Licensing constraints are tracked in docs/RAW-MATERIALS-SEEDABLE-SOURCES.md.",
     ].join("\n"),
   );
@@ -57,18 +64,33 @@ function printHelp() {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
 
-  if (!args.source || !args.path) {
+  if (!args.source) {
     printHelp();
     process.exit(1);
   }
 
-  // eslint-disable-next-line no-console
-  console.log("seed-import scaffold:");
-  // eslint-disable-next-line no-console
-  console.log(JSON.stringify(args, null, 2));
+  if (args.path) {
+    // eslint-disable-next-line no-console
+    console.log("Note: --path is currently ignored; BeerProto imports fetch from upstream.");
+  }
 
-  // TODO: implement source-specific parsers under src/seed/sources/.
-  // TODO: add Prisma staging + canonical models (see src/seed/README.md).
+  const prisma = new PrismaClient();
+  try {
+    if (args.source === "beerproto") {
+      if (args.resource) {
+        await importBeerprotoResource(prisma, {
+          resourcePath: args.resource as BeerprotoResourcePath,
+          dryRun: args.dryRun,
+        });
+      } else {
+        await importBeerprotoAll(prisma, { dryRun: args.dryRun });
+      }
+    } else {
+      throw new Error(`Unsupported --source: ${args.source}`);
+    }
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 main().catch((err) => {

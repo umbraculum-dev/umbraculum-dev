@@ -30,6 +30,19 @@ enum WaterProfileVerificationStatus {
   verified
 }
 
+enum IngredientKind {
+  fermentable
+  hop
+  yeast
+}
+
+enum ColorUnit {
+  ebc
+  srm
+  lovibond
+  unknown
+}
+
 model User {
   id        String          @id @default(uuid())
   email     String          @unique
@@ -51,6 +64,10 @@ model Account {
   recipes   Recipe[]
   waterProfiles WaterProfile[]
   recipeWaterSettings RecipeWaterSettings[]
+
+  fermentables Fermentable[]
+  hops         Hop[]
+  yeasts       Yeast[]
 }
 
 model AccountMember {
@@ -75,6 +92,8 @@ model Recipe {
   style     String?
   notes     String?  @db.Text
   gristJson Json?
+  hopsJson  Json?
+  yeastJson Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -221,5 +240,180 @@ model WaterProfile {
   @@index([scope])
   @@index([type])
   @@index([accountId])
+}
+
+model Fermentable {
+  id        String   @id @default(uuid())
+  // null for system-wide canonical records; set for future brewery-specific overrides
+  accountId String?
+
+  name      String
+  producer  String?
+  group     String?
+  type      String?
+  country   String?
+  notes     String?  @db.Text
+
+  // Color: canonical + original + convenience
+  colorEbc          Float?
+  colorOriginal     Float?
+  colorOriginalUnit ColorUnit @default(unknown)
+  colorLovibond     Float?
+  colorSrm          Float?
+  // BeerProto also includes a “Standard (ASBC/EBC/ION)” field; preserve verbatim.
+  standard          String?
+
+  // Potential / yield (canonical-ish; we’ll fill what we can from sources)
+  potentialSg   Float?
+  yieldPercent  Float?
+  ppg           Float?
+
+  deprecatedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  account      Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  sourceMaps   IngredientSourceMap[]
+
+  @@index([accountId])
+  @@index([name])
+  @@index([producer])
+}
+
+model Hop {
+  id        String   @id @default(uuid())
+  accountId String?
+
+  name      String
+  country   String?
+  type      String?
+  notes     String?  @db.Text
+
+  // alpha/beta acids (%), often a range; keep min/max where available.
+  alphaMin  Float?
+  alphaMax  Float?
+  betaMin   Float?
+  betaMax   Float?
+
+  deprecatedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  account      Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  sourceMaps   IngredientSourceMap[]
+
+  @@index([accountId])
+  @@index([name])
+}
+
+model Yeast {
+  id        String   @id @default(uuid())
+  accountId String?
+
+  name      String
+  lab       String?
+  type      String?
+  form      String?
+  notes     String?  @db.Text
+
+  attenuationMin Float?
+  attenuationMax Float?
+  tempMinC       Float?
+  tempMaxC       Float?
+
+  deprecatedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  account      Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  sourceMaps   IngredientSourceMap[]
+
+  @@index([accountId])
+  @@index([name])
+  @@index([lab])
+}
+
+model IngredientSource {
+  id            String   @id @default(uuid())
+  sourceName    String
+  sourceUrl     String
+  sourceLicense String
+  resourcePath  String
+
+  etag          String?
+  lastCheckedAt DateTime?
+  lastAppliedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  runs IngredientImportRun[]
+
+  @@unique([sourceName, resourcePath])
+  @@index([sourceName])
+}
+
+model IngredientImportRun {
+  id        String   @id @default(uuid())
+  sourceId  String
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+  status    String
+  statsJson Json?
+  error     String?  @db.Text
+
+  createdAt DateTime @default(now())
+
+  source IngredientSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  stagingRows IngredientStagingRow[]
+
+  @@index([sourceId])
+  @@index([startedAt])
+}
+
+model IngredientStagingRow {
+  id          String         @id @default(uuid())
+  importRunId String
+  kind        IngredientKind
+  sourceKey   String
+  rawPayloadJson Json
+  warningsJson   Json?
+
+  createdAt DateTime @default(now())
+
+  importRun IngredientImportRun @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+
+  @@index([importRunId])
+  @@index([kind])
+  @@index([sourceKey])
+}
+
+model IngredientSourceMap {
+  id        String         @id @default(uuid())
+  kind      IngredientKind
+  sourceName String
+  sourceKey  String
+
+  fermentableId String?
+  hopId         String?
+  yeastId       String?
+
+  confidence Float? @default(1.0)
+  notes      String? @db.Text
+  lastSeenAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fermentable Fermentable? @relation(fields: [fermentableId], references: [id], onDelete: Cascade)
+  hop         Hop?         @relation(fields: [hopId], references: [id], onDelete: Cascade)
+  yeast       Yeast?       @relation(fields: [yeastId], references: [id], onDelete: Cascade)
+
+  @@unique([kind, sourceName, sourceKey])
+  @@index([sourceName])
+  @@index([sourceKey])
+  @@index([fermentableId])
+  @@index([hopId])
+  @@index([yeastId])
 }
 

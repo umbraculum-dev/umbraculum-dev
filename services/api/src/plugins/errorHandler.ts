@@ -8,13 +8,20 @@ async function errorHandlerPluginImpl(app: FastifyInstance) {
     const statusCode = isHttp ? err.statusCode : 500;
     const code = isHttp ? err.code : "internal_error";
 
-    req.log.error({ err }, "request failed");
+    req.log.error({ err: err as any }, "request failed");
+
+    const message =
+      err instanceof Error
+        ? err.message
+        : typeof err === "string"
+          ? err
+          : "Unexpected error";
 
     reply.status(statusCode).send({
       ok: false,
       error: {
         code,
-        message: err.message ?? "Unexpected error",
+        message,
       },
     });
   });

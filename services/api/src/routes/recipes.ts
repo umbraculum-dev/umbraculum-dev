@@ -13,13 +13,29 @@ export async function recipesRoutes(app: FastifyInstance) {
 
   app.post("/recipes", async (req) => {
     const ctx = requireActiveAccount(req);
-    const body = (req.body ?? {}) as { name?: unknown; style?: unknown; notes?: unknown; gristJson?: unknown };
+    const body = (req.body ?? {}) as {
+      name?: unknown;
+      style?: unknown;
+      notes?: unknown;
+      gristJson?: unknown;
+      hopsJson?: unknown;
+      yeastJson?: unknown;
+    };
     const name = typeof body.name === "string" ? body.name : "";
     const style = typeof body.style === "string" ? body.style : null;
     const notes = typeof body.notes === "string" ? body.notes : null;
     const gristJson = body.gristJson;
+    const hopsJson = body.hopsJson;
+    const yeastJson = body.yeastJson;
 
-    const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, { name, style, notes, gristJson });
+    const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
+      name,
+      style,
+      notes,
+      gristJson,
+      hopsJson,
+      yeastJson,
+    });
     return { ok: true, recipe: created };
   });
 
@@ -37,13 +53,29 @@ export async function recipesRoutes(app: FastifyInstance) {
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const body = (req.body ?? {}) as { name?: unknown; style?: unknown; notes?: unknown; gristJson?: unknown };
+    const body = (req.body ?? {}) as {
+      name?: unknown;
+      style?: unknown;
+      notes?: unknown;
+      gristJson?: unknown;
+      hopsJson?: unknown;
+      yeastJson?: unknown;
+    };
     const name = typeof body.name === "string" ? body.name : undefined;
     const style = typeof body.style === "string" ? body.style : undefined;
     const notes = typeof body.notes === "string" ? body.notes : undefined;
     const gristJson = body.gristJson;
+    const hopsJson = body.hopsJson;
+    const yeastJson = body.yeastJson;
 
-    const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, { name, style, notes, gristJson });
+    const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, {
+      name,
+      style,
+      notes,
+      gristJson,
+      hopsJson,
+      yeastJson,
+    });
     return { ok: true, recipe: updated };
   });
 

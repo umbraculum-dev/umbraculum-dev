@@ -12,11 +12,13 @@
     "db:seed": "prisma db seed",
     "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST prisma migrate deploy && DATABASE_URL=$DATABASE_URL_TEST prisma db seed",
     "test": "npm run test:db:prepare && vitest run",
-    "seed:import": "tsx src/cli/seed-import.ts"
+    "seed:import": "tsx src/cli/seed-import.ts",
+    "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts"
   },
   "dependencies": {
-    "fastify": "^5.0.0",
     "@prisma/client": "^6.0.0",
+    "csv-parse": "^6.1.0",
+    "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0"
   },
   "devDependencies": {
@@ -30,4 +32,3 @@
     "seed": "tsx prisma/seed.ts"
   }
 }
-

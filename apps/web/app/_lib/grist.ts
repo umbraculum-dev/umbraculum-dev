@@ -12,7 +12,11 @@ export type GristMaltClass = "base" | "crystal" | "roast" | "acid";
 
 export interface GristRow {
   id: string;
+  /** Optional reference to a canonical fermentable ingredient record. */
+  ingredientId?: string | null;
   name: string;
+  /** Optional source metadata for display (does not affect calculations). */
+  producer?: string | null;
   /** kilograms */
   amountKg: number;
   /** Lovibond, may be unknown */
@@ -43,7 +47,15 @@ export function parseGristJson(value: unknown): GristRow[] {
     .map((row) => {
       const o = (row ?? {}) as Record<string, unknown>;
       const id = typeof o.id === "string" ? o.id : newRowId();
+      const ingredientIdRaw = o.ingredientId;
+      const ingredientId =
+        ingredientIdRaw === null || ingredientIdRaw === undefined
+          ? null
+          : typeof ingredientIdRaw === "string"
+            ? ingredientIdRaw
+            : null;
       const name = typeof o.name === "string" ? o.name : "";
+      const producer = typeof o.producer === "string" ? o.producer : null;
       const amountKg = typeof o.amountKg === "number" && Number.isFinite(o.amountKg) ? o.amountKg : 0;
       const colorLovibond =
         o.colorLovibond === null
@@ -76,7 +88,7 @@ export function parseGristJson(value: unknown): GristRow[] {
           ? maltClassRaw
           : "base";
 
-      return { id, name, amountKg, colorLovibond, potential, maltClass } as GristRow;
+      return { id, ingredientId, name, producer, amountKg, colorLovibond, potential, maltClass } as GristRow;
     })
     .filter(Boolean);
 }

@@ -8,7 +8,7 @@ import {
 } from "../domain/waterCalc/spargeAcidification.js";
 import { spargeAcidificationManual } from "../domain/waterCalc/spargeAcidificationManual.js";
 import { mashAcidificationManual } from "../domain/waterCalc/mashAcidificationManual.js";
-import { mashPhEstimateV0 } from "../domain/waterCalc/mashPhEstimateV0.js";
+import { mashPhEstimateV0, type MashPhEstimateV0Input } from "../domain/waterCalc/mashPhEstimateV0.js";
 import { mashAcidificationTargetMashPhV0 } from "../domain/waterCalc/mashAcidificationTargetMashPhV0.js";
 import {
   applySaltAdditions,
@@ -302,7 +302,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
-    const grist = gristRaw.map((row, idx) => {
+    const grist: MashPhEstimateV0Input["grist"] = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
       const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
@@ -440,7 +440,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
-    const grist = gristRaw.map((row, idx) => {
+    const grist: MashPhEstimateV0Input["grist"] = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
       const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
