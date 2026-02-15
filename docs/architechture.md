@@ -54,6 +54,25 @@
 
 ---
 
+## UI information architecture (IA) refactor policy (web + mobile)
+
+### Principle: separate “input pages” from “results pages”
+- **Input pages** are for changing data and running calculations (mash inputs, sparge inputs).
+- **Results pages** are only introduced when results become large/complex enough that:
+  - users need a stable “report” view (shareable/exportable),
+  - the UI needs multiple subpanels, or
+  - we want a read-only audit surface that avoids recomputation.
+
+### Criteria for adding `water/results`
+We should add a dedicated results page (e.g. `/recipes/:id/water/results`) only when at least one is true:
+- **The results surface is too big** to comfortably keep on the input pages without cognitive overload.
+- **We need a stable snapshot view** driven only by the last saved calculation(s), with no double calculation.
+- **We want an export/share workflow** (print/PDF/email) that benefits from a dedicated page.
+
+Until then, keep only small **read-only summaries** and deep links from input pages/hub.
+
+---
+
 ## 3. Request flow and responsibilities (LEMP analogy)
 
 **Nginx is the doorman. Next.js is the web app. Fastify is the backend.**

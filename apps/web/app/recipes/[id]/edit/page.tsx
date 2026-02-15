@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { apiFetch } from "../../../_lib/apiClient";
 import { loadDevAuthFromStorage, type DevAuth } from "../../../_lib/devAuth";
+import { parseGristJson, type GristRow } from "../../../_lib/grist";
 
 type Recipe = {
   id: string;
@@ -17,78 +19,12 @@ type Recipe = {
   updatedAt: string;
 };
 
-type GristPotentialKind = "ppg" | "yieldPercent" | "sg";
-type GristPotential = { kind: GristPotentialKind; value: number } | null;
-type GristMaltClass = "base" | "crystal" | "roast" | "acid";
-type GristRow = {
-  id: string;
-  name: string;
-  amountKg: number;
-  colorLovibond: number | null;
-  potential: GristPotential;
-  maltClass: GristMaltClass;
-};
-
 function newRowId() {
   try {
     return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
   } catch {
     return `${Date.now()}-${Math.random()}`;
   }
-}
-
-function parseGristJson(value: unknown): GristRow[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((row) => {
-      const o = (row ?? {}) as Record<string, unknown>;
-      const id = typeof o.id === "string" ? o.id : newRowId();
-      const name = typeof o.name === "string" ? o.name : "";
-      const amountKg = typeof o.amountKg === "number" && Number.isFinite(o.amountKg) ? o.amountKg : 0;
-      const colorLovibond =
-        o.colorLovibond === null
-          ? null
-          : typeof o.colorLovibond === "number" && Number.isFinite(o.colorLovibond)
-            ? o.colorLovibond
-            : null;
-      const potentialRaw = o.potential;
-      let potential: GristPotential = null;
-      if (potentialRaw && typeof potentialRaw === "object") {
-        const p = potentialRaw as Record<string, unknown>;
-        const kind = p.kind;
-        const v = p.value;
-        if (
-          (kind === "ppg" || kind === "yieldPercent" || kind === "sg") &&
-          typeof v === "number" &&
-          Number.isFinite(v)
-        ) {
-          potential = { kind, value: v };
-        }
-      }
-      const maltClassRaw = o.maltClass;
-      const maltClass: GristMaltClass =
-        maltClassRaw === "base" ||
-        maltClassRaw === "crystal" ||
-        maltClassRaw === "roast" ||
-        maltClassRaw === "acid"
-          ? maltClassRaw
-          : "base";
-      return { id, name, amountKg, colorLovibond, potential, maltClass } as GristRow;
-    })
-    .filter(Boolean);
-}
-
-async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
-  const res = await fetch(path, {
-    ...init,
-    headers: {
-      ...(init?.headers ?? {}),
-      "X-User-Id": auth.userId,
-      ...(auth.activeAccountId ? { "X-Account-Id": auth.activeAccountId } : {}),
-    },
-  });
-  const data = (await res.json()) as unknown;
-  return { ok: res.ok, status: res.status, data };
 }
 
 export default function RecipeEditPage() {

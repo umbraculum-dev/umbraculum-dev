@@ -3,48 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { loadDevAuthFromStorage, type DevAuth } from "../_lib/devAuth";
-
-type MeResponse = {
-  ok: true;
-  userId: string;
-  accountId: string | null;
-  role: string | null;
-};
-
-type WaterProfile = {
-  id: string;
-  scope: "system" | "public" | "account";
-  type: "water" | "dilution";
-  name: string;
-  verificationStatus: "verified" | "unverified";
-  ph?: number | null;
-  calcium: number;
-  magnesium: number;
-  sodium: number;
-  sulfate: number;
-  chloride: number;
-  bicarbonate: number;
-};
-
-type WaterProfilesResponse = {
-  system: WaterProfile[];
-  public: WaterProfile[];
-  account: WaterProfile[];
-};
-
-async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
-  const headers = new Headers(init?.headers ?? {});
-  headers.set("X-User-Id", auth.userId);
-  if (auth.activeAccountId) headers.set("X-Account-Id", auth.activeAccountId);
-
-  const res = await fetch(path, { ...init, headers });
-  const text = await res.text();
-  try {
-    return { ok: res.ok, status: res.status, data: JSON.parse(text) as unknown };
-  } catch {
-    return { ok: res.ok, status: res.status, data: text as unknown };
-  }
-}
+import { apiFetch } from "../_lib/apiClient";
+import type { MeResponse, WaterProfile, WaterProfilesResponse } from "../_lib/apiTypes";
 
 function isAdmin(role: string | null) {
   return role === "owner" || role === "brewery_admin";

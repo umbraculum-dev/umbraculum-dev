@@ -86,3 +86,11 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - Treat `node_modules/` as **generated artifacts**: never edit them directly; always change dependencies via `package.json` and run installs.
   - If Docker creates the folder with unexpected ownership, prefer reinstalling from the host or adjusting ownership rather than manually editing contents.
 
+- **Coding standards (TypeScript/React)**
+  - **Default**: use `interface` for object contracts (DTOs, component props, service inputs/outputs). Use `type` for unions/compositions.
+  - **External APIs (future: malt/hops/yeast DBs)**:
+    - Define an `interface` for the server response shape.
+    - Always validate runtime `unknown` payloads via a `parseXxx()`/`assertIsXxx()` function (or schema validation later). Avoid `as SomeType` casts on network payloads.
+  - **JSDoc**: required on exported/shared contracts when semantics aren’t obvious (units, ranges, invariants).
+  - More detail: `docs/CODING-STANDARDS.md`
+

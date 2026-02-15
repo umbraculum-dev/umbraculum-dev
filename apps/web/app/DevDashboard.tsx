@@ -3,23 +3,11 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { apiFetch } from "./_lib/apiClient";
 import { loadDevAuthFromStorage, saveDevAuthToStorage, type DevAuth } from "./_lib/devAuth";
 
 type AccountListItem = { id: string; name: string; role: string };
 type RecipeListItem = { id: string; accountId: string; name: string; style: string | null };
-
-async function apiFetch(path: string, auth: DevAuth, init?: RequestInit) {
-  const res = await fetch(path, {
-    ...init,
-    headers: {
-      ...(init?.headers ?? {}),
-      "X-User-Id": auth.userId,
-      ...(auth.activeAccountId ? { "X-Account-Id": auth.activeAccountId } : {}),
-    },
-  });
-  const data = (await res.json()) as unknown;
-  return { ok: res.ok, status: res.status, data };
-}
 
 export function DevDashboard() {
   const [auth, setAuth] = useState<DevAuth | null>(null);

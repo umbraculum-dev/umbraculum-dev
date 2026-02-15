@@ -14,6 +14,13 @@
   --info: #8bb8ff;
 
   --radius: 10px;
+
+  /* Field semantics (color is supportive; badges/text still required). */
+  --field-input-bg: var(--surface);
+  --field-readonly-bg: color-mix(in srgb, var(--info) 8%, var(--surface));
+  --field-computed-bg: color-mix(in srgb, var(--success) 7%, var(--surface));
+  --field-readonly-border: color-mix(in srgb, var(--info) 30%, var(--border));
+  --field-computed-border: color-mix(in srgb, var(--success) 30%, var(--border));
 }
 
 /* Prevent 100% width inputs overflowing due to padding/borders */
@@ -135,5 +142,45 @@ code {
 
 .muted {
   color: var(--text-muted);
+}
+
+.fieldBlock {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.fieldBlockHeader {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.fieldBadge {
+  display: inline-block;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.fieldBlock--readonly {
+  background: var(--field-readonly-bg);
+  border-color: var(--field-readonly-border);
+}
+
+.fieldBlock--readonly .fieldBadge {
+  border-color: var(--field-readonly-border);
+}
+
+.fieldBlock--computed {
+  background: var(--field-computed-bg);
+  border-color: var(--field-computed-border);
+}
+
+.fieldBlock--computed .fieldBadge {
+  border-color: var(--field-computed-border);
 }
 
