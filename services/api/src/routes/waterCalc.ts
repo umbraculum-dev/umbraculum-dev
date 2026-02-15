@@ -9,6 +9,7 @@ import {
 import { spargeAcidificationManual } from "../domain/waterCalc/spargeAcidificationManual.js";
 import { mashAcidificationManual } from "../domain/waterCalc/mashAcidificationManual.js";
 import { mashPhEstimateV0, type MashPhEstimateV0Input } from "../domain/waterCalc/mashPhEstimateV0.js";
+import { mashPhEstimateV1, type MashPhEstimateV1Input } from "../domain/waterCalc/mashPhEstimateV1.js";
 import { mashAcidificationTargetMashPhV0 } from "../domain/waterCalc/mashAcidificationTargetMashPhV0.js";
 import {
   applySaltAdditions,
@@ -374,6 +375,98 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       });
     } catch (e) {
       throw new BadRequestError("invalid_mash_ph_estimate_input", (e as Error)?.message || "Invalid input");
+    }
+
+    return { ok: true, result };
+  });
+
+  app.post("/water-calc/mash-ph-estimate-v1", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : NaN;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be a number > 0");
+    }
+    const alkalinityPpmCaCO3 = typeof body.alkalinityPpmCaCO3 === "number" ? body.alkalinityPpmCaCO3 : NaN;
+    if (!Number.isFinite(alkalinityPpmCaCO3) || alkalinityPpmCaCO3 < 0) {
+      throw new BadRequestError("invalid_alkalinity", "Body.alkalinityPpmCaCO3 must be a finite number >= 0");
+    }
+
+    const gristRaw = body.grist;
+    if (!Array.isArray(gristRaw)) {
+      throw new BadRequestError("invalid_grist", "Body.grist must be an array");
+    }
+    const grist: MashPhEstimateV1Input["grist"] = gristRaw.map((row, idx) => {
+      const o = (row ?? {}) as Record<string, unknown>;
+      const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+      if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
+        throw new BadRequestError(
+          "invalid_grist_row_amount",
+          `Body.grist[${idx}].amountKg must be a number > 0`,
+        );
+      }
+
+      const diRaw = o.mashDiPh;
+      const mashDiPh =
+        diRaw === null || diRaw === undefined ? null : typeof diRaw === "number" ? diRaw : NaN;
+      if (typeof mashDiPh === "number" && (!Number.isFinite(mashDiPh) || mashDiPh < 0 || mashDiPh > 14)) {
+        throw new BadRequestError(
+          "invalid_grist_row_mash_di_ph",
+          `Body.grist[${idx}].mashDiPh must be null or a finite number between 0 and 14`,
+        );
+      }
+
+      const taRaw = o.mashTaToPh57_mEqPerKg;
+      const mashTaToPh57_mEqPerKg =
+        taRaw === null || taRaw === undefined ? null : typeof taRaw === "number" ? taRaw : NaN;
+      if (
+        typeof mashTaToPh57_mEqPerKg === "number" &&
+        (!Number.isFinite(mashTaToPh57_mEqPerKg) || mashTaToPh57_mEqPerKg < 0)
+      ) {
+        throw new BadRequestError(
+          "invalid_grist_row_mash_ta",
+          `Body.grist[${idx}].mashTaToPh57_mEqPerKg must be null or a finite number >= 0`,
+        );
+      }
+
+      return { amountKg, mashDiPh, mashTaToPh57_mEqPerKg };
+    });
+
+    const waterToGristRatioQtPerLbOverride =
+      typeof body.waterToGristRatioQtPerLbOverride === "number"
+        ? body.waterToGristRatioQtPerLbOverride
+        : undefined;
+    if (
+      waterToGristRatioQtPerLbOverride !== undefined &&
+      (!Number.isFinite(waterToGristRatioQtPerLbOverride) || !(waterToGristRatioQtPerLbOverride > 0))
+    ) {
+      throw new BadRequestError(
+        "invalid_ratio_override",
+        "Body.waterToGristRatioQtPerLbOverride must be a number > 0",
+      );
+    }
+
+    const acidAdded_mEqPerL =
+      typeof body.acidAdded_mEqPerL === "number" ? (body.acidAdded_mEqPerL as number) : undefined;
+    if (acidAdded_mEqPerL !== undefined && (!Number.isFinite(acidAdded_mEqPerL) || acidAdded_mEqPerL < 0)) {
+      throw new BadRequestError(
+        "invalid_acid_added_meq",
+        "Body.acidAdded_mEqPerL must be a finite number >= 0",
+      );
+    }
+
+    let result;
+    try {
+      result = mashPhEstimateV1({
+        volumeLiters,
+        alkalinityPpmCaCO3,
+        grist,
+        waterToGristRatioQtPerLbOverride,
+        acidAdded_mEqPerL,
+      });
+    } catch (e) {
+      throw new BadRequestError("invalid_mash_ph_estimate_v1_input", (e as Error)?.message || "Invalid input");
     }
 
     return { ok: true, result };

@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
+import { getMashPhModelDefaultsV1 } from "../domain/waterCalc/mashPhDefaultsV1.js";
 import { AccountsService } from "./accountsService.js";
 
 export type CreateRecipeInput = {
@@ -54,7 +55,9 @@ export class RecipesService {
 
     const style = input.style?.trim() || null;
     const notes = input.notes?.trim() || null;
-    const gristJson = validateGristJson(input.gristJson);
+    const gristJsonRaw = validateGristJson(input.gristJson);
+    const gristJson =
+      Array.isArray(gristJsonRaw) ? await snapshotGristRows(this.prisma, gristJsonRaw) : gristJsonRaw;
     const hopsJson = validateHopsJson(input.hopsJson);
     const yeastJson = validateYeastJson(input.yeastJson);
 
@@ -94,7 +97,7 @@ export class RecipesService {
       } else if (gristJson === null) {
         data.gristJson = Prisma.JsonNull;
       } else {
-        data.gristJson = gristJson as unknown as Prisma.InputJsonValue;
+        data.gristJson = (await snapshotGristRows(this.prisma, gristJson)) as unknown as Prisma.InputJsonValue;
       }
     }
 
@@ -141,6 +144,79 @@ export class RecipesService {
   }
 }
 
+async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promise<GristRow[]> {
+  const ids = Array.from(
+    new Set(
+      rows
+        .map((r) => (typeof r.ingredientId === "string" ? r.ingredientId : null))
+        .filter((v): v is string => Boolean(v)),
+    ),
+  );
+  if (ids.length === 0) return rows;
+
+  const fermentables = await prisma.fermentable.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      producer: true,
+      group: true,
+      type: true,
+      notes: true,
+      colorEbc: true,
+      mashDiPh: true,
+      mashTaToPh57_mEqPerKg: true,
+    },
+  });
+  const byId = new Map(fermentables.map((f) => [f.id, f]));
+
+  return rows.map((r) => {
+    const ingredientId = typeof r.ingredientId === "string" ? r.ingredientId : null;
+    if (!ingredientId) return r;
+    const f = byId.get(ingredientId);
+    if (!f) return r;
+
+    const wantsOverride =
+      (typeof r.mashDiPh === "number" && Number.isFinite(r.mashDiPh)) ||
+      (typeof r.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(r.mashTaToPh57_mEqPerKg));
+
+    const defaults = getMashPhModelDefaultsV1({
+      name: r.name,
+      group: f.group ?? null,
+      type: f.type ?? null,
+      notes: f.notes ?? null,
+      colorEbc: typeof f.colorEbc === "number" && Number.isFinite(f.colorEbc) ? f.colorEbc : null,
+    });
+
+    const mashDiPh =
+      wantsOverride && r.mashDiPh !== null && r.mashDiPh !== undefined
+        ? r.mashDiPh
+        : typeof f.mashDiPh === "number" && Number.isFinite(f.mashDiPh)
+          ? f.mashDiPh
+          : defaults.mashDiPh;
+    const mashTaToPh57_mEqPerKg =
+      wantsOverride && r.mashTaToPh57_mEqPerKg !== null && r.mashTaToPh57_mEqPerKg !== undefined
+        ? r.mashTaToPh57_mEqPerKg
+        : typeof f.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(f.mashTaToPh57_mEqPerKg)
+          ? f.mashTaToPh57_mEqPerKg
+          : defaults.mashTaToPh57_mEqPerKg;
+
+    const mashPhModelSource: GristRow["mashPhModelSource"] = wantsOverride
+      ? "override"
+      : mashDiPh === null && mashTaToPh57_mEqPerKg === null
+        ? "unknown"
+        : "default";
+
+    return {
+      ...r,
+      producer: r.producer ?? f.producer ?? null,
+      group: r.group ?? f.group ?? null,
+      mashDiPh: mashDiPh ?? null,
+      mashTaToPh57_mEqPerKg: mashTaToPh57_mEqPerKg ?? null,
+      mashPhModelSource,
+    } as GristRow;
+  });
+}
+
 type GristPotential =
   | { kind: "ppg"; value: number }
   | { kind: "yieldPercent"; value: number }
@@ -153,6 +229,10 @@ type GristRow = {
   ingredientId?: string | null;
   name: string;
   producer?: string | null;
+  group?: string | null;
+  mashDiPh?: number | null;
+  mashTaToPh57_mEqPerKg?: number | null;
+  mashPhModelSource?: "default" | "override" | "unknown";
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential | null;
@@ -201,6 +281,56 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
                 `Body.gristJson[${idx}].producer must be a string or null`,
               );
             })();
+
+    const groupRaw = o.group;
+    const group =
+      groupRaw === null || groupRaw === undefined
+        ? null
+        : typeof groupRaw === "string"
+          ? groupRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_grist_row_group",
+                `Body.gristJson[${idx}].group must be a string or null`,
+              );
+            })();
+
+    const mashDiPhRaw = o.mashDiPh;
+    const mashDiPh =
+      mashDiPhRaw === null || mashDiPhRaw === undefined
+        ? null
+        : typeof mashDiPhRaw === "number"
+          ? mashDiPhRaw
+          : NaN;
+    if (typeof mashDiPh === "number" && (!Number.isFinite(mashDiPh) || mashDiPh < 0 || mashDiPh > 14)) {
+      throw new BadRequestError(
+        "invalid_grist_row_mash_di_ph",
+        `Body.gristJson[${idx}].mashDiPh must be null or a finite number between 0 and 14`,
+      );
+    }
+
+    const mashTaRaw = o.mashTaToPh57_mEqPerKg;
+    const mashTaToPh57_mEqPerKg =
+      mashTaRaw === null || mashTaRaw === undefined
+        ? null
+        : typeof mashTaRaw === "number"
+          ? mashTaRaw
+          : NaN;
+    if (
+      typeof mashTaToPh57_mEqPerKg === "number" &&
+      (!Number.isFinite(mashTaToPh57_mEqPerKg) || mashTaToPh57_mEqPerKg < 0)
+    ) {
+      throw new BadRequestError(
+        "invalid_grist_row_mash_ta",
+        `Body.gristJson[${idx}].mashTaToPh57_mEqPerKg must be null or a finite number >= 0`,
+      );
+    }
+
+    const mashPhModelSourceRaw = o.mashPhModelSource;
+    const mashPhModelSource: GristRow["mashPhModelSource"] =
+      mashPhModelSourceRaw === "default" || mashPhModelSourceRaw === "override" || mashPhModelSourceRaw === "unknown"
+        ? mashPhModelSourceRaw
+        : undefined;
     const amountKg = ensureFinite(o.amountKg, `gristJson[${idx}].amountKg`);
     const colorLovibondRaw = o.colorLovibond;
     const colorLovibond =
@@ -280,6 +410,10 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
     };
     if (ingredientId) out.ingredientId = ingredientId;
     if (producer) out.producer = producer;
+    if (group) out.group = group;
+    if (mashDiPh !== null) out.mashDiPh = mashDiPh;
+    if (mashTaToPh57_mEqPerKg !== null) out.mashTaToPh57_mEqPerKg = mashTaToPh57_mEqPerKg;
+    if (mashPhModelSource) out.mashPhModelSource = mashPhModelSource;
     return out as GristRow;
   });
 }

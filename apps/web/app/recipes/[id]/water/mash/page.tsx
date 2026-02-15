@@ -417,17 +417,34 @@ export default function MashWaterPage() {
   const calcMashEstimatedPh = async (args: {
     volumeLiters: number;
     alkalinityPpmCaCO3: number;
-    grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: GristMaltClass }>;
+    grist: Array<{
+      amountKg: number;
+      colorLovibond: number | null;
+      maltClass: GristMaltClass;
+      mashDiPh?: number | null;
+      mashTaToPh57_mEqPerKg?: number | null;
+    }>;
     acidAdded_mEqPerL?: number;
   }) => {
     if (!auth?.userId || !auth.activeAccountId) return null;
-    const res = await apiFetch("/api/water-calc/mash-ph-estimate", auth, {
+    const hasV1 = args.grist.some(
+      (r) =>
+        typeof r.mashDiPh === "number" ||
+        typeof r.mashTaToPh57_mEqPerKg === "number",
+    );
+    const res = await apiFetch(hasV1 ? "/api/water-calc/mash-ph-estimate-v1" : "/api/water-calc/mash-ph-estimate", auth, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         volumeLiters: args.volumeLiters,
         alkalinityPpmCaCO3: args.alkalinityPpmCaCO3,
-        grist: args.grist,
+        grist: hasV1
+          ? args.grist.map((r) => ({
+              amountKg: r.amountKg,
+              mashDiPh: r.mashDiPh ?? null,
+              mashTaToPh57_mEqPerKg: r.mashTaToPh57_mEqPerKg ?? null,
+            }))
+          : args.grist,
         acidAdded_mEqPerL: args.acidAdded_mEqPerL,
       }),
     });
@@ -463,6 +480,8 @@ export default function MashWaterPage() {
       amountKg: r.amountKg,
       colorLovibond: r.colorLovibond,
       maltClass: r.maltClass,
+      mashDiPh: (r as any).mashDiPh ?? null,
+      mashTaToPh57_mEqPerKg: (r as any).mashTaToPh57_mEqPerKg ?? null,
     }));
 
     let mashMode: "targetPh" | "manual" = mashAcidificationMode;

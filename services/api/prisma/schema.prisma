@@ -268,6 +268,15 @@ model Fermentable {
   yieldPercent  Float?
   ppg           Float?
 
+  // Mash pH model parameters (v1, experimental)
+  // - `mashDiPh`: distilled-water mash pH (room temp, ~20-25C)
+  // - `mashTaToPh57_mEqPerKg`: titratable acidity to pH 5.7, mEq/kg (Troester-style)
+  mashDiPh              Float?
+  mashTaToPh57_mEqPerKg Float?
+  mashPhModelKey        String?
+  mashPhModelSource     String?
+  mashPhModelVersion    Int?
+
   deprecatedAt DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

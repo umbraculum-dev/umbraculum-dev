@@ -3,6 +3,7 @@ import { ForbiddenError } from "../errors.js";
 import { requireActiveAccount, requireUser } from "../plugins/requestContext.js";
 import { AccountsService } from "../services/accountsService.js";
 import { importBeerprotoAll } from "../seed/sources/beerproto/beerproto.js";
+import { getMashPhModelDefaultsV1 } from "../domain/waterCalc/mashPhDefaultsV1.js";
 
 function isAdminRole(role: string | null) {
   return role === "owner" || role === "brewery_admin";
@@ -42,15 +43,39 @@ export async function ingredientsRoutes(app: FastifyInstance) {
         producer: true,
         group: true,
         type: true,
+        notes: true,
         country: true,
         colorEbc: true,
         colorLovibond: true,
         yieldPercent: true,
         ppg: true,
+        mashDiPh: true,
+        mashTaToPh57_mEqPerKg: true,
+        mashPhModelKey: true,
+        mashPhModelSource: true,
+        mashPhModelVersion: true,
       },
     });
 
-    return { ok: true, items };
+    const computed = items.map((it) => {
+      const defaults = getMashPhModelDefaultsV1({
+        name: it.name,
+        group: it.group ?? null,
+        type: it.type ?? null,
+        notes: it.notes ?? null,
+        colorEbc: typeof it.colorEbc === "number" && Number.isFinite(it.colorEbc) ? it.colorEbc : null,
+      });
+      return {
+        ...it,
+        mashDiPh: it.mashDiPh ?? defaults.mashDiPh,
+        mashTaToPh57_mEqPerKg: it.mashTaToPh57_mEqPerKg ?? defaults.mashTaToPh57_mEqPerKg,
+        mashPhModelKey: it.mashPhModelKey ?? defaults.mashPhModelKey,
+        mashPhModelSource: it.mashPhModelSource ?? defaults.mashPhModelSource,
+        mashPhModelVersion: it.mashPhModelVersion ?? defaults.mashPhModelVersion,
+      };
+    });
+
+    return { ok: true, items: computed };
   });
 
   app.get("/ingredients/hops", async (req) => {

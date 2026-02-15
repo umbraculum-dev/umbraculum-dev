@@ -245,6 +245,10 @@ export default function RecipeEditPage() {
         ingredientId: null,
         name: "",
         producer: null,
+        group: null,
+        mashDiPh: null,
+        mashTaToPh57_mEqPerKg: null,
+        mashPhModelSource: "unknown",
         amountKg: 0,
         colorLovibond: null,
         potential: null,
@@ -258,6 +262,14 @@ export default function RecipeEditPage() {
     const itemName = typeof item?.name === "string" ? item.name : "";
     if (!id || !itemName) return;
     const producer = typeof item?.producer === "string" ? item.producer : null;
+    const group = typeof item?.group === "string" ? item.group : null;
+    const mashDiPh = typeof item?.mashDiPh === "number" && Number.isFinite(item.mashDiPh) ? item.mashDiPh : null;
+    const mashTaToPh57_mEqPerKg =
+      typeof item?.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(item.mashTaToPh57_mEqPerKg)
+        ? item.mashTaToPh57_mEqPerKg
+        : null;
+    const mashPhModelSource =
+      mashDiPh !== null || mashTaToPh57_mEqPerKg !== null ? ("default" as const) : ("unknown" as const);
     const name = itemName;
     const colorLovibond =
       typeof item?.colorLovibond === "number" && Number.isFinite(item.colorLovibond)
@@ -282,6 +294,10 @@ export default function RecipeEditPage() {
         ingredientId: id,
         name,
         producer,
+        group,
+        mashDiPh,
+        mashTaToPh57_mEqPerKg,
+        mashPhModelSource,
         amountKg: 0,
         colorLovibond,
         potential,
@@ -668,8 +684,16 @@ export default function RecipeEditPage() {
                         <Fragment key={r.id}>
                           <tr>
                             <td colSpan={7} style={{ paddingTop: 8, borderTop }}>
-                              <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-                                <div style={{ flex: 1, minWidth: 280 }}>
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gap: 12,
+                                  alignItems: "end",
+                                  gridTemplateColumns:
+                                    "minmax(240px, 1fr) minmax(120px, 200px) minmax(120px, 200px) auto",
+                                }}
+                              >
+                                <div style={{ minWidth: 0 }}>
                                   <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-name-${r.id}`}>
                                     Name
                                   </label>
@@ -677,13 +701,21 @@ export default function RecipeEditPage() {
                                     id={`grist-name-${r.id}`}
                                     value={r.name}
                                     onChange={(e) =>
-                                      updateGristRow(r.id, { name: e.target.value, ingredientId: null, producer: null })
+                                      updateGristRow(r.id, {
+                                        name: e.target.value,
+                                        ingredientId: null,
+                                        producer: null,
+                                        group: null,
+                                        mashDiPh: null,
+                                        mashTaToPh57_mEqPerKg: null,
+                                        mashPhModelSource: "unknown",
+                                      })
                                     }
                                     style={{ width: "100%", padding: 8 }}
                                     autoComplete="off"
                                   />
                                 </div>
-                                <div style={{ width: 240, maxWidth: "100%" }}>
+                                <div style={{ minWidth: 0 }}>
                                   <label
                                     className="muted"
                                     style={{ display: "block", fontSize: 12 }}
@@ -699,7 +731,23 @@ export default function RecipeEditPage() {
                                     tabIndex={-1}
                                   />
                                 </div>
-                                <div style={{ flex: "0 0 auto" }}>
+                                <div style={{ minWidth: 0 }}>
+                                  <label
+                                    className="muted"
+                                    style={{ display: "block", fontSize: 12 }}
+                                    htmlFor={`grist-group-${r.id}`}
+                                  >
+                                    Group
+                                  </label>
+                                  <input
+                                    id={`grist-group-${r.id}`}
+                                    value={r.group ?? ""}
+                                    readOnly
+                                    style={{ width: "100%", padding: 8 }}
+                                    tabIndex={-1}
+                                  />
+                                </div>
+                                <div style={{ alignSelf: "start" }}>
                                   <button type="button" onClick={() => removeGristRow(r.id)} aria-label={`Remove fermentable row ${idx + 1}`}>
                                     Remove
                                   </button>
@@ -755,7 +803,7 @@ export default function RecipeEditPage() {
 
                                 <div>
                                   <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-class-${r.id}`}>
-                                    Malt class
+                                    Mash pH class (legacy)
                                   </label>
                                   <select
                                     id={`grist-class-${r.id}`}
@@ -816,6 +864,73 @@ export default function RecipeEditPage() {
                                     disabled={!r.potential}
                                     style={{ width: 140, padding: 8 }}
                                   />
+                                </div>
+
+                                <div style={{ flexBasis: "100%" }}>
+                                  <details>
+                                    <summary className="muted" style={{ fontSize: 12, cursor: "pointer" }}>
+                                      Mash pH model (v1)
+                                    </summary>
+                                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 8 }}>
+                                      <div style={{ width: 240, maxWidth: "100%" }}>
+                                        <label
+                                          className="muted"
+                                          style={{ display: "block", fontSize: 12 }}
+                                          htmlFor={`grist-mash-di-ph-${r.id}`}
+                                        >
+                                          DI mash pH (room temp)
+                                        </label>
+                                        <input
+                                          id={`grist-mash-di-ph-${r.id}`}
+                                          type="number"
+                                          inputMode="decimal"
+                                          step={0.01}
+                                          value={r.mashDiPh ?? ""}
+                                          onChange={(e) =>
+                                            updateGristRow(r.id, {
+                                              mashDiPh: e.target.value === "" ? null : Number(e.target.value),
+                                              mashPhModelSource: "override",
+                                            })
+                                          }
+                                          style={{ width: "100%", padding: 8 }}
+                                        />
+                                      </div>
+                                      <div style={{ width: 280, maxWidth: "100%" }}>
+                                        <label
+                                          className="muted"
+                                          style={{ display: "block", fontSize: 12 }}
+                                          htmlFor={`grist-mash-ta-${r.id}`}
+                                        >
+                                          Titratable acidity to pH 5.7 (mEq/kg)
+                                        </label>
+                                        <input
+                                          id={`grist-mash-ta-${r.id}`}
+                                          type="number"
+                                          inputMode="decimal"
+                                          step={0.1}
+                                          value={r.mashTaToPh57_mEqPerKg ?? ""}
+                                          onChange={(e) =>
+                                            updateGristRow(r.id, {
+                                              mashTaToPh57_mEqPerKg: e.target.value === "" ? null : Number(e.target.value),
+                                              mashPhModelSource: "override",
+                                            })
+                                          }
+                                          style={{ width: "100%", padding: 8 }}
+                                        />
+                                      </div>
+                                      <div style={{ width: 200, maxWidth: "100%" }}>
+                                        <label className="muted" style={{ display: "block", fontSize: 12 }}>
+                                          Source
+                                        </label>
+                                        <input
+                                          value={r.mashPhModelSource ?? "unknown"}
+                                          readOnly
+                                          style={{ width: "100%", padding: 8 }}
+                                          tabIndex={-1}
+                                        />
+                                      </div>
+                                    </div>
+                                  </details>
                                 </div>
                               </div>
                             </td>

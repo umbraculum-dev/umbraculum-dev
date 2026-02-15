@@ -17,6 +17,20 @@ export interface GristRow {
   name: string;
   /** Optional source metadata for display (does not affect calculations). */
   producer?: string | null;
+  /** Optional BeerProto group (display/debug). */
+  group?: string | null;
+  /**
+   * Distilled-water mash pH (room temp, ~20–25°C).
+   * v1 mash pH model parameter; may be estimated or user-overridden.
+   */
+  mashDiPh?: number | null;
+  /**
+   * Titratable acidity to pH 5.7 (Troester-style), in mEq/kg.
+   * v1 mash pH model parameter; may be estimated or user-overridden.
+   */
+  mashTaToPh57_mEqPerKg?: number | null;
+  /** How mash pH params were selected (v1). */
+  mashPhModelSource?: "default" | "override" | "unknown";
   /** kilograms */
   amountKg: number;
   /** Lovibond, may be unknown */
@@ -56,6 +70,17 @@ export function parseGristJson(value: unknown): GristRow[] {
             : null;
       const name = typeof o.name === "string" ? o.name : "";
       const producer = typeof o.producer === "string" ? o.producer : null;
+      const group = typeof o.group === "string" ? o.group : null;
+      const mashDiPh = typeof o.mashDiPh === "number" && Number.isFinite(o.mashDiPh) ? o.mashDiPh : null;
+      const mashTaToPh57_mEqPerKg =
+        typeof o.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(o.mashTaToPh57_mEqPerKg)
+          ? o.mashTaToPh57_mEqPerKg
+          : null;
+      const mashPhModelSourceRaw = o.mashPhModelSource;
+      const mashPhModelSource: GristRow["mashPhModelSource"] =
+        mashPhModelSourceRaw === "default" || mashPhModelSourceRaw === "override" || mashPhModelSourceRaw === "unknown"
+          ? mashPhModelSourceRaw
+          : "unknown";
       const amountKg = typeof o.amountKg === "number" && Number.isFinite(o.amountKg) ? o.amountKg : 0;
       const colorLovibond =
         o.colorLovibond === null
@@ -88,7 +113,20 @@ export function parseGristJson(value: unknown): GristRow[] {
           ? maltClassRaw
           : "base";
 
-      return { id, ingredientId, name, producer, amountKg, colorLovibond, potential, maltClass } as GristRow;
+      return {
+        id,
+        ingredientId,
+        name,
+        producer,
+        group,
+        mashDiPh,
+        mashTaToPh57_mEqPerKg,
+        mashPhModelSource,
+        amountKg,
+        colorLovibond,
+        potential,
+        maltClass,
+      } as GristRow;
     })
     .filter(Boolean);
 }

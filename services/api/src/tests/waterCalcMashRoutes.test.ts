@@ -77,6 +77,30 @@ describe("water calc: mash acidification + salt additions", () => {
     await app.close();
   });
 
+  it("estimates mash pH v1 from DI pH + TA + alkalinity", async () => {
+    const app = buildApp();
+    await app.ready();
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-ph-estimate-v1",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: {
+        volumeLiters: 10,
+        alkalinityPpmCaCO3: 50,
+        grist: [{ amountKg: 5, mashDiPh: 5.76, mashTaToPh57_mEqPerKg: 0 }],
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.result.estimatedMashPhRoomTemp).toBeGreaterThan(0);
+    expect(body.result.estimatedMashPhRoomTemp).toBeLessThan(14);
+    await app.close();
+  });
+
   it("solves acid amount for target mash pH (grist-driven)", async () => {
     const app = buildApp();
     await app.ready();
