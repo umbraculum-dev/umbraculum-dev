@@ -77,6 +77,45 @@ describe("water calc: mash acidification + salt additions", () => {
     await app.close();
   });
 
+  it("mash pH estimate decreases when Ca/Mg increase (RA-like)", async () => {
+    const app = buildApp();
+    await app.ready();
+
+    const basePayload = {
+      volumeLiters: 10,
+      alkalinityPpmCaCO3: 150,
+      grist: [{ amountKg: 5, mashDiPh: 5.76, mashTaToPh57_mEqPerKg: 0 }],
+    };
+
+    const resLow = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-ph-estimate-v1",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: { ...basePayload, calciumPpm: 0, magnesiumPpm: 0 },
+    });
+    expect(resLow.statusCode).toBe(200);
+
+    const resHigh = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-ph-estimate-v1",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: { ...basePayload, calciumPpm: 100, magnesiumPpm: 20 },
+    });
+    expect(resHigh.statusCode).toBe(200);
+
+    const low = (resLow.json() as any).result.estimatedMashPhRoomTemp as number;
+    const high = (resHigh.json() as any).result.estimatedMashPhRoomTemp as number;
+    expect(high).toBeLessThan(low);
+
+    await app.close();
+  });
+
   it("estimates mash pH v1 from DI pH + TA + alkalinity", async () => {
     const app = buildApp();
     await app.ready();
@@ -129,6 +168,50 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.result.acidRequiredMl).toBeGreaterThan(0);
     expect(body.result.estimatedMashPhRoomTemp).toBeTypeOf("number");
     expect(Math.abs(body.result.estimatedMashPhRoomTemp - 5.4)).toBeLessThan(0.05);
+    await app.close();
+  });
+
+  it("requires less acid for target mash pH when Ca/Mg increase (RA-like)", async () => {
+    const app = buildApp();
+    await app.ready();
+
+    const basePayload = {
+      acidType: "lactic",
+      strengthKind: "percent",
+      strengthValue: 88,
+      mashStartingAlkalinityPpmCaCO3: 200,
+      mashStartingPh: 7.0,
+      mashWaterVolumeLiters: 10,
+      targetMashPh: 5.4,
+      grist: [{ amountKg: 5, colorLovibond: 2, maltClass: "base" }],
+    };
+
+    const resLow = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-acidification-target-mash-ph",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: { ...basePayload, calciumPpm: 0, magnesiumPpm: 0 },
+    });
+    expect(resLow.statusCode).toBe(200);
+
+    const resHigh = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-acidification-target-mash-ph",
+      headers: {
+        "x-user-id": "00000000-0000-0000-0000-000000000001",
+        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
+      },
+      payload: { ...basePayload, calciumPpm: 120, magnesiumPpm: 30 },
+    });
+    expect(resHigh.statusCode).toBe(200);
+
+    const low = (resLow.json() as any).result.acidRequiredMl as number;
+    const high = (resHigh.json() as any).result.acidRequiredMl as number;
+    expect(high).toBeLessThan(low);
+
     await app.close();
   });
 

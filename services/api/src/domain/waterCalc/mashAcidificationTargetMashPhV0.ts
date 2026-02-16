@@ -11,6 +11,10 @@ export type MashAcidificationTargetMashPhV0Input = {
   startingPh: number;
   volumeLiters: number;
   targetMashPh: number;
+  /** Optional Ca (mg/L) for RA-like effective alkalinity adjustment in the mash pH estimator. */
+  calciumPpm?: number;
+  /** Optional Mg (mg/L) for RA-like effective alkalinity adjustment in the mash pH estimator. */
+  magnesiumPpm?: number;
   acidType: SpargeAcidType;
   strength: AcidStrength;
   grist: MashPhEstimateGristRowV0[];
@@ -54,6 +58,8 @@ function withAmount(
 function estimateMashPh(
   volumeLiters: number,
   alkalinityPpmCaCO3: number,
+  calciumPpm: number,
+  magnesiumPpm: number,
   grist: MashPhEstimateGristRowV0[],
   waterToGristRatioQtPerLbOverride?: number,
   acidAdded_mEqPerL?: number,
@@ -61,6 +67,8 @@ function estimateMashPh(
   return mashPhEstimateV0({
     volumeLiters,
     alkalinityPpmCaCO3,
+    calciumPpm,
+    magnesiumPpm,
     grist,
     waterToGristRatioQtPerLbOverride,
     acidAdded_mEqPerL,
@@ -89,6 +97,8 @@ export function mashAcidificationTargetMashPhV0(
     startingPh,
     volumeLiters,
     targetMashPh,
+    calciumPpm: calciumPpmRaw,
+    magnesiumPpm: magnesiumPpmRaw,
     acidType,
     strength,
     grist,
@@ -102,11 +112,19 @@ export function mashAcidificationTargetMashPhV0(
   if (!(startingAlkalinityPpmCaCO3 >= 0)) throw new Error("startingAlkalinityPpmCaCO3 must be >= 0");
   if (!(volumeLiters > 0)) throw new Error("volumeLiters must be > 0");
 
+  const calciumPpm = typeof calciumPpmRaw === "number" ? calciumPpmRaw : 0;
+  const magnesiumPpm = typeof magnesiumPpmRaw === "number" ? magnesiumPpmRaw : 0;
+  assertFinite(calciumPpm, "calciumPpm");
+  assertFinite(magnesiumPpm, "magnesiumPpm");
+  if (calciumPpm < 0 || magnesiumPpm < 0) throw new Error("calciumPpm/magnesiumPpm must be >= 0");
+
   const units = amountUnits(strength);
 
   const estimateAtZero = estimateMashPh(
     volumeLiters,
     startingAlkalinityPpmCaCO3,
+    calciumPpm,
+    magnesiumPpm,
     grist,
     waterToGristRatioQtPerLbOverride,
   );
@@ -173,6 +191,8 @@ export function mashAcidificationTargetMashPhV0(
     const estimate = estimateMashPh(
       volumeLiters,
       startingAlkalinityPpmCaCO3,
+      calciumPpm,
+      magnesiumPpm,
       grist,
       waterToGristRatioQtPerLbOverride,
       acidAdded_mEqPerL,

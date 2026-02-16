@@ -105,6 +105,10 @@ There are two reasonable ways to implement this later:
 - Computes specialty malt acidity from TA:
   - `totalAcidity_mEq = Σ(amountKg * mashTaToPh57_mEqPerKg)`
 - Applies a BrunWater-style normalization for mash thickness and alkalinity, producing `netAcidity_mEqPerL`.
+- **RA-like Ca/Mg effect (heuristic)**: before converting alkalinity into charge, we compute an **effective alkalinity**:
+  - `effectiveAlk_asCaCO3 = max(0, alkalinity_asCaCO3 - 0.713*Ca_mgL - 0.588*Mg_mgL)`
+  - This is an intentional, modest “calcium/magnesium makes water behave less alkaline in the mash” adjustment.
+  - It affects **predicted mash pH** (v0 + v1) and the **acid-to-target-mash-pH** solver, but **not** the standalone water-acidification pH solver.
 - Converts `netAcidity_mEqPerL` into an estimated mash pH via a simple linear slope (currently shared with v0 for continuity).
 
 ## Known limitations (v1)

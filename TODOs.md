@@ -4,6 +4,8 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 ## Water calculator (high priority)
 
+- [ ] **Sparge salts vs sparge pH**: verify whether sparge salt additions currently influence predicted sparge pH; if not, implement the same Ca/Mg (RA-like) pH shift approach used for mash so gypsum/CaCl₂ can move predicted sparge pH modestly.
+- [ ] **Deprecate mash pH v0**: after we’ve tested v1 enough for confidence, remove v0 endpoints/logic and UI fallbacks (keep a short-lived migration window if needed).
 - [ ] Implement how recipes manage **late additions** and **boil additions** (separate from mash), since they do not contribute to mash calculations.
 - [ ] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
 - [ ] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).

@@ -299,6 +299,15 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       );
     }
 
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
+      throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
+    }
+    if (magnesiumPpm !== undefined && (!Number.isFinite(magnesiumPpm) || magnesiumPpm < 0)) {
+      throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
+    }
+
     const gristRaw = body.grist;
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
@@ -369,6 +378,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       result = mashPhEstimateV0({
         volumeLiters,
         alkalinityPpmCaCO3,
+        calciumPpm,
+        magnesiumPpm,
         grist,
         waterToGristRatioQtPerLbOverride,
         acidAdded_mEqPerL,
@@ -391,6 +402,15 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const alkalinityPpmCaCO3 = typeof body.alkalinityPpmCaCO3 === "number" ? body.alkalinityPpmCaCO3 : NaN;
     if (!Number.isFinite(alkalinityPpmCaCO3) || alkalinityPpmCaCO3 < 0) {
       throw new BadRequestError("invalid_alkalinity", "Body.alkalinityPpmCaCO3 must be a finite number >= 0");
+    }
+
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
+      throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
+    }
+    if (magnesiumPpm !== undefined && (!Number.isFinite(magnesiumPpm) || magnesiumPpm < 0)) {
+      throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
     }
 
     const gristRaw = body.grist;
@@ -461,6 +481,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       result = mashPhEstimateV1({
         volumeLiters,
         alkalinityPpmCaCO3,
+        calciumPpm,
+        magnesiumPpm,
         grist,
         waterToGristRatioQtPerLbOverride,
         acidAdded_mEqPerL,
@@ -529,6 +551,15 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
     }
 
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
+      throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
+    }
+    if (magnesiumPpm !== undefined && (!Number.isFinite(magnesiumPpm) || magnesiumPpm < 0)) {
+      throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
+    }
+
     const gristRaw = body.grist;
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
@@ -589,6 +620,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         startingPh,
         volumeLiters,
         targetMashPh,
+        calciumPpm,
+        magnesiumPpm,
         acidType,
         strength,
         grist,

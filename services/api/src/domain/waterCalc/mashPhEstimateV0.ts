@@ -1,3 +1,5 @@
+import { effectiveAlkalinityPpmCaCO3FromCaMg } from "./residualAlkalinity.js";
+
 export type MashPhEstimateMaltClassV0 = "base" | "crystal" | "roast" | "acid";
 
 export type MashPhEstimateGristRowV0 = {
@@ -9,6 +11,10 @@ export type MashPhEstimateGristRowV0 = {
 export type MashPhEstimateV0Input = {
   volumeLiters: number;
   alkalinityPpmCaCO3: number;
+  /** Optional Ca (mg/L) for RA-like effective alkalinity adjustment. */
+  calciumPpm?: number;
+  /** Optional Mg (mg/L) for RA-like effective alkalinity adjustment. */
+  magnesiumPpm?: number;
   grist: MashPhEstimateGristRowV0[];
   waterToGristRatioQtPerLbOverride?: number;
   acidAdded_mEqPerL?: number;
@@ -32,6 +38,10 @@ export type MashPhEstimateV0Result = {
     waterToGristRatioQtPerLb: number;
     totalAcidity_mEq: number;
     totalAlkalinity_mEq: number;
+    calciumPpm: number;
+    magnesiumPpm: number;
+    effectiveAlkalinityPpmCaCO3: number;
+    alkalinityReductionFromCaMgPpmCaCO3: number;
     alkalinityRatioFactor: number;
     netAcidity_mEqPerL: number;
     netAcidityBeforeAcid_mEqPerL: number;
@@ -73,6 +83,21 @@ export function mashPhEstimateV0(input: MashPhEstimateV0Input): MashPhEstimateV0
   assertFinite(input.alkalinityPpmCaCO3, "alkalinityPpmCaCO3");
   if (!(input.volumeLiters > 0)) throw new Error("volumeLiters must be > 0");
   if (!Array.isArray(input.grist)) throw new Error("grist must be an array");
+
+  const calciumPpm = typeof input.calciumPpm === "number" ? input.calciumPpm : 0;
+  const magnesiumPpm = typeof input.magnesiumPpm === "number" ? input.magnesiumPpm : 0;
+  assertFinite(calciumPpm, "calciumPpm");
+  assertFinite(magnesiumPpm, "magnesiumPpm");
+  if (calciumPpm < 0 || magnesiumPpm < 0) throw new Error("calciumPpm/magnesiumPpm must be >= 0");
+
+  const {
+    effectiveAlkalinityPpmCaCO3,
+    alkalinityReductionFromCaMgPpmCaCO3,
+  } = effectiveAlkalinityPpmCaCO3FromCaMg({
+    alkalinityPpmCaCO3: input.alkalinityPpmCaCO3,
+    calciumPpm,
+    magnesiumPpm,
+  });
 
   let gristTotalKg = 0;
   const perRow: MashPhEstimateV0Result["debug"]["perRow"] = [];
@@ -129,7 +154,7 @@ export function mashPhEstimateV0(input: MashPhEstimateV0Input): MashPhEstimateV0
 
   // Total alkalinity charge (mEq) in mash water:
   // I24 = (AlkalinityPpmCaCO3 / 50) * volume_L
-  const totalAlkalinity_mEq = (input.alkalinityPpmCaCO3 / 50) * input.volumeLiters;
+  const totalAlkalinity_mEq = (effectiveAlkalinityPpmCaCO3 / 50) * input.volumeLiters;
   const alkalinityRatioFactor = waterToGristRatioQtPerLb / BASELINE_RATIO_QT_PER_LB;
 
   // I26 = (I25 - (I24 * (J25 / 1.5))) / volume_L
@@ -169,6 +194,10 @@ export function mashPhEstimateV0(input: MashPhEstimateV0Input): MashPhEstimateV0
       waterToGristRatioQtPerLb,
       totalAcidity_mEq,
       totalAlkalinity_mEq,
+      calciumPpm,
+      magnesiumPpm,
+      effectiveAlkalinityPpmCaCO3,
+      alkalinityReductionFromCaMgPpmCaCO3,
       alkalinityRatioFactor,
       netAcidity_mEqPerL,
       netAcidityBeforeAcid_mEqPerL,

@@ -432,6 +432,8 @@ export default function MashWaterPage() {
   const calcMashEstimatedPh = async (args: {
     volumeLiters: number;
     alkalinityPpmCaCO3: number;
+    calciumPpm?: number;
+    magnesiumPpm?: number;
     grist: Array<{
       amountKg: number;
       colorLovibond: number | null;
@@ -453,6 +455,8 @@ export default function MashWaterPage() {
       body: JSON.stringify({
         volumeLiters: args.volumeLiters,
         alkalinityPpmCaCO3: args.alkalinityPpmCaCO3,
+        calciumPpm: args.calciumPpm,
+        magnesiumPpm: args.magnesiumPpm,
         grist: hasV1
           ? args.grist.map((r) => ({
               amountKg: r.amountKg,
@@ -534,6 +538,8 @@ export default function MashWaterPage() {
         estimatedMashPhRoomTemp = await calcMashEstimatedPh({
           volumeLiters: derivedMashWaterVolumeLiters,
           alkalinityPpmCaCO3: mashStartingAlk,
+          calciumPpm: salts.resultingProfile.calcium,
+          magnesiumPpm: salts.resultingProfile.magnesium,
           grist: gristRows,
           acidAdded_mEqPerL: (manual as any).predicted?.debug?.acidRequired_mEqPerL ?? undefined,
         }).catch(() => null);
@@ -551,6 +557,10 @@ export default function MashWaterPage() {
         strengthKind: mashStrengthKind,
         ...(gristRows.length ? { grist: gristRows } : {}),
       };
+      if (gristRows.length) {
+        payload.calciumPpm = salts.resultingProfile.calcium;
+        payload.magnesiumPpm = salts.resultingProfile.magnesium;
+      }
       if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
 
       const res = await apiFetch(endpoint, auth as DevAuth, {
@@ -1261,7 +1271,9 @@ export default function MashWaterPage() {
               <div className="fieldBlockHeader">
                 <strong>Resulting ions (after salts only)</strong>
                 <span className="fieldBadge">Computed</span>
-                <span className="muted">Does not consider acid; see overall mash result for combined output</span>
+                <span className="muted">
+                  Does not consider acid; see &quot;Overall mash water result&quot; for combined output
+                </span>
               </div>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
