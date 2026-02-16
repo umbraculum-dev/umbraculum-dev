@@ -6,9 +6,20 @@ import { useRouter } from "next/navigation";
 
 import { apiFetch } from "../../../_lib/apiClient";
 
-type AccountListItem = { id: string; name: string; role: string };
+type AccountListItem = { id: string; name: string; role: string; brandKey?: string | null };
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
+const BRAND_COOKIE = "UI_BRAND";
+
+function writeCookie(name: string, value: string) {
+  const maxAgeSeconds = 60 * 60 * 24 * 365; // 1 year
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
+}
+
+function setBrand(brandKey: string) {
+  writeCookie(BRAND_COOKIE, brandKey);
+  document.documentElement.dataset.brand = brandKey;
+}
 
 export default function SelectAccountPage() {
   const locale = useLocale();
@@ -47,6 +58,10 @@ export default function SelectAccountPage() {
     setSubmittingId(accountId);
     setError(null);
     try {
+      const picked = accounts.find((a) => a.id === accountId) ?? null;
+      const brandKey = (picked?.brandKey && typeof picked.brandKey === "string" ? picked.brandKey : "default") ?? "default";
+      setBrand(brandKey);
+
       const res = await apiFetch("/api/auth/active-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

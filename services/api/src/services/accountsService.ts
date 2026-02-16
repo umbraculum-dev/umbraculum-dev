@@ -15,6 +15,7 @@ export class AccountsService {
       id: m.account.id,
       name: m.account.name,
       role: m.role,
+      brandKey: m.account.brandKey ?? "default",
     }));
   }
 

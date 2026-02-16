@@ -16,7 +16,7 @@ export type AuthMeResponse = {
     preferredFontScale?: string | null;
     preferredDensity?: string | null;
   };
-  accounts: Array<{ id: string; name: string; role: string }>;
+  accounts: Array<{ id: string; name: string; role: string; brandKey?: string | null }>;
   activeAccountId: string | null;
   role: string | null;
 };

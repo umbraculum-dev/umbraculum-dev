@@ -51,6 +51,17 @@ html[data-theme="hc_light"] {
   --focus-ring: #1a5dff;
 }
 
+/* Account/company accent branding (Phase 2 minimal). Applied via <html data-brand="...">. */
+html[data-brand="acme"] {
+  --info: #62e6a8;
+  --focus-ring: #62e6a8;
+}
+
+html[data-brand="forest"] {
+  --info: #7fdc6b;
+  --focus-ring: #7fdc6b;
+}
+
 /* Density presets. */
 html[data-density="compact"] {
   --panel-padding: 10px;

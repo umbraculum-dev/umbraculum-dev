@@ -868,7 +868,7 @@ export default function SpargeWaterPage() {
                   <thead>
                     <tr>
                       <th align="left">Ion</th>
-                      <th align="right">After salts (ppm)</th>
+                      <th align="left">After salts (ppm)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -884,7 +884,7 @@ export default function SpargeWaterPage() {
                     ).map(([label, after]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="right">{after.toFixed(2)}</td>
+                        <td align="left">{after.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -907,7 +907,7 @@ export default function SpargeWaterPage() {
                   <thead>
                     <tr>
                       <th align="left">Ion</th>
-                      <th align="right">After salts + acid (ppm)</th>
+                      <th align="left">After salts + acid (ppm)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -926,7 +926,7 @@ export default function SpargeWaterPage() {
                       ] as const).map(([label, v]) => (
                         <tr key={label}>
                           <td>{label}</td>
-                          <td align="right">{v.toFixed(2)}</td>
+                          <td align="left">{v.toFixed(2)}</td>
                         </tr>
                       ));
                     })()}

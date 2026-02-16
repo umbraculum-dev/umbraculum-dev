@@ -67,6 +67,8 @@ model User {
 model Account {
   id        String   @id @default(uuid())
   name      String
+  /** Optional account/company branding accent key (e.g. "default", "acme"). */
+  brandKey  String?  @default("default")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

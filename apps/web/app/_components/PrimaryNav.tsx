@@ -9,6 +9,17 @@ import { apiFetch } from "../_lib/apiClient";
 import type { AuthMeResponse } from "../_lib/useRequireAuth";
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
+const BRAND_COOKIE = "UI_BRAND";
+
+function writeCookie(name: string, value: string) {
+  const maxAgeSeconds = 60 * 60 * 24 * 365; // 1 year
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
+}
+
+function setBrand(brandKey: string) {
+  writeCookie(BRAND_COOKIE, brandKey);
+  document.documentElement.dataset.brand = brandKey;
+}
 
 export function PrimaryNav() {
   const t = useTranslations("nav");
@@ -34,7 +45,24 @@ export function PrimaryNav() {
           setMe(null);
           return;
         }
-        setMe(res.data as AuthMeResponse);
+        const next = res.data as AuthMeResponse;
+        setMe(next);
+
+        const active =
+          next && next.activeAccountId
+            ? (next.accounts as any[]).find((a) => a && typeof a === "object" && (a as any).id === next.activeAccountId) ?? null
+            : null;
+        const brandKey =
+          active && typeof (active as any).brandKey === "string" && (active as any).brandKey
+            ? ((active as any).brandKey as string)
+            : "default";
+
+        // Best-effort: keep cookie + <html data-brand> in sync so SSR doesn't flash after refresh.
+        try {
+          setBrand(brandKey);
+        } catch {
+          // ignore
+        }
       } catch {
         if (cancelled) return;
         setAuthKnown(true);

@@ -24,9 +24,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const theme = oneOf(cookieStore.get("UI_THEME")?.value, ["default", "hc_dark", "hc_light"] as const, "default");
   const density = oneOf(cookieStore.get("UI_DENSITY")?.value, ["comfortable", "compact"] as const, "comfortable");
   const fontScale = oneOf(cookieStore.get("UI_FONT_SCALE")?.value, ["sm", "md", "lg", "xl"] as const, "md");
+  const brand = oneOf(cookieStore.get("UI_BRAND")?.value, ["default", "acme", "forest"] as const, "default");
 
   return (
-    <html lang={lang} data-theme={theme} data-density={density} data-font-scale={fontScale}>
+    <html lang={lang} data-theme={theme} data-density={density} data-font-scale={fontScale} data-brand={brand}>
       <body>
         {children}
       </body>
