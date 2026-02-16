@@ -10,6 +10,15 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [ ] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
 - [ ] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
 
+## Recipes / templates
+
+- [ ] **Assess external libraries** for importing recipes (BeerXML + BeerJSON) into our `Recipe` model (`gristJson` / `hopsJson` / `yeastJson`).
+  - See `RECIPES-IMPORT-TODO.md` for the agreed path forward (manual import + server-side importer plan).
+  - [ ] **Scope v1 to server-side only** (API importer). Web UI uploads/pastes recipe data; parsing happens in the API.
+  - [ ] Decide input UX: file upload vs paste text (and which we support first).
+  - [ ] Define a licensing policy: default to user-provided files; do not redistribute third-party recipe datasets unless explicitly licensed.
+  - [ ] Choose approach: maintained library vs minimal in-house parser for the subset we need.
+
 ## Authentication (real, production-ready)
 
 - [ ] Implement real auth end-to-end:
