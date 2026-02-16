@@ -2,6 +2,10 @@
 
 This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
 
+## Water calculator (high priority)
+
+- [ ] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
+
 ## Authentication (important)
 
 - [ ] **Dev-only header auth is temporary** (current approach):

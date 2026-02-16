@@ -14,6 +14,28 @@ This app has two mash pH estimators:
 
 The mash water page will **prefer v1** automatically when any grist row includes `mashDiPh` and/or `mashTaToPh57_mEqPerKg`, otherwise it falls back to v0.
 
+## References (Troester/Braukaiser + Palmer/RA)
+
+- **Braukaiser PDF (effect of water and grist on mash pH)**:
+  - Online: `https://braukaiser.com/documents/effect_of_water_and_grist_on_mash_pH.pdf`
+  - Local mirror (if the website is unreachable): `docs/calculators/effect_of_water_and_grist_on_mash_pH.pdf`
+
+## Approach comparison: Palmer (RA) vs Troester/Braukaiser (TA + DI pH)
+
+Both approaches aim to help brewers predict and control mash pH, but they model different things.
+
+- **Palmer / Kolbach (Residual Alkalinity, RA)**:
+  - **Idea**: estimate how “alkaline” the water will behave in the mash after calcium/magnesium effects.
+  - **Strength**: simple, familiar, quick sanity-check (especially for “pale vs dark” thinking).
+  - **Limitations**: RA alone does not capture grist-specific buffering/acidity differences well (e.g. roasted vs crystal vs dehusked roasted).
+
+- **Troester/Braukaiser-style (Titratable acidity + DI mash pH)**:
+  - **Idea**: treat grist as having a baseline mash pH (DI mash pH) plus an acidity/buffering parameter measured by titration (TA to a reference pH; we use pH 5.7).
+  - **Strength**: more directly expresses malt-to-malt differences in mash pH impact, and supports explicit overrides.
+  - **Limitations**: TA/DI pH are rarely available per SKU; defaults are proxies unless you measure or curate values.
+
+**Does one build on the other?** Not exactly. RA is a water-centric heuristic; TA/DI pH is a grist+water parameterization that can model cases RA can’t distinguish.
+
 ## Why we snapshot parameters into recipes
 
 We snapshot DI pH + TA into `Recipe.gristJson` at save-time so results **don’t silently change** when the canonical ingredient database is updated.
@@ -45,6 +67,35 @@ Roasted malts have an important special case: **dehusked / de-bittered** product
   - **`mashRoastDehuskedSource`**: `"inferred" | "override" | "unknown"` describing provenance.
 
 For **non-dehusked** roasted malts, the v1 default TA uses a **weak saturating color proxy** (EBC), rather than a flat constant. This provides gentle differentiation between “dark” and “very dark” roasted malts while preventing runaway linear growth at extreme colors.
+
+## Residual alkalinity (RA) appendix (Palmer/Kolbach)
+
+We plan to surface RA as a **secondary recap metric** because many brewers are familiar with it (and tools like BrewersFriend often show RA-style summaries). RA should be presented as a **rule-of-thumb** check, not as the core mash pH predictor.
+
+### Definitions and unit conventions
+
+- **Alkalinity**: typically reported as **mg/L as CaCO₃** (a.k.a. “ppm as CaCO₃”).
+- **Calcium/Magnesium**: often reported as **mg/L of the element** (Ca, Mg).
+- **Hardness as CaCO₃** conversions:
+  - `CaHardness_asCaCO3 = Ca_mgL * 2.497`
+  - `MgHardness_asCaCO3 = Mg_mgL * 4.116`
+
+### Kolbach/Palmer-style RA (as mg/L as CaCO₃)
+
+One common expression is:
+
+- `RA_asCaCO3 = Alkalinity_asCaCO3 - (CaHardness_asCaCO3 / 3.5) - (MgHardness_asCaCO3 / 7)`
+
+With elemental Ca/Mg mg/L substituted directly, this becomes:
+
+- `RA_asCaCO3 = Alkalinity_asCaCO3 - (0.713 * Ca_mgL) - (0.588 * Mg_mgL)`
+
+### “Style expected RA” (heuristic)
+
+There are two reasonable ways to implement this later:
+
+- **Style table**: map style families to an RA range (explicit targets; simplest to explain).
+- **Color-based guideline**: approximate an RA range from beer color (SRM/EBC), with clear caveats (dehusked malts, unusual grists, etc.).
 
 ## v1 estimator (high level)
 
