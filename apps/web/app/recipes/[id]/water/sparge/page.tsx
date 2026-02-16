@@ -255,8 +255,18 @@ export default function SpargeWaterPage() {
   const onSubmitSparge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth?.userId || !auth.activeAccountId) return;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      setSpargeError("Sparge water volume must be > 0.");
+      return;
+    }
     if (startingPh.trim() === "" || !Number.isFinite(Number(startingPh))) {
       setSpargeError("Starting pH is required (select a profile with pH or enter it manually).");
+      return;
+    }
+    try {
+      await ensureZeroSaltsSnapshotIfMissing();
+    } catch (err) {
+      setSpargeError(String(err));
       return;
     }
     setSpargeError(null);
@@ -397,6 +407,48 @@ export default function SpargeWaterPage() {
     }
   };
 
+  const hasNonZeroSaltAdditions = (rows: SaltAdditionRow[]) =>
+    rows.some((r) => typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0);
+
+  const ensureZeroSaltsSnapshotIfMissing = async () => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    if (spargeSaltsResult) return;
+    if (hasNonZeroSaltAdditions(spargeSaltAdditions)) {
+      throw new Error(
+        "You entered sparge salts but haven’t calculated them. Click “Calculate sparge salts” first so acidification uses the correct ions.",
+      );
+    }
+    if (!selectedSpargeProfile) {
+      throw new Error("Select a sparge water profile first (base ion profile for recap).");
+    }
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new Error("Sparge water volume must be > 0.");
+    }
+
+    const base: IonProfilePpm = {
+      calcium: selectedSpargeProfile.calcium,
+      magnesium: selectedSpargeProfile.magnesium,
+      sodium: selectedSpargeProfile.sodium,
+      sulfate: selectedSpargeProfile.sulfate,
+      chloride: selectedSpargeProfile.chloride,
+      bicarbonate: selectedSpargeProfile.bicarbonate,
+    };
+
+    const result: SaltAdditionsResult = {
+      baseProfile: base,
+      resultingProfile: base,
+      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+      breakdown: [],
+    };
+
+    const nowIso = new Date().toISOString();
+    setSpargeSaltsResult(result);
+    await saveSettings({
+      spargeSaltAdditionsJson: spargeSaltAdditions,
+      spargeSaltsLastResultJson: { calculatedAt: nowIso, result },
+    });
+  };
+
   const onCalculateSpargeSalts = async () => {
     if (!auth?.userId || !auth.activeAccountId) return;
     setSpargeSaltsError(null);
@@ -405,8 +457,8 @@ export default function SpargeWaterPage() {
     setSpargeSaltsResult(null);
     setSpargeSaltsSubmitting(true);
     try {
-      if (!selectedSpargeProfile) throw new Error("Select a sparge water profile first (base ion profile).");
-      if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) throw new Error("Water volume must be > 0.");
+      if (!selectedSpargeProfile) throw new Error("Select a sparge water profile first (base ion profile for salts).");
+      if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) throw new Error("Sparge water volume must be > 0.");
 
       const res = await apiFetch("/api/water-calc/salt-additions", auth, {
         method: "POST",

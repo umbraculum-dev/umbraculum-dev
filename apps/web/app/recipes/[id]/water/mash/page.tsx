@@ -298,9 +298,30 @@ export default function MashWaterPage() {
   const selectedDilution = useMemo(() => dilutionProfiles.find((p) => p.id === dilutionProfileId) ?? null, [dilutionProfileId, dilutionProfiles]);
 
   const mixedSourceProfile = useMemo(() => {
-    if (!selectedSource || !selectedDilution) return null;
     const tap = Math.max(0, Number(tapVolumeLiters) || 0);
     const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    const total = tap + dil;
+    if (!(total > 0)) return null;
+
+    // Intuitive rule: you can’t “dilute nothing”.
+    // - Source must be present and have volume > 0.
+    // - Dilution is optional, but if dilution volume > 0, a dilution profile is required.
+    if (!(tap > 0) || !selectedSource) return null;
+    if (dil > 0 && !selectedDilution) return null;
+
+    // Source-only (no dilution volume)
+    if (!(dil > 0)) {
+      return {
+        name: `Source (${selectedSource.name})`,
+        totalVolumeLiters: tap,
+        calcium: selectedSource.calcium,
+        magnesium: selectedSource.magnesium,
+        sodium: selectedSource.sodium,
+        sulfate: selectedSource.sulfate,
+        chloride: selectedSource.chloride,
+        bicarbonate: selectedSource.bicarbonate,
+      };
+    }
     const mixed = mixIonProfilesByVolume(
       {
         calcium: selectedSource.calcium,
@@ -324,7 +345,7 @@ export default function MashWaterPage() {
     if (!mixed) return null;
     return {
       name: `Mixed (${selectedSource.name} + ${selectedDilution.name})`,
-      totalVolumeLiters: tap + dil,
+      totalVolumeLiters: total,
       ...mixed,
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
@@ -366,6 +387,8 @@ export default function MashWaterPage() {
     setSavingMash(true);
     try {
       await saveSettings({
+        tapWaterVolumeLiters: tapVolumeLiters,
+        dilutionWaterVolumeLiters: dilutionVolumeLiters,
         mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
         mashStartingPh,
         mashTargetPh,
@@ -388,7 +411,13 @@ export default function MashWaterPage() {
   const onCalcSalts = async () => {
     if (!auth?.userId || !auth.activeAccountId) return;
     if (!mixedSourceProfile) {
-      setSaltsError("Select source + dilution profiles and set volumes first (to compute mixed water).");
+      const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+      const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+      if (!(tap > 0)) setSaltsError("Source volume must be > 0.");
+      else if (!selectedSource) setSaltsError("Select a Source water profile.");
+      else if (dil > 0 && !selectedDilution)
+        setSaltsError("Select a Dilution water profile (or set Dilution volume to 0).");
+      else setSaltsError("Compute mixed water first (check Water adjustment inputs).");
       return;
     }
     setSaltsError(null);
@@ -418,6 +447,8 @@ export default function MashWaterPage() {
       setSaltsResult(result);
 
       await saveSettings({
+        tapWaterVolumeLiters: tapVolumeLiters,
+        dilutionWaterVolumeLiters: dilutionVolumeLiters,
         mashSaltAdditionsJson: saltAdditions,
         mashSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
       });
@@ -444,6 +475,47 @@ export default function MashWaterPage() {
     } finally {
       setSavingSalts(false);
     }
+  };
+
+  const hasNonZeroSaltAdditions = (rows: SaltAdditionRow[]) =>
+    rows.some((r) => typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0);
+
+  const ensureZeroSaltsSnapshotIfMissing = async () => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    if (saltsResult) return;
+    if (hasNonZeroSaltAdditions(saltAdditions)) {
+      throw new Error(
+        "You entered salts but haven’t calculated them. Click “Calculate salts” first so overall uses the correct ions.",
+      );
+    }
+    if (!mixedSourceProfile) {
+      throw new Error("Set Source profile + Source volume first (Dilution optional).");
+    }
+
+    const base: IonProfilePpm = {
+      calcium: mixedSourceProfile.calcium,
+      magnesium: mixedSourceProfile.magnesium,
+      sodium: mixedSourceProfile.sodium,
+      sulfate: mixedSourceProfile.sulfate,
+      chloride: mixedSourceProfile.chloride,
+      bicarbonate: mixedSourceProfile.bicarbonate,
+    };
+
+    const result: SaltAdditionsResult = {
+      baseProfile: base,
+      resultingProfile: base,
+      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+      breakdown: [],
+    };
+
+    const nowIso = new Date().toISOString();
+    setSaltsResult(result);
+    await saveSettings({
+      tapWaterVolumeLiters: tapVolumeLiters,
+      dilutionWaterVolumeLiters: dilutionVolumeLiters,
+      mashSaltAdditionsJson: saltAdditions,
+      mashSaltsLastResultJson: { calculatedAt: nowIso, result },
+    });
   };
 
   const calcMashEstimatedPh = async (args: {
@@ -493,7 +565,7 @@ export default function MashWaterPage() {
     // This preserves the existing “overall mash” approach from the monolithic page:
     // - Start from mixed water (if present), then apply salts result, then apply acid result (SO4/Cl only) into ions.
     // - Use the latest saved “acidification mode” result snapshot where possible.
-    if (!mixedSourceProfile) throw new Error("Compute mixed water first (Water adjustment section).");
+    if (!mixedSourceProfile) throw new Error("Set Source profile + Source volume first (Dilution optional).");
 
     const base: IonProfilePpm = {
       calcium: mixedSourceProfile.calcium,
@@ -646,11 +718,14 @@ export default function MashWaterPage() {
     setOverallSaveStatus(null);
     setSavingOverall(true);
     try {
+      await ensureZeroSaltsSnapshotIfMissing();
       const overall = await computeOverallMash();
       setOverallResult(overall);
       setOverallStatus("Calculated.");
       if (saveAlso) {
         await saveSettings({
+          tapWaterVolumeLiters: tapVolumeLiters,
+          dilutionWaterVolumeLiters: dilutionVolumeLiters,
           mashOverallLastResultJson: overall,
           mashOverallLastCalculatedAt: overall.calculatedAt,
         });
@@ -928,7 +1003,7 @@ export default function MashWaterPage() {
               {loadingProfiles ? "Refreshing…" : "Refresh profiles"}
             </button>
             <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
-              {savingAdjustment ? "Saving…" : "Save profile selections"}
+              {savingAdjustment ? "Saving…" : "Save profile and volumes"}
             </button>
             {adjustmentSaveStatus ? (
               <span className="muted" role="status" aria-live="polite">
@@ -1372,6 +1447,9 @@ export default function MashWaterPage() {
               <ul>
                 <li>
                   pH: {overallResult.ph.kind} <code>{overallResult.ph.value.toFixed(2)}</code>
+                </li>
+                <li>
+                  Mash water volume: <code>{derivedMashWaterVolumeLiters.toFixed(2)}</code> L
                 </li>
                 <li>
                   Final alkalinity: <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3

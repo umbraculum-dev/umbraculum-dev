@@ -117,6 +117,13 @@ export default function BoilWaterPage() {
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
 
+  const displayAlkalinityPpmCaCO3 = (v: number) => {
+    // Small negatives can happen with very tiny acid amounts (or floating/solver tolerances).
+    // Treat values near zero as zero for display, but preserve meaningful negative alkalinity.
+    if (v < 0 && v > -1) return 0;
+    return v;
+  };
+
   useEffect(() => {
     setAuth(loadDevAuthFromStorage());
     setAuthLoaded(true);
@@ -244,9 +251,32 @@ export default function BoilWaterPage() {
   const selectedDilution = useMemo(() => dilutionProfiles.find((p) => p.id === dilutionProfileId) ?? null, [dilutionProfileId, dilutionProfiles]);
 
   const mixedSourceProfile = useMemo(() => {
-    if (!selectedSource || !selectedDilution) return null;
     const tap = Math.max(0, Number(tapVolumeLiters) || 0);
     const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    const total = tap + dil;
+    if (!(total > 0)) return null;
+
+    // Intuitive rule: you can’t “dilute nothing”.
+    // - Source must be present and have volume > 0.
+    // - Dilution is optional, but if dilution volume > 0, a dilution profile is required.
+    if (!(tap > 0) || !selectedSource) return null;
+    if (dil > 0 && !selectedDilution) return null;
+
+    // Source-only (no dilution volume)
+    if (!(dil > 0)) {
+      return {
+        name: `Source (${selectedSource.name})`,
+        totalVolumeLiters: tap,
+        calcium: selectedSource.calcium,
+        magnesium: selectedSource.magnesium,
+        sodium: selectedSource.sodium,
+        sulfate: selectedSource.sulfate,
+        chloride: selectedSource.chloride,
+        bicarbonate: selectedSource.bicarbonate,
+      };
+    }
+
+    if (!selectedSource || !selectedDilution) return null;
     const mixed = mixIonProfilesByVolume(
       {
         calcium: selectedSource.calcium,
@@ -270,7 +300,7 @@ export default function BoilWaterPage() {
     if (!mixed) return null;
     return {
       name: `Mixed (${selectedSource.name} + ${selectedDilution.name})`,
-      totalVolumeLiters: tap + dil,
+      totalVolumeLiters: total,
       ...mixed,
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
@@ -298,7 +328,7 @@ export default function BoilWaterPage() {
         boilTapWaterVolumeLiters: tapVolumeLiters,
         boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
       });
-      setAdjustmentSaveStatus("Saved boil profile selections.");
+      setAdjustmentSaveStatus("Saved boil profiles and volumes.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -340,7 +370,13 @@ export default function BoilWaterPage() {
   const onCalcSalts = async () => {
     if (!auth?.userId || !auth.activeAccountId) return;
     if (!mixedSourceProfile) {
-      setSaltsError("Select source + dilution profiles and set volumes first (to compute mixed water).");
+      const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+      const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+      if (!(tap > 0)) setSaltsError("Source volume must be > 0.");
+      else if (!selectedSource) setSaltsError("Select a Source water profile.");
+      else if (dil > 0 && !selectedDilution)
+        setSaltsError("Select a Dilution water profile (or set Dilution volume to 0).");
+      else setSaltsError("Compute mixed water first (check Water adjustment inputs).");
       return;
     }
     setSaltsError(null);
@@ -396,6 +432,45 @@ export default function BoilWaterPage() {
     }
   };
 
+  const hasNonZeroSaltAdditions = (rows: SaltAdditionRow[]) =>
+    rows.some((r) => typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0);
+
+  const ensureZeroSaltsSnapshotIfMissing = async () => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    if (saltsResult) return;
+    if (hasNonZeroSaltAdditions(saltAdditions)) {
+      throw new Error(
+        "You entered salts but haven’t calculated them. Click “Calculate salts” first so overall/acidification uses the correct ions.",
+      );
+    }
+    if (!mixedSourceProfile) {
+      throw new Error("Set Source profile + Source volume first (Dilution optional).");
+    }
+
+    const base: IonProfilePpm = {
+      calcium: mixedSourceProfile.calcium,
+      magnesium: mixedSourceProfile.magnesium,
+      sodium: mixedSourceProfile.sodium,
+      sulfate: mixedSourceProfile.sulfate,
+      chloride: mixedSourceProfile.chloride,
+      bicarbonate: mixedSourceProfile.bicarbonate,
+    };
+
+    const result: SaltAdditionsResult = {
+      baseProfile: base,
+      resultingProfile: base,
+      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+      breakdown: [],
+    };
+
+    const nowIso = new Date().toISOString();
+    setSaltsResult(result);
+    await saveSettings({
+      boilSaltAdditionsJson: saltAdditions,
+      boilSaltsLastResultJson: { calculatedAt: nowIso, result },
+    });
+  };
+
   const boilCalciumPpm = useMemo(() => {
     const v = saltsResult?.resultingProfile?.calcium ?? mixedSourceProfile?.calcium;
     return typeof v === "number" && Number.isFinite(v) ? v : undefined;
@@ -414,6 +489,12 @@ export default function BoilWaterPage() {
     }
     if (!Number.isFinite(derivedBoilWaterVolumeLiters) || !(derivedBoilWaterVolumeLiters > 0)) {
       setBoilError("Boil water volume must be > 0 (set Water adjustment volumes).");
+      return;
+    }
+    try {
+      await ensureZeroSaltsSnapshotIfMissing();
+    } catch (err) {
+      setBoilError(String(err));
       return;
     }
     setBoilError(null);
@@ -533,7 +614,7 @@ export default function BoilWaterPage() {
   };
 
   const computeOverallBoil = async (): Promise<BoilOverallResultV0> => {
-    if (!mixedSourceProfile) throw new Error("Compute mixed water first (Water adjustment section).");
+    if (!mixedSourceProfile) throw new Error("Set Source profile + Source volume first (Dilution optional).");
     const base: IonProfilePpm = {
       calcium: mixedSourceProfile.calcium,
       magnesium: mixedSourceProfile.magnesium,
@@ -583,6 +664,7 @@ export default function BoilWaterPage() {
     setOverallSaveStatus(null);
     setSavingOverall(true);
     try {
+      await ensureZeroSaltsSnapshotIfMissing();
       const overall = await computeOverallBoil();
       setOverallResult(overall);
       setOverallStatus("Calculated.");
@@ -735,7 +817,7 @@ export default function BoilWaterPage() {
               {loadingProfiles ? "Refreshing…" : "Refresh profiles"}
             </button>
             <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
-              {savingAdjustment ? "Saving…" : "Save profile selections"}
+              {savingAdjustment ? "Saving…" : "Save profile and volumes"}
             </button>
             {adjustmentSaveStatus ? (
               <span className="muted" role="status" aria-live="polite">
@@ -788,7 +870,7 @@ export default function BoilWaterPage() {
             </details>
           ) : (
             <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
-              Select a source + dilution profile and set volumes to see mixed ions.
+              Select a Source profile and set Source volume. Dilution is optional, but if Dilution volume is &gt; 0 you must select a Dilution profile.
             </p>
           )}
 
@@ -1062,7 +1144,8 @@ export default function BoilWaterPage() {
                   </li>
                 ) : null}
                 <li>
-                  Final alkalinity: <code>{acidResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  Final alkalinity:{" "}
+                  <code>{displayAlkalinityPpmCaCO3(acidResult.finalAlkalinityPpmCaCO3).toFixed(3)}</code> ppm as CaCO3
                 </li>
               </ul>
             </div>
@@ -1080,7 +1163,9 @@ export default function BoilWaterPage() {
                   Estimated achieved pH: <code>{manualResult.achievedPh.toFixed(3)}</code>
                 </li>
                 <li>
-                  Final alkalinity: <code>{manualResult.predicted.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  Final alkalinity:{" "}
+                  <code>{displayAlkalinityPpmCaCO3(manualResult.predicted.finalAlkalinityPpmCaCO3).toFixed(3)}</code>{" "}
+                  ppm as CaCO3
                 </li>
               </ul>
             </details>
@@ -1122,7 +1207,8 @@ export default function BoilWaterPage() {
                   pH: {overallResult.ph.kind} <code>{overallResult.ph.value.toFixed(2)}</code>
                 </li>
                 <li>
-                  Final alkalinity: <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
+                  Final alkalinity:{" "}
+                  <code>{displayAlkalinityPpmCaCO3(overallResult.finalAlkalinityPpmCaCO3).toFixed(2)}</code> ppm as CaCO3
                 </li>
               </ul>
               <div style={{ overflowX: "auto", marginTop: 8 }}>

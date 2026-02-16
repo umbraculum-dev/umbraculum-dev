@@ -225,26 +225,33 @@ export class RecipeWaterSettingsService {
     }
 
     // Single source of truth (mash page): mash water volume is derived from mixing volumes.
-    // If either mixing field is present in the request, derive mashWaterVolumeLiters from:
+    // If mixing volumes exist (either in the request or already persisted), keep mashWaterVolumeLiters consistent with:
     //   tapWaterVolumeLiters + dilutionWaterVolumeLiters
-    // using request values where provided, otherwise falling back to existing record values.
+    //
+    // Legacy/back-compat: if mixing volumes are both zero/absent, we still allow `mashWaterVolumeLiters` to be set.
     const hasMixingUpdate =
       input.tapWaterVolumeLiters !== undefined || input.dilutionWaterVolumeLiters !== undefined;
-    if (hasMixingUpdate) {
-      const tap =
-        typeof input.tapWaterVolumeLiters === "number"
+
+    const tap =
+      input.tapWaterVolumeLiters === null
+        ? 0
+        : typeof input.tapWaterVolumeLiters === "number"
           ? input.tapWaterVolumeLiters
           : typeof existing?.tapWaterVolumeLiters === "number"
             ? existing.tapWaterVolumeLiters
             : 0;
-      const dil =
-        typeof input.dilutionWaterVolumeLiters === "number"
+    const dil =
+      input.dilutionWaterVolumeLiters === null
+        ? 0
+        : typeof input.dilutionWaterVolumeLiters === "number"
           ? input.dilutionWaterVolumeLiters
           : typeof existing?.dilutionWaterVolumeLiters === "number"
             ? existing.dilutionWaterVolumeLiters
             : 0;
-
-      data.mashWaterVolumeLiters = ensureFinite(Math.max(0, tap) + Math.max(0, dil), "mashWaterVolumeLiters");
+    const derivedMashVolume = Math.max(0, tap) + Math.max(0, dil);
+    if (derivedMashVolume > 0 || hasMixingUpdate) {
+      // If caller explicitly updates mixing volumes to 0, derivedMashVolume will be 0; keep DB consistent anyway.
+      data.mashWaterVolumeLiters = ensureFinite(derivedMashVolume, "mashWaterVolumeLiters");
     }
 
     const mashNumericFields = [
@@ -257,8 +264,8 @@ export class RecipeWaterSettingsService {
       if (v !== undefined) data[f] = ensureFinite(v, f);
     }
 
-    // If mixing volumes are being updated, prevent client-provided mashWaterVolumeLiters from reintroducing duplication.
-    if (!hasMixingUpdate && input.mashWaterVolumeLiters !== undefined) {
+    // Legacy-only: allow setting mashWaterVolumeLiters when mixing is not in use.
+    if (derivedMashVolume <= 0 && !hasMixingUpdate && input.mashWaterVolumeLiters !== undefined) {
       data.mashWaterVolumeLiters = ensureFinite(input.mashWaterVolumeLiters, "mashWaterVolumeLiters");
     }
 
@@ -274,24 +281,25 @@ export class RecipeWaterSettingsService {
 
     const hasBoilMixingUpdate =
       input.boilTapWaterVolumeLiters !== undefined || input.boilDilutionWaterVolumeLiters !== undefined;
-    if (hasBoilMixingUpdate) {
-      const tap =
-        typeof input.boilTapWaterVolumeLiters === "number"
-          ? input.boilTapWaterVolumeLiters
+    const boilTap =
+      (input as any).boilTapWaterVolumeLiters === null
+        ? 0
+        : typeof (input as any).boilTapWaterVolumeLiters === "number"
+          ? (input as any).boilTapWaterVolumeLiters
           : typeof (existing as any)?.boilTapWaterVolumeLiters === "number"
             ? (existing as any).boilTapWaterVolumeLiters
             : 0;
-      const dil =
-        typeof input.boilDilutionWaterVolumeLiters === "number"
-          ? input.boilDilutionWaterVolumeLiters
+    const boilDil =
+      (input as any).boilDilutionWaterVolumeLiters === null
+        ? 0
+        : typeof (input as any).boilDilutionWaterVolumeLiters === "number"
+          ? (input as any).boilDilutionWaterVolumeLiters
           : typeof (existing as any)?.boilDilutionWaterVolumeLiters === "number"
             ? (existing as any).boilDilutionWaterVolumeLiters
             : 0;
-
-      data.boilWaterVolumeLiters = ensureFinite(
-        Math.max(0, tap) + Math.max(0, dil),
-        "boilWaterVolumeLiters",
-      );
+    const derivedBoilVolume = Math.max(0, boilTap) + Math.max(0, boilDil);
+    if (derivedBoilVolume > 0 || hasBoilMixingUpdate) {
+      data.boilWaterVolumeLiters = ensureFinite(derivedBoilVolume, "boilWaterVolumeLiters");
     }
 
     const mashStringFields = ["mashAcidType", "mashStrengthKind"] as const;

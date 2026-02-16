@@ -106,7 +106,13 @@ export default function WaterHubPage() {
       };
     };
 
-    const mashVolumeLiters = typeof settings.mashWaterVolumeLiters === "number" ? settings.mashWaterVolumeLiters : null;
+    // Mash volume: prefer the single source of truth (mixing volumes) when available.
+    // Fall back to legacy `mashWaterVolumeLiters` for older records where mixing volumes were never set.
+    const mashTap = typeof settings.tapWaterVolumeLiters === "number" ? settings.tapWaterVolumeLiters : 0;
+    const mashDil = typeof settings.dilutionWaterVolumeLiters === "number" ? settings.dilutionWaterVolumeLiters : 0;
+    const mashMixTotal = Math.max(0, mashTap) + Math.max(0, mashDil);
+    const mashLegacy = typeof settings.mashWaterVolumeLiters === "number" ? settings.mashWaterVolumeLiters : null;
+    const mashVolumeLiters = mashMixTotal > 0 ? mashMixTotal : mashLegacy;
     const mashPh = overall?.ph?.value ?? null;
     const mashFinalAlk = overall?.finalAlkalinityPpmCaCO3 ?? null;
     const mashIonsAfterAcid = overall?.ionsPpm ?? null;

@@ -92,6 +92,9 @@ const SYSTEM_WATER_PROFILES: Array<{
   { type: "water", name: "Jever (boiled)", calcium: 46, magnesium: 5, sodium: 15, sulfate: 75, chloride: 30, bicarbonate: 60 },
   { type: "water", name: "Wicklow Mtn", calcium: 18, magnesium: 2, sodium: 13, sulfate: 22, chloride: 20, bicarbonate: 35 },
   { type: "water", name: "User Custom", calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+  // Convenience: allow RO/Distilled to be selected as the *source* profile.
+  { type: "water", name: "Distilled Water", calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+  { type: "water", name: "RO Water", calcium: 1, magnesium: 0, sodium: 8, sulfate: 1, chloride: 4, bicarbonate: 16 },
   { type: "water", name: "Burton (boiled)", calcium: 255, magnesium: 40, sodium: 25, sulfate: 610, chloride: 35, bicarbonate: 210 },
   { type: "dilution", name: "Distilled Water", calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
   { type: "dilution", name: "RO Water", calcium: 1, magnesium: 0, sodium: 8, sulfate: 1, chloride: 4, bicarbonate: 16 },
