@@ -74,6 +74,12 @@ export default function WaterHubPage() {
     return o as MashOverallResultV0;
   }, [settings?.mashOverallLastResultJson]);
 
+  const displayAlkalinityPpmCaCO3 = (v: number) => {
+    // Keep consistent with boil page: tiny negatives are usually solver/float tolerances.
+    if (v < 0 && v > -1) return 0;
+    return v;
+  };
+
   type StreamSummary = {
     key: "mash" | "sparge" | "boil";
     label: string;
@@ -439,7 +445,9 @@ export default function WaterHubPage() {
                           <td style={{ textAlign: "left" }}>{s.volumeLiters == null ? "—" : s.volumeLiters.toFixed(2)}</td>
                           <td style={{ textAlign: "left" }}>{s.ph == null ? "—" : s.ph.toFixed(2)}</td>
                           <td style={{ textAlign: "left" }}>
-                            {s.finalAlkalinityPpmCaCO3 == null ? "—" : s.finalAlkalinityPpmCaCO3.toFixed(2)}
+                            {s.finalAlkalinityPpmCaCO3 == null
+                              ? "—"
+                              : displayAlkalinityPpmCaCO3(s.finalAlkalinityPpmCaCO3).toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -457,7 +465,10 @@ export default function WaterHubPage() {
                   </li>
                   <li>
                     Merged final alkalinity:{" "}
-                    <code>{recap.mergedFinalAlk == null ? "—" : recap.mergedFinalAlk.toFixed(2)}</code> ppm as CaCO3
+                    <code>
+                      {recap.mergedFinalAlk == null ? "—" : displayAlkalinityPpmCaCO3(recap.mergedFinalAlk).toFixed(2)}
+                    </code>{" "}
+                    ppm as CaCO3
                   </li>
                 </ul>
 
