@@ -29,6 +29,16 @@ export interface GristRow {
    * v1 mash pH model parameter; may be estimated or user-overridden.
    */
   mashTaToPh57_mEqPerKg?: number | null;
+  /**
+   * For roasted malts: user override for whether the malt is dehusked/de-bittered.
+   * - null/undefined: use inferred detection from canonical ingredient name/notes (if available).
+   */
+  mashRoastDehuskedOverride?: boolean | null;
+  /**
+   * Provenance for dehusked/de-bittered selection.
+   * This is set by the API snapshot; UI may display it as read-only.
+   */
+  mashRoastDehuskedSource?: "inferred" | "override" | "unknown";
   /** How mash pH params were selected (v1). */
   mashPhModelSource?: "default" | "override" | "unknown";
   /** kilograms */
@@ -76,6 +86,15 @@ export function parseGristJson(value: unknown): GristRow[] {
         typeof o.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(o.mashTaToPh57_mEqPerKg)
           ? o.mashTaToPh57_mEqPerKg
           : null;
+      const mashRoastDehuskedOverride =
+        typeof o.mashRoastDehuskedOverride === "boolean" ? o.mashRoastDehuskedOverride : null;
+      const mashRoastDehuskedSourceRaw = o.mashRoastDehuskedSource;
+      const mashRoastDehuskedSource: GristRow["mashRoastDehuskedSource"] =
+        mashRoastDehuskedSourceRaw === "inferred" ||
+        mashRoastDehuskedSourceRaw === "override" ||
+        mashRoastDehuskedSourceRaw === "unknown"
+          ? mashRoastDehuskedSourceRaw
+          : "unknown";
       const mashPhModelSourceRaw = o.mashPhModelSource;
       const mashPhModelSource: GristRow["mashPhModelSource"] =
         mashPhModelSourceRaw === "default" || mashPhModelSourceRaw === "override" || mashPhModelSourceRaw === "unknown"
@@ -121,6 +140,8 @@ export function parseGristJson(value: unknown): GristRow[] {
         group,
         mashDiPh,
         mashTaToPh57_mEqPerKg,
+        mashRoastDehuskedOverride,
+        mashRoastDehuskedSource,
         mashPhModelSource,
         amountKg,
         colorLovibond,

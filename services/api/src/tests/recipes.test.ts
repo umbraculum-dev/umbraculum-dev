@@ -248,6 +248,68 @@ describe("recipes (account scoped)", () => {
     expect(body.error?.code).toBe("invalid_grist_row_amount");
   });
 
+  it("snapshots roasted dehusked override/provenance and uses the TA curve defaults", async () => {
+    const f = await app.prisma.fermentable.create({
+      data: {
+        name: "Weyermann CARAFA SPECIAL II",
+        producer: "Weyermann",
+        group: "Roasted",
+        type: "Malt",
+        notes: "Dehusked",
+        colorEbc: 1000,
+        mashDiPh: null,
+        mashTaToPh57_mEqPerKg: null,
+      },
+    });
+
+    const create = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      payload: {
+        name: "Roast dehusked snapshot recipe",
+        gristJson: [
+          {
+            id: "row-1",
+            ingredientId: f.id,
+            name: "Carafa Special II",
+            amountKg: 0.5,
+            colorLovibond: 500,
+            potential: null,
+            maltClass: "roast",
+          },
+          {
+            id: "row-2",
+            ingredientId: f.id,
+            name: "Carafa Special II",
+            amountKg: 0.5,
+            colorLovibond: 500,
+            potential: null,
+            maltClass: "roast",
+            mashRoastDehuskedOverride: false,
+          },
+        ],
+      },
+    });
+    expect(create.statusCode).toBe(200);
+    const body = create.json() as any;
+    expect(body.ok).toBe(true);
+
+    const rows = body.recipe.gristJson as any[];
+    expect(Array.isArray(rows)).toBe(true);
+    expect(rows).toHaveLength(2);
+
+    // Row 1: inferred dehusked -> lower TA
+    expect(rows[0].mashRoastDehuskedSource).toBe("inferred");
+    expect(rows[0].mashRoastDehuskedOverride).toBe(null);
+    expect(rows[0].mashTaToPh57_mEqPerKg).toBeCloseTo(27.733, 3);
+
+    // Row 2: override to husked -> higher TA
+    expect(rows[1].mashRoastDehuskedSource).toBe("override");
+    expect(rows[1].mashRoastDehuskedOverride).toBe(false);
+    expect(rows[1].mashTaToPh57_mEqPerKg).toBeCloseTo(41.733, 3);
+  });
+
   it("accepts yeastJson with productId + attenuation fields", async () => {
     const create = await app.inject({
       method: "POST",

@@ -103,9 +103,32 @@ function round3(n: number): number {
   return Math.round(n * 1000) / 1000;
 }
 
+function clamp(n: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, n));
+}
+
+/**
+ * Default TA for roasted malts from color (EBC), using a weak saturating curve.
+ * This is a proxy: real TA is malt-specific and should be overridden when known.
+ */
+function roastedTaDefaultFromEbc(input: { colorEbc: number | null; dehusked: boolean }): number {
+  // Tune these constants carefully; we want to keep behavior ~40-ish for common roasted malts,
+  // but still differentiate very dark malts without runaway linear growth.
+  const C0_EBC = 600;
+  const TA_MIN = input.dehusked ? 18 : 32;
+  const TA_MAX = input.dehusked ? 30 : 44;
+
+  const cRaw = input.colorEbc;
+  const c = typeof cRaw === "number" && Number.isFinite(cRaw) && cRaw >= 0 ? cRaw : C0_EBC;
+
+  const frac = 1 - Math.exp(-c / C0_EBC);
+  const ta = TA_MIN + (TA_MAX - TA_MIN) * frac;
+  return round3(clamp(ta, TA_MIN, TA_MAX));
+}
+
 export function defaultMashTaToPh57_mEqPerKg(modelKey: MashPhModelKeyV1, colorEbc: number | null): number | null {
   // Troester-inspired defaults:
-  // - Roasted malts cluster around ~40 mEq/kg, largely independent of color.
+  // - Roasted malts: weak color-proxy with saturation (keeps ~40-ish but differentiates extremes).
   // - Crystal/caramel trend upward with color (with scatter): a ≈ 14 + 0.13*EBC.
   // - Acidulated ~315-358 mEq/kg (use midpoint).
   // For base malts, we treat TA as 0 in v1 (baseline handled by DI pH / intercept).
@@ -113,8 +136,8 @@ export function defaultMashTaToPh57_mEqPerKg(modelKey: MashPhModelKeyV1, colorEb
     if (typeof colorEbc !== "number" || !Number.isFinite(colorEbc) || colorEbc < 0) return 14;
     return round3(Math.max(0, 14 + 0.13 * colorEbc));
   }
-  if (modelKey === "roasted") return 40;
-  if (modelKey === "roasted_dehusked") return 20; // heuristic lower acidity/buffering; override recommended.
+  if (modelKey === "roasted") return roastedTaDefaultFromEbc({ colorEbc, dehusked: false });
+  if (modelKey === "roasted_dehusked") return roastedTaDefaultFromEbc({ colorEbc, dehusked: true });
   if (modelKey === "acidulated") return 335; // midpoint of ~315–358
   return 0;
 }

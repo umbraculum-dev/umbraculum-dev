@@ -254,6 +254,8 @@ export default function RecipeEditPage() {
         group: null,
         mashDiPh: null,
         mashTaToPh57_mEqPerKg: null,
+        mashRoastDehuskedOverride: null,
+        mashRoastDehuskedSource: "unknown",
         mashPhModelSource: "unknown",
         amountKg: 0,
         colorLovibond: null,
@@ -303,6 +305,8 @@ export default function RecipeEditPage() {
         group,
         mashDiPh,
         mashTaToPh57_mEqPerKg,
+        mashRoastDehuskedOverride: null,
+        mashRoastDehuskedSource: "unknown",
         mashPhModelSource,
         amountKg: 0,
         colorLovibond,
@@ -400,6 +404,33 @@ export default function RecipeEditPage() {
     if (g.includes("roast") || g.includes("roasted")) return "roast";
     if (n.includes("acid")) return "acid";
     return "base";
+  };
+
+  const isRoastedLike = (row: Pick<GristRow, "group" | "name">) => {
+    const g = (row.group ?? "").toLowerCase();
+    const n = (row.name ?? "").toLowerCase();
+    return (
+      g.includes("roast") ||
+      g.includes("roasted") ||
+      g.includes("black") ||
+      g.includes("chocolate") ||
+      n.includes("roast") ||
+      n.includes("black malt") ||
+      n.includes("chocolate") ||
+      n.includes("carafa") ||
+      n.includes("patent") ||
+      n.includes("brown malt")
+    );
+  };
+
+  const inferDehuskedFromName = (name: string) => {
+    const n = (name ?? "").toLowerCase();
+    if (!n) return false;
+    if (n.includes("dehusked") || n.includes("de-husked")) return true;
+    if (n.includes("debittered") || n.includes("de-bittered")) return true;
+    if (n.includes("carafa") && n.includes("special")) return true;
+    if (n.includes("de bittered") || n.includes("de bitter")) return true;
+    return false;
   };
 
   const onSearchFermentables = async (e: React.FormEvent) => {
@@ -722,6 +753,8 @@ export default function RecipeEditPage() {
                                         group: null,
                                         mashDiPh: null,
                                         mashTaToPh57_mEqPerKg: null,
+                                        mashRoastDehuskedOverride: null,
+                                        mashRoastDehuskedSource: "unknown",
                                         mashPhModelSource: "unknown",
                                       })
                                     }
@@ -886,6 +919,85 @@ export default function RecipeEditPage() {
                                       Mash pH model (v1)
                                     </summary>
                                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 8 }}>
+                                      {isRoastedLike(r) ? (
+                                        <>
+                                          <div style={{ width: 220, maxWidth: "100%" }}>
+                                            <label className="muted" style={{ display: "block", fontSize: 12 }}>
+                                              Dehusked/de-bittered
+                                            </label>
+                                            <input
+                                              value={
+                                                typeof r.mashRoastDehuskedOverride === "boolean"
+                                                  ? r.mashRoastDehuskedOverride
+                                                    ? "yes"
+                                                    : "no"
+                                                  : r.mashRoastDehuskedSource === "inferred"
+                                                    ? inferDehuskedFromName(r.name)
+                                                      ? "yes"
+                                                      : "no"
+                                                    : ""
+                                              }
+                                              readOnly
+                                              style={{ width: "100%", padding: 8 }}
+                                              tabIndex={-1}
+                                            />
+                                          </div>
+                                          <div style={{ width: 260, maxWidth: "100%" }}>
+                                            <label
+                                              className="muted"
+                                              style={{ display: "block", fontSize: 12 }}
+                                              htmlFor={`grist-roast-dehusked-override-${r.id}`}
+                                            >
+                                              Override
+                                            </label>
+                                            <select
+                                              id={`grist-roast-dehusked-override-${r.id}`}
+                                              value={
+                                                typeof r.mashRoastDehuskedOverride === "boolean"
+                                                  ? r.mashRoastDehuskedOverride
+                                                    ? "force_dehusked"
+                                                    : "force_husked"
+                                                  : "auto"
+                                              }
+                                              onChange={(e) => {
+                                                const v = e.target.value;
+                                                if (v === "auto") {
+                                                  updateGristRow(r.id, {
+                                                    mashRoastDehuskedOverride: null,
+                                                    mashRoastDehuskedSource: "unknown",
+                                                  });
+                                                } else if (v === "force_husked") {
+                                                  updateGristRow(r.id, {
+                                                    mashRoastDehuskedOverride: false,
+                                                    mashRoastDehuskedSource: "override",
+                                                  });
+                                                } else if (v === "force_dehusked") {
+                                                  updateGristRow(r.id, {
+                                                    mashRoastDehuskedOverride: true,
+                                                    mashRoastDehuskedSource: "override",
+                                                  });
+                                                }
+                                              }}
+                                              style={{ width: "100%", padding: 8 }}
+                                            >
+                                              <option value="auto">Auto (detect)</option>
+                                              <option value="force_husked">Force husked</option>
+                                              <option value="force_dehusked">Force dehusked/de-bittered</option>
+                                            </select>
+                                          </div>
+                                          <div style={{ width: 200, maxWidth: "100%" }}>
+                                            <label className="muted" style={{ display: "block", fontSize: 12 }}>
+                                              Dehusked source
+                                            </label>
+                                            <input
+                                              value={r.mashRoastDehuskedSource ?? "unknown"}
+                                              readOnly
+                                              style={{ width: "100%", padding: 8 }}
+                                              tabIndex={-1}
+                                            />
+                                          </div>
+                                        </>
+                                      ) : null}
                                       <div style={{ width: 240, maxWidth: "100%" }}>
                                         <label
                                           className="muted"

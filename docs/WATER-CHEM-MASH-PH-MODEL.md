@@ -20,7 +20,7 @@ We snapshot DI pH + TA into `Recipe.gristJson` at save-time so results **don’t
 
 - If a row has an `ingredientId` and the user did **not** override DI pH/TA, the API will fill these parameters from:
   1) the canonical `Fermentable` record (if values exist), else
-  2) inferred defaults (`getMashPhModelDefaultsV1`) based on BeerProto-like group/type/name (+ dehusked inference).
+  2) inferred defaults based on BeerProto-like group/type/name (+ dehusked inference).
 - If the user sets DI pH and/or TA in the recipe editor, those values are treated as **overrides** and are what gets snapshotted.
 
 ## Parameter meanings and units
@@ -35,6 +35,17 @@ We snapshot DI pH + TA into `Recipe.gristJson` at save-time so results **don’t
 
 These are not usually present on malt spec sheets; for v1 we rely on conservative defaults by ingredient group, with user override support.
 
+### Roasted malts: dehusked/de-bittered and color-proxy defaults
+
+Roasted malts have an important special case: **dehusked / de-bittered** products (e.g. Carafa Special).
+
+- We treat dehusked/de-bittered roasted malts differently because **color is not a reliable proxy** for their mash pH effect.
+- To “tell reality”, we snapshot two additional optional fields into `Recipe.gristJson`:
+  - **`mashRoastDehuskedOverride`**: boolean (or null). If set, the user is explicitly forcing husked vs dehusked behavior for that fermentable row.
+  - **`mashRoastDehuskedSource`**: `"inferred" | "override" | "unknown"` describing provenance.
+
+For **non-dehusked** roasted malts, the v1 default TA uses a **weak saturating color proxy** (EBC), rather than a flat constant. This provides gentle differentiation between “dark” and “very dark” roasted malts while preventing runaway linear growth at extreme colors.
+
 ## v1 estimator (high level)
 
 `mashPhEstimateV1`:
@@ -48,7 +59,7 @@ These are not usually present on malt spec sheets; for v1 we rely on conservativ
 ## Known limitations (v1)
 
 - This is still an empirical model. It will need calibration once we have real measured data for more malts.
-- TA/DI pH are approximations; “dehusked” inference is intentionally conservative.
+- TA/DI pH are approximations; “dehusked/de-bittered” detection is inferred unless explicitly overridden.
 - Temperature effects and specific grist buffering behavior are not modeled yet.
 
 ## Developer notes

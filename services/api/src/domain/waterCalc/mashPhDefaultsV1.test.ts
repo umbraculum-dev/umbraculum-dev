@@ -36,7 +36,19 @@ describe("mashPhDefaultsV1", () => {
     expect(defaultMashDiPh("base_pale")).toBeTypeOf("number");
     expect(defaultMashDiPh("crystal")).toBe(null);
 
-    expect(defaultMashTaToPh57_mEqPerKg("roasted", 1000)).toBe(40);
+    // Roasted defaults now use a weak saturating color proxy (EBC) with a cap.
+    const roastedAt600 = defaultMashTaToPh57_mEqPerKg("roasted", 600)!;
+    const roastedAt1500 = defaultMashTaToPh57_mEqPerKg("roasted", 1500)!;
+    expect(roastedAt600).toBeGreaterThan(35);
+    expect(roastedAt600).toBeLessThanOrEqual(44);
+    expect(roastedAt1500).toBeGreaterThan(roastedAt600);
+    expect(roastedAt1500).toBeLessThanOrEqual(44);
+
+    const dehuskedAt600 = defaultMashTaToPh57_mEqPerKg("roasted_dehusked", 600)!;
+    const dehuskedAt1500 = defaultMashTaToPh57_mEqPerKg("roasted_dehusked", 1500)!;
+    expect(dehuskedAt600).toBeLessThan(roastedAt600);
+    expect(dehuskedAt1500).toBeLessThan(roastedAt1500);
+
     expect(defaultMashTaToPh57_mEqPerKg("acidulated", 5)).toBeGreaterThan(200);
 
     const d = getMashPhModelDefaultsV1({

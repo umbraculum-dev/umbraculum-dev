@@ -1,6 +1,11 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
-import { getMashPhModelDefaultsV1 } from "../domain/waterCalc/mashPhDefaultsV1.js";
+import {
+  defaultMashDiPh,
+  defaultMashTaToPh57_mEqPerKg,
+  inferIsDehuskedOrDebittered,
+  inferMashPhModelKeyV1,
+} from "../domain/waterCalc/mashPhDefaultsV1.js";
 import { AccountsService } from "./accountsService.js";
 
 export type CreateRecipeInput = {
@@ -161,6 +166,7 @@ async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promis
     where: { id: { in: ids } },
     select: {
       id: true,
+      name: true,
       producer: true,
       group: true,
       type: true,
@@ -182,13 +188,46 @@ async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promis
       (typeof r.mashDiPh === "number" && Number.isFinite(r.mashDiPh)) ||
       (typeof r.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(r.mashTaToPh57_mEqPerKg));
 
-    const defaults = getMashPhModelDefaultsV1({
-      name: r.name,
+    const colorEbc = typeof f.colorEbc === "number" && Number.isFinite(f.colorEbc) ? f.colorEbc : null;
+    const canonicalName = (f as any).name ?? r.name;
+
+    const inferredKey = inferMashPhModelKeyV1({
+      name: canonicalName,
       group: f.group ?? null,
       type: f.type ?? null,
       notes: f.notes ?? null,
-      colorEbc: typeof f.colorEbc === "number" && Number.isFinite(f.colorEbc) ? f.colorEbc : null,
+      colorEbc,
     });
+
+    // Dehusked / de-bittered handling for roasted malts:
+    // - default: infer from canonical ingredient name/notes
+    // - user can override (persisted in recipe gristJson)
+    const isRoastedLike = inferredKey === "roasted" || inferredKey === "roasted_dehusked";
+    let mashRoastDehuskedOverride: boolean | null = null;
+    let mashRoastDehuskedSource: GristRow["mashRoastDehuskedSource"] = "unknown";
+    let isRoastDehusked: boolean | null = null;
+
+    if (isRoastedLike) {
+      if (typeof r.mashRoastDehuskedOverride === "boolean") {
+        mashRoastDehuskedOverride = r.mashRoastDehuskedOverride;
+        mashRoastDehuskedSource = "override";
+        isRoastDehusked = mashRoastDehuskedOverride;
+      } else {
+        isRoastDehusked = inferIsDehuskedOrDebittered(canonicalName, f.notes ?? null);
+        mashRoastDehuskedSource = "inferred";
+      }
+    }
+
+    const mashPhModelKey = isRoastedLike
+      ? isRoastDehusked
+        ? "roasted_dehusked"
+        : "roasted"
+      : inferredKey;
+
+    const defaults = {
+      mashDiPh: defaultMashDiPh(mashPhModelKey),
+      mashTaToPh57_mEqPerKg: defaultMashTaToPh57_mEqPerKg(mashPhModelKey, colorEbc),
+    };
 
     const mashDiPh =
       wantsOverride && r.mashDiPh !== null && r.mashDiPh !== undefined
@@ -216,6 +255,8 @@ async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promis
       mashDiPh: mashDiPh ?? null,
       mashTaToPh57_mEqPerKg: mashTaToPh57_mEqPerKg ?? null,
       mashPhModelSource,
+      mashRoastDehuskedOverride,
+      mashRoastDehuskedSource,
     } as GristRow;
   });
 }
@@ -236,6 +277,8 @@ type GristRow = {
   mashDiPh?: number | null;
   mashTaToPh57_mEqPerKg?: number | null;
   mashPhModelSource?: "default" | "override" | "unknown";
+  mashRoastDehuskedOverride?: boolean | null;
+  mashRoastDehuskedSource?: "inferred" | "override" | "unknown";
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential | null;
@@ -334,6 +377,34 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
       mashPhModelSourceRaw === "default" || mashPhModelSourceRaw === "override" || mashPhModelSourceRaw === "unknown"
         ? mashPhModelSourceRaw
         : undefined;
+
+    const mashRoastDehuskedOverrideRaw = o.mashRoastDehuskedOverride;
+    const mashRoastDehuskedOverride =
+      mashRoastDehuskedOverrideRaw === null || mashRoastDehuskedOverrideRaw === undefined
+        ? null
+        : typeof mashRoastDehuskedOverrideRaw === "boolean"
+          ? mashRoastDehuskedOverrideRaw
+          : (() => {
+              throw new BadRequestError(
+                "invalid_grist_row_mash_roast_dehusked_override",
+                `Body.gristJson[${idx}].mashRoastDehuskedOverride must be a boolean or null`,
+              );
+            })();
+
+    const mashRoastDehuskedSourceRaw = o.mashRoastDehuskedSource;
+    const mashRoastDehuskedSource: GristRow["mashRoastDehuskedSource"] =
+      mashRoastDehuskedSourceRaw === null || mashRoastDehuskedSourceRaw === undefined
+        ? undefined
+        : mashRoastDehuskedSourceRaw === "inferred" ||
+            mashRoastDehuskedSourceRaw === "override" ||
+            mashRoastDehuskedSourceRaw === "unknown"
+          ? mashRoastDehuskedSourceRaw
+          : (() => {
+              throw new BadRequestError(
+                "invalid_grist_row_mash_roast_dehusked_source",
+                `Body.gristJson[${idx}].mashRoastDehuskedSource must be "inferred", "override", "unknown" or null`,
+              );
+            })();
     const amountKg = ensureFinite(o.amountKg, `gristJson[${idx}].amountKg`);
     const colorLovibondRaw = o.colorLovibond;
     const colorLovibond =
@@ -417,6 +488,8 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
     if (mashDiPh !== null) out.mashDiPh = mashDiPh;
     if (mashTaToPh57_mEqPerKg !== null) out.mashTaToPh57_mEqPerKg = mashTaToPh57_mEqPerKg;
     if (mashPhModelSource) out.mashPhModelSource = mashPhModelSource;
+    if (mashRoastDehuskedOverride !== null) out.mashRoastDehuskedOverride = mashRoastDehuskedOverride;
+    if (mashRoastDehuskedSource) out.mashRoastDehuskedSource = mashRoastDehuskedSource;
     return out as GristRow;
   });
 }
