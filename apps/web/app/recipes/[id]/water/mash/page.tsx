@@ -916,12 +916,12 @@ export default function MashWaterPage() {
           </div>
 
           {mixedSourceProfile ? (
-            <div className="fieldBlock fieldBlock--readonly" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
+            <details className="fieldBlock fieldBlock--readonly" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
                 <strong>Mixed water ions</strong>
                 <span className="fieldBadge">Read-only</span>
                 <span className="muted">Computed from profiles + volumes</span>
-              </div>
+              </summary>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -956,7 +956,7 @@ export default function MashWaterPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </details>
           ) : (
             <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
               Select a source + dilution profile and set volumes to see mixed ions.
@@ -1267,14 +1267,14 @@ export default function MashWaterPage() {
           ) : null}
 
           {saltsResult ? (
-            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
+            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after salts only)</strong>
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">
                   Does not consider acid; see &quot;Overall mash water result&quot; for combined output
                 </span>
-              </div>
+              </summary>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -1309,7 +1309,7 @@ export default function MashWaterPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </details>
           ) : null}
 
           <hr style={{ margin: "16px 0" }} />
