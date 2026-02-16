@@ -91,6 +91,9 @@ type YeastRow = {
   ingredientId: string | null;
   name: string;
   lab?: string | null;
+  productId?: string | null;
+  attenuationMin?: number | null;
+  attenuationMax?: number | null;
 };
 
 function parseYeastJson(value: unknown): YeastRow[] {
@@ -109,7 +112,10 @@ function parseYeastJson(value: unknown): YeastRow[] {
       const name = typeof o.name === "string" ? o.name : "";
       if (!name) return null;
       const lab = typeof o.lab === "string" ? o.lab : null;
-      return { id, ingredientId, name, lab } as YeastRow;
+      const productId = typeof o.productId === "string" ? o.productId : null;
+      const attenuationMin = typeof o.attenuationMin === "number" && Number.isFinite(o.attenuationMin) ? o.attenuationMin : null;
+      const attenuationMax = typeof o.attenuationMax === "number" && Number.isFinite(o.attenuationMax) ? o.attenuationMax : null;
+      return { id, ingredientId, name, lab, productId, attenuationMin, attenuationMax } as YeastRow;
     })
     .filter(Boolean) as YeastRow[];
 }
@@ -334,7 +340,12 @@ export default function RecipeEditPage() {
     const nameRaw = typeof item?.name === "string" ? item.name : "";
     if (!id || !nameRaw) return;
     const lab = typeof item?.lab === "string" ? item.lab : null;
-    addYeastRow({ ingredientId: id, name: nameRaw, lab });
+    const productId = typeof item?.productId === "string" ? item.productId : null;
+    const attenuationMin =
+      typeof item?.attenuationMin === "number" && Number.isFinite(item.attenuationMin) ? item.attenuationMin : null;
+    const attenuationMax =
+      typeof item?.attenuationMax === "number" && Number.isFinite(item.attenuationMax) ? item.attenuationMax : null;
+    addYeastRow({ ingredientId: id, name: nameRaw, lab, productId, attenuationMin, attenuationMax });
   };
   const removeGristRow = (id: string) => {
     setGristRows((prev) => prev.filter((r) => r.id !== id));
@@ -371,6 +382,9 @@ export default function RecipeEditPage() {
         ingredientId: null,
         name: "",
         lab: null,
+        productId: null,
+        attenuationMin: null,
+        attenuationMax: null,
         ...row,
       },
     ]);
@@ -1224,6 +1238,7 @@ export default function RecipeEditPage() {
                       <tr>
                         <th align="left">Name</th>
                         <th align="left">Lab</th>
+                        <th align="left">Product ID</th>
                         <th align="left">Type</th>
                         <th align="left">Actions</th>
                       </tr>
@@ -1233,6 +1248,7 @@ export default function RecipeEditPage() {
                         <tr key={it.id}>
                           <td>{it.name}</td>
                           <td>{it.lab ?? ""}</td>
+                          <td>{it.productId ?? ""}</td>
                           <td>{it.type ?? ""}</td>
                           <td>
                             <button type="button" onClick={() => addYeastFromDb(it)} disabled={!canCallAccountScoped}>
@@ -1271,7 +1287,14 @@ export default function RecipeEditPage() {
                                   id={`yeast-name-${r.id}`}
                                   value={r.name}
                                   onChange={(e) =>
-                                    updateYeastRow(r.id, { name: e.target.value, ingredientId: null, lab: null })
+                                    updateYeastRow(r.id, {
+                                      name: e.target.value,
+                                      ingredientId: null,
+                                      lab: null,
+                                      productId: null,
+                                      attenuationMin: null,
+                                      attenuationMax: null,
+                                    })
                                   }
                                   style={{ width: "100%", padding: 8 }}
                                   autoComplete="off"
@@ -1284,6 +1307,50 @@ export default function RecipeEditPage() {
                                 <input
                                   id={`yeast-lab-${r.id}`}
                                   value={r.lab ?? ""}
+                                  readOnly
+                                  style={{ width: "100%", padding: 8 }}
+                                  tabIndex={-1}
+                                />
+                              </div>
+                              <div style={{ width: 160, maxWidth: "100%" }}>
+                                <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`yeast-product-${r.id}`}>
+                                  Product ID
+                                </label>
+                                <input
+                                  id={`yeast-product-${r.id}`}
+                                  value={r.productId ?? ""}
+                                  readOnly
+                                  style={{ width: "100%", padding: 8 }}
+                                  tabIndex={-1}
+                                />
+                              </div>
+                              <div style={{ width: 160, maxWidth: "100%" }}>
+                                <label
+                                  className="muted"
+                                  style={{ display: "block", fontSize: 12 }}
+                                  htmlFor={`yeast-atten-min-${r.id}`}
+                                >
+                                  Atten min (%)
+                                </label>
+                                <input
+                                  id={`yeast-atten-min-${r.id}`}
+                                  value={typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
+                                  readOnly
+                                  style={{ width: "100%", padding: 8 }}
+                                  tabIndex={-1}
+                                />
+                              </div>
+                              <div style={{ width: 160, maxWidth: "100%" }}>
+                                <label
+                                  className="muted"
+                                  style={{ display: "block", fontSize: 12 }}
+                                  htmlFor={`yeast-atten-max-${r.id}`}
+                                >
+                                  Atten max (%)
+                                </label>
+                                <input
+                                  id={`yeast-atten-max-${r.id}`}
+                                  value={typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
                                   readOnly
                                   style={{ width: "100%", padding: 8 }}
                                   tabIndex={-1}

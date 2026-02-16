@@ -119,6 +119,7 @@ export async function ingredientsRoutes(app: FastifyInstance) {
               OR: [
                 { name: { contains: q, mode: "insensitive" } },
                 { lab: { contains: q, mode: "insensitive" } },
+                { productId: { contains: q, mode: "insensitive" } },
               ],
             }
           : {}),
@@ -130,6 +131,7 @@ export async function ingredientsRoutes(app: FastifyInstance) {
         accountId: true,
         name: true,
         lab: true,
+        productId: true,
         type: true,
         form: true,
         attenuationMin: true,

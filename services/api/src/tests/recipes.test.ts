@@ -247,5 +247,64 @@ describe("recipes (account scoped)", () => {
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("invalid_grist_row_amount");
   });
+
+  it("accepts yeastJson with productId + attenuation fields", async () => {
+    const create = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      payload: {
+        name: "Yeast snapshot recipe",
+        yeastJson: [
+          {
+            id: "y-1",
+            name: "SafAle US-05",
+            ingredientId: null,
+            lab: "Fermentis",
+            productId: "US-05",
+            attenuationMin: 72,
+            attenuationMax: 78,
+          },
+        ],
+      },
+    });
+    expect(create.statusCode).toBe(200);
+    const body = create.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.recipe.yeastJson).toEqual([
+      {
+        id: "y-1",
+        name: "SafAle US-05",
+        ingredientId: null,
+        lab: "Fermentis",
+        productId: "US-05",
+        attenuationMin: 72,
+        attenuationMax: 78,
+      },
+    ]);
+  });
+
+  it("rejects yeastJson with out-of-range attenuation", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      payload: {
+        name: "Bad yeast",
+        yeastJson: [
+          {
+            id: "y-1",
+            name: "Some yeast",
+            ingredientId: null,
+            attenuationMin: 101,
+          },
+        ],
+      },
+    });
+    expect(res.statusCode).toBe(400);
+    const body = res.json() as any;
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("invalid_yeast_row_attenuation_min");
+  });
 });
 

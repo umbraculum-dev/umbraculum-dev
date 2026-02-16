@@ -321,14 +321,25 @@ model Yeast {
 
   name      String
   lab       String?
+  // BeerProto "Product ID" (vendor code), e.g. "US-05"
+  productId String?
   type      String?
   form      String?
+  species   String?
+  endPhMin  Float?
+  endPhMax  Float?
+  flavorAroma String? @db.Text
+  pitch       String? @db.Text
+  pitchTempC  Float?
+  tolerancePercent   Float?
   notes     String?  @db.Text
 
   attenuationMin Float?
   attenuationMax Float?
+  flocculationPercent Float?
   tempMinC       Float?
   tempMaxC       Float?
+  bestFor        String? @db.Text
 
   deprecatedAt DateTime?
   createdAt    DateTime @default(now())
@@ -340,6 +351,8 @@ model Yeast {
   @@index([accountId])
   @@index([name])
   @@index([lab])
+  @@index([productId])
+  @@index([species])
 }
 
 model IngredientSource {

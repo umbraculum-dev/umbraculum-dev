@@ -59,7 +59,9 @@ export class RecipesService {
     const gristJson =
       Array.isArray(gristJsonRaw) ? await snapshotGristRows(this.prisma, gristJsonRaw) : gristJsonRaw;
     const hopsJson = validateHopsJson(input.hopsJson);
-    const yeastJson = validateYeastJson(input.yeastJson);
+    const yeastJsonRaw = validateYeastJson(input.yeastJson);
+    const yeastJson =
+      Array.isArray(yeastJsonRaw) ? await snapshotYeastRows(this.prisma, yeastJsonRaw) : yeastJsonRaw;
 
     return this.prisma.recipe.create({
       data: {
@@ -119,7 +121,8 @@ export class RecipesService {
       } else if (yeastJson === null) {
         data.yeastJson = Prisma.JsonNull;
       } else {
-        data.yeastJson = yeastJson as unknown as Prisma.InputJsonValue;
+        data.yeastJson =
+          (await snapshotYeastRows(this.prisma, yeastJson)) as unknown as Prisma.InputJsonValue;
       }
     }
 
@@ -529,6 +532,9 @@ type YeastRow = {
   ingredientId?: string | null;
   name: string;
   lab?: string | null;
+  productId?: string | null;
+  attenuationMin?: number | null;
+  attenuationMax?: number | null;
 };
 
 function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
@@ -543,16 +549,18 @@ function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
 
     const ingredientIdRaw = o.ingredientId;
     const ingredientId =
-      ingredientIdRaw === null || ingredientIdRaw === undefined
-        ? null
-        : typeof ingredientIdRaw === "string"
-          ? ingredientIdRaw.trim() || null
-          : (() => {
-              throw new BadRequestError(
-                "invalid_yeast_row_ingredient_id",
-                `Body.yeastJson[${idx}].ingredientId must be a string or null`,
-              );
-            })();
+      ingredientIdRaw === undefined
+        ? undefined
+        : ingredientIdRaw === null
+          ? null
+          : typeof ingredientIdRaw === "string"
+            ? ingredientIdRaw.trim() || null
+            : (() => {
+                throw new BadRequestError(
+                  "invalid_yeast_row_ingredient_id",
+                  `Body.yeastJson[${idx}].ingredientId must be a string or null`,
+                );
+              })();
 
     const name = typeof o.name === "string" ? o.name.trim() : "";
     if (!name) throw new BadRequestError("invalid_yeast_row_name", `Body.yeastJson[${idx}].name is required`);
@@ -570,9 +578,130 @@ function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
               );
             })();
 
-    const out: any = { id, ingredientId, name };
+    const productIdRaw = o.productId;
+    const productId =
+      productIdRaw === undefined
+        ? undefined
+        : productIdRaw === null
+          ? null
+          : typeof productIdRaw === "string"
+            ? productIdRaw.trim() || null
+            : (() => {
+                throw new BadRequestError(
+                  "invalid_yeast_row_product_id",
+                  `Body.yeastJson[${idx}].productId must be a string or null`,
+                );
+              })();
+
+    const attenuationMinRaw = o.attenuationMin;
+    const attenuationMin =
+      attenuationMinRaw === undefined
+        ? undefined
+        : attenuationMinRaw === null
+          ? null
+          : typeof attenuationMinRaw === "number"
+            ? attenuationMinRaw
+            : NaN;
+    if (
+      typeof attenuationMin === "number" &&
+      (!Number.isFinite(attenuationMin) || attenuationMin < 0 || attenuationMin > 100)
+    ) {
+      throw new BadRequestError(
+        "invalid_yeast_row_attenuation_min",
+        `Body.yeastJson[${idx}].attenuationMin must be null or a finite number between 0 and 100`,
+      );
+    }
+
+    const attenuationMaxRaw = o.attenuationMax;
+    const attenuationMax =
+      attenuationMaxRaw === undefined
+        ? undefined
+        : attenuationMaxRaw === null
+          ? null
+          : typeof attenuationMaxRaw === "number"
+            ? attenuationMaxRaw
+            : NaN;
+    if (
+      typeof attenuationMax === "number" &&
+      (!Number.isFinite(attenuationMax) || attenuationMax < 0 || attenuationMax > 100)
+    ) {
+      throw new BadRequestError(
+        "invalid_yeast_row_attenuation_max",
+        `Body.yeastJson[${idx}].attenuationMax must be null or a finite number between 0 and 100`,
+      );
+    }
+
+    const out: any = { id, name };
+    if (ingredientIdRaw !== undefined) out.ingredientId = ingredientId;
     if (lab) out.lab = lab;
+    if (productIdRaw !== undefined) out.productId = productId;
+    if (attenuationMinRaw !== undefined) out.attenuationMin = attenuationMin;
+    if (attenuationMaxRaw !== undefined) out.attenuationMax = attenuationMax;
     return out as YeastRow;
+  });
+}
+
+async function snapshotYeastRows(prisma: PrismaClient, rows: YeastRow[]): Promise<YeastRow[]> {
+  const ids = Array.from(
+    new Set(
+      rows
+        .map((r) => (typeof r.ingredientId === "string" ? r.ingredientId : null))
+        .filter((v): v is string => Boolean(v)),
+    ),
+  );
+  if (ids.length === 0) return rows;
+
+  const yeasts = await prisma.yeast.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      lab: true,
+      productId: true,
+      attenuationMin: true,
+      attenuationMax: true,
+    },
+  });
+  const byId = new Map(yeasts.map((y) => [y.id, y]));
+
+  return rows.map((r) => {
+    const ingredientId = typeof r.ingredientId === "string" ? r.ingredientId : null;
+    if (!ingredientId) return r;
+    const y = byId.get(ingredientId);
+    if (!y) return r;
+
+    const wantsOverride =
+      (typeof r.productId === "string" && r.productId.trim() !== "") ||
+      (typeof r.attenuationMin === "number" && Number.isFinite(r.attenuationMin)) ||
+      (typeof r.attenuationMax === "number" && Number.isFinite(r.attenuationMax));
+
+    const productId =
+      wantsOverride && r.productId !== null && r.productId !== undefined
+        ? r.productId
+        : typeof y.productId === "string" && y.productId.trim()
+          ? y.productId
+          : null;
+
+    const attenuationMin =
+      wantsOverride && r.attenuationMin !== null && r.attenuationMin !== undefined
+        ? r.attenuationMin
+        : typeof y.attenuationMin === "number" && Number.isFinite(y.attenuationMin)
+          ? y.attenuationMin
+          : null;
+
+    const attenuationMax =
+      wantsOverride && r.attenuationMax !== null && r.attenuationMax !== undefined
+        ? r.attenuationMax
+        : typeof y.attenuationMax === "number" && Number.isFinite(y.attenuationMax)
+          ? y.attenuationMax
+          : null;
+
+    return {
+      ...r,
+      lab: r.lab ?? y.lab ?? null,
+      productId: productId ?? null,
+      attenuationMin: attenuationMin ?? null,
+      attenuationMax: attenuationMax ?? null,
+    } as YeastRow;
   });
 }
 

@@ -17,6 +17,11 @@ export type BeerprotoResourcePath =
 export type BeerprotoImportOptions = {
   resourcePath: BeerprotoResourcePath;
   dryRun?: boolean;
+  /**
+   * Force a full fetch + upsert even if upstream resource is unchanged (ETag 304).
+   * Useful when we add new mapped fields (e.g. `productId`) and need to backfill.
+   */
+  force?: boolean;
 };
 
 const SOURCE_NAME = "beerproto";
@@ -75,6 +80,7 @@ async function fetchCsvIfChanged(
   prisma: PrismaLike,
   resourcePath: BeerprotoResourcePath,
   kind: IngredientKind,
+  force: boolean,
 ) {
   const url = rawUrl(resourcePath);
 
@@ -85,7 +91,9 @@ async function fetchCsvIfChanged(
   });
 
   const headers: Record<string, string> = {};
-  if (source.etag) headers["If-None-Match"] = source.etag;
+  // If `force` is set, do not send If-None-Match so we don't get a 304.
+  // This allows backfilling new mapped fields without waiting for upstream changes.
+  if (!force && source.etag) headers["If-None-Match"] = source.etag;
 
   const res = await fetch(url, { headers });
   if (res.status === 304) {
@@ -196,7 +204,7 @@ export async function importBeerprotoResource(prisma: PrismaLike, opts: Beerprot
   });
 
   try {
-    const fetched = await fetchCsvIfChanged(prisma, opts.resourcePath, kind);
+    const fetched = await fetchCsvIfChanged(prisma, opts.resourcePath, kind, opts.force === true);
     if (!fetched.changed) {
       await prisma.ingredientImportRun.update({
         where: { id: run.id },
@@ -336,14 +344,24 @@ export async function importBeerprotoResource(prisma: PrismaLike, opts: Beerprot
         await upsertSourceMap(prisma, { kind: "hop", sourceKey, hopId });
       } else {
         const lab = toStringOrNull(row["Producer"]);
+        const productId = toStringOrNull(row["Product ID"]);
         const type = toStringOrNull(row["Type"]);
         const form = toStringOrNull(row["Form"]);
+        const species = toStringOrNull(row["Species"]);
+        const endPhMin = roundToOrNull(toNumberOrNull(row["End pH Min"]), 3);
+        const endPhMax = roundToOrNull(toNumberOrNull(row["End pH Max"]), 3);
+        const flavorAroma = toStringOrNull(row["Flavor/Aroma"]);
+        const pitch = toStringOrNull(row["Pitch"]);
+        const pitchTempC = roundToOrNull(toNumberOrNull(row["Pitch Temp ©"]), 3);
+        const tolerancePercent = roundToOrNull(toNumberOrNull(row["Tolerance (%)"]), 3);
         const notes = toStringOrNull(row["Description"]);
 
         const attenuationMin = roundToOrNull(toNumberOrNull(row["Attenuation Min (%)"]), 3);
         const attenuationMax = roundToOrNull(toNumberOrNull(row["Attenuation Max (%)"]), 3);
+        const flocculationPercent = roundToOrNull(toNumberOrNull(row["Flocculation (%)"]), 3);
         const tempMinC = roundToOrNull(toNumberOrNull(row["Temperature Min ©"]), 3);
         const tempMaxC = roundToOrNull(toNumberOrNull(row["Temperature Max ©"]), 3);
+        const bestFor = toStringOrNull(row["Best For"]);
 
         if (opts.dryRun === true) continue;
 
@@ -354,13 +372,23 @@ export async function importBeerprotoResource(prisma: PrismaLike, opts: Beerprot
         const data = {
           name,
           lab,
+          productId,
           type,
           form,
+          species,
+          endPhMin,
+          endPhMax,
+          flavorAroma,
+          pitch,
+          pitchTempC,
+          tolerancePercent,
           notes,
           attenuationMin,
           attenuationMax,
+          flocculationPercent,
           tempMinC,
           tempMaxC,
+          bestFor,
         };
 
         let yeastId: string;
@@ -401,7 +429,7 @@ export async function importBeerprotoResource(prisma: PrismaLike, opts: Beerprot
   }
 }
 
-export async function importBeerprotoAll(prisma: PrismaLike, opts?: { dryRun?: boolean }) {
+export async function importBeerprotoAll(prisma: PrismaLike, opts?: { dryRun?: boolean; force?: boolean }) {
   const resources: BeerprotoResourcePath[] = [
     "fermentables/malts.csv",
     "fermentables/sugar.csv",
@@ -411,7 +439,13 @@ export async function importBeerprotoAll(prisma: PrismaLike, opts?: { dryRun?: b
 
   const results = [];
   for (const resourcePath of resources) {
-    results.push(await importBeerprotoResource(prisma, { resourcePath, dryRun: opts?.dryRun === true }));
+    results.push(
+      await importBeerprotoResource(prisma, {
+        resourcePath,
+        dryRun: opts?.dryRun === true,
+        force: opts?.force === true,
+      }),
+    );
   }
   return { ok: true as const, results };
 }

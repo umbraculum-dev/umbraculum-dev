@@ -17,14 +17,16 @@ type Args = {
   path?: string;
   resource?: string;
   dryRun: boolean;
+  force: boolean;
 };
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { dryRun: false };
+  const args: Args = { dryRun: false, force: false };
 
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--dry-run") args.dryRun = true;
+    else if (a === "--force") args.force = true;
     else if (a === "--source") args.source = argv[++i];
     else if (a === "--path") args.path = argv[++i];
     else if (a === "--resource") args.resource = argv[++i];
@@ -53,6 +55,7 @@ function printHelp() {
       "  --resource BeerProto resource path (optional)",
       "  --path     Reserved for future local dataset imports",
       "  --dry-run  Parse/validate only (no DB writes)",
+      "  --force    Ignore ETags; force fetch + upsert (backfill new fields)",
       "",
       "Notes:",
       "  - This command writes into staging tables, normalizes, and upserts canonical tables.",
@@ -81,9 +84,10 @@ async function main() {
         await importBeerprotoResource(prisma, {
           resourcePath: args.resource as BeerprotoResourcePath,
           dryRun: args.dryRun,
+          force: args.force,
         });
       } else {
-        await importBeerprotoAll(prisma, { dryRun: args.dryRun });
+        await importBeerprotoAll(prisma, { dryRun: args.dryRun, force: args.force });
       }
     } else {
       throw new Error(`Unsupported --source: ${args.source}`);
