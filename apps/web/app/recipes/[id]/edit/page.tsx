@@ -735,7 +735,7 @@ export default function RecipeEditPage() {
                                   gap: 12,
                                   alignItems: "end",
                                   gridTemplateColumns:
-                                    "minmax(240px, 1fr) minmax(120px, 200px) minmax(120px, 200px) auto",
+                                    "minmax(240px, 1fr) minmax(100px, 140px) minmax(100px, 140px) auto",
                                 }}
                               >
                                 <div style={{ minWidth: 0 }}>
@@ -916,7 +916,7 @@ export default function RecipeEditPage() {
                                 <div style={{ flexBasis: "100%" }}>
                                   <details>
                                     <summary className="muted" style={{ fontSize: 12, cursor: "pointer" }}>
-                                      Mash pH model (v1)
+                                      Mash pH model (v1) – Advanced users
                                     </summary>
                                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 8 }}>
                                       {isRoastedLike(r) ? (
