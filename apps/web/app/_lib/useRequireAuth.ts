@@ -8,7 +8,14 @@ import { apiFetch } from "./apiClient";
 
 export type AuthMeResponse = {
   ok: true;
-  user: { id: string; email: string; preferredLocale: string };
+  user: {
+    id: string;
+    email: string;
+    preferredLocale: string;
+    preferredTheme?: string | null;
+    preferredFontScale?: string | null;
+    preferredDensity?: string | null;
+  };
   accounts: Array<{ id: string; name: string; role: string }>;
   activeAccountId: string | null;
   role: string | null;

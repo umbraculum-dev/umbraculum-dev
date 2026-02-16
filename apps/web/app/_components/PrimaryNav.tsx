@@ -85,6 +85,9 @@ export function PrimaryNav() {
               <option value="it">IT</option>
             </select>
           </label>
+          <Link href="/accessibility" className="navActionButton">
+            {t("accessibility")}
+          </Link>
           {authKnown && me ? (
             <>
               <span className="muted">

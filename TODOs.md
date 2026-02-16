@@ -56,6 +56,10 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [ ] Assess SEO with the current Next.js App Router usage (client components, hydration, view-source). If pages aren’t SEO-friendly, reassess what must become SSR/server components + metadata strategy.
   - Notes / approach: `docs/SEO.md`
 
+## Web UI accessibility settings
+
+- [ ] **Make density mode more effective**: gradually replace hard-coded inline paddings/margins in web UI with shared CSS variables/tokens (so `compact/comfortable` affects more of the app consistently).
+
 ## Water calculator (BrunWater parity)
 
 - [ ] Mash acidification: add “manual entry” mode (user inputs acid addition amount; app estimates resulting alkalinity/pH and stores both input + calculated snapshot).

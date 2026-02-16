@@ -1,0 +1,241 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+
+import { apiFetch } from "../../_lib/apiClient";
+
+type UiThemeKey = "default" | "hc_dark" | "hc_light";
+type UiFontScaleKey = "sm" | "md" | "lg" | "xl";
+type UiDensityKey = "comfortable" | "compact";
+
+const COOKIE_THEME = "UI_THEME";
+const COOKIE_FONT = "UI_FONT_SCALE";
+const COOKIE_DENSITY = "UI_DENSITY";
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const value = document.cookie
+    .split(";")
+    .map((p) => p.trim())
+    .find((p) => p.startsWith(`${name}=`));
+  if (!value) return null;
+  const idx = value.indexOf("=");
+  return idx >= 0 ? decodeURIComponent(value.slice(idx + 1)) : null;
+}
+
+function writeCookie(name: string, value: string) {
+  const maxAgeSeconds = 60 * 60 * 24 * 365; // 1 year
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
+}
+
+function setHtmlDataset(key: "theme" | "density" | "fontScale", value: string) {
+  document.documentElement.dataset[key] = value;
+}
+
+function oneOf<T extends string>(v: unknown, allowed: readonly T[], fallback: T): T {
+  return typeof v === "string" && (allowed as readonly string[]).includes(v) ? (v as T) : fallback;
+}
+
+export default function AccessibilityPage() {
+  const t = useTranslations("accessibility");
+  const locale = useLocale();
+
+  const allowedTheme = useMemo(() => ["default", "hc_dark", "hc_light"] as const, []);
+  const allowedFont = useMemo(() => ["sm", "md", "lg", "xl"] as const, []);
+  const allowedDensity = useMemo(() => ["comfortable", "compact"] as const, []);
+
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [theme, setTheme] = useState<UiThemeKey>("default");
+  const [fontScale, setFontScale] = useState<UiFontScaleKey>("md");
+  const [density, setDensity] = useState<UiDensityKey>("comfortable");
+
+  // Load from cookies first (works logged out). If logged in, hydrate from profile when cookies are missing/outdated.
+  useEffect(() => {
+    let cancelled = false;
+    const init = async () => {
+      try {
+        const cTheme = oneOf(readCookie(COOKIE_THEME), allowedTheme, "default");
+        const cFont = oneOf(readCookie(COOKIE_FONT), allowedFont, "md");
+        const cDensity = oneOf(readCookie(COOKIE_DENSITY), allowedDensity, "comfortable");
+
+        setTheme(cTheme);
+        setFontScale(cFont);
+        setDensity(cDensity);
+        setHtmlDataset("theme", cTheme);
+        setHtmlDataset("fontScale", cFont);
+        setHtmlDataset("density", cDensity);
+
+        // Try to load server-side preferences (if authenticated).
+        const res = await apiFetch("/api/auth/me");
+        if (!res.ok) {
+          if (!cancelled) setLoaded(true);
+          return;
+        }
+        const me = res.data as any;
+        const u = me?.user ?? {};
+        const pTheme = oneOf(u.preferredTheme, allowedTheme, cTheme);
+        const pFont = oneOf(u.preferredFontScale, allowedFont, cFont);
+        const pDensity = oneOf(u.preferredDensity, allowedDensity, cDensity);
+
+        // If cookies differ, prefer profile and sync cookies + DOM.
+        if (pTheme !== cTheme || pFont !== cFont || pDensity !== cDensity) {
+          writeCookie(COOKIE_THEME, pTheme);
+          writeCookie(COOKIE_FONT, pFont);
+          writeCookie(COOKIE_DENSITY, pDensity);
+          setHtmlDataset("theme", pTheme);
+          setHtmlDataset("fontScale", pFont);
+          setHtmlDataset("density", pDensity);
+          setTheme(pTheme);
+          setFontScale(pFont);
+          setDensity(pDensity);
+        }
+        if (!cancelled) setLoaded(true);
+      } catch (e) {
+        if (!cancelled) {
+          setError(String(e));
+          setLoaded(true);
+        }
+      }
+    };
+    void init();
+    return () => {
+      cancelled = true;
+    };
+  }, [allowedDensity, allowedFont, allowedTheme]);
+
+  const applyAndPersist = async (next: { theme: UiThemeKey; fontScale: UiFontScaleKey; density: UiDensityKey }) => {
+    setError(null);
+
+    // Always: persist to cookie + apply immediately
+    writeCookie(COOKIE_THEME, next.theme);
+    writeCookie(COOKIE_FONT, next.fontScale);
+    writeCookie(COOKIE_DENSITY, next.density);
+    setHtmlDataset("theme", next.theme);
+    setHtmlDataset("fontScale", next.fontScale);
+    setHtmlDataset("density", next.density);
+
+    setTheme(next.theme);
+    setFontScale(next.fontScale);
+    setDensity(next.density);
+
+    // If logged in, also persist to DB. (If logged out, PATCH will 401 and we ignore.)
+    setSaving(true);
+    try {
+      const res = await apiFetch("/api/auth/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          preferredTheme: next.theme,
+          preferredFontScale: next.fontScale,
+          preferredDensity: next.density,
+        }),
+      });
+      if (res.ok) return;
+      // Ignore not-authenticated errors; surface other failures.
+      if (res.status !== 401) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="panel" style={{ maxWidth: 720 }}>
+      <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
+      <p className="muted" style={{ marginTop: 0 }}>
+        {t("subtitle")}
+      </p>
+
+      {!loaded ? (
+        <p className="muted" aria-live="polite">
+          {t("loading")}
+        </p>
+      ) : (
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <label className="muted" htmlFor="ui-theme">
+              {t("themePreset")}
+            </label>
+            <select
+              id="ui-theme"
+              value={theme}
+              onChange={(e) =>
+                applyAndPersist({
+                  theme: oneOf(e.target.value, allowedTheme, "default"),
+                  fontScale,
+                  density,
+                })
+              }
+            >
+              <option value="default">{t("theme.default")}</option>
+              <option value="hc_dark">{t("theme.hcDark")}</option>
+              <option value="hc_light">{t("theme.hcLight")}</option>
+            </select>
+          </div>
+
+          <div style={{ display: "grid", gap: 6 }}>
+            <label className="muted" htmlFor="ui-font-scale">
+              {t("fontScale")}
+            </label>
+            <select
+              id="ui-font-scale"
+              value={fontScale}
+              onChange={(e) =>
+                applyAndPersist({
+                  theme,
+                  fontScale: oneOf(e.target.value, allowedFont, "md"),
+                  density,
+                })
+              }
+            >
+              <option value="sm">{t("font.sm")}</option>
+              <option value="md">{t("font.md")}</option>
+              <option value="lg">{t("font.lg")}</option>
+              <option value="xl">{t("font.xl")}</option>
+            </select>
+          </div>
+
+          <div style={{ display: "grid", gap: 6 }}>
+            <label className="muted" htmlFor="ui-density">
+              {t("density")}
+            </label>
+            <select
+              id="ui-density"
+              value={density}
+              onChange={(e) =>
+                applyAndPersist({
+                  theme,
+                  fontScale,
+                  density: oneOf(e.target.value, allowedDensity, "comfortable"),
+                })
+              }
+            >
+              <option value="comfortable">{t("densityOptions.comfortable")}</option>
+              <option value="compact">{t("densityOptions.compact")}</option>
+            </select>
+          </div>
+
+          <div className="muted" style={{ fontSize: 12 }}>
+            {saving ? t("saving") : t("savingHint")}
+          </div>
+
+          {error ? (
+            <pre className="errorBox" role="alert" style={{ margin: 0 }}>
+              {error}
+            </pre>
+          ) : null}
+
+          <div className="muted" style={{ fontSize: 12 }}>
+            {t("note", { locale })}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+

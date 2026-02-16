@@ -1,7 +1,7 @@
 # DEVELOPMENT-ACCESSIBILITY.md
 **Project:** Brewing SaaS (Next.js web + Expo/React Native mobile + Fastify API)  
 **Status:** v0.1 (living document)  
-**Last updated:** 2026-02-12  
+**Last updated:** 2026-02-16  
 
 This document defines **accessibility-first development rules** for the project. It is designed to be read by humans *and* used as a persistent constraint for Cursor planning/execution.
 
@@ -106,6 +106,34 @@ For menus/popovers:
 - Captcha must not block users with disabilities.
 - Always provide an accessible alternative path (e.g., email verification, rate limits, challenge alternatives).
 - Prefer “invisible” or privacy-friendly captcha solutions only if they remain accessible.
+
+### 3.11 In-app accessibility settings (Web)
+We ship a small set of **user-facing accessibility preferences** that are safe-by-design (presets, not arbitrary colors):
+
+- **Route**: `/<locale>/accessibility` (e.g. `/en/accessibility`, `/it/accessibility`)
+- **Controls**:
+  - Theme preset: `default`, `hc_dark`, `hc_light`
+  - Text size (font scale): `sm`, `md`, `lg`, `xl`
+  - Spacing (density): `comfortable`, `compact`
+
+#### Persistence rules (no flash)
+- Settings are always persisted in cookies:
+  - `UI_THEME`
+  - `UI_FONT_SCALE`
+  - `UI_DENSITY`
+- The Next.js root layout reads these cookies server-side and applies them to `<html>` as:
+  - `data-theme`
+  - `data-font-scale`
+  - `data-density`
+
+This ensures **SSR correctness** and avoids a “flash” back to defaults on refresh.
+
+#### Sync across devices (when signed in)
+- When authenticated, we also persist preferences in the user profile (API) and hydrate cookies from `/api/auth/me` when needed.
+
+#### Implementation pointers (developers)
+- Theme/density/font-scale behavior should be implemented via **CSS variables and tokens** in `apps/web/app/globals.css`.
+- Avoid hard-coded inline paddings for new UI; prefer CSS variables so density mode stays effective.
 
 ---
 

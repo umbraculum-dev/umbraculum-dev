@@ -48,6 +48,12 @@ model User {
   email           String   @unique
   passwordHash    String?
   preferredLocale String   @default("en")
+  /** UI theme preset key (e.g. "default", "hc_dark", "hc_light"). */
+  preferredTheme  String?  @default("default")
+  /** UI font scale key (e.g. "sm", "md", "lg", "xl"). */
+  preferredFontScale String? @default("md")
+  /** UI density key (e.g. "comfortable", "compact"). */
+  preferredDensity String? @default("comfortable")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

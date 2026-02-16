@@ -8,11 +8,38 @@
     "waterProfiles": "Water profiles",
     "about": "About",
     "language": "Language",
+    "accessibility": "Accessibility",
     "login": "Log in",
     "logout": "Log out",
     "signedInAs": "Signed in as",
     "activeAccount": "Active account",
     "switchAccount": "Switch account"
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "subtitle": "Adjust contrast, text size, and spacing. Saved on this device; if you are signed in, settings also sync to your account.",
+    "loading": "Loading…",
+    "themePreset": "Theme preset",
+    "fontScale": "Text size",
+    "density": "Spacing",
+    "saving": "Saving…",
+    "savingHint": "Changes apply immediately.",
+    "theme": {
+      "default": "Default",
+      "hcDark": "High contrast (dark)",
+      "hcLight": "High contrast (light)"
+    },
+    "font": {
+      "sm": "Small (90%)",
+      "md": "Normal (100%)",
+      "lg": "Large (110%)",
+      "xl": "Extra large (125%)"
+    },
+    "densityOptions": {
+      "comfortable": "Comfortable",
+      "compact": "Compact"
+    },
+    "note": "Tip: your browser zoom also works, and respects locale ({locale})."
   },
   "recipes": {
     "title": "Recipes",

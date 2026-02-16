@@ -26,6 +26,25 @@ function assertLocale(v: unknown): "en" | "it" {
   return "en";
 }
 
+type UiThemeKey = "default" | "hc_dark" | "hc_light";
+type UiFontScaleKey = "sm" | "md" | "lg" | "xl";
+type UiDensityKey = "comfortable" | "compact";
+
+function assertUiTheme(v: unknown): UiThemeKey {
+  if (v === "default" || v === "hc_dark" || v === "hc_light") return v;
+  return "default";
+}
+
+function assertUiFontScale(v: unknown): UiFontScaleKey {
+  if (v === "sm" || v === "md" || v === "lg" || v === "xl") return v;
+  return "md";
+}
+
+function assertUiDensity(v: unknown): UiDensityKey {
+  if (v === "comfortable" || v === "compact") return v;
+  return "comfortable";
+}
+
 export async function authRoutes(app: FastifyInstance) {
   const accounts = new AccountsService(app.prisma);
 
@@ -164,7 +183,14 @@ export async function authRoutes(app: FastifyInstance) {
     const s = requireSession(req);
     const user = await app.prisma.user.findUnique({
       where: { id: s.userId },
-      select: { id: true, email: true, preferredLocale: true },
+      select: {
+        id: true,
+        email: true,
+        preferredLocale: true,
+        preferredTheme: true,
+        preferredFontScale: true,
+        preferredDensity: true,
+      },
     });
     if (!user) throw new UnauthorizedError("invalid_session", "Not authenticated");
 
@@ -172,6 +198,27 @@ export async function authRoutes(app: FastifyInstance) {
     const role = s.activeAccountId ? await accounts.getMembershipRole(user.id, s.activeAccountId) : null;
 
     return { ok: true, user, accounts: memberships, activeAccountId: s.activeAccountId, role };
+  });
+
+  app.patch("/auth/preferences", async (req) => {
+    const s = requireSession(req);
+    const body = (req.body ?? {}) as {
+      preferredTheme?: unknown;
+      preferredFontScale?: unknown;
+      preferredDensity?: unknown;
+    };
+
+    const preferredTheme = assertUiTheme(body.preferredTheme);
+    const preferredFontScale = assertUiFontScale(body.preferredFontScale);
+    const preferredDensity = assertUiDensity(body.preferredDensity);
+
+    const updated = await app.prisma.user.update({
+      where: { id: s.userId },
+      data: { preferredTheme, preferredFontScale, preferredDensity },
+      select: { preferredTheme: true, preferredFontScale: true, preferredDensity: true },
+    });
+
+    return { ok: true, preferences: updated };
   });
 
   app.post("/auth/active-account", async (req) => {

@@ -8,11 +8,38 @@
     "waterProfiles": "Profili acqua",
     "about": "Info",
     "language": "Lingua",
+    "accessibility": "Accessibilità",
     "login": "Accedi",
     "logout": "Esci",
     "signedInAs": "Accesso come",
     "activeAccount": "Account attivo",
     "switchAccount": "Cambia account"
+  },
+  "accessibility": {
+    "title": "Accessibilità",
+    "subtitle": "Regola contrasto, dimensione del testo e spaziatura. Salvato su questo dispositivo; se hai effettuato l’accesso, le impostazioni si sincronizzano anche con il tuo account.",
+    "loading": "Caricamento…",
+    "themePreset": "Tema",
+    "fontScale": "Dimensione testo",
+    "density": "Spaziatura",
+    "saving": "Salvataggio…",
+    "savingHint": "Le modifiche si applicano subito.",
+    "theme": {
+      "default": "Predefinito",
+      "hcDark": "Alto contrasto (scuro)",
+      "hcLight": "Alto contrasto (chiaro)"
+    },
+    "font": {
+      "sm": "Piccolo (90%)",
+      "md": "Normale (100%)",
+      "lg": "Grande (110%)",
+      "xl": "Molto grande (125%)"
+    },
+    "densityOptions": {
+      "comfortable": "Confortevole",
+      "compact": "Compatto"
+    },
+    "note": "Suggerimento: funziona anche lo zoom del browser e rispetta la lingua ({locale})."
   },
   "recipes": {
     "title": "Ricette",
