@@ -135,6 +135,11 @@ This ensures **SSR correctness** and avoids a “flash” back to defaults on re
 - Theme/density/font-scale behavior should be implemented via **CSS variables and tokens** in `apps/web/app/globals.css`.
 - Avoid hard-coded inline paddings for new UI; prefer CSS variables so density mode stays effective.
 
+### 3.12 “Surface math” (explainability) popovers
+For water-calculator pages, we support an opt-in explainability UI (“Surface math”) that adds small **fx** popovers near selected computed outputs.
+
+- **Principle**: default UI must stay uncluttered; explainability is always **opt-in**.
+- **v1 scope**: the popovers surface **meaning + notes + unit conventions**.\n  They do **not** attempt to show full derivations or all equations everywhere.\n- **Future enhancement**: consider a second mode like **“Show math +”** to reveal real formulas and (optionally) substituted values for debugging.\n- **Accessibility requirements**:\n  - triggers are keyboard reachable\n  - popover opens with Enter/Space\n  - ESC closes\n  - outside click closes\n  - focus remains predictable\n 
 ---
 
 ## 4) Native mobile guidelines (Expo / React Native)

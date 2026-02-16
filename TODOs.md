@@ -60,6 +60,12 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 - [ ] **Make density mode more effective**: gradually replace hard-coded inline paddings/margins in web UI with shared CSS variables/tokens (so `compact/comfortable` affects more of the app consistently).
 
+## Water calculator UX: Surface math (explainability)
+
+- [ ] **Surface math (v1)** ships “meaning/notes” popovers, not full formulas/derivations. Consider a later enhancement:
+  - Add a second mode like **“Show math +”** to reveal *real formulas*, unit conventions, and (optionally) substituted values for debugging.
+  - Keep it opt-in to avoid clutter; ensure keyboard + screen reader behavior remains correct.
+
 ## Water calculator (BrunWater parity)
 
 - [ ] Mash acidification: add “manual entry” mode (user inputs acid addition amount; app estimates resulting alkalinity/pH and stores both input + calculated snapshot).
