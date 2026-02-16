@@ -117,6 +117,43 @@ code {
   gap: 16px;
 }
 
+.navTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.navTopBarLeft,
+.navTopBarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.navTopBar code {
+  font-size: 11px;
+}
+
+.navTopBar a {
+  text-decoration: none;
+}
+
+.navTopBar a:hover {
+  text-decoration: underline;
+}
+
+.navTopBar button {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);

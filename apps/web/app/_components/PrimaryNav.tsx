@@ -2,9 +2,13 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Link } from "../../src/i18n/navigation";
-import { DevAuthStatus } from "./DevAuthStatus";
+import { apiFetch } from "../_lib/apiClient";
+import type { AuthMeResponse } from "../_lib/useRequireAuth";
+
+const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 
 export function PrimaryNav() {
   const t = useTranslations("nav");
@@ -13,23 +17,56 @@ export function PrimaryNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [me, setMe] = useState<AuthMeResponse | null>(null);
+  const [authKnown, setAuthKnown] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await apiFetch("/api/auth/me");
+        if (cancelled) return;
+        setAuthKnown(true);
+        setAuthError(null);
+        if (!res.ok) {
+          setMe(null);
+          return;
+        }
+        setMe(res.data as AuthMeResponse);
+      } catch {
+        if (cancelled) return;
+        setAuthKnown(true);
+        setAuthError("auth_me_failed");
+        setMe(null);
+      }
+    };
+
+    void check();
+
+    // Keep nav state accurate after login/logout, tab focus, or client-side navigation.
+    const onAuthChanged = () => void check();
+    const onFocus = () => void check();
+    window.addEventListener(AUTH_CHANGED_EVENT, onAuthChanged);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(AUTH_CHANGED_EVENT, onAuthChanged);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [pathname]);
+
+  const active =
+    me && me.activeAccountId ? me.accounts.find((a) => a.id === me.activeAccountId) ?? null : null;
+
+  const showMainNav = authKnown && Boolean(me);
+
   return (
     <nav aria-label="Primary">
-      <ul className="navList">
-        <li>
-          <Link href="/">{t("dashboard")}</Link>
-        </li>
-        <li>
-          <Link href="/recipes">{t("recipes")}</Link>
-        </li>
-        <li>
-          <Link href="/water-profiles">{t("waterProfiles")}</Link>
-        </li>
-        <li>
-          <Link href="/about">{t("about")}</Link>
-        </li>
-        <li>
-          <label className="muted" style={{ fontSize: 12 }}>
+      <div className="navTopBar" aria-label="Session">
+        <div className="navTopBarLeft">
+          <label className="muted" style={{ fontSize: 11 }}>
             {t("language")}{" "}
             <select
               value={locale}
@@ -48,11 +85,78 @@ export function PrimaryNav() {
               <option value="it">IT</option>
             </select>
           </label>
-        </li>
-        <li style={{ marginLeft: "auto" }}>
-          <DevAuthStatus />
-        </li>
-      </ul>
+          {authKnown && me ? (
+            <>
+              <span className="muted">
+                {t("signedInAs")}: <code>{me.user.email}</code>
+              </span>
+              <span className="muted">
+                {t("activeAccount")}:{" "}
+                {active ? (
+                  <>
+                    <code>{active.name}</code>
+                    <span className="muted">{" "}(</span>
+                    <code>{active.id}</code>
+                    <span className="muted">)</span>
+                  </>
+                ) : (
+                  <code>{me.activeAccountId ?? "—"}</code>
+                )}
+              </span>
+            </>
+          ) : null}
+          {process.env.NODE_ENV !== "production" && authError ? (
+            <span className="muted">(auth: {authError})</span>
+          ) : null}
+        </div>
+        <div className="navTopBarRight">
+          {authKnown && me ? (
+            <>
+              <Link href="/select-account" className="muted">
+                {t("switchAccount")}
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoggingOut(true);
+                  apiFetch("/api/auth/logout", { method: "POST" })
+                    .catch(() => {})
+                    .finally(() => {
+                      setLoggingOut(false);
+                      setAuthKnown(true);
+                      setAuthError(null);
+                      setMe(null);
+                      window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+                      router.replace(`/${locale}/login`);
+                    });
+                }}
+                disabled={loggingOut}
+              >
+                {loggingOut ? `${t("logout")}…` : t("logout")}
+              </button>
+            </>
+          ) : authKnown ? (
+            <Link href="/login">{t("login")}</Link>
+          ) : null}
+        </div>
+      </div>
+
+      {showMainNav ? (
+        <ul className="navList">
+          <li>
+            <Link href="/">{t("dashboard")}</Link>
+          </li>
+          <li>
+            <Link href="/recipes">{t("recipes")}</Link>
+          </li>
+          <li>
+            <Link href="/water-profiles">{t("waterProfiles")}</Link>
+          </li>
+          <li>
+            <Link href="/about">{t("about")}</Link>
+          </li>
+        </ul>
+      ) : null}
     </nav>
   );
 }

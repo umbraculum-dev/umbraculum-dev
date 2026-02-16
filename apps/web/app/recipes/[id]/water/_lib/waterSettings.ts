@@ -1,4 +1,3 @@
-import type { DevAuth } from "../../../../_lib/devAuth";
 import { apiFetch } from "./api";
 
 export type RecipeWaterSettings = {
@@ -122,14 +121,14 @@ export type RecipeWaterSettings = {
 
 export type RecipeWaterSettingsResponse = { ok: true; settings: RecipeWaterSettings | null };
 
-export async function fetchRecipeWaterSettings(recipeId: string, auth: DevAuth) {
-  const res = await apiFetch(`/api/recipes/${recipeId}/water-settings`, auth);
+export async function fetchRecipeWaterSettings(recipeId: string) {
+  const res = await apiFetch(`/api/recipes/${recipeId}/water-settings`);
   if (!res.ok) throw new Error(JSON.stringify(res.data));
   return res.data as RecipeWaterSettingsResponse;
 }
 
-export async function saveRecipeWaterSettings(recipeId: string, auth: DevAuth, patch: Record<string, unknown>) {
-  const res = await apiFetch(`/api/recipes/${recipeId}/water-settings`, auth, {
+export async function saveRecipeWaterSettings(recipeId: string, patch: Record<string, unknown>) {
+  const res = await apiFetch(`/api/recipes/${recipeId}/water-settings`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(patch),

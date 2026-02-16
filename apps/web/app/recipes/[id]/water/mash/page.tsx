@@ -4,7 +4,7 @@ import { Link } from "../../../../../src/i18n/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import { loadDevAuthFromStorage, type DevAuth } from "../../../../_lib/devAuth";
+import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { parseGristJson, type GristMaltClass, type GristRow } from "../../../../_lib/grist";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
@@ -76,11 +76,10 @@ function isAdmin(role: string | null) {
 }
 
 export default function MashWaterPage() {
+  const authState = useRequireAuth({ requireActiveAccount: true });
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const [authLoaded, setAuthLoaded] = useState(false);
-  const [auth, setAuth] = useState<DevAuth | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
@@ -146,22 +145,17 @@ export default function MashWaterPage() {
   const [gristImportError, setGristImportError] = useState<string | null>(null);
   const [importingGrist, setImportingGrist] = useState(false);
 
-  useEffect(() => {
-    setAuth(loadDevAuthFromStorage());
-    setAuthLoaded(true);
-  }, []);
-
-  const canCall = useMemo(() => Boolean(auth?.userId && auth?.activeAccountId), [auth]);
+  const canCall = authState.status === "ready";
 
   const refreshProfiles = async () => {
-    if (!auth?.userId) return;
+    if (authState.status !== "ready") return;
     setProfilesError(null);
     setLoadingProfiles(true);
     try {
-      const meRes = await apiFetch("/api/me", auth);
-      setMe(meRes.ok ? (meRes.data as MeResponse) : null);
+      const meRes = await apiFetch("/api/auth/me");
+      setMe(meRes.ok ? ((meRes.data as any) as MeResponse) : null);
 
-      const profRes = await apiFetch("/api/water-profiles", auth);
+      const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
       setProfiles(profRes.data as WaterProfilesResponse);
     } catch (err) {
@@ -172,10 +166,10 @@ export default function MashWaterPage() {
   };
 
   const loadSettings = async () => {
-    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    if (authState.status !== "ready" || !recipeId) return;
     setSettingsError(null);
     try {
-      const data = (await fetchRecipeWaterSettings(recipeId, auth)) as RecipeWaterSettingsResponse;
+      const data = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
       const s = data.settings;
       if (!s) return;
 
@@ -277,12 +271,12 @@ export default function MashWaterPage() {
   useEffect(() => {
     void refreshProfiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.userId, auth?.activeAccountId]);
+  }, [authState.status]);
 
   useEffect(() => {
     void loadSettings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.userId, auth?.activeAccountId, recipeId]);
+  }, [authState.status, recipeId]);
 
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
@@ -357,8 +351,8 @@ export default function MashWaterPage() {
   }, [tapVolumeLiters, dilutionVolumeLiters]);
 
   const saveSettings = async (patch: Record<string, unknown>) => {
-    if (!auth?.userId || !auth.activeAccountId) return;
-    await saveRecipeWaterSettings(recipeId, auth, patch);
+    if (authState.status !== "ready") return;
+    await saveRecipeWaterSettings(recipeId, patch);
   };
 
   const onSaveAdjustment = async () => {
@@ -409,7 +403,7 @@ export default function MashWaterPage() {
   };
 
   const onCalcSalts = async () => {
-    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!canCall) return;
     if (!mixedSourceProfile) {
       const tap = Math.max(0, Number(tapVolumeLiters) || 0);
       const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
@@ -426,7 +420,7 @@ export default function MashWaterPage() {
     setSaltsResult(null);
     setSaltsSubmitting(true);
     try {
-      const res = await apiFetch("/api/water-calc/salt-additions", auth, {
+      const res = await apiFetch("/api/water-calc/salt-additions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -481,7 +475,7 @@ export default function MashWaterPage() {
     rows.some((r) => typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0);
 
   const ensureZeroSaltsSnapshotIfMissing = async () => {
-    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!canCall) return;
     if (saltsResult) return;
     if (hasNonZeroSaltAdditions(saltAdditions)) {
       throw new Error(
@@ -532,13 +526,13 @@ export default function MashWaterPage() {
     }>;
     acidAdded_mEqPerL?: number;
   }) => {
-    if (!auth?.userId || !auth.activeAccountId) return null;
+    if (!canCall) return null;
     const hasV1 = args.grist.some(
       (r) =>
         typeof r.mashDiPh === "number" ||
         typeof r.mashTaToPh57_mEqPerKg === "number",
     );
-    const res = await apiFetch(hasV1 ? "/api/water-calc/mash-ph-estimate-v1" : "/api/water-calc/mash-ph-estimate", auth, {
+    const res = await apiFetch(hasV1 ? "/api/water-calc/mash-ph-estimate-v1" : "/api/water-calc/mash-ph-estimate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -612,7 +606,7 @@ export default function MashWaterPage() {
       };
       if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
 
-      const res = await apiFetch("/api/water-calc/mash-acidification-manual", auth as DevAuth, {
+      const res = await apiFetch("/api/water-calc/mash-acidification-manual", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -652,7 +646,7 @@ export default function MashWaterPage() {
       }
       if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
 
-      const res = await apiFetch(endpoint, auth as DevAuth, {
+      const res = await apiFetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -740,7 +734,7 @@ export default function MashWaterPage() {
 
   const onSubmitMash = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!canCall) return;
     setMashError(null);
     setMashStatus(null);
     setMashManualStatus(null);
@@ -761,7 +755,7 @@ export default function MashWaterPage() {
             : { acidAddedMl: mashManualAcidAdded }),
         };
         if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
-        const res = await apiFetch("/api/water-calc/mash-acidification-manual", auth, {
+        const res = await apiFetch("/api/water-calc/mash-acidification-manual", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -806,7 +800,7 @@ export default function MashWaterPage() {
           ...(gristRows.length ? { grist: gristRows } : {}),
         };
         if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
-        const res = await apiFetch(endpoint, auth, {
+        const res = await apiFetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -854,12 +848,12 @@ export default function MashWaterPage() {
   };
 
   const onImportGristFromRecipe = async () => {
-    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    if (!canCall || !recipeId) return;
     setGristImportError(null);
     setGristImportStatus(null);
     setImportingGrist(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}`, auth);
+      const res = await apiFetch(`/api/recipes/${recipeId}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const data = res.data as RecipeResponse;
       const rows = parseGristJson(data.recipe.gristJson);
@@ -899,11 +893,10 @@ export default function MashWaterPage() {
         <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
       </p>
 
-      {authLoaded && !canCall ? (
-        <p role="alert" className="errorBox">
-          Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account),
-          then come back here.
-        </p>
+      {authState.status === "error" ? (
+        <pre role="alert" className="errorBox">
+          {authState.error}
+        </pre>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>

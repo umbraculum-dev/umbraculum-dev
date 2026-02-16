@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "../../../_lib/apiClient";
-import { loadDevAuthFromStorage, type DevAuth } from "../../../_lib/devAuth";
 import {
   parseGristJson,
   type GristMaltClass,
@@ -139,8 +138,7 @@ export default function RecipeEditPage() {
     { id: "water", label: "Water chemistry" },
   ] as const;
 
-  const [authLoaded, setAuthLoaded] = useState(false);
-  const [auth, setAuth] = useState<DevAuth | null>(null);
+  const [authLoaded, setAuthLoaded] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -171,14 +169,9 @@ export default function RecipeEditPage() {
   const [yeastSearching, setYeastSearching] = useState(false);
   const [yeastSearchError, setYeastSearchError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setAuth(loadDevAuthFromStorage());
-    setAuthLoaded(true);
-  }, []);
-
   const canCallAccountScoped = useMemo(
-    () => Boolean(auth?.userId && auth?.activeAccountId && recipeId),
-    [auth, recipeId],
+    () => Boolean(recipeId),
+    [recipeId],
   );
 
   useEffect(() => {
@@ -190,7 +183,7 @@ export default function RecipeEditPage() {
       setLoadError(null);
       setSaveStatus(null);
       try {
-        const res = await apiFetch(`/api/recipes/${recipeId}`, auth as DevAuth);
+        const res = await apiFetch(`/api/recipes/${recipeId}`);
         if (!res.ok) throw new Error(JSON.stringify(res.data));
         const r = (res.data as any).recipe as Recipe;
         if (cancelled) return;
@@ -212,15 +205,15 @@ export default function RecipeEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [auth, canCallAccountScoped, recipeId]);
+  }, [canCallAccountScoped, recipeId]);
 
   const onSave = async () => {
-    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    if (!recipeId) return;
     setSaving(true);
     setSaveError(null);
     setSaveStatus(null);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}`, auth, {
+      const res = await apiFetch(`/api/recipes/${recipeId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -532,10 +525,9 @@ export default function RecipeEditPage() {
         dedicated calculator page.
       </p>
 
-      {authLoaded && (!auth?.userId || !auth?.activeAccountId) ? (
+      {authLoaded && !canCallAccountScoped ? (
         <p role="alert" className="errorBox">
-          Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User +
-          Active account), then come back here.
+          Not ready to load this recipe.
         </p>
       ) : null}
 

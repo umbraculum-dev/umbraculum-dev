@@ -7,12 +7,28 @@
     "recipes": "Recipes",
     "waterProfiles": "Water profiles",
     "about": "About",
-    "language": "Language"
+    "language": "Language",
+    "login": "Log in",
+    "logout": "Log out",
+    "signedInAs": "Signed in as",
+    "activeAccount": "Active account",
+    "switchAccount": "Switch account"
   },
   "recipes": {
     "title": "Recipes",
     "subtitle": "This is the recipe area entrypoint (list/edit/water calculator).",
-    "instructions": "For now, create recipes from the Dashboard dev panel and then navigate to edit/water pages once they exist."
+    "activeAccount": "Active account:",
+    "createTitle": "Create recipe",
+    "nameLabel": "Name",
+    "styleLabel": "Style (optional)",
+    "createButton": "Create",
+    "creating": "Creating…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "listTitle": "Your recipes",
+    "noRecipes": "No recipes yet.",
+    "openEditor": "Open editor",
+    "openWater": "Open water calculator"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -23,7 +39,7 @@
     "subtitle": "Fetching {url} from the browser (via Nginx)."
   },
   "devDashboard": {
-    "loading": "Loading dev dashboard…"
+    "loading": "Loading…"
   },
   "waterProfiles": {
     "title": "Water profiles",
@@ -87,6 +103,40 @@
   "about": {
     "title": "About",
     "subtitle": "Brewery App is an internal tool for recipe development and brew-day logging, with a water chemistry calculator inspired by BrunWater."
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "signupTitle": "Create account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "accountNameLabel": "Account name (optional)",
+    "submitLogin": "Sign in",
+    "submitSignup": "Create account",
+    "submitting": "Submitting…",
+    "languageLabel": "Language",
+    "noteTitle": "Translations status",
+    "noteBody": "English is the original language. Other languages (starting with Italian) will soon be 100% supported.",
+    "helpTranslate": "Help translate (i18n contributing)"
+  },
+  "i18nContributing": {
+    "title": "Help translate (i18n contributing)",
+    "subtitle": "We welcome translation contributions. English is the source of truth; Italian is the first community language.",
+    "howItWorksTitle": "How translations work",
+    "howItWorks1": "The web app uses locale-prefixed URLs (e.g. /en/..., /it/...).",
+    "howItWorks2Prefix": "Translations live in",
+    "howItWorks2Middle": "and",
+    "howItWorks3": "Keys should be stable. Don’t change keys unless you’re intentionally refactoring text across the app.",
+    "recommendedToolTitle": "Recommended tool (easiest)",
+    "recommendedToolBody": "We recommend using Weblate (web UI) connected to GitHub. It allows anyone to translate without touching git, and it opens PRs automatically.",
+    "recommendedTool1": "Translate using a browser (no git required).",
+    "recommendedTool2": "Maintainers review and merge Weblate PRs.",
+    "githubFallbackTitle": "GitHub fallback",
+    "githubFallbackBody": "If you’re comfortable with git/GitHub, you can also open a PR editing the JSON message files directly.",
+    "rulesTitle": "Rules",
+    "rule1": "Keep placeholders intact (e.g. {url}).",
+    "rule2": "Keep meaning accurate; avoid overly literal translations if they read unnaturally.",
+    "rule3": "Don’t translate technical identifiers like file paths, API paths, or code.",
+    "backToLogin": "Back to sign in"
   }
 }
 

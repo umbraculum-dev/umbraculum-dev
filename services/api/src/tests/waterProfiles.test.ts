@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
+import { createSessionForTestUser } from "./helpers/session.js";
 
 // Use test-only IDs so running tests doesn't pollute seeded dev data.
 const TEST_ADMIN_USER_ID = "11111111-1111-1111-1111-111111111113";
@@ -8,9 +9,22 @@ const TEST_VIEWER_USER_ID = "11111111-1111-1111-1111-111111111114";
 
 describe("water-profiles", () => {
   const app = buildApp();
+  let cookieAdmin = "";
+  let cookieViewer = "";
+  let cookieNoSession = "";
+  let accountId = "";
 
   beforeAll(async () => {
     await app.ready();
+    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "owner" });
+    cookieAdmin = admin.cookie;
+    accountId = admin.accountId;
+
+    const viewer = await createSessionForTestUser(app, { activeAccount: true, role: "viewer" });
+    cookieViewer = viewer.cookie;
+
+    // Used only to validate "not authenticated" behavior
+    cookieNoSession = "";
 
     await app.prisma.user.upsert({
       where: { id: TEST_ADMIN_USER_ID },
@@ -51,12 +65,12 @@ describe("water-profiles", () => {
     await app.close();
   });
 
-  it("requires X-User-Id for GET /water-profiles", async () => {
+  it("requires authentication for GET /water-profiles", async () => {
     const res = await app.inject({ method: "GET", url: "/water-profiles" });
     expect(res.statusCode).toBe(401);
     expect(res.json()).toEqual({
       ok: false,
-      error: { code: "missing_auth", message: "Missing auth headers" },
+      error: { code: "missing_session", message: "Not authenticated" },
     });
   });
 
@@ -64,7 +78,7 @@ describe("water-profiles", () => {
     const res = await app.inject({
       method: "GET",
       url: "/water-profiles",
-      headers: { "x-user-id": TEST_ADMIN_USER_ID },
+      headers: { cookie: cookieAdmin },
     });
     expect(res.statusCode).toBe(200);
     const body = res.json() as any;
@@ -80,7 +94,7 @@ describe("water-profiles", () => {
     const res = await app.inject({
       method: "POST",
       url: "/water-profiles",
-      headers: { "x-user-id": TEST_VIEWER_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieViewer },
       payload: {
         scope: "public",
         type: "water",
@@ -104,7 +118,7 @@ describe("water-profiles", () => {
     const create = await app.inject({
       method: "POST",
       url: "/water-profiles",
-      headers: { "x-user-id": TEST_ADMIN_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieAdmin },
       payload: {
         scope: "public",
         type: "water",
@@ -126,7 +140,7 @@ describe("water-profiles", () => {
     const verify = await app.inject({
       method: "POST",
       url: `/water-profiles/${created.profile.id}/verify`,
-      headers: { "x-user-id": TEST_ADMIN_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieAdmin },
     });
     expect(verify.statusCode).toBe(200);
     const verified = verify.json() as any;
@@ -136,7 +150,7 @@ describe("water-profiles", () => {
     const unverify = await app.inject({
       method: "POST",
       url: `/water-profiles/${created.profile.id}/unverify`,
-      headers: { "x-user-id": TEST_ADMIN_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieAdmin },
     });
     expect(unverify.statusCode).toBe(200);
     const unverified = unverify.json() as any;
@@ -147,7 +161,7 @@ describe("water-profiles", () => {
     const del = await app.inject({
       method: "DELETE",
       url: `/water-profiles/${created.profile.id}`,
-      headers: { "x-user-id": TEST_ADMIN_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieAdmin },
     });
     expect(del.statusCode).toBe(200);
   });
@@ -156,7 +170,7 @@ describe("water-profiles", () => {
     const create = await app.inject({
       method: "POST",
       url: "/water-profiles",
-      headers: { "x-user-id": TEST_ADMIN_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieAdmin },
       payload: {
         scope: "public",
         type: "water",
@@ -176,7 +190,7 @@ describe("water-profiles", () => {
     const del = await app.inject({
       method: "DELETE",
       url: `/water-profiles/${created.profile.id}`,
-      headers: { "x-user-id": TEST_ADMIN_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieAdmin },
     });
     expect(del.statusCode).toBe(200);
     expect(del.json()).toEqual({ ok: true });

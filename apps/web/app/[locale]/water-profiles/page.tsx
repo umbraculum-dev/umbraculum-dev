@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 
 import { Link } from "../../../src/i18n/navigation";
 
-import { loadDevAuthFromStorage, type DevAuth } from "../../_lib/devAuth";
 import { apiFetch } from "../../_lib/apiClient";
 import type { MeResponse, WaterProfile, WaterProfilesResponse } from "../../_lib/apiTypes";
 
@@ -15,9 +14,8 @@ function isAdmin(role: string | null) {
 
 export default function WaterProfilesPage() {
   const t = useTranslations("waterProfiles");
-  const [auth, setAuth] = useState<DevAuth | null>(null);
-  const [authLoaded, setAuthLoaded] = useState(false);
   const [me, setMe] = useState<MeResponse | null>(null);
+  const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,22 +36,23 @@ export default function WaterProfilesPage() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSubmitting, setCreateSubmitting] = useState(false);
 
-  useEffect(() => {
-    setAuth(loadDevAuthFromStorage());
-    setAuthLoaded(true);
-  }, []);
-
-  const canCall = useMemo(() => Boolean(auth?.userId && auth?.activeAccountId), [auth]);
+  const canCall = true;
 
   const refresh = async () => {
-    if (!auth?.userId) return;
     setError(null);
     setLoading(true);
     try {
-      const meRes = await apiFetch("/api/me", auth);
-      setMe(meRes.ok ? (meRes.data as MeResponse) : null);
+      const meRes = await apiFetch("/api/auth/me");
+      if (meRes.ok && meRes.data && typeof meRes.data === "object") {
+        const d: any = meRes.data as any;
+        setMe((d.user ?? null) as any);
+        setActiveAccountId(typeof d.activeAccountId === "string" ? d.activeAccountId : null);
+      } else {
+        setMe(null);
+        setActiveAccountId(null);
+      }
 
-      const profRes = await apiFetch("/api/water-profiles", auth);
+      const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
       setProfiles(profRes.data as WaterProfilesResponse);
     } catch (err) {
@@ -66,7 +65,7 @@ export default function WaterProfilesPage() {
   useEffect(() => {
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.userId, auth?.activeAccountId]);
+  }, []);
 
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
@@ -79,11 +78,10 @@ export default function WaterProfilesPage() {
 
   const onCreateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth?.userId || !auth.activeAccountId) return;
     setCreateError(null);
     setCreateSubmitting(true);
     try {
-      const res = await apiFetch("/api/water-profiles", auth, {
+      const res = await apiFetch("/api/water-profiles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,20 +112,18 @@ export default function WaterProfilesPage() {
   };
 
   const onToggleVerify = async (p: WaterProfile) => {
-    if (!auth?.userId || !auth.activeAccountId) return;
     const action = p.verificationStatus === "verified" ? "unverify" : "verify";
-    await apiFetch(`/api/water-profiles/${p.id}/${action}`, auth, { method: "POST" });
+    await apiFetch(`/api/water-profiles/${p.id}/${action}`, { method: "POST" });
     await refresh();
   };
 
   const onDeleteProfile = async (p: WaterProfile) => {
-    if (!auth?.userId || !auth.activeAccountId) return;
     if (p.scope === "system") return;
     const ok = window.confirm(`Delete water profile "${p.name}"? This cannot be undone.`);
     if (!ok) return;
     setError(null);
     try {
-      const res = await apiFetch(`/api/water-profiles/${p.id}`, auth, { method: "DELETE" });
+      const res = await apiFetch(`/api/water-profiles/${p.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       await refresh();
     } catch (err) {
@@ -139,15 +135,8 @@ export default function WaterProfilesPage() {
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
-        {t("activeAccount")}: <code>{auth?.activeAccountId ? auth.activeAccountId : "—"}</code>
+        {t("activeAccount")}: <code>{activeAccountId ?? "—"}</code>
       </p>
-
-      {authLoaded && !canCall ? (
-        <p role="alert" className="errorBox">
-          Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active
-          account), then come back here.
-        </p>
-      ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="profiles-table-heading">

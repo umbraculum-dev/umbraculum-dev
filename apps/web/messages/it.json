@@ -7,12 +7,28 @@
     "recipes": "Ricette",
     "waterProfiles": "Profili acqua",
     "about": "Info",
-    "language": "Lingua"
+    "language": "Lingua",
+    "login": "Accedi",
+    "logout": "Esci",
+    "signedInAs": "Accesso come",
+    "activeAccount": "Account attivo",
+    "switchAccount": "Cambia account"
   },
   "recipes": {
     "title": "Ricette",
     "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",
-    "instructions": "Per ora, crea le ricette dal pannello dev della Dashboard e poi vai alle pagine di modifica/calcolatore acqua."
+    "activeAccount": "Account attivo:",
+    "createTitle": "Crea ricetta",
+    "nameLabel": "Nome",
+    "styleLabel": "Stile (opzionale)",
+    "createButton": "Crea",
+    "creating": "Creazione…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "listTitle": "Le tue ricette",
+    "noRecipes": "Ancora nessuna ricetta.",
+    "openEditor": "Apri editor",
+    "openWater": "Apri calcolatore acqua"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -23,7 +39,7 @@
     "subtitle": "Richiesta di {url} dal browser (via Nginx)."
   },
   "devDashboard": {
-    "loading": "Caricamento dashboard dev…"
+    "loading": "Caricamento…"
   },
   "waterProfiles": {
     "title": "Profili acqua",
@@ -87,6 +103,40 @@
   "about": {
     "title": "Info",
     "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater."
+  },
+  "auth": {
+    "loginTitle": "Accedi",
+    "signupTitle": "Crea account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "accountNameLabel": "Nome account (opzionale)",
+    "submitLogin": "Accedi",
+    "submitSignup": "Crea account",
+    "submitting": "Invio…",
+    "languageLabel": "Lingua",
+    "noteTitle": "Stato traduzioni",
+    "noteBody": "L’inglese è la lingua originale. Le altre lingue (a partire dall’italiano) saranno presto supportate al 100%.",
+    "helpTranslate": "Aiuta a tradurre (contributi i18n)"
+  },
+  "i18nContributing": {
+    "title": "Aiuta a tradurre (i18n contributing)",
+    "subtitle": "Accettiamo volentieri contributi alle traduzioni. L’inglese è la fonte; l’italiano è la prima lingua community.",
+    "howItWorksTitle": "Come funzionano le traduzioni",
+    "howItWorks1": "La web app usa URL con prefisso lingua (es. /en/..., /it/...).",
+    "howItWorks2Prefix": "Le traduzioni stanno in",
+    "howItWorks2Middle": "e",
+    "howItWorks3": "Le chiavi devono restare stabili. Non cambiare le chiavi a meno di un refactor intenzionale.",
+    "recommendedToolTitle": "Strumento consigliato (più semplice)",
+    "recommendedToolBody": "Consigliamo Weblate (interfaccia web) collegato a GitHub. Permette a chiunque di tradurre senza usare git e apre PR automaticamente.",
+    "recommendedTool1": "Traduci dal browser (senza git).",
+    "recommendedTool2": "I maintainer revisionano e mergiano le PR di Weblate.",
+    "githubFallbackTitle": "Alternativa GitHub",
+    "githubFallbackBody": "Se sei a tuo agio con git/GitHub, puoi aprire una PR modificando direttamente i file JSON delle traduzioni.",
+    "rulesTitle": "Regole",
+    "rule1": "Mantieni intatti i placeholder (es. {url}).",
+    "rule2": "Mantieni il significato; evita traduzioni troppo letterali se suonano innaturali.",
+    "rule3": "Non tradurre identificatori tecnici come path di file, path API o codice.",
+    "backToLogin": "Torna ad Accedi"
   }
 }
 

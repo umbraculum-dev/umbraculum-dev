@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
+import { createSessionForTestUser } from "./helpers/session.js";
 
 // Use test-only IDs so running tests doesn't pollute seeded dev data.
 const TEST_USER_ID = "11111111-1111-1111-1111-111111111112";
@@ -8,9 +9,25 @@ const TEST_ACCOUNT_B = "33333333-3333-3333-3333-333333333334";
 
 describe("recipe water-settings", () => {
   const app = buildApp();
+  let cookieA = "";
+  let cookieB = "";
+  let cookieNoAccount = "";
+  let accountAId = "";
+  let accountBId = "";
 
   beforeAll(async () => {
     await app.ready();
+
+    const sessA = await createSessionForTestUser(app, { activeAccount: true });
+    cookieA = sessA.cookie;
+    accountAId = sessA.accountId;
+
+    const sessB = await createSessionForTestUser(app, { activeAccount: true });
+    cookieB = sessB.cookie;
+    accountBId = sessB.accountId;
+
+    const sessNo = await createSessionForTestUser(app, { activeAccount: false });
+    cookieNoAccount = sessNo.cookie;
 
     await app.prisma.user.upsert({
       where: { id: TEST_USER_ID },
@@ -54,29 +71,29 @@ describe("recipe water-settings", () => {
     await app.close();
   });
 
-  it("returns 400 when X-Account-Id is missing", async () => {
+  it("returns 401 when active account is missing", async () => {
     const res = await app.inject({
       method: "GET",
       url: "/recipes/some-recipe-id/water-settings",
-      headers: { "x-user-id": TEST_USER_ID },
+      headers: { cookie: cookieNoAccount },
     });
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
     expect(res.json()).toEqual({
       ok: false,
-      error: { code: "missing_account_id", message: "Missing header: X-Account-Id" },
+      error: { code: "missing_active_account", message: "No active account selected" },
     });
   });
 
   it("upserts then fetches water settings for a recipe", async () => {
     const recipe = await app.prisma.recipe.create({
-      data: { accountId: TEST_ACCOUNT_A, name: "Water Settings Recipe", style: null, notes: null },
+      data: { accountId: accountAId, name: "Water Settings Recipe", style: null, notes: null },
     });
     const spargeProfileA = await app.prisma.waterProfile.create({
       data: {
         key: `test:spargeProfileA:${Date.now()}`,
         scope: "account",
         type: "water",
-        accountId: TEST_ACCOUNT_A,
+        accountId: accountAId,
         name: "Sparge Water A",
         calcium: 1,
         magnesium: 1,
@@ -114,7 +131,7 @@ describe("recipe water-settings", () => {
     const put = await app.inject({
       method: "PUT",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: {
         tapWaterVolumeLiters: 10,
         dilutionWaterVolumeLiters: 5,
@@ -171,12 +188,12 @@ describe("recipe water-settings", () => {
     const putBody = put.json() as any;
     expect(putBody.ok).toBe(true);
     expect(putBody.settings.recipeId).toBe(recipe.id);
-    expect(putBody.settings.accountId).toBe(TEST_ACCOUNT_A);
+    expect(putBody.settings.accountId).toBe(accountAId);
 
     const get = await app.inject({
       method: "GET",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
     });
     expect(get.statusCode).toBe(200);
     const body = get.json() as any;
@@ -221,20 +238,20 @@ describe("recipe water-settings", () => {
 
   it("does not leak settings across accounts", async () => {
     const recipeA = await app.prisma.recipe.create({
-      data: { accountId: TEST_ACCOUNT_A, name: "Scoped WS", style: null, notes: null },
+      data: { accountId: accountAId, name: "Scoped WS", style: null, notes: null },
     });
 
     await app.inject({
       method: "PUT",
       url: `/recipes/${recipeA.id}/water-settings`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { spargeStartingAlkalinityPpmCaCO3: 1 },
     });
 
     const getB = await app.inject({
       method: "GET",
       url: `/recipes/${recipeA.id}/water-settings`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_B },
+      headers: { cookie: cookieB },
     });
     expect(getB.statusCode).toBe(404);
     expect(getB.json()).toEqual({
@@ -245,14 +262,14 @@ describe("recipe water-settings", () => {
 
   it("rejects saving an account-scoped profile from another account", async () => {
     const recipe = await app.prisma.recipe.create({
-      data: { accountId: TEST_ACCOUNT_A, name: "Profile Validation", style: null, notes: null },
+      data: { accountId: accountAId, name: "Profile Validation", style: null, notes: null },
     });
     const profileB = await app.prisma.waterProfile.create({
       data: {
         key: `test:accountB:${Date.now()}`,
         scope: "account",
         type: "water",
-        accountId: TEST_ACCOUNT_B,
+        accountId: accountBId,
         name: "Account B Water",
         calcium: 1,
         magnesium: 1,
@@ -268,7 +285,7 @@ describe("recipe water-settings", () => {
     const put = await app.inject({
       method: "PUT",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { targetWaterProfileId: profileB.id },
     });
     expect(put.statusCode).toBe(403);
@@ -283,7 +300,7 @@ describe("recipe water-settings", () => {
     const putSparge = await app.inject({
       method: "PUT",
       url: `/recipes/${recipe.id}/water-settings`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { spargeWaterProfileId: profileB.id },
     });
     expect(putSparge.statusCode).toBe(403);

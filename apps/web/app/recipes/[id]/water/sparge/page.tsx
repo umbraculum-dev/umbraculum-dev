@@ -1,10 +1,10 @@
 "use client";
 
 import { Link } from "../../../../../src/i18n/navigation";
+import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import { loadDevAuthFromStorage, type DevAuth } from "../../../../_lib/devAuth";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
@@ -43,11 +43,12 @@ type SaltAdditionsResult = {
 };
 
 export default function SpargeWaterPage() {
+  const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const [authLoaded, setAuthLoaded] = useState(false);
-  const [auth, setAuth] = useState<DevAuth | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authed, setAuthed] = useState(false);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
@@ -92,18 +93,30 @@ export default function SpargeWaterPage() {
   const [spargeSaltsResult, setSpargeSaltsResult] = useState<SaltAdditionsResult | null>(null);
 
   useEffect(() => {
-    setAuth(loadDevAuthFromStorage());
-    setAuthLoaded(true);
+    let cancelled = false;
+    (async () => {
+      const res = await apiFetch("/api/auth/me");
+      if (cancelled) return;
+      setAuthed(res.ok);
+      setAuthChecked(true);
+    })().catch(() => {
+      if (!cancelled) {
+        setAuthed(false);
+        setAuthChecked(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const canCall = useMemo(() => Boolean(auth?.userId && auth?.activeAccountId), [auth]);
+  const canCall = useMemo(() => authed, [authed]);
 
   const refreshProfiles = async () => {
-    if (!auth?.userId) return;
     setProfilesError(null);
     setLoadingProfiles(true);
     try {
-      const profRes = await apiFetch("/api/water-profiles", auth);
+      const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
       setProfiles(profRes.data as WaterProfilesResponse);
     } catch (err) {
@@ -114,10 +127,10 @@ export default function SpargeWaterPage() {
   };
 
   const loadSettings = async () => {
-    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    if (!recipeId) return;
     setSettingsError(null);
     try {
-      const data = (await fetchRecipeWaterSettings(recipeId, auth)) as RecipeWaterSettingsResponse;
+      const data = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
       const s = data.settings;
       if (!s) return;
 
@@ -189,14 +202,16 @@ export default function SpargeWaterPage() {
   };
 
   useEffect(() => {
+    if (!authed) return;
     void refreshProfiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.userId, auth?.activeAccountId]);
+  }, [authed]);
 
   useEffect(() => {
+    if (!authed) return;
     void loadSettings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.userId, auth?.activeAccountId, recipeId]);
+  }, [authed, recipeId]);
 
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
@@ -536,10 +551,9 @@ export default function SpargeWaterPage() {
         <Link href={`/recipes/${recipeId}/water/mash`}>Go to mash</Link>
       </p>
 
-      {authLoaded && !canCall ? (
+      {authChecked && !canCall ? (
         <p role="alert" className="errorBox">
-          Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account),
-          then come back here.
+          Not authenticated. Please <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/sparge`}>sign in</Link>.
         </p>
       ) : null}
 

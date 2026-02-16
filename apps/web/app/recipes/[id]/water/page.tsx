@@ -5,12 +5,12 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { loadDevAuthFromStorage, type DevAuth } from "../../../_lib/devAuth";
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterSettings, type RecipeWaterSettingsResponse } from "./_lib/waterSettings";
 import type { IonProfilePpm } from "./_lib/waterChem";
 import { combineAfterSaltsAndAcid } from "./_lib/waterChem";
 import { formatFixed } from "../../../../src/i18n/format";
+import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
 type MashOverallResultV0 = {
   calculatedAt: string;
@@ -26,8 +26,7 @@ export default function WaterHubPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const [authLoaded, setAuthLoaded] = useState(false);
-  const [auth, setAuth] = useState<DevAuth | null>(null);
+  const authState = useRequireAuth({ requireActiveAccount: true });
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [settings, setSettings] = useState<RecipeWaterSettingsResponse["settings"] | null>(null);
@@ -35,23 +34,17 @@ export default function WaterHubPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setAuth(loadDevAuthFromStorage());
-    setAuthLoaded(true);
-  }, []);
-
-  const canCall = useMemo(() => Boolean(auth?.userId && auth?.activeAccountId), [auth]);
-
   const refresh = async () => {
-    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    if (!recipeId) return;
+    if (authState.status !== "ready") return;
     setError(null);
     setLoading(true);
     try {
-      const profRes = await apiFetch("/api/water-profiles", auth);
+      const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
       setProfiles(profRes.data as WaterProfilesResponse);
 
-      const s = (await fetchRecipeWaterSettings(recipeId, auth)) as RecipeWaterSettingsResponse;
+      const s = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
       setSettings(s.settings ?? null);
     } catch (err) {
       setError(String(err));
@@ -63,7 +56,7 @@ export default function WaterHubPage() {
   useEffect(() => {
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.userId, auth?.activeAccountId, recipeId]);
+  }, [authState.status, recipeId]);
 
   const mashLast = settings?.mashLastCalculatedAt ? new Date(settings.mashLastCalculatedAt).toLocaleString() : "—";
   const spargeLast = settings?.spargeLastCalculatedAt
@@ -340,12 +333,10 @@ export default function WaterHubPage() {
         <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
       </p>
 
-      {authLoaded && !canCall ? (
-        <p role="alert" className="errorBox">
-          {t.rich("missingHeaders", {
-            strong: (chunks) => <strong>{chunks}</strong>,
-          })}
-        </p>
+      {authState.status === "error" ? (
+        <pre className="errorBox" role="alert">
+          {authState.error}
+        </pre>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
@@ -408,7 +399,7 @@ export default function WaterHubPage() {
           </ul>
 
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
+            <button type="button" onClick={() => void refresh()} disabled={authState.status !== "ready" || loading}>
               {loading ? t("refreshing") : t("refresh")}
             </button>
             <span className="muted" role="status" aria-live="polite">

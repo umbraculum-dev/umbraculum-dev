@@ -1,16 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
+import { createSessionForTestUser } from "./helpers/session.js";
 
 describe("water calc: mash acidification + salt additions", () => {
-  it("requires X-Account-Id for mash-acidification", async () => {
-    const app = buildApp();
+  const app = buildApp();
+  let cookieWithAccount = "";
+  let cookieNoAccount = "";
+
+  beforeAll(async () => {
     await app.ready();
+    cookieWithAccount = (await createSessionForTestUser(app, { activeAccount: true })).cookie;
+    cookieNoAccount = (await createSessionForTestUser(app, { activeAccount: false })).cookie;
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it("requires an active account for mash-acidification", async () => {
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/mash-acidification",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-      },
+      headers: { cookie: cookieNoAccount },
       payload: {
         acidType: "phosphoric",
         strengthKind: "percent",
@@ -21,20 +32,14 @@ describe("water calc: mash acidification + salt additions", () => {
         mashWaterVolumeLiters: 10,
       },
     });
-    expect(res.statusCode).toBe(400);
-    await app.close();
+    expect(res.statusCode).toBe(401);
   });
 
   it("estimates achieved pH for mash manual acid entry", async () => {
-    const app = buildApp();
-    await app.ready();
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/mash-acidification-manual",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: {
         acidType: "phosphoric",
         strengthKind: "percent",
@@ -50,19 +55,13 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.ok).toBe(true);
     expect(body.result.achievedPh).toBeGreaterThan(3.0);
     expect(body.result.achievedPh).toBeLessThan(8.0);
-    await app.close();
   });
 
   it("estimates mash pH from grist + alkalinity", async () => {
-    const app = buildApp();
-    await app.ready();
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/mash-ph-estimate",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: {
         volumeLiters: 10,
         alkalinityPpmCaCO3: 50,
@@ -74,13 +73,9 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.ok).toBe(true);
     expect(body.result.estimatedMashPhRoomTemp).toBeGreaterThan(0);
     expect(body.result.estimatedMashPhRoomTemp).toBeLessThan(14);
-    await app.close();
   });
 
   it("mash pH estimate decreases when Ca/Mg increase (RA-like)", async () => {
-    const app = buildApp();
-    await app.ready();
-
     const basePayload = {
       volumeLiters: 10,
       alkalinityPpmCaCO3: 150,
@@ -90,10 +85,7 @@ describe("water calc: mash acidification + salt additions", () => {
     const resLow = await app.inject({
       method: "POST",
       url: "/water-calc/mash-ph-estimate-v1",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: { ...basePayload, calciumPpm: 0, magnesiumPpm: 0 },
     });
     expect(resLow.statusCode).toBe(200);
@@ -101,10 +93,7 @@ describe("water calc: mash acidification + salt additions", () => {
     const resHigh = await app.inject({
       method: "POST",
       url: "/water-calc/mash-ph-estimate-v1",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: { ...basePayload, calciumPpm: 100, magnesiumPpm: 20 },
     });
     expect(resHigh.statusCode).toBe(200);
@@ -112,20 +101,13 @@ describe("water calc: mash acidification + salt additions", () => {
     const low = (resLow.json() as any).result.estimatedMashPhRoomTemp as number;
     const high = (resHigh.json() as any).result.estimatedMashPhRoomTemp as number;
     expect(high).toBeLessThan(low);
-
-    await app.close();
   });
 
   it("estimates mash pH v1 from DI pH + TA + alkalinity", async () => {
-    const app = buildApp();
-    await app.ready();
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/mash-ph-estimate-v1",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: {
         volumeLiters: 10,
         alkalinityPpmCaCO3: 50,
@@ -137,19 +119,13 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.ok).toBe(true);
     expect(body.result.estimatedMashPhRoomTemp).toBeGreaterThan(0);
     expect(body.result.estimatedMashPhRoomTemp).toBeLessThan(14);
-    await app.close();
   });
 
   it("solves acid amount for target mash pH (grist-driven)", async () => {
-    const app = buildApp();
-    await app.ready();
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/mash-acidification-target-mash-ph",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: {
         acidType: "lactic",
         strengthKind: "percent",
@@ -168,13 +144,9 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.result.acidRequiredMl).toBeGreaterThan(0);
     expect(body.result.estimatedMashPhRoomTemp).toBeTypeOf("number");
     expect(Math.abs(body.result.estimatedMashPhRoomTemp - 5.4)).toBeLessThan(0.05);
-    await app.close();
   });
 
   it("requires less acid for target mash pH when Ca/Mg increase (RA-like)", async () => {
-    const app = buildApp();
-    await app.ready();
-
     const basePayload = {
       acidType: "lactic",
       strengthKind: "percent",
@@ -189,10 +161,7 @@ describe("water calc: mash acidification + salt additions", () => {
     const resLow = await app.inject({
       method: "POST",
       url: "/water-calc/mash-acidification-target-mash-ph",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: { ...basePayload, calciumPpm: 0, magnesiumPpm: 0 },
     });
     expect(resLow.statusCode).toBe(200);
@@ -200,10 +169,7 @@ describe("water calc: mash acidification + salt additions", () => {
     const resHigh = await app.inject({
       method: "POST",
       url: "/water-calc/mash-acidification-target-mash-ph",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: { ...basePayload, calciumPpm: 120, magnesiumPpm: 30 },
     });
     expect(resHigh.statusCode).toBe(200);
@@ -211,20 +177,13 @@ describe("water calc: mash acidification + salt additions", () => {
     const low = (resLow.json() as any).result.acidRequiredMl as number;
     const high = (resHigh.json() as any).result.acidRequiredMl as number;
     expect(high).toBeLessThan(low);
-
-    await app.close();
   });
 
   it("computes salt additions", async () => {
-    const app = buildApp();
-    await app.ready();
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/salt-additions",
-      headers: {
-        "x-user-id": "00000000-0000-0000-0000-000000000001",
-        "x-account-id": "00000000-0000-0000-0000-0000000000a1",
-      },
+      headers: { cookie: cookieWithAccount },
       payload: {
         volumeLiters: 10,
         baseProfile: {
@@ -243,7 +202,6 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.ok).toBe(true);
     expect(body.result.resultingProfile.calcium).toBeGreaterThan(0);
     expect(body.result.resultingProfile.sulfate).toBeGreaterThan(0);
-    await app.close();
   });
 });
 

@@ -1,8 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import argon2 from "argon2";
 
 const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
 const DEV_ACCOUNT_ID = "00000000-0000-0000-0000-0000000000a1";
 const WATER_PROFILES_SOURCE = "brunwater_1_25";
+
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
 
 function slug(s: string) {
   return s
@@ -148,6 +153,61 @@ async function main() {
       role: "owner",
     },
   });
+
+  // Optional: seed an owner user with a *real* password for local dev.
+  // This is intentionally driven by env vars so secrets are not committed to the repo.
+  //
+  // Usage:
+  //   SEEDED_OWNER_EMAIL="..." SEEDED_OWNER_PASSWORD="..." docker compose exec -T api npm run db:seed
+  //
+  const seededOwnerEmailRaw = process.env.SEEDED_OWNER_EMAIL;
+  const seededOwnerPassword = process.env.SEEDED_OWNER_PASSWORD;
+  if (typeof seededOwnerEmailRaw === "string" && typeof seededOwnerPassword === "string") {
+    const seededOwnerEmail = normalizeEmail(seededOwnerEmailRaw);
+    if (seededOwnerEmail && seededOwnerEmail.includes("@") && seededOwnerPassword.length >= 8) {
+      const SEEDED_OWNER_ACCOUNT_ID = "00000000-0000-0000-0000-0000000000a2";
+
+      const passwordHash = await argon2.hash(seededOwnerPassword, { type: argon2.argon2id });
+      const user = await prisma.user.upsert({
+        where: { email: seededOwnerEmail },
+        create: { email: seededOwnerEmail, passwordHash, preferredLocale: "en" },
+        update: { passwordHash },
+        select: { id: true, email: true },
+      });
+
+      await prisma.account.upsert({
+        where: { id: SEEDED_OWNER_ACCOUNT_ID },
+        create: {
+          id: SEEDED_OWNER_ACCOUNT_ID,
+          name: "Seeded Owner Brewery",
+          members: {
+            create: {
+              userId: user.id,
+              role: "owner",
+            },
+          },
+        },
+        update: { name: "Seeded Owner Brewery" },
+      });
+
+      await prisma.accountMember.upsert({
+        where: {
+          accountId_userId: {
+            accountId: SEEDED_OWNER_ACCOUNT_ID,
+            userId: user.id,
+          },
+        },
+        create: { accountId: SEEDED_OWNER_ACCOUNT_ID, userId: user.id, role: "owner" },
+        update: { role: "owner" },
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(`Seeded owner login: ${user.email} (account: ${SEEDED_OWNER_ACCOUNT_ID})`);
+    } else {
+      // eslint-disable-next-line no-console
+      console.log("Skipping SEEDED_OWNER_*: invalid email or password too short.");
+    }
+  }
 
   for (const p of SYSTEM_WATER_PROFILES) {
     const key = profileKey(p.type, p.name);

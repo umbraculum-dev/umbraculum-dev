@@ -10,6 +10,15 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [ ] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
 - [ ] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
 
+## Authentication (real, production-ready)
+
+- [ ] Implement real auth end-to-end:
+  - [ ] Email/password **signup** + **login**
+  - [ ] **DB-backed sessions** with `sid` httpOnly cookie
+  - [ ] Persist `preferredLocale` from login/signup, and ensure locale-prefixed routes work for auth pages (`/en/...`, `/it/...`)
+  - [ ] “Active account” selection after login when user has multiple accounts
+- [ ] Add “i18n contributing” flow/tooling (recommended: Weblate) and keep translation catalogs maintained.
+
 ## Authentication (important)
 
 - [ ] **Dev-only header auth is temporary** (current approach):

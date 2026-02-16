@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
+import { createSessionForTestUser } from "./helpers/session.js";
 
 // Use test-only IDs so running tests doesn't pollute seeded dev data.
 const TEST_USER_ID = "11111111-1111-1111-1111-111111111111";
@@ -8,9 +9,25 @@ const TEST_ACCOUNT_B = "33333333-3333-3333-3333-333333333333";
 
 describe("recipes (account scoped)", () => {
   const app = buildApp();
+  let cookieA = "";
+  let cookieB = "";
+  let cookieNoAccount = "";
+  let accountAId = "";
+  let accountBId = "";
 
   beforeAll(async () => {
     await app.ready();
+
+    const sessA = await createSessionForTestUser(app, { activeAccount: true });
+    cookieA = sessA.cookie;
+    accountAId = sessA.accountId;
+
+    const sessB = await createSessionForTestUser(app, { activeAccount: true });
+    cookieB = sessB.cookie;
+    accountBId = sessB.accountId;
+
+    const sessNo = await createSessionForTestUser(app, { activeAccount: false });
+    cookieNoAccount = sessNo.cookie;
 
     await app.prisma.user.upsert({
       where: { id: TEST_USER_ID },
@@ -58,12 +75,12 @@ describe("recipes (account scoped)", () => {
     const res = await app.inject({
       method: "GET",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID },
+      headers: { cookie: cookieNoAccount },
     });
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
     expect(res.json()).toEqual({
       ok: false,
-      error: { code: "missing_account_id", message: "Missing header: X-Account-Id" },
+      error: { code: "missing_active_account", message: "No active account selected" },
     });
   });
 
@@ -71,7 +88,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: {
         name: "Test Recipe",
         style: "IPA",
@@ -89,7 +106,7 @@ describe("recipes (account scoped)", () => {
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
     expect(created.ok).toBe(true);
-    expect(created.recipe.accountId).toBe(TEST_ACCOUNT_A);
+    expect(created.recipe.accountId).toBe(accountAId);
     expect(created.recipe.gristJson).toEqual([
       {
         id: "row-1",
@@ -104,7 +121,7 @@ describe("recipes (account scoped)", () => {
     const list = await app.inject({
       method: "GET",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
     });
     expect(list.statusCode).toBe(200);
     const body = list.json() as any;
@@ -117,7 +134,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { name: "Scoped Recipe", style: null },
     });
     const created = create.json() as any;
@@ -127,7 +144,7 @@ describe("recipes (account scoped)", () => {
     const listB = await app.inject({
       method: "GET",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_B },
+      headers: { cookie: cookieB },
     });
     expect(listB.statusCode).toBe(200);
     const bodyB = listB.json() as any;
@@ -139,7 +156,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { name: "Editable Recipe", style: "Stout", notes: "Initial notes" },
     });
     expect(create.statusCode).toBe(200);
@@ -149,18 +166,18 @@ describe("recipes (account scoped)", () => {
     const getA = await app.inject({
       method: "GET",
       url: `/recipes/${created.recipe.id}`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
     });
     expect(getA.statusCode).toBe(200);
     const gotA = getA.json() as any;
     expect(gotA.ok).toBe(true);
-    expect(gotA.recipe.accountId).toBe(TEST_ACCOUNT_A);
+    expect(gotA.recipe.accountId).toBe(accountAId);
     expect(gotA.recipe.notes).toBe("Initial notes");
 
     const patchA = await app.inject({
       method: "PATCH",
       url: `/recipes/${created.recipe.id}`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { name: "Renamed Recipe", style: "Porter", notes: "Updated notes" },
     });
     expect(patchA.statusCode).toBe(200);
@@ -173,7 +190,7 @@ describe("recipes (account scoped)", () => {
     const getB = await app.inject({
       method: "GET",
       url: `/recipes/${created.recipe.id}`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_B },
+      headers: { cookie: cookieB },
     });
     expect(getB.statusCode).toBe(404);
     expect(getB.json()).toEqual({
@@ -186,7 +203,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { name: "Delete Me", style: null },
     });
     expect(create.statusCode).toBe(200);
@@ -196,7 +213,7 @@ describe("recipes (account scoped)", () => {
     const del = await app.inject({
       method: "DELETE",
       url: `/recipes/${created.recipe.id}`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
     });
     expect(del.statusCode).toBe(200);
     expect(del.json()).toEqual({ ok: true });
@@ -204,7 +221,7 @@ describe("recipes (account scoped)", () => {
     const get = await app.inject({
       method: "GET",
       url: `/recipes/${created.recipe.id}`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
     });
     expect(get.statusCode).toBe(404);
   });
@@ -213,7 +230,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: { name: "Delete Scoped", style: null },
     });
     expect(create.statusCode).toBe(200);
@@ -223,7 +240,7 @@ describe("recipes (account scoped)", () => {
     const delWrong = await app.inject({
       method: "DELETE",
       url: `/recipes/${created.recipe.id}`,
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_B },
+      headers: { cookie: cookieB },
     });
     expect(delWrong.statusCode).toBe(404);
     expect(delWrong.json()).toEqual({
@@ -236,7 +253,7 @@ describe("recipes (account scoped)", () => {
     const res = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: {
         name: "Bad grist",
         gristJson: [{ id: "x", name: "Malt", amountKg: -1, colorLovibond: 2, potential: null }],
@@ -265,7 +282,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: {
         name: "Roast dehusked snapshot recipe",
         gristJson: [
@@ -314,7 +331,7 @@ describe("recipes (account scoped)", () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: {
         name: "Yeast snapshot recipe",
         yeastJson: [
@@ -350,7 +367,7 @@ describe("recipes (account scoped)", () => {
     const res = await app.inject({
       method: "POST",
       url: "/recipes",
-      headers: { "x-user-id": TEST_USER_ID, "x-account-id": TEST_ACCOUNT_A },
+      headers: { cookie: cookieA },
       payload: {
         name: "Bad yeast",
         yeastJson: [

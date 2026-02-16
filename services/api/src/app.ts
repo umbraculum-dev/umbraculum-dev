@@ -1,8 +1,10 @@
 import Fastify from "fastify";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
+import { sessionAuthPlugin } from "./plugins/sessionAuth.js";
 import { errorHandlerPlugin } from "./plugins/errorHandler.js";
 import { healthRoutes } from "./routes/health.js";
+import { authRoutes } from "./routes/auth.js";
 import { accountsRoutes } from "./routes/accounts.js";
 import { recipesRoutes } from "./routes/recipes.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
@@ -15,9 +17,11 @@ export function buildApp() {
 
   app.register(errorHandlerPlugin);
   app.register(prismaPlugin);
+  app.register(sessionAuthPlugin);
   app.register(requestContextPlugin);
 
   app.register(healthRoutes);
+  app.register(authRoutes);
   app.register(accountsRoutes);
   app.register(recipesRoutes);
   app.register(waterProfilesRoutes);
