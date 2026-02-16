@@ -805,7 +805,6 @@ export default function RecipeEditPage() {
                                       value={r.producer ?? ""}
                                       readOnly
                                       style={{ width: "100%", padding: 8 }}
-                                      tabIndex={-1}
                                     />
                                   </div>
                                   <div style={{ minWidth: 0 }}>
@@ -817,7 +816,6 @@ export default function RecipeEditPage() {
                                       value={r.group ?? ""}
                                       readOnly
                                       style={{ width: "100%", padding: 8 }}
-                                      tabIndex={-1}
                                     />
                                   </div>
                                   <div style={{ alignSelf: "start" }}>
@@ -1217,7 +1215,6 @@ export default function RecipeEditPage() {
                                       value={r.country ?? ""}
                                       readOnly
                                       style={{ width: "100%", padding: 8 }}
-                                      tabIndex={-1}
                                     />
                                   </div>
                                   <div style={{ flex: "0 0 auto" }}>
@@ -1449,7 +1446,6 @@ export default function RecipeEditPage() {
                                     value={r.lab ?? ""}
                                     readOnly
                                     style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
                                   />
                                 </div>
                                 <div style={{ width: 160, maxWidth: "100%" }}>
@@ -1461,7 +1457,6 @@ export default function RecipeEditPage() {
                                     value={r.productId ?? ""}
                                     readOnly
                                     style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
                                   />
                                 </div>
                                 <div style={{ width: 160, maxWidth: "100%" }}>
@@ -1473,7 +1468,6 @@ export default function RecipeEditPage() {
                                     value={typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
                                     readOnly
                                     style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
                                   />
                                 </div>
                                 <div style={{ width: 160, maxWidth: "100%" }}>
@@ -1485,7 +1479,6 @@ export default function RecipeEditPage() {
                                     value={typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
                                     readOnly
                                     style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
                                   />
                                 </div>
                                 <div style={{ flex: "0 0 auto" }}>
