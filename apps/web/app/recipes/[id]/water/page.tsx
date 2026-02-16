@@ -80,6 +80,7 @@ export default function WaterHubPage() {
     volumeLiters: number | null;
     ph: number | null;
     finalAlkalinityPpmCaCO3: number | null;
+    saltsAddedLabel: string | null;
     acidType: string | null;
     acidAmountLabel: string | null;
     ionsAfterAcid: IonProfilePpm | null;
@@ -87,6 +88,42 @@ export default function WaterHubPage() {
 
   const recap = useMemo(() => {
     if (!settings) return null;
+
+    const formatSaltKeyLabel = (saltKey: string): string => {
+      switch (saltKey) {
+        case "gypsum":
+          return "Gypsum";
+        case "calcium_chloride":
+          return "Calcium chloride";
+        case "epsom":
+          return "Epsom";
+        case "table_salt":
+          return "Table salt";
+        case "baking_soda":
+          return "Baking soda";
+        default:
+          return saltKey;
+      }
+    };
+
+    const parseSaltsBreakdownLabel = (v: unknown): string | null => {
+      if (!v || typeof v !== "object") return null;
+      const o = v as any;
+      const b = o?.result?.breakdown;
+      if (!Array.isArray(b)) return null;
+
+      const parts: string[] = [];
+      for (const row of b) {
+        if (!row || typeof row !== "object") continue;
+        const r = row as any;
+        const saltKey = typeof r.saltKey === "string" ? r.saltKey : null;
+        const grams = typeof r.grams === "number" && Number.isFinite(r.grams) ? r.grams : null;
+        if (!saltKey || grams == null || !(grams > 0)) continue;
+        parts.push(`${formatSaltKeyLabel(saltKey)} ${grams.toFixed(3)} g`);
+      }
+
+      return parts.length ? parts.join("; ") : null;
+    };
 
     const parseSaltsResultingProfile = (v: unknown): IonProfilePpm | null => {
       if (!v || typeof v !== "object") return null;
@@ -116,6 +153,7 @@ export default function WaterHubPage() {
     const mashPh = overall?.ph?.value ?? null;
     const mashFinalAlk = overall?.finalAlkalinityPpmCaCO3 ?? null;
     const mashIonsAfterAcid = overall?.ionsPpm ?? null;
+    const mashSaltsAddedLabel = parseSaltsBreakdownLabel(settings.mashSaltsLastResultJson);
     const mashAcidAmountLabel =
       settings.mashAcidificationMode === "manual"
         ? settings.mashStrengthKind === "solid"
@@ -141,6 +179,7 @@ export default function WaterHubPage() {
           ? settings.spargeTargetPh
           : null;
     const spargeFinalAlk = settings.spargeLastFinalAlkalinityPpmCaCO3 ?? null;
+    const spargeSaltsAddedLabel = parseSaltsBreakdownLabel(settings.spargeSaltsLastResultJson);
     const spargeAfterSalts = parseSaltsResultingProfile(settings.spargeSaltsLastResultJson);
     const spargeIonsAfterAcid =
       spargeAfterSalts && spargeFinalAlk != null
@@ -179,6 +218,7 @@ export default function WaterHubPage() {
           ? settings.boilTargetPh
           : null;
     const boilFinalAlk = settings.boilLastFinalAlkalinityPpmCaCO3 ?? null;
+    const boilSaltsAddedLabel = parseSaltsBreakdownLabel(settings.boilSaltsLastResultJson);
     const boilAfterSalts = parseSaltsResultingProfile(settings.boilSaltsLastResultJson);
     const boilIonsAfterAcid =
       boilAfterSalts && boilFinalAlk != null
@@ -215,6 +255,7 @@ export default function WaterHubPage() {
         volumeLiters: mashVolumeLiters,
         ph: mashPh,
         finalAlkalinityPpmCaCO3: mashFinalAlk,
+        saltsAddedLabel: mashSaltsAddedLabel,
         acidType: settings.mashAcidType ?? null,
         acidAmountLabel: mashAcidAmountLabel,
         ionsAfterAcid: mashIonsAfterAcid,
@@ -225,6 +266,7 @@ export default function WaterHubPage() {
         volumeLiters: spargeVolumeLiters,
         ph: spargePh,
         finalAlkalinityPpmCaCO3: spargeFinalAlk,
+        saltsAddedLabel: spargeSaltsAddedLabel,
         acidType: settings.spargeAcidType ?? null,
         acidAmountLabel: spargeAcidAmountLabel,
         ionsAfterAcid: spargeIonsAfterAcid,
@@ -235,6 +277,7 @@ export default function WaterHubPage() {
         volumeLiters: boilVolumeLiters,
         ph: boilPh,
         finalAlkalinityPpmCaCO3: boilFinalAlk,
+        saltsAddedLabel: boilSaltsAddedLabel,
         acidType: settings.boilAcidType ?? null,
         acidAmountLabel: boilAcidAmountLabel,
         ionsAfterAcid: boilIonsAfterAcid,
@@ -381,25 +424,22 @@ export default function WaterHubPage() {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th align="left">Stream</th>
-                        <th align="right">Volume (L)</th>
-                        <th align="right">pH</th>
-                        <th align="right">Final alkalinity (ppm as CaCO3)</th>
-                        <th align="left">Acid</th>
+                        <th style={{ textAlign: "left" }}>Stream</th>
+                        <th style={{ textAlign: "left" }}>Volume (L)</th>
+                        <th style={{ textAlign: "left" }}>pH</th>
+                        <th style={{ textAlign: "left" }}>Final alkalinity (ppm as CaCO3)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recap.streams.map((s) => (
-                        <tr key={s.key}>
-                          <td>{s.label}</td>
-                          <td align="right">{s.volumeLiters == null ? "—" : s.volumeLiters.toFixed(2)}</td>
-                          <td align="right">{s.ph == null ? "—" : s.ph.toFixed(2)}</td>
-                          <td align="right">
-                            {s.finalAlkalinityPpmCaCO3 == null ? "—" : s.finalAlkalinityPpmCaCO3.toFixed(2)}
+                        <tr key={`${s.key}-summary`}>
+                          <td style={{ textAlign: "left" }}>
+                            <strong>{s.label}</strong>
                           </td>
-                          <td>
-                            {s.acidType ? <code>{s.acidType}</code> : "—"}{" "}
-                            {s.acidAmountLabel ? <span className="muted">· {s.acidAmountLabel}</span> : null}
+                          <td style={{ textAlign: "left" }}>{s.volumeLiters == null ? "—" : s.volumeLiters.toFixed(2)}</td>
+                          <td style={{ textAlign: "left" }}>{s.ph == null ? "—" : s.ph.toFixed(2)}</td>
+                          <td style={{ textAlign: "left" }}>
+                            {s.finalAlkalinityPpmCaCO3 == null ? "—" : s.finalAlkalinityPpmCaCO3.toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -421,8 +461,40 @@ export default function WaterHubPage() {
                   </li>
                 </ul>
 
+                <h4 style={{ marginTop: 12, marginBottom: 6 }}>Additions (per stream)</h4>
+                <ul style={{ marginTop: 0 }}>
+                  {recap.streams.map((s) => (
+                    <li key={`adds-${s.key}`}>
+                      <strong>{s.label}</strong>
+                      <ul style={{ marginTop: 6 }}>
+                        {(s.saltsAddedLabel ? s.saltsAddedLabel.split("; ") : []).length ? (
+                          (s.saltsAddedLabel as string).split("; ").map((p) => (
+                            <li key={`adds-${s.key}-salt-${p}`}>
+                              <span className="muted">Salt</span> <code>{p}</code>
+                            </li>
+                          ))
+                        ) : (
+                          <li>
+                            <span className="muted">Salt</span> <code>—</code>
+                          </li>
+                        )}
+                        <li>
+                          <span className="muted">Acid</span>{" "}
+                          <code>{s.acidType ?? "—"}</code>
+                          {s.acidAmountLabel ? <span className="muted"> · {s.acidAmountLabel}</span> : null}
+                        </li>
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+
                 {recap.mergedIons ? (
-                  <div style={{ overflowX: "auto", marginTop: 8 }}>
+                  <>
+                    <p className="muted" style={{ marginTop: 8, marginBottom: 8 }}>
+                      Merged ions (ppm) are computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl
+                      counter-ions only) and averaged by volume. Streams without saved snapshots are excluded.
+                    </p>
+                    <div style={{ overflowX: "auto", marginTop: 8 }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
                         <tr>
@@ -449,6 +521,7 @@ export default function WaterHubPage() {
                       </tbody>
                     </table>
                   </div>
+                  </>
                 ) : (
                   <p className="muted" style={{ marginTop: 8 }}>
                     No merged profile available yet (need saved salts + acid snapshots for at least one stream).
