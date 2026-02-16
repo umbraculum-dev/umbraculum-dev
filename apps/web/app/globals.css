@@ -181,6 +181,22 @@ code {
   color: var(--text-muted);
 }
 
+.ingredientCard {
+  background: color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.ingredientCard + .ingredientCard {
+  margin-top: 12px;
+}
+
+.ingredientCardLabel {
+  display: block;
+  font-size: 12px;
+}
+
 .fieldBlock {
   border: 1px solid var(--border);
   border-radius: var(--radius);

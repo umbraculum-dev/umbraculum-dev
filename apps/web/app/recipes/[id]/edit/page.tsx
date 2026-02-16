@@ -758,88 +758,80 @@ export default function RecipeEditPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <tbody>
                     {gristRows.map((r, idx) => {
-                      const borderTop = idx === 0 ? undefined : "1px solid rgba(255,255,255,0.08)";
                       return (
                         <Fragment key={r.id}>
                           <tr>
-                            <td colSpan={7} style={{ paddingTop: 8, borderTop }}>
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gap: 12,
-                                  alignItems: "end",
-                                  gridTemplateColumns:
-                                    "minmax(240px, 1fr) minmax(100px, 140px) minmax(100px, 140px) auto",
-                                }}
-                              >
-                                <div style={{ minWidth: 0 }}>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-name-${r.id}`}>
-                                    Name
-                                  </label>
-                                  <input
-                                    id={`grist-name-${r.id}`}
-                                    value={r.name}
-                                    onChange={(e) =>
-                                      updateGristRow(r.id, {
-                                        name: e.target.value,
-                                        ingredientId: null,
-                                        producer: null,
-                                        group: null,
-                                        mashDiPh: null,
-                                        mashTaToPh57_mEqPerKg: null,
-                                        mashRoastDehuskedOverride: null,
-                                        mashRoastDehuskedSource: "unknown",
-                                        mashPhModelSource: "unknown",
-                                      })
-                                    }
-                                    style={{ width: "100%", padding: 8 }}
-                                    autoComplete="off"
-                                  />
+                            <td colSpan={7} style={{ paddingTop: idx === 0 ? 0 : 12 }}>
+                              <div className="ingredientCard">
+                                <div
+                                  style={{
+                                    display: "grid",
+                                    gap: 12,
+                                    alignItems: "end",
+                                    gridTemplateColumns:
+                                      "minmax(240px, 1fr) minmax(100px, 140px) minmax(100px, 140px) auto",
+                                  }}
+                                >
+                                  <div style={{ minWidth: 0 }}>
+                                    <label className="muted ingredientCardLabel" htmlFor={`grist-name-${r.id}`}>
+                                      Name
+                                    </label>
+                                    <input
+                                      id={`grist-name-${r.id}`}
+                                      value={r.name}
+                                      onChange={(e) =>
+                                        updateGristRow(r.id, {
+                                          name: e.target.value,
+                                          ingredientId: null,
+                                          producer: null,
+                                          group: null,
+                                          mashDiPh: null,
+                                          mashTaToPh57_mEqPerKg: null,
+                                          mashRoastDehuskedOverride: null,
+                                          mashRoastDehuskedSource: "unknown",
+                                          mashPhModelSource: "unknown",
+                                        })
+                                      }
+                                      style={{ width: "100%", padding: 8 }}
+                                      autoComplete="off"
+                                    />
+                                  </div>
+                                  <div style={{ minWidth: 0 }}>
+                                    <label className="muted ingredientCardLabel" htmlFor={`grist-producer-${r.id}`}>
+                                      Producer
+                                    </label>
+                                    <input
+                                      id={`grist-producer-${r.id}`}
+                                      value={r.producer ?? ""}
+                                      readOnly
+                                      style={{ width: "100%", padding: 8 }}
+                                      tabIndex={-1}
+                                    />
+                                  </div>
+                                  <div style={{ minWidth: 0 }}>
+                                    <label className="muted ingredientCardLabel" htmlFor={`grist-group-${r.id}`}>
+                                      Group
+                                    </label>
+                                    <input
+                                      id={`grist-group-${r.id}`}
+                                      value={r.group ?? ""}
+                                      readOnly
+                                      style={{ width: "100%", padding: 8 }}
+                                      tabIndex={-1}
+                                    />
+                                  </div>
+                                  <div style={{ alignSelf: "start" }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeGristRow(r.id)}
+                                      aria-label={`Remove fermentable row ${idx + 1}`}
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
                                 </div>
-                                <div style={{ minWidth: 0 }}>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12 }}
-                                    htmlFor={`grist-producer-${r.id}`}
-                                  >
-                                    Producer
-                                  </label>
-                                  <input
-                                    id={`grist-producer-${r.id}`}
-                                    value={r.producer ?? ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
-                                  />
-                                </div>
-                                <div style={{ minWidth: 0 }}>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12 }}
-                                    htmlFor={`grist-group-${r.id}`}
-                                  >
-                                    Group
-                                  </label>
-                                  <input
-                                    id={`grist-group-${r.id}`}
-                                    value={r.group ?? ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
-                                  />
-                                </div>
-                                <div style={{ alignSelf: "start" }}>
-                                  <button type="button" onClick={() => removeGristRow(r.id)} aria-label={`Remove fermentable row ${idx + 1}`}>
-                                    Remove
-                                  </button>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
 
-                          <tr>
-                            <td colSpan={7} style={{ paddingBottom: 8 }}>
-                              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+                                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
                                 <div>
                                   <label
                                     className="muted"
@@ -1093,6 +1085,7 @@ export default function RecipeEditPage() {
                                   </details>
                                 </div>
                               </div>
+                              </div>
                             </td>
                           </tr>
                         </Fragment>
@@ -1195,50 +1188,50 @@ export default function RecipeEditPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <tbody>
                     {hopsRows.map((r, idx) => {
-                      const borderTop = idx === 0 ? undefined : "1px solid rgba(255,255,255,0.08)";
                       return (
                         <Fragment key={r.id}>
                           <tr>
-                            <td colSpan={6} style={{ paddingTop: 8, borderTop }}>
-                              <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-                                <div style={{ flex: 1, minWidth: 280 }}>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`hop-name-${r.id}`}>
-                                    Name
-                                  </label>
-                                  <input
-                                    id={`hop-name-${r.id}`}
-                                    value={r.name}
-                                    onChange={(e) =>
-                                      updateHopRow(r.id, { name: e.target.value, ingredientId: null, country: null })
-                                    }
-                                    style={{ width: "100%", padding: 8 }}
-                                    autoComplete="off"
-                                  />
+                            <td colSpan={6} style={{ paddingTop: idx === 0 ? 0 : 12 }}>
+                              <div className="ingredientCard">
+                                <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
+                                  <div style={{ flex: 1, minWidth: 280 }}>
+                                    <label className="muted ingredientCardLabel" htmlFor={`hop-name-${r.id}`}>
+                                      Name
+                                    </label>
+                                    <input
+                                      id={`hop-name-${r.id}`}
+                                      value={r.name}
+                                      onChange={(e) =>
+                                        updateHopRow(r.id, { name: e.target.value, ingredientId: null, country: null })
+                                      }
+                                      style={{ width: "100%", padding: 8 }}
+                                      autoComplete="off"
+                                    />
+                                  </div>
+                                  <div style={{ width: 240, maxWidth: "100%" }}>
+                                    <label className="muted ingredientCardLabel" htmlFor={`hop-country-${r.id}`}>
+                                      Country
+                                    </label>
+                                    <input
+                                      id={`hop-country-${r.id}`}
+                                      value={r.country ?? ""}
+                                      readOnly
+                                      style={{ width: "100%", padding: 8 }}
+                                      tabIndex={-1}
+                                    />
+                                  </div>
+                                  <div style={{ flex: "0 0 auto" }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeHopRow(r.id)}
+                                      aria-label={`Remove hop row ${idx + 1}`}
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
                                 </div>
-                                <div style={{ width: 240, maxWidth: "100%" }}>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`hop-country-${r.id}`}>
-                                    Country
-                                  </label>
-                                  <input
-                                    id={`hop-country-${r.id}`}
-                                    value={r.country ?? ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                    tabIndex={-1}
-                                  />
-                                </div>
-                                <div style={{ flex: "0 0 auto" }}>
-                                  <button type="button" onClick={() => removeHopRow(r.id)} aria-label={`Remove hop row ${idx + 1}`}>
-                                    Remove
-                                  </button>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
 
-                          <tr>
-                            <td colSpan={6} style={{ paddingBottom: 8 }}>
-                              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+                                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
                                 <div>
                                   <label
                                     className="muted"
@@ -1317,6 +1310,7 @@ export default function RecipeEditPage() {
                                     style={{ width: 110, padding: 8 }}
                                   />
                                 </div>
+                              </div>
                               </div>
                             </td>
                           </tr>
@@ -1420,92 +1414,89 @@ export default function RecipeEditPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <tbody>
                     {yeastRows.map((r, idx) => {
-                      const borderTop = idx === 0 ? undefined : "1px solid rgba(255,255,255,0.08)";
                       return (
                         <tr key={r.id}>
-                          <td colSpan={2} style={{ paddingTop: 8, paddingBottom: 8, borderTop }}>
-                            <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-                              <div style={{ flex: 1, minWidth: 280 }}>
-                                <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`yeast-name-${r.id}`}>
-                                  Name
-                                </label>
-                                <input
-                                  id={`yeast-name-${r.id}`}
-                                  value={r.name}
-                                  onChange={(e) =>
-                                    updateYeastRow(r.id, {
-                                      name: e.target.value,
-                                      ingredientId: null,
-                                      lab: null,
-                                      productId: null,
-                                      attenuationMin: null,
-                                      attenuationMax: null,
-                                    })
-                                  }
-                                  style={{ width: "100%", padding: 8 }}
-                                  autoComplete="off"
-                                />
-                              </div>
-                              <div style={{ width: 240, maxWidth: "100%" }}>
-                                <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`yeast-lab-${r.id}`}>
-                                  Lab
-                                </label>
-                                <input
-                                  id={`yeast-lab-${r.id}`}
-                                  value={r.lab ?? ""}
-                                  readOnly
-                                  style={{ width: "100%", padding: 8 }}
-                                  tabIndex={-1}
-                                />
-                              </div>
-                              <div style={{ width: 160, maxWidth: "100%" }}>
-                                <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`yeast-product-${r.id}`}>
-                                  Product ID
-                                </label>
-                                <input
-                                  id={`yeast-product-${r.id}`}
-                                  value={r.productId ?? ""}
-                                  readOnly
-                                  style={{ width: "100%", padding: 8 }}
-                                  tabIndex={-1}
-                                />
-                              </div>
-                              <div style={{ width: 160, maxWidth: "100%" }}>
-                                <label
-                                  className="muted"
-                                  style={{ display: "block", fontSize: 12 }}
-                                  htmlFor={`yeast-atten-min-${r.id}`}
-                                >
-                                  Atten min (%)
-                                </label>
-                                <input
-                                  id={`yeast-atten-min-${r.id}`}
-                                  value={typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
-                                  readOnly
-                                  style={{ width: "100%", padding: 8 }}
-                                  tabIndex={-1}
-                                />
-                              </div>
-                              <div style={{ width: 160, maxWidth: "100%" }}>
-                                <label
-                                  className="muted"
-                                  style={{ display: "block", fontSize: 12 }}
-                                  htmlFor={`yeast-atten-max-${r.id}`}
-                                >
-                                  Atten max (%)
-                                </label>
-                                <input
-                                  id={`yeast-atten-max-${r.id}`}
-                                  value={typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
-                                  readOnly
-                                  style={{ width: "100%", padding: 8 }}
-                                  tabIndex={-1}
-                                />
-                              </div>
-                              <div style={{ flex: "0 0 auto" }}>
-                                <button type="button" onClick={() => removeYeastRow(r.id)} aria-label={`Remove yeast row ${idx + 1}`}>
-                                  Remove
-                                </button>
+                          <td colSpan={2} style={{ paddingTop: idx === 0 ? 0 : 12 }}>
+                            <div className="ingredientCard">
+                              <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
+                                <div style={{ flex: 1, minWidth: 280 }}>
+                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-name-${r.id}`}>
+                                    Name
+                                  </label>
+                                  <input
+                                    id={`yeast-name-${r.id}`}
+                                    value={r.name}
+                                    onChange={(e) =>
+                                      updateYeastRow(r.id, {
+                                        name: e.target.value,
+                                        ingredientId: null,
+                                        lab: null,
+                                        productId: null,
+                                        attenuationMin: null,
+                                        attenuationMax: null,
+                                      })
+                                    }
+                                    style={{ width: "100%", padding: 8 }}
+                                    autoComplete="off"
+                                  />
+                                </div>
+                                <div style={{ width: 240, maxWidth: "100%" }}>
+                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-lab-${r.id}`}>
+                                    Lab
+                                  </label>
+                                  <input
+                                    id={`yeast-lab-${r.id}`}
+                                    value={r.lab ?? ""}
+                                    readOnly
+                                    style={{ width: "100%", padding: 8 }}
+                                    tabIndex={-1}
+                                  />
+                                </div>
+                                <div style={{ width: 160, maxWidth: "100%" }}>
+                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-product-${r.id}`}>
+                                    Product ID
+                                  </label>
+                                  <input
+                                    id={`yeast-product-${r.id}`}
+                                    value={r.productId ?? ""}
+                                    readOnly
+                                    style={{ width: "100%", padding: 8 }}
+                                    tabIndex={-1}
+                                  />
+                                </div>
+                                <div style={{ width: 160, maxWidth: "100%" }}>
+                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-atten-min-${r.id}`}>
+                                    Atten min (%)
+                                  </label>
+                                  <input
+                                    id={`yeast-atten-min-${r.id}`}
+                                    value={typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
+                                    readOnly
+                                    style={{ width: "100%", padding: 8 }}
+                                    tabIndex={-1}
+                                  />
+                                </div>
+                                <div style={{ width: 160, maxWidth: "100%" }}>
+                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-atten-max-${r.id}`}>
+                                    Atten max (%)
+                                  </label>
+                                  <input
+                                    id={`yeast-atten-max-${r.id}`}
+                                    value={typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
+                                    readOnly
+                                    style={{ width: "100%", padding: 8 }}
+                                    tabIndex={-1}
+                                  />
+                                </div>
+                                <div style={{ flex: "0 0 auto" }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeYeastRow(r.id)}
+                                    aria-label={`Remove yeast row ${idx + 1}`}
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </td>
@@ -1532,6 +1523,11 @@ export default function RecipeEditPage() {
             <h2 id="other-heading" style={{ marginTop: 0 }}>
               Other ingredients
             </h2>
+            <div className="ingredientCard" style={{ marginTop: 12 }}>
+              <p className="muted" style={{ margin: 0 }}>
+                Not implemented yet. When we add this section, entries will use the same ingredient card layout as fermentables/hops/yeast.
+              </p>
+            </div>
           </section>
 
           <section id="notes" className="panel" aria-labelledby="notes-heading">
