@@ -16,5 +16,10 @@ This repository is the start of a BrewersFriend-style product: a **desktop-first
 - **Testing**: Vitest (unit), Playwright (web e2e)
 - **Mobile (later)**: React Native + Expo + TypeScript (+ SQLite on-device)
 
+## Internationalization (i18n)
+
+- The web app uses **locale-prefixed routing**: `/en/...` and `/it/...` (default: `en`).
+- User-facing UI text should be sourced from `apps/web/messages/*.json` (no new hard-coded JSX strings).
+
 This README will be expanded as implementation lands.
 

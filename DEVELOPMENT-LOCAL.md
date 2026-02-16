@@ -109,6 +109,19 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - **JSDoc**: required on exported/shared contracts when semantics aren’t obvious (units, ranges, invariants).
   - More detail: `docs/CODING-STANDARDS.md`
 
+- **Internationalization / i18n (MANDATORY for all user-facing web UI)**
+  - **Routing**: all app routes are **locale-prefixed**: `/en/...`, `/it/...` (default: `en`). Unprefixed URLs are redirected by middleware.
+  - **No hard-coded UI strings**: do not add new user-facing text inline in JSX.
+    - Put strings in `apps/web/messages/en.json` and `apps/web/messages/it.json`.
+    - Use `useTranslations('namespace')` and `t('key')` (or `t.rich(...)` when you need markup).
+  - **Locale-aware links**: use `apps/web/src/i18n/navigation.ts` `Link` instead of `next/link` for app navigation (keeps locale correct).
+  - **Numbers**: prefer `apps/web/src/i18n/format.ts` helpers (e.g. `formatFixed(locale, value, 2)`) instead of `toFixed()` so decimals can localize.
+  - **Add routes under locale**: new pages should live under `apps/web/app/[locale]/...` (or use a locale wrapper that re-exports an existing non-locale page when needed for incremental migration).
+  - **Config files**:
+    - `apps/web/middleware.ts` controls locale prefix + cookie.
+    - `apps/web/i18n/request.ts` provides `next-intl` request config + message loading.
+    - `apps/web/next.config.js` must keep the `next-intl` plugin enabled.
+
 - **Reverts (MANDATORY protocol)**:
   - Before reverting any change(s), the assistant must provide a short list of exactly what will be reverted (files + a brief description).
   - The assistant must then wait for explicit confirmation before proceeding with the revert.
