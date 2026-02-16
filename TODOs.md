@@ -15,6 +15,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [ ] Implement real auth end-to-end:
   - [ ] Email/password **signup** + **login**
   - [ ] **DB-backed sessions** with `sid` httpOnly cookie
+  - [ ] Add a scheduled cleanup job: `DELETE FROM "Session" WHERE "expiresAt" < now()` to prevent unbounded growth (indexed by `expiresAt`).
   - [ ] Persist `preferredLocale` from login/signup, and ensure locale-prefixed routes work for auth pages (`/en/...`, `/it/...`)
   - [ ] “Active account” selection after login when user has multiple accounts
 - [ ] Add “i18n contributing” flow/tooling (recommended: Weblate) and keep translation catalogs maintained.
