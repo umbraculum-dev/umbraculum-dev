@@ -10,7 +10,11 @@ import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { apiFetch, type MeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
-import { bicarbonatePpmToAlkalinityPpmCaCO3 } from "../_lib/waterChem";
+import {
+  bicarbonatePpmToAlkalinityPpmCaCO3,
+  combineAfterSaltsAndAcid,
+  mixIonProfilesByVolume,
+} from "../_lib/waterChem";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -297,18 +301,31 @@ export default function MashWaterPage() {
     if (!selectedSource || !selectedDilution) return null;
     const tap = Math.max(0, Number(tapVolumeLiters) || 0);
     const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
-    const total = tap + dil;
-    if (total <= 0) return null;
-    const mix = (a: number, b: number) => (a * tap + b * dil) / total;
+    const mixed = mixIonProfilesByVolume(
+      {
+        calcium: selectedSource.calcium,
+        magnesium: selectedSource.magnesium,
+        sodium: selectedSource.sodium,
+        sulfate: selectedSource.sulfate,
+        chloride: selectedSource.chloride,
+        bicarbonate: selectedSource.bicarbonate,
+      },
+      tap,
+      {
+        calcium: selectedDilution.calcium,
+        magnesium: selectedDilution.magnesium,
+        sodium: selectedDilution.sodium,
+        sulfate: selectedDilution.sulfate,
+        chloride: selectedDilution.chloride,
+        bicarbonate: selectedDilution.bicarbonate,
+      },
+      dil,
+    );
+    if (!mixed) return null;
     return {
       name: `Mixed (${selectedSource.name} + ${selectedDilution.name})`,
-      totalVolumeLiters: total,
-      calcium: mix(selectedSource.calcium, selectedDilution.calcium),
-      magnesium: mix(selectedSource.magnesium, selectedDilution.magnesium),
-      sodium: mix(selectedSource.sodium, selectedDilution.sodium),
-      sulfate: mix(selectedSource.sulfate, selectedDilution.sulfate),
-      chloride: mix(selectedSource.chloride, selectedDilution.chloride),
-      bicarbonate: mix(selectedSource.bicarbonate, selectedDilution.bicarbonate),
+      totalVolumeLiters: tap + dil,
+      ...mixed,
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
 
@@ -591,14 +608,19 @@ export default function MashWaterPage() {
 
     if (!acid) throw new Error("No acid result available.");
 
-    const ionsPpm: IonProfilePpm = {
-      calcium: salts.resultingProfile.calcium,
-      magnesium: salts.resultingProfile.magnesium,
-      sodium: salts.resultingProfile.sodium,
-      sulfate: salts.resultingProfile.sulfate + acid.sulfateAddedPpm,
-      chloride: salts.resultingProfile.chloride + acid.chlorideAddedPpm,
-      bicarbonate: salts.resultingProfile.bicarbonate,
-    };
+    // Table conventions:
+    // - Salts affect ions directly (mass-balance on ppm).
+    // - Acid affects SO4/Cl via counter-ions (sulfuric/HCl).
+    // - Acid affects alkalinity; for ion-table HCO3 display we derive from final alkalinity (clamped >= 0).
+    const ionsPpm: IonProfilePpm = combineAfterSaltsAndAcid({
+      afterSalts: salts.resultingProfile,
+      acidResult: acid,
+    });
+
+    // For debugging only: alkalinity after salts (before acid), derived from salts bicarbonate.
+    const alkalinityAfterSaltsPpmCaCO3 = bicarbonatePpmToAlkalinityPpmCaCO3(
+      salts.resultingProfile.bicarbonate,
+    );
 
     const nowIso = new Date().toISOString();
     const overall: MashOverallResultV0 = {
@@ -608,7 +630,7 @@ export default function MashWaterPage() {
       ph: { kind: phKind, value: phValue },
       debug: {
         startingAlkalinityPpmCaCO3: mashStartingAlk,
-        startingAlkalinityAfterSaltsPpmCaCO3: bicarbonatePpmToAlkalinityPpmCaCO3(ionsPpm.bicarbonate),
+        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
         saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
         acidSulfateAddedPpm: acid.sulfateAddedPpm,
         acidChlorideAddedPpm: acid.chlorideAddedPpm,
@@ -1209,8 +1231,12 @@ export default function MashWaterPage() {
           ) : null}
 
           {mashAcidificationMode === "manual" && mashManualResult ? (
-            <div style={{ marginTop: 12 }}>
-              <h3 style={{ marginTop: 0 }}>Result (manual acid amount mode)</h3>
+            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                <strong>Result (manual acid amount mode)</strong>
+                <span className="fieldBadge">Computed</span>
+                <span className="muted">Estimated from manual acid amount</span>
+              </summary>
               <ul>
                 <li>
                   Estimated achieved pH: <code>{mashManualResult.achievedPh.toFixed(3)}</code>
@@ -1231,7 +1257,7 @@ export default function MashWaterPage() {
                   Chloride added: <code>{mashManualResult.predicted.chlorideAddedPpm.toFixed(3)}</code> ppm
                 </li>
               </ul>
-            </div>
+            </details>
           ) : null}
 
           <hr style={{ margin: "16px 0" }} />
@@ -1315,7 +1341,7 @@ export default function MashWaterPage() {
           <hr style={{ margin: "16px 0" }} />
 
           <h3 id="overall-mash-water-result" style={{ marginTop: 0 }}>
-            Overall mash water result (v0)
+            Overall mash water result (v0, HCO3 derived from alkalinity)
           </h3>
           <p className="muted" style={{ marginTop: 0 }}>
             Click <strong>Calculate overall</strong> to preview, or <strong>Calculate + Save</strong> to persist a snapshot.

@@ -1,0 +1,1165 @@
+"use client";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+
+import { loadDevAuthFromStorage, type DevAuth } from "../../../../_lib/devAuth";
+import { ModeFieldset } from "../_components/ModeFieldset";
+import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
+import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
+import type { IonProfilePpm } from "../_lib/waterChem";
+import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonProfilesByVolume } from "../_lib/waterChem";
+import {
+  fetchRecipeWaterSettings,
+  saveRecipeWaterSettings,
+  type RecipeWaterSettingsResponse,
+} from "../_lib/waterSettings";
+
+type BoilAcidResult = {
+  acidRequiredMl: number | null;
+  acidRequiredTsp: number | null;
+  acidRequiredGrams: number | null;
+  acidRequiredKg: number | null;
+  finalAlkalinityPpmCaCO3: number;
+  sulfateAddedPpm: number;
+  chlorideAddedPpm: number;
+};
+
+type BoilManualCalcResult = {
+  achievedPh: number;
+  predicted: BoilAcidResult;
+  clamped: "none" | "low" | "high";
+  iterations: number;
+  targetAmount: number;
+  predictedAmount: number;
+};
+
+type SaltAdditionsResult = {
+  baseProfile: IonProfilePpm;
+  resultingProfile: IonProfilePpm;
+  deltasPpm: IonProfilePpm;
+  breakdown: Array<{ saltKey: SaltKey; grams: number; deltasPpm: Partial<IonProfilePpm> }>;
+};
+
+type BoilOverallResultV0 = {
+  calculatedAt: string;
+  ionsPpm: IonProfilePpm;
+  finalAlkalinityPpmCaCO3: number;
+  ph: { kind: "target" | "estimated"; value: number };
+  debug: {
+    startingAlkalinityPpmCaCO3: number;
+    startingAlkalinityAfterSaltsPpmCaCO3: number;
+    saltsDeltaBicarbonatePpm: number;
+    acidSulfateAddedPpm: number;
+    acidChlorideAddedPpm: number;
+    boilMode: "targetPh" | "manual";
+  };
+};
+
+export default function BoilWaterPage() {
+  const params = useParams<{ id: string }>();
+  const recipeId = params?.id ?? "";
+
+  const [authLoaded, setAuthLoaded] = useState(false);
+  const [auth, setAuth] = useState<DevAuth | null>(null);
+
+  const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
+  const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [profilesError, setProfilesError] = useState<string | null>(null);
+
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [savingError, setSavingError] = useState<string | null>(null);
+
+  // Adjustment selections (boil)
+  const [sourceProfileId, setSourceProfileId] = useState<string>("");
+  const [targetProfileId, setTargetProfileId] = useState<string>("");
+  const [dilutionProfileId, setDilutionProfileId] = useState<string>("");
+  const [tapVolumeLiters, setTapVolumeLiters] = useState(0);
+  const [dilutionVolumeLiters, setDilutionVolumeLiters] = useState(0);
+
+  const [adjustmentSaveStatus, setAdjustmentSaveStatus] = useState<string | null>(null);
+  const [savingAdjustment, setSavingAdjustment] = useState(false);
+
+  // Acidification inputs
+  const [startingAlk, setStartingAlk] = useState(0);
+  const [startingPh, setStartingPh] = useState<string>("7.0");
+  const [targetPh, setTargetPh] = useState(5.6);
+  const [acidType, setAcidType] = useState("phosphoric");
+  const [strengthKind, setStrengthKind] = useState<"percent" | "normality" | "molarity" | "solid">("percent");
+  const [strengthValue, setStrengthValue] = useState(10);
+  const [acidificationMode, setAcidificationMode] = useState<"targetPh" | "manual">("targetPh");
+  const [manualAcidAdded, setManualAcidAdded] = useState(0);
+
+  const [boilError, setBoilError] = useState<string | null>(null);
+  const [boilStatus, setBoilStatus] = useState<string | null>(null);
+  const [boilSaveStatus, setBoilSaveStatus] = useState<string | null>(null);
+  const [calcSaveStatus, setCalcSaveStatus] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [savingInputs, setSavingInputs] = useState(false);
+  const [acidResult, setAcidResult] = useState<BoilAcidResult | null>(null);
+  const [manualResult, setManualResult] = useState<BoilManualCalcResult | null>(null);
+
+  // Salts
+  const [saltsError, setSaltsError] = useState<string | null>(null);
+  const [saltsStatus, setSaltsStatus] = useState<string | null>(null);
+  const [saltsSaveStatus, setSaltsSaveStatus] = useState<string | null>(null);
+  const [saltsCalcSaveStatus, setSaltsCalcSaveStatus] = useState<string | null>(null);
+  const [saltsSubmitting, setSaltsSubmitting] = useState(false);
+  const [savingSalts, setSavingSalts] = useState(false);
+  const [saltAdditions, setSaltAdditions] = useState<SaltAdditionRow[]>([]);
+  const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
+
+  // Overall snapshot
+  const [overallError, setOverallError] = useState<string | null>(null);
+  const [overallStatus, setOverallStatus] = useState<string | null>(null);
+  const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
+  const [savingOverall, setSavingOverall] = useState(false);
+  const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
+
+  useEffect(() => {
+    setAuth(loadDevAuthFromStorage());
+    setAuthLoaded(true);
+  }, []);
+
+  const canCall = useMemo(() => Boolean(auth?.userId && auth?.activeAccountId), [auth]);
+
+  const refreshProfiles = async () => {
+    if (!auth?.userId) return;
+    setProfilesError(null);
+    setLoadingProfiles(true);
+    try {
+      const profRes = await apiFetch("/api/water-profiles", auth);
+      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
+      setProfiles(profRes.data as WaterProfilesResponse);
+    } catch (err) {
+      setProfilesError(String(err));
+    } finally {
+      setLoadingProfiles(false);
+    }
+  };
+
+  const loadSettings = async () => {
+    if (!auth?.userId || !auth.activeAccountId || !recipeId) return;
+    setSettingsError(null);
+    try {
+      const data = (await fetchRecipeWaterSettings(recipeId, auth)) as RecipeWaterSettingsResponse;
+      const s = data.settings;
+      if (!s) return;
+
+      setSourceProfileId(s.boilSourceWaterProfileId ?? "");
+      setTargetProfileId(s.boilTargetWaterProfileId ?? "");
+      setDilutionProfileId(s.boilDilutionWaterProfileId ?? "");
+      setTapVolumeLiters(s.boilTapWaterVolumeLiters ?? 0);
+      setDilutionVolumeLiters(s.boilDilutionWaterVolumeLiters ?? 0);
+
+      setStartingAlk(s.boilStartingAlkalinityPpmCaCO3 ?? 0);
+      setStartingPh(String(s.boilStartingPh ?? 7.0));
+      setTargetPh(s.boilTargetPh ?? 5.6);
+      setAcidType(s.boilAcidType ?? "phosphoric");
+
+      const savedKind = ((s.boilStrengthKind as any) ?? "percent") as "percent" | "normality" | "molarity" | "solid";
+      setStrengthKind(savedKind);
+      setStrengthValue((s.boilStrengthValue as any) ?? 10);
+      setAcidificationMode(s.boilAcidificationMode === "manual" ? "manual" : "targetPh");
+      setManualAcidAdded(
+        savedKind === "solid" ? (s.boilManualAcidAddedGrams ?? 0) : (s.boilManualAcidAddedMl ?? 0),
+      );
+
+      if (Array.isArray(s.boilSaltAdditionsJson)) setSaltAdditions(s.boilSaltAdditionsJson as any);
+      if (s.boilSaltsLastResultJson && typeof s.boilSaltsLastResultJson === "object") {
+        const v: any = s.boilSaltsLastResultJson as any;
+        if (v?.result && typeof v.result === "object") {
+          setSaltsResult(v.result as SaltAdditionsResult);
+          if (typeof v.calculatedAt === "string") {
+            setSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
+          }
+        }
+      }
+
+      if (s.boilLastCalculatedAt) {
+        setAcidResult({
+          acidRequiredMl: s.boilLastAcidRequiredMl ?? null,
+          acidRequiredTsp: s.boilLastAcidRequiredTsp ?? null,
+          acidRequiredGrams: s.boilLastAcidRequiredGrams ?? null,
+          acidRequiredKg: s.boilLastAcidRequiredKg ?? null,
+          finalAlkalinityPpmCaCO3: s.boilLastFinalAlkalinityPpmCaCO3 ?? 0,
+          sulfateAddedPpm: s.boilLastSulfateAddedPpm ?? 0,
+          chlorideAddedPpm: s.boilLastChlorideAddedPpm ?? 0,
+        });
+        setBoilStatus(`Last calculated: ${new Date(s.boilLastCalculatedAt).toLocaleString()}`);
+      }
+
+      if (s.boilManualLastCalculatedAt) {
+        setManualResult({
+          achievedPh: s.boilManualLastAchievedPh ?? 0,
+          predicted: {
+            acidRequiredMl: null,
+            acidRequiredTsp: null,
+            acidRequiredGrams: null,
+            acidRequiredKg: null,
+            finalAlkalinityPpmCaCO3: s.boilManualLastFinalAlkalinityPpmCaCO3 ?? 0,
+            sulfateAddedPpm: s.boilManualLastSulfateAddedPpm ?? 0,
+            chlorideAddedPpm: s.boilManualLastChlorideAddedPpm ?? 0,
+          },
+          clamped: "none",
+          iterations: 0,
+          targetAmount: Number.NaN,
+          predictedAmount: Number.NaN,
+        });
+      }
+
+      if (s.boilOverallLastResultJson && typeof s.boilOverallLastResultJson === "object") {
+        setOverallResult(s.boilOverallLastResultJson as BoilOverallResultV0);
+      }
+      if (s.boilOverallLastCalculatedAt) {
+        setOverallStatus(`Last calculated: ${new Date(s.boilOverallLastCalculatedAt).toLocaleString()}`);
+      }
+    } catch (err) {
+      setSettingsError(String(err));
+    }
+  };
+
+  useEffect(() => {
+    void refreshProfiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.userId, auth?.activeAccountId]);
+
+  useEffect(() => {
+    void loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.userId, auth?.activeAccountId, recipeId]);
+
+  const allProfiles = useMemo(() => {
+    const sys = profiles?.system ?? [];
+    const pub = profiles?.public ?? [];
+    const acc = profiles?.account ?? [];
+    return [...sys, ...pub, ...acc];
+  }, [profiles]);
+  const waterProfiles = useMemo(() => allProfiles.filter((p) => p.type === "water"), [allProfiles]);
+  const dilutionProfiles = useMemo(() => allProfiles.filter((p) => p.type === "dilution"), [allProfiles]);
+
+  const selectedSource = useMemo(() => waterProfiles.find((p) => p.id === sourceProfileId) ?? null, [sourceProfileId, waterProfiles]);
+  const selectedTarget = useMemo(() => waterProfiles.find((p) => p.id === targetProfileId) ?? null, [targetProfileId, waterProfiles]);
+  const selectedDilution = useMemo(() => dilutionProfiles.find((p) => p.id === dilutionProfileId) ?? null, [dilutionProfileId, dilutionProfiles]);
+
+  const mixedSourceProfile = useMemo(() => {
+    if (!selectedSource || !selectedDilution) return null;
+    const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+    const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    const mixed = mixIonProfilesByVolume(
+      {
+        calcium: selectedSource.calcium,
+        magnesium: selectedSource.magnesium,
+        sodium: selectedSource.sodium,
+        sulfate: selectedSource.sulfate,
+        chloride: selectedSource.chloride,
+        bicarbonate: selectedSource.bicarbonate,
+      },
+      tap,
+      {
+        calcium: selectedDilution.calcium,
+        magnesium: selectedDilution.magnesium,
+        sodium: selectedDilution.sodium,
+        sulfate: selectedDilution.sulfate,
+        chloride: selectedDilution.chloride,
+        bicarbonate: selectedDilution.bicarbonate,
+      },
+      dil,
+    );
+    if (!mixed) return null;
+    return {
+      name: `Mixed (${selectedSource.name} + ${selectedDilution.name})`,
+      totalVolumeLiters: tap + dil,
+      ...mixed,
+    };
+  }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
+
+  const derivedBoilWaterVolumeLiters = useMemo(() => {
+    const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+    const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    return tap + dil;
+  }, [tapVolumeLiters, dilutionVolumeLiters]);
+
+  const saveSettings = async (patch: Record<string, unknown>) => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    await saveRecipeWaterSettings(recipeId, auth, patch);
+  };
+
+  const onSaveAdjustment = async () => {
+    setSavingError(null);
+    setAdjustmentSaveStatus(null);
+    setSavingAdjustment(true);
+    try {
+      await saveSettings({
+        boilSourceWaterProfileId: sourceProfileId || null,
+        boilTargetWaterProfileId: targetProfileId || null,
+        boilDilutionWaterProfileId: dilutionProfileId || null,
+        boilTapWaterVolumeLiters: tapVolumeLiters,
+        boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
+      });
+      setAdjustmentSaveStatus("Saved boil profile selections.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingAdjustment(false);
+    }
+  };
+
+  const onSaveInputs = async () => {
+    setSavingError(null);
+    setBoilSaveStatus(null);
+    setSavingInputs(true);
+    try {
+      await saveSettings({
+        boilSourceWaterProfileId: sourceProfileId || null,
+        boilTargetWaterProfileId: targetProfileId || null,
+        boilDilutionWaterProfileId: dilutionProfileId || null,
+        boilTapWaterVolumeLiters: tapVolumeLiters,
+        boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
+
+        boilStartingAlkalinityPpmCaCO3: startingAlk,
+        ...(startingPh.trim() === "" ? {} : { boilStartingPh: Number(startingPh) }),
+        boilTargetPh: targetPh,
+        boilAcidType: acidType,
+        boilStrengthKind: strengthKind,
+        boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
+        boilAcidificationMode: acidificationMode,
+        boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
+        boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
+        boilSaltAdditionsJson: saltAdditions,
+      });
+      setBoilSaveStatus("Saved boil inputs.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingInputs(false);
+    }
+  };
+
+  const onCalcSalts = async () => {
+    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!mixedSourceProfile) {
+      setSaltsError("Select source + dilution profiles and set volumes first (to compute mixed water).");
+      return;
+    }
+    setSaltsError(null);
+    setSaltsStatus(null);
+    setSaltsCalcSaveStatus(null);
+    setSaltsResult(null);
+    setSaltsSubmitting(true);
+    try {
+      const res = await apiFetch("/api/water-calc/salt-additions", auth, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          volumeLiters: mixedSourceProfile.totalVolumeLiters,
+          baseProfile: {
+            calcium: mixedSourceProfile.calcium,
+            magnesium: mixedSourceProfile.magnesium,
+            sodium: mixedSourceProfile.sodium,
+            sulfate: mixedSourceProfile.sulfate,
+            chloride: mixedSourceProfile.chloride,
+            bicarbonate: mixedSourceProfile.bicarbonate,
+          },
+          additions: saltAdditions,
+        }),
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const result = (res.data as any).result as SaltAdditionsResult;
+      setSaltsResult(result);
+
+      await saveSettings({
+        boilSaltAdditionsJson: saltAdditions,
+        boilSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
+      });
+      setSaltsStatus("Calculated.");
+      setSaltsCalcSaveStatus("Calculated and saved.");
+    } catch (err) {
+      setSaltsError(String(err));
+    } finally {
+      setSaltsSubmitting(false);
+    }
+  };
+
+  const onSaveSaltAdditions = async () => {
+    setSavingError(null);
+    setSaltsSaveStatus(null);
+    setSavingSalts(true);
+    try {
+      await saveSettings({ boilSaltAdditionsJson: saltAdditions });
+      setSaltsSaveStatus("Saved boil salt additions.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingSalts(false);
+    }
+  };
+
+  const boilCalciumPpm = useMemo(() => {
+    const v = saltsResult?.resultingProfile?.calcium ?? mixedSourceProfile?.calcium;
+    return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+  }, [saltsResult, mixedSourceProfile]);
+  const boilMagnesiumPpm = useMemo(() => {
+    const v = saltsResult?.resultingProfile?.magnesium ?? mixedSourceProfile?.magnesium;
+    return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+  }, [saltsResult, mixedSourceProfile]);
+
+  const onSubmitAcid = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!auth?.userId || !auth.activeAccountId) return;
+    if (startingPh.trim() === "" || !Number.isFinite(Number(startingPh))) {
+      setBoilError("Starting pH is required (select a profile with pH or enter it manually).");
+      return;
+    }
+    if (!Number.isFinite(derivedBoilWaterVolumeLiters) || !(derivedBoilWaterVolumeLiters > 0)) {
+      setBoilError("Boil water volume must be > 0 (set Water adjustment volumes).");
+      return;
+    }
+    setBoilError(null);
+    setBoilStatus(null);
+    setCalcSaveStatus(null);
+    setAcidResult(null);
+    setManualResult(null);
+    setSubmitting(true);
+    try {
+      if (acidificationMode === "manual") {
+        const acidAdded = typeof manualAcidAdded === "number" && Number.isFinite(manualAcidAdded) ? manualAcidAdded : NaN;
+        if (!Number.isFinite(acidAdded) || acidAdded < 0) {
+          setBoilError("Manual acid amount must be a number ≥ 0.");
+          return;
+        }
+
+        const payload: Record<string, unknown> = {
+          startingAlkalinityPpmCaCO3: startingAlk,
+          startingPh: Number(startingPh),
+          volumeLiters: derivedBoilWaterVolumeLiters,
+          calciumPpm: boilCalciumPpm,
+          magnesiumPpm: boilMagnesiumPpm,
+          acidType,
+          strengthKind,
+          ...(strengthKind === "solid" ? { acidAddedGrams: acidAdded } : { acidAddedMl: acidAdded }),
+        };
+        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+
+        const res = await apiFetch("/api/water-calc/sparge-acidification-manual", auth, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const manual = (res.data as any).result as BoilManualCalcResult;
+        setManualResult(manual);
+        setAcidResult(manual.predicted);
+
+        const nowIso = new Date().toISOString();
+        await saveSettings({
+          boilStartingAlkalinityPpmCaCO3: startingAlk,
+          boilStartingPh: Number(startingPh),
+          boilTargetPh: targetPh,
+          boilAcidType: acidType,
+          boilStrengthKind: strengthKind,
+          boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
+          boilAcidificationMode: acidificationMode,
+          boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
+          boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
+
+          boilLastAcidRequiredMl: manual.predicted.acidRequiredMl,
+          boilLastAcidRequiredTsp: manual.predicted.acidRequiredTsp,
+          boilLastAcidRequiredGrams: manual.predicted.acidRequiredGrams,
+          boilLastAcidRequiredKg: manual.predicted.acidRequiredKg,
+          boilLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
+          boilLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
+          boilLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
+          boilLastCalculatedAt: nowIso,
+
+          boilManualLastAchievedPh: manual.achievedPh,
+          boilManualLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
+          boilManualLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
+          boilManualLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
+          boilManualLastCalculatedAt: nowIso,
+        });
+        setBoilStatus("Estimated (manual mode).");
+        setCalcSaveStatus("Estimated and saved.");
+      } else {
+        const payload: Record<string, unknown> = {
+          startingAlkalinityPpmCaCO3: startingAlk,
+          startingPh: Number(startingPh),
+          targetPh,
+          volumeLiters: derivedBoilWaterVolumeLiters,
+          calciumPpm: boilCalciumPpm,
+          magnesiumPpm: boilMagnesiumPpm,
+          acidType,
+          strengthKind,
+        };
+        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+
+        const res = await apiFetch("/api/water-calc/sparge-acidification", auth, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const result = (res.data as any).result as BoilAcidResult;
+        setAcidResult(result);
+
+        const nowIso = new Date().toISOString();
+        await saveSettings({
+          boilStartingAlkalinityPpmCaCO3: startingAlk,
+          boilStartingPh: Number(startingPh),
+          boilTargetPh: targetPh,
+          boilAcidType: acidType,
+          boilStrengthKind: strengthKind,
+          boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
+          boilAcidificationMode: acidificationMode,
+
+          boilLastAcidRequiredMl: result.acidRequiredMl,
+          boilLastAcidRequiredTsp: result.acidRequiredTsp,
+          boilLastAcidRequiredGrams: result.acidRequiredGrams,
+          boilLastAcidRequiredKg: result.acidRequiredKg,
+          boilLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
+          boilLastSulfateAddedPpm: result.sulfateAddedPpm,
+          boilLastChlorideAddedPpm: result.chlorideAddedPpm,
+          boilLastCalculatedAt: nowIso,
+        });
+        setBoilStatus("Calculated.");
+        setCalcSaveStatus("Calculated and saved.");
+      }
+    } catch (err) {
+      setBoilError(String(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const computeOverallBoil = async (): Promise<BoilOverallResultV0> => {
+    if (!mixedSourceProfile) throw new Error("Compute mixed water first (Water adjustment section).");
+    const base: IonProfilePpm = {
+      calcium: mixedSourceProfile.calcium,
+      magnesium: mixedSourceProfile.magnesium,
+      sodium: mixedSourceProfile.sodium,
+      sulfate: mixedSourceProfile.sulfate,
+      chloride: mixedSourceProfile.chloride,
+      bicarbonate: mixedSourceProfile.bicarbonate,
+    };
+    const salts = saltsResult ?? {
+      baseProfile: base,
+      resultingProfile: base,
+      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+      breakdown: [],
+    };
+
+    // Use latest acid result snapshot if present in state; otherwise force user to calculate.
+    const acid = acidResult ?? (manualResult?.predicted ?? null);
+    if (!acid) throw new Error("Calculate/estimate acidification first.");
+
+    const ionsPpm: IonProfilePpm = combineAfterSaltsAndAcid({ afterSalts: salts.resultingProfile, acidResult: acid });
+    const alkalinityAfterSaltsPpmCaCO3 = bicarbonatePpmToAlkalinityPpmCaCO3(salts.resultingProfile.bicarbonate);
+
+    const nowIso = new Date().toISOString();
+    const phKind: BoilOverallResultV0["ph"]["kind"] = acidificationMode === "manual" ? "estimated" : "target";
+    const phValue =
+      acidificationMode === "manual" && manualResult ? manualResult.achievedPh : targetPh;
+
+    return {
+      calculatedAt: nowIso,
+      ionsPpm,
+      finalAlkalinityPpmCaCO3: acid.finalAlkalinityPpmCaCO3,
+      ph: { kind: phKind, value: phValue },
+      debug: {
+        startingAlkalinityPpmCaCO3: startingAlk,
+        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
+        saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
+        acidSulfateAddedPpm: acid.sulfateAddedPpm,
+        acidChlorideAddedPpm: acid.chlorideAddedPpm,
+        boilMode: acidificationMode,
+      },
+    };
+  };
+
+  const onCalculateOverall = async (saveAlso: boolean) => {
+    setOverallError(null);
+    setOverallStatus(null);
+    setOverallSaveStatus(null);
+    setSavingOverall(true);
+    try {
+      const overall = await computeOverallBoil();
+      setOverallResult(overall);
+      setOverallStatus("Calculated.");
+      if (saveAlso) {
+        await saveSettings({
+          boilOverallLastResultJson: overall,
+          boilOverallLastCalculatedAt: overall.calculatedAt,
+        });
+        setOverallSaveStatus("Calculated and saved.");
+      }
+    } catch (err) {
+      setOverallError(String(err));
+    } finally {
+      setSavingOverall(false);
+    }
+  };
+
+  const selectedProfileInfo = (p: WaterProfile | null, label: string) =>
+    p ? (
+      <span className="muted">
+        {label}: <code>{p.name}</code>
+      </span>
+    ) : (
+      <span className="muted">
+        {label}: <span className="muted">—</span>
+      </span>
+    );
+
+  return (
+    <>
+      <h1 style={{ marginBottom: 8 }}>Additional boil water</h1>
+      <p className="muted" style={{ marginTop: 0 }}>
+        Recipe ID: <code>{recipeId}</code>
+      </p>
+      <p style={{ marginTop: 0 }}>
+        <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link>
+      </p>
+
+      {authLoaded && !canCall ? (
+        <p role="alert" className="errorBox">
+          Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account),
+          then come back here.
+        </p>
+      ) : null}
+
+      <div style={{ display: "grid", gap: 16 }}>
+        <section className="panel" aria-labelledby="boil-adjustment-heading">
+          <h2 id="boil-adjustment-heading" style={{ marginTop: 0 }}>
+            Boil Water adjustment (v0)
+          </h2>
+          <p className="muted" style={{ marginTop: 0 }}>
+            Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
+          </p>
+
+          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr 1fr" }}>
+            <div>
+              <label htmlFor="boil-source-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+                Source water profile
+              </label>
+              <select
+                id="boil-source-profile"
+                value={sourceProfileId}
+                onChange={(e) => setSourceProfileId(e.target.value)}
+                style={{ width: "100%", padding: 8 }}
+              >
+                <option value="">(none)</option>
+                {waterProfiles.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} [{p.scope}/{p.verificationStatus}]
+                  </option>
+                ))}
+              </select>
+              <div style={{ marginTop: 6 }}>{selectedProfileInfo(selectedSource, "Selected")}</div>
+            </div>
+
+            <div>
+              <label htmlFor="boil-target-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+                Target water profile
+              </label>
+              <select
+                id="boil-target-profile"
+                value={targetProfileId}
+                onChange={(e) => setTargetProfileId(e.target.value)}
+                style={{ width: "100%", padding: 8 }}
+              >
+                <option value="">(none)</option>
+                {waterProfiles.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} [{p.scope}/{p.verificationStatus}]
+                  </option>
+                ))}
+              </select>
+              <div style={{ marginTop: 6 }}>{selectedProfileInfo(selectedTarget, "Selected")}</div>
+            </div>
+
+            <div>
+              <label htmlFor="boil-dilution-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+                Dilution water profile
+              </label>
+              <select
+                id="boil-dilution-profile"
+                value={dilutionProfileId}
+                onChange={(e) => setDilutionProfileId(e.target.value)}
+                style={{ width: "100%", padding: 8 }}
+              >
+                <option value="">(none)</option>
+                {dilutionProfiles.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} [{p.scope}/{p.verificationStatus}]
+                  </option>
+                ))}
+              </select>
+              <div style={{ marginTop: 6 }}>{selectedProfileInfo(selectedDilution, "Selected")}</div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 12, display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+            <div>
+              <label htmlFor="boil-source-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
+                Source volume (L)
+              </label>
+              <input
+                id="boil-source-volume"
+                type="number"
+                inputMode="decimal"
+                step={0.1}
+                value={tapVolumeLiters}
+                onChange={(e) => setTapVolumeLiters(Number(e.target.value))}
+                style={{ width: "100%", padding: 8 }}
+              />
+            </div>
+            <div>
+              <label htmlFor="boil-dilution-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
+                Dilution volume (L)
+              </label>
+              <input
+                id="boil-dilution-volume"
+                type="number"
+                inputMode="decimal"
+                step={0.1}
+                value={dilutionVolumeLiters}
+                onChange={(e) => setDilutionVolumeLiters(Number(e.target.value))}
+                style={{ width: "100%", padding: 8 }}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+            <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
+              {loadingProfiles ? "Refreshing…" : "Refresh profiles"}
+            </button>
+            <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
+              {savingAdjustment ? "Saving…" : "Save profile selections"}
+            </button>
+            {adjustmentSaveStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {adjustmentSaveStatus}
+              </span>
+            ) : null}
+          </div>
+
+          {mixedSourceProfile ? (
+            <details className="fieldBlock fieldBlock--readonly" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                <strong>Mixed water ions</strong>
+                <span className="fieldBadge">Read-only</span>
+                <span className="muted">Computed from profiles + volumes</span>
+              </summary>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th align="left">Ion</th>
+                      <th align="right">Mixed (ppm)</th>
+                      <th align="right">Target (ppm)</th>
+                      <th align="right">Δ (mixed - target)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(
+                      [
+                        ["Ca", mixedSourceProfile.calcium, selectedTarget?.calcium ?? null],
+                        ["Mg", mixedSourceProfile.magnesium, selectedTarget?.magnesium ?? null],
+                        ["Na", mixedSourceProfile.sodium, selectedTarget?.sodium ?? null],
+                        ["SO4", mixedSourceProfile.sulfate, selectedTarget?.sulfate ?? null],
+                        ["Cl", mixedSourceProfile.chloride, selectedTarget?.chloride ?? null],
+                        ["HCO3", mixedSourceProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                      ] as const
+                    ).map(([label, mixed, target]) => {
+                      const delta = target === null ? null : mixed - target;
+                      return (
+                        <tr key={label}>
+                          <td>{label}</td>
+                          <td align="right">{mixed.toFixed(2)}</td>
+                          <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
+                          <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          ) : (
+            <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              Select a source + dilution profile and set volumes to see mixed ions.
+            </p>
+          )}
+
+          {profilesError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {profilesError}
+            </pre>
+          ) : null}
+        </section>
+
+        <section className="panel" aria-labelledby="boil-salts-heading">
+          <h2 id="boil-salts-heading" style={{ marginTop: 0 }}>
+            Salt additions (manual, v0)
+          </h2>
+          <p className="muted" style={{ marginTop: 0 }}>
+            Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
+          </p>
+
+          <SaltAdditionsEditor rows={saltAdditions} onChange={setSaltAdditions} idPrefix="boil" disabled={!canCall} />
+
+          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="button" onClick={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+              {savingSalts ? "Saving…" : "Save salt additions"}
+            </button>
+            <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+              {saltsSubmitting ? "Calculating…" : "Calculate + Save salts result"}
+            </button>
+            {saltsStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {saltsStatus}
+              </span>
+            ) : null}
+            {saltsSaveStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {saltsSaveStatus}
+              </span>
+            ) : null}
+            {saltsCalcSaveStatus ? (
+              <span className="muted" role="status" aria-live="polite">
+                {saltsCalcSaveStatus}
+              </span>
+            ) : null}
+          </div>
+
+          {saltsError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {saltsError}
+            </pre>
+          ) : null}
+
+          {saltsResult ? (
+            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                <strong>Resulting ions (after salts only)</strong>
+                <span className="fieldBadge">Computed</span>
+              </summary>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th align="left">Ion</th>
+                      <th align="right">After salts (ppm)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(
+                      [
+                        ["Ca", saltsResult.resultingProfile.calcium],
+                        ["Mg", saltsResult.resultingProfile.magnesium],
+                        ["Na", saltsResult.resultingProfile.sodium],
+                        ["SO4", saltsResult.resultingProfile.sulfate],
+                        ["Cl", saltsResult.resultingProfile.chloride],
+                        ["HCO3", saltsResult.resultingProfile.bicarbonate],
+                      ] as const
+                    ).map(([label, after]) => (
+                      <tr key={label}>
+                        <td>{label}</td>
+                        <td align="right">{after.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          ) : null}
+        </section>
+
+        <section className="panel" aria-labelledby="boil-acid-heading">
+          <h2 id="boil-acid-heading" style={{ marginTop: 0 }}>
+            Boil water acidification (v0)
+          </h2>
+
+          <form onSubmit={onSubmitAcid} aria-describedby={boilError ? "boil-error" : undefined}>
+            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <ModeFieldset
+                  legend="Mode"
+                  name="boil-mode"
+                  value={acidificationMode}
+                  onChange={(v) => setAcidificationMode(v)}
+                  options={[
+                    { value: "targetPh", label: "Target pH (solve acid required)" },
+                    { value: "manual", label: "Manual acid amount (estimate achieved pH)" },
+                  ]}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="boil-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Starting alkalinity (ppm as CaCO3)
+                </label>
+                <input
+                  id="boil-starting-alk"
+                  type="number"
+                  inputMode="decimal"
+                  value={startingAlk}
+                  onChange={(e) => setStartingAlk(Number(e.target.value))}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="boil-starting-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Starting pH
+                </label>
+                <input
+                  id="boil-starting-ph"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  value={startingPh}
+                  onChange={(e) => setStartingPh(e.target.value)}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+
+              {acidificationMode === "targetPh" ? (
+                <div>
+                  <label htmlFor="boil-target-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    Target pH
+                  </label>
+                  <input
+                    id="boil-target-ph"
+                    type="number"
+                    inputMode="decimal"
+                    step={0.01}
+                    value={targetPh}
+                    onChange={(e) => setTargetPh(Number(e.target.value))}
+                    style={{ width: "100%", padding: 8 }}
+                  />
+                </div>
+              ) : null}
+
+              <div>
+                <label htmlFor="boil-acid-type" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Acid type
+                </label>
+                <select
+                  id="boil-acid-type"
+                  value={acidType}
+                  onChange={(e) => setAcidType(e.target.value)}
+                  style={{ width: "100%", padding: 8 }}
+                >
+                  <option value="phosphoric">Phosphoric</option>
+                  <option value="lactic">Lactic</option>
+                  <option value="hydrochloric">Hydrochloric</option>
+                  <option value="sulfuric">Sulfuric</option>
+                  <option value="acetic">Acetic</option>
+                  <option value="citric">Citric (solid)</option>
+                  <option value="tartaric">Tartaric (solid)</option>
+                  <option value="malic">Malic (solid)</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="boil-strength-kind" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Strength kind
+                </label>
+                <select
+                  id="boil-strength-kind"
+                  value={strengthKind}
+                  onChange={(e) => setStrengthKind(e.target.value as any)}
+                  style={{ width: "100%", padding: 8 }}
+                >
+                  <option value="percent">Percent (%)</option>
+                  <option value="normality">Normality (N)</option>
+                  <option value="molarity">Molarity (M)</option>
+                  <option value="solid">Solid (pure)</option>
+                </select>
+              </div>
+
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label htmlFor="boil-strength-value" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
+                </label>
+                <input
+                  id="boil-strength-value"
+                  type="number"
+                  inputMode="decimal"
+                  step={0.01}
+                  value={strengthValue}
+                  onChange={(e) => setStrengthValue(Number(e.target.value))}
+                  disabled={strengthKind === "solid"}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+
+              {acidificationMode === "manual" ? (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="boil-manual-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    Acid added ({strengthKind === "solid" ? "g" : "mL"})
+                  </label>
+                  <input
+                    id="boil-manual-acid-added"
+                    type="number"
+                    inputMode="decimal"
+                    step={0.1}
+                    value={manualAcidAdded}
+                    onChange={(e) => setManualAcidAdded(Number(e.target.value))}
+                    style={{ width: "100%", padding: 8 }}
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <button type="submit" disabled={!canCall || submitting}>
+                {submitting ? "Working…" : acidificationMode === "manual" ? "Estimate + Save result" : "Calculate + Save result"}
+              </button>
+              <button type="button" onClick={() => void onSaveInputs()} disabled={!canCall || savingInputs}>
+                {savingInputs ? "Saving…" : "Save inputs"}
+              </button>
+              {boilStatus ? <span className="muted" role="status" aria-live="polite">{boilStatus}</span> : null}
+              {boilSaveStatus ? <span className="muted" role="status" aria-live="polite">{boilSaveStatus}</span> : null}
+              {calcSaveStatus ? <span className="muted" role="status" aria-live="polite">{calcSaveStatus}</span> : null}
+            </div>
+
+            {boilError ? (
+              <pre id="boil-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                {boilError}
+              </pre>
+            ) : null}
+          </form>
+
+          {acidificationMode === "targetPh" && acidResult ? (
+            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <div className="fieldBlockHeader">
+                <strong>Result</strong>
+                <span className="fieldBadge">Computed</span>
+                <span className="muted">From current inputs</span>
+              </div>
+              <ul>
+                {acidResult.acidRequiredMl !== null ? (
+                  <li>
+                    Acid required: <code>{acidResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    {acidResult.acidRequiredTsp !== null ? (
+                      <>
+                        (<code>{acidResult.acidRequiredTsp.toFixed(3)}</code> tsp)
+                      </>
+                    ) : null}
+                  </li>
+                ) : null}
+                {acidResult.acidRequiredGrams !== null ? (
+                  <li>
+                    Acid required: <code>{acidResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    {acidResult.acidRequiredKg !== null ? (
+                      <>
+                        (<code>{acidResult.acidRequiredKg.toFixed(6)}</code> kg)
+                      </>
+                    ) : null}
+                  </li>
+                ) : null}
+                <li>
+                  Final alkalinity: <code>{acidResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                </li>
+              </ul>
+            </div>
+          ) : null}
+
+          {acidificationMode === "manual" && manualResult ? (
+            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                <strong>Result (manual acid amount mode)</strong>
+                <span className="fieldBadge">Computed</span>
+                <span className="muted">Estimated from manual acid amount</span>
+              </summary>
+              <ul>
+                <li>
+                  Estimated achieved pH: <code>{manualResult.achievedPh.toFixed(3)}</code>
+                </li>
+                <li>
+                  Final alkalinity: <code>{manualResult.predicted.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                </li>
+              </ul>
+            </details>
+          ) : null}
+
+          <hr style={{ margin: "16px 0" }} />
+
+          <h3 id="overall-boil-water-result" style={{ marginTop: 0 }}>
+            Overall boil water result (v0, HCO3 derived from alkalinity)
+          </h3>
+          <p className="muted" style={{ marginTop: 0 }}>
+            Click <strong>Calculate overall</strong> to preview, or <strong>Calculate + Save</strong> to persist a snapshot.
+          </p>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="button" onClick={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
+              {savingOverall ? "Calculating…" : "Calculate overall"}
+            </button>
+            <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
+              {savingOverall ? "Calculating…" : "Calculate + Save overall"}
+            </button>
+            {overallStatus ? <span className="muted">{overallStatus}</span> : null}
+            {overallSaveStatus ? <span className="muted">{overallSaveStatus}</span> : null}
+          </div>
+          {overallError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              {overallError}
+            </pre>
+          ) : null}
+
+          {overallResult ? (
+            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <div className="fieldBlockHeader">
+                <strong>Overall boil snapshot</strong>
+                <span className="fieldBadge">Computed</span>
+                <span className="muted">Uses latest inputs; persist a snapshot to debug</span>
+              </div>
+              <ul>
+                <li>
+                  pH: {overallResult.ph.kind} <code>{overallResult.ph.value.toFixed(2)}</code>
+                </li>
+                <li>
+                  Final alkalinity: <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
+                </li>
+              </ul>
+              <div style={{ overflowX: "auto", marginTop: 8 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th align="left">Ion</th>
+                      <th align="right">Overall (ppm)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(
+                      [
+                        ["Ca", overallResult.ionsPpm.calcium],
+                        ["Mg", overallResult.ionsPpm.magnesium],
+                        ["Na", overallResult.ionsPpm.sodium],
+                        ["SO4", overallResult.ionsPpm.sulfate],
+                        ["Cl", overallResult.ionsPpm.chloride],
+                        ["HCO3", overallResult.ionsPpm.bicarbonate],
+                      ] as const
+                    ).map(([label, v]) => (
+                      <tr key={label}>
+                        <td>{label}</td>
+                        <td align="right">{v.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
+        </section>
+
+        {settingsError ? <pre className="errorBox" role="alert">{settingsError}</pre> : null}
+        {savingError ? <pre className="errorBox" role="alert">{savingError}</pre> : null}
+      </div>
+    </>
+  );
+}
+

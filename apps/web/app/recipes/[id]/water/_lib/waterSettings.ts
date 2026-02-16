@@ -78,6 +78,46 @@ export type RecipeWaterSettings = {
   spargeLastSulfateAddedPpm: number | null;
   spargeLastChlorideAddedPpm: number | null;
   spargeLastCalculatedAt: string | null;
+
+  // Boil/kettle add-on water (v0)
+  boilSourceWaterProfileId?: string | null;
+  boilTargetWaterProfileId?: string | null;
+  boilDilutionWaterProfileId?: string | null;
+
+  boilTapWaterVolumeLiters?: number | null;
+  boilDilutionWaterVolumeLiters?: number | null;
+
+  boilStartingAlkalinityPpmCaCO3?: number;
+  boilStartingPh?: number;
+  boilTargetPh?: number;
+  boilWaterVolumeLiters?: number;
+  boilAcidType?: string;
+  boilStrengthKind?: string;
+  boilStrengthValue?: number | null;
+
+  boilLastAcidRequiredMl?: number | null;
+  boilLastAcidRequiredTsp?: number | null;
+  boilLastAcidRequiredGrams?: number | null;
+  boilLastAcidRequiredKg?: number | null;
+  boilLastFinalAlkalinityPpmCaCO3?: number | null;
+  boilLastSulfateAddedPpm?: number | null;
+  boilLastChlorideAddedPpm?: number | null;
+  boilLastCalculatedAt?: string | null;
+
+  boilAcidificationMode?: string;
+  boilManualAcidAddedMl?: number | null;
+  boilManualAcidAddedGrams?: number | null;
+  boilManualLastAchievedPh?: number | null;
+  boilManualLastFinalAlkalinityPpmCaCO3?: number | null;
+  boilManualLastSulfateAddedPpm?: number | null;
+  boilManualLastChlorideAddedPpm?: number | null;
+  boilManualLastCalculatedAt?: string | null;
+
+  boilSaltAdditionsJson?: unknown;
+  boilSaltsLastResultJson?: unknown;
+
+  boilOverallLastResultJson?: unknown;
+  boilOverallLastCalculatedAt?: string | null;
 };
 
 export type RecipeWaterSettingsResponse = { ok: true; settings: RecipeWaterSettings | null };

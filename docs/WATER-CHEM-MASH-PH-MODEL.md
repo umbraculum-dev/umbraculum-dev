@@ -97,6 +97,39 @@ There are two reasonable ways to implement this later:
 - **Style table**: map style families to an RA range (explicit targets; simplest to explain).
 - **Color-based guideline**: approximate an RA range from beer color (SRM/EBC), with clear caveats (dehusked malts, unusual grists, etc.).
 
+## Water correction tables: conventions and precision
+
+Our water management pages show “ion tables” at different stages (mixed water, after salts, after salts + acid, overall snapshots). These tables are intended to be the **most precise summary possible under the model we are using**, while staying consistent across mash/sparge (and future boil/kettle additions).
+
+### Alkalinity vs bicarbonate in tables
+
+- **Alkalinity (ppm as CaCO₃)** is a measure of **acid-neutralizing capacity** (ANC) relative to a standard endpoint (commonly near pH 4.3).
+- Alkalinity can be **negative** after acidification. This does not mean “impossible water”; it indicates **mineral acidity** (the sample would require base to reach the endpoint).
+- **Bicarbonate concentration (ppm as HCO₃⁻) cannot be negative** as a reported/speciated concentration, even though alkalinity can be negative.
+
+We therefore follow this reporting rule for ion tables:
+
+- We treat **final alkalinity** (ppm as CaCO₃) as the source of truth.
+- When we show **HCO₃** in an “after acid” ion table, it is a **display proxy** derived from alkalinity:
+  - `HCO3_ppm_proxy = max(0, Alkalinity_asCaCO3 * 61/50)`
+  - If alkalinity is negative, HCO₃ in the table is clamped to **0** and the negative alkalinity is still shown elsewhere (e.g. “Final alkalinity”).
+
+Reference guidance:
+- USGS notes that carbonate/bicarbonate/hydroxide concentrations cannot be negative, while alkalinity/ANC can be negative and indicates mineral acidity: `https://or.water.usgs.gov/alk/reporting.html`
+
+### What “after salts” vs “after salts + acid” means
+
+- **After salts**: a mass-balance ion summary from salt additions (Ca/Mg/Na/SO4/Cl/HCO3). This is “ppm bookkeeping”.
+- **After salts + acid**: combines:
+  - the **salt ion profile**, plus
+  - acid **counter-ion contributions** (SO₄ from sulfuric, Cl from hydrochloric), plus
+  - alkalinity-driven **HCO₃ proxy** derived from the acid solver’s `finalAlkalinityPpmCaCO3` (clamped to >= 0).
+
+### Known limitations (tables)
+
+- We do **not** attempt full carbonate speciation at arbitrary pH/CO₂ conditions for the displayed ion tables.
+- “HCO₃” shown after acidification is an **alkalinity-equivalent proxy**, not a full equilibrium species calculation.
+
 ## v1 estimator (high level)
 
 `mashPhEstimateV1`:

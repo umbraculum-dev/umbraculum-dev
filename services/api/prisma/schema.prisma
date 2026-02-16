@@ -193,6 +193,53 @@ model RecipeWaterSettings {
   spargeSaltAdditionsJson   Json?
   spargeSaltsLastResultJson Json?
 
+  // Boil/kettle add-on water (v0): separate from mash/sparge.
+  // Profile selections (like mash)
+  boilSourceWaterProfileId   String?
+  boilTargetWaterProfileId   String?
+  boilDilutionWaterProfileId String?
+
+  // Mixing volumes (like mash)
+  boilTapWaterVolumeLiters      Float? @default(0)
+  boilDilutionWaterVolumeLiters Float? @default(0)
+
+  // Boil water acidification inputs (liters-first; like sparge)
+  boilStartingAlkalinityPpmCaCO3 Float @default(0)
+  boilStartingPh                Float @default(7.0)
+  boilTargetPh                  Float @default(5.6)
+  boilWaterVolumeLiters         Float @default(0) // derived from boilTap + boilDilution
+  boilAcidType                  String @default("phosphoric")
+  boilStrengthKind              String @default("percent")
+  boilStrengthValue             Float?
+
+  // Last calculated snapshot (optional)
+  boilLastAcidRequiredMl            Float?
+  boilLastAcidRequiredTsp           Float?
+  boilLastAcidRequiredGrams         Float?
+  boilLastAcidRequiredKg            Float?
+  boilLastFinalAlkalinityPpmCaCO3   Float?
+  boilLastSulfateAddedPpm           Float?
+  boilLastChlorideAddedPpm          Float?
+  boilLastCalculatedAt              DateTime?
+
+  // Manual-entry mode (v0): user enters acid amount; we estimate achieved pH.
+  boilAcidificationMode             String @default("targetPh") // "targetPh" | "manual"
+  boilManualAcidAddedMl             Float?
+  boilManualAcidAddedGrams          Float?
+  boilManualLastAchievedPh          Float?
+  boilManualLastFinalAlkalinityPpmCaCO3 Float?
+  boilManualLastSulfateAddedPpm     Float?
+  boilManualLastChlorideAddedPpm    Float?
+  boilManualLastCalculatedAt        DateTime?
+
+  // Boil salt additions (manual)
+  boilSaltAdditionsJson   Json?
+  boilSaltsLastResultJson Json?
+
+  // Boil overall adjustment snapshot (v0): combined salts + acid output for debugging/audit.
+  boilOverallLastResultJson   Json?
+  boilOverallLastCalculatedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

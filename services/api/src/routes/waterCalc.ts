@@ -50,12 +50,22 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
     const targetPh = typeof body.targetPh === "number" ? body.targetPh : 5.6;
     const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
+      throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
+    }
+    if (magnesiumPpm !== undefined && (!Number.isFinite(magnesiumPpm) || magnesiumPpm < 0)) {
+      throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
+    }
 
     const result = spargeAcidification({
       startingAlkalinityPpmCaCO3,
       startingPh,
       targetPh,
       volumeLiters,
+      calciumPpm,
+      magnesiumPpm,
       acidType,
       strength,
     });
@@ -94,6 +104,14 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       typeof body.startingAlkalinityPpmCaCO3 === "number" ? body.startingAlkalinityPpmCaCO3 : 0;
     const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
     const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
+      throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
+    }
+    if (magnesiumPpm !== undefined && (!Number.isFinite(magnesiumPpm) || magnesiumPpm < 0)) {
+      throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
+    }
 
     const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
     const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
@@ -113,6 +131,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         startingAlkalinityPpmCaCO3,
         startingPh,
         volumeLiters,
+        calciumPpm,
+        magnesiumPpm,
         acidType,
         strength,
         acidAddedMl,

@@ -8,6 +8,8 @@ export type SpargeAcidType =
   | "tartaric"
   | "malic";
 
+import { effectiveAlkalinityPpmCaCO3FromCaMg } from "./residualAlkalinity.js";
+
 export type AcidStrength =
   | { kind: "percent"; value: number } // whole percent (e.g. 88 for 88%)
   | { kind: "normality"; value: number } // N (eq/L)
@@ -19,6 +21,10 @@ export type SpargeAcidificationInput = {
   startingPh: number;
   targetPh: number;
   volumeLiters: number;
+  /** Optional Ca (mg/L) for RA-like effective alkalinity adjustment. */
+  calciumPpm?: number;
+  /** Optional Mg (mg/L) for RA-like effective alkalinity adjustment. */
+  magnesiumPpm?: number;
   acidType: SpargeAcidType;
   strength: AcidStrength;
 };
@@ -38,6 +44,10 @@ export type SpargeAcidificationResult = {
     mMRequired_mmolPerL: number;
     frac_equivalentsPerMole: number;
     sg_mgPerMl: number | null;
+    calciumPpm: number;
+    magnesiumPpm: number;
+    effectiveAlkalinityPpmCaCO3: number;
+    alkalinityReductionFromCaMgPpmCaCO3: number;
   };
 };
 
@@ -186,7 +196,24 @@ export function spargeAcidification(input: SpargeAcidificationInput): SpargeAcid
   assertFinite(input.targetPh, "targetPh");
   assertFinite(input.volumeLiters, "volumeLiters");
 
-  const alkPpm = input.startingAlkalinityPpmCaCO3;
+  const calciumPpm = typeof input.calciumPpm === "number" ? input.calciumPpm : 0;
+  const magnesiumPpm = typeof input.magnesiumPpm === "number" ? input.magnesiumPpm : 0;
+  assertFinite(calciumPpm, "calciumPpm");
+  assertFinite(magnesiumPpm, "magnesiumPpm");
+  if (calciumPpm < 0 || magnesiumPpm < 0) throw new Error("calciumPpm/magnesiumPpm must be >= 0");
+
+  const {
+    effectiveAlkalinityPpmCaCO3,
+    alkalinityReductionFromCaMgPpmCaCO3,
+  } = effectiveAlkalinityPpmCaCO3FromCaMg({
+    alkalinityPpmCaCO3: input.startingAlkalinityPpmCaCO3,
+    calciumPpm,
+    magnesiumPpm,
+  });
+
+  // Heuristic: treat Ca/Mg as reducing the effective alkalinity that governs predicted pH/acid.
+  // This is clamped to >= 0 for stability (mirrors mash behavior).
+  const alkPpm = effectiveAlkalinityPpmCaCO3;
   const startPh = input.startingPh;
   const targetPh = input.targetPh;
   const volL = input.volumeLiters;
@@ -276,6 +303,10 @@ export function spargeAcidification(input: SpargeAcidificationInput): SpargeAcid
       mMRequired_mmolPerL,
       frac_equivalentsPerMole,
       sg_mgPerMl,
+      calciumPpm,
+      magnesiumPpm,
+      effectiveAlkalinityPpmCaCO3,
+      alkalinityReductionFromCaMgPpmCaCO3,
     },
   };
 }

@@ -9,7 +9,7 @@ import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
-import { bicarbonatePpmToAlkalinityPpmCaCO3 } from "../_lib/waterChem";
+import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -210,6 +210,16 @@ export default function SpargeWaterPage() {
     [spargeWaterProfileId, waterProfiles],
   );
 
+  const spargeCalciumPpm = useMemo(() => {
+    const v = spargeSaltsResult?.resultingProfile?.calcium ?? selectedSpargeProfile?.calcium;
+    return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+  }, [spargeSaltsResult, selectedSpargeProfile]);
+
+  const spargeMagnesiumPpm = useMemo(() => {
+    const v = spargeSaltsResult?.resultingProfile?.magnesium ?? selectedSpargeProfile?.magnesium;
+    return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+  }, [spargeSaltsResult, selectedSpargeProfile]);
+
   const saveSettings = async (patch: Record<string, unknown>) => {
     if (!auth?.userId || !auth.activeAccountId) return;
     await saveRecipeWaterSettings(recipeId, auth, patch);
@@ -270,6 +280,8 @@ export default function SpargeWaterPage() {
           startingAlkalinityPpmCaCO3: startingAlk,
           startingPh: Number(startingPh),
           volumeLiters,
+          calciumPpm: spargeCalciumPpm,
+          magnesiumPpm: spargeMagnesiumPpm,
           acidType,
           strengthKind,
           ...(strengthKind === "solid" ? { acidAddedGrams: acidAdded } : { acidAddedMl: acidAdded }),
@@ -324,6 +336,8 @@ export default function SpargeWaterPage() {
           startingPh: Number(startingPh),
           targetPh,
           volumeLiters,
+          calciumPpm: spargeCalciumPpm,
+          magnesiumPpm: spargeMagnesiumPpm,
           acidType,
           strengthKind,
         };
@@ -712,13 +726,12 @@ export default function SpargeWaterPage() {
           ) : null}
 
           {spargeAcidificationMode === "manual" && spargeManualResult ? (
-            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
-                <strong>Result</strong>
+            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                <strong>Result (manual acid amount mode)</strong>
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">Estimated from manual acid amount</span>
-              </div>
-              <h3 style={{ marginTop: 0 }}>Result (manual acid amount mode)</h3>
+              </summary>
               <ul>
                 <li>
                   Estimated achieved pH: <code>{spargeManualResult.achievedPh.toFixed(3)}</code>
@@ -747,7 +760,7 @@ export default function SpargeWaterPage() {
                   <strong>Starting pH</strong>.
                 </p>
               ) : null}
-            </div>
+            </details>
           ) : null}
 
           <hr style={{ margin: "16px 0" }} />
@@ -779,11 +792,11 @@ export default function SpargeWaterPage() {
           {spargeSaltsError ? <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>{spargeSaltsError}</pre> : null}
 
           {spargeSaltsResult ? (
-            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
+            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after sparge salts only, v0)</strong>
                 <span className="fieldBadge">Computed</span>
-              </div>
+              </summary>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
@@ -811,15 +824,17 @@ export default function SpargeWaterPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </details>
           ) : null}
 
           {spargeSaltsResult && spargeResult ? (
             <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <div className="fieldBlockHeader">
-                <strong>Resulting ions (after sparge salts + acid SO4/Cl only, v0)</strong>
+                <strong>Resulting ions (after sparge salts + acid, v0, HCO3 derived from alkalinity)</strong>
                 <span className="fieldBadge">Computed</span>
-                <span className="muted">v0 note: salts do not affect acid-required math</span>
+                <span className="muted">
+                  Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
+                </span>
               </div>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -831,12 +846,10 @@ export default function SpargeWaterPage() {
                   </thead>
                   <tbody>
                     {(() => {
-                      const after = spargeSaltsResult.resultingProfile;
-                      const combined = {
-                        ...after,
-                        sulfate: after.sulfate + spargeResult.sulfateAddedPpm,
-                        chloride: after.chloride + spargeResult.chlorideAddedPpm,
-                      };
+                      const combined = combineAfterSaltsAndAcid({
+                        afterSalts: spargeSaltsResult.resultingProfile,
+                        acidResult: spargeResult,
+                      });
                       return ([
                         ["Ca", combined.calcium],
                         ["Mg", combined.magnesium],

@@ -76,6 +76,46 @@ export type UpsertRecipeWaterSettingsInput = {
 
   spargeSaltAdditionsJson?: unknown;
   spargeSaltsLastResultJson?: unknown;
+
+  // Boil/kettle add-on water (v0)
+  boilSourceWaterProfileId?: string | null;
+  boilTargetWaterProfileId?: string | null;
+  boilDilutionWaterProfileId?: string | null;
+
+  boilTapWaterVolumeLiters?: number | null;
+  boilDilutionWaterVolumeLiters?: number | null;
+
+  boilStartingAlkalinityPpmCaCO3?: number;
+  boilStartingPh?: number;
+  boilTargetPh?: number;
+  boilWaterVolumeLiters?: number;
+  boilAcidType?: string;
+  boilStrengthKind?: string;
+  boilStrengthValue?: number | null;
+
+  boilLastAcidRequiredMl?: number | null;
+  boilLastAcidRequiredTsp?: number | null;
+  boilLastAcidRequiredGrams?: number | null;
+  boilLastAcidRequiredKg?: number | null;
+  boilLastFinalAlkalinityPpmCaCO3?: number | null;
+  boilLastSulfateAddedPpm?: number | null;
+  boilLastChlorideAddedPpm?: number | null;
+  boilLastCalculatedAt?: Date | null;
+
+  boilAcidificationMode?: string;
+  boilManualAcidAddedMl?: number | null;
+  boilManualAcidAddedGrams?: number | null;
+  boilManualLastAchievedPh?: number | null;
+  boilManualLastFinalAlkalinityPpmCaCO3?: number | null;
+  boilManualLastSulfateAddedPpm?: number | null;
+  boilManualLastChlorideAddedPpm?: number | null;
+  boilManualLastCalculatedAt?: Date | null;
+
+  boilSaltAdditionsJson?: unknown;
+  boilSaltsLastResultJson?: unknown;
+
+  boilOverallLastResultJson?: unknown;
+  boilOverallLastCalculatedAt?: Date | null;
 };
 
 function ensureFinite(n: unknown, field: string) {
@@ -157,6 +197,10 @@ export class RecipeWaterSettingsService {
     if (input.targetWaterProfileId) await this.assertProfileAccessible(accountId, input.targetWaterProfileId);
     if (input.dilutionWaterProfileId) await this.assertProfileAccessible(accountId, input.dilutionWaterProfileId);
     if (input.spargeWaterProfileId) await this.assertProfileAccessible(accountId, input.spargeWaterProfileId);
+    if (input.boilSourceWaterProfileId) await this.assertProfileAccessible(accountId, input.boilSourceWaterProfileId);
+    if (input.boilTargetWaterProfileId) await this.assertProfileAccessible(accountId, input.boilTargetWaterProfileId);
+    if (input.boilDilutionWaterProfileId)
+      await this.assertProfileAccessible(accountId, input.boilDilutionWaterProfileId);
 
     const existing = await this.prisma.recipeWaterSettings.findUnique({ where: { recipeId } });
     const data: Record<string, unknown> = { accountId, recipeId };
@@ -166,6 +210,10 @@ export class RecipeWaterSettingsService {
     if (input.dilutionWaterProfileId !== undefined)
       data.dilutionWaterProfileId = input.dilutionWaterProfileId;
     if (input.spargeWaterProfileId !== undefined) data.spargeWaterProfileId = input.spargeWaterProfileId;
+    if (input.boilSourceWaterProfileId !== undefined) data.boilSourceWaterProfileId = input.boilSourceWaterProfileId;
+    if (input.boilTargetWaterProfileId !== undefined) data.boilTargetWaterProfileId = input.boilTargetWaterProfileId;
+    if (input.boilDilutionWaterProfileId !== undefined)
+      data.boilDilutionWaterProfileId = input.boilDilutionWaterProfileId;
 
     const mixingNumericFields = ["tapWaterVolumeLiters", "dilutionWaterVolumeLiters"] as const;
     for (const f of mixingNumericFields) {
@@ -212,6 +260,38 @@ export class RecipeWaterSettingsService {
     // If mixing volumes are being updated, prevent client-provided mashWaterVolumeLiters from reintroducing duplication.
     if (!hasMixingUpdate && input.mashWaterVolumeLiters !== undefined) {
       data.mashWaterVolumeLiters = ensureFinite(input.mashWaterVolumeLiters, "mashWaterVolumeLiters");
+    }
+
+    // Boil add-on water mixing volumes + derived boilWaterVolumeLiters (single source of truth like mash).
+    const boilMixingNumericFields = ["boilTapWaterVolumeLiters", "boilDilutionWaterVolumeLiters"] as const;
+    for (const f of boilMixingNumericFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+
+    const hasBoilMixingUpdate =
+      input.boilTapWaterVolumeLiters !== undefined || input.boilDilutionWaterVolumeLiters !== undefined;
+    if (hasBoilMixingUpdate) {
+      const tap =
+        typeof input.boilTapWaterVolumeLiters === "number"
+          ? input.boilTapWaterVolumeLiters
+          : typeof (existing as any)?.boilTapWaterVolumeLiters === "number"
+            ? (existing as any).boilTapWaterVolumeLiters
+            : 0;
+      const dil =
+        typeof input.boilDilutionWaterVolumeLiters === "number"
+          ? input.boilDilutionWaterVolumeLiters
+          : typeof (existing as any)?.boilDilutionWaterVolumeLiters === "number"
+            ? (existing as any).boilDilutionWaterVolumeLiters
+            : 0;
+
+      data.boilWaterVolumeLiters = ensureFinite(
+        Math.max(0, tap) + Math.max(0, dil),
+        "boilWaterVolumeLiters",
+      );
     }
 
     const mashStringFields = ["mashAcidType", "mashStrengthKind"] as const;
@@ -406,6 +486,97 @@ export class RecipeWaterSettingsService {
     if (input.spargeLastCalculatedAt !== undefined) {
       data.spargeLastCalculatedAt = input.spargeLastCalculatedAt;
     }
+
+    // Boil add-on water inputs/snapshots (mirrors sparge patterns; mixing mirrors mash).
+    const boilNumericFields = ["boilStartingAlkalinityPpmCaCO3", "boilStartingPh", "boilTargetPh"] as const;
+    for (const f of boilNumericFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) data[f] = ensureFinite(v, f);
+    }
+
+    // Allow client-provided boilWaterVolumeLiters only if mixing volumes are not being updated.
+    if (!hasBoilMixingUpdate && input.boilWaterVolumeLiters !== undefined) {
+      data.boilWaterVolumeLiters = ensureFinite(input.boilWaterVolumeLiters, "boilWaterVolumeLiters");
+    }
+
+    const boilStringFields = ["boilAcidType", "boilStrengthKind"] as const;
+    for (const f of boilStringFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (typeof v !== "string") throw new BadRequestError("invalid_string", `Body.${f} must be a string`);
+        data[f] = v;
+      }
+    }
+    if (input.boilStrengthValue !== undefined) {
+      if (input.boilStrengthValue === null) data.boilStrengthValue = null;
+      else data.boilStrengthValue = ensureFinite(input.boilStrengthValue, "boilStrengthValue");
+    }
+
+    if (input.boilAcidificationMode !== undefined) {
+      const v = input.boilAcidificationMode;
+      if (typeof v !== "string") {
+        throw new BadRequestError("invalid_string", "Body.boilAcidificationMode must be a string");
+      }
+      if (v !== "targetPh" && v !== "manual") {
+        throw new BadRequestError(
+          "invalid_boil_acidification_mode",
+          'Body.boilAcidificationMode must be "targetPh" or "manual"',
+        );
+      }
+      data.boilAcidificationMode = v;
+    }
+
+    const boilManualInputFields = ["boilManualAcidAddedMl", "boilManualAcidAddedGrams"] as const;
+    for (const f of boilManualInputFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+
+    const boilManualSnapshotFields = [
+      "boilManualLastAchievedPh",
+      "boilManualLastFinalAlkalinityPpmCaCO3",
+      "boilManualLastSulfateAddedPpm",
+      "boilManualLastChlorideAddedPpm",
+    ] as const;
+    for (const f of boilManualSnapshotFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+    if (input.boilManualLastCalculatedAt !== undefined) data.boilManualLastCalculatedAt = input.boilManualLastCalculatedAt;
+
+    if (input.boilSaltAdditionsJson !== undefined) {
+      data.boilSaltAdditionsJson = validateSaltAdditionsJson(input.boilSaltAdditionsJson, "boilSaltAdditionsJson") as any;
+    }
+    if (input.boilSaltsLastResultJson !== undefined) {
+      data.boilSaltsLastResultJson = input.boilSaltsLastResultJson as any;
+    }
+
+    const boilSnapshotFields = [
+      "boilLastAcidRequiredMl",
+      "boilLastAcidRequiredTsp",
+      "boilLastAcidRequiredGrams",
+      "boilLastAcidRequiredKg",
+      "boilLastFinalAlkalinityPpmCaCO3",
+      "boilLastSulfateAddedPpm",
+      "boilLastChlorideAddedPpm",
+    ] as const;
+    for (const f of boilSnapshotFields) {
+      const v = (input as any)[f];
+      if (v !== undefined) {
+        if (v === null) data[f] = null;
+        else data[f] = ensureFinite(v, f);
+      }
+    }
+    if (input.boilLastCalculatedAt !== undefined) data.boilLastCalculatedAt = input.boilLastCalculatedAt;
+
+    if (input.boilOverallLastResultJson !== undefined) data.boilOverallLastResultJson = input.boilOverallLastResultJson as any;
+    if (input.boilOverallLastCalculatedAt !== undefined) data.boilOverallLastCalculatedAt = input.boilOverallLastCalculatedAt;
 
     return this.prisma.recipeWaterSettings.upsert({
       where: { recipeId },

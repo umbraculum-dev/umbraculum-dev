@@ -9,6 +9,10 @@ export type SpargeAcidificationManualInput = {
   startingAlkalinityPpmCaCO3: number;
   startingPh: number;
   volumeLiters: number;
+  /** Optional Ca (mg/L) for RA-like effective alkalinity adjustment. */
+  calciumPpm?: number;
+  /** Optional Mg (mg/L) for RA-like effective alkalinity adjustment. */
+  magnesiumPpm?: number;
   acidType: SpargeAcidType;
   strength: AcidStrength;
   acidAddedMl?: number;
@@ -50,6 +54,8 @@ export function spargeAcidificationManual(
     startingAlkalinityPpmCaCO3,
     startingPh,
     volumeLiters,
+    calciumPpm,
+    magnesiumPpm,
     acidType,
     strength,
     acidAddedMl,
@@ -72,6 +78,8 @@ export function spargeAcidificationManual(
       startingPh,
       targetPh: ph,
       volumeLiters,
+      calciumPpm,
+      magnesiumPpm,
       acidType,
       strength,
     });

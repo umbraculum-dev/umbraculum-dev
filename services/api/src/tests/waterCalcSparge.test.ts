@@ -29,6 +29,24 @@ describe("waterCalc.spargeAcidification (BrunWater 1.25 parity)", () => {
     expect(res.chlorideAddedPpm).toBe(0);
   });
 
+  it("reduces acid required when Ca/Mg increase (RA-like effective alkalinity heuristic)", () => {
+    const base = {
+      startingAlkalinityPpmCaCO3: 200,
+      startingPh: 7.0,
+      targetPh: 5.6,
+      volumeLiters: 10,
+      acidType: "phosphoric" as const,
+      strength: { kind: "percent" as const, value: 10 },
+    };
+
+    const low = spargeAcidification({ ...base, calciumPpm: 0, magnesiumPpm: 0 });
+    const high = spargeAcidification({ ...base, calciumPpm: 100, magnesiumPpm: 20 });
+
+    expect(low.acidRequiredMl).not.toBeNull();
+    expect(high.acidRequiredMl).not.toBeNull();
+    expect(high.acidRequiredMl as number).toBeLessThan(low.acidRequiredMl as number);
+  });
+
   it("reports sulfate/chloride contributions for sulfuric/hydrochloric acids", () => {
     const base = {
       startingAlkalinityPpmCaCO3: 0,

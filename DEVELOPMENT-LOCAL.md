@@ -81,6 +81,21 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
+- **Prisma schema changes (IMPORTANT)**:
+  - If you add/rename Prisma fields (edit `services/api/prisma/schema.prisma`) and the API throws errors like:
+    - `Unknown argument "someNewField"` (Prisma Client is stale)
+    - `P1012` / select-field mismatch (schema/client out of sync)
+  - Fix (run inside the `api` container):
+    - Apply migrations:
+      - `docker compose exec -T api npx prisma migrate dev`
+        - (In production jobs/servers use `npx prisma migrate deploy` instead.)
+    - Regenerate Prisma Client:
+      - `docker compose exec -T api npx prisma generate`
+    - Restart API to load the new generated client:
+      - `docker compose restart api`
+  - If it still errors, rebuild the api image (last resort):
+    - `docker compose up -d --build api`
+  - **Do NOT** use `docker compose down -v` unless you intentionally want to wipe local DB volumes.
 - **Editor / TypeScript (Cursor) dependency resolution**:
   - We intentionally bind-mount `services/api/node_modules` into the `api` container (see `docker-compose.yml`) so the editor can resolve devDependencies like `vitest`.
   - Treat `node_modules/` as **generated artifacts**: never edit them directly; always change dependencies via `package.json` and run installs.
