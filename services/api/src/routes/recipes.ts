@@ -15,14 +15,14 @@ export async function recipesRoutes(app: FastifyInstance) {
     const ctx = requireActiveAccount(req);
     const body = (req.body ?? {}) as {
       name?: unknown;
-      style?: unknown;
+      styleKey?: unknown;
       notes?: unknown;
       gristJson?: unknown;
       hopsJson?: unknown;
       yeastJson?: unknown;
     };
     const name = typeof body.name === "string" ? body.name : "";
-    const style = typeof body.style === "string" ? body.style : null;
+    const styleKey = typeof body.styleKey === "string" ? body.styleKey : "";
     const notes = typeof body.notes === "string" ? body.notes : null;
     const gristJson = body.gristJson;
     const hopsJson = body.hopsJson;
@@ -30,7 +30,7 @@ export async function recipesRoutes(app: FastifyInstance) {
 
     const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
       name,
-      style,
+      styleKey,
       notes,
       gristJson,
       hopsJson,
@@ -55,14 +55,14 @@ export async function recipesRoutes(app: FastifyInstance) {
 
     const body = (req.body ?? {}) as {
       name?: unknown;
-      style?: unknown;
+      styleKey?: unknown;
       notes?: unknown;
       gristJson?: unknown;
       hopsJson?: unknown;
       yeastJson?: unknown;
     };
     const name = typeof body.name === "string" ? body.name : undefined;
-    const style = typeof body.style === "string" ? body.style : undefined;
+    const styleKey = typeof body.styleKey === "string" ? body.styleKey : undefined;
     const notes = typeof body.notes === "string" ? body.notes : undefined;
     const gristJson = body.gristJson;
     const hopsJson = body.hopsJson;
@@ -70,7 +70,7 @@ export async function recipesRoutes(app: FastifyInstance) {
 
     const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, {
       name,
-      style,
+      styleKey,
       notes,
       gristJson,
       hopsJson,

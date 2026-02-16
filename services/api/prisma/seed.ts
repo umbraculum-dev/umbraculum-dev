@@ -4,6 +4,7 @@ import argon2 from "argon2";
 const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
 const DEV_ACCOUNT_ID = "00000000-0000-0000-0000-0000000000a1";
 const WATER_PROFILES_SOURCE = "brunwater_1_25";
+const BJCP2021_COMMIT_SHA = "fe9063dff1e86c3aa9d8c65a1c730b4a807e48c3";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -19,6 +20,88 @@ function slug(s: string) {
 
 function profileKey(type: "water" | "dilution", name: string) {
   return `${WATER_PROFILES_SOURCE}:${type}:${slug(name)}`;
+}
+
+function bjcp2021RawUrl() {
+  return `https://raw.githubusercontent.com/beerjson/bjcp-json/${BJCP2021_COMMIT_SHA}/styles/bjcp_styleguide-2021.json`;
+}
+
+async function seedBeerStyles(prisma: PrismaClient) {
+  // Always ensure the "Custom" style exists and sorts last.
+  await prisma.beerStyle.upsert({
+    where: { key: "custom" },
+    create: {
+      key: "custom",
+      source: "system",
+      version: "v1",
+      code: "custom",
+      name: "Custom",
+      category: null,
+      categoryId: null,
+      sortOrder: 1_000_000,
+      isActive: true,
+    },
+    update: {
+      name: "Custom",
+      sortOrder: 1_000_000,
+      isActive: true,
+    },
+  });
+
+  const url = bjcp2021RawUrl();
+  const res = await fetch(url);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`BJCP styles fetch failed (${res.status}) from ${url}: ${text.slice(0, 500)}`);
+  }
+  const json = (await res.json()) as any;
+  const styles = json?.beerjson?.styles;
+  if (!Array.isArray(styles)) throw new Error("BJCP styles JSON: missing beerjson.styles[]");
+
+  const seenKeys: string[] = [];
+  let sortOrder = 0;
+  for (const s of styles) {
+    const styleId = typeof s?.style_id === "string" ? s.style_id.trim() : "";
+    const name = typeof s?.name === "string" ? s.name.trim() : "";
+    if (!styleId || !name) continue;
+    const category = typeof s?.category === "string" ? s.category.trim() : null;
+    const categoryId = typeof s?.category_id === "string" ? s.category_id.trim() : null;
+    const key = `bjcp-2021:${styleId}`;
+    seenKeys.push(key);
+    await prisma.beerStyle.upsert({
+      where: { key },
+      create: {
+        key,
+        source: "bjcp",
+        version: "2021",
+        code: styleId,
+        name,
+        category,
+        categoryId,
+        sortOrder,
+        isActive: true,
+      },
+      update: {
+        code: styleId,
+        name,
+        category,
+        categoryId,
+        sortOrder,
+        isActive: true,
+      },
+    });
+    sortOrder++;
+  }
+
+  // Inactivate removed styles (manual update policy; no background sync).
+  await prisma.beerStyle.updateMany({
+    where: {
+      source: "bjcp",
+      version: "2021",
+      key: { notIn: seenKeys },
+    },
+    data: { isActive: false },
+  });
 }
 
 const SYSTEM_WATER_PROFILES: Array<{
@@ -153,6 +236,8 @@ async function main() {
       role: "owner",
     },
   });
+
+  await seedBeerStyles(prisma);
 
   // Optional: seed an owner user with a *real* password for local dev.
   // This is intentionally driven by env vars so secrets are not committed to the repo.

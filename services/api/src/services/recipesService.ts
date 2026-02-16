@@ -10,7 +10,7 @@ import { AccountsService } from "./accountsService.js";
 
 export type CreateRecipeInput = {
   name: string;
-  style?: string | null;
+  styleKey: string;
   notes?: string | null;
   gristJson?: unknown;
   hopsJson?: unknown;
@@ -19,7 +19,7 @@ export type CreateRecipeInput = {
 
 export type UpdateRecipeInput = {
   name?: string | null;
-  style?: string | null;
+  styleKey?: string | null;
   notes?: string | null;
   gristJson?: unknown;
   hopsJson?: unknown;
@@ -31,6 +31,18 @@ export class RecipesService {
 
   constructor(private readonly prisma: PrismaClient) {
     this.accounts = new AccountsService(prisma);
+  }
+
+  private async resolveStyleKey(styleKeyRaw: string) {
+    const styleKey = styleKeyRaw.trim();
+    if (!styleKey) throw new BadRequestError("invalid_style_key", "Body.styleKey is required");
+    const style = await this.prisma.beerStyle.findUnique({
+      where: { key: styleKey },
+      select: { key: true, name: true, isActive: true },
+    });
+    if (!style) throw new BadRequestError("style_not_found", "Style not found");
+    if (!style.isActive) throw new BadRequestError("style_inactive", "Style is not active");
+    return style;
   }
 
   async listRecipes(userId: string, accountId: string) {
@@ -58,7 +70,9 @@ export class RecipesService {
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");
 
-    const style = input.style?.trim() || null;
+    const styleRec = await this.resolveStyleKey(input.styleKey);
+    const styleKey = styleRec.key;
+    const style = styleRec.name;
     const notes = input.notes?.trim() || null;
     const gristJsonRaw = validateGristJson(input.gristJson);
     const gristJson =
@@ -73,6 +87,7 @@ export class RecipesService {
         accountId,
         name,
         style,
+        styleKey,
         notes,
         gristJson: gristJson === undefined ? undefined : (gristJson as any),
         hopsJson: hopsJson === undefined ? undefined : (hopsJson as any),
@@ -95,7 +110,14 @@ export class RecipesService {
       data.name = name;
     }
 
-    if (input.style !== undefined) data.style = input.style?.trim() || null;
+    if (input.styleKey !== undefined) {
+      if (input.styleKey === null) {
+        throw new BadRequestError("invalid_style_key", "Body.styleKey cannot be null");
+      }
+      const styleRec = await this.resolveStyleKey(input.styleKey);
+      data.styleKey = styleRec.key;
+      data.style = styleRec.name;
+    }
     if (input.notes !== undefined) data.notes = input.notes?.trim() || null;
     if (input.gristJson !== undefined) {
       const gristJson = validateGristJson(input.gristJson);

@@ -91,7 +91,7 @@ describe("recipes (account scoped)", () => {
       headers: { cookie: cookieA },
       payload: {
         name: "Test Recipe",
-        style: "IPA",
+        styleKey: "custom",
         gristJson: [
           {
             id: "row-1",
@@ -107,6 +107,8 @@ describe("recipes (account scoped)", () => {
     const created = create.json() as any;
     expect(created.ok).toBe(true);
     expect(created.recipe.accountId).toBe(accountAId);
+    expect(created.recipe.styleKey).toBe("custom");
+    expect(created.recipe.style).toBe("Custom");
     expect(created.recipe.gristJson).toEqual([
       {
         id: "row-1",
@@ -135,7 +137,7 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Scoped Recipe", style: null },
+      payload: { name: "Scoped Recipe", styleKey: "custom" },
     });
     const created = create.json() as any;
     expect(created.ok).toBe(true);
@@ -157,7 +159,7 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Editable Recipe", style: "Stout", notes: "Initial notes" },
+      payload: { name: "Editable Recipe", styleKey: "custom", notes: "Initial notes" },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
@@ -178,13 +180,14 @@ describe("recipes (account scoped)", () => {
       method: "PATCH",
       url: `/recipes/${created.recipe.id}`,
       headers: { cookie: cookieA },
-      payload: { name: "Renamed Recipe", style: "Porter", notes: "Updated notes" },
+      payload: { name: "Renamed Recipe", styleKey: "custom", notes: "Updated notes" },
     });
     expect(patchA.statusCode).toBe(200);
     const patched = patchA.json() as any;
     expect(patched.ok).toBe(true);
     expect(patched.recipe.name).toBe("Renamed Recipe");
-    expect(patched.recipe.style).toBe("Porter");
+    expect(patched.recipe.styleKey).toBe("custom");
+    expect(patched.recipe.style).toBe("Custom");
     expect(patched.recipe.notes).toBe("Updated notes");
 
     const getB = await app.inject({
@@ -204,7 +207,7 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Delete Me", style: null },
+      payload: { name: "Delete Me", styleKey: "custom" },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
@@ -231,7 +234,7 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Delete Scoped", style: null },
+      payload: { name: "Delete Scoped", styleKey: "custom" },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
@@ -256,6 +259,7 @@ describe("recipes (account scoped)", () => {
       headers: { cookie: cookieA },
       payload: {
         name: "Bad grist",
+        styleKey: "custom",
         gristJson: [{ id: "x", name: "Malt", amountKg: -1, colorLovibond: 2, potential: null }],
       },
     });
@@ -285,6 +289,7 @@ describe("recipes (account scoped)", () => {
       headers: { cookie: cookieA },
       payload: {
         name: "Roast dehusked snapshot recipe",
+        styleKey: "custom",
         gristJson: [
           {
             id: "row-1",
@@ -334,6 +339,7 @@ describe("recipes (account scoped)", () => {
       headers: { cookie: cookieA },
       payload: {
         name: "Yeast snapshot recipe",
+        styleKey: "custom",
         yeastJson: [
           {
             id: "y-1",
@@ -370,6 +376,7 @@ describe("recipes (account scoped)", () => {
       headers: { cookie: cookieA },
       payload: {
         name: "Bad yeast",
+        styleKey: "custom",
         yeastJson: [
           {
             id: "y-1",

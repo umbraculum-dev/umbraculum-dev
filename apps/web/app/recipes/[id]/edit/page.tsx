@@ -18,6 +18,7 @@ type Recipe = {
   accountId: string;
   name: string;
   style: string | null;
+  styleKey?: string | null;
   notes: string | null;
   gristJson?: unknown;
   hopsJson?: unknown;
@@ -25,6 +26,8 @@ type Recipe = {
   createdAt: string;
   updatedAt: string;
 };
+
+type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
 
 function newRowId() {
   try {
@@ -147,11 +150,15 @@ export default function RecipeEditPage() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [name, setName] = useState("");
-  const [style, setStyle] = useState("");
+  const [styleKey, setStyleKey] = useState("custom");
   const [notes, setNotes] = useState("");
   const [gristRows, setGristRows] = useState<GristRow[]>([]);
   const [hopsRows, setHopsRows] = useState<HopRow[]>([]);
   const [yeastRows, setYeastRows] = useState<YeastRow[]>([]);
+
+  const [styles, setStyles] = useState<StyleListItem[]>([]);
+  const [stylesLoading, setStylesLoading] = useState(false);
+  const [stylesError, setStylesError] = useState<string | null>(null);
 
   // Ingredient DB searches (v0)
   const [fermentableQuery, setFermentableQuery] = useState("");
@@ -189,7 +196,7 @@ export default function RecipeEditPage() {
         if (cancelled) return;
         setRecipe(r);
         setName(r.name ?? "");
-        setStyle(r.style ?? "");
+        setStyleKey((r as any).styleKey ?? "custom");
         setNotes(r.notes ?? "");
         setGristRows(parseGristJson(r.gristJson));
         setHopsRows(parseHopsJson(r.hopsJson));
@@ -207,6 +214,27 @@ export default function RecipeEditPage() {
     };
   }, [canCallAccountScoped, recipeId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setStylesLoading(true);
+      setStylesError(null);
+      try {
+        const res = await apiFetch("/api/styles");
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const items = (res.data as any)?.styles;
+        if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+      } catch (err) {
+        if (!cancelled) setStylesError(String(err));
+      } finally {
+        if (!cancelled) setStylesLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const onSave = async () => {
     if (!recipeId) return;
     setSaving(true);
@@ -218,7 +246,7 @@ export default function RecipeEditPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          style: style || null,
+          styleKey,
           notes: notes || null,
           gristJson: gristRows,
           hopsJson: hopsRows,
@@ -228,6 +256,7 @@ export default function RecipeEditPage() {
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const r = (res.data as any).recipe as Recipe;
       setRecipe(r);
+      setStyleKey((r as any).styleKey ?? styleKey);
       setSaveStatus("Saved.");
     } catch (err) {
       setSaveError(String(err));
@@ -593,12 +622,25 @@ export default function RecipeEditPage() {
                 >
                   Style
                 </label>
-                <input
+                <select
                   id="recipe-style"
-                  value={style}
-                  onChange={(e) => setStyle(e.target.value)}
+                  value={styleKey}
+                  onChange={(e) => setStyleKey(e.target.value)}
                   style={{ width: "100%", padding: 8 }}
-                />
+                  disabled={stylesLoading || styles.length === 0}
+                  required
+                >
+                  {styles.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
+                    </option>
+                  ))}
+                </select>
+                {stylesError ? (
+                  <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                    {String(stylesError)}
+                  </p>
+                ) : null}
               </div>
             </div>
 

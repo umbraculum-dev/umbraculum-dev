@@ -120,11 +120,49 @@ model EmailVerificationToken {
   @@index([email])
 }
 
+model BeerStyle {
+  /** Stable canonical key (e.g. "bjcp-2021:13C" or "custom"). */
+  key      String  @id
+  source   String  // e.g. "bjcp"
+  version  String  // e.g. "2021"
+  code     String  // e.g. "13C"
+  name     String
+  category String?
+  categoryId String?
+
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipes Recipe[]
+  aliases BeerStyleAlias[]
+
+  @@index([source, version])
+  @@index([code])
+}
+
+model BeerStyleAlias {
+  id       String @id @default(uuid())
+  /** Stable alias key (e.g. "bjcp-2017:13C") mapping into a canonical `BeerStyle.key`. */
+  aliasKey String @unique
+  styleKey String
+  note     String?
+  createdAt DateTime @default(now())
+
+  style BeerStyle @relation(fields: [styleKey], references: [key], onDelete: Cascade)
+
+  @@index([styleKey])
+}
+
 model Recipe {
   id        String   @id @default(uuid())
   accountId String
   name      String
   style     String?
+  /** Canonical style reference (preferred). */
+  styleKey  String?
   notes     String?  @db.Text
   gristJson Json?
   hopsJson  Json?
@@ -134,8 +172,10 @@ model Recipe {
 
   account       Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
   waterSettings RecipeWaterSettings?
+  beerStyle     BeerStyle?           @relation(fields: [styleKey], references: [key], onDelete: Restrict)
 
   @@index([accountId])
+  @@index([styleKey])
 }
 
 model RecipeWaterSettings {

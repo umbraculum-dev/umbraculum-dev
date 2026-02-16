@@ -8,6 +8,7 @@ import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
 
 type RecipeListItem = { id: string; accountId: string; name: string; style: string | null };
+type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
 
 export default function RecipesPage() {
   const t = useTranslations("recipes");
@@ -20,11 +21,32 @@ export default function RecipesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [newName, setNewName] = useState("");
-  const [newStyle, setNewStyle] = useState("");
+  const [newStyleKey, setNewStyleKey] = useState("");
   const [creating, setCreating] = useState(false);
 
   const canCall = authState.status === "ready";
   const activeAccountId = authState.status === "ready" ? authState.me.activeAccountId : null;
+
+  const [styles, setStyles] = useState<StyleListItem[]>([]);
+  const [stylesLoading, setStylesLoading] = useState(false);
+  const [stylesError, setStylesError] = useState<string | null>(null);
+
+  const loadStyles = async () => {
+    if (!canCall) return;
+    setStylesError(null);
+    setStylesLoading(true);
+    try {
+      const res = await apiFetch("/api/styles");
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const items = (res.data as any)?.styles;
+      setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+    } catch (err) {
+      setStyles([]);
+      setStylesError(String(err));
+    } finally {
+      setStylesLoading(false);
+    }
+  };
 
   const refresh = async () => {
     if (!canCall) return;
@@ -44,6 +66,7 @@ export default function RecipesPage() {
   };
 
   useEffect(() => {
+    void loadStyles();
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState.status]);
@@ -52,18 +75,19 @@ export default function RecipesPage() {
     e.preventDefault();
     if (!canCall) return;
     const name = newName.trim();
-    if (!name) return;
+    const styleKey = newStyleKey.trim();
+    if (!name || !styleKey) return;
     setCreating(true);
     setError(null);
     try {
       const res = await apiFetch("/api/recipes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, style: newStyle.trim() || undefined }),
+        body: JSON.stringify({ name, styleKey }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       setNewName("");
-      setNewStyle("");
+      setNewStyleKey("");
       await refresh();
     } catch (err) {
       setError(String(err));
@@ -103,16 +127,30 @@ export default function RecipesPage() {
               <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-style">
                 {t("styleLabel")}
               </label>
-              <input
+              <select
                 id="recipe-style"
-                value={newStyle}
-                onChange={(e) => setNewStyle(e.target.value)}
+                value={newStyleKey}
+                onChange={(e) => setNewStyleKey(e.target.value)}
                 style={{ width: "100%", padding: 8 }}
-              />
+                disabled={!canCall || stylesLoading || styles.length === 0}
+                required
+              >
+                <option value="">{stylesLoading ? t("stylesLoading") : t("stylePlaceholder")}</option>
+                {styles.map((s) => (
+                  <option key={s.key} value={s.key}>
+                    {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
+                  </option>
+                ))}
+              </select>
+              {stylesError ? (
+                <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                  {String(stylesError)}
+                </p>
+              ) : null}
             </div>
           </div>
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-            <button type="submit" disabled={!canCall || creating || !newName.trim()}>
+            <button type="submit" disabled={!canCall || creating || !newName.trim() || !newStyleKey.trim()}>
               {creating ? t("creating") : t("createButton")}
             </button>
             <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
