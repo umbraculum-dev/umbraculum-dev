@@ -501,6 +501,9 @@ export default function WaterHubPage() {
 
                 {recap.mergedIons ? (
                   <>
+                    <div style={{ marginTop: 8, marginBottom: 6 }}>
+                      <strong>Merged ions</strong>
+                    </div>
                     <p className="muted" style={{ marginTop: 8, marginBottom: 8 }}>
                       Merged ions (ppm) are computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl
                       counter-ions only) and averaged by volume. Streams without saved snapshots are excluded.
@@ -510,7 +513,7 @@ export default function WaterHubPage() {
                       <thead>
                         <tr>
                           <th align="left">Ion</th>
-                          <th align="right">Merged (ppm)</th>
+                          <th align="left">Merged (ppm)</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -526,7 +529,7 @@ export default function WaterHubPage() {
                         ).map(([label, v]) => (
                           <tr key={label}>
                             <td>{label}</td>
-                            <td align="right">{v.toFixed(2)}</td>
+                            <td align="left">{v.toFixed(2)}</td>
                           </tr>
                         ))}
                       </tbody>
