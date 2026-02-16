@@ -1,0 +1,92 @@
+{
+  "common": {
+    "backToDashboard": "Back to Dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "recipes": "Recipes",
+    "waterProfiles": "Water profiles",
+    "about": "About",
+    "language": "Language"
+  },
+  "recipes": {
+    "title": "Recipes",
+    "subtitle": "This is the recipe area entrypoint (list/edit/water calculator).",
+    "instructions": "For now, create recipes from the Dashboard dev panel and then navigate to edit/water pages once they exist."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Desktop-first web app + native mobile apps, offline-first brew-day logging."
+  },
+  "health": {
+    "title": "API health",
+    "subtitle": "Fetching {url} from the browser (via Nginx)."
+  },
+  "devDashboard": {
+    "loading": "Loading dev dashboard…"
+  },
+  "waterProfiles": {
+    "title": "Water profiles",
+    "activeAccount": "Active account"
+  },
+  "salts": {
+    "gypsum": "Gypsum",
+    "calciumChloride": "Calcium chloride",
+    "epsom": "Epsom",
+    "tableSalt": "Table salt",
+    "bakingSoda": "Baking soda",
+    "modeManualSuffix": "(manual)",
+    "modeRequiredSuffix": "(required)"
+  },
+  "waterHub": {
+    "title": "Water management",
+    "recipeId": "Recipe ID",
+    "backToRecipeEditor": "Back to recipe editor",
+    "missingHeaders": "Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account), then come back here.",
+    "chooseArea": "Choose an area",
+    "mashWater": "Mash water",
+    "spargeWater": "Sparge water",
+    "additionalBoilWater": "Additional boil water",
+    "lastCalculated": "last calculated",
+    "manageProfilesOn": "Manage profiles on",
+    "waterProfilesLink": "Water profiles",
+    "quickStatus": "Quick status (read-only)",
+    "mashAcidMode": "Mash acid mode",
+    "spargeAcidMode": "Sparge acid mode",
+    "mashOverallSnapshot": "Mash overall snapshot",
+    "finalAlkalinity": "Final alkalinity",
+    "openMashOverall": "Open mash overall",
+    "refreshing": "Refreshing…",
+    "refresh": "Refresh",
+    "profilesLoaded": "Profiles loaded.",
+    "profilesNotLoaded": "Profiles not loaded.",
+    "recap": "Recap (read-only)",
+    "recapSubtitle": "Uses saved snapshots where available; merged pH is an approximation using volume-weighted [H+].",
+    "mergedWaterRecap": "Merged water recap",
+    "computed": "Computed",
+    "clickToExpand": "Click to expand",
+    "perStream": "Per stream",
+    "colStream": "Stream",
+    "colVolumeL": "Volume (L)",
+    "colPh": "pH",
+    "colFinalAlk": "Final alkalinity (ppm as CaCO3)",
+    "mergedSummary": "Merged summary",
+    "totalVolume": "Total volume",
+    "approxMergedPh": "Approx merged pH",
+    "mergedFinalAlk": "Merged final alkalinity",
+    "additionsPerStream": "Additions (per stream)",
+    "salt": "Salt",
+    "acid": "Acid",
+    "mergedIonsTitle": "Merged ions",
+    "mergedIonsDescription": "Merged ions (ppm) are computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl counter-ions only) and averaged by volume. Streams without saved snapshots are excluded.",
+    "ion": "Ion",
+    "mergedPpm": "Merged (ppm)",
+    "noMergedProfile": "No merged profile available yet (need saved salts + acid snapshots for at least one stream).",
+    "noSettingsLoaded": "No settings loaded yet."
+  },
+  "about": {
+    "title": "About",
+    "subtitle": "Brewery App is an internal tool for recipe development and brew-day logging, with a water chemistry calculator inspired by BrunWater."
+  }
+}
+

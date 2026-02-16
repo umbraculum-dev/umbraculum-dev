@@ -1,16 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { loadDevAuthFromStorage, type DevAuth } from "../_lib/devAuth";
-import { apiFetch } from "../_lib/apiClient";
-import type { MeResponse, WaterProfile, WaterProfilesResponse } from "../_lib/apiTypes";
+import { useTranslations } from "next-intl";
+
+import { Link } from "../../../src/i18n/navigation";
+
+import { loadDevAuthFromStorage, type DevAuth } from "../../_lib/devAuth";
+import { apiFetch } from "../../_lib/apiClient";
+import type { MeResponse, WaterProfile, WaterProfilesResponse } from "../../_lib/apiTypes";
 
 function isAdmin(role: string | null) {
   return role === "owner" || role === "brewery_admin";
 }
 
 export default function WaterProfilesPage() {
+  const t = useTranslations("waterProfiles");
   const [auth, setAuth] = useState<DevAuth | null>(null);
   const [authLoaded, setAuthLoaded] = useState(false);
   const [me, setMe] = useState<MeResponse | null>(null);
@@ -133,9 +137,9 @@ export default function WaterProfilesPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>Water profiles</h1>
+      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
-        Active account: <code>{auth?.activeAccountId ? auth.activeAccountId : "—"}</code>
+        {t("activeAccount")}: <code>{auth?.activeAccountId ? auth.activeAccountId : "—"}</code>
       </p>
 
       {authLoaded && !canCall ? (

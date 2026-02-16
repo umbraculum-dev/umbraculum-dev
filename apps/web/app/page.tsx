@@ -1,3 +1,9 @@
+import { redirect } from "next/navigation";
+
+export default function RootRedirect() {
+  redirect("/en");
+}
+
 import { HealthPanel } from "./HealthPanel";
 import { DashboardClient } from "./DashboardClient";
 

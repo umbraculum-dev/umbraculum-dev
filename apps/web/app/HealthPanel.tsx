@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type HealthState =
   | { status: "idle" | "loading" }
@@ -8,6 +9,7 @@ type HealthState =
   | { status: "error"; error: string };
 
 export function HealthPanel() {
+  const t = useTranslations("health");
   const [state, setState] = useState<HealthState>({ status: "idle" });
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
@@ -31,9 +33,9 @@ export function HealthPanel() {
 
   return (
     <section>
-      <h2 style={{ marginTop: 24 }}>API health</h2>
+      <h2 style={{ marginTop: 24 }}>{t("title")}</h2>
       <p className="muted" style={{ marginTop: 0 }}>
-        Fetching <code>{apiBase}/health</code> from the browser (via Nginx).
+        {t("subtitle", { url: `${apiBase}/health` })}
       </p>
       <pre className="codeBlock">
         {JSON.stringify(state, null, 2)}

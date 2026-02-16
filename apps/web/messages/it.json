@@ -1,0 +1,92 @@
+{
+  "common": {
+    "backToDashboard": "Torna alla Dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "recipes": "Ricette",
+    "waterProfiles": "Profili acqua",
+    "about": "Info",
+    "language": "Lingua"
+  },
+  "recipes": {
+    "title": "Ricette",
+    "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",
+    "instructions": "Per ora, crea le ricette dal pannello dev della Dashboard e poi vai alle pagine di modifica/calcolatore acqua."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first."
+  },
+  "health": {
+    "title": "Stato API",
+    "subtitle": "Richiesta di {url} dal browser (via Nginx)."
+  },
+  "devDashboard": {
+    "loading": "Caricamento dashboard dev…"
+  },
+  "waterProfiles": {
+    "title": "Profili acqua",
+    "activeAccount": "Account attivo"
+  },
+  "salts": {
+    "gypsum": "Gesso (gypsum)",
+    "calciumChloride": "Cloruro di calcio",
+    "epsom": "Sali di Epsom",
+    "tableSalt": "Sale da cucina",
+    "bakingSoda": "Bicarbonato di sodio",
+    "modeManualSuffix": "(manuale)",
+    "modeRequiredSuffix": "(richiesto)"
+  },
+  "waterHub": {
+    "title": "Gestione acqua",
+    "recipeId": "ID ricetta",
+    "backToRecipeEditor": "Torna all’editor ricetta",
+    "missingHeaders": "Header dev mancanti. Vai in Dashboard e clicca <strong>Salva header</strong> (Utente + Account attivo), poi torna qui.",
+    "chooseArea": "Scegli un’area",
+    "mashWater": "Acqua mash",
+    "spargeWater": "Acqua sparge",
+    "additionalBoilWater": "Acqua aggiuntiva in bollitura",
+    "lastCalculated": "ultimo calcolo",
+    "manageProfilesOn": "Gestisci i profili in",
+    "waterProfilesLink": "Profili acqua",
+    "quickStatus": "Stato rapido (sola lettura)",
+    "mashAcidMode": "Modalità acido mash",
+    "spargeAcidMode": "Modalità acido sparge",
+    "mashOverallSnapshot": "Snapshot complessivo mash",
+    "finalAlkalinity": "Alcalinità finale",
+    "openMashOverall": "Apri il riepilogo mash",
+    "refreshing": "Aggiornamento…",
+    "refresh": "Aggiorna",
+    "profilesLoaded": "Profili caricati.",
+    "profilesNotLoaded": "Profili non caricati.",
+    "recap": "Riepilogo (sola lettura)",
+    "recapSubtitle": "Usa snapshot salvati quando disponibili; il pH unito è una approssimazione tramite [H+] pesato sul volume.",
+    "mergedWaterRecap": "Riepilogo acqua unita",
+    "computed": "Calcolato",
+    "clickToExpand": "Clicca per espandere",
+    "perStream": "Per flusso",
+    "colStream": "Flusso",
+    "colVolumeL": "Volume (L)",
+    "colPh": "pH",
+    "colFinalAlk": "Alcalinità finale (ppm come CaCO3)",
+    "mergedSummary": "Riepilogo unito",
+    "totalVolume": "Volume totale",
+    "approxMergedPh": "pH unito (approx)",
+    "mergedFinalAlk": "Alcalinità finale unita",
+    "additionsPerStream": "Aggiunte (per flusso)",
+    "salt": "Sali",
+    "acid": "Acido",
+    "mergedIonsTitle": "Ioni uniti",
+    "mergedIonsDescription": "Gli ioni uniti (ppm) sono calcolati da snapshot mash/sparge/boil salvati dopo sali + acido (solo contro-ioni SO4/Cl) e mediati per volume. I flussi senza snapshot salvati sono esclusi.",
+    "ion": "Ione",
+    "mergedPpm": "Unito (ppm)",
+    "noMergedProfile": "Profilo unito non ancora disponibile (servono snapshot sali + acido salvati per almeno un flusso).",
+    "noSettingsLoaded": "Nessuna impostazione caricata."
+  },
+  "about": {
+    "title": "Info",
+    "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater."
+  }
+}
+

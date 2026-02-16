@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "../../../../src/i18n/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { loadDevAuthFromStorage, type DevAuth } from "../../../_lib/devAuth";
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterSettings, type RecipeWaterSettingsResponse } from "./_lib/waterSettings";
 import type { IonProfilePpm } from "./_lib/waterChem";
 import { combineAfterSaltsAndAcid } from "./_lib/waterChem";
+import { formatFixed } from "../../../../src/i18n/format";
 
 type MashOverallResultV0 = {
   calculatedAt: string;
@@ -18,6 +20,9 @@ type MashOverallResultV0 = {
 };
 
 export default function WaterHubPage() {
+  const t = useTranslations("waterHub");
+  const tsalts = useTranslations("salts");
+  const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
@@ -98,15 +103,15 @@ export default function WaterHubPage() {
     const formatSaltKeyLabel = (saltKey: string): string => {
       switch (saltKey) {
         case "gypsum":
-          return "Gypsum";
+          return tsalts("gypsum");
         case "calcium_chloride":
-          return "Calcium chloride";
+          return tsalts("calciumChloride");
         case "epsom":
-          return "Epsom";
+          return tsalts("epsom");
         case "table_salt":
-          return "Table salt";
+          return tsalts("tableSalt");
         case "baking_soda":
-          return "Baking soda";
+          return tsalts("bakingSoda");
         default:
           return saltKey;
       }
@@ -125,7 +130,7 @@ export default function WaterHubPage() {
         const saltKey = typeof r.saltKey === "string" ? r.saltKey : null;
         const grams = typeof r.grams === "number" && Number.isFinite(r.grams) ? r.grams : null;
         if (!saltKey || grams == null || !(grams > 0)) continue;
-        parts.push(`${formatSaltKeyLabel(saltKey)} ${grams.toFixed(3)} g`);
+        parts.push(`${formatSaltKeyLabel(saltKey)} ${formatFixed(locale, grams, 3)} g`);
       }
 
       return parts.length ? parts.join("; ") : null;
@@ -164,17 +169,17 @@ export default function WaterHubPage() {
       settings.mashAcidificationMode === "manual"
         ? settings.mashStrengthKind === "solid"
           ? settings.mashManualAcidAddedGrams != null
-            ? `${settings.mashManualAcidAddedGrams.toFixed(3)} g (manual)`
+            ? `${formatFixed(locale, settings.mashManualAcidAddedGrams, 3)} g ${tsalts("modeManualSuffix")}`
             : null
           : settings.mashManualAcidAddedMl != null
-            ? `${settings.mashManualAcidAddedMl.toFixed(3)} mL (manual)`
+            ? `${formatFixed(locale, settings.mashManualAcidAddedMl, 3)} mL ${tsalts("modeManualSuffix")}`
             : null
         : settings.mashStrengthKind === "solid"
           ? settings.mashLastAcidRequiredGrams != null
-            ? `${settings.mashLastAcidRequiredGrams.toFixed(3)} g (required)`
+            ? `${formatFixed(locale, settings.mashLastAcidRequiredGrams, 3)} g ${tsalts("modeRequiredSuffix")}`
             : null
           : settings.mashLastAcidRequiredMl != null
-            ? `${settings.mashLastAcidRequiredMl.toFixed(3)} mL (required)`
+            ? `${formatFixed(locale, settings.mashLastAcidRequiredMl, 3)} mL ${tsalts("modeRequiredSuffix")}`
             : null;
 
     const spargeVolumeLiters = typeof settings.spargeVolumeLiters === "number" ? settings.spargeVolumeLiters : null;
@@ -202,17 +207,17 @@ export default function WaterHubPage() {
       settings.spargeAcidificationMode === "manual"
         ? settings.spargeStrengthKind === "solid"
           ? settings.spargeManualAcidAddedGrams != null
-            ? `${settings.spargeManualAcidAddedGrams.toFixed(3)} g (manual)`
+            ? `${formatFixed(locale, settings.spargeManualAcidAddedGrams, 3)} g ${tsalts("modeManualSuffix")}`
             : null
           : settings.spargeManualAcidAddedMl != null
-            ? `${settings.spargeManualAcidAddedMl.toFixed(3)} mL (manual)`
+            ? `${formatFixed(locale, settings.spargeManualAcidAddedMl, 3)} mL ${tsalts("modeManualSuffix")}`
             : null
         : settings.spargeStrengthKind === "solid"
           ? settings.spargeLastAcidRequiredGrams != null
-            ? `${settings.spargeLastAcidRequiredGrams.toFixed(3)} g (required)`
+            ? `${formatFixed(locale, settings.spargeLastAcidRequiredGrams, 3)} g ${tsalts("modeRequiredSuffix")}`
             : null
           : settings.spargeLastAcidRequiredMl != null
-            ? `${settings.spargeLastAcidRequiredMl.toFixed(3)} mL (required)`
+            ? `${formatFixed(locale, settings.spargeLastAcidRequiredMl, 3)} mL ${tsalts("modeRequiredSuffix")}`
             : null;
 
     const boilVolumeLiters =
@@ -241,23 +246,23 @@ export default function WaterHubPage() {
       settings.boilAcidificationMode === "manual"
         ? settings.boilStrengthKind === "solid"
           ? settings.boilManualAcidAddedGrams != null
-            ? `${settings.boilManualAcidAddedGrams.toFixed(3)} g (manual)`
+            ? `${formatFixed(locale, settings.boilManualAcidAddedGrams, 3)} g ${tsalts("modeManualSuffix")}`
             : null
           : settings.boilManualAcidAddedMl != null
-            ? `${settings.boilManualAcidAddedMl.toFixed(3)} mL (manual)`
+            ? `${formatFixed(locale, settings.boilManualAcidAddedMl, 3)} mL ${tsalts("modeManualSuffix")}`
             : null
         : settings.boilStrengthKind === "solid"
           ? settings.boilLastAcidRequiredGrams != null
-            ? `${settings.boilLastAcidRequiredGrams.toFixed(3)} g (required)`
+            ? `${formatFixed(locale, settings.boilLastAcidRequiredGrams, 3)} g ${tsalts("modeRequiredSuffix")}`
             : null
           : settings.boilLastAcidRequiredMl != null
-            ? `${settings.boilLastAcidRequiredMl.toFixed(3)} mL (required)`
+            ? `${formatFixed(locale, settings.boilLastAcidRequiredMl, 3)} mL ${tsalts("modeRequiredSuffix")}`
             : null;
 
     const streams: StreamSummary[] = [
       {
         key: "mash",
-        label: "Mash",
+        label: t("mashWater"),
         volumeLiters: mashVolumeLiters,
         ph: mashPh,
         finalAlkalinityPpmCaCO3: mashFinalAlk,
@@ -268,7 +273,7 @@ export default function WaterHubPage() {
       },
       {
         key: "sparge",
-        label: "Sparge",
+        label: t("spargeWater"),
         volumeLiters: spargeVolumeLiters,
         ph: spargePh,
         finalAlkalinityPpmCaCO3: spargeFinalAlk,
@@ -279,7 +284,7 @@ export default function WaterHubPage() {
       },
       {
         key: "boil",
-        label: "Additional boil",
+        label: t("additionalBoilWater"),
         volumeLiters: boilVolumeLiters,
         ph: boilPh,
         finalAlkalinityPpmCaCO3: boilFinalAlk,
@@ -322,82 +327,92 @@ export default function WaterHubPage() {
         : null;
 
     return { streams, mergedIons, mergedFinalAlk, mergedPh, totalVolumeLiters: totalV };
-  }, [settings, overall]);
+  }, [settings, overall, t, tsalts]);
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>Water management</h1>
+      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
-        Recipe ID: <code>{recipeId}</code>
+        {t("recipeId")}: <code>{recipeId}</code>
       </p>
 
       <p style={{ marginTop: 0 }}>
-        <Link href={`/recipes/${recipeId}/edit`}>Back to recipe editor</Link>
+        <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
       </p>
 
       {authLoaded && !canCall ? (
         <p role="alert" className="errorBox">
-          Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account),
-          then come back here.
+          {t.rich("missingHeaders", {
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="water-hub-links">
           <h2 id="water-hub-links" style={{ marginTop: 0 }}>
-            Choose an area
+            {t("chooseArea")}
           </h2>
           <ul>
             <li>
-              <Link href={`/recipes/${recipeId}/water/mash`}>Mash water</Link>
-              <span className="muted"> · last calculated: {mashLast}</span>
+              <Link href={`/recipes/${recipeId}/water/mash`}>{t("mashWater")}</Link>
+              <span className="muted">
+                {" "}
+                · {t("lastCalculated")}: {mashLast}
+              </span>
             </li>
             <li>
-              <Link href={`/recipes/${recipeId}/water/sparge`}>Sparge water</Link>
-              <span className="muted"> · last calculated: {spargeLast}</span>
+              <Link href={`/recipes/${recipeId}/water/sparge`}>{t("spargeWater")}</Link>
+              <span className="muted">
+                {" "}
+                · {t("lastCalculated")}: {spargeLast}
+              </span>
             </li>
             <li>
-              <Link href={`/recipes/${recipeId}/water/boil`}>Additional boil water</Link>
-              <span className="muted"> · last calculated: {boilLast}</span>
+              <Link href={`/recipes/${recipeId}/water/boil`}>{t("additionalBoilWater")}</Link>
+              <span className="muted">
+                {" "}
+                · {t("lastCalculated")}: {boilLast}
+              </span>
             </li>
           </ul>
           <p className="muted" style={{ marginBottom: 0 }}>
-            Manage profiles on <Link href="/water-profiles">Water profiles</Link>.
+            {t("manageProfilesOn")} <Link href="/water-profiles">{t("waterProfilesLink")}</Link>.
           </p>
         </section>
 
         <section className="panel" aria-labelledby="water-hub-status">
           <h2 id="water-hub-status" style={{ marginTop: 0 }}>
-            Quick status (read-only)
+            {t("quickStatus")}
           </h2>
           <ul style={{ marginTop: 0 }}>
             <li>
-              Mash acid mode: <code>{settings?.mashAcidificationMode ?? "—"}</code>
+              {t("mashAcidMode")}: <code>{settings?.mashAcidificationMode ?? "—"}</code>
             </li>
             <li>
-              Sparge acid mode: <code>{settings?.spargeAcidificationMode ?? "—"}</code>
+              {t("spargeAcidMode")}: <code>{settings?.spargeAcidificationMode ?? "—"}</code>
             </li>
             <li>
-              Mash overall snapshot:{" "}
+              {t("mashOverallSnapshot")}:{" "}
               {overall ? (
                 <>
-                  pH ({overall.ph.kind}) <code>{overall.ph.value.toFixed(2)}</code> · Final alkalinity{" "}
-                  <code>{overall.finalAlkalinityPpmCaCO3.toFixed(2)}</code>
+                  pH ({overall.ph.kind}) <code>{formatFixed(locale, overall.ph.value, 2)}</code> · Final alkalinity{" "}
+                  <code>{formatFixed(locale, overall.finalAlkalinityPpmCaCO3, 2)}</code>
                 </>
               ) : (
                 <span className="muted">—</span>
               )}
               {" · "}
-              <Link href={`/recipes/${recipeId}/water/mash#overall-mash-water-result`}>Open mash overall</Link>
+              <Link href={`/recipes/${recipeId}/water/mash#overall-mash-water-result`}>{t("openMashOverall")}</Link>
             </li>
           </ul>
 
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
-              {loading ? "Refreshing…" : "Refresh"}
+              {loading ? t("refreshing") : t("refresh")}
             </button>
             <span className="muted" role="status" aria-live="polite">
-              {profiles ? "Profiles loaded." : "Profiles not loaded."}
+              {profiles ? t("profilesLoaded") : t("profilesNotLoaded")}
             </span>
           </div>
 
@@ -410,30 +425,30 @@ export default function WaterHubPage() {
 
         <section className="panel" aria-labelledby="water-hub-recap">
           <h2 id="water-hub-recap" style={{ marginTop: 0 }}>
-            Recap (read-only)
+            {t("recap")}
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
-            Uses saved snapshots where available; merged pH is an approximation using volume-weighted [H+].
+            {t("recapSubtitle")}
           </p>
 
           <details className="fieldBlock fieldBlock--computed">
             <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
-              <strong>Merged water recap</strong>
-              <span className="fieldBadge">Computed</span>
-              <span className="muted">Click to expand</span>
+              <strong>{t("mergedWaterRecap")}</strong>
+              <span className="fieldBadge">{t("computed")}</span>
+              <span className="muted">{t("clickToExpand")}</span>
             </summary>
 
             {recap ? (
               <>
-                <h3 style={{ marginTop: 12 }}>Per stream</h3>
+                <h3 style={{ marginTop: 12 }}>{t("perStream")}</h3>
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: "left" }}>Stream</th>
-                        <th style={{ textAlign: "left" }}>Volume (L)</th>
-                        <th style={{ textAlign: "left" }}>pH</th>
-                        <th style={{ textAlign: "left" }}>Final alkalinity (ppm as CaCO3)</th>
+                        <th style={{ textAlign: "left" }}>{t("colStream")}</th>
+                        <th style={{ textAlign: "left" }}>{t("colVolumeL")}</th>
+                        <th style={{ textAlign: "left" }}>{t("colPh")}</th>
+                        <th style={{ textAlign: "left" }}>{t("colFinalAlk")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -442,12 +457,18 @@ export default function WaterHubPage() {
                           <td style={{ textAlign: "left" }}>
                             <strong>{s.label}</strong>
                           </td>
-                          <td style={{ textAlign: "left" }}>{s.volumeLiters == null ? "—" : s.volumeLiters.toFixed(2)}</td>
-                          <td style={{ textAlign: "left" }}>{s.ph == null ? "—" : s.ph.toFixed(2)}</td>
+                          <td style={{ textAlign: "left" }}>
+                            {s.volumeLiters == null ? "—" : formatFixed(locale, s.volumeLiters, 2)}
+                          </td>
+                          <td style={{ textAlign: "left" }}>{s.ph == null ? "—" : formatFixed(locale, s.ph, 2)}</td>
                           <td style={{ textAlign: "left" }}>
                             {s.finalAlkalinityPpmCaCO3 == null
                               ? "—"
-                              : displayAlkalinityPpmCaCO3(s.finalAlkalinityPpmCaCO3).toFixed(2)}
+                              : formatFixed(
+                                  locale,
+                                  displayAlkalinityPpmCaCO3(s.finalAlkalinityPpmCaCO3),
+                                  2,
+                                )}
                           </td>
                         </tr>
                       ))}
@@ -455,24 +476,27 @@ export default function WaterHubPage() {
                   </table>
                 </div>
 
-                <h3 style={{ marginTop: 16 }}>Merged summary</h3>
+                <h3 style={{ marginTop: 16 }}>{t("mergedSummary")}</h3>
                 <ul style={{ marginTop: 0 }}>
                   <li>
-                    Total volume: <code>{recap.totalVolumeLiters.toFixed(2)}</code> L
+                    {t("totalVolume")}: <code>{formatFixed(locale, recap.totalVolumeLiters, 2)}</code> L
                   </li>
                   <li>
-                    Approx merged pH: <code>{recap.mergedPh == null ? "—" : recap.mergedPh.toFixed(2)}</code>
+                    {t("approxMergedPh")}:{" "}
+                    <code>{recap.mergedPh == null ? "—" : formatFixed(locale, recap.mergedPh, 2)}</code>
                   </li>
                   <li>
-                    Merged final alkalinity:{" "}
+                    {t("mergedFinalAlk")}:{" "}
                     <code>
-                      {recap.mergedFinalAlk == null ? "—" : displayAlkalinityPpmCaCO3(recap.mergedFinalAlk).toFixed(2)}
+                      {recap.mergedFinalAlk == null
+                        ? "—"
+                        : formatFixed(locale, displayAlkalinityPpmCaCO3(recap.mergedFinalAlk), 2)}
                     </code>{" "}
                     ppm as CaCO3
                   </li>
                 </ul>
 
-                <h4 style={{ marginTop: 12, marginBottom: 6 }}>Additions (per stream)</h4>
+                <h4 style={{ marginTop: 12, marginBottom: 6 }}>{t("additionsPerStream")}</h4>
                 <ul style={{ marginTop: 0 }}>
                   {recap.streams.map((s) => (
                     <li key={`adds-${s.key}`}>
@@ -481,16 +505,16 @@ export default function WaterHubPage() {
                         {(s.saltsAddedLabel ? s.saltsAddedLabel.split("; ") : []).length ? (
                           (s.saltsAddedLabel as string).split("; ").map((p) => (
                             <li key={`adds-${s.key}-salt-${p}`}>
-                              <span className="muted">Salt</span> <code>{p}</code>
+                              <span className="muted">{t("salt")}</span> <code>{p}</code>
                             </li>
                           ))
                         ) : (
                           <li>
-                            <span className="muted">Salt</span> <code>—</code>
+                            <span className="muted">{t("salt")}</span> <code>—</code>
                           </li>
                         )}
                         <li>
-                          <span className="muted">Acid</span>{" "}
+                          <span className="muted">{t("acid")}</span>{" "}
                           <code>{s.acidType ?? "—"}</code>
                           {s.acidAmountLabel ? <span className="muted"> · {s.acidAmountLabel}</span> : null}
                         </li>
@@ -502,18 +526,17 @@ export default function WaterHubPage() {
                 {recap.mergedIons ? (
                   <>
                     <div style={{ marginTop: 8, marginBottom: 6 }}>
-                      <strong>Merged ions</strong>
+                      <strong>{t("mergedIonsTitle")}</strong>
                     </div>
                     <p className="muted" style={{ marginTop: 8, marginBottom: 8 }}>
-                      Merged ions (ppm) are computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl
-                      counter-ions only) and averaged by volume. Streams without saved snapshots are excluded.
+                      {t("mergedIonsDescription")}
                     </p>
                     <div style={{ overflowX: "auto", marginTop: 8 }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
                         <tr>
-                          <th align="left">Ion</th>
-                          <th align="left">Merged (ppm)</th>
+                          <th align="left">{t("ion")}</th>
+                          <th align="left">{t("mergedPpm")}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -529,7 +552,7 @@ export default function WaterHubPage() {
                         ).map(([label, v]) => (
                           <tr key={label}>
                             <td>{label}</td>
-                            <td align="left">{v.toFixed(2)}</td>
+                            <td align="left">{formatFixed(locale, v, 2)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -538,13 +561,13 @@ export default function WaterHubPage() {
                   </>
                 ) : (
                   <p className="muted" style={{ marginTop: 8 }}>
-                    No merged profile available yet (need saved salts + acid snapshots for at least one stream).
+                    {t("noMergedProfile")}
                   </p>
                 )}
               </>
             ) : (
               <p className="muted" style={{ marginTop: 8 }}>
-                No settings loaded yet.
+                {t("noSettingsLoaded")}
               </p>
             )}
           </details>
