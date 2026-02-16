@@ -185,7 +185,8 @@ describe("recipe water-settings", () => {
     expect(body.settings.dilutionWaterVolumeLiters).toBe(5);
     expect(body.settings.mashStartingAlkalinityPpmCaCO3).toBe(40);
     expect(body.settings.mashTargetPh).toBe(5.4);
-    expect(body.settings.mashWaterVolumeLiters).toBe(12);
+    // mashWaterVolumeLiters is now derived from mixing volumes (tap + dilution)
+    expect(body.settings.mashWaterVolumeLiters).toBe(15);
     expect(body.settings.mashAcidType).toBe("lactic");
     expect(body.settings.mashStrengthKind).toBe("percent");
     expect(body.settings.mashStrengthValue).toBe(88);

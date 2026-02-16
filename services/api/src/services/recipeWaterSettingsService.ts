@@ -158,6 +158,7 @@ export class RecipeWaterSettingsService {
     if (input.dilutionWaterProfileId) await this.assertProfileAccessible(accountId, input.dilutionWaterProfileId);
     if (input.spargeWaterProfileId) await this.assertProfileAccessible(accountId, input.spargeWaterProfileId);
 
+    const existing = await this.prisma.recipeWaterSettings.findUnique({ where: { recipeId } });
     const data: Record<string, unknown> = { accountId, recipeId };
 
     if (input.sourceWaterProfileId !== undefined) data.sourceWaterProfileId = input.sourceWaterProfileId;
@@ -175,15 +176,42 @@ export class RecipeWaterSettingsService {
       }
     }
 
+    // Single source of truth (mash page): mash water volume is derived from mixing volumes.
+    // If either mixing field is present in the request, derive mashWaterVolumeLiters from:
+    //   tapWaterVolumeLiters + dilutionWaterVolumeLiters
+    // using request values where provided, otherwise falling back to existing record values.
+    const hasMixingUpdate =
+      input.tapWaterVolumeLiters !== undefined || input.dilutionWaterVolumeLiters !== undefined;
+    if (hasMixingUpdate) {
+      const tap =
+        typeof input.tapWaterVolumeLiters === "number"
+          ? input.tapWaterVolumeLiters
+          : typeof existing?.tapWaterVolumeLiters === "number"
+            ? existing.tapWaterVolumeLiters
+            : 0;
+      const dil =
+        typeof input.dilutionWaterVolumeLiters === "number"
+          ? input.dilutionWaterVolumeLiters
+          : typeof existing?.dilutionWaterVolumeLiters === "number"
+            ? existing.dilutionWaterVolumeLiters
+            : 0;
+
+      data.mashWaterVolumeLiters = ensureFinite(Math.max(0, tap) + Math.max(0, dil), "mashWaterVolumeLiters");
+    }
+
     const mashNumericFields = [
       "mashStartingAlkalinityPpmCaCO3",
       "mashStartingPh",
       "mashTargetPh",
-      "mashWaterVolumeLiters",
     ] as const;
     for (const f of mashNumericFields) {
       const v = (input as any)[f];
       if (v !== undefined) data[f] = ensureFinite(v, f);
+    }
+
+    // If mixing volumes are being updated, prevent client-provided mashWaterVolumeLiters from reintroducing duplication.
+    if (!hasMixingUpdate && input.mashWaterVolumeLiters !== undefined) {
+      data.mashWaterVolumeLiters = ensureFinite(input.mashWaterVolumeLiters, "mashWaterVolumeLiters");
     }
 
     const mashStringFields = ["mashAcidType", "mashStrengthKind"] as const;

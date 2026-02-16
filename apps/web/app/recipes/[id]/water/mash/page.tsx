@@ -102,7 +102,6 @@ export default function MashWaterPage() {
   const [mashStartingAlk, setMashStartingAlk] = useState(0);
   const [mashStartingPh, setMashStartingPh] = useState(7.0);
   const [mashTargetPh, setMashTargetPh] = useState(5.4);
-  const [mashWaterVolumeLiters, setMashWaterVolumeLiters] = useState(20);
   const [mashAcidType, setMashAcidType] = useState("lactic");
   const [mashStrengthKind, setMashStrengthKind] = useState<"percent" | "normality" | "molarity" | "solid">(
     "percent",
@@ -187,7 +186,6 @@ export default function MashWaterPage() {
       setMashStartingAlk(s.mashStartingAlkalinityPpmCaCO3 ?? 0);
       setMashStartingPh(s.mashStartingPh ?? 7.0);
       setMashTargetPh(s.mashTargetPh ?? 5.4);
-      setMashWaterVolumeLiters(s.mashWaterVolumeLiters ?? 20);
       setMashAcidType(s.mashAcidType ?? "lactic");
 
       const savedKind = ((s.mashStrengthKind as any) ?? "percent") as
@@ -256,6 +254,17 @@ export default function MashWaterPage() {
       if (s.mashGristImportedJson !== undefined) setGristImportedRows(parseGristJson(s.mashGristImportedJson));
       if (s.mashGristImportedAt) setGristImportedAt(s.mashGristImportedAt);
       if (s.mashGristSourceRecipeUpdatedAt) setGristSourceRecipeUpdatedAt(s.mashGristSourceRecipeUpdatedAt);
+
+      // Back-compat / single source of truth:
+      // If mixing volumes are not set but an older saved mashWaterVolumeLiters exists,
+      // seed tap volume from the saved mash volume so the new derived volume model works.
+      const tap = s.tapWaterVolumeLiters ?? 0;
+      const dil = s.dilutionWaterVolumeLiters ?? 0;
+      const totalMix = tap + dil;
+      if (totalMix <= 0 && typeof s.mashWaterVolumeLiters === "number" && Number.isFinite(s.mashWaterVolumeLiters) && s.mashWaterVolumeLiters > 0) {
+        setTapVolumeLiters(s.mashWaterVolumeLiters);
+        setDilutionVolumeLiters(0);
+      }
     } catch (err) {
       setSettingsError(String(err));
     }
@@ -303,6 +312,12 @@ export default function MashWaterPage() {
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
 
+  const derivedMashWaterVolumeLiters = useMemo(() => {
+    const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+    const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    return tap + dil;
+  }, [tapVolumeLiters, dilutionVolumeLiters]);
+
   const saveSettings = async (patch: Record<string, unknown>) => {
     if (!auth?.userId || !auth.activeAccountId) return;
     await saveRecipeWaterSettings(recipeId, auth, patch);
@@ -337,7 +352,7 @@ export default function MashWaterPage() {
         mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
         mashStartingPh,
         mashTargetPh,
-        mashWaterVolumeLiters,
+        mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
         mashAcidType,
         mashStrengthKind,
         mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
@@ -495,7 +510,7 @@ export default function MashWaterPage() {
       const payload: Record<string, unknown> = {
         mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
         mashStartingPh,
-        mashWaterVolumeLiters: mashWaterVolumeLiters,
+        mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
         acidType: mashAcidType,
         strengthKind: mashStrengthKind,
         ...(mashStrengthKind === "solid"
@@ -517,7 +532,7 @@ export default function MashWaterPage() {
       if (gristRows.length) {
         // Manual mode: estimate mash pH given acid contribution if possible.
         estimatedMashPhRoomTemp = await calcMashEstimatedPh({
-          volumeLiters: mashWaterVolumeLiters,
+          volumeLiters: derivedMashWaterVolumeLiters,
           alkalinityPpmCaCO3: mashStartingAlk,
           grist: gristRows,
           acidAdded_mEqPerL: (manual as any).predicted?.debug?.acidRequired_mEqPerL ?? undefined,
@@ -531,7 +546,7 @@ export default function MashWaterPage() {
         mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
         mashStartingPh,
         mashTargetPh,
-        mashWaterVolumeLiters,
+        mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
         acidType: mashAcidType,
         strengthKind: mashStrengthKind,
         ...(gristRows.length ? { grist: gristRows } : {}),
@@ -631,7 +646,7 @@ export default function MashWaterPage() {
         const payload: Record<string, unknown> = {
           mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
           mashStartingPh,
-          mashWaterVolumeLiters,
+          mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
           acidType: mashAcidType,
           strengthKind: mashStrengthKind,
           ...(mashStrengthKind === "solid"
@@ -678,7 +693,7 @@ export default function MashWaterPage() {
           mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
           mashStartingPh,
           mashTargetPh,
-          mashWaterVolumeLiters,
+          mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
           acidType: mashAcidType,
           strengthKind: mashStrengthKind,
           ...(gristRows.length ? { grist: gristRows } : {}),
@@ -708,7 +723,7 @@ export default function MashWaterPage() {
           mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
           mashStartingPh,
           mashTargetPh,
-          mashWaterVolumeLiters,
+          mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
           mashAcidType,
           mashStrengthKind,
           mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
@@ -787,7 +802,7 @@ export default function MashWaterPage() {
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="adjustment-heading">
           <h2 id="adjustment-heading" style={{ marginTop: 0 }}>
-            Water adjustment (Sheet 4, v0)
+            Mash Water adjustment (Sheet 4, v0)
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
             Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
@@ -1013,13 +1028,18 @@ export default function MashWaterPage() {
                 <label htmlFor="mash-volume-l" className="muted" style={{ display: "block", fontSize: 12 }}>
                   Mash water volume (L)
                 </label>
+                <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                  Derived from Water adjustment volumes above (Source + Dilution).
+                </div>
                 <input
                   id="mash-volume-l"
                   type="number"
                   inputMode="decimal"
                   step={0.1}
-                  value={mashWaterVolumeLiters}
-                  onChange={(e) => setMashWaterVolumeLiters(Number(e.target.value))}
+                  value={derivedMashWaterVolumeLiters}
+                  readOnly
+                  tabIndex={-1}
+                  disabled
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>

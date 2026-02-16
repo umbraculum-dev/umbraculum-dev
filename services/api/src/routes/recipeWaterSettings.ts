@@ -55,8 +55,9 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
           : undefined,
       mashStartingPh: typeof body.mashStartingPh === "number" ? body.mashStartingPh : undefined,
       mashTargetPh: typeof body.mashTargetPh === "number" ? body.mashTargetPh : undefined,
-      mashWaterVolumeLiters:
-        typeof body.mashWaterVolumeLiters === "number" ? body.mashWaterVolumeLiters : undefined,
+      // Mash water volume is derived from tap+dilution volumes in the service layer to avoid duplication.
+      // Keep backward compatibility for callers that don't send mixing volumes by still accepting this field.
+      mashWaterVolumeLiters: typeof body.mashWaterVolumeLiters === "number" ? body.mashWaterVolumeLiters : undefined,
       mashAcidType: typeof body.mashAcidType === "string" ? body.mashAcidType : undefined,
       mashStrengthKind: typeof body.mashStrengthKind === "string" ? body.mashStrengthKind : undefined,
       mashStrengthValue:
