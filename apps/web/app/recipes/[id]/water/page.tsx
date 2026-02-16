@@ -11,6 +11,8 @@ import type { IonProfilePpm } from "./_lib/waterChem";
 import { combineAfterSaltsAndAcid } from "./_lib/waterChem";
 import { formatFixed } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { MathHelpPopover } from "../../../_components/MathHelpPopover";
+import { mathExplain } from "./_lib/mathExplain";
 
 type MashOverallResultV0 = {
   calculatedAt: string;
@@ -22,6 +24,7 @@ type MashOverallResultV0 = {
 export default function WaterHubPage() {
   const t = useTranslations("waterHub");
   const tsalts = useTranslations("salts");
+  const tMath = useTranslations("math");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -33,6 +36,23 @@ export default function WaterHubPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [surfaceMath, setSurfaceMath] = useState(false);
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem("brewery:surfaceMath:waterHub");
+      if (v === "1") setSurfaceMath(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("brewery:surfaceMath:waterHub", surfaceMath ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [surfaceMath]);
 
   const refresh = async () => {
     if (!recipeId) return;
@@ -329,9 +349,14 @@ export default function WaterHubPage() {
         {t("recipeId")}: <code>{recipeId}</code>
       </p>
 
-      <p style={{ marginTop: 0 }}>
-        <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
-      </p>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
+        <p style={{ margin: 0 }}>
+          <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
+        </p>
+        <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
+          {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
+        </button>
+      </div>
 
       {authState.status === "error" ? (
         <pre className="errorBox" role="alert">
@@ -425,6 +450,17 @@ export default function WaterHubPage() {
           <details className="fieldBlock fieldBlock--computed">
             <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
               <strong>{t("mergedWaterRecap")}</strong>
+              {surfaceMath ? (() => {
+                const ex = mathExplain["waterHub.mergedWaterRecap"];
+                const title = tMath(ex.titleKey);
+                return (
+                  <MathHelpPopover
+                    title={title}
+                    body={tMath(ex.bodyKey)}
+                    ariaLabel={tMath("fxLabel", { topic: title })}
+                  />
+                );
+              })() : null}
               <span className="fieldBadge">{t("computed")}</span>
               <span className="muted">{t("clickToExpand")}</span>
             </summary>
@@ -516,8 +552,19 @@ export default function WaterHubPage() {
 
                 {recap.mergedIons ? (
                   <>
-                    <div style={{ marginTop: 8, marginBottom: 6 }}>
+                    <div style={{ marginTop: 8, marginBottom: 6, display: "flex", gap: 8, alignItems: "baseline" }}>
                       <strong>{t("mergedIonsTitle")}</strong>
+                      {surfaceMath ? (() => {
+                        const ex = mathExplain["waterHub.mergedIons"];
+                        const title = tMath(ex.titleKey);
+                        return (
+                          <MathHelpPopover
+                            title={title}
+                            body={tMath(ex.bodyKey)}
+                            ariaLabel={tMath("fxLabel", { topic: title })}
+                          />
+                        );
+                      })() : null}
                     </div>
                     <p className="muted" style={{ marginTop: 8, marginBottom: 8 }}>
                       {t("mergedIonsDescription")}

@@ -1,15 +1,17 @@
 "use client";
 
 import { Link } from "../../../../../src/i18n/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
+import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
+import { mathExplain } from "../_lib/mathExplain";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -44,6 +46,7 @@ type SaltAdditionsResult = {
 
 export default function SpargeWaterPage() {
   const locale = useLocale();
+  const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
@@ -91,6 +94,23 @@ export default function SpargeWaterPage() {
   const [savingSpargeSalts, setSavingSpargeSalts] = useState(false);
   const [spargeSaltAdditions, setSpargeSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [spargeSaltsResult, setSpargeSaltsResult] = useState<SaltAdditionsResult | null>(null);
+
+  const [surfaceMath, setSurfaceMath] = useState(false);
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem("brewery:surfaceMath:sparge");
+      if (v === "1") setSurfaceMath(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("brewery:surfaceMath:sparge", surfaceMath ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [surfaceMath]);
 
   useEffect(() => {
     let cancelled = false;
@@ -546,10 +566,15 @@ export default function SpargeWaterPage() {
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
-      <p style={{ marginTop: 0 }}>
-        <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link> {" · "}
-        <Link href={`/recipes/${recipeId}/water/mash`}>Go to mash</Link>
-      </p>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
+        <p style={{ margin: 0 }}>
+          <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link> {" · "}
+          <Link href={`/recipes/${recipeId}/water/mash`}>Go to mash</Link>
+        </p>
+        <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
+          {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
+        </button>
+      </div>
 
       {authChecked && !canCall ? (
         <p role="alert" className="errorBox">
@@ -754,7 +779,19 @@ export default function SpargeWaterPage() {
               <ul>
                 {spargeResult.acidRequiredMl !== null ? (
                   <li>
-                    Acid required: <code>{spargeResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    Acid required{" "}
+                    {surfaceMath ? (() => {
+                      const ex = mathExplain["sparge.acidRequired"];
+                      const title = tMath(ex.titleKey);
+                      return (
+                        <MathHelpPopover
+                          title={title}
+                          body={tMath(ex.bodyKey)}
+                          ariaLabel={tMath("fxLabel", { topic: title })}
+                        />
+                      );
+                    })() : null}
+                    : <code>{spargeResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
                     {spargeResult.acidRequiredTsp !== null ? (
                       <>
                         (<code>{spargeResult.acidRequiredTsp.toFixed(3)}</code> tsp)
@@ -764,7 +801,19 @@ export default function SpargeWaterPage() {
                 ) : null}
                 {spargeResult.acidRequiredGrams !== null ? (
                   <li>
-                    Acid required: <code>{spargeResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    Acid required{" "}
+                    {surfaceMath ? (() => {
+                      const ex = mathExplain["sparge.acidRequired"];
+                      const title = tMath(ex.titleKey);
+                      return (
+                        <MathHelpPopover
+                          title={title}
+                          body={tMath(ex.bodyKey)}
+                          ariaLabel={tMath("fxLabel", { topic: title })}
+                        />
+                      );
+                    })() : null}
+                    : <code>{spargeResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
                     {spargeResult.acidRequiredKg !== null ? (
                       <>
                         (<code>{spargeResult.acidRequiredKg.toFixed(6)}</code> kg)
@@ -773,7 +822,19 @@ export default function SpargeWaterPage() {
                   </li>
                 ) : null}
                 <li>
-                  Final alkalinity: <code>{spargeResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  Final alkalinity{" "}
+                  {surfaceMath ? (() => {
+                    const ex = mathExplain["sparge.finalAlkalinity"];
+                    const title = tMath(ex.titleKey);
+                    return (
+                      <MathHelpPopover
+                        title={title}
+                        body={tMath(ex.bodyKey)}
+                        ariaLabel={tMath("fxLabel", { topic: title })}
+                      />
+                    );
+                  })() : null}
+                  : <code>{spargeResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
                 </li>
                 <li>
                   Sulfate added: <code>{spargeResult.sulfateAddedPpm.toFixed(3)}</code> ppm
@@ -861,6 +922,17 @@ export default function SpargeWaterPage() {
             <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after sparge salts only, v0)</strong>
+                {surfaceMath ? (() => {
+                  const ex = mathExplain["sparge.ionsAfterSalts"];
+                  const title = tMath(ex.titleKey);
+                  return (
+                    <MathHelpPopover
+                      title={title}
+                      body={tMath(ex.bodyKey)}
+                      ariaLabel={tMath("fxLabel", { topic: title })}
+                    />
+                  );
+                })() : null}
                 <span className="fieldBadge">Computed</span>
               </summary>
               <div style={{ overflowX: "auto" }}>
@@ -897,9 +969,33 @@ export default function SpargeWaterPage() {
             <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <div className="fieldBlockHeader">
                 <strong>Resulting ions (after sparge salts + acid, v0, HCO3 derived from alkalinity)</strong>
+                {surfaceMath ? (() => {
+                  const ex = mathExplain["sparge.ionsAfterSaltsAndAcid"];
+                  const title = tMath(ex.titleKey);
+                  return (
+                    <MathHelpPopover
+                      title={title}
+                      body={tMath(ex.bodyKey)}
+                      ariaLabel={tMath("fxLabel", { topic: title })}
+                    />
+                  );
+                })() : null}
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">
                   Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
+                  {surfaceMath ? (() => {
+                    const ex = mathExplain["sparge.alkalinityHeuristic"];
+                    const title = tMath(ex.titleKey);
+                    return (
+                      <span style={{ marginLeft: 6 }}>
+                        <MathHelpPopover
+                          title={title}
+                          body={tMath(ex.bodyKey)}
+                          ariaLabel={tMath("fxLabel", { topic: title })}
+                        />
+                      </span>
+                    );
+                  })() : null}
                 </span>
               </div>
               <div style={{ overflowX: "auto" }}>

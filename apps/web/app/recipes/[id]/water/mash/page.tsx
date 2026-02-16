@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "../../../../../src/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -8,6 +9,7 @@ import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { parseGristJson, type GristMaltClass, type GristRow } from "../../../../_lib/grist";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
+import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { apiFetch, type MeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
@@ -15,6 +17,7 @@ import {
   combineAfterSaltsAndAcid,
   mixIonProfilesByVolume,
 } from "../_lib/waterChem";
+import { mathExplain } from "../_lib/mathExplain";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -76,6 +79,7 @@ function isAdmin(role: string | null) {
 }
 
 export default function MashWaterPage() {
+  const tMath = useTranslations("math");
   const authState = useRequireAuth({ requireActiveAccount: true });
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -146,6 +150,23 @@ export default function MashWaterPage() {
   const [importingGrist, setImportingGrist] = useState(false);
 
   const canCall = authState.status === "ready";
+
+  const [surfaceMath, setSurfaceMath] = useState(false);
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem("brewery:surfaceMath:mash");
+      if (v === "1") setSurfaceMath(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("brewery:surfaceMath:mash", surfaceMath ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [surfaceMath]);
 
   const refreshProfiles = async () => {
     if (authState.status !== "ready") return;
@@ -887,11 +908,16 @@ export default function MashWaterPage() {
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
-      <p style={{ marginTop: 0 }}>
-        <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link> {" · "}
-        <Link href={`/recipes/${recipeId}/water/sparge`}>Go to sparge</Link> {" · "}
-        <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
-      </p>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
+        <p style={{ margin: 0 }}>
+          <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link> {" · "}
+          <Link href={`/recipes/${recipeId}/water/sparge`}>Go to sparge</Link> {" · "}
+          <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
+        </p>
+        <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
+          {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
+        </button>
+      </div>
 
       {authState.status === "error" ? (
         <pre role="alert" className="errorBox">
@@ -1267,7 +1293,19 @@ export default function MashWaterPage() {
               <ul>
                 {mashResult.acidRequiredMl !== null ? (
                   <li>
-                    Acid required: <code>{mashResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    Acid required{" "}
+                    {surfaceMath ? (() => {
+                      const ex = mathExplain["mash.acidRequired"];
+                      const title = tMath(ex.titleKey);
+                      return (
+                        <MathHelpPopover
+                          title={title}
+                          body={tMath(ex.bodyKey)}
+                          ariaLabel={tMath("fxLabel", { topic: title })}
+                        />
+                      );
+                    })() : null}
+                    : <code>{mashResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
                     {mashResult.acidRequiredTsp !== null ? (
                       <>
                         (<code>{mashResult.acidRequiredTsp.toFixed(3)}</code> tsp)
@@ -1277,7 +1315,19 @@ export default function MashWaterPage() {
                 ) : null}
                 {mashResult.acidRequiredGrams !== null ? (
                   <li>
-                    Acid required: <code>{mashResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    Acid required{" "}
+                    {surfaceMath ? (() => {
+                      const ex = mathExplain["mash.acidRequired"];
+                      const title = tMath(ex.titleKey);
+                      return (
+                        <MathHelpPopover
+                          title={title}
+                          body={tMath(ex.bodyKey)}
+                          ariaLabel={tMath("fxLabel", { topic: title })}
+                        />
+                      );
+                    })() : null}
+                    : <code>{mashResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
                     {mashResult.acidRequiredKg !== null ? (
                       <>
                         (<code>{mashResult.acidRequiredKg.toFixed(6)}</code> kg)
@@ -1286,7 +1336,19 @@ export default function MashWaterPage() {
                   </li>
                 ) : null}
                 <li>
-                  Final alkalinity: <code>{mashResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  Final alkalinity{" "}
+                  {surfaceMath ? (() => {
+                    const ex = mathExplain["mash.finalAlkalinity"];
+                    const title = tMath(ex.titleKey);
+                    return (
+                      <MathHelpPopover
+                        title={title}
+                        body={tMath(ex.bodyKey)}
+                        ariaLabel={tMath("fxLabel", { topic: title })}
+                      />
+                    );
+                  })() : null}
+                  : <code>{mashResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
                 </li>
                 <li>
                   Sulfate added: <code>{mashResult.sulfateAddedPpm.toFixed(3)}</code> ppm
@@ -1364,6 +1426,17 @@ export default function MashWaterPage() {
             <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after salts only)</strong>
+                {surfaceMath ? (() => {
+                  const ex = mathExplain["mash.ionsAfterSalts"];
+                  const title = tMath(ex.titleKey);
+                  return (
+                    <MathHelpPopover
+                      title={title}
+                      body={tMath(ex.bodyKey)}
+                      ariaLabel={tMath("fxLabel", { topic: title })}
+                    />
+                  );
+                })() : null}
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">
                   Does not consider acid; see &quot;Overall mash water result&quot; for combined output
@@ -1434,6 +1507,17 @@ export default function MashWaterPage() {
             <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <div className="fieldBlockHeader">
                 <strong>Overall mash snapshot</strong>
+                {surfaceMath ? (() => {
+                  const ex = mathExplain["mash.overallSnapshot"];
+                  const title = tMath(ex.titleKey);
+                  return (
+                    <MathHelpPopover
+                      title={title}
+                      body={tMath(ex.bodyKey)}
+                      ariaLabel={tMath("fxLabel", { topic: title })}
+                    />
+                  );
+                })() : null}
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">Uses latest inputs; persist a snapshot to debug</span>
               </div>
@@ -1445,7 +1529,19 @@ export default function MashWaterPage() {
                   Mash water volume: <code>{derivedMashWaterVolumeLiters.toFixed(2)}</code> L
                 </li>
                 <li>
-                  Final alkalinity: <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
+                  Final alkalinity{" "}
+                  {surfaceMath ? (() => {
+                    const ex = mathExplain["mash.finalAlkalinity"];
+                    const title = tMath(ex.titleKey);
+                    return (
+                      <MathHelpPopover
+                        title={title}
+                        body={tMath(ex.bodyKey)}
+                        ariaLabel={tMath("fxLabel", { topic: title })}
+                      />
+                    );
+                  })() : null}
+                  : <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
                 </li>
               </ul>
               <div style={{ overflowX: "auto", marginTop: 8 }}>

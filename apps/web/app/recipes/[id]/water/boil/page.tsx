@@ -1,15 +1,17 @@
 "use client";
 
 import { Link } from "../../../../../src/i18n/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
+import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonProfilesByVolume } from "../_lib/waterChem";
+import { mathExplain } from "../_lib/mathExplain";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -59,6 +61,7 @@ type BoilOverallResultV0 = {
 
 export default function BoilWaterPage() {
   const locale = useLocale();
+  const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
@@ -117,6 +120,23 @@ export default function BoilWaterPage() {
   const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
+
+  const [surfaceMath, setSurfaceMath] = useState(false);
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem("brewery:surfaceMath:boil");
+      if (v === "1") setSurfaceMath(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("brewery:surfaceMath:boil", surfaceMath ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [surfaceMath]);
 
   const displayAlkalinityPpmCaCO3 = (v: number) => {
     // Small negatives can happen with very tiny acid amounts (or floating/solver tolerances).
@@ -714,9 +734,14 @@ export default function BoilWaterPage() {
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
-      <p style={{ marginTop: 0 }}>
-        <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link>
-      </p>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
+        <p style={{ margin: 0 }}>
+          <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link>
+        </p>
+        <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
+          {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
+        </button>
+      </div>
 
       {authChecked && !canCall ? (
         <p role="alert" className="errorBox">
@@ -939,6 +964,17 @@ export default function BoilWaterPage() {
             <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after salts only)</strong>
+                {surfaceMath ? (() => {
+                  const ex = mathExplain["boil.ionsAfterSalts"];
+                  const title = tMath(ex.titleKey);
+                  return (
+                    <MathHelpPopover
+                      title={title}
+                      body={tMath(ex.bodyKey)}
+                      ariaLabel={tMath("fxLabel", { topic: title })}
+                    />
+                  );
+                })() : null}
                 <span className="fieldBadge">Computed</span>
               </summary>
               <div style={{ overflowX: "auto" }}>
@@ -946,7 +982,7 @@ export default function BoilWaterPage() {
                   <thead>
                     <tr>
                       <th align="left">Ion</th>
-                      <th align="right">After salts (ppm)</th>
+                      <th align="left">After salts (ppm)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -962,7 +998,7 @@ export default function BoilWaterPage() {
                     ).map(([label, after]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="right">{after.toFixed(2)}</td>
+                        <td align="left">{after.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1213,6 +1249,17 @@ export default function BoilWaterPage() {
             <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <div className="fieldBlockHeader">
                 <strong>Overall boil snapshot</strong>
+                {surfaceMath ? (() => {
+                  const ex = mathExplain["boil.overallSnapshot"];
+                  const title = tMath(ex.titleKey);
+                  return (
+                    <MathHelpPopover
+                      title={title}
+                      body={tMath(ex.bodyKey)}
+                      ariaLabel={tMath("fxLabel", { topic: title })}
+                    />
+                  );
+                })() : null}
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">Uses latest inputs; persist a snapshot to debug</span>
               </div>
@@ -1230,7 +1277,7 @@ export default function BoilWaterPage() {
                   <thead>
                     <tr>
                       <th align="left">Ion</th>
-                      <th align="right">Overall (ppm)</th>
+                      <th align="left">Overall (ppm)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1246,7 +1293,7 @@ export default function BoilWaterPage() {
                     ).map(([label, v]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="right">{v.toFixed(2)}</td>
+                        <td align="left">{v.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>

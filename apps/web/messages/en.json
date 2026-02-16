@@ -41,6 +41,71 @@
     },
     "note": "Tip: your browser zoom also works, and respects locale ({locale})."
   },
+  "math": {
+    "toggleShow": "Show math",
+    "toggleHide": "Hide math",
+    "fxLabel": "Show formula: {topic}",
+    "sparge": {
+      "acidRequired": {
+        "title": "Acid required (target pH)",
+        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and water volume.\n\nNotes:\n- If the selected profile has no pH, we only use the manually entered Starting pH.\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator (v0): use it as guidance, then measure/adjust."
+      },
+      "finalAlkalinity": {
+        "title": "Final alkalinity (ppm as CaCO3)",
+        "body": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention)."
+      },
+      "ionsAfterSalts": {
+        "title": "Resulting ions (after salts only)",
+        "body": "Meaning:\n- Starting from the selected sparge profile, we add ions contributed by the entered salt grams at the given sparge water volume.\n\nNotes:\n- Values are ppm (mg/L) for each ion."
+      },
+      "ionsAfterSaltsAndAcid": {
+        "title": "Resulting ions (after salts + acid)",
+        "body": "Meaning:\n- Same as “after salts”, then apply the acid result.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+      },
+      "alkalinityHeuristic": {
+        "title": "Heuristic: Ca/Mg reduce effective alkalinity",
+        "body": "We apply a residual-alkalinity-style adjustment:\n- Calcium and magnesium from salts modestly reduce effective alkalinity, so acid required can change slightly when salts are added.\n\nNotes:\n- This is intentionally modest; it improves realism without overfitting."
+      }
+    },
+    "mash": {
+      "acidRequired": {
+        "title": "Acid required (target pH)",
+        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and mash water volume.\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator (v0): use it as guidance, then measure/adjust."
+      },
+      "finalAlkalinity": {
+        "title": "Final alkalinity (ppm as CaCO3)",
+        "body": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention)."
+      },
+      "ionsAfterSalts": {
+        "title": "Resulting ions (after salts only)",
+        "body": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nNotes:\n- Values are ppm (mg/L) for each ion.\n- This table does not include acid; see the overall result for combined output."
+      },
+      "overallSnapshot": {
+        "title": "Overall mash snapshot (salts + acid)",
+        "body": "Meaning:\n- Combined result after applying both salts and acid.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+      }
+    },
+    "boil": {
+      "ionsAfterSalts": {
+        "title": "Resulting ions (after salts only)",
+        "body": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nNotes:\n- Values are ppm (mg/L) for each ion."
+      },
+      "overallSnapshot": {
+        "title": "Overall boil snapshot (salts + acid)",
+        "body": "Meaning:\n- Combined result after applying both salts and acid.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+      }
+    },
+    "waterHub": {
+      "mergedWaterRecap": {
+        "title": "Merged water recap",
+        "body": "Meaning:\n- This section summarizes each stream (mash/sparge/additional boil) and the merged summary.\n\nNotes:\n- Merged pH is an approximate volume-weighted [H+] mix (rule-of-thumb).\n- Streams without saved snapshots are excluded from merged ions."
+      },
+      "mergedIons": {
+        "title": "Merged ions (ppm)",
+        "body": "Meaning:\n- Computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl counter-ions only) and averaged by volume.\n\nNotes:\n- Streams without saved snapshots are excluded.\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+      }
+    }
+  },
   "recipes": {
     "title": "Recipes",
     "subtitle": "This is the recipe area entrypoint (list/edit/water calculator).",

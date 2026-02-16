@@ -41,6 +41,71 @@
     },
     "note": "Suggerimento: funziona anche lo zoom del browser e rispetta la lingua ({locale})."
   },
+  "math": {
+    "toggleShow": "Mostra formule",
+    "toggleHide": "Nascondi formule",
+    "fxLabel": "Mostra formula: {topic}",
+    "sparge": {
+      "acidRequired": {
+        "title": "Acido necessario (pH target)",
+        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, dato alcalinità iniziale e volume.\n\nNote:\n- Se il profilo selezionato non ha il pH, usiamo solo il pH iniziale inserito manualmente.\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico (v0): usa come guida, poi misura e correggi."
+      },
+      "finalAlkalinity": {
+        "title": "Alcalinità finale (ppm come CaCO3)",
+        "body": "Significato:\n- Alcalinità dopo l’aggiunta di acido calcolata.\n\nNote:\n- Può essere vicina a 0 quando l’acido neutralizza la capacità tampone.\n- Riportiamo in ppm come CaCO3 (convenzione standard)."
+      },
+      "ionsAfterSalts": {
+        "title": "Ioni risultanti (solo sali)",
+        "body": "Significato:\n- Partendo dal profilo acqua di sparge selezionato, aggiungiamo gli ioni dovuti ai grammi di sali inseriti sul volume di sparge.\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione."
+      },
+      "ionsAfterSaltsAndAcid": {
+        "title": "Ioni risultanti (sali + acido)",
+        "body": "Significato:\n- Come “solo sali”, poi applichiamo il risultato dell’acido.\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      },
+      "alkalinityHeuristic": {
+        "title": "Euristica: Ca/Mg riducono l’alcalinità efficace",
+        "body": "Applichiamo un aggiustamento stile alcalinità residua:\n- Calcio e magnesio dai sali riducono leggermente l’alcalinità efficace, quindi l’acido necessario può cambiare un po’ quando si aggiungono sali.\n\nNote:\n- L’effetto è volutamente modesto; migliora il realismo senza sovra-adattare."
+      }
+    },
+    "mash": {
+      "acidRequired": {
+        "title": "Acido necessario (pH target)",
+        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, data alcalinità iniziale e volume acqua di mash.\n\nNote:\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico (v0): usa come guida, poi misura e correggi."
+      },
+      "finalAlkalinity": {
+        "title": "Alcalinità finale (ppm come CaCO3)",
+        "body": "Significato:\n- Alcalinità dopo l’aggiunta di acido calcolata.\n\nNote:\n- Può essere vicina a 0 quando l’acido neutralizza la capacità tampone.\n- Riportiamo in ppm come CaCO3 (convenzione standard)."
+      },
+      "ionsAfterSalts": {
+        "title": "Ioni risultanti (solo sali)",
+        "body": "Significato:\n- Partendo dall’acqua di partenza miscelata, aggiungiamo gli ioni dovuti ai grammi di sali inseriti.\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione.\n- Questa tabella non include l’acido; vedi il risultato complessivo per l’output combinato."
+      },
+      "overallSnapshot": {
+        "title": "Snapshot complessivo mash (sali + acido)",
+        "body": "Significato:\n- Risultato combinato dopo l’applicazione di sali e acido.\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      }
+    },
+    "boil": {
+      "ionsAfterSalts": {
+        "title": "Ioni risultanti (solo sali)",
+        "body": "Significato:\n- Partendo dall’acqua di partenza miscelata, aggiungiamo gli ioni dovuti ai grammi di sali inseriti.\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione."
+      },
+      "overallSnapshot": {
+        "title": "Snapshot complessivo bollitura (sali + acido)",
+        "body": "Significato:\n- Risultato combinato dopo l’applicazione di sali e acido.\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      }
+    },
+    "waterHub": {
+      "mergedWaterRecap": {
+        "title": "Riepilogo acqua unificato",
+        "body": "Significato:\n- Questa sezione riassume ogni flusso (mash/sparge/acqua aggiuntiva in bollitura) e il riepilogo unificato.\n\nNote:\n- Il pH unificato è una stima (media volumetrica di [H+], regola pratica).\n- I flussi senza snapshot salvati sono esclusi dagli ioni unificati."
+      },
+      "mergedIons": {
+        "title": "Ioni unificati (ppm)",
+        "body": "Significato:\n- Calcolati dagli snapshot salvati di mash/sparge/bollitura dopo sali + acido (solo contro-ioni SO4/Cl) e mediati per volume.\n\nNote:\n- I flussi senza snapshot salvati sono esclusi.\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      }
+    }
+  },
   "recipes": {
     "title": "Ricette",
     "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",

@@ -316,3 +316,49 @@ code {
   border-color: var(--field-computed-border);
 }
 
+.mathFxWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mathFxButton {
+  background: color-mix(in srgb, var(--info) 14%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--info) 25%, var(--border));
+  color: var(--text);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.mathFxButton--md {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.mathPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  width: min(460px, 75vw);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.mathPopoverTitle {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.mathPopoverBody {
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text);
+}
