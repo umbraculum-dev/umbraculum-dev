@@ -175,6 +175,7 @@ model Recipe {
   gristJson Json?
   hopsJson  Json?
   yeastJson Json?
+  miscJson  Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

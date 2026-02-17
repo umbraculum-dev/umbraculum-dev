@@ -12,6 +12,7 @@ import {
   type GristPotentialKind,
   type GristRow,
 } from "../../../_lib/grist";
+import { parseMiscJson, type MiscRow, type MiscType, type MiscUse } from "../../../_lib/misc";
 
 type Recipe = {
   id: string;
@@ -23,6 +24,7 @@ type Recipe = {
   gristJson?: unknown;
   hopsJson?: unknown;
   yeastJson?: unknown;
+  miscJson?: unknown;
   createdAt: string;
   updatedAt: string;
 };
@@ -122,6 +124,23 @@ function parseYeastJson(value: unknown): YeastRow[] {
     .filter(Boolean) as YeastRow[];
 }
 
+const miscTypeOptions: { value: MiscType; label: string }[] = [
+  { value: "spice", label: "Spice" },
+  { value: "fining", label: "Fining" },
+  { value: "water_agent", label: "Water agent" },
+  { value: "herb", label: "Herb" },
+  { value: "flavor", label: "Flavor" },
+  { value: "other", label: "Other" },
+];
+
+const miscUseOptions: { value: MiscUse; label: string }[] = [
+  { value: "mash", label: "Mash" },
+  { value: "boil", label: "Boil" },
+  { value: "primary", label: "Primary" },
+  { value: "secondary", label: "Secondary" },
+  { value: "bottling", label: "Bottling" },
+];
+
 export default function RecipeEditPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -155,6 +174,7 @@ export default function RecipeEditPage() {
   const [gristRows, setGristRows] = useState<GristRow[]>([]);
   const [hopsRows, setHopsRows] = useState<HopRow[]>([]);
   const [yeastRows, setYeastRows] = useState<YeastRow[]>([]);
+  const [miscRows, setMiscRows] = useState<MiscRow[]>([]);
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
   const [stylesLoading, setStylesLoading] = useState(false);
@@ -201,6 +221,7 @@ export default function RecipeEditPage() {
         setGristRows(parseGristJson(r.gristJson));
         setHopsRows(parseHopsJson(r.hopsJson));
         setYeastRows(parseYeastJson(r.yeastJson));
+        setMiscRows(parseMiscJson(r.miscJson));
       } catch (err) {
         if (cancelled) return;
         setLoadError(String(err));
@@ -251,6 +272,7 @@ export default function RecipeEditPage() {
           gristJson: gristRows,
           hopsJson: hopsRows,
           yeastJson: yeastRows,
+          miscJson: miscRows,
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
@@ -419,6 +441,27 @@ export default function RecipeEditPage() {
   const updateYeastRow = (id: string, patch: Partial<YeastRow>) =>
     setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
+  const addMiscRow = () => {
+    setMiscRows((prev) => [
+      ...prev,
+      {
+        id: newRowId(),
+        ingredientId: null,
+        name: "",
+        type: "other",
+        use: "boil",
+        timeMinutes: 10,
+        amount: 0,
+        amountIsWeight: true,
+        useFor: null,
+        notes: null,
+      },
+    ]);
+  };
+  const removeMiscRow = (id: string) => setMiscRows((prev) => prev.filter((r) => r.id !== id));
+  const updateMiscRow = (id: string, patch: Partial<MiscRow>) =>
+    setMiscRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+
   const inferMaltClass = (group: string | null | undefined, fermentableName: string): GristMaltClass => {
     const g = (group ?? "").toLowerCase();
     const n = fermentableName.toLowerCase();
@@ -573,7 +616,7 @@ export default function RecipeEditPage() {
               </li>
             ))}
           </ul>
-          <hr style={{ border: 0, borderTop: "1px solid var(--border)", margin: "12px 0" }} />
+          <hr className="recipeEditDivider" suppressHydrationWarning />
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             <li>
               <Link href={`/recipes/${recipeId}/water`}>Open water calculator</Link>
@@ -1504,10 +1547,170 @@ export default function RecipeEditPage() {
             <h2 id="other-heading" style={{ marginTop: 0 }}>
               Other ingredients
             </h2>
-            <div className="ingredientCard" style={{ marginTop: 12 }}>
+            <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", gap: 12 }}>
               <p className="muted" style={{ margin: 0 }}>
-                Not implemented yet. When we add this section, entries will use the same ingredient card layout as fermentables/hops/yeast.
+                Spices, finings, flavorings, etc.
               </p>
+              <button type="button" onClick={addMiscRow}>
+                Add other ingredient
+              </button>
+            </div>
+
+            {miscRows.length ? (
+              <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
+                {miscRows.map((r, idx) => {
+                  const amountLabel = r.amountIsWeight ? "Amount (kg)" : "Amount (L)";
+                  return (
+                    <div key={r.id} className="ingredientCard">
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 12 }}>
+                        <div style={{ flex: "1 1 280px", minWidth: 240 }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-name-${r.id}`}>
+                            Name
+                          </label>
+                          <input
+                            id={`misc-name-${r.id}`}
+                            value={r.name}
+                            onChange={(e) => updateMiscRow(r.id, { name: e.target.value })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient name ${idx + 1}`}
+                          />
+                        </div>
+
+                        <div style={{ flex: "0 0 auto", width: 180, maxWidth: "100%" }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-type-${r.id}`}>
+                            Type
+                          </label>
+                          <select
+                            id={`misc-type-${r.id}`}
+                            value={r.type}
+                            onChange={(e) => updateMiscRow(r.id, { type: e.target.value as MiscType })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient type ${idx + 1}`}
+                          >
+                            {miscTypeOptions.map((o) => (
+                              <option key={o.value} value={o.value}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div style={{ flex: "0 0 auto", width: 160, maxWidth: "100%" }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-use-${r.id}`}>
+                            Use
+                          </label>
+                          <select
+                            id={`misc-use-${r.id}`}
+                            value={r.use}
+                            onChange={(e) => updateMiscRow(r.id, { use: e.target.value as MiscUse })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient use ${idx + 1}`}
+                          >
+                            {miscUseOptions.map((o) => (
+                              <option key={o.value} value={o.value}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div style={{ flex: "0 0 auto", width: 140, maxWidth: "100%" }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-time-${r.id}`}>
+                            Time (min)
+                          </label>
+                          <input
+                            id={`misc-time-${r.id}`}
+                            type="number"
+                            value={typeof r.timeMinutes === "number" ? r.timeMinutes : ""}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              updateMiscRow(r.id, { timeMinutes: v === "" ? null : Number(v) });
+                            }}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient time minutes ${idx + 1}`}
+                          />
+                        </div>
+
+                        <div style={{ flex: "0 0 auto", width: 200, maxWidth: "100%" }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-amount-is-weight-${r.id}`}>
+                            Amount kind
+                          </label>
+                          <select
+                            id={`misc-amount-is-weight-${r.id}`}
+                            value={r.amountIsWeight ? "weight" : "volume"}
+                            onChange={(e) => updateMiscRow(r.id, { amountIsWeight: e.target.value === "weight" })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient amount kind ${idx + 1}`}
+                          >
+                            <option value="weight">Weight</option>
+                            <option value="volume">Volume</option>
+                          </select>
+                        </div>
+
+                        <div style={{ flex: "0 0 auto", width: 180, maxWidth: "100%" }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-amount-${r.id}`}>
+                            {amountLabel}
+                          </label>
+                          <input
+                            id={`misc-amount-${r.id}`}
+                            type="number"
+                            value={Number.isFinite(r.amount) ? r.amount : ""}
+                            onChange={(e) => updateMiscRow(r.id, { amount: Number(e.target.value || 0) })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient amount ${idx + 1}`}
+                          />
+                        </div>
+
+                        <div style={{ flex: "1 1 240px", minWidth: 240 }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-use-for-${r.id}`}>
+                            Use for
+                          </label>
+                          <input
+                            id={`misc-use-for-${r.id}`}
+                            value={r.useFor ?? ""}
+                            onChange={(e) => updateMiscRow(r.id, { useFor: e.target.value || null })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient use for ${idx + 1}`}
+                          />
+                        </div>
+
+                        <div style={{ flex: "1 1 320px", minWidth: 260 }}>
+                          <label className="muted ingredientCardLabel" htmlFor={`misc-notes-${r.id}`}>
+                            Notes
+                          </label>
+                          <input
+                            id={`misc-notes-${r.id}`}
+                            value={r.notes ?? ""}
+                            onChange={(e) => updateMiscRow(r.id, { notes: e.target.value || null })}
+                            style={{ width: "100%", padding: 8 }}
+                            aria-label={`Other ingredient notes ${idx + 1}`}
+                          />
+                        </div>
+
+                        <div style={{ flex: "0 0 auto" }}>
+                          <button
+                            type="button"
+                            onClick={() => removeMiscRow(r.id)}
+                            aria-label={`Remove other ingredient row ${idx + 1}`}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                No other ingredients yet.
+              </p>
+            )}
+
+            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+              <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                {saving ? "Saving…" : "Save (including other ingredients)"}
+              </button>
             </div>
           </section>
 

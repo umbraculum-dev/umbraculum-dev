@@ -15,6 +15,7 @@ export type CreateRecipeInput = {
   gristJson?: unknown;
   hopsJson?: unknown;
   yeastJson?: unknown;
+  miscJson?: unknown;
 };
 
 export type UpdateRecipeInput = {
@@ -24,6 +25,7 @@ export type UpdateRecipeInput = {
   gristJson?: unknown;
   hopsJson?: unknown;
   yeastJson?: unknown;
+  miscJson?: unknown;
 };
 
 export class RecipesService {
@@ -81,6 +83,7 @@ export class RecipesService {
     const yeastJsonRaw = validateYeastJson(input.yeastJson);
     const yeastJson =
       Array.isArray(yeastJsonRaw) ? await snapshotYeastRows(this.prisma, yeastJsonRaw) : yeastJsonRaw;
+    const miscJson = validateMiscJson(input.miscJson);
 
     return this.prisma.recipe.create({
       data: {
@@ -92,6 +95,7 @@ export class RecipesService {
         gristJson: gristJson === undefined ? undefined : (gristJson as any),
         hopsJson: hopsJson === undefined ? undefined : (hopsJson as any),
         yeastJson: yeastJson === undefined ? undefined : (yeastJson as any),
+        miscJson: miscJson === undefined ? undefined : (miscJson as any),
       },
     });
   }
@@ -102,7 +106,7 @@ export class RecipesService {
     // Ensure account scoping is enforced even if IDs collide across accounts.
     await this.getRecipe(userId, accountId, recipeId);
 
-    const data: Prisma.RecipeUpdateInput = {};
+    const data: Prisma.RecipeUncheckedUpdateInput = {};
 
     if (input.name !== undefined) {
       const name = (input.name ?? "").trim();
@@ -150,6 +154,17 @@ export class RecipesService {
       } else {
         data.yeastJson =
           (await snapshotYeastRows(this.prisma, yeastJson)) as unknown as Prisma.InputJsonValue;
+      }
+    }
+
+    if (input.miscJson !== undefined) {
+      const miscJson = validateMiscJson(input.miscJson);
+      if (miscJson === undefined) {
+        // no-op
+      } else if (miscJson === null) {
+        data.miscJson = Prisma.JsonNull;
+      } else {
+        data.miscJson = miscJson as unknown as Prisma.InputJsonValue;
       }
     }
 
@@ -800,3 +815,139 @@ async function snapshotYeastRows(prisma: PrismaClient, rows: YeastRow[]): Promis
   });
 }
 
+type MiscType = "spice" | "fining" | "water_agent" | "herb" | "flavor" | "other";
+type MiscUse = "boil" | "mash" | "primary" | "secondary" | "bottling";
+
+type MiscRow = {
+  id: string;
+  ingredientId?: string | null;
+  name: string;
+  type: MiscType;
+  use: MiscUse;
+  timeMinutes: number | null;
+  /** If amountIsWeight=true: kilograms. If false: liters. */
+  amount: number;
+  amountIsWeight: boolean;
+  useFor?: string | null;
+  notes?: string | null;
+};
+
+function validateMiscJson(value: unknown): MiscRow[] | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (!Array.isArray(value)) throw new BadRequestError("invalid_misc_json", "Body.miscJson must be an array");
+
+  return value.map((row, idx) => {
+    const o = (row ?? {}) as Record<string, unknown>;
+    const id = typeof o.id === "string" ? o.id.trim() : "";
+    if (!id) throw new BadRequestError("invalid_misc_row_id", `Body.miscJson[${idx}].id is required`);
+
+    const ingredientIdRaw = o.ingredientId;
+    const ingredientId =
+      ingredientIdRaw === undefined
+        ? undefined
+        : ingredientIdRaw === null
+          ? null
+          : typeof ingredientIdRaw === "string"
+            ? ingredientIdRaw.trim() || null
+            : (() => {
+                throw new BadRequestError(
+                  "invalid_misc_row_ingredient_id",
+                  `Body.miscJson[${idx}].ingredientId must be a string or null`,
+                );
+              })();
+
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (!name) throw new BadRequestError("invalid_misc_row_name", `Body.miscJson[${idx}].name is required`);
+
+    const typeRaw = o.type;
+    const type: MiscType =
+      typeRaw === "spice" ||
+      typeRaw === "fining" ||
+      typeRaw === "water_agent" ||
+      typeRaw === "herb" ||
+      typeRaw === "flavor" ||
+      typeRaw === "other"
+        ? typeRaw
+        : (() => {
+            throw new BadRequestError(
+              "invalid_misc_row_type",
+              `Body.miscJson[${idx}].type must be one of: spice, fining, water_agent, herb, flavor, other`,
+            );
+          })();
+
+    const useRaw = o.use;
+    const use: MiscUse =
+      useRaw === "boil" || useRaw === "mash" || useRaw === "primary" || useRaw === "secondary" || useRaw === "bottling"
+        ? useRaw
+        : (() => {
+            throw new BadRequestError(
+              "invalid_misc_row_use",
+              `Body.miscJson[${idx}].use must be one of: boil, mash, primary, secondary, bottling`,
+            );
+          })();
+
+    const timeRaw = o.timeMinutes;
+    const timeMinutes = timeRaw === null || timeRaw === undefined ? null : typeof timeRaw === "number" ? timeRaw : NaN;
+    if (typeof timeMinutes === "number" && (!Number.isFinite(timeMinutes) || timeMinutes < 0)) {
+      throw new BadRequestError(
+        "invalid_misc_row_time",
+        `Body.miscJson[${idx}].timeMinutes must be null or a number >= 0`,
+      );
+    }
+
+    const amount = ensureFinite(o.amount, `miscJson[${idx}].amount`);
+    if (!(amount > 0)) {
+      throw new BadRequestError("invalid_misc_row_amount", `Body.miscJson[${idx}].amount must be > 0`);
+    }
+
+    const amountIsWeightRaw = o.amountIsWeight;
+    if (typeof amountIsWeightRaw !== "boolean") {
+      throw new BadRequestError(
+        "invalid_misc_row_amount_is_weight",
+        `Body.miscJson[${idx}].amountIsWeight must be a boolean`,
+      );
+    }
+    const amountIsWeight = amountIsWeightRaw;
+
+    const useForRaw = o.useFor;
+    const useFor =
+      useForRaw === null || useForRaw === undefined
+        ? null
+        : typeof useForRaw === "string"
+          ? useForRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_misc_row_use_for",
+                `Body.miscJson[${idx}].useFor must be a string or null`,
+              );
+            })();
+
+    const notesRaw = o.notes;
+    const notes =
+      notesRaw === null || notesRaw === undefined
+        ? null
+        : typeof notesRaw === "string"
+          ? notesRaw.trim() || null
+          : (() => {
+              throw new BadRequestError(
+                "invalid_misc_row_notes",
+                `Body.miscJson[${idx}].notes must be a string or null`,
+              );
+            })();
+
+    const out: any = {
+      id,
+      name,
+      type,
+      use,
+      timeMinutes,
+      amount,
+      amountIsWeight,
+    };
+    if (ingredientIdRaw !== undefined) out.ingredientId = ingredientId;
+    if (useFor) out.useFor = useFor;
+    if (notes) out.notes = notes;
+    return out as MiscRow;
+  });
+}

@@ -27,7 +27,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const brand = oneOf(cookieStore.get("UI_BRAND")?.value, ["default", "acme", "forest"] as const, "default");
 
   return (
-    <html lang={lang} data-theme={theme} data-density={density} data-font-scale={fontScale} data-brand={brand}>
+    <html
+      lang={lang}
+      data-theme={theme}
+      data-density={density}
+      data-font-scale={fontScale}
+      data-brand={brand}
+      suppressHydrationWarning
+    >
       <body>
         {children}
       </body>

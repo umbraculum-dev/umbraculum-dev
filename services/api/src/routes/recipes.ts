@@ -20,6 +20,7 @@ export async function recipesRoutes(app: FastifyInstance) {
       gristJson?: unknown;
       hopsJson?: unknown;
       yeastJson?: unknown;
+      miscJson?: unknown;
     };
     const name = typeof body.name === "string" ? body.name : "";
     const styleKey = typeof body.styleKey === "string" ? body.styleKey : "";
@@ -27,6 +28,7 @@ export async function recipesRoutes(app: FastifyInstance) {
     const gristJson = body.gristJson;
     const hopsJson = body.hopsJson;
     const yeastJson = body.yeastJson;
+    const miscJson = body.miscJson;
 
     const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
       name,
@@ -35,6 +37,7 @@ export async function recipesRoutes(app: FastifyInstance) {
       gristJson,
       hopsJson,
       yeastJson,
+      miscJson,
     });
     return { ok: true, recipe: created };
   });
@@ -60,6 +63,7 @@ export async function recipesRoutes(app: FastifyInstance) {
       gristJson?: unknown;
       hopsJson?: unknown;
       yeastJson?: unknown;
+      miscJson?: unknown;
     };
     const name = typeof body.name === "string" ? body.name : undefined;
     const styleKey = typeof body.styleKey === "string" ? body.styleKey : undefined;
@@ -67,6 +71,7 @@ export async function recipesRoutes(app: FastifyInstance) {
     const gristJson = body.gristJson;
     const hopsJson = body.hopsJson;
     const yeastJson = body.yeastJson;
+    const miscJson = body.miscJson;
 
     const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, {
       name,
@@ -75,6 +80,7 @@ export async function recipesRoutes(app: FastifyInstance) {
       gristJson,
       hopsJson,
       yeastJson,
+      miscJson,
     });
     return { ok: true, recipe: updated };
   });

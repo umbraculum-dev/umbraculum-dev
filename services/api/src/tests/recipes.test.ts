@@ -392,5 +392,91 @@ describe("recipes (account scoped)", () => {
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("invalid_yeast_row_attenuation_min");
   });
+
+  it("accepts miscJson with weight and volume amounts", async () => {
+    const create = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { cookie: cookieA },
+      payload: {
+        name: "Misc recipe",
+        styleKey: "custom",
+        miscJson: [
+          {
+            id: "m-1",
+            name: "Irish moss",
+            type: "fining",
+            use: "boil",
+            timeMinutes: 10,
+            amount: 0.01,
+            amountIsWeight: true,
+            useFor: "clarity",
+            notes: "kettle fining",
+          },
+          {
+            id: "m-2",
+            name: "Vanilla extract",
+            type: "flavor",
+            use: "secondary",
+            timeMinutes: null,
+            amount: 0.05,
+            amountIsWeight: false,
+          },
+        ],
+      },
+    });
+    expect(create.statusCode).toBe(200);
+    const body = create.json() as any;
+    expect(body.ok).toBe(true);
+    expect(body.recipe.miscJson).toEqual([
+      {
+        id: "m-1",
+        name: "Irish moss",
+        type: "fining",
+        use: "boil",
+        timeMinutes: 10,
+        amount: 0.01,
+        amountIsWeight: true,
+        useFor: "clarity",
+        notes: "kettle fining",
+      },
+      {
+        id: "m-2",
+        name: "Vanilla extract",
+        type: "flavor",
+        use: "secondary",
+        timeMinutes: null,
+        amount: 0.05,
+        amountIsWeight: false,
+      },
+    ]);
+  });
+
+  it("rejects miscJson with non-positive amount", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { cookie: cookieA },
+      payload: {
+        name: "Bad misc",
+        styleKey: "custom",
+        miscJson: [
+          {
+            id: "m-1",
+            name: "Some spice",
+            type: "spice",
+            use: "boil",
+            timeMinutes: 10,
+            amount: 0,
+            amountIsWeight: true,
+          },
+        ],
+      },
+    });
+    expect(res.statusCode).toBe(400);
+    const body = res.json() as any;
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("invalid_misc_row_amount");
+  });
 });
 

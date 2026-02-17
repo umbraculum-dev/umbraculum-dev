@@ -119,6 +119,13 @@ textarea {
   font: inherit;
 }
 
+/* Avoid inline styles on SSR content; keeps hydration stable and is easier for extensions/theme tools. */
+.recipeEditDivider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
 input,
 select,
 textarea {
