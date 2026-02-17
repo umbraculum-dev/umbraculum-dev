@@ -8,6 +8,7 @@ import { authRoutes } from "./routes/auth.js";
 import { accountsRoutes } from "./routes/accounts.js";
 import { recipesRoutes } from "./routes/recipes.js";
 import { recipesImportRoutes } from "./routes/recipesImport.js";
+import { recipesExportRoutes } from "./routes/recipesExport.js";
 import { stylesRoutes } from "./routes/styles.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { equipmentProfilesRoutes } from "./routes/equipmentProfiles.js";
@@ -28,6 +29,7 @@ export function buildApp() {
   app.register(accountsRoutes);
   app.register(recipesRoutes);
   app.register(recipesImportRoutes);
+  app.register(recipesExportRoutes);
   app.register(stylesRoutes);
   app.register(waterProfilesRoutes);
   app.register(equipmentProfilesRoutes);

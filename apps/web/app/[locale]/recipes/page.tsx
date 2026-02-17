@@ -12,7 +12,7 @@ type StyleListItem = { key: string; name: string; code: string; sortOrder: numbe
 
 export default function RecipesPage() {
   const t = useTranslations("recipes");
-  const c = useTranslations("common");
+  const tImport = useTranslations("recipes.import");
 
   const authState = useRequireAuth({ requireActiveAccount: true });
 
@@ -20,9 +20,16 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [exportRecipeId, setExportRecipeId] = useState("");
+
+  const pageSize = 20;
+  const [page, setPage] = useState(1);
+
   const [newName, setNewName] = useState("");
   const [newStyleKey, setNewStyleKey] = useState("");
   const [creating, setCreating] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const canCall = authState.status === "ready";
   const activeAccountId = authState.status === "ready" ? authState.me.activeAccountId : null;
@@ -57,6 +64,7 @@ export default function RecipesPage() {
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       const items = (res.data as any)?.recipes;
       setRecipes(Array.isArray(items) ? items : []);
+      setDeleteConfirmId(null);
     } catch (err) {
       setError(String(err));
       setRecipes([]);
@@ -70,6 +78,19 @@ export default function RecipesPage() {
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState.status]);
+
+  useEffect(() => {
+    if (exportRecipeId) return;
+    if (recipes.length === 0) return;
+    setExportRecipeId(recipes[0]?.id ?? "");
+  }, [exportRecipeId, recipes]);
+
+  const pageCount = useMemo(() => Math.max(1, Math.ceil(recipes.length / pageSize)), [pageSize, recipes.length]);
+
+  useEffect(() => {
+    if (page < 1) return setPage(1);
+    if (page > pageCount) setPage(pageCount);
+  }, [page, pageCount]);
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +117,30 @@ export default function RecipesPage() {
     }
   };
 
+  const onAskDelete = (id: string) => {
+    setError(null);
+    setDeleteConfirmId((cur) => (cur === id ? null : id));
+  };
+
+  const onDelete = async (id: string) => {
+    if (!canCall) return;
+    setError(null);
+    setDeletingId(id);
+    try {
+      const res = await apiFetch(`/api/recipes/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await refresh();
+      if (exportRecipeId === id) setExportRecipeId("");
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setDeletingId(null);
+      setDeleteConfirmId(null);
+    }
+  };
+
   const hasRecipes = useMemo(() => recipes.length > 0, [recipes.length]);
+  const pageRecipes = useMemo(() => recipes.slice((page - 1) * pageSize, page * pageSize), [page, pageSize, recipes]);
 
   return (
     <>
@@ -165,14 +209,26 @@ export default function RecipesPage() {
         ) : null}
       </section>
 
-      <section className="panel" aria-labelledby="recipes-list-heading">
+      <section className="panel" aria-labelledby="recipes-import-heading" style={{ marginTop: 16 }}>
+        <h2 id="recipes-import-heading" style={{ marginTop: 0 }}>
+          {tImport("title")}
+        </h2>
+        <p className="muted" style={{ marginTop: 0 }}>
+          {tImport("subtitle")}
+        </p>
+        <p style={{ marginBottom: 0 }}>
+          <Link href="/recipes/import">{tImport("cta")}</Link>
+        </p>
+      </section>
+
+      <section className="panel" aria-labelledby="recipes-list-heading" style={{ marginTop: 16 }}>
         <h2 id="recipes-list-heading" style={{ marginTop: 0 }}>
           {t("listTitle")}
         </h2>
         {!loading && !hasRecipes ? <p className="muted">{t("noRecipes")}</p> : null}
         {hasRecipes ? (
           <ul style={{ marginBottom: 0 }}>
-            {recipes.map((r) => (
+            {pageRecipes.map((r) => (
               <li key={r.id} style={{ display: "grid", gap: 6, padding: "8px 0" }}>
                 <div>
                   <strong>{r.name}</strong> {r.style ? <span className="muted">({r.style})</span> : null}
@@ -180,18 +236,97 @@ export default function RecipesPage() {
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
                   <Link href={`/recipes/${r.id}/water`}>{t("openWater")}</Link>
+                  <button type="button" onClick={() => onAskDelete(r.id)} disabled={!canCall || deletingId === r.id}>
+                    {t("delete.cta")}
+                  </button>
                 </div>
+                {deleteConfirmId === r.id ? (
+                  <div className="errorBox" role="alert" style={{ marginTop: 6 }}>
+                    <p style={{ marginTop: 0, marginBottom: 8 }}>
+                      <strong>{t("delete.confirmTitle")}</strong>{" "}
+                      <span className="muted">{t("delete.confirmBody")}</span>
+                    </p>
+                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                      <button type="button" onClick={() => void onDelete(r.id)} disabled={!canCall || deletingId === r.id}>
+                        {deletingId === r.id ? t("delete.deleting") : t("delete.confirmCta")}
+                      </button>
+                      <button type="button" onClick={() => setDeleteConfirmId(null)} disabled={deletingId === r.id}>
+                        {t("delete.cancel")}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
         ) : null}
+
+        {hasRecipes && pageCount > 1 ? (
+          <nav aria-label={t("pagination.ariaLabel")} style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+            <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+              {t("pagination.prev")}
+            </button>
+            <span className="muted" aria-live="polite">
+              {t("pagination.status", { page, pages: pageCount })}
+            </span>
+            <button type="button" onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount}>
+              {t("pagination.next")}
+            </button>
+          </nav>
+        ) : null}
       </section>
 
-      <ul>
-        <li>
-          <Link href="/">{c("backToDashboard")}</Link>
-        </li>
-      </ul>
+      <section className="panel" aria-labelledby="recipes-export-heading" style={{ marginTop: 16 }}>
+        <h2 id="recipes-export-heading" style={{ marginTop: 0 }}>
+          {t("export.title")}
+        </h2>
+        <p className="muted" style={{ marginTop: 0 }}>
+          {t("export.subtitle")}
+        </p>
+
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
+          <div>
+            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="export-recipe">
+              {t("export.selectLabel")}
+            </label>
+            <select
+              id="export-recipe"
+              value={exportRecipeId}
+              onChange={(e) => setExportRecipeId(e.target.value)}
+              disabled={!hasRecipes}
+              style={{ width: "100%", padding: 8 }}
+            >
+              {hasRecipes ? null : <option value="">{t("export.noneAvailable")}</option>}
+              {recipes.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <a
+            href={exportRecipeId ? `/api/recipes/${exportRecipeId}/export/beerjson` : undefined}
+            aria-disabled={!exportRecipeId}
+            onClick={(e) => {
+              if (!exportRecipeId) e.preventDefault();
+            }}
+          >
+            {t("export.exportSelectedCta")}
+          </a>
+          <a
+            href={hasRecipes ? "/api/recipes/export/beerjson" : undefined}
+            aria-disabled={!hasRecipes}
+            onClick={(e) => {
+              if (!hasRecipes) e.preventDefault();
+            }}
+          >
+            {t("export.exportAllCta")}
+          </a>
+        </div>
+        <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
+          {t("export.strictNote")}
+        </p>
+      </section>
     </>
   );
 }

@@ -160,6 +160,58 @@
   "recipes": {
     "title": "Ricette",
     "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",
+    "import": {
+      "title": "Importa ricetta",
+      "subtitle": "Importa un file e crea una nuova ricetta nel tuo account.",
+      "cta": "Importa da BeerJSON / BeerXML",
+      "loading": "Caricamento…",
+      "backToRecipes": "Torna alle Ricette",
+      "singleHeading": "Importa ricetta singola",
+      "singleSubtitle": "Importa un singolo file ricetta nel tuo account (scegli tu lo stile).",
+      "bulkHeading": "Import massivo (più ricette)",
+      "bulkSubtitle": "Importa un file che contiene più ricette e creale tutte in una volta.",
+      "fileHeading": "File",
+      "fileLabel": "File ricetta (BeerJSON .json o BeerXML .xml)",
+      "filePicked": "Selezionato: {name}",
+      "fileNotPicked": "Nessun file selezionato.",
+      "formatLabel": "Formato",
+      "formatAuto": "Auto",
+      "formatBeerJson": "BeerJSON (.json)",
+      "formatBeerXml": "BeerXML (.xml)",
+      "formatResolved": "Formato rilevato: {format}",
+      "formatNotResolved": "Impossibile rilevare il formato dal nome file. Seleziona un formato sopra.",
+      "styleLabel": "Stile",
+      "bulkStyleRule": "L’import massivo associa lo stile a BJCP 2021 prima per nome esatto, poi per codice. Se non c’è corrispondenza, assegniamo Personalizzato.",
+      "preview": "Anteprima",
+      "previewing": "Anteprima…",
+      "reset": "Reset",
+      "previewHeading": "Anteprima",
+      "previewNameLabel": "Nome",
+      "previewNotesLabel": "Note",
+      "bulkPreviewHeading": "Anteprima massiva",
+      "resolvedStyleLabel": "Stile risolto",
+      "customStyleName": "Personalizzato",
+      "customStyleCode": "custom",
+      "warningsHeading": "Avvisi",
+      "noWarnings": "Nessun avviso.",
+      "import": "Importa ricetta",
+      "importing": "Importazione…",
+      "bulkCreatedHeading": "Ricette create",
+      "bulkCreatedCount": "{count} create",
+      "bulkNoneCreated": "Non è stata creata nessuna ricetta.",
+      "bulkFailedHeading": "Import falliti",
+      "dash": "—",
+      "unknownWarningCode": "avviso",
+      "errors": {
+        "notAuthenticated": "Non autenticato.",
+        "noActiveAccount": "Nessun account attivo selezionato.",
+        "noContent": "Seleziona prima un file.",
+        "unknownFormat": "Formato sconosciuto. Seleziona BeerJSON o BeerXML.",
+        "previewMissing": "La risposta di anteprima non contiene i dati attesi.",
+        "styleRequired": "Lo stile è obbligatorio.",
+        "importMissingId": "La risposta di import non contiene l’id ricetta."
+      }
+    },
     "edit": {
       "title": "Modifica ricetta",
       "loading": "Caricamento…",
@@ -278,11 +330,54 @@
     "listTitle": "Le tue ricette",
     "noRecipes": "Ancora nessuna ricetta.",
     "openEditor": "Apri editor",
-    "openWater": "Apri calcolatore acqua"
+    "openWater": "Apri calcolatore acqua",
+    "exportBeerJson": "Esporta (BeerJSON)",
+    "pagination": {
+      "ariaLabel": "Paginazione elenco ricette",
+      "prev": "Precedente",
+      "next": "Successiva",
+      "status": "Pagina {page} di {pages}"
+    },
+    "delete": {
+      "cta": "Elimina",
+      "confirmTitle": "Eliminare la ricetta?",
+      "confirmBody": "Questa azione non può essere annullata. Fai clic su “Elimina ora” per confermare, oppure Annulla per mantenerla.",
+      "confirmCta": "Elimina ora",
+      "deleting": "Eliminazione…",
+      "cancel": "Annulla"
+    },
+    "export": {
+      "title": "Esporta",
+      "subtitle": "Scarica BeerJSON strict per una ricetta o per tutte le ricette.",
+      "selectLabel": "Ricetta",
+      "noneAvailable": "Nessuna ricetta disponibile",
+      "exportSelectedCta": "Esporta selezionata",
+      "exportAllCta": "Esporta tutte",
+      "strictNote": "Le esportazioni sono BeerJSON strict (gli id interni delle aggiunte vengono rimossi per interoperabilità)."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first."
+    "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first.",
+    "importExport": {
+      "title": "Import / Export",
+      "supportedNote": "L’interoperabilità di import/export ricette è centrata su BeerJSON (canonico).",
+      "importFormats": "Import: BeerJSON (.json) e BeerXML (.xml).",
+      "exportFormats": "Export: BeerJSON (.json).",
+      "actionsLiveInRecipes": "Le azioni di import/export sono in Ricette:",
+      "actionsCta": "Vai alle Ricette",
+      "customImportNote": "Hai bisogno di un altro sistema?",
+      "customImportCta": "Contattaci per un import personalizzato a un costo accessibile."
+    }
+  },
+  "contact": {
+    "title": "Contatti",
+    "subtitle": "Per richieste di import personalizzati, scrivici: risponderemo con i prossimi passi e una stima.",
+    "emailHeading": "Email",
+    "emailLabel": "Email:",
+    "emailAddress": "aabrewery@proton.me",
+    "mailtoSubject": "Richiesta import personalizzato",
+    "emailCta": "Scrivici"
   },
   "health": {
     "title": "Stato API",

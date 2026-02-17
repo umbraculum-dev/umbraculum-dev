@@ -58,11 +58,16 @@ To keep stable editor row identity across edits, the web editor includes an `id`
 
 This `id` is **not part of the BeerJSON standard**, but it is accepted by the upstream JSON-Schema (these addition types do not set `additionalProperties: false`).
 
-**Portability note:** if you export BeerJSON to other systems, they should ignore unknown fields; if we later add a “strict export” mode, we can strip `id` on export.
+**Portability note:** exported BeerJSON uses a **strict mode** that strips these internal row `id` fields.
 
 ## Import/export behavior
-- **Import** routes validate BeerJSON and map it into canonical storage.
-- **Export** uses `beerJsonRecipeJson` directly (canonical).
+- **Import** routes validate BeerJSON and map it into canonical storage:
+  - Single recipe: `POST /recipes/import/preview`, `POST /recipes/import`
+  - Bulk (multi-recipe files): `POST /recipes/import/bulk/preview`, `POST /recipes/import/bulk`
+- **Export (strict BeerJSON)** is implemented:
+  - Single recipe: `GET /recipes/:id/export/beerjson`
+  - Bulk export (all recipes in active account): `GET /recipes/export/beerjson`
+  - Strict export strips internal addition row `id` fields for interoperability.
 
 ## Files (source of truth)
 - API BeerJSON validation: `services/api/src/beerjson/beerjsonValidator.ts`

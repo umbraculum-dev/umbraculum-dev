@@ -3,6 +3,7 @@
 import { HealthPanel } from "../HealthPanel";
 import { DashboardClient } from "../DashboardClient";
 import { useTranslations } from "next-intl";
+import { ImportExportPanel } from "../_components/ImportExportPanel";
 
 export default function Home() {
   const t = useTranslations("dashboard");
@@ -13,6 +14,7 @@ export default function Home() {
         {t("subtitle")}
       </p>
       <HealthPanel />
+      <ImportExportPanel headingId="import-export-heading" className="" />
       <DashboardClient />
     </>
   );

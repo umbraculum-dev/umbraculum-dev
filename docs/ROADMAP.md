@@ -43,6 +43,13 @@ These map to three “pillars”:
 - The recipe editor should **not** embed the full water calculator; water chemistry in recipe edit is a link to the full calculator.
 - UI preference: **dark grey background** (Cursor-like) is desired for recipe + water calculator UIs, **as long as** accessibility constraints are met.
 
+### Recipe import/export (v1)
+- Import/export actions live under **Recipes** (not the Dashboard).
+- Import UX is split into:
+  - **Import single recipe**: user selects a style (default Custom).
+  - **Bulk import**: multi-recipe files; style is auto-matched to **BJCP 2021** (name-first, then code), else Custom.
+- Export uses **strict BeerJSON** for interoperability (internal addition row `id` fields are stripped).
+
 ### Offline-forward constraint (future)
 Even though v0 is server-backed, we want to design pages so we can later support offline drafts:
 - Each page can maintain a clear “draft saved” model (local-first draft state, explicit save events).

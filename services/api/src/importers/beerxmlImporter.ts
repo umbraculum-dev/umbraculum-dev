@@ -1,6 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 
 type ImportWarning = { code: string; message: string };
+export type StyleCandidate = { name?: string | null; code?: string | null };
 
 type BeerJsonDocument = {
   beerjson: {
@@ -151,17 +152,7 @@ function miscTypeToBeerJsonType(t: BeerXmlMiscRow["type"]) {
   return t;
 }
 
-export function importBeerXmlToLegacy(xml: string): {
-  recipeName: string;
-  notes: string | null;
-  gristJson: BeerXmlGristRow[];
-  hopsJson: BeerXmlHopRow[];
-  yeastJson: BeerXmlYeastRow[];
-  miscJson: BeerXmlMiscRow[];
-  warnings: ImportWarning[];
-} {
-  const warnings: ImportWarning[] = [];
-
+function parseBeerXml(xml: string): any {
   // Basic hardening: avoid DTD/DOCTYPE usage. (fast-xml-parser doesn't resolve external entities,
   // but rejecting these early keeps risk lower.)
   if (xml.includes("<!DOCTYPE") || xml.includes("<!ENTITY")) {
@@ -176,9 +167,43 @@ export function importBeerXmlToLegacy(xml: string): {
     parseTagValue: true,
   });
 
-  const doc = parser.parse(xml) as any;
-  const recipe = doc?.RECIPES?.RECIPE ?? doc?.RECIPE ?? null;
-  if (!recipe || typeof recipe !== "object") throw new Error("BeerXML: missing RECIPES.RECIPE");
+  return parser.parse(xml) as any;
+}
+
+function extractBeerXmlRecipes(doc: any): any[] {
+  const raw = doc?.RECIPES?.RECIPE ?? doc?.RECIPE ?? null;
+  return asArray<any>(raw).filter((r) => r && typeof r === "object");
+}
+
+function extractStyleCandidateFromBeerXmlRecipe(recipe: any): StyleCandidate | null {
+  const style = recipe?.STYLE ?? null;
+  if (!style || typeof style !== "object") return null;
+
+  const name = typeof style?.NAME === "string" ? style.NAME.trim() : "";
+
+  const categoryNumberRaw = style?.CATEGORY_NUMBER;
+  const categoryNumber =
+    typeof categoryNumberRaw === "number" && Number.isFinite(categoryNumberRaw) ? String(categoryNumberRaw)
+      : typeof categoryNumberRaw === "string" ? categoryNumberRaw.trim()
+      : "";
+
+  const styleLetter = typeof style?.STYLE_LETTER === "string" ? style.STYLE_LETTER.trim() : "";
+  const code = categoryNumber && styleLetter ? `${categoryNumber}${styleLetter}` : "";
+
+  if (!name && !code) return null;
+  return { name: name || null, code: code || null };
+}
+
+function importBeerXmlRecipeToLegacy(recipe: any): {
+  recipeName: string;
+  notes: string | null;
+  gristJson: BeerXmlGristRow[];
+  hopsJson: BeerXmlHopRow[];
+  yeastJson: BeerXmlYeastRow[];
+  miscJson: BeerXmlMiscRow[];
+  warnings: ImportWarning[];
+} {
+  const warnings: ImportWarning[] = [];
 
   const recipeName = typeof recipe.NAME === "string" ? recipe.NAME.trim() : "";
   if (!recipeName) throw new Error("BeerXML: recipe NAME is required");
@@ -295,6 +320,23 @@ export function importBeerXmlToLegacy(xml: string): {
   return { recipeName, notes, gristJson, hopsJson, yeastJson, miscJson, warnings };
 }
 
+export function importBeerXmlToLegacy(xml: string): {
+  recipeName: string;
+  notes: string | null;
+  gristJson: BeerXmlGristRow[];
+  hopsJson: BeerXmlHopRow[];
+  yeastJson: BeerXmlYeastRow[];
+  miscJson: BeerXmlMiscRow[];
+  warnings: ImportWarning[];
+} {
+  const doc = parseBeerXml(xml);
+  const recipes = extractBeerXmlRecipes(doc);
+  const recipe = recipes[0] ?? null;
+  if (!recipe) throw new Error("BeerXML: missing RECIPES.RECIPE");
+
+  return importBeerXmlRecipeToLegacy(recipe);
+}
+
 export function importBeerXmlToBeerJson(xml: string): {
   recipeName: string;
   notes: string | null;
@@ -303,6 +345,24 @@ export function importBeerXmlToBeerJson(xml: string): {
 } {
   const mapped = importBeerXmlToLegacy(xml);
 
+  const recipe: any = legacyToBeerJsonRecipe(mapped);
+
+  return {
+    recipeName: mapped.recipeName,
+    notes: mapped.notes,
+    beerJsonRecipeJson: { beerjson: { version: 1, recipes: [recipe] } },
+    warnings: mapped.warnings,
+  };
+}
+
+function legacyToBeerJsonRecipe(mapped: {
+  recipeName: string;
+  notes: string | null;
+  gristJson: BeerXmlGristRow[];
+  hopsJson: BeerXmlHopRow[];
+  yeastJson: BeerXmlYeastRow[];
+  miscJson: BeerXmlMiscRow[];
+}) {
   const recipe: any = {
     name: mapped.recipeName,
     type: "all grain",
@@ -361,11 +421,30 @@ export function importBeerXmlToBeerJson(xml: string): {
     },
   };
   if (mapped.notes) recipe.notes = mapped.notes;
+  return recipe;
+}
 
-  return {
-    recipeName: mapped.recipeName,
-    notes: mapped.notes,
-    beerJsonRecipeJson: { beerjson: { version: 1, recipes: [recipe] } },
-    warnings: mapped.warnings,
-  };
+export function importBeerXmlToBeerJsonMany(xml: string): Array<{
+  recipeName: string;
+  notes: string | null;
+  beerJsonRecipeJson: BeerJsonDocument;
+  warnings: ImportWarning[];
+  styleCandidate: StyleCandidate | null;
+}> {
+  const doc = parseBeerXml(xml);
+  const recipes = extractBeerXmlRecipes(doc);
+  if (recipes.length === 0) throw new Error("BeerXML: missing RECIPES.RECIPE");
+
+  return recipes.map((r) => {
+    const styleCandidate = extractStyleCandidateFromBeerXmlRecipe(r);
+    const legacy = importBeerXmlRecipeToLegacy(r);
+    const recipe = legacyToBeerJsonRecipe(legacy);
+    return {
+      recipeName: legacy.recipeName,
+      notes: legacy.notes,
+      beerJsonRecipeJson: { beerjson: { version: 1, recipes: [recipe] } },
+      warnings: legacy.warnings,
+      styleCandidate,
+    };
+  });
 }

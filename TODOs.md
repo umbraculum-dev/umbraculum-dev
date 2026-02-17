@@ -12,12 +12,21 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 ## Recipes / templates
 
-- [ ] **Assess external libraries** for importing recipes (BeerXML + BeerJSON) into our canonical recipe model (BeerJSON-first: `beerJsonRecipeJson` + `recipeExtJson`).
-  - See `RECIPES-IMPORT-TODO.md` for the agreed path forward (manual import + server-side importer plan).
-  - [ ] **Scope v1 to server-side only** (API importer). Web UI uploads/pastes recipe data; parsing happens in the API.
-  - [ ] Decide input UX: file upload vs paste text (and which we support first).
-  - [ ] Define a licensing policy: default to user-provided files; do not redistribute third-party recipe datasets unless explicitly licensed.
-  - [ ] Choose approach: maintained library vs minimal in-house parser for the subset we need.
+- [x] **Recipe import/export v1** (BeerXML + BeerJSON) implemented as BeerJSON-first canonical storage.
+  - Implemented endpoints:
+    - Single import: `POST /recipes/import/preview`, `POST /recipes/import`
+    - Bulk import: `POST /recipes/import/bulk/preview`, `POST /recipes/import/bulk`
+    - Strict export (single): `GET /recipes/:id/export/beerjson`
+    - Strict export (bulk): `GET /recipes/export/beerjson`
+  - Web UI:
+    - `/[locale]/recipes/import` has **Import single recipe** (manual style, default Custom) and **Bulk import** (BJCP 2021 style match name→code, else Custom).
+    - `/[locale]/recipes` has pagination (20/page), export selected/all, and delete-with-confirm.
+  - See `RECIPES-IMPORT-TODO.md` for remaining improvements and constraints.
+- [ ] **Owner-only full Import/Export**: allow the app owner to import/export recipes with **all columns**, including internal/customized fields (not strict/interoperability mode).
+- [ ] Add upload/paste size limits (API) and show clear “file too large” errors.
+- [ ] Add optional “paste content” import UX (secondary to file upload) if desired.
+- [ ] Extend BeerXML (BrewersFriend-style) handling to preserve more data where possible (primarily **mash steps**); verify what is importable and reflect it in our BeerJSON + `recipeExtJson` model.
+- [ ] Extend style parsing for imports (BeerXML and likely BeerJSON): some exporters may split style/classification over multiple fields/lines (e.g. BeerXML `<CATEGORY>English Pale Ale</CATEGORY>` + `<CATEGORY_NUMBER>8</CATEGORY_NUMBER>` + `<STYLE_LETTER>B</STYLE_LETTER>` + `<STYLE_GUIDE>BJCP</STYLE_GUIDE>` + `<TYPE>Ale</TYPE>`). Consider this when extracting style name/code candidates for BJCP matching.
 - [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
 - [ ] Assess whether the Recipe Edit sidebar “Sections” nav is still useful now that recipe sections default-collapsed (especially on mobile/touch).
 

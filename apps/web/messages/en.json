@@ -160,6 +160,58 @@
   "recipes": {
     "title": "Recipes",
     "subtitle": "This is the recipe area entrypoint (list/edit/water calculator).",
+    "import": {
+      "title": "Import recipe",
+      "subtitle": "Import a recipe file and create a new recipe in your account.",
+      "cta": "Import from BeerJSON / BeerXML",
+      "loading": "Loading…",
+      "backToRecipes": "Back to Recipes",
+      "singleHeading": "Import single recipe",
+      "singleSubtitle": "Import one recipe file into your account (you choose the style).",
+      "bulkHeading": "Bulk import (multiple recipes)",
+      "bulkSubtitle": "Import a file containing multiple recipes and create them all at once.",
+      "fileHeading": "File",
+      "fileLabel": "Recipe file (BeerJSON .json or BeerXML .xml)",
+      "filePicked": "Selected: {name}",
+      "fileNotPicked": "No file selected yet.",
+      "formatLabel": "Format",
+      "formatAuto": "Auto-detect",
+      "formatBeerJson": "BeerJSON (.json)",
+      "formatBeerXml": "BeerXML (.xml)",
+      "formatResolved": "Resolved format: {format}",
+      "formatNotResolved": "Unable to detect format from filename. Choose a format above.",
+      "styleLabel": "Style",
+      "bulkStyleRule": "Bulk import matches style to BJCP 2021 by exact name first, then code. If no match, we assign Custom.",
+      "preview": "Preview",
+      "previewing": "Previewing…",
+      "reset": "Reset",
+      "previewHeading": "Preview",
+      "previewNameLabel": "Name",
+      "previewNotesLabel": "Notes",
+      "bulkPreviewHeading": "Bulk preview",
+      "resolvedStyleLabel": "Resolved style",
+      "customStyleName": "Custom",
+      "customStyleCode": "custom",
+      "warningsHeading": "Warnings",
+      "noWarnings": "No warnings.",
+      "import": "Import recipe",
+      "importing": "Importing…",
+      "bulkCreatedHeading": "Created recipes",
+      "bulkCreatedCount": "{count} created",
+      "bulkNoneCreated": "No recipes were created.",
+      "bulkFailedHeading": "Failed imports",
+      "dash": "—",
+      "unknownWarningCode": "warning",
+      "errors": {
+        "notAuthenticated": "Not authenticated.",
+        "noActiveAccount": "No active account selected.",
+        "noContent": "Please select a file first.",
+        "unknownFormat": "Unknown format. Please choose BeerJSON or BeerXML.",
+        "previewMissing": "Preview response is missing expected data.",
+        "styleRequired": "Style is required.",
+        "importMissingId": "Import response is missing recipe id."
+      }
+    },
     "edit": {
       "title": "Edit recipe",
       "loading": "Loading…",
@@ -278,11 +330,54 @@
     "listTitle": "Your recipes",
     "noRecipes": "No recipes yet.",
     "openEditor": "Open editor",
-    "openWater": "Open water calculator"
+    "openWater": "Open water calculator",
+    "exportBeerJson": "Export (BeerJSON)",
+    "pagination": {
+      "ariaLabel": "Recipe list pagination",
+      "prev": "Previous",
+      "next": "Next",
+      "status": "Page {page} of {pages}"
+    },
+    "delete": {
+      "cta": "Delete",
+      "confirmTitle": "Delete recipe?",
+      "confirmBody": "This cannot be undone. Click “Delete now” to confirm, or Cancel to keep it.",
+      "confirmCta": "Delete now",
+      "deleting": "Deleting…",
+      "cancel": "Cancel"
+    },
+    "export": {
+      "title": "Export",
+      "subtitle": "Download strict BeerJSON for one recipe or all recipes.",
+      "selectLabel": "Recipe",
+      "noneAvailable": "No recipes available",
+      "exportSelectedCta": "Export selected",
+      "exportAllCta": "Export all",
+      "strictNote": "Exports are strict BeerJSON (internal addition row ids are removed for interoperability)."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Desktop-first web app + native mobile apps, offline-first brew-day logging."
+    "subtitle": "Desktop-first web app + native mobile apps, offline-first brew-day logging.",
+    "importExport": {
+      "title": "Import / Export",
+      "supportedNote": "Recipe import/export interoperability is centered on BeerJSON (canonical).",
+      "importFormats": "Import: BeerJSON (.json) and BeerXML (.xml).",
+      "exportFormats": "Export: BeerJSON (.json).",
+      "actionsLiveInRecipes": "Import/export actions live under Recipes:",
+      "actionsCta": "Go to Recipes",
+      "customImportNote": "Need another system?",
+      "customImportCta": "Contact us for affordable custom import."
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "For custom import requests, send us a message and we’ll reply with next steps and an estimate.",
+    "emailHeading": "Email",
+    "emailLabel": "Email:",
+    "emailAddress": "aabrewery@proton.me",
+    "mailtoSubject": "Custom import request",
+    "emailCta": "Email us"
   },
   "health": {
     "title": "API health",

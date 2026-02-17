@@ -1,6 +1,6 @@
-# Recipe import (BeerXML / BeerJSON) – path forward (TODO)
+# Recipe import (BeerXML / BeerJSON) – v1 shipped + follow-ups
 
-This document captures the agreed direction for adding **recipe import** without implementing it yet.
+This document captures what was shipped for **recipe import/export v1** and the remaining follow-ups.
 
 Goals:
 - Let a logged-in user create a new `Recipe` from an imported file/template.
@@ -45,13 +45,18 @@ The web editor is BeerJSON-first, so imports should ultimately produce a valid B
   - Paste XML/JSON into a text area.
   - Same preview → confirm flow.
 
-**API shape (proposal)**
-- `POST /recipes/import/preview`
-  - Input: `{ format: "beerxml" | "beerjson", content: string }`
-  - Output: `{ ok: true, preview: { name, notes, beerJsonRecipeJson }, warnings: string[] }`
-- `POST /recipes/import`
-  - Input: `{ format, content, nameOverride?, styleOverride? }`
-  - Output: `{ ok: true, recipe: { id, ... } }`
+**API shape (implemented)**
+- Single import:
+  - `POST /recipes/import/preview`
+    - Input: `{ format: "beerxml" | "beerjson", content: string }`
+    - Output: `{ ok: true, preview: { name, notes, beerJsonRecipeJson, warnings[] } }`
+  - `POST /recipes/import`
+    - Input: `{ format, content, styleKey }` (style is user-chosen; default `custom`)
+    - Output: `{ ok: true, recipe: { id, ... }, warnings[] }`
+
+**Web UX (implemented)**
+- `/[locale]/recipes/import`
+  - **Import single recipe**: file upload + preview + confirm; user selects style (default Custom).
 
 Rationale:
 - Preview prevents polluting the DB with bad parses.
@@ -73,6 +78,30 @@ This is not a “recipe dataset”. It’s the **import pipeline** implemented o
 **Why this matters**
 - It keeps the importer consistent and testable.
 - It enables future batch imports (admin tools) without changing the web client.
+
+---
+
+## Bulk import (multi-recipe) (implemented)
+
+Bulk import is a separate flow from single import:
+- It accepts files containing multiple recipes:
+  - BeerXML: `<RECIPES><RECIPE>...</RECIPE>...</RECIPES>`
+  - BeerJSON: `beerjson.recipes[]`
+- It imports **all** recipes and reports per-recipe failures.
+
+**API shape (implemented)**
+- `POST /recipes/import/bulk/preview`
+  - Input: `{ format: "beerxml" | "beerjson", content: string }`
+  - Output: `{ ok: true, previewItems: Array<{ index, name, notes, resolvedStyleKey, resolvedStyleName, resolvedStyleCode, warnings[] }> }`
+- `POST /recipes/import/bulk`
+  - Input: `{ format, content }`
+  - Output: `{ ok: true, created: [...], failed: [...] }`
+
+**Style matching (implemented, bulk-only)**
+- If the imported file provides a style candidate:
+  - Match BJCP 2021 by **exact name (case-insensitive)** first, then **exact code**
+  - If no deterministic match, assign `custom` and emit `style_unmatched`
+- Single import remains manual style selection.
 
 ---
 
@@ -155,15 +184,22 @@ If we later consider pre-seeding templates:
 
 ## Deliverables (when we implement)
 
-1. API importer module(s)
-   - `beerxmlImporter.ts` (parse + map + warnings)
-   - `beerjsonImporter.ts` (validate + map + warnings)
-2. Routes
-   - `/recipes/import/preview`
-   - `/recipes/import`
-3. Web UI
-   - Import panel on `/[locale]/recipes` (file upload first)
-4. Tests
-   - Fixture BeerXML/BeerJSON files
-   - Assertions on generated canonical `beerJsonRecipeJson`
+## Deliverables (implemented)
+
+- API importer module(s)
+  - `services/api/src/importers/beerxmlImporter.ts` (parse + map + warnings; supports multi-recipe for bulk import)
+  - BeerJSON validation: `services/api/src/beerjson/index.ts` (`validateBeerJsonDoc`)
+- Routes
+  - Single: `/recipes/import/preview`, `/recipes/import`
+  - Bulk: `/recipes/import/bulk/preview`, `/recipes/import/bulk`
+- Web UI
+  - `/[locale]/recipes/import` (single + bulk panels)
+- Tests
+  - `services/api/src/tests/recipesImport.test.ts`
+
+## Follow-ups (not yet implemented)
+
+- Add explicit size limits for upload/paste and return a clear “file too large” error.
+- Decide whether to add “paste content” UX (in addition to file upload).
+- Expand BeerXML/BeerJSON mapping coverage (process steps, equipment, fermentation) only when needed.
 
