@@ -7,18 +7,12 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "../../../_lib/apiClient";
 import {
-  parseGristJson,
-  type GristMaltClass,
-  type GristPotential,
-  type GristPotentialKind,
-  type GristRow,
-} from "../../../_lib/grist";
-import { parseMiscJson, type MiscRow, type MiscType, type MiscUse } from "../../../_lib/misc";
-import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
+  type EditorGristRow,
   type EditorHopRow,
+  type EditorMiscRow,
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 
@@ -29,10 +23,6 @@ type Recipe = {
   style: string | null;
   styleKey?: string | null;
   notes: string | null;
-  gristJson?: unknown;
-  hopsJson?: unknown;
-  yeastJson?: unknown;
-  miscJson?: unknown;
   beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
   createdAt: string;
@@ -49,90 +39,17 @@ function newRowId() {
   }
 }
 
+type GristRow = EditorGristRow;
+type GristMaltClass = EditorGristRow["maltClass"];
+type GristPotential = EditorGristRow["potential"];
+type GristPotentialKind = NonNullable<GristPotential>["kind"];
+type HopRow = EditorHopRow;
+type YeastRow = EditorYeastRow;
+type MiscRow = EditorMiscRow;
+
 type HopUse = "boil" | "whirlpool" | "dryhop";
-type HopRow = {
-  id: string;
-  ingredientId: string | null;
-  name: string;
-  country?: string | null;
-  amountGrams: number;
-  alphaAcidPercent: number | null;
-  use: HopUse;
-  timeMinutes: number | null;
-};
-
-function parseHopsJson(value: unknown): HopRow[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((row) => {
-      const o = (row ?? {}) as Record<string, unknown>;
-      const id = typeof o.id === "string" ? o.id : newRowId();
-      const ingredientIdRaw = o.ingredientId;
-      const ingredientId =
-        ingredientIdRaw === null || ingredientIdRaw === undefined
-          ? null
-          : typeof ingredientIdRaw === "string"
-            ? ingredientIdRaw
-            : null;
-      const name = typeof o.name === "string" ? o.name : "";
-      const country = typeof o.country === "string" ? o.country : null;
-      const amountGrams =
-        typeof o.amountGrams === "number" && Number.isFinite(o.amountGrams) ? o.amountGrams : 0;
-      const alphaRaw = o.alphaAcidPercent;
-      const alphaAcidPercent =
-        alphaRaw === null || alphaRaw === undefined
-          ? null
-          : typeof alphaRaw === "number" && Number.isFinite(alphaRaw)
-            ? alphaRaw
-            : null;
-      const useRaw = o.use;
-      const use: HopUse = useRaw === "whirlpool" || useRaw === "dryhop" || useRaw === "boil" ? useRaw : "boil";
-      const timeRaw = o.timeMinutes;
-      const timeMinutes =
-        timeRaw === null || timeRaw === undefined
-          ? null
-          : typeof timeRaw === "number" && Number.isFinite(timeRaw)
-            ? timeRaw
-            : null;
-      if (!name) return null;
-      return { id, ingredientId, name, country, amountGrams, alphaAcidPercent, use, timeMinutes } as HopRow;
-    })
-    .filter(Boolean) as HopRow[];
-}
-
-type YeastRow = {
-  id: string;
-  ingredientId: string | null;
-  name: string;
-  lab?: string | null;
-  productId?: string | null;
-  attenuationMin?: number | null;
-  attenuationMax?: number | null;
-};
-
-function parseYeastJson(value: unknown): YeastRow[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((row) => {
-      const o = (row ?? {}) as Record<string, unknown>;
-      const id = typeof o.id === "string" ? o.id : newRowId();
-      const ingredientIdRaw = o.ingredientId;
-      const ingredientId =
-        ingredientIdRaw === null || ingredientIdRaw === undefined
-          ? null
-          : typeof ingredientIdRaw === "string"
-            ? ingredientIdRaw
-            : null;
-      const name = typeof o.name === "string" ? o.name : "";
-      if (!name) return null;
-      const lab = typeof o.lab === "string" ? o.lab : null;
-      const productId = typeof o.productId === "string" ? o.productId : null;
-      const attenuationMin = typeof o.attenuationMin === "number" && Number.isFinite(o.attenuationMin) ? o.attenuationMin : null;
-      const attenuationMax = typeof o.attenuationMax === "number" && Number.isFinite(o.attenuationMax) ? o.attenuationMax : null;
-      return { id, ingredientId, name, lab, productId, attenuationMin, attenuationMax } as YeastRow;
-    })
-    .filter(Boolean) as YeastRow[];
-}
+type MiscType = EditorMiscRow["type"];
+type MiscUse = EditorMiscRow["use"];
 
 const miscTypeOptions: { value: MiscType; label: string }[] = [
   { value: "spice", label: "Spice" },
@@ -182,10 +99,10 @@ export default function RecipeEditPage() {
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
   const [notes, setNotes] = useState("");
-  const [gristRows, setGristRows] = useState<GristRow[]>([]);
-  const [hopsRows, setHopsRows] = useState<HopRow[]>([]);
-  const [yeastRows, setYeastRows] = useState<YeastRow[]>([]);
-  const [miscRows, setMiscRows] = useState<MiscRow[]>([]);
+  const [gristRows, setGristRows] = useState<EditorGristRow[]>([]);
+  const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
+  const [yeastRows, setYeastRows] = useState<EditorYeastRow[]>([]);
+  const [miscRows, setMiscRows] = useState<EditorMiscRow[]>([]);
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
   const [stylesLoading, setStylesLoading] = useState(false);
@@ -233,47 +150,40 @@ export default function RecipeEditPage() {
         const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
         const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
 
-        if ((r as any).beerJsonRecipeJson) {
-          const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
-          const grist = s.gristRows.map((row) => {
-            const ingredientId =
-              typeof links?.grist?.[row.id] === "string" ? (links.grist[row.id] as string) : null;
-            const m = row.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[row.id] : null;
-            return {
-              ...row,
-              ingredientId,
-              mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : row.mashDiPh ?? null,
-              mashTaToPh57_mEqPerKg:
-                typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : row.mashTaToPh57_mEqPerKg ?? null,
-              mashRoastDehuskedOverride:
-                "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : row.mashRoastDehuskedOverride ?? null,
-            } as GristRow;
-          });
-          const hops = s.hopsRows.map((row) => ({
-            ...row,
-            ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
-          })) as unknown as HopRow[];
-          const yeast = s.yeastRows.map((row) => ({
-            ...row,
-            ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
-          })) as unknown as YeastRow[];
-          const misc = s.miscRows.map((row) => ({
-            ...row,
-            ingredientId: typeof links?.misc?.[row.id] === "string" ? (links.misc[row.id] as string) : null,
-          })) as unknown as MiscRow[];
-
-          setGristRows(grist);
-          setHopsRows(hops);
-          setYeastRows(yeast);
-          setMiscRows(misc);
-        } else {
-          // Back-compat: if BeerJSON is missing, fall back to legacy columns for display,
-          // but saving will still write BeerJSON (see onSave).
-          setGristRows(parseGristJson(r.gristJson));
-          setHopsRows(parseHopsJson(r.hopsJson));
-          setYeastRows(parseYeastJson(r.yeastJson));
-          setMiscRows(parseMiscJson(r.miscJson));
+        if (!(r as any).beerJsonRecipeJson) {
+          throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
         }
+        const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
+        const grist = s.gristRows.map((row) => {
+          const ingredientId = typeof links?.grist?.[row.id] === "string" ? (links.grist[row.id] as string) : null;
+          const m = row.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[row.id] : null;
+          return {
+            ...row,
+            ingredientId,
+            mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : row.mashDiPh ?? null,
+            mashTaToPh57_mEqPerKg:
+              typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : row.mashTaToPh57_mEqPerKg ?? null,
+            mashRoastDehuskedOverride:
+              "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : row.mashRoastDehuskedOverride ?? null,
+          } as EditorGristRow;
+        });
+        const hops = s.hopsRows.map((row) => ({
+          ...row,
+          ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
+        })) as EditorHopRow[];
+        const yeast = s.yeastRows.map((row) => ({
+          ...row,
+          ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+        })) as EditorYeastRow[];
+        const misc = s.miscRows.map((row) => ({
+          ...row,
+          ingredientId: typeof links?.misc?.[row.id] === "string" ? (links.misc[row.id] as string) : null,
+        })) as EditorMiscRow[];
+
+        setGristRows(grist);
+        setHopsRows(hops);
+        setYeastRows(yeast);
+        setMiscRows(misc);
       } catch (err) {
         if (cancelled) return;
         setLoadError(String(err));

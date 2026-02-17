@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
-import { parseGristJson, type GristMaltClass, type GristRow } from "../../../../_lib/grist";
+import { parseGristJson, type GristRow } from "../../../../_lib/grist";
 import { editorStateFromBeerJson } from "../../../_lib/beerjsonRecipe";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
@@ -71,7 +71,6 @@ type RecipeResponse = {
   recipe: {
     id: string;
     updatedAt: string;
-    gristJson?: unknown;
     beerJsonRecipeJson?: unknown;
     recipeExtJson?: unknown;
   };
@@ -889,23 +888,21 @@ export default function MashWaterPage() {
       const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
 
       let rows: GristRow[] = [];
-      if ((data.recipe as any).beerJsonRecipeJson) {
-        const s = editorStateFromBeerJson((data.recipe as any).beerJsonRecipeJson);
-        rows = (s.gristRows as any[]).map((r) => {
-          const m = r.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[r.id] : null;
-          return {
-            ...r,
-            mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : (r as any).mashDiPh ?? null,
-            mashTaToPh57_mEqPerKg:
-              typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : (r as any).mashTaToPh57_mEqPerKg ?? null,
-            mashRoastDehuskedOverride:
-              "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : (r as any).mashRoastDehuskedOverride ?? null,
-          } as GristRow;
-        });
-      } else {
-        // Back-compat: old recipes without BeerJSON.
-        rows = parseGristJson(data.recipe.gristJson);
+      if (!(data.recipe as any).beerJsonRecipeJson) {
+        throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
       }
+      const s = editorStateFromBeerJson((data.recipe as any).beerJsonRecipeJson);
+      rows = (s.gristRows as any[]).map((r) => {
+        const m = r.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[r.id] : null;
+        return {
+          ...r,
+          mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : (r as any).mashDiPh ?? null,
+          mashTaToPh57_mEqPerKg:
+            typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : (r as any).mashTaToPh57_mEqPerKg ?? null,
+          mashRoastDehuskedOverride:
+            "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : (r as any).mashRoastDehuskedOverride ?? null,
+        } as GristRow;
+      });
       const nowIso = new Date().toISOString();
       await saveSettings({
         mashGristImportedJson: rows,

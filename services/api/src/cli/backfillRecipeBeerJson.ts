@@ -1,15 +1,13 @@
 /**
- * Backfill `Recipe.beerJsonRecipeJson` from legacy recipe JSON columns.
+ * Backfill `Recipe.recipeExtJson` (and verify `Recipe.beerJsonRecipeJson`) after BeerJSON-first cutover.
  *
  * Strategy:
- * - If `beerJsonRecipeJson` already exists, do nothing.
- * - Else generate a minimal valid BeerJSON document from:
- *   - `Recipe.name`, `Recipe.notes`
- *   - `Recipe.gristJson`, `Recipe.hopsJson`, `Recipe.yeastJson`, `Recipe.miscJson`
+ * - Validate that `beerJsonRecipeJson` exists and is a valid BeerJSON document.
+ * - Ensure `recipeExtJson` is present (at least `{ version: 1 }`).
  *
  * Notes:
  * - This is intentionally conservative and idempotent.
- * - We keep legacy columns intact for the migration window.
+ * - Legacy recipe JSON columns were removed; this script does not attempt to regenerate BeerJSON.
  */
 
 import { Prisma, PrismaClient } from "@prisma/client";

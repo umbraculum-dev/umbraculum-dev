@@ -1,5 +1,5 @@
 /**
- * Shared grist contract for `Recipe.gristJson`.
+ * Shared grist-row contract for internal grist snapshots (water calculator + editor utilities).
  *
  * - Stored as JSON (unknown at runtime) and parsed defensively.
  * - Keep this as a *contract* used by multiple pages; prefer `interface`.
@@ -58,7 +58,7 @@ function newRowId() {
 }
 
 /**
- * Parse `Recipe.gristJson` into a well-typed list.
+ * Parse a persisted grist snapshot JSON into a well-typed list.
  *
  * Behavior (by design, v0):
  * - Missing/invalid `id` gets a generated ID (so the editor can keep the row).

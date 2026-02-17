@@ -38,12 +38,15 @@ Both approaches aim to help brewers predict and control mash pH, but they model 
 
 ## Why we snapshot parameters into recipes
 
-We snapshot DI pH + TA into `Recipe.gristJson` at save-time so results **don’t silently change** when the canonical ingredient database is updated.
+We snapshot DI pH + TA per fermentable row so results **don’t silently change** when the canonical ingredient database is updated.
 
-- If a row has an `ingredientId` and the user did **not** override DI pH/TA, the API will fill these parameters from:
-  1) the canonical `Fermentable` record (if values exist), else
-  2) inferred defaults based on BeerProto-like group/type/name (+ dehusked inference).
-- If the user sets DI pH and/or TA in the recipe editor, those values are treated as **overrides** and are what gets snapshotted.
+In the BeerJSON-first model, we store:
+- Canonical ingredients in `Recipe.beerJsonRecipeJson` (BeerJSON document)
+- App-specific overrides and internal parameters in `Recipe.recipeExtJson` (versioned)
+
+Behavior:
+- If a fermentable row is linked to a canonical ingredient and the user did **not** override DI pH/TA, the app can fill defaults from the canonical ingredient database (when available) or inferred defaults.
+- If the user sets DI pH and/or TA in the recipe editor, those values are treated as **overrides** and are stored on the recipe (so the recipe stays stable over time).
 
 ## Parameter meanings and units
 
@@ -62,9 +65,9 @@ These are not usually present on malt spec sheets; for v1 we rely on conservativ
 Roasted malts have an important special case: **dehusked / de-bittered** products (e.g. Carafa Special).
 
 - We treat dehusked/de-bittered roasted malts differently because **color is not a reliable proxy** for their mash pH effect.
-- To “tell reality”, we snapshot two additional optional fields into `Recipe.gristJson`:
+- To “tell reality”, we store an additional optional field per fermentable row:
   - **`mashRoastDehuskedOverride`**: boolean (or null). If set, the user is explicitly forcing husked vs dehusked behavior for that fermentable row.
-  - **`mashRoastDehuskedSource`**: `"inferred" | "override" | "unknown"` describing provenance.
+  - Provenance/source can be tracked internally (inferred vs override) as needed, but it is not required for v1 correctness.
 
 For **non-dehusked** roasted malts, the v1 default TA uses a **weak saturating color proxy** (EBC), rather than a flat constant. This provides gentle differentiation between “dark” and “very dark” roasted malts while preventing runaway linear growth at extreme colors.
 
@@ -154,5 +157,5 @@ Reference guidance:
 
 - Defaults + inference live in `services/api/src/domain/waterCalc/mashPhDefaultsV1.ts`.
 - v1 estimator lives in `services/api/src/domain/waterCalc/mashPhEstimateV1.ts`.
-- Recipe snapshot enrichment lives in `services/api/src/services/recipesService.ts` (`snapshotGristRows`).
+- Recipe-side overrides live in `Recipe.recipeExtJson` (see `docs/BEERJSON-FIRST.md`).
 

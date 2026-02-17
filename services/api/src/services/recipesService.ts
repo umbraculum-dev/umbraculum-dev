@@ -1,8 +1,8 @@
-import { type PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
-import { importBeerJsonToLegacy } from "../importers/beerjsonImporter.js";
 import { AccountsService } from "./accountsService.js";
 import { validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
+import { validateBeerJsonRecipeDomain } from "../beerjson/recipeDomainValidator.js";
 
 export type CreateRecipeInput = {
   name: string;
@@ -104,27 +104,8 @@ export class RecipesService {
       throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
     }
 
-    // Enforce internal invariants using the same legacy validators (without persisting legacy columns).
-    const legacy = importBeerJsonToLegacy(doc);
-    const links = (recipeExtJson as any)?.ingredientLinks ?? null;
-    const mashPhModel = (recipeExtJson as any)?.mashPhModel ?? null;
-    const gristRows = Array.isArray(legacy.gristJson) ? legacy.gristJson : [];
-    for (const row of gristRows) {
-      const rowId = typeof row?.id === "string" ? row.id : "";
-      if (rowId && links?.grist && typeof links.grist[rowId] === "string") {
-        row.ingredientId = links.grist[rowId];
-      }
-      const m = rowId && mashPhModel && typeof mashPhModel === "object" ? mashPhModel[rowId] : null;
-      if (m && typeof m === "object") {
-        if (typeof m.mashDiPh === "number") row.mashDiPh = m.mashDiPh;
-        if (typeof m.mashTaToPh57_mEqPerKg === "number") row.mashTaToPh57_mEqPerKg = m.mashTaToPh57_mEqPerKg;
-        if ("roastDehuskedOverride" in m) row.mashRoastDehuskedOverride = m.roastDehuskedOverride;
-      }
-    }
-    validateGristJson(gristRows);
-    validateHopsJson(legacy.hopsJson);
-    validateYeastJson(legacy.yeastJson);
-    validateMiscJson(legacy.miscJson);
+    // Enforce supported domain rules directly on BeerJSON (no legacy-row mapping).
+    validateBeerJsonRecipeDomain(doc);
 
     return this.prisma.recipe.create({
       data: {
@@ -190,28 +171,8 @@ export class RecipesService {
         throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
       }
 
-      // Enforce internal invariants using legacy validators (without persisting legacy columns).
-      const legacy = importBeerJsonToLegacy(doc);
-      const recipeExtNext = data.recipeExtJson !== undefined ? data.recipeExtJson : (existing.recipeExtJson as any);
-      const links = (recipeExtNext as any)?.ingredientLinks ?? null;
-      const mashPhModel = (recipeExtNext as any)?.mashPhModel ?? null;
-      const gristRows = Array.isArray(legacy.gristJson) ? legacy.gristJson : [];
-      for (const row of gristRows) {
-        const rowId = typeof row?.id === "string" ? row.id : "";
-        if (rowId && links?.grist && typeof links.grist[rowId] === "string") {
-          row.ingredientId = links.grist[rowId];
-        }
-        const m = rowId && mashPhModel && typeof mashPhModel === "object" ? mashPhModel[rowId] : null;
-        if (m && typeof m === "object") {
-          if (typeof m.mashDiPh === "number") row.mashDiPh = m.mashDiPh;
-          if (typeof m.mashTaToPh57_mEqPerKg === "number") row.mashTaToPh57_mEqPerKg = m.mashTaToPh57_mEqPerKg;
-          if ("roastDehuskedOverride" in m) row.mashRoastDehuskedOverride = m.roastDehuskedOverride;
-        }
-      }
-      validateGristJson(gristRows);
-      validateHopsJson(legacy.hopsJson);
-      validateYeastJson(legacy.yeastJson);
-      validateMiscJson(legacy.miscJson);
+      // Enforce supported domain rules directly on BeerJSON (no legacy-row mapping).
+      validateBeerJsonRecipeDomain(doc);
 
       data.beerJsonRecipeJson = doc as any;
     }
@@ -335,7 +296,7 @@ async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promis
 
     // Dehusked / de-bittered handling for roasted malts:
     // - default: infer from canonical ingredient name/notes
-    // - user can override (persisted in recipe gristJson)
+    // - user can override (persisted in recipeExtJson mashPhModel)
     const isRoastedLike = inferredKey === "roasted" || inferredKey === "roasted_dehusked";
     let mashRoastDehuskedOverride: boolean | null = null;
     let mashRoastDehuskedSource: GristRow["mashRoastDehuskedSource"] = "unknown";
