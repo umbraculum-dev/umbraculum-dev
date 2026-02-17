@@ -91,8 +91,8 @@ export function PrimaryNav() {
   const showMainNav = authKnown && Boolean(me);
 
   return (
-    <nav aria-label="Primary">
-      <div className="navTopBar" aria-label="Session">
+    <nav aria-label={t("ariaPrimary")}>
+      <div className="navTopBar" aria-label={t("ariaSession")}>
         <div className="navTopBarLeft">
           <label className="muted" style={{ fontSize: 11 }}>
             {t("language")}{" "}

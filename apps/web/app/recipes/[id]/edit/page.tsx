@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "../../../../src/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 
@@ -142,6 +143,7 @@ const miscUseOptions: { value: MiscUse; label: string }[] = [
 ];
 
 export default function RecipeEditPage() {
+  const t = useTranslations("recipes.edit");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
@@ -151,13 +153,13 @@ export default function RecipeEditPage() {
   };
 
   const sections = [
-    { id: "basics", label: "Basics" },
-    { id: "fermentables", label: "Fermentables" },
-    { id: "hops", label: "Hops" },
-    { id: "yeast", label: "Yeast" },
-    { id: "other", label: "Other ingredients" },
-    { id: "notes", label: "Notes" },
-    { id: "water", label: "Water chemistry" },
+    { id: "basics", label: t("sections.basics") },
+    { id: "fermentables", label: t("sections.fermentables") },
+    { id: "hops", label: t("sections.hops") },
+    { id: "yeast", label: t("sections.yeast") },
+    { id: "other", label: t("sections.other") },
+    { id: "notes", label: t("sections.notes") },
+    { id: "water", label: t("sections.water") },
   ] as const;
 
   const [authLoaded, setAuthLoaded] = useState(true);
@@ -581,23 +583,22 @@ export default function RecipeEditPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>Edit recipe</h1>
+      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
 
       <p className="muted" style={{ marginTop: 0 }}>
-        v0 shape: single-page editor with section navigation. Water chemistry is a link-out to the
-        dedicated calculator page.
+        {t("v0ShapeNote")}
       </p>
 
       {authLoaded && !canCallAccountScoped ? (
         <p role="alert" className="errorBox">
-          Not ready to load this recipe.
+          {t("notReadyToLoad")}
         </p>
       ) : null}
 
-      {loading ? <p className="muted">Loading…</p> : null}
+      {loading ? <p className="muted">{t("loading")}</p> : null}
       {loadError ? (
         <pre className="errorBox" aria-live="polite">
           {loadError}
@@ -605,9 +606,9 @@ export default function RecipeEditPage() {
       ) : null}
 
       <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
-        <nav aria-label="Recipe sections" className="panel" style={{ position: "sticky", top: 16 }}>
+        <nav aria-label={t("nav.sectionsAriaLabel")} className="panel" style={{ position: "sticky", top: 16 }}>
           <p className="muted" style={{ marginTop: 0 }}>
-            Sections
+            {t("nav.sectionsTitle")}
           </p>
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             {sections.map((s) => (
@@ -619,10 +620,10 @@ export default function RecipeEditPage() {
           <hr className="recipeEditDivider" suppressHydrationWarning />
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             <li>
-              <Link href={`/recipes/${recipeId}/water`}>Open water calculator</Link>
+              <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
             </li>
             <li>
-              <Link href="/recipes">Back to Recipes</Link>
+              <Link href="/recipes">{t("nav.backToRecipes")}</Link>
             </li>
           </ul>
         </nav>
@@ -630,10 +631,10 @@ export default function RecipeEditPage() {
         <div style={{ display: "grid", gap: 16 }}>
           <section id="basics" className="panel" aria-labelledby="basics-heading">
             <h2 id="basics-heading" style={{ marginTop: 0 }}>
-              Basics
+              {t("sections.basics")}
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
-              Loaded/saved via <code>GET</code>/<code>PATCH</code> <code>/api/recipes/:id</code>.
+              {t("basicsHelp")}
             </p>
             <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
               <div>
@@ -706,7 +707,7 @@ export default function RecipeEditPage() {
 
           <section id="fermentables" className="panel" aria-labelledby="fermentables-heading">
             <h2 id="fermentables-heading" style={{ marginTop: 0 }}>
-              Fermentables
+              {t("sections.fermentables")}
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
               v0: enter your grist here. Water calculator can import a read-only snapshot.
@@ -732,7 +733,7 @@ export default function RecipeEditPage() {
                   onClick={clearFermentableSearchResults}
                   disabled={fermentableSearching || (!fermentableSearchError && fermentableResults.length === 0)}
                 >
-                  Clear
+                  {t("buttons.clear")}
                 </button>
               </div>
               {fermentableSearchError ? (
@@ -776,7 +777,7 @@ export default function RecipeEditPage() {
 
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <button type="button" onClick={addGristRow} disabled={!canCallAccountScoped}>
-                Add fermentable
+                {t("buttons.addFermentable")}
               </button>
               <span className="muted" aria-live="polite">
                 Total: <code>{gristTotals.totalKg.toFixed(3)}</code> kg{" "}
@@ -1142,10 +1143,10 @@ export default function RecipeEditPage() {
 
           <section id="hops" className="panel" aria-labelledby="hops-heading">
             <h2 id="hops-heading" style={{ marginTop: 0 }}>
-              Hops
+              {t("sections.hops")}
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
-              v0: pick hops from the database (or enter manually). Stored as a snapshot on the recipe.
+              {t("hopsHelp")}
             </p>
 
             <form onSubmit={onSearchHops} style={{ marginTop: 12 }}>
@@ -1168,7 +1169,7 @@ export default function RecipeEditPage() {
                   onClick={clearHopSearchResults}
                   disabled={hopSearching || (!hopSearchError && hopResults.length === 0)}
                 >
-                  Clear
+                  {t("buttons.clear")}
                 </button>
               </div>
               {hopSearchError ? (
@@ -1365,10 +1366,10 @@ export default function RecipeEditPage() {
 
           <section id="yeast" className="panel" aria-labelledby="yeast-heading">
             <h2 id="yeast-heading" style={{ marginTop: 0 }}>
-              Yeast
+              {t("sections.yeast")}
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
-              v0: select yeast from the database (or enter manually). Stored as a snapshot on the recipe.
+              {t("yeastHelp")}
             </p>
 
             <form onSubmit={onSearchYeasts} style={{ marginTop: 12 }}>
@@ -1391,7 +1392,7 @@ export default function RecipeEditPage() {
                   onClick={clearYeastSearchResults}
                   disabled={yeastSearching || (!yeastSearchError && yeastResults.length === 0)}
                 >
-                  Clear
+                  {t("buttons.clear")}
                 </button>
               </div>
               {yeastSearchError ? (
@@ -1545,14 +1546,14 @@ export default function RecipeEditPage() {
 
           <section id="other" className="panel" aria-labelledby="other-heading">
             <h2 id="other-heading" style={{ marginTop: 0 }}>
-              Other ingredients
+              {t("sections.other")}
             </h2>
             <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", gap: 12 }}>
               <p className="muted" style={{ margin: 0 }}>
-                Spices, finings, flavorings, etc.
+                {t("otherHelp")}
               </p>
               <button type="button" onClick={addMiscRow}>
-                Add other ingredient
+                {t("buttons.addOtherIngredient")}
               </button>
             </div>
 
@@ -1716,7 +1717,7 @@ export default function RecipeEditPage() {
 
           <section id="notes" className="panel" aria-labelledby="notes-heading">
             <h2 id="notes-heading" style={{ marginTop: 0 }}>
-              Notes
+              {t("sections.notes")}
             </h2>
             <label htmlFor="recipe-notes" className="muted" style={{ display: "block", fontSize: 12 }}>
               Notes
@@ -1732,13 +1733,13 @@ export default function RecipeEditPage() {
 
           <section id="water" className="panel" aria-labelledby="water-heading">
             <h2 id="water-heading" style={{ marginTop: 0 }}>
-              Water chemistry
+              {t("sections.water")}
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
-              The full mash chemistry + water calculator lives on its own page (not embedded here).
+              {t("waterHelp")}
             </p>
             <p style={{ marginBottom: 0 }}>
-              <Link href={`/recipes/${recipeId}/water`}>Open water calculator</Link>
+              <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
             </p>
           </section>
         </div>

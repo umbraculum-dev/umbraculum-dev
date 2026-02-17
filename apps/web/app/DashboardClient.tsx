@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 export function DashboardClient() {
   const locale = useLocale();
+  const tCommon = useTranslations("common");
   const router = useRouter();
   // Avoid hydration mismatches caused by browser extensions (e.g. password managers)
   // injecting DOM into form fields before React hydrates.
@@ -30,7 +32,7 @@ export function DashboardClient() {
     };
   }, [locale, mounted, router]);
 
-  if (!mounted) return <p className="muted">Loading…</p>;
+  if (!mounted) return <p className="muted">{tCommon("loading")}</p>;
   return null;
 }
 

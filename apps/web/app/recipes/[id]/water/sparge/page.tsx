@@ -46,6 +46,8 @@ type SaltAdditionsResult = {
 
 export default function SpargeWaterPage() {
   const locale = useLocale();
+  const tWater = useTranslations("recipes.water.common");
+  const t = useTranslations("recipes.water.sparge");
   const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -562,14 +564,14 @@ export default function SpargeWaterPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>Sparge water</h1>
+      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
         <p style={{ margin: 0 }}>
-          <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link> {" · "}
-          <Link href={`/recipes/${recipeId}/water/mash`}>Go to mash</Link>
+          <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}
+          <Link href={`/recipes/${recipeId}/water/mash`}>{tWater("goToMash")}</Link>
         </p>
         <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
           {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
@@ -578,14 +580,16 @@ export default function SpargeWaterPage() {
 
       {authChecked && !canCall ? (
         <p role="alert" className="errorBox">
-          Not authenticated. Please <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/sparge`}>sign in</Link>.
+          {tWater.rich("notAuthenticated", {
+            signIn: (chunks) => <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/sparge`}>{chunks}</Link>,
+          })}
         </p>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="sparge-heading">
           <h2 id="sparge-heading" style={{ marginTop: 0 }}>
-            Sparge acidification
+            {t("acidificationHeading")}
           </h2>
 
           <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
@@ -779,7 +783,7 @@ export default function SpargeWaterPage() {
                 <span className="fieldBadge">Computed</span>
                 <span className="muted">From current inputs</span>
               </div>
-              <h3 style={{ marginTop: 0 }}>Result (last calculated)</h3>
+              <h3 style={{ marginTop: 0 }}>{t("resultLastCalculated")}</h3>
               <ul>
                 {spargeResult.acidRequiredMl !== null ? (
                   <li>
@@ -896,9 +900,9 @@ export default function SpargeWaterPage() {
 
           <hr style={{ margin: "16px 0" }} />
 
-          <h3 style={{ marginTop: 0 }}>Sparge salt additions (manual, v0)</h3>
+          <h3 style={{ marginTop: 0 }}>{t("saltAdditionsManualV0")}</h3>
           <p className="muted" style={{ marginTop: 0 }}>
-            Base profile is the selected sparge water profile above. Add salts in grams; we compute resulting ions (ppm) for the sparge water volume.
+            {t("saltAdditionsHelp")}
           </p>
 
           <SaltAdditionsEditor
@@ -925,7 +929,7 @@ export default function SpargeWaterPage() {
           {spargeSaltsResult ? (
             <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
-                <strong>Resulting ions (after sparge salts only, v0)</strong>
+                <strong>Resulting ions (after sparge salts only)</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["sparge.ionsAfterSalts"];
                   const title = tMath(ex.titleKey);
@@ -972,7 +976,7 @@ export default function SpargeWaterPage() {
           {spargeSaltsResult && spargeResult ? (
             <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
               <div className="fieldBlockHeader">
-                <strong>Resulting ions (after sparge salts + acid, v0, HCO3 derived from alkalinity)</strong>
+                <strong>Resulting ions (after sparge salts + acid, HCO3 derived from alkalinity)</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["sparge.ionsAfterSaltsAndAcid"];
                   const title = tMath(ex.titleKey);

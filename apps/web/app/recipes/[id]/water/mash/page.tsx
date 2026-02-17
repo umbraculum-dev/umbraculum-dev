@@ -79,6 +79,8 @@ function isAdmin(role: string | null) {
 }
 
 export default function MashWaterPage() {
+  const tWater = useTranslations("recipes.water.common");
+  const t = useTranslations("recipes.water.mash");
   const tMath = useTranslations("math");
   const authState = useRequireAuth({ requireActiveAccount: true });
   const params = useParams<{ id: string }>();
@@ -907,15 +909,15 @@ export default function MashWaterPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>Mash water</h1>
+      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
         <p style={{ margin: 0 }}>
-          <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link> {" · "}
-          <Link href={`/recipes/${recipeId}/water/sparge`}>Go to sparge</Link> {" · "}
-          <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
+          <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}
+          <Link href={`/recipes/${recipeId}/water/sparge`}>{tWater("goToSparge")}</Link> {" · "}
+          <Link href={`/recipes/${recipeId}/edit#fermentables`}>{tWater("viewEditGrist")}</Link>
         </p>
         <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
           {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
@@ -931,7 +933,7 @@ export default function MashWaterPage() {
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="adjustment-heading">
           <h2 id="adjustment-heading" style={{ marginTop: 0 }}>
-            Mash water adjustment
+            {t("adjustmentHeading")}
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
             Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
@@ -1078,7 +1080,7 @@ export default function MashWaterPage() {
             </details>
           ) : (
             <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
-              Select a source + dilution profile and set volumes to see mixed ions.
+              {t("adjustmentHint")}
             </p>
           )}
 
@@ -1089,13 +1091,16 @@ export default function MashWaterPage() {
           ) : null}
         </section>
 
+        <p className="muted" style={{ marginTop: -4 }}>
+          {t("adjustmentHint")}
+        </p>
+
         <section className="panel" aria-labelledby="grist-summary-heading">
           <h2 id="grist-summary-heading" style={{ marginTop: 0 }}>
-            Grist (summary)
+            {t("gristSummaryHeading")}
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
-            We avoid duplicating the full grist table here. Use the recipe editor for details; this page only keeps a
-            snapshot for calculations.
+            {t("gristSummaryHelp")}
           </p>
           <ul style={{ marginTop: 0 }}>
             <li>
@@ -1124,7 +1129,7 @@ export default function MashWaterPage() {
 
         <section className="panel" aria-labelledby="mash-heading">
           <h2 id="mash-heading" style={{ marginTop: 0 }}>
-            Mash water acidification
+            {t("acidificationHeading")}
           </h2>
 
           <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
@@ -1296,7 +1301,7 @@ export default function MashWaterPage() {
 
           {mashAcidificationMode === "targetPh" && mashResult ? (
             <div style={{ marginTop: 12 }}>
-              <h3 style={{ marginTop: 0 }}>Result (last calculated)</h3>
+              <h3 style={{ marginTop: 0 }}>{t("resultLastCalculated")}</h3>
               <ul>
                 {mashResult.acidRequiredMl !== null ? (
                   <li>
@@ -1399,7 +1404,7 @@ export default function MashWaterPage() {
 
           <hr style={{ margin: "16px 0" }} />
 
-          <h3 style={{ marginTop: 0 }}>Salt additions (manual, v0)</h3>
+          <h3 style={{ marginTop: 0 }}>{t("saltAdditionsManualV0")}</h3>
           <p className="muted" style={{ marginTop: 0 }}>
             Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
           </p>
@@ -1489,7 +1494,7 @@ export default function MashWaterPage() {
           <hr style={{ margin: "16px 0" }} />
 
           <h3 id="overall-mash-water-result" style={{ marginTop: 0 }}>
-            Overall mash water result (v0, HCO3 derived from alkalinity)
+            {t("overallResultHeading")}
           </h3>
           <p className="muted" style={{ marginTop: 0 }}>
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.

@@ -1,6 +1,7 @@
 {
   "common": {
-    "backToDashboard": "Back to Dashboard"
+    "backToDashboard": "Back to Dashboard",
+    "loading": "Loading…"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -13,7 +14,17 @@
     "logout": "Log out",
     "signedInAs": "Signed in as",
     "activeAccount": "Active account",
-    "switchAccount": "Switch account"
+    "switchAccount": "Switch account",
+    "ariaPrimary": "Primary",
+    "ariaSession": "Session"
+  },
+  "auth": {
+    "selectAccount": {
+      "title": "Select account",
+      "subtitle": "Choose which brewery/account you want to work in.",
+      "loading": "Loading…",
+      "noAccountsFound": "No accounts found."
+    }
   },
   "accessibility": {
     "title": "Accessibility",
@@ -109,6 +120,74 @@
   "recipes": {
     "title": "Recipes",
     "subtitle": "This is the recipe area entrypoint (list/edit/water calculator).",
+    "edit": {
+      "title": "Edit recipe",
+      "loading": "Loading…",
+      "v0ShapeNote": "v0 shape: single-page editor with section navigation. Water chemistry is a link-out to the dedicated calculator page.",
+      "notReadyToLoad": "Not ready to load this recipe.",
+      "nav": {
+        "sectionsAriaLabel": "Recipe sections",
+        "sectionsTitle": "Sections",
+        "openWaterCalculator": "Open water calculator",
+        "backToRecipes": "Back to Recipes"
+      },
+      "sections": {
+        "basics": "Basics",
+        "fermentables": "Fermentables",
+        "hops": "Hops",
+        "yeast": "Yeast",
+        "other": "Other ingredients",
+        "notes": "Notes",
+        "water": "Water chemistry"
+      },
+      "basicsHelp": "Loaded/saved via GET/PATCH /api/recipes/:id.",
+      "hopsHelp": "v0: pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
+      "yeastHelp": "v0: select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
+      "otherHelp": "Spices, finings, flavorings, etc.",
+      "waterHelp": "The full mash chemistry + water calculator lives on its own page (not embedded here).",
+      "buttons": {
+        "clear": "Clear",
+        "addFermentable": "Add fermentable",
+        "addOtherIngredient": "Add other ingredient"
+      }
+    },
+    "water": {
+      "common": {
+        "backToHub": "Back to water hub",
+        "goToSparge": "Go to sparge",
+        "goToMash": "Go to mash",
+        "viewEditGrist": "View/edit grist in recipe",
+        "notAuthenticated": "Not authenticated. Please {signIn}."
+      },
+      "mash": {
+        "title": "Mash water",
+        "adjustmentHeading": "Mash water adjustment",
+        "adjustmentHint": "Select a source + dilution profile and set volumes to see mixed ions.",
+        "gristSummaryHeading": "Grist (summary)",
+        "gristSummaryHelp": "We avoid duplicating the full grist table here. Use the recipe editor for details; this page only keeps a snapshot for calculations.",
+        "acidificationHeading": "Mash water acidification",
+        "resultLastCalculated": "Result (last calculated)",
+        "overallResultHeading": "Overall mash water result (HCO3 derived from alkalinity)",
+        "saltAdditionsManualV0": "Salt additions (manual)"
+      },
+      "sparge": {
+        "title": "Sparge water",
+        "acidificationHeading": "Sparge acidification",
+        "resultLastCalculated": "Result (last calculated)",
+        "saltAdditionsManualV0": "Sparge salt additions (manual)",
+        "saltAdditionsHelp": "Base profile is the selected sparge water profile above. Add salts in grams; we compute resulting ions (ppm) for the sparge water volume."
+      },
+      "boil": {
+        "title": "Additional boil water",
+        "adjustmentHeading": "Boil water adjustment (v0)",
+        "saltAdditionsHeading": "Salt additions (manual, v0)",
+        "acidificationHeading": "Boil water acidification (v0)",
+        "overallResultHeading": "Overall boil water result (v0, HCO3 derived from alkalinity)",
+        "adjustmentHelp": "Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.",
+        "saltAdditionsHelp": "Select a Source profile and set Source volume. Dilution is optional, but if Dilution volume is > 0 you must select a Dilution profile.",
+        "saltAdditionsBaseHelp": "Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm)."
+      }
+    },
     "activeAccount": "Active account:",
     "createTitle": "Create recipe",
     "nameLabel": "Name",
@@ -137,7 +216,16 @@
   },
   "waterProfiles": {
     "title": "Water profiles",
-    "activeAccount": "Active account"
+    "activeAccount": "Active account",
+    "viewAllTableTitle": "View all water profiles (table)",
+    "adminAddTitle": "Admin: add water profile",
+    "createdProfilesStartUnverified": "Created profiles start as unverified. Use the table actions to verify/unverify.",
+    "navigationTitle": "Navigation",
+    "phPlaceholder": "e.g. 7.80"
+  },
+  "ui": {
+    "addSalt": "Add salt",
+    "fx": "fx"
   },
   "salts": {
     "gypsum": "Gypsum",

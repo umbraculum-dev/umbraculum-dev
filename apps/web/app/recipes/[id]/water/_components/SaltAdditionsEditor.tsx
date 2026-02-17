@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 export type SaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";
 export type SaltAdditionRow = { saltKey: SaltKey; grams: number };
 
@@ -9,6 +11,7 @@ export function SaltAdditionsEditor(props: {
   idPrefix: string;
   disabled?: boolean;
 }) {
+  const tUi = useTranslations("ui");
   const { rows, onChange, idPrefix, disabled } = props;
 
   const addRow = () => onChange([...rows, { saltKey: "gypsum", grams: 0 }]);
@@ -79,7 +82,7 @@ export function SaltAdditionsEditor(props: {
 
       <div>
         <button type="button" onClick={addRow} disabled={disabled}>
-          Add salt
+          {tUi("addSalt")}
         </button>
       </div>
     </div>

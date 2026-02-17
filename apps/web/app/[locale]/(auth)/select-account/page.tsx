@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { apiFetch } from "../../../_lib/apiClient";
@@ -23,6 +24,7 @@ function setBrand(brandKey: string) {
 
 export default function SelectAccountPage() {
   const locale = useLocale();
+  const t = useTranslations("auth.selectAccount");
   const router = useRouter();
 
   const [accounts, setAccounts] = useState<AccountListItem[]>([]);
@@ -79,12 +81,12 @@ export default function SelectAccountPage() {
 
   return (
     <section className="panel" style={{ maxWidth: 720 }}>
-      <h1 style={{ marginTop: 0 }}>Select account</h1>
+      <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
-        Choose which brewery/account you want to work in.
+        {t("subtitle")}
       </p>
 
-      {loading ? <p className="muted">Loading…</p> : null}
+      {loading ? <p className="muted">{t("loading")}</p> : null}
 
       {error ? (
         <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
@@ -92,7 +94,7 @@ export default function SelectAccountPage() {
         </pre>
       ) : null}
 
-      {!loading && !hasAccounts ? <p className="muted">No accounts found.</p> : null}
+      {!loading && !hasAccounts ? <p className="muted">{t("noAccountsFound")}</p> : null}
 
       {hasAccounts ? (
         <div style={{ display: "grid", gap: 8, marginTop: 12 }}>

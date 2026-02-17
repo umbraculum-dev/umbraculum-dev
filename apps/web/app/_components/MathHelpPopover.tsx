@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function MathHelpPopover(props: {
   title: string;
@@ -9,6 +10,7 @@ export function MathHelpPopover(props: {
   /** Optional: render small (default) or inline. */
   size?: "sm" | "md";
 }) {
+  const tUi = useTranslations("ui");
   const { title, body, ariaLabel, size = "sm" } = props;
   const popoverId = useId();
   const wrapRef = useRef<HTMLSpanElement | null>(null);
@@ -54,7 +56,7 @@ export function MathHelpPopover(props: {
         aria-controls={popoverId}
         onClick={() => setOpen((v) => !v)}
       >
-        fx
+        {tUi("fx")}
       </button>
       {open ? (
         <div id={popoverId} className="mathPopover" role="dialog" aria-label={title}>

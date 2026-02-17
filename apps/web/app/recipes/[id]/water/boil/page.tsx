@@ -61,6 +61,8 @@ type BoilOverallResultV0 = {
 
 export default function BoilWaterPage() {
   const locale = useLocale();
+  const tWater = useTranslations("recipes.water.common");
+  const t = useTranslations("recipes.water.boil");
   const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -730,13 +732,13 @@ export default function BoilWaterPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>Additional boil water</h1>
+      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <p className="muted" style={{ marginTop: 0 }}>
         Recipe ID: <code>{recipeId}</code>
       </p>
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
         <p style={{ margin: 0 }}>
-          <Link href={`/recipes/${recipeId}/water`}>Back to water hub</Link>
+          <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link>
         </p>
         <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
           {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
@@ -745,17 +747,19 @@ export default function BoilWaterPage() {
 
       {authChecked && !canCall ? (
         <p role="alert" className="errorBox">
-          Not authenticated. Please <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/boil`}>sign in</Link>.
+          {tWater.rich("notAuthenticated", {
+            signIn: (chunks) => <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/boil`}>{chunks}</Link>,
+          })}
         </p>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="boil-adjustment-heading">
           <h2 id="boil-adjustment-heading" style={{ marginTop: 0 }}>
-            Boil Water adjustment (v0)
+            {t("adjustmentHeading")}
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
-            Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
+            {t("adjustmentHelp")}
           </p>
 
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr 1fr" }}>
@@ -909,7 +913,7 @@ export default function BoilWaterPage() {
             </details>
           ) : (
             <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
-              Select a Source profile and set Source volume. Dilution is optional, but if Dilution volume is &gt; 0 you must select a Dilution profile.
+              {t("saltAdditionsHelp")}
             </p>
           )}
 
@@ -922,10 +926,10 @@ export default function BoilWaterPage() {
 
         <section className="panel" aria-labelledby="boil-salts-heading">
           <h2 id="boil-salts-heading" style={{ marginTop: 0 }}>
-            Salt additions (manual, v0)
+            {t("saltAdditionsHeading")}
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
-            Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
+            {t("saltAdditionsBaseHelp")}
           </p>
 
           <SaltAdditionsEditor rows={saltAdditions} onChange={setSaltAdditions} idPrefix="boil" disabled={!canCall} />
@@ -1010,7 +1014,7 @@ export default function BoilWaterPage() {
 
         <section className="panel" aria-labelledby="boil-acid-heading">
           <h2 id="boil-acid-heading" style={{ marginTop: 0 }}>
-            Boil water acidification (v0)
+            {t("acidificationHeading")}
           </h2>
 
           <form onSubmit={onSubmitAcid} aria-describedby={boilError ? "boil-error" : undefined}>
@@ -1228,7 +1232,7 @@ export default function BoilWaterPage() {
           <hr style={{ margin: "16px 0" }} />
 
           <h3 id="overall-boil-water-result" style={{ marginTop: 0 }}>
-            Overall boil water result (v0, HCO3 derived from alkalinity)
+            {t("overallResultHeading")}
           </h3>
           <p className="muted" style={{ marginTop: 0 }}>
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.

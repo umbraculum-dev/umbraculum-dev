@@ -141,7 +141,7 @@ export default function WaterProfilesPage() {
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="profiles-table-heading">
           <h2 id="profiles-table-heading" style={{ marginTop: 0 }}>
-            View all water profiles (table)
+            {t("viewAllTableTitle")}
           </h2>
 
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -235,10 +235,10 @@ export default function WaterProfilesPage() {
         {admin ? (
           <section className="panel" aria-labelledby="admin-profiles-heading">
             <h2 id="admin-profiles-heading" style={{ marginTop: 0 }}>
-              Admin: add water profile
+              {t("adminAddTitle")}
             </h2>
             <p className="muted" style={{ marginTop: 0 }}>
-              Created profiles start as <code>unverified</code>. Use the table actions to verify/unverify.
+              {t("createdProfilesStartUnverified")}
             </p>
 
             <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
@@ -295,7 +295,7 @@ export default function WaterProfilesPage() {
                     value={createPh}
                     onChange={(e) => setCreatePh(e.target.value)}
                     style={{ width: "100%", padding: 8 }}
-                    placeholder="e.g. 7.80"
+                    placeholder={t("phPlaceholder")}
                   />
                 </div>
               </div>
@@ -352,7 +352,7 @@ export default function WaterProfilesPage() {
 
         <section className="panel" aria-labelledby="nav-heading">
           <h2 id="nav-heading" style={{ marginTop: 0 }}>
-            Navigation
+            {t("navigationTitle")}
           </h2>
           <ul style={{ marginBottom: 0 }}>
             <li>

@@ -13,12 +13,8 @@ export function ModeFieldset<T extends string>(props: {
 
   return (
     <fieldset
-      style={{
-        border: "1px solid rgba(255,255,255,0.12)",
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
-      }}
+      className="modeFieldset"
+      suppressHydrationWarning
     >
       <legend className="muted" style={{ fontSize: 12, padding: "0 6px" }}>
         {legend}

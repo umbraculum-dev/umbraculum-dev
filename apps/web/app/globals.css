@@ -126,6 +126,14 @@ textarea {
   margin: 12px 0;
 }
 
+/* Water calculator */
+.modeFieldset {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
 input,
 select,
 textarea {

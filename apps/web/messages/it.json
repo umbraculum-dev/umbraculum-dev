@@ -1,6 +1,7 @@
 {
   "common": {
-    "backToDashboard": "Torna alla Dashboard"
+    "backToDashboard": "Torna alla Dashboard",
+    "loading": "Caricamento…"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -13,7 +14,17 @@
     "logout": "Esci",
     "signedInAs": "Accesso come",
     "activeAccount": "Account attivo",
-    "switchAccount": "Cambia account"
+    "switchAccount": "Cambia account",
+    "ariaPrimary": "Principale",
+    "ariaSession": "Sessione"
+  },
+  "auth": {
+    "selectAccount": {
+      "title": "Seleziona account",
+      "subtitle": "Scegli su quale birrificio/account vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noAccountsFound": "Nessun account trovato."
+    }
   },
   "accessibility": {
     "title": "Accessibilità",
@@ -109,6 +120,74 @@
   "recipes": {
     "title": "Ricette",
     "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",
+    "edit": {
+      "title": "Modifica ricetta",
+      "loading": "Caricamento…",
+      "v0ShapeNote": "Struttura v0: editor a pagina singola con navigazione per sezioni. La chimica dell’acqua apre il calcolatore dedicato.",
+      "notReadyToLoad": "Non pronto per caricare questa ricetta.",
+      "nav": {
+        "sectionsAriaLabel": "Sezioni ricetta",
+        "sectionsTitle": "Sezioni",
+        "openWaterCalculator": "Apri calcolatore acqua",
+        "backToRecipes": "Torna alle Ricette"
+      },
+      "sections": {
+        "basics": "Basi",
+        "fermentables": "Fermentabili",
+        "hops": "Luppoli",
+        "yeast": "Lievito",
+        "other": "Altri ingredienti",
+        "notes": "Note",
+        "water": "Chimica dell’acqua"
+      },
+      "basicsHelp": "Caricamento/salvataggio via GET/PATCH /api/recipes/:id.",
+      "hopsHelp": "v0: scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "yeastHelp": "v0: scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "otherHelp": "Spezie, chiarificanti, aromi, ecc.",
+      "waterHelp": "Il calcolatore completo (chimica mash + acqua) vive in una pagina dedicata (non integrata qui).",
+      "buttons": {
+        "clear": "Pulisci",
+        "addFermentable": "Aggiungi fermentabile",
+        "addOtherIngredient": "Aggiungi altro ingrediente"
+      }
+    },
+    "water": {
+      "common": {
+        "backToHub": "Torna al centro acqua",
+        "goToSparge": "Vai allo sparge",
+        "goToMash": "Vai al mash",
+        "viewEditGrist": "Vedi/modifica grist nella ricetta",
+        "notAuthenticated": "Non autenticato. {signIn}."
+      },
+      "mash": {
+        "title": "Acqua mash",
+        "adjustmentHeading": "Regolazione acqua mash",
+        "adjustmentHint": "Seleziona un profilo sorgente + diluizione e imposta i volumi per vedere gli ioni miscelati.",
+        "gristSummaryHeading": "Grist (riepilogo)",
+        "gristSummaryHelp": "Evitiamo di duplicare qui la tabella completa del grist. Usa l’editor ricetta per i dettagli; questa pagina mantiene solo uno snapshot per i calcoli.",
+        "acidificationHeading": "Acidificazione acqua mash",
+        "resultLastCalculated": "Risultato (ultimo calcolo)",
+        "overallResultHeading": "Risultato complessivo acqua mash (HCO3 derivato dall’alcalinità)",
+        "saltAdditionsManualV0": "Aggiunte di sali (manuale)"
+      },
+      "sparge": {
+        "title": "Acqua sparge",
+        "acidificationHeading": "Acidificazione sparge",
+        "resultLastCalculated": "Risultato (ultimo calcolo)",
+        "saltAdditionsManualV0": "Aggiunte di sali sparge (manuale)",
+        "saltAdditionsHelp": "Il profilo base è quello selezionato sopra. Aggiungi sali in grammi; calcoliamo gli ioni risultanti (ppm) per il volume di sparge."
+      },
+      "boil": {
+        "title": "Acqua aggiuntiva in bollitura",
+        "adjustmentHeading": "Regolazione acqua bollitura (v0)",
+        "saltAdditionsHeading": "Aggiunte di sali (manuale, v0)",
+        "acidificationHeading": "Acidificazione acqua bollitura (v0)",
+        "overallResultHeading": "Risultato complessivo acqua bollitura (v0, HCO3 derivato dall’alcalinità)",
+        "adjustmentHelp": "Scegli profili sorgente/target/diluizione e volumi per calcolare un profilo acqua iniziale miscelato.",
+        "saltAdditionsHelp": "Seleziona un profilo Sorgente e imposta il volume. La diluizione è opzionale, ma se il volume di diluizione è > 0 devi selezionare un profilo di diluizione.",
+        "saltAdditionsBaseHelp": "Il profilo base è l’acqua sorgente miscelata sopra. Aggiungi sali in grammi; calcoliamo gli ioni risultanti (ppm)."
+      }
+    },
     "activeAccount": "Account attivo:",
     "createTitle": "Crea ricetta",
     "nameLabel": "Nome",
@@ -137,7 +216,16 @@
   },
   "waterProfiles": {
     "title": "Profili acqua",
-    "activeAccount": "Account attivo"
+    "activeAccount": "Account attivo",
+    "viewAllTableTitle": "Vedi tutti i profili acqua (tabella)",
+    "adminAddTitle": "Admin: aggiungi profilo acqua",
+    "createdProfilesStartUnverified": "I profili creati iniziano come non verificati. Usa le azioni nella tabella per verificare/non verificare.",
+    "navigationTitle": "Navigazione",
+    "phPlaceholder": "es. 7,80"
+  },
+  "ui": {
+    "addSalt": "Aggiungi sale",
+    "fx": "fx"
   },
   "salts": {
     "gypsum": "Gesso (gypsum)",
