@@ -97,6 +97,7 @@ export default function SpargeWaterPage() {
   const [savingSpargeSalts, setSavingSpargeSalts] = useState(false);
   const [spargeSaltAdditions, setSpargeSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [spargeSaltsResult, setSpargeSaltsResult] = useState<SaltAdditionsResult | null>(null);
+  const [spargeSaltsInputsKey, setSpargeSaltsInputsKey] = useState<string | null>(null);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
   useEffect(() => {
@@ -183,6 +184,13 @@ export default function SpargeWaterPage() {
         const v: any = s.spargeSaltsLastResultJson as any;
         if (v?.result && typeof v.result === "object") {
           setSpargeSaltsResult(v.result as SaltAdditionsResult);
+          setSpargeSaltsInputsKey(
+            JSON.stringify({
+              spargeWaterProfileId: s.spargeWaterProfileId ?? "",
+              volumeLiters: s.spargeVolumeLiters ?? 20,
+              additions: Array.isArray(s.spargeSaltAdditionsJson) ? s.spargeSaltAdditionsJson : [],
+            }),
+          );
           if (typeof v.calculatedAt === "string") {
             setSpargeSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
           }
@@ -301,12 +309,6 @@ export default function SpargeWaterPage() {
       setSpargeError("Starting pH is required (select a profile with pH or enter it manually).");
       return;
     }
-    try {
-      await ensureZeroSaltsSnapshotIfMissing();
-    } catch (err) {
-      setSpargeError(String(err));
-      return;
-    }
     setSpargeError(null);
     setSpargeStatus(null);
     setCalcSaveStatus(null);
@@ -314,6 +316,16 @@ export default function SpargeWaterPage() {
     setSpargeManualResult(null);
     setSpargeSubmitting(true);
     try {
+      const saltsSnapshot = await ensureSpargeSaltsSnapshotForAcidification();
+      const calciumPpm =
+        typeof saltsSnapshot.resultingProfile?.calcium === "number" && Number.isFinite(saltsSnapshot.resultingProfile.calcium)
+          ? saltsSnapshot.resultingProfile.calcium
+          : undefined;
+      const magnesiumPpm =
+        typeof saltsSnapshot.resultingProfile?.magnesium === "number" && Number.isFinite(saltsSnapshot.resultingProfile.magnesium)
+          ? saltsSnapshot.resultingProfile.magnesium
+          : undefined;
+
       if (spargeAcidificationMode === "manual") {
         const acidAdded =
           typeof spargeManualAcidAdded === "number" && Number.isFinite(spargeManualAcidAdded)
@@ -328,15 +340,15 @@ export default function SpargeWaterPage() {
           startingAlkalinityPpmCaCO3: startingAlk,
           startingPh: Number(startingPh),
           volumeLiters,
-          calciumPpm: spargeCalciumPpm,
-          magnesiumPpm: spargeMagnesiumPpm,
+          calciumPpm,
+          magnesiumPpm,
           acidType,
           strengthKind,
           ...(strengthKind === "solid" ? { acidAddedGrams: acidAdded } : { acidAddedMl: acidAdded }),
         };
         if (strengthKind !== "solid") payload.strengthValue = strengthValue;
 
-      const res = await apiFetch("/api/water-calc/sparge-acidification-manual", {
+        const res = await apiFetch("/api/water-calc/sparge-acidification-manual", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -384,14 +396,14 @@ export default function SpargeWaterPage() {
           startingPh: Number(startingPh),
           targetPh,
           volumeLiters,
-          calciumPpm: spargeCalciumPpm,
-          magnesiumPpm: spargeMagnesiumPpm,
+          calciumPpm,
+          magnesiumPpm,
           acidType,
           strengthKind,
         };
         if (strengthKind !== "solid") payload.strengthValue = strengthValue;
 
-      const res = await apiFetch("/api/water-calc/sparge-acidification", {
+        const res = await apiFetch("/api/water-calc/sparge-acidification", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -448,20 +460,27 @@ export default function SpargeWaterPage() {
   const hasNonZeroSaltAdditions = (rows: SaltAdditionRow[]) =>
     rows.some((r) => typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0);
 
-  const ensureZeroSaltsSnapshotIfMissing = async () => {
+  const buildSpargeSaltsInputsKey = () => {
+    return JSON.stringify({
+      spargeWaterProfileId,
+      volumeLiters,
+      additions: spargeSaltAdditions,
+    });
+  };
+
+  const ensureSpargeSaltsSnapshotForAcidification = async (): Promise<SaltAdditionsResult> => {
     if (!canCall) return;
-    if (spargeSaltsResult) return;
-    if (hasNonZeroSaltAdditions(spargeSaltAdditions)) {
-      throw new Error(
-        "You entered sparge salts but haven’t calculated them. Click “Calculate & save salts snapshot” first so acidification uses the correct ions.",
-      );
-    }
     if (!selectedSpargeProfile) {
       throw new Error("Select a sparge water profile first (base ion profile for recap).");
     }
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new Error("Sparge water volume must be > 0.");
     }
+
+    const inputsKey = buildSpargeSaltsInputsKey();
+    const saltsEntered = hasNonZeroSaltAdditions(spargeSaltAdditions);
+    const isSnapshotStale = saltsEntered && (!!spargeSaltsResult && spargeSaltsInputsKey !== inputsKey);
+    if (spargeSaltsResult && !isSnapshotStale) return spargeSaltsResult;
 
     const base: IonProfilePpm = {
       calcium: selectedSpargeProfile.calcium,
@@ -472,19 +491,45 @@ export default function SpargeWaterPage() {
       bicarbonate: selectedSpargeProfile.bicarbonate,
     };
 
-    const result: SaltAdditionsResult = {
-      baseProfile: base,
-      resultingProfile: base,
-      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
-      breakdown: [],
-    };
+    if (!saltsEntered) {
+      const result: SaltAdditionsResult = {
+        baseProfile: base,
+        resultingProfile: base,
+        deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+        breakdown: [],
+      };
+
+      const nowIso = new Date().toISOString();
+      setSpargeSaltsResult(result);
+      setSpargeSaltsInputsKey(inputsKey);
+      await saveSettings({
+        spargeSaltAdditionsJson: spargeSaltAdditions,
+        spargeSaltsLastResultJson: { calculatedAt: nowIso, result },
+      });
+      return result;
+    }
+
+    setSpargeSaltsStatus("Calculating salts for acidification…");
+    const res = await apiFetch("/api/water-calc/salt-additions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        volumeLiters,
+        baseProfile,
+        additions: spargeSaltAdditions,
+      }),
+    });
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+    const result = (res.data as any).result as SaltAdditionsResult;
 
     const nowIso = new Date().toISOString();
     setSpargeSaltsResult(result);
+    setSpargeSaltsInputsKey(inputsKey);
     await saveSettings({
       spargeSaltAdditionsJson: spargeSaltAdditions,
       spargeSaltsLastResultJson: { calculatedAt: nowIso, result },
     });
+    return result;
   };
 
   const onCalculateSpargeSalts = async () => {
@@ -498,6 +543,7 @@ export default function SpargeWaterPage() {
       if (!selectedSpargeProfile) throw new Error("Select a sparge water profile first (base ion profile for salts).");
       if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) throw new Error("Sparge water volume must be > 0.");
 
+      setSpargeSaltsInputsKey(buildSpargeSaltsInputsKey());
       const res = await apiFetch("/api/water-calc/salt-additions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

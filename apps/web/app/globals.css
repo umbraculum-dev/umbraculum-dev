@@ -369,9 +369,7 @@ code {
 .mathPopoverTitle {
   font-weight: 700;
   margin-bottom: 6px;
-}
-
-.mathPopoverBody {
+}.mathPopoverBody {
   white-space: pre-wrap;
   font-size: 12px;
   line-height: 1.35;

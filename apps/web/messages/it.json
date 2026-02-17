@@ -273,7 +273,20 @@
     "ion": "Ione",
     "mergedPpm": "Unito (ppm)",
     "noMergedProfile": "Profilo unito non ancora disponibile (servono snapshot sali + acido salvati per almeno un flusso).",
-    "noSettingsLoaded": "Nessuna impostazione caricata."
+    "noSettingsLoaded": "Nessuna impostazione caricata.",
+    "finalRecapTitle": "Riepilogo finale",
+    "finalRecapSubtitle": "Sintesi rapida ed euristica (non è un modello completo di chimica dell’acqua).",
+    "predictedMashPh": "pH mash previsto",
+    "residualAlkalinity": "Alcalinità residua (RA)",
+    "raMashOverall": "Mash complessivo (dopo sali + acido)",
+    "raMerged": "Acqua unita (se disponibile)",
+    "ppmAsCaCO3": "ppm come CaCO3",
+    "styleExpectedRa": "RA attesa per lo stile (regola pratica)",
+    "styleExpectedRaNa": "N/A",
+    "finalRecapCaveat": "Nota: la RA è un’euristica; i risultati dipendono da assunzioni e non sostituiscono un modello completo di pH/chimica.",
+    "styleExpectedRaPale": "Gli stili chiari / orientati al luppolo spesso beneficiano di RA più bassa.",
+    "styleExpectedRaAmber": "Gli stili ambrati / maltati spesso tollerano una RA moderata.",
+    "styleExpectedRaDark": "Gli stili scuri / tostati spesso beneficiano di RA più alta."
   },
   "about": {
     "title": "Info",

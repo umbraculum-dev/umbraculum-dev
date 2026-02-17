@@ -34,6 +34,18 @@ export default function WaterHubPage() {
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [settings, setSettings] = useState<RecipeWaterSettingsResponse["settings"] | null>(null);
+  const [recipeStyleKey, setRecipeStyleKey] = useState<string | null>(null);
+  const [beerStyles, setBeerStyles] = useState<
+    null | {
+      styles: Array<{
+        key: string;
+        name: string;
+        category: string | null;
+        categoryId: string | null;
+        code: string;
+      }>;
+    }
+  >(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +79,14 @@ export default function WaterHubPage() {
 
       const s = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
       setSettings(s.settings ?? null);
+
+      const recipeRes = await apiFetch(`/api/recipes/${recipeId}`);
+      if (!recipeRes.ok) throw new Error(JSON.stringify(recipeRes.data));
+      setRecipeStyleKey(extractRecipeStyleKey(recipeRes.data));
+
+      const stylesRes = await apiFetch("/api/styles");
+      if (!stylesRes.ok) throw new Error(JSON.stringify(stylesRes.data));
+      setBeerStyles(extractBeerStyles(stylesRes.data));
     } catch (err) {
       setError(String(err));
     } finally {
@@ -98,6 +118,59 @@ export default function WaterHubPage() {
     if (v < 0 && v > -1) return 0;
     return v;
   };
+
+  const calcResidualAlkalinityPpmCaCO3 = (args: {
+    alkalinityPpmCaCO3: number;
+    calciumPpm: number;
+    magnesiumPpm: number;
+  }) => {
+    return args.alkalinityPpmCaCO3 - 0.713 * args.calciumPpm - 0.588 * args.magnesiumPpm;
+  };
+
+  const expectedRa = useMemo(() => {
+    if (!recipeStyleKey || recipeStyleKey === "custom") return null;
+    const style = beerStyles?.styles?.find((s) => s.key === recipeStyleKey) ?? null;
+    if (!style) return null;
+
+    const text = `${style.category ?? ""} ${style.name}`.trim().toLowerCase();
+    const includes = (needle: string) => text.includes(needle);
+
+    if (
+      includes("stout") ||
+      includes("porter") ||
+      includes("schwarz") ||
+      includes("dunkel") ||
+      includes("dark") ||
+      includes("black")
+    ) {
+      return { min: 50, max: 200, rationaleKey: "styleExpectedRaDark" as const };
+    }
+    if (
+      includes("ipa") ||
+      includes("pale") ||
+      includes("pils") ||
+      includes("lager") ||
+      includes("blonde") ||
+      includes("kölsch") ||
+      includes("kolsch") ||
+      includes("saison")
+    ) {
+      return { min: -50, max: 50, rationaleKey: "styleExpectedRaPale" as const };
+    }
+    if (
+      includes("amber") ||
+      includes("red") ||
+      includes("brown") ||
+      includes("bock") ||
+      includes("vienna") ||
+      includes("märzen") ||
+      includes("marzen")
+    ) {
+      return { min: 0, max: 100, rationaleKey: "styleExpectedRaAmber" as const };
+    }
+
+    return null;
+  }, [beerStyles?.styles, recipeStyleKey]);
 
   type StreamSummary = {
     key: "mash" | "sparge" | "boil";
@@ -609,8 +682,124 @@ export default function WaterHubPage() {
             )}
           </details>
         </section>
+
+        <section className="panel" aria-labelledby="water-hub-final-recap">
+          <h2 id="water-hub-final-recap" style={{ marginTop: 0 }}>
+            {t("finalRecapTitle")}
+          </h2>
+          <p className="muted" style={{ marginTop: 0 }}>
+            {t("finalRecapSubtitle")}
+          </p>
+
+          <ul style={{ marginTop: 0 }}>
+            <li>
+              {t("predictedMashPh")}{" "}
+              {overall ? (
+                <>
+                  <code>{formatFixed(locale, overall.ph.value, 2)}</code>{" "}
+                  <span className="muted">({overall.ph.kind})</span>
+                </>
+              ) : (
+                <span className="muted">—</span>
+              )}
+            </li>
+            <li>
+              {t("residualAlkalinity")}
+              <ul style={{ marginTop: 6 }}>
+                <li>
+                  {t("raMashOverall")}:{" "}
+                  {overall ? (
+                    <code>
+                      {formatFixed(
+                        locale,
+                        calcResidualAlkalinityPpmCaCO3({
+                          alkalinityPpmCaCO3: displayAlkalinityPpmCaCO3(overall.finalAlkalinityPpmCaCO3),
+                          calciumPpm: overall.ionsPpm.calcium,
+                          magnesiumPpm: overall.ionsPpm.magnesium,
+                        }),
+                        2,
+                      )}
+                    </code>
+                  ) : (
+                    <span className="muted">—</span>
+                  )}{" "}
+                  <span className="muted">{t("ppmAsCaCO3")}</span>
+                </li>
+                <li>
+                  {t("raMerged")}:{" "}
+                  {recap?.mergedIons && typeof recap.mergedFinalAlk === "number" ? (
+                    <code>
+                      {formatFixed(
+                        locale,
+                        calcResidualAlkalinityPpmCaCO3({
+                          alkalinityPpmCaCO3: displayAlkalinityPpmCaCO3(recap.mergedFinalAlk),
+                          calciumPpm: recap.mergedIons.calcium,
+                          magnesiumPpm: recap.mergedIons.magnesium,
+                        }),
+                        2,
+                      )}
+                    </code>
+                  ) : (
+                    <span className="muted">—</span>
+                  )}{" "}
+                  <span className="muted">{t("ppmAsCaCO3")}</span>
+                </li>
+              </ul>
+            </li>
+            <li>
+              {t("styleExpectedRa")}:{" "}
+              {expectedRa ? (
+                <>
+                  <code>
+                    {formatFixed(locale, expectedRa.min, 0)}..{formatFixed(locale, expectedRa.max, 0)}
+                  </code>{" "}
+                  <span className="muted">{t("ppmAsCaCO3")}</span>{" "}
+                  <span className="muted">· {t(expectedRa.rationaleKey)}</span>
+                </>
+              ) : (
+                <span className="muted">{t("styleExpectedRaNa")}</span>
+              )}
+            </li>
+          </ul>
+
+          <p className="muted" style={{ marginBottom: 0 }}>
+            {t("finalRecapCaveat")}
+          </p>
+        </section>
       </div>
     </>
   );
+}
+
+function extractRecipeStyleKey(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const d = data as any;
+  const recipe = d?.recipe;
+  if (!recipe || typeof recipe !== "object") return null;
+  const styleKey = (recipe as any).styleKey;
+  if (typeof styleKey !== "string") return null;
+  const trimmed = styleKey.trim();
+  return trimmed ? trimmed : null;
+}
+
+function extractBeerStyles(data: unknown): { styles: Array<{ key: string; name: string; category: string | null; categoryId: string | null; code: string }> } | null {
+  if (!data || typeof data !== "object") return null;
+  const d = data as any;
+  const styles = d?.styles;
+  if (!Array.isArray(styles)) return null;
+
+  const out: Array<{ key: string; name: string; category: string | null; categoryId: string | null; code: string }> = [];
+  for (const s of styles) {
+    if (!s || typeof s !== "object") continue;
+    const key = typeof (s as any).key === "string" ? (s as any).key : null;
+    const name = typeof (s as any).name === "string" ? (s as any).name : null;
+    const code = typeof (s as any).code === "string" ? (s as any).code : null;
+    if (!key || !name || !code) continue;
+    const category = typeof (s as any).category === "string" ? (s as any).category : null;
+    const categoryId = typeof (s as any).categoryId === "string" ? (s as any).categoryId : null;
+    out.push({ key, name, category, categoryId, code });
+  }
+
+  return { styles: out };
 }
 

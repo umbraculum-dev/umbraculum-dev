@@ -273,7 +273,20 @@
     "ion": "Ion",
     "mergedPpm": "Merged (ppm)",
     "noMergedProfile": "No merged profile available yet (need saved salts + acid snapshots for at least one stream).",
-    "noSettingsLoaded": "No settings loaded yet."
+    "noSettingsLoaded": "No settings loaded yet.",
+    "finalRecapTitle": "Final recap",
+    "finalRecapSubtitle": "A quick, heuristic summary (not a full water chemistry model).",
+    "predictedMashPh": "Predicted mash pH",
+    "residualAlkalinity": "Residual alkalinity (RA)",
+    "raMashOverall": "Mash overall (after salts + acid)",
+    "raMerged": "Merged water (if available)",
+    "ppmAsCaCO3": "ppm as CaCO3",
+    "styleExpectedRa": "Style expected RA (rule of thumb)",
+    "styleExpectedRaNa": "N/A",
+    "finalRecapCaveat": "Caveat: RA is a heuristic; results depend on assumptions and do not replace a full mash pH/chemistry model.",
+    "styleExpectedRaPale": "Pale / hop-forward styles usually benefit from lower RA.",
+    "styleExpectedRaAmber": "Amber / malty styles often tolerate moderate RA.",
+    "styleExpectedRaDark": "Dark / roasty styles often benefit from higher RA."
   },
   "about": {
     "title": "About",
