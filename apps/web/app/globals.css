@@ -191,16 +191,25 @@ code {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-2) 25%, var(--surface));
 }
 
 .navList a {
   display: inline-flex;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: 999px;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--info));
   background: color-mix(in srgb, var(--surface-2) 60%, var(--surface));
   color: var(--text);
@@ -217,6 +226,17 @@ code {
 .navList a[aria-current="page"] {
   background: color-mix(in srgb, var(--info) 18%, var(--surface-2));
   border-color: color-mix(in srgb, var(--info) 35%, var(--border));
+}
+
+@media (max-width: 520px) {
+  .navList {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    padding: 8px;
+    gap: 6px;
+  }
+  .navList a {
+    padding: 10px 10px;
+  }
 }
 
 .navTopBar {
