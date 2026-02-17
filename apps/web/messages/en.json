@@ -361,6 +361,11 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Desktop-first web app + native mobile apps, offline-first brew-day logging.",
+    "links": {
+      "title": "Brew day & Brewing data",
+      "fermDataIntegration": "Ferm Data & Integration",
+      "brewdaySteps": "Brewday Steps"
+    },
     "importExport": {
       "title": "Import / Export",
       "supportedNote": "Recipe import/export interoperability is centered on BeerJSON (canonical).",
@@ -370,6 +375,28 @@
       "actionsCta": "Go to Recipes",
       "customImportNote": "Need another system?",
       "customImportCta": "Contact us for affordable custom import."
+    },
+    "fermDataIntegration": {
+      "title": "Ferm Data & Integration",
+      "subtitle": "Integrations and fermentation data (stats and insights).",
+      "backToDashboard": "Back to dashboard",
+      "sections": {
+        "integration": {
+          "title": "Integration",
+          "empty": "No integrations yet."
+        }
+      }
+    },
+    "brewdaySteps": {
+      "title": "Brewday Steps",
+      "subtitle": "A structured checklist for brew day (timers, steps, notes).",
+      "backToDashboard": "Back to dashboard",
+      "sections": {
+        "brewSteps": {
+          "title": "Brew Steps",
+          "empty": "No brew steps yet."
+        }
+      }
     }
   },
   "contact": {

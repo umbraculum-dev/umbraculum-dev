@@ -28,6 +28,19 @@ export function PrimaryNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const pathnameNoLocale = (() => {
+    const p = typeof pathname === "string" ? pathname : "/";
+    const parts = p.split("/");
+    if (parts.length > 1) parts[1] = "";
+    const rebuilt = parts.join("/").replace(/\/{2,}/g, "/");
+    return rebuilt === "" ? "/" : rebuilt;
+  })();
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathnameNoLocale === "/" || pathnameNoLocale === "";
+    return pathnameNoLocale === href || pathnameNoLocale.startsWith(`${href}/`);
+  };
+
   const [me, setMe] = useState<AuthMeResponse | null>(null);
   const [authKnown, setAuthKnown] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -175,19 +188,29 @@ export function PrimaryNav() {
       {showMainNav ? (
         <ul className="navList">
           <li>
-            <Link href="/">{t("dashboard")}</Link>
+            <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
+              {t("dashboard")}
+            </Link>
           </li>
           <li>
-            <Link href="/recipes">{t("recipes")}</Link>
+            <Link href="/recipes" aria-current={isActive("/recipes") ? "page" : undefined}>
+              {t("recipes")}
+            </Link>
           </li>
           <li>
-            <Link href="/water-profiles">{t("waterProfiles")}</Link>
+            <Link href="/water-profiles" aria-current={isActive("/water-profiles") ? "page" : undefined}>
+              {t("waterProfiles")}
+            </Link>
           </li>
           <li>
-            <Link href="/equipment">{t("equipment")}</Link>
+            <Link href="/equipment" aria-current={isActive("/equipment") ? "page" : undefined}>
+              {t("equipment")}
+            </Link>
           </li>
           <li>
-            <Link href="/about">{t("about")}</Link>
+            <Link href="/about" aria-current={isActive("/about") ? "page" : undefined}>
+              {t("about")}
+            </Link>
           </li>
         </ul>
       ) : null}

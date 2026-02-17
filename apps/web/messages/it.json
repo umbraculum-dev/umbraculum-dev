@@ -361,6 +361,11 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first.",
+    "links": {
+      "title": "Brew day e dati di produzione",
+      "fermDataIntegration": "Dati fermentazione e integrazione",
+      "brewdaySteps": "Step brewday"
+    },
     "importExport": {
       "title": "Import / Export",
       "supportedNote": "L’interoperabilità di import/export ricette è centrata su BeerJSON (canonico).",
@@ -370,6 +375,28 @@
       "actionsCta": "Vai alle Ricette",
       "customImportNote": "Hai bisogno di un altro sistema?",
       "customImportCta": "Contattaci per un import personalizzato a un costo accessibile."
+    },
+    "fermDataIntegration": {
+      "title": "Dati fermentazione e integrazione",
+      "subtitle": "Integrazioni e dati di fermentazione (statistiche e insight).",
+      "backToDashboard": "Torna alla dashboard",
+      "sections": {
+        "integration": {
+          "title": "Integrazione",
+          "empty": "Nessuna integrazione per ora."
+        }
+      }
+    },
+    "brewdaySteps": {
+      "title": "Step brewday",
+      "subtitle": "Una checklist strutturata per il brew day (timer, step, note).",
+      "backToDashboard": "Torna alla dashboard",
+      "sections": {
+        "brewSteps": {
+          "title": "Step di brew",
+          "empty": "Nessuno step per ora."
+        }
+      }
     }
   },
   "contact": {

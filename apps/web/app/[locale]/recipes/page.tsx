@@ -227,18 +227,26 @@ export default function RecipesPage() {
         </h2>
         {!loading && !hasRecipes ? <p className="muted">{t("noRecipes")}</p> : null}
         {hasRecipes ? (
-          <ul style={{ marginBottom: 0 }}>
+          <ul className="recipeList" style={{ marginBottom: 0 }}>
             {pageRecipes.map((r) => (
-              <li key={r.id} style={{ display: "grid", gap: 6, padding: "8px 0" }}>
-                <div>
-                  <strong>{r.name}</strong> {r.style ? <span className="muted">({r.style})</span> : null}
-                </div>
-                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                  <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
-                  <Link href={`/recipes/${r.id}/water`}>{t("openWater")}</Link>
-                  <button type="button" onClick={() => onAskDelete(r.id)} disabled={!canCall || deletingId === r.id}>
+              <li key={r.id} className="recipeListRow" style={{ display: "grid", gap: 6 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: 12, rowGap: 2, alignItems: "start" }}>
+                  <div>
+                    <strong>{r.name}</strong> {r.style ? <span className="muted">({r.style})</span> : null}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onAskDelete(r.id)}
+                    disabled={!canCall || deletingId === r.id}
+                    className="recipeListDeleteButton"
+                    style={{ alignSelf: "start", justifySelf: "end" }}
+                  >
                     {t("delete.cta")}
                   </button>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", gridColumn: "1 / 2" }}>
+                    <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
+                    <Link href={`/recipes/${r.id}/water`}>{t("openWater")}</Link>
+                  </div>
                 </div>
                 {deleteConfirmId === r.id ? (
                   <div className="errorBox" role="alert" style={{ marginTop: 6 }}>
