@@ -15,11 +15,14 @@ export interface GravityAnalysis {
 }
 
 interface ExtractedEquipment {
-  kettleVolumeLiters: number | null;
+  kettleCapacityLiters: number | null;
   kettleLossesLiters: number;
   kettleBoilEvaporationRatePercentPerHour: number;
   kettleCoolingShrinkagePercent: number;
   kettleHopsAbsorptionLitersPerGram: number;
+  mashLossesLiters: number;
+  mashGrainAbsorptionLPerKg: number;
+  mashWaterLeftoverLiters: number;
   mashEfficiencyPercent: number | null;
   otherLossesLiters: number;
 }
@@ -48,20 +51,26 @@ function extractEquipment(ext: unknown): ExtractedEquipment {
   const mash = e && typeof e === "object" ? (e as any).mash : null;
   const misc = e && typeof e === "object" ? (e as any).misc : null;
 
-  const kettleVolumeLiters = safeNum(kettle?.kettleVolumeLiters);
+  const kettleCapacityLiters = safeNum(kettle?.kettleVolumeLiters);
   const kettleLossesLiters = safeNum(kettle?.kettleLossesLiters) ?? 0;
   const kettleBoilEvaporationRatePercentPerHour = safeNum(kettle?.kettleBoilEvaporationRatePercentPerHour) ?? 0;
   const kettleCoolingShrinkagePercent = safeNum(kettle?.kettleCoolingShrinkagePercent) ?? 0;
   const kettleHopsAbsorptionLitersPerGram = safeNum(kettle?.kettleHopsAbsorptionLiters) ?? 0;
+  const mashLossesLiters = safeNum(mash?.mashLossesLiters) ?? 0;
+  const mashGrainAbsorptionLPerKg = safeNum(mash?.mashGrainAbsorptionLPerKg) ?? 0;
+  const mashWaterLeftoverLiters = safeNum(mash?.mashWaterLeftoverLiters) ?? 0;
   const mashEfficiencyPercent = safeNum(mash?.mashEfficiencyPercent);
   const otherLossesLiters = safeNum(misc?.otherLossesLiters) ?? 0;
 
   return {
-    kettleVolumeLiters: kettleVolumeLiters != null && kettleVolumeLiters > 0 ? kettleVolumeLiters : null,
+    kettleCapacityLiters: kettleCapacityLiters != null && kettleCapacityLiters > 0 ? kettleCapacityLiters : null,
     kettleLossesLiters: Math.max(0, kettleLossesLiters),
     kettleBoilEvaporationRatePercentPerHour: clamp(kettleBoilEvaporationRatePercentPerHour, 0, 100),
     kettleCoolingShrinkagePercent: clamp(kettleCoolingShrinkagePercent, 0, 100),
     kettleHopsAbsorptionLitersPerGram: Math.max(0, kettleHopsAbsorptionLitersPerGram),
+    mashLossesLiters: Math.max(0, mashLossesLiters),
+    mashGrainAbsorptionLPerKg: Math.max(0, mashGrainAbsorptionLPerKg),
+    mashWaterLeftoverLiters: Math.max(0, mashWaterLeftoverLiters),
     mashEfficiencyPercent:
       mashEfficiencyPercent != null && mashEfficiencyPercent >= 0 && mashEfficiencyPercent <= 100
         ? mashEfficiencyPercent
@@ -100,6 +109,23 @@ function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
     if (unit === "kg") totalGrams += value * 1000;
   }
   return Math.max(0, totalGrams);
+}
+
+function extractTotalGrainKg(beerJsonRecipeJson: unknown): number {
+  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
+  const ferms = r0?.ingredients?.fermentable_additions;
+  const list = Array.isArray(ferms) ? ferms : [];
+  let totalKg = 0;
+  for (const f of list) {
+    const type = typeof f?.type === "string" ? f.type.trim().toLowerCase() : "";
+    if (type !== "grain") continue;
+    const unit = typeof f?.amount?.unit === "string" ? f.amount.unit : "";
+    const value = safeNum(f?.amount?.value);
+    if (value == null || !(value > 0)) continue;
+    if (unit === "kg") totalKg += value;
+    if (unit === "g") totalKg += value / 1000;
+  }
+  return Math.max(0, totalKg);
 }
 
 function extractFermentablesPpgAndPounds(beerJsonRecipeJson: unknown): Array<{ ppg: number; pounds: number }> {
@@ -186,13 +212,14 @@ function effectiveAttenuationPercent(yeasts: ExtractedYeastAttenuation[]): numbe
 export function computeRecipeGravityAnalysis(args: {
   beerJsonRecipeJson: unknown;
   recipeExtJson: unknown;
+  recipeWaterSettings: unknown;
 }): GravityAnalysis {
   const warnings: GravityAnalysisWarning[] = [];
   const equipment = extractEquipment(args.recipeExtJson);
 
   if (!args.beerJsonRecipeJson) {
     return {
-      kettleVolumeLiters: equipment.kettleVolumeLiters,
+      kettleVolumeLiters: null,
       preBoilVolumeLiters: null,
       ogEstimatedSg: null,
       pbgEstimatedSg: null,
@@ -203,18 +230,53 @@ export function computeRecipeGravityAnalysis(args: {
     };
   }
 
+  const water = args.recipeWaterSettings && typeof args.recipeWaterSettings === "object" && !Array.isArray(args.recipeWaterSettings)
+    ? (args.recipeWaterSettings as any)
+    : null;
+
+  const mashWaterVolumeLiters = typeof water?.mashWaterVolumeLiters === "number" && Number.isFinite(water.mashWaterVolumeLiters)
+    ? water.mashWaterVolumeLiters
+    : null;
+  const spargeVolumeLiters = typeof water?.spargeVolumeLiters === "number" && Number.isFinite(water.spargeVolumeLiters)
+    ? water.spargeVolumeLiters
+    : null;
+  const boilWaterVolumeLiters = typeof water?.boilWaterVolumeLiters === "number" && Number.isFinite(water.boilWaterVolumeLiters)
+    ? water.boilWaterVolumeLiters
+    : 0;
+
   const boilTimeHours = extractBoilTimeHours(args.beerJsonRecipeJson);
   const kettleHopMassGrams = extractKettleHopMassGrams(args.beerJsonRecipeJson);
   const kettleHopAbsorptionLiters = equipment.kettleHopsAbsorptionLitersPerGram * kettleHopMassGrams;
 
-  const totalLossesLiters = equipment.kettleLossesLiters + kettleHopAbsorptionLiters + equipment.otherLossesLiters;
-
   const preBoilVolumeLiters = (() => {
-    if (equipment.kettleVolumeLiters == null) return null;
+    if (!water) {
+      warnings.push({ code: "missing_water_settings", message: "Missing saved water settings; cannot derive volume estimates." });
+      return null;
+    }
+    if (mashWaterVolumeLiters == null || spargeVolumeLiters == null) {
+      warnings.push({ code: "missing_water_volumes", message: "Missing mash/sparge water volumes; cannot derive volume estimates." });
+      return null;
+    }
+    const totalGrainKg = extractTotalGrainKg(args.beerJsonRecipeJson);
+    const grainAbsorptionLiters = equipment.mashGrainAbsorptionLPerKg * totalGrainKg;
+    const runoffLiters =
+      mashWaterVolumeLiters +
+      spargeVolumeLiters -
+      grainAbsorptionLiters -
+      equipment.mashLossesLiters -
+      equipment.mashWaterLeftoverLiters;
 
-    const shrink = clamp(equipment.kettleCoolingShrinkagePercent, 0, 99) / 100;
-    const cooledVolumePlusLosses = equipment.kettleVolumeLiters + totalLossesLiters;
-    const hotEndVolume = cooledVolumePlusLosses / (1 - shrink);
+    if (!(runoffLiters > 0)) {
+      warnings.push({ code: "invalid_runoff_volume", message: "Mash/sparge volumes and losses imply zero or negative runoff volume; check water and mash equipment inputs." });
+      return null;
+    }
+
+    const preBoil = runoffLiters + Math.max(0, boilWaterVolumeLiters);
+    return preBoil > 0 ? preBoil : null;
+  })();
+
+  const kettleVolumeLiters = (() => {
+    if (preBoilVolumeLiters == null) return null;
 
     const evapRate = clamp(equipment.kettleBoilEvaporationRatePercentPerHour, 0, 99) / 100;
     const denom = 1 - evapRate * boilTimeHours;
@@ -225,7 +287,26 @@ export function computeRecipeGravityAnalysis(args: {
       });
       return null;
     }
-    return hotEndVolume / denom;
+
+    const postBoilHotVolume = preBoilVolumeLiters * denom;
+    const shrink = clamp(equipment.kettleCoolingShrinkagePercent, 0, 99) / 100;
+    const cooledVolume = postBoilHotVolume * (1 - shrink);
+
+    const totalKettleLossesLiters = equipment.kettleLossesLiters + kettleHopAbsorptionLiters + equipment.otherLossesLiters;
+    const out = cooledVolume - totalKettleLossesLiters;
+    if (!(out > 0)) {
+      warnings.push({ code: "invalid_kettle_volume", message: "Computed kettle volume is zero or negative; check equipment losses and water inputs." });
+      return null;
+    }
+
+    if (equipment.kettleCapacityLiters != null && out > equipment.kettleCapacityLiters) {
+      warnings.push({
+        code: "exceeds_kettle_capacity",
+        message: "Computed kettle volume exceeds kettle capacity/target from equipment profile; check water volumes or equipment losses.",
+      });
+    }
+
+    return out;
   })();
 
   const efficiencyPercent =
@@ -253,8 +334,8 @@ export function computeRecipeGravityAnalysis(args: {
   }
 
   const ogEstimatedSg =
-    equipment.kettleVolumeLiters != null && fermentables.length && efficiencyPercent > 0
-      ? estimateSgFromPpg({ fermentables, volumeLiters: equipment.kettleVolumeLiters, efficiencyPercent })
+    kettleVolumeLiters != null && fermentables.length && efficiencyPercent > 0
+      ? estimateSgFromPpg({ fermentables, volumeLiters: kettleVolumeLiters, efficiencyPercent })
       : null;
 
   const pbgEstimatedSg =
@@ -280,7 +361,7 @@ export function computeRecipeGravityAnalysis(args: {
     ogEstimatedSg != null && fgEstimatedSg != null ? (ogEstimatedSg - fgEstimatedSg) * ABV_FACTOR : null;
 
   return {
-    kettleVolumeLiters: equipment.kettleVolumeLiters,
+    kettleVolumeLiters,
     preBoilVolumeLiters,
     ogEstimatedSg,
     pbgEstimatedSg,

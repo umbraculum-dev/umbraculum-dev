@@ -43,9 +43,13 @@ export async function recipesRoutes(app: FastifyInstance) {
     const id = typeof params.id === "string" ? params.id : "";
 
     const recipe = await recipes.getRecipe(ctx.userId, ctx.activeAccountId, id);
+    const waterSettings = await app.prisma.recipeWaterSettings.findUnique({
+      where: { recipeId: (recipe as any).id },
+    });
     const analysis = computeRecipeGravityAnalysis({
       beerJsonRecipeJson: (recipe as any).beerJsonRecipeJson,
       recipeExtJson: (recipe as any).recipeExtJson,
+      recipeWaterSettings: waterSettings,
     });
     return { ok: true, recipe: { ...recipe, analysis } };
   });

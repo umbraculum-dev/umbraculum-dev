@@ -75,6 +75,11 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
         },
         yeastAttenuationOverridesPercent: { "y-1": 90 },
       },
+      recipeWaterSettings: {
+        mashWaterVolumeLiters: 20,
+        spargeVolumeLiters: 10,
+        boilWaterVolumeLiters: 0,
+      },
     });
 
     expect(res.attenuationEffectivePercent).toBeCloseTo((90 + 80) / 2, 9);
@@ -102,6 +107,11 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
           mash: { mashEfficiencyPercent: 75 },
         },
       },
+      recipeWaterSettings: {
+        mashWaterVolumeLiters: 20,
+        spargeVolumeLiters: 10,
+        boilWaterVolumeLiters: 0,
+      },
     });
 
     expect(res.attenuationEffectivePercent).toBeCloseTo((80 + 70) / 2, 9);
@@ -116,12 +126,28 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
     const res = computeRecipeGravityAnalysis({
       beerJsonRecipeJson: doc,
       recipeExtJson: { version: 1, equipment: { kettle: {} } },
+      recipeWaterSettings: null,
     });
 
     expect(res.ogEstimatedSg).toBeNull();
     expect(res.fgEstimatedSg).toBeNull();
     expect(res.abvEstimatedPercent).toBeNull();
     expect(res.warnings.length).toBeGreaterThan(0);
+  });
+
+  it("gates kettle/pre-boil volumes on saved water settings", () => {
+    const doc = beerJsonDoc({
+      fermentables: [{ amountKg: 5, yieldPercent: 80 }],
+      yeasts: [{ id: "y-1", attenuationPercent: 75 }],
+    });
+    const res = computeRecipeGravityAnalysis({
+      beerJsonRecipeJson: doc,
+      recipeExtJson: { version: 1, equipment: { kettle: { kettleVolumeLiters: 20 }, mash: { mashEfficiencyPercent: 75 } } },
+      recipeWaterSettings: null,
+    });
+    expect(res.preBoilVolumeLiters).toBeNull();
+    expect(res.kettleVolumeLiters).toBeNull();
+    expect(res.warnings.map((w) => w.code)).toContain("missing_water_settings");
   });
 
   it("OG increases with efficiency and decreases with volume", () => {
@@ -139,6 +165,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
           mash: { mashEfficiencyPercent: 60 },
         },
       },
+      recipeWaterSettings: { mashWaterVolumeLiters: 20, spargeVolumeLiters: 10, boilWaterVolumeLiters: 0 },
     });
     const highEff = computeRecipeGravityAnalysis({
       beerJsonRecipeJson: doc,
@@ -149,6 +176,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
           mash: { mashEfficiencyPercent: 80 },
         },
       },
+      recipeWaterSettings: { mashWaterVolumeLiters: 20, spargeVolumeLiters: 10, boilWaterVolumeLiters: 0 },
     });
     expect(highEff.ogEstimatedSg as number).toBeGreaterThan(lowEff.ogEstimatedSg as number);
 
@@ -161,6 +189,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
           mash: { mashEfficiencyPercent: 75 },
         },
       },
+      recipeWaterSettings: { mashWaterVolumeLiters: 18, spargeVolumeLiters: 10, boilWaterVolumeLiters: 0 },
     });
     const highVol = computeRecipeGravityAnalysis({
       beerJsonRecipeJson: doc,
@@ -171,6 +200,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
           mash: { mashEfficiencyPercent: 75 },
         },
       },
+      recipeWaterSettings: { mashWaterVolumeLiters: 25, spargeVolumeLiters: 10, boilWaterVolumeLiters: 0 },
     });
     expect(lowVol.ogEstimatedSg as number).toBeGreaterThan(highVol.ogEstimatedSg as number);
   });
@@ -195,9 +225,14 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
             kettleCoolingShrinkagePercent: 4,
             kettleBoilEvaporationRatePercentPerHour: 10,
           },
-          mash: { mashEfficiencyPercent: 75 },
+          mash: { mashEfficiencyPercent: 75, mashGrainAbsorptionLPerKg: 0.8 },
           misc: { otherLossesLiters: 1 },
         },
+      },
+      recipeWaterSettings: {
+        mashWaterVolumeLiters: 20,
+        spargeVolumeLiters: 10,
+        boilWaterVolumeLiters: 0,
       },
     });
 

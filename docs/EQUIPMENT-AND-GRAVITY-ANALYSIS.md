@@ -72,8 +72,11 @@ All values are `number | null`. `null` means “insufficient data”.
   - fallback: `recipeExtJson.brewhouseEfficiencyPercent`
   - fallback: BeerJSON `efficiency.brewhouse`
 - volumes:
-  - kettle volume: `equipment.kettle.kettleVolumeLiters` (required for OG)
-  - pre-boil volume: derived (required for PBG)
+  - **requires saved water settings** (`RecipeWaterSettings` row) for volume estimates
+  - mash + sparge (and optional boil add-on) water volumes come from `RecipeWaterSettings`
+  - mash absorption/losses come from `recipeExtJson.equipment.mash.*`
+  - kettle losses/evap/shrink/hops absorption come from `recipeExtJson.equipment.kettle.*` + `misc.otherLossesLiters`
+  - kettle capacity/target (`equipment.kettle.kettleVolumeLiters`) is used only for warnings (it does not drive the calculation)
 
 ### OG (estimated)
 
@@ -101,21 +104,42 @@ Given OG and an effective yeast attenuation percent \(A\\):
 
 - \(ABV\\% \\approx (OG - FG) \\cdot 131.25\)
 
-## Pre-boil volume derivation (v0)
+## Volume model (v0)
+
+### Gating rule
+
+If the recipe has no saved water settings (`RecipeWaterSettings` is missing), the analysis returns:
+- `kettleVolumeLiters = null`
+- `preBoilVolumeLiters = null`
+
+So the UI shows **“Insufficient data”** for those fields.
+
+### Boil time inference
 
 We infer boil time from BeerJSON hop additions:
 
 - max duration of hop additions with `timing.use = add_to_boil`
 - default: 60 min
 
-We then work backward from the kettle target volume using a simple model:
+### Forward volume calculation
 
-- add losses: kettle losses + hops absorption + misc “other losses”
-  - hops absorption is computed as \(kettleHopsAbsorption(L/g) \times kettleHopMass(g)\) (using boil hop additions)
-- undo cooling shrinkage (treated as a % applied to volume)
-- undo evaporation (treated as a linear % per hour for the inferred boil time)
+We compute volumes forward from mash/sparge water:
 
-If evaporation inputs imply an invalid denominator (zero/negative volume), pre-boil volume becomes `null` and a warning is returned.
+1) **Runoff (to kettle, pre-boil base)**:
+- `grainAbsorptionLiters = mashGrainAbsorptionLPerKg * totalGrainKg`
+  - `totalGrainKg` is the sum of fermentables with `type = "grain"` (kg/g supported)
+- `runoffLiters = mashWaterVolume + spargeVolume - grainAbsorptionLiters - mashLossesLiters - mashWaterLeftoverLiters`
+
+2) **Pre-boil volume**:
+- `preBoilVolumeLiters = runoffLiters + boilWaterVolumeLiters`
+
+3) **Kettle volume (estimated, cooled, after losses)**:
+- `postBoilHotVolume = preBoilVolumeLiters * (1 - evapRate * boilTimeHours)`
+- `cooledVolume = postBoilHotVolume * (1 - coolingShrinkagePercent)`
+- `kettleHopAbsorptionLiters = kettleHopsAbsorption(L/g) * kettleHopMass(g)` (using boil hop additions)
+- `kettleVolumeLiters = cooledVolume - kettleLossesLiters - kettleHopAbsorptionLiters - otherLossesLiters`
+
+If any step implies an invalid/negative volume, the affected output becomes `null` and a warning is returned.
 
 ## Yeast attenuation selection (v0)
 
