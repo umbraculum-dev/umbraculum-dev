@@ -96,6 +96,17 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - If it still errors, rebuild the api image (last resort):
     - `docker compose up -d --build api`
   - **Do NOT** use `docker compose down -v` unless you intentionally want to wipe local DB volumes.
+
+- **Database naming convention (Postgres + Prisma)**:
+  - **DB identifiers**: use **lowercase `snake_case`** for **tables and columns** (no quoting needed in pgAdmin / raw SQL).
+    - Example: `recipes`, `recipe_water_settings`, `style_key`, `created_at`
+  - **Prisma identifiers**:
+    - Models remain **PascalCase** (e.g. `RecipeWaterSettings`)
+    - Fields remain **camelCase** (e.g. `styleKey`, `createdAt`)
+    - Prisma maps to DB names via `@@map("table_name")` and `@map("column_name")` in `services/api/prisma/schema.prisma`.
+  - **Migrations**:
+    - When changing mappings/identifiers, prefer **rename-only migrations** (`ALTER TABLE ... RENAME`, `RENAME COLUMN`) to avoid drops.
+    - In non-interactive environments, use `docker compose exec -T api npx prisma migrate deploy`.
 - **Editor / TypeScript (Cursor) dependency resolution**:
   - We intentionally bind-mount `services/api/node_modules` into the `api` container (see `docker-compose.yml`) so the editor can resolve devDependencies like `vitest`.
   - Treat `node_modules/` as **generated artifacts**: never edit them directly; always change dependencies via `package.json` and run installs.

@@ -7,6 +7,7 @@ import { healthRoutes } from "./routes/health.js";
 import { authRoutes } from "./routes/auth.js";
 import { accountsRoutes } from "./routes/accounts.js";
 import { recipesRoutes } from "./routes/recipes.js";
+import { recipesImportRoutes } from "./routes/recipesImport.js";
 import { stylesRoutes } from "./routes/styles.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { waterCalcRoutes } from "./routes/waterCalc.js";
@@ -25,6 +26,7 @@ export function buildApp() {
   app.register(authRoutes);
   app.register(accountsRoutes);
   app.register(recipesRoutes);
+  app.register(recipesImportRoutes);
   app.register(stylesRoutes);
   app.register(waterProfilesRoutes);
   app.register(waterCalcRoutes);

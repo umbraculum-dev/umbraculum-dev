@@ -12,28 +12,38 @@ enum AccountRole {
   brewery_admin
   member
   viewer
+
+  @@map("account_role")
 }
 
 enum WaterProfileScope {
   system
   account
   public
+
+  @@map("water_profile_scope")
 }
 
 enum WaterProfileType {
   water
   dilution
+
+  @@map("water_profile_type")
 }
 
 enum WaterProfileVerificationStatus {
   unverified
   verified
+
+  @@map("water_profile_verification_status")
 }
 
 enum IngredientKind {
   fermentable
   hop
   yeast
+
+  @@map("ingredient_kind")
 }
 
 enum ColorUnit {
@@ -41,36 +51,39 @@ enum ColorUnit {
   srm
   lovibond
   unknown
+
+  @@map("color_unit")
 }
 
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
-  passwordHash    String?
-  preferredLocale String   @default("en")
+  passwordHash    String?  @map("password_hash")
+  preferredLocale String   @default("en") @map("preferred_locale")
   /** UI theme preset key (e.g. "default", "hc_dark", "hc_light"). */
-  preferredTheme  String?  @default("default")
+  preferredTheme  String?  @default("default") @map("preferred_theme")
   /** UI font scale key (e.g. "sm", "md", "lg", "xl"). */
-  preferredFontScale String? @default("md")
+  preferredFontScale String? @default("md") @map("preferred_font_scale")
   /** UI density key (e.g. "comfortable", "compact"). */
-  preferredDensity String? @default("comfortable")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  preferredDensity String? @default("comfortable") @map("preferred_density")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   memberships             AccountMember[]
   sessions                Session[]
   emailVerificationTokens EmailVerificationToken[]
 
   @@index([email])
+  @@map("users")
 }
 
 model Account {
   id        String   @id @default(uuid())
   name      String
   /** Optional account/company branding accent key (e.g. "default", "acme"). */
-  brandKey  String?  @default("default")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  brandKey  String?  @default("default") @map("brand_key")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   members             AccountMember[]
   sessions            Session[]             @relation("SessionActiveAccount")
@@ -81,14 +94,16 @@ model Account {
   fermentables Fermentable[]
   hops         Hop[]
   yeasts       Yeast[]
+
+  @@map("accounts")
 }
 
 model AccountMember {
   id        String      @id @default(uuid())
-  accountId String
-  userId    String
+  accountId String      @map("account_id")
+  userId    String      @map("user_id")
   role      AccountRole @default(member)
-  createdAt DateTime    @default(now())
+  createdAt DateTime    @default(now()) @map("created_at")
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -96,14 +111,15 @@ model AccountMember {
   @@unique([accountId, userId])
   @@index([userId])
   @@index([accountId])
+  @@map("account_members")
 }
 
 model Session {
   id              String   @id
-  userId          String
-  activeAccountId String?
-  createdAt       DateTime @default(now())
-  expiresAt       DateTime
+  userId          String   @map("user_id")
+  activeAccountId String?  @map("active_account_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  expiresAt       DateTime @map("expires_at")
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activeAccount Account? @relation("SessionActiveAccount", fields: [activeAccountId], references: [id], onDelete: SetNull)
@@ -111,21 +127,23 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
   @@index([activeAccountId])
+  @@map("sessions")
 }
 
 model EmailVerificationToken {
   id        String    @id
-  userId    String
+  userId    String    @map("user_id")
   email     String
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
   @@index([email])
+  @@map("email_verification_tokens")
 }
 
 model BeerStyle {
@@ -136,48 +154,54 @@ model BeerStyle {
   code     String  // e.g. "13C"
   name     String
   category String?
-  categoryId String?
+  categoryId String? @map("category_id")
 
-  sortOrder Int     @default(0)
-  isActive  Boolean @default(true)
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   recipes Recipe[]
   aliases BeerStyleAlias[]
 
   @@index([source, version])
   @@index([code])
+  @@map("beer_styles")
 }
 
 model BeerStyleAlias {
   id       String @id @default(uuid())
   /** Stable alias key (e.g. "bjcp-2017:13C") mapping into a canonical `BeerStyle.key`. */
-  aliasKey String @unique
-  styleKey String
+  aliasKey String @unique @map("alias_key")
+  styleKey String @map("style_key")
   note     String?
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
   style BeerStyle @relation(fields: [styleKey], references: [key], onDelete: Cascade)
 
   @@index([styleKey])
+  @@map("beer_style_aliases")
 }
 
 model Recipe {
   id        String   @id @default(uuid())
-  accountId String
+  accountId String   @map("account_id")
   name      String
   style     String?
   /** Canonical style reference (preferred). */
-  styleKey  String?
+  styleKey  String?  @map("style_key")
   notes     String?  @db.Text
-  gristJson Json?
-  hopsJson  Json?
-  yeastJson Json?
-  miscJson  Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  gristJson Json?    @map("grist_json")
+  hopsJson  Json?    @map("hops_json")
+  yeastJson Json?    @map("yeast_json")
+  miscJson  Json?    @map("misc_json")
+  /** Canonical BeerJSON representation (Option A). */
+  beerJsonRecipeJson Json? @map("beer_json_recipe_json")
+  /** Internal extensions/metadata not covered by BeerJSON (Option 2.1). */
+  recipeExtJson Json? @map("recipe_ext_json")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   account       Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
   waterSettings RecipeWaterSettings?
@@ -185,153 +209,155 @@ model Recipe {
 
   @@index([accountId])
   @@index([styleKey])
+  @@map("recipes")
 }
 
 model RecipeWaterSettings {
   id        String @id @default(uuid())
-  accountId String
-  recipeId  String @unique
+  accountId String @map("account_id")
+  recipeId  String @unique @map("recipe_id")
 
   // Profile selections
-  sourceWaterProfileId   String?
-  targetWaterProfileId   String?
-  dilutionWaterProfileId String?
+  sourceWaterProfileId   String? @map("source_water_profile_id")
+  targetWaterProfileId   String? @map("target_water_profile_id")
+  dilutionWaterProfileId String? @map("dilution_water_profile_id")
 
   // Mixing (sheet 4 v0): tap + dilution volumes to create a mixed source profile
-  tapWaterVolumeLiters      Float? @default(0)
-  dilutionWaterVolumeLiters Float? @default(0)
+  tapWaterVolumeLiters      Float? @default(0) @map("tap_water_volume_liters")
+  dilutionWaterVolumeLiters Float? @default(0) @map("dilution_water_volume_liters")
 
   // Mash water acidification inputs (liters-first)
-  mashStartingAlkalinityPpmCaCO3 Float  @default(0)
-  mashStartingPh                 Float  @default(7.0)
-  mashTargetPh                   Float  @default(5.6)
-  mashWaterVolumeLiters          Float  @default(20)
-  mashAcidType                   String @default("phosphoric")
-  mashStrengthKind               String @default("percent")
-  mashStrengthValue              Float?
+  mashStartingAlkalinityPpmCaCO3 Float  @default(0) @map("mash_starting_alkalinity_ppm_caco3")
+  mashStartingPh                 Float  @default(7.0) @map("mash_starting_ph")
+  mashTargetPh                   Float  @default(5.6) @map("mash_target_ph")
+  mashWaterVolumeLiters          Float  @default(20) @map("mash_water_volume_liters")
+  mashAcidType                   String @default("phosphoric") @map("mash_acid_type")
+  mashStrengthKind               String @default("percent") @map("mash_strength_kind")
+  mashStrengthValue              Float? @map("mash_strength_value")
 
   // Mash water acidification last snapshot (optional)
-  mashLastAcidRequiredMl          Float?
-  mashLastAcidRequiredTsp         Float?
-  mashLastAcidRequiredGrams       Float?
-  mashLastAcidRequiredKg          Float?
-  mashLastFinalAlkalinityPpmCaCO3 Float?
-  mashLastSulfateAddedPpm         Float?
-  mashLastChlorideAddedPpm        Float?
-  mashLastCalculatedAt            DateTime?
+  mashLastAcidRequiredMl          Float? @map("mash_last_acid_required_ml")
+  mashLastAcidRequiredTsp         Float? @map("mash_last_acid_required_tsp")
+  mashLastAcidRequiredGrams       Float? @map("mash_last_acid_required_grams")
+  mashLastAcidRequiredKg          Float? @map("mash_last_acid_required_kg")
+  mashLastFinalAlkalinityPpmCaCO3 Float? @map("mash_last_final_alkalinity_ppm_caco3")
+  mashLastSulfateAddedPpm         Float? @map("mash_last_sulfate_added_ppm")
+  mashLastChlorideAddedPpm        Float? @map("mash_last_chloride_added_ppm")
+  mashLastCalculatedAt            DateTime? @map("mash_last_calculated_at")
 
   // Mash water acidification manual-entry mode (v0): user enters amount added; we estimate achieved pH.
-  mashAcidificationMode                 String    @default("targetPh") // "targetPh" | "manual"
-  mashManualAcidAddedMl                 Float?
-  mashManualAcidAddedGrams              Float?
-  mashManualLastAchievedPh              Float?
-  mashManualLastFinalAlkalinityPpmCaCO3 Float?
-  mashManualLastSulfateAddedPpm         Float?
-  mashManualLastChlorideAddedPpm        Float?
-  mashManualLastCalculatedAt            DateTime?
+  mashAcidificationMode                 String    @default("targetPh") @map("mash_acidification_mode") // "targetPh" | "manual"
+  mashManualAcidAddedMl                 Float? @map("mash_manual_acid_added_ml")
+  mashManualAcidAddedGrams              Float? @map("mash_manual_acid_added_grams")
+  mashManualLastAchievedPh              Float? @map("mash_manual_last_achieved_ph")
+  mashManualLastFinalAlkalinityPpmCaCO3 Float? @map("mash_manual_last_final_alkalinity_ppm_caco3")
+  mashManualLastSulfateAddedPpm         Float? @map("mash_manual_last_sulfate_added_ppm")
+  mashManualLastChlorideAddedPpm        Float? @map("mash_manual_last_chloride_added_ppm")
+  mashManualLastCalculatedAt            DateTime? @map("mash_manual_last_calculated_at")
 
   // Mash salt additions (manual)
-  mashSaltAdditionsJson   Json?
-  mashSaltsLastResultJson Json?
+  mashSaltAdditionsJson   Json? @map("mash_salt_additions_json")
+  mashSaltsLastResultJson Json? @map("mash_salts_last_result_json")
 
   // Mash overall adjustment snapshot (Sheet 5, v0): combined salts + acid output for debugging/audit.
-  mashOverallLastResultJson   Json?
-  mashOverallLastCalculatedAt DateTime?
+  mashOverallLastResultJson   Json? @map("mash_overall_last_result_json")
+  mashOverallLastCalculatedAt DateTime? @map("mash_overall_last_calculated_at")
 
   // Mash grist snapshot (imported from recipe; read-only in water calculator)
-  mashGristImportedJson          Json?
-  mashGristImportedAt            DateTime?
-  mashGristSourceRecipeUpdatedAt DateTime?
+  mashGristImportedJson          Json? @map("mash_grist_imported_json")
+  mashGristImportedAt            DateTime? @map("mash_grist_imported_at")
+  mashGristSourceRecipeUpdatedAt DateTime? @map("mash_grist_source_recipe_updated_at")
 
   // Sparge acidification inputs (liters-first)
-  spargeWaterProfileId             String?
-  spargeStartingAlkalinityPpmCaCO3 Float   @default(0)
-  spargeStartingPh                 Float   @default(7.0)
-  spargeTargetPh                   Float   @default(5.6)
-  spargeVolumeLiters               Float   @default(20)
-  spargeAcidType                   String  @default("phosphoric")
-  spargeStrengthKind               String  @default("percent")
-  spargeStrengthValue              Float?
+  spargeWaterProfileId             String? @map("sparge_water_profile_id")
+  spargeStartingAlkalinityPpmCaCO3 Float   @default(0) @map("sparge_starting_alkalinity_ppm_caco3")
+  spargeStartingPh                 Float   @default(7.0) @map("sparge_starting_ph")
+  spargeTargetPh                   Float   @default(5.6) @map("sparge_target_ph")
+  spargeVolumeLiters               Float   @default(20) @map("sparge_volume_liters")
+  spargeAcidType                   String  @default("phosphoric") @map("sparge_acid_type")
+  spargeStrengthKind               String  @default("percent") @map("sparge_strength_kind")
+  spargeStrengthValue              Float? @map("sparge_strength_value")
 
   // Last calculated snapshot (optional)
-  spargeLastAcidRequiredMl          Float?
-  spargeLastAcidRequiredTsp         Float?
-  spargeLastAcidRequiredGrams       Float?
-  spargeLastAcidRequiredKg          Float?
-  spargeLastFinalAlkalinityPpmCaCO3 Float?
-  spargeLastSulfateAddedPpm         Float?
-  spargeLastChlorideAddedPpm        Float?
-  spargeLastCalculatedAt            DateTime?
+  spargeLastAcidRequiredMl          Float? @map("sparge_last_acid_required_ml")
+  spargeLastAcidRequiredTsp         Float? @map("sparge_last_acid_required_tsp")
+  spargeLastAcidRequiredGrams       Float? @map("sparge_last_acid_required_grams")
+  spargeLastAcidRequiredKg          Float? @map("sparge_last_acid_required_kg")
+  spargeLastFinalAlkalinityPpmCaCO3 Float? @map("sparge_last_final_alkalinity_ppm_caco3")
+  spargeLastSulfateAddedPpm         Float? @map("sparge_last_sulfate_added_ppm")
+  spargeLastChlorideAddedPpm        Float? @map("sparge_last_chloride_added_ppm")
+  spargeLastCalculatedAt            DateTime? @map("sparge_last_calculated_at")
 
   // Sparge acidification manual-entry mode (v0): user enters amount added; we estimate achieved pH.
-  spargeAcidificationMode                 String    @default("targetPh") // "targetPh" | "manual"
-  spargeManualAcidAddedMl                 Float?
-  spargeManualAcidAddedGrams              Float?
-  spargeManualLastAchievedPh              Float?
-  spargeManualLastFinalAlkalinityPpmCaCO3 Float?
-  spargeManualLastSulfateAddedPpm         Float?
-  spargeManualLastChlorideAddedPpm        Float?
-  spargeManualLastCalculatedAt            DateTime?
+  spargeAcidificationMode                 String    @default("targetPh") @map("sparge_acidification_mode") // "targetPh" | "manual"
+  spargeManualAcidAddedMl                 Float? @map("sparge_manual_acid_added_ml")
+  spargeManualAcidAddedGrams              Float? @map("sparge_manual_acid_added_grams")
+  spargeManualLastAchievedPh              Float? @map("sparge_manual_last_achieved_ph")
+  spargeManualLastFinalAlkalinityPpmCaCO3 Float? @map("sparge_manual_last_final_alkalinity_ppm_caco3")
+  spargeManualLastSulfateAddedPpm         Float? @map("sparge_manual_last_sulfate_added_ppm")
+  spargeManualLastChlorideAddedPpm        Float? @map("sparge_manual_last_chloride_added_ppm")
+  spargeManualLastCalculatedAt            DateTime? @map("sparge_manual_last_calculated_at")
 
   // Sparge salt additions (manual)
-  spargeSaltAdditionsJson   Json?
-  spargeSaltsLastResultJson Json?
+  spargeSaltAdditionsJson   Json? @map("sparge_salt_additions_json")
+  spargeSaltsLastResultJson Json? @map("sparge_salts_last_result_json")
 
   // Boil/kettle add-on water (v0): separate from mash/sparge.
   // Profile selections (like mash)
-  boilSourceWaterProfileId   String?
-  boilTargetWaterProfileId   String?
-  boilDilutionWaterProfileId String?
+  boilSourceWaterProfileId   String? @map("boil_source_water_profile_id")
+  boilTargetWaterProfileId   String? @map("boil_target_water_profile_id")
+  boilDilutionWaterProfileId String? @map("boil_dilution_water_profile_id")
 
   // Mixing volumes (like mash)
-  boilTapWaterVolumeLiters      Float? @default(0)
-  boilDilutionWaterVolumeLiters Float? @default(0)
+  boilTapWaterVolumeLiters      Float? @default(0) @map("boil_tap_water_volume_liters")
+  boilDilutionWaterVolumeLiters Float? @default(0) @map("boil_dilution_water_volume_liters")
 
   // Boil water acidification inputs (liters-first; like sparge)
-  boilStartingAlkalinityPpmCaCO3 Float  @default(0)
-  boilStartingPh                 Float  @default(7.0)
-  boilTargetPh                   Float  @default(5.6)
-  boilWaterVolumeLiters          Float  @default(0) // derived from boilTap + boilDilution
-  boilAcidType                   String @default("phosphoric")
-  boilStrengthKind               String @default("percent")
-  boilStrengthValue              Float?
+  boilStartingAlkalinityPpmCaCO3 Float  @default(0) @map("boil_starting_alkalinity_ppm_caco3")
+  boilStartingPh                 Float  @default(7.0) @map("boil_starting_ph")
+  boilTargetPh                   Float  @default(5.6) @map("boil_target_ph")
+  boilWaterVolumeLiters          Float  @default(0) @map("boil_water_volume_liters") // derived from boilTap + boilDilution
+  boilAcidType                   String @default("phosphoric") @map("boil_acid_type")
+  boilStrengthKind               String @default("percent") @map("boil_strength_kind")
+  boilStrengthValue              Float? @map("boil_strength_value")
 
   // Last calculated snapshot (optional)
-  boilLastAcidRequiredMl          Float?
-  boilLastAcidRequiredTsp         Float?
-  boilLastAcidRequiredGrams       Float?
-  boilLastAcidRequiredKg          Float?
-  boilLastFinalAlkalinityPpmCaCO3 Float?
-  boilLastSulfateAddedPpm         Float?
-  boilLastChlorideAddedPpm        Float?
-  boilLastCalculatedAt            DateTime?
+  boilLastAcidRequiredMl          Float? @map("boil_last_acid_required_ml")
+  boilLastAcidRequiredTsp         Float? @map("boil_last_acid_required_tsp")
+  boilLastAcidRequiredGrams       Float? @map("boil_last_acid_required_grams")
+  boilLastAcidRequiredKg          Float? @map("boil_last_acid_required_kg")
+  boilLastFinalAlkalinityPpmCaCO3 Float? @map("boil_last_final_alkalinity_ppm_caco3")
+  boilLastSulfateAddedPpm         Float? @map("boil_last_sulfate_added_ppm")
+  boilLastChlorideAddedPpm        Float? @map("boil_last_chloride_added_ppm")
+  boilLastCalculatedAt            DateTime? @map("boil_last_calculated_at")
 
   // Manual-entry mode (v0): user enters acid amount; we estimate achieved pH.
-  boilAcidificationMode                 String    @default("targetPh") // "targetPh" | "manual"
-  boilManualAcidAddedMl                 Float?
-  boilManualAcidAddedGrams              Float?
-  boilManualLastAchievedPh              Float?
-  boilManualLastFinalAlkalinityPpmCaCO3 Float?
-  boilManualLastSulfateAddedPpm         Float?
-  boilManualLastChlorideAddedPpm        Float?
-  boilManualLastCalculatedAt            DateTime?
+  boilAcidificationMode                 String    @default("targetPh") @map("boil_acidification_mode") // "targetPh" | "manual"
+  boilManualAcidAddedMl                 Float? @map("boil_manual_acid_added_ml")
+  boilManualAcidAddedGrams              Float? @map("boil_manual_acid_added_grams")
+  boilManualLastAchievedPh              Float? @map("boil_manual_last_achieved_ph")
+  boilManualLastFinalAlkalinityPpmCaCO3 Float? @map("boil_manual_last_final_alkalinity_ppm_caco3")
+  boilManualLastSulfateAddedPpm         Float? @map("boil_manual_last_sulfate_added_ppm")
+  boilManualLastChlorideAddedPpm        Float? @map("boil_manual_last_chloride_added_ppm")
+  boilManualLastCalculatedAt            DateTime? @map("boil_manual_last_calculated_at")
 
   // Boil salt additions (manual)
-  boilSaltAdditionsJson   Json?
-  boilSaltsLastResultJson Json?
+  boilSaltAdditionsJson   Json? @map("boil_salt_additions_json")
+  boilSaltsLastResultJson Json? @map("boil_salts_last_result_json")
 
   // Boil overall adjustment snapshot (v0): combined salts + acid output for debugging/audit.
-  boilOverallLastResultJson   Json?
-  boilOverallLastCalculatedAt DateTime?
+  boilOverallLastResultJson   Json? @map("boil_overall_last_result_json")
+  boilOverallLastCalculatedAt DateTime? @map("boil_overall_last_calculated_at")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   recipe  Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@index([recipeId])
   @@index([accountId])
+  @@map("recipe_water_settings")
 }
 
 model WaterProfile {
@@ -342,7 +368,7 @@ model WaterProfile {
   type  WaterProfileType
 
   // `accountId` is only set for account-scoped profiles and for audit of admin-created public ones.
-  accountId String?
+  accountId String? @map("account_id")
   name      String
 
   // ppm (mg/L) ions
@@ -356,27 +382,28 @@ model WaterProfile {
   // Optional pH (for sparge/mash UX; many water reports include it, but it may be unknown).
   ph Float?
 
-  verificationStatus WaterProfileVerificationStatus @default(unverified)
-  submittedByUserId  String?
-  verifiedByUserId   String?
-  verifiedAt         DateTime?
+  verificationStatus WaterProfileVerificationStatus @default(unverified) @map("verification_status")
+  submittedByUserId  String? @map("submitted_by_user_id")
+  verifiedByUserId   String? @map("verified_by_user_id")
+  verifiedAt         DateTime? @map("verified_at")
 
   source String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   account Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
 
   @@index([scope])
   @@index([type])
   @@index([accountId])
+  @@map("water_profiles")
 }
 
 model Fermentable {
   id        String  @id @default(uuid())
   // null for system-wide canonical records; set for future brewery-specific overrides
-  accountId String?
+  accountId String? @map("account_id")
 
   name     String
   producer String?
@@ -386,31 +413,31 @@ model Fermentable {
   notes    String? @db.Text
 
   // Color: canonical + original + convenience
-  colorEbc          Float?
-  colorOriginal     Float?
-  colorOriginalUnit ColorUnit @default(unknown)
-  colorLovibond     Float?
-  colorSrm          Float?
+  colorEbc          Float? @map("color_ebc")
+  colorOriginal     Float? @map("color_original")
+  colorOriginalUnit ColorUnit @default(unknown) @map("color_original_unit")
+  colorLovibond     Float? @map("color_lovibond")
+  colorSrm          Float? @map("color_srm")
   // BeerProto also includes a “Standard (ASBC/EBC/ION)” field; preserve verbatim.
   standard          String?
 
   // Potential / yield (canonical-ish; we’ll fill what we can from sources)
-  potentialSg  Float?
-  yieldPercent Float?
+  potentialSg  Float? @map("potential_sg")
+  yieldPercent Float? @map("yield_percent")
   ppg          Float?
 
   // Mash pH model parameters (v1, experimental)
   // - `mashDiPh`: distilled-water mash pH (room temp, ~20-25C)
   // - `mashTaToPh57_mEqPerKg`: titratable acidity to pH 5.7, mEq/kg (Troester-style)
-  mashDiPh              Float?
-  mashTaToPh57_mEqPerKg Float?
-  mashPhModelKey        String?
-  mashPhModelSource     String?
-  mashPhModelVersion    Int?
+  mashDiPh              Float? @map("mash_di_ph")
+  mashTaToPh57_mEqPerKg Float? @map("mash_ta_to_ph57_meq_per_kg")
+  mashPhModelKey        String? @map("mash_ph_model_key")
+  mashPhModelSource     String? @map("mash_ph_model_source")
+  mashPhModelVersion    Int? @map("mash_ph_model_version")
 
-  deprecatedAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  deprecatedAt DateTime? @map("deprecated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   account    Account?              @relation(fields: [accountId], references: [id], onDelete: SetNull)
   sourceMaps IngredientSourceMap[]
@@ -418,11 +445,12 @@ model Fermentable {
   @@index([accountId])
   @@index([name])
   @@index([producer])
+  @@map("fermentables")
 }
 
 model Hop {
   id        String  @id @default(uuid())
-  accountId String?
+  accountId String? @map("account_id")
 
   name    String
   country String?
@@ -430,51 +458,52 @@ model Hop {
   notes   String? @db.Text
 
   // alpha/beta acids (%), often a range; keep min/max where available.
-  alphaMin Float?
-  alphaMax Float?
-  betaMin  Float?
-  betaMax  Float?
+  alphaMin Float? @map("alpha_min")
+  alphaMax Float? @map("alpha_max")
+  betaMin  Float? @map("beta_min")
+  betaMax  Float? @map("beta_max")
 
-  deprecatedAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  deprecatedAt DateTime? @map("deprecated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   account    Account?              @relation(fields: [accountId], references: [id], onDelete: SetNull)
   sourceMaps IngredientSourceMap[]
 
   @@index([accountId])
   @@index([name])
+  @@map("hops")
 }
 
 model Yeast {
   id        String  @id @default(uuid())
-  accountId String?
+  accountId String? @map("account_id")
 
   name             String
   lab              String?
   // BeerProto "Product ID" (vendor code), e.g. "US-05"
-  productId        String?
+  productId        String? @map("product_id")
   type             String?
   form             String?
   species          String?
-  endPhMin         Float?
-  endPhMax         Float?
+  endPhMin         Float? @map("end_ph_min")
+  endPhMax         Float? @map("end_ph_max")
   flavorAroma      String? @db.Text
   pitch            String? @db.Text
-  pitchTempC       Float?
-  tolerancePercent Float?
+  pitchTempC       Float? @map("pitch_temp_c")
+  tolerancePercent Float? @map("tolerance_percent")
   notes            String? @db.Text
 
-  attenuationMin      Float?
-  attenuationMax      Float?
-  flocculationPercent Float?
-  tempMinC            Float?
-  tempMaxC            Float?
+  attenuationMin      Float? @map("attenuation_min")
+  attenuationMax      Float? @map("attenuation_max")
+  flocculationPercent Float? @map("flocculation_percent")
+  tempMinC            Float? @map("temp_min_c")
+  tempMaxC            Float? @map("temp_max_c")
   bestFor             String? @db.Text
 
-  deprecatedAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  deprecatedAt DateTime? @map("deprecated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   account    Account?              @relation(fields: [accountId], references: [id], onDelete: SetNull)
   sourceMaps IngredientSourceMap[]
@@ -484,79 +513,83 @@ model Yeast {
   @@index([lab])
   @@index([productId])
   @@index([species])
+  @@map("yeasts")
 }
 
 model IngredientSource {
   id            String @id @default(uuid())
-  sourceName    String
-  sourceUrl     String
-  sourceLicense String
-  resourcePath  String
+  sourceName    String @map("source_name")
+  sourceUrl     String @map("source_url")
+  sourceLicense String @map("source_license")
+  resourcePath  String @map("resource_path")
 
   etag          String?
-  lastCheckedAt DateTime?
-  lastAppliedAt DateTime?
+  lastCheckedAt DateTime? @map("last_checked_at")
+  lastAppliedAt DateTime? @map("last_applied_at")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   runs IngredientImportRun[]
 
   @@unique([sourceName, resourcePath])
   @@index([sourceName])
+  @@map("ingredient_sources")
 }
 
 model IngredientImportRun {
   id         String    @id @default(uuid())
-  sourceId   String
-  startedAt  DateTime  @default(now())
-  finishedAt DateTime?
+  sourceId   String    @map("source_id")
+  startedAt  DateTime  @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
   status     String
-  statsJson  Json?
+  statsJson  Json?     @map("stats_json")
   error      String?   @db.Text
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
   source      IngredientSource       @relation(fields: [sourceId], references: [id], onDelete: Cascade)
   stagingRows IngredientStagingRow[]
 
   @@index([sourceId])
   @@index([startedAt])
+  @@map("ingredient_import_runs")
 }
 
 model IngredientStagingRow {
   id             String         @id @default(uuid())
-  importRunId    String
+  importRunId    String         @map("import_run_id")
   kind           IngredientKind
-  sourceKey      String
-  rawPayloadJson Json
-  warningsJson   Json?
+  sourceKey      String         @map("source_key")
+  rawPayloadJson Json           @map("raw_payload_json")
+  warningsJson   Json?          @map("warnings_json")
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
   importRun IngredientImportRun @relation(fields: [importRunId], references: [id], onDelete: Cascade)
 
   @@index([importRunId])
   @@index([kind])
   @@index([sourceKey])
+  @@map("ingredient_staging_rows")
 }
 
 model IngredientSourceMap {
   id         String         @id @default(uuid())
   kind       IngredientKind
-  sourceName String
-  sourceKey  String
+  sourceName String         @map("source_name")
+  sourceKey  String         @map("source_key")
 
-  fermentableId String?
-  hopId         String?
-  yeastId       String?
+  fermentableId String?     @map("fermentable_id")
+  hopId         String?     @map("hop_id")
+  yeastId       String?     @map("yeast_id")
 
   confidence Float?    @default(1.0)
   notes      String?   @db.Text
-  lastSeenAt DateTime?
+  lastSeenAt DateTime? @map("last_seen_at")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   fermentable Fermentable? @relation(fields: [fermentableId], references: [id], onDelete: Cascade)
   hop         Hop?         @relation(fields: [hopId], references: [id], onDelete: Cascade)
@@ -568,4 +601,5 @@ model IngredientSourceMap {
   @@index([fermentableId])
   @@index([hopId])
   @@index([yeastId])
+  @@map("ingredient_source_maps")
 }

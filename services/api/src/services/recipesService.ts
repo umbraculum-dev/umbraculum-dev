@@ -7,6 +7,7 @@ import {
   inferMashPhModelKeyV1,
 } from "../domain/waterCalc/mashPhDefaultsV1.js";
 import { AccountsService } from "./accountsService.js";
+import { buildBeerJsonDocumentFromLegacy, validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 
 export type CreateRecipeInput = {
   name: string;
@@ -16,6 +17,7 @@ export type CreateRecipeInput = {
   hopsJson?: unknown;
   yeastJson?: unknown;
   miscJson?: unknown;
+  recipeExtJson?: unknown;
 };
 
 export type UpdateRecipeInput = {
@@ -26,6 +28,7 @@ export type UpdateRecipeInput = {
   hopsJson?: unknown;
   yeastJson?: unknown;
   miscJson?: unknown;
+  recipeExtJson?: unknown;
 };
 
 export class RecipesService {
@@ -84,6 +87,28 @@ export class RecipesService {
     const yeastJson =
       Array.isArray(yeastJsonRaw) ? await snapshotYeastRows(this.prisma, yeastJsonRaw) : yeastJsonRaw;
     const miscJson = validateMiscJson(input.miscJson);
+    const recipeExtJson = (() => {
+      try {
+        return validateRecipeExtJson(input.recipeExtJson);
+      } catch (err) {
+        throw new BadRequestError("invalid_recipe_ext_json", `Body.recipeExtJson is invalid: ${String(err)}`);
+      }
+    })();
+
+    const beerJsonRecipeJson = buildBeerJsonDocumentFromLegacy({
+      recipe: { name, notes },
+      gristJson: gristJson ?? null,
+      hopsJson: hopsJson ?? null,
+      yeastJson: yeastJson ?? null,
+      miscJson: miscJson ?? null,
+    });
+    const beerJsonValidation = validateBeerJsonDoc(beerJsonRecipeJson);
+    if (!beerJsonValidation.ok) {
+      throw new BadRequestError(
+        "invalid_beerjson_recipe",
+        `Generated BeerJSON is invalid: ${beerJsonValidation.errors}`,
+      );
+    }
 
     return this.prisma.recipe.create({
       data: {
@@ -96,6 +121,8 @@ export class RecipesService {
         hopsJson: hopsJson === undefined ? undefined : (hopsJson as any),
         yeastJson: yeastJson === undefined ? undefined : (yeastJson as any),
         miscJson: miscJson === undefined ? undefined : (miscJson as any),
+        beerJsonRecipeJson: beerJsonRecipeJson as any,
+        recipeExtJson: recipeExtJson === undefined ? undefined : (recipeExtJson as any),
       },
     });
   }
@@ -104,7 +131,7 @@ export class RecipesService {
     await this.accounts.assertMembership(userId, accountId);
 
     // Ensure account scoping is enforced even if IDs collide across accounts.
-    await this.getRecipe(userId, accountId, recipeId);
+    const existing = await this.getRecipe(userId, accountId, recipeId);
 
     const data: Prisma.RecipeUncheckedUpdateInput = {};
 
@@ -168,9 +195,70 @@ export class RecipesService {
       }
     }
 
+    if (input.recipeExtJson !== undefined) {
+      if (input.recipeExtJson === null) {
+        data.recipeExtJson = Prisma.JsonNull;
+      } else {
+        try {
+          const v = validateRecipeExtJson(input.recipeExtJson);
+          if (v === undefined) {
+            // no-op
+          } else {
+            data.recipeExtJson = v as any;
+          }
+        } catch (err) {
+          throw new BadRequestError("invalid_recipe_ext_json", `Body.recipeExtJson is invalid: ${String(err)}`);
+        }
+      }
+    }
+
     if (Object.keys(data).length === 0) {
       throw new BadRequestError("no_updates", "No updatable fields provided");
     }
+
+    // Recompute canonical BeerJSON from the next state (dual-write).
+    const nextName = (data.name as string | undefined) ?? existing.name;
+    const nextNotes = (data.notes as string | null | undefined) ?? existing.notes ?? null;
+    const nextGrist =
+      data.gristJson === Prisma.JsonNull
+        ? null
+        : data.gristJson !== undefined
+          ? data.gristJson
+          : (existing.gristJson as any);
+    const nextHops =
+      data.hopsJson === Prisma.JsonNull
+        ? null
+        : data.hopsJson !== undefined
+          ? data.hopsJson
+          : (existing.hopsJson as any);
+    const nextYeast =
+      data.yeastJson === Prisma.JsonNull
+        ? null
+        : data.yeastJson !== undefined
+          ? data.yeastJson
+          : (existing.yeastJson as any);
+    const nextMisc =
+      data.miscJson === Prisma.JsonNull
+        ? null
+        : data.miscJson !== undefined
+          ? data.miscJson
+          : (existing.miscJson as any);
+
+    const beerJsonRecipeJson = buildBeerJsonDocumentFromLegacy({
+      recipe: { name: nextName, notes: nextNotes },
+      gristJson: nextGrist,
+      hopsJson: nextHops,
+      yeastJson: nextYeast,
+      miscJson: nextMisc,
+    });
+    const beerJsonValidation = validateBeerJsonDoc(beerJsonRecipeJson);
+    if (!beerJsonValidation.ok) {
+      throw new BadRequestError(
+        "invalid_beerjson_recipe",
+        `Generated BeerJSON is invalid: ${beerJsonValidation.errors}`,
+      );
+    }
+    data.beerJsonRecipeJson = beerJsonRecipeJson as any;
 
     return this.prisma.recipe.update({
       where: { id: recipeId },

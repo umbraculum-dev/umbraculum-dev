@@ -11,17 +11,21 @@
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
     "db:backfill:recipe-styles": "tsx src/cli/backfillRecipeStyleKeys.ts",
+    "db:backfill:recipe-beerjson": "tsx src/cli/backfillRecipeBeerJson.ts",
     "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST prisma migrate deploy && DATABASE_URL=$DATABASE_URL_TEST prisma db seed",
     "test": "npm run test:db:prepare && vitest run",
     "seed:import": "tsx src/cli/seed-import.ts",
     "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.0",
+    "@beerjson/beerjson": "^1.0.2",
     "@fastify/cookie": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",
+    "@prisma/client": "^6.0.0",
+    "ajv": "^8.18.0",
     "argon2": "^0.43.0",
     "csv-parse": "^6.1.0",
+    "fast-xml-parser": "^5.3.6",
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0"
   },
