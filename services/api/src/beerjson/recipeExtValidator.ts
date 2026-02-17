@@ -11,6 +11,36 @@ const recipeExtSchemaV1 = {
   properties: {
     version: { type: "number", enum: [1] },
     /**
+     * Canonical "v1 real" recipe parameters that we want to be explicit (not defaults),
+     * even if the UI surface is still evolving.
+     */
+    batchSizeLiters: { type: "number", exclusiveMinimum: 0 },
+    brewhouseEfficiencyPercent: { type: "number", minimum: 0, maximum: 100 },
+    ogTarget: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        sg: { type: "number", minimum: 0.9, maximum: 1.3 },
+      },
+      required: ["sg"],
+    },
+    fgTarget: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        sg: { type: "number", minimum: 0.9, maximum: 1.3 },
+      },
+      required: ["sg"],
+    },
+    abvTarget: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        percent: { type: "number", minimum: 0, maximum: 100 },
+      },
+      required: ["percent"],
+    },
+    /**
      * Best-effort links from UI row IDs -> canonical Ingredient IDs.
      * We keep these separate from BeerJSON so the canonical export stays clean.
      */

@@ -17,29 +17,20 @@ export async function recipesRoutes(app: FastifyInstance) {
       name?: unknown;
       styleKey?: unknown;
       notes?: unknown;
-      gristJson?: unknown;
-      hopsJson?: unknown;
-      yeastJson?: unknown;
-      miscJson?: unknown;
+      beerJsonRecipeJson?: unknown;
       recipeExtJson?: unknown;
     };
     const name = typeof body.name === "string" ? body.name : "";
     const styleKey = typeof body.styleKey === "string" ? body.styleKey : "";
     const notes = typeof body.notes === "string" ? body.notes : null;
-    const gristJson = body.gristJson;
-    const hopsJson = body.hopsJson;
-    const yeastJson = body.yeastJson;
-    const miscJson = body.miscJson;
+    const beerJsonRecipeJson = body.beerJsonRecipeJson;
     const recipeExtJson = body.recipeExtJson;
 
     const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
       name,
       styleKey,
       notes,
-      gristJson,
-      hopsJson,
-      yeastJson,
-      miscJson,
+      beerJsonRecipeJson,
       recipeExtJson,
     });
     return { ok: true, recipe: created };
@@ -63,29 +54,20 @@ export async function recipesRoutes(app: FastifyInstance) {
       name?: unknown;
       styleKey?: unknown;
       notes?: unknown;
-      gristJson?: unknown;
-      hopsJson?: unknown;
-      yeastJson?: unknown;
-      miscJson?: unknown;
+      beerJsonRecipeJson?: unknown;
       recipeExtJson?: unknown;
     };
     const name = typeof body.name === "string" ? body.name : undefined;
     const styleKey = typeof body.styleKey === "string" ? body.styleKey : undefined;
     const notes = typeof body.notes === "string" ? body.notes : undefined;
-    const gristJson = body.gristJson;
-    const hopsJson = body.hopsJson;
-    const yeastJson = body.yeastJson;
-    const miscJson = body.miscJson;
+    const beerJsonRecipeJson = body.beerJsonRecipeJson;
     const recipeExtJson = body.recipeExtJson;
 
     const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, {
       name,
       styleKey,
       notes,
-      gristJson,
-      hopsJson,
-      yeastJson,
-      miscJson,
+      beerJsonRecipeJson,
       recipeExtJson,
     });
     return { ok: true, recipe: updated };

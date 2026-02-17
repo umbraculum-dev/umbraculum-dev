@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { parseGristJson, type GristMaltClass, type GristRow } from "../../../../_lib/grist";
+import { editorStateFromBeerJson } from "../../../_lib/beerjsonRecipe";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
@@ -71,6 +72,8 @@ type RecipeResponse = {
     id: string;
     updatedAt: string;
     gristJson?: unknown;
+    beerJsonRecipeJson?: unknown;
+    recipeExtJson?: unknown;
   };
 };
 
@@ -882,7 +885,27 @@ export default function MashWaterPage() {
       const res = await apiFetch(`/api/recipes/${recipeId}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const data = res.data as RecipeResponse;
-      const rows = parseGristJson(data.recipe.gristJson);
+      const ext = (data.recipe as any).recipeExtJson;
+      const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
+
+      let rows: GristRow[] = [];
+      if ((data.recipe as any).beerJsonRecipeJson) {
+        const s = editorStateFromBeerJson((data.recipe as any).beerJsonRecipeJson);
+        rows = (s.gristRows as any[]).map((r) => {
+          const m = r.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[r.id] : null;
+          return {
+            ...r,
+            mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : (r as any).mashDiPh ?? null,
+            mashTaToPh57_mEqPerKg:
+              typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : (r as any).mashTaToPh57_mEqPerKg ?? null,
+            mashRoastDehuskedOverride:
+              "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : (r as any).mashRoastDehuskedOverride ?? null,
+          } as GristRow;
+        });
+      } else {
+        // Back-compat: old recipes without BeerJSON.
+        rows = parseGristJson(data.recipe.gristJson);
+      }
       const nowIso = new Date().toISOString();
       await saveSettings({
         mashGristImportedJson: rows,

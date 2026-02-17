@@ -1,22 +1,14 @@
-import { Prisma, type PrismaClient } from "@prisma/client";
+import { type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
-import {
-  defaultMashDiPh,
-  defaultMashTaToPh57_mEqPerKg,
-  inferIsDehuskedOrDebittered,
-  inferMashPhModelKeyV1,
-} from "../domain/waterCalc/mashPhDefaultsV1.js";
+import { importBeerJsonToLegacy } from "../importers/beerjsonImporter.js";
 import { AccountsService } from "./accountsService.js";
-import { buildBeerJsonDocumentFromLegacy, validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
+import { validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 
 export type CreateRecipeInput = {
   name: string;
   styleKey: string;
   notes?: string | null;
-  gristJson?: unknown;
-  hopsJson?: unknown;
-  yeastJson?: unknown;
-  miscJson?: unknown;
+  beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
 };
 
@@ -24,10 +16,7 @@ export type UpdateRecipeInput = {
   name?: string | null;
   styleKey?: string | null;
   notes?: string | null;
-  gristJson?: unknown;
-  hopsJson?: unknown;
-  yeastJson?: unknown;
-  miscJson?: unknown;
+  beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
 };
 
@@ -79,14 +68,6 @@ export class RecipesService {
     const styleKey = styleRec.key;
     const style = styleRec.name;
     const notes = input.notes?.trim() || null;
-    const gristJsonRaw = validateGristJson(input.gristJson);
-    const gristJson =
-      Array.isArray(gristJsonRaw) ? await snapshotGristRows(this.prisma, gristJsonRaw) : gristJsonRaw;
-    const hopsJson = validateHopsJson(input.hopsJson);
-    const yeastJsonRaw = validateYeastJson(input.yeastJson);
-    const yeastJson =
-      Array.isArray(yeastJsonRaw) ? await snapshotYeastRows(this.prisma, yeastJsonRaw) : yeastJsonRaw;
-    const miscJson = validateMiscJson(input.miscJson);
     const recipeExtJson = (() => {
       try {
         return validateRecipeExtJson(input.recipeExtJson);
@@ -95,20 +76,55 @@ export class RecipesService {
       }
     })();
 
-    const beerJsonRecipeJson = buildBeerJsonDocumentFromLegacy({
-      recipe: { name, notes },
-      gristJson: gristJson ?? null,
-      hopsJson: hopsJson ?? null,
-      yeastJson: yeastJson ?? null,
-      miscJson: miscJson ?? null,
-    });
-    const beerJsonValidation = validateBeerJsonDoc(beerJsonRecipeJson);
-    if (!beerJsonValidation.ok) {
-      throw new BadRequestError(
-        "invalid_beerjson_recipe",
-        `Generated BeerJSON is invalid: ${beerJsonValidation.errors}`,
-      );
+    if (input.beerJsonRecipeJson === undefined || input.beerJsonRecipeJson === null) {
+      throw new BadRequestError("invalid_recipe_payload", "Body.beerJsonRecipeJson is required");
     }
+
+    const doc = input.beerJsonRecipeJson as any;
+    const before = validateBeerJsonDoc(doc);
+    if (!before.ok) {
+      throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${before.errors}`);
+    }
+
+    // Normalize: keep DB columns `name`/`notes` in sync with BeerJSON.
+    try {
+      const r0 = doc?.beerjson?.recipes?.[0];
+      if (!r0 || typeof r0 !== "object") {
+        throw new Error("BeerJSON is missing beerjson.recipes[0]");
+      }
+      r0.name = name;
+      if (notes) r0.notes = notes;
+      else delete r0.notes;
+    } catch (err) {
+      throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${String(err)}`);
+    }
+
+    const after = validateBeerJsonDoc(doc);
+    if (!after.ok) {
+      throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
+    }
+
+    // Enforce internal invariants using the same legacy validators (without persisting legacy columns).
+    const legacy = importBeerJsonToLegacy(doc);
+    const links = (recipeExtJson as any)?.ingredientLinks ?? null;
+    const mashPhModel = (recipeExtJson as any)?.mashPhModel ?? null;
+    const gristRows = Array.isArray(legacy.gristJson) ? legacy.gristJson : [];
+    for (const row of gristRows) {
+      const rowId = typeof row?.id === "string" ? row.id : "";
+      if (rowId && links?.grist && typeof links.grist[rowId] === "string") {
+        row.ingredientId = links.grist[rowId];
+      }
+      const m = rowId && mashPhModel && typeof mashPhModel === "object" ? mashPhModel[rowId] : null;
+      if (m && typeof m === "object") {
+        if (typeof m.mashDiPh === "number") row.mashDiPh = m.mashDiPh;
+        if (typeof m.mashTaToPh57_mEqPerKg === "number") row.mashTaToPh57_mEqPerKg = m.mashTaToPh57_mEqPerKg;
+        if ("roastDehuskedOverride" in m) row.mashRoastDehuskedOverride = m.roastDehuskedOverride;
+      }
+    }
+    validateGristJson(gristRows);
+    validateHopsJson(legacy.hopsJson);
+    validateYeastJson(legacy.yeastJson);
+    validateMiscJson(legacy.miscJson);
 
     return this.prisma.recipe.create({
       data: {
@@ -117,11 +133,7 @@ export class RecipesService {
         style,
         styleKey,
         notes,
-        gristJson: gristJson === undefined ? undefined : (gristJson as any),
-        hopsJson: hopsJson === undefined ? undefined : (hopsJson as any),
-        yeastJson: yeastJson === undefined ? undefined : (yeastJson as any),
-        miscJson: miscJson === undefined ? undefined : (miscJson as any),
-        beerJsonRecipeJson: beerJsonRecipeJson as any,
+        beerJsonRecipeJson: doc as any,
         recipeExtJson: recipeExtJson === undefined ? undefined : (recipeExtJson as any),
       },
     });
@@ -133,7 +145,9 @@ export class RecipesService {
     // Ensure account scoping is enforced even if IDs collide across accounts.
     const existing = await this.getRecipe(userId, accountId, recipeId);
 
-    const data: Prisma.RecipeUncheckedUpdateInput = {};
+    const data: any = {};
+
+    const hasBeerJson = input.beerJsonRecipeJson !== undefined && input.beerJsonRecipeJson !== null;
 
     if (input.name !== undefined) {
       const name = (input.name ?? "").trim();
@@ -150,49 +164,56 @@ export class RecipesService {
       data.style = styleRec.name;
     }
     if (input.notes !== undefined) data.notes = input.notes?.trim() || null;
-    if (input.gristJson !== undefined) {
-      const gristJson = validateGristJson(input.gristJson);
-      if (gristJson === undefined) {
-        // no-op
-      } else if (gristJson === null) {
-        data.gristJson = Prisma.JsonNull;
-      } else {
-        data.gristJson = (await snapshotGristRows(this.prisma, gristJson)) as unknown as Prisma.InputJsonValue;
-      }
-    }
 
-    if (input.hopsJson !== undefined) {
-      const hopsJson = validateHopsJson(input.hopsJson);
-      if (hopsJson === undefined) {
-        // no-op
-      } else if (hopsJson === null) {
-        data.hopsJson = Prisma.JsonNull;
-      } else {
-        data.hopsJson = hopsJson as unknown as Prisma.InputJsonValue;
+    if (hasBeerJson) {
+      const nextName = (data.name as string | undefined) ?? existing.name;
+      const nextNotes = (data.notes as string | null | undefined) ?? existing.notes ?? null;
+      const doc = input.beerJsonRecipeJson as any;
+      const before = validateBeerJsonDoc(doc);
+      if (!before.ok) {
+        throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${before.errors}`);
       }
-    }
+      // Normalize BeerJSON name/notes to match DB columns.
+      try {
+        const r0 = doc?.beerjson?.recipes?.[0];
+        if (!r0 || typeof r0 !== "object") {
+          throw new Error("BeerJSON is missing beerjson.recipes[0]");
+        }
+        r0.name = nextName;
+        if (nextNotes) r0.notes = nextNotes;
+        else delete r0.notes;
+      } catch (err) {
+        throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${String(err)}`);
+      }
+      const after = validateBeerJsonDoc(doc);
+      if (!after.ok) {
+        throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
+      }
 
-    if (input.yeastJson !== undefined) {
-      const yeastJson = validateYeastJson(input.yeastJson);
-      if (yeastJson === undefined) {
-        // no-op
-      } else if (yeastJson === null) {
-        data.yeastJson = Prisma.JsonNull;
-      } else {
-        data.yeastJson =
-          (await snapshotYeastRows(this.prisma, yeastJson)) as unknown as Prisma.InputJsonValue;
+      // Enforce internal invariants using legacy validators (without persisting legacy columns).
+      const legacy = importBeerJsonToLegacy(doc);
+      const recipeExtNext = data.recipeExtJson !== undefined ? data.recipeExtJson : (existing.recipeExtJson as any);
+      const links = (recipeExtNext as any)?.ingredientLinks ?? null;
+      const mashPhModel = (recipeExtNext as any)?.mashPhModel ?? null;
+      const gristRows = Array.isArray(legacy.gristJson) ? legacy.gristJson : [];
+      for (const row of gristRows) {
+        const rowId = typeof row?.id === "string" ? row.id : "";
+        if (rowId && links?.grist && typeof links.grist[rowId] === "string") {
+          row.ingredientId = links.grist[rowId];
+        }
+        const m = rowId && mashPhModel && typeof mashPhModel === "object" ? mashPhModel[rowId] : null;
+        if (m && typeof m === "object") {
+          if (typeof m.mashDiPh === "number") row.mashDiPh = m.mashDiPh;
+          if (typeof m.mashTaToPh57_mEqPerKg === "number") row.mashTaToPh57_mEqPerKg = m.mashTaToPh57_mEqPerKg;
+          if ("roastDehuskedOverride" in m) row.mashRoastDehuskedOverride = m.roastDehuskedOverride;
+        }
       }
-    }
+      validateGristJson(gristRows);
+      validateHopsJson(legacy.hopsJson);
+      validateYeastJson(legacy.yeastJson);
+      validateMiscJson(legacy.miscJson);
 
-    if (input.miscJson !== undefined) {
-      const miscJson = validateMiscJson(input.miscJson);
-      if (miscJson === undefined) {
-        // no-op
-      } else if (miscJson === null) {
-        data.miscJson = Prisma.JsonNull;
-      } else {
-        data.miscJson = miscJson as unknown as Prisma.InputJsonValue;
-      }
+      data.beerJsonRecipeJson = doc as any;
     }
 
     if (input.recipeExtJson !== undefined) {
@@ -216,49 +237,37 @@ export class RecipesService {
       throw new BadRequestError("no_updates", "No updatable fields provided");
     }
 
-    // Recompute canonical BeerJSON from the next state (dual-write).
-    const nextName = (data.name as string | undefined) ?? existing.name;
-    const nextNotes = (data.notes as string | null | undefined) ?? existing.notes ?? null;
-    const nextGrist =
-      data.gristJson === Prisma.JsonNull
-        ? null
-        : data.gristJson !== undefined
-          ? data.gristJson
-          : (existing.gristJson as any);
-    const nextHops =
-      data.hopsJson === Prisma.JsonNull
-        ? null
-        : data.hopsJson !== undefined
-          ? data.hopsJson
-          : (existing.hopsJson as any);
-    const nextYeast =
-      data.yeastJson === Prisma.JsonNull
-        ? null
-        : data.yeastJson !== undefined
-          ? data.yeastJson
-          : (existing.yeastJson as any);
-    const nextMisc =
-      data.miscJson === Prisma.JsonNull
-        ? null
-        : data.miscJson !== undefined
-          ? data.miscJson
-          : (existing.miscJson as any);
+    if (!hasBeerJson && (data.name !== undefined || data.notes !== undefined)) {
+      // Keep BeerJSON in sync when only name/notes change.
+      const nextName = (data.name as string | undefined) ?? existing.name;
+      const nextNotes = (data.notes as string | null | undefined) ?? existing.notes ?? null;
 
-    const beerJsonRecipeJson = buildBeerJsonDocumentFromLegacy({
-      recipe: { name: nextName, notes: nextNotes },
-      gristJson: nextGrist,
-      hopsJson: nextHops,
-      yeastJson: nextYeast,
-      miscJson: nextMisc,
-    });
-    const beerJsonValidation = validateBeerJsonDoc(beerJsonRecipeJson);
-    if (!beerJsonValidation.ok) {
-      throw new BadRequestError(
-        "invalid_beerjson_recipe",
-        `Generated BeerJSON is invalid: ${beerJsonValidation.errors}`,
-      );
+      const doc = (existing.beerJsonRecipeJson ?? null) as any;
+      if (doc && typeof doc === "object") {
+        const before = validateBeerJsonDoc(doc);
+        if (!before.ok) {
+          throw new BadRequestError("invalid_beerjson_recipe", `Stored BeerJSON is invalid: ${before.errors}`);
+        }
+        try {
+          const r0 = doc?.beerjson?.recipes?.[0];
+          if (!r0 || typeof r0 !== "object") {
+            throw new Error("BeerJSON is missing beerjson.recipes[0]");
+          }
+          r0.name = nextName;
+          if (nextNotes) r0.notes = nextNotes;
+          else delete r0.notes;
+        } catch (err) {
+          throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${String(err)}`);
+        }
+        const after = validateBeerJsonDoc(doc);
+        if (!after.ok) {
+          throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
+        }
+        data.beerJsonRecipeJson = doc;
+      } else {
+        throw new BadRequestError("invalid_beerjson_recipe", "Stored BeerJSON is missing; cannot patch name/notes.");
+      }
     }
-    data.beerJsonRecipeJson = beerJsonRecipeJson as any;
 
     return this.prisma.recipe.update({
       where: { id: recipeId },

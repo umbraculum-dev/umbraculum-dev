@@ -83,15 +83,22 @@ export async function recipesImportRoutes(app: FastifyInstance) {
             }
           })());
 
-    // Create the recipe using existing validation/snapshotting.
-    const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
-      name: mapped.recipeName,
-      styleKey,
-      notes: mapped.notes,
+    const beerJson = buildBeerJsonDocumentFromLegacy({
+      recipe: { name: mapped.recipeName, notes: mapped.notes },
       gristJson: mapped.gristJson,
       hopsJson: mapped.hopsJson,
       yeastJson: mapped.yeastJson,
       miscJson: mapped.miscJson,
+    });
+    const v = validateBeerJsonDoc(beerJson);
+    if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `Generated BeerJSON invalid: ${v.errors}`);
+
+    // Create the recipe (BeerJSON-first).
+    const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
+      name: mapped.recipeName,
+      styleKey,
+      notes: mapped.notes,
+      beerJsonRecipeJson: beerJson,
     });
 
     return { ok: true, recipe: created, warnings: mapped.warnings };

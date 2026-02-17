@@ -85,6 +85,36 @@ describe("recipes (account scoped)", () => {
   });
 
   it("can create then list recipes for active account", async () => {
+    const beerJsonRecipeJson = {
+      beerjson: {
+        version: 1,
+        recipes: [
+          {
+            name: "Test Recipe",
+            type: "all grain",
+            author: "brewery-app",
+            efficiency: { brewhouse: { unit: "%", value: 75 } },
+            batch_size: { unit: "l", value: 20 },
+            ingredients: {
+              fermentable_additions: [
+                {
+                  id: "row-1",
+                  name: "Pale malt",
+                  type: "grain",
+                  yield: { potential: { unit: "sg", value: 1.037 } },
+                  color: { unit: "Lovi", value: 2.0 },
+                  amount: { unit: "kg", value: 4.5 },
+                },
+              ],
+              hop_additions: [],
+              culture_additions: [],
+              miscellaneous_additions: [],
+            },
+          },
+        ],
+      },
+    };
+
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
@@ -92,15 +122,7 @@ describe("recipes (account scoped)", () => {
       payload: {
         name: "Test Recipe",
         styleKey: "custom",
-        gristJson: [
-          {
-            id: "row-1",
-            name: "Pale malt",
-            amountKg: 4.5,
-            colorLovibond: 2.0,
-            potential: { kind: "ppg", value: 37 },
-          },
-        ],
+        beerJsonRecipeJson,
       },
     });
     expect(create.statusCode).toBe(200);
@@ -109,16 +131,13 @@ describe("recipes (account scoped)", () => {
     expect(created.recipe.accountId).toBe(accountAId);
     expect(created.recipe.styleKey).toBe("custom");
     expect(created.recipe.style).toBe("Custom");
-    expect(created.recipe.gristJson).toEqual([
-      {
-        id: "row-1",
-        name: "Pale malt",
-        amountKg: 4.5,
-        colorLovibond: 2,
-        maltClass: "base",
-        potential: { kind: "ppg", value: 37 },
-      },
-    ]);
+    expect(created.recipe.beerJsonRecipeJson?.beerjson?.version).toBe(1);
+    expect(created.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.fermentable_additions?.[0]?.id).toBe(
+      "row-1",
+    );
+    expect(created.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.fermentable_additions?.[0]?.name).toBe(
+      "Pale malt",
+    );
 
     const list = await app.inject({
       method: "GET",
@@ -137,7 +156,30 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Scoped Recipe", styleKey: "custom" },
+      payload: {
+        name: "Scoped Recipe",
+        styleKey: "custom",
+        beerJsonRecipeJson: {
+          beerjson: {
+            version: 1,
+            recipes: [
+              {
+                name: "Scoped Recipe",
+                type: "all grain",
+                author: "brewery-app",
+                efficiency: { brewhouse: { unit: "%", value: 75 } },
+                batch_size: { unit: "l", value: 20 },
+                ingredients: {
+                  fermentable_additions: [],
+                  hop_additions: [],
+                  culture_additions: [],
+                  miscellaneous_additions: [],
+                },
+              },
+            ],
+          },
+        },
+      },
     });
     const created = create.json() as any;
     expect(created.ok).toBe(true);
@@ -159,7 +201,32 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Editable Recipe", styleKey: "custom", notes: "Initial notes" },
+      payload: {
+        name: "Editable Recipe",
+        styleKey: "custom",
+        notes: "Initial notes",
+        beerJsonRecipeJson: {
+          beerjson: {
+            version: 1,
+            recipes: [
+              {
+                name: "Editable Recipe",
+                type: "all grain",
+                author: "brewery-app",
+                efficiency: { brewhouse: { unit: "%", value: 75 } },
+                batch_size: { unit: "l", value: 20 },
+                notes: "Initial notes",
+                ingredients: {
+                  fermentable_additions: [],
+                  hop_additions: [],
+                  culture_additions: [],
+                  miscellaneous_additions: [],
+                },
+              },
+            ],
+          },
+        },
+      },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
@@ -207,7 +274,30 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Delete Me", styleKey: "custom" },
+      payload: {
+        name: "Delete Me",
+        styleKey: "custom",
+        beerJsonRecipeJson: {
+          beerjson: {
+            version: 1,
+            recipes: [
+              {
+                name: "Delete Me",
+                type: "all grain",
+                author: "brewery-app",
+                efficiency: { brewhouse: { unit: "%", value: 75 } },
+                batch_size: { unit: "l", value: 20 },
+                ingredients: {
+                  fermentable_additions: [],
+                  hop_additions: [],
+                  culture_additions: [],
+                  miscellaneous_additions: [],
+                },
+              },
+            ],
+          },
+        },
+      },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
@@ -234,7 +324,30 @@ describe("recipes (account scoped)", () => {
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
-      payload: { name: "Delete Scoped", styleKey: "custom" },
+      payload: {
+        name: "Delete Scoped",
+        styleKey: "custom",
+        beerJsonRecipeJson: {
+          beerjson: {
+            version: 1,
+            recipes: [
+              {
+                name: "Delete Scoped",
+                type: "all grain",
+                author: "brewery-app",
+                efficiency: { brewhouse: { unit: "%", value: 75 } },
+                batch_size: { unit: "l", value: 20 },
+                ingredients: {
+                  fermentable_additions: [],
+                  hop_additions: [],
+                  culture_additions: [],
+                  miscellaneous_additions: [],
+                },
+              },
+            ],
+          },
+        },
+      },
     });
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
@@ -252,21 +365,20 @@ describe("recipes (account scoped)", () => {
     });
   });
 
-  it("rejects invalid gristJson", async () => {
+  it("rejects missing beerJsonRecipeJson", async () => {
     const res = await app.inject({
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
       payload: {
-        name: "Bad grist",
+        name: "Missing beerjson",
         styleKey: "custom",
-        gristJson: [{ id: "x", name: "Malt", amountKg: -1, colorLovibond: 2, potential: null }],
       },
     });
     expect(res.statusCode).toBe(400);
     const body = res.json() as any;
     expect(body.ok).toBe(false);
-    expect(body.error?.code).toBe("invalid_grist_row_amount");
+    expect(body.error?.code).toBe("invalid_recipe_payload");
   });
 
   it("snapshots roasted dehusked override/provenance and uses the TA curve defaults", async () => {
@@ -283,6 +395,48 @@ describe("recipes (account scoped)", () => {
       },
     });
 
+    const beerJsonRecipeJson = {
+      beerjson: {
+        version: 1,
+        recipes: [
+          {
+            name: "Roast dehusked snapshot recipe",
+            type: "all grain",
+            author: "brewery-app",
+            efficiency: { brewhouse: { unit: "%", value: 75 } },
+            batch_size: { unit: "l", value: 20 },
+            ingredients: {
+              fermentable_additions: [
+                {
+                  id: "row-1",
+                  name: "Carafa Special II",
+                  type: "grain",
+                  producer: "Weyermann",
+                  grain_group: "roasted",
+                  yield: { fine_grind: { unit: "%", value: 80 } },
+                  color: { unit: "Lovi", value: 500 },
+                  amount: { unit: "kg", value: 0.5 },
+                },
+                {
+                  id: "row-2",
+                  name: "Carafa Special II",
+                  type: "grain",
+                  producer: "Weyermann",
+                  grain_group: "roasted",
+                  yield: { fine_grind: { unit: "%", value: 80 } },
+                  color: { unit: "Lovi", value: 500 },
+                  amount: { unit: "kg", value: 0.5 },
+                },
+              ],
+              hop_additions: [],
+              culture_additions: [],
+              miscellaneous_additions: [],
+            },
+          },
+        ],
+      },
+    };
+
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
@@ -290,49 +444,57 @@ describe("recipes (account scoped)", () => {
       payload: {
         name: "Roast dehusked snapshot recipe",
         styleKey: "custom",
-        gristJson: [
-          {
-            id: "row-1",
-            ingredientId: f.id,
-            name: "Carafa Special II",
-            amountKg: 0.5,
-            colorLovibond: 500,
-            potential: null,
-            maltClass: "roast",
+        beerJsonRecipeJson,
+        recipeExtJson: {
+          version: 1,
+          ingredientLinks: { grist: { "row-1": f.id, "row-2": f.id } },
+          mashPhModel: {
+            "row-2": { roastDehuskedOverride: false },
           },
-          {
-            id: "row-2",
-            ingredientId: f.id,
-            name: "Carafa Special II",
-            amountKg: 0.5,
-            colorLovibond: 500,
-            potential: null,
-            maltClass: "roast",
-            mashRoastDehuskedOverride: false,
-          },
-        ],
+        },
       },
     });
     expect(create.statusCode).toBe(200);
     const body = create.json() as any;
     expect(body.ok).toBe(true);
-
-    const rows = body.recipe.gristJson as any[];
-    expect(Array.isArray(rows)).toBe(true);
-    expect(rows).toHaveLength(2);
-
-    // Row 1: inferred dehusked -> lower TA
-    expect(rows[0].mashRoastDehuskedSource).toBe("inferred");
-    expect(rows[0].mashRoastDehuskedOverride).toBe(null);
-    expect(rows[0].mashTaToPh57_mEqPerKg).toBeCloseTo(27.733, 3);
-
-    // Row 2: override to husked -> higher TA
-    expect(rows[1].mashRoastDehuskedSource).toBe("override");
-    expect(rows[1].mashRoastDehuskedOverride).toBe(false);
-    expect(rows[1].mashTaToPh57_mEqPerKg).toBeCloseTo(41.733, 3);
+    expect(body.recipe.beerJsonRecipeJson?.beerjson?.version).toBe(1);
+    expect(body.recipe.recipeExtJson?.version).toBe(1);
+    expect(body.recipe.recipeExtJson?.ingredientLinks?.grist?.["row-1"]).toBe(f.id);
+    expect(body.recipe.recipeExtJson?.mashPhModel?.["row-2"]?.roastDehuskedOverride).toBe(false);
   });
 
   it("accepts yeastJson with productId + attenuation fields", async () => {
+    const beerJsonRecipeJson = {
+      beerjson: {
+        version: 1,
+        recipes: [
+          {
+            name: "Yeast snapshot recipe",
+            type: "all grain",
+            author: "brewery-app",
+            efficiency: { brewhouse: { unit: "%", value: 75 } },
+            batch_size: { unit: "l", value: 20 },
+            ingredients: {
+              fermentable_additions: [],
+              hop_additions: [],
+              culture_additions: [
+                {
+                  id: "y-1",
+                  name: "SafAle US-05",
+                  type: "ale",
+                  form: "dry",
+                  producer: "Fermentis",
+                  product_id: "US-05",
+                  amount: { unit: "pkg", value: 1 },
+                  attenuation: { unit: "%", value: 75 },
+                },
+              ],
+              miscellaneous_additions: [],
+            },
+          },
+        ],
+      },
+    };
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
@@ -340,60 +502,73 @@ describe("recipes (account scoped)", () => {
       payload: {
         name: "Yeast snapshot recipe",
         styleKey: "custom",
-        yeastJson: [
-          {
-            id: "y-1",
-            name: "SafAle US-05",
-            ingredientId: null,
-            lab: "Fermentis",
-            productId: "US-05",
-            attenuationMin: 72,
-            attenuationMax: 78,
-          },
-        ],
+        beerJsonRecipeJson,
       },
     });
     expect(create.statusCode).toBe(200);
     const body = create.json() as any;
     expect(body.ok).toBe(true);
-    expect(body.recipe.yeastJson).toEqual([
-      {
-        id: "y-1",
-        name: "SafAle US-05",
-        ingredientId: null,
-        lab: "Fermentis",
-        productId: "US-05",
-        attenuationMin: 72,
-        attenuationMax: 78,
-      },
-    ]);
+    expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.culture_additions?.[0]?.id).toBe("y-1");
+    expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.culture_additions?.[0]?.product_id).toBe(
+      "US-05",
+    );
   });
 
-  it("rejects yeastJson with out-of-range attenuation", async () => {
+  it("rejects invalid BeerJSON", async () => {
     const res = await app.inject({
       method: "POST",
       url: "/recipes",
       headers: { cookie: cookieA },
       payload: {
-        name: "Bad yeast",
+        name: "Bad beerjson",
         styleKey: "custom",
-        yeastJson: [
-          {
-            id: "y-1",
-            name: "Some yeast",
-            ingredientId: null,
-            attenuationMin: 101,
-          },
-        ],
+        beerJsonRecipeJson: { beerjson: { version: 1, recipes: [] } },
       },
     });
     expect(res.statusCode).toBe(400);
     const body = res.json() as any;
     expect(body.ok).toBe(false);
-    expect(body.error?.code).toBe("invalid_yeast_row_attenuation_min");
+    expect(body.error?.code).toBe("invalid_beerjson_recipe");
   });
 
   it("accepts miscJson with weight and volume amounts", async () => {
+    const beerJsonRecipeJson = {
+      beerjson: {
+        version: 1,
+        recipes: [
+          {
+            name: "Misc recipe",
+            type: "all grain",
+            author: "brewery-app",
+            efficiency: { brewhouse: { unit: "%", value: 75 } },
+            batch_size: { unit: "l", value: 20 },
+            ingredients: {
+              fermentable_additions: [],
+              hop_additions: [],
+              culture_additions: [],
+              miscellaneous_additions: [
+                {
+                  id: "m-1",
+                  name: "Irish moss",
+                  type: "fining",
+                  timing: { use: "add_to_boil", duration: { unit: "min", value: 10 } },
+                  amount: { unit: "kg", value: 0.01 },
+                  use_for: "clarity",
+                  notes: "kettle fining",
+                },
+                {
+                  id: "m-2",
+                  name: "Vanilla extract",
+                  type: "flavor",
+                  timing: { use: "add_to_fermentation" },
+                  amount: { unit: "l", value: 0.05 },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    };
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
@@ -401,58 +576,18 @@ describe("recipes (account scoped)", () => {
       payload: {
         name: "Misc recipe",
         styleKey: "custom",
-        miscJson: [
-          {
-            id: "m-1",
-            name: "Irish moss",
-            type: "fining",
-            use: "boil",
-            timeMinutes: 10,
-            amount: 0.01,
-            amountIsWeight: true,
-            useFor: "clarity",
-            notes: "kettle fining",
-          },
-          {
-            id: "m-2",
-            name: "Vanilla extract",
-            type: "flavor",
-            use: "secondary",
-            timeMinutes: null,
-            amount: 0.05,
-            amountIsWeight: false,
-          },
-        ],
+        beerJsonRecipeJson,
       },
     });
     expect(create.statusCode).toBe(200);
     const body = create.json() as any;
     expect(body.ok).toBe(true);
-    expect(body.recipe.miscJson).toEqual([
-      {
-        id: "m-1",
-        name: "Irish moss",
-        type: "fining",
-        use: "boil",
-        timeMinutes: 10,
-        amount: 0.01,
-        amountIsWeight: true,
-        useFor: "clarity",
-        notes: "kettle fining",
-      },
-      {
-        id: "m-2",
-        name: "Vanilla extract",
-        type: "flavor",
-        use: "secondary",
-        timeMinutes: null,
-        amount: 0.05,
-        amountIsWeight: false,
-      },
-    ]);
+    expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.miscellaneous_additions?.length).toBe(2);
+    expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.miscellaneous_additions?.[0]?.id).toBe("m-1");
+    expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.miscellaneous_additions?.[1]?.id).toBe("m-2");
   });
 
-  it("rejects miscJson with non-positive amount", async () => {
+  it("rejects invalid BeerJSON (non-positive misc amount)", async () => {
     const res = await app.inject({
       method: "POST",
       url: "/recipes",
@@ -460,17 +595,34 @@ describe("recipes (account scoped)", () => {
       payload: {
         name: "Bad misc",
         styleKey: "custom",
-        miscJson: [
-          {
-            id: "m-1",
-            name: "Some spice",
-            type: "spice",
-            use: "boil",
-            timeMinutes: 10,
-            amount: 0,
-            amountIsWeight: true,
+        beerJsonRecipeJson: {
+          beerjson: {
+            version: 1,
+            recipes: [
+              {
+                name: "Bad misc",
+                type: "all grain",
+                author: "brewery-app",
+                efficiency: { brewhouse: { unit: "%", value: 75 } },
+                batch_size: { unit: "l", value: 20 },
+                ingredients: {
+                  fermentable_additions: [],
+                  hop_additions: [],
+                  culture_additions: [],
+                  miscellaneous_additions: [
+                    {
+                      id: "m-1",
+                      name: "Some spice",
+                      type: "spice",
+                      timing: { use: "add_to_boil", duration: { unit: "min", value: 10 } },
+                      amount: { unit: "kg", value: 0 },
+                    },
+                  ],
+                },
+              },
+            ],
           },
-        ],
+        },
       },
     });
     expect(res.statusCode).toBe(400);

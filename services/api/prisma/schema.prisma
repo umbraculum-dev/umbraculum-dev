@@ -192,10 +192,6 @@ model Recipe {
   /** Canonical style reference (preferred). */
   styleKey  String?  @map("style_key")
   notes     String?  @db.Text
-  gristJson Json?    @map("grist_json")
-  hopsJson  Json?    @map("hops_json")
-  yeastJson Json?    @map("yeast_json")
-  miscJson  Json?    @map("misc_json")
   /** Canonical BeerJSON representation (Option A). */
   beerJsonRecipeJson Json? @map("beer_json_recipe_json")
   /** Internal extensions/metadata not covered by BeerJSON (Option 2.1). */

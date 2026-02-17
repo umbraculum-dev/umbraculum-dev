@@ -13,22 +13,27 @@
  */
 
 import { Prisma, PrismaClient } from "@prisma/client";
-import { buildBeerJsonDocumentFromLegacy, validateBeerJsonDoc } from "../beerjson/index.js";
+import { validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 
 async function main() {
   const prisma = new PrismaClient();
   const dryRun = process.env.DRY_RUN === "1";
   try {
     const candidates = await prisma.recipe.findMany({
-      where: { beerJsonRecipeJson: { equals: Prisma.DbNull } },
+      where: {
+        OR: [
+          { beerJsonRecipeJson: { equals: Prisma.DbNull } },
+          { beerJsonRecipeJson: { equals: Prisma.JsonNull } },
+          { recipeExtJson: { equals: Prisma.DbNull } },
+          { recipeExtJson: { equals: Prisma.JsonNull } },
+        ],
+      },
       select: {
         id: true,
         name: true,
         notes: true,
-        gristJson: true,
-        hopsJson: true,
-        yeastJson: true,
-        miscJson: true,
+        beerJsonRecipeJson: true,
+        recipeExtJson: true,
       },
     });
 
@@ -37,20 +42,19 @@ async function main() {
 
     for (const r of candidates) {
       try {
-        const doc = buildBeerJsonDocumentFromLegacy({
-          recipe: { name: r.name, notes: r.notes ?? null },
-          gristJson: r.gristJson,
-          hopsJson: r.hopsJson,
-          yeastJson: r.yeastJson,
-          miscJson: r.miscJson,
-        });
-        const v = validateBeerJsonDoc(doc);
+        const hasBeerJson = r.beerJsonRecipeJson !== null;
+        if (!hasBeerJson) {
+          throw new Error("Missing beerJsonRecipeJson; cannot backfill without legacy columns (already dropped).");
+        }
+        const v = validateBeerJsonDoc(r.beerJsonRecipeJson);
         if (!v.ok) throw new Error(v.errors);
+
+        const nextRecipeExtJson = r.recipeExtJson === null ? validateRecipeExtJson({ version: 1 }) : validateRecipeExtJson(r.recipeExtJson);
 
         if (!dryRun) {
           await prisma.recipe.update({
             where: { id: r.id },
-            data: { beerJsonRecipeJson: doc as any },
+            data: { recipeExtJson: nextRecipeExtJson as any },
           });
         }
         updated += 1;

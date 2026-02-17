@@ -14,6 +14,13 @@ import {
   type GristRow,
 } from "../../../_lib/grist";
 import { parseMiscJson, type MiscRow, type MiscType, type MiscUse } from "../../../_lib/misc";
+import {
+  buildBeerJsonRecipeDocument,
+  buildRecipeExtJsonFromEditorState,
+  editorStateFromBeerJson,
+  type EditorHopRow,
+  type EditorYeastRow,
+} from "../../_lib/beerjsonRecipe";
 
 type Recipe = {
   id: string;
@@ -26,6 +33,8 @@ type Recipe = {
   hopsJson?: unknown;
   yeastJson?: unknown;
   miscJson?: unknown;
+  beerJsonRecipeJson?: unknown;
+  recipeExtJson?: unknown;
   createdAt: string;
   updatedAt: string;
 };
@@ -220,10 +229,51 @@ export default function RecipeEditPage() {
         setName(r.name ?? "");
         setStyleKey((r as any).styleKey ?? "custom");
         setNotes(r.notes ?? "");
-        setGristRows(parseGristJson(r.gristJson));
-        setHopsRows(parseHopsJson(r.hopsJson));
-        setYeastRows(parseYeastJson(r.yeastJson));
-        setMiscRows(parseMiscJson(r.miscJson));
+        const ext = (r as any).recipeExtJson;
+        const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
+        const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
+
+        if ((r as any).beerJsonRecipeJson) {
+          const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
+          const grist = s.gristRows.map((row) => {
+            const ingredientId =
+              typeof links?.grist?.[row.id] === "string" ? (links.grist[row.id] as string) : null;
+            const m = row.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[row.id] : null;
+            return {
+              ...row,
+              ingredientId,
+              mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : row.mashDiPh ?? null,
+              mashTaToPh57_mEqPerKg:
+                typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : row.mashTaToPh57_mEqPerKg ?? null,
+              mashRoastDehuskedOverride:
+                "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : row.mashRoastDehuskedOverride ?? null,
+            } as GristRow;
+          });
+          const hops = s.hopsRows.map((row) => ({
+            ...row,
+            ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
+          })) as unknown as HopRow[];
+          const yeast = s.yeastRows.map((row) => ({
+            ...row,
+            ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+          })) as unknown as YeastRow[];
+          const misc = s.miscRows.map((row) => ({
+            ...row,
+            ingredientId: typeof links?.misc?.[row.id] === "string" ? (links.misc[row.id] as string) : null,
+          })) as unknown as MiscRow[];
+
+          setGristRows(grist);
+          setHopsRows(hops);
+          setYeastRows(yeast);
+          setMiscRows(misc);
+        } else {
+          // Back-compat: if BeerJSON is missing, fall back to legacy columns for display,
+          // but saving will still write BeerJSON (see onSave).
+          setGristRows(parseGristJson(r.gristJson));
+          setHopsRows(parseHopsJson(r.hopsJson));
+          setYeastRows(parseYeastJson(r.yeastJson));
+          setMiscRows(parseMiscJson(r.miscJson));
+        }
       } catch (err) {
         if (cancelled) return;
         setLoadError(String(err));
@@ -264,6 +314,34 @@ export default function RecipeEditPage() {
     setSaveError(null);
     setSaveStatus(null);
     try {
+      const extBase = (recipe as any)?.recipeExtJson;
+      const batchSizeLiters =
+        extBase && typeof extBase === "object" && typeof (extBase as any).batchSizeLiters === "number"
+          ? (extBase as any).batchSizeLiters
+          : null;
+      const brewhouseEfficiencyPercent =
+        extBase && typeof extBase === "object" && typeof (extBase as any).brewhouseEfficiencyPercent === "number"
+          ? (extBase as any).brewhouseEfficiencyPercent
+          : null;
+
+      const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
+        name,
+        notes: notes || null,
+        gristRows: gristRows as any,
+        hopsRows: hopsRows as unknown as EditorHopRow[],
+        yeastRows: yeastRows as unknown as EditorYeastRow[],
+        miscRows: miscRows as any,
+        batchSizeLiters,
+        brewhouseEfficiencyPercent,
+      });
+
+      const recipeExtJson = buildRecipeExtJsonFromEditorState({
+        gristRows: gristRows as any,
+        hopsRows: hopsRows as unknown as EditorHopRow[],
+        yeastRows: yeastRows as unknown as EditorYeastRow[],
+        miscRows: miscRows as any,
+      });
+
       const res = await apiFetch(`/api/recipes/${recipeId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -271,10 +349,8 @@ export default function RecipeEditPage() {
           name,
           styleKey,
           notes: notes || null,
-          gristJson: gristRows,
-          hopsJson: hopsRows,
-          yeastJson: yeastRows,
-          miscJson: miscRows,
+          beerJsonRecipeJson,
+          recipeExtJson,
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));

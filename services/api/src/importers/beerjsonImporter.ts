@@ -48,6 +48,7 @@ export function importBeerJsonToLegacy(doc: unknown): {
   const misc = asArray<any>(ing.miscellaneous_additions);
 
   const gristJson = fermentables.map((f) => {
+    const id = typeof f?.id === "string" && f.id.trim() ? f.id.trim() : newId();
     const amount = f?.amount;
     const amountKg =
       amount?.unit === "kg" && typeof amount.value === "number" ? amount.value : amount?.unit === "g" && typeof amount.value === "number" ? amount.value / 1000 : null;
@@ -57,14 +58,27 @@ export function importBeerJsonToLegacy(doc: unknown): {
     const colorLovibond = color?.unit === "Lovi" ? toNumber(color.value) : null;
 
     const y = f?.yield;
-    const potential = y?.potential?.unit === "sg" && typeof y.potential.value === "number"
-      ? { kind: "sg", value: y.potential.value }
-      : y?.fine_grind?.unit === "%" && typeof y.fine_grind.value === "number"
-        ? { kind: "yieldPercent", value: y.fine_grind.value }
-        : null;
+    const potentialSg =
+      y?.potential?.unit === "sg" && typeof y.potential.value === "number" ? y.potential.value : null;
+    const fineGrindYieldPercent =
+      y?.fine_grind?.unit === "%" && typeof y.fine_grind.value === "number" ? y.fine_grind.value : null;
+
+    // We treat 0 as "unknown" here because the web editor uses 0 as a placeholder to satisfy BeerJSON required fields.
+    // This prevents server-side legacy validation from rejecting "potential.value must be > 0".
+    const potential =
+      potentialSg !== null && potentialSg > 0
+        ? { kind: "sg", value: potentialSg }
+        : fineGrindYieldPercent !== null && fineGrindYieldPercent > 0
+          ? { kind: "yieldPercent", value: fineGrindYieldPercent }
+          : null;
+    if (potentialSg !== null && !(potentialSg > 0)) {
+      warnings.push({ code: "fermentable_yield_unknown", message: `Fermentable yield/potential is 0/invalid for ${String(f?.name ?? "")}` });
+    } else if (fineGrindYieldPercent !== null && !(fineGrindYieldPercent > 0)) {
+      warnings.push({ code: "fermentable_yield_unknown", message: `Fermentable yield/potential is 0/invalid for ${String(f?.name ?? "")}` });
+    }
 
     return {
-      id: newId(),
+      id,
       name: typeof f?.name === "string" ? f.name : "",
       amountKg: amountKg ?? 0,
       colorLovibond,
@@ -74,6 +88,7 @@ export function importBeerJsonToLegacy(doc: unknown): {
   });
 
   const hopsJson = hops.map((h) => {
+    const id = typeof h?.id === "string" && h.id.trim() ? h.id.trim() : newId();
     const amount = h?.amount;
     const amountGrams =
       amount?.unit === "g" && typeof amount.value === "number"
@@ -86,7 +101,7 @@ export function importBeerJsonToLegacy(doc: unknown): {
     const use = timingUse === "add_to_fermentation" ? "dryhop" : "boil";
     const timeMinutes = h?.timing?.duration?.unit === "min" ? toNumber(h?.timing?.duration?.value) : null;
     return {
-      id: newId(),
+      id,
       name: typeof h?.name === "string" ? h.name : "",
       amountGrams,
       alphaAcidPercent: alpha,
@@ -96,9 +111,10 @@ export function importBeerJsonToLegacy(doc: unknown): {
   });
 
   const yeastJson = cultures.map((c) => {
+    const id = typeof c?.id === "string" && c.id.trim() ? c.id.trim() : newId();
     const att = c?.attenuation?.unit === "%" ? toNumber(c?.attenuation?.value) : null;
     return {
-      id: newId(),
+      id,
       name: typeof c?.name === "string" ? c.name : "",
       lab: typeof c?.producer === "string" ? c.producer : null,
       productId: typeof c?.product_id === "string" ? c.product_id : null,
@@ -108,6 +124,7 @@ export function importBeerJsonToLegacy(doc: unknown): {
   });
 
   const miscJson = misc.map((m) => {
+    const id = typeof m?.id === "string" && m.id.trim() ? m.id.trim() : newId();
     const amount = m?.amount;
     const amountIsWeight = amount?.unit === "kg" || amount?.unit === "g";
     const amountValue =
@@ -118,13 +135,24 @@ export function importBeerJsonToLegacy(doc: unknown): {
           : amount?.unit === "l" && typeof amount.value === "number"
             ? amount.value
             : 0;
+    const timingUse = typeof m?.timing?.use === "string" ? m.timing.use : null;
+    const use: "boil" | "mash" | "primary" | "secondary" | "bottling" =
+      timingUse === "add_to_mash"
+        ? "mash"
+        : timingUse === "add_to_fermentation"
+          ? "secondary"
+          : timingUse === "add_to_package"
+            ? "bottling"
+            : "boil";
+    const timeMinutes =
+      m?.timing?.duration?.unit === "min" ? toNumber(m?.timing?.duration?.value) : null;
     const t = typeof m?.type === "string" ? m.type : "other";
     return {
-      id: newId(),
+      id,
       name: typeof m?.name === "string" ? m.name : "",
       type: t === "water agent" ? "water_agent" : t,
-      use: "boil",
-      timeMinutes: null,
+      use,
+      timeMinutes,
       amount: amountValue,
       amountIsWeight,
       useFor: typeof m?.use_for === "string" ? m.use_for : null,
