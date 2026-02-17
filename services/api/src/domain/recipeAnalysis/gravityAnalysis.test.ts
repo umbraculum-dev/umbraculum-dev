@@ -190,7 +190,8 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
           kettle: {
             kettleVolumeLiters: 20,
             kettleLossesLiters: 1,
-            kettleHopsAbsorptionLiters: 1,
+            // Semantics: coefficient (L/g). Test doc uses 10 g in boil hops.
+            kettleHopsAbsorptionLiters: 0.1,
             kettleCoolingShrinkagePercent: 4,
             kettleBoilEvaporationRatePercentPerHour: 10,
           },

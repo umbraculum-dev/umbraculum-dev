@@ -39,7 +39,7 @@
     "kettleLossesLitersLabel": "Perdite kettle (L)",
     "kettleBoilEvaporationRatePercentPerHourLabel": "Evaporazione (% per ora)",
     "kettleCoolingShrinkagePercentLabel": "Contrazione raffreddamento (%)",
-    "kettleHopsAbsorptionLitersLabel": "Assorbimento luppolo (L)",
+    "kettleHopsAbsorptionLitersLabel": "Assorbimento luppolo (L/g)",
     "mashVolumeLitersLabel": "Volume mash (L)",
     "mashEfficiencyPercentLabel": "Efficienza mash (%)",
     "mashLossesLitersLabel": "Perdite mash (L)",

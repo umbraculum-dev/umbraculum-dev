@@ -19,7 +19,7 @@ interface ExtractedEquipment {
   kettleLossesLiters: number;
   kettleBoilEvaporationRatePercentPerHour: number;
   kettleCoolingShrinkagePercent: number;
-  kettleHopsAbsorptionLiters: number;
+  kettleHopsAbsorptionLitersPerGram: number;
   mashEfficiencyPercent: number | null;
   otherLossesLiters: number;
 }
@@ -52,7 +52,7 @@ function extractEquipment(ext: unknown): ExtractedEquipment {
   const kettleLossesLiters = safeNum(kettle?.kettleLossesLiters) ?? 0;
   const kettleBoilEvaporationRatePercentPerHour = safeNum(kettle?.kettleBoilEvaporationRatePercentPerHour) ?? 0;
   const kettleCoolingShrinkagePercent = safeNum(kettle?.kettleCoolingShrinkagePercent) ?? 0;
-  const kettleHopsAbsorptionLiters = safeNum(kettle?.kettleHopsAbsorptionLiters) ?? 0;
+  const kettleHopsAbsorptionLitersPerGram = safeNum(kettle?.kettleHopsAbsorptionLiters) ?? 0;
   const mashEfficiencyPercent = safeNum(mash?.mashEfficiencyPercent);
   const otherLossesLiters = safeNum(misc?.otherLossesLiters) ?? 0;
 
@@ -61,7 +61,7 @@ function extractEquipment(ext: unknown): ExtractedEquipment {
     kettleLossesLiters: Math.max(0, kettleLossesLiters),
     kettleBoilEvaporationRatePercentPerHour: clamp(kettleBoilEvaporationRatePercentPerHour, 0, 100),
     kettleCoolingShrinkagePercent: clamp(kettleCoolingShrinkagePercent, 0, 100),
-    kettleHopsAbsorptionLiters: Math.max(0, kettleHopsAbsorptionLiters),
+    kettleHopsAbsorptionLitersPerGram: Math.max(0, kettleHopsAbsorptionLitersPerGram),
     mashEfficiencyPercent:
       mashEfficiencyPercent != null && mashEfficiencyPercent >= 0 && mashEfficiencyPercent <= 100
         ? mashEfficiencyPercent
@@ -83,6 +83,23 @@ function extractBoilTimeHours(beerJsonRecipeJson: unknown): number {
   }
   const inferredMinutes = maxMinutes > 0 ? maxMinutes : 60;
   return inferredMinutes / 60;
+}
+
+function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
+  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
+  const hops = r0?.ingredients?.hop_additions;
+  const list = Array.isArray(hops) ? hops : [];
+  let totalGrams = 0;
+  for (const h of list) {
+    const use = typeof h?.timing?.use === "string" ? h.timing.use : "";
+    if (use !== "add_to_boil") continue;
+    const unit = typeof h?.amount?.unit === "string" ? h.amount.unit : "";
+    const value = safeNum(h?.amount?.value);
+    if (value == null || !(value > 0)) continue;
+    if (unit === "g") totalGrams += value;
+    if (unit === "kg") totalGrams += value * 1000;
+  }
+  return Math.max(0, totalGrams);
 }
 
 function extractFermentablesPpgAndPounds(beerJsonRecipeJson: unknown): Array<{ ppg: number; pounds: number }> {
@@ -187,9 +204,10 @@ export function computeRecipeGravityAnalysis(args: {
   }
 
   const boilTimeHours = extractBoilTimeHours(args.beerJsonRecipeJson);
+  const kettleHopMassGrams = extractKettleHopMassGrams(args.beerJsonRecipeJson);
+  const kettleHopAbsorptionLiters = equipment.kettleHopsAbsorptionLitersPerGram * kettleHopMassGrams;
 
-  const totalLossesLiters =
-    equipment.kettleLossesLiters + equipment.kettleHopsAbsorptionLiters + equipment.otherLossesLiters;
+  const totalLossesLiters = equipment.kettleLossesLiters + kettleHopAbsorptionLiters + equipment.otherLossesLiters;
 
   const preBoilVolumeLiters = (() => {
     if (equipment.kettleVolumeLiters == null) return null;

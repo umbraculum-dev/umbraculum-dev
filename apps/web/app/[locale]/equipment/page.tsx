@@ -311,48 +311,52 @@ export default function EquipmentPage() {
         </pre>
       ) : null}
 
-      <section className="panel" aria-labelledby="equipment-list" style={{ marginTop: 16 }}>
-        <h2 id="equipment-list" style={{ marginTop: 0 }}>
-          {t("listTitle")}
-        </h2>
-        {profiles.length ? (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th align="left">{t("colName")}</th>
-                  <th align="left">{t("colKettleVol")}</th>
-                  <th align="left">{t("colMashEff")}</th>
-                  {canWrite ? <th align="left">{t("colActions")}</th> : null}
-                </tr>
-              </thead>
-              <tbody>
-                {profiles.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.name}</td>
-                    <td>{p.equipment?.kettle?.kettleVolumeLiters == null ? "—" : p.equipment.kettle.kettleVolumeLiters}</td>
-                    <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
-                    {canWrite ? (
-                      <td>
-                        <button type="button" onClick={() => beginEdit(p)} style={{ marginRight: 8 }}>
-                          {t("edit")}
-                        </button>
-                        <button type="button" onClick={() => void onDelete(p.id)}>
-                          {t("delete")}
-                        </button>
-                      </td>
-                    ) : null}
+      <details className="panel" style={{ marginTop: 16 }}>
+        <summary style={{ cursor: "pointer" }}>
+          <h2 id="equipment-list" style={{ marginTop: 0, display: "inline" }}>
+            {t("listTitle")}
+          </h2>
+        </summary>
+        <div style={{ marginTop: 12 }}>
+          {profiles.length ? (
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th align="left">{t("colName")}</th>
+                    <th align="left">{t("colKettleVol")}</th>
+                    <th align="left">{t("colMashEff")}</th>
+                    {canWrite ? <th align="left">{t("colActions")}</th> : null}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
-            {t("noProfiles")}
-          </p>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {profiles.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.name}</td>
+                      <td>{p.equipment?.kettle?.kettleVolumeLiters == null ? "—" : p.equipment.kettle.kettleVolumeLiters}</td>
+                      <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
+                      {canWrite ? (
+                        <td>
+                          <button type="button" onClick={() => beginEdit(p)} style={{ marginRight: 8 }}>
+                            {t("edit")}
+                          </button>
+                          <button type="button" onClick={() => void onDelete(p.id)}>
+                            {t("delete")}
+                          </button>
+                        </td>
+                      ) : null}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              {t("noProfiles")}
+            </p>
+          )}
+        </div>
+      </details>
 
       {canWrite && editingId ? (
         <section className="panel" aria-labelledby="equipment-edit" style={{ marginTop: 16 }}>
@@ -440,7 +444,7 @@ export default function EquipmentPage() {
                       id="equip-edit-hops-abs"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
+                      step={0.001}
                       value={editDraft.kettleHopsAbsorptionLiters ?? ""}
                       onChange={(e) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: e.target.value }))}
                       style={{ width: "100%", padding: 8 }}
@@ -586,11 +590,13 @@ export default function EquipmentPage() {
       ) : null}
 
       {canWrite ? (
-        <section className="panel" aria-labelledby="equipment-create" style={{ marginTop: 16 }}>
-          <h2 id="equipment-create" style={{ marginTop: 0 }}>
-            {t("createTitle")}
-          </h2>
-          <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined}>
+        <details className="panel" style={{ marginTop: 16 }}>
+          <summary style={{ cursor: "pointer" }}>
+            <h2 id="equipment-create" style={{ marginTop: 0, display: "inline" }}>
+              {t("createTitle")}
+            </h2>
+          </summary>
+          <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined} style={{ marginTop: 12 }}>
             <div style={{ display: "grid", gap: 12 }}>
               <div>
                 <label htmlFor="equip-name" className="muted" style={{ display: "block", fontSize: 12 }}>
@@ -671,7 +677,7 @@ export default function EquipmentPage() {
                       id="equip-hops-abs"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
+                      step={0.001}
                       value={createKettleHopsAbsorptionLiters}
                       onChange={(e) => setCreateKettleHopsAbsorptionLiters(e.target.value)}
                       style={{ width: "100%", padding: 8 }}
@@ -801,7 +807,7 @@ export default function EquipmentPage() {
               </pre>
             ) : null}
           </form>
-        </section>
+        </details>
       ) : null}
     </>
   );

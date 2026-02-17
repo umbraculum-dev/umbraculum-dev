@@ -111,6 +111,7 @@ We infer boil time from BeerJSON hop additions:
 We then work backward from the kettle target volume using a simple model:
 
 - add losses: kettle losses + hops absorption + misc “other losses”
+  - hops absorption is computed as \(kettleHopsAbsorption(L/g) \times kettleHopMass(g)\) (using boil hop additions)
 - undo cooling shrinkage (treated as a % applied to volume)
 - undo evaporation (treated as a linear % per hour for the inferred boil time)
 

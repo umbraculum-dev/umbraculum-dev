@@ -39,7 +39,7 @@
     "kettleLossesLitersLabel": "Kettle losses (L)",
     "kettleBoilEvaporationRatePercentPerHourLabel": "Boil evaporation rate (% per hour)",
     "kettleCoolingShrinkagePercentLabel": "Cooling shrinkage (%)",
-    "kettleHopsAbsorptionLitersLabel": "Hops absorption (L)",
+    "kettleHopsAbsorptionLitersLabel": "Hops absorption (L/g)",
     "mashVolumeLitersLabel": "Mash volume (L)",
     "mashEfficiencyPercentLabel": "Mash efficiency (%)",
     "mashLossesLitersLabel": "Mash losses (L)",
