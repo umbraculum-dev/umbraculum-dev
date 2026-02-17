@@ -457,14 +457,10 @@ export default function RecipeEditPage() {
 
   const onSearchFermentables = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth?.userId) return;
     setFermentableSearchError(null);
     setFermentableSearching(true);
     try {
-      const res = await apiFetch(
-        `/api/ingredients/fermentables?query=${encodeURIComponent(fermentableQuery)}`,
-        auth,
-      );
+      const res = await apiFetch(`/api/ingredients/fermentables?query=${encodeURIComponent(fermentableQuery)}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const items = (res.data as any)?.items;
       setFermentableResults(Array.isArray(items) ? items : []);
@@ -483,11 +479,10 @@ export default function RecipeEditPage() {
 
   const onSearchHops = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth?.userId) return;
     setHopSearchError(null);
     setHopSearching(true);
     try {
-      const res = await apiFetch(`/api/ingredients/hops?query=${encodeURIComponent(hopQuery)}`, auth);
+      const res = await apiFetch(`/api/ingredients/hops?query=${encodeURIComponent(hopQuery)}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const items = (res.data as any)?.items;
       setHopResults(Array.isArray(items) ? items : []);
@@ -506,11 +501,10 @@ export default function RecipeEditPage() {
 
   const onSearchYeasts = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth?.userId) return;
     setYeastSearchError(null);
     setYeastSearching(true);
     try {
-      const res = await apiFetch(`/api/ingredients/yeasts?query=${encodeURIComponent(yeastQuery)}`, auth);
+      const res = await apiFetch(`/api/ingredients/yeasts?query=${encodeURIComponent(yeastQuery)}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const items = (res.data as any)?.items;
       setYeastResults(Array.isArray(items) ? items : []);
@@ -690,14 +684,12 @@ export default function RecipeEditPage() {
                 <button type="submit" disabled={!canCallAccountScoped || fermentableSearching}>
                   {fermentableSearching ? "Searching…" : "Search"}
                 </button>
-              </div>
-              <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end" }}>
                 <button
                   type="button"
                   onClick={clearFermentableSearchResults}
                   disabled={fermentableSearching || (!fermentableSearchError && fermentableResults.length === 0)}
                 >
-                  Clear search results
+                  Clear
                 </button>
               </div>
               {fermentableSearchError ? (
@@ -1128,14 +1120,12 @@ export default function RecipeEditPage() {
                 <button type="submit" disabled={!canCallAccountScoped || hopSearching}>
                   {hopSearching ? "Searching…" : "Search"}
                 </button>
-              </div>
-              <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end" }}>
                 <button
                   type="button"
                   onClick={clearHopSearchResults}
                   disabled={hopSearching || (!hopSearchError && hopResults.length === 0)}
                 >
-                  Clear search results
+                  Clear
                 </button>
               </div>
               {hopSearchError ? (
@@ -1353,14 +1343,12 @@ export default function RecipeEditPage() {
                 <button type="submit" disabled={!canCallAccountScoped || yeastSearching}>
                   {yeastSearching ? "Searching…" : "Search"}
                 </button>
-              </div>
-              <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end" }}>
                 <button
                   type="button"
                   onClick={clearYeastSearchResults}
                   disabled={yeastSearching || (!yeastSearchError && yeastResults.length === 0)}
                 >
-                  Clear search results
+                  Clear
                 </button>
               </div>
               {yeastSearchError ? (

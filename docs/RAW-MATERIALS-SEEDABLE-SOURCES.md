@@ -51,6 +51,24 @@ Practical approach:
 
 **Recommendation:** Start here as your first import.
 
+#### 2.1.1 “Other ingredients” / “Misc” (spices, finings, herbs, flavors)
+We intentionally separate:
+
+- **Schema (shape)**: how we represent “other/misc” ingredients in recipes and (later) in canonical DB tables.
+  - We align with **BeerJSON** so future import/export (BeerJSON/BeerXML) is straightforward and we avoid inventing an incompatible format.
+  - BeerJSON misc schema docs: https://beerjson.github.io/beerjson/misc.json.html
+  - BeerJSON license: MIT (https://raw.githubusercontent.com/beerjson/beerjson/v.1.0/LICENSE)
+
+- **Catalog / dataset (list)**: where the actual ingredient list comes from (e.g. “Irish moss”, “ginger”, “coriander”, …).
+  - BeerJSON does **not** provide a canonical list.
+  - For v0, BeerProto is our chosen seed source for **malts/hops/yeast**. For “misc/other ingredients”, BeerProto’s list is a **candidate** source (not yet selected as canonical by us).
+  - BeerProto misc list (ODS candidate): https://raw.githubusercontent.com/beerproto/dataset/master/miscellaneous/miscellaneous.ods
+
+Rationale:
+- BeerJSON provides a stable open standard for structure.
+- BeerProto provides a practical seedable dataset for malts/hops/yeast today; “misc/other” is intentionally left open to multiple possible sources.
+- This combination keeps us compatible with the ecosystem while staying pragmatic.
+
 ---
 
 ### 2.2 BrewDB (CC-BY-SA 4.0) — rich malt/yeast detail, but “ShareAlike”

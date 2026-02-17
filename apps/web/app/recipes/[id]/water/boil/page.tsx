@@ -363,7 +363,7 @@ export default function BoilWaterPage() {
         boilTapWaterVolumeLiters: tapVolumeLiters,
         boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
       });
-      setAdjustmentSaveStatus("Saved boil profiles and volumes.");
+      setAdjustmentSaveStatus("Saved profile and volumes.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -394,7 +394,7 @@ export default function BoilWaterPage() {
         boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
         boilSaltAdditionsJson: saltAdditions,
       });
-      setBoilSaveStatus("Saved boil inputs.");
+      setBoilSaveStatus("Saved boil draft.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -445,7 +445,7 @@ export default function BoilWaterPage() {
         boilSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
       });
       setSaltsStatus("Calculated.");
-      setSaltsCalcSaveStatus("Calculated and saved.");
+      setSaltsCalcSaveStatus("Calculated & saved salts snapshot.");
     } catch (err) {
       setSaltsError(String(err));
     } finally {
@@ -459,7 +459,7 @@ export default function BoilWaterPage() {
     setSavingSalts(true);
     try {
       await saveSettings({ boilSaltAdditionsJson: saltAdditions });
-      setSaltsSaveStatus("Saved boil salt additions.");
+      setSaltsSaveStatus("Saved salts draft.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -475,7 +475,7 @@ export default function BoilWaterPage() {
     if (saltsResult) return;
     if (hasNonZeroSaltAdditions(saltAdditions)) {
       throw new Error(
-        "You entered salts but haven’t calculated them. Click “Calculate salts” first so overall/acidification uses the correct ions.",
+        "You entered salts but haven’t calculated them. Click “Calculate & save salts snapshot” first so overall/acidification uses the correct ions.",
       );
     }
     if (!mixedSourceProfile) {
@@ -596,7 +596,7 @@ export default function BoilWaterPage() {
           boilManualLastCalculatedAt: nowIso,
         });
         setBoilStatus("Estimated (manual mode).");
-        setCalcSaveStatus("Estimated and saved.");
+        setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
         const payload: Record<string, unknown> = {
           startingAlkalinityPpmCaCO3: startingAlk,
@@ -639,7 +639,7 @@ export default function BoilWaterPage() {
           boilLastCalculatedAt: nowIso,
         });
         setBoilStatus("Calculated.");
-        setCalcSaveStatus("Calculated and saved.");
+        setCalcSaveStatus("Calculated & saved snapshot.");
       }
     } catch (err) {
       setBoilError(String(err));
@@ -708,7 +708,7 @@ export default function BoilWaterPage() {
           boilOverallLastResultJson: overall,
           boilOverallLastCalculatedAt: overall.calculatedAt,
         });
-        setOverallSaveStatus("Calculated and saved.");
+        setOverallSaveStatus("Calculated & saved overall snapshot.");
       }
     } catch (err) {
       setOverallError(String(err));
@@ -853,7 +853,7 @@ export default function BoilWaterPage() {
 
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
-              {loadingProfiles ? "Refreshing…" : "Refresh profiles"}
+              {loadingProfiles ? "Reloading…" : "Reload water profiles"}
             </button>
             <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
@@ -932,10 +932,10 @@ export default function BoilWaterPage() {
 
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" onClick={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
-              {savingSalts ? "Saving…" : "Save salt additions"}
+              {savingSalts ? "Saving…" : "Save salts draft"}
             </button>
             <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
-              {saltsSubmitting ? "Calculating…" : "Calculate + Save salts result"}
+              {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
             {saltsStatus ? (
               <span className="muted" role="status" aria-live="polite">
@@ -1148,10 +1148,14 @@ export default function BoilWaterPage() {
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <button type="submit" disabled={!canCall || submitting}>
-                {submitting ? "Working…" : acidificationMode === "manual" ? "Estimate + Save result" : "Calculate + Save result"}
+                {submitting
+                  ? "Working…"
+                  : acidificationMode === "manual"
+                    ? "Estimate & save snapshot"
+                    : "Calculate & save snapshot"}
               </button>
               <button type="button" onClick={() => void onSaveInputs()} disabled={!canCall || savingInputs}>
-                {savingInputs ? "Saving…" : "Save inputs"}
+                {savingInputs ? "Saving…" : "Save boil draft"}
               </button>
               {boilStatus ? <span className="muted" role="status" aria-live="polite">{boilStatus}</span> : null}
               {boilSaveStatus ? <span className="muted" role="status" aria-live="polite">{boilSaveStatus}</span> : null}
@@ -1227,14 +1231,14 @@ export default function BoilWaterPage() {
             Overall boil water result (v0, HCO3 derived from alkalinity)
           </h3>
           <p className="muted" style={{ marginTop: 0 }}>
-            Click <strong>Calculate overall</strong> to preview, or <strong>Calculate + Save</strong> to persist a snapshot.
+            Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </p>
           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" onClick={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
-              {savingOverall ? "Calculating…" : "Calculate overall"}
+              {savingOverall ? "Calculating…" : "Preview overall"}
             </button>
             <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
-              {savingOverall ? "Calculating…" : "Calculate + Save overall"}
+              {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
             </button>
             {overallStatus ? <span className="muted">{overallStatus}</span> : null}
             {overallSaveStatus ? <span className="muted">{overallSaveStatus}</span> : null}

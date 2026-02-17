@@ -256,8 +256,8 @@ export default function SpargeWaterPage() {
   }, [spargeSaltsResult, selectedSpargeProfile]);
 
   const saveSettings = async (patch: Record<string, unknown>) => {
-    if (!auth?.userId || !auth.activeAccountId) return;
-    await saveRecipeWaterSettings(recipeId, auth, patch);
+    if (!canCall) return;
+    await saveRecipeWaterSettings(recipeId, patch);
   };
 
   const onSaveSpargeInputs = async () => {
@@ -279,7 +279,7 @@ export default function SpargeWaterPage() {
         spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
         spargeSaltAdditionsJson: spargeSaltAdditions,
       });
-      setSpargeSaveStatus("Saved sparge inputs.");
+      setSpargeSaveStatus("Saved sparge draft.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -289,7 +289,7 @@ export default function SpargeWaterPage() {
 
   const onSubmitSparge = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!canCall) return;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       setSpargeError("Sparge water volume must be > 0.");
       return;
@@ -333,7 +333,7 @@ export default function SpargeWaterPage() {
         };
         if (strengthKind !== "solid") payload.strengthValue = strengthValue;
 
-        const res = await apiFetch("/api/water-calc/sparge-acidification-manual", auth, {
+      const res = await apiFetch("/api/water-calc/sparge-acidification-manual", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -374,7 +374,7 @@ export default function SpargeWaterPage() {
         });
 
         setSpargeStatus("Estimated (manual mode).");
-        setCalcSaveStatus("Estimated and saved.");
+        setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
         const payload: Record<string, unknown> = {
           startingAlkalinityPpmCaCO3: startingAlk,
@@ -388,7 +388,7 @@ export default function SpargeWaterPage() {
         };
         if (strengthKind !== "solid") payload.strengthValue = strengthValue;
 
-        const res = await apiFetch("/api/water-calc/sparge-acidification", auth, {
+      const res = await apiFetch("/api/water-calc/sparge-acidification", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -419,7 +419,7 @@ export default function SpargeWaterPage() {
           spargeLastCalculatedAt: nowIso,
         });
         setSpargeStatus("Calculated.");
-        setCalcSaveStatus("Calculated and saved.");
+        setCalcSaveStatus("Calculated & saved snapshot.");
       }
     } catch (err) {
       setSpargeError(String(err));
@@ -434,7 +434,7 @@ export default function SpargeWaterPage() {
     setSavingSpargeSalts(true);
     try {
       await saveSettings({ spargeSaltAdditionsJson: spargeSaltAdditions });
-      setSpargeSaltsSaveStatus("Saved sparge salts inputs.");
+      setSpargeSaltsSaveStatus("Saved salts draft.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -446,11 +446,11 @@ export default function SpargeWaterPage() {
     rows.some((r) => typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0);
 
   const ensureZeroSaltsSnapshotIfMissing = async () => {
-    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!canCall) return;
     if (spargeSaltsResult) return;
     if (hasNonZeroSaltAdditions(spargeSaltAdditions)) {
       throw new Error(
-        "You entered sparge salts but haven’t calculated them. Click “Calculate sparge salts” first so acidification uses the correct ions.",
+        "You entered sparge salts but haven’t calculated them. Click “Calculate & save salts snapshot” first so acidification uses the correct ions.",
       );
     }
     if (!selectedSpargeProfile) {
@@ -485,7 +485,7 @@ export default function SpargeWaterPage() {
   };
 
   const onCalculateSpargeSalts = async () => {
-    if (!auth?.userId || !auth.activeAccountId) return;
+    if (!canCall) return;
     setSpargeSaltsError(null);
     setSpargeSaltsStatus(null);
     setSpargeSaltsCalcSaveStatus(null);
@@ -495,7 +495,7 @@ export default function SpargeWaterPage() {
       if (!selectedSpargeProfile) throw new Error("Select a sparge water profile first (base ion profile for salts).");
       if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) throw new Error("Sparge water volume must be > 0.");
 
-      const res = await apiFetch("/api/water-calc/salt-additions", auth, {
+      const res = await apiFetch("/api/water-calc/salt-additions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -520,7 +520,7 @@ export default function SpargeWaterPage() {
         spargeSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
       });
       setSpargeSaltsStatus("Calculated.");
-      setSpargeSaltsCalcSaveStatus("Calculated and saved.");
+      setSpargeSaltsCalcSaveStatus("Calculated & saved salts snapshot.");
     } catch (err) {
       setSpargeSaltsError(String(err));
     } finally {
@@ -751,10 +751,14 @@ export default function SpargeWaterPage() {
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
               <button type="submit" disabled={!canCall || spargeSubmitting}>
-                {spargeSubmitting ? "Working…" : spargeAcidificationMode === "manual" ? "Estimate + Save result" : "Calculate + Save result"}
+                {spargeSubmitting
+                  ? "Working…"
+                  : spargeAcidificationMode === "manual"
+                    ? "Estimate & save snapshot"
+                    : "Calculate & save snapshot"}
               </button>
               <button type="button" onClick={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
-                {savingSparge ? "Saving…" : "Save sparge inputs"}
+                {savingSparge ? "Saving…" : "Save sparge draft"}
               </button>
               {spargeStatus ? <span className="muted" role="status" aria-live="polite">{spargeStatus}</span> : null}
               {spargeSaveStatus ? <span className="muted" role="status" aria-live="polite">{spargeSaveStatus}</span> : null}
@@ -906,10 +910,10 @@ export default function SpargeWaterPage() {
 
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" onClick={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
-              {savingSpargeSalts ? "Saving…" : "Save sparge salt additions"}
+              {savingSpargeSalts ? "Saving…" : "Save salts draft"}
             </button>
             <button type="button" onClick={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
-              {spargeSaltsSubmitting ? "Calculating…" : "Calculate + Save sparge salts result"}
+              {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
             {spargeSaltsStatus ? <span className="muted" role="status" aria-live="polite">{spargeSaltsStatus}</span> : null}
             {spargeSaltsSaveStatus ? <span className="muted" role="status" aria-live="polite">{spargeSaltsSaveStatus}</span> : null}

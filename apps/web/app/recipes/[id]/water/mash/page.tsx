@@ -337,6 +337,9 @@ export default function MashWaterPage() {
         bicarbonate: selectedSource.bicarbonate,
       };
     }
+    // At this point we have dilution volume, so a dilution profile must exist.
+    // (We check this above, but guard again for type narrowing.)
+    if (!selectedDilution) return null;
     const mixed = mixIonProfilesByVolume(
       {
         calcium: selectedSource.calcium,
@@ -388,7 +391,7 @@ export default function MashWaterPage() {
         tapWaterVolumeLiters: tapVolumeLiters,
         dilutionWaterVolumeLiters: dilutionVolumeLiters,
       });
-      setAdjustmentSaveStatus("Saved profile selections.");
+      setAdjustmentSaveStatus("Saved profile and volumes.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -415,7 +418,7 @@ export default function MashWaterPage() {
         mashManualAcidAddedMl: mashStrengthKind === "solid" ? null : mashManualAcidAdded,
         mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
       });
-      setMashSaveStatus("Saved mash inputs.");
+      setMashSaveStatus("Saved mash draft.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -468,7 +471,7 @@ export default function MashWaterPage() {
         mashSaltsLastResultJson: { calculatedAt: new Date().toISOString(), result },
       });
       setSaltsStatus("Calculated.");
-      setSaltsCalcSaveStatus("Calculated and saved.");
+      setSaltsCalcSaveStatus("Calculated & saved salts snapshot.");
     } catch (err) {
       setSaltsError(String(err));
     } finally {
@@ -484,7 +487,7 @@ export default function MashWaterPage() {
       await saveSettings({
         mashSaltAdditionsJson: saltAdditions,
       });
-      setSaltsSaveStatus("Saved salt additions.");
+      setSaltsSaveStatus("Saved salts draft.");
     } catch (err) {
       setSavingError(String(err));
     } finally {
@@ -500,7 +503,7 @@ export default function MashWaterPage() {
     if (saltsResult) return;
     if (hasNonZeroSaltAdditions(saltAdditions)) {
       throw new Error(
-        "You entered salts but haven’t calculated them. Click “Calculate salts” first so overall uses the correct ions.",
+        "You entered salts but haven’t calculated them. Click “Calculate & save salts snapshot” first so overall uses the correct ions.",
       );
     }
     if (!mixedSourceProfile) {
@@ -744,7 +747,7 @@ export default function MashWaterPage() {
           mashOverallLastResultJson: overall,
           mashOverallLastCalculatedAt: overall.calculatedAt,
         });
-        setOverallSaveStatus("Calculated and saved.");
+        setOverallSaveStatus("Calculated & saved overall snapshot.");
       }
     } catch (err) {
       setOverallError(String(err));
@@ -802,7 +805,7 @@ export default function MashWaterPage() {
           mashLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
           mashLastCalculatedAt: nowIso,
         });
-        setMashCalcSaveStatus("Estimated and saved.");
+        setMashCalcSaveStatus("Estimated & saved snapshot.");
       } else {
         const gristRows = gristImportedRows.map((r) => ({
           amountKg: r.amountKg,
@@ -859,7 +862,7 @@ export default function MashWaterPage() {
           mashLastCalculatedAt: nowIso,
         });
         setMashStatus("Calculated.");
-        setMashCalcSaveStatus("Calculated and saved.");
+        setMashCalcSaveStatus("Calculated & saved snapshot.");
       }
     } catch (err) {
       setMashError(String(err));
@@ -1019,7 +1022,7 @@ export default function MashWaterPage() {
 
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
-              {loadingProfiles ? "Refreshing…" : "Refresh profiles"}
+              {loadingProfiles ? "Reloading…" : "Reload water profiles"}
             </button>
             <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
@@ -1269,10 +1272,14 @@ export default function MashWaterPage() {
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
               <button type="submit" disabled={!canCall || mashSubmitting}>
-                {mashSubmitting ? "Working…" : mashAcidificationMode === "manual" ? "Estimate + Save result" : "Calculate + Save result"}
+                {mashSubmitting
+                  ? "Working…"
+                  : mashAcidificationMode === "manual"
+                    ? "Estimate & save snapshot"
+                    : "Calculate & save snapshot"}
               </button>
               <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
-                {savingMash ? "Saving…" : "Save mash inputs"}
+                {savingMash ? "Saving…" : "Save mash draft"}
               </button>
               {mashStatus ? <span className="muted" role="status" aria-live="polite">{mashStatus}</span> : null}
               {mashManualStatus ? <span className="muted" role="status" aria-live="polite">{mashManualStatus}</span> : null}
@@ -1406,10 +1413,10 @@ export default function MashWaterPage() {
 
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <button type="button" onClick={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
-              {savingSalts ? "Saving…" : "Save salt additions"}
+              {savingSalts ? "Saving…" : "Save salts draft"}
             </button>
             <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
-              {saltsSubmitting ? "Calculating…" : "Calculate + Save salts result"}
+              {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
             {saltsStatus ? <span className="muted" role="status" aria-live="polite">{saltsStatus}</span> : null}
             {saltsSaveStatus ? <span className="muted" role="status" aria-live="polite">{saltsSaveStatus}</span> : null}
@@ -1485,14 +1492,14 @@ export default function MashWaterPage() {
             Overall mash water result (v0, HCO3 derived from alkalinity)
           </h3>
           <p className="muted" style={{ marginTop: 0 }}>
-            Click <strong>Calculate overall</strong> to preview, or <strong>Calculate + Save</strong> to persist a snapshot.
+            Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </p>
           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" onClick={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
-              {savingOverall ? "Calculating…" : "Calculate overall"}
+              {savingOverall ? "Calculating…" : "Preview overall"}
             </button>
             <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
-              {savingOverall ? "Calculating…" : "Calculate + Save overall"}
+              {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
             </button>
             {overallStatus ? <span className="muted">{overallStatus}</span> : null}
             {overallSaveStatus ? <span className="muted">{overallSaveStatus}</span> : null}

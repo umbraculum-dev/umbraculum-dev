@@ -65,3 +65,22 @@ export interface WaterProfile {
 - Keep contracts focused (single responsibility).
 - Model `null` vs `undefined` explicitly, especially in DTOs.
 
+### UI CTAs: Draft vs Snapshot vs Preview (MANDATORY)
+This app persists both **inputs** and **computed results**. CTAs must make it obvious which one a button affects.
+
+Definitions:
+- **Draft**: saves user inputs only (no computation implied).
+- **Snapshot**: saves computed results (the “last calculated” payload/timestamp JSON fields we use for recap + debugging).
+- **Preview**: computes and shows results, but does **not** save them.
+
+Button verb rules:
+- **Save … draft**: persist inputs only.
+- **Calculate & save … snapshot**: compute and persist a computed result.
+- **Estimate & save … snapshot**: same as above, but for manual/iterative estimation modes.
+- **Preview …**: compute-only (no persistence).
+
+Examples (water pages):
+- “Save mash draft” vs “Calculate & save snapshot”
+- “Save salts draft” vs “Calculate & save salts snapshot”
+- “Preview overall” vs “Calculate & save overall snapshot”
+

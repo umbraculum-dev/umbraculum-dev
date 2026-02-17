@@ -108,6 +108,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
     - Always validate runtime `unknown` payloads via a `parseXxx()`/`assertIsXxx()` function (or schema validation later). Avoid `as SomeType` casts on network payloads.
   - **JSDoc**: required on exported/shared contracts when semantics aren’t obvious (units, ranges, invariants).
   - More detail: `docs/CODING-STANDARDS.md`
+  - **UI CTAs (MANDATORY)**: use the **Draft vs Snapshot vs Preview** naming convention from `docs/CODING-STANDARDS.md` to avoid user confusion.
 
 - **Internationalization / i18n (MANDATORY for all user-facing web UI)**
   - **Routing**: all app routes are **locale-prefixed**: `/en/...`, `/it/...` (default: `en`). Unprefixed URLs are redirected by middleware.
@@ -125,4 +126,10 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Reverts (MANDATORY protocol)**:
   - Before reverting any change(s), the assistant must provide a short list of exactly what will be reverted (files + a brief description).
   - The assistant must then wait for explicit confirmation before proceeding with the revert.
+
+- **Ingredient catalogs vs schemas (MANDATORY)**:
+  - Treat **BeerJSON** as the **schema/shape** for recipe ingredients (especially “misc/other” ingredients).
+  - Treat **BeerProto** as the **seedable catalog/dataset** for malts/hops/yeast ingredient lists (current choice).
+  - Treat BeerProto “miscellaneous” as a **candidate** source for “other/misc” ingredients until we explicitly select a canonical list.
+  - Details: `docs/RAW-MATERIALS-SEEDABLE-SOURCES.md` section **2.1.1**.
 
