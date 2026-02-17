@@ -415,7 +415,11 @@ export default function RecipeEditPage() {
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const r = (res.data as any).recipe as Recipe;
+
+      // Re-fetch to refresh derived analysis (PATCH response does not include it).
+      const reload = await apiFetch(`/api/recipes/${recipeId}`);
+      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
+      const r = (reload.data as any).recipe as Recipe;
       setRecipe(r);
       setAnalysis((r as any).analysis ?? null);
       setStyleKey((r as any).styleKey ?? styleKey);
@@ -884,6 +888,22 @@ export default function RecipeEditPage() {
                               <td>
                                 <code>{fmt(a?.abvEstimatedPercent, 2)}</code>{" "}
                                 {typeof a?.abvEstimatedPercent === "number" ? <span className="muted">%</span> : null}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.ibuTinseth")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.ibuTinsethEstimated, 1)}</code>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.ibuRager")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.ibuRagerEstimated, 1)}</code>
                               </td>
                             </tr>
                             <tr>

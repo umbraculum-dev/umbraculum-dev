@@ -142,6 +142,9 @@ function buildHopAddition(row: EditorHopRow) {
     alpha_acid: { unit: "%", value: row.alphaAcidPercent ?? 0 },
     amount: { unit: "g", value: row.amountGrams },
     timing: hopUseToTiming(row.use, row.timeMinutes),
+    // Not in BeerJSON schema, but allowed (additionalProperties is not false on this type).
+    // We store this so the API/editor can distinguish boil vs whirlpool vs dry hop.
+    brewery_app_use: row.use,
   };
 }
 
@@ -338,7 +341,12 @@ export function editorStateFromBeerJson(doc: unknown): {
         h?.amount?.unit === "g" ? safeNum(h?.amount?.value, 0) : h?.amount?.unit === "kg" ? safeNum(h?.amount?.value, 0) * 1000 : 0;
       const alphaAcidPercent = h?.alpha_acid?.unit === "%" ? safeNum(h?.alpha_acid?.value, 0) : null;
       const timingUse = typeof h?.timing?.use === "string" ? h.timing.use : "";
-      const use: EditorHopRow["use"] = timingUse === "add_to_fermentation" ? "dryhop" : "boil";
+      const savedUseRaw = typeof h?.brewery_app_use === "string" ? h.brewery_app_use : "";
+      const savedUse: EditorHopRow["use"] | null =
+        savedUseRaw === "boil" || savedUseRaw === "whirlpool" || savedUseRaw === "dryhop" ? savedUseRaw : null;
+
+      const use: EditorHopRow["use"] =
+        timingUse === "add_to_fermentation" ? "dryhop" : savedUse != null ? savedUse : "boil";
       const timeMinutes = h?.timing?.duration?.unit === "min" ? safeNum(h?.timing?.duration?.value, 0) : null;
       return {
         id,

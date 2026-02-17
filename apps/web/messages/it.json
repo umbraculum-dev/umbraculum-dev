@@ -270,6 +270,8 @@
       "customAttenuationPercentLabel": "Attenuazione personalizzata (%)",
       "fields": {
         "abv": "ABV (stimata)",
+        "ibuTinseth": "IBU (Tinseth, stimata)",
+        "ibuRager": "IBU (Rager, stimata)",
         "kettleVolume": "Volume (kettle)",
         "preBoilVolume": "Volume pre-boil (stimato)",
         "og": "OG (stimata)",

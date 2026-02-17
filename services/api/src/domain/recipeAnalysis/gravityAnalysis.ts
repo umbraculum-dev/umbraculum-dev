@@ -8,6 +8,8 @@ export interface GravityAnalysis {
   preBoilVolumeLiters: number | null;
   ogEstimatedSg: number | null;
   pbgEstimatedSg: number | null;
+  ibuTinsethEstimated: number | null;
+  ibuRagerEstimated: number | null;
   fgEstimatedSg: number | null;
   abvEstimatedPercent: number | null;
   attenuationEffectivePercent: number | null;
@@ -36,6 +38,7 @@ interface ExtractedYeastAttenuation {
 const KG_TO_LB = 2.204_622_621_8;
 const L_TO_GAL = 0.264_172_052_4;
 const ABV_FACTOR = 131.25;
+const WHIRLPOOL_UTILIZATION_MULTIPLIER = 0.5;
 
 function safeNum(v: unknown): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
@@ -43,6 +46,170 @@ function safeNum(v: unknown): number | null {
 
 function clamp(v: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, v));
+}
+
+type HopUse = "boil" | "whirlpool" | "dryhop";
+
+interface ExtractedHopAddition {
+  id: string | null;
+  name: string | null;
+  use: HopUse;
+  timeMinutes: number | null;
+  amountGrams: number | null;
+  alphaAcidPercent: number | null;
+}
+
+function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
+  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
+  const unit = typeof r0?.batch_size?.unit === "string" ? r0.batch_size.unit : "";
+  const value = safeNum(r0?.batch_size?.value);
+  if (value == null || !(value > 0)) return null;
+  if (unit === "l") return value;
+  if (unit === "ml") return value / 1000;
+  return null;
+}
+
+function extractHopAdditions(beerJsonRecipeJson: unknown): ExtractedHopAddition[] {
+  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
+  const hops = r0?.ingredients?.hop_additions;
+  const list = Array.isArray(hops) ? hops : [];
+
+  const out: ExtractedHopAddition[] = [];
+  for (const h of list) {
+    const id = typeof h?.id === "string" ? h.id : null;
+    const name = typeof h?.name === "string" ? h.name : null;
+
+    const timingUse = typeof h?.timing?.use === "string" ? h.timing.use : "";
+    const savedUseRaw = typeof h?.brewery_app_use === "string" ? h.brewery_app_use : "";
+    const savedUse: HopUse | null =
+      savedUseRaw === "boil" || savedUseRaw === "whirlpool" || savedUseRaw === "dryhop" ? savedUseRaw : null;
+    const use: HopUse =
+      timingUse === "add_to_fermentation"
+        ? "dryhop"
+        : savedUse != null
+          ? savedUse
+          : "boil";
+
+    const timeMinutes = h?.timing?.duration?.unit === "min" ? safeNum(h?.timing?.duration?.value) : null;
+
+    const amountUnit = typeof h?.amount?.unit === "string" ? h.amount.unit : "";
+    const amountValue = safeNum(h?.amount?.value);
+    const amountGrams =
+      amountValue != null && amountValue >= 0
+        ? amountUnit === "g"
+          ? amountValue
+          : amountUnit === "kg"
+            ? amountValue * 1000
+            : null
+        : null;
+
+    const alphaAcidPercent = h?.alpha_acid?.unit === "%" ? safeNum(h?.alpha_acid?.value) : null;
+
+    out.push({
+      id,
+      name,
+      use,
+      timeMinutes,
+      amountGrams,
+      alphaAcidPercent,
+    });
+  }
+
+  return out;
+}
+
+function tinsethUtilization(args: { boilTimeMinutes: number; boilGravitySg: number }): number {
+  const t = Math.max(0, args.boilTimeMinutes);
+  const g = Math.max(1, args.boilGravitySg);
+  const bigness = 1.65 * Math.pow(0.000125, g - 1);
+  const timeFactor = (1 - Math.exp(-0.04 * t)) / 4.15;
+  return Math.max(0, bigness * timeFactor);
+}
+
+function ragerUtilizationFraction(args: { boilTimeMinutes: number; boilGravitySg: number }): number {
+  const t = Math.max(0, args.boilTimeMinutes);
+  const g = Math.max(1, args.boilGravitySg);
+
+  const utilPercent = 18.11 + 13.86 * Math.tanh((t - 31.32) / 18.27);
+  const utilPercentClamped = clamp(utilPercent, 0, 30);
+
+  const gravityAdjustment = g > 1.05 ? (g - 1.05) / 0.2 : 0;
+  const adjusted = utilPercentClamped / (1 + gravityAdjustment);
+  return clamp(adjusted / 100, 0, 1);
+}
+
+function computeIbuTinseth(args: {
+  hops: ExtractedHopAddition[];
+  boilGravitySg: number;
+  postBoilVolumeLiters: number;
+  warnings: GravityAnalysisWarning[];
+}): number | null {
+  if (!(args.postBoilVolumeLiters > 0)) return null;
+  if (!(args.boilGravitySg > 0)) return null;
+
+  let total = 0;
+  let anyUsed = false;
+
+  for (const h of args.hops) {
+    if (h.use !== "boil" && h.use !== "whirlpool") continue;
+    if (!(h.amountGrams != null && h.amountGrams > 0)) continue;
+    if (!(h.alphaAcidPercent != null && h.alphaAcidPercent > 0)) continue;
+    if (!(h.timeMinutes != null && h.timeMinutes >= 0)) continue;
+
+    anyUsed = true;
+    const aaFrac = h.alphaAcidPercent / 100;
+    let u = tinsethUtilization({ boilTimeMinutes: h.timeMinutes, boilGravitySg: args.boilGravitySg });
+    if (h.use === "whirlpool") u *= WHIRLPOOL_UTILIZATION_MULTIPLIER;
+
+    total += (h.amountGrams * aaFrac * u * 1000) / args.postBoilVolumeLiters;
+  }
+
+  if (!anyUsed) {
+    args.warnings.push({
+      code: "missing_ibu_inputs",
+      message: "No usable hop boil/whirlpool additions with amount, alpha acid %, and time; cannot estimate IBU.",
+    });
+    return null;
+  }
+
+  return total;
+}
+
+function computeIbuRager(args: {
+  hops: ExtractedHopAddition[];
+  boilGravitySg: number;
+  postBoilVolumeLiters: number;
+  warnings: GravityAnalysisWarning[];
+}): number | null {
+  if (!(args.postBoilVolumeLiters > 0)) return null;
+  if (!(args.boilGravitySg > 0)) return null;
+
+  let total = 0;
+  let anyUsed = false;
+
+  for (const h of args.hops) {
+    if (h.use !== "boil" && h.use !== "whirlpool") continue;
+    if (!(h.amountGrams != null && h.amountGrams > 0)) continue;
+    if (!(h.alphaAcidPercent != null && h.alphaAcidPercent > 0)) continue;
+    if (!(h.timeMinutes != null && h.timeMinutes >= 0)) continue;
+
+    anyUsed = true;
+    const aaFrac = h.alphaAcidPercent / 100;
+    let u = ragerUtilizationFraction({ boilTimeMinutes: h.timeMinutes, boilGravitySg: args.boilGravitySg });
+    if (h.use === "whirlpool") u *= WHIRLPOOL_UTILIZATION_MULTIPLIER;
+
+    total += (h.amountGrams * aaFrac * u * 1000) / args.postBoilVolumeLiters;
+  }
+
+  if (!anyUsed) {
+    args.warnings.push({
+      code: "missing_ibu_inputs",
+      message: "No usable hop boil/whirlpool additions with amount, alpha acid %, and time; cannot estimate IBU.",
+    });
+    return null;
+  }
+
+  return total;
 }
 
 function extractEquipment(ext: unknown): ExtractedEquipment {
@@ -223,6 +390,8 @@ export function computeRecipeGravityAnalysis(args: {
       preBoilVolumeLiters: null,
       ogEstimatedSg: null,
       pbgEstimatedSg: null,
+      ibuTinsethEstimated: null,
+      ibuRagerEstimated: null,
       fgEstimatedSg: null,
       abvEstimatedPercent: null,
       attenuationEffectivePercent: null,
@@ -343,6 +512,38 @@ export function computeRecipeGravityAnalysis(args: {
       ? estimateSgFromPpg({ fermentables, volumeLiters: preBoilVolumeLiters, efficiencyPercent })
       : null;
 
+  const hops = extractHopAdditions(args.beerJsonRecipeJson);
+
+  const ibuVolumeLiters =
+    kettleVolumeLiters ??
+    (() => {
+      const batchSize = extractBatchSizeLiters(args.beerJsonRecipeJson);
+      if (batchSize != null) {
+        warnings.push({
+          code: "used_batch_size_volume",
+          message: "Using BeerJSON batch_size volume for IBU estimate because computed kettle volume is unavailable.",
+        });
+      }
+      return batchSize;
+    })();
+
+  const ibuGravitySg = pbgEstimatedSg ?? ogEstimatedSg;
+  if (ibuGravitySg == null) {
+    warnings.push({
+      code: "missing_ibu_gravity",
+      message: "Missing boil gravity estimate; IBU estimates require PBG/OG to estimate hop utilization.",
+    });
+  }
+
+  const ibuTinsethEstimated =
+    ibuVolumeLiters != null && ibuGravitySg != null
+      ? computeIbuTinseth({ hops, boilGravitySg: ibuGravitySg, postBoilVolumeLiters: ibuVolumeLiters, warnings })
+      : null;
+  const ibuRagerEstimated =
+    ibuVolumeLiters != null && ibuGravitySg != null
+      ? computeIbuRager({ hops, boilGravitySg: ibuGravitySg, postBoilVolumeLiters: ibuVolumeLiters, warnings })
+      : null;
+
   const yeasts = extractYeastAttenuations(args);
   const attenuationEffectivePercent = effectiveAttenuationPercent(yeasts);
   if (attenuationEffectivePercent == null) {
@@ -365,6 +566,8 @@ export function computeRecipeGravityAnalysis(args: {
     preBoilVolumeLiters,
     ogEstimatedSg,
     pbgEstimatedSg,
+    ibuTinsethEstimated,
+    ibuRagerEstimated,
     fgEstimatedSg,
     abvEstimatedPercent,
     attenuationEffectivePercent,
