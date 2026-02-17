@@ -332,9 +332,11 @@ async function main() {
   // eslint-disable-next-line no-console
   console.log("Seeded dev identities:");
   // eslint-disable-next-line no-console
-  console.log(`X-User-Id: ${DEV_USER_ID}`);
+  console.log(`UserId: ${DEV_USER_ID}`);
   // eslint-disable-next-line no-console
-  console.log(`X-Account-Id: ${DEV_ACCOUNT_ID}`);
+  console.log(`AccountId: ${DEV_ACCOUNT_ID}`);
+  // eslint-disable-next-line no-console
+  console.log("Auth is cookie-session-based (sid). Use /en/signup or /en/login in the web app.");
 }
 
 main().catch((err) => {

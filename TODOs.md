@@ -22,23 +22,16 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 ## Authentication (real, production-ready)
 
-- [ ] Implement real auth end-to-end:
-  - [ ] Email/password **signup** + **login**
-  - [ ] **DB-backed sessions** with `sid` httpOnly cookie
-  - [ ] Add a scheduled cleanup job: `DELETE FROM "Session" WHERE "expiresAt" < now()` to prevent unbounded growth (indexed by `expiresAt`).
-  - [ ] Persist `preferredLocale` from login/signup, and ensure locale-prefixed routes work for auth pages (`/en/...`, `/it/...`)
-  - [ ] “Active account” selection after login when user has multiple accounts
+- [x] Email/password **signup** + **login**
+- [x] **DB-backed sessions** with `sid` httpOnly cookie
+- [ ] Add a scheduled cleanup job: `DELETE FROM "Session" WHERE "expiresAt" < now()` to prevent unbounded growth (indexed by `expiresAt`).
+- [x] Persist `preferredLocale` from login/signup, and ensure locale-prefixed routes work for auth pages (`/en/...`, `/it/...`)
+- [x] “Active account” selection after login when user has multiple accounts
 - [ ] Add “i18n contributing” flow/tooling (recommended: Weblate) and keep translation catalogs maintained.
 
-## Authentication (important)
+## Authentication (dev shortcuts)
 
-- [ ] **Dev-only header auth is temporary** (current approach):
-  - API accepts `X-User-Id` and `X-Account-Id` in development.
-  - Local DB is bootstrapped via a seed script (stable IDs).
-- [ ] **Migrate to proper auth** after initial development:
-  - session/JWT scaffolding
-  - real login/logout
-  - remove reliance on dev headers (or confine them behind a dev-only gate)
+- [x] Remove dev-only header auth (`X-User-Id` / `X-Account-Id`). All environments use cookie-backed sessions.
 
 ## Tenancy + ACL (always enforce)
 

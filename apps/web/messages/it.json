@@ -18,14 +18,6 @@
     "ariaPrimary": "Principale",
     "ariaSession": "Sessione"
   },
-  "auth": {
-    "selectAccount": {
-      "title": "Seleziona account",
-      "subtitle": "Scegli su quale birrificio/account vuoi lavorare.",
-      "loading": "Caricamento…",
-      "noAccountsFound": "Nessun account trovato."
-    }
-  },
   "accessibility": {
     "title": "Accessibilità",
     "subtitle": "Regola contrasto, dimensione del testo e spaziatura. Salvato su questo dispositivo; se hai effettuato l’accesso, le impostazioni si sincronizzano anche con il tuo account.",
@@ -287,6 +279,12 @@
     "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater."
   },
   "auth": {
+    "selectAccount": {
+      "title": "Seleziona account",
+      "subtitle": "Scegli su quale birrificio/account vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noAccountsFound": "Nessun account trovato."
+    },
     "loginTitle": "Accedi",
     "signupTitle": "Crea account",
     "emailLabel": "Email",

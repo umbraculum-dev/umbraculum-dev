@@ -71,7 +71,7 @@ describe("recipes (account scoped)", () => {
     await app.close();
   });
 
-  it("returns 400 when X-Account-Id is missing", async () => {
+  it("returns 401 when active account is missing in session", async () => {
     const res = await app.inject({
       method: "GET",
       url: "/recipes",

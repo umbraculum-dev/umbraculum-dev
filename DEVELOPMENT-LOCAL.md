@@ -81,6 +81,10 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
+- **Auth (local dev)**:
+  - Auth is **cookie-session-based** (`sid` httpOnly cookie). Dev header auth (`X-User-Id` / `X-Account-Id`) is not supported.
+  - Use `http://localhost:18080/en/signup` or `http://localhost:18080/en/login`.
+  - If you have multiple accounts, use `http://localhost:18080/en/select-account` (calls `POST /api/auth/active-account`) to set `activeAccountId` in your session.
 - **Prisma schema changes (IMPORTANT)**:
   - If you add/rename Prisma fields (edit `services/api/prisma/schema.prisma`) and the API throws errors like:
     - `Unknown argument "someNewField"` (Prisma Client is stale)
