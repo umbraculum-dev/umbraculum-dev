@@ -18,6 +18,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
   - [ ] Decide input UX: file upload vs paste text (and which we support first).
   - [ ] Define a licensing policy: default to user-provided files; do not redistribute third-party recipe datasets unless explicitly licensed.
   - [ ] Choose approach: maintained library vs minimal in-house parser for the subset we need.
+- [x] Add recipe **Other ingredients** (`miscJson`) schema + editor (BeerJSON-aligned shape; persisted on `Recipe.miscJson`).
 
 ## Authentication (real, production-ready)
 

@@ -585,7 +585,7 @@ export default function SpargeWaterPage() {
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="sparge-heading">
           <h2 id="sparge-heading" style={{ marginTop: 0 }}>
-            Sparge acidification (Sheet 2)
+            Sparge acidification
           </h2>
 
           <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>

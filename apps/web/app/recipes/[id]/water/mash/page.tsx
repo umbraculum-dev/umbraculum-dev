@@ -931,7 +931,7 @@ export default function MashWaterPage() {
       <div style={{ display: "grid", gap: 16 }}>
         <section className="panel" aria-labelledby="adjustment-heading">
           <h2 id="adjustment-heading" style={{ marginTop: 0 }}>
-            Mash Water adjustment (Sheet 4, v0)
+            Mash water adjustment
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
             Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
@@ -1124,7 +1124,7 @@ export default function MashWaterPage() {
 
         <section className="panel" aria-labelledby="mash-heading">
           <h2 id="mash-heading" style={{ marginTop: 0 }}>
-            Mash water acidification (Sheet 4, v0)
+            Mash water acidification
           </h2>
 
           <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
