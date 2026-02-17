@@ -144,3 +144,14 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - Treat BeerProto “miscellaneous” as a **candidate** source for “other/misc” ingredients until we explicitly select a canonical list.
   - Details: `docs/RAW-MATERIALS-SEEDABLE-SOURCES.md` section **2.1.1**.
 
+## Recipes: BeerJSON-first (canonical)
+
+- **Canonical recipe JSON**:
+  - `recipes.beer_json_recipe_json` is the canonical recipe document (BeerJSON).
+  - `recipes.recipe_ext_json` stores internal extensions (versioned).
+  - Legacy recipe JSON columns (`grist_json`, `hops_json`, `yeast_json`, `misc_json`) were removed.
+- **API contract**:
+  - `POST /recipes` requires `beerJsonRecipeJson` (plus `name`, `styleKey`).
+  - `PATCH /recipes/:id` can update `beerJsonRecipeJson` and `recipeExtJson`.
+- **Docs**:
+  - See `docs/BEERJSON-FIRST.md`.

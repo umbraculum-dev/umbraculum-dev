@@ -12,13 +12,13 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 ## Recipes / templates
 
-- [ ] **Assess external libraries** for importing recipes (BeerXML + BeerJSON) into our `Recipe` model (`gristJson` / `hopsJson` / `yeastJson`).
+- [ ] **Assess external libraries** for importing recipes (BeerXML + BeerJSON) into our canonical recipe model (BeerJSON-first: `beerJsonRecipeJson` + `recipeExtJson`).
   - See `RECIPES-IMPORT-TODO.md` for the agreed path forward (manual import + server-side importer plan).
   - [ ] **Scope v1 to server-side only** (API importer). Web UI uploads/pastes recipe data; parsing happens in the API.
   - [ ] Decide input UX: file upload vs paste text (and which we support first).
   - [ ] Define a licensing policy: default to user-provided files; do not redistribute third-party recipe datasets unless explicitly licensed.
   - [ ] Choose approach: maintained library vs minimal in-house parser for the subset we need.
-- [x] Add recipe **Other ingredients** (`miscJson`) schema + editor (BeerJSON-aligned shape; persisted on `Recipe.miscJson`).
+- [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
 
 ## Authentication (real, production-ready)
 

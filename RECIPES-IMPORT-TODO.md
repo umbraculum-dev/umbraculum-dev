@@ -18,9 +18,10 @@ Non-goals (v1):
 
 The app persists recipes as:
 - `Recipe.name`, `Recipe.style`, `Recipe.notes`
-- `Recipe.gristJson`, `Recipe.hopsJson`, `Recipe.yeastJson` (JSON blobs)
+- `Recipe.beerJsonRecipeJson` (canonical BeerJSON document)
+- `Recipe.recipeExtJson` (internal extensions/overrides; versioned)
 
-The editor already parses these JSON blobs defensively, so imports can start by producing compatible row shapes.
+The web editor is BeerJSON-first, so imports should ultimately produce a valid BeerJSON document (plus optional `recipeExtJson`).
 
 ---
 
@@ -47,7 +48,7 @@ The editor already parses these JSON blobs defensively, so imports can start by 
 **API shape (proposal)**
 - `POST /recipes/import/preview`
   - Input: `{ format: "beerxml" | "beerjson", content: string }`
-  - Output: `{ ok: true, preview: { name, style, notes, gristJson, hopsJson, yeastJson }, warnings: string[] }`
+  - Output: `{ ok: true, preview: { name, notes, beerJsonRecipeJson }, warnings: string[] }`
 - `POST /recipes/import`
   - Input: `{ format, content, nameOverride?, styleOverride? }`
   - Output: `{ ok: true, recipe: { id, ... } }`
@@ -96,20 +97,11 @@ Avoid for new implementation unless proven necessary:
 
 ### What we map first
 - Recipe metadata: name, style (if present), notes (if present)
-- Fermentables/grist:
-  - `name`
-  - amount (normalize to **kg**)
-  - color (normalize to **Lovibond** if possible; otherwise store `null`)
-  - classify `maltClass` heuristically (base/crystal/roast/acid) as best-effort
-- Hops:
-  - `name`
-  - amount (normalize to **grams**)
-  - alpha acid % (optional)
-  - `use` (boil/whirlpool/dryhop) best-effort
-  - time (minutes) best-effort
-- Yeast/culture:
-  - `name`
-  - optional metadata if available (lab, productId, attenuation)
+- BeerJSON recipe + ingredients (minimal useful subset):
+  - Fermentables: `name`, `amount`, `color`, best-effort `yield`
+  - Hops: `name`, `amount`, best-effort timing + alpha acid
+  - Culture: `name`, best-effort `producer`/`product_id`/`attenuation`
+  - Misc: `name`, `type`, `amount`, best-effort timing
 
 ### What we intentionally ignore first
 - Equipment profiles
@@ -173,5 +165,5 @@ If we later consider pre-seeding templates:
    - Import panel on `/[locale]/recipes` (file upload first)
 4. Tests
    - Fixture BeerXML/BeerJSON files
-   - Snapshot of mapped `gristJson/hopsJson/yeastJson`
+   - Assertions on generated canonical `beerJsonRecipeJson`
 
