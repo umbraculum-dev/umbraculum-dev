@@ -52,6 +52,11 @@
     "save": "Salva modifiche",
     "saving": "Salvataggio…",
     "cancel": "Annulla",
+    "sectionTitles": {
+      "kettle": "Kettle",
+      "mash": "Mash",
+      "misc": "Varie"
+    },
     "errors": {
       "nameRequired": "Il nome è obbligatorio.",
       "notAuthenticated": "Non autenticato.",
@@ -370,7 +375,11 @@
   },
   "about": {
     "title": "Info",
-    "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater."
+    "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater, Troester e altri. Supporto completo allo schema Beer.json. Il database materie prime scelto per la v0 è BeerProto.",
+    "translationsRowPrefix": "I contributi alle traduzioni sono benvenuti e gestiti tramite il nostro workflow (vedi",
+    "translationsRowLinkText": "Aiuta a tradurre",
+    "translationsRowSuffix": ").",
+    "translationsSideNote": "Nota: è solo un’introduzione — il workflow di contributo traduzioni è pianificato, ma non è ancora pienamente operativo."
   },
   "auth": {
     "selectAccount": {

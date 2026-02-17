@@ -360,8 +360,8 @@ export default function EquipmentPage() {
             {t("editTitle")}
           </h2>
           <form onSubmit={onSaveEdit} aria-describedby={editError ? "equipment-edit-error" : undefined}>
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-              <div style={{ gridColumn: "1 / -1" }}>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div>
                 <label htmlFor="equip-edit-name" className="muted" style={{ display: "block", fontSize: 12 }}>
                   {t("nameLabel")}
                 </label>
@@ -373,175 +373,191 @@ export default function EquipmentPage() {
                 />
               </div>
 
-              <div>
-                <label htmlFor="equip-edit-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleVolumeLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-kettle-vol"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.kettleVolumeLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleLossesLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-kettle-losses"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.kettleLossesLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, kettleLossesLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-evap" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleBoilEvaporationRatePercentPerHourLabel")}
-                </label>
-                <input
-                  id="equip-edit-evap"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-shrink" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleCoolingShrinkagePercentLabel")}
-                </label>
-                <input
-                  id="equip-edit-shrink"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.kettleCoolingShrinkagePercent ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleHopsAbsorptionLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-hops-abs"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.kettleHopsAbsorptionLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
+              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
+                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.kettle")}</legend>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="equip-edit-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleVolumeLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-kettle-vol"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.kettleVolumeLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleLossesLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-kettle-losses"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.kettleLossesLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleLossesLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-evap" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleBoilEvaporationRatePercentPerHourLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-evap"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-shrink" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleCoolingShrinkagePercentLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-shrink"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.kettleCoolingShrinkagePercent ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleHopsAbsorptionLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-hops-abs"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.kettleHopsAbsorptionLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                </div>
+              </fieldset>
 
-              <div>
-                <label htmlFor="equip-edit-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashVolumeLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-mash-vol"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.mashVolumeLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, mashVolumeLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-mash-eff" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashEfficiencyPercentLabel")}
-                </label>
-                <input
-                  id="equip-edit-mash-eff"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.mashEfficiencyPercent ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashLossesLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-mash-losses"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.mashLossesLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, mashLossesLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashThicknessLPerKgLabel")}
-                </label>
-                <input
-                  id="equip-edit-thickness"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={editDraft.mashThicknessLPerKg ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashGrainAbsorptionLPerKgLabel")}
-                </label>
-                <input
-                  id="equip-edit-grain-abs"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={editDraft.mashGrainAbsorptionLPerKg ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashWaterLeftoverLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-water-leftover"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.mashWaterLeftoverLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-edit-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("otherLossesLitersLabel")}
-                </label>
-                <input
-                  id="equip-edit-other-losses"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={editDraft.otherLossesLiters ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, otherLossesLiters: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
+              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
+                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.mash")}</legend>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="equip-edit-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashVolumeLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-mash-vol"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.mashVolumeLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, mashVolumeLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-mash-eff" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashEfficiencyPercentLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-mash-eff"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.mashEfficiencyPercent ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashLossesLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-mash-losses"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.mashLossesLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, mashLossesLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashThicknessLPerKgLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-thickness"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.01}
+                      value={editDraft.mashThicknessLPerKg ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashGrainAbsorptionLPerKgLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-grain-abs"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.01}
+                      value={editDraft.mashGrainAbsorptionLPerKg ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-edit-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashWaterLeftoverLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-water-leftover"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.mashWaterLeftoverLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
+                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.misc")}</legend>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="equip-edit-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("otherLossesLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-edit-other-losses"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={editDraft.otherLossesLiters ?? ""}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, otherLossesLiters: e.target.value }))}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                </div>
+              </fieldset>
             </div>
 
             <div style={{ marginTop: 12, display: "flex", gap: 12 }}>
@@ -575,8 +591,8 @@ export default function EquipmentPage() {
             {t("createTitle")}
           </h2>
           <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined}>
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-              <div style={{ gridColumn: "1 / -1" }}>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div>
                 <label htmlFor="equip-name" className="muted" style={{ display: "block", fontSize: 12 }}>
                   {t("nameLabel")}
                 </label>
@@ -587,174 +603,192 @@ export default function EquipmentPage() {
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>
-              <div>
-                <label htmlFor="equip-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleVolumeLitersLabel")}
-                </label>
-                <input
-                  id="equip-kettle-vol"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createKettleVolumeLiters}
-                  onChange={(e) => setCreateKettleVolumeLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleLossesLitersLabel")}
-                </label>
-                <input
-                  id="equip-kettle-losses"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createKettleLossesLiters}
-                  onChange={(e) => setCreateKettleLossesLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-evap" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleBoilEvaporationRatePercentPerHourLabel")}
-                </label>
-                <input
-                  id="equip-evap"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createKettleBoilEvaporationRatePercentPerHour}
-                  onChange={(e) => setCreateKettleBoilEvaporationRatePercentPerHour(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-shrink" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleCoolingShrinkagePercentLabel")}
-                </label>
-                <input
-                  id="equip-shrink"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createKettleCoolingShrinkagePercent}
-                  onChange={(e) => setCreateKettleCoolingShrinkagePercent(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("kettleHopsAbsorptionLitersLabel")}
-                </label>
-                <input
-                  id="equip-hops-abs"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createKettleHopsAbsorptionLiters}
-                  onChange={(e) => setCreateKettleHopsAbsorptionLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashVolumeLitersLabel")}
-                </label>
-                <input
-                  id="equip-mash-vol"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createMashVolumeLiters}
-                  onChange={(e) => setCreateMashVolumeLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-mash-eff" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashEfficiencyPercentLabel")}
-                </label>
-                <input
-                  id="equip-mash-eff"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createMashEfficiencyPercent}
-                  onChange={(e) => setCreateMashEfficiencyPercent(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashLossesLitersLabel")}
-                </label>
-                <input
-                  id="equip-mash-losses"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createMashLossesLiters}
-                  onChange={(e) => setCreateMashLossesLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-mash-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashThicknessLPerKgLabel")}
-                </label>
-                <input
-                  id="equip-mash-thickness"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={createMashThicknessLPerKg}
-                  onChange={(e) => setCreateMashThicknessLPerKg(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashGrainAbsorptionLPerKgLabel")}
-                </label>
-                <input
-                  id="equip-grain-abs"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={createMashGrainAbsorptionLPerKg}
-                  onChange={(e) => setCreateMashGrainAbsorptionLPerKg(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("mashWaterLeftoverLitersLabel")}
-                </label>
-                <input
-                  id="equip-water-leftover"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createMashWaterLeftoverLiters}
-                  onChange={(e) => setCreateMashWaterLeftoverLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label htmlFor="equip-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("otherLossesLitersLabel")}
-                </label>
-                <input
-                  id="equip-other-losses"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={createOtherLossesLiters}
-                  onChange={(e) => setCreateOtherLossesLiters(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
+
+              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
+                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.kettle")}</legend>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="equip-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleVolumeLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-kettle-vol"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createKettleVolumeLiters}
+                      onChange={(e) => setCreateKettleVolumeLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleLossesLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-kettle-losses"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createKettleLossesLiters}
+                      onChange={(e) => setCreateKettleLossesLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-evap" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleBoilEvaporationRatePercentPerHourLabel")}
+                    </label>
+                    <input
+                      id="equip-evap"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createKettleBoilEvaporationRatePercentPerHour}
+                      onChange={(e) => setCreateKettleBoilEvaporationRatePercentPerHour(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-shrink" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleCoolingShrinkagePercentLabel")}
+                    </label>
+                    <input
+                      id="equip-shrink"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createKettleCoolingShrinkagePercent}
+                      onChange={(e) => setCreateKettleCoolingShrinkagePercent(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("kettleHopsAbsorptionLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-hops-abs"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createKettleHopsAbsorptionLiters}
+                      onChange={(e) => setCreateKettleHopsAbsorptionLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
+                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.mash")}</legend>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="equip-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashVolumeLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-mash-vol"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createMashVolumeLiters}
+                      onChange={(e) => setCreateMashVolumeLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-mash-eff" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashEfficiencyPercentLabel")}
+                    </label>
+                    <input
+                      id="equip-mash-eff"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createMashEfficiencyPercent}
+                      onChange={(e) => setCreateMashEfficiencyPercent(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashLossesLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-mash-losses"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createMashLossesLiters}
+                      onChange={(e) => setCreateMashLossesLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-mash-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashThicknessLPerKgLabel")}
+                    </label>
+                    <input
+                      id="equip-mash-thickness"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.01}
+                      value={createMashThicknessLPerKg}
+                      onChange={(e) => setCreateMashThicknessLPerKg(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashGrainAbsorptionLPerKgLabel")}
+                    </label>
+                    <input
+                      id="equip-grain-abs"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.01}
+                      value={createMashGrainAbsorptionLPerKg}
+                      onChange={(e) => setCreateMashGrainAbsorptionLPerKg(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="equip-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("mashWaterLeftoverLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-water-leftover"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createMashWaterLeftoverLiters}
+                      onChange={(e) => setCreateMashWaterLeftoverLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
+                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.misc")}</legend>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="equip-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {t("otherLossesLitersLabel")}
+                    </label>
+                    <input
+                      id="equip-other-losses"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.1}
+                      value={createOtherLossesLiters}
+                      onChange={(e) => setCreateOtherLossesLiters(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                </div>
+              </fieldset>
             </div>
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
               <button type="submit" disabled={createSubmitting}>

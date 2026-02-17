@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "../../../src/i18n/navigation";
 
 export default function I18nContributingPage() {
   const t = useTranslations("i18nContributing");
@@ -36,14 +35,10 @@ export default function I18nContributingPage() {
 
       <h2>{t("rulesTitle")}</h2>
       <ul>
-        <li>{t("rule1")}</li>
+        <li>{t("rule1", { url: "{url}" })}</li>
         <li>{t("rule2")}</li>
         <li>{t("rule3")}</li>
       </ul>
-
-      <p style={{ marginBottom: 0 }}>
-        <Link href="/login">{t("backToLogin")}</Link>
-      </p>
     </section>
   );
 }

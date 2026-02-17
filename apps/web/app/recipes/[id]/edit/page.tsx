@@ -104,6 +104,18 @@ export default function RecipeEditPage() {
     { id: "water", label: t("sections.water") },
   ] as const;
 
+  const collapsibleSectionIds = ["basics", "analysis", "equipment", "fermentables", "hops", "yeast", "other", "notes"] as const;
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    for (const id of collapsibleSectionIds) init[id] = false;
+    return init;
+  });
+
+  const setSectionOpen = (id: string, open: boolean) => {
+    setOpenSections((prev) => (prev[id] === open ? prev : { ...prev, [id]: open }));
+  };
+
   const [authLoaded, setAuthLoaded] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -153,6 +165,20 @@ export default function RecipeEditPage() {
     () => Boolean(recipeId),
     [recipeId],
   );
+
+  useEffect(() => {
+    const applyHashOpen = () => {
+      const raw = window.location.hash || "";
+      const id = raw.startsWith("#") ? raw.slice(1) : raw;
+      if (!id) return;
+      if (!collapsibleSectionIds.includes(id as any)) return;
+      setSectionOpen(id, true);
+    };
+
+    applyHashOpen();
+    window.addEventListener("hashchange", applyHashOpen);
+    return () => window.removeEventListener("hashchange", applyHashOpen);
+  }, []);
 
   useEffect(() => {
     if (!canCallAccountScoped) return;
@@ -740,255 +766,274 @@ export default function RecipeEditPage() {
         </nav>
 
         <div style={{ display: "grid", gap: 16 }}>
-          <section id="basics" className="panel" aria-labelledby="basics-heading">
-            <h2 id="basics-heading" style={{ marginTop: 0 }}>
-              {t("sections.basics")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              {t("basicsHelp")}
-            </p>
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-              <div>
-                <label
-                  htmlFor="recipe-name"
-                  className="muted"
-                  style={{ display: "block", fontSize: 12 }}
-                >
-                  Name
-                </label>
-                <input
-                  id="recipe-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="recipe-style"
-                  className="muted"
-                  style={{ display: "block", fontSize: 12 }}
-                >
-                  Style
-                </label>
-                <select
-                  id="recipe-style"
-                  value={styleKey}
-                  onChange={(e) => setStyleKey(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                  disabled={stylesLoading || styles.length === 0}
-                  required
-                >
-                  {styles.map((s) => (
-                    <option key={s.key} value={s.key}>
-                      {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
-                    </option>
-                  ))}
-                </select>
-                {stylesError ? (
-                  <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                    {String(stylesError)}
-                  </p>
+          <section id="basics" className="panel">
+            <details open={openSections.basics} onToggle={(e) => setSectionOpen("basics", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="basics-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.basics")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  {t("basicsHelp")}
+                </p>
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+                  <div>
+                    <label htmlFor="recipe-name" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      Name
+                    </label>
+                    <input
+                      id="recipe-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="recipe-style" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      Style
+                    </label>
+                    <select
+                      id="recipe-style"
+                      value={styleKey}
+                      onChange={(e) => setStyleKey(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                      disabled={stylesLoading || styles.length === 0}
+                      required
+                    >
+                      {styles.map((s) => (
+                        <option key={s.key} value={s.key}>
+                          {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
+                        </option>
+                      ))}
+                    </select>
+                    {stylesError ? (
+                      <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                        {String(stylesError)}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+                  <button onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                    {saving ? "Saving…" : "Save"}
+                  </button>
+                  {saveStatus ? (
+                    <span className="muted" aria-live="polite">
+                      {saveStatus}
+                    </span>
+                  ) : null}
+                  {recipe ? (
+                    <span className="muted">
+                      Updated: <code>{recipe.updatedAt}</code>
+                    </span>
+                  ) : null}
+                </div>
+
+                {saveError ? (
+                  <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                    {saveError}
+                  </pre>
                 ) : null}
               </div>
-            </div>
-
-            <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-              <button onClick={onSave} disabled={!canCallAccountScoped || saving}>
-                {saving ? "Saving…" : "Save"}
-              </button>
-              {saveStatus ? (
-                <span className="muted" aria-live="polite">
-                  {saveStatus}
-                </span>
-              ) : null}
-              {recipe ? (
-                <span className="muted">
-                  Updated: <code>{recipe.updatedAt}</code>
-                </span>
-              ) : null}
-            </div>
-
-            {saveError ? (
-              <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
-                {saveError}
-              </pre>
-            ) : null}
+            </details>
           </section>
 
-          <section id="analysis" className="panel" aria-labelledby="analysis-heading">
-            <h2 id="analysis-heading" style={{ marginTop: 0 }}>
-              {t("sections.analysis")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              {tAnalysis("help")}
-            </p>
+          <section id="analysis" className="panel">
+            <details open={openSections.analysis} onToggle={(e) => setSectionOpen("analysis", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="analysis-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.analysis")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  {tAnalysis("help")}
+                </p>
 
-            {(() => {
-              const a = analysis && typeof analysis === "object" ? (analysis as any) : null;
-              const fmt = (v: unknown, decimals: number) =>
-                typeof v === "number" && Number.isFinite(v) ? formatFixed(locale, v, decimals) : tAnalysis("na");
+                {(() => {
+                  const a = analysis && typeof analysis === "object" ? (analysis as any) : null;
+                  const fmt = (v: unknown, decimals: number) =>
+                    typeof v === "number" && Number.isFinite(v) ? formatFixed(locale, v, decimals) : tAnalysis("na");
 
-              const warnings = Array.isArray(a?.warnings) ? (a.warnings as any[]) : [];
+                  const warnings = Array.isArray(a?.warnings) ? (a.warnings as any[]) : [];
 
-              return (
-                <>
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <tbody>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.abv")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.abvEstimatedPercent, 2)}</code>{" "}
-                            {typeof a?.abvEstimatedPercent === "number" ? <span className="muted">%</span> : null}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.kettleVolume")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.kettleVolumeLiters, 2)}</code>{" "}
-                            {typeof a?.kettleVolumeLiters === "number" ? <span className="muted">L</span> : null}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.preBoilVolume")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.preBoilVolumeLiters, 2)}</code>{" "}
-                            {typeof a?.preBoilVolumeLiters === "number" ? <span className="muted">L</span> : null}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.og")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.ogEstimatedSg, 3)}</code>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.fg")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.fgEstimatedSg, 3)}</code>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.attenuation")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.attenuationEffectivePercent, 1)}</code>{" "}
-                            {typeof a?.attenuationEffectivePercent === "number" ? <span className="muted">%</span> : null}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style={{ paddingRight: 12 }}>
-                            <strong>{tAnalysis("fields.pbg")}</strong>
-                          </td>
-                          <td>
-                            <code>{fmt(a?.pbgEstimatedSg, 3)}</code>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                  return (
+                    <>
+                      <div style={{ overflowX: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                          <tbody>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.abv")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.abvEstimatedPercent, 2)}</code>{" "}
+                                {typeof a?.abvEstimatedPercent === "number" ? <span className="muted">%</span> : null}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.kettleVolume")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.kettleVolumeLiters, 2)}</code>{" "}
+                                {typeof a?.kettleVolumeLiters === "number" ? <span className="muted">L</span> : null}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.preBoilVolume")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.preBoilVolumeLiters, 2)}</code>{" "}
+                                {typeof a?.preBoilVolumeLiters === "number" ? <span className="muted">L</span> : null}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.og")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.ogEstimatedSg, 3)}</code>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.fg")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.fgEstimatedSg, 3)}</code>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.attenuation")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.attenuationEffectivePercent, 1)}</code>{" "}
+                                {typeof a?.attenuationEffectivePercent === "number" ? (
+                                  <span className="muted">%</span>
+                                ) : null}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <strong>{tAnalysis("fields.pbg")}</strong>
+                              </td>
+                              <td>
+                                <code>{fmt(a?.pbgEstimatedSg, 3)}</code>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
 
-                  {warnings.length ? (
-                    <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-                      <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
-                        <strong>{tAnalysis("warningsTitle")}</strong>
-                        <span className="muted">{tAnalysis("warningsClickToExpand")}</span>
-                      </summary>
-                      <ul style={{ marginTop: 8 }}>
-                        {warnings.map((w, idx) => (
-                          <li key={`${String(w?.code ?? "warn")}-${idx}`}>
-                            <code>{String(w?.code ?? "warning")}</code>{" "}
-                            <span className="muted">{String(w?.message ?? "")}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : null}
-                </>
-              );
-            })()}
-          </section>
-
-          <section id="equipment" className="panel" aria-labelledby="equipment-heading">
-            <h2 id="equipment-heading" style={{ marginTop: 0 }}>
-              {t("sections.equipment")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              {tEquip("help")}
-            </p>
-
-            {equipmentProfilesError ? (
-              <pre className="errorBox" role="alert">
-                {equipmentProfilesError}
-              </pre>
-            ) : null}
-
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
-              <div>
-                <label htmlFor="equipment-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {tEquip("profileLabel")}
-                </label>
-                <select
-                  id="equipment-profile"
-                  value={selectedEquipmentProfileId}
-                  onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                  disabled={equipmentProfilesLoading}
-                >
-                  <option value="">{tEquip("noneOption")}</option>
-                  {equipmentProfiles.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                      {warnings.length ? (
+                        <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+                          <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                            <strong>{tAnalysis("warningsTitle")}</strong>
+                            <span className="muted">{tAnalysis("warningsClickToExpand")}</span>
+                          </summary>
+                          <ul style={{ marginTop: 8 }}>
+                            {warnings.map((w, idx) => (
+                              <li key={`${String(w?.code ?? "warn")}-${idx}`}>
+                                <code>{String(w?.code ?? "warning")}</code>{" "}
+                                <span className="muted">{String(w?.message ?? "")}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </details>
+                      ) : null}
+                    </>
+                  );
+                })()}
               </div>
-              <button
-                type="button"
-                onClick={() => void applyEquipmentProfileToRecipe("apply")}
-                disabled={!selectedEquipmentProfileId || equipmentApplying}
-              >
-                {equipmentApplying ? tEquip("working") : tEquip("apply")}
-              </button>
-              <button
-                type="button"
-                onClick={() => void applyEquipmentProfileToRecipe("reload")}
-                disabled={!selectedEquipmentProfileId || equipmentApplying}
-              >
-                {equipmentApplying ? tEquip("working") : tEquip("reload")}
-              </button>
-            </div>
-
-            {equipmentApplyError ? (
-              <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
-                {equipmentApplyError}
-              </pre>
-            ) : null}
-
-            <p className="muted" style={{ marginBottom: 0 }}>
-              {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
-            </p>
+            </details>
           </section>
 
-          <section id="fermentables" className="panel" aria-labelledby="fermentables-heading">
-            <h2 id="fermentables-heading" style={{ marginTop: 0 }}>
-              {t("sections.fermentables")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              v0: enter your grist here. Water calculator can import a read-only snapshot.
-            </p>
+          <section id="equipment" className="panel">
+            <details open={openSections.equipment} onToggle={(e) => setSectionOpen("equipment", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="equipment-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.equipment")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  {tEquip("help")}
+                </p>
+
+                {equipmentProfilesError ? (
+                  <pre className="errorBox" role="alert">
+                    {equipmentProfilesError}
+                  </pre>
+                ) : null}
+
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
+                  <div>
+                    <label htmlFor="equipment-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+                      {tEquip("profileLabel")}
+                    </label>
+                    <select
+                      id="equipment-profile"
+                      value={selectedEquipmentProfileId}
+                      onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
+                      style={{ width: "100%", padding: 8 }}
+                      disabled={equipmentProfilesLoading}
+                    >
+                      <option value="">{tEquip("noneOption")}</option>
+                      {equipmentProfiles.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void applyEquipmentProfileToRecipe("apply")}
+                    disabled={!selectedEquipmentProfileId || equipmentApplying}
+                  >
+                    {equipmentApplying ? tEquip("working") : tEquip("apply")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void applyEquipmentProfileToRecipe("reload")}
+                    disabled={!selectedEquipmentProfileId || equipmentApplying}
+                  >
+                    {equipmentApplying ? tEquip("working") : tEquip("reload")}
+                  </button>
+                </div>
+
+                {equipmentApplyError ? (
+                  <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                    {equipmentApplyError}
+                  </pre>
+                ) : null}
+
+                <p className="muted" style={{ marginBottom: 0 }}>
+                  {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
+                </p>
+              </div>
+            </details>
+          </section>
+
+          <section id="fermentables" className="panel">
+            <details
+              open={openSections.fermentables}
+              onToggle={(e) => setSectionOpen("fermentables", e.currentTarget.open)}
+            >
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="fermentables-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.fermentables")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  v0: enter your grist here. Water calculator can import a read-only snapshot.
+                </p>
 
             <form onSubmit={onSearchFermentables} style={{ marginTop: 12 }}>
               <label htmlFor="fermentable-search" className="muted" style={{ display: "block", fontSize: 12 }}>
@@ -1411,20 +1456,26 @@ export default function RecipeEditPage() {
               </p>
             )}
 
-            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-              <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
-                {saving ? "Saving…" : "Save (including grist)"}
-              </button>
-            </div>
+                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                    {saving ? "Saving…" : "Save (including grist)"}
+                  </button>
+                </div>
+              </div>
+            </details>
           </section>
 
-          <section id="hops" className="panel" aria-labelledby="hops-heading">
-            <h2 id="hops-heading" style={{ marginTop: 0 }}>
-              {t("sections.hops")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              {t("hopsHelp")}
-            </p>
+          <section id="hops" className="panel">
+            <details open={openSections.hops} onToggle={(e) => setSectionOpen("hops", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="hops-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.hops")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  {t("hopsHelp")}
+                </p>
 
             <form onSubmit={onSearchHops} style={{ marginTop: 12 }}>
               <label htmlFor="hop-search" className="muted" style={{ display: "block", fontSize: 12 }}>
@@ -1634,20 +1685,26 @@ export default function RecipeEditPage() {
               </p>
             )}
 
-            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-              <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
-                {saving ? "Saving…" : "Save (including hops)"}
-              </button>
-            </div>
+                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                    {saving ? "Saving…" : "Save (including hops)"}
+                  </button>
+                </div>
+              </div>
+            </details>
           </section>
 
-          <section id="yeast" className="panel" aria-labelledby="yeast-heading">
-            <h2 id="yeast-heading" style={{ marginTop: 0 }}>
-              {t("sections.yeast")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              {t("yeastHelp")}
-            </p>
+          <section id="yeast" className="panel">
+            <details open={openSections.yeast} onToggle={(e) => setSectionOpen("yeast", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="yeast-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.yeast")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  {t("yeastHelp")}
+                </p>
 
             <form onSubmit={onSearchYeasts} style={{ marginTop: 12 }}>
               <label htmlFor="yeast-search" className="muted" style={{ display: "block", fontSize: 12 }}>
@@ -1830,25 +1887,31 @@ export default function RecipeEditPage() {
               </p>
             )}
 
-            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-              <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
-                {saving ? "Saving…" : "Save (including yeast)"}
-              </button>
-            </div>
+                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                    {saving ? "Saving…" : "Save (including yeast)"}
+                  </button>
+                </div>
+              </div>
+            </details>
           </section>
 
-          <section id="other" className="panel" aria-labelledby="other-heading">
-            <h2 id="other-heading" style={{ marginTop: 0 }}>
-              {t("sections.other")}
-            </h2>
-            <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <p className="muted" style={{ margin: 0 }}>
-                {t("otherHelp")}
-              </p>
-              <button type="button" onClick={addMiscRow}>
-                {t("buttons.addOtherIngredient")}
-              </button>
-            </div>
+          <section id="other" className="panel">
+            <details open={openSections.other} onToggle={(e) => setSectionOpen("other", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="other-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.other")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <div style={{ marginTop: 0, display: "flex", justifyContent: "space-between", gap: 12 }}>
+                  <p className="muted" style={{ margin: 0 }}>
+                    {t("otherHelp")}
+                  </p>
+                  <button type="button" onClick={addMiscRow}>
+                    {t("buttons.addOtherIngredient")}
+                  </button>
+                </div>
 
             {miscRows.length ? (
               <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
@@ -2001,27 +2064,35 @@ export default function RecipeEditPage() {
               </p>
             )}
 
-            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-              <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
-                {saving ? "Saving…" : "Save (including other ingredients)"}
-              </button>
-            </div>
+                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
+                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                    {saving ? "Saving…" : "Save (including other ingredients)"}
+                  </button>
+                </div>
+              </div>
+            </details>
           </section>
 
-          <section id="notes" className="panel" aria-labelledby="notes-heading">
-            <h2 id="notes-heading" style={{ marginTop: 0 }}>
-              {t("sections.notes")}
-            </h2>
-            <label htmlFor="recipe-notes" className="muted" style={{ display: "block", fontSize: 12 }}>
-              {t("sections.notes")}
-            </label>
-            <textarea
-              id="recipe-notes"
-              rows={6}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
-            />
+          <section id="notes" className="panel">
+            <details open={openSections.notes} onToggle={(e) => setSectionOpen("notes", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="notes-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.notes")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <label htmlFor="recipe-notes" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  {t("sections.notes")}
+                </label>
+                <textarea
+                  id="recipe-notes"
+                  rows={6}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  style={{ width: "100%", padding: 8 }}
+                />
+              </div>
+            </details>
           </section>
 
           <section id="water" className="panel" aria-labelledby="water-heading">
