@@ -213,7 +213,12 @@ export function buildRecipeExtJsonFromEditorState(args: {
   hopsRows: EditorHopRow[];
   yeastRows: EditorYeastRow[];
   miscRows: EditorMiscRow[];
+  extBase?: unknown;
 }): unknown {
+  const extBase =
+    args.extBase && typeof args.extBase === "object" && !Array.isArray(args.extBase)
+      ? (args.extBase as Record<string, unknown>)
+      : null;
   const ingredientLinks = {
     grist: Object.fromEntries(
       args.gristRows
@@ -263,6 +268,7 @@ export function buildRecipeExtJsonFromEditorState(args: {
   );
 
   return {
+    ...(extBase ? extBase : {}),
     version: 1,
     ingredientLinks,
     mashPhModel,

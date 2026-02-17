@@ -41,6 +41,71 @@ const recipeExtSchemaV1 = {
       required: ["percent"],
     },
     /**
+     * Recipe-scoped equipment and losses inputs for best-effort volume/gravity analysis (v0).
+     * These are intentionally pragmatic: they allow us to derive a pre-boil volume estimate
+     * and surface OG/FG/ABV/PBG without introducing a full process model yet.
+     */
+    equipment: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        kettle: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            name: { type: "string" },
+            kettleVolumeLiters: { type: "number", exclusiveMinimum: 0 },
+            kettleLossesLiters: { type: "number", minimum: 0 },
+            kettleBoilEvaporationRatePercentPerHour: { type: "number", minimum: 0, maximum: 100 },
+            kettleCoolingShrinkagePercent: { type: "number", minimum: 0, maximum: 100 },
+            kettleHopsAbsorptionLiters: { type: "number", minimum: 0 },
+          },
+        },
+        mash: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            name: { type: "string" },
+            mashVolumeLiters: { type: "number", minimum: 0 },
+            mashEfficiencyPercent: { type: "number", minimum: 0, maximum: 100 },
+            mashLossesLiters: { type: "number", minimum: 0 },
+            mashThicknessLPerKg: { type: "number", minimum: 0 },
+            mashGrainAbsorptionLPerKg: { type: "number", minimum: 0 },
+            mashWaterLeftoverLiters: { type: "number", minimum: 0 },
+          },
+        },
+        misc: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            otherLossesLiters: { type: "number", minimum: 0 },
+          },
+        },
+      },
+    },
+    /**
+     * Per-yeast-row attenuation override (%). Keyed by BeerJSON culture_additions[*].id.
+     * When present, this override is used for analysis in preference to yeast min/max.
+     */
+    yeastAttenuationOverridesPercent: {
+      type: "object",
+      additionalProperties: { type: "number", minimum: 0, maximum: 100 },
+    },
+    /**
+     * Snapshot provenance for `equipment`.
+     * - We snapshot/copy from an account-scoped equipment template (no live reference).
+     * - This records which template was copied and when, enabling an explicit “reload template” action.
+     */
+    equipmentSource: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        equipmentProfileId: { type: "string", minLength: 1 },
+        copiedAt: { type: "string", minLength: 1 },
+      },
+      required: ["equipmentProfileId", "copiedAt"],
+    },
+    /**
      * Best-effort links from UI row IDs -> canonical Ingredient IDs.
      * We keep these separate from BeerJSON so the canonical export stays clean.
      */

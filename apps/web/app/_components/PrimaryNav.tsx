@@ -184,6 +184,9 @@ export function PrimaryNav() {
             <Link href="/water-profiles">{t("waterProfiles")}</Link>
           </li>
           <li>
+            <Link href="/equipment">{t("equipment")}</Link>
+          </li>
+          <li>
             <Link href="/about">{t("about")}</Link>
           </li>
         </ul>

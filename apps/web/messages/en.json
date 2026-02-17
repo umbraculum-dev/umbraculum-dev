@@ -7,6 +7,7 @@
     "dashboard": "Dashboard",
     "recipes": "Recipes",
     "waterProfiles": "Water profiles",
+    "equipment": "Equipment",
     "about": "About",
     "language": "Language",
     "accessibility": "Accessibility",
@@ -17,6 +18,48 @@
     "switchAccount": "Switch account",
     "ariaPrimary": "Primary",
     "ariaSession": "Session"
+  },
+  "equipment": {
+    "subtitle": "Account-scoped equipment templates used by recipes (snapshot copy; no live references).",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "backToRecipes": "Back to Recipes",
+    "listTitle": "Equipment profiles",
+    "noProfiles": "No equipment profiles yet.",
+    "colName": "Name",
+    "colKettleVol": "Kettle volume (L)",
+    "colMashEff": "Mash efficiency (%)",
+    "colActions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "createTitle": "Add equipment profile",
+    "editTitle": "Edit equipment profile",
+    "nameLabel": "Name",
+    "kettleVolumeLitersLabel": "Kettle volume (L)",
+    "kettleLossesLitersLabel": "Kettle losses (L)",
+    "kettleBoilEvaporationRatePercentPerHourLabel": "Boil evaporation rate (% per hour)",
+    "kettleCoolingShrinkagePercentLabel": "Cooling shrinkage (%)",
+    "kettleHopsAbsorptionLitersLabel": "Hops absorption (L)",
+    "mashVolumeLitersLabel": "Mash volume (L)",
+    "mashEfficiencyPercentLabel": "Mash efficiency (%)",
+    "mashLossesLitersLabel": "Mash losses (L)",
+    "mashThicknessLPerKgLabel": "Mash thickness (L/kg)",
+    "mashGrainAbsorptionLPerKgLabel": "Mash grain absorption (L/kg)",
+    "mashWaterLeftoverLitersLabel": "Mash water leftover (L)",
+    "otherLossesLitersLabel": "Other non-specified losses (L)",
+    "create": "Create",
+    "creating": "Creating…",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "errors": {
+      "nameRequired": "Name is required.",
+      "notAuthenticated": "Not authenticated.",
+      "lossesMustBeNonNegative": "This value must be ≥ 0.",
+      "percentRange": "Percent must be between 0 and 100.",
+      "kettleVolumeMustBePositive": "Kettle volume must be > 0.",
+      "mashEfficiencyRange": "Mash efficiency must be between 0 and 100."
+    }
   },
   "accessibility": {
     "title": "Accessibility",
@@ -117,20 +160,41 @@
       "loading": "Loading…",
       "shapeNote": "Single-page editor with section navigation. Water chemistry is a link-out to the dedicated calculator page.",
       "notReadyToLoad": "Not ready to load this recipe.",
+      "status": {
+        "saved": "Saved.",
+        "equipmentApplied": "Applied equipment & refreshed analysis.",
+        "equipmentReloaded": "Reloaded equipment & refreshed analysis."
+      },
       "nav": {
         "sectionsAriaLabel": "Recipe sections",
         "sectionsTitle": "Sections",
         "openWaterCalculator": "Open water calculator",
+        "openEquipment": "Open equipment",
         "backToRecipes": "Back to Recipes"
       },
       "sections": {
         "basics": "Basics",
+        "analysis": "Analysis",
+        "equipment": "Equipment",
         "fermentables": "Fermentables",
         "hops": "Hops",
         "yeast": "Yeast",
         "other": "Other ingredients",
         "notes": "Notes",
         "water": "Water chemistry"
+      },
+      "equipmentSection": {
+        "help": "Choose an account-level equipment profile to snapshot into this recipe (no live reference).",
+        "profileLabel": "Equipment profile",
+        "noneOption": "(none)",
+        "apply": "Apply to recipe",
+        "reload": "Reload Equipment profile & recalculate overall",
+        "working": "Working…",
+        "manageTemplatesText": "Manage equipment templates on",
+        "manageTemplatesLinkText": "Equipment",
+        "errors": {
+          "selectFirst": "Select an equipment profile first."
+        }
       },
       "basicsHelp": "Loaded/saved via GET/PATCH /api/recipes/:id.",
       "hopsHelp": "Pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
@@ -142,6 +206,22 @@
         "addFermentable": "Add fermentable",
         "addOtherIngredient": "Add other ingredient"
       }
+    },
+    "analysis": {
+      "help": "Derived estimates. If required inputs are missing, values show as “Insufficient data”.",
+      "na": "Insufficient data",
+      "customAttenuationPercentLabel": "Custom attenuation (%)",
+      "fields": {
+        "abv": "ABV (estimated)",
+        "kettleVolume": "Volume (kettle)",
+        "preBoilVolume": "Pre-boil volume (estimated)",
+        "og": "OG (estimated)",
+        "fg": "FG (estimated)",
+        "attenuation": "Attenuation (effective)",
+        "pbg": "PBG (pre-boil gravity, estimated)"
+      },
+      "warningsTitle": "Notes / missing inputs",
+      "warningsClickToExpand": "Click to expand"
     },
     "water": {
       "common": {

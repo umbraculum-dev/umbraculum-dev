@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { requireActiveAccount } from "../plugins/requestContext.js";
 import { RecipesService } from "../services/recipesService.js";
+import { computeRecipeGravityAnalysis } from "../domain/recipeAnalysis/gravityAnalysis.js";
 
 export async function recipesRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
@@ -42,7 +43,11 @@ export async function recipesRoutes(app: FastifyInstance) {
     const id = typeof params.id === "string" ? params.id : "";
 
     const recipe = await recipes.getRecipe(ctx.userId, ctx.activeAccountId, id);
-    return { ok: true, recipe };
+    const analysis = computeRecipeGravityAnalysis({
+      beerJsonRecipeJson: (recipe as any).beerJsonRecipeJson,
+      recipeExtJson: (recipe as any).recipeExtJson,
+    });
+    return { ok: true, recipe: { ...recipe, analysis } };
   });
 
   app.patch("/recipes/:id", async (req) => {

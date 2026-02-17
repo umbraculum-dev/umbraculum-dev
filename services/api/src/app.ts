@@ -10,6 +10,7 @@ import { recipesRoutes } from "./routes/recipes.js";
 import { recipesImportRoutes } from "./routes/recipesImport.js";
 import { stylesRoutes } from "./routes/styles.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
+import { equipmentProfilesRoutes } from "./routes/equipmentProfiles.js";
 import { waterCalcRoutes } from "./routes/waterCalc.js";
 import { recipeWaterSettingsRoutes } from "./routes/recipeWaterSettings.js";
 import { ingredientsRoutes } from "./routes/ingredients.js";
@@ -29,6 +30,7 @@ export function buildApp() {
   app.register(recipesImportRoutes);
   app.register(stylesRoutes);
   app.register(waterProfilesRoutes);
+  app.register(equipmentProfilesRoutes);
   app.register(waterCalcRoutes);
   app.register(recipeWaterSettingsRoutes);
   app.register(ingredientsRoutes);

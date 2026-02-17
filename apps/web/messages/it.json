@@ -7,6 +7,7 @@
     "dashboard": "Dashboard",
     "recipes": "Ricette",
     "waterProfiles": "Profili acqua",
+    "equipment": "Attrezzatura",
     "about": "Info",
     "language": "Lingua",
     "accessibility": "Accessibilità",
@@ -17,6 +18,48 @@
     "switchAccount": "Cambia account",
     "ariaPrimary": "Principale",
     "ariaSession": "Sessione"
+  },
+  "equipment": {
+    "subtitle": "Profili attrezzatura (per account) usati dalle ricette (copia snapshot; nessun riferimento live).",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "backToRecipes": "Torna alle Ricette",
+    "listTitle": "Profili attrezzatura",
+    "noProfiles": "Ancora nessun profilo attrezzatura.",
+    "colName": "Nome",
+    "colKettleVol": "Volume kettle (L)",
+    "colMashEff": "Efficienza mash (%)",
+    "colActions": "Azioni",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "createTitle": "Aggiungi profilo attrezzatura",
+    "editTitle": "Modifica profilo attrezzatura",
+    "nameLabel": "Nome",
+    "kettleVolumeLitersLabel": "Volume kettle (L)",
+    "kettleLossesLitersLabel": "Perdite kettle (L)",
+    "kettleBoilEvaporationRatePercentPerHourLabel": "Evaporazione (% per ora)",
+    "kettleCoolingShrinkagePercentLabel": "Contrazione raffreddamento (%)",
+    "kettleHopsAbsorptionLitersLabel": "Assorbimento luppolo (L)",
+    "mashVolumeLitersLabel": "Volume mash (L)",
+    "mashEfficiencyPercentLabel": "Efficienza mash (%)",
+    "mashLossesLitersLabel": "Perdite mash (L)",
+    "mashThicknessLPerKgLabel": "Spessore mash (L/kg)",
+    "mashGrainAbsorptionLPerKgLabel": "Assorbimento grani (L/kg)",
+    "mashWaterLeftoverLitersLabel": "Acqua mash residua (L)",
+    "otherLossesLitersLabel": "Altre perdite non specificate (L)",
+    "create": "Crea",
+    "creating": "Creazione…",
+    "save": "Salva modifiche",
+    "saving": "Salvataggio…",
+    "cancel": "Annulla",
+    "errors": {
+      "nameRequired": "Il nome è obbligatorio.",
+      "notAuthenticated": "Non autenticato.",
+      "lossesMustBeNonNegative": "Questo valore deve essere ≥ 0.",
+      "percentRange": "La percentuale deve essere tra 0 e 100.",
+      "kettleVolumeMustBePositive": "Il volume del kettle deve essere > 0.",
+      "mashEfficiencyRange": "L’efficienza mash deve essere tra 0 e 100."
+    }
   },
   "accessibility": {
     "title": "Accessibilità",
@@ -117,20 +160,41 @@
       "loading": "Caricamento…",
       "shapeNote": "Editor a pagina singola con navigazione per sezioni. La chimica dell’acqua apre il calcolatore dedicato.",
       "notReadyToLoad": "Non pronto per caricare questa ricetta.",
+      "status": {
+        "saved": "Salvato.",
+        "equipmentApplied": "Attrezzatura applicata e analisi aggiornata.",
+        "equipmentReloaded": "Attrezzatura ricaricata e analisi aggiornata."
+      },
       "nav": {
         "sectionsAriaLabel": "Sezioni ricetta",
         "sectionsTitle": "Sezioni",
         "openWaterCalculator": "Apri calcolatore acqua",
+        "openEquipment": "Apri attrezzatura",
         "backToRecipes": "Torna alle Ricette"
       },
       "sections": {
         "basics": "Basi",
+        "analysis": "Analisi",
+        "equipment": "Attrezzatura",
         "fermentables": "Fermentabili",
         "hops": "Luppoli",
         "yeast": "Lievito",
         "other": "Altri ingredienti",
         "notes": "Note",
         "water": "Chimica dell’acqua"
+      },
+      "equipmentSection": {
+        "help": "Scegli un profilo attrezzatura (per account) da copiare nella ricetta (nessun riferimento live).",
+        "profileLabel": "Profilo attrezzatura",
+        "noneOption": "(nessuno)",
+        "apply": "Applica alla ricetta",
+        "reload": "Ricarica profilo attrezzatura e ricalcola",
+        "working": "In corso…",
+        "manageTemplatesText": "Gestisci i profili attrezzatura in",
+        "manageTemplatesLinkText": "Attrezzatura",
+        "errors": {
+          "selectFirst": "Seleziona prima un profilo attrezzatura."
+        }
       },
       "basicsHelp": "Caricamento/salvataggio via GET/PATCH /api/recipes/:id.",
       "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
@@ -142,6 +206,22 @@
         "addFermentable": "Aggiungi fermentabile",
         "addOtherIngredient": "Aggiungi altro ingrediente"
       }
+    },
+    "analysis": {
+      "help": "Stime derivate. Se mancano input necessari, i valori mostrano “Dati insufficienti”.",
+      "na": "Dati insufficienti",
+      "customAttenuationPercentLabel": "Attenuazione personalizzata (%)",
+      "fields": {
+        "abv": "ABV (stimata)",
+        "kettleVolume": "Volume (kettle)",
+        "preBoilVolume": "Volume pre-boil (stimato)",
+        "og": "OG (stimata)",
+        "fg": "FG (stimata)",
+        "attenuation": "Attenuazione (effettiva)",
+        "pbg": "PBG (gravità pre-boil, stimata)"
+      },
+      "warningsTitle": "Note / input mancanti",
+      "warningsClickToExpand": "Clicca per espandere"
     },
     "water": {
       "common": {

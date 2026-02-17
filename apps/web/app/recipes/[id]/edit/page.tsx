@@ -1,11 +1,12 @@
 "use client";
 
 import { Link } from "../../../../src/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "../../../_lib/apiClient";
+import { formatFixed } from "../../../../src/i18n/format";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
@@ -15,6 +16,7 @@ import {
   type EditorMiscRow,
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
+import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
 
 type Recipe = {
   id: string;
@@ -30,6 +32,15 @@ type Recipe = {
 };
 
 type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
+type EquipmentProfile = {
+  id: string;
+  name: string;
+  equipment: {
+    kettle: Record<string, unknown>;
+    mash: Record<string, unknown>;
+    misc: Record<string, unknown>;
+  };
+};
 
 function newRowId() {
   try {
@@ -70,6 +81,9 @@ const miscUseOptions: { value: MiscUse; label: string }[] = [
 
 export default function RecipeEditPage() {
   const t = useTranslations("recipes.edit");
+  const tEquip = useTranslations("recipes.edit.equipmentSection");
+  const tAnalysis = useTranslations("recipes.analysis");
+  const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
@@ -80,6 +94,8 @@ export default function RecipeEditPage() {
 
   const sections = [
     { id: "basics", label: t("sections.basics") },
+    { id: "analysis", label: t("sections.analysis") },
+    { id: "equipment", label: t("sections.equipment") },
     { id: "fermentables", label: t("sections.fermentables") },
     { id: "hops", label: t("sections.hops") },
     { id: "yeast", label: t("sections.yeast") },
@@ -96,6 +112,7 @@ export default function RecipeEditPage() {
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [analysis, setAnalysis] = useState<any | null>(null);
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
   const [notes, setNotes] = useState("");
@@ -103,10 +120,18 @@ export default function RecipeEditPage() {
   const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
   const [yeastRows, setYeastRows] = useState<EditorYeastRow[]>([]);
   const [miscRows, setMiscRows] = useState<EditorMiscRow[]>([]);
+  const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
   const [stylesLoading, setStylesLoading] = useState(false);
   const [stylesError, setStylesError] = useState<string | null>(null);
+
+  const [equipmentProfiles, setEquipmentProfiles] = useState<EquipmentProfile[]>([]);
+  const [equipmentProfilesLoading, setEquipmentProfilesLoading] = useState(false);
+  const [equipmentProfilesError, setEquipmentProfilesError] = useState<string | null>(null);
+  const [selectedEquipmentProfileId, setSelectedEquipmentProfileId] = useState<string>("");
+  const [equipmentApplyError, setEquipmentApplyError] = useState<string | null>(null);
+  const [equipmentApplying, setEquipmentApplying] = useState(false);
 
   // Ingredient DB searches (v0)
   const [fermentableQuery, setFermentableQuery] = useState("");
@@ -143,12 +168,32 @@ export default function RecipeEditPage() {
         const r = (res.data as any).recipe as Recipe;
         if (cancelled) return;
         setRecipe(r);
+        setAnalysis((r as any).analysis ?? null);
         setName(r.name ?? "");
         setStyleKey((r as any).styleKey ?? "custom");
         setNotes(r.notes ?? "");
         const ext = (r as any).recipeExtJson;
         const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
         const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
+        const yeastOverridesRaw = ext && typeof ext === "object" ? (ext as any).yeastAttenuationOverridesPercent : null;
+        if (yeastOverridesRaw && typeof yeastOverridesRaw === "object") {
+          const out: Record<string, string> = {};
+          for (const [k, v] of Object.entries(yeastOverridesRaw as any)) {
+            if (typeof k !== "string") continue;
+            if (typeof v !== "number" || !Number.isFinite(v)) continue;
+            out[k] = String(v);
+          }
+          setYeastAttenuationOverrides(out);
+        } else {
+          setYeastAttenuationOverrides({});
+        }
+
+        const equipmentSource = ext && typeof ext === "object" ? (ext as any).equipmentSource : null;
+        const equipmentProfileId =
+          equipmentSource && typeof equipmentSource === "object" && typeof (equipmentSource as any).equipmentProfileId === "string"
+            ? ((equipmentSource as any).equipmentProfileId as string)
+            : "";
+        setSelectedEquipmentProfileId(equipmentProfileId);
 
         if (!(r as any).beerJsonRecipeJson) {
           throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
@@ -218,6 +263,64 @@ export default function RecipeEditPage() {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setEquipmentProfilesLoading(true);
+      setEquipmentProfilesError(null);
+      try {
+        const res = await apiFetch("/api/equipment-profiles");
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const items = (res.data as any)?.profiles;
+        if (!cancelled) setEquipmentProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
+      } catch (err) {
+        if (!cancelled) setEquipmentProfilesError(String(err));
+      } finally {
+        if (!cancelled) setEquipmentProfilesLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const applyEquipmentProfileToRecipe = async (mode: "apply" | "reload") => {
+    if (!recipeId) return;
+    setEquipmentApplyError(null);
+    setEquipmentApplying(true);
+    try {
+      const selected = equipmentProfiles.find((p) => p.id === selectedEquipmentProfileId) ?? null;
+      if (!selected) throw new Error(tEquip("errors.selectFirst"));
+
+      const extBase = (recipe as any)?.recipeExtJson;
+      const base =
+        extBase && typeof extBase === "object" && !Array.isArray(extBase) ? ({ ...(extBase as any) } as any) : ({} as any);
+
+      base.version = 1;
+      base.equipment = selected.equipment;
+      base.equipmentSource = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
+
+      const patchRes = await apiFetch(`/api/recipes/${recipeId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipeExtJson: base }),
+      });
+      if (!patchRes.ok) throw new Error(JSON.stringify(patchRes.data));
+
+      // Re-fetch to refresh derived analysis.
+      const reload = await apiFetch(`/api/recipes/${recipeId}`);
+      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
+      const r = (reload.data as any).recipe as Recipe;
+      setRecipe(r);
+      setAnalysis((r as any).analysis ?? null);
+      setSaveStatus(mode === "reload" ? t("status.equipmentReloaded") : t("status.equipmentApplied"));
+    } catch (err) {
+      setEquipmentApplyError(String(err));
+    } finally {
+      setEquipmentApplying(false);
+    }
+  };
+
   const onSave = async () => {
     if (!recipeId) return;
     setSaving(true);
@@ -225,13 +328,31 @@ export default function RecipeEditPage() {
     setSaveStatus(null);
     try {
       const extBase = (recipe as any)?.recipeExtJson;
+      const extBaseForSave =
+        extBase && typeof extBase === "object" && !Array.isArray(extBase) ? ({ ...(extBase as any) } as any) : ({} as any);
+
+      const yeastAttenuationOverridesPercent = Object.fromEntries(
+        Object.entries(yeastAttenuationOverrides)
+          .map(([k, v]) => {
+            const trimmed = v.trim();
+            if (!trimmed) return null;
+            const n = Number(trimmed);
+            if (!Number.isFinite(n)) return null;
+            return [k, n] as const;
+          })
+          .filter(Boolean) as Array<readonly [string, number]>,
+      );
+      if (Object.keys(yeastAttenuationOverridesPercent).length) {
+        extBaseForSave.yeastAttenuationOverridesPercent = yeastAttenuationOverridesPercent;
+      } else {
+        delete extBaseForSave.yeastAttenuationOverridesPercent;
+      }
+
       const batchSizeLiters =
-        extBase && typeof extBase === "object" && typeof (extBase as any).batchSizeLiters === "number"
-          ? (extBase as any).batchSizeLiters
+        typeof extBaseForSave.batchSizeLiters === "number" ? extBaseForSave.batchSizeLiters
           : null;
       const brewhouseEfficiencyPercent =
-        extBase && typeof extBase === "object" && typeof (extBase as any).brewhouseEfficiencyPercent === "number"
-          ? (extBase as any).brewhouseEfficiencyPercent
+        typeof extBaseForSave.brewhouseEfficiencyPercent === "number" ? extBaseForSave.brewhouseEfficiencyPercent
           : null;
 
       const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
@@ -250,6 +371,7 @@ export default function RecipeEditPage() {
         hopsRows: hopsRows as unknown as EditorHopRow[],
         yeastRows: yeastRows as unknown as EditorYeastRow[],
         miscRows: miscRows as any,
+        extBase: extBaseForSave,
       });
 
       const res = await apiFetch(`/api/recipes/${recipeId}`, {
@@ -266,8 +388,9 @@ export default function RecipeEditPage() {
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const r = (res.data as any).recipe as Recipe;
       setRecipe(r);
+      setAnalysis((r as any).analysis ?? null);
       setStyleKey((r as any).styleKey ?? styleKey);
-      setSaveStatus("Saved.");
+      setSaveStatus(t("status.saved"));
     } catch (err) {
       setSaveError(String(err));
     } finally {
@@ -425,7 +548,15 @@ export default function RecipeEditPage() {
       },
     ]);
   };
-  const removeYeastRow = (id: string) => setYeastRows((prev) => prev.filter((r) => r.id !== id));
+  const removeYeastRow = (id: string) => {
+    setYeastRows((prev) => prev.filter((r) => r.id !== id));
+    setYeastAttenuationOverrides((prev) => {
+      if (!(id in prev)) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  };
   const updateYeastRow = (id: string, patch: Partial<YeastRow>) =>
     setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
@@ -570,13 +701,7 @@ export default function RecipeEditPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
-        Recipe ID: <code>{recipeId}</code>
-      </p>
-
-      <p className="muted" style={{ marginTop: 0 }}>
-        {t("shapeNote")}
-      </p>
+      <RecipeMetaLine recipeId={recipeId} />
 
       {authLoaded && !canCallAccountScoped ? (
         <p role="alert" className="errorBox">
@@ -689,6 +814,172 @@ export default function RecipeEditPage() {
                 {saveError}
               </pre>
             ) : null}
+          </section>
+
+          <section id="analysis" className="panel" aria-labelledby="analysis-heading">
+            <h2 id="analysis-heading" style={{ marginTop: 0 }}>
+              {t("sections.analysis")}
+            </h2>
+            <p className="muted" style={{ marginTop: 0 }}>
+              {tAnalysis("help")}
+            </p>
+
+            {(() => {
+              const a = analysis && typeof analysis === "object" ? (analysis as any) : null;
+              const fmt = (v: unknown, decimals: number) =>
+                typeof v === "number" && Number.isFinite(v) ? formatFixed(locale, v, decimals) : tAnalysis("na");
+
+              const warnings = Array.isArray(a?.warnings) ? (a.warnings as any[]) : [];
+
+              return (
+                <>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.abv")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.abvEstimatedPercent, 2)}</code>{" "}
+                            {typeof a?.abvEstimatedPercent === "number" ? <span className="muted">%</span> : null}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.kettleVolume")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.kettleVolumeLiters, 2)}</code>{" "}
+                            {typeof a?.kettleVolumeLiters === "number" ? <span className="muted">L</span> : null}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.preBoilVolume")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.preBoilVolumeLiters, 2)}</code>{" "}
+                            {typeof a?.preBoilVolumeLiters === "number" ? <span className="muted">L</span> : null}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.og")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.ogEstimatedSg, 3)}</code>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.fg")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.fgEstimatedSg, 3)}</code>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.attenuation")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.attenuationEffectivePercent, 1)}</code>{" "}
+                            {typeof a?.attenuationEffectivePercent === "number" ? <span className="muted">%</span> : null}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ paddingRight: 12 }}>
+                            <strong>{tAnalysis("fields.pbg")}</strong>
+                          </td>
+                          <td>
+                            <code>{fmt(a?.pbgEstimatedSg, 3)}</code>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {warnings.length ? (
+                    <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
+                      <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+                        <strong>{tAnalysis("warningsTitle")}</strong>
+                        <span className="muted">{tAnalysis("warningsClickToExpand")}</span>
+                      </summary>
+                      <ul style={{ marginTop: 8 }}>
+                        {warnings.map((w, idx) => (
+                          <li key={`${String(w?.code ?? "warn")}-${idx}`}>
+                            <code>{String(w?.code ?? "warning")}</code>{" "}
+                            <span className="muted">{String(w?.message ?? "")}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
+                </>
+              );
+            })()}
+          </section>
+
+          <section id="equipment" className="panel" aria-labelledby="equipment-heading">
+            <h2 id="equipment-heading" style={{ marginTop: 0 }}>
+              {t("sections.equipment")}
+            </h2>
+            <p className="muted" style={{ marginTop: 0 }}>
+              {tEquip("help")}
+            </p>
+
+            {equipmentProfilesError ? (
+              <pre className="errorBox" role="alert">
+                {equipmentProfilesError}
+              </pre>
+            ) : null}
+
+            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
+              <div>
+                <label htmlFor="equipment-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  {tEquip("profileLabel")}
+                </label>
+                <select
+                  id="equipment-profile"
+                  value={selectedEquipmentProfileId}
+                  onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
+                  style={{ width: "100%", padding: 8 }}
+                  disabled={equipmentProfilesLoading}
+                >
+                  <option value="">{tEquip("noneOption")}</option>
+                  {equipmentProfiles.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={() => void applyEquipmentProfileToRecipe("apply")}
+                disabled={!selectedEquipmentProfileId || equipmentApplying}
+              >
+                {equipmentApplying ? tEquip("working") : tEquip("apply")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void applyEquipmentProfileToRecipe("reload")}
+                disabled={!selectedEquipmentProfileId || equipmentApplying}
+              >
+                {equipmentApplying ? tEquip("working") : tEquip("reload")}
+              </button>
+            </div>
+
+            {equipmentApplyError ? (
+              <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                {equipmentApplyError}
+              </pre>
+            ) : null}
+
+            <p className="muted" style={{ marginBottom: 0 }}>
+              {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
+            </p>
           </section>
 
           <section id="fermentables" className="panel" aria-labelledby="fermentables-heading">
@@ -1499,6 +1790,22 @@ export default function RecipeEditPage() {
                                     style={{ width: "100%", padding: 8 }}
                                   />
                                 </div>
+                                <div style={{ width: 200, maxWidth: "100%" }}>
+                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-atten-override-${r.id}`}>
+                                    {tAnalysis("customAttenuationPercentLabel")}
+                                  </label>
+                                  <input
+                                    id={`yeast-atten-override-${r.id}`}
+                                    type="number"
+                                    inputMode="decimal"
+                                    step={0.1}
+                                    value={yeastAttenuationOverrides[r.id] ?? ""}
+                                    onChange={(e) =>
+                                      setYeastAttenuationOverrides((prev) => ({ ...prev, [r.id]: e.target.value }))
+                                    }
+                                    style={{ width: "100%", padding: 8 }}
+                                  />
+                                </div>
                                 <div style={{ flex: "0 0 auto" }}>
                                   <button
                                     type="button"
@@ -1706,7 +2013,7 @@ export default function RecipeEditPage() {
               {t("sections.notes")}
             </h2>
             <label htmlFor="recipe-notes" className="muted" style={{ display: "block", fontSize: 12 }}>
-              Notes
+              {t("sections.notes")}
             </label>
             <textarea
               id="recipe-notes"

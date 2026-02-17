@@ -89,6 +89,7 @@ model Account {
   sessions            Session[]             @relation("SessionActiveAccount")
   recipes             Recipe[]
   waterProfiles       WaterProfile[]
+  equipmentProfiles   EquipmentProfile[]
   recipeWaterSettings RecipeWaterSettings[]
 
   fermentables Fermentable[]
@@ -394,6 +395,36 @@ model WaterProfile {
   @@index([type])
   @@index([accountId])
   @@map("water_profiles")
+}
+
+model EquipmentProfile {
+  id        String   @id @default(uuid())
+  accountId String   @map("account_id")
+  name      String
+
+  kettleVolumeLiters                     Float? @map("kettle_volume_liters")
+  kettleLossesLiters                     Float? @map("kettle_losses_liters")
+  kettleBoilEvaporationRatePercentPerHour Float? @map("kettle_boil_evaporation_rate_percent_per_hour")
+  kettleCoolingShrinkagePercent          Float? @map("kettle_cooling_shrinkage_percent")
+  kettleHopsAbsorptionLiters             Float? @map("kettle_hops_absorption_liters")
+
+  mashVolumeLiters           Float? @map("mash_volume_liters")
+  mashEfficiencyPercent      Float? @map("mash_efficiency_percent")
+  mashLossesLiters           Float? @map("mash_losses_liters")
+  mashThicknessLPerKg        Float? @map("mash_thickness_l_per_kg")
+  mashGrainAbsorptionLPerKg  Float? @map("mash_grain_absorption_l_per_kg")
+  mashWaterLeftoverLiters    Float? @map("mash_water_leftover_liters")
+
+  otherLossesLiters Float? @map("other_losses_liters")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, name])
+  @@index([accountId])
+  @@map("equipment_profiles")
 }
 
 model Fermentable {

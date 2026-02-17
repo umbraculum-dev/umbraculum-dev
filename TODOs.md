@@ -4,10 +4,10 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 ## Water calculator (high priority)
 
-- [ ] **Sparge salts vs sparge pH**: verify whether sparge salt additions currently influence predicted sparge pH; if not, implement the same Ca/Mg (RA-like) pH shift approach used for mash so gypsum/CaCl₂ can move predicted sparge pH modestly.
-- [ ] **Deprecate mash pH v0**: after we’ve tested v1 enough for confidence, remove v0 endpoints/logic and UI fallbacks (keep a short-lived migration window if needed).
+- [x] **Sparge salts vs sparge pH**: ensure sparge salt additions influence sparge acidification (Ca/Mg effective-alkalinity heuristic), without requiring a manual “calculate salts” step first.
+- [x] **Deprecate mash pH v0**: remove v0 endpoints/logic and UI naming; keep a single canonical mash pH estimator that supports back-compat inputs.
 - [ ] Implement how recipes manage **late additions** and **boil additions** (separate from mash), since they do not contribute to mash calculations.
-- [ ] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
+- [x] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
 - [ ] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
 
 ## Recipes / templates
@@ -19,6 +19,15 @@ This file tracks near-term implementation tasks and “migration reminders” as
   - [ ] Define a licensing policy: default to user-provided files; do not redistribute third-party recipe datasets unless explicitly licensed.
   - [ ] Choose approach: maintained library vs minimal in-house parser for the subset we need.
 - [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
+
+## Gravity / ABV analysis + equipment
+
+- [x] Add account-level **Equipment templates** (admin-managed) and allow recipes to snapshot-select one into `recipeExtJson` (kettle + mash + misc losses).
+- [x] Add a product-facing **Analysis** section (OG/FG/ABV/PBG + volumes + attenuation) driven by derived estimates (null when insufficient data).
+- [x] Allow per-yeast **custom attenuation % override** (stored by yeast row ID in `recipeExtJson`) and use it for FG/ABV estimate.
+- [ ] Clarify semantics and units in docs: which volumes are “hot-side” vs “cold-side” today; add fermenter volume stage later.
+- [ ] Consider persisting yeast attenuation **min/max range** in `recipeExtJson` (BeerJSON currently stores a single attenuation value).
+- [ ] Add equipment template UX improvements: inline validation, preset suggestions, and import/export.
 
 ## Authentication (real, production-ready)
 
