@@ -13,6 +13,7 @@ import { formatFixed } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { mathExplain } from "./_lib/mathExplain";
+import { RecipeMetaLine } from "./_components/RecipeMetaLine";
 
 type MashOverallResult = {
   calculatedAt: string;
@@ -345,9 +346,7 @@ export default function WaterHubPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
-        {t("recipeId")}: <code>{recipeId}</code>
-      </p>
+      <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
 
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
         <p style={{ margin: 0 }}>

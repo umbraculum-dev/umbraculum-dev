@@ -9,6 +9,7 @@ import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { parseGristJson, type GristRow } from "../../../../_lib/grist";
 import { editorStateFromBeerJson } from "../../../_lib/beerjsonRecipe";
 import { ModeFieldset } from "../_components/ModeFieldset";
+import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { apiFetch, type MeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
@@ -925,9 +926,7 @@ export default function MashWaterPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
-        Recipe ID: <code>{recipeId}</code>
-      </p>
+      <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
         <p style={{ margin: 0 }}>
           <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}

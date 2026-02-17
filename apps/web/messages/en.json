@@ -231,6 +231,7 @@
   "waterHub": {
     "title": "Water management",
     "recipeId": "Recipe ID",
+    "recipeName": "Name",
     "backToRecipeEditor": "Back to recipe editor",
     "missingHeaders": "Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account), then come back here.",
     "chooseArea": "Choose an area",

@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModeFieldset } from "../_components/ModeFieldset";
+import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
@@ -733,9 +734,7 @@ export default function BoilWaterPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
-        Recipe ID: <code>{recipeId}</code>
-      </p>
+      <RecipeMetaLine recipeId={recipeId} enabled={authed} />
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
         <p style={{ margin: 0 }}>
           <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link>

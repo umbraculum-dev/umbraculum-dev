@@ -231,6 +231,7 @@
   "waterHub": {
     "title": "Gestione acqua",
     "recipeId": "ID ricetta",
+    "recipeName": "Nome",
     "backToRecipeEditor": "Torna all’editor ricetta",
     "missingHeaders": "Header dev mancanti. Vai in Dashboard e clicca <strong>Salva header</strong> (Utente + Account attivo), poi torna qui.",
     "chooseArea": "Scegli un’area",
