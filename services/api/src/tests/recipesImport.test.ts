@@ -70,8 +70,6 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
     const pj = preview.json() as any;
     expect(pj.ok).toBe(true);
     expect(pj.preview.name).toBe("Import Test IPA");
-    expect(Array.isArray(pj.preview.gristJson)).toBe(true);
-    expect(pj.preview.gristJson.length).toBe(1);
     expect(pj.preview.beerJsonRecipeJson?.beerjson?.version).toBe(1);
 
     const imp = await app.inject({

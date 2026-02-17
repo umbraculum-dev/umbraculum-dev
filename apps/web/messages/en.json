@@ -59,7 +59,7 @@
     "sparge": {
       "acidRequired": {
         "title": "Acid required (target pH)",
-        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and water volume.\n\nNotes:\n- If the selected profile has no pH, we only use the manually entered Starting pH.\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator (v0): use it as guidance, then measure/adjust."
+        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and water volume.\n\nNotes:\n- If the selected profile has no pH, we only use the manually entered Starting pH.\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust."
       },
       "finalAlkalinity": {
         "title": "Final alkalinity (ppm as CaCO3)",
@@ -81,7 +81,7 @@
     "mash": {
       "acidRequired": {
         "title": "Acid required (target pH)",
-        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and mash water volume.\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator (v0): use it as guidance, then measure/adjust."
+        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and mash water volume.\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust."
       },
       "finalAlkalinity": {
         "title": "Final alkalinity (ppm as CaCO3)",
@@ -123,7 +123,7 @@
     "edit": {
       "title": "Edit recipe",
       "loading": "Loading…",
-      "v0ShapeNote": "v0 shape: single-page editor with section navigation. Water chemistry is a link-out to the dedicated calculator page.",
+      "shapeNote": "Single-page editor with section navigation. Water chemistry is a link-out to the dedicated calculator page.",
       "notReadyToLoad": "Not ready to load this recipe.",
       "nav": {
         "sectionsAriaLabel": "Recipe sections",
@@ -141,8 +141,8 @@
         "water": "Water chemistry"
       },
       "basicsHelp": "Loaded/saved via GET/PATCH /api/recipes/:id.",
-      "hopsHelp": "v0: pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
-      "yeastHelp": "v0: select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
+      "hopsHelp": "Pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
+      "yeastHelp": "Select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
       "otherHelp": "Spices, finings, flavorings, etc.",
       "waterHelp": "The full mash chemistry + water calculator lives on its own page (not embedded here).",
       "buttons": {
@@ -179,10 +179,10 @@
       },
       "boil": {
         "title": "Additional boil water",
-        "adjustmentHeading": "Boil water adjustment (v0)",
-        "saltAdditionsHeading": "Salt additions (manual, v0)",
-        "acidificationHeading": "Boil water acidification (v0)",
-        "overallResultHeading": "Overall boil water result (v0, HCO3 derived from alkalinity)",
+        "adjustmentHeading": "Boil water adjustment",
+        "saltAdditionsHeading": "Salt additions (manual)",
+        "acidificationHeading": "Boil water acidification",
+        "overallResultHeading": "Overall boil water result (HCO3 derived from alkalinity)",
         "adjustmentHelp": "Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.",
         "saltAdditionsHelp": "Select a Source profile and set Source volume. Dilution is optional, but if Dilution volume is > 0 you must select a Dilution profile.",
         "saltAdditionsBaseHelp": "Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm)."

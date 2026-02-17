@@ -1,18 +1,12 @@
-## Mash pH model (v0 vs v1)
+## Mash pH model
 
-This app has two mash pH estimators:
+This app uses a single mash pH estimator:
 
-- **v0**: `POST /api/water-calc/mash-ph-estimate`
-  - Inputs: `amountKg`, `colorLovibond`, `maltClass` (4-bucket classification)
-  - Status: legacy; kept for regression and fallback
-
-- **v1 (experimental)**: `POST /api/water-calc/mash-ph-estimate-v1`
-  - Inputs: `amountKg`, plus two per-fermentable parameters:
+- `POST /api/water-calc/mash-ph-estimate`
+  - Inputs (canonical): `amountKg`, plus two per-fermentable parameters:
     - **DI mash pH** (`mashDiPh`): distilled-water mash pH (room temp, ~20–25°C)
     - **Titratable acidity to pH 5.7** (`mashTaToPh57_mEqPerKg`): Troester-style TA in **mEq/kg**
-  - Status: accuracy-first direction; designed to support canonical DB defaults + per-recipe overrides
-
-The mash water page will **prefer v1** automatically when any grist row includes `mashDiPh` and/or `mashTaToPh57_mEqPerKg`, otherwise it falls back to v0.
+  - Back-compat: if a caller provides the older `maltClass` + `colorLovibond` fields, the API derives v1 defaults.
 
 ## References (Troester/Braukaiser + Palmer/RA)
 
@@ -133,7 +127,7 @@ Reference guidance:
 - We do **not** attempt full carbonate speciation at arbitrary pH/CO₂ conditions for the displayed ion tables.
 - “HCO₃” shown after acidification is an **alkalinity-equivalent proxy**, not a full equilibrium species calculation.
 
-## v1 estimator (high level)
+## Estimator (high level)
 
 `mashPhEstimateV1`:
 

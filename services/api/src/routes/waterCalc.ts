@@ -8,15 +8,30 @@ import {
 } from "../domain/waterCalc/spargeAcidification.js";
 import { spargeAcidificationManual } from "../domain/waterCalc/spargeAcidificationManual.js";
 import { mashAcidificationManual } from "../domain/waterCalc/mashAcidificationManual.js";
-import { mashPhEstimateV0, type MashPhEstimateV0Input } from "../domain/waterCalc/mashPhEstimateV0.js";
-import { mashPhEstimateV1, type MashPhEstimateV1Input } from "../domain/waterCalc/mashPhEstimateV1.js";
-import { mashAcidificationTargetMashPhV0 } from "../domain/waterCalc/mashAcidificationTargetMashPhV0.js";
+import { mashPhEstimate, type MashPhEstimateInput } from "../domain/waterCalc/mashPhEstimate.js";
+import { mashAcidificationTargetMashPh } from "../domain/waterCalc/mashAcidificationTargetMashPh.js";
+import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "../domain/waterCalc/mashPhDefaultsV1.js";
 import {
   applySaltAdditions,
   type IonProfilePpm,
   type SaltAddition,
   type SaltKey,
 } from "../domain/waterCalc/saltAdditions.js";
+
+function colorLovibondToEbc(colorLovibond: number | null): number | null {
+  if (colorLovibond === null) return null;
+  if (!Number.isFinite(colorLovibond) || colorLovibond < 0) return null;
+  // Pragmatic approximation for defaults lookup. (We only need a reasonable magnitude.)
+  return colorLovibond * 1.97;
+}
+
+function mashPhModelKeyFromMaltClass(maltClass: string) {
+  if (maltClass === "base") return "base_pale";
+  if (maltClass === "crystal") return "crystal";
+  if (maltClass === "roast") return "roasted";
+  if (maltClass === "acid") return "acidulated";
+  return "base_pale";
+}
 
 export async function waterCalcRoutes(app: FastifyInstance) {
   app.post("/water-calc/sparge-acidification", async (req) => {
@@ -332,7 +347,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
-    const grist: MashPhEstimateV0Input["grist"] = gristRaw.map((row, idx) => {
+    const grist: MashPhEstimateInput["grist"] = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
       const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
@@ -341,13 +356,35 @@ export async function waterCalcRoutes(app: FastifyInstance) {
           `Body.grist[${idx}].amountKg must be a number > 0`,
         );
       }
+
+      // Preferred v1 inputs:
+      const diRaw = o.mashDiPh;
+      const mashDiPh =
+        diRaw === null || diRaw === undefined ? null : typeof diRaw === "number" ? diRaw : NaN;
+      if (typeof mashDiPh === "number" && (!Number.isFinite(mashDiPh) || mashDiPh < 0 || mashDiPh > 14)) {
+        throw new BadRequestError(
+          "invalid_grist_row_mash_di_ph",
+          `Body.grist[${idx}].mashDiPh must be null or a finite number between 0 and 14`,
+        );
+      }
+
+      const taRaw = o.mashTaToPh57_mEqPerKg;
+      const mashTaToPh57_mEqPerKg =
+        taRaw === null || taRaw === undefined ? null : typeof taRaw === "number" ? taRaw : NaN;
+      if (
+        typeof mashTaToPh57_mEqPerKg === "number" &&
+        (!Number.isFinite(mashTaToPh57_mEqPerKg) || mashTaToPh57_mEqPerKg < 0)
+      ) {
+        throw new BadRequestError(
+          "invalid_grist_row_mash_ta",
+          `Body.grist[${idx}].mashTaToPh57_mEqPerKg must be null or a finite number >= 0`,
+        );
+      }
+
+      // Back-compat: derive v1 defaults from v0-style fields when present.
       const colorRaw = o.colorLovibond;
       const colorLovibond =
-        colorRaw === null || colorRaw === undefined
-          ? null
-          : typeof colorRaw === "number"
-            ? colorRaw
-            : NaN;
+        colorRaw === null || colorRaw === undefined ? null : typeof colorRaw === "number" ? colorRaw : NaN;
       if (typeof colorLovibond === "number" && (!Number.isFinite(colorLovibond) || colorLovibond < 0)) {
         throw new BadRequestError(
           "invalid_grist_row_color",
@@ -357,14 +394,23 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
       const maltClassRaw = o.maltClass;
       const maltClass =
-        maltClassRaw === "base" ||
-        maltClassRaw === "crystal" ||
-        maltClassRaw === "roast" ||
-        maltClassRaw === "acid"
+        maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
           ? maltClassRaw
-          : "base";
+          : null;
 
-      return { amountKg, colorLovibond, maltClass };
+      const modelKey = maltClass ? mashPhModelKeyFromMaltClass(maltClass) : "base_pale";
+      const colorEbc = colorLovibondToEbc(typeof colorLovibond === "number" ? colorLovibond : null);
+
+      const mashDiPhFinal =
+        typeof mashDiPh === "number"
+          ? mashDiPh
+          : defaultMashDiPh(modelKey) ?? null;
+      const mashTaFinal =
+        typeof mashTaToPh57_mEqPerKg === "number"
+          ? mashTaToPh57_mEqPerKg
+          : defaultMashTaToPh57_mEqPerKg(modelKey, colorEbc) ?? null;
+
+      return { amountKg, mashDiPh: mashDiPhFinal, mashTaToPh57_mEqPerKg: mashTaFinal };
     });
 
     const waterToGristRatioQtPerLbOverride =
@@ -395,7 +441,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
     let result;
     try {
-      result = mashPhEstimateV0({
+      result = mashPhEstimate({
         volumeLiters,
         alkalinityPpmCaCO3,
         calciumPpm,
@@ -411,108 +457,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     return { ok: true, result };
   });
 
-  app.post("/water-calc/mash-ph-estimate-v1", async (req) => {
-    requireActiveAccount(req);
-    const body = (req.body ?? {}) as Record<string, unknown>;
-
-    const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : NaN;
-    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
-      throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be a number > 0");
-    }
-    const alkalinityPpmCaCO3 = typeof body.alkalinityPpmCaCO3 === "number" ? body.alkalinityPpmCaCO3 : NaN;
-    if (!Number.isFinite(alkalinityPpmCaCO3) || alkalinityPpmCaCO3 < 0) {
-      throw new BadRequestError("invalid_alkalinity", "Body.alkalinityPpmCaCO3 must be a finite number >= 0");
-    }
-
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
-    if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
-      throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
-    }
-    if (magnesiumPpm !== undefined && (!Number.isFinite(magnesiumPpm) || magnesiumPpm < 0)) {
-      throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
-    }
-
-    const gristRaw = body.grist;
-    if (!Array.isArray(gristRaw)) {
-      throw new BadRequestError("invalid_grist", "Body.grist must be an array");
-    }
-    const grist: MashPhEstimateV1Input["grist"] = gristRaw.map((row, idx) => {
-      const o = (row ?? {}) as Record<string, unknown>;
-      const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
-      if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
-        throw new BadRequestError(
-          "invalid_grist_row_amount",
-          `Body.grist[${idx}].amountKg must be a number > 0`,
-        );
-      }
-
-      const diRaw = o.mashDiPh;
-      const mashDiPh =
-        diRaw === null || diRaw === undefined ? null : typeof diRaw === "number" ? diRaw : NaN;
-      if (typeof mashDiPh === "number" && (!Number.isFinite(mashDiPh) || mashDiPh < 0 || mashDiPh > 14)) {
-        throw new BadRequestError(
-          "invalid_grist_row_mash_di_ph",
-          `Body.grist[${idx}].mashDiPh must be null or a finite number between 0 and 14`,
-        );
-      }
-
-      const taRaw = o.mashTaToPh57_mEqPerKg;
-      const mashTaToPh57_mEqPerKg =
-        taRaw === null || taRaw === undefined ? null : typeof taRaw === "number" ? taRaw : NaN;
-      if (
-        typeof mashTaToPh57_mEqPerKg === "number" &&
-        (!Number.isFinite(mashTaToPh57_mEqPerKg) || mashTaToPh57_mEqPerKg < 0)
-      ) {
-        throw new BadRequestError(
-          "invalid_grist_row_mash_ta",
-          `Body.grist[${idx}].mashTaToPh57_mEqPerKg must be null or a finite number >= 0`,
-        );
-      }
-
-      return { amountKg, mashDiPh, mashTaToPh57_mEqPerKg };
-    });
-
-    const waterToGristRatioQtPerLbOverride =
-      typeof body.waterToGristRatioQtPerLbOverride === "number"
-        ? body.waterToGristRatioQtPerLbOverride
-        : undefined;
-    if (
-      waterToGristRatioQtPerLbOverride !== undefined &&
-      (!Number.isFinite(waterToGristRatioQtPerLbOverride) || !(waterToGristRatioQtPerLbOverride > 0))
-    ) {
-      throw new BadRequestError(
-        "invalid_ratio_override",
-        "Body.waterToGristRatioQtPerLbOverride must be a number > 0",
-      );
-    }
-
-    const acidAdded_mEqPerL =
-      typeof body.acidAdded_mEqPerL === "number" ? (body.acidAdded_mEqPerL as number) : undefined;
-    if (acidAdded_mEqPerL !== undefined && (!Number.isFinite(acidAdded_mEqPerL) || acidAdded_mEqPerL < 0)) {
-      throw new BadRequestError(
-        "invalid_acid_added_meq",
-        "Body.acidAdded_mEqPerL must be a finite number >= 0",
-      );
-    }
-
-    let result;
-    try {
-      result = mashPhEstimateV1({
-        volumeLiters,
-        alkalinityPpmCaCO3,
-        calciumPpm,
-        magnesiumPpm,
-        grist,
-        waterToGristRatioQtPerLbOverride,
-        acidAdded_mEqPerL,
-      });
-    } catch (e) {
-      throw new BadRequestError("invalid_mash_ph_estimate_v1_input", (e as Error)?.message || "Invalid input");
-    }
-
-    return { ok: true, result };
-  });
+  // v1 is now canonical: the unversioned endpoint handles both the new v1 per-row inputs and
+  // the older maltClass/color inputs (it derives v1 defaults when needed).
 
   app.post("/water-calc/mash-acidification-target-mash-ph", async (req) => {
     requireActiveAccount(req);
@@ -584,7 +530,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
-    const grist: MashPhEstimateV0Input["grist"] = gristRaw.map((row, idx) => {
+    const grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: string }> = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
       const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
@@ -635,7 +581,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
     let result;
     try {
-      result = mashAcidificationTargetMashPhV0({
+      result = mashAcidificationTargetMashPh({
         startingAlkalinityPpmCaCO3,
         startingPh,
         volumeLiters,

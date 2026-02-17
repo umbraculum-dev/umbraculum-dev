@@ -2,14 +2,29 @@ import type { FastifyInstance } from "fastify";
 import { requireActiveAccount } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import { RecipesService } from "../services/recipesService.js";
-import { importBeerXmlToLegacy } from "../importers/beerxmlImporter.js";
-import { importBeerJsonToLegacy } from "../importers/beerjsonImporter.js";
-import { buildBeerJsonDocumentFromLegacy, validateBeerJsonDoc } from "../beerjson/index.js";
+import { importBeerXmlToBeerJson } from "../importers/beerxmlImporter.js";
+import { validateBeerJsonDoc } from "../beerjson/index.js";
 
 type ImportFormat = "beerjson" | "beerxml";
 
 export async function recipesImportRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
+
+  function parseBeerJsonContent(content: string): any {
+    try {
+      return JSON.parse(content);
+    } catch {
+      throw new BadRequestError("invalid_beerjson", "Body.content must be valid JSON for format=beerjson");
+    }
+  }
+
+  function extractRecipeMetaFromBeerJson(doc: any): { recipeName: string; notes: string | null } {
+    const r0 = doc?.beerjson?.recipes?.[0];
+    const recipeName = typeof r0?.name === "string" ? r0.name.trim() : "";
+    if (!recipeName) throw new BadRequestError("invalid_beerjson", "BeerJSON recipe name is required");
+    const notes = typeof r0?.notes === "string" ? r0.notes.trim() || null : null;
+    return { recipeName, notes };
+  }
 
   app.post("/recipes/import/preview", async (req) => {
     const ctx = requireActiveAccount(req);
@@ -23,24 +38,17 @@ export async function recipesImportRoutes(app: FastifyInstance) {
 
     const mapped =
       format === "beerxml"
-        ? importBeerXmlToLegacy(content)
-        : importBeerJsonToLegacy((() => {
-            try {
-              return JSON.parse(content);
-            } catch {
-              throw new BadRequestError("invalid_beerjson", "Body.content must be valid JSON for format=beerjson");
-            }
-          })());
+        ? importBeerXmlToBeerJson(content)
+        : (() => {
+            const doc = parseBeerJsonContent(content);
+            const v = validateBeerJsonDoc(doc);
+            if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
+            const meta = extractRecipeMetaFromBeerJson(doc);
+            return { recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: doc, warnings: [] as any[] };
+          })();
 
-    const beerJson = buildBeerJsonDocumentFromLegacy({
-      recipe: { name: mapped.recipeName, notes: mapped.notes },
-      gristJson: mapped.gristJson,
-      hopsJson: mapped.hopsJson,
-      yeastJson: mapped.yeastJson,
-      miscJson: mapped.miscJson,
-    });
-    const v = validateBeerJsonDoc(beerJson);
-    if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `Generated BeerJSON invalid: ${v.errors}`);
+    const v2 = validateBeerJsonDoc(mapped.beerJsonRecipeJson);
+    if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v2.errors}`);
 
     // Best-effort: no DB writes here.
     return {
@@ -49,11 +57,7 @@ export async function recipesImportRoutes(app: FastifyInstance) {
       preview: {
         name: mapped.recipeName,
         notes: mapped.notes,
-        gristJson: mapped.gristJson,
-        hopsJson: mapped.hopsJson,
-        yeastJson: mapped.yeastJson,
-        miscJson: mapped.miscJson,
-        beerJsonRecipeJson: beerJson,
+        beerJsonRecipeJson: mapped.beerJsonRecipeJson,
         warnings: mapped.warnings,
       },
       accountId: ctx.activeAccountId,
@@ -74,31 +78,21 @@ export async function recipesImportRoutes(app: FastifyInstance) {
 
     const mapped =
       format === "beerxml"
-        ? importBeerXmlToLegacy(content)
-        : importBeerJsonToLegacy((() => {
-            try {
-              return JSON.parse(content);
-            } catch {
-              throw new BadRequestError("invalid_beerjson", "Body.content must be valid JSON for format=beerjson");
-            }
-          })());
-
-    const beerJson = buildBeerJsonDocumentFromLegacy({
-      recipe: { name: mapped.recipeName, notes: mapped.notes },
-      gristJson: mapped.gristJson,
-      hopsJson: mapped.hopsJson,
-      yeastJson: mapped.yeastJson,
-      miscJson: mapped.miscJson,
-    });
-    const v = validateBeerJsonDoc(beerJson);
-    if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `Generated BeerJSON invalid: ${v.errors}`);
+        ? importBeerXmlToBeerJson(content)
+        : (() => {
+            const doc = parseBeerJsonContent(content);
+            const v = validateBeerJsonDoc(doc);
+            if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
+            const meta = extractRecipeMetaFromBeerJson(doc);
+            return { recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: doc, warnings: [] as any[] };
+          })();
 
     // Create the recipe (BeerJSON-first).
     const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
       name: mapped.recipeName,
       styleKey,
       notes: mapped.notes,
-      beerJsonRecipeJson: beerJson,
+      beerJsonRecipeJson: mapped.beerJsonRecipeJson,
     });
 
     return { ok: true, recipe: created, warnings: mapped.warnings };

@@ -59,7 +59,7 @@
     "sparge": {
       "acidRequired": {
         "title": "Acido necessario (pH target)",
-        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, dato alcalinità iniziale e volume.\n\nNote:\n- Se il profilo selezionato non ha il pH, usiamo solo il pH iniziale inserito manualmente.\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico (v0): usa come guida, poi misura e correggi."
+        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, dato alcalinità iniziale e volume.\n\nNote:\n- Se il profilo selezionato non ha il pH, usiamo solo il pH iniziale inserito manualmente.\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico: usa come guida, poi misura e correggi."
       },
       "finalAlkalinity": {
         "title": "Alcalinità finale (ppm come CaCO3)",
@@ -81,7 +81,7 @@
     "mash": {
       "acidRequired": {
         "title": "Acido necessario (pH target)",
-        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, data alcalinità iniziale e volume acqua di mash.\n\nNote:\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico (v0): usa come guida, poi misura e correggi."
+        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, data alcalinità iniziale e volume acqua di mash.\n\nNote:\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico: usa come guida, poi misura e correggi."
       },
       "finalAlkalinity": {
         "title": "Alcalinità finale (ppm come CaCO3)",
@@ -123,7 +123,7 @@
     "edit": {
       "title": "Modifica ricetta",
       "loading": "Caricamento…",
-      "v0ShapeNote": "Struttura v0: editor a pagina singola con navigazione per sezioni. La chimica dell’acqua apre il calcolatore dedicato.",
+      "shapeNote": "Editor a pagina singola con navigazione per sezioni. La chimica dell’acqua apre il calcolatore dedicato.",
       "notReadyToLoad": "Non pronto per caricare questa ricetta.",
       "nav": {
         "sectionsAriaLabel": "Sezioni ricetta",
@@ -141,8 +141,8 @@
         "water": "Chimica dell’acqua"
       },
       "basicsHelp": "Caricamento/salvataggio via GET/PATCH /api/recipes/:id.",
-      "hopsHelp": "v0: scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
-      "yeastHelp": "v0: scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "yeastHelp": "Scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "otherHelp": "Spezie, chiarificanti, aromi, ecc.",
       "waterHelp": "Il calcolatore completo (chimica mash + acqua) vive in una pagina dedicata (non integrata qui).",
       "buttons": {
@@ -179,10 +179,10 @@
       },
       "boil": {
         "title": "Acqua aggiuntiva in bollitura",
-        "adjustmentHeading": "Regolazione acqua bollitura (v0)",
-        "saltAdditionsHeading": "Aggiunte di sali (manuale, v0)",
-        "acidificationHeading": "Acidificazione acqua bollitura (v0)",
-        "overallResultHeading": "Risultato complessivo acqua bollitura (v0, HCO3 derivato dall’alcalinità)",
+        "adjustmentHeading": "Regolazione acqua bollitura",
+        "saltAdditionsHeading": "Aggiunte di sali (manuale)",
+        "acidificationHeading": "Acidificazione acqua bollitura",
+        "overallResultHeading": "Risultato complessivo acqua bollitura (HCO3 derivato dall’alcalinità)",
         "adjustmentHelp": "Scegli profili sorgente/target/diluizione e volumi per calcolare un profilo acqua iniziale miscelato.",
         "saltAdditionsHelp": "Seleziona un profilo Sorgente e imposta il volume. La diluizione è opzionale, ma se il volume di diluizione è > 0 devi selezionare un profilo di diluizione.",
         "saltAdditionsBaseHelp": "Il profilo base è l’acqua sorgente miscelata sopra. Aggiungi sali in grammi; calcoliamo gli ioni risultanti (ppm)."

@@ -51,7 +51,7 @@ type SaltAdditionsResult = {
   breakdown: Array<{ saltKey: SaltKey; grams: number; deltasPpm: Partial<IonProfilePpm> }>;
 };
 
-type MashOverallResultV0 = {
+type MashOverallResult = {
   calculatedAt: string;
   ionsPpm: IonProfilePpm;
   finalAlkalinityPpmCaCO3: number;
@@ -136,7 +136,7 @@ export default function MashWaterPage() {
   const [overallStatus, setOverallStatus] = useState<string | null>(null);
   const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
   const [savingOverall, setSavingOverall] = useState(false);
-  const [overallResult, setOverallResult] = useState<MashOverallResultV0 | null>(null);
+  const [overallResult, setOverallResult] = useState<MashOverallResult | null>(null);
 
   // Water adjustment inputs (profiles + dilution)
   const [sourceProfileId, setSourceProfileId] = useState<string>("");
@@ -267,7 +267,7 @@ export default function MashWaterPage() {
       }
 
       if (s.mashOverallLastResultJson && typeof s.mashOverallLastResultJson === "object") {
-        setOverallResult(s.mashOverallLastResultJson as MashOverallResultV0);
+        setOverallResult(s.mashOverallLastResultJson as MashOverallResult);
       }
       if (s.mashOverallLastCalculatedAt) {
         setOverallStatus(`Last calculated: ${new Date(s.mashOverallLastCalculatedAt).toLocaleString()}`);
@@ -555,12 +555,7 @@ export default function MashWaterPage() {
     acidAdded_mEqPerL?: number;
   }) => {
     if (!canCall) return null;
-    const hasV1 = args.grist.some(
-      (r) =>
-        typeof r.mashDiPh === "number" ||
-        typeof r.mashTaToPh57_mEqPerKg === "number",
-    );
-    const res = await apiFetch(hasV1 ? "/api/water-calc/mash-ph-estimate-v1" : "/api/water-calc/mash-ph-estimate", {
+    const res = await apiFetch("/api/water-calc/mash-ph-estimate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -568,13 +563,13 @@ export default function MashWaterPage() {
         alkalinityPpmCaCO3: args.alkalinityPpmCaCO3,
         calciumPpm: args.calciumPpm,
         magnesiumPpm: args.magnesiumPpm,
-        grist: hasV1
-          ? args.grist.map((r) => ({
-              amountKg: r.amountKg,
-              mashDiPh: r.mashDiPh ?? null,
-              mashTaToPh57_mEqPerKg: r.mashTaToPh57_mEqPerKg ?? null,
-            }))
-          : args.grist,
+        grist: args.grist.map((r) => ({
+          amountKg: r.amountKg,
+          colorLovibond: r.colorLovibond,
+          maltClass: r.maltClass,
+          mashDiPh: r.mashDiPh ?? null,
+          mashTaToPh57_mEqPerKg: r.mashTaToPh57_mEqPerKg ?? null,
+        })),
         acidAdded_mEqPerL: args.acidAdded_mEqPerL,
       }),
     });
@@ -717,7 +712,7 @@ export default function MashWaterPage() {
     );
 
     const nowIso = new Date().toISOString();
-    const overall: MashOverallResultV0 = {
+    const overall: MashOverallResult = {
       calculatedAt: nowIso,
       ionsPpm,
       finalAlkalinityPpmCaCO3: acid.finalAlkalinityPpmCaCO3,

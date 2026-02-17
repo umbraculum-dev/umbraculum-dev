@@ -62,7 +62,6 @@ export type MashPhEstimateV1Result = {
   };
 };
 
-const LB_PER_KG = 2.2046226218;
 const L_PER_KG_TO_QT_PER_LB = 0.4792; // BrunWater constant
 const BASELINE_RATIO_QT_PER_LB = 1.5;
 
@@ -75,7 +74,7 @@ function assertFinite(n: number, label: string) {
 }
 
 /**
- * Mash pH estimate (v1, experimental):
+ * Mash pH estimate:
  * - Uses per-row DI mash pH (weighted average) as baseline.
  * - Uses per-row titratable acidity (mEq/kg to pH 5.7) to model specialty malt acidity contributions.
  * - Applies BrunWater-style alkalinity + mash thickness normalization.
@@ -94,14 +93,12 @@ export function mashPhEstimateV1(input: MashPhEstimateV1Input): MashPhEstimateV1
   assertFinite(magnesiumPpm, "magnesiumPpm");
   if (calciumPpm < 0 || magnesiumPpm < 0) throw new Error("calciumPpm/magnesiumPpm must be >= 0");
 
-  const {
-    effectiveAlkalinityPpmCaCO3,
-    alkalinityReductionFromCaMgPpmCaCO3,
-  } = effectiveAlkalinityPpmCaCO3FromCaMg({
-    alkalinityPpmCaCO3: input.alkalinityPpmCaCO3,
-    calciumPpm,
-    magnesiumPpm,
-  });
+  const { effectiveAlkalinityPpmCaCO3, alkalinityReductionFromCaMgPpmCaCO3 } =
+    effectiveAlkalinityPpmCaCO3FromCaMg({
+      alkalinityPpmCaCO3: input.alkalinityPpmCaCO3,
+      calciumPpm,
+      magnesiumPpm,
+    });
 
   let gristTotalKg = 0;
   let diMashPhWeightedSum = 0;
@@ -130,7 +127,7 @@ export function mashPhEstimateV1(input: MashPhEstimateV1Input): MashPhEstimateV1
             })();
 
     const mashDiPhUsed = mashDiPh ?? BASELINE_DI_MASH_PH;
-    if (mashDiPh === null) missingDiPhRowCount++;
+    if (mashDiPh === null) missingDiPhRowCount += 1;
     diMashPhWeightedSum += mashDiPhUsed * amountKg;
     diMashPhWeight += amountKg;
 
@@ -145,7 +142,7 @@ export function mashPhEstimateV1(input: MashPhEstimateV1Input): MashPhEstimateV1
             })();
 
     const mashTaUsed = mashTa ?? 0;
-    if (mashTa === null) missingTaRowCount++;
+    if (mashTa === null) missingTaRowCount += 1;
     const acidity_mEq = amountKg * mashTaUsed;
     totalAcidity_mEq += acidity_mEq;
 

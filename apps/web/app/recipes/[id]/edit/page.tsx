@@ -575,7 +575,7 @@ export default function RecipeEditPage() {
       </p>
 
       <p className="muted" style={{ marginTop: 0 }}>
-        {t("v0ShapeNote")}
+        {t("shapeNote")}
       </p>
 
       {authLoaded && !canCallAccountScoped ? (

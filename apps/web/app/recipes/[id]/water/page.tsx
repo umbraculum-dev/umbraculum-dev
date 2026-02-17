@@ -14,7 +14,7 @@ import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { mathExplain } from "./_lib/mathExplain";
 
-type MashOverallResultV0 = {
+type MashOverallResult = {
   calculatedAt: string;
   ionsPpm: IonProfilePpm;
   finalAlkalinityPpmCaCO3: number;
@@ -89,7 +89,7 @@ export default function WaterHubPage() {
     if (!v || typeof v !== "object") return null;
     const o = v as any;
     if (!o?.ph || typeof o?.finalAlkalinityPpmCaCO3 !== "number" || !o?.ionsPpm) return null;
-    return o as MashOverallResultV0;
+    return o as MashOverallResult;
   }, [settings?.mashOverallLastResultJson]);
 
   const displayAlkalinityPpmCaCO3 = (v: number) => {
