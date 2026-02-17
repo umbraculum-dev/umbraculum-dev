@@ -112,6 +112,8 @@ export default function RecipeEditPage() {
     return init;
   });
 
+  const [activeNavId, setActiveNavId] = useState<string>("");
+
   const setSectionOpen = (id: string, open: boolean) => {
     setOpenSections((prev) => (prev[id] === open ? prev : { ...prev, [id]: open }));
   };
@@ -170,6 +172,7 @@ export default function RecipeEditPage() {
     const applyHashOpen = () => {
       const raw = window.location.hash || "";
       const id = raw.startsWith("#") ? raw.slice(1) : raw;
+      setActiveNavId(id);
       if (!id) return;
       if (!collapsibleSectionIds.includes(id as any)) return;
       setSectionOpen(id, true);
@@ -742,30 +745,40 @@ export default function RecipeEditPage() {
         </pre>
       ) : null}
 
-      <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
-        <nav aria-label={t("nav.sectionsAriaLabel")} className="panel" style={{ position: "sticky", top: 16 }}>
+      <div className="recipeEditLayout">
+        <nav aria-label={t("nav.sectionsAriaLabel")} className="panel recipeEditSidebar">
           <p className="muted" style={{ marginTop: 0 }}>
             {t("nav.sectionsTitle")}
           </p>
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
+          <ul className="recipeEditNavList">
             {sections.map((s) => (
               <li key={s.id}>
-                <a href={`#${s.id}`}>{s.label}</a>
+                <a
+                  href={`#${s.id}`}
+                  className={`recipeEditNavLink${activeNavId === s.id ? " recipeEditNavLink--active" : ""}`}
+                  aria-current={activeNavId === s.id ? "location" : undefined}
+                >
+                  {s.label}
+                </a>
               </li>
             ))}
           </ul>
           <hr className="recipeEditDivider" suppressHydrationWarning />
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
+          <ul className="recipeEditNavList">
             <li>
-              <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
+              <Link href={`/recipes/${recipeId}/water`} className="recipeEditNavLink recipeEditNavLink--secondary">
+                {t("nav.openWaterCalculator")}
+              </Link>
             </li>
             <li>
-              <Link href="/recipes">{t("nav.backToRecipes")}</Link>
+              <Link href="/recipes" className="recipeEditNavLink recipeEditNavLink--secondary">
+                {t("nav.backToRecipes")}
+              </Link>
             </li>
           </ul>
         </nav>
 
-        <div style={{ display: "grid", gap: 16 }}>
+        <div className="recipeEditContent">
           <section id="basics" className="panel">
             <details open={openSections.basics} onToggle={(e) => setSectionOpen("basics", e.currentTarget.open)}>
               <summary style={{ cursor: "pointer" }}>

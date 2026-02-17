@@ -353,6 +353,78 @@ code {
   font-size: 12px;
 }
 
+.recipeEditLayout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+}
+
+.recipeEditSidebar {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+
+.recipeEditContent {
+  display: grid;
+  gap: 16px;
+}
+
+.recipeEditNavList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.recipeEditNavLink {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  background: transparent;
+}
+
+.recipeEditNavLink:hover {
+  text-decoration: none;
+  background: color-mix(in srgb, var(--info) 10%, var(--surface-2));
+}
+
+.recipeEditNavLink--active {
+  background: color-mix(in srgb, var(--info) 16%, var(--surface-2));
+  box-shadow: inset 3px 0 0 0 var(--info);
+}
+
+.recipeEditNavLink--secondary {
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface-2) 35%, transparent);
+}
+
+.recipeEditNavLink--secondary:hover {
+  color: var(--text);
+}
+
+@media (max-width: 880px) {
+  .recipeEditLayout {
+    grid-template-columns: 1fr;
+  }
+  .recipeEditSidebar {
+    display: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .recipeEditLayout {
+    grid-template-columns: 1fr;
+  }
+  .recipeEditSidebar {
+    display: none;
+  }
+}
+
 .mathPopover {
   position: absolute;
   top: calc(100% + 6px);

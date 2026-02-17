@@ -19,6 +19,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
   - [ ] Define a licensing policy: default to user-provided files; do not redistribute third-party recipe datasets unless explicitly licensed.
   - [ ] Choose approach: maintained library vs minimal in-house parser for the subset we need.
 - [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
+- [ ] Assess whether the Recipe Edit sidebar “Sections” nav is still useful now that recipe sections default-collapsed (especially on mobile/touch).
 
 ## Gravity / ABV analysis + equipment
 
