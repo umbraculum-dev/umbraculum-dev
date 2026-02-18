@@ -95,7 +95,7 @@ function ragerUtilizationFraction(args: { boilTimeMinutes: number; boilGravitySg
   return Math.min(1, Math.max(0, adjusted / 100));
 }
 
-describe("recipeAnalysis.gravityAnalysis (v0)", () => {
+describe("recipeAnalysis.gravityAnalysis (v1)", () => {
   it("uses per-yeast override in preference to BeerJSON attenuation; top-2 average", () => {
     const doc = beerJsonDoc({
       fermentables: [{ amountKg: 5, yieldPercent: 80 }],
@@ -122,10 +122,10 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       },
     });
 
-    expect(res.attenuationEffectivePercent).toBeCloseTo((90 + 80) / 2, 9);
-    expect(res.ogEstimatedSg).not.toBeNull();
-    expect(res.fgEstimatedSg).not.toBeNull();
-    expect(res.abvEstimatedPercent).not.toBeNull();
+    expect(res.result.attenuationEffectivePercent).toBeCloseTo((90 + 80) / 2, 9);
+    expect(res.result.ogEstimatedSg).not.toBeNull();
+    expect(res.result.fgEstimatedSg).not.toBeNull();
+    expect(res.result.abvEstimatedPercent).not.toBeNull();
   });
 
   it("averages the top-2 highest effective attenuations across multiple yeasts", () => {
@@ -154,7 +154,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       },
     });
 
-    expect(res.attenuationEffectivePercent).toBeCloseTo((80 + 70) / 2, 9);
+    expect(res.result.attenuationEffectivePercent).toBeCloseTo((80 + 70) / 2, 9);
   });
 
   it("returns nulls when inputs are insufficient", () => {
@@ -169,10 +169,10 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       recipeWaterSettings: null,
     });
 
-    expect(res.ogEstimatedSg).toBeNull();
-    expect(res.fgEstimatedSg).toBeNull();
-    expect(res.abvEstimatedPercent).toBeNull();
-    expect(res.warnings.length).toBeGreaterThan(0);
+    expect(res.result.ogEstimatedSg).toBeNull();
+    expect(res.result.fgEstimatedSg).toBeNull();
+    expect(res.result.abvEstimatedPercent).toBeNull();
+    expect(res.result.warnings.length).toBeGreaterThan(0);
   });
 
   it("gates kettle/pre-boil volumes on saved water settings", () => {
@@ -185,9 +185,9 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       recipeExtJson: { version: 1, equipment: { kettle: { kettleVolumeLiters: 20 }, mash: { mashEfficiencyPercent: 75 } } },
       recipeWaterSettings: null,
     });
-    expect(res.preBoilVolumeLiters).toBeNull();
-    expect(res.kettleVolumeLiters).toBeNull();
-    expect(res.warnings.map((w) => w.code)).toContain("missing_water_settings");
+    expect(res.result.preBoilVolumeLiters).toBeNull();
+    expect(res.result.kettleVolumeLiters).toBeNull();
+    expect(res.result.warnings.map((w: any) => w.code)).toContain("missing_water_settings");
   });
 
   it("OG increases with efficiency and decreases with volume", () => {
@@ -218,7 +218,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       },
       recipeWaterSettings: { mashWaterVolumeLiters: 20, spargeVolumeLiters: 10, boilWaterVolumeLiters: 0 },
     });
-    expect(highEff.ogEstimatedSg as number).toBeGreaterThan(lowEff.ogEstimatedSg as number);
+    expect(highEff.result.ogEstimatedSg as number).toBeGreaterThan(lowEff.result.ogEstimatedSg as number);
 
     const lowVol = computeRecipeGravityAnalysis({
       beerJsonRecipeJson: doc,
@@ -242,7 +242,7 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       },
       recipeWaterSettings: { mashWaterVolumeLiters: 25, spargeVolumeLiters: 10, boilWaterVolumeLiters: 0 },
     });
-    expect(lowVol.ogEstimatedSg as number).toBeGreaterThan(highVol.ogEstimatedSg as number);
+    expect(lowVol.result.ogEstimatedSg as number).toBeGreaterThan(highVol.result.ogEstimatedSg as number);
   });
 
   it("pre-boil volume increases with evaporation and losses", () => {
@@ -276,8 +276,8 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       },
     });
 
-    expect(res.preBoilVolumeLiters).not.toBeNull();
-    expect(res.preBoilVolumeLiters as number).toBeGreaterThan(20);
+    expect(res.result.preBoilVolumeLiters).not.toBeNull();
+    expect(res.result.preBoilVolumeLiters as number).toBeGreaterThan(20);
   });
 
   it("computes Tinseth + Rager IBU using PBG gravity and kettle volume", () => {
@@ -319,20 +319,20 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       },
     });
 
-    expect(res.kettleVolumeLiters).toBeCloseTo(20, 9);
-    expect(res.preBoilVolumeLiters).toBeCloseTo(30, 9);
-    expect(res.ogEstimatedSg).not.toBeNull();
-    expect(res.pbgEstimatedSg).not.toBeNull();
-    expect(res.pbgEstimatedSg as number).toBeLessThan(res.ogEstimatedSg as number);
+    expect(res.result.kettleVolumeLiters).toBeCloseTo(20, 9);
+    expect(res.result.preBoilVolumeLiters).toBeCloseTo(30, 9);
+    expect(res.result.ogEstimatedSg).not.toBeNull();
+    expect(res.result.pbgEstimatedSg).not.toBeNull();
+    expect(res.result.pbgEstimatedSg as number).toBeLessThan(res.result.ogEstimatedSg as number);
 
-    const vol = res.kettleVolumeLiters as number;
-    const g = res.pbgEstimatedSg as number;
+    const vol = res.result.kettleVolumeLiters as number;
+    const g = res.result.pbgEstimatedSg as number;
 
     const expectedTinseth = (10 * 0.1 * tinsethUtilization({ boilTimeMinutes: 60, boilGravitySg: g }) * 1000) / vol;
     const expectedRager = (10 * 0.1 * ragerUtilizationFraction({ boilTimeMinutes: 60, boilGravitySg: g }) * 1000) / vol;
 
-    expect(res.ibuTinsethEstimated).toBeCloseTo(expectedTinseth, 9);
-    expect(res.ibuRagerEstimated).toBeCloseTo(expectedRager, 9);
+    expect(res.result.ibuTinsethEstimated).toBeCloseTo(expectedTinseth, 9);
+    expect(res.result.ibuRagerEstimated).toBeCloseTo(expectedRager, 9);
   });
 
   it("applies whirlpool utilization multiplier (0.5x) for IBU", () => {
@@ -377,13 +377,13 @@ describe("recipeAnalysis.gravityAnalysis (v0)", () => {
       }),
     });
 
-    expect(boilRes.ibuTinsethEstimated).not.toBeNull();
-    expect(whirlRes.ibuTinsethEstimated).not.toBeNull();
-    expect(boilRes.ibuRagerEstimated).not.toBeNull();
-    expect(whirlRes.ibuRagerEstimated).not.toBeNull();
+    expect(boilRes.result.ibuTinsethEstimated).not.toBeNull();
+    expect(whirlRes.result.ibuTinsethEstimated).not.toBeNull();
+    expect(boilRes.result.ibuRagerEstimated).not.toBeNull();
+    expect(whirlRes.result.ibuRagerEstimated).not.toBeNull();
 
-    expect(whirlRes.ibuTinsethEstimated as number).toBeCloseTo((boilRes.ibuTinsethEstimated as number) * 0.5, 9);
-    expect(whirlRes.ibuRagerEstimated as number).toBeCloseTo((boilRes.ibuRagerEstimated as number) * 0.5, 9);
+    expect(whirlRes.result.ibuTinsethEstimated as number).toBeCloseTo((boilRes.result.ibuTinsethEstimated as number) * 0.5, 9);
+    expect(whirlRes.result.ibuRagerEstimated as number).toBeCloseTo((boilRes.result.ibuRagerEstimated as number) * 0.5, 9);
   });
 });
 

@@ -90,7 +90,7 @@ function renderBreakdowns(args: { locale: string; tMath: T; derivation: WaterCal
   return blockTexts.join("\n\n");
 }
 
-function renderDerivationBody(args: { locale: string; tMath: T; derivation: WaterCalcDerivation }): string {
+export function renderDerivationBody(args: { locale: string; tMath: T; derivation: WaterCalcDerivation }): string {
   const parts: string[] = [];
 
   parts.push(args.tMath("derivation.headings.formula"));

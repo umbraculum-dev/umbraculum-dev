@@ -1,6 +1,13 @@
+import type { GravityAnalysisResponseV1, GravityAnalysisWarningCode, NumberFormatHintV1 } from "@brewery/contracts";
+import type { WaterCalcDerivation } from "../waterCalc/derivation/types.js";
+
+function hintFixed(args: { decimals: number; unit?: NumberFormatHintV1["unit"]; clamp?: { min?: number; max?: number } }): NumberFormatHintV1 {
+  return { version: 1, style: "fixed", decimals: args.decimals, unit: args.unit, clamp: args.clamp };
+}
+
 export interface GravityAnalysisWarning {
-  code: string;
-  message: string;
+  code: GravityAnalysisWarningCode;
+  message?: string;
 }
 
 export interface GravityAnalysis {
@@ -380,12 +387,12 @@ export function computeRecipeGravityAnalysis(args: {
   beerJsonRecipeJson: unknown;
   recipeExtJson: unknown;
   recipeWaterSettings: unknown;
-}): GravityAnalysis {
+}): GravityAnalysisResponseV1 {
   const warnings: GravityAnalysisWarning[] = [];
   const equipment = extractEquipment(args.recipeExtJson);
 
   if (!args.beerJsonRecipeJson) {
-    return {
+    const result: GravityAnalysis = {
       kettleVolumeLiters: null,
       preBoilVolumeLiters: null,
       ogEstimatedSg: null,
@@ -395,7 +402,24 @@ export function computeRecipeGravityAnalysis(args: {
       fgEstimatedSg: null,
       abvEstimatedPercent: null,
       attenuationEffectivePercent: null,
-      warnings: [{ code: "missing_beerjson", message: "Recipe is missing BeerJSON; cannot derive gravity estimates." }],
+      warnings: [{ code: "missing_beerjson" }],
+    };
+    return {
+      ok: true,
+      version: 1,
+      result,
+      derivations: {},
+      formatHints: {
+        kettleVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
+        preBoilVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
+        ogEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
+        pbgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
+        fgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
+        abvEstimatedPercent: hintFixed({ decimals: 2, unit: "percent" }),
+        attenuationEffectivePercent: hintFixed({ decimals: 1, unit: "percent", clamp: { min: 0, max: 100 } }),
+        ibuTinsethEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
+        ibuRagerEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
+      },
     };
   }
 
@@ -419,11 +443,11 @@ export function computeRecipeGravityAnalysis(args: {
 
   const preBoilVolumeLiters = (() => {
     if (!water) {
-      warnings.push({ code: "missing_water_settings", message: "Missing saved water settings; cannot derive volume estimates." });
+      warnings.push({ code: "missing_water_settings" });
       return null;
     }
     if (mashWaterVolumeLiters == null || spargeVolumeLiters == null) {
-      warnings.push({ code: "missing_water_volumes", message: "Missing mash/sparge water volumes; cannot derive volume estimates." });
+      warnings.push({ code: "missing_water_volumes" });
       return null;
     }
     const totalGrainKg = extractTotalGrainKg(args.beerJsonRecipeJson);
@@ -436,7 +460,7 @@ export function computeRecipeGravityAnalysis(args: {
       equipment.mashWaterLeftoverLiters;
 
     if (!(runoffLiters > 0)) {
-      warnings.push({ code: "invalid_runoff_volume", message: "Mash/sparge volumes and losses imply zero or negative runoff volume; check water and mash equipment inputs." });
+      warnings.push({ code: "invalid_runoff_volume" });
       return null;
     }
 
@@ -452,7 +476,6 @@ export function computeRecipeGravityAnalysis(args: {
     if (!(denom > 0)) {
       warnings.push({
         code: "invalid_evaporation",
-        message: "Boil evaporation rate/time imply zero or negative post-boil volume; check equipment inputs.",
       });
       return null;
     }
@@ -464,14 +487,13 @@ export function computeRecipeGravityAnalysis(args: {
     const totalKettleLossesLiters = equipment.kettleLossesLiters + kettleHopAbsorptionLiters + equipment.otherLossesLiters;
     const out = cooledVolume - totalKettleLossesLiters;
     if (!(out > 0)) {
-      warnings.push({ code: "invalid_kettle_volume", message: "Computed kettle volume is zero or negative; check equipment losses and water inputs." });
+      warnings.push({ code: "invalid_kettle_volume" });
       return null;
     }
 
     if (equipment.kettleCapacityLiters != null && out > equipment.kettleCapacityLiters) {
       warnings.push({
         code: "exceeds_kettle_capacity",
-        message: "Computed kettle volume exceeds kettle capacity/target from equipment profile; check water volumes or equipment losses.",
       });
     }
 
@@ -491,14 +513,13 @@ export function computeRecipeGravityAnalysis(args: {
     0;
 
   if (!(efficiencyPercent > 0)) {
-    warnings.push({ code: "missing_efficiency", message: "Missing efficiency; OG/PBG estimates require an efficiency %." });
+    warnings.push({ code: "missing_efficiency" });
   }
 
   const fermentables = extractFermentablesPpgAndPounds(args.beerJsonRecipeJson);
   if (!fermentables.length) {
     warnings.push({
       code: "missing_fermentables",
-      message: "No fermentables with usable amount + yield/potential; cannot estimate OG/PBG.",
     });
   }
 
@@ -521,7 +542,6 @@ export function computeRecipeGravityAnalysis(args: {
       if (batchSize != null) {
         warnings.push({
           code: "used_batch_size_volume",
-          message: "Using BeerJSON batch_size volume for IBU estimate because computed kettle volume is unavailable.",
         });
       }
       return batchSize;
@@ -531,7 +551,6 @@ export function computeRecipeGravityAnalysis(args: {
   if (ibuGravitySg == null) {
     warnings.push({
       code: "missing_ibu_gravity",
-      message: "Missing boil gravity estimate; IBU estimates require PBG/OG to estimate hop utilization.",
     });
   }
 
@@ -549,7 +568,6 @@ export function computeRecipeGravityAnalysis(args: {
   if (attenuationEffectivePercent == null) {
     warnings.push({
       code: "missing_attenuation",
-      message: "Missing yeast attenuation; FG/ABV estimates require yeast attenuation or an override.",
     });
   }
 
@@ -561,7 +579,7 @@ export function computeRecipeGravityAnalysis(args: {
   const abvEstimatedPercent =
     ogEstimatedSg != null && fgEstimatedSg != null ? (ogEstimatedSg - fgEstimatedSg) * ABV_FACTOR : null;
 
-  return {
+  const result: GravityAnalysis = {
     kettleVolumeLiters,
     preBoilVolumeLiters,
     ogEstimatedSg,
@@ -572,6 +590,149 @@ export function computeRecipeGravityAnalysis(args: {
     abvEstimatedPercent,
     attenuationEffectivePercent,
     warnings,
+  };
+
+  const derivations: Record<string, WaterCalcDerivation> = {};
+
+  if (preBoilVolumeLiters != null && mashWaterVolumeLiters != null && spargeVolumeLiters != null) {
+    derivations["analysis.pre_boil_volume"] = {
+      kind: "analysis.pre_boil_volume" as any,
+      version: 1,
+      formulaId: "analysis.pre_boil_volume.v1",
+      inputs: [
+        { id: "mashWaterVolumeLiters", value: { kind: "number", value: mashWaterVolumeLiters, unit: "L" } },
+        { id: "spargeVolumeLiters", value: { kind: "number", value: spargeVolumeLiters, unit: "L" } },
+        { id: "boilWaterVolumeLiters", value: { kind: "number", value: boilWaterVolumeLiters, unit: "L" } },
+        { id: "mashLossesLiters", value: { kind: "number", value: equipment.mashLossesLiters, unit: "L" } },
+        { id: "mashWaterLeftoverLiters", value: { kind: "number", value: equipment.mashWaterLeftoverLiters, unit: "L" } },
+        { id: "mashGrainAbsorptionLPerKg", value: { kind: "number", value: equipment.mashGrainAbsorptionLPerKg, unit: "L_per_kg" as any } },
+      ],
+      intermediates: [{ id: "preBoilVolumeLiters", value: { kind: "number", value: preBoilVolumeLiters, unit: "L" } }],
+    };
+  }
+
+  if (kettleVolumeLiters != null && preBoilVolumeLiters != null) {
+    derivations["analysis.kettle_volume"] = {
+      kind: "analysis.kettle_volume" as any,
+      version: 1,
+      formulaId: "analysis.kettle_volume.v1",
+      inputs: [
+        { id: "preBoilVolumeLiters", value: { kind: "number", value: preBoilVolumeLiters, unit: "L" } },
+        { id: "boilTimeHours", value: { kind: "number", value: boilTimeHours, unit: "h" as any } },
+        { id: "evaporationRatePercentPerHour", value: { kind: "number", value: equipment.kettleBoilEvaporationRatePercentPerHour, unit: "percent_per_hour" as any } },
+        { id: "coolingShrinkagePercent", value: { kind: "number", value: equipment.kettleCoolingShrinkagePercent, unit: "percent" } },
+        { id: "kettleLossesLiters", value: { kind: "number", value: equipment.kettleLossesLiters, unit: "L" } },
+        { id: "otherLossesLiters", value: { kind: "number", value: equipment.otherLossesLiters, unit: "L" } },
+        { id: "kettleHopAbsorptionLiters", value: { kind: "number", value: kettleHopAbsorptionLiters, unit: "L" } },
+      ],
+      intermediates: [{ id: "kettleVolumeLiters", value: { kind: "number", value: kettleVolumeLiters, unit: "L" } }],
+    };
+  }
+
+  if (ogEstimatedSg != null && kettleVolumeLiters != null) {
+    derivations["analysis.og"] = {
+      kind: "analysis.og" as any,
+      version: 1,
+      formulaId: "analysis.og.v1",
+      inputs: [
+        { id: "kettleVolumeLiters", value: { kind: "number", value: kettleVolumeLiters, unit: "L" } },
+        { id: "efficiencyPercent", value: { kind: "number", value: efficiencyPercent, unit: "percent" } },
+      ],
+      intermediates: [{ id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" as any } }],
+    };
+  }
+
+  if (pbgEstimatedSg != null && preBoilVolumeLiters != null) {
+    derivations["analysis.pbg"] = {
+      kind: "analysis.pbg" as any,
+      version: 1,
+      formulaId: "analysis.pbg.v1",
+      inputs: [
+        { id: "preBoilVolumeLiters", value: { kind: "number", value: preBoilVolumeLiters, unit: "L" } },
+        { id: "efficiencyPercent", value: { kind: "number", value: efficiencyPercent, unit: "percent" } },
+      ],
+      intermediates: [{ id: "pbgEstimatedSg", value: { kind: "number", value: pbgEstimatedSg, unit: "sg" as any } }],
+    };
+  }
+
+  if (attenuationEffectivePercent != null) {
+    derivations["analysis.attenuation"] = {
+      kind: "analysis.attenuation" as any,
+      version: 1,
+      formulaId: "analysis.attenuation.v1",
+      inputs: [],
+      intermediates: [{ id: "attenuationEffectivePercent", value: { kind: "number", value: attenuationEffectivePercent, unit: "percent" } }],
+    };
+  }
+
+  if (fgEstimatedSg != null && ogEstimatedSg != null && attenuationEffectivePercent != null) {
+    derivations["analysis.fg"] = {
+      kind: "analysis.fg" as any,
+      version: 1,
+      formulaId: "analysis.fg.v1",
+      inputs: [
+        { id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" as any } },
+        { id: "attenuationEffectivePercent", value: { kind: "number", value: attenuationEffectivePercent, unit: "percent" } },
+      ],
+      intermediates: [{ id: "fgEstimatedSg", value: { kind: "number", value: fgEstimatedSg, unit: "sg" as any } }],
+    };
+  }
+
+  if (abvEstimatedPercent != null && ogEstimatedSg != null && fgEstimatedSg != null) {
+    derivations["analysis.abv"] = {
+      kind: "analysis.abv" as any,
+      version: 1,
+      formulaId: "analysis.abv.v1",
+      inputs: [
+        { id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" as any } },
+        { id: "fgEstimatedSg", value: { kind: "number", value: fgEstimatedSg, unit: "sg" as any } },
+      ],
+      intermediates: [{ id: "abvEstimatedPercent", value: { kind: "number", value: abvEstimatedPercent, unit: "percent" } }],
+    };
+  }
+
+  if (ibuTinsethEstimated != null && ibuVolumeLiters != null && ibuGravitySg != null) {
+    derivations["analysis.ibu_tinseth"] = {
+      kind: "analysis.ibu_tinseth" as any,
+      version: 1,
+      formulaId: "analysis.ibu_tinseth.v1",
+      inputs: [
+        { id: "postBoilVolumeLiters", value: { kind: "number", value: ibuVolumeLiters, unit: "L" } },
+        { id: "boilGravitySg", value: { kind: "number", value: ibuGravitySg, unit: "sg" as any } },
+      ],
+      intermediates: [{ id: "ibuTinsethEstimated", value: { kind: "number", value: ibuTinsethEstimated, unit: "ibu" as any } }],
+    };
+  }
+
+  if (ibuRagerEstimated != null && ibuVolumeLiters != null && ibuGravitySg != null) {
+    derivations["analysis.ibu_rager"] = {
+      kind: "analysis.ibu_rager" as any,
+      version: 1,
+      formulaId: "analysis.ibu_rager.v1",
+      inputs: [
+        { id: "postBoilVolumeLiters", value: { kind: "number", value: ibuVolumeLiters, unit: "L" } },
+        { id: "boilGravitySg", value: { kind: "number", value: ibuGravitySg, unit: "sg" as any } },
+      ],
+      intermediates: [{ id: "ibuRagerEstimated", value: { kind: "number", value: ibuRagerEstimated, unit: "ibu" as any } }],
+    };
+  }
+
+  return {
+    ok: true,
+    version: 1,
+    result,
+    derivations: derivations as any,
+    formatHints: {
+      kettleVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
+      preBoilVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
+      ogEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
+      pbgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
+      fgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
+      abvEstimatedPercent: hintFixed({ decimals: 2, unit: "percent" }),
+      attenuationEffectivePercent: hintFixed({ decimals: 1, unit: "percent", clamp: { min: 0, max: 100 } }),
+      ibuTinsethEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
+      ibuRagerEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
+    },
   };
 }
 

@@ -20,6 +20,8 @@ import {
 } from "../../_lib/beerjsonRecipe";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
 import { mathExplain } from "./_lib/mathExplain";
+import { parseGravityAnalysisResponseV1 } from "./_lib/parseGravityAnalysis";
+import { renderDerivationBody } from "../water/_lib/mathBodies";
 
 type Recipe = {
   id: string;
@@ -905,9 +907,23 @@ export default function RecipeEditPage() {
                 </p>
 
                 {(() => {
-                  const a = analysis && typeof analysis === "object" ? (analysis as any) : null;
+                  const parsed = (() => {
+                    try {
+                      return parseGravityAnalysisResponseV1(analysis);
+                    } catch {
+                      return null;
+                    }
+                  })();
+                  const a = parsed?.result ?? null;
+
                   const fmt = (v: unknown, decimals: number) =>
                     typeof v === "number" && Number.isFinite(v) ? formatFixed(locale, v, decimals) : tAnalysis("na");
+
+                  const fmtField = (field: string, v: unknown, fallbackDecimals: number) => {
+                    const hint = parsed?.formatHints ? (parsed.formatHints as any)[field] : null;
+                    const decimals = typeof hint?.decimals === "number" && Number.isFinite(hint.decimals) ? hint.decimals : fallbackDecimals;
+                    return fmt(v, decimals);
+                  };
 
                   const warnings = Array.isArray(a?.warnings) ? (a.warnings as any[]) : [];
                   const warningCodes = new Set(warnings.map((w) => String(w?.code ?? "")));
@@ -925,17 +941,28 @@ export default function RecipeEditPage() {
                     );
                   };
 
+                  const renderDerivationMath = (derivationKey: string, fallback: string) => {
+                    if (!surfaceMath) return null;
+                    const d = parsed?.derivations ? (parsed.derivations as any)[derivationKey] : null;
+                    if (!d) return null;
+                    try {
+                      return renderDerivationBody({ locale, tMath, derivation: d });
+                    } catch {
+                      return fallback;
+                    }
+                  };
+
                   const ibuGravityUsed = (() => {
                     const pbg = a?.pbgEstimatedSg;
-                    if (typeof pbg === "number" && Number.isFinite(pbg)) return { value: fmt(pbg, 3), source: tMath("analysis.common.sources.pbg") };
+                    if (typeof pbg === "number" && Number.isFinite(pbg)) return { value: fmtField("pbgEstimatedSg", pbg, 3), source: tMath("analysis.common.sources.pbg") };
                     const og = a?.ogEstimatedSg;
-                    if (typeof og === "number" && Number.isFinite(og)) return { value: fmt(og, 3), source: tMath("analysis.common.sources.og") };
+                    if (typeof og === "number" && Number.isFinite(og)) return { value: fmtField("ogEstimatedSg", og, 3), source: tMath("analysis.common.sources.og") };
                     return { value: tAnalysis("na"), source: tMath("analysis.common.sources.unknown") };
                   })();
 
                   const ibuVolumeUsed = (() => {
                     const vol = a?.kettleVolumeLiters;
-                    if (typeof vol === "number" && Number.isFinite(vol)) return { value: fmt(vol, 2), source: tMath("analysis.common.sources.kettleVolume") };
+                    if (typeof vol === "number" && Number.isFinite(vol)) return { value: fmtField("kettleVolumeLiters", vol, 2), source: tMath("analysis.common.sources.kettleVolume") };
                     if (warningCodes.has("used_batch_size_volume")) {
                       const r0 = (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0];
                       const unit = typeof r0?.batch_size?.unit === "string" ? r0.batch_size.unit : "";
@@ -1040,16 +1067,23 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.abv")}</strong>
                                   {renderMath(
                                     "analysis.abv",
-                                    tMath("analysis.abv.body", {
-                                      og: fmt(a?.ogEstimatedSg, 3),
-                                      fg: fmt(a?.fgEstimatedSg, 3),
-                                      abv: fmt(a?.abvEstimatedPercent, 2),
+                                    renderDerivationMath(
+                                      "analysis.abv",
+                                      tMath("analysis.abv.body", {
+                                        og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                        fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
+                                        abv: fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2),
+                                      }),
+                                    ) ?? tMath("analysis.abv.body", {
+                                      og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                      fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
+                                      abv: fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2),
                                     }),
                                   )}
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.abvEstimatedPercent, 2)}</code>{" "}
+                                <code>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</code>{" "}
                                 {typeof a?.abvEstimatedPercent === "number" ? <span className="muted">%</span> : null}
                               </td>
                             </tr>
@@ -1059,8 +1093,18 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.ibuTinseth")}</strong>
                                   {renderMath(
                                     "analysis.ibuTinseth",
-                                    tMath("analysis.ibuTinseth.body", {
-                                      ibu: fmt(a?.ibuTinsethEstimated, 1),
+                                    renderDerivationMath(
+                                      "analysis.ibu_tinseth",
+                                      tMath("analysis.ibuTinseth.body", {
+                                        ibu: fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1),
+                                        gravity: ibuGravityUsed.value,
+                                        gravitySource: ibuGravityUsed.source,
+                                        volume: ibuVolumeUsed.value,
+                                        volumeSource: ibuVolumeUsed.source,
+                                        hopsLines: hopLines,
+                                      }),
+                                    ) ?? tMath("analysis.ibuTinseth.body", {
+                                      ibu: fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1),
                                       gravity: ibuGravityUsed.value,
                                       gravitySource: ibuGravityUsed.source,
                                       volume: ibuVolumeUsed.value,
@@ -1071,7 +1115,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.ibuTinsethEstimated, 1)}</code>
+                                <code>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</code>
                               </td>
                             </tr>
                             <tr>
@@ -1080,8 +1124,18 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.ibuRager")}</strong>
                                   {renderMath(
                                     "analysis.ibuRager",
-                                    tMath("analysis.ibuRager.body", {
-                                      ibu: fmt(a?.ibuRagerEstimated, 1),
+                                    renderDerivationMath(
+                                      "analysis.ibu_rager",
+                                      tMath("analysis.ibuRager.body", {
+                                        ibu: fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1),
+                                        gravity: ibuGravityUsed.value,
+                                        gravitySource: ibuGravityUsed.source,
+                                        volume: ibuVolumeUsed.value,
+                                        volumeSource: ibuVolumeUsed.source,
+                                        hopsLines: hopLines,
+                                      }),
+                                    ) ?? tMath("analysis.ibuRager.body", {
+                                      ibu: fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1),
                                       gravity: ibuGravityUsed.value,
                                       gravitySource: ibuGravityUsed.source,
                                       volume: ibuVolumeUsed.value,
@@ -1092,7 +1146,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.ibuRagerEstimated, 1)}</code>
+                                <code>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</code>
                               </td>
                             </tr>
                             <tr>
@@ -1101,8 +1155,17 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.kettleVolume")}</strong>
                                   {renderMath(
                                     "analysis.kettleVolume",
-                                    tMath("analysis.kettleVolume.body", {
-                                      kettleVolume: fmt(a?.kettleVolumeLiters, 2),
+                                    renderDerivationMath(
+                                      "analysis.kettle_volume",
+                                      tMath("analysis.kettleVolume.body", {
+                                        kettleVolume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                        notes:
+                                          warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
+                                            ? tMath("analysis.common.noteMissingWaterSettings")
+                                            : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                      }),
+                                    ) ?? tMath("analysis.kettleVolume.body", {
+                                      kettleVolume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                       notes:
                                         warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
                                           ? tMath("analysis.common.noteMissingWaterSettings")
@@ -1112,7 +1175,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.kettleVolumeLiters, 2)}</code>{" "}
+                                <code>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</code>{" "}
                                 {typeof a?.kettleVolumeLiters === "number" ? <span className="muted">L</span> : null}
                               </td>
                             </tr>
@@ -1122,8 +1185,17 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.preBoilVolume")}</strong>
                                   {renderMath(
                                     "analysis.preBoilVolume",
-                                    tMath("analysis.preBoilVolume.body", {
-                                      preBoilVolume: fmt(a?.preBoilVolumeLiters, 2),
+                                    renderDerivationMath(
+                                      "analysis.pre_boil_volume",
+                                      tMath("analysis.preBoilVolume.body", {
+                                        preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
+                                        notes:
+                                          warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
+                                            ? tMath("analysis.common.noteMissingWaterSettings")
+                                            : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                      }),
+                                    ) ?? tMath("analysis.preBoilVolume.body", {
+                                      preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
                                       notes:
                                         warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
                                           ? tMath("analysis.common.noteMissingWaterSettings")
@@ -1133,7 +1205,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.preBoilVolumeLiters, 2)}</code>{" "}
+                                <code>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</code>{" "}
                                 {typeof a?.preBoilVolumeLiters === "number" ? <span className="muted">L</span> : null}
                               </td>
                             </tr>
@@ -1143,9 +1215,33 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.og")}</strong>
                                   {renderMath(
                                     "analysis.og",
-                                    tMath("analysis.og.body", {
-                                      og: fmt(a?.ogEstimatedSg, 3),
-                                      volume: fmt(a?.kettleVolumeLiters, 2),
+                                    renderDerivationMath(
+                                      "analysis.og",
+                                      tMath("analysis.og.body", {
+                                        og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                        volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                        efficiency: (() => {
+                                          const ext = (recipe as any)?.recipeExtJson;
+                                          const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                          const mashEff =
+                                            typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                              ? e.equipment.mash.mashEfficiencyPercent
+                                              : null;
+                                          const brewEff =
+                                            typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                              ? e.brewhouseEfficiencyPercent
+                                              : null;
+                                          const bjEff =
+                                            (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                              ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                              : null;
+                                          const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                          return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                        })(),
+                                      }),
+                                    ) ?? tMath("analysis.og.body", {
+                                      og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                      volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                       efficiency: (() => {
                                         const ext = (recipe as any)?.recipeExtJson;
                                         const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
@@ -1169,7 +1265,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.ogEstimatedSg, 3)}</code>
+                                <code>{fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3)}</code>
                               </td>
                             </tr>
                             <tr>
@@ -1178,16 +1274,23 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.fg")}</strong>
                                   {renderMath(
                                     "analysis.fg",
-                                    tMath("analysis.fg.body", {
-                                      og: fmt(a?.ogEstimatedSg, 3),
-                                      attenuation: fmt(a?.attenuationEffectivePercent, 1),
-                                      fg: fmt(a?.fgEstimatedSg, 3),
+                                    renderDerivationMath(
+                                      "analysis.fg",
+                                      tMath("analysis.fg.body", {
+                                        og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                        attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
+                                        fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
+                                      }),
+                                    ) ?? tMath("analysis.fg.body", {
+                                      og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                      attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
+                                      fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
                                     }),
                                   )}
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.fgEstimatedSg, 3)}</code>
+                                <code>{fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3)}</code>
                               </td>
                             </tr>
                             <tr>
@@ -1196,8 +1299,16 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.attenuation")}</strong>
                                   {renderMath(
                                     "analysis.attenuation",
-                                    tMath("analysis.attenuation.body", {
-                                      attenuation: fmt(a?.attenuationEffectivePercent, 1),
+                                    renderDerivationMath(
+                                      "analysis.attenuation",
+                                      tMath("analysis.attenuation.body", {
+                                        attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
+                                        yeastLines: yeastLines.lines,
+                                        selectedLines: yeastLines.selectedLines,
+                                        topAvg: yeastLines.topAvg,
+                                      }),
+                                    ) ?? tMath("analysis.attenuation.body", {
+                                      attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
                                       yeastLines: yeastLines.lines,
                                       selectedLines: yeastLines.selectedLines,
                                       topAvg: yeastLines.topAvg,
@@ -1206,7 +1317,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.attenuationEffectivePercent, 1)}</code>{" "}
+                                <code>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</code>{" "}
                                 {typeof a?.attenuationEffectivePercent === "number" ? (
                                   <span className="muted">%</span>
                                 ) : null}
@@ -1218,9 +1329,33 @@ export default function RecipeEditPage() {
                                   <strong>{tAnalysis("fields.pbg")}</strong>
                                   {renderMath(
                                     "analysis.pbg",
-                                    tMath("analysis.pbg.body", {
-                                      pbg: fmt(a?.pbgEstimatedSg, 3),
-                                      preBoilVolume: fmt(a?.preBoilVolumeLiters, 2),
+                                    renderDerivationMath(
+                                      "analysis.pbg",
+                                      tMath("analysis.pbg.body", {
+                                        pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
+                                        preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
+                                        efficiency: (() => {
+                                          const ext = (recipe as any)?.recipeExtJson;
+                                          const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                          const mashEff =
+                                            typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                              ? e.equipment.mash.mashEfficiencyPercent
+                                              : null;
+                                          const brewEff =
+                                            typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                              ? e.brewhouseEfficiencyPercent
+                                              : null;
+                                          const bjEff =
+                                            (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                              ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                              : null;
+                                          const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                          return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                        })(),
+                                      }),
+                                    ) ?? tMath("analysis.pbg.body", {
+                                      pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
+                                      preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
                                       efficiency: (() => {
                                         const ext = (recipe as any)?.recipeExtJson;
                                         const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
@@ -1244,7 +1379,7 @@ export default function RecipeEditPage() {
                                 </div>
                               </td>
                               <td>
-                                <code>{fmt(a?.pbgEstimatedSg, 3)}</code>
+                                <code>{fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3)}</code>
                               </td>
                             </tr>
                           </tbody>
@@ -1261,7 +1396,7 @@ export default function RecipeEditPage() {
                             {warnings.map((w, idx) => (
                               <li key={`${String(w?.code ?? "warn")}-${idx}`}>
                                 <code>{String(w?.code ?? "warning")}</code>{" "}
-                                <span className="muted">{String(w?.message ?? "")}</span>
+                                <span className="muted">{tAnalysis(`warnings.${String(w?.code ?? "unknown")}` as any)}</span>
                               </li>
                             ))}
                           </ul>

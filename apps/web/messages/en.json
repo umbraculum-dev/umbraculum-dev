@@ -151,7 +151,31 @@
           "sulfatePpm": "Base SO4 (ppm)",
           "chloridePpm": "Base Cl (ppm)",
           "bicarbonatePpm": "Base HCO3 (ppm)"
-        }
+        },
+        "mashWaterVolumeLiters": "Mash water volume (L)",
+        "spargeVolumeLiters": "Sparge water volume (L)",
+        "boilWaterVolumeLiters": "Additional boil water volume (L)",
+        "mashLossesLiters": "Mash losses (L)",
+        "mashWaterLeftoverLiters": "Mash leftover water (L)",
+        "mashGrainAbsorptionLPerKg": "Grain absorption (L/kg)",
+        "preBoilVolumeLiters": "Pre-boil volume (L)",
+        "boilTimeHours": "Boil time (hours)",
+        "evaporationRatePercentPerHour": "Evaporation rate (% per hour)",
+        "coolingShrinkagePercent": "Cooling shrinkage (%)",
+        "kettleLossesLiters": "Kettle losses (L)",
+        "otherLossesLiters": "Other losses (L)",
+        "kettleHopAbsorptionLiters": "Hop absorption (L)",
+        "kettleVolumeLiters": "Kettle volume (L)",
+        "efficiencyPercent": "Efficiency (%)",
+        "ogEstimatedSg": "OG estimate (SG)",
+        "pbgEstimatedSg": "PBG estimate (SG)",
+        "attenuationEffectivePercent": "Effective attenuation (%)",
+        "fgEstimatedSg": "FG estimate (SG)",
+        "abvEstimatedPercent": "ABV estimate (%)",
+        "postBoilVolumeLiters": "Post-boil volume (L)",
+        "boilGravitySg": "Boil gravity (SG)",
+        "ibuTinsethEstimated": "IBU (Tinseth, estimated)",
+        "ibuRagerEstimated": "IBU (Rager, estimated)"
       },
       "rows": {
         "saltDelta": "- {saltKey} ({grams} g): {deltas}"
@@ -190,6 +214,36 @@
           },
           "boil_overall": {
             "v1": "Overall ions = ions(after salts) + acid counter-ions, and HCO3 is derived from final alkalinity."
+          }
+        }
+        ,
+        "analysis": {
+          "pre_boil_volume": {
+            "v1": "pre_boil_volume = mash_water + sparge_water - grain_absorption - mash_losses - leftover + boil_additions"
+          },
+          "kettle_volume": {
+            "v1": "kettle_volume = cooled(post_boil_hot(pre_boil_volume)) - kettle_losses - hop_absorption - other_losses"
+          },
+          "og": {
+            "v1": "OG is estimated from fermentables yield, efficiency (%), and kettle volume."
+          },
+          "pbg": {
+            "v1": "PBG is estimated from fermentables yield, efficiency (%), and pre-boil volume."
+          },
+          "attenuation": {
+            "v1": "Effective attenuation = average of the top 2 yeast attenuations (overrides win)."
+          },
+          "fg": {
+            "v1": "FG = 1 + (OG - 1) × (1 - attenuation/100)"
+          },
+          "abv": {
+            "v1": "ABV% = (OG - FG) × 131.25"
+          },
+          "ibu_tinseth": {
+            "v1": "Tinseth IBU is computed from hop additions, utilization, boil gravity, and post-boil volume."
+          },
+          "ibu_rager": {
+            "v1": "Rager IBU is computed from hop additions, utilization, boil gravity, and post-boil volume."
           }
         }
       }
@@ -462,7 +516,22 @@
         "pbg": "PBG (pre-boil gravity, estimated)"
       },
       "warningsTitle": "Notes / missing inputs",
-      "warningsClickToExpand": "Click to expand"
+      "warningsClickToExpand": "Click to expand",
+      "warnings": {
+        "missing_beerjson": "Recipe is missing BeerJSON; cannot compute analysis.",
+        "missing_water_settings": "Missing saved water settings; volume estimates may be unavailable.",
+        "missing_water_volumes": "Missing mash/sparge water volumes; volume estimates may be unavailable.",
+        "invalid_runoff_volume": "Mash/sparge volumes and losses imply zero or negative runoff volume; check water + mash equipment inputs.",
+        "invalid_evaporation": "Boil evaporation rate/time imply zero or negative post-boil volume; check equipment inputs.",
+        "invalid_kettle_volume": "Computed kettle volume is zero or negative; check equipment losses and water inputs.",
+        "exceeds_kettle_capacity": "Computed kettle volume exceeds kettle capacity/target from equipment profile.",
+        "missing_efficiency": "Missing efficiency; OG/PBG estimates require an efficiency %.",
+        "missing_fermentables": "No fermentables with usable amount + yield/potential; cannot estimate OG/PBG.",
+        "used_batch_size_volume": "Using BeerJSON batch_size volume for IBU estimate because computed kettle volume is unavailable.",
+        "missing_ibu_gravity": "Missing boil gravity estimate; IBU estimates require PBG/OG.",
+        "missing_ibu_inputs": "No usable hop boil/whirlpool additions with amount, alpha acid %, and time; cannot estimate IBU.",
+        "missing_attenuation": "Missing yeast attenuation; FG/ABV estimates require yeast attenuation or an override."
+      }
     },
     "water": {
       "common": {

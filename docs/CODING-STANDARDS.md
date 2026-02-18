@@ -99,6 +99,27 @@ Guardrails:
   - For server-centralized domains (water, later analysis), the API is the source of truth.
   - Web/native should consume `result` + `derivation` and render it, with runtime parsing of network payloads (`unknown` → `parseXxx()`).
 
+### Shared contracts (`@brewery/contracts`) + versioning (MANDATORY for native-ready endpoints)
+We treat `@brewery/contracts` (`/home/rf/dkprojects/rfapps/brewery-app/packages/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
+
+Standards:
+- **Type-only imports** for TS safety without runtime coupling:
+  - API/services and web clients import DTOs as `import type { ... } from "@brewery/contracts"`.
+- **Every canonical/native-ready response is versioned**:
+  - top-level `ok: true`
+  - top-level `version: 1` (or higher later)
+  - nested discriminators (`kind`) for unions (example: compute-and-save `acid.kind`).
+- **Runtime parsing is mandatory in clients**:
+  - treat network JSON as `unknown`
+  - parse/validate into contracts types before use.
+
+Current canonical “native beta” Water endpoints (v1):
+- `GET /recipes/:id/water-hub-summary`
+- `POST /recipes/:id/water-settings/{mash|sparge|boil}/compute-and-save`
+
+Current Analysis (v1) standard:
+- `GET /recipes/:id` returns `recipe.analysis` as a versioned object `{ ok:true, version:1, result, derivations, formatHints }`.
+
 ### Math popovers (“Show math”) must explain *how* (DERIVATIONS)
 When “Show math” is enabled, popovers must explain **how** a value/table is derived (formula + inputs + key intermediate values).
 
@@ -141,4 +162,27 @@ Adding a new “math topic” end-to-end:
 - Add/extend the API response to include `derivation` (and keep numeric `result` unchanged).
 - Add required i18n keys under `math.derivation.*` (EN + IT).
 - Wire the popover to pass the correct `*Derivation` object into `buildWaterMathBody(...)`.
+
+### Number formatting hints (Medium-ROI; general standard)
+We do **not** ship localized numeric strings from the API. Values remain numeric. To keep rendering consistent across web/native, the API may include **format hints** (non-localized) alongside results.
+
+Standard:
+- Use `@brewery/contracts` `NumberFormatHintV1` (`packages/contracts/src/format/numberFormat.ts`).
+- Hints must be **optional** and safe to ignore by older clients.
+- Clients apply hints when present; otherwise use existing local formatting defaults.
+
+Example usage:
+- `sg` values: 3 decimals
+- `percent` values (ABV): 2 decimals
+- `L` values: 2 decimals
+- `ibu` values: 1 decimal
+
+### Analysis derivations (Medium-ROI; unified “result + derivation” pattern)
+The “result + derivation” pattern is not water-only.
+
+Standards:
+- Analysis computations (OG/FG/ABV/IBU/volumes/attenuation/PBG) should expose a **bounded derivation** object per field.
+- Analysis warnings are **code-first**:
+  - API returns warning `code`s
+  - clients localize `code` → user-facing text via i18n.
 

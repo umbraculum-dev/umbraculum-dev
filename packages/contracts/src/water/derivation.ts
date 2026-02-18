@@ -3,7 +3,16 @@ export type WaterCalcDerivationKind =
   | "acidification"
   | "mash_overall"
   | "sparge_overall"
-  | "boil_overall";
+  | "boil_overall"
+  | "analysis.abv"
+  | "analysis.ibu_tinseth"
+  | "analysis.ibu_rager"
+  | "analysis.kettle_volume"
+  | "analysis.pre_boil_volume"
+  | "analysis.og"
+  | "analysis.fg"
+  | "analysis.attenuation"
+  | "analysis.pbg";
 
 export type WaterCalcUnit =
   | "L"
@@ -12,6 +21,12 @@ export type WaterCalcUnit =
   | "ppm"
   | "ppm_as_CaCO3"
   | "pH"
+  | "percent"
+  | "sg"
+  | "ibu"
+  | "h"
+  | "percent_per_hour"
+  | "L_per_kg"
   | "mEq_per_L"
   | "mmol_per_L";
 

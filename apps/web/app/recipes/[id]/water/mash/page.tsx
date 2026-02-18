@@ -116,6 +116,7 @@ export default function MashWaterPage() {
   const [mashManualResult, setMashManualResult] = useState<MashManualCalcResult | null>(null);
 
   const [mashStartingAlk, setMashStartingAlk] = useState(0);
+  const [mashStartingAlkTouched, setMashStartingAlkTouched] = useState(false);
   const [mashStartingPh, setMashStartingPh] = useState(7.0);
   const [mashTargetPh, setMashTargetPh] = useState(5.4);
   const [mashAcidType, setMashAcidType] = useState("lactic");
@@ -208,13 +209,23 @@ export default function MashWaterPage() {
 
       // Adjustment selections
       setSourceProfileId(s.sourceWaterProfileId ?? "");
-      setTargetProfileId(s.targetWaterProfileId ?? "");
+      // UX default: if no explicit target profile is saved yet, seed it from the saved source profile.
+      // This avoids empty Target/Δ columns in the Mixed water ions table.
+      setTargetProfileId(s.targetWaterProfileId ?? s.sourceWaterProfileId ?? "");
       setDilutionProfileId(s.dilutionWaterProfileId ?? "");
       setTapVolumeLiters(s.tapWaterVolumeLiters ?? 0);
       setDilutionVolumeLiters(s.dilutionWaterVolumeLiters ?? 0);
 
       // Mash
-      setMashStartingAlk(s.mashStartingAlkalinityPpmCaCO3 ?? 0);
+      const savedStartingAlk = s.mashStartingAlkalinityPpmCaCO3;
+      if (typeof savedStartingAlk === "number" && Number.isFinite(savedStartingAlk)) {
+        setMashStartingAlk(savedStartingAlk);
+        // Treat a saved 0 as "likely unset" so we can derive from the mixed water profile.
+        setMashStartingAlkTouched(savedStartingAlk !== 0);
+      } else {
+        setMashStartingAlk(0);
+        setMashStartingAlkTouched(false);
+      }
       setMashStartingPh(s.mashStartingPh ?? 7.0);
       setMashTargetPh(s.mashTargetPh ?? 5.4);
       setMashAcidType(s.mashAcidType ?? "lactic");
@@ -311,6 +322,14 @@ export default function MashWaterPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState.status, recipeId]);
 
+  useEffect(() => {
+    // UX default: if the user picks a source profile but no target is selected yet,
+    // default target to source so the Mixed water ions table can show Target/Δ numbers.
+    if (!targetProfileId && sourceProfileId) {
+      setTargetProfileId(sourceProfileId);
+    }
+  }, [sourceProfileId, targetProfileId]);
+
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
     const pub = profiles?.public ?? [];
@@ -379,6 +398,20 @@ export default function MashWaterPage() {
       ...mixed,
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
+
+  const derivedMashStartingAlkPpmCaCO3 = useMemo(() => {
+    if (!mixedSourceProfile) return null;
+    const alk = bicarbonatePpmToAlkalinityPpmCaCO3(mixedSourceProfile.bicarbonate);
+    return Number.isFinite(alk) ? alk : null;
+  }, [mixedSourceProfile]);
+
+  useEffect(() => {
+    if (mashStartingAlkTouched) return;
+    if (derivedMashStartingAlkPpmCaCO3 === null) return;
+    // Keep it stable for display + payloads.
+    const rounded = Math.round(derivedMashStartingAlkPpmCaCO3 * 100) / 100;
+    setMashStartingAlk(rounded);
+  }, [derivedMashStartingAlkPpmCaCO3, mashStartingAlkTouched]);
 
   const derivedMashWaterVolumeLiters = useMemo(() => {
     const tap = Math.max(0, Number(tapVolumeLiters) || 0);
@@ -1073,7 +1106,7 @@ export default function MashWaterPage() {
               value={mashAcidificationMode}
               onChange={(v) => setMashAcidificationMode(v)}
               options={[
-                { value: "targetPh", label: "Target mash pH (compute acid required)" },
+                { value: "targetPh", label: "Target mash pH (compute required acid)" },
                 { value: "manual", label: "Manual acid amount (estimate achieved pH)" },
               ]}
             />
@@ -1088,7 +1121,11 @@ export default function MashWaterPage() {
                   type="number"
                   inputMode="decimal"
                   value={mashStartingAlk}
-                  onChange={(e) => setMashStartingAlk(Number(e.target.value))}
+                  onChange={(e) => {
+                    setMashStartingAlkTouched(true);
+                    const n = Number(e.target.value);
+                    setMashStartingAlk(Number.isFinite(n) ? n : 0);
+                  }}
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>
