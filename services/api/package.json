@@ -18,6 +18,7 @@
     "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts"
   },
   "dependencies": {
+    "@brewery/contracts": "file:../../packages/contracts",
     "@beerjson/beerjson": "^1.0.2",
     "@fastify/cookie": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",

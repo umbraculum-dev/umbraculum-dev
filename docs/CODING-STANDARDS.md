@@ -84,6 +84,21 @@ Examples (water pages):
 - “Save salts draft” vs “Calculate & save salts snapshot”
 - “Preview overall” vs “Calculate & save overall snapshot”
 
+### API centralization guardrails (MANDATORY when moving logic server-side)
+When we centralize calculations/formatting in the API (Fastify), we intentionally shift work away from clients (web/native) and into server-side compute. This reduces drift and makes native reuse safer, but it must be done with guardrails so we don’t accidentally overload the API or bloat persistence.
+
+Guardrails:
+- **Do not recompute on every keystroke**:
+  - Never bind compute endpoints to raw text input changes.
+  - Prefer explicit CTAs (Preview / Calculate & save snapshot) as the default UX.
+  - If “live preview” is ever added, it must be debounced and must cancel/ignore stale in-flight requests.
+- **Keep persistence bounded by default**:
+  - “Snapshot” persistence should overwrite the existing “last snapshot” JSON fields (no unbounded history) unless we explicitly design a history feature.
+  - Do not persist large debug payloads (e.g. derivation trees) unless required; store only what the UI needs for recap/debug and keep sizes predictable.
+- **Clients render; clients do not re-implement canonical formulas**:
+  - For server-centralized domains (water, later analysis), the API is the source of truth.
+  - Web/native should consume `result` + `derivation` and render it, with runtime parsing of network payloads (`unknown` → `parseXxx()`).
+
 ### Math popovers (“Show math”) must explain *how* (DERIVATIONS)
 When “Show math” is enabled, popovers must explain **how** a value/table is derived (formula + inputs + key intermediate values).
 

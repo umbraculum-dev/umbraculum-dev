@@ -15,6 +15,7 @@ import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
+import { parseSpargeComputeAndSaveResponse } from "../_lib/parseWaterComputeAndSave";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -322,130 +323,47 @@ export default function SpargeWaterPage() {
     setAcidDerivation(null);
     setSpargeSubmitting(true);
     try {
-      const saltsSnapshot = await ensureSpargeSaltsSnapshotForAcidification();
-      const calciumPpm =
-        typeof saltsSnapshot.resultingProfile?.calcium === "number" && Number.isFinite(saltsSnapshot.resultingProfile.calcium)
-          ? saltsSnapshot.resultingProfile.calcium
-          : undefined;
-      const magnesiumPpm =
-        typeof saltsSnapshot.resultingProfile?.magnesium === "number" && Number.isFinite(saltsSnapshot.resultingProfile.magnesium)
-          ? saltsSnapshot.resultingProfile.magnesium
-          : undefined;
+      const payload: Record<string, unknown> = {
+        spargeWaterProfileId: spargeWaterProfileId,
+        spargeSaltAdditionsJson: spargeSaltAdditions,
+        spargeStartingAlkalinityPpmCaCO3: startingAlk,
+        spargeStartingPh: Number(startingPh),
+        spargeTargetPh: targetPh,
+        spargeVolumeLiters: volumeLiters,
+        spargeAcidType: acidType,
+        spargeStrengthKind: strengthKind,
+        spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
+        spargeAcidificationMode: spargeAcidificationMode,
+        spargeManualAcidAddedMl: strengthKind === "solid" ? null : spargeManualAcidAdded,
+        spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
+      };
 
-      if (spargeAcidificationMode === "manual") {
-        const acidAdded =
-          typeof spargeManualAcidAdded === "number" && Number.isFinite(spargeManualAcidAdded)
-            ? spargeManualAcidAdded
-            : NaN;
-        if (!Number.isFinite(acidAdded) || acidAdded < 0) {
-          setSpargeError("Manual acid amount must be a number ≥ 0.");
-          return;
-        }
+      const res = await apiFetch(`/api/recipes/${recipeId}/water-settings/sparge/compute-and-save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const computed = parseSpargeComputeAndSaveResponse(res.data);
 
-        const payload: Record<string, unknown> = {
-          startingAlkalinityPpmCaCO3: startingAlk,
-          startingPh: Number(startingPh),
-          volumeLiters,
-          calciumPpm,
-          magnesiumPpm,
-          acidType,
-          strengthKind,
-          ...(strengthKind === "solid" ? { acidAddedGrams: acidAdded } : { acidAddedMl: acidAdded }),
-        };
-        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+      setSpargeSaltsResult(computed.salts.result as any);
+      setSaltDerivation(computed.salts.derivation as any);
+      setSpargeSaltsInputsKey(buildSpargeSaltsInputsKey());
 
-        const res = await apiFetch("/api/water-calc/sparge-acidification-manual", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        setAcidDerivation((res.data as any).derivation ?? null);
-        const manual = (res.data as any).result as SpargeManualCalcResult;
-        setSpargeManualResult(manual);
-        setSpargeResult(manual.predicted);
-        await refreshSpargeOverallIfPossible().catch(() => null);
-
-        const nowIso = new Date().toISOString();
-        await saveSettings({
-          spargeWaterProfileId: spargeWaterProfileId || null,
-          spargeStartingAlkalinityPpmCaCO3: startingAlk,
-          spargeStartingPh: Number(startingPh),
-          spargeTargetPh: targetPh,
-          spargeVolumeLiters: volumeLiters,
-          spargeAcidType: acidType,
-          spargeStrengthKind: strengthKind,
-          spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
-          spargeAcidificationMode,
-          spargeManualAcidAddedMl: strengthKind === "solid" ? null : spargeManualAcidAdded,
-          spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
-
-          spargeLastAcidRequiredMl: manual.predicted.acidRequiredMl,
-          spargeLastAcidRequiredTsp: manual.predicted.acidRequiredTsp,
-          spargeLastAcidRequiredGrams: manual.predicted.acidRequiredGrams,
-          spargeLastAcidRequiredKg: manual.predicted.acidRequiredKg,
-          spargeLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
-          spargeLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
-          spargeLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
-          spargeLastCalculatedAt: nowIso,
-
-          spargeManualLastAchievedPh: manual.achievedPh,
-          spargeManualLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
-          spargeManualLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
-          spargeManualLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
-          spargeManualLastCalculatedAt: nowIso,
-        });
-
+      setAcidDerivation(computed.acid.derivation as any);
+      if (computed.acid.kind === "sparge_acidification_manual") {
+        setSpargeManualResult(computed.acid.result as any);
+        setSpargeResult((computed.acid.result as any).predicted ?? null);
         setSpargeStatus("Estimated (manual mode).");
         setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
-        const payload: Record<string, unknown> = {
-          startingAlkalinityPpmCaCO3: startingAlk,
-          startingPh: Number(startingPh),
-          targetPh,
-          volumeLiters,
-          calciumPpm,
-          magnesiumPpm,
-          acidType,
-          strengthKind,
-        };
-        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
-
-        const res = await apiFetch("/api/water-calc/sparge-acidification", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        setAcidDerivation((res.data as any).derivation ?? null);
-        const result = (res.data as any).result as SpargeResult;
-        setSpargeResult(result);
-        await refreshSpargeOverallIfPossible().catch(() => null);
-
-        const nowIso = new Date().toISOString();
-        await saveSettings({
-          spargeWaterProfileId: spargeWaterProfileId || null,
-          spargeStartingAlkalinityPpmCaCO3: startingAlk,
-          spargeStartingPh: Number(startingPh),
-          spargeTargetPh: targetPh,
-          spargeVolumeLiters: volumeLiters,
-          spargeAcidType: acidType,
-          spargeStrengthKind: strengthKind,
-          spargeStrengthValue: strengthKind === "solid" ? null : strengthValue,
-          spargeAcidificationMode,
-
-          spargeLastAcidRequiredMl: result.acidRequiredMl,
-          spargeLastAcidRequiredTsp: result.acidRequiredTsp,
-          spargeLastAcidRequiredGrams: result.acidRequiredGrams,
-          spargeLastAcidRequiredKg: result.acidRequiredKg,
-          spargeLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
-          spargeLastSulfateAddedPpm: result.sulfateAddedPpm,
-          spargeLastChlorideAddedPpm: result.chlorideAddedPpm,
-          spargeLastCalculatedAt: nowIso,
-        });
+        setSpargeManualResult(null);
+        setSpargeResult(computed.acid.result as any);
         setSpargeStatus("Calculated.");
         setCalcSaveStatus("Calculated & saved snapshot.");
       }
+
+      await refreshSpargeOverallIfPossible().catch(() => null);
     } catch (err) {
       setSpargeError(String(err));
     } finally {

@@ -22,6 +22,7 @@ import {
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
+import { parseMashComputeAndSaveResponse } from "../_lib/parseWaterComputeAndSave";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -669,24 +670,78 @@ export default function MashWaterPage() {
     return body.result as MashOverallResult;
   };
 
+  const computeAndSaveMashSnapshots = async () => {
+    if (!canCall) throw new Error("Not ready to call API.");
+    if (!recipeId) throw new Error("Missing recipe id.");
+    if (!sourceProfileId) throw new Error("Select a Source water profile.");
+
+    const gristRows = gristImportedRows.map((r) => ({
+      amountKg: r.amountKg,
+      colorLovibond: r.colorLovibond,
+      maltClass: r.maltClass,
+    }));
+
+    const payload: Record<string, unknown> = {
+      sourceWaterProfileId: sourceProfileId,
+      dilutionWaterProfileId: dilutionProfileId || null,
+      tapWaterVolumeLiters: tapVolumeLiters,
+      dilutionWaterVolumeLiters: dilutionVolumeLiters,
+
+      mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+      mashStartingPh: mashStartingPh,
+      mashTargetPh: mashTargetPh,
+      mashAcidType: mashAcidType,
+      mashStrengthKind: mashStrengthKind,
+      mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
+      mashAcidificationMode: mashAcidificationMode,
+      mashManualAcidAddedMl: mashStrengthKind === "solid" ? null : mashManualAcidAdded,
+      mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
+
+      mashSaltAdditionsJson: saltAdditions,
+      ...(gristRows.length ? { grist: gristRows } : {}),
+    };
+
+    const res = await apiFetch(`/api/recipes/${recipeId}/water-settings/mash/compute-and-save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+    return parseMashComputeAndSaveResponse(res.data);
+  };
+
   const onCalculateOverall = async (saveAlso: boolean) => {
     setOverallError(null);
     setOverallStatus(null);
     setOverallSaveStatus(null);
     setSavingOverall(true);
     try {
-      await ensureZeroSaltsSnapshotIfMissing();
-      const overall = await computeOverallMash();
-      setOverallResult(overall);
-      setOverallStatus("Calculated.");
       if (saveAlso) {
-        await saveSettings({
-          tapWaterVolumeLiters: tapVolumeLiters,
-          dilutionWaterVolumeLiters: dilutionVolumeLiters,
-          mashOverallLastResultJson: overall,
-          mashOverallLastCalculatedAt: overall.calculatedAt,
-        });
+        const computed = await computeAndSaveMashSnapshots();
+        setSaltsResult(computed.salts.result as any);
+        setSaltsDerivation(computed.salts.derivation as any);
+        setAcidDerivation(computed.acid.derivation as any);
+        setOverallDerivation(computed.overall.derivation as any);
+        setOverallResult(computed.overall.result as any);
+        setOverallStatus("Calculated.");
+        if (computed.acid.kind === "mash_acidification_manual") {
+          setMashManualResult(computed.acid.result as any);
+          setMashManualStatus("Estimated (manual mode).");
+          setMashResult((computed.acid.result as any).predicted ?? null);
+          setMashCalcSaveStatus("Estimated & saved snapshot.");
+        } else {
+          setMashManualResult(null);
+          setMashManualStatus(null);
+          setMashResult(computed.acid.result as any);
+          setMashStatus("Calculated.");
+          setMashCalcSaveStatus("Calculated & saved snapshot.");
+        }
         setOverallSaveStatus("Calculated & saved overall snapshot.");
+      } else {
+        await ensureZeroSaltsSnapshotIfMissing();
+        const overall = await computeOverallMash();
+        setOverallResult(overall);
+        setOverallStatus("Calculated.");
       }
     } catch (err) {
       setOverallError(String(err));
@@ -707,102 +762,23 @@ export default function MashWaterPage() {
     setAcidDerivation(null);
     setMashSubmitting(true);
     try {
-      if (mashAcidificationMode === "manual") {
-        const payload: Record<string, unknown> = {
-          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-          mashStartingPh,
-          mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
-          acidType: mashAcidType,
-          strengthKind: mashStrengthKind,
-          ...(mashStrengthKind === "solid"
-            ? { acidAddedGrams: mashManualAcidAdded }
-            : { acidAddedMl: mashManualAcidAdded }),
-        };
-        if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
-        const res = await apiFetch("/api/water-calc/mash-acidification-manual", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const manual = (res.data as any).result as MashManualCalcResult;
-        setAcidDerivation((res.data as any).derivation ?? null);
-        setMashManualResult(manual);
-        setMashManualStatus("Estimated (manual mode).");
-        setMashResult(manual.predicted);
+      const computed = await computeAndSaveMashSnapshots();
+      setSaltsResult(computed.salts.result as any);
+      setSaltsDerivation(computed.salts.derivation as any);
+      setAcidDerivation(computed.acid.derivation as any);
+      setOverallDerivation(computed.overall.derivation as any);
+      setOverallResult(computed.overall.result as any);
+      setOverallStatus("Calculated.");
 
-        const nowIso = new Date().toISOString();
-        await saveSettings({
-          mashAcidificationMode,
-          mashManualAcidAddedMl: mashStrengthKind === "solid" ? null : mashManualAcidAdded,
-          mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
-          mashManualLastAchievedPh: manual.achievedPh,
-          mashManualLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
-          mashManualLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
-          mashManualLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
-          mashManualLastCalculatedAt: nowIso,
-          mashLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
-          mashLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
-          mashLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
-          mashLastCalculatedAt: nowIso,
-        });
+      if (computed.acid.kind === "mash_acidification_manual") {
+        setMashManualResult(computed.acid.result as any);
+        setMashManualStatus("Estimated (manual mode).");
+        setMashResult((computed.acid.result as any).predicted ?? null);
         setMashCalcSaveStatus("Estimated & saved snapshot.");
       } else {
-        const gristRows = gristImportedRows.map((r) => ({
-          amountKg: r.amountKg,
-          colorLovibond: r.colorLovibond,
-          maltClass: r.maltClass,
-        }));
-        const endpoint =
-          gristRows.length > 0 ? "/api/water-calc/mash-acidification-target-mash-ph" : "/api/water-calc/mash-acidification";
-        const payload: Record<string, unknown> = {
-          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-          mashStartingPh,
-          mashTargetPh,
-          mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
-          acidType: mashAcidType,
-          strengthKind: mashStrengthKind,
-          ...(gristRows.length ? { grist: gristRows } : {}),
-        };
-        if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
-        const res = await apiFetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        setAcidDerivation((res.data as any).derivation ?? null);
-        const result = (res.data as any).result as any;
-        const r: MashResult = {
-          acidRequiredMl: result.acidRequiredMl,
-          acidRequiredTsp: result.acidRequiredTsp,
-          acidRequiredGrams: result.acidRequiredGrams,
-          acidRequiredKg: result.acidRequiredKg,
-          finalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
-          sulfateAddedPpm: result.sulfateAddedPpm,
-          chlorideAddedPpm: result.chlorideAddedPpm,
-        };
-        setMashResult(r);
-
-        const nowIso = new Date().toISOString();
-        await saveSettings({
-          mashAcidificationMode,
-          mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-          mashStartingPh,
-          mashTargetPh,
-          mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
-          mashAcidType,
-          mashStrengthKind,
-          mashStrengthValue: mashStrengthKind === "solid" ? null : mashStrengthValue,
-          mashLastAcidRequiredMl: r.acidRequiredMl,
-          mashLastAcidRequiredTsp: r.acidRequiredTsp,
-          mashLastAcidRequiredGrams: r.acidRequiredGrams,
-          mashLastAcidRequiredKg: r.acidRequiredKg,
-          mashLastFinalAlkalinityPpmCaCO3: r.finalAlkalinityPpmCaCO3,
-          mashLastSulfateAddedPpm: r.sulfateAddedPpm,
-          mashLastChlorideAddedPpm: r.chlorideAddedPpm,
-          mashLastCalculatedAt: nowIso,
-        });
+        setMashManualResult(null);
+        setMashManualStatus(null);
+        setMashResult(computed.acid.result as any);
         setMashStatus("Calculated.");
         setMashCalcSaveStatus("Calculated & saved snapshot.");
       }

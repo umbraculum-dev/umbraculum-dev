@@ -2,40 +2,10 @@
 
 import { formatFixed } from "../../../../../src/i18n/format";
 import type { MathExplainKey } from "./mathExplain";
+import type { WaterCalcDerivation, WaterCalcDerivationLine, WaterCalcDerivationValue, WaterCalcDerivationKind } from "@brewery/contracts";
 
 type TValues = Record<string, string | number | Date>;
 type T = (key: string, values?: TValues) => string;
-
-type WaterCalcDerivationKind =
-  | "salt_additions"
-  | "acidification"
-  | "mash_overall"
-  | "sparge_overall"
-  | "boil_overall";
-
-type WaterCalcDerivationValue =
-  | { kind: "number"; value: number; unit?: string }
-  | { kind: "string"; value: string }
-  | { kind: "boolean"; value: boolean }
-  | { kind: "null" };
-
-type WaterCalcDerivationLine = {
-  id: string;
-  value: WaterCalcDerivationValue;
-};
-
-type WaterCalcDerivation = {
-  kind: WaterCalcDerivationKind;
-  version: 1;
-  formulaId: string;
-  inputs: WaterCalcDerivationLine[];
-  intermediates: WaterCalcDerivationLine[];
-  breakdowns?: Array<{
-    id: string;
-    rows: Array<Record<string, WaterCalcDerivationValue>>;
-  }>;
-  notes?: string[];
-};
 
 function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);

@@ -5,10 +5,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
-import { fetchRecipeWaterSettings, type RecipeWaterSettingsResponse } from "./_lib/waterSettings";
-import type { IonProfilePpm } from "./_lib/waterChem";
-import { combineAfterSaltsAndAcid } from "./_lib/waterChem";
 import { formatFixed } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
@@ -16,13 +12,7 @@ import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow"
 import { mathExplain } from "./_lib/mathExplain";
 import { buildWaterMathBody } from "./_lib/mathBodies";
 import { RecipeMetaLine } from "./_components/RecipeMetaLine";
-
-type MashOverallResult = {
-  calculatedAt: string;
-  ionsPpm: IonProfilePpm;
-  finalAlkalinityPpmCaCO3: number;
-  ph: { kind: "target" | "estimated"; value: number };
-};
+import { fetchRecipeWaterHubSummary, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary } from "./_lib/waterHubSummary";
 
 export default function WaterHubPage() {
   const t = useTranslations("waterHub");
@@ -34,20 +24,7 @@ export default function WaterHubPage() {
 
   const authState = useRequireAuth({ requireActiveAccount: true });
 
-  const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [settings, setSettings] = useState<RecipeWaterSettingsResponse["settings"] | null>(null);
-  const [recipeStyleKey, setRecipeStyleKey] = useState<string | null>(null);
-  const [beerStyles, setBeerStyles] = useState<
-    null | {
-      styles: Array<{
-        key: string;
-        name: string;
-        category: string | null;
-        categoryId: string | null;
-        code: string;
-      }>;
-    }
-  >(null);
+  const [summary, setSummary] = useState<RecipeWaterHubSummary | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,20 +52,8 @@ export default function WaterHubPage() {
     setError(null);
     setLoading(true);
     try {
-      const profRes = await apiFetch("/api/water-profiles");
-      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(profRes.data as WaterProfilesResponse);
-
-      const s = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
-      setSettings(s.settings ?? null);
-
-      const recipeRes = await apiFetch(`/api/recipes/${recipeId}`);
-      if (!recipeRes.ok) throw new Error(JSON.stringify(recipeRes.data));
-      setRecipeStyleKey(extractRecipeStyleKey(recipeRes.data));
-
-      const stylesRes = await apiFetch("/api/styles");
-      if (!stylesRes.ok) throw new Error(JSON.stringify(stylesRes.data));
-      setBeerStyles(extractBeerStyles(stylesRes.data));
+      const res = await fetchRecipeWaterHubSummary(recipeId);
+      setSummary(res.summary ?? null);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -101,19 +66,9 @@ export default function WaterHubPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState.status, recipeId]);
 
-  const mashLast = settings?.mashLastCalculatedAt ? new Date(settings.mashLastCalculatedAt).toLocaleString() : "—";
-  const spargeLast = settings?.spargeLastCalculatedAt
-    ? new Date(settings.spargeLastCalculatedAt).toLocaleString()
-    : "—";
-  const boilLast = settings?.boilLastCalculatedAt ? new Date(settings.boilLastCalculatedAt).toLocaleString() : "—";
-
-  const overall = useMemo(() => {
-    const v = settings?.mashOverallLastResultJson;
-    if (!v || typeof v !== "object") return null;
-    const o = v as any;
-    if (!o?.ph || typeof o?.finalAlkalinityPpmCaCO3 !== "number" || !o?.ionsPpm) return null;
-    return o as MashOverallResult;
-  }, [settings?.mashOverallLastResultJson]);
+  const mashLast = summary?.status.mashLastCalculatedAt ? new Date(summary.status.mashLastCalculatedAt).toLocaleString() : "—";
+  const spargeLast = summary?.status.spargeLastCalculatedAt ? new Date(summary.status.spargeLastCalculatedAt).toLocaleString() : "—";
+  const boilLast = summary?.status.boilLastCalculatedAt ? new Date(summary.status.boilLastCalculatedAt).toLocaleString() : "—";
 
   const displayAlkalinityPpmCaCO3 = (v: number) => {
     // Keep consistent with boil page: tiny negatives are usually solver/float tolerances.
@@ -121,302 +76,47 @@ export default function WaterHubPage() {
     return v;
   };
 
-  const calcResidualAlkalinityPpmCaCO3 = (args: {
-    alkalinityPpmCaCO3: number;
-    calciumPpm: number;
-    magnesiumPpm: number;
-  }) => {
-    return args.alkalinityPpmCaCO3 - 0.713 * args.calciumPpm - 0.588 * args.magnesiumPpm;
-  };
-
-  const expectedRa = useMemo(() => {
-    if (!recipeStyleKey || recipeStyleKey === "custom") return null;
-    const style = beerStyles?.styles?.find((s) => s.key === recipeStyleKey) ?? null;
-    if (!style) return null;
-
-    const text = `${style.category ?? ""} ${style.name}`.trim().toLowerCase();
-    const includes = (needle: string) => text.includes(needle);
-
-    if (
-      includes("stout") ||
-      includes("porter") ||
-      includes("schwarz") ||
-      includes("dunkel") ||
-      includes("dark") ||
-      includes("black")
-    ) {
-      return { min: 50, max: 200, rationaleKey: "styleExpectedRaDark" as const };
-    }
-    if (
-      includes("ipa") ||
-      includes("pale") ||
-      includes("pils") ||
-      includes("lager") ||
-      includes("blonde") ||
-      includes("kölsch") ||
-      includes("kolsch") ||
-      includes("saison")
-    ) {
-      return { min: -50, max: 50, rationaleKey: "styleExpectedRaPale" as const };
-    }
-    if (
-      includes("amber") ||
-      includes("red") ||
-      includes("brown") ||
-      includes("bock") ||
-      includes("vienna") ||
-      includes("märzen") ||
-      includes("marzen")
-    ) {
-      return { min: 0, max: 100, rationaleKey: "styleExpectedRaAmber" as const };
-    }
-
-    return null;
-  }, [beerStyles?.styles, recipeStyleKey]);
-
-  type StreamSummary = {
-    key: "mash" | "sparge" | "boil";
-    label: string;
-    volumeLiters: number | null;
-    ph: number | null;
-    finalAlkalinityPpmCaCO3: number | null;
-    saltsAddedLabel: string | null;
-    acidType: string | null;
-    acidAmountLabel: string | null;
-    ionsAfterAcid: IonProfilePpm | null;
-  };
-
-  const recap = useMemo(() => {
-    if (!settings) return null;
-
-    const formatSaltKeyLabel = (saltKey: string): string => {
-      switch (saltKey) {
-        case "gypsum":
-          return tsalts("gypsum");
-        case "calcium_chloride":
-          return tsalts("calciumChloride");
-        case "epsom":
-          return tsalts("epsom");
-        case "table_salt":
-          return tsalts("tableSalt");
-        case "baking_soda":
-          return tsalts("bakingSoda");
-        default:
-          return saltKey;
+  const displayStreams = useMemo(() => {
+    const streams = summary?.streams ?? [];
+    const labelOf = (k: RecipeWaterHubStreamSummary["key"]) => {
+      switch (k) {
+        case "mash":
+          return t("mashWater");
+        case "sparge":
+          return t("spargeWater");
+        case "boil":
+          return t("additionalBoilWater");
       }
     };
+    return streams.map((s) => ({ ...s, label: labelOf(s.key) }));
+  }, [summary?.streams, t]);
 
-    const parseSaltsBreakdownLabel = (v: unknown): string | null => {
-      if (!v || typeof v !== "object") return null;
-      const o = v as any;
-      const b = o?.result?.breakdown;
-      if (!Array.isArray(b)) return null;
+  const formatSaltKeyLabel = (saltKey: string): string => {
+    switch (saltKey) {
+      case "gypsum":
+        return tsalts("gypsum");
+      case "calcium_chloride":
+        return tsalts("calciumChloride");
+      case "epsom":
+        return tsalts("epsom");
+      case "table_salt":
+        return tsalts("tableSalt");
+      case "baking_soda":
+        return tsalts("bakingSoda");
+      default:
+        return saltKey;
+    }
+  };
 
-      const parts: string[] = [];
-      for (const row of b) {
-        if (!row || typeof row !== "object") continue;
-        const r = row as any;
-        const saltKey = typeof r.saltKey === "string" ? r.saltKey : null;
-        const grams = typeof r.grams === "number" && Number.isFinite(r.grams) ? r.grams : null;
-        if (!saltKey || grams == null || !(grams > 0)) continue;
-        parts.push(`${formatSaltKeyLabel(saltKey)} ${formatFixed(locale, grams, 3)} g`);
-      }
-
-      return parts.length ? parts.join("; ") : null;
-    };
-
-    const parseSaltsResultingProfile = (v: unknown): IonProfilePpm | null => {
-      if (!v || typeof v !== "object") return null;
-      const o = v as any;
-      const r = o?.result?.resultingProfile;
-      if (!r || typeof r !== "object") return null;
-      const p = r as any;
-      const keys: Array<keyof IonProfilePpm> = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
-      for (const k of keys) if (typeof p[k] !== "number") return null;
-      return {
-        calcium: p.calcium,
-        magnesium: p.magnesium,
-        sodium: p.sodium,
-        sulfate: p.sulfate,
-        chloride: p.chloride,
-        bicarbonate: p.bicarbonate,
-      };
-    };
-
-    // Mash volume: prefer the single source of truth (mixing volumes) when available.
-    // Fall back to legacy `mashWaterVolumeLiters` for older records where mixing volumes were never set.
-    const mashTap = typeof settings.tapWaterVolumeLiters === "number" ? settings.tapWaterVolumeLiters : 0;
-    const mashDil = typeof settings.dilutionWaterVolumeLiters === "number" ? settings.dilutionWaterVolumeLiters : 0;
-    const mashMixTotal = Math.max(0, mashTap) + Math.max(0, mashDil);
-    const mashLegacy = typeof settings.mashWaterVolumeLiters === "number" ? settings.mashWaterVolumeLiters : null;
-    const mashVolumeLiters = mashMixTotal > 0 ? mashMixTotal : mashLegacy;
-    const mashPh = overall?.ph?.value ?? null;
-    const mashFinalAlk = overall?.finalAlkalinityPpmCaCO3 ?? null;
-    const mashIonsAfterAcid = overall?.ionsPpm ?? null;
-    const mashSaltsAddedLabel = parseSaltsBreakdownLabel(settings.mashSaltsLastResultJson);
-    const mashAcidAmountLabel =
-      settings.mashAcidificationMode === "manual"
-        ? settings.mashStrengthKind === "solid"
-          ? settings.mashManualAcidAddedGrams != null
-            ? `${formatFixed(locale, settings.mashManualAcidAddedGrams, 3)} g ${tsalts("modeManualSuffix")}`
-            : null
-          : settings.mashManualAcidAddedMl != null
-            ? `${formatFixed(locale, settings.mashManualAcidAddedMl, 3)} mL ${tsalts("modeManualSuffix")}`
-            : null
-        : settings.mashStrengthKind === "solid"
-          ? settings.mashLastAcidRequiredGrams != null
-            ? `${formatFixed(locale, settings.mashLastAcidRequiredGrams, 3)} g ${tsalts("modeRequiredSuffix")}`
-            : null
-          : settings.mashLastAcidRequiredMl != null
-            ? `${formatFixed(locale, settings.mashLastAcidRequiredMl, 3)} mL ${tsalts("modeRequiredSuffix")}`
-            : null;
-
-    const spargeVolumeLiters = typeof settings.spargeVolumeLiters === "number" ? settings.spargeVolumeLiters : null;
-    const spargePh =
-      settings.spargeAcidificationMode === "manual"
-        ? settings.spargeManualLastAchievedPh ?? null
-        : typeof settings.spargeTargetPh === "number"
-          ? settings.spargeTargetPh
-          : null;
-    const spargeFinalAlk = settings.spargeLastFinalAlkalinityPpmCaCO3 ?? null;
-    const spargeSaltsAddedLabel = parseSaltsBreakdownLabel(settings.spargeSaltsLastResultJson);
-    const spargeAfterSalts = parseSaltsResultingProfile(settings.spargeSaltsLastResultJson);
-    const spargeIonsAfterAcid =
-      spargeAfterSalts && spargeFinalAlk != null
-        ? combineAfterSaltsAndAcid({
-            afterSalts: spargeAfterSalts,
-            acidResult: {
-              finalAlkalinityPpmCaCO3: spargeFinalAlk,
-              sulfateAddedPpm: settings.spargeLastSulfateAddedPpm ?? 0,
-              chlorideAddedPpm: settings.spargeLastChlorideAddedPpm ?? 0,
-            },
-          })
-        : null;
-    const spargeAcidAmountLabel =
-      settings.spargeAcidificationMode === "manual"
-        ? settings.spargeStrengthKind === "solid"
-          ? settings.spargeManualAcidAddedGrams != null
-            ? `${formatFixed(locale, settings.spargeManualAcidAddedGrams, 3)} g ${tsalts("modeManualSuffix")}`
-            : null
-          : settings.spargeManualAcidAddedMl != null
-            ? `${formatFixed(locale, settings.spargeManualAcidAddedMl, 3)} mL ${tsalts("modeManualSuffix")}`
-            : null
-        : settings.spargeStrengthKind === "solid"
-          ? settings.spargeLastAcidRequiredGrams != null
-            ? `${formatFixed(locale, settings.spargeLastAcidRequiredGrams, 3)} g ${tsalts("modeRequiredSuffix")}`
-            : null
-          : settings.spargeLastAcidRequiredMl != null
-            ? `${formatFixed(locale, settings.spargeLastAcidRequiredMl, 3)} mL ${tsalts("modeRequiredSuffix")}`
-            : null;
-
-    const boilVolumeLiters =
-      typeof settings.boilWaterVolumeLiters === "number" ? settings.boilWaterVolumeLiters : null;
-    const boilPh =
-      settings.boilAcidificationMode === "manual"
-        ? settings.boilManualLastAchievedPh ?? null
-        : typeof settings.boilTargetPh === "number"
-          ? settings.boilTargetPh
-          : null;
-    const boilFinalAlk = settings.boilLastFinalAlkalinityPpmCaCO3 ?? null;
-    const boilSaltsAddedLabel = parseSaltsBreakdownLabel(settings.boilSaltsLastResultJson);
-    const boilAfterSalts = parseSaltsResultingProfile(settings.boilSaltsLastResultJson);
-    const boilIonsAfterAcid =
-      boilAfterSalts && boilFinalAlk != null
-        ? combineAfterSaltsAndAcid({
-            afterSalts: boilAfterSalts,
-            acidResult: {
-              finalAlkalinityPpmCaCO3: boilFinalAlk,
-              sulfateAddedPpm: settings.boilLastSulfateAddedPpm ?? 0,
-              chlorideAddedPpm: settings.boilLastChlorideAddedPpm ?? 0,
-            },
-          })
-        : null;
-    const boilAcidAmountLabel =
-      settings.boilAcidificationMode === "manual"
-        ? settings.boilStrengthKind === "solid"
-          ? settings.boilManualAcidAddedGrams != null
-            ? `${formatFixed(locale, settings.boilManualAcidAddedGrams, 3)} g ${tsalts("modeManualSuffix")}`
-            : null
-          : settings.boilManualAcidAddedMl != null
-            ? `${formatFixed(locale, settings.boilManualAcidAddedMl, 3)} mL ${tsalts("modeManualSuffix")}`
-            : null
-        : settings.boilStrengthKind === "solid"
-          ? settings.boilLastAcidRequiredGrams != null
-            ? `${formatFixed(locale, settings.boilLastAcidRequiredGrams, 3)} g ${tsalts("modeRequiredSuffix")}`
-            : null
-          : settings.boilLastAcidRequiredMl != null
-            ? `${formatFixed(locale, settings.boilLastAcidRequiredMl, 3)} mL ${tsalts("modeRequiredSuffix")}`
-            : null;
-
-    const streams: StreamSummary[] = [
-      {
-        key: "mash",
-        label: t("mashWater"),
-        volumeLiters: mashVolumeLiters,
-        ph: mashPh,
-        finalAlkalinityPpmCaCO3: mashFinalAlk,
-        saltsAddedLabel: mashSaltsAddedLabel,
-        acidType: settings.mashAcidType ?? null,
-        acidAmountLabel: mashAcidAmountLabel,
-        ionsAfterAcid: mashIonsAfterAcid,
-      },
-      {
-        key: "sparge",
-        label: t("spargeWater"),
-        volumeLiters: spargeVolumeLiters,
-        ph: spargePh,
-        finalAlkalinityPpmCaCO3: spargeFinalAlk,
-        saltsAddedLabel: spargeSaltsAddedLabel,
-        acidType: settings.spargeAcidType ?? null,
-        acidAmountLabel: spargeAcidAmountLabel,
-        ionsAfterAcid: spargeIonsAfterAcid,
-      },
-      {
-        key: "boil",
-        label: t("additionalBoilWater"),
-        volumeLiters: boilVolumeLiters,
-        ph: boilPh,
-        finalAlkalinityPpmCaCO3: boilFinalAlk,
-        saltsAddedLabel: boilSaltsAddedLabel,
-        acidType: settings.boilAcidType ?? null,
-        acidAmountLabel: boilAcidAmountLabel,
-        ionsAfterAcid: boilIonsAfterAcid,
-      },
-    ];
-
-    const validForMerge = streams.filter((s) => s.volumeLiters && s.volumeLiters > 0 && s.ionsAfterAcid);
-    const totalV = validForMerge.reduce((acc, s) => acc + (s.volumeLiters as number), 0);
-    const mergedIons: IonProfilePpm | null =
-      totalV > 0
-        ? (["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"] as const).reduce((acc, k) => {
-            const sum = validForMerge.reduce(
-              (a, s) => a + ((s.ionsAfterAcid as IonProfilePpm)[k] * (s.volumeLiters as number)),
-              0,
-            );
-            (acc as any)[k] = sum / totalV;
-            return acc;
-          }, {} as any as IonProfilePpm)
-        : null;
-
-    const mergedFinalAlk =
-      totalV > 0
-        ? validForMerge.reduce((a, s) => a + ((s.finalAlkalinityPpmCaCO3 ?? 0) * (s.volumeLiters as number)), 0) /
-          totalV
-        : null;
-
-    // Approximate merged pH by volume-weighting [H+]. This is a rough summary, not full equilibrium mixing.
-    const validPh = streams.filter((s) => s.volumeLiters && s.volumeLiters > 0 && typeof s.ph === "number");
-    const totalPhV = validPh.reduce((a, s) => a + (s.volumeLiters as number), 0);
-    const mergedPh =
-      totalPhV > 0
-        ? (() => {
-            const h = validPh.reduce((a, s) => a + (10 ** (-(s.ph as number)) * (s.volumeLiters as number)), 0) / totalPhV;
-            return -Math.log10(h);
-          })()
-        : null;
-
-    return { streams, mergedIons, mergedFinalAlk, mergedPh, totalVolumeLiters: totalV };
-  }, [settings, overall, t, tsalts]);
+  const formatAcidAmountLabel = (s: RecipeWaterHubStreamSummary): string | null => {
+    const suffix =
+      s.acidMode === "manual" ? tsalts("modeManualSuffix") : s.acidMode === "required" ? tsalts("modeRequiredSuffix") : "";
+    const isSolid = s.acidStrengthKind === "solid";
+    const v = isSolid ? s.acidAmountGrams : s.acidAmountMl;
+    const unit = isSolid ? "g" : "mL";
+    if (v == null) return null;
+    return `${formatFixed(locale, v, 3)} ${unit}${suffix ? ` ${suffix}` : ""}`;
+  };
 
   return (
     <>
@@ -479,17 +179,18 @@ export default function WaterHubPage() {
           </h2>
           <ul style={{ marginTop: 0 }}>
             <li>
-              {t("mashAcidMode")}: <code>{settings?.mashAcidificationMode ?? "—"}</code>
+              {t("mashAcidMode")}: <code>{summary?.status.mashAcidificationMode ?? "—"}</code>
             </li>
             <li>
-              {t("spargeAcidMode")}: <code>{settings?.spargeAcidificationMode ?? "—"}</code>
+              {t("spargeAcidMode")}: <code>{summary?.status.spargeAcidificationMode ?? "—"}</code>
             </li>
             <li>
               {t("mashOverallSnapshot")}:{" "}
-              {overall ? (
+              {summary?.status.mashOverallSnapshot ? (
                 <>
-                  pH ({overall.ph.kind}) <code>{formatFixed(locale, overall.ph.value, 2)}</code> · Final alkalinity{" "}
-                  <code>{formatFixed(locale, overall.finalAlkalinityPpmCaCO3, 2)}</code>
+                  pH ({summary.status.mashOverallSnapshot.ph.kind}){" "}
+                  <code>{formatFixed(locale, summary.status.mashOverallSnapshot.ph.value, 2)}</code> · Final alkalinity{" "}
+                  <code>{formatFixed(locale, summary.status.mashOverallSnapshot.finalAlkalinityPpmCaCO3, 2)}</code>
                 </>
               ) : (
                 <span className="muted">—</span>
@@ -504,7 +205,7 @@ export default function WaterHubPage() {
               {loading ? t("refreshing") : t("refresh")}
             </button>
             <span className="muted" role="status" aria-live="polite">
-              {profiles ? t("profilesLoaded") : t("profilesNotLoaded")}
+              {summary ? t("profilesLoaded") : t("profilesNotLoaded")}
             </span>
           </div>
 
@@ -537,10 +238,10 @@ export default function WaterHubPage() {
                       tMath,
                       locale,
                       ctx: {
-                        streams: recap?.streams ?? [],
-                        totalVolumeLiters: recap?.totalVolumeLiters ?? null,
-                        mergedPh: recap?.mergedPh ?? null,
-                        mergedFinalAlk: recap?.mergedFinalAlk ?? null,
+                        streams: displayStreams ?? [],
+                        totalVolumeLiters: summary?.merged.totalVolumeLiters ?? null,
+                        mergedPh: summary?.merged.ph ?? null,
+                        mergedFinalAlk: summary?.merged.finalAlkalinityPpmCaCO3 ?? null,
                       },
                     })}
                     ariaLabel={tMath("fxLabel", { topic: title })}
@@ -551,7 +252,7 @@ export default function WaterHubPage() {
               <span className="muted">{t("clickToExpand")}</span>
             </summary>
 
-            {recap ? (
+            {summary ? (
               <>
                 <h3 style={{ marginTop: 12 }}>{t("perStream")}</h3>
                 <div style={{ overflowX: "auto" }}>
@@ -565,7 +266,7 @@ export default function WaterHubPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {recap.streams.map((s) => (
+                      {displayStreams.map((s) => (
                         <tr key={`${s.key}-summary`}>
                           <td style={{ textAlign: "left" }}>
                             <strong>{s.label}</strong>
@@ -592,18 +293,18 @@ export default function WaterHubPage() {
                 <h3 style={{ marginTop: 16 }}>{t("mergedSummary")}</h3>
                 <ul style={{ marginTop: 0 }}>
                   <li>
-                    {t("totalVolume")}: <code>{formatFixed(locale, recap.totalVolumeLiters, 2)}</code> L
+                    {t("totalVolume")}: <code>{formatFixed(locale, summary.merged.totalVolumeLiters, 2)}</code> L
                   </li>
                   <li>
                     {t("approxMergedPh")}:{" "}
-                    <code>{recap.mergedPh == null ? "—" : formatFixed(locale, recap.mergedPh, 2)}</code>
+                    <code>{summary.merged.ph == null ? "—" : formatFixed(locale, summary.merged.ph, 2)}</code>
                   </li>
                   <li>
                     {t("mergedFinalAlk")}:{" "}
                     <code>
-                      {recap.mergedFinalAlk == null
+                      {summary.merged.finalAlkalinityPpmCaCO3 == null
                         ? "—"
-                        : formatFixed(locale, displayAlkalinityPpmCaCO3(recap.mergedFinalAlk), 2)}
+                        : formatFixed(locale, displayAlkalinityPpmCaCO3(summary.merged.finalAlkalinityPpmCaCO3), 2)}
                     </code>{" "}
                     ppm as CaCO3
                   </li>
@@ -611,32 +312,36 @@ export default function WaterHubPage() {
 
                 <h4 style={{ marginTop: 12, marginBottom: 6 }}>{t("additionsPerStream")}</h4>
                 <ul style={{ marginTop: 0 }}>
-                  {recap.streams.map((s) => (
+                  {displayStreams.map((s) => (
                     <li key={`adds-${s.key}`}>
                       <strong>{s.label}</strong>
                       <ul style={{ marginTop: 6 }}>
-                        {(s.saltsAddedLabel ? s.saltsAddedLabel.split("; ") : []).length ? (
-                          (s.saltsAddedLabel as string).split("; ").map((p) => (
-                            <li key={`adds-${s.key}-salt-${p}`}>
-                              <span className="muted">{t("salt")}</span> <code>{p}</code>
+                        {(s.saltsBreakdown ?? []).length ? (
+                          (s.saltsBreakdown as Array<{ saltKey: string; grams: number }>).map((row) => (
+                            <li key={`adds-${s.key}-salt-${row.saltKey}`}>
+                              <span className="muted">{t("salt")}</span>{" "}
+                              <code>
+                                {formatSaltKeyLabel(row.saltKey)} {formatFixed(locale, row.grams, 3)} g
+                              </code>
                             </li>
                           ))
-                        ) : (
+                        ) : null}
+                        {!(s.saltsBreakdown ?? []).length ? (
                           <li>
                             <span className="muted">{t("salt")}</span> <code>—</code>
                           </li>
-                        )}
+                        ) : null}
                         <li>
                           <span className="muted">{t("acid")}</span>{" "}
                           <code>{s.acidType ?? "—"}</code>
-                          {s.acidAmountLabel ? <span className="muted"> · {s.acidAmountLabel}</span> : null}
+                          {formatAcidAmountLabel(s) ? <span className="muted"> · {formatAcidAmountLabel(s)}</span> : null}
                         </li>
                       </ul>
                     </li>
                   ))}
                 </ul>
 
-                {recap.mergedIons ? (
+                {summary.merged.ionsPpm ? (
                   <>
                     <div style={{ marginTop: 8, marginBottom: 6, display: "flex", gap: 8, alignItems: "baseline" }}>
                       <strong>{t("mergedIonsTitle")}</strong>
@@ -651,7 +356,7 @@ export default function WaterHubPage() {
                               tMath,
                               locale,
                               ctx: {
-                                ions: recap?.mergedIons ?? null,
+                                ions: summary?.merged.ionsPpm ?? null,
                               },
                             })}
                             ariaLabel={tMath("fxLabel", { topic: title })}
@@ -673,12 +378,12 @@ export default function WaterHubPage() {
                       <tbody>
                         {(
                           [
-                            ["Ca", recap.mergedIons.calcium],
-                            ["Mg", recap.mergedIons.magnesium],
-                            ["Na", recap.mergedIons.sodium],
-                            ["SO4", recap.mergedIons.sulfate],
-                            ["Cl", recap.mergedIons.chloride],
-                            ["HCO3", recap.mergedIons.bicarbonate],
+                            ["Ca", summary.merged.ionsPpm.calcium],
+                            ["Mg", summary.merged.ionsPpm.magnesium],
+                            ["Na", summary.merged.ionsPpm.sodium],
+                            ["SO4", summary.merged.ionsPpm.sulfate],
+                            ["Cl", summary.merged.ionsPpm.chloride],
+                            ["HCO3", summary.merged.ionsPpm.bicarbonate],
                           ] as const
                         ).map(([label, v]) => (
                           <tr key={label}>
@@ -715,10 +420,10 @@ export default function WaterHubPage() {
           <ul style={{ marginTop: 0 }}>
             <li>
               {t("predictedMashPh")}{" "}
-              {overall ? (
+              {summary?.finalRecap.predictedMashPh ? (
                 <>
-                  <code>{formatFixed(locale, overall.ph.value, 2)}</code>{" "}
-                  <span className="muted">({overall.ph.kind})</span>
+                  <code>{formatFixed(locale, summary.finalRecap.predictedMashPh.value, 2)}</code>{" "}
+                  <span className="muted">({summary.finalRecap.predictedMashPh.kind})</span>
                 </>
               ) : (
                 <span className="muted">—</span>
@@ -729,18 +434,8 @@ export default function WaterHubPage() {
               <ul style={{ marginTop: 6 }}>
                 <li>
                   {t("raMashOverall")}:{" "}
-                  {overall ? (
-                    <code>
-                      {formatFixed(
-                        locale,
-                        calcResidualAlkalinityPpmCaCO3({
-                          alkalinityPpmCaCO3: displayAlkalinityPpmCaCO3(overall.finalAlkalinityPpmCaCO3),
-                          calciumPpm: overall.ionsPpm.calcium,
-                          magnesiumPpm: overall.ionsPpm.magnesium,
-                        }),
-                        2,
-                      )}
-                    </code>
+                  {typeof summary?.finalRecap.residualAlkalinityMashOverallPpmCaCO3 === "number" ? (
+                    <code>{formatFixed(locale, summary.finalRecap.residualAlkalinityMashOverallPpmCaCO3, 2)}</code>
                   ) : (
                     <span className="muted">—</span>
                   )}{" "}
@@ -748,18 +443,8 @@ export default function WaterHubPage() {
                 </li>
                 <li>
                   {t("raMerged")}:{" "}
-                  {recap?.mergedIons && typeof recap.mergedFinalAlk === "number" ? (
-                    <code>
-                      {formatFixed(
-                        locale,
-                        calcResidualAlkalinityPpmCaCO3({
-                          alkalinityPpmCaCO3: displayAlkalinityPpmCaCO3(recap.mergedFinalAlk),
-                          calciumPpm: recap.mergedIons.calcium,
-                          magnesiumPpm: recap.mergedIons.magnesium,
-                        }),
-                        2,
-                      )}
-                    </code>
+                  {typeof summary?.finalRecap.residualAlkalinityMergedPpmCaCO3 === "number" ? (
+                    <code>{formatFixed(locale, summary.finalRecap.residualAlkalinityMergedPpmCaCO3, 2)}</code>
                   ) : (
                     <span className="muted">—</span>
                   )}{" "}
@@ -769,13 +454,14 @@ export default function WaterHubPage() {
             </li>
             <li>
               {t("styleExpectedRa")}:{" "}
-              {expectedRa ? (
+              {summary?.finalRecap.styleExpectedRa ? (
                 <>
                   <code>
-                    {formatFixed(locale, expectedRa.min, 0)}..{formatFixed(locale, expectedRa.max, 0)}
+                    {formatFixed(locale, summary.finalRecap.styleExpectedRa.min, 0)}..
+                    {formatFixed(locale, summary.finalRecap.styleExpectedRa.max, 0)}
                   </code>{" "}
                   <span className="muted">{t("ppmAsCaCO3")}</span>{" "}
-                  <span className="muted">· {t(expectedRa.rationaleKey)}</span>
+                  <span className="muted">· {t(summary.finalRecap.styleExpectedRa.rationaleKey)}</span>
                 </>
               ) : (
                 <span className="muted">{t("styleExpectedRaNa")}</span>
@@ -805,37 +491,5 @@ export default function WaterHubPage() {
       </div>
     </>
   );
-}
-
-function extractRecipeStyleKey(data: unknown): string | null {
-  if (!data || typeof data !== "object") return null;
-  const d = data as any;
-  const recipe = d?.recipe;
-  if (!recipe || typeof recipe !== "object") return null;
-  const styleKey = (recipe as any).styleKey;
-  if (typeof styleKey !== "string") return null;
-  const trimmed = styleKey.trim();
-  return trimmed ? trimmed : null;
-}
-
-function extractBeerStyles(data: unknown): { styles: Array<{ key: string; name: string; category: string | null; categoryId: string | null; code: string }> } | null {
-  if (!data || typeof data !== "object") return null;
-  const d = data as any;
-  const styles = d?.styles;
-  if (!Array.isArray(styles)) return null;
-
-  const out: Array<{ key: string; name: string; category: string | null; categoryId: string | null; code: string }> = [];
-  for (const s of styles) {
-    if (!s || typeof s !== "object") continue;
-    const key = typeof (s as any).key === "string" ? (s as any).key : null;
-    const name = typeof (s as any).name === "string" ? (s as any).name : null;
-    const code = typeof (s as any).code === "string" ? (s as any).code : null;
-    if (!key || !name || !code) continue;
-    const category = typeof (s as any).category === "string" ? (s as any).category : null;
-    const categoryId = typeof (s as any).categoryId === "string" ? (s as any).categoryId : null;
-    out.push({ key, name, category, categoryId, code });
-  }
-
-  return { styles: out };
 }
 

@@ -15,6 +15,7 @@ import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
+import { parseBoilComputeAndSaveResponse } from "../_lib/parseWaterComputeAndSave";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -526,6 +527,39 @@ export default function BoilWaterPage() {
     return typeof v === "number" && Number.isFinite(v) ? v : undefined;
   }, [saltsResult, mixedSourceProfile]);
 
+  const computeAndSaveBoilSnapshots = async () => {
+    if (!canCall) throw new Error("Not ready to call API.");
+    if (!recipeId) throw new Error("Missing recipe id.");
+    if (!sourceProfileId) throw new Error("Select a Source water profile.");
+
+    const payload: Record<string, unknown> = {
+      boilSourceWaterProfileId: sourceProfileId,
+      boilDilutionWaterProfileId: dilutionProfileId || null,
+      boilTapWaterVolumeLiters: tapVolumeLiters,
+      boilDilutionWaterVolumeLiters: dilutionVolumeLiters,
+
+      boilStartingAlkalinityPpmCaCO3: startingAlk,
+      boilStartingPh: Number(startingPh),
+      boilTargetPh: targetPh,
+      boilAcidType: acidType,
+      boilStrengthKind: strengthKind,
+      boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
+      boilAcidificationMode: acidificationMode,
+      boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
+      boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
+
+      boilSaltAdditionsJson: saltAdditions,
+    };
+
+    const res = await apiFetch(`/api/recipes/${recipeId}/water-settings/boil/compute-and-save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+    return parseBoilComputeAndSaveResponse(res.data);
+  };
+
   const onSubmitAcid = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canCall) return;
@@ -551,107 +585,22 @@ export default function BoilWaterPage() {
     setAcidDerivation(null);
     setSubmitting(true);
     try {
-      if (acidificationMode === "manual") {
-        const acidAdded = typeof manualAcidAdded === "number" && Number.isFinite(manualAcidAdded) ? manualAcidAdded : NaN;
-        if (!Number.isFinite(acidAdded) || acidAdded < 0) {
-          setBoilError("Manual acid amount must be a number ≥ 0.");
-          return;
-        }
+      const computed = await computeAndSaveBoilSnapshots();
+      setSaltsResult(computed.salts.result as any);
+      setSaltDerivation(computed.salts.derivation as any);
+      setAcidDerivation(computed.acid.derivation as any);
+      setOverallDerivation(computed.overall.derivation as any);
+      setOverallResult(computed.overall.result as any);
+      setOverallStatus("Calculated.");
 
-        const payload: Record<string, unknown> = {
-          startingAlkalinityPpmCaCO3: startingAlk,
-          startingPh: Number(startingPh),
-          volumeLiters: derivedBoilWaterVolumeLiters,
-          calciumPpm: boilCalciumPpm,
-          magnesiumPpm: boilMagnesiumPpm,
-          acidType,
-          strengthKind,
-          ...(strengthKind === "solid" ? { acidAddedGrams: acidAdded } : { acidAddedMl: acidAdded }),
-        };
-        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
-
-        const res = await apiFetch("/api/water-calc/sparge-acidification-manual", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        setAcidDerivation((res.data as any).derivation ?? null);
-        const manual = (res.data as any).result as BoilManualCalcResult;
-        setManualResult(manual);
-        setAcidResult(manual.predicted);
-
-        const nowIso = new Date().toISOString();
-        await saveSettings({
-          boilStartingAlkalinityPpmCaCO3: startingAlk,
-          boilStartingPh: Number(startingPh),
-          boilTargetPh: targetPh,
-          boilAcidType: acidType,
-          boilStrengthKind: strengthKind,
-          boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
-          boilAcidificationMode: acidificationMode,
-          boilManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
-          boilManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
-
-          boilLastAcidRequiredMl: manual.predicted.acidRequiredMl,
-          boilLastAcidRequiredTsp: manual.predicted.acidRequiredTsp,
-          boilLastAcidRequiredGrams: manual.predicted.acidRequiredGrams,
-          boilLastAcidRequiredKg: manual.predicted.acidRequiredKg,
-          boilLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
-          boilLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
-          boilLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
-          boilLastCalculatedAt: nowIso,
-
-          boilManualLastAchievedPh: manual.achievedPh,
-          boilManualLastFinalAlkalinityPpmCaCO3: manual.predicted.finalAlkalinityPpmCaCO3,
-          boilManualLastSulfateAddedPpm: manual.predicted.sulfateAddedPpm,
-          boilManualLastChlorideAddedPpm: manual.predicted.chlorideAddedPpm,
-          boilManualLastCalculatedAt: nowIso,
-        });
+      if (computed.acid.kind === "boil_acidification_manual") {
+        setManualResult(computed.acid.result as any);
+        setAcidResult((computed.acid.result as any).predicted ?? null);
         setBoilStatus("Estimated (manual mode).");
         setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
-        const payload: Record<string, unknown> = {
-          startingAlkalinityPpmCaCO3: startingAlk,
-          startingPh: Number(startingPh),
-          targetPh,
-          volumeLiters: derivedBoilWaterVolumeLiters,
-          calciumPpm: boilCalciumPpm,
-          magnesiumPpm: boilMagnesiumPpm,
-          acidType,
-          strengthKind,
-        };
-        if (strengthKind !== "solid") payload.strengthValue = strengthValue;
-
-        const res = await apiFetch("/api/water-calc/sparge-acidification", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        setAcidDerivation((res.data as any).derivation ?? null);
-        const result = (res.data as any).result as BoilAcidResult;
-        setAcidResult(result);
-
-        const nowIso = new Date().toISOString();
-        await saveSettings({
-          boilStartingAlkalinityPpmCaCO3: startingAlk,
-          boilStartingPh: Number(startingPh),
-          boilTargetPh: targetPh,
-          boilAcidType: acidType,
-          boilStrengthKind: strengthKind,
-          boilStrengthValue: strengthKind === "solid" ? null : strengthValue,
-          boilAcidificationMode: acidificationMode,
-
-          boilLastAcidRequiredMl: result.acidRequiredMl,
-          boilLastAcidRequiredTsp: result.acidRequiredTsp,
-          boilLastAcidRequiredGrams: result.acidRequiredGrams,
-          boilLastAcidRequiredKg: result.acidRequiredKg,
-          boilLastFinalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
-          boilLastSulfateAddedPpm: result.sulfateAddedPpm,
-          boilLastChlorideAddedPpm: result.chlorideAddedPpm,
-          boilLastCalculatedAt: nowIso,
-        });
+        setManualResult(null);
+        setAcidResult(computed.acid.result as any);
         setBoilStatus("Calculated.");
         setCalcSaveStatus("Calculated & saved snapshot.");
       }
@@ -713,16 +662,20 @@ export default function BoilWaterPage() {
     setOverallSaveStatus(null);
     setSavingOverall(true);
     try {
-      await ensureZeroSaltsSnapshotIfMissing();
-      const overall = await computeOverallBoil();
-      setOverallResult(overall);
-      setOverallStatus("Calculated.");
       if (saveAlso) {
-        await saveSettings({
-          boilOverallLastResultJson: overall,
-          boilOverallLastCalculatedAt: overall.calculatedAt,
-        });
+        const computed = await computeAndSaveBoilSnapshots();
+        setSaltsResult(computed.salts.result as any);
+        setSaltDerivation(computed.salts.derivation as any);
+        setAcidDerivation(computed.acid.derivation as any);
+        setOverallDerivation(computed.overall.derivation as any);
+        setOverallResult(computed.overall.result as any);
+        setOverallStatus("Calculated.");
         setOverallSaveStatus("Calculated & saved overall snapshot.");
+      } else {
+        await ensureZeroSaltsSnapshotIfMissing();
+        const overall = await computeOverallBoil();
+        setOverallResult(overall);
+        setOverallStatus("Calculated.");
       }
     } catch (err) {
       setOverallError(String(err));

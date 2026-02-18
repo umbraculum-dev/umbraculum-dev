@@ -14,6 +14,8 @@ import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { equipmentProfilesRoutes } from "./routes/equipmentProfiles.js";
 import { waterCalcRoutes } from "./routes/waterCalc.js";
 import { recipeWaterSettingsRoutes } from "./routes/recipeWaterSettings.js";
+import { recipeWaterHubSummaryRoutes } from "./routes/recipeWaterHubSummary.js";
+import { recipeWaterComputeAndSaveRoutes } from "./routes/recipeWaterComputeAndSave.js";
 import { ingredientsRoutes } from "./routes/ingredients.js";
 
 export function buildApp() {
@@ -35,6 +37,8 @@ export function buildApp() {
   app.register(equipmentProfilesRoutes);
   app.register(waterCalcRoutes);
   app.register(recipeWaterSettingsRoutes);
+  app.register(recipeWaterHubSummaryRoutes);
+  app.register(recipeWaterComputeAndSaveRoutes);
   app.register(ingredientsRoutes);
 
   return app;

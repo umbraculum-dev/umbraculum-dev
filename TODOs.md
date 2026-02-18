@@ -2,6 +2,12 @@
 
 This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
 
+## Native beta readiness (nice-to-have, not required)
+
+- [ ] Centralize formatting metadata (precision/rounding hints) so web/native render numbers consistently.
+- [ ] Version derivations/DTOs more explicitly (endpoint versioning and/or payload `version` field) to reduce upgrade risk for native.
+- [ ] Unify the “result + derivation” pattern beyond water (e.g. Analysis: OG/FG/ABV/IBU) so all clients can render explainable math consistently.
+
 ## Water calculator (high priority)
 
 - [x] **Sparge salts vs sparge pH**: ensure sparge salt additions influence sparge acidification (Ca/Mg effective-alkalinity heuristic), without requiring a manual “calculate salts” step first.
