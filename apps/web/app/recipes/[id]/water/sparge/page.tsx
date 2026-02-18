@@ -84,6 +84,7 @@ export default function SpargeWaterPage() {
   // liters-first inputs (v0)
   const [spargeWaterProfileId, setSpargeWaterProfileId] = useState<string>("");
   const [startingAlk, setStartingAlk] = useState(0);
+  const [startingAlkTouched, setStartingAlkTouched] = useState(false);
   const [startingPh, setStartingPh] = useState<string>("7.0");
   const [targetPh, setTargetPh] = useState(5.6);
   const [volumeLiters, setVolumeLiters] = useState(20);
@@ -164,7 +165,15 @@ export default function SpargeWaterPage() {
       const s = data.settings;
       if (!s) return;
 
-      setStartingAlk(s.spargeStartingAlkalinityPpmCaCO3 ?? 0);
+      const savedStartingAlk = s.spargeStartingAlkalinityPpmCaCO3;
+      if (typeof savedStartingAlk === "number" && Number.isFinite(savedStartingAlk)) {
+        setStartingAlk(savedStartingAlk);
+        // Treat a saved 0 as "likely unset" so we can derive from the selected profile.
+        setStartingAlkTouched(savedStartingAlk !== 0);
+      } else {
+        setStartingAlk(0);
+        setStartingAlkTouched(false);
+      }
       setStartingPh(String(s.spargeStartingPh ?? 7.0));
       setTargetPh(s.spargeTargetPh ?? 5.6);
       setVolumeLiters(s.spargeVolumeLiters ?? 20);
@@ -261,6 +270,19 @@ export default function SpargeWaterPage() {
     () => waterProfiles.find((p) => p.id === spargeWaterProfileId) ?? null,
     [spargeWaterProfileId, waterProfiles],
   );
+
+  const derivedStartingAlkPpmCaCO3 = useMemo(() => {
+    if (!selectedSpargeProfile) return null;
+    const alk = bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate);
+    return Number.isFinite(alk) ? alk : null;
+  }, [selectedSpargeProfile]);
+
+  useEffect(() => {
+    if (startingAlkTouched) return;
+    if (derivedStartingAlkPpmCaCO3 === null) return;
+    const rounded = Math.round(derivedStartingAlkPpmCaCO3 * 100) / 100;
+    setStartingAlk(rounded);
+  }, [derivedStartingAlkPpmCaCO3, startingAlkTouched]);
 
   const spargeCalciumPpm = useMemo(() => {
     const v = spargeSaltsResult?.resultingProfile?.calcium ?? selectedSpargeProfile?.calcium;
@@ -659,7 +681,11 @@ export default function SpargeWaterPage() {
                   type="number"
                   inputMode="decimal"
                   value={startingAlk}
-                  onChange={(e) => setStartingAlk(Number(e.target.value))}
+                  onChange={(e) => {
+                    setStartingAlkTouched(true);
+                    const n = Number(e.target.value);
+                    setStartingAlk(Number.isFinite(n) ? n : 0);
+                  }}
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>

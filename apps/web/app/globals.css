@@ -313,6 +313,10 @@ code {
   border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
   border-radius: var(--radius);
   padding: 12px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .muted {
