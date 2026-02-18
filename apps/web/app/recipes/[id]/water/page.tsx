@@ -12,6 +12,7 @@ import { combineAfterSaltsAndAcid } from "./_lib/waterChem";
 import { formatFixed } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
+import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import { mathExplain } from "./_lib/mathExplain";
 import { RecipeMetaLine } from "./_components/RecipeMetaLine";
 
@@ -421,14 +422,16 @@ export default function WaterHubPage() {
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
-        <p style={{ margin: 0 }}>
-          <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
-        </p>
-        <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
-          {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
-        </button>
-      </div>
+      <SurfaceMathToggleRow
+        left={
+          <p style={{ margin: 0 }}>
+            <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
+          </p>
+        }
+        surfaceMath={surfaceMath}
+        onToggle={() => setSurfaceMath((v) => !v)}
+        style={{ marginTop: 0, marginBottom: 8 }}
+      />
 
       {authState.status === "error" ? (
         <pre className="errorBox" role="alert">

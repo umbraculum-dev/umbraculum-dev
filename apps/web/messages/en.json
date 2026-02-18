@@ -96,6 +96,75 @@
     "toggleShow": "Show math",
     "toggleHide": "Hide math",
     "fxLabel": "Show formula: {topic}",
+    "analysis": {
+      "common": {
+        "toggleHint": "Applies to all sections on this page (where available).",
+        "sources": {
+          "kettleVolume": "kettle volume",
+          "batchSize": "BeerJSON batch size",
+          "pbg": "PBG",
+          "og": "OG",
+          "unknown": "unknown"
+        },
+        "hopUse": {
+          "boil": "boil",
+          "whirlpool": "whirlpool (0.5×)",
+          "dryhop": "dry hop"
+        },
+        "excludeDryhop": "dry hop does not contribute to IBU",
+        "excludeMissingInputs": "missing amount/AA%/time",
+        "hopLine": "- {name}: {use}, {amountG} g @ {alpha}% AA, {timeMin} min",
+        "hopLineExcluded": "- {name}: excluded ({reason})",
+        "noHops": "(no hops in editor)",
+        "yeastSource": {
+          "override": "override",
+          "beerjson": "BeerJSON",
+          "missing": "missing"
+        },
+        "yeastLine": "- {name}: {value}% ({source})",
+        "yeastSelectedLine": "- {name}: {value}%",
+        "noYeast": "(no yeast in editor)",
+        "noYeastSelected": "(no usable yeast attenuation)",
+        "noteDependsOnWaterAndEquipment": "Depends on saved water settings + equipment snapshot.",
+        "noteMissingWaterSettings": "Missing saved water settings; volume estimates may be unavailable."
+      },
+      "abv": {
+        "title": "ABV (estimated)",
+        "body": "Formula:\nABV = (OG - FG) × 131.25\n\nThis recipe:\nOG = {og}\nFG = {fg}\nABV = {abv}%\n\nNotes:\n- OG/FG are derived estimates (not measured)."
+      },
+      "ibuTinseth": {
+        "title": "IBU (Tinseth, estimated)",
+        "body": "Model (Tinseth):\nU = 1.65 × 0.000125^(G - 1) × (1 - e^(-0.04 × t)) / 4.15\nIBU = Σ (g × (AA%/100) × U × 1000 / V_L)\n\nThis recipe:\nGravity used (SG) = {gravity} ({gravitySource})\nVolume used (L) = {volume} ({volumeSource})\n\nHop additions (from editor):\n{hopsLines}\n\nResult:\nIBU (Tinseth) = {ibu}"
+      },
+      "ibuRager": {
+        "title": "IBU (Rager, estimated)",
+        "body": "Model (Rager):\nU% ≈ 18.11 + 13.86 × tanh((t - 31.32) / 18.27)\nGravity adjustment (if G > 1.050): GA = (G - 1.050) / 0.2\nIBU = Σ (g × (AA%/100) × (U%/(1+GA)) × 1000 / V_L)\n\nThis recipe:\nGravity used (SG) = {gravity} ({gravitySource})\nVolume used (L) = {volume} ({volumeSource})\n\nHop additions (from editor):\n{hopsLines}\n\nResult:\nIBU (Rager) = {ibu}"
+      },
+      "kettleVolume": {
+        "title": "Volume (kettle)",
+        "body": "This value is derived from your saved water settings and equipment losses/evaporation.\n\nThis recipe:\nKettle volume = {kettleVolume} L\n\nNotes:\n- {notes}"
+      },
+      "preBoilVolume": {
+        "title": "Pre-boil volume (estimated)",
+        "body": "This value is derived from your saved water settings and equipment losses.\n\nThis recipe:\nPre-boil volume = {preBoilVolume} L\n\nNotes:\n- {notes}"
+      },
+      "og": {
+        "title": "OG (estimated)",
+        "body": "OG is estimated from fermentables potential + volume + efficiency.\n\nThis recipe:\nOG = {og}\nVolume (kettle) = {volume} L\nEfficiency used = {efficiency}%\n\nNotes:\n- If efficiency/fermentables are missing, OG can be unavailable."
+      },
+      "fg": {
+        "title": "FG (estimated)",
+        "body": "Formula:\nFG = 1 + (OG - 1) × (1 - Attenuation/100)\n\nThis recipe:\nOG = {og}\nAttenuation = {attenuation}%\nFG = {fg}"
+      },
+      "attenuation": {
+        "title": "Attenuation (effective)",
+        "body": "Model:\n- For each yeast: use override% if present, else use BeerJSON attenuation (avg(min,max) if given).\n- Effective attenuation = average of the top 2 highest effective values.\n\nThis recipe:\nAll yeasts:\n{yeastLines}\n\nSelected (top 2):\n{selectedLines}\n\nTop-2 average = {topAvg}%\nEffective attenuation = {attenuation}%"
+      },
+      "pbg": {
+        "title": "PBG (pre-boil gravity, estimated)",
+        "body": "PBG is estimated like OG, but using the pre-boil volume.\n\nThis recipe:\nPBG = {pbg}\nPre-boil volume = {preBoilVolume} L\nEfficiency used = {efficiency}%\n\nNotes:\n- Requires saved water volumes to estimate pre-boil volume."
+      }
+    },
     "sparge": {
       "acidRequired": {
         "title": "Acid required (target pH)",

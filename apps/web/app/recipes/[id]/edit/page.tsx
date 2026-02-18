@@ -7,6 +7,8 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "../../../_lib/apiClient";
 import { formatFixed } from "../../../../src/i18n/format";
+import { MathHelpPopover } from "../../../_components/MathHelpPopover";
+import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
@@ -17,6 +19,7 @@ import {
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
+import { mathExplain } from "./_lib/mathExplain";
 
 type Recipe = {
   id: string;
@@ -83,6 +86,7 @@ export default function RecipeEditPage() {
   const t = useTranslations("recipes.edit");
   const tEquip = useTranslations("recipes.edit.equipmentSection");
   const tAnalysis = useTranslations("recipes.analysis");
+  const tMath = useTranslations("math");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -113,6 +117,28 @@ export default function RecipeEditPage() {
   });
 
   const [activeNavId, setActiveNavId] = useState<string>("");
+
+  const [surfaceMath, setSurfaceMath] = useState(false);
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem("brewery:surfaceMath:recipeEdit");
+      if (v === "1") return setSurfaceMath(true);
+      if (v === "0") return setSurfaceMath(false);
+
+      // Back-compat with the previous Analysis-only toggle key.
+      const legacy = sessionStorage.getItem("brewery:surfaceMath:recipeEdit:analysis");
+      if (legacy === "1") setSurfaceMath(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("brewery:surfaceMath:recipeEdit", surfaceMath ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [surfaceMath]);
 
   const setSectionOpen = (id: string, open: boolean) => {
     setOpenSections((prev) => (prev[id] === open ? prev : { ...prev, [id]: open }));
@@ -736,6 +762,14 @@ export default function RecipeEditPage() {
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <RecipeMetaLine recipeId={recipeId} />
 
+      <SurfaceMathToggleRow
+        left={null}
+        rightHint={<span className="muted">{tMath("analysis.common.toggleHint")}</span>}
+        surfaceMath={surfaceMath}
+        onToggle={() => setSurfaceMath((v) => !v)}
+        style={{ marginTop: 8, marginBottom: 8 }}
+      />
+
       {authLoaded && !canCallAccountScoped ? (
         <p role="alert" className="errorBox">
           {t("notReadyToLoad")}
@@ -875,6 +909,121 @@ export default function RecipeEditPage() {
                     typeof v === "number" && Number.isFinite(v) ? formatFixed(locale, v, decimals) : tAnalysis("na");
 
                   const warnings = Array.isArray(a?.warnings) ? (a.warnings as any[]) : [];
+                  const warningCodes = new Set(warnings.map((w) => String(w?.code ?? "")));
+
+                  const renderMath = (key: keyof typeof mathExplain, body: string) => {
+                    if (!surfaceMath) return null;
+                    const ex = mathExplain[key];
+                    const title = tMath(ex.titleKey);
+                    return (
+                      <MathHelpPopover
+                        title={title}
+                        body={body}
+                        ariaLabel={tMath("fxLabel", { topic: title })}
+                      />
+                    );
+                  };
+
+                  const ibuGravityUsed = (() => {
+                    const pbg = a?.pbgEstimatedSg;
+                    if (typeof pbg === "number" && Number.isFinite(pbg)) return { value: fmt(pbg, 3), source: tMath("analysis.common.sources.pbg") };
+                    const og = a?.ogEstimatedSg;
+                    if (typeof og === "number" && Number.isFinite(og)) return { value: fmt(og, 3), source: tMath("analysis.common.sources.og") };
+                    return { value: tAnalysis("na"), source: tMath("analysis.common.sources.unknown") };
+                  })();
+
+                  const ibuVolumeUsed = (() => {
+                    const vol = a?.kettleVolumeLiters;
+                    if (typeof vol === "number" && Number.isFinite(vol)) return { value: fmt(vol, 2), source: tMath("analysis.common.sources.kettleVolume") };
+                    if (warningCodes.has("used_batch_size_volume")) {
+                      const r0 = (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0];
+                      const unit = typeof r0?.batch_size?.unit === "string" ? r0.batch_size.unit : "";
+                      const value = typeof r0?.batch_size?.value === "number" && Number.isFinite(r0.batch_size.value) ? r0.batch_size.value : null;
+                      const liters = value != null ? (unit === "l" ? value : unit === "ml" ? value / 1000 : null) : null;
+                      return {
+                        value: liters != null && liters > 0 ? fmt(liters, 2) : tAnalysis("na"),
+                        source: tMath("analysis.common.sources.batchSize"),
+                      };
+                    }
+                    return { value: tAnalysis("na"), source: tMath("analysis.common.sources.unknown") };
+                  })();
+
+                  const hopLines = (() => {
+                    const rows = Array.isArray(hopsRows) ? hopsRows : [];
+                    const out: string[] = [];
+                    for (const h of rows) {
+                      const name = typeof h?.name === "string" ? h.name.trim() : "";
+                      if (!name) continue;
+                      const use: HopUse = h?.use === "whirlpool" || h?.use === "dryhop" ? h.use : "boil";
+                      if (use === "dryhop") {
+                        out.push(tMath("analysis.common.hopLineExcluded", { name, reason: tMath("analysis.common.excludeDryhop") }));
+                        continue;
+                      }
+                      const amountOk = typeof h?.amountGrams === "number" && Number.isFinite(h.amountGrams) && h.amountGrams > 0;
+                      const aaOk = typeof h?.alphaAcidPercent === "number" && Number.isFinite(h.alphaAcidPercent) && h.alphaAcidPercent > 0;
+                      const timeOk = typeof h?.timeMinutes === "number" && Number.isFinite(h.timeMinutes) && h.timeMinutes >= 0;
+                      if (!amountOk || !aaOk || !timeOk) {
+                        out.push(tMath("analysis.common.hopLineExcluded", { name, reason: tMath("analysis.common.excludeMissingInputs") }));
+                        continue;
+                      }
+                      out.push(
+                        tMath("analysis.common.hopLine", {
+                          name,
+                          use: tMath(`analysis.common.hopUse.${use}` as any),
+                          amountG: fmt(h.amountGrams, 1),
+                          alpha: fmt(h.alphaAcidPercent, 1),
+                          timeMin: String(Math.round(h.timeMinutes)),
+                        }),
+                      );
+                    }
+                    return out.length ? out.join("\n") : tMath("analysis.common.noHops");
+                  })();
+
+                  const yeastLines = (() => {
+                    const rows = Array.isArray(yeastRows) ? yeastRows : [];
+                    const overrides = yeastAttenuationOverrides && typeof yeastAttenuationOverrides === "object" ? yeastAttenuationOverrides : {};
+
+                    const effective: Array<{ id: string; name: string; eff: number | null; source: "override" | "beerjson" | "missing" }> = [];
+                    for (const y of rows) {
+                      const id = typeof (y as any)?.id === "string" ? (y as any).id : "";
+                      const name = typeof (y as any)?.name === "string" ? String((y as any).name).trim() : "";
+                      if (!id || !name) continue;
+                      const ovRaw = typeof (overrides as any)[id] === "string" ? String((overrides as any)[id]).trim() : "";
+                      const ov = ovRaw ? Number(ovRaw) : null;
+                      const overrideOk = ov != null && Number.isFinite(ov) ? Math.max(0, Math.min(100, ov)) : null;
+                      const min = typeof (y as any)?.attenuationMin === "number" && Number.isFinite((y as any).attenuationMin) ? (y as any).attenuationMin : null;
+                      const max = typeof (y as any)?.attenuationMax === "number" && Number.isFinite((y as any).attenuationMax) ? (y as any).attenuationMax : null;
+                      const att =
+                        min != null && max != null ? (min + max) / 2 : min != null ? min : max != null ? max : null;
+                      const eff = overrideOk ?? (att != null ? Math.max(0, Math.min(100, att)) : null);
+                      effective.push({ id, name, eff, source: overrideOk != null ? "override" : att != null ? "beerjson" : "missing" });
+                    }
+
+                    const sorted = [...effective].sort((a1, a2) => (a2.eff ?? -1) - (a1.eff ?? -1));
+                    const top = sorted.filter((x) => x.eff != null).slice(0, 2);
+                    const topAvg = top.length ? top.reduce((acc, x) => acc + (x.eff as number), 0) / top.length : null;
+
+                    const lines = sorted.map((y) =>
+                      tMath("analysis.common.yeastLine", {
+                        name: y.name,
+                        value: y.eff != null ? fmt(y.eff, 1) : tAnalysis("na"),
+                        source:
+                          y.source === "override"
+                            ? tMath("analysis.common.yeastSource.override")
+                            : y.source === "beerjson"
+                              ? tMath("analysis.common.yeastSource.beerjson")
+                              : tMath("analysis.common.yeastSource.missing"),
+                      }),
+                    );
+
+                    const selected = top.map((y) => tMath("analysis.common.yeastSelectedLine", { name: y.name, value: fmt(y.eff as number, 1) }));
+
+                    return {
+                      lines: lines.length ? lines.join("\n") : tMath("analysis.common.noYeast"),
+                      selectedLines: selected.length ? selected.join("\n") : tMath("analysis.common.noYeastSelected"),
+                      topAvg: topAvg != null ? fmt(topAvg, 1) : tAnalysis("na"),
+                    };
+                  })();
 
                   return (
                     <>
@@ -883,7 +1032,17 @@ export default function RecipeEditPage() {
                           <tbody>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.abv")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.abv")}</strong>
+                                  {renderMath(
+                                    "analysis.abv",
+                                    tMath("analysis.abv.body", {
+                                      og: fmt(a?.ogEstimatedSg, 3),
+                                      fg: fmt(a?.fgEstimatedSg, 3),
+                                      abv: fmt(a?.abvEstimatedPercent, 2),
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.abvEstimatedPercent, 2)}</code>{" "}
@@ -892,7 +1051,20 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.ibuTinseth")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.ibuTinseth")}</strong>
+                                  {renderMath(
+                                    "analysis.ibuTinseth",
+                                    tMath("analysis.ibuTinseth.body", {
+                                      ibu: fmt(a?.ibuTinsethEstimated, 1),
+                                      gravity: ibuGravityUsed.value,
+                                      gravitySource: ibuGravityUsed.source,
+                                      volume: ibuVolumeUsed.value,
+                                      volumeSource: ibuVolumeUsed.source,
+                                      hopsLines: hopLines,
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.ibuTinsethEstimated, 1)}</code>
@@ -900,7 +1072,20 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.ibuRager")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.ibuRager")}</strong>
+                                  {renderMath(
+                                    "analysis.ibuRager",
+                                    tMath("analysis.ibuRager.body", {
+                                      ibu: fmt(a?.ibuRagerEstimated, 1),
+                                      gravity: ibuGravityUsed.value,
+                                      gravitySource: ibuGravityUsed.source,
+                                      volume: ibuVolumeUsed.value,
+                                      volumeSource: ibuVolumeUsed.source,
+                                      hopsLines: hopLines,
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.ibuRagerEstimated, 1)}</code>
@@ -908,7 +1093,19 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.kettleVolume")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.kettleVolume")}</strong>
+                                  {renderMath(
+                                    "analysis.kettleVolume",
+                                    tMath("analysis.kettleVolume.body", {
+                                      kettleVolume: fmt(a?.kettleVolumeLiters, 2),
+                                      notes:
+                                        warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
+                                          ? tMath("analysis.common.noteMissingWaterSettings")
+                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.kettleVolumeLiters, 2)}</code>{" "}
@@ -917,7 +1114,19 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.preBoilVolume")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.preBoilVolume")}</strong>
+                                  {renderMath(
+                                    "analysis.preBoilVolume",
+                                    tMath("analysis.preBoilVolume.body", {
+                                      preBoilVolume: fmt(a?.preBoilVolumeLiters, 2),
+                                      notes:
+                                        warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
+                                          ? tMath("analysis.common.noteMissingWaterSettings")
+                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.preBoilVolumeLiters, 2)}</code>{" "}
@@ -926,7 +1135,34 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.og")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.og")}</strong>
+                                  {renderMath(
+                                    "analysis.og",
+                                    tMath("analysis.og.body", {
+                                      og: fmt(a?.ogEstimatedSg, 3),
+                                      volume: fmt(a?.kettleVolumeLiters, 2),
+                                      efficiency: (() => {
+                                        const ext = (recipe as any)?.recipeExtJson;
+                                        const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                        const mashEff =
+                                          typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                            ? e.equipment.mash.mashEfficiencyPercent
+                                            : null;
+                                        const brewEff =
+                                          typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                            ? e.brewhouseEfficiencyPercent
+                                            : null;
+                                        const bjEff =
+                                          (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                            ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                            : null;
+                                        const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                        return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                      })(),
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.ogEstimatedSg, 3)}</code>
@@ -934,7 +1170,17 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.fg")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.fg")}</strong>
+                                  {renderMath(
+                                    "analysis.fg",
+                                    tMath("analysis.fg.body", {
+                                      og: fmt(a?.ogEstimatedSg, 3),
+                                      attenuation: fmt(a?.attenuationEffectivePercent, 1),
+                                      fg: fmt(a?.fgEstimatedSg, 3),
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.fgEstimatedSg, 3)}</code>
@@ -942,7 +1188,18 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.attenuation")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.attenuation")}</strong>
+                                  {renderMath(
+                                    "analysis.attenuation",
+                                    tMath("analysis.attenuation.body", {
+                                      attenuation: fmt(a?.attenuationEffectivePercent, 1),
+                                      yeastLines: yeastLines.lines,
+                                      selectedLines: yeastLines.selectedLines,
+                                      topAvg: yeastLines.topAvg,
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.attenuationEffectivePercent, 1)}</code>{" "}
@@ -953,7 +1210,34 @@ export default function RecipeEditPage() {
                             </tr>
                             <tr>
                               <td style={{ paddingRight: 12 }}>
-                                <strong>{tAnalysis("fields.pbg")}</strong>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.pbg")}</strong>
+                                  {renderMath(
+                                    "analysis.pbg",
+                                    tMath("analysis.pbg.body", {
+                                      pbg: fmt(a?.pbgEstimatedSg, 3),
+                                      preBoilVolume: fmt(a?.preBoilVolumeLiters, 2),
+                                      efficiency: (() => {
+                                        const ext = (recipe as any)?.recipeExtJson;
+                                        const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                        const mashEff =
+                                          typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                            ? e.equipment.mash.mashEfficiencyPercent
+                                            : null;
+                                        const brewEff =
+                                          typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                            ? e.brewhouseEfficiencyPercent
+                                            : null;
+                                        const bjEff =
+                                          (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                            ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                            : null;
+                                        const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                        return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                      })(),
+                                    }),
+                                  )}
+                                </div>
                               </td>
                               <td>
                                 <code>{fmt(a?.pbgEstimatedSg, 3)}</code>

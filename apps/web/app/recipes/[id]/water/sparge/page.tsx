@@ -9,6 +9,7 @@ import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
+import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
@@ -613,15 +614,17 @@ export default function SpargeWaterPage() {
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
       <RecipeMetaLine recipeId={recipeId} enabled={authed} />
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 0, marginBottom: 8 }}>
-        <p style={{ margin: 0 }}>
-          <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}
-          <Link href={`/recipes/${recipeId}/water/mash`}>{tWater("goToMash")}</Link>
-        </p>
-        <button type="button" onClick={() => setSurfaceMath((v) => !v)} style={{ marginLeft: "auto" }}>
-          {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
-        </button>
-      </div>
+      <SurfaceMathToggleRow
+        left={
+          <p style={{ margin: 0 }}>
+            <Link href={`/recipes/${recipeId}/water`}>{tWater("backToHub")}</Link> {" · "}
+            <Link href={`/recipes/${recipeId}/water/mash`}>{tWater("goToMash")}</Link>
+          </p>
+        }
+        surfaceMath={surfaceMath}
+        onToggle={() => setSurfaceMath((v) => !v)}
+        style={{ marginTop: 0, marginBottom: 8 }}
+      />
 
       {authChecked && !canCall ? (
         <p role="alert" className="errorBox">

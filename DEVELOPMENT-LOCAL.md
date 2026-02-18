@@ -130,6 +130,9 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - **No hard-coded UI strings**: do not add new user-facing text inline in JSX.
     - Put strings in `apps/web/messages/en.json` and `apps/web/messages/it.json`.
     - Use `useTranslations('namespace')` and `t('key')` (or `t.rich(...)` when you need markup).
+  - **Multi-line strings (MathHelpPopover / formula bodies)**:
+    - Use JSON `\\n` escapes as `\n` (single backslash) to create real newlines.
+    - Do **not** write `\\n` (double backslash) in the JSON value, or the UI will render the literal `\\n` text.
   - **Locale-aware links**: use `apps/web/src/i18n/navigation.ts` `Link` instead of `next/link` for app navigation (keeps locale correct).
   - **Numbers**: prefer `apps/web/src/i18n/format.ts` helpers (e.g. `formatFixed(locale, value, 2)`) instead of `toFixed()` so decimals can localize.
   - **Add routes under locale**: new pages should live under `apps/web/app/[locale]/...` (or use a locale wrapper that re-exports an existing non-locale page when needed for incremental migration).

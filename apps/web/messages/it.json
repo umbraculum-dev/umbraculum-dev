@@ -96,6 +96,75 @@
     "toggleShow": "Mostra formule",
     "toggleHide": "Nascondi formule",
     "fxLabel": "Mostra formula: {topic}",
+    "analysis": {
+      "common": {
+        "toggleHint": "Si applica a tutte le sezioni di questa pagina (dove disponibile).",
+        "sources": {
+          "kettleVolume": "volume kettle",
+          "batchSize": "batch size BeerJSON",
+          "pbg": "PBG",
+          "og": "OG",
+          "unknown": "sconosciuto"
+        },
+        "hopUse": {
+          "boil": "boil",
+          "whirlpool": "whirlpool (0,5×)",
+          "dryhop": "dry hop"
+        },
+        "excludeDryhop": "il dry hop non contribuisce all’IBU",
+        "excludeMissingInputs": "mancano quantità/AA%/tempo",
+        "hopLine": "- {name}: {use}, {amountG} g @ {alpha}% AA, {timeMin} min",
+        "hopLineExcluded": "- {name}: escluso ({reason})",
+        "noHops": "(nessun luppolo nell’editor)",
+        "yeastSource": {
+          "override": "override",
+          "beerjson": "BeerJSON",
+          "missing": "mancante"
+        },
+        "yeastLine": "- {name}: {value}% ({source})",
+        "yeastSelectedLine": "- {name}: {value}%",
+        "noYeast": "(nessun lievito nell’editor)",
+        "noYeastSelected": "(attenuazione lievito non disponibile)",
+        "noteDependsOnWaterAndEquipment": "Dipende da impostazioni acqua salvate e snapshot attrezzatura.",
+        "noteMissingWaterSettings": "Impostazioni acqua salvate mancanti; i volumi stimati potrebbero non essere disponibili."
+      },
+      "abv": {
+        "title": "ABV (stimata)",
+        "body": "Formula:\nABV = (OG - FG) × 131,25\n\nQuesta ricetta:\nOG = {og}\nFG = {fg}\nABV = {abv}%\n\nNote:\n- OG/FG sono stime derivate (non misurate)."
+      },
+      "ibuTinseth": {
+        "title": "IBU (Tinseth, stimata)",
+        "body": "Modello (Tinseth):\nU = 1,65 × 0,000125^(G - 1) × (1 - e^(-0,04 × t)) / 4,15\nIBU = Σ (g × (AA%/100) × U × 1000 / V_L)\n\nQuesta ricetta:\nGravità usata (SG) = {gravity} ({gravitySource})\nVolume usato (L) = {volume} ({volumeSource})\n\nAggiunte luppolo (dall’editor):\n{hopsLines}\n\nRisultato:\nIBU (Tinseth) = {ibu}"
+      },
+      "ibuRager": {
+        "title": "IBU (Rager, stimata)",
+        "body": "Modello (Rager):\nU% ≈ 18,11 + 13,86 × tanh((t - 31,32) / 18,27)\nCorrezione gravità (se G > 1,050): GA = (G - 1,050) / 0,2\nIBU = Σ (g × (AA%/100) × (U%/(1+GA)) × 1000 / V_L)\n\nQuesta ricetta:\nGravità usata (SG) = {gravity} ({gravitySource})\nVolume usato (L) = {volume} ({volumeSource})\n\nAggiunte luppolo (dall’editor):\n{hopsLines}\n\nRisultato:\nIBU (Rager) = {ibu}"
+      },
+      "kettleVolume": {
+        "title": "Volume (kettle)",
+        "body": "Questo valore è derivato da impostazioni acqua salvate e perdite/evaporazione dell’attrezzatura.\n\nQuesta ricetta:\nVolume kettle = {kettleVolume} L\n\nNote:\n- {notes}"
+      },
+      "preBoilVolume": {
+        "title": "Volume pre-boil (stimato)",
+        "body": "Questo valore è derivato da impostazioni acqua salvate e perdite dell’attrezzatura.\n\nQuesta ricetta:\nVolume pre-boil = {preBoilVolume} L\n\nNote:\n- {notes}"
+      },
+      "og": {
+        "title": "OG (stimata)",
+        "body": "L’OG è stimata da potenziale fermentabili + volume + efficienza.\n\nQuesta ricetta:\nOG = {og}\nVolume (kettle) = {volume} L\nEfficienza usata = {efficiency}%\n\nNote:\n- Se mancano efficienza/fermentabili, l’OG può non essere disponibile."
+      },
+      "fg": {
+        "title": "FG (stimata)",
+        "body": "Formula:\nFG = 1 + (OG - 1) × (1 - Attenuazione/100)\n\nQuesta ricetta:\nOG = {og}\nAttenuazione = {attenuation}%\nFG = {fg}"
+      },
+      "attenuation": {
+        "title": "Attenuazione (effettiva)",
+        "body": "Modello:\n- Per ogni lievito: usa override% se presente, altrimenti attenuazione BeerJSON (media(min,max) se disponibile).\n- Attenuazione effettiva = media dei 2 valori effettivi più alti.\n\nQuesta ricetta:\nTutti i lieviti:\n{yeastLines}\n\nSelezionati (top 2):\n{selectedLines}\n\nMedia top-2 = {topAvg}%\nAttenuazione effettiva = {attenuation}%"
+      },
+      "pbg": {
+        "title": "PBG (gravità pre-boil, stimata)",
+        "body": "La PBG è stimata come l’OG, ma usando il volume pre-boil.\n\nQuesta ricetta:\nPBG = {pbg}\nVolume pre-boil = {preBoilVolume} L\nEfficienza usata = {efficiency}%\n\nNote:\n- Richiede volumi acqua salvati per stimare il volume pre-boil."
+      }
+    },
     "sparge": {
       "acidRequired": {
         "title": "Acido necessario (pH target)",
