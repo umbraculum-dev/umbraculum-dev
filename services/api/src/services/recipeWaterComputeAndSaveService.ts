@@ -16,6 +16,8 @@ import { mashAcidificationTargetMashPh } from "../domain/waterCalc/mashAcidifica
 import { alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult, combineAfterSaltsAndAcid } from "../domain/waterCalc/overall.js";
 import { buildSaltAdditionsDerivation } from "../domain/waterCalc/derivation/saltAdditionsDerivation.js";
 import { buildAcidificationDerivation } from "../domain/waterCalc/derivation/acidificationDerivation.js";
+import { mashPhEstimate, type MashPhEstimateInput } from "../domain/waterCalc/mashPhEstimate.js";
+import { defaultMashDiPh, defaultMashTaToPh57_mEqPerKg } from "../domain/waterCalc/mashPhDefaultsV1.js";
 import type { WaterCalcDerivation } from "../domain/waterCalc/derivation/types.js";
 
 type StrengthKind = "percent" | "normality" | "molarity" | "solid";
@@ -63,6 +65,21 @@ function mixIonProfilesByVolume(a: IonProfilePpm, aVolumeLiters: number, b: IonP
     chloride: mix(a.chloride, b.chloride),
     bicarbonate: mix(a.bicarbonate, b.bicarbonate),
   };
+}
+
+function colorLovibondToEbc(colorLovibond: number | null): number | null {
+  if (colorLovibond === null) return null;
+  if (!Number.isFinite(colorLovibond) || colorLovibond < 0) return null;
+  // Pragmatic approximation for defaults lookup. (We only need a reasonable magnitude.)
+  return colorLovibond * 1.97;
+}
+
+function mashPhModelKeyFromMaltClass(maltClass: string) {
+  if (maltClass === "base") return "base_pale";
+  if (maltClass === "crystal") return "crystal";
+  if (maltClass === "roast") return "roasted";
+  if (maltClass === "acid") return "acidulated";
+  return "base_pale";
 }
 
 function parseSaltAdditions(value: unknown, field: string): SaltAddition[] {
@@ -275,7 +292,32 @@ export class RecipeWaterComputeAndSaveService {
         strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
         result: manual.predicted,
       });
-      overallPh = { kind: "estimated", value: manual.achievedPh };
+      if (hasGrist) {
+        const mashPhEstimateGrist = grist.map((row, idx) => {
+          const amountKg = ensureFinite(row.amountKg, `grist[${idx}].amountKg`);
+          const modelKey = mashPhModelKeyFromMaltClass(row.maltClass);
+          const colorEbc = colorLovibondToEbc(
+            row.colorLovibond === null ? null : typeof row.colorLovibond === "number" ? row.colorLovibond : null,
+          );
+          const mashDiPh = defaultMashDiPh(modelKey) ?? null;
+          const mashTaToPh57_mEqPerKg = defaultMashTaToPh57_mEqPerKg(modelKey, colorEbc) ?? null;
+          return { amountKg, mashDiPh, mashTaToPh57_mEqPerKg };
+        });
+
+        const acidAdded_mEqPerL = (manual.predicted as any)?.debug?.acidRequired_mEqPerL as number | undefined;
+        const estimate = mashPhEstimate({
+          volumeLiters: derivedVolumeLiters,
+          alkalinityPpmCaCO3: startingAlkalinityPpmCaCO3,
+          calciumPpm: salts.resultingProfile.calcium,
+          magnesiumPpm: salts.resultingProfile.magnesium,
+          grist: mashPhEstimateGrist,
+          acidAdded_mEqPerL: typeof acidAdded_mEqPerL === "number" ? acidAdded_mEqPerL : 0,
+        } satisfies MashPhEstimateInput);
+
+        overallPh = { kind: "estimated", value: estimate.estimatedMashPhRoomTemp };
+      } else {
+        overallPh = { kind: "estimated", value: manual.achievedPh };
+      }
     } else {
       if (hasGrist) {
         const r = mashAcidificationTargetMashPh({

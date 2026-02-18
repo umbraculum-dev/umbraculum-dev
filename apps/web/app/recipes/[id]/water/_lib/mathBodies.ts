@@ -144,7 +144,11 @@ export function buildWaterMathBody(args: {
     case "mash.finalAlkalinity":
     case "sparge.acidRequired":
     case "sparge.finalAlkalinity": {
-      const d = ctx.acidDerivation as WaterCalcDerivation | undefined;
+      // Prefer overall derivation when available (it can carry mash-estimated pH in manual+grist mode),
+      // but fall back to the acid derivation for snapshot-only sections.
+      const d =
+        (ctx.overallDerivation as WaterCalcDerivation | undefined) ??
+        (ctx.acidDerivation as WaterCalcDerivation | undefined);
       return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("derivation.common.missing");
     }
 

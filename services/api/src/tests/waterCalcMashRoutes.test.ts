@@ -205,5 +205,67 @@ describe("water calc: mash acidification + salt additions", () => {
     expect(body.result.resultingProfile.calcium).toBeGreaterThan(0);
     expect(body.result.resultingProfile.sulfate).toBeGreaterThan(0);
   });
+
+  it("mash-overall manual mode uses grist-driven mash pH estimate when grist is provided", async () => {
+    const basePayload = {
+      mashMode: "manual",
+      mashStartingAlkalinityPpmCaCO3: 248,
+      mashStartingPh: 7.0,
+      mashTargetPh: 5.4,
+      mashWaterVolumeLiters: 30,
+      acidType: "phosphoric",
+      strengthKind: "percent",
+      strengthValue: 75,
+      acidAddedMl: 10,
+      baseProfile: {
+        calcium: 0,
+        magnesium: 0,
+        sodium: 0,
+        sulfate: 0,
+        chloride: 0,
+        // 248 ppm as CaCO3 ≈ 302.56 ppm as HCO3
+        bicarbonate: 302.56,
+      },
+      additions: [
+        { saltKey: "gypsum", grams: 5 },
+        { saltKey: "calcium_chloride", grams: 15 },
+      ],
+    };
+
+    const resNoGrist = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-overall",
+      headers: { cookie: cookieWithAccount },
+      payload: basePayload,
+    });
+    expect(resNoGrist.statusCode).toBe(200);
+
+    const resWithGrist = await app.inject({
+      method: "POST",
+      url: "/water-calc/mash-overall",
+      headers: { cookie: cookieWithAccount },
+      payload: {
+        ...basePayload,
+        grist: [
+          {
+            amountKg: 6,
+            mashDiPh: 5.76,
+            mashTaToPh57_mEqPerKg: 50,
+            colorLovibond: 2,
+            maltClass: "base",
+          },
+        ],
+      },
+    });
+    expect(resWithGrist.statusCode).toBe(200);
+
+    const phNoGrist = ((resNoGrist.json() as any).result.ph.value ?? NaN) as number;
+    const phWithGrist = ((resWithGrist.json() as any).result.ph.value ?? NaN) as number;
+
+    expect(Number.isFinite(phNoGrist)).toBe(true);
+    expect(Number.isFinite(phWithGrist)).toBe(true);
+    // Grist should pull estimated mash pH downward vs water-only manual estimate.
+    expect(phWithGrist).toBeLessThan(phNoGrist);
+  });
 });
 

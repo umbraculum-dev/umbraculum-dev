@@ -801,8 +801,14 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
     const gristRaw = body.grist;
     const hasGrist = Array.isArray(gristRaw) && gristRaw.length > 0;
-    if (hasGrist && mashMode !== "manual") {
-      const grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: "base" | "crystal" | "roast" | "acid" }> = (gristRaw as any[]).map((row, idx) => {
+    const grist: Array<{
+      amountKg: number;
+      colorLovibond: number | null;
+      maltClass: "base" | "crystal" | "roast" | "acid";
+      mashDiPh?: number | null;
+      mashTaToPh57_mEqPerKg?: number | null;
+    }> | null = hasGrist
+      ? (gristRaw as any[]).map((row, idx) => {
         const o = (row ?? {}) as Record<string, unknown>;
         const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
         if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
@@ -819,8 +825,30 @@ export async function waterCalcRoutes(app: FastifyInstance) {
           maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
             ? maltClassRaw
             : "base";
-        return { amountKg, colorLovibond, maltClass };
-      });
+        const mashDiPh = typeof o.mashDiPh === "number" ? (o.mashDiPh as number) : o.mashDiPh === null ? null : undefined;
+        const mashTaToPh57_mEqPerKg =
+          typeof o.mashTaToPh57_mEqPerKg === "number"
+            ? (o.mashTaToPh57_mEqPerKg as number)
+            : o.mashTaToPh57_mEqPerKg === null
+              ? null
+              : undefined;
+        return { amountKg, colorLovibond, maltClass, mashDiPh, mashTaToPh57_mEqPerKg };
+      })
+      : null;
+
+    const mashPhEstimateGrist =
+      grist?.map((r) => {
+        const modelKey = mashPhModelKeyFromMaltClass(r.maltClass);
+        const colorEbc = colorLovibondToEbc(r.colorLovibond);
+        const mashDiPh = typeof r.mashDiPh === "number" ? r.mashDiPh : defaultMashDiPh(modelKey) ?? null;
+        const mashTaToPh57_mEqPerKg =
+          typeof r.mashTaToPh57_mEqPerKg === "number"
+            ? r.mashTaToPh57_mEqPerKg
+            : defaultMashTaToPh57_mEqPerKg(modelKey, colorEbc) ?? null;
+        return { amountKg: r.amountKg, mashDiPh, mashTaToPh57_mEqPerKg };
+      }) ?? null;
+
+    if (hasGrist && mashMode !== "manual") {
 
       const waterToGristRatioQtPerLbOverride =
         typeof body.waterToGristRatioQtPerLbOverride === "number" ? body.waterToGristRatioQtPerLbOverride : undefined;
@@ -834,7 +862,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         magnesiumPpm: salts.resultingProfile.magnesium,
         acidType,
         strength,
-        grist,
+        grist: grist ?? [],
         waterToGristRatioQtPerLbOverride,
       });
       acid = r;
@@ -854,7 +882,21 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       });
       acid = r.predicted;
       phKind = "estimated";
-      phValue = r.achievedPh;
+      if (mashPhEstimateGrist && mashPhEstimateGrist.length) {
+        const acidAdded_mEqPerL = (r.predicted as any)?.debug?.acidRequired_mEqPerL as number | undefined;
+        const estimate = mashPhEstimate({
+          volumeLiters,
+          alkalinityPpmCaCO3: startingAlkalinityPpmCaCO3,
+          calciumPpm: salts.resultingProfile.calcium,
+          magnesiumPpm: salts.resultingProfile.magnesium,
+          grist: mashPhEstimateGrist,
+          acidAdded_mEqPerL: typeof acidAdded_mEqPerL === "number" ? acidAdded_mEqPerL : 0,
+        } satisfies MashPhEstimateInput);
+        phValue = estimate.estimatedMashPhRoomTemp;
+      } else {
+        // Back-compat: without grist, manual mode only models water alkalinity + acid.
+        phValue = r.achievedPh;
+      }
     } else {
       acid = spargeAcidification({
         startingAlkalinityPpmCaCO3,
