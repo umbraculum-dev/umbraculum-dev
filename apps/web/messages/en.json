@@ -439,6 +439,7 @@
       "yeastHelp": "Select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
       "otherHelp": "Spices, finings, flavorings, etc.",
       "waterHelp": "The full mash chemistry + water calculator lives on its own page (not embedded here).",
+      "waterProfilesManageText": "Manage profiles on",
       "buttons": {
         "clear": "Clear",
         "addFermentable": "Add fermentable",
@@ -545,7 +546,8 @@
     "links": {
       "title": "Brew day & Brewing data",
       "fermDataIntegration": "Ferm Data & Integration",
-      "brewdaySteps": "Brewday Steps"
+      "brewdaySteps": "Brewday Steps",
+      "waterProfiles": "Water profiles"
     },
     "importExport": {
       "title": "Import / Export",

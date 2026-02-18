@@ -439,6 +439,7 @@
       "yeastHelp": "Scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "otherHelp": "Spezie, chiarificanti, aromi, ecc.",
       "waterHelp": "Il calcolatore completo (chimica mash + acqua) vive in una pagina dedicata (non integrata qui).",
+      "waterProfilesManageText": "Gestisci i profili su",
       "buttons": {
         "clear": "Pulisci",
         "addFermentable": "Aggiungi fermentabile",
@@ -545,7 +546,8 @@
     "links": {
       "title": "Brew day e dati di produzione",
       "fermDataIntegration": "Dati fermentazione e integrazione",
-      "brewdaySteps": "Step brewday"
+      "brewdaySteps": "Step brewday",
+      "waterProfiles": "Profili acqua"
     },
     "importExport": {
       "title": "Import / Export",

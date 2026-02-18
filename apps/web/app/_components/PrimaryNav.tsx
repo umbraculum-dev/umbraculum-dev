@@ -198,11 +198,6 @@ export function PrimaryNav() {
             </Link>
           </li>
           <li>
-            <Link href="/water-profiles" aria-current={isActive("/water-profiles") ? "page" : undefined}>
-              {t("waterProfiles")}
-            </Link>
-          </li>
-          <li>
             <Link href="/equipment" aria-current={isActive("/equipment") ? "page" : undefined}>
               {t("equipment")}
             </Link>

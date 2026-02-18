@@ -28,6 +28,9 @@ export default function Home() {
           <li>
             <Link href="/brewday-steps">{t("links.brewdaySteps")}</Link>
           </li>
+          <li>
+            <Link href="/water-profiles">{t("links.waterProfiles")}</Link>
+          </li>
         </ul>
       </section>
 

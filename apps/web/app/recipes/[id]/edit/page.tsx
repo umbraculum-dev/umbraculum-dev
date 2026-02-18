@@ -87,6 +87,7 @@ export default function RecipeEditPage() {
   const tEquip = useTranslations("recipes.edit.equipmentSection");
   const tAnalysis = useTranslations("recipes.analysis");
   const tMath = useTranslations("math");
+  const tNav = useTranslations("nav");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -2424,6 +2425,9 @@ export default function RecipeEditPage() {
             </p>
             <p style={{ marginBottom: 0 }}>
               <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
+            </p>
+            <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              {t("waterProfilesManageText")} <Link href="/water-profiles">{tNav("waterProfiles")}</Link>.
             </p>
           </section>
         </div>
