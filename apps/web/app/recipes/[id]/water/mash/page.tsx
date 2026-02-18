@@ -1247,6 +1247,9 @@ export default function MashWaterPage() {
             </div>
 
             <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+              <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
+                {savingMash ? "Saving…" : "Save mash draft"}
+              </button>
               <button type="submit" disabled={!canCall || mashSubmitting}>
                 {mashSubmitting
                   ? "Working…"
@@ -1254,13 +1257,6 @@ export default function MashWaterPage() {
                     ? "Estimate & save snapshot"
                     : "Calculate & save snapshot"}
               </button>
-              <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
-                {savingMash ? "Saving…" : "Save mash draft"}
-              </button>
-              {mashStatus ? <span className="muted" role="status" aria-live="polite">{mashStatus}</span> : null}
-              {mashManualStatus ? <span className="muted" role="status" aria-live="polite">{mashManualStatus}</span> : null}
-              {mashSaveStatus ? <span className="muted" role="status" aria-live="polite">{mashSaveStatus}</span> : null}
-              {mashCalcSaveStatus ? <span className="muted" role="status" aria-live="polite">{mashCalcSaveStatus}</span> : null}
             </div>
 
             {mashError ? (
