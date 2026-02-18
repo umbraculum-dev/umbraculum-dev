@@ -256,14 +256,9 @@ export default function RecipesImportPage() {
       </p>
 
       {authState.status === "loading" ? <p className="muted">{t("loading")}</p> : null}
-      {authState.status === "unauthenticated" ? (
+      {authState.status === "error" ? (
         <p className="errorBox" role="alert">
-          {t("errors.notAuthenticated")}
-        </p>
-      ) : null}
-      {authState.status === "needs_active_account" ? (
-        <p className="errorBox" role="alert">
-          {t("errors.noActiveAccount")}
+          {authState.error}
         </p>
       ) : null}
 

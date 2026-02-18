@@ -17,6 +17,12 @@ import {
   type SaltAddition,
   type SaltKey,
 } from "../domain/waterCalc/saltAdditions.js";
+import {
+  alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult,
+  combineAfterSaltsAndAcid,
+} from "../domain/waterCalc/overall.js";
+import { buildSaltAdditionsDerivation } from "../domain/waterCalc/derivation/saltAdditionsDerivation.js";
+import { buildAcidificationDerivation } from "../domain/waterCalc/derivation/acidificationDerivation.js";
 
 function colorLovibondToEbc(colorLovibond: number | null): number | null {
   if (colorLovibond === null) return null;
@@ -85,7 +91,21 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       strength,
     });
 
-    return { ok: true, result };
+    return {
+      ok: true,
+      result,
+      derivation: buildAcidificationDerivation({
+        mode: "target",
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh,
+        volumeLiters,
+        acidType,
+        strengthKind,
+        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        result,
+      }),
+    };
   });
 
   // Sparge acidification manual-entry mode (Sheet 2, v0): user enters acid amount; we estimate achieved pH.
@@ -160,7 +180,21 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       );
     }
 
-    return { ok: true, result };
+    return {
+      ok: true,
+      result,
+      derivation: buildAcidificationDerivation({
+        mode: "manual",
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh: result.achievedPh,
+        volumeLiters,
+        acidType,
+        strengthKind,
+        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        result: result.predicted,
+      }),
+    };
   });
 
   // Mash water acidification (Sheet 4, v0): same math as sparge acidification, but stored/displayed separately.
@@ -225,7 +259,21 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       strength,
     });
 
-    return { ok: true, result };
+    return {
+      ok: true,
+      result,
+      derivation: buildAcidificationDerivation({
+        mode: "target",
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh,
+        volumeLiters,
+        acidType,
+        strengthKind,
+        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        result,
+      }),
+    };
   });
 
   // Mash water acidification manual-entry mode (Sheet 4, v0): user enters acid amount; we estimate achieved pH.
@@ -302,7 +350,21 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_manual_acid_input", (e as Error)?.message || "Invalid manual input");
     }
 
-    return { ok: true, result };
+    return {
+      ok: true,
+      result,
+      derivation: buildAcidificationDerivation({
+        mode: "manual",
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh: result.achievedPh,
+        volumeLiters,
+        acidType,
+        strengthKind,
+        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        result: result.predicted,
+      }),
+    };
   });
 
   app.post("/water-calc/mash-ph-estimate", async (req) => {
@@ -530,7 +592,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
-    const grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: string }> = gristRaw.map((row, idx) => {
+    const grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: "base" | "crystal" | "roast" | "acid" }> = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
       const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
@@ -640,7 +702,558 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     });
 
     const result = applySaltAdditions(baseProfile, volumeLiters, additions);
-    return { ok: true, result };
+    return {
+      ok: true,
+      result,
+      derivation: buildSaltAdditionsDerivation({ volumeLiters, baseProfile, result }),
+    };
+  });
+
+  app.post("/water-calc/mash-overall", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const mashMode = body.mashMode === "manual" ? "manual" : "targetPh";
+    const startingAlkalinityPpmCaCO3 =
+      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
+        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        : typeof body.startingAlkalinityPpmCaCO3 === "number"
+          ? (body.startingAlkalinityPpmCaCO3 as number)
+          : 0;
+    const startingPh =
+      typeof body.mashStartingPh === "number"
+        ? (body.mashStartingPh as number)
+        : typeof body.startingPh === "number"
+          ? (body.startingPh as number)
+          : 7.0;
+    const targetPh =
+      typeof body.mashTargetPh === "number"
+        ? (body.mashTargetPh as number)
+        : typeof body.targetPh === "number"
+          ? (body.targetPh as number)
+          : 5.6;
+    const volumeLiters =
+      typeof body.mashWaterVolumeLiters === "number"
+        ? (body.mashWaterVolumeLiters as number)
+        : typeof body.volumeLiters === "number"
+          ? (body.volumeLiters as number)
+          : NaN;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
+    }
+
+    const base = body.baseProfile as Partial<IonProfilePpm>;
+    if (!base || typeof base !== "object") {
+      throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
+    }
+    const baseProfile: IonProfilePpm = {
+      calcium: typeof base.calcium === "number" ? base.calcium : 0,
+      magnesium: typeof base.magnesium === "number" ? base.magnesium : 0,
+      sodium: typeof base.sodium === "number" ? base.sodium : 0,
+      sulfate: typeof base.sulfate === "number" ? base.sulfate : 0,
+      chloride: typeof base.chloride === "number" ? base.chloride : 0,
+      bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
+    };
+
+    const additionsRaw = body.additions;
+    if (!Array.isArray(additionsRaw)) {
+      throw new BadRequestError("invalid_additions", "Body.additions must be an array");
+    }
+    const additions: SaltAddition[] = additionsRaw.map((a) => {
+      const o = (a ?? {}) as Record<string, unknown>;
+      const saltKey = o.saltKey as SaltKey;
+      if (typeof saltKey !== "string") {
+        throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
+      }
+      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      if (!Number.isFinite(grams) || grams < 0) {
+        throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
+      }
+      return { saltKey, grams };
+    });
+
+    const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
+
+    const acidType = body.acidType as SpargeAcidType;
+    if (typeof acidType !== "string") {
+      throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
+    }
+    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+      | "percent"
+      | "normality"
+      | "molarity"
+      | "solid";
+    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+
+    let strength: AcidStrength;
+    if (strengthKind === "solid") {
+      strength = { kind: "solid" };
+    } else {
+      if (typeof strengthValue !== "number") {
+        throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
+      }
+      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+    }
+
+    let acid;
+    let phKind: "target" | "estimated" = "target";
+    let phValue = targetPh;
+
+    const gristRaw = body.grist;
+    const hasGrist = Array.isArray(gristRaw) && gristRaw.length > 0;
+    if (hasGrist && mashMode !== "manual") {
+      const grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: "base" | "crystal" | "roast" | "acid" }> = (gristRaw as any[]).map((row, idx) => {
+        const o = (row ?? {}) as Record<string, unknown>;
+        const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+        if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
+          throw new BadRequestError("invalid_grist_row_amount", `Body.grist[${idx}].amountKg must be a number > 0`);
+        }
+        const colorRaw = o.colorLovibond;
+        const colorLovibond =
+          colorRaw === null || colorRaw === undefined ? null : typeof colorRaw === "number" ? colorRaw : NaN;
+        if (typeof colorLovibond === "number" && (!Number.isFinite(colorLovibond) || colorLovibond < 0)) {
+          throw new BadRequestError("invalid_grist_row_color", `Body.grist[${idx}].colorLovibond must be null or a number >= 0`);
+        }
+        const maltClassRaw = o.maltClass;
+        const maltClass =
+          maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
+            ? maltClassRaw
+            : "base";
+        return { amountKg, colorLovibond, maltClass };
+      });
+
+      const waterToGristRatioQtPerLbOverride =
+        typeof body.waterToGristRatioQtPerLbOverride === "number" ? body.waterToGristRatioQtPerLbOverride : undefined;
+
+      const r = mashAcidificationTargetMashPh({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        volumeLiters,
+        targetMashPh: targetPh,
+        calciumPpm: salts.resultingProfile.calcium,
+        magnesiumPpm: salts.resultingProfile.magnesium,
+        acidType,
+        strength,
+        grist,
+        waterToGristRatioQtPerLbOverride,
+      });
+      acid = r;
+      phKind = "estimated";
+      phValue = r.estimatedMashPhRoomTemp;
+    } else if (mashMode === "manual") {
+      const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
+      const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+      const r = mashAcidificationManual({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        volumeLiters,
+        acidType,
+        strength,
+        acidAddedMl,
+        acidAddedGrams,
+      });
+      acid = r.predicted;
+      phKind = "estimated";
+      phValue = r.achievedPh;
+    } else {
+      acid = spargeAcidification({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh,
+        volumeLiters,
+        acidType,
+        strength,
+      });
+      phKind = "target";
+      phValue = targetPh;
+    }
+
+    const ionsPpm = combineAfterSaltsAndAcid({
+      afterSalts: salts.resultingProfile,
+      acidResult: acid,
+    });
+    const alkalinityAfterSaltsPpmCaCO3 = alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult(salts);
+    const calculatedAt = new Date().toISOString();
+
+    const result = {
+      calculatedAt,
+      ionsPpm,
+      finalAlkalinityPpmCaCO3: acid.finalAlkalinityPpmCaCO3,
+      ph: { kind: phKind, value: phValue },
+      debug: {
+        startingAlkalinityPpmCaCO3,
+        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
+        saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
+        acidSulfateAddedPpm: acid.sulfateAddedPpm,
+        acidChlorideAddedPpm: acid.chlorideAddedPpm,
+        mashMode,
+      },
+    };
+
+    return {
+      ok: true,
+      result,
+      derivation: {
+        kind: "mash_overall",
+        version: 1,
+        formulaId: "water.mash_overall.v1",
+        inputs: [
+          { id: "volumeLiters", value: { kind: "number", value: volumeLiters, unit: "L" } },
+          { id: "startingAlk", value: { kind: "number", value: startingAlkalinityPpmCaCO3, unit: "ppm_as_CaCO3" } },
+          { id: "startingPh", value: { kind: "number", value: startingPh, unit: "pH" } },
+          { id: "targetPh", value: { kind: "number", value: phValue, unit: "pH" } },
+        ],
+        intermediates: [
+          { id: "alkAfterSalts", value: { kind: "number", value: alkalinityAfterSaltsPpmCaCO3, unit: "ppm_as_CaCO3" } },
+          { id: "acidSulfateAddedPpm", value: { kind: "number", value: acid.sulfateAddedPpm, unit: "ppm" } },
+          { id: "acidChlorideAddedPpm", value: { kind: "number", value: acid.chlorideAddedPpm, unit: "ppm" } },
+        ],
+        notes: ["counter_ions_only_for_sulfuric_or_hydrochloric"],
+        breakdowns: [
+          {
+            id: "saltBreakdown",
+            rows: salts.breakdown.map((b) => ({
+              saltKey: { kind: "string", value: b.saltKey },
+              grams: { kind: "number", value: b.grams, unit: "g" },
+              calciumPpm: { kind: "number", value: b.deltasPpm.calcium ?? 0, unit: "ppm" },
+              magnesiumPpm: { kind: "number", value: b.deltasPpm.magnesium ?? 0, unit: "ppm" },
+              sodiumPpm: { kind: "number", value: b.deltasPpm.sodium ?? 0, unit: "ppm" },
+              sulfatePpm: { kind: "number", value: b.deltasPpm.sulfate ?? 0, unit: "ppm" },
+              chloridePpm: { kind: "number", value: b.deltasPpm.chloride ?? 0, unit: "ppm" },
+              bicarbonatePpm: { kind: "number", value: b.deltasPpm.bicarbonate ?? 0, unit: "ppm" },
+            })),
+          },
+        ],
+      },
+    };
+  });
+
+  app.post("/water-calc/sparge-overall", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const spargeMode = body.spargeMode === "manual" ? "manual" : "targetPh";
+    const startingAlkalinityPpmCaCO3 =
+      typeof body.startingAlkalinityPpmCaCO3 === "number"
+        ? (body.startingAlkalinityPpmCaCO3 as number)
+        : typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
+          ? (body.spargeStartingAlkalinityPpmCaCO3 as number)
+          : 0;
+    const startingPh = typeof body.startingPh === "number" ? (body.startingPh as number) : 7.0;
+    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : 5.6;
+    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters as number) : NaN;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
+    }
+
+    const base = body.baseProfile as Partial<IonProfilePpm>;
+    if (!base || typeof base !== "object") {
+      throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
+    }
+    const baseProfile: IonProfilePpm = {
+      calcium: typeof base.calcium === "number" ? base.calcium : 0,
+      magnesium: typeof base.magnesium === "number" ? base.magnesium : 0,
+      sodium: typeof base.sodium === "number" ? base.sodium : 0,
+      sulfate: typeof base.sulfate === "number" ? base.sulfate : 0,
+      chloride: typeof base.chloride === "number" ? base.chloride : 0,
+      bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
+    };
+
+    const additionsRaw = body.additions;
+    if (!Array.isArray(additionsRaw)) {
+      throw new BadRequestError("invalid_additions", "Body.additions must be an array");
+    }
+    const additions: SaltAddition[] = additionsRaw.map((a) => {
+      const o = (a ?? {}) as Record<string, unknown>;
+      const saltKey = o.saltKey as SaltKey;
+      if (typeof saltKey !== "string") {
+        throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
+      }
+      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      if (!Number.isFinite(grams) || grams < 0) {
+        throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
+      }
+      return { saltKey, grams };
+    });
+
+    const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
+
+    const acidType = body.acidType as SpargeAcidType;
+    if (typeof acidType !== "string") {
+      throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
+    }
+    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+      | "percent"
+      | "normality"
+      | "molarity"
+      | "solid";
+    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+
+    let strength: AcidStrength;
+    if (strengthKind === "solid") {
+      strength = { kind: "solid" };
+    } else {
+      if (typeof strengthValue !== "number") {
+        throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
+      }
+      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+    }
+
+    let acid;
+    const calciumPpm = salts.resultingProfile.calcium;
+    const magnesiumPpm = salts.resultingProfile.magnesium;
+
+    if (spargeMode === "manual") {
+      const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
+      const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+      const r = spargeAcidificationManual({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        volumeLiters,
+        calciumPpm,
+        magnesiumPpm,
+        acidType,
+        strength,
+        acidAddedMl,
+        acidAddedGrams,
+      });
+      acid = { predicted: r.predicted, achievedPh: r.achievedPh };
+    } else {
+      const r = spargeAcidification({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh,
+        volumeLiters,
+        calciumPpm,
+        magnesiumPpm,
+        acidType,
+        strength,
+      });
+      acid = { predicted: r, achievedPh: targetPh };
+    }
+
+    const ionsPpm = combineAfterSaltsAndAcid({
+      afterSalts: salts.resultingProfile,
+      acidResult: acid.predicted,
+    });
+    const alkalinityAfterSaltsPpmCaCO3 = alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult(salts);
+    const calculatedAt = new Date().toISOString();
+
+    const result = {
+      calculatedAt,
+      ionsPpm,
+      finalAlkalinityPpmCaCO3: acid.predicted.finalAlkalinityPpmCaCO3,
+      ph: { kind: spargeMode === "manual" ? "estimated" : "target", value: acid.achievedPh },
+      debug: {
+        startingAlkalinityPpmCaCO3,
+        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
+        saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
+        acidSulfateAddedPpm: acid.predicted.sulfateAddedPpm,
+        acidChlorideAddedPpm: acid.predicted.chlorideAddedPpm,
+        spargeMode,
+      },
+    };
+
+    return {
+      ok: true,
+      result,
+      derivation: {
+        kind: "sparge_overall",
+        version: 1,
+        formulaId: "water.sparge_overall.v1",
+        inputs: [
+          { id: "volumeLiters", value: { kind: "number", value: volumeLiters, unit: "L" } },
+          { id: "startingAlk", value: { kind: "number", value: startingAlkalinityPpmCaCO3, unit: "ppm_as_CaCO3" } },
+          { id: "startingPh", value: { kind: "number", value: startingPh, unit: "pH" } },
+          { id: "targetPh", value: { kind: "number", value: acid.achievedPh, unit: "pH" } },
+        ],
+        intermediates: [
+          { id: "alkAfterSalts", value: { kind: "number", value: alkalinityAfterSaltsPpmCaCO3, unit: "ppm_as_CaCO3" } },
+          { id: "acidSulfateAddedPpm", value: { kind: "number", value: acid.predicted.sulfateAddedPpm, unit: "ppm" } },
+          { id: "acidChlorideAddedPpm", value: { kind: "number", value: acid.predicted.chlorideAddedPpm, unit: "ppm" } },
+        ],
+        notes: ["counter_ions_only_for_sulfuric_or_hydrochloric"],
+        breakdowns: [
+          {
+            id: "saltBreakdown",
+            rows: salts.breakdown.map((b) => ({
+              saltKey: { kind: "string", value: b.saltKey },
+              grams: { kind: "number", value: b.grams, unit: "g" },
+              calciumPpm: { kind: "number", value: b.deltasPpm.calcium ?? 0, unit: "ppm" },
+              magnesiumPpm: { kind: "number", value: b.deltasPpm.magnesium ?? 0, unit: "ppm" },
+              sodiumPpm: { kind: "number", value: b.deltasPpm.sodium ?? 0, unit: "ppm" },
+              sulfatePpm: { kind: "number", value: b.deltasPpm.sulfate ?? 0, unit: "ppm" },
+              chloridePpm: { kind: "number", value: b.deltasPpm.chloride ?? 0, unit: "ppm" },
+              bicarbonatePpm: { kind: "number", value: b.deltasPpm.bicarbonate ?? 0, unit: "ppm" },
+            })),
+          },
+        ],
+      },
+    };
+  });
+
+  app.post("/water-calc/boil-overall", async (req) => {
+    requireActiveAccount(req);
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    const boilMode = body.boilMode === "manual" ? "manual" : "targetPh";
+    const startingAlkalinityPpmCaCO3 =
+      typeof body.startingAlkalinityPpmCaCO3 === "number"
+        ? (body.startingAlkalinityPpmCaCO3 as number)
+        : typeof body.boilStartingAlkalinityPpmCaCO3 === "number"
+          ? (body.boilStartingAlkalinityPpmCaCO3 as number)
+          : 0;
+    const startingPh = typeof body.startingPh === "number" ? (body.startingPh as number) : 7.0;
+    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : 5.6;
+    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters as number) : NaN;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
+      throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
+    }
+
+    const base = body.baseProfile as Partial<IonProfilePpm>;
+    if (!base || typeof base !== "object") {
+      throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
+    }
+    const baseProfile: IonProfilePpm = {
+      calcium: typeof base.calcium === "number" ? base.calcium : 0,
+      magnesium: typeof base.magnesium === "number" ? base.magnesium : 0,
+      sodium: typeof base.sodium === "number" ? base.sodium : 0,
+      sulfate: typeof base.sulfate === "number" ? base.sulfate : 0,
+      chloride: typeof base.chloride === "number" ? base.chloride : 0,
+      bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
+    };
+
+    const additionsRaw = body.additions;
+    if (!Array.isArray(additionsRaw)) {
+      throw new BadRequestError("invalid_additions", "Body.additions must be an array");
+    }
+    const additions: SaltAddition[] = additionsRaw.map((a) => {
+      const o = (a ?? {}) as Record<string, unknown>;
+      const saltKey = o.saltKey as SaltKey;
+      if (typeof saltKey !== "string") {
+        throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
+      }
+      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      if (!Number.isFinite(grams) || grams < 0) {
+        throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
+      }
+      return { saltKey, grams };
+    });
+
+    const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
+
+    const acidType = body.acidType as SpargeAcidType;
+    if (typeof acidType !== "string") {
+      throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
+    }
+    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+      | "percent"
+      | "normality"
+      | "molarity"
+      | "solid";
+    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+
+    let strength: AcidStrength;
+    if (strengthKind === "solid") {
+      strength = { kind: "solid" };
+    } else {
+      if (typeof strengthValue !== "number") {
+        throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
+      }
+      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+    }
+
+    let acid;
+    const calciumPpm = salts.resultingProfile.calcium;
+    const magnesiumPpm = salts.resultingProfile.magnesium;
+
+    if (boilMode === "manual") {
+      const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
+      const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+      const r = spargeAcidificationManual({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        volumeLiters,
+        calciumPpm,
+        magnesiumPpm,
+        acidType,
+        strength,
+        acidAddedMl,
+        acidAddedGrams,
+      });
+      acid = { predicted: r.predicted, achievedPh: r.achievedPh };
+    } else {
+      const r = spargeAcidification({
+        startingAlkalinityPpmCaCO3,
+        startingPh,
+        targetPh,
+        volumeLiters,
+        calciumPpm,
+        magnesiumPpm,
+        acidType,
+        strength,
+      });
+      acid = { predicted: r, achievedPh: targetPh };
+    }
+
+    const ionsPpm = combineAfterSaltsAndAcid({
+      afterSalts: salts.resultingProfile,
+      acidResult: acid.predicted,
+    });
+    const alkalinityAfterSaltsPpmCaCO3 = alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult(salts);
+    const calculatedAt = new Date().toISOString();
+
+    const result = {
+      calculatedAt,
+      ionsPpm,
+      finalAlkalinityPpmCaCO3: acid.predicted.finalAlkalinityPpmCaCO3,
+      ph: { kind: boilMode === "manual" ? "estimated" : "target", value: acid.achievedPh },
+      debug: {
+        startingAlkalinityPpmCaCO3,
+        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
+        saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
+        acidSulfateAddedPpm: acid.predicted.sulfateAddedPpm,
+        acidChlorideAddedPpm: acid.predicted.chlorideAddedPpm,
+        boilMode,
+      },
+    };
+
+    return {
+      ok: true,
+      result,
+      derivation: {
+        kind: "boil_overall",
+        version: 1,
+        formulaId: "water.boil_overall.v1",
+        inputs: [
+          { id: "volumeLiters", value: { kind: "number", value: volumeLiters, unit: "L" } },
+          { id: "startingAlk", value: { kind: "number", value: startingAlkalinityPpmCaCO3, unit: "ppm_as_CaCO3" } },
+          { id: "startingPh", value: { kind: "number", value: startingPh, unit: "pH" } },
+          { id: "targetPh", value: { kind: "number", value: acid.achievedPh, unit: "pH" } },
+        ],
+        intermediates: [
+          { id: "alkAfterSalts", value: { kind: "number", value: alkalinityAfterSaltsPpmCaCO3, unit: "ppm_as_CaCO3" } },
+          { id: "acidSulfateAddedPpm", value: { kind: "number", value: acid.predicted.sulfateAddedPpm, unit: "ppm" } },
+          { id: "acidChlorideAddedPpm", value: { kind: "number", value: acid.predicted.chlorideAddedPpm, unit: "ppm" } },
+        ],
+        notes: ["counter_ions_only_for_sulfuric_or_hydrochloric"],
+        breakdowns: [
+          {
+            id: "saltBreakdown",
+            rows: salts.breakdown.map((b) => ({
+              saltKey: { kind: "string", value: b.saltKey },
+              grams: { kind: "number", value: b.grams, unit: "g" },
+              calciumPpm: { kind: "number", value: b.deltasPpm.calcium ?? 0, unit: "ppm" },
+              magnesiumPpm: { kind: "number", value: b.deltasPpm.magnesium ?? 0, unit: "ppm" },
+              sodiumPpm: { kind: "number", value: b.deltasPpm.sodium ?? 0, unit: "ppm" },
+              sulfatePpm: { kind: "number", value: b.deltasPpm.sulfate ?? 0, unit: "ppm" },
+              chloridePpm: { kind: "number", value: b.deltasPpm.chloride ?? 0, unit: "ppm" },
+              bicarbonatePpm: { kind: "number", value: b.deltasPpm.bicarbonate ?? 0, unit: "ppm" },
+            })),
+          },
+        ],
+      },
+    };
   });
 }
 

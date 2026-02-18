@@ -14,6 +14,7 @@ import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import { mathExplain } from "./_lib/mathExplain";
+import { buildWaterMathBody } from "./_lib/mathBodies";
 import { RecipeMetaLine } from "./_components/RecipeMetaLine";
 
 type MashOverallResult = {
@@ -531,7 +532,17 @@ export default function WaterHubPage() {
                 return (
                   <MathHelpPopover
                     title={title}
-                    body={tMath(ex.bodyKey)}
+                    body={buildWaterMathBody({
+                      key: "waterHub.mergedWaterRecap",
+                      tMath,
+                      locale,
+                      ctx: {
+                        streams: recap?.streams ?? [],
+                        totalVolumeLiters: recap?.totalVolumeLiters ?? null,
+                        mergedPh: recap?.mergedPh ?? null,
+                        mergedFinalAlk: recap?.mergedFinalAlk ?? null,
+                      },
+                    })}
                     ariaLabel={tMath("fxLabel", { topic: title })}
                   />
                 );
@@ -635,7 +646,14 @@ export default function WaterHubPage() {
                         return (
                           <MathHelpPopover
                             title={title}
-                            body={tMath(ex.bodyKey)}
+                            body={buildWaterMathBody({
+                              key: "waterHub.mergedIons",
+                              tMath,
+                              locale,
+                              ctx: {
+                                ions: recap?.mergedIons ?? null,
+                              },
+                            })}
                             ariaLabel={tMath("fxLabel", { topic: title })}
                           />
                         );
@@ -768,6 +786,21 @@ export default function WaterHubPage() {
           <p className="muted" style={{ marginBottom: 0 }}>
             {t("finalRecapCaveat")}
           </p>
+        </section>
+
+        <section className="panel" aria-labelledby="water-hub-alkalinity-vs-bicarbonate">
+          <h2 id="water-hub-alkalinity-vs-bicarbonate" style={{ marginTop: 0 }}>
+            {t("alkVsBicarbTitle")}
+          </h2>
+          <p className="muted" style={{ marginTop: 0 }}>
+            {t("alkVsBicarbSubtitle")}
+          </p>
+          <ul style={{ marginTop: 0 }}>
+            <li>{t("alkVsBicarbPoint1")}</li>
+            <li>{t("alkVsBicarbPoint2")}</li>
+            <li>{t("alkVsBicarbPoint3")}</li>
+            <li>{t("alkVsBicarbPoint4")}</li>
+          </ul>
         </section>
       </div>
     </>

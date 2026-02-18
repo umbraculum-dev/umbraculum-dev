@@ -961,8 +961,11 @@ export default function RecipeEditPage() {
                       }
                       const amountOk = typeof h?.amountGrams === "number" && Number.isFinite(h.amountGrams) && h.amountGrams > 0;
                       const aaOk = typeof h?.alphaAcidPercent === "number" && Number.isFinite(h.alphaAcidPercent) && h.alphaAcidPercent > 0;
-                      const timeOk = typeof h?.timeMinutes === "number" && Number.isFinite(h.timeMinutes) && h.timeMinutes >= 0;
-                      if (!amountOk || !aaOk || !timeOk) {
+                      const timeMin =
+                        typeof h?.timeMinutes === "number" && Number.isFinite(h.timeMinutes) && h.timeMinutes >= 0
+                          ? h.timeMinutes
+                          : null;
+                      if (!amountOk || !aaOk || timeMin === null) {
                         out.push(tMath("analysis.common.hopLineExcluded", { name, reason: tMath("analysis.common.excludeMissingInputs") }));
                         continue;
                       }
@@ -972,7 +975,7 @@ export default function RecipeEditPage() {
                           use: tMath(`analysis.common.hopUse.${use}` as any),
                           amountG: fmt(h.amountGrams, 1),
                           alpha: fmt(h.alphaAcidPercent, 1),
-                          timeMin: String(Math.round(h.timeMinutes)),
+                          timeMin: String(Math.round(timeMin)),
                         }),
                       );
                     }

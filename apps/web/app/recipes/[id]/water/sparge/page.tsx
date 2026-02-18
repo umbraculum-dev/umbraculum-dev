@@ -14,6 +14,7 @@ import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
+import { buildWaterMathBody } from "../_lib/mathBodies";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -69,6 +70,7 @@ export default function SpargeWaterPage() {
   const [spargeSaveStatus, setSpargeSaveStatus] = useState<string | null>(null);
   const [calcSaveStatus, setCalcSaveStatus] = useState<string | null>(null);
   const [spargeResult, setSpargeResult] = useState<SpargeResult | null>(null);
+  const [acidDerivation, setAcidDerivation] = useState<any | null>(null);
   const [spargeManualResult, setSpargeManualResult] = useState<SpargeManualCalcResult | null>(null);
   const [spargeSubmitting, setSpargeSubmitting] = useState(false);
   const [savingSparge, setSavingSparge] = useState(false);
@@ -98,6 +100,8 @@ export default function SpargeWaterPage() {
   const [savingSpargeSalts, setSavingSpargeSalts] = useState(false);
   const [spargeSaltAdditions, setSpargeSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [spargeSaltsResult, setSpargeSaltsResult] = useState<SaltAdditionsResult | null>(null);
+  const [saltDerivation, setSaltDerivation] = useState<any | null>(null);
+  const [spargeOverall, setSpargeOverall] = useState<any | null>(null);
   const [spargeSaltsInputsKey, setSpargeSaltsInputsKey] = useState<string | null>(null);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
@@ -315,6 +319,7 @@ export default function SpargeWaterPage() {
     setCalcSaveStatus(null);
     setSpargeResult(null);
     setSpargeManualResult(null);
+    setAcidDerivation(null);
     setSpargeSubmitting(true);
     try {
       const saltsSnapshot = await ensureSpargeSaltsSnapshotForAcidification();
@@ -355,9 +360,11 @@ export default function SpargeWaterPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error(JSON.stringify(res.data));
+        setAcidDerivation((res.data as any).derivation ?? null);
         const manual = (res.data as any).result as SpargeManualCalcResult;
         setSpargeManualResult(manual);
         setSpargeResult(manual.predicted);
+        await refreshSpargeOverallIfPossible().catch(() => null);
 
         const nowIso = new Date().toISOString();
         await saveSettings({
@@ -410,8 +417,10 @@ export default function SpargeWaterPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error(JSON.stringify(res.data));
+        setAcidDerivation((res.data as any).derivation ?? null);
         const result = (res.data as any).result as SpargeResult;
         setSpargeResult(result);
+        await refreshSpargeOverallIfPossible().catch(() => null);
 
         const nowIso = new Date().toISOString();
         await saveSettings({
@@ -470,7 +479,7 @@ export default function SpargeWaterPage() {
   };
 
   const ensureSpargeSaltsSnapshotForAcidification = async (): Promise<SaltAdditionsResult> => {
-    if (!canCall) return;
+    if (!canCall) throw new Error("Not ready to call API.");
     if (!selectedSpargeProfile) {
       throw new Error("Select a sparge water profile first (base ion profile for recap).");
     }
@@ -502,6 +511,7 @@ export default function SpargeWaterPage() {
 
       const nowIso = new Date().toISOString();
       setSpargeSaltsResult(result);
+      setSaltDerivation(null);
       setSpargeSaltsInputsKey(inputsKey);
       await saveSettings({
         spargeSaltAdditionsJson: spargeSaltAdditions,
@@ -516,12 +526,13 @@ export default function SpargeWaterPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         volumeLiters,
-        baseProfile,
+        baseProfile: base,
         additions: spargeSaltAdditions,
       }),
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
     const result = (res.data as any).result as SaltAdditionsResult;
+    setSaltDerivation((res.data as any).derivation ?? null);
 
     const nowIso = new Date().toISOString();
     setSpargeSaltsResult(result);
@@ -564,6 +575,8 @@ export default function SpargeWaterPage() {
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const result = (res.data as any).result as SaltAdditionsResult;
       setSpargeSaltsResult(result);
+      setSaltDerivation((res.data as any).derivation ?? null);
+      await refreshSpargeOverallIfPossible().catch(() => null);
 
       await saveSettings({
         spargeSaltAdditionsJson: spargeSaltAdditions,
@@ -576,6 +589,50 @@ export default function SpargeWaterPage() {
     } finally {
       setSpargeSaltsSubmitting(false);
     }
+  };
+
+  const refreshSpargeOverallIfPossible = async () => {
+    if (!canCall) return;
+    if (!selectedSpargeProfile) return;
+    if (!spargeSaltsResult) return;
+    if (!spargeResult) return;
+    if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) return;
+    if (startingPh.trim() === "" || !Number.isFinite(Number(startingPh))) return;
+
+    const payload: Record<string, unknown> = {
+      spargeMode: spargeAcidificationMode,
+      startingAlkalinityPpmCaCO3: startingAlk,
+      startingPh: Number(startingPh),
+      targetPh,
+      volumeLiters,
+      baseProfile: {
+        calcium: selectedSpargeProfile.calcium,
+        magnesium: selectedSpargeProfile.magnesium,
+        sodium: selectedSpargeProfile.sodium,
+        sulfate: selectedSpargeProfile.sulfate,
+        chloride: selectedSpargeProfile.chloride,
+        bicarbonate: selectedSpargeProfile.bicarbonate,
+      },
+      additions: spargeSaltAdditions,
+      acidType,
+      strengthKind,
+    };
+    if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+    if (spargeAcidificationMode === "manual") {
+      Object.assign(
+        payload,
+        strengthKind === "solid" ? { acidAddedGrams: spargeManualAcidAdded } : { acidAddedMl: spargeManualAcidAdded },
+      );
+    }
+
+    const res = await apiFetch("/api/water-calc/sparge-overall", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) return;
+    const data = res.data as any;
+    setSpargeOverall({ result: data.result, derivation: data.derivation });
   };
 
   const selectedSpargeProfileInfo = selectedSpargeProfile ? (
@@ -842,7 +899,14 @@ export default function SpargeWaterPage() {
                       return (
                         <MathHelpPopover
                           title={title}
-                          body={tMath(ex.bodyKey)}
+                          body={buildWaterMathBody({
+                            key: "sparge.acidRequired",
+                            tMath,
+                            locale,
+                            ctx: {
+                              acidDerivation,
+                            },
+                          })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
@@ -864,7 +928,14 @@ export default function SpargeWaterPage() {
                       return (
                         <MathHelpPopover
                           title={title}
-                          body={tMath(ex.bodyKey)}
+                          body={buildWaterMathBody({
+                            key: "sparge.acidRequired",
+                            tMath,
+                            locale,
+                            ctx: {
+                              acidDerivation,
+                            },
+                          })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
@@ -885,7 +956,14 @@ export default function SpargeWaterPage() {
                     return (
                       <MathHelpPopover
                         title={title}
-                        body={tMath(ex.bodyKey)}
+                        body={buildWaterMathBody({
+                          key: "sparge.finalAlkalinity",
+                          tMath,
+                          locale,
+                          ctx: {
+                            acidDerivation,
+                          },
+                        })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
                     );
@@ -984,7 +1062,14 @@ export default function SpargeWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={tMath(ex.bodyKey)}
+                      body={buildWaterMathBody({
+                        key: "sparge.ionsAfterSalts",
+                        tMath,
+                        locale,
+                        ctx: {
+                          saltDerivation,
+                        },
+                      })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
@@ -1031,7 +1116,14 @@ export default function SpargeWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={tMath(ex.bodyKey)}
+                      body={buildWaterMathBody({
+                        key: "sparge.ionsAfterSaltsAndAcid",
+                        tMath,
+                        locale,
+                        ctx: {
+                          overallDerivation: spargeOverall?.derivation ?? null,
+                        },
+                      })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
@@ -1046,7 +1138,12 @@ export default function SpargeWaterPage() {
                       <span style={{ marginLeft: 6 }}>
                         <MathHelpPopover
                           title={title}
-                          body={tMath(ex.bodyKey)}
+                          body={buildWaterMathBody({
+                            key: "sparge.alkalinityHeuristic",
+                            tMath,
+                            locale,
+                            ctx: { acidDerivation },
+                          })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       </span>
@@ -1064,10 +1161,12 @@ export default function SpargeWaterPage() {
                   </thead>
                   <tbody>
                     {(() => {
-                      const combined = combineAfterSaltsAndAcid({
-                        afterSalts: spargeSaltsResult.resultingProfile,
-                        acidResult: spargeResult,
-                      });
+                      const combined =
+                        (spargeOverall?.result?.ionsPpm as any) ??
+                        combineAfterSaltsAndAcid({
+                          afterSalts: spargeSaltsResult.resultingProfile,
+                          acidResult: spargeResult,
+                        });
                       return ([
                         ["Ca", combined.calcium],
                         ["Mg", combined.magnesium],

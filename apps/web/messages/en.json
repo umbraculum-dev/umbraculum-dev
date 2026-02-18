@@ -96,6 +96,104 @@
     "toggleShow": "Show math",
     "toggleHide": "Hide math",
     "fxLabel": "Show formula: {topic}",
+    "common": {
+      "none": "(none)",
+      "yes": "yes",
+      "no": "no",
+      "more": "(+{count} more…)",
+      "ionLine": "- {ion}: {ppm} ppm",
+      "saltLine": "- {salt}: {grams} g",
+      "detailLine": "- {label}: {value}"
+    },
+    "derivation": {
+      "headings": {
+        "formula": "Formula:",
+        "inputs": "Inputs:",
+        "intermediates": "Steps / intermediates:",
+        "breakdowns": "Breakdowns:",
+        "notes": "Notes:"
+      },
+      "common": {
+        "kvLine": "- {label}: {value}",
+        "ionDelta": "{ion} {ppm} ppm",
+        "more": "(+{count} more…)",
+        "yes": "yes",
+        "no": "no",
+        "null": "—",
+        "unknown": "unknown",
+        "none": "(none)",
+        "missing": "(recalculate to show derivation)"
+      },
+      "labels": {
+        "volumeLiters": "Volume (L)",
+        "startingAlk": "Starting alkalinity (ppm as CaCO3)",
+        "startingPh": "Starting pH",
+        "targetPh": "Target/achieved pH",
+        "alkAfterSalts": "Alkalinity after salts (ppm as CaCO3)",
+        "acidSulfateAddedPpm": "Acid sulfate added (ppm)",
+        "acidChlorideAddedPpm": "Acid chloride added (ppm)",
+        "mode": "Mode",
+        "startingAlkalinityPpmCaCO3": "Starting alkalinity (ppm as CaCO3)",
+        "effectiveAlkalinityPpmCaCO3": "Effective alkalinity (ppm as CaCO3)",
+        "alkalinityReductionFromCaMgPpmCaCO3": "Alkalinity reduction from Ca/Mg (ppm as CaCO3)",
+        "acidRequired_mEqPerL": "Acid required (mEq/L)",
+        "mMRequired_mmolPerL": "mM required (mmol/L)",
+        "frac_equivalentsPerMole": "Equivalents per mole (fraction)",
+        "sg_mgPerMl": "Solution density (mg/mL)",
+        "acidType": "Acid type",
+        "strengthKind": "Strength kind",
+        "strengthValue": "Strength value",
+        "breakdownSum": "How deltas are combined",
+        "base": {
+          "calciumPpm": "Base Ca (ppm)",
+          "magnesiumPpm": "Base Mg (ppm)",
+          "sodiumPpm": "Base Na (ppm)",
+          "sulfatePpm": "Base SO4 (ppm)",
+          "chloridePpm": "Base Cl (ppm)",
+          "bicarbonatePpm": "Base HCO3 (ppm)"
+        }
+      },
+      "rows": {
+        "saltDelta": "- {saltKey} ({grams} g): {deltas}"
+      },
+      "breakdowns": {
+        "salt_additions": {
+          "perSaltDeltas": { "title": "Per-salt ion deltas (ppm)" }
+        },
+        "mash_overall": {
+          "saltBreakdown": { "title": "Salt contributions (per-salt deltas)" }
+        },
+        "sparge_overall": {
+          "saltBreakdown": { "title": "Salt contributions (per-salt deltas)" }
+        },
+        "boil_overall": {
+          "saltBreakdown": { "title": "Salt contributions (per-salt deltas)" }
+        }
+      },
+      "notes": {
+        "generic": "- {note}",
+        "counterIonsOnlyStrongAcids": "Counter-ions: only sulfuric adds SO4 and only hydrochloric adds Cl. For other acids these are 0."
+      },
+      "formulas": {
+        "water": {
+          "salt_additions": {
+            "v1": "ppm = mg/L\n\nFor each salt:\n- Convert grams -> moles of salt\n- Use stoichiometry to get moles of each ion group\n- Convert to mg of each ion group\n- Divide by volume (L) to get ppm\n\nFinal ions = base ions + sum(per-salt deltas)"
+          },
+          "acidification": {
+            "v1": "We solve for an acid amount that reaches a target pH given alkalinity and volume.\n\nKey relationships (simplified):\n- final_alkalinity = effective_alkalinity - acid_required(mEq/L) × 50\n- acid_required depends on carbonate distribution + acid dissociation at target pH\n\nCounter-ions:\n- sulfuric adds SO4\n- hydrochloric adds Cl"
+          },
+          "mash_overall": {
+            "v1": "Overall ions = ions(after salts) + acid counter-ions, and HCO3 is derived from final alkalinity.\n\nThis combines:\n- salt additions (mass-balance on ppm)\n- acidification (final alkalinity + SO4/Cl counter-ions)"
+          },
+          "sparge_overall": {
+            "v1": "Overall ions = ions(after salts) + acid counter-ions, and HCO3 is derived from final alkalinity."
+          },
+          "boil_overall": {
+            "v1": "Overall ions = ions(after salts) + acid counter-ions, and HCO3 is derived from final alkalinity."
+          }
+        }
+      }
+    },
     "analysis": {
       "common": {
         "toggleHint": "Applies to all sections on this page (where available).",
@@ -168,61 +266,75 @@
     "sparge": {
       "acidRequired": {
         "title": "Acid required (target pH)",
-        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and water volume.\n\nNotes:\n- If the selected profile has no pH, we only use the manually entered Starting pH.\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust."
+        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and water volume.\n\nNotes:\n- If the selected profile has no pH, we only use the manually entered Starting pH.\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust.",
+        "bodyWithValues": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and water volume.\n\nThis recipe:\nStarting pH = {startingPh}\nTarget pH = {targetPh}\nStarting alkalinity = {startingAlk} ppm as CaCO3\nVolume = {volumeL} L\nSelected profile has pH = {profilePhKnown}\n\nResult:\n{detailsLines}\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust."
       },
       "finalAlkalinity": {
         "title": "Final alkalinity (ppm as CaCO3)",
-        "body": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention)."
+        "body": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention).",
+        "bodyWithValues": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nThis recipe:\nStarting alkalinity = {startingAlk} ppm as CaCO3\nFinal alkalinity = {finalAlk} ppm as CaCO3\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention)."
       },
       "ionsAfterSalts": {
         "title": "Resulting ions (after salts only)",
-        "body": "Meaning:\n- Starting from the selected sparge profile, we add ions contributed by the entered salt grams at the given sparge water volume.\n\nNotes:\n- Values are ppm (mg/L) for each ion."
+        "body": "Meaning:\n- Starting from the selected sparge profile, we add ions contributed by the entered salt grams at the given sparge water volume.\n\nNotes:\n- Values are ppm (mg/L) for each ion.",
+        "bodyWithValues": "Meaning:\n- Starting from the selected sparge profile, we add ions contributed by the entered salt grams at the given sparge water volume.\n\nThis recipe:\nVolume = {volumeL} L\n\nSalts:\n{saltsLines}\n\nIons (ppm):\n{ionsLines}\n\nNotes:\n- Values are ppm (mg/L) for each ion."
       },
       "ionsAfterSaltsAndAcid": {
         "title": "Resulting ions (after salts + acid)",
-        "body": "Meaning:\n- Same as “after salts”, then apply the acid result.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+        "body": "Meaning:\n- Same as “after salts”, then apply the acid result.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate.",
+        "bodyWithValues": "Meaning:\n- Same as “after salts”, then apply the acid result.\n\nThis recipe:\nVolume = {volumeL} L\nFinal alkalinity = {finalAlk} ppm as CaCO3\n\nSalts:\n{saltsLines}\n\nIons (ppm):\n{ionsLines}\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
       },
       "alkalinityHeuristic": {
         "title": "Heuristic: Ca/Mg reduce effective alkalinity",
-        "body": "We apply a residual-alkalinity-style adjustment:\n- Calcium and magnesium from salts modestly reduce effective alkalinity, so acid required can change slightly when salts are added.\n\nNotes:\n- This is intentionally modest; it improves realism without overfitting."
+        "body": "We apply a residual-alkalinity-style adjustment:\n- Calcium and magnesium from salts modestly reduce effective alkalinity, so acid required can change slightly when salts are added.\n\nNotes:\n- This is intentionally modest; it improves realism without overfitting.",
+        "bodyWithValues": "{note}"
       }
     },
     "mash": {
       "acidRequired": {
         "title": "Acid required (target pH)",
-        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and mash water volume.\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust."
+        "body": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and mash water volume.\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust.",
+        "bodyWithValues": "Conceptual model:\n- We solve for an acid amount that brings Starting pH -> Target pH, given Starting alkalinity and mash water volume.\n\nThis recipe:\nStarting pH = {startingPh}\nTarget pH = {targetPh}\nStarting alkalinity = {startingAlk} ppm as CaCO3\nMash water volume = {volumeL} L\n\nResult:\n{detailsLines}\n\nNotes:\n- Acid type/strength changes the conversion from equivalents to mL/grams.\n- This is a heuristic calculator: use it as guidance, then measure/adjust."
       },
       "finalAlkalinity": {
         "title": "Final alkalinity (ppm as CaCO3)",
-        "body": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention)."
+        "body": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention).",
+        "bodyWithValues": "Meaning:\n- Alkalinity after the calculated acid addition.\n\nThis recipe:\nStarting alkalinity = {startingAlk} ppm as CaCO3\nFinal alkalinity = {finalAlk} ppm as CaCO3\n\nNotes:\n- It can be near 0 when acid neutralizes the buffering capacity.\n- We report alkalinity in ppm as CaCO3 (standard brewing convention)."
       },
       "ionsAfterSalts": {
         "title": "Resulting ions (after salts only)",
-        "body": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nNotes:\n- Values are ppm (mg/L) for each ion.\n- This table does not include acid; see the overall result for combined output."
+        "body": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nNotes:\n- Values are ppm (mg/L) for each ion.\n- This table does not include acid; see the overall result for combined output.",
+        "bodyWithValues": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nThis recipe:\nMash water volume = {volumeL} L\n\nSalts:\n{saltsLines}\n\nIons (ppm):\n{ionsLines}\n\nNotes:\n- Values are ppm (mg/L) for each ion.\n- This table does not include acid; see the overall result for combined output."
       },
       "overallSnapshot": {
         "title": "Overall mash snapshot (salts + acid)",
-        "body": "Meaning:\n- Combined result after applying both salts and acid.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+        "body": "Meaning:\n- Combined result after applying both salts and acid.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate.",
+        "bodyWithValues": "Meaning:\n- Combined result after applying both salts and acid.\n\nThis recipe:\npH = {ph}\nMash water volume = {volumeL} L\nFinal alkalinity = {finalAlk} ppm as CaCO3\n\nIons (ppm):\n{ionsLines}\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
       }
     },
     "boil": {
       "ionsAfterSalts": {
         "title": "Resulting ions (after salts only)",
-        "body": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nNotes:\n- Values are ppm (mg/L) for each ion."
+        "body": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nNotes:\n- Values are ppm (mg/L) for each ion.",
+        "bodyWithValues": "Meaning:\n- Starting from the mixed source water, we add ions contributed by the entered salt grams.\n\nThis recipe:\nBoil water volume = {volumeL} L\n\nSalts:\n{saltsLines}\n\nIons (ppm):\n{ionsLines}\n\nNotes:\n- Values are ppm (mg/L) for each ion."
       },
       "overallSnapshot": {
         "title": "Overall boil snapshot (salts + acid)",
-        "body": "Meaning:\n- Combined result after applying both salts and acid.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+        "body": "Meaning:\n- Combined result after applying both salts and acid.\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate.",
+        "bodyWithValues": "Meaning:\n- Combined result after applying both salts and acid.\n\nThis recipe:\npH = {ph}\nFinal alkalinity = {finalAlk} ppm as CaCO3\n\nIons (ppm):\n{ionsLines}\n\nNotes:\n- SO4/Cl increases come from the acid counter-ion model (when applicable).\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
       }
     },
     "waterHub": {
       "mergedWaterRecap": {
         "title": "Merged water recap",
-        "body": "Meaning:\n- This section summarizes each stream (mash/sparge/additional boil) and the merged summary.\n\nNotes:\n- Merged pH is an approximate volume-weighted [H+] mix (rule-of-thumb).\n- Streams without saved snapshots are excluded from merged ions."
+        "body": "Meaning:\n- This section summarizes each stream (mash/sparge/additional boil) and the merged summary.\n\nNotes:\n- Merged pH is an approximate volume-weighted [H+] mix (rule-of-thumb).\n- Streams without saved snapshots are excluded from merged ions.",
+        "bodyWithValues": "Meaning:\n- This section summarizes each stream (mash/sparge/additional boil) and the merged summary.\n\nThis recipe:\nTotal volume = {totalVolumeL} L\nApprox. merged pH = {mergedPh}\nMerged final alkalinity = {mergedFinalAlk} ppm as CaCO3\n\nStreams:\n{streamLines}\n\nNotes:\n- Merged pH is an approximate volume-weighted [H+] mix (rule-of-thumb).\n- Streams without saved snapshots are excluded from merged ions.",
+        "streamLine": "- {label}: {volumeL} L, pH {ph}, alk {alk} ppm as CaCO3"
       },
       "mergedIons": {
         "title": "Merged ions (ppm)",
-        "body": "Meaning:\n- Computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl counter-ions only) and averaged by volume.\n\nNotes:\n- Streams without saved snapshots are excluded.\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
+        "body": "Meaning:\n- Computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl counter-ions only) and averaged by volume.\n\nNotes:\n- Streams without saved snapshots are excluded.\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate.",
+        "bodyWithValues": "Meaning:\n- Computed from saved mash/sparge/boil snapshots after salts + acid (SO4/Cl counter-ions only) and averaged by volume.\n\nThis recipe:\nIons (ppm):\n{ionsLines}\n\nNotes:\n- Streams without saved snapshots are excluded.\n- HCO3 is derived from alkalinity (proxy), not measured bicarbonate."
       }
     }
   },
@@ -564,7 +676,13 @@
     "finalRecapCaveat": "Caveat: RA is a heuristic; results depend on assumptions and do not replace a full mash pH/chemistry model.",
     "styleExpectedRaPale": "Pale / hop-forward styles usually benefit from lower RA.",
     "styleExpectedRaAmber": "Amber / malty styles often tolerate moderate RA.",
-    "styleExpectedRaDark": "Dark / roasty styles often benefit from higher RA."
+    "styleExpectedRaDark": "Dark / roasty styles often benefit from higher RA.",
+    "alkVsBicarbTitle": "Alkalinity (as CaCO3) vs bicarbonate (HCO3)",
+    "alkVsBicarbSubtitle": "Why this app uses CaCO3 for alkalinity/RA and HCO3 in the ion tables.",
+    "alkVsBicarbPoint1": "“ppm as CaCO3” is an alkalinity unit: it expresses acid-neutralizing capacity (not dissolved CaCO3).",
+    "alkVsBicarbPoint2": "Ion tables list species concentrations (ppm): Ca, Mg, Na, SO4, Cl and HCO3.",
+    "alkVsBicarbPoint3": "When the table says “HCO3 derived from alkalinity”, it converts CaCO3-equivalent alkalinity into an HCO3 ppm estimate: HCO3 ≈ alkalinity × 61/50.",
+    "alkVsBicarbPoint4": "Strictly, alkalinity and bicarbonate are not identical at all pH/conditions; this conversion is a practical approximation for typical brewing water."
   },
   "about": {
     "title": "About",

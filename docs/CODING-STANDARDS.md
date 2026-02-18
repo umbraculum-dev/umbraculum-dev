@@ -84,3 +84,46 @@ Examples (water pages):
 - “Save salts draft” vs “Calculate & save salts snapshot”
 - “Preview overall” vs “Calculate & save overall snapshot”
 
+### Math popovers (“Show math”) must explain *how* (DERIVATIONS)
+When “Show math” is enabled, popovers must explain **how** a value/table is derived (formula + inputs + key intermediate values).
+
+Non-goal:
+- Do not restate the same values already visible in an expanded computed box/table (that becomes duplicative and adds noise).
+
+Standard approach (canonical):
+- **The API is canonical for calculations**.
+- Water-calc endpoints return both:
+  - `result`: numeric outputs (what the UI tables/fields display)
+  - `derivation`: a bounded, machine-readable explanation payload for rendering
+
+Derivation contract:
+- **Types**: `services/api/src/domain/waterCalc/derivation/types.ts`
+- **Shape (high level)**:
+  - `kind` + `formulaId` (versioned, stable)
+  - `inputs[]`: `{ id, value }`
+  - `intermediates[]`: `{ id, value }`
+  - `breakdowns[]` (optional): `{ id, rows[] }`
+  - `notes[]` (optional): machine-readable note codes
+- **No user-facing strings in API derivations**:
+  - derivation line IDs are stable
+  - the web (and future native app) maps IDs → localized labels via i18n keys
+
+Web rendering rules:
+- Use `apps/web/app/recipes/[id]/water/_lib/mathBodies.ts` as the shared renderer.
+- Labels/copy live under:
+  - `apps/web/messages/en.json` → `math.derivation.*`
+  - `apps/web/messages/it.json` → `math.derivation.*`
+- Prefer showing:
+  - the formula skeleton (from `derivation.formulas.<formulaId>`)
+  - the minimal inputs + intermediates needed to follow the computation
+  - capped breakdown rows (e.g. per-salt contributions)
+
+Capping (readability-first):
+- Cap breakdown rows to keep popovers readable (current standard: 10 rows).
+- If data is omitted, include a short “(+N more…)” indicator.
+
+Adding a new “math topic” end-to-end:
+- Add/extend the API response to include `derivation` (and keep numeric `result` unchanged).
+- Add required i18n keys under `math.derivation.*` (EN + IT).
+- Wire the popover to pass the correct `*Derivation` object into `buildWaterMathBody(...)`.
+

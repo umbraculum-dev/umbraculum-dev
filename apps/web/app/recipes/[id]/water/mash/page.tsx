@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "../../../../../src/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -21,6 +21,7 @@ import {
   mixIonProfilesByVolume,
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
+import { buildWaterMathBody } from "../_lib/mathBodies";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -83,6 +84,7 @@ function isAdmin(role: string | null) {
 }
 
 export default function MashWaterPage() {
+  const locale = useLocale();
   const tWater = useTranslations("recipes.water.common");
   const t = useTranslations("recipes.water.mash");
   const tMath = useTranslations("math");
@@ -133,6 +135,9 @@ export default function MashWaterPage() {
   const [savingSalts, setSavingSalts] = useState(false);
   const [saltAdditions, setSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
+  const [saltsDerivation, setSaltsDerivation] = useState<any | null>(null);
+  const [acidDerivation, setAcidDerivation] = useState<any | null>(null);
+  const [overallDerivation, setOverallDerivation] = useState<any | null>(null);
 
   const [overallError, setOverallError] = useState<string | null>(null);
   const [overallStatus, setOverallStatus] = useState<string | null>(null);
@@ -380,6 +385,41 @@ export default function MashWaterPage() {
     return tap + dil;
   }, [tapVolumeLiters, dilutionVolumeLiters]);
 
+  const saltDerivationForMath = useMemo(() => {
+    if (saltsDerivation) return saltsDerivation;
+    if (!saltsResult) return null;
+    return {
+      kind: "salt_additions",
+      version: 1,
+      formulaId: "water.salt_additions.v1",
+      inputs: [
+        { id: "volumeLiters", value: { kind: "number", value: derivedMashWaterVolumeLiters, unit: "L" } },
+        { id: "base.calciumPpm", value: { kind: "number", value: saltsResult.baseProfile.calcium, unit: "ppm" } },
+        { id: "base.magnesiumPpm", value: { kind: "number", value: saltsResult.baseProfile.magnesium, unit: "ppm" } },
+        { id: "base.sodiumPpm", value: { kind: "number", value: saltsResult.baseProfile.sodium, unit: "ppm" } },
+        { id: "base.sulfatePpm", value: { kind: "number", value: saltsResult.baseProfile.sulfate, unit: "ppm" } },
+        { id: "base.chloridePpm", value: { kind: "number", value: saltsResult.baseProfile.chloride, unit: "ppm" } },
+        { id: "base.bicarbonatePpm", value: { kind: "number", value: saltsResult.baseProfile.bicarbonate, unit: "ppm" } },
+      ],
+      intermediates: [{ id: "breakdownSum", value: { kind: "string", value: "sum_per_salt_deltas" } }],
+      breakdowns: [
+        {
+          id: "perSaltDeltas",
+          rows: saltsResult.breakdown.map((b) => ({
+            saltKey: { kind: "string", value: b.saltKey },
+            grams: { kind: "number", value: b.grams, unit: "g" },
+            deltaCalciumPpm: { kind: "number", value: b.deltasPpm.calcium ?? 0, unit: "ppm" },
+            deltaMagnesiumPpm: { kind: "number", value: b.deltasPpm.magnesium ?? 0, unit: "ppm" },
+            deltaSodiumPpm: { kind: "number", value: b.deltasPpm.sodium ?? 0, unit: "ppm" },
+            deltaSulfatePpm: { kind: "number", value: b.deltasPpm.sulfate ?? 0, unit: "ppm" },
+            deltaChloridePpm: { kind: "number", value: b.deltasPpm.chloride ?? 0, unit: "ppm" },
+            deltaBicarbonatePpm: { kind: "number", value: b.deltasPpm.bicarbonate ?? 0, unit: "ppm" },
+          })),
+        },
+      ],
+    };
+  }, [derivedMashWaterVolumeLiters, saltsDerivation, saltsResult]);
+
   const saveSettings = async (patch: Record<string, unknown>) => {
     if (authState.status !== "ready") return;
     await saveRecipeWaterSettings(recipeId, patch);
@@ -469,6 +509,7 @@ export default function MashWaterPage() {
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const result = (res.data as any).result as SaltAdditionsResult;
       setSaltsResult(result);
+      setSaltsDerivation((res.data as any).derivation ?? null);
 
       await saveSettings({
         tapWaterVolumeLiters: tapVolumeLiters,
@@ -534,6 +575,7 @@ export default function MashWaterPage() {
 
     const nowIso = new Date().toISOString();
     setSaltsResult(result);
+    setSaltsDerivation(null);
     await saveSettings({
       tapWaterVolumeLiters: tapVolumeLiters,
       dilutionWaterVolumeLiters: dilutionVolumeLiters,
@@ -550,7 +592,7 @@ export default function MashWaterPage() {
     grist: Array<{
       amountKg: number;
       colorLovibond: number | null;
-      maltClass: GristMaltClass;
+      maltClass: "base" | "crystal" | "roast" | "acid";
       mashDiPh?: number | null;
       mashTaToPh57_mEqPerKg?: number | null;
     }>;
@@ -581,12 +623,9 @@ export default function MashWaterPage() {
   };
 
   const computeOverallMash = async () => {
-    // This preserves the existing “overall mash” approach from the monolithic page:
-    // - Start from mixed water (if present), then apply salts result, then apply acid result (SO4/Cl only) into ions.
-    // - Use the latest saved “acidification mode” result snapshot where possible.
     if (!mixedSourceProfile) throw new Error("Set Source profile + Source volume first (Dilution optional).");
 
-    const base: IonProfilePpm = {
+    const baseProfile: IonProfilePpm = {
       calcium: mixedSourceProfile.calcium,
       magnesium: mixedSourceProfile.magnesium,
       sodium: mixedSourceProfile.sodium,
@@ -595,140 +634,39 @@ export default function MashWaterPage() {
       bicarbonate: mixedSourceProfile.bicarbonate,
     };
 
-    const salts = saltsResult ?? {
-      baseProfile: base,
-      resultingProfile: base,
-      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
-      breakdown: [],
-    };
-
-    // Use the same API endpoints as before: if grist present, use target-mash-ph solver; otherwise legacy mash-acidification.
     const gristRows = gristImportedRows.map((r) => ({
       amountKg: r.amountKg,
       colorLovibond: r.colorLovibond,
       maltClass: r.maltClass,
-      mashDiPh: (r as any).mashDiPh ?? null,
-      mashTaToPh57_mEqPerKg: (r as any).mashTaToPh57_mEqPerKg ?? null,
     }));
 
-    let mashMode: "targetPh" | "manual" = mashAcidificationMode;
-    let phKind: "target" | "estimated" = mashMode === "manual" ? "estimated" : gristRows.length ? "estimated" : "target";
-    let phValue = mashMode === "manual" ? mashStartingPh : mashTargetPh;
-
-    // First, compute an acidification result (targetPh or manual).
-    let acid: MashResult | null = null;
-    let estimatedMashPhRoomTemp: number | null = null;
-    if (mashMode === "manual") {
-      const payload: Record<string, unknown> = {
-        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-        mashStartingPh,
-        mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
-        acidType: mashAcidType,
-        strengthKind: mashStrengthKind,
-        ...(mashStrengthKind === "solid"
-          ? { acidAddedGrams: mashManualAcidAdded }
-          : { acidAddedMl: mashManualAcidAdded }),
-      };
-      if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
-
-      const res = await apiFetch("/api/water-calc/mash-acidification-manual", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const manual = (res.data as any).result as MashManualCalcResult;
-      acid = manual.predicted;
-      phValue = manual.achievedPh;
-      phKind = gristRows.length ? "estimated" : "target";
-      if (gristRows.length) {
-        // Manual mode: estimate mash pH given acid contribution if possible.
-        estimatedMashPhRoomTemp = await calcMashEstimatedPh({
-          volumeLiters: derivedMashWaterVolumeLiters,
-          alkalinityPpmCaCO3: mashStartingAlk,
-          calciumPpm: salts.resultingProfile.calcium,
-          magnesiumPpm: salts.resultingProfile.magnesium,
-          grist: gristRows,
-          acidAdded_mEqPerL: (manual as any).predicted?.debug?.acidRequired_mEqPerL ?? undefined,
-        }).catch(() => null);
-        if (typeof estimatedMashPhRoomTemp === "number") phValue = estimatedMashPhRoomTemp;
-      }
-    } else {
-      const endpoint =
-        gristRows.length > 0 ? "/api/water-calc/mash-acidification-target-mash-ph" : "/api/water-calc/mash-acidification";
-      const payload: Record<string, unknown> = {
-        mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
-        mashStartingPh,
-        mashTargetPh,
-        mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
-        acidType: mashAcidType,
-        strengthKind: mashStrengthKind,
-        ...(gristRows.length ? { grist: gristRows } : {}),
-      };
-      if (gristRows.length) {
-        payload.calciumPpm = salts.resultingProfile.calcium;
-        payload.magnesiumPpm = salts.resultingProfile.magnesium;
-      }
-      if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
-
-      const res = await apiFetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const result = (res.data as any).result as any;
-      acid = {
-        acidRequiredMl: result.acidRequiredMl,
-        acidRequiredTsp: result.acidRequiredTsp,
-        acidRequiredGrams: result.acidRequiredGrams,
-        acidRequiredKg: result.acidRequiredKg,
-        finalAlkalinityPpmCaCO3: result.finalAlkalinityPpmCaCO3,
-        sulfateAddedPpm: result.sulfateAddedPpm,
-        chlorideAddedPpm: result.chlorideAddedPpm,
-      };
-      if (typeof result.estimatedMashPhRoomTemp === "number") {
-        estimatedMashPhRoomTemp = result.estimatedMashPhRoomTemp;
-        phKind = "estimated";
-        phValue = result.estimatedMashPhRoomTemp;
-      } else {
-        phKind = "target";
-        phValue = mashTargetPh;
-      }
+    const payload: Record<string, unknown> = {
+      mashMode: mashAcidificationMode,
+      mashStartingAlkalinityPpmCaCO3: mashStartingAlk,
+      mashStartingPh,
+      mashTargetPh,
+      mashWaterVolumeLiters: derivedMashWaterVolumeLiters,
+      volumeLiters: derivedMashWaterVolumeLiters,
+      baseProfile,
+      additions: saltAdditions,
+      acidType: mashAcidType,
+      strengthKind: mashStrengthKind,
+      ...(gristRows.length ? { grist: gristRows } : {}),
+    };
+    if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
+    if (mashAcidificationMode === "manual") {
+      Object.assign(payload, mashStrengthKind === "solid" ? { acidAddedGrams: mashManualAcidAdded } : { acidAddedMl: mashManualAcidAdded });
     }
 
-    if (!acid) throw new Error("No acid result available.");
-
-    // Table conventions:
-    // - Salts affect ions directly (mass-balance on ppm).
-    // - Acid affects SO4/Cl via counter-ions (sulfuric/HCl).
-    // - Acid affects alkalinity; for ion-table HCO3 display we derive from final alkalinity (clamped >= 0).
-    const ionsPpm: IonProfilePpm = combineAfterSaltsAndAcid({
-      afterSalts: salts.resultingProfile,
-      acidResult: acid,
+    const res = await apiFetch("/api/water-calc/mash-overall", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
-
-    // For debugging only: alkalinity after salts (before acid), derived from salts bicarbonate.
-    const alkalinityAfterSaltsPpmCaCO3 = bicarbonatePpmToAlkalinityPpmCaCO3(
-      salts.resultingProfile.bicarbonate,
-    );
-
-    const nowIso = new Date().toISOString();
-    const overall: MashOverallResult = {
-      calculatedAt: nowIso,
-      ionsPpm,
-      finalAlkalinityPpmCaCO3: acid.finalAlkalinityPpmCaCO3,
-      ph: { kind: phKind, value: phValue },
-      debug: {
-        startingAlkalinityPpmCaCO3: mashStartingAlk,
-        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
-        saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
-        acidSulfateAddedPpm: acid.sulfateAddedPpm,
-        acidChlorideAddedPpm: acid.chlorideAddedPpm,
-        mashMode,
-      },
-    };
-    return overall;
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+    const body = res.data as any;
+    setOverallDerivation(body.derivation ?? null);
+    return body.result as MashOverallResult;
   };
 
   const onCalculateOverall = async (saveAlso: boolean) => {
@@ -766,6 +704,7 @@ export default function MashWaterPage() {
     setMashCalcSaveStatus(null);
     setMashResult(null);
     setMashManualResult(null);
+    setAcidDerivation(null);
     setMashSubmitting(true);
     try {
       if (mashAcidificationMode === "manual") {
@@ -787,6 +726,7 @@ export default function MashWaterPage() {
         });
         if (!res.ok) throw new Error(JSON.stringify(res.data));
         const manual = (res.data as any).result as MashManualCalcResult;
+        setAcidDerivation((res.data as any).derivation ?? null);
         setMashManualResult(manual);
         setMashManualStatus("Estimated (manual mode).");
         setMashResult(manual.predicted);
@@ -831,6 +771,7 @@ export default function MashWaterPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error(JSON.stringify(res.data));
+        setAcidDerivation((res.data as any).derivation ?? null);
         const result = (res.data as any).result as any;
         const r: MashResult = {
           acidRequiredMl: result.acidRequiredMl,
@@ -1329,7 +1270,14 @@ export default function MashWaterPage() {
                       return (
                         <MathHelpPopover
                           title={title}
-                          body={tMath(ex.bodyKey)}
+                          body={buildWaterMathBody({
+                            key: "mash.acidRequired",
+                            tMath,
+                            locale,
+                            ctx: {
+                              acidDerivation,
+                            },
+                          })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
@@ -1351,7 +1299,14 @@ export default function MashWaterPage() {
                       return (
                         <MathHelpPopover
                           title={title}
-                          body={tMath(ex.bodyKey)}
+                          body={buildWaterMathBody({
+                            key: "mash.acidRequired",
+                            tMath,
+                            locale,
+                            ctx: {
+                              acidDerivation,
+                            },
+                          })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
@@ -1372,7 +1327,14 @@ export default function MashWaterPage() {
                     return (
                       <MathHelpPopover
                         title={title}
-                        body={tMath(ex.bodyKey)}
+                        body={buildWaterMathBody({
+                          key: "mash.finalAlkalinity",
+                          tMath,
+                          locale,
+                          ctx: {
+                            acidDerivation,
+                          },
+                        })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
                     );
@@ -1461,7 +1423,14 @@ export default function MashWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={tMath(ex.bodyKey)}
+                      body={buildWaterMathBody({
+                        key: "mash.ionsAfterSalts",
+                        tMath,
+                        locale,
+                        ctx: {
+                          saltDerivation: saltDerivationForMath,
+                        },
+                      })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
@@ -1542,7 +1511,14 @@ export default function MashWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={tMath(ex.bodyKey)}
+                      body={buildWaterMathBody({
+                        key: "mash.overallSnapshot",
+                        tMath,
+                        locale,
+                        ctx: {
+                          overallDerivation,
+                        },
+                      })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
@@ -1565,7 +1541,14 @@ export default function MashWaterPage() {
                     return (
                       <MathHelpPopover
                         title={title}
-                        body={tMath(ex.bodyKey)}
+                        body={buildWaterMathBody({
+                          key: "mash.finalAlkalinity",
+                          tMath,
+                          locale,
+                          ctx: {
+                            acidDerivation,
+                          },
+                        })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
                     );

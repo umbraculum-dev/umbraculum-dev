@@ -20,6 +20,8 @@ export type EditorGristRow = {
   mashDiPh?: number | null;
   mashTaToPh57_mEqPerKg?: number | null;
   mashRoastDehuskedOverride?: boolean | null;
+  mashRoastDehuskedSource?: "unknown" | "inferred" | "override";
+  mashPhModelSource?: "unknown" | "default" | "override";
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential;

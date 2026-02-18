@@ -14,6 +14,7 @@ import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
+import { buildWaterMathBody } from "../_lib/mathBodies";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -107,6 +108,7 @@ export default function BoilWaterPage() {
   const [savingInputs, setSavingInputs] = useState(false);
   const [acidResult, setAcidResult] = useState<BoilAcidResult | null>(null);
   const [manualResult, setManualResult] = useState<BoilManualCalcResult | null>(null);
+  const [acidDerivation, setAcidDerivation] = useState<any | null>(null);
 
   // Salts
   const [saltsError, setSaltsError] = useState<string | null>(null);
@@ -117,6 +119,7 @@ export default function BoilWaterPage() {
   const [savingSalts, setSavingSalts] = useState(false);
   const [saltAdditions, setSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
+  const [saltDerivation, setSaltDerivation] = useState<any | null>(null);
 
   // Overall snapshot
   const [overallError, setOverallError] = useState<string | null>(null);
@@ -124,6 +127,7 @@ export default function BoilWaterPage() {
   const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
+  const [overallDerivation, setOverallDerivation] = useState<any | null>(null);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
   useEffect(() => {
@@ -422,6 +426,7 @@ export default function BoilWaterPage() {
     setSaltsStatus(null);
     setSaltsCalcSaveStatus(null);
     setSaltsResult(null);
+    setSaltDerivation(null);
     setSaltsSubmitting(true);
     try {
       const res = await apiFetch("/api/water-calc/salt-additions", {
@@ -443,6 +448,7 @@ export default function BoilWaterPage() {
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const result = (res.data as any).result as SaltAdditionsResult;
       setSaltsResult(result);
+      setSaltDerivation((res.data as any).derivation ?? null);
 
       await saveSettings({
         boilSaltAdditionsJson: saltAdditions,
@@ -504,6 +510,7 @@ export default function BoilWaterPage() {
 
     const nowIso = new Date().toISOString();
     setSaltsResult(result);
+    setSaltDerivation(null);
     await saveSettings({
       boilSaltAdditionsJson: saltAdditions,
       boilSaltsLastResultJson: { calculatedAt: nowIso, result },
@@ -541,6 +548,7 @@ export default function BoilWaterPage() {
     setCalcSaveStatus(null);
     setAcidResult(null);
     setManualResult(null);
+    setAcidDerivation(null);
     setSubmitting(true);
     try {
       if (acidificationMode === "manual") {
@@ -568,6 +576,7 @@ export default function BoilWaterPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error(JSON.stringify(res.data));
+        setAcidDerivation((res.data as any).derivation ?? null);
         const manual = (res.data as any).result as BoilManualCalcResult;
         setManualResult(manual);
         setAcidResult(manual.predicted);
@@ -620,6 +629,7 @@ export default function BoilWaterPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error(JSON.stringify(res.data));
+        setAcidDerivation((res.data as any).derivation ?? null);
         const result = (res.data as any).result as BoilAcidResult;
         setAcidResult(result);
 
@@ -654,7 +664,11 @@ export default function BoilWaterPage() {
 
   const computeOverallBoil = async (): Promise<BoilOverallResultV0> => {
     if (!mixedSourceProfile) throw new Error("Set Source profile + Source volume first (Dilution optional).");
-    const base: IonProfilePpm = {
+    if (!Number.isFinite(derivedBoilWaterVolumeLiters) || !(derivedBoilWaterVolumeLiters > 0)) {
+      throw new Error("Boil water volume must be > 0 (set Water adjustment volumes).");
+    }
+
+    const baseProfile: IonProfilePpm = {
       calcium: mixedSourceProfile.calcium,
       magnesium: mixedSourceProfile.magnesium,
       sodium: mixedSourceProfile.sodium,
@@ -662,39 +676,35 @@ export default function BoilWaterPage() {
       chloride: mixedSourceProfile.chloride,
       bicarbonate: mixedSourceProfile.bicarbonate,
     };
-    const salts = saltsResult ?? {
-      baseProfile: base,
-      resultingProfile: base,
-      deltasPpm: { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
-      breakdown: [],
+
+    const payload: Record<string, unknown> = {
+      boilMode: acidificationMode,
+      startingAlkalinityPpmCaCO3: startingAlk,
+      startingPh: Number(startingPh),
+      targetPh,
+      volumeLiters: derivedBoilWaterVolumeLiters,
+      baseProfile,
+      additions: saltAdditions,
+      acidType,
+      strengthKind,
     };
+    if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+    if (acidificationMode === "manual") {
+      Object.assign(
+        payload,
+        strengthKind === "solid" ? { acidAddedGrams: manualAcidAdded } : { acidAddedMl: manualAcidAdded },
+      );
+    }
 
-    // Use latest acid result snapshot if present in state; otherwise force user to calculate.
-    const acid = acidResult ?? (manualResult?.predicted ?? null);
-    if (!acid) throw new Error("Calculate/estimate acidification first.");
-
-    const ionsPpm: IonProfilePpm = combineAfterSaltsAndAcid({ afterSalts: salts.resultingProfile, acidResult: acid });
-    const alkalinityAfterSaltsPpmCaCO3 = bicarbonatePpmToAlkalinityPpmCaCO3(salts.resultingProfile.bicarbonate);
-
-    const nowIso = new Date().toISOString();
-    const phKind: BoilOverallResultV0["ph"]["kind"] = acidificationMode === "manual" ? "estimated" : "target";
-    const phValue =
-      acidificationMode === "manual" && manualResult ? manualResult.achievedPh : targetPh;
-
-    return {
-      calculatedAt: nowIso,
-      ionsPpm,
-      finalAlkalinityPpmCaCO3: acid.finalAlkalinityPpmCaCO3,
-      ph: { kind: phKind, value: phValue },
-      debug: {
-        startingAlkalinityPpmCaCO3: startingAlk,
-        startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
-        saltsDeltaBicarbonatePpm: salts.deltasPpm.bicarbonate,
-        acidSulfateAddedPpm: acid.sulfateAddedPpm,
-        acidChlorideAddedPpm: acid.chlorideAddedPpm,
-        boilMode: acidificationMode,
-      },
-    };
+    const res = await apiFetch("/api/water-calc/boil-overall", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(JSON.stringify(res.data));
+    const body = res.data as any;
+    setOverallDerivation(body.derivation ?? null);
+    return body.result as BoilOverallResultV0;
   };
 
   const onCalculateOverall = async (saveAlso: boolean) => {
@@ -976,7 +986,14 @@ export default function BoilWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={tMath(ex.bodyKey)}
+                      body={buildWaterMathBody({
+                        key: "boil.ionsAfterSalts",
+                        tMath,
+                        locale,
+                        ctx: {
+                          saltDerivation,
+                        },
+                      })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
@@ -1265,7 +1282,14 @@ export default function BoilWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={tMath(ex.bodyKey)}
+                      body={buildWaterMathBody({
+                        key: "boil.overallSnapshot",
+                        tMath,
+                        locale,
+                        ctx: {
+                          overallDerivation,
+                        },
+                      })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
