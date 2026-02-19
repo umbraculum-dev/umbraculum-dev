@@ -863,6 +863,7 @@ export default function SpargeWaterPage() {
                               L: tUnits("L"),
                               ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                               ppm: tUnits("ppm"),
+                              g: tUnits("g"),
                               LPerKg: tUnits("LPerKg"),
                             },
                           })}
@@ -898,6 +899,7 @@ export default function SpargeWaterPage() {
                               L: tUnits("L"),
                               ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                               ppm: tUnits("ppm"),
+                              g: tUnits("g"),
                               LPerKg: tUnits("LPerKg"),
                             },
                           })}
@@ -932,6 +934,7 @@ export default function SpargeWaterPage() {
                             L: tUnits("L"),
                             ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                             ppm: tUnits("ppm"),
+                            g: tUnits("g"),
                             LPerKg: tUnits("LPerKg"),
                           },
                         })}
@@ -1044,6 +1047,7 @@ export default function SpargeWaterPage() {
                           L: tUnits("L"),
                           ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                           ppm: tUnits("ppm"),
+                          g: tUnits("g"),
                           LPerKg: tUnits("LPerKg"),
                         },
                       })}
@@ -1104,6 +1108,7 @@ export default function SpargeWaterPage() {
                           L: tUnits("L"),
                           ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                           ppm: tUnits("ppm"),
+                          g: tUnits("g"),
                           LPerKg: tUnits("LPerKg"),
                         },
                       })}
@@ -1130,6 +1135,7 @@ export default function SpargeWaterPage() {
                               L: tUnits("L"),
                               ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                               ppm: tUnits("ppm"),
+                              g: tUnits("g"),
                               LPerKg: tUnits("LPerKg"),
                             },
                           })}

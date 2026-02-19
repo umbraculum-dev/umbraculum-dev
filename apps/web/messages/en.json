@@ -179,8 +179,8 @@
       "yes": "yes",
       "no": "no",
       "more": "(+{count} more…)",
-      "ionLine": "- {ion}: {ppm} ppm",
-      "saltLine": "- {salt}: {grams} g",
+      "ionLine": "- {ion}: {ppm} {ppmUnit}",
+      "saltLine": "- {salt}: {grams} {g}",
       "detailLine": "- {label}: {value}"
     },
     "derivation": {
@@ -193,7 +193,7 @@
       },
       "common": {
         "kvLine": "- {label}: {value}",
-        "ionDelta": "{ion} {ppm} ppm",
+        "ionDelta": "{ion} {ppm} {ppmUnit}",
         "more": "(+{count} more…)",
         "yes": "yes",
         "no": "no",
@@ -259,7 +259,7 @@
         "colorSrmDanielsEstimated": "SRM (Daniels, estimated)"
       },
       "rows": {
-        "saltDelta": "- {saltKey} ({grams} g): {deltas}"
+        "saltDelta": "- {saltKey} ({grams} {g}): {deltas}"
       },
       "breakdowns": {
         "salt_additions": {
@@ -573,6 +573,7 @@
         "basics": "Basics",
         "analysis": "Analysis",
         "equipment": "Equipment",
+        "mashing": "Mashing & Sparging",
         "fermentables": "Fermentables",
         "hops": "Hops",
         "yeast": "Yeast",
@@ -580,6 +581,40 @@
         "notes": "Notes",
         "water": "Water chemistry"
       },
+      "mashingHelp": "Mash schedule (BeerJSON mash procedure). Import a BeerJSON/BeerXML recipe with mash steps, or add steps manually in the Mash and/or Sparge water calculator pages.",
+      "mashingEmpty": "No mash steps. Add steps or import a recipe with a mash schedule.",
+      "mashingAddStep": "Add step",
+      "mashingAddFromTemplate": "Add from template",
+      "mashingTemplateSingleInfusion": "Single infusion",
+      "mashingTemplateStepMash": "Step mash",
+      "mashingTemplateTemperature": "Temperature",
+      "mashingTemplateDecoction": "Decoction",
+      "mashingProcedureName": "Procedure name",
+      "mashingGrainTemp": "Grain temp",
+      "mashingStepName": "Name",
+      "mashingStepType": "Type",
+      "mashingStepTemp": "Temp ({unit})",
+      "mashingStepTime": "Time ({unit})",
+      "mashingStepAmount": "Amount ({unit})",
+      "mashingStepRamp": "Ramp ({unit})",
+      "mashingDeleteStep": "Delete step",
+      "mashingDeduceFromMashIn": "Deduce from Mash in",
+      "mashingSave": "Save (including mash)",
+      "mashingSaveMashSteps": "Save",
+      "mashingEditInMashPage": "Edit mash schedule in Mash water & Mash steps",
+      "spargeStepFromWaterPage": "Sparge step (from Sparge water page)",
+      "spargeStepConfigureLink": "Configure sparge water",
+      "mashingWaterVolumesTitle": "Water volumes (mash + sparge)",
+      "mashingWaterVolumesSource": "From water calculator",
+      "mashingWaterVolumesUnavailable": "Set up water volumes in the Water calculator to see mash and sparge volumes here.",
+      "mashingFirstStepSuggested": "Suggested: {amount} {unit} (from mash water volume)",
+      "mashingSpargeStepAmountSource": "From water calculator",
+      "mashStepsWaterBudgetNote": "Total water across all mash steps cannot exceed the 'Mash [total] water volume' above. Only steps with 'Deduce from Mash in' checked deduct from the Mash water volume. This is useful for brewers who use hot water for temperature increase.",
+      "mashStepsMashInAlwaysPresentNote": "The \"Mash in\" step is always present by design: it guarantees total quantity correctness. If you need an immediate successive step (i.e. 'Protein rest') use the \"Add step\" button and add it. You can have a new step with 0 amount.",
+      "mashStepsTypeFallbackNote": "If you do not find the step mash you're looking for in the 'Type' list use 'Temperature' and add the name (like 'Protein rest' or 'Ferulic rest') in the 'Name' field.",
+      "mashStepsSeeRecapLink": "See Mash recap in recipe summary here.",
+      "mashingSpargeStepAmountUnavailable": "Set up water volumes in Water calculator",
+      "mashingTemplateSparge": "Sparge",
       "equipmentSection": {
         "help": "Choose an account-level equipment profile to snapshot into this recipe (no live reference).",
         "profileLabel": "Equipment profile",
@@ -656,11 +691,13 @@
         "backToHub": "Back to water hub",
         "goToSparge": "Go to sparge",
         "goToMash": "Go to mash",
+        "mashWaterAndSteps": "Mash water & Mash steps",
         "viewEditGrist": "View/edit grist in recipe",
         "notAuthenticated": "Not authenticated. Please {signIn}."
       },
       "mash": {
-        "title": "Mash water",
+        "title": "Mash water & Mash steps",
+        "mashStepsHeading": "Mash steps",
         "adjustmentHeading": "Mash water adjustment",
         "adjustmentHint": "Select a source + dilution profile and set volumes to see mixed ions.",
         "gristSummaryHeading": "Grist (summary)",
@@ -845,7 +882,7 @@
     "backToRecipeEditor": "Back to recipe editor",
     "missingHeaders": "Missing dev headers. Go to the dashboard and click <strong>Save headers</strong> (User + Active account), then come back here.",
     "chooseArea": "Choose an area",
-    "mashWater": "Mash water",
+    "mashWater": "Mash water & Mash steps",
     "spargeWater": "Sparge water",
     "additionalBoilWater": "Additional boil water",
     "lastCalculated": "last calculated",

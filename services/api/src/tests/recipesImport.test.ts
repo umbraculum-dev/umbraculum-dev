@@ -92,6 +92,98 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
     expect(ij.recipe.beerJsonRecipeJson).toBeTruthy();
   });
 
+  it("preserves mash steps when importing BeerXML with MASH", async () => {
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<RECIPES>
+  <RECIPE>
+    <NAME>Mash Test Recipe</NAME>
+    <BATCH_SIZE>20</BATCH_SIZE>
+    <MASH>
+      <NAME>Single Infusion</NAME>
+      <GRAIN_TEMP>20</GRAIN_TEMP>
+      <MASH_STEPS>
+        <MASH_STEP>
+          <NAME>Mash In</NAME>
+          <TYPE>Infusion</TYPE>
+          <STEP_TEMP>67</STEP_TEMP>
+          <STEP_TIME>60</STEP_TIME>
+          <INFUSE_AMOUNT>12</INFUSE_AMOUNT>
+        </MASH_STEP>
+          <MASH_STEP>
+          <NAME>Mash Out</NAME>
+          <TYPE>Temperature</TYPE>
+          <STEP_TEMP>76</STEP_TEMP>
+          <STEP_TIME>10</STEP_TIME>
+        </MASH_STEP>
+      </MASH_STEPS>
+    </MASH>
+    <FERMENTABLES>
+      <FERMENTABLE>
+        <NAME>Pale Malt</NAME>
+        <AMOUNT>4.5</AMOUNT>
+        <YIELD>80</YIELD>
+        <COLOR>2</COLOR>
+        <TYPE>Grain</TYPE>
+      </FERMENTABLE>
+    </FERMENTABLES>
+    <HOPS>
+      <HOP>
+        <NAME>Cascade</NAME>
+        <AMOUNT>0.05</AMOUNT>
+        <ALPHA>5.5</ALPHA>
+        <USE>Boil</USE>
+        <TIME>60</TIME>
+      </HOP>
+    </HOPS>
+    <YEASTS>
+      <YEAST>
+        <NAME>US-05</NAME>
+        <LABORATORY>Fermentis</LABORATORY>
+        <ATTENUATION>78</ATTENUATION>
+      </YEAST>
+    </YEASTS>
+  </RECIPE>
+</RECIPES>`;
+
+    const preview = await app.inject({
+      method: "POST",
+      url: "/recipes/import/preview",
+      headers: { cookie },
+      payload: { format: "beerxml", content: xml },
+    });
+    expect(preview.statusCode).toBe(200);
+    const pj = preview.json() as any;
+    expect(pj.ok).toBe(true);
+    expect(pj.preview.name).toBe("Mash Test Recipe");
+    const mash = pj.preview.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.mash ?? null;
+    expect(mash).toBeTruthy();
+    expect(mash.name).toBe("Single Infusion");
+    expect(mash.grain_temperature?.value).toBe(20);
+    expect(Array.isArray(mash.mash_steps)).toBe(true);
+    expect(mash.mash_steps.length).toBe(2);
+    expect(mash.mash_steps[0].name).toBe("Mash In");
+    expect(mash.mash_steps[0].type).toBe("infusion");
+    expect(mash.mash_steps[0].step_temperature?.value).toBe(67);
+    expect(mash.mash_steps[0].step_time?.value).toBe(60);
+    expect(mash.mash_steps[0].amount?.value).toBe(12);
+    expect(mash.mash_steps[1].name).toBe("Mash Out");
+    expect(mash.mash_steps[1].type).toBe("temperature");
+
+    const imp = await app.inject({
+      method: "POST",
+      url: "/recipes/import",
+      headers: { cookie },
+      payload: { format: "beerxml", content: xml, styleKey: "custom" },
+    });
+    expect(imp.statusCode).toBe(200);
+    const ij = imp.json() as any;
+    expect(ij.ok).toBe(true);
+    createdRecipeIds.push(ij.recipe.id);
+    const storedMash = ij.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.mash ?? null;
+    expect(storedMash).toBeTruthy();
+    expect(storedMash.mash_steps.length).toBe(2);
+  });
+
   it("normalizes US customary units when importing BeerJSON (preview + import)", async () => {
     const doc = {
       beerjson: {

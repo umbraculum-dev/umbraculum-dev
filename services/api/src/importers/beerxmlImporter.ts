@@ -231,6 +231,11 @@ function parseBeerXmlMash(recipe: any): { name: string; grain_temperature: any; 
         }
       }
 
+      const description = typeof s?.DESCRIPTION === "string" ? s.DESCRIPTION.trim() : null;
+      if (description) {
+        step.description = description;
+      }
+
       return step;
     })
     .filter(Boolean);

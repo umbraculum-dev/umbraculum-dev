@@ -346,6 +346,9 @@ model RecipeWaterSettings {
   spargeSaltAdditionsJson   Json? @map("sparge_salt_additions_json")
   spargeSaltsLastResultJson Json? @map("sparge_salts_last_result_json")
 
+  // Sparge step temperature (editable in Edit recipe when sparge is configured)
+  spargeStepTemperatureC Float? @default(76) @map("sparge_step_temperature_c")
+
   // Boil/kettle add-on water (v0): separate from mash/sparge.
   // Profile selections (like mash)
   boilSourceWaterProfileId   String? @map("boil_source_water_profile_id")

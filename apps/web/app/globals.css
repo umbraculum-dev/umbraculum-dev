@@ -339,6 +339,11 @@ code {
   font-size: 12px;
 }
 
+.mashStepsEditor input,
+.mashStepsEditor select {
+  text-align: left !important;
+}
+
 .fieldBlock {
   border: 1px solid var(--border);
   border-radius: var(--radius);

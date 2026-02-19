@@ -263,6 +263,12 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
         body.spargeSaltAdditionsJson !== undefined ? body.spargeSaltAdditionsJson : undefined,
       spargeSaltsLastResultJson:
         body.spargeSaltsLastResultJson !== undefined ? body.spargeSaltsLastResultJson : undefined,
+      spargeStepTemperatureC:
+        typeof body.spargeStepTemperatureC === "number"
+          ? body.spargeStepTemperatureC
+          : body.spargeStepTemperatureC === null
+            ? null
+            : undefined,
 
       spargeLastAcidRequiredMl:
         typeof body.spargeLastAcidRequiredMl === "number"

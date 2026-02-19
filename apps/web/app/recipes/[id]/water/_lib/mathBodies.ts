@@ -82,9 +82,18 @@ function renderLines(args: {
   return rendered.join("\n");
 }
 
-function renderBreakdowns(args: { locale: string; tMath: T; derivation: WaterCalcDerivation }): string {
+function renderBreakdowns(args: {
+  locale: string;
+  tMath: T;
+  derivation: WaterCalcDerivation;
+  units?: Record<string, string>;
+}): string {
+  const { units } = args;
   const blocks = args.derivation.breakdowns ?? [];
   if (!blocks.length) return "";
+
+  const ppmUnit = units?.ppm ?? "ppm";
+  const gUnit = units?.g ?? "g";
 
   const blockTexts = blocks.map((b) => {
     const title = args.tMath(`derivation.breakdowns.${args.derivation.kind}.${b.id}.title`);
@@ -108,6 +117,7 @@ function renderBreakdowns(args: { locale: string; tMath: T; derivation: WaterCal
           args.tMath("derivation.common.ionDelta", {
             ion,
             ppm: fmt(args.locale, v.value, 2),
+            ppmUnit,
           }),
         );
       });
@@ -117,6 +127,7 @@ function renderBreakdowns(args: { locale: string; tMath: T; derivation: WaterCal
         saltKey: saltKey ?? args.tMath("derivation.common.unknown"),
         grams: grams === null ? args.tMath("derivation.common.unknown") : formatFixed(args.locale, grams, 2),
         deltas,
+        g: gUnit,
       });
     });
 
@@ -151,7 +162,12 @@ export function renderDerivationBody(args: {
     parts.push(renderLines({ locale: args.locale, tMath: args.tMath, lines: args.derivation.intermediates, units }));
   }
 
-  const breakdownText = renderBreakdowns({ locale: args.locale, tMath: args.tMath, derivation: args.derivation });
+  const breakdownText = renderBreakdowns({
+    locale: args.locale,
+    tMath: args.tMath,
+    derivation: args.derivation,
+    units: args.units,
+  });
   if (breakdownText) {
     parts.push("");
     parts.push(args.tMath("derivation.headings.breakdowns"));
@@ -247,13 +263,14 @@ export function buildWaterMathBody(args: {
     case "waterHub.mergedIons": {
       const ions = (ctx.ions as any) ?? null;
       if (!ions) return tMath("waterHub.mergedIons.body");
+      const ppmUnit = units?.ppm ?? "ppm";
       const ionL = [
-        tMath("common.ionLine", { ion: "Ca", ppm: fmt(locale, ions.calcium, 2) }),
-        tMath("common.ionLine", { ion: "Mg", ppm: fmt(locale, ions.magnesium, 2) }),
-        tMath("common.ionLine", { ion: "Na", ppm: fmt(locale, ions.sodium, 2) }),
-        tMath("common.ionLine", { ion: "SO4", ppm: fmt(locale, ions.sulfate, 2) }),
-        tMath("common.ionLine", { ion: "Cl", ppm: fmt(locale, ions.chloride, 2) }),
-        tMath("common.ionLine", { ion: "HCO3", ppm: fmt(locale, ions.bicarbonate, 2) }),
+        tMath("common.ionLine", { ion: "Ca", ppm: fmt(locale, ions.calcium, 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Mg", ppm: fmt(locale, ions.magnesium, 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Na", ppm: fmt(locale, ions.sodium, 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "SO4", ppm: fmt(locale, ions.sulfate, 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Cl", ppm: fmt(locale, ions.chloride, 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "HCO3", ppm: fmt(locale, ions.bicarbonate, 2), ppmUnit }),
       ];
       return tMath("waterHub.mergedIons.bodyWithValues", {
         ...(units ?? {}),

@@ -3,7 +3,7 @@
 This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
 
 
-**Proposed next step**: Consider math.derivation body placeholders (units i18n) or other water calculator improvements.
+**Proposed next step**: Mash acidification manual entry mode (BrunWater parity) or extend BeerXML style parsing.
 
 ## Native login gate (MANDATORY before React Native auth)
 
@@ -33,7 +33,7 @@ Before implementing native app login, complete these items.
   - [x] Localize form labels that embed units (e.g. "Starting alkalinity (ppm as CaCO3)") via i18n keys or `tUnits` where appropriate.
   - [x] Extend `tUnits` to **equipment** and other pages that display unit suffixes.
   - [x] Add locale-specific variants for `tsp` (e.g. Italian "cucch. da tè") if desired.
-  - [ ] Consider `math.derivation` body strings: introduce placeholders (e.g. `{ppmAsCaCO3}`) in bodyWithValues so derivation prose can use localized units.
+  - [x] Consider `math.derivation` body strings: introduce placeholders (e.g. `{ppmAsCaCO3}`) in bodyWithValues so derivation prose can use localized units.
 - [x] **Sparge salts vs sparge pH**: ensure sparge salt additions influence sparge acidification (Ca/Mg effective-alkalinity heuristic), without requiring a manual “calculate salts” step first.
 - [x] **Deprecate mash pH v0**: remove v0 endpoints/logic and UI naming; keep a single canonical mash pH estimator that supports back-compat inputs.
 - [x] Implement **late extract additions** (kettle): ensure fermentables added at kettle are excluded from mash grist for water calc. Boil water chemistry is implemented at `/water/boil`.
@@ -55,7 +55,7 @@ Before implementing native app login, complete these items.
 - [x] **Platform-admin full Import/Export**: allow platform admins to import/export recipes with **all columns** (including internal/customized fields) in the superadmin backend; assign recipes to any organization on import.
 - [x] Add upload/paste size limits (API) and show clear “file too large” errors.
 - [ ] Add optional “paste content” import UX (secondary to file upload) if desired.
-- [ ] Extend BeerXML (BrewersFriend-style) handling to preserve more data where possible (primarily **mash steps**); verify what is importable and reflect it in our BeerJSON + `recipeExtJson` model.
+- [x] Extend BeerXML (BrewersFriend-style) handling to preserve more data where possible (primarily **mash steps**); verify what is importable and reflect it in our BeerJSON + `recipeExtJson` model.
 - [ ] Extend style parsing for imports (BeerXML and likely BeerJSON): some exporters may split style/classification over multiple fields/lines (e.g. BeerXML `<CATEGORY>English Pale Ale</CATEGORY>` + `<CATEGORY_NUMBER>8</CATEGORY_NUMBER>` + `<STYLE_LETTER>B</STYLE_LETTER>` + `<STYLE_GUIDE>BJCP</STYLE_GUIDE>` + `<TYPE>Ale</TYPE>`). Consider this when extracting style name/code candidates for BJCP matching.
 - [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
 - [ ] Assess whether the Recipe Edit sidebar “Sections” nav is still useful now that recipe sections default-collapsed (especially on mobile/touch).

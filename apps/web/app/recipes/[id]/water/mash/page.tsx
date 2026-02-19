@@ -7,7 +7,16 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { parseGristJson, type GristRow } from "../../../../_lib/grist";
-import { editorStateFromBeerJson } from "../../../_lib/beerjsonRecipe";
+import {
+  editorStateFromBeerJson,
+  mergeMashDeduceFromExt,
+  replaceMashInBeerJsonDocument,
+  validateMashBeforeSave,
+  MASH_TEMPLATES,
+  newMashRowId,
+  type EditorMashStep,
+} from "../../../_lib/beerjsonRecipe";
+import { MashStepsEditor } from "../../../_components/MashStepsEditor";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
@@ -23,8 +32,8 @@ import {
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseMashComputeAndSaveResponse } from "@brewery/contracts";
-import { formatWithHint } from "../../../../../src/i18n/format";
+import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@brewery/contracts";
+import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -73,12 +82,12 @@ type MashOverallResult = {
 };
 
 type RecipeResponse = {
-  ok: true;
   recipe: {
     id: string;
     updatedAt: string;
     beerJsonRecipeJson?: unknown;
     recipeExtJson?: unknown;
+    analysis?: unknown;
   };
 };
 
@@ -90,6 +99,7 @@ export default function MashWaterPage() {
   const locale = useLocale();
   const tWater = useTranslations("recipes.water.common");
   const t = useTranslations("recipes.water.mash");
+  const tEdit = useTranslations("recipes.edit");
   const tUnits = useTranslations("units");
   const tMath = useTranslations("math");
   const authState = useRequireAuth({ requireActiveAccount: true });
@@ -168,6 +178,14 @@ export default function MashWaterPage() {
   const [gristImportStatus, setGristImportStatus] = useState<string | null>(null);
   const [gristImportError, setGristImportError] = useState<string | null>(null);
   const [importingGrist, setImportingGrist] = useState(false);
+
+  const [recipe, setRecipe] = useState<RecipeResponse["recipe"] | null>(null);
+  const [mashProcedure, setMashProcedure] = useState<{ name: string; grainTemperatureC: number } | null>(null);
+  const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
+  const [mashStepsDirty, setMashStepsDirty] = useState(false);
+  const [mashStepsSaveStatus, setMashStepsSaveStatus] = useState<string | null>(null);
+  const [mashStepsSaveError, setMashStepsSaveError] = useState<string | null>(null);
+  const [mashStepsSaving, setMashStepsSaving] = useState(false);
 
   const canCall = authState.status === "ready";
 
@@ -330,12 +348,64 @@ export default function MashWaterPage() {
   }, [authState.status, recipeId]);
 
   useEffect(() => {
+    if (!canCall || !recipeId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/recipes/${recipeId}`);
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const data = res.data as { recipe: RecipeResponse["recipe"] };
+        if (cancelled) return;
+        setRecipe(data.recipe);
+        setMashStepsDirty(false);
+      } catch (err) {
+        if (!cancelled) setMashStepsSaveError(String(err));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canCall, recipeId]);
+
+  const waterVolumes = useMemo(() => {
+    const analysis = recipe?.analysis;
+    if (!analysis) return null;
+    try {
+      const parsed = parseGravityAnalysisResponseV1(analysis as any);
+      const preBoil = parsed?.derivations?.["analysis.pre_boil_volume"];
+      if (!preBoil?.inputs) return null;
+      const mashIn = preBoil.inputs.find((i: { id: string }) => i.id === "mashWaterVolumeLiters")?.value;
+      const spargeIn = preBoil.inputs.find((i: { id: string }) => i.id === "spargeVolumeLiters")?.value;
+      const mashL = mashIn?.kind === "number" ? mashIn.value : null;
+      const spargeL = spargeIn?.kind === "number" ? spargeIn.value : null;
+      return mashL != null && spargeL != null ? { mashLiters: mashL, spargeLiters: spargeL } : null;
+    } catch {
+      return null;
+    }
+  }, [recipe?.analysis]);
+
+  useEffect(() => {
     // UX default: if the user picks a source profile but no target is selected yet,
     // default target to source so the Mixed water ions table can show Target/Δ numbers.
     if (!targetProfileId && sourceProfileId) {
       setTargetProfileId(sourceProfileId);
     }
   }, [sourceProfileId, targetProfileId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash?.replace(/^#/, "") || "";
+    if (hash !== "mash-steps") return;
+    const scrollToEl = () => {
+      const el = document.getElementById("mash-steps");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    const t = requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToEl);
+    });
+    return () => cancelAnimationFrame(t);
+  }, [recipe]);
 
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
@@ -425,6 +495,45 @@ export default function MashWaterPage() {
     const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
     return tap + dil;
   }, [tapVolumeLiters, dilutionVolumeLiters]);
+
+  useEffect(() => {
+    if (!recipe) return;
+    const r = recipe;
+    if (!r?.beerJsonRecipeJson) {
+      if (!mashStepsDirty) {
+        setMashProcedure(null);
+        setMashRows([]);
+      }
+      return;
+    }
+    const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
+    const mashMerged = mergeMashDeduceFromExt(s.mash, (r as any).recipeExtJson);
+    if (mashMerged && mashMerged.steps.length > 0) {
+      if (!mashStepsDirty) {
+        setMashProcedure({ name: mashMerged.name, grainTemperatureC: mashMerged.grainTemperatureC });
+        setMashRows(mashMerged.steps);
+      }
+      return;
+    }
+    if (mashStepsDirty || mashRows.length > 0) return;
+    const budget = derivedMashWaterVolumeLiters;
+    if (budget > 0) {
+      const step = {
+        id: newMashRowId(),
+        name: "Mash In",
+        type: "infusion" as const,
+        stepTemperatureC: 67,
+        stepTimeMin: 60,
+        amountL: budget,
+      };
+      setMashProcedure({ name: "Mash", grainTemperatureC: 20 });
+      setMashRows([step]);
+    } else {
+      setMashProcedure(null);
+      setMashRows([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipe, derivedMashWaterVolumeLiters, mashRows.length, mashStepsDirty]);
 
   const saltDerivationForMath = useMemo(() => {
     if (saltsDerivation) return saltsDerivation;
@@ -831,6 +940,138 @@ export default function MashWaterPage() {
     }
   };
 
+  const computeFirstStepAmountL = useMemo(() => {
+    const otherInfusionSum = mashRows
+      .slice(1)
+      .filter((r) => r.deduceFromMashIn === true)
+      .reduce((sum, r) => sum + (r.amountL ?? 0), 0);
+    return Math.max(0, derivedMashWaterVolumeLiters - otherInfusionSum);
+  }, [mashRows, derivedMashWaterVolumeLiters]);
+
+  const addMashStep = () => {
+    setMashStepsDirty(true);
+    setMashProcedure((prev) => prev ?? { name: "Mash", grainTemperatureC: 20 });
+    setMashRows((prev) => [
+      ...prev,
+      {
+        id: newMashRowId(),
+        name: "",
+        type: "infusion",
+        stepTemperatureC: 67,
+        stepTimeMin: 60,
+        amountL: 0,
+        deduceFromMashIn: false,
+      },
+    ]);
+  };
+
+  const updateMashStep = (id: string, patch: Partial<EditorMashStep>) => {
+    setMashStepsDirty(true);
+    if ("amountL" in patch && patch.amountL != null) {
+      const idx = mashRows.findIndex((r) => r.id === id);
+      const row = mashRows[idx];
+      if (idx > 0) {
+        if (row?.deduceFromMashIn !== true) {
+          patch = { ...patch, amountL: 0 };
+        } else {
+          const otherSum = mashRows
+            .filter((r, i) => i !== idx && i !== 0)
+            .reduce((s, r) => s + (r.amountL ?? 0), 0);
+          const available = Math.max(0, derivedMashWaterVolumeLiters - otherSum);
+          patch = { ...patch, amountL: Math.min(patch.amountL as number, available) };
+        }
+      }
+    }
+    setMashRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  };
+
+  const deleteMashStep = (id: string) => {
+    setMashStepsDirty(true);
+    setMashRows((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const addMashFromTemplate = (templateId: string) => {
+    const tpl = MASH_TEMPLATES.find((x) => x.id === templateId);
+    if (!tpl) return;
+    setMashStepsDirty(true);
+    setMashProcedure((prev) => prev ?? { name: "Mash", grainTemperatureC: 20 });
+    setMashRows((prev) => [
+      ...prev,
+      ...tpl.steps.map((s) => ({
+        ...s,
+        id: newMashRowId(),
+        deduceFromMashIn: false,
+      })),
+    ]);
+  };
+
+  const updateMashProcedure = (patch: { name?: string; grainTemperatureC?: number }) => {
+    setMashStepsDirty(true);
+    setMashProcedure((prev) => {
+      const base = prev ?? { name: "Mash", grainTemperatureC: 20 };
+      return { ...base, ...patch };
+    });
+  };
+
+  const saveMashSteps = async () => {
+    if (!canCall || !recipeId || !recipe?.beerJsonRecipeJson) return;
+    setMashStepsSaveError(null);
+    setMashStepsSaveStatus(null);
+    setMashStepsSaving(true);
+    try {
+      const stepsForSave = mashRows.map((r, idx) => {
+        if (r.type === "sparge" && r.name.trim().toLowerCase() === "sparge" && waterVolumes) {
+          return { ...r, amountL: waterVolumes.spargeLiters };
+        }
+        if (idx === 0 && r.type === "infusion" && derivedMashWaterVolumeLiters > 0) {
+          return { ...r, amountL: computeFirstStepAmountL };
+        }
+        return r;
+      });
+      const mash =
+        mashRows.length > 0 && mashProcedure
+          ? {
+              name: mashProcedure.name || "Mash",
+              grainTemperatureC: mashProcedure.grainTemperatureC,
+              steps: stepsForSave,
+            }
+          : mashRows.length > 0
+            ? { name: "Mash", grainTemperatureC: 20, steps: stepsForSave }
+            : null;
+      const mashValidation = validateMashBeforeSave(mash);
+      if (!mashValidation.ok) {
+        setMashStepsSaveError(mashValidation.errors);
+        return;
+      }
+      const newDoc = replaceMashInBeerJsonDocument(recipe.beerJsonRecipeJson, mash);
+      const extBase = (recipe as any).recipeExtJson && typeof (recipe as any).recipeExtJson === "object"
+        ? (recipe as any).recipeExtJson
+        : { version: 1 };
+      const mashStepDeduceFromMashIn = Object.fromEntries(
+        mashRows
+          .filter((r, i) => i > 0 && r.deduceFromMashIn === true)
+          .map((r) => [r.id, true] as const),
+      );
+      const recipeExtJson = { ...extBase, mashStepDeduceFromMashIn };
+      const patchRes = await apiFetch(`/api/recipes/${recipeId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ beerJsonRecipeJson: newDoc, recipeExtJson }),
+      });
+      if (!patchRes.ok) throw new Error(JSON.stringify(patchRes.data));
+      const reload = await apiFetch(`/api/recipes/${recipeId}`);
+      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
+      const reloadData = reload.data as { recipe: RecipeResponse["recipe"] };
+      setRecipe(reloadData.recipe);
+      setMashStepsDirty(false);
+      setMashStepsSaveStatus("Saved.");
+    } catch (err) {
+      setMashStepsSaveError(String(err));
+    } finally {
+      setMashStepsSaving(false);
+    }
+  };
+
   const onImportGristFromRecipe = async () => {
     if (!canCall || !recipeId) return;
     setGristImportError(null);
@@ -1015,6 +1256,10 @@ export default function MashWaterPage() {
             ) : null}
           </div>
 
+          <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+            {t("adjustmentHint")}
+          </p>
+
           {mixedSourceProfile ? (
             <details className="fieldBlock fieldBlock--readonly" style={{ marginTop: 12 }}>
               <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
@@ -1057,11 +1302,7 @@ export default function MashWaterPage() {
                 </table>
               </div>
             </details>
-          ) : (
-            <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
-              {t("adjustmentHint")}
-            </p>
-          )}
+          ) : null}
 
           {profilesError ? (
             <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
@@ -1069,10 +1310,6 @@ export default function MashWaterPage() {
             </pre>
           ) : null}
         </section>
-
-        <p className="muted" style={{ marginTop: -4 }}>
-          {t("adjustmentHint")}
-        </p>
 
         <section className="panel" aria-labelledby="grist-summary-heading">
           <h2 id="grist-summary-heading" style={{ marginTop: 0 }}>
@@ -1305,6 +1542,7 @@ export default function MashWaterPage() {
                               L: tUnits("L"),
                               ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                               ppm: tUnits("ppm"),
+                              g: tUnits("g"),
                               LPerKg: tUnits("LPerKg"),
                             },
                           })}
@@ -1340,6 +1578,7 @@ export default function MashWaterPage() {
                               L: tUnits("L"),
                               ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                               ppm: tUnits("ppm"),
+                              g: tUnits("g"),
                               LPerKg: tUnits("LPerKg"),
                             },
                           })}
@@ -1477,6 +1716,7 @@ body={buildWaterMathBody({
                         L: tUnits("L"),
                         ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                         ppm: tUnits("ppm"),
+                        g: tUnits("g"),
                         LPerKg: tUnits("LPerKg"),
                       },
                     })}
@@ -1571,6 +1811,7 @@ body={buildWaterMathBody({
                           L: tUnits("L"),
                           ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                           ppm: tUnits("ppm"),
+                          g: tUnits("g"),
                           LPerKg: tUnits("LPerKg"),
                         },
                       })}
@@ -1647,6 +1888,44 @@ body={buildWaterMathBody({
               </div>
             </div>
           ) : null}
+        </section>
+
+        <section id="mash-steps" className="panel" aria-labelledby="mash-steps-heading">
+          <h2 id="mash-steps-heading" style={{ marginTop: 0 }}>
+            {t("mashStepsHeading")}
+          </h2>
+          {mashStepsSaveError ? (
+            <pre className="errorBox" role="alert" style={{ marginTop: 0, marginBottom: 12 }}>
+              {mashStepsSaveError}
+            </pre>
+          ) : null}
+          <MashStepsEditor
+            mashRows={mashRows}
+            mashProcedure={mashProcedure}
+            waterVolumes={waterVolumes}
+            mashWaterBudgetLiters={derivedMashWaterVolumeLiters > 0 ? derivedMashWaterVolumeLiters : null}
+            firstStepAmountComputed={
+              derivedMashWaterVolumeLiters > 0 && mashRows[0]?.type === "infusion"
+                ? computeFirstStepAmountL
+                : null
+            }
+            hideSpargeFromTypeOptions
+            recipeId={recipeId}
+            readOnly={false}
+            onUpdateProcedure={updateMashProcedure}
+            onUpdateStep={updateMashStep}
+            onAddStep={addMashStep}
+            onDeleteStep={deleteMashStep}
+            onAddFromTemplate={addMashFromTemplate}
+            onSave={saveMashSteps}
+            canSave={canCall && !!recipe?.beerJsonRecipeJson}
+            saving={mashStepsSaving}
+            saveStatus={mashStepsSaveStatus}
+            t={tEdit}
+            tUnits={tUnits}
+            locale={locale}
+            formatFixed={formatFixed}
+          />
         </section>
 
         {savingError ? (

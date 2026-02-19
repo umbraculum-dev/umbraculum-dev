@@ -286,6 +286,7 @@ export default function WaterHubPage() {
                             L: tUnits("L"),
                             ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                             ppm: tUnits("ppm"),
+                            g: tUnits("g"),
                           },
                         })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
@@ -398,13 +399,14 @@ export default function WaterHubPage() {
                                     L: tUnits("L"),
                                     ppmAsCaCO3: tUnits("ppmAsCaCO3"),
                                     ppm: tUnits("ppm"),
+                                    g: tUnits("g"),
                                   },
-                                })}
-                                ariaLabel={tMath("fxLabel", { topic: title })}
-                              />
-                            );
-                          })()
-                        : null}
+                        })}
+                        ariaLabel={tMath("fxLabel", { topic: title })}
+                      />
+                    );
+                  })()
+                : null}
                     </div>
                     <p className="muted" style={{ marginTop: 8, marginBottom: 8 }}>
                       {t("mergedIonsDescription")}

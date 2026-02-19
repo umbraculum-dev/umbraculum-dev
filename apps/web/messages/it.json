@@ -179,8 +179,8 @@
       "yes": "sì",
       "no": "no",
       "more": "(+{count} in più…)",
-      "ionLine": "- {ion}: {ppm} ppm",
-      "saltLine": "- {salt}: {grams} g",
+      "ionLine": "- {ion}: {ppm} {ppmUnit}",
+      "saltLine": "- {salt}: {grams} {g}",
       "detailLine": "- {label}: {value}"
     },
     "derivation": {
@@ -193,7 +193,7 @@
       },
       "common": {
         "kvLine": "- {label}: {value}",
-        "ionDelta": "{ion} {ppm} ppm",
+        "ionDelta": "{ion} {ppm} {ppmUnit}",
         "more": "(+{count} in più…)",
         "yes": "sì",
         "no": "no",
@@ -259,7 +259,7 @@
         "colorSrmDanielsEstimated": "SRM (Daniels, stimato)"
       },
       "rows": {
-        "saltDelta": "- {saltKey} ({grams} g): {deltas}"
+        "saltDelta": "- {saltKey} ({grams} {g}): {deltas}"
       },
       "breakdowns": {
         "salt_additions": {
@@ -580,6 +580,7 @@
         "basics": "Basi",
         "analysis": "Analisi",
         "equipment": "Attrezzatura",
+        "mashing": "Ammostamento e Sparge",
         "fermentables": "Fermentabili",
         "hops": "Luppoli",
         "yeast": "Lievito",
@@ -587,6 +588,40 @@
         "notes": "Note",
         "water": "Chimica dell’acqua"
       },
+      "mashingHelp": "Programma di ammostamento (procedura mash BeerJSON). Importa una ricetta BeerJSON/BeerXML con step mash o aggiungili manualmente nelle pagine calcolatore acqua Mash e/o Sparge.",
+      "mashingEmpty": "Nessuno step di ammostamento. Aggiungi step o importa una ricetta con programma mash.",
+      "mashingAddStep": "Aggiungi step",
+      "mashingAddFromTemplate": "Aggiungi da modello",
+      "mashingTemplateSingleInfusion": "Infusione singola",
+      "mashingTemplateStepMash": "Step mash",
+      "mashingTemplateTemperature": "Temperatura",
+      "mashingTemplateDecoction": "Decozione",
+      "mashingProcedureName": "Nome procedura",
+      "mashingGrainTemp": "Temp. grani",
+      "mashingStepName": "Nome",
+      "mashingStepType": "Tipo",
+      "mashingStepTemp": "Temp ({unit})",
+      "mashingStepTime": "Tempo ({unit})",
+      "mashingStepAmount": "Quantità ({unit})",
+      "mashingStepRamp": "Rampa ({unit})",
+      "mashingDeleteStep": "Elimina step",
+      "mashingDeduceFromMashIn": "Deduci da Mash in",
+      "mashingSave": "Salva (inclusa mash)",
+      "mashingSaveMashSteps": "Salva",
+      "mashingEditInMashPage": "Modifica programma mash in Acqua mash e Step mash",
+      "spargeStepFromWaterPage": "Step sparge (da pagina Acqua sparge)",
+      "spargeStepConfigureLink": "Configura acqua sparge",
+      "mashingWaterVolumesTitle": "Volumi acqua (mash + sparge)",
+      "mashingWaterVolumesSource": "Dal calcolatore acqua",
+      "mashingWaterVolumesUnavailable": "Configura i volumi acqua nel Calcolatore acqua per vedere i volumi mash e sparge qui.",
+      "mashingFirstStepSuggested": "Suggerito: {amount} {unit} (dal volume acqua mash)",
+      "mashingSpargeStepAmountSource": "Dal calcolatore acqua",
+      "mashStepsWaterBudgetNote": "L'acqua totale di tutti gli step mash non può superare il 'Volume acqua mash [totale]' sopra. Solo gli step con 'Deduci da Mash in' selezionato deducono dal volume acqua mash. Utile per i birrai che usano acqua calda per aumentare la temperatura.",
+      "mashStepsMashInAlwaysPresentNote": "Lo step \"Mash in\" è sempre presente per design: garantisce la correttezza della quantità totale. Se serve uno step successivo immediato (es. 'Protein rest') usa il pulsante \"Aggiungi step\" e aggiungilo. Puoi avere un nuovo step con quantità 0.",
+      "mashStepsTypeFallbackNote": "Se non trovi lo step mash che cerchi nell'elenco 'Tipo' usa 'Temperature' e aggiungi il nome (es. 'Protein rest' o 'Ferulic rest') nel campo 'Nome'.",
+      "mashStepsSeeRecapLink": "Vedi riepilogo mash nel riepilogo ricetta qui.",
+      "mashingSpargeStepAmountUnavailable": "Configura i volumi acqua nel Calcolatore acqua",
+      "mashingTemplateSparge": "Sparge",
       "equipmentSection": {
         "help": "Scegli un profilo attrezzatura (per account) da copiare nella ricetta (nessun riferimento live).",
         "profileLabel": "Profilo attrezzatura",
@@ -663,11 +698,13 @@
         "backToHub": "Torna al centro acqua",
         "goToSparge": "Vai allo sparge",
         "goToMash": "Vai al mash",
+        "mashWaterAndSteps": "Acqua mash e Step mash",
         "viewEditGrist": "Vedi/modifica grist nella ricetta",
         "notAuthenticated": "Non autenticato. {signIn}."
       },
       "mash": {
-        "title": "Acqua mash",
+        "title": "Acqua mash e Step mash",
+        "mashStepsHeading": "Step mash",
         "adjustmentHeading": "Regolazione acqua mash",
         "adjustmentHint": "Seleziona un profilo sorgente + diluizione e imposta i volumi per vedere gli ioni miscelati.",
         "gristSummaryHeading": "Grist (riepilogo)",
@@ -852,7 +889,7 @@
     "backToRecipeEditor": "Torna all’editor ricetta",
     "missingHeaders": "Header dev mancanti. Vai in Dashboard e clicca <strong>Salva header</strong> (Utente + Account attivo), poi torna qui.",
     "chooseArea": "Scegli un’area",
-    "mashWater": "Acqua mash",
+    "mashWater": "Acqua mash e Step mash",
     "spargeWater": "Acqua sparge",
     "additionalBoilWater": "Acqua aggiuntiva in bollitura",
     "lastCalculated": "ultimo calcolo",

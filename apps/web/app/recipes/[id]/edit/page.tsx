@@ -14,12 +14,22 @@ import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
+  mergeMashDeduceFromExt,
+  validateMashBeforeSave,
   type EditorGristRow,
   type EditorHopRow,
+  type EditorMash,
+  type EditorMashStep,
   type EditorMiscRow,
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
+import { MashStepsEditor } from "../../_components/MashStepsEditor";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
+import {
+  fetchRecipeWaterSettings,
+  saveRecipeWaterSettings,
+  type RecipeWaterSettingsResponse,
+} from "../water/_lib/waterSettings";
 import { mathExplain } from "./_lib/mathExplain";
 import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
 import { renderDerivationBody } from "../water/_lib/mathBodies";
@@ -105,6 +115,7 @@ export default function RecipeEditPage() {
     { id: "basics", label: t("sections.basics") },
     { id: "analysis", label: t("sections.analysis") },
     { id: "equipment", label: t("sections.equipment") },
+    { id: "mashing", label: t("sections.mashing") },
     { id: "fermentables", label: t("sections.fermentables") },
     { id: "hops", label: t("sections.hops") },
     { id: "yeast", label: t("sections.yeast") },
@@ -113,7 +124,7 @@ export default function RecipeEditPage() {
     { id: "water", label: t("sections.water") },
   ] as const;
 
-  const collapsibleSectionIds = ["basics", "analysis", "equipment", "fermentables", "hops", "yeast", "other", "notes"] as const;
+  const collapsibleSectionIds = ["basics", "analysis", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "notes"] as const;
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
@@ -165,6 +176,11 @@ export default function RecipeEditPage() {
   const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
   const [yeastRows, setYeastRows] = useState<EditorYeastRow[]>([]);
   const [miscRows, setMiscRows] = useState<EditorMiscRow[]>([]);
+  const [mashProcedure, setMashProcedure] = useState<{ name: string; grainTemperatureC: number } | null>(null);
+  const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
+  const [waterSettings, setWaterSettings] = useState<RecipeWaterSettingsResponse["settings"]>(null);
+  const [spargeStepTempSaving, setSpargeStepTempSaving] = useState(false);
+  const [spargeStepTempLocal, setSpargeStepTempLocal] = useState<number | null>(null);
   const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
@@ -198,6 +214,65 @@ export default function RecipeEditPage() {
     () => Boolean(recipeId),
     [recipeId],
   );
+
+  const waterVolumes = useMemo(() => {
+    if (!analysis) return null;
+    try {
+      const parsed = parseGravityAnalysisResponseV1(analysis);
+      const preBoil = parsed?.derivations?.["analysis.pre_boil_volume"];
+      if (!preBoil?.inputs) return null;
+      const mashIn = preBoil.inputs.find((i) => i.id === "mashWaterVolumeLiters")?.value;
+      const spargeIn = preBoil.inputs.find((i) => i.id === "spargeVolumeLiters")?.value;
+      const mashL = mashIn?.kind === "number" ? mashIn.value : null;
+      const spargeL = spargeIn?.kind === "number" ? spargeIn.value : null;
+      return mashL != null && spargeL != null ? { mashLiters: mashL, spargeLiters: spargeL } : null;
+    } catch {
+      return null;
+    }
+  }, [analysis]);
+
+  const spargeConfigured = waterVolumes != null && waterVolumes.spargeLiters > 0;
+
+  const mashRowsFiltered = useMemo(() => {
+    if (!spargeConfigured) return mashRows;
+    return mashRows.filter(
+      (r) => !(r.type === "sparge" && r.name.trim().toLowerCase() === "sparge"),
+    );
+  }, [mashRows, spargeConfigured]);
+
+  useEffect(() => {
+    if (!canCallAccountScoped || !recipeId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await fetchRecipeWaterSettings(recipeId);
+        if (cancelled) return;
+        setWaterSettings(data.settings);
+      } catch {
+        if (!cancelled) setWaterSettings(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [canCallAccountScoped, recipeId]);
+
+  const spargeStepTempDisplay =
+    spargeStepTempLocal ?? waterSettings?.spargeStepTemperatureC ?? 76;
+
+  const saveSpargeStepTemperature = async (tempC: number) => {
+    if (!canCallAccountScoped || !recipeId) return;
+    setSpargeStepTempSaving(true);
+    try {
+      const data = await saveRecipeWaterSettings(recipeId, { spargeStepTemperatureC: tempC });
+      setWaterSettings(data.settings);
+      setSpargeStepTempLocal(null);
+    } catch {
+      setSpargeStepTempLocal(null);
+    } finally {
+      setSpargeStepTempSaving(false);
+    }
+  };
 
   useEffect(() => {
     const applyHashOpen = () => {
@@ -289,6 +364,14 @@ export default function RecipeEditPage() {
         setHopsRows(hops);
         setYeastRows(yeast);
         setMiscRows(misc);
+        const mashMerged = mergeMashDeduceFromExt(s.mash, ext);
+        if (mashMerged) {
+          setMashProcedure({ name: mashMerged.name, grainTemperatureC: mashMerged.grainTemperatureC });
+          setMashRows(mashMerged.steps);
+        } else {
+          setMashProcedure(null);
+          setMashRows([]);
+        }
       } catch (err) {
         if (cancelled) return;
         setLoadError(String(err));
@@ -415,6 +498,41 @@ export default function RecipeEditPage() {
         typeof extBaseForSave.brewhouseEfficiencyPercent === "number" ? extBaseForSave.brewhouseEfficiencyPercent
           : null;
 
+      const stepsForSave = mashRows.map((r) => {
+        if (r.type === "sparge" && r.name.trim().toLowerCase() === "sparge" && waterVolumes) {
+          return { ...r, amountL: waterVolumes.spargeLiters };
+        }
+        return r;
+      });
+
+      const mash: EditorMash =
+        mashRows.length > 0 && mashProcedure
+          ? {
+              name: mashProcedure.name || "Mash",
+              grainTemperatureC: mashProcedure.grainTemperatureC,
+              steps: stepsForSave,
+            }
+          : mashRows.length > 0
+            ? {
+                name: "Mash",
+                grainTemperatureC: 20,
+                steps: stepsForSave,
+              }
+            : null;
+
+      const mashValidation = validateMashBeforeSave(mash);
+      if (!mashValidation.ok) {
+        setSaveError(mashValidation.errors);
+        setSaving(false);
+        return;
+      }
+
+      extBaseForSave.mashStepDeduceFromMashIn = Object.fromEntries(
+        mashRows
+          .filter((r, i) => i > 0 && r.deduceFromMashIn === true)
+          .map((r) => [r.id, true] as const),
+      );
+
       const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
         name,
         notes: notes || null,
@@ -422,6 +540,7 @@ export default function RecipeEditPage() {
         hopsRows: hopsRows as unknown as EditorHopRow[],
         yeastRows: yeastRows as unknown as EditorYeastRow[],
         miscRows: miscRows as any,
+        mash,
         batchSizeLiters,
         brewhouseEfficiencyPercent,
       });
@@ -950,7 +1069,18 @@ export default function RecipeEditPage() {
                     const d = parsed?.derivations ? (parsed.derivations as any)[derivationKey] : null;
                     if (!d) return null;
                     try {
-                      return renderDerivationBody({ locale, tMath, derivation: d });
+                      return renderDerivationBody({
+                        locale,
+                        tMath,
+                        derivation: d,
+                        units: {
+                          L: tUnits("L"),
+                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                          ppm: tUnits("ppm"),
+                          g: tUnits("g"),
+                          LPerKg: tUnits("LPerKg"),
+                        },
+                      });
                     } catch {
                       return fallback;
                     }
@@ -1542,6 +1672,183 @@ export default function RecipeEditPage() {
                 <p className="muted" style={{ marginBottom: 0 }}>
                   {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
                 </p>
+              </div>
+            </details>
+          </section>
+
+          <section id="mashing" className="panel">
+            <details open={openSections.mashing} onToggle={(e) => setSectionOpen("mashing", e.currentTarget.open)}>
+              <summary style={{ cursor: "pointer" }}>
+                <h2 id="mashing-heading" style={{ margin: 0, display: "inline" }}>
+                  {t("sections.mashing")}
+                </h2>
+              </summary>
+              <div style={{ marginTop: 12 }}>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  {t("mashingHelp")}
+                </p>
+
+                {waterVolumes ? (
+                  <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12, marginBottom: 12 }}>
+                    <div className="fieldBlockHeader">
+                      <strong>{t("mashingWaterVolumesTitle")}</strong>
+                      <span className="fieldBadge">Computed</span>
+                      <span className="muted">{t("mashingWaterVolumesSource")}</span>
+                    </div>
+                    <ul style={{ marginTop: 8, marginBottom: 0 }}>
+                      <li>Mash water: <code>{formatFixed(locale, waterVolumes.mashLiters, 2)}</code> {tUnits("L")}</li>
+                      <li>Sparge water: <code>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</code> {tUnits("L")}</li>
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="muted" style={{ marginTop: 0, marginBottom: 12 }}>
+                    {t("mashingWaterVolumesUnavailable")}
+                  </p>
+                )}
+
+                <div style={{ marginTop: 12 }}>
+                  <MashStepsEditor
+                    mashRows={mashRowsFiltered}
+                    mashProcedure={mashProcedure}
+                    waterVolumes={waterVolumes}
+                    readOnly
+                    recipeId={recipeId}
+                    t={t}
+                    tUnits={tUnits}
+                    locale={locale}
+                    formatFixed={formatFixed}
+                  />
+                </div>
+
+                {spargeConfigured ? (
+                  <div style={{ marginTop: 16 }}>
+                    <p className="muted" style={{ marginTop: 0, marginBottom: 8 }}>
+                      {t("spargeStepFromWaterPage")}
+                    </p>
+                    <div className="ingredientCard" style={{ width: "100%" }}>
+                      <div
+                        style={{
+                          display: "grid",
+                          gap: 12,
+                          alignItems: "end",
+                          gridTemplateColumns:
+                            "auto minmax(80px, 100px) minmax(80px, 100px) minmax(60px, 80px) minmax(50px, 70px) minmax(80px, 120px) minmax(50px, 70px)",
+                        }}
+                      >
+                        <div style={{ alignSelf: "center", fontWeight: 500 }}>
+                          {mashRowsFiltered.length + 1}
+                        </div>
+                        <div>
+                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
+                            {t("mashingStepName")}
+                          </label>
+                          <div
+                            style={{
+                              padding: 8,
+                              background: "var(--surface-2)",
+                              borderRadius: "var(--radius)",
+                              border: "1px solid var(--border)",
+                            }}
+                          >
+                            Sparge
+                          </div>
+                        </div>
+                        <div>
+                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
+                            {t("mashingStepType")}
+                          </label>
+                          <div
+                            style={{
+                              padding: 8,
+                              background: "var(--surface-2)",
+                              borderRadius: "var(--radius)",
+                              border: "1px solid var(--border)",
+                            }}
+                          >
+                            Sparge
+                          </div>
+                        </div>
+                        <div>
+                          <label className="muted ingredientCardLabel" htmlFor="sparge-step-temp" style={{ display: "block", fontSize: 12 }}>
+                            {t("mashingStepTemp", { unit: "°C" })}
+                          </label>
+                          <input
+                            id="sparge-step-temp"
+                            type="number"
+                            value={spargeStepTempDisplay}
+                            onChange={(e) => {
+                              const v = Number(e.target.value);
+                              setSpargeStepTempLocal(Number.isFinite(v) ? v : null);
+                            }}
+                            onBlur={(e) => {
+                              const v = Number(e.target.value);
+                              if (Number.isFinite(v) && v >= 0 && v <= 100) {
+                                void saveSpargeStepTemperature(v);
+                              } else {
+                                setSpargeStepTempLocal(null);
+                              }
+                            }}
+                            min={0}
+                            max={100}
+                            step={0.5}
+                            disabled={spargeStepTempSaving}
+                            style={{ width: "100%", padding: 8 }}
+                          />
+                        </div>
+                        <div>
+                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
+                            {t("mashingStepTime", { unit: "min" })}
+                          </label>
+                          <div
+                            style={{
+                              padding: 8,
+                              background: "var(--surface-2)",
+                              borderRadius: "var(--radius)",
+                              border: "1px solid var(--border)",
+                            }}
+                          >
+                            0
+                          </div>
+                        </div>
+                        <div>
+                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
+                            {t("mashingStepAmount", { unit: "L" })}
+                          </label>
+                          <div
+                            style={{
+                              padding: 8,
+                              background: "var(--surface-2)",
+                              borderRadius: "var(--radius)",
+                              border: "1px solid var(--border)",
+                            }}
+                          >
+                            <code>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</code> {tUnits("L")}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
+                            {t("mashingStepRamp", { unit: "min" })}
+                          </label>
+                          <div
+                            style={{
+                              padding: 8,
+                              background: "var(--surface-2)",
+                              borderRadius: "var(--radius)",
+                              border: "1px solid var(--border)",
+                            }}
+                          >
+                            —
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <p style={{ marginTop: 8, marginBottom: 0 }}>
+                      <Link href={`/recipes/${recipeId}/water/sparge`}>
+                        {t("spargeStepConfigureLink")}
+                      </Link>
+                    </p>
+                  </div>
+                ) : null}
               </div>
             </details>
           </section>

@@ -65,6 +65,91 @@ export type EditorMiscRow = {
   notes?: string | null;
 };
 
+export type EditorMashStepType =
+  | "infusion"
+  | "temperature"
+  | "decoction"
+  | "souring mash"
+  | "souring wort"
+  | "drain mash tun"
+  | "sparge";
+
+export const MASH_STEP_TYPE_OPTIONS: { value: EditorMashStepType; label: string }[] = [
+  { value: "infusion", label: "Infusion" },
+  { value: "temperature", label: "Temperature" },
+  { value: "decoction", label: "Decoction" },
+  { value: "souring mash", label: "Souring mash" },
+  { value: "souring wort", label: "Souring wort" },
+  { value: "drain mash tun", label: "Drain mash tun" },
+  { value: "sparge", label: "Sparge" },
+];
+
+export const MASH_TEMPLATES: { id: string; labelKey: string; steps: Omit<EditorMashStep, "id">[] }[] = [
+  {
+    id: "single_infusion",
+    labelKey: "mashingTemplateSingleInfusion",
+    steps: [{ name: "Mash In", type: "infusion", stepTemperatureC: 67, stepTimeMin: 60 }],
+  },
+  {
+    id: "step_mash",
+    labelKey: "mashingTemplateStepMash",
+    steps: [
+      { name: "Protein rest", type: "infusion", stepTemperatureC: 52, stepTimeMin: 15 },
+      { name: "Saccharification", type: "temperature", stepTemperatureC: 65, stepTimeMin: 30 },
+      { name: "Mash out", type: "temperature", stepTemperatureC: 72, stepTimeMin: 20 },
+    ],
+  },
+  {
+    id: "temperature",
+    labelKey: "mashingTemplateTemperature",
+    steps: [{ name: "Single rest", type: "temperature", stepTemperatureC: 68, stepTimeMin: 60 }],
+  },
+  {
+    id: "decoction",
+    labelKey: "mashingTemplateDecoction",
+    steps: [
+      { name: "Dough in", type: "infusion", stepTemperatureC: 45, stepTimeMin: 15 },
+      { name: "Protein rest", type: "decoction", stepTemperatureC: 52, stepTimeMin: 20 },
+      { name: "Saccharification", type: "decoction", stepTemperatureC: 65, stepTimeMin: 30 },
+      { name: "Mash out", type: "decoction", stepTemperatureC: 76, stepTimeMin: 10 },
+    ],
+  },
+  {
+    id: "sparge",
+    labelKey: "mashingTemplateSparge",
+    steps: [{ name: "Sparge", type: "sparge", stepTemperatureC: 76, stepTimeMin: 0 }],
+  },
+];
+
+export function newMashRowId(): string {
+  try {
+    return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  } catch {
+    return `${Date.now()}-${Math.random()}`;
+  }
+}
+
+export type EditorMashStep = {
+  id: string;
+  name: string;
+  type: EditorMashStepType;
+  stepTemperatureC: number;
+  stepTimeMin: number;
+  amountL?: number | null;
+  deduceFromMashIn?: boolean;
+  rampTimeMin?: number | null;
+  endTemperatureC?: number | null;
+  infuseTemperatureC?: number | null;
+  description?: string | null;
+};
+
+export type EditorMash = {
+  name: string;
+  grainTemperatureC: number;
+  steps: EditorMashStep[];
+  notes?: string | null;
+} | null;
+
 function safeNum(v: unknown, fallback: number) {
   return typeof v === "number" && Number.isFinite(v) ? v : fallback;
 }
@@ -191,6 +276,113 @@ function buildMiscAddition(row: EditorMiscRow) {
   return out;
 }
 
+const VALID_MASH_STEP_TYPES: EditorMashStepType[] = [
+  "infusion",
+  "temperature",
+  "decoction",
+  "souring mash",
+  "souring wort",
+  "drain mash tun",
+  "sparge",
+];
+
+function buildMashStep(step: EditorMashStep): any {
+  const out: any = {
+    name: step.name,
+    type: step.type,
+    step_temperature: { unit: "C" as const, value: step.stepTemperatureC },
+    step_time: { unit: "min" as const, value: Math.max(0, step.stepTimeMin) },
+  };
+  if (step.amountL != null && Number.isFinite(step.amountL) && step.amountL >= 0) {
+    out.amount = { unit: "l" as const, value: step.amountL };
+  }
+  if (step.rampTimeMin != null && Number.isFinite(step.rampTimeMin) && step.rampTimeMin >= 0) {
+    out.ramp_time = { unit: "min" as const, value: step.rampTimeMin };
+  }
+  if (step.endTemperatureC != null && Number.isFinite(step.endTemperatureC)) {
+    out.end_temperature = { unit: "C" as const, value: step.endTemperatureC };
+  }
+  if (step.infuseTemperatureC != null && Number.isFinite(step.infuseTemperatureC)) {
+    out.infuse_temperature = { unit: "C" as const, value: step.infuseTemperatureC };
+  }
+  if (typeof step.description === "string" && step.description.trim()) {
+    out.description = step.description.trim();
+  }
+  return out;
+}
+
+function buildMashProcedure(mash: EditorMash): any {
+  if (!mash || !mash.steps.length) return null;
+  return {
+    name: mash.name,
+    grain_temperature: { unit: "C" as const, value: mash.grainTemperatureC },
+    mash_steps: mash.steps.map(buildMashStep),
+    ...(typeof mash.notes === "string" && mash.notes.trim() ? { notes: mash.notes.trim() } : {}),
+  };
+}
+
+export function validateMashBeforeSave(mash: EditorMash): { ok: true } | { ok: false; errors: string } {
+  if (!mash) return { ok: true };
+  if (typeof mash.name !== "string" || !mash.name.trim()) {
+    return { ok: false, errors: "Mash procedure name is required" };
+  }
+  if (typeof mash.grainTemperatureC !== "number" || !Number.isFinite(mash.grainTemperatureC)) {
+    return { ok: false, errors: "Grain temperature must be a valid number" };
+  }
+  if (mash.grainTemperatureC < -20 || mash.grainTemperatureC > 100) {
+    return { ok: false, errors: "Grain temperature must be between -20 and 100 °C" };
+  }
+  if (!Array.isArray(mash.steps)) {
+    return { ok: false, errors: "Mash steps must be an array" };
+  }
+  if (mash.steps.length === 0) {
+    return { ok: true };
+  }
+  const errs: string[] = [];
+  mash.steps.forEach((s, idx) => {
+    if (typeof s.name !== "string" || !s.name.trim()) {
+      errs.push(`Step ${idx + 1}: name is required`);
+    }
+    if (!VALID_MASH_STEP_TYPES.includes(s.type)) {
+      errs.push(`Step ${idx + 1}: invalid type "${s.type}"`);
+    }
+    if (typeof s.stepTemperatureC !== "number" || !Number.isFinite(s.stepTemperatureC)) {
+      errs.push(`Step ${idx + 1}: step temperature must be a valid number`);
+    } else if (s.stepTemperatureC < 0 || s.stepTemperatureC > 100) {
+      errs.push(`Step ${idx + 1}: step temperature must be between 0 and 100 °C`);
+    }
+    if (typeof s.stepTimeMin !== "number" || !Number.isFinite(s.stepTimeMin)) {
+      errs.push(`Step ${idx + 1}: step time must be a valid number`);
+    } else if (s.stepTimeMin < 0) {
+      errs.push(`Step ${idx + 1}: step time must be >= 0`);
+    }
+  });
+  if (errs.length) return { ok: false, errors: errs.join("; ") };
+  return { ok: true };
+}
+
+/**
+ * Replaces only the mash in an existing BeerJSON document.
+ * Used when saving mash steps from the mash page without rebuilding the full recipe.
+ */
+export function replaceMashInBeerJsonDocument(
+  doc: unknown,
+  mash: EditorMash | null,
+): { beerjson: { version: number; recipes: any[] } } {
+  const cloned = JSON.parse(JSON.stringify(doc)) as { beerjson?: { version?: number; recipes?: any[] } };
+  const r0 = cloned?.beerjson?.recipes?.[0];
+  if (!r0 || typeof r0 !== "object") {
+    return cloned as { beerjson: { version: number; recipes: any[] } };
+  }
+  const mashProc = buildMashProcedure(mash);
+  if (mashProc) {
+    r0.mash = mashProc;
+  } else {
+    delete r0.mash;
+  }
+  return cloned as { beerjson: { version: number; recipes: any[] } };
+}
+
 export function buildBeerJsonRecipeDocument(args: {
   name: string;
   notes: string | null;
@@ -198,6 +390,7 @@ export function buildBeerJsonRecipeDocument(args: {
   hopsRows: EditorHopRow[];
   yeastRows: EditorYeastRow[];
   miscRows: EditorMiscRow[];
+  mash?: EditorMash | null;
   batchSizeLiters?: number | null;
   brewhouseEfficiencyPercent?: number | null;
 }): BeerJsonDocument {
@@ -218,6 +411,9 @@ export function buildBeerJsonRecipeDocument(args: {
     },
   };
   if (args.notes) recipe.notes = args.notes;
+
+  const mashProc = buildMashProcedure(args.mash ?? null);
+  if (mashProc) recipe.mash = mashProc;
 
   return { beerjson: { version: 1, recipes: [recipe] } };
 }
@@ -289,11 +485,109 @@ export function buildRecipeExtJsonFromEditorState(args: {
   };
 }
 
+function parseMashFromBeerJson(r0: any): EditorMash {
+  const mash = r0?.mash;
+  if (!mash || typeof mash !== "object") return null;
+  const name = typeof mash.name === "string" ? mash.name.trim() : "";
+  const grainTemp =
+    mash.grain_temperature?.unit === "C" && typeof mash.grain_temperature?.value === "number" && Number.isFinite(mash.grain_temperature.value)
+      ? mash.grain_temperature.value
+      : mash.grain_temperature?.unit === "F"
+        ? ((mash.grain_temperature.value - 32) * 5) / 9
+        : null;
+  if (!name || grainTemp == null) return null;
+
+  const stepsRaw = Array.isArray(mash.mash_steps) ? mash.mash_steps : [];
+  const steps: EditorMashStep[] = stepsRaw
+    .map((s: any) => {
+      const stepName = typeof s?.name === "string" ? s.name.trim() : "";
+      const typeRaw = typeof s?.type === "string" ? s.type : "";
+      const type: EditorMashStepType = VALID_MASH_STEP_TYPES.includes(typeRaw as EditorMashStepType) ? (typeRaw as EditorMashStepType) : "infusion";
+      const stepTemp =
+        s?.step_temperature?.unit === "C" && typeof s?.step_temperature?.value === "number" && Number.isFinite(s.step_temperature.value)
+          ? s.step_temperature.value
+          : s?.step_temperature?.unit === "F" && typeof s?.step_temperature?.value === "number"
+            ? ((s.step_temperature.value - 32) * 5) / 9
+            : null;
+      const stepTime =
+        s?.step_time?.unit === "min" && typeof s?.step_time?.value === "number" && Number.isFinite(s.step_time.value)
+          ? s.step_time.value
+          : null;
+      if (!stepName || stepTemp == null || stepTime == null) return null;
+
+      const amountL =
+        s?.amount?.unit === "l" && typeof s?.amount?.value === "number" && Number.isFinite(s.amount.value)
+          ? s.amount.value
+          : s?.amount?.unit === "ml"
+            ? s.amount.value / 1000
+            : null;
+      const rampTimeMin =
+        s?.ramp_time?.unit === "min" && typeof s?.ramp_time?.value === "number" && Number.isFinite(s.ramp_time.value) && s.ramp_time.value >= 0
+          ? s.ramp_time.value
+          : null;
+      const endTemp =
+        s?.end_temperature?.unit === "C" && typeof s?.end_temperature?.value === "number" && Number.isFinite(s.end_temperature.value)
+          ? s.end_temperature.value
+          : s?.end_temperature?.unit === "F" && typeof s?.end_temperature?.value === "number"
+            ? ((s.end_temperature.value - 32) * 5) / 9
+            : null;
+      const infuseTemp =
+        s?.infuse_temperature?.unit === "C" && typeof s?.infuse_temperature?.value === "number" && Number.isFinite(s.infuse_temperature.value)
+          ? s.infuse_temperature.value
+          : s?.infuse_temperature?.unit === "F" && typeof s?.infuse_temperature?.value === "number"
+            ? ((s.infuse_temperature.value - 32) * 5) / 9
+            : null;
+      const description = typeof s?.description === "string" ? s.description.trim() || null : null;
+
+      return {
+        id: typeof s?.id === "string" ? s.id : `${Date.now()}-${Math.random()}`,
+        name: stepName,
+        type,
+        stepTemperatureC: stepTemp,
+        stepTimeMin: Math.max(0, stepTime),
+        amountL: amountL ?? undefined,
+        rampTimeMin: rampTimeMin ?? undefined,
+        endTemperatureC: endTemp ?? undefined,
+        infuseTemperatureC: infuseTemp ?? undefined,
+        description: description ?? undefined,
+      } as EditorMashStep;
+    })
+    .filter(Boolean) as EditorMashStep[];
+
+  if (steps.length === 0) return null;
+
+  return {
+    name,
+    grainTemperatureC: grainTemp,
+    steps,
+    notes: typeof mash.notes === "string" ? mash.notes.trim() || undefined : undefined,
+  };
+}
+
+/**
+ * Merges deduceFromMashIn from recipeExtJson into mash steps.
+ * Stored in recipeExtJson.mashStepDeduceFromMashIn (keyed by step id) because BeerJSON schema disallows additional properties.
+ */
+export function mergeMashDeduceFromExt(mash: EditorMash | null, recipeExtJson: unknown): EditorMash | null {
+  if (!mash || !mash.steps.length) return mash;
+  const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? (recipeExtJson as Record<string, unknown>) : null;
+  const map = ext?.mashStepDeduceFromMashIn && typeof ext.mashStepDeduceFromMashIn === "object" && !Array.isArray(ext.mashStepDeduceFromMashIn)
+    ? (ext.mashStepDeduceFromMashIn as Record<string, boolean>)
+    : null;
+  if (!map) return mash;
+  const steps = mash.steps.map((s) => ({
+    ...s,
+    deduceFromMashIn: map[s.id] === true,
+  }));
+  return { ...mash, steps };
+}
+
 export function editorStateFromBeerJson(doc: unknown): {
   gristRows: EditorGristRow[];
   hopsRows: EditorHopRow[];
   yeastRows: EditorYeastRow[];
   miscRows: EditorMiscRow[];
+  mash: EditorMash;
 } {
   const d = (doc ?? {}) as any;
   const r0 = d?.beerjson?.recipes?.[0];
@@ -435,6 +729,8 @@ export function editorStateFromBeerJson(doc: unknown): {
     })
     .filter(Boolean) as EditorMiscRow[];
 
-  return { gristRows, hopsRows, yeastRows, miscRows };
+  const mash = parseMashFromBeerJson(r0);
+
+  return { gristRows, hopsRows, yeastRows, miscRows, mash };
 }
 

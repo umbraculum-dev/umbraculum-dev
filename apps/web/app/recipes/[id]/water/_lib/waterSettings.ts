@@ -69,6 +69,8 @@ export type RecipeWaterSettings = {
   spargeSaltAdditionsJson?: unknown;
   spargeSaltsLastResultJson?: unknown;
 
+  spargeStepTemperatureC?: number | null;
+
   spargeLastAcidRequiredMl: number | null;
   spargeLastAcidRequiredTsp: number | null;
   spargeLastAcidRequiredGrams: number | null;

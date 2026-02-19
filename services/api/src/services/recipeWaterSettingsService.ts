@@ -77,6 +77,8 @@ export type UpsertRecipeWaterSettingsInput = {
   spargeSaltAdditionsJson?: unknown;
   spargeSaltsLastResultJson?: unknown;
 
+  spargeStepTemperatureC?: number | null;
+
   // Boil/kettle add-on water (v0)
   boilSourceWaterProfileId?: string | null;
   boilTargetWaterProfileId?: string | null;
@@ -473,6 +475,16 @@ export class RecipeWaterSettingsService {
     }
     if (input.spargeSaltsLastResultJson !== undefined) {
       data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson as any;
+    }
+    if (input.spargeStepTemperatureC !== undefined) {
+      if (input.spargeStepTemperatureC === null) data.spargeStepTemperatureC = null;
+      else {
+        const v = input.spargeStepTemperatureC;
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100) {
+          throw new BadRequestError("invalid_sparge_step_temperature", "Body.spargeStepTemperatureC must be 0–100");
+        }
+        data.spargeStepTemperatureC = v;
+      }
     }
 
     const snapshotFields = [

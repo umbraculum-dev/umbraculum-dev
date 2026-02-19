@@ -135,6 +135,10 @@ const recipeExtSchemaV1 = {
         },
       },
     },
+    mashStepDeduceFromMashIn: {
+      type: "object",
+      additionalProperties: { type: "boolean" },
+    },
   },
   required: ["version"],
 } as const;
