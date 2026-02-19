@@ -190,6 +190,7 @@ export async function authRoutes(app: FastifyInstance) {
         preferredTheme: true,
         preferredFontScale: true,
         preferredDensity: true,
+        isPlatformAdmin: true,
       },
     });
     if (!user) throw new UnauthorizedError("invalid_session", "Not authenticated");

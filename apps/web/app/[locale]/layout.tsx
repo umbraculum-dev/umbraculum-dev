@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import { AdSlot } from "../_components/AdSlot";
 import { PrimaryNav } from "../_components/PrimaryNav";
 import { isLocale } from "../../src/i18n/routing";
 
@@ -25,9 +26,11 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="appShell">
         <PrimaryNav />
+        <AdSlot placement="global_top" />
         <main id="main" style={{ marginTop: 16 }}>
           {children}
         </main>
+        <AdSlot placement="global_bottom" />
       </div>
     </NextIntlClientProvider>
   );

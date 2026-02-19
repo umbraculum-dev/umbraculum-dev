@@ -15,6 +15,22 @@ enum AccountRole {
   @@map("account_role")
 }
 
+enum AdPlacement {
+  global_top
+  global_bottom
+  recipe_edit_after_fermentables
+  recipe_edit_after_hops
+  recipe_edit_after_yeast
+
+  @@map("ad_placement")
+}
+
+enum AdPlatform {
+  web
+
+  @@map("ad_platform")
+}
+
 enum WaterProfileScope {
   system
   account
@@ -65,6 +81,8 @@ model User {
   preferredFontScale String? @default("md") @map("preferred_font_scale")
   /** UI density key (e.g. "comfortable", "compact"). */
   preferredDensity String? @default("comfortable") @map("preferred_density")
+  /** Platform admin flag (not account-scoped). Enables platform-wide admin features. */
+  isPlatformAdmin Boolean @default(false) @map("is_platform_admin")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -81,6 +99,8 @@ model Account {
   name      String
   /** Optional account/company branding accent key (e.g. "default", "acme"). */
   brandKey  String?  @default("default") @map("brand_key")
+  /** If true, ads are disabled for this account/workspace (platform-controlled). */
+  adsDisabled Boolean @default(false) @map("ads_disabled")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -96,6 +116,34 @@ model Account {
   yeasts       Yeast[]
 
   @@map("accounts")
+}
+
+model Ad {
+  id        String      @id @default(uuid())
+  placement AdPlacement
+  platform  AdPlatform
+
+  imageUrl String @map("image_url")
+  linkUrl  String @map("link_url")
+  altText  String @map("alt_text")
+
+  isActive Boolean   @default(true) @map("is_active")
+  startsAt DateTime? @map("starts_at")
+  endsAt   DateTime? @map("ends_at")
+
+  /** Higher values win. Used to break ties deterministically. */
+  priority Int @default(0)
+  /** Future-proofing: selection weight for rotation within same priority tier. */
+  weight   Int @default(1)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([placement, platform, isActive])
+  @@index([platform, isActive])
+  @@index([startsAt])
+  @@index([endsAt])
+  @@map("ads")
 }
 
 model AccountMember {

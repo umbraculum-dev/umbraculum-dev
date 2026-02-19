@@ -15,6 +15,7 @@ export type AuthMeResponse = {
     preferredTheme?: string | null;
     preferredFontScale?: string | null;
     preferredDensity?: string | null;
+    isPlatformAdmin?: boolean;
   };
   accounts: Array<{ id: string; name: string; role: string; brandKey?: string | null }>;
   activeAccountId: string | null;

@@ -8,6 +8,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { apiFetch } from "../../../_lib/apiClient";
 import { formatFixed } from "../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
+import { AdSlot } from "../../../_components/AdSlot";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import {
   buildBeerJsonRecipeDocument,
@@ -1992,6 +1993,8 @@ export default function RecipeEditPage() {
             </details>
           </section>
 
+          <AdSlot placement="recipe_edit_after_fermentables" />
+
           <section id="hops" className="panel">
             <details open={openSections.hops} onToggle={(e) => setSectionOpen("hops", e.currentTarget.open)}>
               <summary style={{ cursor: "pointer" }}>
@@ -2226,6 +2229,8 @@ export default function RecipeEditPage() {
             </details>
           </section>
 
+          <AdSlot placement="recipe_edit_after_hops" />
+
           <section id="yeast" className="panel">
             <details open={openSections.yeast} onToggle={(e) => setSectionOpen("yeast", e.currentTarget.open)}>
               <summary style={{ cursor: "pointer" }}>
@@ -2432,6 +2437,8 @@ export default function RecipeEditPage() {
               </div>
             </details>
           </section>
+
+          <AdSlot placement="recipe_edit_after_yeast" />
 
           <section id="other" className="panel">
             <details open={openSections.other} onToggle={(e) => setSectionOpen("other", e.currentTarget.open)}>

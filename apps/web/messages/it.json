@@ -19,6 +19,51 @@
     "ariaPrimary": "Principale",
     "ariaSession": "Sessione"
   },
+  "ads": {
+    "ariaLabel": "Pubblicità",
+    "contactLine": "Contattaci per ospitare qui la tua pubblicità.",
+    "upgradeLine": "Passa a un piano a pagamento per rimuoverle."
+  },
+  "platformAds": {
+    "title": "Pubblicità piattaforma",
+    "subtitle": "Gestisci le pubblicità a livello piattaforma (web). Visibili su tutti gli account, salvo disattivazione per uno specifico workspace.",
+    "hint": "Suggerimento: per vedere i posizionamenti apri una pagina e fai un hard reload (lingua: {locale}).",
+    "loading": "Caricamento…",
+    "notAuthorized": "Non sei autorizzato a gestire le pubblicità piattaforma.",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "create": "Crea pubblicità",
+    "creating": "Creazione…",
+    "listTitle": "Pubblicità",
+    "noAds": "Ancora nessuna pubblicità.",
+    "form": {
+      "placement": "Posizionamento",
+      "priority": "Priorità",
+      "imageUrl": "URL immagine",
+      "linkUrl": "URL link",
+      "altText": "Testo alt",
+      "isActive": "Attiva"
+    },
+    "placements": {
+      "globalTop": "Globale: in alto",
+      "globalBottom": "Globale: in basso",
+      "recipeEditAfterFermentables": "Modifica ricetta: dopo Fermentabili",
+      "recipeEditAfterHops": "Modifica ricetta: dopo Luppoli",
+      "recipeEditAfterYeast": "Modifica ricetta: dopo Lievito"
+    },
+    "table": {
+      "placement": "Posizionamento",
+      "imageUrl": "Immagine",
+      "linkUrl": "Link",
+      "active": "Attiva",
+      "actions": "Azioni",
+      "open": "Apri",
+      "yes": "sì",
+      "no": "no",
+      "delete": "Elimina",
+      "toggleActiveAria": "Attiva/disattiva la pubblicità {id}"
+    }
+  },
   "equipment": {
     "subtitle": "Profili attrezzatura (per account) usati dalle ricette (copia snapshot; nessun riferimento live).",
     "refresh": "Aggiorna",

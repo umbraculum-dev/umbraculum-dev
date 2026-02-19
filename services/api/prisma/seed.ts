@@ -5,6 +5,8 @@ const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
 const DEV_ACCOUNT_ID = "00000000-0000-0000-0000-0000000000a1";
 const WATER_PROFILES_SOURCE = "brunwater_1_25";
 const BJCP2021_COMMIT_SHA = "fe9063dff1e86c3aa9d8c65a1c730b4a807e48c3";
+const SAMPLE_AD_GLOBAL_TOP_ID = "00000000-0000-0000-0000-00000000ad01";
+const SAMPLE_AD_RECIPE_HOPS_ID = "00000000-0000-0000-0000-00000000ad02";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -216,6 +218,7 @@ async function main() {
     },
     update: {
       name: "Dev Brewery",
+      adsDisabled: false,
     },
   });
 
@@ -239,6 +242,65 @@ async function main() {
 
   await seedBeerStyles(prisma);
 
+  // Seed a couple of sample ads (idempotent by fixed IDs).
+  await prisma.ad.upsert({
+    where: { id: SAMPLE_AD_GLOBAL_TOP_ID },
+    create: {
+      id: SAMPLE_AD_GLOBAL_TOP_ID,
+      placement: "global_top",
+      platform: "web",
+      imageUrl: "/ads/sample-global-top.svg",
+      linkUrl: "/en/contact",
+      altText: "Sample banner ad (global top)",
+      isActive: true,
+      startsAt: null,
+      endsAt: null,
+      priority: 10,
+      weight: 1,
+    },
+    update: {
+      placement: "global_top",
+      platform: "web",
+      imageUrl: "/ads/sample-global-top.svg",
+      linkUrl: "/en/contact",
+      altText: "Sample banner ad (global top)",
+      isActive: true,
+      startsAt: null,
+      endsAt: null,
+      priority: 10,
+      weight: 1,
+    },
+  });
+
+  await prisma.ad.upsert({
+    where: { id: SAMPLE_AD_RECIPE_HOPS_ID },
+    create: {
+      id: SAMPLE_AD_RECIPE_HOPS_ID,
+      placement: "recipe_edit_after_hops",
+      platform: "web",
+      imageUrl: "/ads/sample-recipe-hops.svg",
+      linkUrl: "/en/contact",
+      altText: "Sample banner ad (recipe edit after hops)",
+      isActive: true,
+      startsAt: null,
+      endsAt: null,
+      priority: 5,
+      weight: 1,
+    },
+    update: {
+      placement: "recipe_edit_after_hops",
+      platform: "web",
+      imageUrl: "/ads/sample-recipe-hops.svg",
+      linkUrl: "/en/contact",
+      altText: "Sample banner ad (recipe edit after hops)",
+      isActive: true,
+      startsAt: null,
+      endsAt: null,
+      priority: 5,
+      weight: 1,
+    },
+  });
+
   // Optional: seed an admin user with a *real* password for local dev.
   // This is intentionally driven by env vars so secrets are not committed to the repo.
   //
@@ -255,8 +317,8 @@ async function main() {
       const passwordHash = await argon2.hash(seededOwnerPassword, { type: argon2.argon2id });
       const user = await prisma.user.upsert({
         where: { email: seededOwnerEmail },
-        create: { email: seededOwnerEmail, passwordHash, preferredLocale: "en" },
-        update: { passwordHash },
+        create: { email: seededOwnerEmail, passwordHash, preferredLocale: "en", isPlatformAdmin: true },
+        update: { passwordHash, isPlatformAdmin: true },
         select: { id: true, email: true },
       });
 
@@ -265,6 +327,7 @@ async function main() {
         create: {
           id: SEEDED_OWNER_ACCOUNT_ID,
           name: "Seeded Owner Brewery",
+          adsDisabled: true,
           members: {
             create: {
               userId: user.id,
@@ -272,7 +335,7 @@ async function main() {
             },
           },
         },
-        update: { name: "Seeded Owner Brewery" },
+        update: { name: "Seeded Owner Brewery", adsDisabled: true },
       });
 
       await prisma.accountMember.upsert({

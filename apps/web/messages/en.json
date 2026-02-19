@@ -19,6 +19,51 @@
     "ariaPrimary": "Primary",
     "ariaSession": "Session"
   },
+  "ads": {
+    "ariaLabel": "Advertisement",
+    "contactLine": "Contact us for hosting your ad here.",
+    "upgradeLine": "Upgrade to a paid plan for removal."
+  },
+  "platformAds": {
+    "title": "Platform ads",
+    "subtitle": "Manage platform-scoped ads (web). Visible across accounts unless ads are disabled for a workspace.",
+    "hint": "Tip: preview placements by opening any page and hard-reloading (locale: {locale}).",
+    "loading": "Loading…",
+    "notAuthorized": "You are not authorized to manage platform ads.",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "create": "Create ad",
+    "creating": "Creating…",
+    "listTitle": "Ads",
+    "noAds": "No ads yet.",
+    "form": {
+      "placement": "Placement",
+      "priority": "Priority",
+      "imageUrl": "Image URL",
+      "linkUrl": "Link URL",
+      "altText": "Alt text",
+      "isActive": "Active"
+    },
+    "placements": {
+      "globalTop": "Global top",
+      "globalBottom": "Global bottom",
+      "recipeEditAfterFermentables": "Recipe edit: after Fermentables",
+      "recipeEditAfterHops": "Recipe edit: after Hops",
+      "recipeEditAfterYeast": "Recipe edit: after Yeast"
+    },
+    "table": {
+      "placement": "Placement",
+      "imageUrl": "Image",
+      "linkUrl": "Link",
+      "active": "Active",
+      "actions": "Actions",
+      "open": "Open",
+      "yes": "yes",
+      "no": "no",
+      "delete": "Delete",
+      "toggleActiveAria": "Toggle active for ad {id}"
+    }
+  },
   "equipment": {
     "subtitle": "Account-scoped equipment templates used by recipes (snapshot copy; no live references).",
     "refresh": "Refresh",

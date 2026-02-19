@@ -17,6 +17,8 @@ import { recipeWaterSettingsRoutes } from "./routes/recipeWaterSettings.js";
 import { recipeWaterHubSummaryRoutes } from "./routes/recipeWaterHubSummary.js";
 import { recipeWaterComputeAndSaveRoutes } from "./routes/recipeWaterComputeAndSave.js";
 import { ingredientsRoutes } from "./routes/ingredients.js";
+import { adsRoutes } from "./routes/ads.js";
+import { platformAdsRoutes } from "./routes/platformAds.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -40,6 +42,8 @@ export function buildApp() {
   app.register(recipeWaterHubSummaryRoutes);
   app.register(recipeWaterComputeAndSaveRoutes);
   app.register(ingredientsRoutes);
+  app.register(adsRoutes);
+  app.register(platformAdsRoutes);
 
   return app;
 }
