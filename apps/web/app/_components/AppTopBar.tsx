@@ -1,35 +1,63 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
+import { useMedia, XStack, YStack } from "tamagui";
 
 export interface AppTopBarProps {
   left: ReactNode;
   right: ReactNode;
+  bottom?: ReactNode;
   ariaLabel?: string;
 }
 
-export function AppTopBar({ left, right, ariaLabel }: AppTopBarProps) {
+export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
+  const media = useMedia();
+  const narrow = media.narrow;
+
   return (
-    <XStack
-      ai="center"
-      jc="space-between"
-      gap="$2"
-      py="$1.5"
+    <YStack
+      aria-label={ariaLabel}
+      py="$2"
       pb="$2.5"
       mb="$2.5"
       borderBottomWidth={1}
       borderColor="var(--border)"
-      fontSize={11}
       style={{ lineHeight: 1.2 }}
-      aria-label={ariaLabel}
+      minWidth={0}
     >
-      <XStack ai="center" gap="$2" flexWrap="wrap">
-        {left}
+      <XStack
+        ai={narrow ? "stretch" : "center"}
+        jc="space-between"
+        flexDirection={narrow ? "column" : "row"}
+        gap={narrow ? "$2" : "$3"}
+        flexWrap="wrap"
+        minWidth={0}
+      >
+        <XStack
+          ai="center"
+          gap="$3"
+          flexWrap={narrow ? "wrap" : "nowrap"}
+          minWidth={0}
+          flex={narrow ? undefined : 1}
+        >
+          {left}
+        </XStack>
+        <XStack
+          ai="center"
+          jc={narrow ? "flex-start" : "flex-end"}
+          gap="$3"
+          flexWrap={narrow ? "wrap" : "nowrap"}
+          minWidth={0}
+        >
+          {right}
+        </XStack>
       </XStack>
-      <XStack ai="center" gap="$2" flexWrap="wrap">
-        {right}
-      </XStack>
-    </XStack>
+
+      {bottom ? (
+        <YStack mt="$2" minWidth={0}>
+          {bottom}
+        </YStack>
+      ) : null}
+    </YStack>
   );
 }
