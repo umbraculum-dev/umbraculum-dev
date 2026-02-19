@@ -2,13 +2,14 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Sheet, useMedia } from "tamagui";
+import { Button, Sheet, Text, useMedia } from "tamagui";
 
 export interface NavSheetProps {
   children: ReactNode;
   triggerLabel: string;
   ariaLabel?: string;
   triggerVariant?: "hamburger" | "text";
+  mode?: "auto" | "sheet" | "inline";
 }
 
 function HamburgerIcon() {
@@ -31,28 +32,54 @@ function HamburgerIcon() {
   );
 }
 
-export function NavSheet({ children, triggerLabel, ariaLabel, triggerVariant = "hamburger" }: NavSheetProps) {
+export function NavSheet({
+  children,
+  triggerLabel,
+  ariaLabel,
+  triggerVariant = "hamburger",
+  mode = "auto",
+}: NavSheetProps) {
   const [open, setOpen] = useState(false);
   const media = useMedia();
   const narrow = media.narrow;
 
-  if (!narrow) {
+  const useSheet = mode === "sheet" ? true : mode === "inline" ? false : narrow;
+
+  if (!useSheet) {
     return <>{children}</>;
   }
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
+      <Button
+        unstyled
+        ai="center"
+        px="$2"
+        py="$1"
+        borderRadius="$2"
+        borderWidth={1}
+        borderColor="color-mix(in srgb, var(--focus-ring) 25%, var(--border))"
+        backgroundColor="color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))"
+        color="var(--text)"
+        fontSize={11}
+        hoverStyle={{
+          textDecoration: "none",
+          borderColor: "color-mix(in srgb, var(--focus-ring) 25%, var(--border))",
+          backgroundColor: "color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))",
+        }}
         aria-label={ariaLabel ?? triggerLabel}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="navActionButton"
-        style={{ padding: 8, display: "inline-flex", alignItems: "center" }}
+        onPress={() => setOpen(true)}
       >
-        {triggerVariant === "text" ? triggerLabel : <HamburgerIcon />}
-      </button>
+        {triggerVariant === "text" ? (
+          <Text color="var(--text)" fontSize={11}>
+            {triggerLabel}
+          </Text>
+        ) : (
+          <HamburgerIcon />
+        )}
+      </Button>
       <Sheet
         open={open}
         onOpenChange={setOpen}

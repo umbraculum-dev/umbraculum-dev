@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Link } from "../../src/i18n/navigation";
 import type { AuthMeResponse } from "@brewery/contracts";
 import { parseAuthMeResponse } from "@brewery/contracts";
+import { Button, Text, XStack } from "tamagui";
 
 import { apiFetch } from "../_lib/apiClient";
 import { AppMainNav } from "./AppMainNav";
@@ -119,49 +120,73 @@ export function PrimaryNav() {
         ariaLabel={t("ariaSession")}
         left={
           <>
-            <label className="muted" style={{ fontSize: 11 }}>
-              {t("language")}{" "}
-              <select
-                value={locale}
-                onChange={(e) => {
-                  const next = e.target.value;
-                  const parts = (pathname || "/").split("/");
-                  if (parts.length > 1) parts[1] = next;
-                  const nextPath = parts.join("/") || `/${next}`;
-                  const qs = searchParams?.toString();
-                  router.push(qs ? `${nextPath}?${qs}` : nextPath);
+            <XStack ai="center" gap="$1">
+              <Text as="label" color="var(--text-muted)" fontSize={11}>
+                {t("language")}{" "}
+                <select
+                  value={locale}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    const parts = (pathname || "/").split("/");
+                    if (parts.length > 1) parts[1] = next;
+                    const nextPath = parts.join("/") || `/${next}`;
+                    const qs = searchParams?.toString();
+                    router.push(qs ? `${nextPath}?${qs}` : nextPath);
+                  }}
+                  style={{ marginLeft: 6 }}
+                >
+                  <option value="en">EN</option>
+                  <option value="it">IT</option>
+                </select>
+              </Text>
+            </XStack>
+            <Link href="/accessibility" style={{ display: "contents", textDecoration: "none" }}>
+              <XStack
+                as="span"
+                ai="center"
+                px="$1"
+                py="$0.5"
+                borderRadius="$2"
+                borderWidth={1}
+                borderColor="color-mix(in srgb, var(--focus-ring) 25%, var(--border))"
+                backgroundColor="color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))"
+                color="var(--text)"
+                fontSize={11}
+                cursor="pointer"
+                hoverStyle={{
+                  textDecoration: "none",
+                  borderColor: "color-mix(in srgb, var(--focus-ring) 25%, var(--border))",
+                  backgroundColor: "color-mix(in srgb, var(--focus-ring) 14%, var(--surface-2))",
                 }}
-                style={{ marginLeft: 6 }}
+                focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
               >
-                <option value="en">EN</option>
-                <option value="it">IT</option>
-              </select>
-            </label>
-            <Link href="/accessibility" className="navActionButton">
-              {t("accessibility")}
+                <Text color="var(--text)" fontSize={11}>
+                  {t("accessibility")}
+                </Text>
+              </XStack>
             </Link>
             {authKnown && me ? (
               <>
-                <span className="muted">
+                <Text color="var(--text-muted)" fontSize={11}>
                   {t("signedInAs")}: <code>{me.user.email}</code>
-                </span>
-                <span className="muted">
+                </Text>
+                <Text color="var(--text-muted)" fontSize={11}>
                   {t("activeAccount")}:{" "}
                   {active ? (
                     <>
                       <code>{active.name}</code>
-                      <span className="muted">{" "}(</span>
-                      <code>{active.id}</code>
-                      <span className="muted">)</span>
+                      {" "}(<code>{active.id}</code>)
                     </>
                   ) : (
                     <code>{me.activeAccountId ?? "—"}</code>
                   )}
-                </span>
+                </Text>
               </>
             ) : null}
             {process.env.NODE_ENV !== "production" && authError ? (
-              <span className="muted">(auth: {authError})</span>
+              <Text color="var(--text-muted)" fontSize={11}>
+                (auth: {authError})
+              </Text>
             ) : null}
           </>
         }
@@ -169,12 +194,24 @@ export function PrimaryNav() {
           <>
             {authKnown && me ? (
               <>
-                <Link href="/select-account" className="muted">
-                  {t("switchAccount")}
+                <Link href="/select-account" style={{ textDecoration: "none" }}>
+                  <Text color="var(--text-muted)" fontSize={11} hoverStyle={{ textDecoration: "underline" }}>
+                    {t("switchAccount")}
+                  </Text>
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => {
+                <Button
+                  size="$1"
+                  chromeless
+                  fontSize={11}
+                  px="$1"
+                  py="$0.5"
+                  color="var(--text)"
+                  backgroundColor="transparent"
+                  borderWidth={0}
+                  hoverStyle={{ textDecoration: "underline" }}
+                  pressStyle={{ opacity: 0.8 }}
+                  disabled={loggingOut}
+                  onPress={() => {
                     setLoggingOut(true);
                     apiFetch("/api/auth/logout", { method: "POST" })
                       .catch(() => {})
@@ -187,13 +224,16 @@ export function PrimaryNav() {
                         router.replace(`/${locale}/login`);
                       });
                   }}
-                  disabled={loggingOut}
                 >
                   {loggingOut ? `${t("logout")}…` : t("logout")}
-                </button>
+                </Button>
               </>
             ) : authKnown ? (
-              <Link href="/login">{t("login")}</Link>
+              <Link href="/login" style={{ textDecoration: "none" }}>
+                <Text color="var(--info)" fontSize={11} hoverStyle={{ textDecoration: "underline" }}>
+                  {t("login")}
+                </Text>
+              </Link>
             ) : null}
           </>
         }

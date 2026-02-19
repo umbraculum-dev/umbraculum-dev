@@ -106,6 +106,45 @@ export default function RecipeEditPage() {
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
+  const [layoutMetrics, setLayoutMetrics] = useState<{
+    leftGutterPx: number | null;
+    railTopPx: number | null;
+  }>({ leftGutterPx: null, railTopPx: null });
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      const appShell = document.querySelector(".appShell");
+      const mainEl = document.getElementById("main");
+      const leftGutterPx = appShell instanceof HTMLElement ? appShell.getBoundingClientRect().left : null;
+      const railTopPx = mainEl instanceof HTMLElement ? Math.max(mainEl.getBoundingClientRect().top, 16) : null;
+      setLayoutMetrics({ leftGutterPx, railTopPx });
+    };
+
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        update();
+      });
+    };
+
+    update();
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("scroll", schedule, { passive: true });
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule);
+    };
+  }, []);
+
+  // We need enough real left gutter to shift the rail into it.
+  // Add a safety margin so we fall back to the button sooner while resizing.
+  const DESKTOP_RAIL_REQUIRED_GUTTER_PX = 320;
+  const useDesktopRail =
+    typeof layoutMetrics.leftGutterPx === "number" &&
+    layoutMetrics.leftGutterPx >= DESKTOP_RAIL_REQUIRED_GUTTER_PX;
 
   const roundTo = (n: number, decimals: number) => {
     const f = 10 ** decimals;
@@ -907,19 +946,23 @@ export default function RecipeEditPage() {
         </pre>
       ) : null}
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 16,
-        }}
-        className="recipeEditLayout"
-      >
-        <div style={{ flexShrink: 0 }} className="recipeEditLayout-sidebar">
-          <RecipeEditSectionsNav sections={sections} recipeId={recipeId} />
-        </div>
+      {useDesktopRail ? (
+        <RecipeEditSectionsNav
+          sections={sections}
+          recipeId={recipeId}
+          layoutMode="rail"
+          railLeftPx={layoutMetrics.leftGutterPx}
+          railTopPx={layoutMetrics.railTopPx}
+        />
+      ) : null}
 
+      <div className="recipeEditLayout">
         <div className="recipeEditContent" style={{ flex: 1, minWidth: 0 }}>
+          {!useDesktopRail ? (
+            <div style={{ marginBottom: 12 }}>
+              <RecipeEditSectionsNav sections={sections} recipeId={recipeId} layoutMode="sheet" />
+            </div>
+          ) : null}
           <section id="basics" className="panel">
             <details open={openSections.basics} onToggle={(e) => setSectionOpen("basics", e.currentTarget.open)}>
               <summary style={{ cursor: "pointer" }}>
