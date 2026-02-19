@@ -830,7 +830,7 @@
     "submitting": "Submitting…",
     "languageLabel": "Language",
     "noteTitle": "Translations status",
-    "noteBody": "English is the original language. Other languages (starting with Italian) will soon be 100% supported.",
+    "noteBody": "English is the original language. Other languages (starting with Italian) will soon be 100% supported. Spanish and German are coming soon as well.",
     "helpTranslate": "Help translate (i18n contributing)"
   },
   "i18nContributing": {
