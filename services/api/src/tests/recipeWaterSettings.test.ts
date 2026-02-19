@@ -42,8 +42,8 @@ describe("recipe water-settings", () => {
     });
     await app.prisma.accountMember.upsert({
       where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "owner" },
-      update: { role: "owner" },
+      create: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "brewery_admin" },
+      update: { role: "brewery_admin" },
     });
 
     await app.prisma.account.upsert({
@@ -53,8 +53,8 @@ describe("recipe water-settings", () => {
     });
     await app.prisma.accountMember.upsert({
       where: { accountId_userId: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "owner" },
-      update: { role: "owner" },
+      create: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "brewery_admin" },
+      update: { role: "brewery_admin" },
     });
 
     // Idempotence: wipe test data if it exists from earlier runs.

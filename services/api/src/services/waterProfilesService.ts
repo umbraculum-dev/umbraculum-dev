@@ -21,7 +21,7 @@ export type UpdateWaterProfileInput = Partial<CreateWaterProfileInput> & {
 };
 
 function isAdminRole(role: string) {
-  return role === "owner" || role === "brewery_admin";
+  return role === "brewery_admin";
 }
 
 function toNumber(val: unknown, field: string) {

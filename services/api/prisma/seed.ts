@@ -210,7 +210,7 @@ async function main() {
       members: {
         create: {
           userId: DEV_USER_ID,
-          role: "owner",
+          role: "brewery_admin",
         },
       },
     },
@@ -230,16 +230,16 @@ async function main() {
     create: {
       accountId: DEV_ACCOUNT_ID,
       userId: DEV_USER_ID,
-      role: "owner",
+      role: "brewery_admin",
     },
     update: {
-      role: "owner",
+      role: "brewery_admin",
     },
   });
 
   await seedBeerStyles(prisma);
 
-  // Optional: seed an owner user with a *real* password for local dev.
+  // Optional: seed an admin user with a *real* password for local dev.
   // This is intentionally driven by env vars so secrets are not committed to the repo.
   //
   // Usage:
@@ -268,7 +268,7 @@ async function main() {
           members: {
             create: {
               userId: user.id,
-              role: "owner",
+              role: "brewery_admin",
             },
           },
         },
@@ -282,12 +282,12 @@ async function main() {
             userId: user.id,
           },
         },
-        create: { accountId: SEEDED_OWNER_ACCOUNT_ID, userId: user.id, role: "owner" },
-        update: { role: "owner" },
+        create: { accountId: SEEDED_OWNER_ACCOUNT_ID, userId: user.id, role: "brewery_admin" },
+        update: { role: "brewery_admin" },
       });
 
       // eslint-disable-next-line no-console
-      console.log(`Seeded owner login: ${user.email} (account: ${SEEDED_OWNER_ACCOUNT_ID})`);
+      console.log(`Seeded admin login: ${user.email} (account: ${SEEDED_OWNER_ACCOUNT_ID})`);
     } else {
       // eslint-disable-next-line no-console
       console.log("Skipping SEEDED_OWNER_*: invalid email or password too short.");

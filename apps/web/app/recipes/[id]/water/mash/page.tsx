@@ -81,7 +81,7 @@ type RecipeResponse = {
 };
 
 function isAdmin(role: string | null) {
-  return role === "owner" || role === "brewery_admin";
+  return role === "brewery_admin";
 }
 
 export default function MashWaterPage() {

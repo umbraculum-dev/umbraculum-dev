@@ -8,7 +8,6 @@ datasource db {
 }
 
 enum AccountRole {
-  owner
   brewery_admin
   member
   viewer

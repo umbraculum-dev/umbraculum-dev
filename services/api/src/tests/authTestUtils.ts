@@ -20,7 +20,7 @@ export async function createAccountForUser(app: FastifyInstance, userId: string,
   return await app.prisma.account.create({
     data: {
       name,
-      members: { create: { userId, role: "owner" } },
+      members: { create: { userId, role: "brewery_admin" } },
     },
     select: { id: true, name: true },
   });

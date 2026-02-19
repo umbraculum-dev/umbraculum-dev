@@ -6,7 +6,7 @@ import { importBeerprotoAll } from "../seed/sources/beerproto/beerproto.js";
 import { getMashPhModelDefaultsV1 } from "../domain/waterCalc/mashPhDefaultsV1.js";
 
 function isAdminRole(role: string | null) {
-  return role === "owner" || role === "brewery_admin";
+  return role === "brewery_admin";
 }
 
 function getQueryString(raw: unknown): string {

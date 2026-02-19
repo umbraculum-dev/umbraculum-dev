@@ -9,7 +9,7 @@ import { apiFetch } from "../../_lib/apiClient";
 import type { MeResponse, WaterProfile, WaterProfilesResponse } from "../../_lib/apiTypes";
 
 function isAdmin(role: string | null) {
-  return role === "owner" || role === "brewery_admin";
+  return role === "brewery_admin";
 }
 
 export default function WaterProfilesPage() {

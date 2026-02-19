@@ -50,8 +50,8 @@ export async function accountsRoutes(app: FastifyInstance) {
     if (!accountId) throw new BadRequestError("invalid_account_id", "Params.id is required");
 
     const role = await accounts.assertMembership(ctx.userId, accountId);
-    if (role !== "owner") {
-      throw new BadRequestError("not_owner", "Only account owners can update branding");
+    if (role !== "brewery_admin") {
+      throw new BadRequestError("not_admin", "Admin role required");
     }
 
     const body = (req.body ?? {}) as { brandKey?: unknown };

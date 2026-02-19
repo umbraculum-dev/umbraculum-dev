@@ -14,7 +14,7 @@ describe("equipment-profiles", () => {
   beforeAll(async () => {
     await app.ready();
 
-    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "owner" });
+    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "brewery_admin" });
     cookieAdmin = admin.cookie;
     adminAccountId = admin.accountId;
 

@@ -16,7 +16,7 @@ describe("water-profiles", () => {
 
   beforeAll(async () => {
     await app.ready();
-    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "owner" });
+    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "brewery_admin" });
     cookieAdmin = admin.cookie;
     accountId = admin.accountId;
 
@@ -40,8 +40,8 @@ describe("water-profiles", () => {
 
     await app.prisma.accountMember.upsert({
       where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID, role: "owner" },
-      update: { role: "owner" },
+      create: { accountId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID, role: "brewery_admin" },
+      update: { role: "brewery_admin" },
     });
 
     await app.prisma.user.upsert({

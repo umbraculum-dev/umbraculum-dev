@@ -39,7 +39,7 @@ export class AccountsService {
         members: {
           create: {
             userId,
-            role: "owner",
+            role: "brewery_admin",
           },
         },
       },

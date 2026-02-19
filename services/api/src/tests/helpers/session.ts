@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { randomBytes } from "node:crypto";
 
-type Role = "owner" | "brewery_admin" | "member" | "viewer";
+type Role = "brewery_admin" | "member" | "viewer";
 
 function opaqueId(bytes = 32) {
   return randomBytes(bytes).toString("hex");
@@ -20,7 +20,7 @@ export async function createSessionForTestUser(
     options?.email ??
     `test_${Date.now()}_${Math.random().toString(16).slice(2)}@example.com`.toLowerCase();
   const preferredLocale = options?.preferredLocale ?? "en";
-  const role: Role = options?.role ?? "owner";
+  const role: Role = options?.role ?? "brewery_admin";
   const activeAccount = options?.activeAccount ?? true;
 
   const user = await app.prisma.user.create({
