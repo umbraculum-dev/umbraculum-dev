@@ -13,7 +13,8 @@ import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
-import { apiFetch, type MeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
+import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
+import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
   bicarbonatePpmToAlkalinityPpmCaCO3,
@@ -22,7 +23,8 @@ import {
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseMashComputeAndSaveResponse } from "../_lib/parseWaterComputeAndSave";
+import { parseMashComputeAndSaveResponse } from "@brewery/contracts";
+import { formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -88,12 +90,13 @@ export default function MashWaterPage() {
   const locale = useLocale();
   const tWater = useTranslations("recipes.water.common");
   const t = useTranslations("recipes.water.mash");
+  const tUnits = useTranslations("units");
   const tMath = useTranslations("math");
   const authState = useRequireAuth({ requireActiveAccount: true });
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const [me, setMe] = useState<MeResponse | null>(null);
+  const [me, setMe] = useState<AuthMeResponse | null>(null);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
@@ -146,6 +149,10 @@ export default function MashWaterPage() {
   const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<MashOverallResult | null>(null);
+  const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
+
+  const fmt = (unitKey: string, value: unknown, fallback: number) =>
+    formatWithHint(locale, value, formatHints, unitKey, fallback);
 
   // Water adjustment inputs (profiles + dilution)
   const [sourceProfileId, setSourceProfileId] = useState<string>("");
@@ -187,11 +194,11 @@ export default function MashWaterPage() {
     setLoadingProfiles(true);
     try {
       const meRes = await apiFetch("/api/auth/me");
-      setMe(meRes.ok ? ((meRes.data as any) as MeResponse) : null);
+      setMe(meRes.ok ? parseAuthMeResponse(meRes.data) : null);
 
       const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(profRes.data as WaterProfilesResponse);
+      setProfiles(parseWaterProfilesResponse(profRes.data));
     } catch (err) {
       setProfilesError(String(err));
     } finally {
@@ -751,6 +758,7 @@ export default function MashWaterPage() {
     try {
       if (saveAlso) {
         const computed = await computeAndSaveMashSnapshots();
+        setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
         setSaltsResult(computed.salts.result as any);
         setSaltsDerivation(computed.salts.derivation as any);
         setAcidDerivation(computed.acid.derivation as any);
@@ -796,6 +804,7 @@ export default function MashWaterPage() {
     setMashSubmitting(true);
     try {
       const computed = await computeAndSaveMashSnapshots();
+      setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
       setSaltsResult(computed.salts.result as any);
       setSaltsDerivation(computed.salts.derivation as any);
       setAcidDerivation(computed.acid.derivation as any);
@@ -961,7 +970,7 @@ export default function MashWaterPage() {
             </div>
             <div>
               <label htmlFor="tap-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
-                Source volume (L)
+                {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
                 id="tap-volume"
@@ -975,7 +984,7 @@ export default function MashWaterPage() {
             </div>
             <div>
               <label htmlFor="dilution-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
-                Dilution volume (L)
+                {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
                 id="dilution-volume"
@@ -1035,9 +1044,9 @@ export default function MashWaterPage() {
                       return (
                         <tr key={label}>
                           <td>{label}</td>
-                          <td align="right">{mixed.toFixed(2)}</td>
-                          <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
-                          <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                          <td align="right">{fmt("ppm", mixed, 0)}</td>
+                          <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
+                          <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
                         </tr>
                       );
                     })}
@@ -1071,7 +1080,7 @@ export default function MashWaterPage() {
           </p>
           <ul style={{ marginTop: 0 }}>
             <li>
-              Rows: <code>{gristImportedRows.length}</code> · Total: <code>{gristTotalKg.toFixed(2)}</code> kg
+              Rows: <code>{gristImportedRows.length}</code> · Total: <code>{fmt("kg", gristTotalKg, 2)}</code> {tUnits("kg")}
             </li>
             <li>
               Snapshot imported at: <code>{gristImportedAt ?? "—"}</code>
@@ -1114,7 +1123,7 @@ export default function MashWaterPage() {
             <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
               <div>
                 <label htmlFor="mash-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  Starting alkalinity (ppm as CaCO3)
+                  {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </label>
                 <input
                   id="mash-starting-alk"
@@ -1131,7 +1140,7 @@ export default function MashWaterPage() {
               </div>
               <div>
                 <label htmlFor="mash-volume-l" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  Mash water volume (L)
+                  {t("mashWaterVolumeLabel", { unit: tUnits("L") })}
                 </label>
                 <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
                   Derived from Water adjustment volumes above (Source + Dilution).
@@ -1231,7 +1240,7 @@ export default function MashWaterPage() {
               {mashAcidificationMode === "manual" ? (
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label htmlFor="mash-manual-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
-                    Acid added ({mashStrengthKind === "solid" ? "g" : "mL"})
+                    Acid added ({mashStrengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </label>
                   <input
                     id="mash-manual-acid-added"
@@ -1286,15 +1295,21 @@ export default function MashWaterPage() {
                             ctx: {
                               acidDerivation,
                             },
+                            units: {
+                              L: tUnits("L"),
+                              ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                              ppm: tUnits("ppm"),
+                              LPerKg: tUnits("LPerKg"),
+                            },
                           })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
                     })() : null}
-                    : <code>{mashResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    : <code>{fmt("mL", mashResult.acidRequiredMl, 0)}</code> {tUnits("mL")}{" "}
                     {mashResult.acidRequiredTsp !== null ? (
                       <>
-                        (<code>{mashResult.acidRequiredTsp.toFixed(3)}</code> tsp)
+                        (<code>{fmt("mL", mashResult.acidRequiredTsp, 0)}</code> {tUnits("tsp")})
                       </>
                     ) : null}
                   </li>
@@ -1315,15 +1330,21 @@ export default function MashWaterPage() {
                             ctx: {
                               acidDerivation,
                             },
+                            units: {
+                              L: tUnits("L"),
+                              ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                              ppm: tUnits("ppm"),
+                              LPerKg: tUnits("LPerKg"),
+                            },
                           })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
                     })() : null}
-                    : <code>{mashResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    : <code>{fmt("g", mashResult.acidRequiredGrams, 0)}</code> {tUnits("g")}{" "}
                     {mashResult.acidRequiredKg !== null ? (
                       <>
-                        (<code>{mashResult.acidRequiredKg.toFixed(6)}</code> kg)
+                        (<code>{fmt("kg", mashResult.acidRequiredKg, 2)}</code> {tUnits("kg")})
                       </>
                     ) : null}
                   </li>
@@ -1344,18 +1365,24 @@ export default function MashWaterPage() {
                             overallDerivation,
                             acidDerivation,
                           },
+                          units: {
+                            L: tUnits("L"),
+                            ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                            ppm: tUnits("ppm"),
+                            LPerKg: tUnits("LPerKg"),
+                          },
                         })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
                     );
                   })() : null}
-                  : <code>{mashResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  : <code>{fmt("ppm_as_CaCO3", mashResult.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
                 <li>
-                  Sulfate added: <code>{mashResult.sulfateAddedPpm.toFixed(3)}</code> ppm
+                  Sulfate added: <code>{fmt("ppm", mashResult.sulfateAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
                 <li>
-                  Chloride added: <code>{mashResult.chlorideAddedPpm.toFixed(3)}</code> ppm
+                  Chloride added: <code>{fmt("ppm", mashResult.chlorideAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
               </ul>
             </div>
@@ -1370,22 +1397,22 @@ export default function MashWaterPage() {
               </summary>
               <ul>
                 <li>
-                  Estimated achieved pH: <code>{mashManualResult.achievedPh.toFixed(3)}</code>
+                  Estimated achieved pH: <code>{fmt("pH", mashManualResult.achievedPh, 2)}</code>
                 </li>
                 {Number.isFinite(mashManualResult.targetAmount) && Number.isFinite(mashManualResult.predictedAmount) ? (
                   <li>
-                    Acid amount: <code>{mashManualResult.targetAmount.toFixed(3)}</code> {mashStrengthKind === "solid" ? "g" : "mL"} (solver check:{" "}
-                    <code>{mashManualResult.predictedAmount.toFixed(3)}</code>)
+                    Acid amount: <code>{fmt(mashStrengthKind === "solid" ? "g" : "mL", mashManualResult.targetAmount, 0)}</code> {mashStrengthKind === "solid" ? tUnits("g") : tUnits("mL")} (solver check:{" "}
+                    <code>{fmt(mashStrengthKind === "solid" ? "g" : "mL", mashManualResult.predictedAmount, 0)}</code>)
                   </li>
                 ) : null}
                 <li>
-                  Final alkalinity: <code>{mashManualResult.predicted.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  Final alkalinity: <code>{fmt("ppm_as_CaCO3", mashManualResult.predicted.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
                 <li>
-                  Sulfate added: <code>{mashManualResult.predicted.sulfateAddedPpm.toFixed(3)}</code> ppm
+                  Sulfate added: <code>{fmt("ppm", mashManualResult.predicted.sulfateAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
                 <li>
-                  Chloride added: <code>{mashManualResult.predicted.chlorideAddedPpm.toFixed(3)}</code> ppm
+                  Chloride added: <code>{fmt("ppm", mashManualResult.predicted.chlorideAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
               </ul>
             </details>
@@ -1433,14 +1460,20 @@ export default function MashWaterPage() {
                   return (
                     <MathHelpPopover
                       title={title}
-                      body={buildWaterMathBody({
-                        key: "mash.ionsAfterSalts",
-                        tMath,
-                        locale,
-                        ctx: {
-                          saltDerivation: saltDerivationForMath,
-                        },
-                      })}
+body={buildWaterMathBody({
+                      key: "mash.ionsAfterSalts",
+                      tMath,
+                      locale,
+                      ctx: {
+                        saltDerivation: saltDerivationForMath,
+                      },
+                      units: {
+                        L: tUnits("L"),
+                        ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                        ppm: tUnits("ppm"),
+                        LPerKg: tUnits("LPerKg"),
+                      },
+                    })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
                   );
@@ -1475,9 +1508,9 @@ export default function MashWaterPage() {
                       return (
                         <tr key={label}>
                           <td>{label}</td>
-                          <td align="right">{after.toFixed(2)}</td>
-                          <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
-                          <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                          <td align="right">{fmt("ppm", after, 0)}</td>
+                          <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
+                          <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
                         </tr>
                       );
                     })}
@@ -1528,6 +1561,12 @@ export default function MashWaterPage() {
                         ctx: {
                           overallDerivation,
                         },
+                        units: {
+                          L: tUnits("L"),
+                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                          ppm: tUnits("ppm"),
+                          LPerKg: tUnits("LPerKg"),
+                        },
                       })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
@@ -1538,10 +1577,10 @@ export default function MashWaterPage() {
               </div>
               <ul>
                 <li>
-                  pH: {overallResult.ph.kind} <code>{overallResult.ph.value.toFixed(2)}</code>
+                  pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
                 </li>
                 <li>
-                  Mash water volume: <code>{derivedMashWaterVolumeLiters.toFixed(2)}</code> L
+                  Mash water volume: <code>{fmt("L", derivedMashWaterVolumeLiters, 2)}</code> {tUnits("L")}
                 </li>
                 <li>
                   Final alkalinity{" "}
@@ -1559,12 +1598,18 @@ export default function MashWaterPage() {
                             overallDerivation,
                             acidDerivation,
                           },
+                          units: {
+                            L: tUnits("L"),
+                            ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                            ppm: tUnits("ppm"),
+                            LPerKg: tUnits("LPerKg"),
+                          },
                         })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
                     );
                   })() : null}
-                  : <code>{overallResult.finalAlkalinityPpmCaCO3.toFixed(2)}</code> ppm as CaCO3
+                  : <code>{fmt("ppm_as_CaCO3", overallResult.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
               </ul>
               <div style={{ overflowX: "auto", marginTop: 8 }}>
@@ -1588,7 +1633,7 @@ export default function MashWaterPage() {
                     ).map(([label, v]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="right">{v.toFixed(2)}</td>
+                        <td align="right">{fmt("ppm", v, 0)}</td>
                       </tr>
                     ))}
                   </tbody>

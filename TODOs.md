@@ -2,6 +2,21 @@
 
 This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
 
+## Native login gate (MANDATORY before React Native auth)
+
+Before implementing native app login, complete these items.
+
+### Must complete first
+- [x] **Shared parsers**: Move `parseWaterComputeAndSave` and `parseGravityAnalysis` into `@brewery/contracts` so web + native use the same runtime validation.
+- [x] **Format hints consistency**: Apply `formatHints` consistently across all native-ready endpoints (water hub, compute-and-save, analysis).
+- [ ] **Web auth hardening check**: Assess whether current cookie-based auth needs hardening (CSRF, secure flags, session cleanup) before adding token-based native auth.
+- [x] **Native login strategy**: Implemented (opaque session token via `POST /auth/login/native`). See `docs/AUTH-STRATEGY.md`.
+
+### Can defer (but track)
+- [ ] Full "result + derivation" unification beyond water.
+- [ ] Explicit `version` field on every native-ready payload.
+- [ ] Density mode / design tokens (web-only for now).
+
 ## Native beta readiness (nice-to-have, not required)
 
 - [ ] Centralize formatting metadata (precision/rounding hints) so web/native render numbers consistently.
@@ -10,11 +25,17 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 ## Water calculator (high priority)
 
+- [x] **Units i18n namespace**: Add `units` namespace (L, g, mL, kg, ppm, ppmAsCaCO3, tsp, pH) and replace hardcoded unit strings in water hub, mash, sparge, boil pages.
+- [ ] **Units i18n follow-ups** (natural next steps):
+  - [ ] Localize form labels that embed units (e.g. "Starting alkalinity (ppm as CaCO3)") via i18n keys or `tUnits` where appropriate.
+  - [ ] Extend `tUnits` to **equipment** and other pages that display unit suffixes.
+  - [ ] Add locale-specific variants for `tsp` (e.g. Italian "cucch. da tè") if desired.
+  - [ ] Consider `math.derivation` body strings: introduce placeholders (e.g. `{ppmAsCaCO3}`) in bodyWithValues so derivation prose can use localized units.
 - [x] **Sparge salts vs sparge pH**: ensure sparge salt additions influence sparge acidification (Ca/Mg effective-alkalinity heuristic), without requiring a manual “calculate salts” step first.
 - [x] **Deprecate mash pH v0**: remove v0 endpoints/logic and UI naming; keep a single canonical mash pH estimator that supports back-compat inputs.
 - [ ] Implement how recipes manage **late additions** and **boil additions** (separate from mash), since they do not contribute to mash calculations.
 - [x] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
-- [ ] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
+- [x] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
 
 ## Recipes / templates
 

@@ -9,13 +9,12 @@ import type {
   BoilAcidComputeBlock,
   WaterAcidificationManualResult,
   WaterAcidificationResult,
-  WaterCalcDerivation,
-  WaterCalcDerivationLine,
-  WaterCalcDerivationValue,
   WaterOverallResult,
   WaterSaltAdditionsResult,
-  IonProfilePpm,
-} from "@brewery/contracts";
+} from "./computeAndSave";
+import type { WaterCalcDerivation, WaterCalcDerivationLine, WaterCalcDerivationValue } from "./derivation";
+import type { IonProfilePpm } from "./ionProfile";
+import type { NumberFormatHintV1 } from "../format/numberFormat";
 
 function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
@@ -264,6 +263,40 @@ function parseBoilAcidBlock(v: unknown, label: string): BoilAcidComputeBlock {
   throw new Error(`Invalid ${label}.kind`);
 }
 
+function parseNumberFormatHintV1(v: unknown, label: string): NumberFormatHintV1 {
+  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
+  const o = v as any;
+  if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
+  const style = o.style === "fixed" || o.style === "significant" ? o.style : null;
+  if (!style) throw new Error(`Invalid ${label}.style`);
+  const decimals = isFiniteNumber(o.decimals) ? o.decimals : NaN;
+  if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
+  const unit = typeof o.unit === "string" ? o.unit : undefined;
+  const clamp =
+    o.clamp && typeof o.clamp === "object"
+      ? {
+          min: isFiniteNumber((o.clamp as any).min) ? (o.clamp as any).min : undefined,
+          max: isFiniteNumber((o.clamp as any).max) ? (o.clamp as any).max : undefined,
+        }
+      : undefined;
+  return { version: 1, style, decimals, unit: unit as any, clamp };
+}
+
+function parseFormatHints(root: any): Record<string, NumberFormatHintV1> {
+  const hintsOut: Record<string, NumberFormatHintV1> = {};
+  const h = root?.formatHints;
+  if (h && typeof h === "object") {
+    for (const [k, v] of Object.entries(h as Record<string, unknown>)) {
+      try {
+        hintsOut[k] = parseNumberFormatHintV1(v, `formatHints.${k}`);
+      } catch {
+        // ignore invalid hint entries
+      }
+    }
+  }
+  return hintsOut;
+}
+
 export function parseMashComputeAndSaveResponse(x: unknown): MashComputeAndSaveResponseV1 {
   const root = (x ?? {}) as any;
   if (!root || typeof root !== "object") throw new Error("Invalid MashComputeAndSaveResponseV1");
@@ -274,6 +307,7 @@ export function parseMashComputeAndSaveResponse(x: unknown): MashComputeAndSaveR
   const acid = root.acid;
   const overall = root.overall;
 
+  const formatHints = parseFormatHints(root);
   return {
     ok: true,
     version: 1,
@@ -287,6 +321,7 @@ export function parseMashComputeAndSaveResponse(x: unknown): MashComputeAndSaveR
       result: parseOverallResult(overall?.result, "MashComputeAndSaveResponseV1.overall.result"),
       derivation: parseDerivation(overall?.derivation, "MashComputeAndSaveResponseV1.overall.derivation"),
     },
+    formatHints: Object.keys(formatHints).length > 0 ? formatHints : undefined,
   };
 }
 
@@ -299,6 +334,7 @@ export function parseSpargeComputeAndSaveResponse(x: unknown): SpargeComputeAndS
   const salts = root.salts;
   const acid = root.acid;
 
+  const formatHints = parseFormatHints(root);
   return {
     ok: true,
     version: 1,
@@ -308,6 +344,7 @@ export function parseSpargeComputeAndSaveResponse(x: unknown): SpargeComputeAndS
       derivation: parseDerivation(salts?.derivation, "SpargeComputeAndSaveResponseV1.salts.derivation"),
     },
     acid: parseSpargeAcidBlock(acid, "SpargeComputeAndSaveResponseV1.acid"),
+    formatHints: Object.keys(formatHints).length > 0 ? formatHints : undefined,
   };
 }
 
@@ -321,6 +358,7 @@ export function parseBoilComputeAndSaveResponse(x: unknown): BoilComputeAndSaveR
   const acid = root.acid;
   const overall = root.overall;
 
+  const formatHints = parseFormatHints(root);
   return {
     ok: true,
     version: 1,
@@ -334,6 +372,6 @@ export function parseBoilComputeAndSaveResponse(x: unknown): BoilComputeAndSaveR
       result: parseOverallResult(overall?.result, "BoilComputeAndSaveResponseV1.overall.result"),
       derivation: parseDerivation(overall?.derivation, "BoilComputeAndSaveResponseV1.overall.derivation"),
     },
+    formatHints: Object.keys(formatHints).length > 0 ? formatHints : undefined,
   };
 }
-

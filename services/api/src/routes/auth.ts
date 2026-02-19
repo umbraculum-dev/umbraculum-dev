@@ -4,7 +4,7 @@ import argon2 from "argon2";
 import { randomBytes } from "node:crypto";
 
 import { BadRequestError, UnauthorizedError } from "../errors.js";
-import { SESSION_COOKIE_NAME, requireSession } from "../plugins/sessionAuth.js";
+import { SESSION_COOKIE_NAME, readBearerToken, requireSession } from "../plugins/sessionAuth.js";
 import { AccountsService } from "../services/accountsService.js";
 
 const SESSION_TTL_DAYS = 14;
@@ -168,8 +168,64 @@ export async function authRoutes(app: FastifyInstance) {
     },
   );
 
+  app.post(
+    "/auth/login/native",
+    { config: { rateLimit: { max: 20, timeWindow: "1 minute" } } },
+    async (req, reply) => {
+      const body = (req.body ?? {}) as { email?: unknown; password?: unknown; preferredLocale?: unknown };
+      const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+      const password = typeof body.password === "string" ? body.password : "";
+      const preferredLocale = assertLocale(body.preferredLocale);
+
+      if (!email || !email.includes("@")) throw new BadRequestError("invalid_email", "Email is required");
+      if (!password) throw new BadRequestError("invalid_password", "Password is required");
+
+      const user = await app.prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, passwordHash: true, preferredLocale: true },
+      });
+      if (!user || !user.passwordHash) throw new UnauthorizedError("invalid_credentials", "Invalid email or password");
+
+      const ok = await argon2.verify(user.passwordHash, password);
+      if (!ok) throw new UnauthorizedError("invalid_credentials", "Invalid email or password");
+
+      if (user.preferredLocale !== preferredLocale) {
+        await app.prisma.user.update({
+          where: { id: user.id },
+          data: { preferredLocale },
+        });
+      }
+
+      const memberships = await accounts.listAccountsForUser(user.id);
+      const activeAccountId =
+        memberships.length === 1
+          ? memberships[0]!.id
+          : null;
+
+      const sessionId = makeOpaqueId();
+      const session = await app.prisma.session.create({
+        data: {
+          id: sessionId,
+          userId: user.id,
+          activeAccountId,
+          expiresAt: nowPlusDays(SESSION_TTL_DAYS),
+        },
+        select: { id: true, activeAccountId: true },
+      });
+
+      reply.send({
+        ok: true,
+        token: session.id,
+        user: { id: user.id, email: user.email, preferredLocale },
+        accounts: memberships,
+        activeAccountId: session.activeAccountId,
+      });
+    },
+  );
+
   app.post("/auth/logout", async (req, reply) => {
-    const sessionId = (req.cookies as any)?.[SESSION_COOKIE_NAME];
+    const sessionId =
+      (req.cookies as any)?.[SESSION_COOKIE_NAME] ?? readBearerToken(req);
     if (typeof sessionId === "string" && sessionId) {
       await app.prisma.session.delete({ where: { id: sessionId } }).catch(() => {});
     }

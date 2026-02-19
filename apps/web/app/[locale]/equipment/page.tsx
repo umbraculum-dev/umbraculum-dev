@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Link } from "../../../src/i18n/navigation";
+import type { AuthMeResponse } from "@brewery/contracts";
+import { parseAuthMeResponse } from "@brewery/contracts";
+
 import { apiFetch } from "../../_lib/apiClient";
-import type { AuthMeResponse } from "../../_lib/useRequireAuth";
 
 type EquipmentProfile = {
   id: string;
@@ -34,6 +36,7 @@ type EquipmentProfile = {
 
 export default function EquipmentPage() {
   const t = useTranslations("equipment");
+  const tUnits = useTranslations("units");
   const tNav = useTranslations("nav");
 
   const [auth, setAuth] = useState<AuthMeResponse | null>(null);
@@ -75,7 +78,7 @@ export default function EquipmentPage() {
         setAuth(null);
         throw new Error(t("errors.notAuthenticated"));
       }
-      setAuth(meRes.data as AuthMeResponse);
+      setAuth(parseAuthMeResponse(meRes.data));
 
       const listRes = await apiFetch("/api/equipment-profiles");
       if (!listRes.ok) throw new Error(JSON.stringify(listRes.data));
@@ -324,7 +327,7 @@ export default function EquipmentPage() {
                 <thead>
                   <tr>
                     <th align="left">{t("colName")}</th>
-                    <th align="left">{t("colKettleVol")}</th>
+                    <th align="left">{t("colKettleVol", { unit: tUnits("L") })}</th>
                     <th align="left">{t("colMashEff")}</th>
                     {canWrite ? <th align="left">{t("colActions")}</th> : null}
                   </tr>
@@ -382,7 +385,7 @@ export default function EquipmentPage() {
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
                     <label htmlFor="equip-edit-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleVolumeLitersLabel")}
+                      {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-edit-kettle-vol"
@@ -396,7 +399,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-edit-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleLossesLitersLabel")}
+                      {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-edit-kettle-losses"
@@ -438,7 +441,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-edit-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleHopsAbsorptionLitersLabel")}
+                      {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
                     </label>
                     <input
                       id="equip-edit-hops-abs"
@@ -458,7 +461,7 @@ export default function EquipmentPage() {
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
                     <label htmlFor="equip-edit-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashVolumeLitersLabel")}
+                      {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-edit-mash-vol"
@@ -486,7 +489,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-edit-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashLossesLitersLabel")}
+                      {t("mashLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-edit-mash-losses"
@@ -500,7 +503,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-edit-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashThicknessLPerKgLabel")}
+                      {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
                       id="equip-edit-thickness"
@@ -514,7 +517,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-edit-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashGrainAbsorptionLPerKgLabel")}
+                      {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
                       id="equip-edit-grain-abs"
@@ -528,7 +531,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-edit-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashWaterLeftoverLitersLabel")}
+                      {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-edit-water-leftover"
@@ -548,7 +551,7 @@ export default function EquipmentPage() {
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
                     <label htmlFor="equip-edit-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("otherLossesLitersLabel")}
+                      {t("otherLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-edit-other-losses"
@@ -615,7 +618,7 @@ export default function EquipmentPage() {
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
                     <label htmlFor="equip-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleVolumeLitersLabel")}
+                      {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-kettle-vol"
@@ -629,7 +632,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleLossesLitersLabel")}
+                      {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-kettle-losses"
@@ -671,7 +674,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleHopsAbsorptionLitersLabel")}
+                      {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
                     </label>
                     <input
                       id="equip-hops-abs"
@@ -691,7 +694,7 @@ export default function EquipmentPage() {
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
                     <label htmlFor="equip-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashVolumeLitersLabel")}
+                      {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-mash-vol"
@@ -719,7 +722,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashLossesLitersLabel")}
+                      {t("mashLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-mash-losses"
@@ -733,7 +736,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-mash-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashThicknessLPerKgLabel")}
+                      {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
                       id="equip-mash-thickness"
@@ -747,7 +750,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashGrainAbsorptionLPerKgLabel")}
+                      {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
                       id="equip-grain-abs"
@@ -761,7 +764,7 @@ export default function EquipmentPage() {
                   </div>
                   <div>
                     <label htmlFor="equip-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashWaterLeftoverLitersLabel")}
+                      {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-water-leftover"
@@ -781,7 +784,7 @@ export default function EquipmentPage() {
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
                     <label htmlFor="equip-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("otherLossesLitersLabel")}
+                      {t("otherLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
                       id="equip-other-losses"

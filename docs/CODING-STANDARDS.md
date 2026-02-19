@@ -112,6 +112,8 @@ Standards:
 - **Runtime parsing is mandatory in clients**:
   - treat network JSON as `unknown`
   - parse/validate into contracts types before use.
+- **Runtime parsers** for water compute-and-save and gravity analysis live in `@brewery/contracts` (e.g. `parseMashComputeAndSaveResponse`, `parseGravityAnalysisResponseV1`).
+- **Water hub and compute-and-save** endpoints return `formatHints` (unit-keyed: L, pH, ppm_as_CaCO3, ppm, g, mL, kg) for consistent web/native number rendering.
 
 Current canonical “native beta” Water endpoints (v1):
 - `GET /recipes/:id/water-hub-summary`

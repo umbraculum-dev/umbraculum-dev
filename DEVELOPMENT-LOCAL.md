@@ -85,6 +85,8 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - Auth is **cookie-session-based** (`sid` httpOnly cookie). Dev header auth (`X-User-Id` / `X-Account-Id`) is not supported.
   - Use `http://localhost:18080/en/signup` or `http://localhost:18080/en/login`.
   - If you have multiple accounts, use `http://localhost:18080/en/select-account` (calls `POST /api/auth/active-account`) to set `activeAccountId` in your session.
+  - Native apps use `POST /auth/login/native` (returns `token`) and `Authorization: Bearer <token>`. See `docs/AUTH-STRATEGY.md`.
+  - **Session cleanup**: Run `docker compose exec api npm run job:session-cleanup` periodically (e.g. daily) to delete expired sessions.
 - **Prisma schema changes (IMPORTANT)**:
   - If you add/rename Prisma fields (edit `services/api/prisma/schema.prisma`) and the API throws errors like:
     - `Unknown argument "someNewField"` (Prisma Client is stale)

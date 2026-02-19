@@ -5,8 +5,10 @@ import { useTranslations } from "next-intl";
 
 import { Link } from "../../../src/i18n/navigation";
 
+import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
+import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
+
 import { apiFetch } from "../../_lib/apiClient";
-import type { MeResponse, WaterProfile, WaterProfilesResponse } from "../../_lib/apiTypes";
 
 function isAdmin(role: string | null) {
   return role === "brewery_admin";
@@ -14,7 +16,7 @@ function isAdmin(role: string | null) {
 
 export default function WaterProfilesPage() {
   const t = useTranslations("waterProfiles");
-  const [me, setMe] = useState<MeResponse | null>(null);
+  const [me, setMe] = useState<AuthMeResponse | null>(null);
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,10 +45,10 @@ export default function WaterProfilesPage() {
     setLoading(true);
     try {
       const meRes = await apiFetch("/api/auth/me");
-      if (meRes.ok && meRes.data && typeof meRes.data === "object") {
-        const d: any = meRes.data as any;
-        setMe((d.user ?? null) as any);
-        setActiveAccountId(typeof d.activeAccountId === "string" ? d.activeAccountId : null);
+      if (meRes.ok && meRes.data) {
+        const parsed = parseAuthMeResponse(meRes.data);
+        setMe(parsed);
+        setActiveAccountId(parsed.activeAccountId);
       } else {
         setMe(null);
         setActiveAccountId(null);
@@ -54,7 +56,7 @@ export default function WaterProfilesPage() {
 
       const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(profRes.data as WaterProfilesResponse);
+      setProfiles(parseWaterProfilesResponse(profRes.data));
     } catch (err) {
       setError(String(err));
     } finally {

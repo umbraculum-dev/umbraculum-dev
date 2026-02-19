@@ -1,5 +1,6 @@
-import type { IonProfilePpm } from "./ionProfile.js";
-import type { WaterCalcDerivation } from "./derivation.js";
+import type { IonProfilePpm } from "./ionProfile";
+import type { WaterCalcDerivation } from "./derivation";
+import type { NumberFormatHintV1 } from "../format/numberFormat";
 
 export interface RecipeWaterSettingsSavedRef {
   recipeId: string;
@@ -153,6 +154,7 @@ export interface MashComputeAndSaveResponseV1 {
   salts: { result: WaterSaltAdditionsResult; derivation: WaterCalcDerivation };
   acid: MashAcidComputeBlock;
   overall: { result: WaterOverallResult; derivation: WaterCalcDerivation };
+  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
 }
 
 export interface SpargeComputeAndSaveResponseV1 {
@@ -161,6 +163,7 @@ export interface SpargeComputeAndSaveResponseV1 {
   settings: RecipeWaterSettingsSavedRef;
   salts: { result: WaterSaltAdditionsResult; derivation: WaterCalcDerivation };
   acid: SpargeAcidComputeBlock;
+  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
 }
 
 export interface BoilComputeAndSaveResponseV1 {
@@ -170,5 +173,6 @@ export interface BoilComputeAndSaveResponseV1 {
   salts: { result: WaterSaltAdditionsResult; derivation: WaterCalcDerivation };
   acid: BoilAcidComputeBlock;
   overall: { result: WaterOverallResult; derivation: WaterCalcDerivation };
+  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
 }
 

@@ -24,11 +24,18 @@ function readCookieSessionId(req: FastifyRequest): string | null {
   return val;
 }
 
+export function readBearerToken(req: FastifyRequest): string | null {
+  const auth = req.headers.authorization;
+  if (typeof auth !== "string" || !auth.startsWith("Bearer ")) return null;
+  const token = auth.slice(7).trim();
+  return token || null;
+}
+
 export const sessionAuthPlugin = fp(async (app: FastifyInstance) => {
   await app.register(cookie);
 
   app.addHook("onRequest", async (req) => {
-    const sessionId = readCookieSessionId(req);
+    const sessionId = readCookieSessionId(req) ?? readBearerToken(req);
     if (!sessionId) return;
 
     const session = await app.prisma.session.findUnique({

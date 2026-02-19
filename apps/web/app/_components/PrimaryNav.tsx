@@ -5,8 +5,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Link } from "../../src/i18n/navigation";
+import type { AuthMeResponse } from "@brewery/contracts";
+import { parseAuthMeResponse } from "@brewery/contracts";
+
 import { apiFetch } from "../_lib/apiClient";
-import type { AuthMeResponse } from "../_lib/useRequireAuth";
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 const BRAND_COOKIE = "UI_BRAND";
@@ -58,7 +60,7 @@ export function PrimaryNav() {
           setMe(null);
           return;
         }
-        const next = res.data as AuthMeResponse;
+        const next = parseAuthMeResponse(res.data);
         setMe(next);
 
         const active =

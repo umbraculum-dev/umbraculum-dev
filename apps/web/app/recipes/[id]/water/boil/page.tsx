@@ -10,12 +10,15 @@ import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
+import { parseWaterProfilesResponse } from "@brewery/contracts";
+
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseBoilComputeAndSaveResponse } from "../_lib/parseWaterComputeAndSave";
+import { parseBoilComputeAndSaveResponse } from "@brewery/contracts";
+import { formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -67,6 +70,7 @@ export default function BoilWaterPage() {
   const locale = useLocale();
   const tWater = useTranslations("recipes.water.common");
   const t = useTranslations("recipes.water.boil");
+  const tUnits = useTranslations("units");
   const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -129,6 +133,10 @@ export default function BoilWaterPage() {
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
   const [overallDerivation, setOverallDerivation] = useState<any | null>(null);
+  const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
+
+  const fmt = (unitKey: string, value: unknown, fallback: number) =>
+    formatWithHint(locale, value, formatHints, unitKey, fallback);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
   useEffect(() => {
@@ -180,7 +188,7 @@ export default function BoilWaterPage() {
     try {
       const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(profRes.data as WaterProfilesResponse);
+      setProfiles(parseWaterProfilesResponse(profRes.data));
     } catch (err) {
       setProfilesError(String(err));
     } finally {
@@ -586,6 +594,7 @@ export default function BoilWaterPage() {
     setSubmitting(true);
     try {
       const computed = await computeAndSaveBoilSnapshots();
+      setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
       setSaltsResult(computed.salts.result as any);
       setSaltDerivation(computed.salts.derivation as any);
       setAcidDerivation(computed.acid.derivation as any);
@@ -664,6 +673,7 @@ export default function BoilWaterPage() {
     try {
       if (saveAlso) {
         const computed = await computeAndSaveBoilSnapshots();
+        setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
         setSaltsResult(computed.salts.result as any);
         setSaltDerivation(computed.salts.derivation as any);
         setAcidDerivation(computed.acid.derivation as any);
@@ -792,7 +802,7 @@ export default function BoilWaterPage() {
           <div style={{ marginTop: 12, display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
             <div>
               <label htmlFor="boil-source-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
-                Source volume (L)
+                {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
                 id="boil-source-volume"
@@ -806,7 +816,7 @@ export default function BoilWaterPage() {
             </div>
             <div>
               <label htmlFor="boil-dilution-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
-                Dilution volume (L)
+                {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
                 id="boil-dilution-volume"
@@ -866,9 +876,9 @@ export default function BoilWaterPage() {
                       return (
                         <tr key={label}>
                           <td>{label}</td>
-                          <td align="right">{mixed.toFixed(2)}</td>
-                          <td align="right">{target === null ? "—" : target.toFixed(2)}</td>
-                          <td align="right">{delta === null ? "—" : delta.toFixed(2)}</td>
+                          <td align="right">{fmt("ppm", mixed, 0)}</td>
+                          <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
+                          <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
                         </tr>
                       );
                     })}
@@ -946,6 +956,12 @@ export default function BoilWaterPage() {
                         ctx: {
                           saltDerivation,
                         },
+                        units: {
+                          L: tUnits("L"),
+                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                          ppm: tUnits("ppm"),
+                          LPerKg: tUnits("LPerKg"),
+                        },
                       })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
@@ -974,7 +990,7 @@ export default function BoilWaterPage() {
                     ).map(([label, after]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="left">{after.toFixed(2)}</td>
+                        <td align="left">{fmt("ppm", after, 0)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1006,7 +1022,7 @@ export default function BoilWaterPage() {
 
               <div>
                 <label htmlFor="boil-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  Starting alkalinity (ppm as CaCO3)
+                  {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </label>
                 <input
                   id="boil-starting-alk"
@@ -1107,7 +1123,7 @@ export default function BoilWaterPage() {
               {acidificationMode === "manual" ? (
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label htmlFor="boil-manual-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
-                    Acid added ({strengthKind === "solid" ? "g" : "mL"})
+                    Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </label>
                   <input
                     id="boil-manual-acid-added"
@@ -1155,27 +1171,27 @@ export default function BoilWaterPage() {
               <ul>
                 {acidResult.acidRequiredMl !== null ? (
                   <li>
-                    Acid required: <code>{acidResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    Acid required: <code>{fmt("mL", acidResult.acidRequiredMl, 0)}</code> {tUnits("mL")}{" "}
                     {acidResult.acidRequiredTsp !== null ? (
                       <>
-                        (<code>{acidResult.acidRequiredTsp.toFixed(3)}</code> tsp)
+                        (<code>{fmt("mL", acidResult.acidRequiredTsp, 0)}</code> {tUnits("tsp")})
                       </>
                     ) : null}
                   </li>
                 ) : null}
                 {acidResult.acidRequiredGrams !== null ? (
                   <li>
-                    Acid required: <code>{acidResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    Acid required: <code>{fmt("g", acidResult.acidRequiredGrams, 0)}</code> {tUnits("g")}{" "}
                     {acidResult.acidRequiredKg !== null ? (
                       <>
-                        (<code>{acidResult.acidRequiredKg.toFixed(6)}</code> kg)
+                        (<code>{fmt("kg", acidResult.acidRequiredKg, 2)}</code> {tUnits("kg")})
                       </>
                     ) : null}
                   </li>
                 ) : null}
                 <li>
                   Final alkalinity:{" "}
-                  <code>{displayAlkalinityPpmCaCO3(acidResult.finalAlkalinityPpmCaCO3).toFixed(3)}</code> ppm as CaCO3
+                  <code>{fmt("ppm_as_CaCO3", displayAlkalinityPpmCaCO3(acidResult.finalAlkalinityPpmCaCO3), 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
               </ul>
             </div>
@@ -1190,12 +1206,12 @@ export default function BoilWaterPage() {
               </summary>
               <ul>
                 <li>
-                  Estimated achieved pH: <code>{manualResult.achievedPh.toFixed(3)}</code>
+                  Estimated achieved pH: <code>{fmt("pH", manualResult.achievedPh, 2)}</code>
                 </li>
                 <li>
                   Final alkalinity:{" "}
-                  <code>{displayAlkalinityPpmCaCO3(manualResult.predicted.finalAlkalinityPpmCaCO3).toFixed(3)}</code>{" "}
-                  ppm as CaCO3
+                  <code>{fmt("ppm_as_CaCO3", displayAlkalinityPpmCaCO3(manualResult.predicted.finalAlkalinityPpmCaCO3), 0)}</code>{" "}
+                  {tUnits("ppmAsCaCO3")}
                 </li>
               </ul>
             </details>
@@ -1242,6 +1258,12 @@ export default function BoilWaterPage() {
                         ctx: {
                           overallDerivation,
                         },
+                        units: {
+                          L: tUnits("L"),
+                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                          ppm: tUnits("ppm"),
+                          LPerKg: tUnits("LPerKg"),
+                        },
                       })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
@@ -1252,11 +1274,11 @@ export default function BoilWaterPage() {
               </div>
               <ul>
                 <li>
-                  pH: {overallResult.ph.kind} <code>{overallResult.ph.value.toFixed(2)}</code>
+                  pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
                 </li>
                 <li>
                   Final alkalinity:{" "}
-                  <code>{displayAlkalinityPpmCaCO3(overallResult.finalAlkalinityPpmCaCO3).toFixed(2)}</code> ppm as CaCO3
+                  <code>{fmt("ppm_as_CaCO3", displayAlkalinityPpmCaCO3(overallResult.finalAlkalinityPpmCaCO3), 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
               </ul>
               <div style={{ overflowX: "auto", marginTop: 8 }}>
@@ -1280,7 +1302,7 @@ export default function BoilWaterPage() {
                     ).map(([label, v]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="left">{v.toFixed(2)}</td>
+                        <td align="left">{fmt("ppm", v, 0)}</td>
                       </tr>
                     ))}
                   </tbody>

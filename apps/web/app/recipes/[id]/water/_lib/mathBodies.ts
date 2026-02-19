@@ -35,13 +35,50 @@ function formatDerivationValue(args: { locale: string; v: WaterCalcDerivationVal
   }
 }
 
-function renderLines(args: { locale: string; tMath: T; lines: WaterCalcDerivationLine[] }): string {
-  const rendered = args.lines.map((l) =>
-    args.tMath("derivation.common.kvLine", {
-      label: args.tMath(`derivation.labels.${l.id}`),
+const LABEL_ID_TO_UNIT_KEY: Record<string, string> = {
+  volumeLiters: "L",
+  startingAlk: "ppmAsCaCO3",
+  alkAfterSalts: "ppmAsCaCO3",
+  acidSulfateAddedPpm: "ppm",
+  acidChlorideAddedPpm: "ppm",
+  startingAlkalinityPpmCaCO3: "ppmAsCaCO3",
+  effectiveAlkalinityPpmCaCO3: "ppmAsCaCO3",
+  alkalinityReductionFromCaMgPpmCaCO3: "ppmAsCaCO3",
+  mashWaterVolumeLiters: "L",
+  spargeVolumeLiters: "L",
+  boilWaterVolumeLiters: "L",
+  mashLossesLiters: "L",
+  mashWaterLeftoverLiters: "L",
+  mashGrainAbsorptionLPerKg: "LPerKg",
+  preBoilVolumeLiters: "L",
+  postBoilVolumeLiters: "L",
+  kettleLossesLiters: "L",
+  otherLossesLiters: "L",
+  kettleHopAbsorptionLiters: "L",
+  kettleVolumeLiters: "L",
+  "base.calciumPpm": "ppm",
+  "base.magnesiumPpm": "ppm",
+  "base.sodiumPpm": "ppm",
+  "base.sulfatePpm": "ppm",
+  "base.chloridePpm": "ppm",
+  "base.bicarbonatePpm": "ppm",
+};
+
+function renderLines(args: {
+  locale: string;
+  tMath: T;
+  lines: WaterCalcDerivationLine[];
+  units?: Record<string, string>;
+}): string {
+  const { units } = args;
+  const rendered = args.lines.map((l) => {
+    const unitKey = LABEL_ID_TO_UNIT_KEY[l.id];
+    const labelValues: TValues | undefined = unitKey && units ? { unit: units[unitKey] ?? "" } : undefined;
+    return args.tMath("derivation.common.kvLine", {
+      label: args.tMath(`derivation.labels.${l.id}`, labelValues),
       value: formatDerivationValue({ locale: args.locale, v: l.value, tMath: args.tMath }),
-    }),
-  );
+    });
+  });
   return rendered.join("\n");
 }
 
@@ -90,7 +127,13 @@ function renderBreakdowns(args: { locale: string; tMath: T; derivation: WaterCal
   return blockTexts.join("\n\n");
 }
 
-export function renderDerivationBody(args: { locale: string; tMath: T; derivation: WaterCalcDerivation }): string {
+export function renderDerivationBody(args: {
+  locale: string;
+  tMath: T;
+  derivation: WaterCalcDerivation;
+  units?: Record<string, string>;
+}): string {
+  const { units } = args;
   const parts: string[] = [];
 
   parts.push(args.tMath("derivation.headings.formula"));
@@ -99,13 +142,13 @@ export function renderDerivationBody(args: { locale: string; tMath: T; derivatio
   if (args.derivation.inputs.length) {
     parts.push("");
     parts.push(args.tMath("derivation.headings.inputs"));
-    parts.push(renderLines({ locale: args.locale, tMath: args.tMath, lines: args.derivation.inputs }));
+    parts.push(renderLines({ locale: args.locale, tMath: args.tMath, lines: args.derivation.inputs, units }));
   }
 
   if (args.derivation.intermediates.length) {
     parts.push("");
     parts.push(args.tMath("derivation.headings.intermediates"));
-    parts.push(renderLines({ locale: args.locale, tMath: args.tMath, lines: args.derivation.intermediates }));
+    parts.push(renderLines({ locale: args.locale, tMath: args.tMath, lines: args.derivation.intermediates, units }));
   }
 
   const breakdownText = renderBreakdowns({ locale: args.locale, tMath: args.tMath, derivation: args.derivation });
@@ -136,8 +179,9 @@ export function buildWaterMathBody(args: {
   tMath: T;
   locale: string;
   ctx: Record<string, unknown>;
+  units?: Record<string, string>;
 }): string {
-  const { key, tMath, locale, ctx } = args;
+  const { key, tMath, locale, ctx, units } = args;
 
   switch (key) {
     case "mash.acidRequired":
@@ -149,40 +193,41 @@ export function buildWaterMathBody(args: {
       const d =
         (ctx.overallDerivation as WaterCalcDerivation | undefined) ??
         (ctx.acidDerivation as WaterCalcDerivation | undefined);
-      return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("derivation.common.missing");
+      return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "mash.ionsAfterSalts":
     case "sparge.ionsAfterSalts":
     case "boil.ionsAfterSalts": {
       const d = ctx.saltDerivation as WaterCalcDerivation | undefined;
-      return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("derivation.common.missing");
+      return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "mash.overallSnapshot": {
       const d = ctx.overallDerivation as WaterCalcDerivation | undefined;
-      return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("derivation.common.missing");
+      return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "sparge.ionsAfterSaltsAndAcid": {
       const d = ctx.overallDerivation as WaterCalcDerivation | undefined;
-      return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("derivation.common.missing");
+      return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "boil.overallSnapshot": {
       const d = ctx.overallDerivation as WaterCalcDerivation | undefined;
-      return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("derivation.common.missing");
+      return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "sparge.alkalinityHeuristic": {
       const d = ctx.acidDerivation as WaterCalcDerivation | undefined;
-      return d ? renderDerivationBody({ locale, tMath, derivation: d }) : tMath("sparge.alkalinityHeuristic.body");
+      return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("sparge.alkalinityHeuristic.body");
     }
 
     case "waterHub.mergedWaterRecap": {
       const streams = Array.isArray(ctx.streams) ? (ctx.streams as any[]) : [];
       const streamLines = streams.map((s) =>
         tMath("waterHub.mergedWaterRecap.streamLine", {
+          ...(units ?? {}),
           label: String(s?.label ?? "—"),
           volumeL: fmt(locale, s?.volumeLiters, 2),
           ph: fmt(locale, s?.ph, 2),
@@ -191,6 +236,7 @@ export function buildWaterMathBody(args: {
       );
       const capped = capLines({ lines: streamLines, max: 6, tMath });
       return tMath("waterHub.mergedWaterRecap.bodyWithValues", {
+        ...(units ?? {}),
         totalVolumeL: fmt(locale, ctx.totalVolumeLiters, 2),
         mergedPh: fmt(locale, ctx.mergedPh, 2),
         mergedFinalAlk: fmt(locale, ctx.mergedFinalAlk, 2),
@@ -210,6 +256,7 @@ export function buildWaterMathBody(args: {
         tMath("common.ionLine", { ion: "HCO3", ppm: fmt(locale, ions.bicarbonate, 2) }),
       ];
       return tMath("waterHub.mergedIons.bodyWithValues", {
+        ...(units ?? {}),
         ionsLines: ionL.join("\n"),
       });
     }

@@ -1,4 +1,6 @@
-import type { GravityAnalysisResponseV1, GravityAnalysisWarningCode, NumberFormatHintV1, WaterCalcDerivation } from "@brewery/contracts";
+import type { GravityAnalysisResponseV1, GravityAnalysisWarningCode } from "./gravityAnalysis";
+import type { NumberFormatHintV1 } from "../format/numberFormat";
+import type { WaterCalcDerivation } from "../water/derivation";
 
 function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
@@ -146,4 +148,3 @@ export function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisRespo
     formatHints: hintsOut as any,
   };
 }
-

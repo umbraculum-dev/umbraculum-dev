@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { requireActiveAccount } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
+import { waterFormatHints } from "@brewery/contracts";
 import {
   RecipeWaterComputeAndSaveService,
   type BoilComputeAndSaveInput,
@@ -57,7 +58,7 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
     };
 
     const computed = await svc.computeAndSaveMash(ctx.userId, ctx.activeAccountId, recipeId, input);
-    return { ok: true, version: 1, ...computed };
+    return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 
   app.post("/recipes/:id/water-settings/sparge/compute-and-save", async (req) => {
@@ -90,7 +91,7 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
     };
 
     const computed = await svc.computeAndSaveSparge(ctx.userId, ctx.activeAccountId, recipeId, input);
-    return { ok: true, version: 1, ...computed };
+    return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 
   app.post("/recipes/:id/water-settings/boil/compute-and-save", async (req) => {
@@ -132,7 +133,7 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
     };
 
     const computed = await svc.computeAndSaveBoil(ctx.userId, ctx.activeAccountId, recipeId, input);
-    return { ok: true, version: 1, ...computed };
+    return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 }
 

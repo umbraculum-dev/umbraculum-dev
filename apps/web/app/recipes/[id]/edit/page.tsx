@@ -21,7 +21,7 @@ import {
 } from "../../_lib/beerjsonRecipe";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
 import { mathExplain } from "./_lib/mathExplain";
-import { parseGravityAnalysisResponseV1 } from "./_lib/parseGravityAnalysis";
+import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
 import { renderDerivationBody } from "../water/_lib/mathBodies";
 
 type Recipe = {

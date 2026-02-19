@@ -15,7 +15,8 @@
     "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST prisma migrate deploy && DATABASE_URL=$DATABASE_URL_TEST prisma db seed",
     "test": "npm run test:db:prepare && vitest run",
     "seed:import": "tsx src/cli/seed-import.ts",
-    "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts"
+    "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts",
+    "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts"
   },
   "dependencies": {
     "@brewery/core": "file:../../packages/core",

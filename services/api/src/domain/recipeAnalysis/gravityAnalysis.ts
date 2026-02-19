@@ -1,9 +1,6 @@
-import type { GravityAnalysisResponseV1, GravityAnalysisWarningCode, NumberFormatHintV1 } from "@brewery/contracts";
+import type { GravityAnalysisResponseV1, GravityAnalysisWarningCode } from "@brewery/contracts";
+import { analysisFormatHints } from "@brewery/contracts";
 import type { WaterCalcDerivation } from "../waterCalc/derivation/types.js";
-
-function hintFixed(args: { decimals: number; unit?: NumberFormatHintV1["unit"]; clamp?: { min?: number; max?: number } }): NumberFormatHintV1 {
-  return { version: 1, style: "fixed", decimals: args.decimals, unit: args.unit, clamp: args.clamp };
-}
 
 export interface GravityAnalysisWarning {
   code: GravityAnalysisWarningCode;
@@ -466,19 +463,7 @@ export function computeRecipeGravityAnalysis(args: {
       canonicalModels: { ibu: "tinseth", srm: "morey" },
       result,
       derivations: {},
-      formatHints: {
-        kettleVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
-        preBoilVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
-        ogEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
-        pbgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
-        fgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
-        abvEstimatedPercent: hintFixed({ decimals: 2, unit: "percent" }),
-        attenuationEffectivePercent: hintFixed({ decimals: 1, unit: "percent", clamp: { min: 0, max: 100 } }),
-        ibuTinsethEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
-        ibuRagerEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
-        colorSrmMoreyEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
-        colorSrmDanielsEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
-      },
+      formatHints: analysisFormatHints,
     };
   }
 
@@ -835,19 +820,7 @@ export function computeRecipeGravityAnalysis(args: {
     canonicalModels: { ibu: "tinseth", srm: "morey" },
     result,
     derivations: derivations as any,
-    formatHints: {
-      kettleVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
-      preBoilVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
-      ogEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
-      pbgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
-      fgEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),
-      abvEstimatedPercent: hintFixed({ decimals: 2, unit: "percent" }),
-      attenuationEffectivePercent: hintFixed({ decimals: 1, unit: "percent", clamp: { min: 0, max: 100 } }),
-      ibuTinsethEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
-      ibuRagerEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
-      colorSrmMoreyEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
-      colorSrmDanielsEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
-    },
+    formatHints: analysisFormatHints,
   };
 }
 

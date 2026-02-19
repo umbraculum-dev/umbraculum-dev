@@ -123,5 +123,55 @@ describe("auth (signup/login) + cookie sessions", () => {
     expect(recipesOk.statusCode).toBe(200);
     expect((recipesOk.json() as any).ok).toBe(true);
   });
+
+  it("login/native returns token (no cookie); Bearer token works for /auth/me and logout", async () => {
+    const email = `native_${Date.now()}@example.com`;
+    const password = "password123";
+
+    const signup = await app.inject({
+      method: "POST",
+      url: "/auth/signup",
+      payload: { email, password, preferredLocale: "en", accountName: "Native Test" },
+    });
+    expect(signup.statusCode).toBe(200);
+
+    const loginNative = await app.inject({
+      method: "POST",
+      url: "/auth/login/native",
+      payload: { email, password, preferredLocale: "en" },
+    });
+    expect(loginNative.statusCode).toBe(200);
+    expect(loginNative.headers["set-cookie"]).toBeUndefined();
+
+    const body = loginNative.json() as any;
+    expect(body.ok).toBe(true);
+    expect(typeof body.token).toBe("string");
+    expect(body.token.length).toBeGreaterThan(0);
+    expect(body.user.email).toBe(email.toLowerCase());
+
+    const token = body.token as string;
+
+    const me = await app.inject({
+      method: "GET",
+      url: "/auth/me",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(me.statusCode).toBe(200);
+    expect((me.json() as any).user.email).toBe(email.toLowerCase());
+
+    const logout = await app.inject({
+      method: "POST",
+      url: "/auth/logout",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(logout.statusCode).toBe(200);
+
+    const meAfter = await app.inject({
+      method: "GET",
+      url: "/auth/me",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(meAfter.statusCode).toBe(401);
+  });
 });
 

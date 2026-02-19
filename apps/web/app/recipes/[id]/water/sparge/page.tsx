@@ -10,12 +10,15 @@ import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
+import { parseWaterProfilesResponse } from "@brewery/contracts";
+
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseSpargeComputeAndSaveResponse } from "../_lib/parseWaterComputeAndSave";
+import { parseSpargeComputeAndSaveResponse } from "@brewery/contracts";
+import { formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -52,6 +55,7 @@ export default function SpargeWaterPage() {
   const locale = useLocale();
   const tWater = useTranslations("recipes.water.common");
   const t = useTranslations("recipes.water.sparge");
+  const tUnits = useTranslations("units");
   const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -105,6 +109,10 @@ export default function SpargeWaterPage() {
   const [saltDerivation, setSaltDerivation] = useState<any | null>(null);
   const [spargeOverall, setSpargeOverall] = useState<any | null>(null);
   const [spargeSaltsInputsKey, setSpargeSaltsInputsKey] = useState<string | null>(null);
+  const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
+
+  const fmt = (unitKey: string, value: unknown, fallback: number) =>
+    formatWithHint(locale, value, formatHints, unitKey, fallback);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
   useEffect(() => {
@@ -149,7 +157,7 @@ export default function SpargeWaterPage() {
     try {
       const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(profRes.data as WaterProfilesResponse);
+      setProfiles(parseWaterProfilesResponse(profRes.data));
     } catch (err) {
       setProfilesError(String(err));
     } finally {
@@ -367,6 +375,7 @@ export default function SpargeWaterPage() {
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const computed = parseSpargeComputeAndSaveResponse(res.data);
+      setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
 
       setSpargeSaltsResult(computed.salts.result as any);
       setSaltDerivation(computed.salts.derivation as any);
@@ -583,9 +592,9 @@ export default function SpargeWaterPage() {
         <span className="muted">From selected profile</span>
       </div>
       <span className="muted">
-        Bicarbonate: <code>{selectedSpargeProfile.bicarbonate.toFixed(2)}</code> ppm {" · "}Estimated alkalinity:{" "}
-        <code>{bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate).toFixed(2)}</code> ppm as CaCO3{" "}
-        {" · "}pH: {selectedSpargeProfile.ph == null ? <span className="muted">—</span> : <code>{selectedSpargeProfile.ph.toFixed(2)}</code>}
+        Bicarbonate: <code>{fmt("ppm", selectedSpargeProfile.bicarbonate, 0)}</code> {tUnits("ppm")}{" · "}Estimated alkalinity:{" "}
+        <code>{fmt("ppm_as_CaCO3", bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate), 0)}</code> {tUnits("ppmAsCaCO3")}{" "}
+        {" · "}pH: {selectedSpargeProfile.ph == null ? <span className="muted">—</span> : <code>{fmt("pH", selectedSpargeProfile.ph, 2)}</code>}
       </span>
       <div style={{ marginTop: 8, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <button
@@ -674,7 +683,7 @@ export default function SpargeWaterPage() {
 
               <div>
                 <label htmlFor="starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  Starting alkalinity (ppm as CaCO3)
+                  {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </label>
                 <input
                   id="starting-alk"
@@ -691,7 +700,7 @@ export default function SpargeWaterPage() {
               </div>
               <div>
                 <label htmlFor="volume-l" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  Water volume (L)
+                  {t("waterVolumeLabel", { unit: tUnits("L") })}
                 </label>
                 <input
                   id="volume-l"
@@ -787,7 +796,7 @@ export default function SpargeWaterPage() {
               {spargeAcidificationMode === "manual" ? (
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label htmlFor="sparge-manual-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
-                    Acid added ({strengthKind === "solid" ? "g" : "mL"})
+                    Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </label>
                   <input
                     id="sparge-manual-acid-added"
@@ -850,15 +859,21 @@ export default function SpargeWaterPage() {
                             ctx: {
                               acidDerivation,
                             },
+                            units: {
+                              L: tUnits("L"),
+                              ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                              ppm: tUnits("ppm"),
+                              LPerKg: tUnits("LPerKg"),
+                            },
                           })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
                     })() : null}
-                    : <code>{spargeResult.acidRequiredMl.toFixed(3)}</code> mL{" "}
+                    : <code>{fmt("mL", spargeResult.acidRequiredMl, 0)}</code> {tUnits("mL")}{" "}
                     {spargeResult.acidRequiredTsp !== null ? (
                       <>
-                        (<code>{spargeResult.acidRequiredTsp.toFixed(3)}</code> tsp)
+                        (<code>{fmt("mL", spargeResult.acidRequiredTsp, 0)}</code> {tUnits("tsp")})
                       </>
                     ) : null}
                   </li>
@@ -879,15 +894,21 @@ export default function SpargeWaterPage() {
                             ctx: {
                               acidDerivation,
                             },
+                            units: {
+                              L: tUnits("L"),
+                              ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                              ppm: tUnits("ppm"),
+                              LPerKg: tUnits("LPerKg"),
+                            },
                           })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
                       );
                     })() : null}
-                    : <code>{spargeResult.acidRequiredGrams.toFixed(3)}</code> g{" "}
+                    : <code>{fmt("g", spargeResult.acidRequiredGrams, 0)}</code> {tUnits("g")}{" "}
                     {spargeResult.acidRequiredKg !== null ? (
                       <>
-                        (<code>{spargeResult.acidRequiredKg.toFixed(6)}</code> kg)
+                        (<code>{fmt("kg", spargeResult.acidRequiredKg, 2)}</code> {tUnits("kg")})
                       </>
                     ) : null}
                   </li>
@@ -907,18 +928,24 @@ export default function SpargeWaterPage() {
                           ctx: {
                             acidDerivation,
                           },
+                          units: {
+                            L: tUnits("L"),
+                            ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                            ppm: tUnits("ppm"),
+                            LPerKg: tUnits("LPerKg"),
+                          },
                         })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
                     );
                   })() : null}
-                  : <code>{spargeResult.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  : <code>{fmt("ppm_as_CaCO3", spargeResult.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
                 <li>
-                  Sulfate added: <code>{spargeResult.sulfateAddedPpm.toFixed(3)}</code> ppm
+                  Sulfate added: <code>{fmt("ppm", spargeResult.sulfateAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
                 <li>
-                  Chloride added: <code>{spargeResult.chlorideAddedPpm.toFixed(3)}</code> ppm
+                  Chloride added: <code>{fmt("ppm", spargeResult.chlorideAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
               </ul>
               {selectedSpargeProfile?.ph == null ? (
@@ -939,24 +966,24 @@ export default function SpargeWaterPage() {
               </summary>
               <ul>
                 <li>
-                  Estimated achieved pH: <code>{spargeManualResult.achievedPh.toFixed(3)}</code>
+                  Estimated achieved pH: <code>{fmt("pH", spargeManualResult.achievedPh, 2)}</code>
                 </li>
                 {Number.isFinite(spargeManualResult.targetAmount) &&
                 Number.isFinite(spargeManualResult.predictedAmount) ? (
                   <li>
-                    Acid amount: <code>{spargeManualResult.targetAmount.toFixed(3)}</code>{" "}
-                    {strengthKind === "solid" ? "g" : "mL"} (solver check:{" "}
-                    <code>{spargeManualResult.predictedAmount.toFixed(3)}</code>)
+                    Acid amount: <code>{fmt(strengthKind === "solid" ? "g" : "mL", spargeManualResult.targetAmount, 0)}</code>{" "}
+                    {strengthKind === "solid" ? tUnits("g") : tUnits("mL")} (solver check:{" "}
+                    <code>{fmt(strengthKind === "solid" ? "g" : "mL", spargeManualResult.predictedAmount, 0)}</code>)
                   </li>
                 ) : null}
                 <li>
-                  Final alkalinity: <code>{spargeManualResult.predicted.finalAlkalinityPpmCaCO3.toFixed(3)}</code> ppm as CaCO3
+                  Final alkalinity: <code>{fmt("ppm_as_CaCO3", spargeManualResult.predicted.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
                 <li>
-                  Sulfate added: <code>{spargeManualResult.predicted.sulfateAddedPpm.toFixed(3)}</code> ppm
+                  Sulfate added: <code>{fmt("ppm", spargeManualResult.predicted.sulfateAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
                 <li>
-                  Chloride added: <code>{spargeManualResult.predicted.chlorideAddedPpm.toFixed(3)}</code> ppm
+                  Chloride added: <code>{fmt("ppm", spargeManualResult.predicted.chlorideAddedPpm, 0)}</code> {tUnits("ppm")}
                 </li>
               </ul>
               {selectedSpargeProfile?.ph == null ? (
@@ -1013,6 +1040,12 @@ export default function SpargeWaterPage() {
                         ctx: {
                           saltDerivation,
                         },
+                        units: {
+                          L: tUnits("L"),
+                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                          ppm: tUnits("ppm"),
+                          LPerKg: tUnits("LPerKg"),
+                        },
                       })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
@@ -1041,7 +1074,7 @@ export default function SpargeWaterPage() {
                     ).map(([label, after]) => (
                       <tr key={label}>
                         <td>{label}</td>
-                        <td align="left">{after.toFixed(2)}</td>
+                        <td align="left">{fmt("ppm", after, 0)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1067,6 +1100,12 @@ export default function SpargeWaterPage() {
                         ctx: {
                           overallDerivation: spargeOverall?.derivation ?? null,
                         },
+                        units: {
+                          L: tUnits("L"),
+                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                          ppm: tUnits("ppm"),
+                          LPerKg: tUnits("LPerKg"),
+                        },
                       })}
                       ariaLabel={tMath("fxLabel", { topic: title })}
                     />
@@ -1087,6 +1126,12 @@ export default function SpargeWaterPage() {
                             tMath,
                             locale,
                             ctx: { acidDerivation },
+                            units: {
+                              L: tUnits("L"),
+                              ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                              ppm: tUnits("ppm"),
+                              LPerKg: tUnits("LPerKg"),
+                            },
                           })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
@@ -1121,7 +1166,7 @@ export default function SpargeWaterPage() {
                       ] as const).map(([label, v]) => (
                         <tr key={label}>
                           <td>{label}</td>
-                          <td align="left">{v.toFixed(2)}</td>
+                          <td align="left">{fmt("ppm", v, 0)}</td>
                         </tr>
                       ));
                     })()}

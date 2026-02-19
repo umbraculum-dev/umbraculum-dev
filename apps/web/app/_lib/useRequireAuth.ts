@@ -4,23 +4,12 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+import type { AuthMeResponse } from "@brewery/contracts";
+import { parseAuthMeResponse } from "@brewery/contracts";
+
 import { apiFetch } from "./apiClient";
 
-export type AuthMeResponse = {
-  ok: true;
-  user: {
-    id: string;
-    email: string;
-    preferredLocale: string;
-    preferredTheme?: string | null;
-    preferredFontScale?: string | null;
-    preferredDensity?: string | null;
-    isPlatformAdmin?: boolean;
-  };
-  accounts: Array<{ id: string; name: string; role: string; brandKey?: string | null }>;
-  activeAccountId: string | null;
-  role: string | null;
-};
+export type { AuthMeResponse };
 
 type State =
   | { status: "loading" }
@@ -50,7 +39,7 @@ export function useRequireAuth(options?: { requireActiveAccount?: boolean }) {
           router.replace(`/${locale}/login?next=${encodeURIComponent(current)}`);
           return;
         }
-        const me = res.data as AuthMeResponse;
+        const me = parseAuthMeResponse(res.data);
         if (requireActiveAccount && !me.activeAccountId) {
           router.replace(`/${locale}/select-account`);
           return;

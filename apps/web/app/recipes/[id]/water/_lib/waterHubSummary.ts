@@ -2,6 +2,7 @@ import { apiFetch } from "./api";
 import type {
   ExpectedRaRange,
   IonProfilePpm,
+  NumberFormatHintV1,
   RecipeWaterHubStreamSummary,
   RecipeWaterHubSummary,
   RecipeWaterHubSummaryResponse,
@@ -145,6 +146,11 @@ export function parseRecipeWaterHubSummaryResponse(x: unknown): RecipeWaterHubSu
     return { kind, value };
   })();
 
+  const formatHints =
+    root.formatHints && typeof root.formatHints === "object" && !Array.isArray(root.formatHints)
+      ? (root.formatHints as Partial<Record<string, NumberFormatHintV1>>)
+      : undefined;
+
   return {
     ok: true,
     summary: {
@@ -180,6 +186,7 @@ export function parseRecipeWaterHubSummaryResponse(x: unknown): RecipeWaterHubSu
         styleExpectedRa: parseExpectedRaRange(finalRecap.styleExpectedRa),
       },
     },
+    formatHints,
   };
 }
 

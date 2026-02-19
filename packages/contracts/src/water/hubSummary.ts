@@ -1,4 +1,7 @@
-import type { IonProfilePpm } from "./ionProfile.js";
+import type { IonProfilePpm } from "./ionProfile";
+import type { NumberFormatHintV1 } from "../format/numberFormat";
+
+export type WaterHubFormatHintKeys = "L" | "pH" | "ppm_as_CaCO3" | "g" | "mL";
 
 export interface ExpectedRaRange {
   min: number;
@@ -53,5 +56,6 @@ export interface RecipeWaterHubSummary {
 export interface RecipeWaterHubSummaryResponse {
   ok: true;
   summary: RecipeWaterHubSummary;
+  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
 }
 

@@ -7,9 +7,11 @@ import { useLocale, useTranslations } from "next-intl";
 
 import type { IonProfilePpm } from "@brewery/contracts";
 
+import { parseWaterProfilesResponse } from "@brewery/contracts";
+
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
-import { formatFixed } from "../../../../src/i18n/format";
+import { formatFixed, formatWithHint } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
@@ -31,6 +33,7 @@ type DisplayStream = {
 
 export default function WaterHubPage() {
   const t = useTranslations("waterHub");
+  const tUnits = useTranslations("units");
   const tsalts = useTranslations("salts");
   const tMath = useTranslations("math");
   const locale = useLocale();
@@ -70,7 +73,7 @@ export default function WaterHubPage() {
     try {
       const profRes = await apiFetch("/api/water-profiles");
       if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(profRes.data as WaterProfilesResponse);
+      setProfiles(parseWaterProfilesResponse(profRes.data));
 
       const summary = await fetchRecipeWaterHubSummary(recipeId);
       setSummaryRes(summary);
@@ -87,6 +90,9 @@ export default function WaterHubPage() {
   }, [authState.status, recipeId]);
 
   const summary = summaryRes?.summary ?? null;
+  const formatHints = summaryRes?.formatHints;
+  const fmt = (unitKey: string, value: unknown, fallback: number) =>
+    formatWithHint(locale, value, formatHints as Record<string, { decimals?: number }> | undefined, unitKey, fallback);
 
   const mashLast = summary?.status.mashLastCalculatedAt ? new Date(summary.status.mashLastCalculatedAt).toLocaleString() : "—";
   const spargeLast = summary?.status.spargeLastCalculatedAt ? new Date(summary.status.spargeLastCalculatedAt).toLocaleString() : "—";
@@ -99,6 +105,7 @@ export default function WaterHubPage() {
 
   const displayStreams = useMemo(() => {
     if (!summary) return null;
+    const hints = formatHints as Record<string, { decimals?: number }> | undefined;
 
     const formatSaltKeyLabel = (saltKey: string): string => {
       switch (saltKey) {
@@ -121,14 +128,14 @@ export default function WaterHubPage() {
       if (!rows?.length) return null;
       return rows
         .filter((r) => r && typeof r.saltKey === "string" && typeof r.grams === "number" && Number.isFinite(r.grams) && r.grams > 0)
-        .map((r) => `${formatSaltKeyLabel(r.saltKey)} ${formatFixed(locale, r.grams, 3)} g`)
+        .map((r) => `${formatSaltKeyLabel(r.saltKey)} ${formatWithHint(locale, r.grams, hints, "g", 0)} ${tUnits("g")}`)
         .join("; ");
     };
 
     const acidAmountLabel = (s: (typeof summary.streams)[number]): string | null => {
       const suffix = s.acidMode === "manual" ? tsalts("modeManualSuffix") : s.acidMode === "required" ? tsalts("modeRequiredSuffix") : "";
-      if (s.acidAmountGrams != null) return `${formatFixed(locale, s.acidAmountGrams, 3)} g${suffix ? ` ${suffix}` : ""}`;
-      if (s.acidAmountMl != null) return `${formatFixed(locale, s.acidAmountMl, 3)} mL${suffix ? ` ${suffix}` : ""}`;
+      if (s.acidAmountGrams != null) return `${formatWithHint(locale, s.acidAmountGrams, hints, "g", 0)} ${tUnits("g")}${suffix ? ` ${suffix}` : ""}`;
+      if (s.acidAmountMl != null) return `${formatWithHint(locale, s.acidAmountMl, hints, "mL", 0)} ${tUnits("mL")}${suffix ? ` ${suffix}` : ""}`;
       return null;
     };
 
@@ -152,7 +159,7 @@ export default function WaterHubPage() {
 
     return streams;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [summary, locale, t, tsalts]);
+  }, [summary, formatHints, locale, t, tUnits, tsalts]);
 
   return (
     <>
@@ -215,8 +222,8 @@ export default function WaterHubPage() {
               {t("mashOverallSnapshot")}: {" "}
               {summary?.status.mashOverallSnapshot ? (
                 <>
-                  pH ({summary.status.mashOverallSnapshot.ph.kind}) <code>{formatFixed(locale, summary.status.mashOverallSnapshot.ph.value, 2)}</code> · Final alkalinity {" "}
-                  <code>{formatFixed(locale, summary.status.mashOverallSnapshot.finalAlkalinityPpmCaCO3, 2)}</code>
+                  pH ({summary.status.mashOverallSnapshot.ph.kind}) <code>{fmt("pH", summary.status.mashOverallSnapshot.ph.value, 2)}</code> · Final alkalinity {" "}
+                  <code>{fmt("ppm_as_CaCO3", summary.status.mashOverallSnapshot.finalAlkalinityPpmCaCO3, 0)}</code>
                 </>
               ) : (
                 <span className="muted">—</span>
@@ -275,6 +282,11 @@ export default function WaterHubPage() {
                             mergedPh: summary?.merged.ph ?? null,
                             mergedFinalAlk: summary?.merged.finalAlkalinityPpmCaCO3 ?? null,
                           },
+                          units: {
+                            L: tUnits("L"),
+                            ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                            ppm: tUnits("ppm"),
+                          },
                         })}
                         ariaLabel={tMath("fxLabel", { topic: title })}
                       />
@@ -305,13 +317,13 @@ export default function WaterHubPage() {
                             <strong>{s.label}</strong>
                           </td>
                           <td style={{ textAlign: "left" }}>
-                            {s.volumeLiters == null ? "—" : formatFixed(locale, s.volumeLiters, 2)}
+                            {s.volumeLiters == null ? "—" : fmt("L", s.volumeLiters, 2)}
                           </td>
-                          <td style={{ textAlign: "left" }}>{s.ph == null ? "—" : formatFixed(locale, s.ph, 2)}</td>
+                          <td style={{ textAlign: "left" }}>{s.ph == null ? "—" : fmt("pH", s.ph, 2)}</td>
                           <td style={{ textAlign: "left" }}>
                             {s.finalAlkalinityPpmCaCO3 == null
                               ? "—"
-                              : formatFixed(locale, displayAlkalinityPpmCaCO3(s.finalAlkalinityPpmCaCO3), 2)}
+                              : fmt("ppm_as_CaCO3", displayAlkalinityPpmCaCO3(s.finalAlkalinityPpmCaCO3), 0)}
                           </td>
                         </tr>
                       ))}
@@ -322,19 +334,19 @@ export default function WaterHubPage() {
                 <h3 style={{ marginTop: 16 }}>{t("mergedSummary")}</h3>
                 <ul style={{ marginTop: 0 }}>
                   <li>
-                    {t("totalVolume")}: <code>{formatFixed(locale, summary.merged.totalVolumeLiters, 2)}</code> L
+                    {t("totalVolume")}: <code>{fmt("L", summary.merged.totalVolumeLiters, 2)}</code> {tUnits("L")}
                   </li>
                   <li>
-                    {t("approxMergedPh")}: <code>{summary.merged.ph == null ? "—" : formatFixed(locale, summary.merged.ph, 2)}</code>
+                    {t("approxMergedPh")}: <code>{summary.merged.ph == null ? "—" : fmt("pH", summary.merged.ph, 2)}</code>
                   </li>
                   <li>
                     {t("mergedFinalAlk")}: {" "}
                     <code>
                       {summary.merged.finalAlkalinityPpmCaCO3 == null
                         ? "—"
-                        : formatFixed(locale, displayAlkalinityPpmCaCO3(summary.merged.finalAlkalinityPpmCaCO3), 2)}
+                        : fmt("ppm_as_CaCO3", displayAlkalinityPpmCaCO3(summary.merged.finalAlkalinityPpmCaCO3), 0)}
                     </code>{" "}
-                    ppm as CaCO3
+                    {tUnits("ppmAsCaCO3")}
                   </li>
                 </ul>
 
@@ -382,6 +394,11 @@ export default function WaterHubPage() {
                                   ctx: {
                                     ions: summary.merged.ionsPpm,
                                   },
+                                  units: {
+                                    L: tUnits("L"),
+                                    ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                    ppm: tUnits("ppm"),
+                                  },
                                 })}
                                 ariaLabel={tMath("fxLabel", { topic: title })}
                               />
@@ -413,7 +430,7 @@ export default function WaterHubPage() {
                           ).map(([label, v]) => (
                             <tr key={label}>
                               <td>{label}</td>
-                              <td align="left">{formatFixed(locale, v, 2)}</td>
+                              <td align="left">{fmt("ppm", v, 0)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -447,7 +464,7 @@ export default function WaterHubPage() {
               {t("predictedMashPh")} {" "}
               {summary?.finalRecap.predictedMashPh ? (
                 <>
-                  <code>{formatFixed(locale, summary.finalRecap.predictedMashPh.value, 2)}</code>{" "}
+                  <code>{fmt("pH", summary.finalRecap.predictedMashPh.value, 2)}</code>{" "}
                   <span className="muted">({summary.finalRecap.predictedMashPh.kind})</span>
                 </>
               ) : (
@@ -460,20 +477,20 @@ export default function WaterHubPage() {
                 <li>
                   {t("raMashOverall")}: {" "}
                   {summary?.finalRecap.residualAlkalinityMashOverallPpmCaCO3 != null ? (
-                    <code>{formatFixed(locale, summary.finalRecap.residualAlkalinityMashOverallPpmCaCO3, 2)}</code>
+                    <code>{fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMashOverallPpmCaCO3, 0)}</code>
                   ) : (
                     <span className="muted">—</span>
                   )}{" "}
-                  <span className="muted">{t("ppmAsCaCO3")}</span>
+                  <span className="muted">{tUnits("ppmAsCaCO3")}</span>
                 </li>
                 <li>
                   {t("raMerged")}: {" "}
                   {summary?.finalRecap.residualAlkalinityMergedPpmCaCO3 != null ? (
-                    <code>{formatFixed(locale, summary.finalRecap.residualAlkalinityMergedPpmCaCO3, 2)}</code>
+                    <code>{fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMergedPpmCaCO3, 0)}</code>
                   ) : (
                     <span className="muted">—</span>
                   )}{" "}
-                  <span className="muted">{t("ppmAsCaCO3")}</span>
+                  <span className="muted">{tUnits("ppmAsCaCO3")}</span>
                 </li>
               </ul>
             </li>
@@ -482,9 +499,9 @@ export default function WaterHubPage() {
               {summary?.finalRecap.styleExpectedRa ? (
                 <>
                   <code>
-                    {formatFixed(locale, summary.finalRecap.styleExpectedRa.min, 0)}..{formatFixed(locale, summary.finalRecap.styleExpectedRa.max, 0)}
+                    {fmt("ppm_as_CaCO3", summary.finalRecap.styleExpectedRa.min, 0)}..{fmt("ppm_as_CaCO3", summary.finalRecap.styleExpectedRa.max, 0)}
                   </code>{" "}
-                  <span className="muted">{t("ppmAsCaCO3")}</span>{" "}
+                  <span className="muted">{tUnits("ppmAsCaCO3")}</span>{" "}
                   <span className="muted">· {t(summary.finalRecap.styleExpectedRa.rationaleKey)}</span>
                 </>
               ) : (

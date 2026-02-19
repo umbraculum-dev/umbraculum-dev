@@ -1,5 +1,5 @@
-import type { NumberFormatHintV1 } from "../format/numberFormat.js";
-import type { WaterCalcDerivation } from "../water/derivation.js";
+import type { NumberFormatHintV1 } from "../format/numberFormat";
+import type { WaterCalcDerivation } from "../water/derivation";
 
 export type GravityAnalysisWarningCode =
   | "missing_beerjson"
