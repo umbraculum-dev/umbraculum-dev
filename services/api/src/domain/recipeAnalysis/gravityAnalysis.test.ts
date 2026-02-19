@@ -122,6 +122,7 @@ describe("recipeAnalysis.gravityAnalysis (v1)", () => {
       },
     });
 
+    expect(res.canonicalModels).toEqual({ ibu: "tinseth", srm: "morey" });
     expect(res.result.attenuationEffectivePercent).toBeCloseTo((90 + 80) / 2, 9);
     expect(res.result.ogEstimatedSg).not.toBeNull();
     expect(res.result.fgEstimatedSg).not.toBeNull();

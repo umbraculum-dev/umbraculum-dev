@@ -463,6 +463,7 @@ export function computeRecipeGravityAnalysis(args: {
     return {
       ok: true,
       version: 1,
+      canonicalModels: { ibu: "tinseth", srm: "morey" },
       result,
       derivations: {},
       formatHints: {
@@ -831,6 +832,7 @@ export function computeRecipeGravityAnalysis(args: {
   return {
     ok: true,
     version: 1,
+    canonicalModels: { ibu: "tinseth", srm: "morey" },
     result,
     derivations: derivations as any,
     formatHints: {

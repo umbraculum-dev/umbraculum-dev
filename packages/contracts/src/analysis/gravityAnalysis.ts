@@ -22,6 +22,15 @@ export interface GravityAnalysisWarningV1 {
   code: GravityAnalysisWarningCode;
 }
 
+export type GravityAnalysisIbuModelV1 = "tinseth" | "rager";
+
+export type GravityAnalysisSrmModelV1 = "morey" | "daniels";
+
+export interface GravityAnalysisCanonicalModelsV1 {
+  ibu: GravityAnalysisIbuModelV1;
+  srm: GravityAnalysisSrmModelV1;
+}
+
 export interface GravityAnalysisResultV1 {
   kettleVolumeLiters: number | null;
   preBoilVolumeLiters: number | null;
@@ -54,6 +63,7 @@ export type GravityAnalysisDerivationKind =
 export interface GravityAnalysisResponseV1 {
   ok: true;
   version: 1;
+  canonicalModels: GravityAnalysisCanonicalModelsV1;
   result: GravityAnalysisResultV1;
   derivations: Partial<Record<GravityAnalysisDerivationKind, WaterCalcDerivation>>;
   formatHints: Partial<Record<keyof GravityAnalysisResultV1, NumberFormatHintV1>>;

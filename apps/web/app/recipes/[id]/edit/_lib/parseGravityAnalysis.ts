@@ -4,6 +4,13 @@ function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
 }
 
+function parseCanonicalModels(v: unknown): any {
+  const o = v && typeof v === "object" ? (v as any) : null;
+  const ibu = o?.ibu === "tinseth" || o?.ibu === "rager" ? o.ibu : "tinseth";
+  const srm = o?.srm === "morey" || o?.srm === "daniels" ? o.srm : "morey";
+  return { ibu, srm };
+}
+
 function parseNumberFormatHintV1(v: unknown, label: string): NumberFormatHintV1 {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v as any;
@@ -76,6 +83,8 @@ export function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisRespo
   if (root.ok !== true) throw new Error("Invalid GravityAnalysisResponseV1.ok");
   if (root.version !== 1) throw new Error("Invalid GravityAnalysisResponseV1.version");
 
+  const canonicalModels = parseCanonicalModels(root.canonicalModels);
+
   const r = root.result;
   if (!r || typeof r !== "object") throw new Error("Invalid GravityAnalysisResponseV1.result");
   const rr = r as any;
@@ -131,6 +140,7 @@ export function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisRespo
   return {
     ok: true,
     version: 1,
+    canonicalModels: canonicalModels as any,
     result: result as any,
     derivations: derivationsOut as any,
     formatHints: hintsOut as any,
