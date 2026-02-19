@@ -64,9 +64,7 @@ export class RecipesService {
     return recipe;
   }
 
-  async createRecipe(userId: string, accountId: string, input: CreateRecipeInput) {
-    await this.accounts.assertMembership(userId, accountId);
-
+  private async createRecipeCore(accountId: string, input: CreateRecipeInput) {
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");
 
@@ -129,6 +127,35 @@ export class RecipesService {
         beerJsonRecipeJson: doc as any,
         recipeExtJson: recipeExtJson === undefined ? undefined : (recipeExtJson as any),
       },
+    });
+  }
+
+  async createRecipe(userId: string, accountId: string, input: CreateRecipeInput) {
+    await this.accounts.assertMembership(userId, accountId);
+    return this.createRecipeCore(accountId, input);
+  }
+
+  async createRecipeForAccount(accountId: string, input: CreateRecipeInput) {
+    const account = await this.prisma.account.findUnique({
+      where: { id: accountId },
+      select: { id: true },
+    });
+    if (!account) throw new NotFoundError("account_not_found", "Account not found");
+    return this.createRecipeCore(accountId, input);
+  }
+
+  async getRecipeForAccount(recipeId: string, accountId: string) {
+    const recipe = await this.prisma.recipe.findFirst({
+      where: { id: recipeId, accountId },
+    });
+    if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
+    return recipe;
+  }
+
+  async listRecipesForAccount(accountId: string) {
+    return this.prisma.recipe.findMany({
+      where: { accountId },
+      orderBy: { createdAt: "desc" },
     });
   }
 

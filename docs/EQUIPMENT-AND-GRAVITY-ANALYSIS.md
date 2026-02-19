@@ -106,6 +106,21 @@ Given OG and an effective yeast attenuation percent \(A\\):
 
 ## Volume model (v0)
 
+### Hot-side vs cold-side volumes
+
+All current volumes are **hot-side** (pre-fermentation). Units are liters (`l`).
+
+**Hot-side** (implemented):
+
+- Mash water, sparge water, boil add-on water
+- Runoff (to kettle)
+- Pre-boil volume
+- Post-boil kettle volume (cooled, after evaporation and losses)
+
+**Cold-side** (not yet implemented):
+
+- Fermenter volume is a future stage. The model does not yet track volumes beyond the kettle.
+
 ### Gating rule
 
 If the recipe has no saved water settings (`RecipeWaterSettings` is missing), the analysis returns:

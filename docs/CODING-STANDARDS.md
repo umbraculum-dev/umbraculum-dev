@@ -65,6 +65,13 @@ export interface WaterProfile {
 - Keep contracts focused (single responsibility).
 - Model `null` vs `undefined` explicitly, especially in DTOs.
 
+### Shared logic over copying (MANDATORY for functionalities)
+Duplicating code for similar functionalities is generally bad practice. It reduces maintainability: a fix or improvement must be applied in multiple places, increasing the risk of drift and bugs.
+
+- **Avoid copying logic**: When adding a new flow that resembles an existing one, extract common logic into shared services, modules, or components. Multiple callers should import and use the same implementation. One modification then reflects in all consumers.
+- **Prefer shared modules**: Whenever possible, extract common logic into shared services, modules, or components. Do not copy-paste and tweak.
+- **Naming**: Use descriptive names for modules and classes (e.g. `RecipesImportService`, `BeerJsonExport`). Avoid generic suffixes like "helpers" in actual class/module names; use names that describe the domain or responsibility.
+
 ### UI CTAs: Draft vs Snapshot vs Preview (MANDATORY)
 This app persists both **inputs** and **computed results**. CTAs must make it obvious which one a button affects.
 

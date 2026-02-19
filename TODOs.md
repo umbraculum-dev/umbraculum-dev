@@ -2,6 +2,9 @@
 
 This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
 
+
+**Proposed next step**: Platform-admin full Import/Export (in superadmin backend).
+
 ## Native login gate (MANDATORY before React Native auth)
 
 Before implementing native app login, complete these items.
@@ -9,7 +12,7 @@ Before implementing native app login, complete these items.
 ### Must complete first
 - [x] **Shared parsers**: Move `parseWaterComputeAndSave` and `parseGravityAnalysis` into `@brewery/contracts` so web + native use the same runtime validation.
 - [x] **Format hints consistency**: Apply `formatHints` consistently across all native-ready endpoints (water hub, compute-and-save, analysis).
-- [ ] **Web auth hardening check**: Assess whether current cookie-based auth needs hardening (CSRF, secure flags, session cleanup) before adding token-based native auth.
+- [x] **Web auth hardening check**: Assess whether current cookie-based auth needs hardening (CSRF, secure flags, session cleanup) before adding token-based native auth. See `docs/AUTH-HARDENING-ASSESSMENT.md`.
 - [x] **Native login strategy**: Implemented (opaque session token via `POST /auth/login/native`). See `docs/AUTH-STRATEGY.md`.
 
 ### Can defer (but track)
@@ -33,7 +36,7 @@ Before implementing native app login, complete these items.
   - [ ] Consider `math.derivation` body strings: introduce placeholders (e.g. `{ppmAsCaCO3}`) in bodyWithValues so derivation prose can use localized units.
 - [x] **Sparge salts vs sparge pH**: ensure sparge salt additions influence sparge acidification (Ca/Mg effective-alkalinity heuristic), without requiring a manual “calculate salts” step first.
 - [x] **Deprecate mash pH v0**: remove v0 endpoints/logic and UI naming; keep a single canonical mash pH estimator that supports back-compat inputs.
-- [ ] Implement how recipes manage **late additions** and **boil additions** (separate from mash), since they do not contribute to mash calculations.
+- [ ] Implement **late extract additions** (kettle): ensure fermentables added at kettle are excluded from mash grist for water calc. Boil water chemistry is implemented at `/water/boil`.
 - [x] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
 - [x] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
 
@@ -49,8 +52,8 @@ Before implementing native app login, complete these items.
     - `/[locale]/recipes/import` has **Import single recipe** (manual style, default Custom) and **Bulk import** (BJCP 2021 style match name→code, else Custom).
     - `/[locale]/recipes` has pagination (20/page), export selected/all, and delete-with-confirm.
   - See `RECIPES-IMPORT-TODO.md` for remaining improvements and constraints.
-- [ ] **Owner-only full Import/Export**: allow the app owner to import/export recipes with **all columns**, including internal/customized fields (not strict/interoperability mode).
-- [ ] Add upload/paste size limits (API) and show clear “file too large” errors.
+- [ ] **Platform-admin full Import/Export**: allow platform admins to import/export recipes with **all columns** (including internal/customized fields) in the superadmin backend; assign recipes to any organization on import.
+- [x] Add upload/paste size limits (API) and show clear “file too large” errors.
 - [ ] Add optional “paste content” import UX (secondary to file upload) if desired.
 - [ ] Extend BeerXML (BrewersFriend-style) handling to preserve more data where possible (primarily **mash steps**); verify what is importable and reflect it in our BeerJSON + `recipeExtJson` model.
 - [ ] Extend style parsing for imports (BeerXML and likely BeerJSON): some exporters may split style/classification over multiple fields/lines (e.g. BeerXML `<CATEGORY>English Pale Ale</CATEGORY>` + `<CATEGORY_NUMBER>8</CATEGORY_NUMBER>` + `<STYLE_LETTER>B</STYLE_LETTER>` + `<STYLE_GUIDE>BJCP</STYLE_GUIDE>` + `<TYPE>Ale</TYPE>`). Consider this when extracting style name/code candidates for BJCP matching.
@@ -59,12 +62,13 @@ Before implementing native app login, complete these items.
 
 ## Raw materials DB + collaboration (high priority)
 
-- [ ] Add a single **Contributing** hub page (`/[locale]/contributing`) with two collapsed sections:
+- [x] Add a single **Contributing** hub page (`/[locale]/contributing`) with two collapsed sections:
   - “Help translate (i18n contributing)”
   - “Help improve raw materials database”
-- [ ] Add “Found a missing or incorrect raw material?” CTAs in the recipe editor:
+- [x] Add "Found a missing or incorrect raw material?" CTAs in the recipe editor:
   - Fermentables / Hops / Yeast / Other ingredients → link to `contributing?topic=raw-materials`
-- [ ] Add the same CTA on **Water profiles** page (and later salts/acids pages when they exist).
+- [x] Add the same CTA on **Water profiles** page (and later salts/acids pages when they exist).
+- [ ] Add **Contributing** to primary nav — only when the target repository (Weblate, raw-materials issue template) is set up and contributions are actually possible. Not urgent but desired.
 - [ ] Multi-source ingredients strategy (BeerProto-first, but allow enrichment):
   - keep `ingredient_source_map` + provenance/staging as the backbone
   - support multiple seed sources feeding a single canonical `fermentable/hop/yeast/...` table with confidence + provenance
@@ -86,7 +90,7 @@ Before implementing native app login, complete these items.
 
 - [x] Email/password **signup** + **login**
 - [x] **DB-backed sessions** with `sid` httpOnly cookie
-- [ ] Add a scheduled cleanup job: `DELETE FROM "Session" WHERE "expiresAt" < now()` to prevent unbounded growth (indexed by `expiresAt`).
+- [x] Add a scheduled cleanup job: `DELETE FROM "Session" WHERE "expiresAt" < now()` to prevent unbounded growth (indexed by `expiresAt`). Job exists (`job:session-cleanup`); scheduling documented in `docs/AUTH-STRATEGY.md`.
 - [x] Persist `preferredLocale` from login/signup, and ensure locale-prefixed routes work for auth pages (`/en/...`, `/it/...`)
 - [x] “Active account” selection after login when user has multiple accounts
 - [ ] Add “i18n contributing” flow/tooling (recommended: Weblate) and keep translation catalogs maintained.

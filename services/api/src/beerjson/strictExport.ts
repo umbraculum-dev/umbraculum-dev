@@ -43,3 +43,22 @@ export function strictBeerJsonExport(doc: unknown): unknown {
   return out as unknown;
 }
 
+export type RecipeForExport = { beerJsonRecipeJson: unknown; recipeExtJson?: unknown };
+
+/**
+ * Export recipe in strict mode (strips addition row `id` fields for interoperability).
+ */
+export function exportRecipeStrict(recipe: RecipeForExport): unknown {
+  return strictBeerJsonExport(recipe.beerJsonRecipeJson);
+}
+
+/**
+ * Export recipe in full mode (keeps `id` fields, includes recipeExtJson).
+ */
+export function exportRecipeFull(recipe: RecipeForExport): { beerjson: unknown; recipeExtJson?: unknown } {
+  return {
+    beerjson: recipe.beerJsonRecipeJson,
+    recipeExtJson: recipe.recipeExtJson,
+  };
+}
+

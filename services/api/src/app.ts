@@ -19,6 +19,7 @@ import { recipeWaterComputeAndSaveRoutes } from "./routes/recipeWaterComputeAndS
 import { ingredientsRoutes } from "./routes/ingredients.js";
 import { adsRoutes } from "./routes/ads.js";
 import { platformAdsRoutes } from "./routes/platformAds.js";
+import { platformRecipesRoutes } from "./routes/platformRecipes.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -44,6 +45,7 @@ export function buildApp() {
   app.register(ingredientsRoutes);
   app.register(adsRoutes);
   app.register(platformAdsRoutes);
+  app.register(platformRecipesRoutes);
 
   return app;
 }

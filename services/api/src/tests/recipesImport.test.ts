@@ -300,5 +300,35 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
     expect(Array.isArray(bj.previewItems)).toBe(true);
     expect(bj.previewItems.length).toBe(doc.beerjson.recipes.length);
   });
+
+  it("rejects single import when content exceeds 1 MB", async () => {
+    const oversized = "x".repeat(1 * 1024 * 1024 + 1);
+    const res = await app.inject({
+      method: "POST",
+      url: "/recipes/import/preview",
+      headers: { cookie },
+      payload: { format: "beerjson", content: oversized },
+    });
+    expect(res.statusCode).toBe(400);
+    const body = res.json() as any;
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("file_too_large");
+    expect(body.error?.message).toContain("1 MB");
+  });
+
+  it("rejects bulk import when content exceeds 5 MB", async () => {
+    const oversized = "x".repeat(5 * 1024 * 1024 + 1);
+    const res = await app.inject({
+      method: "POST",
+      url: "/recipes/import/bulk/preview",
+      headers: { cookie },
+      payload: { format: "beerjson", content: oversized },
+    });
+    expect(res.statusCode).toBe(400);
+    const body = res.json() as any;
+    expect(body.ok).toBe(false);
+    expect(body.error?.code).toBe("file_too_large");
+    expect(body.error?.message).toContain("5 MB");
+  });
 });
 

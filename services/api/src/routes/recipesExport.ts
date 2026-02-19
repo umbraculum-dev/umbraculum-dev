@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { requireActiveAccount } from "../plugins/requestContext.js";
 import { RecipesService } from "../services/recipesService.js";
-import { strictBeerJsonExport } from "../beerjson/strictExport.js";
+import { exportRecipeStrict } from "../beerjson/strictExport.js";
 
 function safeFilenamePart(v: string) {
   const trimmed = v.trim();
@@ -21,7 +21,7 @@ export async function recipesExportRoutes(app: FastifyInstance) {
     const recipeId = typeof params.id === "string" ? params.id : "";
 
     const recipe = await recipes.getRecipe(ctx.userId, ctx.activeAccountId, recipeId);
-    const strictDoc = strictBeerJsonExport((recipe as any).beerJsonRecipeJson);
+    const strictDoc = exportRecipeStrict(recipe as any);
 
     const namePart = safeFilenamePart((recipe as any)?.name ?? "");
     const filename = namePart ? `${namePart}.beerjson.json` : `recipe-${recipeId}.beerjson.json`;
@@ -37,7 +37,7 @@ export async function recipesExportRoutes(app: FastifyInstance) {
 
     const outRecipes: any[] = [];
     for (const r of list as any[]) {
-      const strictDoc = strictBeerJsonExport(r?.beerJsonRecipeJson);
+      const strictDoc = exportRecipeStrict(r as any);
       const r0 = (strictDoc as any)?.beerjson?.recipes?.[0] ?? null;
       if (r0) outRecipes.push(r0);
     }

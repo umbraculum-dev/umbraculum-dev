@@ -3,6 +3,7 @@ import type { AdPlacement, AdPlatform } from "@prisma/client";
 
 import { BadRequestError, ForbiddenError } from "../errors.js";
 import { requireSession } from "../plugins/sessionAuth.js";
+import { requirePlatformAdmin } from "../plugins/requirePlatformAdmin.js";
 
 function assertPlacement(v: unknown): AdPlacement {
   if (
@@ -29,14 +30,6 @@ function parseDateOrNull(v: unknown): Date | null {
   const d = new Date(v);
   if (!Number.isFinite(d.getTime())) throw new BadRequestError("invalid_date", "Invalid date");
   return d;
-}
-
-async function requirePlatformAdmin(app: FastifyInstance, userId: string) {
-  const user = await app.prisma.user.findUnique({
-    where: { id: userId },
-    select: { isPlatformAdmin: true },
-  });
-  if (!user?.isPlatformAdmin) throw new ForbiddenError("not_platform_admin", "Platform admin required");
 }
 
 export async function platformAdsRoutes(app: FastifyInstance) {

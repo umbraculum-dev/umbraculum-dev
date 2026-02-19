@@ -97,6 +97,7 @@ export default function BoilWaterPage() {
 
   // Acidification inputs
   const [startingAlk, setStartingAlk] = useState(0);
+  const [startingAlkTouched, setStartingAlkTouched] = useState(false);
   const [startingPh, setStartingPh] = useState<string>("7.0");
   const [targetPh, setTargetPh] = useState(5.6);
   const [acidType, setAcidType] = useState("phosphoric");
@@ -210,7 +211,14 @@ export default function BoilWaterPage() {
       setTapVolumeLiters(s.boilTapWaterVolumeLiters ?? 0);
       setDilutionVolumeLiters(s.boilDilutionWaterVolumeLiters ?? 0);
 
-      setStartingAlk(s.boilStartingAlkalinityPpmCaCO3 ?? 0);
+      const savedStartingAlk = s.boilStartingAlkalinityPpmCaCO3;
+      if (typeof savedStartingAlk === "number" && Number.isFinite(savedStartingAlk)) {
+        setStartingAlk(savedStartingAlk);
+        setStartingAlkTouched(savedStartingAlk !== 0);
+      } else {
+        setStartingAlk(0);
+        setStartingAlkTouched(false);
+      }
       setStartingPh(String(s.boilStartingPh ?? 7.0));
       setTargetPh(s.boilTargetPh ?? 5.6);
       setAcidType(s.boilAcidType ?? "phosphoric");
@@ -356,6 +364,19 @@ export default function BoilWaterPage() {
       ...mixed,
     };
   }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
+
+  const derivedBoilStartingAlkPpmCaCO3 = useMemo(() => {
+    if (!mixedSourceProfile) return null;
+    const alk = bicarbonatePpmToAlkalinityPpmCaCO3(mixedSourceProfile.bicarbonate);
+    return Number.isFinite(alk) ? alk : null;
+  }, [mixedSourceProfile]);
+
+  useEffect(() => {
+    if (startingAlkTouched) return;
+    if (derivedBoilStartingAlkPpmCaCO3 === null) return;
+    const rounded = Math.round(derivedBoilStartingAlkPpmCaCO3 * 100) / 100;
+    setStartingAlk(rounded);
+  }, [derivedBoilStartingAlkPpmCaCO3, startingAlkTouched]);
 
   const derivedBoilWaterVolumeLiters = useMemo(() => {
     const tap = Math.max(0, Number(tapVolumeLiters) || 0);
@@ -1029,7 +1050,11 @@ export default function BoilWaterPage() {
                   type="number"
                   inputMode="decimal"
                   value={startingAlk}
-                  onChange={(e) => setStartingAlk(Number(e.target.value))}
+                  onChange={(e) => {
+                    setStartingAlkTouched(true);
+                    const n = Number(e.target.value);
+                    setStartingAlk(Number.isFinite(n) ? n : 0);
+                  }}
                   style={{ width: "100%", padding: 8 }}
                 />
               </div>

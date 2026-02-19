@@ -4,6 +4,19 @@ import { HttpError } from "../errors.js";
 
 async function errorHandlerPluginImpl(app: FastifyInstance) {
   app.setErrorHandler((err, req, reply) => {
+    const errCode = (err as NodeJS.ErrnoException).code;
+    if (errCode === "FST_ERR_CTP_ENTITY_TOO_LARGE" || errCode === "FST_ERR_CTP_BODY_TOO_LARGE") {
+      req.log.warn({ err: err as any }, "request body exceeded size limit");
+      return reply.status(400).send({
+        ok: false,
+        error: {
+          code: "file_too_large",
+          message:
+            "File too large. Maximum size is 1 MB for single recipe import or 5 MB for bulk import.",
+        },
+      });
+    }
+
     const isHttp = err instanceof HttpError;
     const statusCode = isHttp ? err.statusCode : 500;
     const code = isHttp ? err.code : "internal_error";

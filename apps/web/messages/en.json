@@ -76,6 +76,26 @@
       "toggleActiveAria": "Toggle active for ad {id}"
     }
   },
+  "platform": {
+    "navLabel": "Platform admin",
+    "ads": "Ads",
+    "recipes": "Recipes"
+  },
+  "platformRecipes": {
+    "title": "Platform recipes import/export",
+    "subtitle": "Import or export recipes for any account. Select an account first.",
+    "loading": "Loading…",
+    "notAuthorized": "You are not authorized to manage platform recipes.",
+    "accountLabel": "Account",
+    "accountPlaceholder": "Select account…",
+    "accountRequired": "Select an account to import or export.",
+    "exportSectionTitle": "Export (full BeerJSON)",
+    "exportSingleLabel": "Export single recipe",
+    "exportSingleCta": "Download selected",
+    "exportBulkCta": "Export all recipes",
+    "exportNoneAvailable": "No recipes",
+    "exportFullNote": "Platform export includes full BeerJSON and recipeExtJson."
+  },
   "equipment": {
     "subtitle": "Account-scoped equipment templates used by recipes (snapshot copy; no live references).",
     "refresh": "Refresh",
@@ -526,7 +546,9 @@
         "unknownFormat": "Unknown format. Please choose BeerJSON or BeerXML.",
         "previewMissing": "Preview response is missing expected data.",
         "styleRequired": "Style is required.",
-        "importMissingId": "Import response is missing recipe id."
+        "importMissingId": "Import response is missing recipe id.",
+        "fileTooLarge": "File too large. Maximum size is {max}.",
+        "fileTooLargeHelp": "If you're experiencing this error, try splitting the file into smaller parts. Paid tier users can contact our support for assistance."
       }
     },
     "edit": {

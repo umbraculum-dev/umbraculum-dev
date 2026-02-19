@@ -175,11 +175,80 @@ function extractBeerXmlRecipes(doc: any): any[] {
   return asArray<any>(raw).filter((r) => r && typeof r === "object");
 }
 
+function normMashStepType(typeRaw: string | null): "infusion" | "temperature" | "decoction" {
+  const t = (typeRaw ?? "").trim().toLowerCase();
+  if (t.includes("infusion")) return "infusion";
+  if (t.includes("decoction")) return "decoction";
+  return "temperature";
+}
+
+function parseBeerXmlMash(recipe: any): { name: string; grain_temperature: any; mash_steps: any[] } | null {
+  const mash = recipe?.MASH ?? null;
+  if (!mash || typeof mash !== "object") return null;
+
+  const name = typeof mash.NAME === "string" ? mash.NAME.trim() : "Imported Mash";
+  const grainTempC = toNumber(mash.GRAIN_TEMP);
+  if (grainTempC == null || !Number.isFinite(grainTempC)) return null;
+
+  const stepsRaw = mash.MASH_STEPS?.MASH_STEP ?? null;
+  const stepsArr = asArray<any>(stepsRaw);
+  if (stepsArr.length === 0) return null;
+
+  const mashSteps = stepsArr
+    .map((s) => {
+      const stepName = typeof s?.NAME === "string" ? s.NAME.trim() : "";
+      const stepTempC = toNumber(s?.STEP_TEMP);
+      const stepTimeMin = toNumber(s?.STEP_TIME);
+      if (!stepName || stepTempC == null || stepTimeMin == null) return null;
+
+      const type = normMashStepType(typeof s?.TYPE === "string" ? s.TYPE : null);
+      const step: any = {
+        name: stepName,
+        type,
+        step_temperature: { unit: "C" as const, value: stepTempC },
+        step_time: { unit: "min" as const, value: Math.max(0, stepTimeMin) },
+      };
+
+      const rampTime = toNumber(s?.RAMP_TIME);
+      if (rampTime != null && rampTime >= 0) {
+        step.ramp_time = { unit: "min" as const, value: rampTime };
+      }
+
+      const endTemp = toNumber(s?.END_TEMP);
+      if (endTemp != null && Number.isFinite(endTemp)) {
+        step.end_temperature = { unit: "C" as const, value: endTemp };
+      }
+
+      if (type === "infusion") {
+        const infuseAmount = toNumber(s?.INFUSE_AMOUNT);
+        if (infuseAmount != null && infuseAmount >= 0) {
+          step.amount = { unit: "l" as const, value: infuseAmount };
+        }
+        const infuseTemp = toNumber(s?.INFUSE_TEMP);
+        if (infuseTemp != null && Number.isFinite(infuseTemp)) {
+          step.infuse_temperature = { unit: "C" as const, value: infuseTemp };
+        }
+      }
+
+      return step;
+    })
+    .filter(Boolean);
+
+  if (mashSteps.length === 0) return null;
+
+  return {
+    name,
+    grain_temperature: { unit: "C" as const, value: grainTempC },
+    mash_steps: mashSteps,
+  };
+}
+
 function extractStyleCandidateFromBeerXmlRecipe(recipe: any): StyleCandidate | null {
   const style = recipe?.STYLE ?? null;
   if (!style || typeof style !== "object") return null;
 
-  const name = typeof style?.NAME === "string" ? style.NAME.trim() : "";
+  const nameRaw = typeof style?.NAME === "string" ? style.NAME.trim() : "";
+  const category = typeof style?.CATEGORY === "string" ? style.CATEGORY.trim() : "";
 
   const categoryNumberRaw = style?.CATEGORY_NUMBER;
   const categoryNumber =
@@ -189,6 +258,10 @@ function extractStyleCandidateFromBeerXmlRecipe(recipe: any): StyleCandidate | n
 
   const styleLetter = typeof style?.STYLE_LETTER === "string" ? style.STYLE_LETTER.trim() : "";
   const code = categoryNumber && styleLetter ? `${categoryNumber}${styleLetter}` : "";
+
+  const name =
+    nameRaw ||
+    (category && code ? `${category} ${code}` : category || "");
 
   if (!name && !code) return null;
   return { name: name || null, code: code || null };
@@ -351,14 +424,21 @@ export function importBeerXmlToBeerJson(xml: string): {
   beerJsonRecipeJson: BeerJsonDocument;
   warnings: ImportWarning[];
 } {
-  const mapped = importBeerXmlToLegacy(xml);
+  const doc = parseBeerXml(xml);
+  const recipes = extractBeerXmlRecipes(doc);
+  const recipe = recipes[0] ?? null;
+  if (!recipe) throw new Error("BeerXML: missing RECIPES.RECIPE");
 
-  const recipe: any = legacyToBeerJsonRecipe(mapped);
+  const mapped = importBeerXmlRecipeToLegacy(recipe);
+  const out: any = legacyToBeerJsonRecipe(mapped);
+
+  const mash = parseBeerXmlMash(recipe);
+  if (mash) out.mash = mash;
 
   return {
     recipeName: mapped.recipeName,
     notes: mapped.notes,
-    beerJsonRecipeJson: { beerjson: { version: 1, recipes: [recipe] } },
+    beerJsonRecipeJson: { beerjson: { version: 1, recipes: [out] } },
     warnings: mapped.warnings,
   };
 }
@@ -449,11 +529,13 @@ export function importBeerXmlToBeerJsonMany(xml: string): Array<{
   return recipes.map((r) => {
     const styleCandidate = extractStyleCandidateFromBeerXmlRecipe(r);
     const legacy = importBeerXmlRecipeToLegacy(r);
-    const recipe = legacyToBeerJsonRecipe(legacy);
+    const out: any = legacyToBeerJsonRecipe(legacy);
+    const mash = parseBeerXmlMash(r);
+    if (mash) out.mash = mash;
     return {
       recipeName: legacy.recipeName,
       notes: legacy.notes,
-      beerJsonRecipeJson: { beerjson: { version: 1, recipes: [recipe] } },
+      beerJsonRecipeJson: { beerjson: { version: 1, recipes: [out] } },
       warnings: legacy.warnings,
       styleCandidate,
     };

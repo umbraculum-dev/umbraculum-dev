@@ -76,6 +76,26 @@
       "toggleActiveAria": "Attiva/disattiva la pubblicità {id}"
     }
   },
+  "platform": {
+    "navLabel": "Admin piattaforma",
+    "ads": "Pubblicità",
+    "recipes": "Ricette"
+  },
+  "platformRecipes": {
+    "title": "Import/export ricette piattaforma",
+    "subtitle": "Importa o esporta ricette per qualsiasi account. Seleziona prima un account.",
+    "loading": "Caricamento…",
+    "notAuthorized": "Non sei autorizzato a gestire le ricette piattaforma.",
+    "accountLabel": "Account",
+    "accountPlaceholder": "Seleziona account…",
+    "accountRequired": "Seleziona un account per importare o esportare.",
+    "exportSectionTitle": "Export (BeerJSON completo)",
+    "exportSingleLabel": "Esporta singola ricetta",
+    "exportSingleCta": "Scarica selezionata",
+    "exportBulkCta": "Esporta tutte le ricette",
+    "exportNoneAvailable": "Nessuna ricetta",
+    "exportFullNote": "L'export piattaforma include BeerJSON completo e recipeExtJson."
+  },
   "equipment": {
     "subtitle": "Profili attrezzatura (per account) usati dalle ricette (copia snapshot; nessun riferimento live).",
     "refresh": "Aggiorna",
@@ -242,16 +262,24 @@
       },
       "breakdowns": {
         "salt_additions": {
-          "perSaltDeltas": { "title": "Delta per sale (ppm)" }
+          "perSaltDeltas": {
+            "title": "Delta per sale (ppm)"
+          }
         },
         "mash_overall": {
-          "saltBreakdown": { "title": "Contributi dei sali (delta per sale)" }
+          "saltBreakdown": {
+            "title": "Contributi dei sali (delta per sale)"
+          }
         },
         "sparge_overall": {
-          "saltBreakdown": { "title": "Contributi dei sali (delta per sale)" }
+          "saltBreakdown": {
+            "title": "Contributi dei sali (delta per sale)"
+          }
         },
         "boil_overall": {
-          "saltBreakdown": { "title": "Contributi dei sali (delta per sale)" }
+          "saltBreakdown": {
+            "title": "Contributi dei sali (delta per sale)"
+          }
         }
       },
       "notes": {
@@ -275,8 +303,7 @@
           "boil_overall": {
             "v1": "Ioni complessivi = ioni(dopo sali) + contro-ioni dell’acido, e HCO3 è derivato dall’alcalinità finale."
           }
-        }
-        ,
+        },
         "analysis": {
           "pre_boil_volume": {
             "v1": "volume_pre_boil = acqua_mash + acqua_sparge - assorbimento_grani - perdite_mash - residuo + aggiunte_boil"
@@ -526,7 +553,9 @@
         "unknownFormat": "Formato sconosciuto. Seleziona BeerJSON o BeerXML.",
         "previewMissing": "La risposta di anteprima non contiene i dati attesi.",
         "styleRequired": "Lo stile è obbligatorio.",
-        "importMissingId": "La risposta di import non contiene l’id ricetta."
+        "importMissingId": "La risposta di import non contiene l’id ricetta.",
+        "fileTooLarge": "File troppo grande. Dimensione massima: {max}.",
+        "fileTooLargeHelp": "Se riscontri questo errore, prova a dividere il file in parti più piccole. Gli utenti con piano a pagamento possono contattare il nostro supporto per assistenza."
       }
     },
     "edit": {
@@ -920,4 +949,3 @@
     "backToLogin": "Torna ad Accedi"
   }
 }
-
