@@ -9,6 +9,9 @@ import type { AuthMeResponse } from "@brewery/contracts";
 import { parseAuthMeResponse } from "@brewery/contracts";
 
 import { apiFetch } from "../_lib/apiClient";
+import { AppMainNav } from "./AppMainNav";
+import { AppTopBar } from "./AppTopBar";
+import { NavSheet } from "./NavSheet";
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 const BRAND_COOKIE = "UI_BRAND";
@@ -72,7 +75,6 @@ export function PrimaryNav() {
             ? ((active as any).brandKey as string)
             : "default";
 
-        // Best-effort: keep cookie + <html data-brand> in sync so SSR doesn't flash after refresh.
         try {
           setBrand(brandKey);
         } catch {
@@ -88,7 +90,6 @@ export function PrimaryNav() {
 
     void check();
 
-    // Keep nav state accurate after login/logout, tab focus, or client-side navigation.
     const onAuthChanged = () => void check();
     const onFocus = () => void check();
     window.addEventListener(AUTH_CHANGED_EVENT, onAuthChanged);
@@ -105,113 +106,104 @@ export function PrimaryNav() {
 
   const showMainNav = authKnown && Boolean(me);
 
+  const mainNavItems = [
+    { href: "/", label: t("dashboard"), isActive: isActive("/") },
+    { href: "/recipes", label: t("recipes"), isActive: isActive("/recipes") },
+    { href: "/equipment", label: t("equipment"), isActive: isActive("/equipment") },
+    { href: "/about", label: t("about"), isActive: isActive("/about") },
+  ];
+
   return (
     <nav aria-label={t("ariaPrimary")}>
-      <div className="navTopBar" aria-label={t("ariaSession")}>
-        <div className="navTopBarLeft">
-          <label className="muted" style={{ fontSize: 11 }}>
-            {t("language")}{" "}
-            <select
-              value={locale}
-              onChange={(e) => {
-                const next = e.target.value;
-                const parts = (pathname || "/").split("/");
-                // pathname includes locale prefix: /en/...
-                if (parts.length > 1) parts[1] = next;
-                const nextPath = parts.join("/") || `/${next}`;
-                const qs = searchParams?.toString();
-                router.push(qs ? `${nextPath}?${qs}` : nextPath);
-              }}
-              style={{ marginLeft: 6 }}
-            >
-              <option value="en">EN</option>
-              <option value="it">IT</option>
-            </select>
-          </label>
-          <Link href="/accessibility" className="navActionButton">
-            {t("accessibility")}
-          </Link>
-          {authKnown && me ? (
-            <>
-              <span className="muted">
-                {t("signedInAs")}: <code>{me.user.email}</code>
-              </span>
-              <span className="muted">
-                {t("activeAccount")}:{" "}
-                {active ? (
-                  <>
-                    <code>{active.name}</code>
-                    <span className="muted">{" "}(</span>
-                    <code>{active.id}</code>
-                    <span className="muted">)</span>
-                  </>
-                ) : (
-                  <code>{me.activeAccountId ?? "—"}</code>
-                )}
-              </span>
-            </>
-          ) : null}
-          {process.env.NODE_ENV !== "production" && authError ? (
-            <span className="muted">(auth: {authError})</span>
-          ) : null}
-        </div>
-        <div className="navTopBarRight">
-          {authKnown && me ? (
-            <>
-              <Link href="/select-account" className="muted">
-                {t("switchAccount")}
-              </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  setLoggingOut(true);
-                  apiFetch("/api/auth/logout", { method: "POST" })
-                    .catch(() => {})
-                    .finally(() => {
-                      setLoggingOut(false);
-                      setAuthKnown(true);
-                      setAuthError(null);
-                      setMe(null);
-                      window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
-                      router.replace(`/${locale}/login`);
-                    });
+      <AppTopBar
+        ariaLabel={t("ariaSession")}
+        left={
+          <>
+            <label className="muted" style={{ fontSize: 11 }}>
+              {t("language")}{" "}
+              <select
+                value={locale}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  const parts = (pathname || "/").split("/");
+                  if (parts.length > 1) parts[1] = next;
+                  const nextPath = parts.join("/") || `/${next}`;
+                  const qs = searchParams?.toString();
+                  router.push(qs ? `${nextPath}?${qs}` : nextPath);
                 }}
-                disabled={loggingOut}
+                style={{ marginLeft: 6 }}
               >
-                {loggingOut ? `${t("logout")}…` : t("logout")}
-              </button>
-            </>
-          ) : authKnown ? (
-            <Link href="/login">{t("login")}</Link>
-          ) : null}
-        </div>
-      </div>
+                <option value="en">EN</option>
+                <option value="it">IT</option>
+              </select>
+            </label>
+            <Link href="/accessibility" className="navActionButton">
+              {t("accessibility")}
+            </Link>
+            {authKnown && me ? (
+              <>
+                <span className="muted">
+                  {t("signedInAs")}: <code>{me.user.email}</code>
+                </span>
+                <span className="muted">
+                  {t("activeAccount")}:{" "}
+                  {active ? (
+                    <>
+                      <code>{active.name}</code>
+                      <span className="muted">{" "}(</span>
+                      <code>{active.id}</code>
+                      <span className="muted">)</span>
+                    </>
+                  ) : (
+                    <code>{me.activeAccountId ?? "—"}</code>
+                  )}
+                </span>
+              </>
+            ) : null}
+            {process.env.NODE_ENV !== "production" && authError ? (
+              <span className="muted">(auth: {authError})</span>
+            ) : null}
+          </>
+        }
+        right={
+          <>
+            {authKnown && me ? (
+              <>
+                <Link href="/select-account" className="muted">
+                  {t("switchAccount")}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoggingOut(true);
+                    apiFetch("/api/auth/logout", { method: "POST" })
+                      .catch(() => {})
+                      .finally(() => {
+                        setLoggingOut(false);
+                        setAuthKnown(true);
+                        setAuthError(null);
+                        setMe(null);
+                        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+                        router.replace(`/${locale}/login`);
+                      });
+                  }}
+                  disabled={loggingOut}
+                >
+                  {loggingOut ? `${t("logout")}…` : t("logout")}
+                </button>
+              </>
+            ) : authKnown ? (
+              <Link href="/login">{t("login")}</Link>
+            ) : null}
+          </>
+        }
+      />
 
       {showMainNav ? (
-        <ul className="navList">
-          <li>
-            <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
-              {t("dashboard")}
-            </Link>
-          </li>
-          <li>
-            <Link href="/recipes" aria-current={isActive("/recipes") ? "page" : undefined}>
-              {t("recipes")}
-            </Link>
-          </li>
-          <li>
-            <Link href="/equipment" aria-current={isActive("/equipment") ? "page" : undefined}>
-              {t("equipment")}
-            </Link>
-          </li>
-          <li>
-            <Link href="/about" aria-current={isActive("/about") ? "page" : undefined}>
-              {t("about")}
-            </Link>
-          </li>
-        </ul>
+        <NavSheet triggerLabel={t("menu")} ariaLabel={t("ariaPrimary")}>
+          <AppMainNav items={mainNavItems} ariaLabel={t("ariaPrimary")} />
+        </NavSheet>
       ) : null}
     </nav>
   );
 }
-

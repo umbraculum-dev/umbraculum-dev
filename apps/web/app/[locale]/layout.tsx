@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { AdSlot } from "../_components/AdSlot";
 import { PrimaryNav } from "../_components/PrimaryNav";
+import { TamaguiProviderWrapper } from "../_components/TamaguiProviderWrapper";
 import { isLocale } from "../../src/i18n/routing";
 
 export default async function LocaleLayout({
@@ -24,6 +25,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <TamaguiProviderWrapper>
       <div className="appShell">
         <PrimaryNav />
         <AdSlot placement="global_top" />
@@ -32,6 +34,7 @@ export default async function LocaleLayout({
         </main>
         <AdSlot placement="global_bottom" />
       </div>
+      </TamaguiProviderWrapper>
     </NextIntlClientProvider>
   );
 }

@@ -30,7 +30,8 @@
     "activeAccount": "Active account",
     "switchAccount": "Switch account",
     "ariaPrimary": "Primary",
-    "ariaSession": "Session"
+    "ariaSession": "Session",
+    "menu": "Menu"
   },
   "ads": {
     "ariaLabel": "Advertisement",

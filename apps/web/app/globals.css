@@ -430,9 +430,18 @@ code {
 }
 
 .recipeEditLayout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
+}
+
+@media (min-width: 881px) {
+  .recipeEditLayout {
+    flex-direction: row;
+  }
+  .recipeEditLayout-sidebar {
+    width: 240px;
+  }
 }
 
 .recipeEditSidebar {
@@ -494,11 +503,6 @@ code {
   background: color-mix(in srgb, var(--info) 10%, var(--surface-2));
 }
 
-.recipeEditNavLink--active {
-  background: color-mix(in srgb, var(--info) 16%, var(--surface-2));
-  box-shadow: inset 3px 0 0 0 var(--info);
-}
-
 .recipeEditNavLink--secondary {
   color: var(--text-muted);
   background: color-mix(in srgb, var(--surface-2) 35%, transparent);
@@ -506,24 +510,6 @@ code {
 
 .recipeEditNavLink--secondary:hover {
   color: var(--text);
-}
-
-@media (max-width: 880px) {
-  .recipeEditLayout {
-    grid-template-columns: 1fr;
-  }
-  .recipeEditSidebar {
-    display: none;
-  }
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .recipeEditLayout {
-    grid-template-columns: 1fr;
-  }
-  .recipeEditSidebar {
-    display: none;
-  }
 }
 
 .mathPopover {

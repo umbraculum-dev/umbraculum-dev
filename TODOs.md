@@ -5,6 +5,10 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 **Proposed next step**: Mash acidification manual entry mode (BrunWater parity) or extend BeerXML style parsing.
 
+## Tamagui migration (in progress)
+
+- **Edit Recipe sections nav**: While migrating to Tamagui, the "active section" highlight in the recipe edit sidebar was intentionally removed and is flagged for permanent removal. It is not needed for the core workflow.
+
 ## Native login gate (MANDATORY before React Native auth)
 
 Before implementing native app login, complete these items.

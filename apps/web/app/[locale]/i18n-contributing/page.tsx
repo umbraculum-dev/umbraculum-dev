@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 
-export default function I18nContributingRedirectPage(props: { params: { locale: string } }) {
-  redirect(`/${props.params.locale}/contributing?topic=i18n`);
+export default async function I18nContributingRedirectPage(props: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await props.params;
+  redirect(`/${locale}/contributing?topic=i18n`);
 }
 

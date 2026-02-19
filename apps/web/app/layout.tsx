@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { defaultLocale, isLocale } from "../src/i18n/routing";
 import "./globals.css";
+import "../public/tamagui.generated.css";
 
 export const metadata: Metadata = {
   title: {

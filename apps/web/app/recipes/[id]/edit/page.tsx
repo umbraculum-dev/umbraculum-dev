@@ -24,6 +24,7 @@ import {
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 import { MashStepsEditor } from "../../_components/MashStepsEditor";
+import { RecipeEditSectionsNav } from "../../_components/RecipeEditSectionsNav";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
 import {
   fetchRecipeWaterSettings,
@@ -131,8 +132,6 @@ export default function RecipeEditPage() {
     for (const id of collapsibleSectionIds) init[id] = false;
     return init;
   });
-
-  const [activeNavId, setActiveNavId] = useState<string>("");
 
   const [surfaceMath, setSurfaceMath] = useState(false);
   useEffect(() => {
@@ -278,7 +277,6 @@ export default function RecipeEditPage() {
     const applyHashOpen = () => {
       const raw = window.location.hash || "";
       const id = raw.startsWith("#") ? raw.slice(1) : raw;
-      setActiveNavId(id);
       if (!id) return;
       if (!collapsibleSectionIds.includes(id as any)) return;
       setSectionOpen(id, true);
@@ -909,40 +907,19 @@ export default function RecipeEditPage() {
         </pre>
       ) : null}
 
-      <div className="recipeEditLayout">
-        <nav aria-label={t("nav.sectionsAriaLabel")} className="panel recipeEditSidebar">
-          <p className="muted" style={{ marginTop: 0 }}>
-            {t("nav.sectionsTitle")}
-          </p>
-          <ul className="recipeEditNavList">
-            {sections.map((s) => (
-              <li key={s.id}>
-                <a
-                  href={`#${s.id}`}
-                  className={`recipeEditNavLink${activeNavId === s.id ? " recipeEditNavLink--active" : ""}`}
-                  aria-current={activeNavId === s.id ? "location" : undefined}
-                >
-                  {s.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <hr className="recipeEditDivider" suppressHydrationWarning />
-          <ul className="recipeEditNavList">
-            <li>
-              <Link href={`/recipes/${recipeId}/water`} className="recipeEditNavLink recipeEditNavLink--secondary">
-                {t("nav.openWaterCalculator")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/recipes" className="recipeEditNavLink recipeEditNavLink--secondary">
-                {t("nav.backToRecipes")}
-              </Link>
-            </li>
-          </ul>
-        </nav>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+        className="recipeEditLayout"
+      >
+        <div style={{ flexShrink: 0 }} className="recipeEditLayout-sidebar">
+          <RecipeEditSectionsNav sections={sections} recipeId={recipeId} />
+        </div>
 
-        <div className="recipeEditContent">
+        <div className="recipeEditContent" style={{ flex: 1, minWidth: 0 }}>
           <section id="basics" className="panel">
             <details open={openSections.basics} onToggle={(e) => setSectionOpen("basics", e.currentTarget.open)}>
               <summary style={{ cursor: "pointer" }}>
