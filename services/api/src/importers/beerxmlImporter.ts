@@ -17,6 +17,7 @@ type BeerXmlGristRow = {
   colorLovibond: number | null;
   potential: { kind: "ppg" | "yieldPercent" | "sg"; value: number } | null;
   maltClass: "base" | "crystal" | "roast" | "acid";
+  addAfterBoil?: boolean;
 };
 
 type BeerXmlHopRow = {
@@ -307,6 +308,8 @@ function importBeerXmlRecipeToLegacy(recipe: any): {
       const potential =
         yieldPercent != null ? ({ kind: "yieldPercent", value: yieldPercent } as const) : null;
       const typeRaw = typeof f?.TYPE === "string" ? f.TYPE : null;
+      const addAfterBoilRaw = typeof f?.ADD_AFTER_BOIL === "string" ? f.ADD_AFTER_BOIL.trim().toUpperCase() : "";
+      const addAfterBoil = addAfterBoilRaw === "TRUE" || addAfterBoilRaw === "1" || addAfterBoilRaw === "YES";
       return {
         id: newId(),
         name,
@@ -314,6 +317,7 @@ function importBeerXmlRecipeToLegacy(recipe: any): {
         colorLovibond: colorLovibond != null ? colorLovibond : null,
         potential,
         maltClass: normMaltClass(typeRaw),
+        addAfterBoil: addAfterBoil || undefined,
       } as BeerXmlGristRow;
     })
     .filter(Boolean) as BeerXmlGristRow[];
@@ -470,6 +474,7 @@ function legacyToBeerJsonRecipe(mapped: {
           ? { color: { unit: "Lovi", value: g.colorLovibond } }
           : {}),
         amount: { unit: "kg", value: g.amountKg },
+        timing: { use: g.addAfterBoil ? "add_to_boil" : "add_to_mash" },
       })),
       hop_additions: mapped.hopsJson.map((h) => ({
         id: h.id,

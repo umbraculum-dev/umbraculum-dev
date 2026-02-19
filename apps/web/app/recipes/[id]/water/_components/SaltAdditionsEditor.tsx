@@ -12,6 +12,7 @@ export function SaltAdditionsEditor(props: {
   disabled?: boolean;
 }) {
   const tUi = useTranslations("ui");
+  const tUnits = useTranslations("units");
   const { rows, onChange, idPrefix, disabled } = props;
 
   const addRow = () => onChange([...rows, { saltKey: "gypsum", grams: 0 }]);
@@ -53,7 +54,7 @@ export function SaltAdditionsEditor(props: {
                   className="muted"
                   style={{ display: "block", fontSize: 12 }}
                 >
-                  Amount (g)
+                  {tUi("amountLabel", { unit: tUnits("g") })}
                 </label>
                 <input
                   id={`${idPrefix}-salt-grams-${idx}`}

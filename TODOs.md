@@ -3,7 +3,7 @@
 This file tracks near-term implementation tasks and “migration reminders” as we bootstrap the product.
 
 
-**Proposed next step**: Platform-admin full Import/Export (in superadmin backend).
+**Proposed next step**: Consider math.derivation body placeholders (units i18n) or other water calculator improvements.
 
 ## Native login gate (MANDATORY before React Native auth)
 
@@ -30,13 +30,13 @@ Before implementing native app login, complete these items.
 
 - [x] **Units i18n namespace**: Add `units` namespace (L, g, mL, kg, ppm, ppmAsCaCO3, tsp, pH) and replace hardcoded unit strings in water hub, mash, sparge, boil pages.
 - [ ] **Units i18n follow-ups** (natural next steps):
-  - [ ] Localize form labels that embed units (e.g. "Starting alkalinity (ppm as CaCO3)") via i18n keys or `tUnits` where appropriate.
-  - [ ] Extend `tUnits` to **equipment** and other pages that display unit suffixes.
-  - [ ] Add locale-specific variants for `tsp` (e.g. Italian "cucch. da tè") if desired.
+  - [x] Localize form labels that embed units (e.g. "Starting alkalinity (ppm as CaCO3)") via i18n keys or `tUnits` where appropriate.
+  - [x] Extend `tUnits` to **equipment** and other pages that display unit suffixes.
+  - [x] Add locale-specific variants for `tsp` (e.g. Italian "cucch. da tè") if desired.
   - [ ] Consider `math.derivation` body strings: introduce placeholders (e.g. `{ppmAsCaCO3}`) in bodyWithValues so derivation prose can use localized units.
 - [x] **Sparge salts vs sparge pH**: ensure sparge salt additions influence sparge acidification (Ca/Mg effective-alkalinity heuristic), without requiring a manual “calculate salts” step first.
 - [x] **Deprecate mash pH v0**: remove v0 endpoints/logic and UI naming; keep a single canonical mash pH estimator that supports back-compat inputs.
-- [ ] Implement **late extract additions** (kettle): ensure fermentables added at kettle are excluded from mash grist for water calc. Boil water chemistry is implemented at `/water/boil`.
+- [x] Implement **late extract additions** (kettle): ensure fermentables added at kettle are excluded from mash grist for water calc. Boil water chemistry is implemented at `/water/boil`.
 - [x] Add a BrewersFriend-like **final recap**: show **recipe residual alkalinity (RA)** vs **style expected RA** (heuristic), alongside predicted mash pH and a clear “this is a rule-of-thumb” explanation.
 - [x] Add a dedicated **“Kettle/Boil add-on water”** page for preparing water additions used at boil/kettle (separate from mash water).
 
@@ -52,7 +52,7 @@ Before implementing native app login, complete these items.
     - `/[locale]/recipes/import` has **Import single recipe** (manual style, default Custom) and **Bulk import** (BJCP 2021 style match name→code, else Custom).
     - `/[locale]/recipes` has pagination (20/page), export selected/all, and delete-with-confirm.
   - See `RECIPES-IMPORT-TODO.md` for remaining improvements and constraints.
-- [ ] **Platform-admin full Import/Export**: allow platform admins to import/export recipes with **all columns** (including internal/customized fields) in the superadmin backend; assign recipes to any organization on import.
+- [x] **Platform-admin full Import/Export**: allow platform admins to import/export recipes with **all columns** (including internal/customized fields) in the superadmin backend; assign recipes to any organization on import.
 - [x] Add upload/paste size limits (API) and show clear “file too large” errors.
 - [ ] Add optional “paste content” import UX (secondary to file upload) if desired.
 - [ ] Extend BeerXML (BrewersFriend-style) handling to preserve more data where possible (primarily **mash steps**); verify what is importable and reflect it in our BeerJSON + `recipeExtJson` model.

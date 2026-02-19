@@ -26,6 +26,8 @@ export type EditorGristRow = {
   colorLovibond: number | null;
   potential: GristPotential;
   maltClass: "base" | "crystal" | "roast" | "acid";
+  /** When add_to_boil: late extract / kettle addition; excluded from mash grist for water calc. */
+  timingUse?: "add_to_mash" | "add_to_boil";
 };
 
 export type EditorHopRow = {
@@ -128,6 +130,7 @@ function buildFermentableAddition(row: EditorGristRow) {
       ? row.colorLovibond
       : null;
 
+  const timingUse = row.timingUse ?? "add_to_mash";
   return {
     // Not in BeerJSON schema, but allowed (additionalProperties is not false on this type).
     id: row.id,
@@ -138,6 +141,7 @@ function buildFermentableAddition(row: EditorGristRow) {
     yield: yieldObj,
     ...(colorLovibond === null ? {} : { color: { unit: "Lovi", value: colorLovibond } }),
     amount: { unit: "kg", value: row.amountKg },
+    timing: { use: timingUse },
   };
 }
 
@@ -323,6 +327,12 @@ export function editorStateFromBeerJson(doc: unknown): {
       const maltClass: EditorGristRow["maltClass"] =
         grainGroup === "roasted" ? "roast" : grainGroup === "caramel" ? "crystal" : "base";
 
+      const timingUseRaw = typeof f?.timing?.use === "string" ? f.timing.use : "";
+      const timingUse: EditorGristRow["timingUse"] =
+        timingUseRaw === "add_to_boil" || timingUseRaw === "add_to_fermentation" || timingUseRaw === "add_to_package"
+          ? "add_to_boil"
+          : "add_to_mash";
+
       return {
         id,
         ingredientId: null,
@@ -338,6 +348,7 @@ export function editorStateFromBeerJson(doc: unknown): {
         colorLovibond,
         potential,
         maltClass,
+        timingUse,
       } as EditorGristRow;
     })
     .filter(Boolean) as EditorGristRow[];

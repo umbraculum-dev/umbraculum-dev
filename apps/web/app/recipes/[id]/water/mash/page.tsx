@@ -848,7 +848,10 @@ export default function MashWaterPage() {
         throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
       }
       const s = editorStateFromBeerJson((data.recipe as any).beerJsonRecipeJson);
-      rows = (s.gristRows as any[]).map((r) => {
+      const mashOnlyRows = (s.gristRows as any[]).filter(
+        (r) => (r.timingUse ?? "add_to_mash") === "add_to_mash",
+      );
+      rows = mashOnlyRows.map((r) => {
         const m = r.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[r.id] : null;
         return {
           ...r,
@@ -1077,6 +1080,9 @@ export default function MashWaterPage() {
           </h2>
           <p className="muted" style={{ marginTop: 0 }}>
             {t("gristSummaryHelp")}
+          </p>
+          <p className="muted" style={{ marginTop: 4, marginBottom: 0, fontSize: 12 }}>
+            {t("lateExtractExcludedNote")}
           </p>
           <ul style={{ marginTop: 0 }}>
             <li>

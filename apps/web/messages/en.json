@@ -8,6 +8,7 @@
     "g": "g",
     "mL": "mL",
     "kg": "kg",
+    "lovibond": "°L",
     "LPerKg": "L/kg",
     "LPerG": "L/g",
     "ppm": "ppm",
@@ -604,7 +605,14 @@
         "clear": "Clear",
         "addFermentable": "Add fermentable",
         "addOtherIngredient": "Add other ingredient"
-      }
+      },
+      "amountLabel": "Amount ({unit})",
+      "colorLabel": "Color ({unit})",
+      "gristTotalKg": "Total: {value} {unit}",
+      "gristAvgColor": "Avg color: {value} {unit}",
+      "fermentableTimingLabel": "Add to",
+      "fermentableTimingMash": "Mash",
+      "fermentableTimingKettle": "Kettle (late extract)"
     },
     "analysis": {
       "help": "Derived estimates. If required inputs are missing, values show as “Insufficient data”.",
@@ -657,6 +665,7 @@
         "adjustmentHint": "Select a source + dilution profile and set volumes to see mixed ions.",
         "gristSummaryHeading": "Grist (summary)",
         "gristSummaryHelp": "We avoid duplicating the full grist table here. Use the recipe editor for details; this page only keeps a snapshot for calculations.",
+        "lateExtractExcludedNote": "Late extract (kettle) additions are excluded from mash grist for water chemistry.",
         "acidificationHeading": "Mash water acidification",
         "resultLastCalculated": "Result (last calculated)",
         "overallResultHeading": "Overall mash water result (HCO3 derived from alkalinity)",
@@ -788,6 +797,7 @@
   },
   "waterProfiles": {
     "title": "Water profiles",
+    "ionsLegend": "Ions ({unit})",
     "activeAccount": "Active account",
     "viewAllTableTitle": "View all water profiles (table)",
     "adminAddTitle": "Admin: add water profile",
@@ -816,6 +826,7 @@
   },
   "ui": {
     "addSalt": "Add salt",
+    "amountLabel": "Amount ({unit})",
     "fx": "fx"
   },
   "salts": {

@@ -16,6 +16,7 @@ function isAdmin(role: string | null) {
 
 export default function WaterProfilesPage() {
   const t = useTranslations("waterProfiles");
+  const tUnits = useTranslations("units");
   const [me, setMe] = useState<AuthMeResponse | null>(null);
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
@@ -304,7 +305,7 @@ export default function WaterProfilesPage() {
 
               <fieldset style={{ border: 0, padding: 0, marginTop: 12 }}>
                 <legend className="muted" style={{ fontSize: 12 }}>
-                  Ions (ppm)
+                  {t("ionsLegend", { unit: tUnits("ppm") })}
                 </legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(3, 1fr)" }}>
                   {(

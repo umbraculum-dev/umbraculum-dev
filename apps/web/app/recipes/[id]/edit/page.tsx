@@ -91,6 +91,7 @@ export default function RecipeEditPage() {
   const tAnalysis = useTranslations("recipes.analysis");
   const tMath = useTranslations("math");
   const tNav = useTranslations("nav");
+  const tUnits = useTranslations("units");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -479,6 +480,7 @@ export default function RecipeEditPage() {
         colorLovibond: null,
         potential: null,
         maltClass: "base",
+        timingUse: "add_to_mash",
       },
     ]);
   };
@@ -530,6 +532,7 @@ export default function RecipeEditPage() {
         colorLovibond,
         potential,
         maltClass,
+        timingUse: "add_to_mash",
       },
     ]);
   };
@@ -1625,11 +1628,9 @@ export default function RecipeEditPage() {
                 {t("buttons.addFermentable")}
               </button>
               <span className="muted" aria-live="polite">
-                Total: <code>{gristTotals.totalKg.toFixed(3)}</code> kg{" "}
+                {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
                 {gristTotals.weightedAvgLovibond !== null ? (
-                  <>
-                    · Avg color: <code>{gristTotals.weightedAvgLovibond.toFixed(1)}</code> °L
-                  </>
+                  <> · {t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}</>
                 ) : null}
               </span>
             </div>
@@ -1717,7 +1718,7 @@ export default function RecipeEditPage() {
                                     style={{ display: "block", fontSize: 12, textAlign: "left" }}
                                     htmlFor={`grist-kg-${r.id}`}
                                   >
-                                    Amount (kg)
+                                    {t("amountLabel", { unit: tUnits("kg") })}
                                   </label>
                                   <input
                                     id={`grist-kg-${r.id}`}
@@ -1736,7 +1737,7 @@ export default function RecipeEditPage() {
                                     style={{ display: "block", fontSize: 12, textAlign: "left" }}
                                     htmlFor={`grist-lov-${r.id}`}
                                   >
-                                    Color (°L)
+                                    {t("colorLabel", { unit: tUnits("lovibond") })}
                                   </label>
                                   <input
                                     id={`grist-lov-${r.id}`}
@@ -1767,6 +1768,25 @@ export default function RecipeEditPage() {
                                     <option value="crystal">Crystal</option>
                                     <option value="roast">Roast</option>
                                     <option value="acid">Acid malt</option>
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-timing-${r.id}`}>
+                                    {t("fermentableTimingLabel")}
+                                  </label>
+                                  <select
+                                    id={`grist-timing-${r.id}`}
+                                    value={r.timingUse ?? "add_to_mash"}
+                                    onChange={(e) =>
+                                      updateGristRow(r.id, {
+                                        timingUse: e.target.value === "add_to_boil" ? "add_to_boil" : "add_to_mash",
+                                      })
+                                    }
+                                    style={{ width: 160, padding: 8 }}
+                                  >
+                                    <option value="add_to_mash">{t("fermentableTimingMash")}</option>
+                                    <option value="add_to_boil">{t("fermentableTimingKettle")}</option>
                                   </select>
                                 </div>
 
@@ -2127,7 +2147,7 @@ export default function RecipeEditPage() {
                                     style={{ display: "block", fontSize: 12, textAlign: "left" }}
                                     htmlFor={`hop-g-${r.id}`}
                                   >
-                                    Amount (g)
+                                    {t("amountLabel", { unit: tUnits("g") })}
                                   </label>
                                   <input
                                     id={`hop-g-${r.id}`}
@@ -2460,7 +2480,7 @@ export default function RecipeEditPage() {
             {miscRows.length ? (
               <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
                 {miscRows.map((r, idx) => {
-                  const amountLabel = r.amountIsWeight ? "Amount (kg)" : "Amount (L)";
+                  const amountLabel = t("amountLabel", { unit: r.amountIsWeight ? tUnits("kg") : tUnits("L") });
                   return (
                     <div key={r.id} className="ingredientCard">
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 12 }}>

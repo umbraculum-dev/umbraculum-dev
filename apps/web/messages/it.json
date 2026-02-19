@@ -8,6 +8,7 @@
     "g": "g",
     "mL": "mL",
     "kg": "kg",
+    "lovibond": "°L",
     "LPerKg": "L/kg",
     "LPerG": "L/g",
     "ppm": "ppm",
@@ -611,7 +612,14 @@
         "clear": "Pulisci",
         "addFermentable": "Aggiungi fermentabile",
         "addOtherIngredient": "Aggiungi altro ingrediente"
-      }
+      },
+      "amountLabel": "Quantità ({unit})",
+      "colorLabel": "Colore ({unit})",
+      "gristTotalKg": "Totale: {value} {unit}",
+      "gristAvgColor": "Colore medio: {value} {unit}",
+      "fermentableTimingLabel": "Aggiungi a",
+      "fermentableTimingMash": "Mash",
+      "fermentableTimingKettle": "Kettle (estratto a fine bollitura)"
     },
     "analysis": {
       "help": "Stime derivate. Se mancano input necessari, i valori mostrano “Dati insufficienti”.",
@@ -664,6 +672,7 @@
         "adjustmentHint": "Seleziona un profilo sorgente + diluizione e imposta i volumi per vedere gli ioni miscelati.",
         "gristSummaryHeading": "Grist (riepilogo)",
         "gristSummaryHelp": "Evitiamo di duplicare qui la tabella completa del grist. Usa l’editor ricetta per i dettagli; questa pagina mantiene solo uno snapshot per i calcoli.",
+        "lateExtractExcludedNote": "Gli aggiunti di estratto a fine bollitura (kettle) sono esclusi dal grist mash per la chimica dell'acqua.",
         "acidificationHeading": "Acidificazione acqua mash",
         "resultLastCalculated": "Risultato (ultimo calcolo)",
         "overallResultHeading": "Risultato complessivo acqua mash (HCO3 derivato dall’alcalinità)",
@@ -795,6 +804,7 @@
   },
   "waterProfiles": {
     "title": "Profili acqua",
+    "ionsLegend": "Ioni ({unit})",
     "activeAccount": "Account attivo",
     "viewAllTableTitle": "Vedi tutti i profili acqua (tabella)",
     "adminAddTitle": "Admin: aggiungi profilo acqua",
@@ -823,6 +833,7 @@
   },
   "ui": {
     "addSalt": "Aggiungi sale",
+    "amountLabel": "Quantità ({unit})",
     "fx": "fx"
   },
   "salts": {
