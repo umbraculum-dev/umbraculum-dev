@@ -175,7 +175,10 @@
         "postBoilVolumeLiters": "Volume post-boil (L)",
         "boilGravitySg": "Gravità boil (SG)",
         "ibuTinsethEstimated": "IBU (Tinseth, stimata)",
-        "ibuRagerEstimated": "IBU (Rager, stimata)"
+        "ibuRagerEstimated": "IBU (Rager, stimata)",
+        "mcu": "MCU",
+        "colorSrmMoreyEstimated": "SRM (Morey, stimato)",
+        "colorSrmDanielsEstimated": "SRM (Daniels, stimato)"
       },
       "rows": {
         "saltDelta": "- {saltKey} ({grams} g): {deltas}"
@@ -244,6 +247,15 @@
           },
           "ibu_rager": {
             "v1": "IBU Rager calcolata da aggiunte luppolo, utilizzo, gravità boil e volume."
+          },
+          "mcu": {
+            "v1": "MCU (Malt Color Units) = Σ(lb × °L) / gal, usando il volume post-boil/kettle."
+          },
+          "srm_morey": {
+            "v1": "SRM (Morey) = 1,4922 × MCU^0,6859"
+          },
+          "srm_daniels": {
+            "v1": "SRM (Daniels) ≈ 0,2 × MCU + 8,4"
           }
         }
       }
@@ -278,7 +290,8 @@
         "noYeast": "(nessun lievito nell’editor)",
         "noYeastSelected": "(attenuazione lievito non disponibile)",
         "noteDependsOnWaterAndEquipment": "Dipende da impostazioni acqua salvate e snapshot attrezzatura.",
-        "noteMissingWaterSettings": "Impostazioni acqua salvate mancanti; i volumi stimati potrebbero non essere disponibili."
+        "noteMissingWaterSettings": "Impostazioni acqua salvate mancanti; i volumi stimati potrebbero non essere disponibili.",
+        "noteMissingFermentableColors": "Colore fermentabile (Lovibond) mancante su una o più righe."
       },
       "abv": {
         "title": "ABV (stimata)",
@@ -291,6 +304,14 @@
       "ibuRager": {
         "title": "IBU (Rager, stimata)",
         "body": "Modello (Rager):\nU% ≈ 18,11 + 13,86 × tanh((t - 31,32) / 18,27)\nCorrezione gravità (se G > 1,050): GA = (G - 1,050) / 0,2\nIBU = Σ (g × (AA%/100) × (U%/(1+GA)) × 1000 / V_L)\n\nQuesta ricetta:\nGravità usata (SG) = {gravity} ({gravitySource})\nVolume usato (L) = {volume} ({volumeSource})\n\nAggiunte luppolo (dall’editor):\n{hopsLines}\n\nRisultato:\nIBU (Rager) = {ibu}"
+      },
+      "srmMorey": {
+        "title": "Colore (SRM, Morey, stimato)",
+        "body": "Modello (Morey):\nMCU = Σ (lb × °L) / gal\nSRM = 1,4922 × MCU^0,6859\n\nQuesta ricetta:\nVolume kettle usato = {volume} L\nNote:\n- {notes}\n\nRisultato:\nSRM (Morey) = {srm}"
+      },
+      "srmDaniels": {
+        "title": "Colore (SRM, Daniels, stimato)",
+        "body": "Modello (Daniels, lineare):\nMCU = Σ (lb × °L) / gal\nSRM ≈ 0,2 × MCU + 8,4\n\nQuesta ricetta:\nVolume kettle usato = {volume} L\nNote:\n- {notes}\n\nRisultato:\nSRM (Daniels) = {srm}"
       },
       "kettleVolume": {
         "title": "Volume (kettle)",
@@ -508,6 +529,8 @@
         "abv": "ABV (stimata)",
         "ibuTinseth": "IBU (Tinseth, stimata)",
         "ibuRager": "IBU (Rager, stimata)",
+        "srmMorey": "Colore (SRM, Morey, stimato)",
+        "srmDaniels": "Colore (SRM, Daniels, stimato)",
         "kettleVolume": "Volume (kettle)",
         "preBoilVolume": "Volume pre-boil (stimato)",
         "og": "OG (stimata)",
@@ -527,6 +550,8 @@
         "exceeds_kettle_capacity": "Il volume kettle calcolato supera la capacità/target del profilo attrezzatura.",
         "missing_efficiency": "Efficienza mancante; OG/PBG richiedono una % di efficienza.",
         "missing_fermentables": "Nessun fermentabile con quantità e resa/potenziale utilizzabili; impossibile stimare OG/PBG.",
+        "missing_color_volume": "Volume kettle calcolato mancante; l’SRM richiede impostazioni acqua salvate e volumi.",
+        "missing_fermentable_colors": "Colore fermentabile (Lovibond) mancante su una o più righe; l’SRM richiede i colori dei fermentabili.",
         "used_batch_size_volume": "Uso il batch_size BeerJSON per stimare l’IBU perché il volume kettle calcolato non è disponibile.",
         "missing_ibu_gravity": "Gravità di bollitura mancante; l’IBU richiede PBG/OG.",
         "missing_ibu_inputs": "Nessuna aggiunta di luppolo boil/whirlpool utilizzabile (quantità, AA%, tempo); impossibile stimare l’IBU.",

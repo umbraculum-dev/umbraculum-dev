@@ -175,7 +175,10 @@
         "postBoilVolumeLiters": "Post-boil volume (L)",
         "boilGravitySg": "Boil gravity (SG)",
         "ibuTinsethEstimated": "IBU (Tinseth, estimated)",
-        "ibuRagerEstimated": "IBU (Rager, estimated)"
+        "ibuRagerEstimated": "IBU (Rager, estimated)",
+        "mcu": "MCU",
+        "colorSrmMoreyEstimated": "SRM (Morey, estimated)",
+        "colorSrmDanielsEstimated": "SRM (Daniels, estimated)"
       },
       "rows": {
         "saltDelta": "- {saltKey} ({grams} g): {deltas}"
@@ -244,6 +247,15 @@
           },
           "ibu_rager": {
             "v1": "Rager IBU is computed from hop additions, utilization, boil gravity, and post-boil volume."
+          },
+          "mcu": {
+            "v1": "MCU (Malt Color Units) = Σ(lb × °L) / gal, using post-boil/kettle volume."
+          },
+          "srm_morey": {
+            "v1": "SRM (Morey) = 1.4922 × MCU^0.6859"
+          },
+          "srm_daniels": {
+            "v1": "SRM (Daniels) ≈ 0.2 × MCU + 8.4"
           }
         }
       }
@@ -278,7 +290,8 @@
         "noYeast": "(no yeast in editor)",
         "noYeastSelected": "(no usable yeast attenuation)",
         "noteDependsOnWaterAndEquipment": "Depends on saved water settings + equipment snapshot.",
-        "noteMissingWaterSettings": "Missing saved water settings; volume estimates may be unavailable."
+        "noteMissingWaterSettings": "Missing saved water settings; volume estimates may be unavailable.",
+        "noteMissingFermentableColors": "Missing fermentable color (Lovibond) on one or more grist rows."
       },
       "abv": {
         "title": "ABV (estimated)",
@@ -291,6 +304,14 @@
       "ibuRager": {
         "title": "IBU (Rager, estimated)",
         "body": "Model (Rager):\nU% ≈ 18.11 + 13.86 × tanh((t - 31.32) / 18.27)\nGravity adjustment (if G > 1.050): GA = (G - 1.050) / 0.2\nIBU = Σ (g × (AA%/100) × (U%/(1+GA)) × 1000 / V_L)\n\nThis recipe:\nGravity used (SG) = {gravity} ({gravitySource})\nVolume used (L) = {volume} ({volumeSource})\n\nHop additions (from editor):\n{hopsLines}\n\nResult:\nIBU (Rager) = {ibu}"
+      },
+      "srmMorey": {
+        "title": "Color (SRM, Morey, estimated)",
+        "body": "Model (Morey):\nMCU = Σ (lb × °L) / gal\nSRM = 1.4922 × MCU^0.6859\n\nThis recipe:\nKettle volume used = {volume} L\nNotes:\n- {notes}\n\nResult:\nSRM (Morey) = {srm}"
+      },
+      "srmDaniels": {
+        "title": "Color (SRM, Daniels, estimated)",
+        "body": "Model (Daniels, linear):\nMCU = Σ (lb × °L) / gal\nSRM ≈ 0.2 × MCU + 8.4\n\nThis recipe:\nKettle volume used = {volume} L\nNotes:\n- {notes}\n\nResult:\nSRM (Daniels) = {srm}"
       },
       "kettleVolume": {
         "title": "Volume (kettle)",
@@ -508,6 +529,8 @@
         "abv": "ABV (estimated)",
         "ibuTinseth": "IBU (Tinseth, estimated)",
         "ibuRager": "IBU (Rager, estimated)",
+        "srmMorey": "Color (SRM, Morey, estimated)",
+        "srmDaniels": "Color (SRM, Daniels, estimated)",
         "kettleVolume": "Volume (kettle)",
         "preBoilVolume": "Pre-boil volume (estimated)",
         "og": "OG (estimated)",
@@ -527,6 +550,8 @@
         "exceeds_kettle_capacity": "Computed kettle volume exceeds kettle capacity/target from equipment profile.",
         "missing_efficiency": "Missing efficiency; OG/PBG estimates require an efficiency %.",
         "missing_fermentables": "No fermentables with usable amount + yield/potential; cannot estimate OG/PBG.",
+        "missing_color_volume": "Missing computed kettle volume; SRM requires saved water settings + volumes.",
+        "missing_fermentable_colors": "Missing fermentable color (Lovibond) on one or more grist rows; SRM requires fermentable colors.",
         "used_batch_size_volume": "Using BeerJSON batch_size volume for IBU estimate because computed kettle volume is unavailable.",
         "missing_ibu_gravity": "Missing boil gravity estimate; IBU estimates require PBG/OG.",
         "missing_ibu_inputs": "No usable hop boil/whirlpool additions with amount, alpha acid %, and time; cannot estimate IBU.",

@@ -93,6 +93,10 @@ export function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisRespo
     pbgEstimatedSg: rr.pbgEstimatedSg === null ? null : isFiniteNumber(rr.pbgEstimatedSg) ? rr.pbgEstimatedSg : null,
     ibuTinsethEstimated: rr.ibuTinsethEstimated === null ? null : isFiniteNumber(rr.ibuTinsethEstimated) ? rr.ibuTinsethEstimated : null,
     ibuRagerEstimated: rr.ibuRagerEstimated === null ? null : isFiniteNumber(rr.ibuRagerEstimated) ? rr.ibuRagerEstimated : null,
+    colorSrmMoreyEstimated:
+      rr.colorSrmMoreyEstimated === null ? null : isFiniteNumber(rr.colorSrmMoreyEstimated) ? rr.colorSrmMoreyEstimated : null,
+    colorSrmDanielsEstimated:
+      rr.colorSrmDanielsEstimated === null ? null : isFiniteNumber(rr.colorSrmDanielsEstimated) ? rr.colorSrmDanielsEstimated : null,
     fgEstimatedSg: rr.fgEstimatedSg === null ? null : isFiniteNumber(rr.fgEstimatedSg) ? rr.fgEstimatedSg : null,
     abvEstimatedPercent: rr.abvEstimatedPercent === null ? null : isFiniteNumber(rr.abvEstimatedPercent) ? rr.abvEstimatedPercent : null,
     attenuationEffectivePercent:

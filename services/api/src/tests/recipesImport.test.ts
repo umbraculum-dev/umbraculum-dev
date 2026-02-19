@@ -28,6 +28,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
   <RECIPE>
     <NAME>Import Test IPA</NAME>
     <NOTES>Imported from BeerXML</NOTES>
+    <BATCH_SIZE>20</BATCH_SIZE>
     <FERMENTABLES>
       <FERMENTABLE>
         <NAME>Pale Malt</NAME>
@@ -107,6 +108,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       <CATEGORY_NUMBER>1</CATEGORY_NUMBER>
       <STYLE_LETTER>C</STYLE_LETTER>
     </STYLE>
+    <BATCH_SIZE>20</BATCH_SIZE>
     <FERMENTABLES>
       <FERMENTABLE>
         <NAME>Pale Malt</NAME>
@@ -140,6 +142,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       <CATEGORY_NUMBER>99</CATEGORY_NUMBER>
       <STYLE_LETTER>Z</STYLE_LETTER>
     </STYLE>
+    <BATCH_SIZE>20</BATCH_SIZE>
     <FERMENTABLES>
       <FERMENTABLE>
         <NAME>Pilsner Malt</NAME>

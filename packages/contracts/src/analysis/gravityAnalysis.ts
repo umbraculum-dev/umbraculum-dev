@@ -11,6 +11,8 @@ export type GravityAnalysisWarningCode =
   | "exceeds_kettle_capacity"
   | "missing_efficiency"
   | "missing_fermentables"
+  | "missing_color_volume"
+  | "missing_fermentable_colors"
   | "used_batch_size_volume"
   | "missing_ibu_gravity"
   | "missing_ibu_inputs"
@@ -27,6 +29,8 @@ export interface GravityAnalysisResultV1 {
   pbgEstimatedSg: number | null;
   ibuTinsethEstimated: number | null;
   ibuRagerEstimated: number | null;
+  colorSrmMoreyEstimated: number | null;
+  colorSrmDanielsEstimated: number | null;
   fgEstimatedSg: number | null;
   abvEstimatedPercent: number | null;
   attenuationEffectivePercent: number | null;
@@ -37,6 +41,9 @@ export type GravityAnalysisDerivationKind =
   | "analysis.abv"
   | "analysis.ibu_tinseth"
   | "analysis.ibu_rager"
+  | "analysis.mcu"
+  | "analysis.srm_morey"
+  | "analysis.srm_daniels"
   | "analysis.kettle_volume"
   | "analysis.pre_boil_volume"
   | "analysis.og"

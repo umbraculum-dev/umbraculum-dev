@@ -197,6 +197,7 @@ function extractStyleCandidateFromBeerXmlRecipe(recipe: any): StyleCandidate | n
 function importBeerXmlRecipeToLegacy(recipe: any): {
   recipeName: string;
   notes: string | null;
+  batchSizeLiters: number;
   gristJson: BeerXmlGristRow[];
   hopsJson: BeerXmlHopRow[];
   yeastJson: BeerXmlYeastRow[];
@@ -208,6 +209,12 @@ function importBeerXmlRecipeToLegacy(recipe: any): {
   const recipeName = typeof recipe.NAME === "string" ? recipe.NAME.trim() : "";
   if (!recipeName) throw new Error("BeerXML: recipe NAME is required");
   const notes = typeof recipe.NOTES === "string" ? recipe.NOTES.trim() || null : null;
+
+  const batchSizeLitersRaw = toNumber(recipe.BATCH_SIZE);
+  if (batchSizeLitersRaw == null || !(batchSizeLitersRaw > 0)) {
+    throw new Error("BeerXML: recipe BATCH_SIZE is required and must be > 0 (liters)");
+  }
+  const batchSizeLiters = batchSizeLitersRaw;
 
   const fermentables = asArray<any>(recipe.FERMENTABLES?.FERMENTABLE);
   const hops = asArray<any>(recipe.HOPS?.HOP);
@@ -317,12 +324,13 @@ function importBeerXmlRecipeToLegacy(recipe: any): {
     warnings.push({ code: "no_fermentables", message: "No fermentables found in BeerXML; recipe will import with an empty grist." });
   }
 
-  return { recipeName, notes, gristJson, hopsJson, yeastJson, miscJson, warnings };
+  return { recipeName, notes, batchSizeLiters, gristJson, hopsJson, yeastJson, miscJson, warnings };
 }
 
 export function importBeerXmlToLegacy(xml: string): {
   recipeName: string;
   notes: string | null;
+  batchSizeLiters: number;
   gristJson: BeerXmlGristRow[];
   hopsJson: BeerXmlHopRow[];
   yeastJson: BeerXmlYeastRow[];
@@ -358,6 +366,7 @@ export function importBeerXmlToBeerJson(xml: string): {
 function legacyToBeerJsonRecipe(mapped: {
   recipeName: string;
   notes: string | null;
+  batchSizeLiters: number;
   gristJson: BeerXmlGristRow[];
   hopsJson: BeerXmlHopRow[];
   yeastJson: BeerXmlYeastRow[];
@@ -368,7 +377,7 @@ function legacyToBeerJsonRecipe(mapped: {
     type: "all grain",
     author: "brewery-app",
     efficiency: { brewhouse: { unit: "%", value: 75 } },
-    batch_size: { unit: "l", value: 20 },
+    batch_size: { unit: "l", value: mapped.batchSizeLiters },
     ingredients: {
       fermentable_additions: mapped.gristJson.map((g) => ({
         // Not in BeerJSON schema, but allowed (additionalProperties is not false on this type).
@@ -377,7 +386,9 @@ function legacyToBeerJsonRecipe(mapped: {
         type: "grain",
         grain_group: maltClassToGrainGroup(g.maltClass),
         yield: gristPotentialToBeerJsonYield(g.potential),
-        color: { unit: "Lovi", value: typeof g.colorLovibond === "number" && Number.isFinite(g.colorLovibond) ? g.colorLovibond : 0 },
+        ...(typeof g.colorLovibond === "number" && Number.isFinite(g.colorLovibond) && g.colorLovibond >= 0
+          ? { color: { unit: "Lovi", value: g.colorLovibond } }
+          : {}),
         amount: { unit: "kg", value: g.amountKg },
       })),
       hop_additions: mapped.hopsJson.map((h) => ({

@@ -17,6 +17,8 @@ export interface GravityAnalysis {
   pbgEstimatedSg: number | null;
   ibuTinsethEstimated: number | null;
   ibuRagerEstimated: number | null;
+  colorSrmMoreyEstimated: number | null;
+  colorSrmDanielsEstimated: number | null;
   fgEstimatedSg: number | null;
   abvEstimatedPercent: number | null;
   attenuationEffectivePercent: number | null;
@@ -66,6 +68,11 @@ interface ExtractedHopAddition {
   alphaAcidPercent: number | null;
 }
 
+interface ExtractedFermentableForColor {
+  pounds: number;
+  lovibond: number;
+}
+
 function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
   const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
   const unit = typeof r0?.batch_size?.unit === "string" ? r0.batch_size.unit : "";
@@ -74,6 +81,53 @@ function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
   if (unit === "l") return value;
   if (unit === "ml") return value / 1000;
   return null;
+}
+
+function extractFermentablesForColor(beerJsonRecipeJson: unknown): { rows: ExtractedFermentableForColor[]; hasMissingColor: boolean } {
+  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
+  const ferms = r0?.ingredients?.fermentable_additions;
+  const list = Array.isArray(ferms) ? ferms : [];
+
+  const rows: ExtractedFermentableForColor[] = [];
+  let hasMissingColor = false;
+
+  for (const f of list) {
+    const amountKg =
+      f?.amount?.unit === "kg"
+        ? safeNum(f?.amount?.value)
+        : f?.amount?.unit === "g"
+          ? (safeNum(f?.amount?.value) ?? 0) / 1000
+          : null;
+    if (amountKg == null || !(amountKg > 0)) continue;
+
+    const colorLovibond =
+      f?.color?.unit === "Lovi" && typeof f?.color?.value === "number" && Number.isFinite(f.color.value) ? f.color.value : null;
+    if (colorLovibond == null) {
+      hasMissingColor = true;
+      continue;
+    }
+
+    rows.push({ pounds: amountKg * KG_TO_LB, lovibond: Math.max(0, colorLovibond) });
+  }
+
+  return { rows, hasMissingColor };
+}
+
+function computeMcu(args: { fermentables: ExtractedFermentableForColor[]; postBoilVolumeLiters: number }): number | null {
+  if (!(args.postBoilVolumeLiters > 0)) return null;
+  const gallons = args.postBoilVolumeLiters * L_TO_GAL;
+  if (!(gallons > 0)) return null;
+  const numerator = args.fermentables.reduce((acc, r) => acc + r.pounds * r.lovibond, 0);
+  if (!(numerator >= 0)) return null;
+  return numerator / gallons;
+}
+
+function srmMoreyFromMcu(mcu: number): number {
+  return 1.4922 * Math.pow(Math.max(0, mcu), 0.6859);
+}
+
+function srmDanielsFromMcu(mcu: number): number {
+  return 0.2 * Math.max(0, mcu) + 8.4;
 }
 
 function extractHopAdditions(beerJsonRecipeJson: unknown): ExtractedHopAddition[] {
@@ -399,6 +453,8 @@ export function computeRecipeGravityAnalysis(args: {
       pbgEstimatedSg: null,
       ibuTinsethEstimated: null,
       ibuRagerEstimated: null,
+      colorSrmMoreyEstimated: null,
+      colorSrmDanielsEstimated: null,
       fgEstimatedSg: null,
       abvEstimatedPercent: null,
       attenuationEffectivePercent: null,
@@ -419,6 +475,8 @@ export function computeRecipeGravityAnalysis(args: {
         attenuationEffectivePercent: hintFixed({ decimals: 1, unit: "percent", clamp: { min: 0, max: 100 } }),
         ibuTinsethEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
         ibuRagerEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
+        colorSrmMoreyEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
+        colorSrmDanielsEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
       },
     };
   }
@@ -563,6 +621,27 @@ export function computeRecipeGravityAnalysis(args: {
       ? computeIbuRager({ hops, boilGravitySg: ibuGravitySg, postBoilVolumeLiters: ibuVolumeLiters, warnings })
       : null;
 
+  const colorFermentables = extractFermentablesForColor(args.beerJsonRecipeJson);
+  let colorMcuEstimated: number | null = null;
+  let colorSrmMoreyEstimated: number | null = null;
+  let colorSrmDanielsEstimated: number | null = null;
+
+  if (kettleVolumeLiters == null) {
+    warnings.push({ code: "missing_color_volume" });
+  } else if (colorFermentables.hasMissingColor) {
+    warnings.push({ code: "missing_fermentable_colors" });
+  } else if (!colorFermentables.rows.length) {
+    if (!warnings.some((w) => w.code === "missing_fermentables")) {
+      warnings.push({ code: "missing_fermentables" });
+    }
+  } else {
+    colorMcuEstimated = computeMcu({ fermentables: colorFermentables.rows, postBoilVolumeLiters: kettleVolumeLiters });
+    if (colorMcuEstimated != null) {
+      colorSrmMoreyEstimated = srmMoreyFromMcu(colorMcuEstimated);
+      colorSrmDanielsEstimated = srmDanielsFromMcu(colorMcuEstimated);
+    }
+  }
+
   const yeasts = extractYeastAttenuations(args);
   const attenuationEffectivePercent = effectiveAttenuationPercent(yeasts);
   if (attenuationEffectivePercent == null) {
@@ -586,6 +665,8 @@ export function computeRecipeGravityAnalysis(args: {
     pbgEstimatedSg,
     ibuTinsethEstimated,
     ibuRagerEstimated,
+    colorSrmMoreyEstimated,
+    colorSrmDanielsEstimated,
     fgEstimatedSg,
     abvEstimatedPercent,
     attenuationEffectivePercent,
@@ -717,6 +798,36 @@ export function computeRecipeGravityAnalysis(args: {
     };
   }
 
+  if (colorMcuEstimated != null && kettleVolumeLiters != null) {
+    derivations["analysis.mcu"] = {
+      kind: "analysis.mcu" as any,
+      version: 1,
+      formulaId: "analysis.mcu.v1",
+      inputs: [{ id: "postBoilVolumeLiters", value: { kind: "number", value: kettleVolumeLiters, unit: "L" } }],
+      intermediates: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" as any } }],
+    };
+  }
+
+  if (colorSrmMoreyEstimated != null && colorMcuEstimated != null) {
+    derivations["analysis.srm_morey"] = {
+      kind: "analysis.srm_morey" as any,
+      version: 1,
+      formulaId: "analysis.srm_morey.v1",
+      inputs: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" as any } }],
+      intermediates: [{ id: "colorSrmMoreyEstimated", value: { kind: "number", value: colorSrmMoreyEstimated, unit: "srm" as any } }],
+    };
+  }
+
+  if (colorSrmDanielsEstimated != null && colorMcuEstimated != null) {
+    derivations["analysis.srm_daniels"] = {
+      kind: "analysis.srm_daniels" as any,
+      version: 1,
+      formulaId: "analysis.srm_daniels.v1",
+      inputs: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" as any } }],
+      intermediates: [{ id: "colorSrmDanielsEstimated", value: { kind: "number", value: colorSrmDanielsEstimated, unit: "srm" as any } }],
+    };
+  }
+
   return {
     ok: true,
     version: 1,
@@ -732,6 +843,8 @@ export function computeRecipeGravityAnalysis(args: {
       attenuationEffectivePercent: hintFixed({ decimals: 1, unit: "percent", clamp: { min: 0, max: 100 } }),
       ibuTinsethEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
       ibuRagerEstimated: hintFixed({ decimals: 1, unit: "ibu", clamp: { min: 0 } }),
+      colorSrmMoreyEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
+      colorSrmDanielsEstimated: hintFixed({ decimals: 1, unit: "srm", clamp: { min: 0 } }),
     },
   };
 }

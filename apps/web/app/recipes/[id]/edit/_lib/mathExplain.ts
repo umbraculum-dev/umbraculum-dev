@@ -2,6 +2,8 @@ export const mathExplain = {
   "analysis.abv": { titleKey: "analysis.abv.title" },
   "analysis.ibuTinseth": { titleKey: "analysis.ibuTinseth.title" },
   "analysis.ibuRager": { titleKey: "analysis.ibuRager.title" },
+  "analysis.srmMorey": { titleKey: "analysis.srmMorey.title" },
+  "analysis.srmDaniels": { titleKey: "analysis.srmDaniels.title" },
   "analysis.kettleVolume": { titleKey: "analysis.kettleVolume.title" },
   "analysis.preBoilVolume": { titleKey: "analysis.preBoilVolume.title" },
   "analysis.og": { titleKey: "analysis.og.title" },

@@ -123,6 +123,11 @@ function buildFermentableAddition(row: EditorGristRow) {
           ? { potential: { unit: "sg", value: ppgToSg(row.potential.value) } }
           : { fine_grind: { unit: "%", value: 0 } };
 
+  const colorLovibond =
+    typeof row.colorLovibond === "number" && Number.isFinite(row.colorLovibond) && row.colorLovibond >= 0
+      ? row.colorLovibond
+      : null;
+
   return {
     // Not in BeerJSON schema, but allowed (additionalProperties is not false on this type).
     id: row.id,
@@ -131,7 +136,7 @@ function buildFermentableAddition(row: EditorGristRow) {
     producer: row.producer ?? undefined,
     grain_group: maltClassToGrainGroup(row.maltClass),
     yield: yieldObj,
-    color: { unit: "Lovi", value: row.colorLovibond ?? 0 },
+    ...(colorLovibond === null ? {} : { color: { unit: "Lovi", value: colorLovibond } }),
     amount: { unit: "kg", value: row.amountKg },
   };
 }
@@ -302,7 +307,10 @@ export function editorStateFromBeerJson(doc: unknown): {
       if (!name) return null;
       const amountKg =
         f?.amount?.unit === "kg" ? safeNum(f?.amount?.value, 0) : f?.amount?.unit === "g" ? safeNum(f?.amount?.value, 0) / 1000 : 0;
-      const colorLovibond = f?.color?.unit === "Lovi" ? safeNum(f?.color?.value, 0) : 0;
+      const colorLovibond =
+        f?.color?.unit === "Lovi" && typeof f?.color?.value === "number" && Number.isFinite(f.color.value) && f.color.value >= 0
+          ? safeNum(f.color.value, 0)
+          : null;
 
       const potential: GristPotential =
         f?.yield?.potential?.unit === "sg" && typeof f?.yield?.potential?.value === "number"

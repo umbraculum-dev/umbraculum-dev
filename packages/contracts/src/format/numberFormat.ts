@@ -8,7 +8,8 @@ export type NumberFormatUnit =
   | "kg"
   | "percent"
   | "sg"
-  | "ibu";
+  | "ibu"
+  | "srm";
 
 export interface NumberFormatHintV1 {
   version: 1;

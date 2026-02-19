@@ -1152,6 +1152,72 @@ export default function RecipeEditPage() {
                             <tr>
                               <td style={{ paddingRight: 12 }}>
                                 <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.srmMorey")}</strong>
+                                  {renderMath(
+                                    "analysis.srmMorey",
+                                    renderDerivationMath(
+                                      "analysis.srm_morey",
+                                      tMath("analysis.srmMorey.body", {
+                                        srm: fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1),
+                                        volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                        notes: warningCodes.has("missing_color_volume")
+                                          ? tMath("analysis.common.noteMissingWaterSettings")
+                                          : warningCodes.has("missing_fermentable_colors")
+                                            ? tMath("analysis.common.noteMissingFermentableColors")
+                                            : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                      }),
+                                    ) ?? tMath("analysis.srmMorey.body", {
+                                      srm: fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1),
+                                      volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                      notes: warningCodes.has("missing_color_volume")
+                                        ? tMath("analysis.common.noteMissingWaterSettings")
+                                        : warningCodes.has("missing_fermentable_colors")
+                                          ? tMath("analysis.common.noteMissingFermentableColors")
+                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                    }),
+                                  )}
+                                </div>
+                              </td>
+                              <td>
+                                <code>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</code>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+                                  <strong>{tAnalysis("fields.srmDaniels")}</strong>
+                                  {renderMath(
+                                    "analysis.srmDaniels",
+                                    renderDerivationMath(
+                                      "analysis.srm_daniels",
+                                      tMath("analysis.srmDaniels.body", {
+                                        srm: fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1),
+                                        volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                        notes: warningCodes.has("missing_color_volume")
+                                          ? tMath("analysis.common.noteMissingWaterSettings")
+                                          : warningCodes.has("missing_fermentable_colors")
+                                            ? tMath("analysis.common.noteMissingFermentableColors")
+                                            : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                      }),
+                                    ) ?? tMath("analysis.srmDaniels.body", {
+                                      srm: fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1),
+                                      volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                      notes: warningCodes.has("missing_color_volume")
+                                        ? tMath("analysis.common.noteMissingWaterSettings")
+                                        : warningCodes.has("missing_fermentable_colors")
+                                          ? tMath("analysis.common.noteMissingFermentableColors")
+                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                    }),
+                                  )}
+                                </div>
+                              </td>
+                              <td>
+                                <code>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</code>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style={{ paddingRight: 12 }}>
+                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
                                   <strong>{tAnalysis("fields.kettleVolume")}</strong>
                                   {renderMath(
                                     "analysis.kettleVolume",
