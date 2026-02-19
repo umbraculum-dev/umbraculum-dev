@@ -177,6 +177,70 @@ Example usage:
 - `L` values: 2 decimals
 - `ibu` values: 1 decimal
 
+### Units of measurement (canonical + normalization) (MANDATORY)
+This app is designed to support multiple client platforms (web now; native soon). To avoid subtle drift and duplicated formulas:
+
+- The **API + storage** use a single canonical unit system (metric + SG).
+- Clients may **display and accept input** in other unit systems, but must convert to canonical for persistence and computation.
+
+#### Canonical unit system (v1)
+Canonical means: what is stored in DB BeerJSON / `recipeExtJson`, what calculations use, and what API endpoints expect after normalization.
+
+- **Mass**: `kg` (fermentables, most misc-by-weight) and `g` (hops) are canonical targets.
+- **Volume**: `l` is canonical target.
+- **Specific gravity**: `sg` is canonical target.
+- **Temperature**: (not yet standardized; do not add ad-hoc °F support without a shared conversion + policy).
+
+#### Allowed non-canonical inputs (v1)
+We accept a small, explicit set of US customary inputs at the API boundary and normalize them into canonical units:
+
+- **Mass (US)**: `lb`, `oz`
+- **Volume (US)**: `gal`, `qt`, `pt`, `fl_oz`
+
+If an input uses a unit outside this list, we either:
+- normalize it only if we explicitly add support, or
+- reject it with a clear error (do not “guess” units).
+
+#### Where normalization happens (single source of truth)
+Normalization must happen in exactly one place:
+
+- **API boundary normalization**: the API converts incoming BeerJSON amounts into canonical units **before** domain validation/persistence.
+  - This enables BeerJSON imports and future native clients to send US customary values without changing the stored canonical representation.
+- **Shared conversion library**: conversion factors and rounding helpers live in `packages/core/src/units/` and are reused by API + web (and later native).
+
+#### Canonical targets per BeerJSON field (v1)
+When normalizing BeerJSON recipes, enforce these canonical targets:
+
+- `beerjson.recipes[0].batch_size`: always `l`
+- `beerjson.recipes[0].ingredients.fermentable_additions[*].amount`: always `kg`
+- `beerjson.recipes[0].ingredients.hop_additions[*].amount`: always `g`
+- `beerjson.recipes[0].ingredients.miscellaneous_additions[*].amount`:
+  - if amount is a **mass**: always `kg`
+  - if amount is a **volume**: always `l`
+
+#### Precision + rounding policy (prevents “5.0 gal → 4.999 gal”)
+We must avoid UX regressions caused by floating point conversions:
+
+- **Never round canonical values** during conversion/normalization.
+  - Store canonical numeric values as full JS numbers (IEEE 754 doubles).
+- **Round only for display**, using a single shared helper.
+  - The UI should apply format hints/decimals consistently; if it converts liters → gallons for display, it must round to the chosen decimals at render time.
+- **Never use formatted UI strings as compute inputs**.
+  - Always convert the user’s numeric input to canonical, store it, and compute from canonical.
+
+Recommended display decimals (v1 defaults; can be tuned later):
+- `gal`, `qt`, `pt`: 2 decimals
+- `fl_oz`: 1–2 decimals
+- `lb`: 2 decimals
+- `oz`: 1 decimal
+- `l`: 2 decimals; `ml`: 0 decimals
+- `kg`: 3 decimals; `g`: 0 decimals
+- `sg`: 3 decimals
+
+#### Don’t duplicate formulas
+- If a formula is expressed in imperial units in brewing literature, the **API** may convert canonical metric inputs to imperial **internally** as part of the calculation (example: lb/gal based MCU), but clients must not re-implement the formula.
+- Web/native clients should render API outputs; they may only convert for display and for input capture.
+
 ### Analysis derivations (Medium-ROI; unified “result + derivation” pattern)
 The “result + derivation” pattern is not water-only.
 

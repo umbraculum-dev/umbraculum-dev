@@ -150,6 +150,71 @@ describe("recipes (account scoped)", () => {
     expect(body.recipes.some((r: any) => r.id === created.recipe.id)).toBe(true);
   });
 
+  it("normalizes US customary units when creating a recipe", async () => {
+    const beerJsonRecipeJson = {
+      beerjson: {
+        version: 1,
+        recipes: [
+          {
+            name: "Imperial Create",
+            type: "all grain",
+            author: "brewery-app",
+            efficiency: { brewhouse: { unit: "%", value: 75 } },
+            batch_size: { unit: "gal", value: 5 },
+            ingredients: {
+              fermentable_additions: [
+                {
+                  id: "row-imp-1",
+                  name: "Pale malt",
+                  type: "grain",
+                  yield: { potential: { unit: "sg", value: 1.037 } },
+                  color: { unit: "Lovi", value: 2.0 },
+                  amount: { unit: "lb", value: 10 },
+                },
+              ],
+              hop_additions: [
+                {
+                  name: "Cascade",
+                  alpha_acid: { unit: "%", value: 5.5 },
+                  amount: { unit: "oz", value: 2 },
+                  timing: { use: "add_to_boil", duration: { unit: "min", value: 60 } },
+                },
+              ],
+              culture_additions: [],
+              miscellaneous_additions: [],
+            },
+          },
+        ],
+      },
+    };
+
+    const create = await app.inject({
+      method: "POST",
+      url: "/recipes",
+      headers: { cookie: cookieA },
+      payload: {
+        name: "Imperial Create",
+        styleKey: "custom",
+        beerJsonRecipeJson,
+      },
+    });
+    expect(create.statusCode).toBe(200);
+    const created = create.json() as any;
+    expect(created.ok).toBe(true);
+
+    const r0 = created.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0] ?? null;
+    expect(r0?.batch_size?.unit).toBe("l");
+    expect(r0?.batch_size?.value).toBeCloseTo(18.927_058_92, 8);
+
+    const f0 = r0?.ingredients?.fermentable_additions?.[0] ?? null;
+    expect(f0?.amount?.unit).toBe("kg");
+    expect(f0?.amount?.value).toBeCloseTo(4.535_923_7, 8);
+
+    const h0 = r0?.ingredients?.hop_additions?.[0] ?? null;
+    expect(h0?.amount?.unit).toBe("g");
+    expect(h0?.amount?.value).toBeCloseTo(56.699_046_25, 8);
+  });
+
   it("does not leak recipes across accounts", async () => {
     // Create recipe in A
     const create = await app.inject({

@@ -92,6 +92,81 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
     expect(ij.recipe.beerJsonRecipeJson).toBeTruthy();
   });
 
+  it("normalizes US customary units when importing BeerJSON (preview + import)", async () => {
+    const doc = {
+      beerjson: {
+        version: 1,
+        recipes: [
+          {
+            name: "Imperial Units Recipe",
+            type: "all grain",
+            author: "brewery-app",
+            efficiency: { brewhouse: { unit: "%", value: 75 } },
+            batch_size: { unit: "gal", value: 5 },
+            ingredients: {
+              fermentable_additions: [
+                {
+                  name: "Pale malt",
+                  type: "grain",
+                  yield: { potential: { unit: "sg", value: 1.037 } },
+                  color: { unit: "Lovi", value: 2.0 },
+                  amount: { unit: "lb", value: 10 },
+                },
+              ],
+              hop_additions: [
+                {
+                  name: "Cascade",
+                  alpha_acid: { unit: "%", value: 5.5 },
+                  amount: { unit: "oz", value: 2 },
+                  timing: { use: "add_to_boil", duration: { unit: "min", value: 60 } },
+                },
+              ],
+              culture_additions: [],
+              miscellaneous_additions: [],
+            },
+          },
+        ],
+      },
+    };
+
+    const preview = await app.inject({
+      method: "POST",
+      url: "/recipes/import/preview",
+      headers: { cookie },
+      payload: { format: "beerjson", content: JSON.stringify(doc) },
+    });
+    expect(preview.statusCode).toBe(200);
+    const pj = preview.json() as any;
+    expect(pj.ok).toBe(true);
+    expect(pj.preview.name).toBe("Imperial Units Recipe");
+    expect(Array.isArray(pj.preview.warnings)).toBe(true);
+    const codes = pj.preview.warnings.map((w: any) => w?.code).filter(Boolean).join(",");
+    expect(codes).toContain("unit_normalized");
+
+    const imp = await app.inject({
+      method: "POST",
+      url: "/recipes/import",
+      headers: { cookie },
+      payload: { format: "beerjson", content: JSON.stringify(doc), styleKey: "custom" },
+    });
+    expect(imp.statusCode).toBe(200);
+    const ij = imp.json() as any;
+    expect(ij.ok).toBe(true);
+    createdRecipeIds.push(ij.recipe.id);
+
+    const r0 = ij.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0] ?? null;
+    expect(r0?.batch_size?.unit).toBe("l");
+    expect(r0?.batch_size?.value).toBeCloseTo(18.927_058_92, 8);
+
+    const f0 = r0?.ingredients?.fermentable_additions?.[0] ?? null;
+    expect(f0?.amount?.unit).toBe("kg");
+    expect(f0?.amount?.value).toBeCloseTo(4.535_923_7, 8);
+
+    const h0 = r0?.ingredients?.hop_additions?.[0] ?? null;
+    expect(h0?.amount?.unit).toBe("g");
+    expect(h0?.amount?.value).toBeCloseTo(56.699_046_25, 8);
+  });
+
   it("can bulk preview + import multiple BeerXML recipes, match style by name/code, and bulk export strict BeerJSON", async () => {
     const bjcpCreamAle = await app.prisma.beerStyle.findFirst({
       where: { source: "bjcp", version: "2021", isActive: true, code: "1C" },

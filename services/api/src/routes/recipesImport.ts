@@ -3,7 +3,7 @@ import { requireActiveAccount } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import { RecipesService } from "../services/recipesService.js";
 import { importBeerXmlToBeerJson, importBeerXmlToBeerJsonMany, type StyleCandidate } from "../importers/beerxmlImporter.js";
-import { validateBeerJsonDoc } from "../beerjson/index.js";
+import { normalizeBeerJsonRecipeUnits, validateBeerJsonDoc } from "../beerjson/index.js";
 
 type ImportFormat = "beerjson" | "beerxml";
 
@@ -119,8 +119,13 @@ export async function recipesImportRoutes(app: FastifyInstance) {
             const doc = parseBeerJsonContent(content);
             const v = validateBeerJsonDoc(doc);
             if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
+            const n = normalizeBeerJsonRecipeUnits(doc);
+            if (n.warnings.length > 0) {
+              const v2 = validateBeerJsonDoc(doc);
+              if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v2.errors}`);
+            }
             const meta = extractRecipeMetaFromBeerJson(doc);
-            return { recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: doc, warnings: [] as any[] };
+            return { recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: doc, warnings: n.warnings as any[] };
           })();
 
     const v2 = validateBeerJsonDoc(mapped.beerJsonRecipeJson);
@@ -159,8 +164,13 @@ export async function recipesImportRoutes(app: FastifyInstance) {
             const doc = parseBeerJsonContent(content);
             const v = validateBeerJsonDoc(doc);
             if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
+            const n = normalizeBeerJsonRecipeUnits(doc);
+            if (n.warnings.length > 0) {
+              const v2 = validateBeerJsonDoc(doc);
+              if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v2.errors}`);
+            }
             const meta = extractRecipeMetaFromBeerJson(doc);
-            return { recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: doc, warnings: [] as any[] };
+            return { recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: doc, warnings: n.warnings as any[] };
           })();
 
     // Create the recipe (BeerJSON-first).
@@ -204,9 +214,14 @@ export async function recipesImportRoutes(app: FastifyInstance) {
               const singleDoc = { beerjson: { ...(doc.beerjson ?? {}), recipes: [r] } };
               const v2 = validateBeerJsonDoc(singleDoc);
               if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON recipe[${idx}] is invalid: ${v2.errors}`);
+              const n = normalizeBeerJsonRecipeUnits(singleDoc);
+              if (n.warnings.length > 0) {
+                const v3 = validateBeerJsonDoc(singleDoc);
+                if (!v3.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON recipe[${idx}] is invalid: ${v3.errors}`);
+              }
               const meta = extractRecipeMetaFromBeerJson(singleDoc);
               const styleCandidate = extractStyleCandidateFromBeerJsonRecipe(r);
-              return { index: idx, recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: singleDoc, warnings: [], styleCandidate };
+              return { index: idx, recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: singleDoc, warnings: n.warnings, styleCandidate };
             });
           })();
 
@@ -257,9 +272,14 @@ export async function recipesImportRoutes(app: FastifyInstance) {
               const singleDoc = { beerjson: { ...(doc.beerjson ?? {}), recipes: [r] } };
               const v2 = validateBeerJsonDoc(singleDoc);
               if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON recipe[${idx}] is invalid: ${v2.errors}`);
+              const n = normalizeBeerJsonRecipeUnits(singleDoc);
+              if (n.warnings.length > 0) {
+                const v3 = validateBeerJsonDoc(singleDoc);
+                if (!v3.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON recipe[${idx}] is invalid: ${v3.errors}`);
+              }
               const meta = extractRecipeMetaFromBeerJson(singleDoc);
               const styleCandidate = extractStyleCandidateFromBeerJsonRecipe(r);
-              return { index: idx, recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: singleDoc, warnings: [], styleCandidate };
+              return { index: idx, recipeName: meta.recipeName, notes: meta.notes, beerJsonRecipeJson: singleDoc, warnings: n.warnings, styleCandidate };
             });
           })();
 

@@ -9,6 +9,7 @@
     "i18n:guardrail": "node scripts/i18n-guardrail.mjs"
   },
   "dependencies": {
+    "@brewery/core": "file:../../packages/core",
     "@brewery/contracts": "file:../../packages/contracts",
     "next": "^15.0.0",
     "next-intl": "^4.0.0",

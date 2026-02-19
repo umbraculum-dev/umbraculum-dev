@@ -1,7 +1,7 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
 import { AccountsService } from "./accountsService.js";
-import { validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
+import { normalizeBeerJsonRecipeUnits, validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 import { validateBeerJsonRecipeDomain } from "../beerjson/recipeDomainValidator.js";
 import {
   defaultMashDiPh,
@@ -110,6 +110,12 @@ export class RecipesService {
       throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
     }
 
+    normalizeBeerJsonRecipeUnits(doc);
+    const afterUnits = validateBeerJsonDoc(doc);
+    if (!afterUnits.ok) {
+      throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${afterUnits.errors}`);
+    }
+
     // Enforce supported domain rules directly on BeerJSON (no legacy-row mapping).
     validateBeerJsonRecipeDomain(doc);
 
@@ -175,6 +181,12 @@ export class RecipesService {
       const after = validateBeerJsonDoc(doc);
       if (!after.ok) {
         throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
+      }
+
+      normalizeBeerJsonRecipeUnits(doc);
+      const afterUnits = validateBeerJsonDoc(doc);
+      if (!afterUnits.ok) {
+        throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${afterUnits.errors}`);
       }
 
       // Enforce supported domain rules directly on BeerJSON (no legacy-row mapping).

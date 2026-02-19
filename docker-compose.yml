@@ -20,6 +20,7 @@ services:
       - ./apps/web:/app
       - web_node_modules:/app/node_modules
       - ./packages/contracts:/packages/contracts:ro
+      - ./packages/core:/packages/core:ro
 
   api:
     build: ./services/api
@@ -36,6 +37,7 @@ services:
       - ./services/api:/app
       - ./services/api/node_modules:/app/node_modules
       - ./packages/contracts:/packages/contracts:ro
+      - ./packages/core:/packages/core:ro
 
   beerproto-sync:
     profiles: ["jobs"]
@@ -49,6 +51,7 @@ services:
       - ./services/api:/app
       - ./services/api/node_modules:/app/node_modules
       - ./packages/contracts:/packages/contracts:ro
+      - ./packages/core:/packages/core:ro
 
   postgres:
     image: postgres:16

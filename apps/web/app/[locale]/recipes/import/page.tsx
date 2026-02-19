@@ -248,6 +248,28 @@ export default function RecipesImportPage() {
   const canBulkImport = canCall && Boolean(bulkPreviewItems) && !bulkImporting;
   const bulkFormatLabel = bulkFormat === "beerjson" ? t("formatBeerJson") : bulkFormat === "beerxml" ? t("formatBeerXml") : "";
 
+  const LegendBox = (props: { subtitle: string; children?: React.ReactNode }) => {
+    return (
+      <div className="fieldBlock fieldBlock--readonly" style={{ marginTop: 10, marginBottom: 16 }}>
+        <div className="fieldBlockHeader">
+          <strong>{t("legendTitle")}</strong>
+        </div>
+        <div>
+          <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
+            {props.subtitle}
+          </p>
+          <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+            {t("unitsNote")}
+          </p>
+          <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+            {t("customImportNote")} <Link href="/contact">{t("customImportCta")}</Link>
+          </p>
+          {props.children ? <div style={{ marginTop: 8 }}>{props.children}</div> : null}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
@@ -266,9 +288,7 @@ export default function RecipesImportPage() {
         <h2 id="import-single-heading" style={{ marginTop: 0 }}>
           {t("singleHeading")}
         </h2>
-        <p className="muted" style={{ marginTop: 0 }}>
-          {t("singleSubtitle")}
-        </p>
+        <LegendBox subtitle={t("singleSubtitle")} />
 
         <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-file">
           {t("fileLabel")}
@@ -281,7 +301,7 @@ export default function RecipesImportPage() {
           disabled={!canCall}
           aria-describedby="import-file-help"
         />
-        <p id="import-file-help" className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+        <p id="import-file-help" className="muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
           {fileName ? t("filePicked", { name: fileName }) : t("fileNotPicked")}
         </p>
 
@@ -420,9 +440,11 @@ export default function RecipesImportPage() {
         <h2 id="import-bulk-heading" style={{ marginTop: 0 }}>
           {t("bulkHeading")}
         </h2>
-        <p className="muted" style={{ marginTop: 0 }}>
-          {t("bulkSubtitle")}
-        </p>
+        <LegendBox subtitle={t("bulkSubtitle")}>
+          <p className="muted" style={{ margin: 0 }}>
+            {t("bulkStyleRule")}
+          </p>
+        </LegendBox>
 
         <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-file">
           {t("fileLabel")}
@@ -435,7 +457,7 @@ export default function RecipesImportPage() {
           disabled={!canCall}
           aria-describedby="bulk-import-file-help"
         />
-        <p id="bulk-import-file-help" className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+        <p id="bulk-import-file-help" className="muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
           {bulkFileName ? t("filePicked", { name: bulkFileName }) : t("fileNotPicked")}
         </p>
 
@@ -457,10 +479,6 @@ export default function RecipesImportPage() {
             {bulkFormat ? t("formatResolved", { format: bulkFormatLabel }) : t("formatNotResolved")}
           </p>
         </div>
-
-        <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
-          {t("bulkStyleRule")}
-        </p>
 
         <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <button type="button" onClick={() => void onBulkPreview()} disabled={!canBulkPreview}>
