@@ -36,6 +36,22 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
 - [ ] Assess whether the Recipe Edit sidebar “Sections” nav is still useful now that recipe sections default-collapsed (especially on mobile/touch).
 
+## Raw materials DB + collaboration (high priority)
+
+- [ ] Add a single **Contributing** hub page (`/[locale]/contributing`) with two collapsed sections:
+  - “Help translate (i18n contributing)”
+  - “Help improve raw materials database”
+- [ ] Add “Found a missing or incorrect raw material?” CTAs in the recipe editor:
+  - Fermentables / Hops / Yeast / Other ingredients → link to `contributing?topic=raw-materials`
+- [ ] Add the same CTA on **Water profiles** page (and later salts/acids pages when they exist).
+- [ ] Multi-source ingredients strategy (BeerProto-first, but allow enrichment):
+  - keep `ingredient_source_map` + provenance/staging as the backbone
+  - support multiple seed sources feeding a single canonical `fermentable/hop/yeast/...` table with confidence + provenance
+  - add a “merge/crosswalk” workflow for maintainers to reconcile duplicates across sources
+- [ ] Add a collaboration entrypoint for ingredients:
+  - initial: GitHub issue template (Raw materials)
+  - later: in-app structured suggestion form + moderation/approval workflow
+
 ## Gravity / ABV analysis + equipment
 
 - [x] Add account-level **Equipment templates** (admin-managed) and allow recipes to snapshot-select one into `recipeExtJson` (kettle + mash + misc losses).

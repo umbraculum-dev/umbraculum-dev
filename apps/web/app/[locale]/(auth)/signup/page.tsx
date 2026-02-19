@@ -144,7 +144,7 @@ export default function SignupPage() {
         <strong>{t("noteTitle")}</strong>
         <div style={{ marginTop: 6 }}>{t("noteBody")}</div>
         <div style={{ marginTop: 8 }}>
-          <Link href="/i18n-contributing">{t("helpTranslate")}</Link>
+          <Link href="/contributing?topic=i18n">{t("helpTranslate")}</Link>
         </div>
       </div>
     </section>

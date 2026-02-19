@@ -515,6 +515,8 @@
       "otherHelp": "Spezie, chiarificanti, aromi, ecc.",
       "waterHelp": "Il calcolatore completo (chimica mash + acqua) vive in una pagina dedicata (non integrata qui).",
       "waterProfilesManageText": "Gestisci i profili su",
+      "rawMaterialsCtaPrefix": "Hai trovato una materia prima mancante o errata?",
+      "rawMaterialsCtaLinkText": "Aiuta a migliorare il database materie prime",
       "buttons": {
         "clear": "Pulisci",
         "addFermentable": "Aggiungi fermentabile",
@@ -699,7 +701,26 @@
     "adminAddTitle": "Admin: aggiungi profilo acqua",
     "createdProfilesStartUnverified": "I profili creati iniziano come non verificati. Usa le azioni nella tabella per verificare/non verificare.",
     "navigationTitle": "Navigazione",
-    "phPlaceholder": "es. 7,80"
+    "phPlaceholder": "es. 7,80",
+    "rawMaterialsCtaPrefix": "Hai trovato una materia prima mancante o errata?",
+    "rawMaterialsCtaLinkText": "Aiuta a migliorare il database materie prime"
+  },
+  "contributing": {
+    "title": "Contribuire",
+    "subtitle": "Aiuta a migliorare traduzioni e dataset di birrificazione usati dall’app.",
+    "sections": {
+      "i18n": {
+        "title": "Aiuta a tradurre (i18n contributing)"
+      },
+      "rawMaterials": {
+        "title": "Aiuta a migliorare il database materie prime",
+        "subtitle": "Se trovi fermentabili/luppoli/lieviti/altri ingredienti mancanti o errati (o profili acqua), segnalacelo per migliorare il dataset canonico.",
+        "step1": "Annota cosa manca o cosa è errato (nome, produttore, specifiche chiave come colore/resa/AA% quando applicabile).",
+        "step2": "Se possibile includi uno screenshot o i valori esatti (aiuta a evitare ambiguità).",
+        "step3": "Apri una segnalazione usando il nostro template GitHub “Raw materials” (in arrivo).",
+        "issueTemplateNote": "Aggiungeremo un link diretto quando il workflow di contribuzione su GitHub sarà finalizzato."
+      }
+    }
   },
   "ui": {
     "addSalt": "Aggiungi sale",

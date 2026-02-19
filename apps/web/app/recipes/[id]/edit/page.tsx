@@ -1983,6 +1983,11 @@ export default function RecipeEditPage() {
                     {saving ? "Saving…" : "Save (including grist)"}
                   </button>
                 </div>
+
+                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                  {t("rawMaterialsCtaPrefix")}{" "}
+                  <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+                </p>
               </div>
             </details>
           </section>
@@ -2212,6 +2217,11 @@ export default function RecipeEditPage() {
                     {saving ? "Saving…" : "Save (including hops)"}
                   </button>
                 </div>
+
+                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                  {t("rawMaterialsCtaPrefix")}{" "}
+                  <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+                </p>
               </div>
             </details>
           </section>
@@ -2414,6 +2424,11 @@ export default function RecipeEditPage() {
                     {saving ? "Saving…" : "Save (including yeast)"}
                   </button>
                 </div>
+
+                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                  {t("rawMaterialsCtaPrefix")}{" "}
+                  <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+                </p>
               </div>
             </details>
           </section>
@@ -2591,6 +2606,11 @@ export default function RecipeEditPage() {
                     {saving ? "Saving…" : "Save (including other ingredients)"}
                   </button>
                 </div>
+
+                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                  {t("rawMaterialsCtaPrefix")}{" "}
+                  <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+                </p>
               </div>
             </details>
           </section>

@@ -358,6 +358,9 @@ export default function WaterProfilesPage() {
             <li>
               <Link href="/recipes">Back to Recipes</Link>
             </li>
+            <li className="muted" style={{ marginTop: 8 }}>
+              {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+            </li>
           </ul>
         </section>
       </div>

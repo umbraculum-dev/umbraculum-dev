@@ -13,7 +13,7 @@ export default function AboutPage() {
       </p>
       <p className="muted" style={{ marginTop: 12 }}>
         {t("translationsRowPrefix")}{" "}
-        <Link href="/i18n-contributing">{t("translationsRowLinkText")}</Link> {t("translationsRowSuffix")}
+        <Link href="/contributing?topic=i18n">{t("translationsRowLinkText")}</Link> {t("translationsRowSuffix")}
       </p>
       <p className="muted" style={{ marginTop: 8 }}>
         {t("translationsSideNote")}
