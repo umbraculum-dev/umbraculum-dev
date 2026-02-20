@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
 type Placement =
@@ -148,43 +150,45 @@ export default function PlatformAdsPage() {
 
   if (!isPlatformAdmin) {
     return (
-      <section className="brew-panel" style={{ maxWidth: 900 }}>
-        <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="brew-muted" style={{ marginBottom: 0 }}>
-          {t("notAuthorized")}
-        </p>
-      </section>
+      <YStack maxWidth={900}>
+        <View className="brew-panel">
+          <H1 mt={0}>{t("title")}</H1>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+            {t("notAuthorized")}
+          </SizableText>
+        </View>
+      </YStack>
     );
   }
 
   return (
-    <div style={{ display: "grid", gap: 16, maxWidth: 900 }}>
-      <section className="brew-panel">
-        <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$4" maxWidth={900}>
+      <View className="brew-panel">
+        <H1 mt={0}>{t("title")}</H1>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("subtitle")}
-        </p>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+        </SizableText>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("hint", { locale })}
-        </p>
+        </SizableText>
 
         {error ? (
-          <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
+          <pre className="brew-error-box brew-mt3" role="alert">
             {error}
           </pre>
         ) : null}
 
-        <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
-          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+        <YStack mt="$3" gap="$3">
+          <div className="brew-grid-2col">
             <div>
-              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-placement">
+              <RecipeEditFieldLabel htmlFor="ad-placement">
                 {t("form.placement")}
-              </label>
+              </RecipeEditFieldLabel>
               <select
                 id="ad-placement"
                 value={placement}
                 onChange={(e) => setPlacement(e.target.value as Placement)}
-                style={{ width: "100%", padding: 8 }}
+                className="brew-recipe-edit-select brew-recipe-edit-select-full"
               >
                 {placements.map((p) => (
                   <option key={p.value} value={p.value}>
@@ -194,9 +198,9 @@ export default function PlatformAdsPage() {
               </select>
             </div>
             <div>
-              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-priority">
+              <RecipeEditFieldLabel htmlFor="ad-priority">
                 {t("form.priority")}
-              </label>
+              </RecipeEditFieldLabel>
               <input
                 id="ad-priority"
                 type="number"
@@ -204,74 +208,78 @@ export default function PlatformAdsPage() {
                 step={1}
                 value={String(priority)}
                 onChange={(e) => setPriority(e.target.value === "" ? 0 : Number(e.target.value))}
-                style={{ width: "100%", padding: 8 }}
+                className="brew-recipe-edit-select brew-recipe-edit-select-full"
               />
             </div>
           </div>
 
           <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-image-url">
+            <RecipeEditFieldLabel htmlFor="ad-image-url">
               {t("form.imageUrl")}
-            </label>
+            </RecipeEditFieldLabel>
             <input
               id="ad-image-url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
+              className="brew-recipe-edit-select brew-recipe-edit-select-full"
               autoComplete="off"
             />
           </div>
 
           <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-link-url">
+            <RecipeEditFieldLabel htmlFor="ad-link-url">
               {t("form.linkUrl")}
-            </label>
+            </RecipeEditFieldLabel>
             <input
               id="ad-link-url"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
+              className="brew-recipe-edit-select brew-recipe-edit-select-full"
               autoComplete="off"
             />
           </div>
 
           <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-alt-text">
+            <RecipeEditFieldLabel htmlFor="ad-alt-text">
               {t("form.altText")}
-            </label>
+            </RecipeEditFieldLabel>
             <input
               id="ad-alt-text"
               value={altText}
               onChange={(e) => setAltText(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
+              className="brew-recipe-edit-select brew-recipe-edit-select-full"
               autoComplete="off"
             />
           </div>
 
-          <label className="brew-muted" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <label className="brew-radio-label brew-muted">
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
             {t("form.isActive")}
           </label>
 
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <XStack gap="$2" justifyContent="flex-end">
             <button type="button" onClick={() => void refresh()} disabled={loading}>
               {loading ? t("refreshing") : t("refresh")}
             </button>
             <button type="button" onClick={() => void onCreate()} disabled={loading}>
               {loading ? t("creating") : t("create")}
             </button>
-          </div>
-        </div>
-      </section>
+          </XStack>
+        </YStack>
+      </View>
 
-      <section className="brew-panel">
-        <h2 style={{ marginTop: 0 }}>{t("listTitle")}</h2>
+      <View className="brew-panel">
+        <H2 mt={0}>{t("listTitle")}</H2>
 
-        {!items.length ? <p className="brew-muted">{t("noAds")}</p> : null}
+        {!items.length ? (
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            {t("noAds")}
+          </SizableText>
+        ) : null}
 
         {items.length ? (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <View className="brew-table-wrap">
+            <table className="brew-table">
               <thead>
                 <tr>
                   <th align="left">{t("table.placement")}</th>
@@ -284,21 +292,21 @@ export default function PlatformAdsPage() {
               <tbody>
                 {items.map((a) => (
                   <tr key={a.id}>
-                    <td style={{ verticalAlign: "top", paddingTop: 8 }}>
+                    <td className="brew-table-cell-top">
                       <code>{a.placement}</code>
                     </td>
-                    <td style={{ verticalAlign: "top", paddingTop: 8 }}>
+                    <td className="brew-table-cell-top">
                       <a href={a.imageUrl} target="_blank" rel="noreferrer noopener">
                         {t("table.open")}
                       </a>
                     </td>
-                    <td style={{ verticalAlign: "top", paddingTop: 8 }}>
+                    <td className="brew-table-cell-top">
                       <a href={a.linkUrl} target="_blank" rel="noreferrer noopener">
                         {t("table.open")}
                       </a>
                     </td>
-                    <td style={{ verticalAlign: "top", paddingTop: 8 }}>
-                      <label className="brew-muted" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                    <td className="brew-table-cell-top">
+                      <label className="brew-radio-label brew-muted">
                         <input
                           type="checkbox"
                           checked={a.isActive}
@@ -308,7 +316,7 @@ export default function PlatformAdsPage() {
                         {a.isActive ? t("table.yes") : t("table.no")}
                       </label>
                     </td>
-                    <td style={{ verticalAlign: "top", paddingTop: 8 }}>
+                    <td className="brew-table-cell-top">
                       <button type="button" onClick={() => void onDelete(a.id)} disabled={loading}>
                         {t("table.delete")}
                       </button>
@@ -317,10 +325,10 @@ export default function PlatformAdsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </View>
         ) : null}
-      </section>
-    </div>
+      </View>
+    </YStack>
   );
 }
 

@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
-import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
+import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
 type AccountItem = { id: string; name: string };
 type RecipeItem = { id: string; name: string };
@@ -91,33 +93,35 @@ export default function PlatformRecipesPage() {
 
   if (!isPlatformAdmin) {
     return (
-      <section className="brew-panel" style={{ maxWidth: 900 }}>
-        <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="brew-muted" style={{ marginBottom: 0 }}>
-          {t("notAuthorized")}
-        </p>
-      </section>
+      <YStack maxWidth={900}>
+        <View className="brew-panel">
+          <H1 mt={0}>{t("title")}</H1>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+            {t("notAuthorized")}
+          </SizableText>
+        </View>
+      </YStack>
     );
   }
 
   return (
-    <div style={{ display: "grid", gap: 16, maxWidth: 900 }}>
-      <section className="brew-panel">
-        <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$4" maxWidth={900}>
+      <View className="brew-panel">
+        <H1 mt={0}>{t("title")}</H1>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("subtitle")}
-        </p>
+        </SizableText>
 
-        <div style={{ marginTop: 12 }}>
-          <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="platform-account">
+        <View mt="$3">
+          <RecipeEditFieldLabel htmlFor="platform-account">
             {t("accountLabel")}
-          </label>
+          </RecipeEditFieldLabel>
           <select
             id="platform-account"
             value={accountId}
             onChange={(e) => setAccountId(e.target.value)}
             disabled={accountsLoading || accounts.length === 0}
-            style={{ width: "100%", maxWidth: 400, padding: 8 }}
+            className="brew-recipe-edit-select brew-recipe-edit-select-full brew-select-max400"
           >
             <option value="">{t("accountPlaceholder")}</option>
             {accounts.map((a) => (
@@ -127,28 +131,30 @@ export default function PlatformRecipesPage() {
             ))}
           </select>
           {accountsError ? (
-            <p className="brew-muted" style={{ marginTop: 6 }}>{accountsError}</p>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+              {accountsError}
+            </SizableText>
           ) : null}
-        </div>
-      </section>
+        </View>
+      </View>
 
       {accountId ? (
         <>
-          <section className="brew-panel" aria-labelledby="platform-export-heading">
-            <h2 id="platform-export-heading" style={{ marginTop: 0 }}>
+          <View className="brew-panel" aria-labelledby="platform-export-heading">
+            <H2 id="platform-export-heading" mt={0}>
               {t("exportSectionTitle")}
-            </h2>
-            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ minWidth: 200 }}>
-                <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="platform-export-recipe">
+            </H2>
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <View minWidth={200}>
+                <RecipeEditFieldLabel htmlFor="platform-export-recipe">
                   {t("exportSingleLabel")}
-                </label>
+                </RecipeEditFieldLabel>
                 <select
                   id="platform-export-recipe"
                   value={exportRecipeId}
                   onChange={(e) => setExportRecipeId(e.target.value)}
                   disabled={recipesLoading || !hasRecipes}
-                  style={{ width: "100%", padding: 8 }}
+                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 >
                   {!hasRecipes ? <option value="">{t("exportNoneAvailable")}</option> : null}
                   {recipes.map((r) => (
@@ -157,7 +163,7 @@ export default function PlatformRecipesPage() {
                     </option>
                   ))}
                 </select>
-              </div>
+              </View>
               <a
                 href={singleExportHref}
                 aria-disabled={!singleExportHref}
@@ -172,11 +178,11 @@ export default function PlatformRecipesPage() {
               >
                 {t("exportBulkCta")}
               </a>
-            </div>
-            <p className="brew-muted" style={{ marginTop: 10, marginBottom: 0 }}>
+            </XStack>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2.5" mb={0}>
               {t("exportFullNote")}
-            </p>
-          </section>
+            </SizableText>
+          </View>
 
           <RecipeImportForm
             apiBasePath="/api/platform/recipes"
@@ -186,8 +192,10 @@ export default function PlatformRecipesPage() {
           />
         </>
       ) : (
-        <p className="brew-muted">{t("accountRequired")}</p>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("accountRequired")}
+        </SizableText>
       )}
-    </div>
+    </YStack>
   );
 }

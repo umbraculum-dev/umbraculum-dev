@@ -40,6 +40,10 @@
 .brew-recipe-edit-select-full {
   width: 100%;
 }
+
+.brew-select-max400 {
+  max-width: 400px;
+}
 .brew-recipe-edit-list-disc {
   list-style: disc;
   padding-left: 20px;
@@ -198,6 +202,11 @@
 
 .brew-table-row-alt {
   background-color: color-mix(in srgb, var(--surface-2) 35%, var(--surface));
+}
+
+.brew-table-cell-top {
+  vertical-align: top;
+  padding-top: 8px;
 }
 .brew-grid-2col {
   display: grid;
