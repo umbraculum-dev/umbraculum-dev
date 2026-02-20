@@ -12,10 +12,9 @@ export function SurfaceMathToggleRow(props: {
   onToggle: () => void;
   mt?: number | string;
   mb?: number | string;
-  style?: React.CSSProperties;
 }) {
   const tMath = useTranslations("math");
-  const { left, rightHint, surfaceMath, onToggle, mt, mb, style } = props;
+  const { left, rightHint, surfaceMath, onToggle, mt, mb } = props;
 
   return (
     <XStack
@@ -24,7 +23,6 @@ export function SurfaceMathToggleRow(props: {
       flexWrap="wrap"
       mt={mt}
       mb={mb}
-      style={style}
     >
       {left}
       <XStack

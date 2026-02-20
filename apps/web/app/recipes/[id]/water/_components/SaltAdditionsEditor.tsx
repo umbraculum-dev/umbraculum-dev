@@ -1,6 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { SizableText, XStack, YStack } from "tamagui";
+
+import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
 export type SaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";
 export type SaltAdditionRow = { saltKey: SaltKey; grams: number };
@@ -21,24 +24,20 @@ export function SaltAdditionsEditor(props: {
   const removeRow = (idx: number) => onChange(rows.filter((_, i) => i !== idx));
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <YStack gap="$3">
       {rows.length ? (
-        <div style={{ display: "grid", gap: 12 }}>
+        <YStack gap="$3">
           {rows.map((row, idx) => (
-            <div key={idx} style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr auto" }}>
-              <div>
-                <label
-                  htmlFor={`${idPrefix}-salt-key-${idx}`}
-                  className="brew-muted"
-                  style={{ display: "block", fontSize: 12 }}
-                >
+            <XStack key={idx} gap="$3" flexWrap="wrap" alignItems="flex-end">
+              <YStack flex={1} minWidth={120} gap="$1.5">
+                <RecipeEditFieldLabel htmlFor={`${idPrefix}-salt-key-${idx}`}>
                   Salt
-                </label>
+                </RecipeEditFieldLabel>
                 <select
                   id={`${idPrefix}-salt-key-${idx}`}
                   value={row.saltKey}
                   onChange={(e) => updateRow(idx, { saltKey: e.target.value as SaltKey })}
-                  style={{ width: "100%", padding: 8 }}
+                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   disabled={disabled}
                 >
                   <option value="gypsum">Gypsum (CaSO4·2H2O)</option>
@@ -47,15 +46,11 @@ export function SaltAdditionsEditor(props: {
                   <option value="table_salt">Table salt (NaCl)</option>
                   <option value="baking_soda">Baking soda (NaHCO3)</option>
                 </select>
-              </div>
-              <div>
-                <label
-                  htmlFor={`${idPrefix}-salt-grams-${idx}`}
-                  className="brew-muted"
-                  style={{ display: "block", fontSize: 12 }}
-                >
+              </YStack>
+              <YStack flex={1} minWidth={120} gap="$1.5">
+                <RecipeEditFieldLabel htmlFor={`${idPrefix}-salt-grams-${idx}`}>
                   {tUi("amountLabel", { unit: tUnits("g") })}
-                </label>
+                </RecipeEditFieldLabel>
                 <input
                   id={`${idPrefix}-salt-grams-${idx}`}
                   type="number"
@@ -63,30 +58,31 @@ export function SaltAdditionsEditor(props: {
                   step={0.1}
                   value={row.grams}
                   onChange={(e) => updateRow(idx, { grams: Number(e.target.value) })}
-                  style={{ width: "100%", padding: 8 }}
+                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   disabled={disabled}
                 />
-              </div>
-              <div style={{ alignSelf: "end" }}>
+              </YStack>
+              <YStack alignSelf="flex-end">
                 <button type="button" onClick={() => removeRow(idx)} disabled={disabled}>
                   Remove
                 </button>
-              </div>
-            </div>
+              </YStack>
+            </XStack>
           ))}
-        </div>
+        </YStack>
       ) : (
-        <p className="brew-muted" style={{ margin: 0 }}>
-          No salts added yet.
-        </p>
+        <YStack>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+            No salts added yet.
+          </SizableText>
+        </YStack>
       )}
 
-      <div>
+      <YStack>
         <button type="button" onClick={addRow} disabled={disabled}>
           {tUi("addSalt")}
         </button>
-      </div>
-    </div>
+      </YStack>
+    </YStack>
   );
 }
-

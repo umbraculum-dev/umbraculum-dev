@@ -1,5 +1,7 @@
 "use client";
 
+import { SizableText, YStack } from "tamagui";
+
 export type ModeOption<T extends string> = { value: T; label: string };
 
 export function ModeFieldset<T extends string>(props: {
@@ -12,16 +14,11 @@ export function ModeFieldset<T extends string>(props: {
   const { legend, name, value, onChange, options } = props;
 
   return (
-    <fieldset
-      className="brew-mode-fieldset"
-      suppressHydrationWarning
-    >
-      <legend className="brew-muted" style={{ fontSize: 12, padding: "0 6px" }}>
-        {legend}
-      </legend>
-      <div style={{ display: "grid", gap: 8 }}>
+    <fieldset className="brew-mode-fieldset" suppressHydrationWarning>
+      <legend className="brew-muted brew-fieldset-legend">{legend}</legend>
+      <YStack gap="$2">
         {options.map((o) => (
-          <label key={o.value} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <label key={o.value} className="brew-radio-label">
             <input
               type="radio"
               name={name}
@@ -29,11 +26,12 @@ export function ModeFieldset<T extends string>(props: {
               checked={value === o.value}
               onChange={() => onChange(o.value)}
             />
-            <span>{o.label}</span>
+            <SizableText size="$2" fontFamily="$body">
+              {o.label}
+            </SizableText>
           </label>
         ))}
-      </div>
+      </YStack>
     </fieldset>
   );
 }
-

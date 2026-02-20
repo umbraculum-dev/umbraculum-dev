@@ -165,21 +165,54 @@
 }
 .brew-fieldset-legend {
   padding: 0 6px;
+  font-size: 12px;
+}
+
+.brew-fieldset-noborder {
+  border: 0;
+  padding: 0;
+  margin-top: 12px;
 }
 .brew-details-summary {
   cursor: pointer;
 }
+
+.brew-hr {
+  margin: 16px 0;
+  border: 0;
+  height: 1px;
+  background: var(--border);
+}
 .brew-table-wrap {
   overflow-x: auto;
+}
+
+.brew-table-wrap-mt {
+  overflow-x: auto;
+  margin-top: 8px;
 }
 .brew-table {
   width: 100%;
   border-collapse: collapse;
 }
+
+.brew-table-row-alt {
+  background-color: color-mix(in srgb, var(--surface-2) 35%, var(--surface));
+}
 .brew-grid-2col {
   display: grid;
   gap: 12px;
   grid-template-columns: 1fr 1fr;
+}
+
+.brew-grid-full {
+  grid-column: 1 / -1;
+}
+
+.brew-grid-3col {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .brew-grid-export {
@@ -201,6 +234,39 @@
   margin-top: 4px;
 }
 
+.brew-list-mt2 {
+  margin-top: 8px;
+}
+
 .brew-list-item-mb {
   margin-bottom: 8px;
+}
+
+.brew-list-mb0 {
+  margin-bottom: 0;
+}
+
+.brew-text-sm-mt1 {
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.brew-pre-mb3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.brew-radio-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.brew-mt3 {
+  margin-top: 12px;
+}
+
+.brew-ml1 {
+  margin-left: 6px;
 }

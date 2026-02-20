@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 
@@ -9,6 +10,7 @@ import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewe
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 
 import { apiFetch } from "../../_lib/apiClient";
+import { RecipeEditFieldLabel } from "../../_components/recipe-edit";
 
 function isAdmin(role: string | null) {
   return role === "brewery_admin";
@@ -18,12 +20,10 @@ export default function WaterProfilesPage() {
   const t = useTranslations("waterProfiles");
   const tUnits = useTranslations("units");
   const [me, setMe] = useState<AuthMeResponse | null>(null);
-  const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // admin create profile
   const [createName, setCreateName] = useState("");
   const [createScope, setCreateScope] = useState<"account" | "public">("public");
   const [createType, setCreateType] = useState<"water" | "dilution">("water");
@@ -49,10 +49,8 @@ export default function WaterProfilesPage() {
       if (meRes.ok && meRes.data) {
         const parsed = parseAuthMeResponse(meRes.data);
         setMe(parsed);
-        setActiveAccountId(parsed.activeAccountId);
       } else {
         setMe(null);
-        setActiveAccountId(null);
       }
 
       const profRes = await apiFetch("/api/water-profiles");
@@ -136,39 +134,38 @@ export default function WaterProfilesPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
-        {t("activeAccount")}: <code>{activeAccountId ?? "—"}</code>
-      </p>
+      <H1 mb="$2">{t("title")}</H1>
 
-      <div style={{ display: "grid", gap: 16 }}>
-        <section className="brew-panel" aria-labelledby="profiles-table-heading">
-          <h2 id="profiles-table-heading" style={{ marginTop: 0 }}>
+      <YStack gap="$4">
+        <View className="brew-panel" aria-labelledby="profiles-table-heading">
+          <H2 id="profiles-table-heading" mt={0}>
             {t("viewAllTableTitle")}
-          </h2>
+          </H2>
 
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <XStack gap="$3" alignItems="center">
             <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
               {loading ? "Refreshing…" : "Refresh"}
             </button>
-            <span className="brew-muted" role="status" aria-live="polite">
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
               {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
-            </span>
-          </div>
+            </SizableText>
+          </XStack>
 
           {error ? (
-            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-              {error}
-            </pre>
+            <View mt="$3">
+              <pre className="brew-error-box" role="alert">
+                {error}
+              </pre>
+            </View>
           ) : null}
 
-          <div style={{ overflowX: "auto", marginTop: 12 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <View className="brew-table-wrap" mt="$3">
+            <table className="brew-table">
               <thead>
                 <tr>
-                  <th align="left">Name</th>
-                  <th align="left">Scope</th>
-                  <th align="left">Status</th>
+                  <th>Name</th>
+                  <th>Scope</th>
+                  <th>Status</th>
                   <th align="right">pH</th>
                   <th align="right">Ca</th>
                   <th align="right">Mg</th>
@@ -176,27 +173,27 @@ export default function WaterProfilesPage() {
                   <th align="right">SO4</th>
                   <th align="right">Cl</th>
                   <th align="right">HCO3</th>
-                  <th align="left">Actions</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {allProfiles.map((p, idx) => (
-                  <tr
-                    key={p.id}
-                    style={{
-                      backgroundColor:
-                        idx % 2 === 1
-                          ? "color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
-                          : "transparent",
-                    }}
-                  >
+                  <tr key={p.id} className={idx % 2 === 1 ? "brew-table-row-alt" : undefined}>
                     <td>{p.name}</td>
-                    <td className="brew-muted">
-                      {p.scope}/{p.type}
+                    <td>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {p.scope}/{p.type}
+                      </SizableText>
                     </td>
-                    <td className="brew-muted">{p.verificationStatus}</td>
-                    <td align="right" className="brew-muted">
-                      {p.ph == null ? "—" : p.ph.toFixed(2)}
+                    <td>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {p.verificationStatus}
+                      </SizableText>
+                    </td>
+                    <td align="right">
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {p.ph == null ? "—" : p.ph.toFixed(2)}
+                      </SizableText>
                     </td>
                     <td align="right">{p.calcium}</td>
                     <td align="right">{p.magnesium}</td>
@@ -206,7 +203,7 @@ export default function WaterProfilesPage() {
                     <td align="right">{p.bicarbonate}</td>
                     <td>
                       {admin && p.scope !== "system" ? (
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <XStack gap="$2" alignItems="center">
                           <button type="button" onClick={() => void onToggleVerify(p)}>
                             {p.verificationStatus === "verified" ? "Mark unverified" : "Mark verified"}
                           </button>
@@ -217,97 +214,95 @@ export default function WaterProfilesPage() {
                           >
                             Delete
                           </button>
-                        </div>
+                        </XStack>
                       ) : (
-                        <span className="brew-muted">—</span>
+                        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                          —
+                        </SizableText>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </View>
 
           {!admin ? (
-            <p className="brew-muted" style={{ marginBottom: 0 }}>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
               Only <code>owner</code> and <code>brewery_admin</code> can add/verify profiles.
-            </p>
+            </SizableText>
           ) : null}
-        </section>
+        </View>
 
         {admin ? (
-          <section className="brew-panel" aria-labelledby="admin-profiles-heading">
-            <h2 id="admin-profiles-heading" style={{ marginTop: 0 }}>
+          <View className="brew-panel" aria-labelledby="admin-profiles-heading">
+            <H2 id="admin-profiles-heading" mt={0}>
               {t("adminAddTitle")}
-            </h2>
-            <p className="brew-muted" style={{ marginTop: 0 }}>
+            </H2>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("createdProfilesStartUnverified")}
-            </p>
+            </SizableText>
 
             <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
-              <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="create-name" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                    Profile name
-                  </label>
-                  <input
-                    id="create-name"
-                    value={createName}
-                    onChange={(e) => setCreateName(e.target.value)}
-                    style={{ width: "100%", padding: 8 }}
-                    required
-                  />
+              <div className="brew-grid-2col">
+                <div className="brew-grid-full">
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="create-name">Profile name</RecipeEditFieldLabel>
+                    <input
+                      id="create-name"
+                      value={createName}
+                      onChange={(e) => setCreateName(e.target.value)}
+                      className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                      required
+                    />
+                  </YStack>
                 </div>
-                <div>
-                  <label htmlFor="create-scope" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                    Scope
-                  </label>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="create-scope">Scope</RecipeEditFieldLabel>
                   <select
                     id="create-scope"
                     value={createScope}
-                    onChange={(e) => setCreateScope(e.target.value as any)}
-                    style={{ width: "100%", padding: 8 }}
+                    onChange={(e) => setCreateScope(e.target.value as "account" | "public")}
+                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   >
                     <option value="public">Public</option>
                     <option value="account">Account</option>
                   </select>
-                </div>
-                <div>
-                  <label htmlFor="create-type" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                    Type
-                  </label>
+                </YStack>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="create-type">Type</RecipeEditFieldLabel>
                   <select
                     id="create-type"
                     value={createType}
-                    onChange={(e) => setCreateType(e.target.value as any)}
-                    style={{ width: "100%", padding: 8 }}
+                    onChange={(e) => setCreateType(e.target.value as "water" | "dilution")}
+                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   >
                     <option value="water">Water</option>
                     <option value="dilution">Dilution</option>
                   </select>
-                </div>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="create-ph" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                    pH (optional)
-                  </label>
-                  <input
-                    id="create-ph"
-                    type="number"
-                    inputMode="decimal"
-                    step={0.01}
-                    value={createPh}
-                    onChange={(e) => setCreatePh(e.target.value)}
-                    style={{ width: "100%", padding: 8 }}
-                    placeholder={t("phPlaceholder")}
-                  />
+                </YStack>
+                <div className="brew-grid-full">
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="create-ph">pH (optional)</RecipeEditFieldLabel>
+                    <input
+                      id="create-ph"
+                      type="number"
+                      inputMode="decimal"
+                      step={0.01}
+                      value={createPh}
+                      onChange={(e) => setCreatePh(e.target.value)}
+                      className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                      placeholder={t("phPlaceholder")}
+                    />
+                  </YStack>
                 </div>
               </div>
 
-              <fieldset style={{ border: 0, padding: 0, marginTop: 12 }}>
-                <legend className="brew-muted" style={{ fontSize: 12 }}>
+              <fieldset className="brew-fieldset-noborder">
+                <legend className="brew-muted brew-fieldset-legend">
                   {t("ionsLegend", { unit: tUnits("ppm") })}
                 </legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(3, 1fr)" }}>
+                <div className="brew-grid-3col">
                   {(
                     [
                       ["calcium", "Calcium (Ca)"],
@@ -318,56 +313,59 @@ export default function WaterProfilesPage() {
                       ["bicarbonate", "Bicarbonate (HCO3)"],
                     ] as const
                   ).map(([k, label]) => (
-                    <div key={k}>
-                      <label htmlFor={`ion-${k}`} className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                        {label}
-                      </label>
+                    <YStack key={k} gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor={`ion-${k}`}>{label}</RecipeEditFieldLabel>
                       <input
                         id={`ion-${k}`}
                         type="number"
                         inputMode="decimal"
-                        value={(createIon as any)[k]}
+                        value={(createIon as Record<string, number>)[k]}
                         onChange={(e) => setCreateIon((prev) => ({ ...prev, [k]: Number(e.target.value) }))}
-                        style={{ width: "100%", padding: 8 }}
+                        className="brew-recipe-edit-select brew-recipe-edit-select-full"
                       />
-                    </div>
+                    </YStack>
                   ))}
                 </div>
               </fieldset>
 
-              <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+              <XStack gap="$3" mt="$3" alignItems="center">
                 <button type="submit" disabled={!createName.trim() || createSubmitting}>
                   {createSubmitting ? "Creating…" : "Create profile"}
                 </button>
-                <span className="brew-muted" role="status" aria-live="polite">
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                   Profiles in this section require admin privileges.
-                </span>
-              </div>
+                </SizableText>
+              </XStack>
 
               {createError ? (
-                <pre id="create-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-                  {createError}
-                </pre>
+                <View mt="$3">
+                  <pre id="create-error" className="brew-error-box" role="alert">
+                    {createError}
+                  </pre>
+                </View>
               ) : null}
             </form>
-          </section>
+          </View>
         ) : null}
 
-        <section className="brew-panel" aria-labelledby="nav-heading">
-          <h2 id="nav-heading" style={{ marginTop: 0 }}>
+        <View className="brew-panel" aria-labelledby="nav-heading">
+          <H2 id="nav-heading" mt={0}>
             {t("navigationTitle")}
-          </h2>
-          <ul style={{ marginBottom: 0 }}>
+          </H2>
+          <ul className="brew-recipe-edit-list-disc brew-list-mb0">
             <li>
-              <Link href="/recipes">Back to Recipes</Link>
+              <SizableText size="$2" fontFamily="$body">
+                <Link href="/recipes">Back to Recipes</Link>
+              </SizableText>
             </li>
-            <li className="brew-muted" style={{ marginTop: 8 }}>
-              {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+            <li className="brew-list-mt2">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+              </SizableText>
             </li>
           </ul>
-        </section>
-      </div>
+        </View>
+      </YStack>
     </>
   );
 }
-
