@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { SizableText } from "tamagui";
 
 export function DashboardClient() {
   const locale = useLocale();
@@ -32,7 +33,7 @@ export function DashboardClient() {
     };
   }, [locale, mounted, router]);
 
-  if (!mounted) return <p className="brew-muted">{tCommon("loading")}</p>;
+  if (!mounted) return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{tCommon("loading")}</SizableText>;
   return null;
 }
 

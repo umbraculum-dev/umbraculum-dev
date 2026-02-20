@@ -157,3 +157,27 @@
   line-height: 1.35;
   color: var(--text);
 }
+
+.brew-fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--panel-padding);
+}
+.brew-fieldset-legend {
+  padding: 0 6px;
+}
+.brew-details-summary {
+  cursor: pointer;
+}
+.brew-table-wrap {
+  overflow-x: auto;
+}
+.brew-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.brew-grid-2col {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}

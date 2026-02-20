@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 import type { AuthMeResponse } from "@brewery/contracts";
 import { parseAuthMeResponse } from "@brewery/contracts";
 
+import { RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 
 type EquipmentProfile = {
@@ -293,281 +295,366 @@ export default function EquipmentPage() {
   };
 
   return (
-    <>
-      <h1 style={{ marginBottom: 8 }}>{tNav("equipment")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$3">
+      <H1 mb="$2">{tNav("equipment")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <button type="button" onClick={() => void refresh()} disabled={loading}>
-          {loading ? t("refreshing") : t("refresh")}
-        </button>
-        <Link href="/recipes" className="brew-muted" style={{ marginLeft: "auto" }}>
-          {t("backToRecipes")}
-        </Link>
-      </div>
+      <Link href="/recipes" className="brew-muted">
+        {t("backToRecipes")}
+      </Link>
 
       {error ? (
-        <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
+        <pre className="brew-error-box" role="alert">
           {error}
         </pre>
       ) : null}
 
-      <details className="brew-panel" style={{ marginTop: 16 }}>
-        <summary style={{ cursor: "pointer" }}>
-          <h2 id="equipment-list" style={{ marginTop: 0, display: "inline" }}>
-            {t("listTitle")}
-          </h2>
-        </summary>
-        <div style={{ marginTop: 12 }}>
-          {profiles.length ? (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th align="left">{t("colName")}</th>
-                    <th align="left">{t("colKettleVol", { unit: tUnits("L") })}</th>
-                    <th align="left">{t("colMashEff")}</th>
-                    {canWrite ? <th align="left">{t("colActions")}</th> : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {profiles.map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.name}</td>
-                      <td>{p.equipment?.kettle?.kettleVolumeLiters == null ? "—" : p.equipment.kettle.kettleVolumeLiters}</td>
-                      <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
-                      {canWrite ? (
-                        <td>
-                          <button type="button" onClick={() => beginEdit(p)} style={{ marginRight: 8 }}>
-                            {t("edit")}
-                          </button>
-                          <button type="button" onClick={() => void onDelete(p.id)}>
-                            {t("delete")}
-                          </button>
-                        </td>
-                      ) : null}
+      <View mt="$3">
+        <details className="brew-panel">
+          <summary className="brew-details-summary">
+            <H2 id="equipment-list" mt={0} display="inline">
+              {t("listTitle")}
+            </H2>
+          </summary>
+          <YStack mt="$3">
+            {profiles.length ? (
+              <View className="brew-table-wrap">
+                <table className="brew-table">
+                  <thead>
+                    <tr>
+                      <th align="left">{t("colName")}</th>
+                      <th align="left">{t("colKettleVol", { unit: tUnits("L") })}</th>
+                      <th align="left">{t("colMashEff")}</th>
+                      {canWrite ? <th align="left">{t("colActions")}</th> : null}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
-              {t("noProfiles")}
-            </p>
-          )}
-        </div>
-      </details>
+                  </thead>
+                  <tbody>
+                    {profiles.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.name}</td>
+                        <td>{p.equipment?.kettle?.kettleVolumeLiters == null ? "—" : p.equipment.kettle.kettleVolumeLiters}</td>
+                        <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
+                        {canWrite ? (
+                          <td>
+                            <XStack gap="$2" display="inline-flex">
+                              <Button
+                                size="$3"
+                                onPress={() => beginEdit(p)}
+                                bg="var(--surface-2)"
+                                borderWidth={1}
+                                borderColor="var(--border)"
+                                color="var(--text)"
+                              >
+                                {t("edit")}
+                              </Button>
+                              <Button
+                                size="$3"
+                                onPress={() => void onDelete(p.id)}
+                                bg="var(--surface-2)"
+                                borderWidth={1}
+                                borderColor="var(--border)"
+                                color="var(--text)"
+                              >
+                                {t("delete")}
+                              </Button>
+                            </XStack>
+                          </td>
+                        ) : null}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </View>
+            ) : (
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+                {t("noProfiles")}
+              </SizableText>
+            )}
+          </YStack>
+        </details>
+      </View>
 
       {canWrite && editingId ? (
-        <section className="brew-panel" aria-labelledby="equipment-edit" style={{ marginTop: 16 }}>
-          <h2 id="equipment-edit" style={{ marginTop: 0 }}>
+        <View
+          mt="$3"
+          bg="var(--surface)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          rounded="$2"
+          p="$3"
+          aria-labelledby="equipment-edit"
+        >
+          <H2 id="equipment-edit" mt={0}>
             {t("editTitle")}
-          </h2>
+          </H2>
           <form onSubmit={onSaveEdit} aria-describedby={editError ? "equipment-edit-error" : undefined}>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div>
-                <label htmlFor="equip-edit-name" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("nameLabel")}
-                </label>
-                <input
+            <YStack gap="$3">
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="equip-edit-name">{t("nameLabel")}</RecipeEditFieldLabel>
+                <Input
                   id="equip-edit-name"
                   value={editDraft.name ?? ""}
-                  onChange={(e) => setEditDraft((d) => ({ ...d, name: e.target.value }))}
-                  style={{ width: "100%", padding: 8 }}
+                  onChangeText={(v) => setEditDraft((d) => ({ ...d, name: v }))}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
-              </div>
+              </YStack>
 
-              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
-                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.kettle")}</legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="equip-edit-kettle-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+              <fieldset className="brew-fieldset">
+                <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
+                <div className="brew-grid-2col">
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-kettle-vol">
                       {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-kettle-vol"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.kettleVolumeLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-kettle-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-kettle-losses">
                       {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-kettle-losses"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.kettleLossesLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleLossesLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleLossesLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-evap" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-evap">
                       {t("kettleBoilEvaporationRatePercentPerHourLabel")}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-evap"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-shrink" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-shrink">
                       {t("kettleCoolingShrinkagePercentLabel")}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-shrink"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.kettleCoolingShrinkagePercent ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-hops-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-hops-abs">
                       {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-hops-abs"
                       type="number"
                       inputMode="decimal"
-                      step={0.001}
                       value={editDraft.kettleHopsAbsorptionLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
+                  </YStack>
                 </div>
               </fieldset>
 
-              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
-                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.mash")}</legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="equip-edit-mash-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+              <fieldset className="brew-fieldset">
+                <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
+                <div className="brew-grid-2col">
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-mash-vol">
                       {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-mash-vol"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.mashVolumeLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, mashVolumeLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, mashVolumeLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-mash-eff" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-mash-eff">
                       {t("mashEfficiencyPercentLabel")}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-mash-eff"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.mashEfficiencyPercent ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-mash-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-mash-losses">
                       {t("mashLossesLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-mash-losses"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.mashLossesLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, mashLossesLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, mashLossesLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-thickness" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-thickness">
                       {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-thickness"
                       type="number"
                       inputMode="decimal"
-                      step={0.01}
                       value={editDraft.mashThicknessLPerKg ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-grain-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-grain-abs">
                       {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-grain-abs"
                       type="number"
                       inputMode="decimal"
-                      step={0.01}
                       value={editDraft.mashGrainAbsorptionLPerKg ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-edit-water-leftover" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+                  </YStack>
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-water-leftover">
                       {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-water-leftover"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.mashWaterLeftoverLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
+                  </YStack>
                 </div>
               </fieldset>
 
-              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
-                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.misc")}</legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="equip-edit-other-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
+              <fieldset className="brew-fieldset">
+                <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
+                <div className="brew-grid-2col">
+                  <YStack gap="$1.5">
+                    <RecipeEditFieldLabel htmlFor="equip-edit-other-losses">
                       {t("otherLossesLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
+                    </RecipeEditFieldLabel>
+                    <Input
                       id="equip-edit-other-losses"
                       type="number"
                       inputMode="decimal"
-                      step={0.1}
                       value={editDraft.otherLossesLiters ?? ""}
-                      onChange={(e) => setEditDraft((d) => ({ ...d, otherLossesLiters: e.target.value }))}
-                      style={{ width: "100%", padding: 8 }}
+                      onChangeText={(v) => setEditDraft((d) => ({ ...d, otherLossesLiters: v }))}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                     />
-                  </div>
+                  </YStack>
                 </div>
               </fieldset>
-            </div>
+            </YStack>
 
-            <div style={{ marginTop: 12, display: "flex", gap: 12 }}>
+            <XStack gap="$3" mt="$3">
               <button type="submit" disabled={editSubmitting}>
                 {editSubmitting ? t("saving") : t("save")}
               </button>
@@ -582,237 +669,307 @@ export default function EquipmentPage() {
               >
                 {t("cancel")}
               </button>
-            </div>
+            </XStack>
             {editError ? (
-              <pre id="equipment-edit-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-                {editError}
-              </pre>
+              <View mt="$3">
+                <pre id="equipment-edit-error" className="brew-error-box" role="alert">
+                  {editError}
+                </pre>
+              </View>
             ) : null}
           </form>
-        </section>
+        </View>
       ) : null}
 
       {canWrite ? (
-        <details className="brew-panel" style={{ marginTop: 16 }}>
-          <summary style={{ cursor: "pointer" }}>
-            <h2 id="equipment-create" style={{ marginTop: 0, display: "inline" }}>
-              {t("createTitle")}
-            </h2>
-          </summary>
-          <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined} style={{ marginTop: 12 }}>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div>
-                <label htmlFor="equip-name" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("nameLabel")}
-                </label>
-                <input
-                  id="equip-name"
-                  value={createName}
-                  onChange={(e) => setCreateName(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
+        <View mt="$3">
+          <details className="brew-panel">
+            <summary className="brew-details-summary">
+              <H2 id="equipment-create" mt={0} display="inline">
+                {t("createTitle")}
+              </H2>
+            </summary>
+            <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined}>
+              <YStack mt="$3" gap="$3">
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="equip-name">{t("nameLabel")}</RecipeEditFieldLabel>
+                  <Input
+                    id="equip-name"
+                    value={createName}
+                    onChangeText={setCreateName}
+                    size="$3"
+                    w="100%"
+                    bg="var(--surface)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    rounded="$2"
+                    fontFamily="$body"
+                  />
+                </YStack>
 
-              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
-                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.kettle")}</legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="equip-kettle-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
-                      id="equip-kettle-vol"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createKettleVolumeLiters}
-                      onChange={(e) => setCreateKettleVolumeLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
+                <fieldset className="brew-fieldset">
+                  <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
+                  <div className="brew-grid-2col">
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-kettle-vol">
+                        {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-kettle-vol"
+                        type="number"
+                        inputMode="decimal"
+                        value={createKettleVolumeLiters}
+                        onChangeText={setCreateKettleVolumeLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-kettle-losses">
+                        {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-kettle-losses"
+                        type="number"
+                        inputMode="decimal"
+                        value={createKettleLossesLiters}
+                        onChangeText={setCreateKettleLossesLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-evap">
+                        {t("kettleBoilEvaporationRatePercentPerHourLabel")}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-evap"
+                        type="number"
+                        inputMode="decimal"
+                        value={createKettleBoilEvaporationRatePercentPerHour}
+                        onChangeText={setCreateKettleBoilEvaporationRatePercentPerHour}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-shrink">
+                        {t("kettleCoolingShrinkagePercentLabel")}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-shrink"
+                        type="number"
+                        inputMode="decimal"
+                        value={createKettleCoolingShrinkagePercent}
+                        onChangeText={setCreateKettleCoolingShrinkagePercent}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-hops-abs">
+                        {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-hops-abs"
+                        type="number"
+                        inputMode="decimal"
+                        value={createKettleHopsAbsorptionLiters}
+                        onChangeText={setCreateKettleHopsAbsorptionLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
                   </div>
-                  <div>
-                    <label htmlFor="equip-kettle-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
-                      id="equip-kettle-losses"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createKettleLossesLiters}
-                      onChange={(e) => setCreateKettleLossesLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-evap" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleBoilEvaporationRatePercentPerHourLabel")}
-                    </label>
-                    <input
-                      id="equip-evap"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createKettleBoilEvaporationRatePercentPerHour}
-                      onChange={(e) => setCreateKettleBoilEvaporationRatePercentPerHour(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-shrink" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleCoolingShrinkagePercentLabel")}
-                    </label>
-                    <input
-                      id="equip-shrink"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createKettleCoolingShrinkagePercent}
-                      onChange={(e) => setCreateKettleCoolingShrinkagePercent(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-hops-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
-                    </label>
-                    <input
-                      id="equip-hops-abs"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.001}
-                      value={createKettleHopsAbsorptionLiters}
-                      onChange={(e) => setCreateKettleHopsAbsorptionLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                </div>
-              </fieldset>
+                </fieldset>
 
-              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
-                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.mash")}</legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="equip-mash-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
-                      id="equip-mash-vol"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createMashVolumeLiters}
-                      onChange={(e) => setCreateMashVolumeLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
+                <fieldset className="brew-fieldset">
+                  <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
+                  <div className="brew-grid-2col">
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-mash-vol">
+                        {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-mash-vol"
+                        type="number"
+                        inputMode="decimal"
+                        value={createMashVolumeLiters}
+                        onChangeText={setCreateMashVolumeLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-mash-eff">
+                        {t("mashEfficiencyPercentLabel")}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-mash-eff"
+                        type="number"
+                        inputMode="decimal"
+                        value={createMashEfficiencyPercent}
+                        onChangeText={setCreateMashEfficiencyPercent}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-mash-losses">
+                        {t("mashLossesLitersLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-mash-losses"
+                        type="number"
+                        inputMode="decimal"
+                        value={createMashLossesLiters}
+                        onChangeText={setCreateMashLossesLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-mash-thickness">
+                        {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-mash-thickness"
+                        type="number"
+                        inputMode="decimal"
+                        value={createMashThicknessLPerKg}
+                        onChangeText={setCreateMashThicknessLPerKg}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-grain-abs">
+                        {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-grain-abs"
+                        type="number"
+                        inputMode="decimal"
+                        value={createMashGrainAbsorptionLPerKg}
+                        onChangeText={setCreateMashGrainAbsorptionLPerKg}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-water-leftover">
+                        {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-water-leftover"
+                        type="number"
+                        inputMode="decimal"
+                        value={createMashWaterLeftoverLiters}
+                        onChangeText={setCreateMashWaterLeftoverLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
                   </div>
-                  <div>
-                    <label htmlFor="equip-mash-eff" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashEfficiencyPercentLabel")}
-                    </label>
-                    <input
-                      id="equip-mash-eff"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createMashEfficiencyPercent}
-                      onChange={(e) => setCreateMashEfficiencyPercent(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-mash-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashLossesLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
-                      id="equip-mash-losses"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createMashLossesLiters}
-                      onChange={(e) => setCreateMashLossesLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-mash-thickness" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
-                    </label>
-                    <input
-                      id="equip-mash-thickness"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.01}
-                      value={createMashThicknessLPerKg}
-                      onChange={(e) => setCreateMashThicknessLPerKg(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-grain-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
-                    </label>
-                    <input
-                      id="equip-grain-abs"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.01}
-                      value={createMashGrainAbsorptionLPerKg}
-                      onChange={(e) => setCreateMashGrainAbsorptionLPerKg(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="equip-water-leftover" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
-                      id="equip-water-leftover"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createMashWaterLeftoverLiters}
-                      onChange={(e) => setCreateMashWaterLeftoverLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                </div>
-              </fieldset>
+                </fieldset>
 
-              <fieldset style={{ border: "1px solid var(--panel-border, #ddd)", borderRadius: 8, padding: 12 }}>
-                <legend style={{ padding: "0 6px" }}>{t("sectionTitles.misc")}</legend>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="equip-other-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-                      {t("otherLossesLitersLabel", { unit: tUnits("L") })}
-                    </label>
-                    <input
-                      id="equip-other-losses"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.1}
-                      value={createOtherLossesLiters}
-                      onChange={(e) => setCreateOtherLossesLiters(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
+                <fieldset className="brew-fieldset">
+                  <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
+                  <div className="brew-grid-2col">
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-other-losses">
+                        {t("otherLossesLitersLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="equip-other-losses"
+                        type="number"
+                        inputMode="decimal"
+                        value={createOtherLossesLiters}
+                        onChangeText={setCreateOtherLossesLiters}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
                   </div>
-                </div>
-              </fieldset>
-            </div>
-            <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-              <button type="submit" disabled={createSubmitting}>
-                {createSubmitting ? t("creating") : t("create")}
-              </button>
-            </div>
-            {createError ? (
-              <pre id="equipment-create-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-                {createError}
-              </pre>
-            ) : null}
-          </form>
-        </details>
+                </fieldset>
+              </YStack>
+              <XStack gap="$3" mt="$3" alignItems="center">
+                <button type="submit" disabled={createSubmitting}>
+                  {createSubmitting ? t("creating") : t("create")}
+                </button>
+              </XStack>
+              {createError ? (
+                <View mt="$3">
+                  <pre id="equipment-create-error" className="brew-error-box" role="alert">
+                    {createError}
+                  </pre>
+                </View>
+              ) : null}
+            </form>
+          </details>
+        </View>
       ) : null}
-    </>
+    </YStack>
   );
 }
 

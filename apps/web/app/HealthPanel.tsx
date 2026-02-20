@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { H2, SizableText, View } from "tamagui";
 
 type HealthState =
   | { status: "idle" | "loading" }
@@ -32,15 +33,21 @@ export function HealthPanel() {
   }, [apiBase]);
 
   return (
-    <section>
-      <h2 style={{ marginTop: 24 }}>{t("title")}</h2>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <View
+      bg="var(--surface)"
+      borderWidth={1}
+      borderColor="var(--border)"
+      rounded="$2"
+      p="$3"
+    >
+      <H2 mt="$4">{t("title")}</H2>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle", { url: `${apiBase}/health` })}
-      </p>
+      </SizableText>
       <pre className="brew-code-block">
         {JSON.stringify(state, null, 2)}
       </pre>
-    </section>
+    </View>
   );
 }
 
