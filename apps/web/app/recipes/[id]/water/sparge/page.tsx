@@ -13,7 +13,7 @@ import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleR
 import { parseWaterProfilesResponse } from "@brewery/contracts";
 import { H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
-import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -589,16 +589,16 @@ export default function SpargeWaterPage() {
 
   const selectedSpargeProfileInfo = selectedSpargeProfile ? (
     <View className="brew-field-block brew-field-block--readonly brew-mt3">
-      <div className="brew-field-block-header">
+      <View className="brew-field-block-header">
         <strong>Selected profile info</strong>
         <span className="brew-field-badge">Read-only</span>
-        <span className="brew-muted">From selected profile</span>
-      </div>
-      <span className="brew-muted">
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">From selected profile</SizableText>
+      </View>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         Bicarbonate: <code>{fmt("ppm", selectedSpargeProfile.bicarbonate, 0)}</code> {tUnits("ppm")}{" · "}Estimated alkalinity:{" "}
         <code>{fmt("ppm_as_CaCO3", bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate), 0)}</code> {tUnits("ppmAsCaCO3")}{" "}
-        {" · "}pH: {selectedSpargeProfile.ph == null ? <span className="brew-muted">—</span> : <code>{fmt("pH", selectedSpargeProfile.ph, 2)}</code>}
-      </span>
+        {" · "}pH: {selectedSpargeProfile.ph == null ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">—</SizableText> : <code>{fmt("pH", selectedSpargeProfile.ph, 2)}</code>}
+      </SizableText>
       <XStack mt="$2" gap="$3" alignItems="center" flexWrap="wrap">
         <button
           type="button"
@@ -610,7 +610,7 @@ export default function SpargeWaterPage() {
         >
           Use profile alkalinity + pH
         </button>
-        <span className="brew-muted">If profile pH is missing, we clear Starting pH so you can enter it.</span>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">If profile pH is missing, we clear Starting pH so you can enter it.</SizableText>
       </XStack>
     </View>
   ) : (
@@ -636,11 +636,11 @@ export default function SpargeWaterPage() {
       />
 
       {authChecked && !canCall ? (
-        <p role="alert" className="brew-error-box">
+        <ErrorBox>
           {tWater.rich("notAuthenticated", {
             signIn: (chunks) => <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/sparge`}>{chunks}</Link>,
           })}
-        </p>
+        </ErrorBox>
       ) : null}
 
       <YStack gap="$4">
@@ -650,9 +650,10 @@ export default function SpargeWaterPage() {
           </H2>
 
           <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
-            <div className="brew-grid-2col">
-              <div className="brew-grid-full">
-                <RecipeEditFieldLabel htmlFor="sparge-profile">
+            <XStack gap="$3" flexWrap="wrap">
+              <View width="100%" flexBasis="100%">
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="sparge-profile">
                   Sparge water profile
                 </RecipeEditFieldLabel>
                 <select
@@ -669,9 +670,10 @@ export default function SpargeWaterPage() {
                   ))}
                 </select>
                 {selectedSpargeProfileInfo}
-              </div>
+                </YStack>
+              </View>
 
-              <div className="brew-grid-full">
+              <View width="100%" flexBasis="100%">
                 <ModeFieldset
                   legend="Mode"
                   name="sparge-mode"
@@ -682,10 +684,11 @@ export default function SpargeWaterPage() {
                     { value: "manual", label: "Manual acid amount (estimate achieved pH)" },
                   ]}
                 />
-              </div>
+              </View>
 
-              <div>
-                <RecipeEditFieldLabel htmlFor="starting-alk">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="starting-alk">
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </RecipeEditFieldLabel>
                 <input
@@ -700,9 +703,11 @@ export default function SpargeWaterPage() {
                   }}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="volume-l">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="volume-l">
                   {t("waterVolumeLabel", { unit: tUnits("L") })}
                 </RecipeEditFieldLabel>
                 <input
@@ -714,9 +719,11 @@ export default function SpargeWaterPage() {
                   onChange={(e) => setVolumeLiters(Number(e.target.value))}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="starting-ph">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="starting-ph">
                   Starting pH
                 </RecipeEditFieldLabel>
                 <input
@@ -728,9 +735,11 @@ export default function SpargeWaterPage() {
                   onChange={(e) => setStartingPh(e.target.value)}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
+                </YStack>
+              </View>
               {spargeAcidificationMode === "targetPh" ? (
-                <div>
+                <View flex={1} minWidth={200}>
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="target-ph">
                     Target pH
                   </RecipeEditFieldLabel>
@@ -743,10 +752,12 @@ export default function SpargeWaterPage() {
                     onChange={(e) => setTargetPh(Number(e.target.value))}
                     className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   />
-                </div>
+                  </YStack>
+                </View>
               ) : null}
-              <div>
-                <RecipeEditFieldLabel htmlFor="acid-type">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="acid-type">
                   Acid type
                 </RecipeEditFieldLabel>
                 <select
@@ -764,9 +775,11 @@ export default function SpargeWaterPage() {
                   <option value="tartaric">Tartaric (solid)</option>
                   <option value="malic">Malic (solid)</option>
                 </select>
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="strength-kind">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="strength-kind">
                   Strength kind
                 </RecipeEditFieldLabel>
                 <select
@@ -780,9 +793,11 @@ export default function SpargeWaterPage() {
                   <option value="molarity">Molarity (M)</option>
                   <option value="solid">Solid (pure)</option>
                 </select>
-              </div>
-              <div className="brew-grid-full">
-                <RecipeEditFieldLabel htmlFor="strength-value">
+                </YStack>
+              </View>
+              <View width="100%" flexBasis="100%">
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="strength-value">
                   Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </RecipeEditFieldLabel>
                 <input
@@ -795,9 +810,11 @@ export default function SpargeWaterPage() {
                   disabled={strengthKind === "solid"}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
+                </YStack>
+              </View>
               {spargeAcidificationMode === "manual" ? (
-                <div className="brew-grid-full">
+                <View width="100%" flexBasis="100%">
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="sparge-manual-acid-added">
                     Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </RecipeEditFieldLabel>
@@ -810,9 +827,10 @@ export default function SpargeWaterPage() {
                     onChange={(e) => setSpargeManualAcidAdded(Number(e.target.value))}
                     className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   />
-                </div>
+                  </YStack>
+                </View>
               ) : null}
-            </div>
+            </XStack>
 
             <XStack mt="$3" gap="$3" alignItems="center">
               <button type="submit" disabled={!canCall || spargeSubmitting}>
@@ -825,25 +843,23 @@ export default function SpargeWaterPage() {
               <button type="button" onClick={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
                 {savingSparge ? "Saving…" : "Save sparge draft"}
               </button>
-              {spargeStatus ? <span className="brew-muted" role="status" aria-live="polite">{spargeStatus}</span> : null}
-              {spargeSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{spargeSaveStatus}</span> : null}
-              {calcSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{calcSaveStatus}</span> : null}
+              {spargeStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeStatus}</SizableText> : null}
+              {spargeSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaveStatus}</SizableText> : null}
+              {calcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{calcSaveStatus}</SizableText> : null}
             </XStack>
 
             {spargeError ? (
-              <pre id="sparge-error" className="brew-error-box brew-mt3" role="alert">
-                {spargeError}
-              </pre>
+              <ErrorBox id="sparge-error" mt="$3">{spargeError}</ErrorBox>
             ) : null}
           </form>
 
           {spargeAcidificationMode === "targetPh" && spargeResult ? (
-            <div className="brew-field-block brew-field-block--computed brew-mt3">
-              <div className="brew-field-block-header">
+            <View className="brew-field-block brew-field-block--computed brew-mt3">
+              <View className="brew-field-block-header">
                 <strong>Result</strong>
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">From current inputs</span>
-              </div>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">From current inputs</SizableText>
+              </View>
               <H3 mt={0}>{t("resultLastCalculated")}</H3>
               <ul>
                 {spargeResult.acidRequiredMl !== null ? (
@@ -955,12 +971,12 @@ export default function SpargeWaterPage() {
                 </li>
               </ul>
               {selectedSpargeProfile?.ph == null ? (
-                <p className="brew-muted brew-text-sm-mt1">
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
                   Note: this profile has no pH. The calculation uses only the manually entered{" "}
                   <strong>Starting pH</strong>.
-                </p>
+                </SizableText>
               ) : null}
-            </div>
+            </View>
           ) : null}
 
           {spargeAcidificationMode === "manual" && spargeManualResult ? (
@@ -968,7 +984,7 @@ export default function SpargeWaterPage() {
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Result (manual acid amount mode)</strong>
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">Estimated from manual acid amount</span>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Estimated from manual acid amount</SizableText>
               </summary>
               <ul>
                 <li>
@@ -993,15 +1009,15 @@ export default function SpargeWaterPage() {
                 </li>
               </ul>
               {selectedSpargeProfile?.ph == null ? (
-                <p className="brew-muted brew-text-sm-mt1">
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
                   Note: this profile has no pH. The calculation uses only the manually entered{" "}
                   <strong>Starting pH</strong>.
-                </p>
+                </SizableText>
               ) : null}
             </details>
           ) : null}
 
-          <View className="brew-hr" />
+          <View height={1} bg="var(--border)" my="$4" />
 
           <H3 mt={0}>{t("saltAdditionsManualV0")}</H3>
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -1022,12 +1038,12 @@ export default function SpargeWaterPage() {
             <button type="button" onClick={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
               {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
-            {spargeSaltsStatus ? <span className="brew-muted" role="status" aria-live="polite">{spargeSaltsStatus}</span> : null}
-            {spargeSaltsSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{spargeSaltsSaveStatus}</span> : null}
-            {spargeSaltsCalcSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{spargeSaltsCalcSaveStatus}</span> : null}
+            {spargeSaltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsStatus}</SizableText> : null}
+            {spargeSaltsSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsSaveStatus}</SizableText> : null}
+            {spargeSaltsCalcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsCalcSaveStatus}</SizableText> : null}
           </XStack>
 
-          {spargeSaltsError ? <pre className="brew-error-box brew-mt3" role="alert">{spargeSaltsError}</pre> : null}
+          {spargeSaltsError ? <ErrorBox mt="$3">{spargeSaltsError}</ErrorBox> : null}
 
           {spargeSaltsResult ? (
             <details className="brew-field-block brew-field-block--computed brew-mt3">
@@ -1091,8 +1107,8 @@ export default function SpargeWaterPage() {
           ) : null}
 
           {spargeSaltsResult && spargeResult ? (
-            <div className="brew-field-block brew-field-block--computed brew-mt3">
-              <div className="brew-field-block-header">
+            <View className="brew-field-block brew-field-block--computed brew-mt3">
+              <View className="brew-field-block-header">
                 <strong>Resulting ions (after sparge salts + acid, HCO3 derived from alkalinity)</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["sparge.ionsAfterSaltsAndAcid"];
@@ -1120,7 +1136,7 @@ export default function SpargeWaterPage() {
                   );
                 })() : null}
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
                   Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
                   {surfaceMath ? (() => {
                     const ex = mathExplain["sparge.alkalinityHeuristic"];
@@ -1147,9 +1163,9 @@ export default function SpargeWaterPage() {
                       </span>
                     );
                   })() : null}
-                </span>
-              </div>
-              <div className="brew-table-wrap">
+                </SizableText>
+              </View>
+              <View className="brew-table-wrap">
                 <table className="brew-table">
                   <thead>
                     <tr>
@@ -1181,14 +1197,14 @@ export default function SpargeWaterPage() {
                     })()}
                   </tbody>
                 </table>
-              </div>
-            </div>
+              </View>
+            </View>
           ) : null}
         </View>
 
-        {profilesError ? <pre className="brew-error-box" role="alert">{profilesError}</pre> : null}
-        {settingsError ? <pre className="brew-error-box" role="alert">{settingsError}</pre> : null}
-        {savingError ? <pre className="brew-error-box" role="alert">{savingError}</pre> : null}
+        {profilesError ? <ErrorBox>{profilesError}</ErrorBox> : null}
+        {settingsError ? <ErrorBox>{settingsError}</ErrorBox> : null}
+        {savingError ? <ErrorBox>{savingError}</ErrorBox> : null}
       </YStack>
     </>
   );

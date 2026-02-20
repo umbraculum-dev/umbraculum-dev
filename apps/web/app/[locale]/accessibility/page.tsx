@@ -148,7 +148,7 @@ export default function AccessibilityPage() {
   };
 
   return (
-    <section>
+    <View>
       <View bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" maxW={720}>
         <H1 mt={0}>{t("title")}</H1>
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -233,7 +233,7 @@ export default function AccessibilityPage() {
           </YStack>
         )}
       </View>
-    </section>
+    </View>
   );
 }
 

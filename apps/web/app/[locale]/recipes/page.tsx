@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
-import { RecipeEditFieldLabel } from "../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
 
@@ -156,8 +156,9 @@ export default function RecipesPage() {
           {t("createTitle")}
         </H2>
         <form onSubmit={onCreate}>
-            <div className="brew-grid-2col">
-              <YStack gap="$1.5">
+            <XStack gap="$3" flexWrap="wrap">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="recipe-name">{t("nameLabel")}</RecipeEditFieldLabel>
                 <Input
                   id="recipe-name"
@@ -196,7 +197,8 @@ export default function RecipesPage() {
                   </SizableText>
                 ) : null}
               </YStack>
-            </div>
+              </View>
+            </XStack>
             <XStack gap="$3" mt="$3" alignItems="center">
               <button type="submit" disabled={!canCall || creating || !newName.trim() || !newStyleKey.trim()}>
                 {creating ? t("creating") : t("createButton")}
@@ -207,11 +209,7 @@ export default function RecipesPage() {
             </XStack>
         </form>
         {error ? (
-            <View mt="$3">
-              <pre className="brew-error-box" role="alert">
-                {error}
-              </pre>
-            </View>
+            <ErrorBox mt="$3">{error}</ErrorBox>
         ) : null}
       </View>
 
@@ -308,8 +306,9 @@ export default function RecipesPage() {
           {t("export.subtitle")}
         </SizableText>
 
-        <div className="brew-grid-export">
-          <YStack gap="$1.5">
+        <XStack gap="$3" flexWrap="wrap" alignItems="flex-end">
+          <View flex={1} minWidth={180}>
+            <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="export-recipe">{t("export.selectLabel")}</RecipeEditFieldLabel>
             <select
               id="export-recipe"
@@ -325,13 +324,15 @@ export default function RecipesPage() {
                 </option>
               ))}
             </select>
-          </YStack>
+            </YStack>
+          </View>
           <a
             href={exportRecipeId ? `/api/recipes/${exportRecipeId}/export/beerjson` : undefined}
             aria-disabled={!exportRecipeId}
             onClick={(e) => {
               if (!exportRecipeId) e.preventDefault();
             }}
+            className="brew-link-contents"
           >
             {t("export.exportSelectedCta")}
           </a>
@@ -341,10 +342,11 @@ export default function RecipesPage() {
             onClick={(e) => {
               if (!hasRecipes) e.preventDefault();
             }}
+            className="brew-link-contents"
           >
             {t("export.exportAllCta")}
           </a>
-        </div>
+        </XStack>
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2.5" mb={0}>
           {t("export.strictNote")}
         </SizableText>

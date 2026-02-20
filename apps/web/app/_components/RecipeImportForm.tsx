@@ -6,7 +6,7 @@ import { H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
-import { RecipeEditFieldLabel } from "./recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "./recipe-edit";
 import { ImportExportPanel } from "./ImportExportPanel";
 
 const RECIPES_IMPORT_SINGLE_MAX_BYTES = 1 * 1024 * 1024;
@@ -335,8 +335,9 @@ export function RecipeImportForm({
           {fileName ? t("filePicked", { name: fileName }) : t("fileNotPicked")}
         </SizableText>
 
-        <div className="brew-grid-2col">
-          <YStack gap="$1.5">
+        <XStack gap="$3" flexWrap="wrap">
+          <View flex={1} minWidth={200}>
+            <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="import-format">{t("formatLabel")}</RecipeEditFieldLabel>
             <select
               id="import-format"
@@ -352,9 +353,11 @@ export function RecipeImportForm({
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
               {format ? t("formatResolved", { format: formatLabel }) : t("formatNotResolved")}
             </SizableText>
-          </YStack>
-          <YStack gap="$1.5">
-            <RecipeEditFieldLabel htmlFor="import-style">{t("styleLabel")}</RecipeEditFieldLabel>
+            </YStack>
+          </View>
+          <View flex={1} minWidth={200}>
+            <YStack gap="$1.5">
+              <RecipeEditFieldLabel htmlFor="import-style">{t("styleLabel")}</RecipeEditFieldLabel>
             <select
               id="import-style"
               value={styleKey}
@@ -374,8 +377,9 @@ export function RecipeImportForm({
                 {String(stylesError)}
               </SizableText>
             ) : null}
-          </YStack>
-        </div>
+            </YStack>
+          </View>
+        </XStack>
 
         <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
           <button type="button" onClick={() => void onPreview()} disabled={!canPreview}>
@@ -398,11 +402,7 @@ export function RecipeImportForm({
 
         {previewError ? (
           <>
-            <View mt="$3">
-              <pre className="brew-error-box" role="alert">
-                {previewError}
-              </pre>
-            </View>
+            <ErrorBox mt="$3">{previewError}</ErrorBox>
             {isFileTooLargeError(previewError) ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                 {t("errors.fileTooLargeHelp")}
@@ -479,11 +479,7 @@ export function RecipeImportForm({
           </XStack>
           {importError ? (
             <>
-              <View mt="$3">
-                <pre className="brew-error-box" role="alert">
-                  {importError}
-                </pre>
-              </View>
+              <ErrorBox mt="$3">{importError}</ErrorBox>
               {isFileTooLargeError(importError) ? (
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                   {t("errors.fileTooLargeHelp")}
@@ -558,11 +554,7 @@ export function RecipeImportForm({
 
         {bulkPreviewError ? (
           <>
-            <View mt="$3">
-              <pre className="brew-error-box" role="alert">
-                {bulkPreviewError}
-              </pre>
-            </View>
+            <ErrorBox mt="$3">{bulkPreviewError}</ErrorBox>
             {isFileTooLargeError(bulkPreviewError) ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                 {t("errors.fileTooLargeHelp")}
@@ -572,11 +564,7 @@ export function RecipeImportForm({
         ) : null}
         {bulkImportError ? (
           <>
-            <View mt="$3">
-              <pre className="brew-error-box" role="alert">
-                {bulkImportError}
-              </pre>
-            </View>
+            <ErrorBox mt="$3">{bulkImportError}</ErrorBox>
             {isFileTooLargeError(bulkImportError) ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                 {t("errors.fileTooLargeHelp")}
@@ -647,10 +635,10 @@ export function RecipeImportForm({
             </View>
 
             {bulkResult.failed.length ? (
-              <pre className="brew-error-box" role="alert">
-                {t("bulkFailedHeading")}\n
+              <ErrorBox>
+                {t("bulkFailedHeading")}{"\n"}
                 {bulkResult.failed.map((f: any) => `#${String(f?.index ?? "?")}: ${String(f?.name ?? "")} — ${String(f?.error ?? "")}`).join("\n")}
-              </pre>
+              </ErrorBox>
             ) : null}
           </YStack>
         ) : null}

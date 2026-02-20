@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { H1, Input, SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
-import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { LocaleSelect } from "../_components/LocaleSelect";
 
@@ -166,11 +166,7 @@ export default function SignupPage() {
       </form>
 
       {error ? (
-        <View mt="$3">
-          <pre id="signup-error" className="brew-error-box" role="alert">
-            {error}
-          </pre>
-        </View>
+        <ErrorBox id="signup-error" mt="$3">{error}</ErrorBox>
       ) : null}
 
       <View mt="$3">

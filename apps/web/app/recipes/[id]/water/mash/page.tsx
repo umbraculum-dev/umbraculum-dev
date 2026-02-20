@@ -17,7 +17,7 @@ import {
   type EditorMashStep,
 } from "../../../_lib/beerjsonRecipe";
 import { MashStepsEditor } from "../../../_components/MashStepsEditor";
-import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
@@ -1147,9 +1147,7 @@ export default function MashWaterPage() {
       />
 
       {authState.status === "error" ? (
-        <pre role="alert" className="brew-error-box">
-          {authState.error}
-        </pre>
+        <ErrorBox>{authState.error}</ErrorBox>
       ) : null}
 
       <YStack gap="$4">
@@ -1157,14 +1155,15 @@ export default function MashWaterPage() {
           <H2 id="adjustment-heading" mt={0}>
             {t("adjustmentHeading")}
           </H2>
-          <p className="brew-muted" mt={0}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
             Manage profiles on <Link href="/water-profiles">Water profiles</Link>.
-          </p>
+          </SizableText>
 
-          <div className="brew-grid-2col">
-            <div>
-              <RecipeEditFieldLabel htmlFor="source-profile">
+          <XStack gap="$3" flexWrap="wrap">
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="source-profile">
                 Source water profile (starting water)
               </RecipeEditFieldLabel>
               <select
@@ -1179,9 +1178,11 @@ export default function MashWaterPage() {
                   </option>
                 ))}
               </select>
-            </div>
-            <div>
-              <RecipeEditFieldLabel htmlFor="target-profile">
+              </YStack>
+            </View>
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="target-profile">
                 Target water profile
               </RecipeEditFieldLabel>
               <select
@@ -1196,9 +1197,11 @@ export default function MashWaterPage() {
                   </option>
                 ))}
               </select>
-            </div>
-            <div>
-              <RecipeEditFieldLabel htmlFor="dilution-profile">
+              </YStack>
+            </View>
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="dilution-profile">
                 Dilution water profile
               </RecipeEditFieldLabel>
               <select
@@ -1213,9 +1216,11 @@ export default function MashWaterPage() {
                   </option>
                 ))}
               </select>
-            </div>
-            <div>
-              <RecipeEditFieldLabel htmlFor="tap-volume">
+              </YStack>
+            </View>
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="tap-volume">
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </RecipeEditFieldLabel>
               <input
@@ -1227,9 +1232,11 @@ export default function MashWaterPage() {
                 onChange={(e) => setTapVolumeLiters(Number(e.target.value))}
                 className="brew-recipe-edit-select brew-recipe-edit-select-full"
               />
-            </div>
-            <div>
-              <RecipeEditFieldLabel htmlFor="dilution-volume">
+              </YStack>
+            </View>
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="dilution-volume">
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </RecipeEditFieldLabel>
               <input
@@ -1241,8 +1248,9 @@ export default function MashWaterPage() {
                 onChange={(e) => setDilutionVolumeLiters(Number(e.target.value))}
                 className="brew-recipe-edit-select brew-recipe-edit-select-full"
               />
-            </div>
-          </div>
+              </YStack>
+            </View>
+          </XStack>
 
           <XStack gap="$3" mt="$3" alignItems="center">
             <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
@@ -1252,22 +1260,22 @@ export default function MashWaterPage() {
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
             </button>
             {adjustmentSaveStatus ? (
-              <span className="brew-muted" role="status" aria-live="polite">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {adjustmentSaveStatus}
-              </span>
+              </SizableText>
             ) : null}
           </XStack>
 
-          <p className="brew-muted brew-mt3 brew-list-mb0">
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
             {t("adjustmentHint")}
-          </p>
+          </SizableText>
 
           {mixedSourceProfile ? (
             <details className="brew-field-block brew-field-block--readonly brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Mixed water ions</strong>
                 <span className="brew-field-badge">Read-only</span>
-                <span className="brew-muted">Computed from profiles + volumes</span>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Computed from profiles + volumes</SizableText>
               </summary>
               <View className="brew-table-wrap">
                 <table className="brew-table">
@@ -1307,9 +1315,7 @@ export default function MashWaterPage() {
           ) : null}
 
           {profilesError ? (
-            <pre className="brew-error-box brew-mt3" role="alert">
-              {profilesError}
-            </pre>
+            <ErrorBox mt="$3">{profilesError}</ErrorBox>
           ) : null}
         </View>
 
@@ -1317,12 +1323,12 @@ export default function MashWaterPage() {
           <H2 id="grist-summary-heading" mt={0}>
             {t("gristSummaryHeading")}
           </H2>
-          <p className="brew-muted" mt={0}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             {t("gristSummaryHelp")}
-          </p>
-          <p className="brew-muted brew-text-sm-mt1">
+          </SizableText>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
             {t("lateExtractExcludedNote")}
-          </p>
+          </SizableText>
           <ul className="brew-list-mt0">
             <li>
               Rows: <code>{gristImportedRows.length}</code> · Total: <code>{fmt("kg", gristTotalKg, 2)}</code> {tUnits("kg")}
@@ -1339,12 +1345,10 @@ export default function MashWaterPage() {
               {importingGrist ? "Importing…" : "Import/update grist snapshot"}
             </button>
             <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
-            {gristImportStatus ? <span className="brew-muted">{gristImportStatus}</span> : null}
+            {gristImportStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{gristImportStatus}</SizableText> : null}
           </XStack>
           {gristImportError ? (
-            <pre className="brew-error-box brew-mt3" role="alert">
-              {gristImportError}
-            </pre>
+            <ErrorBox mt="$3">{gristImportError}</ErrorBox>
           ) : null}
         </View>
 
@@ -1365,9 +1369,10 @@ export default function MashWaterPage() {
               ]}
             />
 
-            <div className="brew-grid-2col">
-              <div>
-                <RecipeEditFieldLabel htmlFor="mash-starting-alk">
+            <XStack gap="$3" flexWrap="wrap">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-starting-alk">
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </RecipeEditFieldLabel>
                 <input
@@ -1382,14 +1387,16 @@ export default function MashWaterPage() {
                   }}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="mash-volume-l">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-volume-l">
                   {t("mashWaterVolumeLabel", { unit: tUnits("L") })}
                 </RecipeEditFieldLabel>
-                <div className="brew-muted brew-text-sm-mt1">
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
                   Derived from Water adjustment volumes above (Source + Dilution).
-                </div>
+                </SizableText>
                 <input
                   id="mash-volume-l"
                   type="number"
@@ -1401,9 +1408,11 @@ export default function MashWaterPage() {
                   disabled
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="mash-starting-ph">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-starting-ph">
                   Starting pH
                 </RecipeEditFieldLabel>
                 <input
@@ -1415,9 +1424,11 @@ export default function MashWaterPage() {
                   onChange={(e) => setMashStartingPh(Number(e.target.value))}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="mash-target-ph">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-target-ph">
                   Target pH
                 </RecipeEditFieldLabel>
                 <input
@@ -1430,9 +1441,11 @@ export default function MashWaterPage() {
                   disabled={mashAcidificationMode === "manual"}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="mash-acid-type">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-acid-type">
                   Acid type
                 </RecipeEditFieldLabel>
                 <select
@@ -1450,9 +1463,11 @@ export default function MashWaterPage() {
                   <option value="tartaric">Tartaric (solid)</option>
                   <option value="malic">Malic (solid)</option>
                 </select>
-              </div>
-              <div>
-                <RecipeEditFieldLabel htmlFor="mash-strength-kind">
+                </YStack>
+              </View>
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-strength-kind">
                   Strength kind
                 </RecipeEditFieldLabel>
                 <select
@@ -1466,9 +1481,11 @@ export default function MashWaterPage() {
                   <option value="molarity">Molarity (M)</option>
                   <option value="solid">Solid (pure)</option>
                 </select>
-              </div>
-              <div className="brew-grid-full">
-                <RecipeEditFieldLabel htmlFor="mash-strength-value">
+                </YStack>
+              </View>
+              <View width="100%" flexBasis="100%">
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="mash-strength-value">
                   Strength value {mashStrengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </RecipeEditFieldLabel>
                 <input
@@ -1481,9 +1498,11 @@ export default function MashWaterPage() {
                   disabled={mashStrengthKind === "solid"}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
+                </YStack>
+              </View>
               {mashAcidificationMode === "manual" ? (
-                <div className="brew-grid-full">
+                <View width="100%" flexBasis="100%">
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="mash-manual-acid-added">
                     Acid added ({mashStrengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </RecipeEditFieldLabel>
@@ -1496,9 +1515,10 @@ export default function MashWaterPage() {
                     onChange={(e) => setMashManualAcidAdded(Number(e.target.value))}
                     className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   />
-                </div>
+                  </YStack>
+                </View>
               ) : null}
-            </div>
+            </XStack>
 
             <XStack gap="$3" mt="$3" alignItems="center">
               <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
@@ -1514,9 +1534,7 @@ export default function MashWaterPage() {
             </XStack>
 
             {mashError ? (
-              <pre id="mash-error" className="brew-error-box" role="alert" mt="$3">
-                {mashError}
-              </pre>
+              <ErrorBox id="mash-error" mt="$3">{mashError}</ErrorBox>
             ) : null}
           </form>
 
@@ -1640,7 +1658,7 @@ export default function MashWaterPage() {
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Result (manual acid amount mode)</strong>
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">Estimated from manual acid amount</span>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Estimated from manual acid amount</SizableText>
               </summary>
               <ul>
                 <li>
@@ -1665,12 +1683,12 @@ export default function MashWaterPage() {
             </details>
           ) : null}
 
-          <hr className="brew-hr" />
+          <View height={1} bg="var(--border)" my="$4" />
 
           <H3 mt={0}>{t("saltAdditionsManualV0")}</H3>
-          <p className="brew-muted" mt={0}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
-          </p>
+          </SizableText>
 
           <SaltAdditionsEditor
             rows={saltAdditions}
@@ -1686,15 +1704,13 @@ export default function MashWaterPage() {
             <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
               {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
-            {saltsStatus ? <span className="brew-muted" role="status" aria-live="polite">{saltsStatus}</span> : null}
-            {saltsSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{saltsSaveStatus}</span> : null}
-            {saltsCalcSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{saltsCalcSaveStatus}</span> : null}
+            {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
+            {saltsSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsSaveStatus}</SizableText> : null}
+            {saltsCalcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsCalcSaveStatus}</SizableText> : null}
           </XStack>
 
           {saltsError ? (
-            <pre className="brew-error-box brew-mt3" role="alert">
-              {saltsError}
-            </pre>
+            <ErrorBox mt="$3">{saltsError}</ErrorBox>
           ) : null}
 
           {saltsResult ? (
@@ -1727,9 +1743,9 @@ body={buildWaterMathBody({
                   );
                 })() : null}
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
                   Does not consider acid; see &quot;Overall mash water result&quot; for combined output
-                </span>
+                </SizableText>
               </summary>
               <View className="brew-table-wrap">
                 <table className="brew-table">
@@ -1768,7 +1784,7 @@ body={buildWaterMathBody({
             </details>
           ) : null}
 
-          <hr className="brew-hr" />
+          <View height={1} bg="var(--border)" my="$4" />
 
 <H3 id="overall-mash-water-result" mt={0}>
                 {t("overallResultHeading")}
@@ -1783,18 +1799,16 @@ body={buildWaterMathBody({
             <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
             </button>
-            {overallStatus ? <span className="brew-muted">{overallStatus}</span> : null}
-            {overallSaveStatus ? <span className="brew-muted">{overallSaveStatus}</span> : null}
+            {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
+            {overallSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallSaveStatus}</SizableText> : null}
           </XStack>
           {overallError ? (
-            <pre className="brew-error-box brew-mt3" role="alert">
-              {overallError}
-            </pre>
+            <ErrorBox mt="$3">{overallError}</ErrorBox>
           ) : null}
 
           {overallResult ? (
-            <div className="brew-field-block brew-field-block--computed brew-mt3">
-              <div className="brew-field-block-header">
+            <View className="brew-field-block brew-field-block--computed brew-mt3">
+              <View className="brew-field-block-header">
                 <strong>Overall mash snapshot</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["mash.overallSnapshot"];
@@ -1822,8 +1836,8 @@ body={buildWaterMathBody({
                   );
                 })() : null}
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">Uses latest inputs; persist a snapshot to debug</span>
-              </div>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
+              </View>
               <ul>
                 <li>
                   pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
@@ -1888,7 +1902,7 @@ body={buildWaterMathBody({
                   </tbody>
                 </table>
               </View>
-            </div>
+            </View>
           ) : null}
         </View>
 
@@ -1897,9 +1911,7 @@ body={buildWaterMathBody({
             {t("mashStepsHeading")}
           </H2>
           {mashStepsSaveError ? (
-            <pre className="brew-error-box brew-pre-mb3" role="alert">
-              {mashStepsSaveError}
-            </pre>
+            <ErrorBox mb="$3">{mashStepsSaveError}</ErrorBox>
           ) : null}
           <MashStepsEditor
             mashRows={mashRows}
@@ -1931,21 +1943,17 @@ body={buildWaterMathBody({
         </View>
 
         {savingError ? (
-          <pre className="brew-error-box brew-mt3" role="alert">
-            {savingError}
-          </pre>
+          <ErrorBox mt="$3">{savingError}</ErrorBox>
         ) : null}
         {settingsError ? (
-          <pre className="brew-error-box brew-mt3" role="alert">
-            {settingsError}
-          </pre>
+          <ErrorBox mt="$3">{settingsError}</ErrorBox>
         ) : null}
 
         {!admin ? (
-          <p className="brew-muted" mt={0}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             Only <code>owner</code> and <code>brewery_admin</code> can manage water profiles. Current role:{" "}
             <code>{me?.role ?? "—"}</code>
-          </p>
+          </SizableText>
         ) : null}
       </YStack>
     </>

@@ -18,6 +18,7 @@ import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import { mathExplain } from "./_lib/mathExplain";
 import { buildWaterMathBody } from "./_lib/mathBodies";
+import { ErrorBox } from "../../../_components/recipe-edit";
 import { RecipeMetaLine } from "./_components/RecipeMetaLine";
 
 type DisplayStream = {
@@ -179,11 +180,7 @@ export default function WaterHubPage() {
       />
 
       {authState.status === "error" ? (
-        <View>
-          <pre className="brew-error-box" role="alert">
-            {authState.error}
-          </pre>
-        </View>
+        <ErrorBox>{authState.error}</ErrorBox>
       ) : null}
 
       <YStack gap="$4">
@@ -258,11 +255,7 @@ export default function WaterHubPage() {
           </XStack>
 
           {error ? (
-            <View mt="$3">
-              <pre className="brew-error-box" role="alert">
-                {error}
-              </pre>
-            </View>
+            <ErrorBox mt="$3">{error}</ErrorBox>
           ) : null}
         </View>
 

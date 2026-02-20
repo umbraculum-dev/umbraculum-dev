@@ -9,7 +9,7 @@ import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
-import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
 import { H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
@@ -719,13 +719,13 @@ export default function BoilWaterPage() {
 
   const selectedProfileInfo = (p: WaterProfile | null, label: string) =>
     p ? (
-      <span className="brew-muted">
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         {label}: <code>{p.name}</code>
-      </span>
+      </SizableText>
     ) : (
-      <span className="brew-muted">
-        {label}: <span className="brew-muted">—</span>
-      </span>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        {label}: <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">—</SizableText>
+      </SizableText>
     );
 
   return (
@@ -744,11 +744,11 @@ export default function BoilWaterPage() {
       />
 
       {authChecked && !canCall ? (
-        <p role="alert" className="brew-error-box">
+        <ErrorBox>
           {tWater.rich("notAuthenticated", {
             signIn: (chunks) => <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/boil`}>{chunks}</Link>,
           })}
-        </p>
+        </ErrorBox>
       ) : null}
 
       <YStack gap="$4">
@@ -760,9 +760,10 @@ export default function BoilWaterPage() {
             {t("adjustmentHelp")}
           </SizableText>
 
-          <div className="brew-grid-3col">
-            <div>
-              <RecipeEditFieldLabel htmlFor="boil-source-profile">
+          <XStack gap="$3" flexWrap="wrap">
+            <View flex={1} minWidth={180}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="boil-source-profile">
                 Source water profile
               </RecipeEditFieldLabel>
               <select
@@ -779,10 +780,12 @@ export default function BoilWaterPage() {
                 ))}
               </select>
               <View mt="$1.5">{selectedProfileInfo(selectedSource, "Selected")}</View>
-            </div>
+              </YStack>
+            </View>
 
-            <div>
-              <RecipeEditFieldLabel htmlFor="boil-target-profile">
+            <View flex={1} minWidth={180}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="boil-target-profile">
                 Target water profile
               </RecipeEditFieldLabel>
               <select
@@ -799,10 +802,12 @@ export default function BoilWaterPage() {
                 ))}
               </select>
               <View mt="$1.5">{selectedProfileInfo(selectedTarget, "Selected")}</View>
-            </div>
+              </YStack>
+            </View>
 
-            <div>
-              <RecipeEditFieldLabel htmlFor="boil-dilution-profile">
+            <View flex={1} minWidth={180}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="boil-dilution-profile">
                 Dilution water profile
               </RecipeEditFieldLabel>
               <select
@@ -819,12 +824,14 @@ export default function BoilWaterPage() {
                 ))}
               </select>
               <View mt="$1.5">{selectedProfileInfo(selectedDilution, "Selected")}</View>
-            </div>
-          </div>
+              </YStack>
+            </View>
+          </XStack>
 
-          <div className="brew-grid-2col brew-mt3">
-            <div>
-              <RecipeEditFieldLabel htmlFor="boil-source-volume">
+          <XStack gap="$3" flexWrap="wrap" mt="$3">
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="boil-source-volume">
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </RecipeEditFieldLabel>
               <input
@@ -836,9 +843,11 @@ export default function BoilWaterPage() {
                 onChange={(e) => setTapVolumeLiters(Number(e.target.value))}
                 className="brew-recipe-edit-select brew-recipe-edit-select-full"
               />
-            </div>
-            <div>
-              <RecipeEditFieldLabel htmlFor="boil-dilution-volume">
+              </YStack>
+            </View>
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="boil-dilution-volume">
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </RecipeEditFieldLabel>
               <input
@@ -850,8 +859,9 @@ export default function BoilWaterPage() {
                 onChange={(e) => setDilutionVolumeLiters(Number(e.target.value))}
                 className="brew-recipe-edit-select brew-recipe-edit-select-full"
               />
-            </div>
-          </div>
+              </YStack>
+            </View>
+          </XStack>
 
           <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
             <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
@@ -861,9 +871,9 @@ export default function BoilWaterPage() {
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
             </button>
             {adjustmentSaveStatus ? (
-              <span className="brew-muted" role="status" aria-live="polite">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {adjustmentSaveStatus}
-              </span>
+              </SizableText>
             ) : null}
           </XStack>
 
@@ -872,7 +882,7 @@ export default function BoilWaterPage() {
               <summary className="brew-field-block-header brew-details-summary">
                 <SizableText fontWeight="bold">Mixed water ions</SizableText>
                 <span className="brew-field-badge">Read-only</span>
-                <span className="brew-muted">Computed from profiles + volumes</span>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Computed from profiles + volumes</SizableText>
               </summary>
               <View className="brew-table-wrap">
                 <table className="brew-table">
@@ -916,9 +926,7 @@ export default function BoilWaterPage() {
           )}
 
           {profilesError ? (
-            <pre className="brew-error-box brew-mt3" role="alert">
-              {profilesError}
-            </pre>
+            <ErrorBox mt="$3">{profilesError}</ErrorBox>
           ) : null}
         </View>
 
@@ -940,30 +948,28 @@ export default function BoilWaterPage() {
               {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
             {saltsStatus ? (
-              <span className="brew-muted" role="status" aria-live="polite">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {saltsStatus}
-              </span>
+              </SizableText>
             ) : null}
             {saltsSaveStatus ? (
-              <span className="brew-muted" role="status" aria-live="polite">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {saltsSaveStatus}
-              </span>
+              </SizableText>
             ) : null}
             {saltsCalcSaveStatus ? (
-              <span className="brew-muted" role="status" aria-live="polite">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {saltsCalcSaveStatus}
-              </span>
+              </SizableText>
             ) : null}
           </XStack>
 
           {saltsError ? (
-            <pre className="brew-error-box brew-mt3" role="alert">
-              {saltsError}
-            </pre>
+            <ErrorBox mt="$3">{saltsError}</ErrorBox>
           ) : null}
 
           {saltsResult ? (
-            <details className="brew-field-block brew-field-block--computed" className="brew-mt3">
+            <details className="brew-field-block brew-field-block--computed brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <SizableText fontWeight="bold">Resulting ions (after salts only)</SizableText>
                 {surfaceMath ? (() => {
@@ -1030,8 +1036,8 @@ export default function BoilWaterPage() {
           </H2>
 
           <form onSubmit={onSubmitAcid} aria-describedby={boilError ? "boil-error" : undefined}>
-            <div className="brew-grid-2col">
-              <div className="brew-grid-full">
+            <XStack gap="$3" flexWrap="wrap">
+              <View width="100%" flexBasis="100%">
                 <ModeFieldset
                   legend="Mode"
                   name="boil-mode"
@@ -1042,10 +1048,11 @@ export default function BoilWaterPage() {
                     { value: "manual", label: "Manual acid amount (estimate achieved pH)" },
                   ]}
                 />
-              </div>
+              </View>
 
-              <div>
-                <RecipeEditFieldLabel htmlFor="boil-starting-alk">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="boil-starting-alk">
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </RecipeEditFieldLabel>
                 <input
@@ -1060,10 +1067,12 @@ export default function BoilWaterPage() {
                   }}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
+                </YStack>
+              </View>
 
-              <div>
-                <RecipeEditFieldLabel htmlFor="boil-starting-ph">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="boil-starting-ph">
                   Starting pH
                 </RecipeEditFieldLabel>
                 <input
@@ -1075,10 +1084,12 @@ export default function BoilWaterPage() {
                   onChange={(e) => setStartingPh(e.target.value)}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
+                </YStack>
+              </View>
 
               {acidificationMode === "targetPh" ? (
-                <div>
+                <View flex={1} minWidth={200}>
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="boil-target-ph">
                     Target pH
                   </RecipeEditFieldLabel>
@@ -1091,11 +1102,13 @@ export default function BoilWaterPage() {
                     onChange={(e) => setTargetPh(Number(e.target.value))}
                     className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   />
-                </div>
+                  </YStack>
+                </View>
               ) : null}
 
-              <div>
-                <RecipeEditFieldLabel htmlFor="boil-acid-type">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="boil-acid-type">
                   Acid type
                 </RecipeEditFieldLabel>
                 <select
@@ -1113,10 +1126,12 @@ export default function BoilWaterPage() {
                   <option value="tartaric">Tartaric (solid)</option>
                   <option value="malic">Malic (solid)</option>
                 </select>
-              </div>
+                </YStack>
+              </View>
 
-              <div>
-                <RecipeEditFieldLabel htmlFor="boil-strength-kind">
+              <View flex={1} minWidth={200}>
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="boil-strength-kind">
                   Strength kind
                 </RecipeEditFieldLabel>
                 <select
@@ -1130,10 +1145,12 @@ export default function BoilWaterPage() {
                   <option value="molarity">Molarity (M)</option>
                   <option value="solid">Solid (pure)</option>
                 </select>
-              </div>
+                </YStack>
+              </View>
 
-              <div className="brew-grid-full">
-                <RecipeEditFieldLabel htmlFor="boil-strength-value">
+              <View width="100%" flexBasis="100%">
+                <YStack gap="$1.5">
+                  <RecipeEditFieldLabel htmlFor="boil-strength-value">
                   Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </RecipeEditFieldLabel>
                 <input
@@ -1146,10 +1163,12 @@ export default function BoilWaterPage() {
                   disabled={strengthKind === "solid"}
                   className="brew-recipe-edit-select brew-recipe-edit-select-full"
                 />
-              </div>
+                </YStack>
+              </View>
 
               {acidificationMode === "manual" ? (
-                <div className="brew-grid-full">
+                <View width="100%" flexBasis="100%">
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="boil-manual-acid-added">
                     Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </RecipeEditFieldLabel>
@@ -1162,9 +1181,10 @@ export default function BoilWaterPage() {
                     onChange={(e) => setManualAcidAdded(Number(e.target.value))}
                     className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   />
-                </div>
+                  </YStack>
+                </View>
               ) : null}
-            </div>
+            </XStack>
 
             <XStack mt="$3" gap="$3" alignItems="center" flexWrap="wrap">
               <button type="submit" disabled={!canCall || submitting}>
@@ -1177,25 +1197,23 @@ export default function BoilWaterPage() {
               <button type="button" onClick={() => void onSaveInputs()} disabled={!canCall || savingInputs}>
                 {savingInputs ? "Saving…" : "Save boil draft"}
               </button>
-              {boilStatus ? <span className="brew-muted" role="status" aria-live="polite">{boilStatus}</span> : null}
-              {boilSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{boilSaveStatus}</span> : null}
-              {calcSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{calcSaveStatus}</span> : null}
+              {boilStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{boilStatus}</SizableText> : null}
+              {boilSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{boilSaveStatus}</SizableText> : null}
+              {calcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{calcSaveStatus}</SizableText> : null}
             </XStack>
 
             {boilError ? (
-              <pre id="boil-error" className="brew-error-box" role="alert" className="brew-mt3">
-                {boilError}
-              </pre>
+              <ErrorBox id="boil-error" mt="$3">{boilError}</ErrorBox>
             ) : null}
           </form>
 
           {acidificationMode === "targetPh" && acidResult ? (
-            <div className="brew-field-block brew-field-block--computed brew-mt3">
-              <div className="brew-field-block-header">
+            <View className="brew-field-block brew-field-block--computed brew-mt3">
+              <View className="brew-field-block-header">
                 <SizableText fontWeight="bold">Result</SizableText>
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">From current inputs</span>
-              </div>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">From current inputs</SizableText>
+              </View>
               <ul>
                 {acidResult.acidRequiredMl !== null ? (
                   <li>
@@ -1222,15 +1240,15 @@ export default function BoilWaterPage() {
                   <code>{fmt("ppm_as_CaCO3", displayAlkalinityPpmCaCO3(acidResult.finalAlkalinityPpmCaCO3), 0)}</code> {tUnits("ppmAsCaCO3")}
                 </li>
               </ul>
-            </div>
+            </View>
           ) : null}
 
           {acidificationMode === "manual" && manualResult ? (
-            <details className="brew-field-block brew-field-block--computed" className="brew-mt3">
+            <details className="brew-field-block brew-field-block--computed brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <SizableText fontWeight="bold">Result (manual acid amount mode)</SizableText>
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">Estimated from manual acid amount</span>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Estimated from manual acid amount</SizableText>
               </summary>
               <ul>
                 <li>
@@ -1245,7 +1263,7 @@ export default function BoilWaterPage() {
             </details>
           ) : null}
 
-          <View className="brew-hr" />
+          <View height={1} bg="var(--border)" my="$4" />
 
           <H3 id="overall-boil-water-result" mt={0}>
             {t("overallResultHeading")}
@@ -1260,18 +1278,16 @@ export default function BoilWaterPage() {
             <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
             </button>
-            {overallStatus ? <span className="brew-muted">{overallStatus}</span> : null}
-            {overallSaveStatus ? <span className="brew-muted">{overallSaveStatus}</span> : null}
+            {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
+            {overallSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallSaveStatus}</SizableText> : null}
           </XStack>
           {overallError ? (
-            <pre className="brew-error-box" role="alert" className="brew-mt3">
-              {overallError}
-            </pre>
+            <ErrorBox mt="$3">{overallError}</ErrorBox>
           ) : null}
 
           {overallResult ? (
-            <div className="brew-field-block brew-field-block--computed brew-mt3">
-              <div className="brew-field-block-header">
+            <View className="brew-field-block brew-field-block--computed brew-mt3">
+              <View className="brew-field-block-header">
                 <SizableText fontWeight="bold">Overall boil snapshot</SizableText>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["boil.overallSnapshot"];
@@ -1299,8 +1315,8 @@ export default function BoilWaterPage() {
                   );
                 })() : null}
                 <span className="brew-field-badge">Computed</span>
-                <span className="brew-muted">Uses latest inputs; persist a snapshot to debug</span>
-              </div>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
+              </View>
               <ul>
                 <li>
                   pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
@@ -1337,12 +1353,12 @@ export default function BoilWaterPage() {
                   </tbody>
                 </table>
               </View>
-            </div>
+            </View>
           ) : null}
         </View>
 
-        {settingsError ? <pre className="brew-error-box" role="alert">{settingsError}</pre> : null}
-        {savingError ? <pre className="brew-error-box" role="alert">{savingError}</pre> : null}
+        {settingsError ? <ErrorBox>{settingsError}</ErrorBox> : null}
+        {savingError ? <ErrorBox>{savingError}</ErrorBox> : null}
       </YStack>
     </>
   );

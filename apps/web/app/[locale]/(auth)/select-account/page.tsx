@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
+import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 
 type AccountListItem = { id: string; name: string; role: string; brandKey?: string | null };
@@ -101,11 +102,7 @@ export default function SelectAccountPage() {
       ) : null}
 
       {error ? (
-        <View mt="$3">
-          <pre className="brew-error-box" role="alert">
-            {error}
-          </pre>
-        </View>
+        <ErrorBox mt="$3">{error}</ErrorBox>
       ) : null}
 
       {!loading && !hasAccounts ? (

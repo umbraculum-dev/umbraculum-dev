@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
-import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
@@ -88,8 +88,8 @@ export default function PlatformRecipesPage() {
     ? `/api/platform/recipes/export/beerjson?accountId=${encodeURIComponent(accountId)}`
     : undefined;
 
-  if (auth.status === "loading") return <p className="brew-muted">{t("loading")}</p>;
-  if (auth.status === "error") return <pre className="brew-error-box" role="alert">{auth.error}</pre>;
+  if (auth.status === "loading") return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("loading")}</SizableText>;
+  if (auth.status === "error") return <ErrorBox>{auth.error}</ErrorBox>;
 
   if (!isPlatformAdmin) {
     return (

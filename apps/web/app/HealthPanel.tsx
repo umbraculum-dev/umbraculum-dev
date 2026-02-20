@@ -44,9 +44,18 @@ export function HealthPanel() {
       <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle", { url: `${apiBase}/health` })}
       </SizableText>
-      <pre className="brew-code-block">
-        {JSON.stringify(state, null, 2)}
-      </pre>
+      <View
+        bg="var(--surface-2)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+        overflow="auto"
+      >
+        <SizableText size="$2" fontFamily="$mono" whiteSpace="pre-wrap">
+          {JSON.stringify(state, null, 2)}
+        </SizableText>
+      </View>
     </View>
   );
 }

@@ -8,7 +8,7 @@ import { Link } from "../../../src/i18n/navigation";
 import type { AuthMeResponse } from "@brewery/contracts";
 import { parseAuthMeResponse } from "@brewery/contracts";
 
-import { RecipeEditFieldLabel } from "../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 
 type EquipmentProfile = {
@@ -306,9 +306,7 @@ export default function EquipmentPage() {
       </Link>
 
       {error ? (
-        <pre className="brew-error-box" role="alert">
-          {error}
-        </pre>
+        <ErrorBox>{error}</ErrorBox>
       ) : null}
 
       <View mt="$3">
@@ -409,8 +407,9 @@ export default function EquipmentPage() {
 
               <fieldset className="brew-fieldset">
                 <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
-                <div className="brew-grid-2col">
-                  <YStack gap="$1.5">
+                <XStack gap="$3" flexWrap="wrap">
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
                     <RecipeEditFieldLabel htmlFor="equip-edit-kettle-vol">
                       {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
                     </RecipeEditFieldLabel>
@@ -429,8 +428,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-kettle-losses">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-kettle-losses">
                       {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -448,8 +449,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-evap">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-evap">
                       {t("kettleBoilEvaporationRatePercentPerHourLabel")}
                     </RecipeEditFieldLabel>
                     <Input
@@ -467,8 +470,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-shrink">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-shrink">
                       {t("kettleCoolingShrinkagePercentLabel")}
                     </RecipeEditFieldLabel>
                     <Input
@@ -486,8 +491,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-hops-abs">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-hops-abs">
                       {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -505,14 +512,16 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                </div>
+                  </View>
+                </XStack>
               </fieldset>
 
               <fieldset className="brew-fieldset">
                 <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
-                <div className="brew-grid-2col">
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-mash-vol">
+                <XStack gap="$3" flexWrap="wrap">
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-mash-vol">
                       {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -530,8 +539,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-mash-eff">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-mash-eff">
                       {t("mashEfficiencyPercentLabel")}
                     </RecipeEditFieldLabel>
                     <Input
@@ -549,8 +560,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-mash-losses">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-mash-losses">
                       {t("mashLossesLitersLabel", { unit: tUnits("L") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -568,8 +581,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-thickness">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-thickness">
                       {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -587,8 +602,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-grain-abs">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-grain-abs">
                       {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -606,8 +623,10 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-water-leftover">
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-water-leftover">
                       {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -625,14 +644,16 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                </div>
+                  </View>
+                </XStack>
               </fieldset>
 
               <fieldset className="brew-fieldset">
                 <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
-                <div className="brew-grid-2col">
-                  <YStack gap="$1.5">
-                    <RecipeEditFieldLabel htmlFor="equip-edit-other-losses">
+                <XStack gap="$3" flexWrap="wrap">
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="equip-edit-other-losses">
                       {t("otherLossesLitersLabel", { unit: tUnits("L") })}
                     </RecipeEditFieldLabel>
                     <Input
@@ -650,7 +671,8 @@ export default function EquipmentPage() {
                       fontFamily="$body"
                     />
                   </YStack>
-                </div>
+                  </View>
+                </XStack>
               </fieldset>
             </YStack>
 
@@ -671,11 +693,7 @@ export default function EquipmentPage() {
               </button>
             </XStack>
             {editError ? (
-              <View mt="$3">
-                <pre id="equipment-edit-error" className="brew-error-box" role="alert">
-                  {editError}
-                </pre>
-              </View>
+              <ErrorBox id="equipment-edit-error" mt="$3">{editError}</ErrorBox>
             ) : null}
           </form>
         </View>
@@ -709,9 +727,10 @@ export default function EquipmentPage() {
 
                 <fieldset className="brew-fieldset">
                   <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
-                  <div className="brew-grid-2col">
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-kettle-vol">
+                  <XStack gap="$3" flexWrap="wrap">
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-kettle-vol">
                         {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -729,8 +748,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-kettle-losses">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-kettle-losses">
                         {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -748,8 +769,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-evap">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-evap">
                         {t("kettleBoilEvaporationRatePercentPerHourLabel")}
                       </RecipeEditFieldLabel>
                       <Input
@@ -767,8 +790,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-shrink">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-shrink">
                         {t("kettleCoolingShrinkagePercentLabel")}
                       </RecipeEditFieldLabel>
                       <Input
@@ -786,8 +811,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-hops-abs">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-hops-abs">
                         {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -805,13 +832,15 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                  </div>
+                    </View>
+                  </XStack>
                 </fieldset>
 
                 <fieldset className="brew-fieldset">
                   <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
-                  <div className="brew-grid-2col">
-                    <YStack gap="$1.5">
+                  <XStack gap="$3" flexWrap="wrap">
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
                       <RecipeEditFieldLabel htmlFor="equip-mash-vol">
                         {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
                       </RecipeEditFieldLabel>
@@ -830,8 +859,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-mash-eff">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-mash-eff">
                         {t("mashEfficiencyPercentLabel")}
                       </RecipeEditFieldLabel>
                       <Input
@@ -849,8 +880,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-mash-losses">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-mash-losses">
                         {t("mashLossesLitersLabel", { unit: tUnits("L") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -868,8 +901,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-mash-thickness">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-mash-thickness">
                         {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -887,8 +922,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-grain-abs">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-grain-abs">
                         {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -906,8 +943,10 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-water-leftover">
+                    </View>
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-water-leftover">
                         {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -925,14 +964,16 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                  </div>
+                    </View>
+                  </XStack>
                 </fieldset>
 
                 <fieldset className="brew-fieldset">
                   <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
-                  <div className="brew-grid-2col">
-                    <YStack gap="$1.5">
-                      <RecipeEditFieldLabel htmlFor="equip-other-losses">
+                  <XStack gap="$3" flexWrap="wrap">
+                    <View flex={1} minWidth={200}>
+                      <YStack gap="$1.5">
+                        <RecipeEditFieldLabel htmlFor="equip-other-losses">
                         {t("otherLossesLitersLabel", { unit: tUnits("L") })}
                       </RecipeEditFieldLabel>
                       <Input
@@ -950,7 +991,8 @@ export default function EquipmentPage() {
                         fontFamily="$body"
                       />
                     </YStack>
-                  </div>
+                    </View>
+                  </XStack>
                 </fieldset>
               </YStack>
               <XStack gap="$3" mt="$3" alignItems="center">
@@ -959,11 +1001,7 @@ export default function EquipmentPage() {
                 </button>
               </XStack>
               {createError ? (
-                <View mt="$3">
-                  <pre id="equipment-create-error" className="brew-error-box" role="alert">
-                    {createError}
-                  </pre>
-                </View>
+                <ErrorBox id="equipment-create-error" mt="$3">{createError}</ErrorBox>
               ) : null}
             </form>
           </details>

@@ -8,18 +8,24 @@ export interface ErrorBoxProps {
   children: ReactNode;
   role?: "alert";
   "aria-live"?: "polite";
+  id?: string;
   mt?: string | number;
+  mb?: string | number;
 }
 
 export function ErrorBox({
   children,
   role = "alert",
   "aria-live": ariaLive,
+  id,
   mt,
+  mb,
 }: ErrorBoxProps) {
   return (
     <View
+      id={id}
       mt={mt}
+      mb={mb}
       bg="color-mix(in srgb, var(--danger) 12%, var(--surface))"
       borderWidth={1}
       borderColor="color-mix(in srgb, var(--danger) 35%, var(--border))"

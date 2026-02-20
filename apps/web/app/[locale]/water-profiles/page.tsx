@@ -10,7 +10,7 @@ import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewe
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 
 import { apiFetch } from "../../_lib/apiClient";
-import { RecipeEditFieldLabel } from "../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 
 function isAdmin(role: string | null) {
   return role === "brewery_admin";
@@ -152,11 +152,7 @@ export default function WaterProfilesPage() {
           </XStack>
 
           {error ? (
-            <View mt="$3">
-              <pre className="brew-error-box" role="alert">
-                {error}
-              </pre>
-            </View>
+            <ErrorBox mt="$3">{error}</ErrorBox>
           ) : null}
 
           <View className="brew-table-wrap" mt="$3">
@@ -244,8 +240,8 @@ export default function WaterProfilesPage() {
             </SizableText>
 
             <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
-              <div className="brew-grid-2col">
-                <div className="brew-grid-full">
+              <XStack gap="$3" flexWrap="wrap">
+                <View width="100%" flexBasis="100%">
                   <YStack gap="$1.5">
                     <RecipeEditFieldLabel htmlFor="create-name">Profile name</RecipeEditFieldLabel>
                     <input
@@ -256,8 +252,9 @@ export default function WaterProfilesPage() {
                       required
                     />
                   </YStack>
-                </div>
-                <YStack gap="$1.5">
+                </View>
+                <View flex={1} minWidth={200}>
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="create-scope">Scope</RecipeEditFieldLabel>
                   <select
                     id="create-scope"
@@ -269,7 +266,9 @@ export default function WaterProfilesPage() {
                     <option value="account">Account</option>
                   </select>
                 </YStack>
-                <YStack gap="$1.5">
+                </View>
+                <View flex={1} minWidth={200}>
+                  <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="create-type">Type</RecipeEditFieldLabel>
                   <select
                     id="create-type"
@@ -281,7 +280,8 @@ export default function WaterProfilesPage() {
                     <option value="dilution">Dilution</option>
                   </select>
                 </YStack>
-                <div className="brew-grid-full">
+                </View>
+                <View width="100%" flexBasis="100%">
                   <YStack gap="$1.5">
                     <RecipeEditFieldLabel htmlFor="create-ph">pH (optional)</RecipeEditFieldLabel>
                     <input
@@ -295,14 +295,14 @@ export default function WaterProfilesPage() {
                       placeholder={t("phPlaceholder")}
                     />
                   </YStack>
-                </div>
-              </div>
+                </View>
+              </XStack>
 
               <fieldset className="brew-fieldset-noborder">
                 <legend className="brew-muted brew-fieldset-legend">
                   {t("ionsLegend", { unit: tUnits("ppm") })}
                 </legend>
-                <div className="brew-grid-3col">
+                <XStack gap="$3" flexWrap="wrap">
                   {(
                     [
                       ["calcium", "Calcium (Ca)"],
@@ -313,7 +313,8 @@ export default function WaterProfilesPage() {
                       ["bicarbonate", "Bicarbonate (HCO3)"],
                     ] as const
                   ).map(([k, label]) => (
-                    <YStack key={k} gap="$1.5">
+                    <View key={k} flex={1} minWidth={180}>
+                      <YStack gap="$1.5">
                       <RecipeEditFieldLabel htmlFor={`ion-${k}`}>{label}</RecipeEditFieldLabel>
                       <input
                         id={`ion-${k}`}
@@ -324,8 +325,9 @@ export default function WaterProfilesPage() {
                         className="brew-recipe-edit-select brew-recipe-edit-select-full"
                       />
                     </YStack>
+                    </View>
                   ))}
-                </div>
+                </XStack>
               </fieldset>
 
               <XStack gap="$3" mt="$3" alignItems="center">
@@ -338,11 +340,7 @@ export default function WaterProfilesPage() {
               </XStack>
 
               {createError ? (
-                <View mt="$3">
-                  <pre id="create-error" className="brew-error-box" role="alert">
-                    {createError}
-                  </pre>
-                </View>
+                <ErrorBox id="create-error" mt="$3">{createError}</ErrorBox>
               ) : null}
             </form>
           </View>

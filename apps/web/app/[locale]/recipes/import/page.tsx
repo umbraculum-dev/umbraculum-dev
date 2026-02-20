@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { H1, SizableText, View, YStack } from "tamagui";
 
+import { ErrorBox } from "../../../_components/recipe-edit";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
 
@@ -28,11 +29,7 @@ export default function RecipesImportPage() {
         </SizableText>
       ) : null}
       {authState.status === "error" ? (
-        <View>
-          <pre className="brew-error-box" role="alert">
-            {authState.error}
-          </pre>
-        </View>
+        <ErrorBox>{authState.error}</ErrorBox>
       ) : null}
 
       <RecipeImportForm

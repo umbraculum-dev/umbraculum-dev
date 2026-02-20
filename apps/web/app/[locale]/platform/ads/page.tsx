@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
+import { Checkbox, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
-import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
 type Placement =
@@ -145,8 +145,8 @@ export default function PlatformAdsPage() {
     }
   };
 
-  if (auth.status === "loading") return <p className="brew-muted">{t("loading")}</p>;
-  if (auth.status === "error") return <pre className="brew-error-box" role="alert">{auth.error}</pre>;
+  if (auth.status === "loading") return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("loading")}</SizableText>;
+  if (auth.status === "error") return <ErrorBox>{auth.error}</ErrorBox>;
 
   if (!isPlatformAdmin) {
     return (
@@ -173,15 +173,14 @@ export default function PlatformAdsPage() {
         </SizableText>
 
         {error ? (
-          <pre className="brew-error-box brew-mt3" role="alert">
-            {error}
-          </pre>
+          <ErrorBox mt="$3">{error}</ErrorBox>
         ) : null}
 
         <YStack mt="$3" gap="$3">
-          <div className="brew-grid-2col">
-            <div>
-              <RecipeEditFieldLabel htmlFor="ad-placement">
+          <XStack gap="$3" flexWrap="wrap">
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="ad-placement">
                 {t("form.placement")}
               </RecipeEditFieldLabel>
               <select
@@ -196,9 +195,11 @@ export default function PlatformAdsPage() {
                   </option>
                 ))}
               </select>
-            </div>
-            <div>
-              <RecipeEditFieldLabel htmlFor="ad-priority">
+              </YStack>
+            </View>
+            <View flex={1} minWidth={200}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="ad-priority">
                 {t("form.priority")}
               </RecipeEditFieldLabel>
               <input
@@ -210,10 +211,11 @@ export default function PlatformAdsPage() {
                 onChange={(e) => setPriority(e.target.value === "" ? 0 : Number(e.target.value))}
                 className="brew-recipe-edit-select brew-recipe-edit-select-full"
               />
-            </div>
-          </div>
+              </YStack>
+            </View>
+          </XStack>
 
-          <div>
+          <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="ad-image-url">
               {t("form.imageUrl")}
             </RecipeEditFieldLabel>
@@ -224,9 +226,9 @@ export default function PlatformAdsPage() {
               className="brew-recipe-edit-select brew-recipe-edit-select-full"
               autoComplete="off"
             />
-          </div>
+          </YStack>
 
-          <div>
+          <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="ad-link-url">
               {t("form.linkUrl")}
             </RecipeEditFieldLabel>
@@ -237,9 +239,9 @@ export default function PlatformAdsPage() {
               className="brew-recipe-edit-select brew-recipe-edit-select-full"
               autoComplete="off"
             />
-          </div>
+          </YStack>
 
-          <div>
+          <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="ad-alt-text">
               {t("form.altText")}
             </RecipeEditFieldLabel>
@@ -250,12 +252,23 @@ export default function PlatformAdsPage() {
               className="brew-recipe-edit-select brew-recipe-edit-select-full"
               autoComplete="off"
             />
-          </div>
+          </YStack>
 
-          <label className="brew-radio-label brew-muted">
-            <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-            {t("form.isActive")}
-          </label>
+          <XStack gap="$2" alignItems="center" className="brew-muted">
+            <Checkbox
+              id="ad-is-active"
+              checked={isActive}
+              onCheckedChange={(c) => setIsActive(c === true)}
+              aria-label={t("form.isActive")}
+              size="$2"
+              native
+            >
+              <Checkbox.Indicator />
+            </Checkbox>
+            <SizableText as="label" htmlFor="ad-is-active" size="$2" color="var(--text-muted)" fontFamily="$body">
+              {t("form.isActive")}
+            </SizableText>
+          </XStack>
 
           <XStack gap="$2" justifyContent="flex-end">
             <button type="button" onClick={() => void refresh()} disabled={loading}>
@@ -306,15 +319,21 @@ export default function PlatformAdsPage() {
                       </a>
                     </td>
                     <td className="brew-table-cell-top">
-                      <label className="brew-radio-label brew-muted">
-                        <input
-                          type="checkbox"
+                      <XStack gap="$2" alignItems="center" className="brew-muted">
+                        <Checkbox
+                          id={`ad-toggle-active-${a.id}`}
                           checked={a.isActive}
-                          onChange={(e) => void onToggleActive(a.id, e.target.checked)}
+                          onCheckedChange={(c) => void onToggleActive(a.id, c === true)}
                           aria-label={t("table.toggleActiveAria", { id: a.id })}
-                        />
-                        {a.isActive ? t("table.yes") : t("table.no")}
-                      </label>
+                          size="$2"
+                          native
+                        >
+                          <Checkbox.Indicator />
+                        </Checkbox>
+                        <SizableText as="label" htmlFor={`ad-toggle-active-${a.id}`} size="$2" color="var(--text-muted)" fontFamily="$body">
+                          {a.isActive ? t("table.yes") : t("table.no")}
+                        </SizableText>
+                      </XStack>
                     </td>
                     <td className="brew-table-cell-top">
                       <button type="button" onClick={() => void onDelete(a.id)} disabled={loading}>
