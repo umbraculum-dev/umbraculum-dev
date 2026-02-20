@@ -580,7 +580,7 @@
         "yeast": "Yeast",
         "other": "Other ingredients",
         "notes": "Notes",
-        "water": "Water chemistry"
+        "water": "Water Chemistry & Volumes"
       },
       "mashingHelp": "Mash schedule (BeerJSON mash procedure). Import a BeerJSON/BeerXML recipe with mash steps, or add steps manually in the Mash and/or Sparge water calculator pages.",
       "mashingEmpty": "No mash steps. Add steps or import a recipe with a mash schedule.",

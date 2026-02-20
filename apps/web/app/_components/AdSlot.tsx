@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
+import { Image, SizableText, View, YStack } from "tamagui";
+
+import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
 
 export type AdPlacementV1 =
@@ -24,13 +27,11 @@ type SlotResponse = {
 };
 
 export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
-  const locale = useLocale();
   const t = useTranslations("ads");
 
   const [disabled, setDisabled] = useState(false);
   const [ad, setAd] = useState<SlotResponse["ad"]>(null);
 
-  const contactHref = useMemo(() => `/${locale}/contact`, [locale]);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,25 +57,47 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   if (disabled) return null;
 
   return (
-    <div className="adSlotWrap">
-      <aside className="adSlot" aria-label={t("ariaLabel")}>
+    <YStack my="$3" gap="$1.5">
+      <View
+        as="aside"
+        aria-label={t("ariaLabel")}
+        bg="color-mix(in srgb, var(--surface-2) 45%, var(--surface))"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$2.5"
+      >
+        <YStack gap="$1.5">
         {ad ? (
           <>
             <a href={ad.linkUrl} target="_blank" rel="noreferrer noopener">
-              <img className="adSlotImage" src={ad.imageUrl} alt={ad.altText} loading="lazy" />
+              <Image
+                src={ad.imageUrl}
+                alt={ad.altText}
+                loading="lazy"
+                w="100%"
+                maxW="100%"
+                h="auto"
+                rounded="$2"
+                style={{ display: "block" }}
+              />
             </a>
-            <p className="muted adSlotLine">{t("upgradeLine")}</p>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
+              {t("upgradeLine")}
+            </SizableText>
           </>
         ) : (
           <>
-            <p className="muted adSlotLine">
-              <a href={contactHref}>{t("contactLine")}</a>
-            </p>
-            <p className="muted adSlotLine">{t("upgradeLine")}</p>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
+              <Link href="/contact">{t("contactLine")}</Link>
+            </SizableText>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
+              {t("upgradeLine")}
+            </SizableText>
           </>
         )}
-      </aside>
-    </div>
+        </YStack>
+      </View>
+    </YStack>
   );
 }
-

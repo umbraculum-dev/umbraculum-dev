@@ -3,6 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
+import { H1, SizableText, View, YStack } from "tamagui";
+
+import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 
 type UiThemeKey = "default" | "hc_dark" | "hc_light";
@@ -145,22 +148,20 @@ export default function AccessibilityPage() {
   };
 
   return (
-    <section className="panel" style={{ maxWidth: 720 }}>
-      <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+    <View as="section" bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" maxW={720}>
+      <H1 mt={0}>{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
       {!loaded ? (
-        <p className="muted" aria-live="polite">
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
           {t("loading")}
-        </p>
+        </SizableText>
       ) : (
-        <div style={{ display: "grid", gap: 12 }}>
-          <div style={{ display: "grid", gap: 6 }}>
-            <label className="muted" htmlFor="ui-theme">
-              {t("themePreset")}
-            </label>
+        <YStack gap="$3">
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="ui-theme">{t("themePreset")}</RecipeEditFieldLabel>
             <select
               id="ui-theme"
               value={theme}
@@ -171,17 +172,16 @@ export default function AccessibilityPage() {
                   density,
                 })
               }
+              style={{ width: "100%" }}
             >
               <option value="default">{t("theme.default")}</option>
               <option value="hc_dark">{t("theme.hcDark")}</option>
               <option value="hc_light">{t("theme.hcLight")}</option>
             </select>
-          </div>
+          </YStack>
 
-          <div style={{ display: "grid", gap: 6 }}>
-            <label className="muted" htmlFor="ui-font-scale">
-              {t("fontScale")}
-            </label>
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="ui-font-scale">{t("fontScale")}</RecipeEditFieldLabel>
             <select
               id="ui-font-scale"
               value={fontScale}
@@ -192,18 +192,17 @@ export default function AccessibilityPage() {
                   density,
                 })
               }
+              style={{ width: "100%" }}
             >
               <option value="sm">{t("font.sm")}</option>
               <option value="md">{t("font.md")}</option>
               <option value="lg">{t("font.lg")}</option>
               <option value="xl">{t("font.xl")}</option>
             </select>
-          </div>
+          </YStack>
 
-          <div style={{ display: "grid", gap: 6 }}>
-            <label className="muted" htmlFor="ui-density">
-              {t("density")}
-            </label>
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="ui-density">{t("density")}</RecipeEditFieldLabel>
             <select
               id="ui-density"
               value={density}
@@ -214,28 +213,25 @@ export default function AccessibilityPage() {
                   density: oneOf(e.target.value, allowedDensity, "comfortable"),
                 })
               }
+              style={{ width: "100%" }}
             >
               <option value="comfortable">{t("densityOptions.comfortable")}</option>
               <option value="compact">{t("densityOptions.compact")}</option>
             </select>
-          </div>
+          </YStack>
 
-          <div className="muted" style={{ fontSize: 12 }}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
             {saving ? t("saving") : t("savingHint")}
-          </div>
+          </SizableText>
 
-          {error ? (
-            <pre className="errorBox" role="alert" style={{ margin: 0 }}>
-              {error}
-            </pre>
-          ) : null}
+          {error ? <ErrorBox>{error}</ErrorBox> : null}
 
-          <div className="muted" style={{ fontSize: 12 }}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
             {t("note", { locale })}
-          </div>
-        </div>
+          </SizableText>
+        </YStack>
       )}
-    </section>
+    </View>
   );
 }
 

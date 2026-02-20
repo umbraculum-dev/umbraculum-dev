@@ -24,6 +24,7 @@ import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
+import { H1 } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
   bicarbonatePpmToAlkalinityPpmCaCO3,
@@ -1129,7 +1130,7 @@ export default function MashWaterPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
+      <H1 mb="$2">{t("title")}</H1>
       <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
       <SurfaceMathToggleRow
         left={

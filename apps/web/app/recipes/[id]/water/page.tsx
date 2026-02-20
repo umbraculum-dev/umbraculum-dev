@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { IonProfilePpm } from "@brewery/contracts";
 
 import { parseWaterProfilesResponse } from "@brewery/contracts";
+import { H1 } from "tamagui";
 
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
@@ -163,7 +164,7 @@ export default function WaterHubPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
+      <H1 mb="$2">{t("title")}</H1>
       <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
 
       <SurfaceMathToggleRow

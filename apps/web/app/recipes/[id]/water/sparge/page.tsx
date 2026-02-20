@@ -11,6 +11,7 @@ import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_com
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
+import { H1 } from "tamagui";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -618,7 +619,7 @@ export default function SpargeWaterPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
+      <H1 mb="$2">{t("title")}</H1>
       <RecipeMetaLine recipeId={recipeId} enabled={authed} />
       <SurfaceMathToggleRow
         left={

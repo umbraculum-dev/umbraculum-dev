@@ -5,10 +5,22 @@ import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 
+import { Button, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
+
 import { apiFetch } from "../../../_lib/apiClient";
 import { formatFixed } from "../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { AdSlot } from "../../../_components/AdSlot";
+import { CodeInline } from "../../../_components/CodeInline";
+import {
+  ErrorBox,
+  RecipeEditField,
+  RecipeEditFieldBlock,
+  RecipeEditFieldLabel,
+  RecipeEditIngredientCard,
+  RecipeEditReadOnlyValue,
+  RecipeEditSection,
+} from "../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import {
   buildBeerJsonRecipeDocument,
@@ -103,6 +115,7 @@ export default function RecipeEditPage() {
   const tMath = useTranslations("math");
   const tNav = useTranslations("nav");
   const tUnits = useTranslations("units");
+  const tWater = useTranslations("waterHub");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
@@ -922,28 +935,29 @@ export default function RecipeEditPage() {
 
   return (
     <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
+      <H1 mb="$2">{t("title")}</H1>
       <RecipeMetaLine recipeId={recipeId} />
 
       <SurfaceMathToggleRow
         left={null}
-        rightHint={<span className="muted">{tMath("analysis.common.toggleHint")}</span>}
+        rightHint={<SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{tMath("analysis.common.toggleHint")}</SizableText>}
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
-        style={{ marginTop: 8, marginBottom: 8 }}
+        mt="$2"
+        mb="$2"
       />
 
       {authLoaded && !canCallAccountScoped ? (
-        <p role="alert" className="errorBox">
-          {t("notReadyToLoad")}
-        </p>
+        <ErrorBox>{t("notReadyToLoad")}</ErrorBox>
       ) : null}
 
-      {loading ? <p className="muted">{t("loading")}</p> : null}
+      {loading ? (
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("loading")}
+        </SizableText>
+      ) : null}
       {loadError ? (
-        <pre className="errorBox" aria-live="polite">
-          {loadError}
-        </pre>
+        <ErrorBox aria-live="polite">{loadError}</ErrorBox>
       ) : null}
 
       {useDesktopRail ? (
@@ -956,98 +970,116 @@ export default function RecipeEditPage() {
         />
       ) : null}
 
-      <div className="recipeEditLayout">
-        <div className="recipeEditContent" style={{ flex: 1, minWidth: 0 }}>
+      <XStack
+        flexDirection="column"
+        gap="$4"
+        $gtNarrow={{ flexDirection: "row" }}
+        flex={1}
+        minW={0}
+      >
+        <YStack gap="$4" flex={1} minW={0}>
           {!useDesktopRail ? (
-            <div style={{ marginBottom: 12 }}>
+            <View mb="$3">
               <RecipeEditSectionsNav sections={sections} recipeId={recipeId} layoutMode="sheet" />
-            </div>
+            </View>
           ) : null}
-          <section id="basics" className="panel">
-            <details open={openSections.basics} onToggle={(e) => setSectionOpen("basics", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="basics-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.basics")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  {t("basicsHelp")}
-                </p>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-                  <div>
-                    <label htmlFor="recipe-name" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      Name
-                    </label>
-                    <input
-                      id="recipe-name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="recipe-style" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      Style
-                    </label>
-                    <select
-                      id="recipe-style"
-                      value={styleKey}
-                      onChange={(e) => setStyleKey(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                      disabled={stylesLoading || styles.length === 0}
-                      required
-                    >
-                      {styles.map((s) => (
-                        <option key={s.key} value={s.key}>
-                          {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
-                        </option>
-                      ))}
-                    </select>
-                    {stylesError ? (
-                      <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                        {String(stylesError)}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-                  <button onClick={onSave} disabled={!canCallAccountScoped || saving}>
-                    {saving ? "Saving…" : "Save"}
-                  </button>
-                  {saveStatus ? (
-                    <span className="muted" aria-live="polite">
-                      {saveStatus}
-                    </span>
-                  ) : null}
-                  {recipe ? (
-                    <span className="muted">
-                      Updated: <code>{recipe.updatedAt}</code>
-                    </span>
-                  ) : null}
-                </div>
-
-                {saveError ? (
-                  <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
-                    {saveError}
-                  </pre>
+          <RecipeEditSection
+            id="basics"
+            headingId="basics-heading"
+            label={t("sections.basics")}
+            open={openSections.basics}
+            onOpenChange={(open) => setSectionOpen("basics", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              {t("basicsHelp")}
+            </SizableText>
+            <XStack
+              gap="$3"
+              mt="$3"
+              flexWrap="wrap"
+              $gtNarrow={{ flexWrap: "nowrap" }}
+            >
+              <View flex={1} minW={200}>
+                <RecipeEditField id="recipe-name" label="Name">
+                <Input
+                  id="recipe-name"
+                  value={name}
+                  onChangeText={setName}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
+                />
+                </RecipeEditField>
+              </View>
+              <View flex={1} minW={200}>
+                <RecipeEditField id="recipe-style" label="Style">
+                  <select
+                    id="recipe-style"
+                    name="styleKey"
+                    value={styleKey}
+                    onChange={(e) => setStyleKey(e.target.value)}
+                    disabled={stylesLoading || styles.length === 0}
+                    className="recipeEditSelect recipeEditSelectFull"
+                  >
+                    {styles.map((s) => (
+                      <option key={s.key} value={s.key}>
+                        {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
+                      </option>
+                    ))}
+                  </select>
+                {stylesError ? (
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+                    {String(stylesError)}
+                  </SizableText>
                 ) : null}
-              </div>
-            </details>
-          </section>
+                </RecipeEditField>
+              </View>
+            </XStack>
 
-          <section id="analysis" className="panel">
-            <details open={openSections.analysis} onToggle={(e) => setSectionOpen("analysis", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="analysis-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.analysis")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  {tAnalysis("help")}
-                </p>
+            <XStack gap="$3" items="center" mt="$3" flexWrap="wrap">
+              <Button
+                onPress={onSave}
+                disabled={!canCallAccountScoped || saving}
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {saving ? "Saving…" : "Save"}
+              </Button>
+              {saveStatus ? (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+                  {saveStatus}
+                </SizableText>
+              ) : null}
+              {recipe ? (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  Updated: <CodeInline>{recipe.updatedAt}</CodeInline>
+                </SizableText>
+              ) : null}
+            </XStack>
+
+            {saveError ? (
+              <ErrorBox mt="$3">{saveError}</ErrorBox>
+            ) : null}
+          </RecipeEditSection>
+
+          <RecipeEditSection
+            id="analysis"
+            headingId="analysis-heading"
+            label={t("sections.analysis")}
+            open={openSections.analysis}
+            onOpenChange={(open) => setSectionOpen("analysis", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              {tAnalysis("help")}
+            </SizableText>
 
                 {(() => {
                   const parsed = (() => {
@@ -1212,13 +1244,13 @@ export default function RecipeEditPage() {
 
                   return (
                     <>
-                      <div style={{ overflowX: "auto" }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <View overflowX="auto">
+                        <table className="recipeEditTable">
                           <tbody>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.abv")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.abv")}</SizableText>
                                   {renderMath(
                                     "analysis.abv",
                                     renderDerivationMath(
@@ -1234,17 +1266,17 @@ export default function RecipeEditPage() {
                                       abv: fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</code>{" "}
-                                {typeof a?.abvEstimatedPercent === "number" ? <span className="muted">%</span> : null}
+                                <CodeInline>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</CodeInline>{" "}
+                                {typeof a?.abvEstimatedPercent === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText> : null}
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.ibuTinseth")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuTinseth")}</SizableText>
                                   {renderMath(
                                     "analysis.ibuTinseth",
                                     renderDerivationMath(
@@ -1266,16 +1298,16 @@ export default function RecipeEditPage() {
                                       hopsLines: hopLines,
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</code>
+                                <CodeInline>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</CodeInline>
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.ibuRager")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuRager")}</SizableText>
                                   {renderMath(
                                     "analysis.ibuRager",
                                     renderDerivationMath(
@@ -1297,16 +1329,16 @@ export default function RecipeEditPage() {
                                       hopsLines: hopLines,
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</code>
+                                <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.srmMorey")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmMorey")}</SizableText>
                                   {renderMath(
                                     "analysis.srmMorey",
                                     renderDerivationMath(
@@ -1330,16 +1362,16 @@ export default function RecipeEditPage() {
                                           : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</code>
+                                <CodeInline>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</CodeInline>
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.srmDaniels")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmDaniels")}</SizableText>
                                   {renderMath(
                                     "analysis.srmDaniels",
                                     renderDerivationMath(
@@ -1363,16 +1395,16 @@ export default function RecipeEditPage() {
                                           : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</code>
+                                <CodeInline>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</CodeInline>
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.kettleVolume")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.kettleVolume")}</SizableText>
                                   {renderMath(
                                     "analysis.kettleVolume",
                                     renderDerivationMath(
@@ -1392,17 +1424,17 @@ export default function RecipeEditPage() {
                                           : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</code>{" "}
-                                {typeof a?.kettleVolumeLiters === "number" ? <span className="muted">L</span> : null}
+                                <CodeInline>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</CodeInline>{" "}
+                                {typeof a?.kettleVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.preBoilVolume")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.preBoilVolume")}</SizableText>
                                   {renderMath(
                                     "analysis.preBoilVolume",
                                     renderDerivationMath(
@@ -1422,17 +1454,17 @@ export default function RecipeEditPage() {
                                           : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</code>{" "}
-                                {typeof a?.preBoilVolumeLiters === "number" ? <span className="muted">L</span> : null}
+                                <CodeInline>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</CodeInline>{" "}
+                                {typeof a?.preBoilVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.og")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.og")}</SizableText>
                                   {renderMath(
                                     "analysis.og",
                                     renderDerivationMath(
@@ -1482,16 +1514,16 @@ export default function RecipeEditPage() {
                                       })(),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3)}</code>
+                                <CodeInline>{fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3)}</CodeInline>
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.fg")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.fg")}</SizableText>
                                   {renderMath(
                                     "analysis.fg",
                                     renderDerivationMath(
@@ -1507,16 +1539,16 @@ export default function RecipeEditPage() {
                                       fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3)}</code>
+                                <CodeInline>{fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3)}</CodeInline>
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.attenuation")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.attenuation")}</SizableText>
                                   {renderMath(
                                     "analysis.attenuation",
                                     renderDerivationMath(
@@ -1534,19 +1566,19 @@ export default function RecipeEditPage() {
                                       topAvg: yeastLines.topAvg,
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</code>{" "}
+                                <CodeInline>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</CodeInline>{" "}
                                 {typeof a?.attenuationEffectivePercent === "number" ? (
-                                  <span className="muted">%</span>
+                                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText>
                                 ) : null}
                               </td>
                             </tr>
                             <tr>
-                              <td style={{ paddingRight: 12 }}>
-                                <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
-                                  <strong>{tAnalysis("fields.pbg")}</strong>
+                              <td className="recipeEditAnalysisLabelCell">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
                                   {renderMath(
                                     "analysis.pbg",
                                     renderDerivationMath(
@@ -1596,137 +1628,165 @@ export default function RecipeEditPage() {
                                       })(),
                                     }),
                                   )}
-                                </div>
+                                </XStack>
                               </td>
                               <td>
-                                <code>{fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3)}</code>
+                                <CodeInline>{fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3)}</CodeInline>
                               </td>
                             </tr>
                           </tbody>
                         </table>
-                      </div>
+                      </View>
 
                       {warnings.length ? (
-                        <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-                          <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
-                            <strong>{tAnalysis("warningsTitle")}</strong>
-                            <span className="muted">{tAnalysis("warningsClickToExpand")}</span>
+                        <View
+                          as="details"
+                          bg="var(--field-computed-bg)"
+                          borderWidth={1}
+                          borderColor="var(--field-computed-border)"
+                          rounded="$2"
+                          p="$3"
+                          mt="$3"
+                        >
+                          <summary className="recipeEditDetailsSummary">
+                            <XStack gap="$2" flexWrap="wrap" items="baseline" display="inline-flex">
+                              <SizableText size="$3" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                                {tAnalysis("warningsTitle")}
+                              </SizableText>
+                              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                                {tAnalysis("warningsClickToExpand")}
+                              </SizableText>
+                            </XStack>
                           </summary>
-                          <ul style={{ marginTop: 8 }}>
+                          <YStack as="ul" gap="$1" mt="$2" className="recipeEditListDisc">
                             {warnings.map((w, idx) => (
-                              <li key={`${String(w?.code ?? "warn")}-${idx}`}>
-                                <code>{String(w?.code ?? "warning")}</code>{" "}
-                                <span className="muted">{tAnalysis(`warnings.${String(w?.code ?? "unknown")}` as any)}</span>
-                              </li>
+                              <SizableText
+                                as="li"
+                                key={`${String(w?.code ?? "warn")}-${idx}`}
+                                size="$2"
+                                fontFamily="$body"
+                                color="var(--text)"
+                              >
+                                <CodeInline>{String(w?.code ?? "warning")}</CodeInline>{" "}
+                                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                                  {tAnalysis(`warnings.${String(w?.code ?? "unknown")}` as any)}
+                                </SizableText>
+                              </SizableText>
                             ))}
-                          </ul>
-                        </details>
+                          </YStack>
+                        </View>
                       ) : null}
                     </>
                   );
                 })()}
-              </div>
-            </details>
-          </section>
+          </RecipeEditSection>
 
-          <section id="equipment" className="panel">
-            <details open={openSections.equipment} onToggle={(e) => setSectionOpen("equipment", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="equipment-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.equipment")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  {tEquip("help")}
-                </p>
+          <RecipeEditSection
+            id="equipment"
+            headingId="equipment-heading"
+            label={t("sections.equipment")}
+            open={openSections.equipment}
+            onOpenChange={(open) => setSectionOpen("equipment", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              {tEquip("help")}
+            </SizableText>
 
-                {equipmentProfilesError ? (
-                  <pre className="errorBox" role="alert">
-                    {equipmentProfilesError}
-                  </pre>
-                ) : null}
+            {equipmentProfilesError ? (
+              <ErrorBox>{equipmentProfilesError}</ErrorBox>
+            ) : null}
 
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
-                  <div>
-                    <label htmlFor="equipment-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
-                      {tEquip("profileLabel")}
-                    </label>
-                    <select
-                      id="equipment-profile"
-                      value={selectedEquipmentProfileId}
-                      onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
-                      style={{ width: "100%", padding: 8 }}
-                      disabled={equipmentProfilesLoading}
-                    >
-                      <option value="">{tEquip("noneOption")}</option>
-                      {equipmentProfiles.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => void applyEquipmentProfileToRecipe("apply")}
-                    disabled={!selectedEquipmentProfileId || equipmentApplying}
+            <XStack gap="$3" mt="$3" flexWrap="wrap" items="flex-end">
+              <View flex={1} minW={200}>
+                <RecipeEditField id="equipment-profile" label={tEquip("profileLabel")}>
+                  <select
+                    id="equipment-profile"
+                    name="equipmentProfileId"
+                    value={selectedEquipmentProfileId}
+                    onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
+                    disabled={equipmentProfilesLoading}
+                    className="recipeEditSelect recipeEditSelectFull"
                   >
-                    {equipmentApplying ? tEquip("working") : tEquip("apply")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void applyEquipmentProfileToRecipe("reload")}
-                    disabled={!selectedEquipmentProfileId || equipmentApplying}
-                  >
-                    {equipmentApplying ? tEquip("working") : tEquip("reload")}
-                  </button>
-                </div>
+                    <option value="">{tEquip("noneOption")}</option>
+                    {equipmentProfiles.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </RecipeEditField>
+              </View>
+              <Button
+                onPress={() => void applyEquipmentProfileToRecipe("apply")}
+                disabled={!selectedEquipmentProfileId || equipmentApplying}
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {equipmentApplying ? tEquip("working") : tEquip("apply")}
+              </Button>
+              <Button
+                onPress={() => void applyEquipmentProfileToRecipe("reload")}
+                disabled={!selectedEquipmentProfileId || equipmentApplying}
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {equipmentApplying ? tEquip("working") : tEquip("reload")}
+              </Button>
+            </XStack>
 
-                {equipmentApplyError ? (
-                  <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
-                    {equipmentApplyError}
-                  </pre>
-                ) : null}
+            {equipmentApplyError ? (
+              <ErrorBox mt="$3">{equipmentApplyError}</ErrorBox>
+            ) : null}
 
-                <p className="muted" style={{ marginBottom: 0 }}>
-                  {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
-                </p>
-              </div>
-            </details>
-          </section>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
+              {tEquip("manageTemplatesText")} <Link href="/equipment">{tEquip("manageTemplatesLinkText")}</Link>.
+            </SizableText>
+          </RecipeEditSection>
 
-          <section id="mashing" className="panel">
-            <details open={openSections.mashing} onToggle={(e) => setSectionOpen("mashing", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="mashing-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.mashing")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  {t("mashingHelp")}
-                </p>
+          <RecipeEditSection
+            id="mashing"
+            headingId="mashing-heading"
+            label={t("sections.mashing")}
+            open={openSections.mashing}
+            onOpenChange={(open) => setSectionOpen("mashing", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              {t("mashingHelp")}
+            </SizableText>
 
-                {waterVolumes ? (
-                  <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12, marginBottom: 12 }}>
-                    <div className="fieldBlockHeader">
-                      <strong>{t("mashingWaterVolumesTitle")}</strong>
-                      <span className="fieldBadge">Computed</span>
-                      <span className="muted">{t("mashingWaterVolumesSource")}</span>
-                    </div>
-                    <ul style={{ marginTop: 8, marginBottom: 0 }}>
-                      <li>Mash water: <code>{formatFixed(locale, waterVolumes.mashLiters, 2)}</code> {tUnits("L")}</li>
-                      <li>Sparge water: <code>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</code> {tUnits("L")}</li>
-                    </ul>
-                  </div>
-                ) : (
-                  <p className="muted" style={{ marginTop: 0, marginBottom: 12 }}>
-                    {t("mashingWaterVolumesUnavailable")}
-                  </p>
-                )}
+            {waterVolumes ? (
+              <RecipeEditFieldBlock
+                variant="computed"
+                header={t("mashingWaterVolumesTitle")}
+                badge="Computed"
+                source={t("mashingWaterVolumesSource")}
+                mt="$3"
+                mb="$3"
+              >
+                <YStack as="ul" gap="$1" mt="$2" mb={0} className="recipeEditListDisc">
+                  <SizableText as="li" size="$2" fontFamily="$body" color="var(--text)">
+                    Mash water: <CodeInline>{formatFixed(locale, waterVolumes.mashLiters, 2)}</CodeInline> {tUnits("L")}
+                  </SizableText>
+                  <SizableText as="li" size="$2" fontFamily="$body" color="var(--text)">
+                    Sparge water: <CodeInline>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</CodeInline> {tUnits("L")}
+                  </SizableText>
+                </YStack>
+              </RecipeEditFieldBlock>
+            ) : (
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb="$3">
+                {t("mashingWaterVolumesUnavailable")}
+              </SizableText>
+            )}
 
-                <div style={{ marginTop: 12 }}>
+                <View mt="$3">
                   <MashStepsEditor
                     mashRows={mashRowsFiltered}
                     mashProcedure={mashProcedure}
@@ -1738,187 +1798,151 @@ export default function RecipeEditPage() {
                     locale={locale}
                     formatFixed={formatFixed}
                   />
-                </div>
+                </View>
 
                 {spargeConfigured ? (
-                  <div style={{ marginTop: 16 }}>
-                    <p className="muted" style={{ marginTop: 0, marginBottom: 8 }}>
+                  <View mt="$4">
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2">
                       {t("spargeStepFromWaterPage")}
-                    </p>
-                    <div className="ingredientCard" style={{ width: "100%" }}>
-                      <div
-                        style={{
-                          display: "grid",
-                          gap: 12,
-                          alignItems: "end",
-                          gridTemplateColumns:
-                            "auto minmax(80px, 100px) minmax(80px, 100px) minmax(60px, 80px) minmax(50px, 70px) minmax(80px, 120px) minmax(50px, 70px)",
-                        }}
-                      >
-                        <div style={{ alignSelf: "center", fontWeight: 500 }}>
-                          {mashRowsFiltered.length + 1}
-                        </div>
-                        <div>
-                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
-                            {t("mashingStepName")}
-                          </label>
-                          <div
-                            style={{
-                              padding: 8,
-                              background: "var(--surface-2)",
-                              borderRadius: "var(--radius)",
-                              border: "1px solid var(--border)",
-                            }}
-                          >
-                            Sparge
-                          </div>
-                        </div>
-                        <div>
-                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
-                            {t("mashingStepType")}
-                          </label>
-                          <div
-                            style={{
-                              padding: 8,
-                              background: "var(--surface-2)",
-                              borderRadius: "var(--radius)",
-                              border: "1px solid var(--border)",
-                            }}
-                          >
-                            Sparge
-                          </div>
-                        </div>
-                        <div>
-                          <label className="muted ingredientCardLabel" htmlFor="sparge-step-temp" style={{ display: "block", fontSize: 12 }}>
+                    </SizableText>
+                    <RecipeEditIngredientCard>
+                      <XStack gap="$3" flexWrap="wrap" items="flex-end">
+                        <View alignSelf="center">
+                          <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                            {mashRowsFiltered.length + 1}
+                          </SizableText>
+                        </View>
+                        <YStack gap="$1" minW={80}>
+                          <RecipeEditFieldLabel>{t("mashingStepName")}</RecipeEditFieldLabel>
+                          <RecipeEditReadOnlyValue>Sparge</RecipeEditReadOnlyValue>
+                        </YStack>
+                        <YStack gap="$1" minW={80}>
+                          <RecipeEditFieldLabel>{t("mashingStepType")}</RecipeEditFieldLabel>
+                          <RecipeEditReadOnlyValue>Sparge</RecipeEditReadOnlyValue>
+                        </YStack>
+                        <YStack gap="$1" minW={60}>
+                          <RecipeEditFieldLabel htmlFor="sparge-step-temp">
                             {t("mashingStepTemp", { unit: "°C" })}
-                          </label>
-                          <input
+                          </RecipeEditFieldLabel>
+                          <Input
                             id="sparge-step-temp"
-                            type="number"
-                            value={spargeStepTempDisplay}
-                            onChange={(e) => {
-                              const v = Number(e.target.value);
-                              setSpargeStepTempLocal(Number.isFinite(v) ? v : null);
+                            value={spargeStepTempDisplay === null || spargeStepTempDisplay === undefined ? "" : String(spargeStepTempDisplay)}
+                            onChangeText={(text) => {
+                              if (text === "") {
+                                setSpargeStepTempLocal(null);
+                              } else {
+                                const v = parseFloat(text);
+                                setSpargeStepTempLocal(Number.isFinite(v) ? v : null);
+                              }
                             }}
-                            onBlur={(e) => {
-                              const v = Number(e.target.value);
-                              if (Number.isFinite(v) && v >= 0 && v <= 100) {
+                            onBlur={() => {
+                              const v = spargeStepTempLocal;
+                              if (v !== null && Number.isFinite(v) && v >= 0 && v <= 100) {
                                 void saveSpargeStepTemperature(v);
                               } else {
                                 setSpargeStepTempLocal(null);
                               }
                             }}
-                            min={0}
-                            max={100}
-                            step={0.5}
+                            keyboardType="numeric"
                             disabled={spargeStepTempSaving}
-                            style={{ width: "100%", padding: 8 }}
+                            size="$3"
+                            w="100%"
+                            bg="var(--surface)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            rounded="$2"
+                            fontFamily="$body"
                           />
-                        </div>
-                        <div>
-                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
-                            {t("mashingStepTime", { unit: "min" })}
-                          </label>
-                          <div
-                            style={{
-                              padding: 8,
-                              background: "var(--surface-2)",
-                              borderRadius: "var(--radius)",
-                              border: "1px solid var(--border)",
-                            }}
-                          >
-                            0
-                          </div>
-                        </div>
-                        <div>
-                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
-                            {t("mashingStepAmount", { unit: "L" })}
-                          </label>
-                          <div
-                            style={{
-                              padding: 8,
-                              background: "var(--surface-2)",
-                              borderRadius: "var(--radius)",
-                              border: "1px solid var(--border)",
-                            }}
-                          >
-                            <code>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</code> {tUnits("L")}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="muted ingredientCardLabel" style={{ display: "block", fontSize: 12 }}>
-                            {t("mashingStepRamp", { unit: "min" })}
-                          </label>
-                          <div
-                            style={{
-                              padding: 8,
-                              background: "var(--surface-2)",
-                              borderRadius: "var(--radius)",
-                              border: "1px solid var(--border)",
-                            }}
-                          >
-                            —
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <p style={{ marginTop: 8, marginBottom: 0 }}>
+                        </YStack>
+                        <YStack gap="$1" minW={50}>
+                          <RecipeEditFieldLabel>{t("mashingStepTime", { unit: "min" })}</RecipeEditFieldLabel>
+                          <RecipeEditReadOnlyValue>0</RecipeEditReadOnlyValue>
+                        </YStack>
+                        <YStack gap="$1" minW={80}>
+                          <RecipeEditFieldLabel>{t("mashingStepAmount", { unit: "L" })}</RecipeEditFieldLabel>
+                          <RecipeEditReadOnlyValue>
+                            <CodeInline>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</CodeInline> {tUnits("L")}
+                          </RecipeEditReadOnlyValue>
+                        </YStack>
+                        <YStack gap="$1" minW={50}>
+                          <RecipeEditFieldLabel>{t("mashingStepRamp", { unit: "min" })}</RecipeEditFieldLabel>
+                          <RecipeEditReadOnlyValue>—</RecipeEditReadOnlyValue>
+                        </YStack>
+                      </XStack>
+                    </RecipeEditIngredientCard>
+                    <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$2" mb={0}>
                       <Link href={`/recipes/${recipeId}/water/sparge`}>
                         {t("spargeStepConfigureLink")}
                       </Link>
-                    </p>
-                  </div>
+                    </SizableText>
+                  </View>
                 ) : null}
-              </div>
-            </details>
-          </section>
+          </RecipeEditSection>
 
-          <section id="fermentables" className="panel">
-            <details
-              open={openSections.fermentables}
-              onToggle={(e) => setSectionOpen("fermentables", e.currentTarget.open)}
-            >
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="fermentables-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.fermentables")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  v0: enter your grist here. Water calculator can import a read-only snapshot.
-                </p>
+          <RecipeEditSection
+            id="fermentables"
+            headingId="fermentables-heading"
+            label={t("sections.fermentables")}
+            open={openSections.fermentables}
+            onOpenChange={(open) => setSectionOpen("fermentables", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              v0: enter your grist here. Water calculator can import a read-only snapshot.
+            </SizableText>
 
-            <form onSubmit={onSearchFermentables} style={{ marginTop: 12 }}>
-              <label htmlFor="fermentable-search" className="muted" style={{ display: "block", fontSize: 12 }}>
+            <View mt="$3">
+              <form onSubmit={onSearchFermentables}>
+                <RecipeEditFieldLabel htmlFor="fermentable-search">
                 Search fermentables database
-              </label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input
+              </RecipeEditFieldLabel>
+              <XStack gap="$2" items="center" flexWrap="wrap">
+                <Input
                   id="fermentable-search"
                   value={fermentableQuery}
-                  onChange={(e) => setFermentableQuery(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
+                  onChangeText={setFermentableQuery}
+                  flex={1}
+                  minW={200}
                   autoComplete="off"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
-                <button type="submit" disabled={!canCallAccountScoped || fermentableSearching}>
+                <Button
+                  type="submit"
+                  disabled={!canCallAccountScoped || fermentableSearching}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
                   {fermentableSearching ? "Searching…" : "Search"}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  onClick={clearFermentableSearchResults}
+                  onPress={clearFermentableSearchResults}
                   disabled={fermentableSearching || (!fermentableSearchError && fermentableResults.length === 0)}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
                 >
                   {t("buttons.clear")}
-                </button>
-              </div>
+                </Button>
+              </XStack>
               {fermentableSearchError ? (
-                <pre className="errorBox" role="alert" style={{ marginTop: 8 }}>
-                  {fermentableSearchError}
-                </pre>
+                <ErrorBox mt="$2">{fermentableSearchError}</ErrorBox>
               ) : null}
               {fermentableResults.length ? (
-                <div style={{ overflowX: "auto", marginTop: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <View overflowX="auto" mt="$2">
+                  <table className="recipeEditTable">
                     <thead>
                       <tr>
                         <th align="left">Name</th>
@@ -1938,59 +1962,68 @@ export default function RecipeEditPage() {
                           <td align="right">{typeof it.yieldPercent === "number" ? it.yieldPercent.toFixed(3) : ""}</td>
                           <td align="right">{typeof it.ppg === "number" ? it.ppg.toFixed(3) : ""}</td>
                           <td>
-                            <button type="button" onClick={() => addFermentableFromDb(it)} disabled={!canCallAccountScoped}>
+                            <Button
+                              size="$2"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="$body"
+                              onPress={() => addFermentableFromDb(it)}
+                              disabled={!canCallAccountScoped}
+                            >
                               Add
-                            </button>
+                            </Button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </View>
               ) : null}
-            </form>
+              </form>
+            </View>
 
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              <button type="button" onClick={addGristRow} disabled={!canCallAccountScoped}>
+            <XStack gap="$3" items="center" flexWrap="wrap">
+              <Button
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+                onPress={addGristRow}
+                disabled={!canCallAccountScoped}
+              >
                 {t("buttons.addFermentable")}
-              </button>
-              <span className="muted" aria-live="polite">
+              </Button>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
                 {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
                 {gristTotals.weightedAvgLovibond !== null ? (
                   <> · {t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}</>
                 ) : null}
-              </span>
-            </div>
+              </SizableText>
+            </XStack>
 
             {gristRows.length ? (
-              <div style={{ overflowX: "auto", marginTop: 12 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <tbody>
-                    {gristRows.map((r, idx) => {
-                      return (
-                        <Fragment key={r.id}>
-                          <tr>
-                            <td colSpan={7} style={{ paddingTop: idx === 0 ? 0 : 12 }}>
-                              <div className="ingredientCard">
-                                <div
-                                  style={{
-                                    display: "grid",
-                                    gap: 12,
-                                    alignItems: "end",
-                                    gridTemplateColumns:
-                                      "minmax(240px, 1fr) minmax(100px, 140px) minmax(100px, 140px) auto",
-                                  }}
-                                >
-                                  <div style={{ minWidth: 0 }}>
-                                    <label className="muted ingredientCardLabel" htmlFor={`grist-name-${r.id}`}>
-                                      Name
-                                    </label>
-                                    <input
+              <View overflowX="auto" mt="$3">
+                <YStack gap="$3">
+                  {gristRows.map((r, idx) => (
+                    <RecipeEditIngredientCard key={r.id}>
+                                <XStack gap="$3" flexWrap="wrap" items="flex-end" flexDirection="row">
+                                  <View alignSelf="center">
+                                    <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                                      {idx + 1}
+                                    </SizableText>
+                                  </View>
+                                  <YStack gap="$1" flex={1} minW={240} minWidth={0}>
+                                    <RecipeEditFieldLabel htmlFor={`grist-name-${r.id}`}>Name</RecipeEditFieldLabel>
+                                    <Input
                                       id={`grist-name-${r.id}`}
                                       value={r.name}
-                                      onChange={(e) =>
+                                      onChangeText={(text) =>
                                         updateGristRow(r.id, {
-                                          name: e.target.value,
+                                          name: text,
                                           ingredientId: null,
                                           producer: null,
                                           group: null,
@@ -2001,107 +2034,108 @@ export default function RecipeEditPage() {
                                           mashPhModelSource: "unknown",
                                         })
                                       }
-                                      style={{ width: "100%", padding: 8 }}
                                       autoComplete="off"
+                                      size="$3"
+                                      w="100%"
+                                      bg="var(--surface)"
+                                      borderWidth={1}
+                                      borderColor="var(--border)"
+                                      rounded="$2"
+                                      fontFamily="$body"
                                     />
-                                  </div>
-                                  <div style={{ minWidth: 0 }}>
-                                    <label className="muted ingredientCardLabel" htmlFor={`grist-producer-${r.id}`}>
-                                      Producer
-                                    </label>
-                                    <input
-                                      id={`grist-producer-${r.id}`}
-                                      value={r.producer ?? ""}
-                                      readOnly
-                                      style={{ width: "100%", padding: 8 }}
-                                    />
-                                  </div>
-                                  <div style={{ minWidth: 0 }}>
-                                    <label className="muted ingredientCardLabel" htmlFor={`grist-group-${r.id}`}>
-                                      Group
-                                    </label>
-                                    <input
-                                      id={`grist-group-${r.id}`}
-                                      value={r.group ?? ""}
-                                      readOnly
-                                      style={{ width: "100%", padding: 8 }}
-                                    />
-                                  </div>
-                                  <div style={{ alignSelf: "start" }}>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeGristRow(r.id)}
-                                      aria-label={`Remove fermentable row ${idx + 1}`}
-                                    >
-                                      Remove
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
-                                <div>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12, textAlign: "left" }}
-                                    htmlFor={`grist-kg-${r.id}`}
+                                  </YStack>
+                                  {(r.producer ?? "") ? (
+                                    <YStack gap="$1" minW={100}>
+                                      <RecipeEditFieldLabel>Producer</RecipeEditFieldLabel>
+                                      <RecipeEditReadOnlyValue>{r.producer}</RecipeEditReadOnlyValue>
+                                    </YStack>
+                                  ) : null}
+                                  {(r.group ?? "") ? (
+                                    <YStack gap="$1" minW={100}>
+                                      <RecipeEditFieldLabel>Group</RecipeEditFieldLabel>
+                                      <RecipeEditReadOnlyValue>{r.group}</RecipeEditReadOnlyValue>
+                                    </YStack>
+                                  ) : null}
+                                  <Button
+                                    size="$2"
+                                    bg="var(--surface-2)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    color="var(--text)"
+                                    fontFamily="$body"
+                                    onPress={() => removeGristRow(r.id)}
+                                    aria-label={`Remove fermentable row ${idx + 1}`}
                                   >
+                                    Remove
+                                  </Button>
+                                </XStack>
+
+                                <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
+                                <YStack gap="$1" minW={100}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-kg-${r.id}`}>
                                     {t("amountLabel", { unit: tUnits("kg") })}
-                                  </label>
-                                  <input
+                                  </RecipeEditFieldLabel>
+                                  <Input
                                     id={`grist-kg-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={0.001}
-                                    value={r.amountKg}
-                                    onChange={(e) => updateGristRow(r.id, { amountKg: Number(e.target.value) })}
-                                    style={{ width: 140, padding: 8 }}
+                                    value={String(r.amountKg)}
+                                    onChangeText={(text) =>
+                                      updateGristRow(r.id, { amountKg: text === "" ? 0 : Number(text) })
+                                    }
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w={140}
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12, textAlign: "left" }}
-                                    htmlFor={`grist-lov-${r.id}`}
-                                  >
+                                <YStack gap="$1" minW={80}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-lov-${r.id}`}>
                                     {t("colorLabel", { unit: tUnits("lovibond") })}
-                                  </label>
-                                  <input
+                                  </RecipeEditFieldLabel>
+                                  <Input
                                     id={`grist-lov-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={0.1}
                                     value={r.colorLovibond ?? ""}
-                                    onChange={(e) =>
+                                    onChangeText={(text) =>
                                       updateGristRow(r.id, {
-                                        colorLovibond: e.target.value === "" ? null : Number(e.target.value),
+                                        colorLovibond: text === "" ? null : Number(text),
                                       })
                                     }
-                                    style={{ width: 100, padding: 8 }}
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w={100}
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-class-${r.id}`}>
+                                <YStack gap="$1" minW={140}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-class-${r.id}`}>
                                     Mash pH class (legacy)
-                                  </label>
+                                  </RecipeEditFieldLabel>
                                   <select
                                     id={`grist-class-${r.id}`}
                                     value={r.maltClass}
                                     onChange={(e) => updateGristRow(r.id, { maltClass: e.target.value as any })}
-                                    style={{ width: 160, padding: 8 }}
+                                    className="recipeEditSelect"
                                   >
                                     <option value="base">Base</option>
                                     <option value="crystal">Crystal</option>
                                     <option value="roast">Roast</option>
                                     <option value="acid">Acid malt</option>
                                   </select>
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-timing-${r.id}`}>
+                                <YStack gap="$1" minW={140}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-timing-${r.id}`}>
                                     {t("fermentableTimingLabel")}
-                                  </label>
+                                  </RecipeEditFieldLabel>
                                   <select
                                     id={`grist-timing-${r.id}`}
                                     value={r.timingUse ?? "add_to_mash"}
@@ -2110,17 +2144,17 @@ export default function RecipeEditPage() {
                                         timingUse: e.target.value === "add_to_boil" ? "add_to_boil" : "add_to_mash",
                                       })
                                     }
-                                    style={{ width: 160, padding: 8 }}
+                                    className="recipeEditSelect"
                                   >
                                     <option value="add_to_mash">{t("fermentableTimingMash")}</option>
                                     <option value="add_to_boil">{t("fermentableTimingKettle")}</option>
                                   </select>
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`grist-pot-kind-${r.id}`}>
+                                <YStack gap="$1" minW={140}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-pot-kind-${r.id}`}>
                                     Potential kind
-                                  </label>
+                                  </RecipeEditFieldLabel>
                                   <select
                                     id={`grist-pot-kind-${r.id}`}
                                     value={r.potential?.kind ?? ""}
@@ -2131,77 +2165,68 @@ export default function RecipeEditPage() {
                                         potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) },
                                       });
                                     }}
-                                    style={{ width: 160, padding: 8 }}
+                                    className="recipeEditSelect"
                                   >
                                     <option value="">(none)</option>
                                     <option value="ppg">PPG</option>
                                     <option value="yieldPercent">Yield %</option>
                                     <option value="sg">SG (e.g. 1.037)</option>
                                   </select>
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12, textAlign: "left" }}
-                                    htmlFor={`grist-pot-val-${r.id}`}
-                                  >
+                                <YStack gap="$1" minW={100}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-pot-val-${r.id}`}>
                                     Potential value
-                                  </label>
-                                  <input
+                                  </RecipeEditFieldLabel>
+                                  <Input
                                     id={`grist-pot-val-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={0.001}
-                                    value={r.potential ? roundTo(r.potential.value, 3) : ""}
-                                    onChange={(e) => {
-                                      const v = e.target.value === "" ? null : Number(e.target.value);
+                                    value={r.potential ? String(roundTo(r.potential.value, 3)) : ""}
+                                    onChangeText={(text) => {
+                                      const v = text === "" ? null : Number(text);
                                       if (!r.potential) return;
                                       if (v === null) return updateGristRow(r.id, { potential: null });
                                       updateGristRow(r.id, { potential: { ...r.potential, value: roundTo(v, 3) } });
                                     }}
                                     disabled={!r.potential}
-                                    style={{ width: 140, padding: 8 }}
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w={140}
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
+                                </YStack>
 
-                                <div style={{ flexBasis: "100%" }}>
+                                <View flexBasis="100%" w="100%">
                                   <details>
-                                    <summary className="muted" style={{ fontSize: 12, cursor: "pointer" }}>
-                                      Mash pH model (v1) – Advanced users
+                                    <summary className="recipeEditDetailsSummary">
+                                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                                        Mash pH model (v1) – Advanced users
+                                      </SizableText>
                                     </summary>
-                                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 8 }}>
+                                    <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
                                       {isRoastedLike(r) ? (
                                         <>
-                                          <div style={{ width: 220, maxWidth: "100%" }}>
-                                            <label className="muted" style={{ display: "block", fontSize: 12 }}>
-                                              Dehusked/de-bittered
-                                            </label>
-                                            <input
-                                              value={
-                                                typeof r.mashRoastDehuskedOverride === "boolean"
-                                                  ? r.mashRoastDehuskedOverride
+                                          <YStack gap="$1" w={220} maxW="100%">
+                                            <RecipeEditFieldLabel>Dehusked/de-bittered</RecipeEditFieldLabel>
+                                            <RecipeEditReadOnlyValue>
+                                              {typeof r.mashRoastDehuskedOverride === "boolean"
+                                                ? r.mashRoastDehuskedOverride
+                                                  ? "yes"
+                                                  : "no"
+                                                : r.mashRoastDehuskedSource === "inferred"
+                                                  ? inferDehuskedFromName(r.name)
                                                     ? "yes"
                                                     : "no"
-                                                  : r.mashRoastDehuskedSource === "inferred"
-                                                    ? inferDehuskedFromName(r.name)
-                                                      ? "yes"
-                                                      : "no"
-                                                    : ""
-                                              }
-                                              readOnly
-                                              style={{ width: "100%", padding: 8 }}
-                                              tabIndex={-1}
-                                            />
-                                          </div>
-                                          <div style={{ width: 260, maxWidth: "100%" }}>
-                                            <label
-                                              className="muted"
-                                              style={{ display: "block", fontSize: 12 }}
-                                              htmlFor={`grist-roast-dehusked-override-${r.id}`}
-                                            >
+                                                  : ""}
+                                            </RecipeEditReadOnlyValue>
+                                          </YStack>
+                                          <YStack gap="$1" w={260} maxW="100%">
+                                            <RecipeEditFieldLabel htmlFor={`grist-roast-dehusked-override-${r.id}`}>
                                               Override
-                                            </label>
+                                            </RecipeEditFieldLabel>
                                             <select
                                               id={`grist-roast-dehusked-override-${r.id}`}
                                               value={
@@ -2230,161 +2255,165 @@ export default function RecipeEditPage() {
                                                   });
                                                 }
                                               }}
-                                              style={{ width: "100%", padding: 8 }}
+                                              className="recipeEditSelect recipeEditSelectFull"
                                             >
                                               <option value="auto">Auto (detect)</option>
                                               <option value="force_husked">Force husked</option>
                                               <option value="force_dehusked">Force dehusked/de-bittered</option>
                                             </select>
-                                          </div>
-                                          <div style={{ width: 200, maxWidth: "100%" }}>
-                                            <label className="muted" style={{ display: "block", fontSize: 12 }}>
-                                              Dehusked source
-                                            </label>
-                                            <input
-                                              value={r.mashRoastDehuskedSource ?? "unknown"}
-                                              readOnly
-                                              style={{ width: "100%", padding: 8 }}
-                                              tabIndex={-1}
-                                            />
-                                          </div>
+                                          </YStack>
+                                          <YStack gap="$1" w={200} maxW="100%">
+                                            <RecipeEditFieldLabel>Dehusked source</RecipeEditFieldLabel>
+                                            <RecipeEditReadOnlyValue>{r.mashRoastDehuskedSource ?? "unknown"}</RecipeEditReadOnlyValue>
+                                          </YStack>
                                         </>
                                       ) : null}
-                                      <div style={{ width: 240, maxWidth: "100%" }}>
-                                        <label
-                                          className="muted"
-                                          style={{ display: "block", fontSize: 12 }}
-                                          htmlFor={`grist-mash-di-ph-${r.id}`}
-                                        >
+                                      <YStack gap="$1" w={240} maxW="100%">
+                                        <RecipeEditFieldLabel htmlFor={`grist-mash-di-ph-${r.id}`}>
                                           DI mash pH (room temp)
-                                        </label>
-                                        <input
+                                        </RecipeEditFieldLabel>
+                                        <Input
                                           id={`grist-mash-di-ph-${r.id}`}
-                                          type="number"
-                                          inputMode="decimal"
-                                          step={0.01}
                                           value={r.mashDiPh ?? ""}
-                                          onChange={(e) =>
+                                          onChangeText={(text) =>
                                             updateGristRow(r.id, {
-                                              mashDiPh: e.target.value === "" ? null : Number(e.target.value),
+                                              mashDiPh: text === "" ? null : Number(text),
                                               mashPhModelSource: "override",
                                             })
                                           }
-                                          style={{ width: "100%", padding: 8 }}
+                                          keyboardType="decimal-pad"
+                                          size="$3"
+                                          w="100%"
+                                          bg="var(--surface)"
+                                          borderWidth={1}
+                                          borderColor="var(--border)"
+                                          rounded="$2"
+                                          fontFamily="$body"
                                         />
-                                      </div>
-                                      <div style={{ width: 280, maxWidth: "100%" }}>
-                                        <label
-                                          className="muted"
-                                          style={{ display: "block", fontSize: 12 }}
-                                          htmlFor={`grist-mash-ta-${r.id}`}
-                                        >
+                                      </YStack>
+                                      <YStack gap="$1" w={280} maxW="100%">
+                                        <RecipeEditFieldLabel htmlFor={`grist-mash-ta-${r.id}`}>
                                           Titratable acidity to pH 5.7 (mEq/kg)
-                                        </label>
-                                        <input
+                                        </RecipeEditFieldLabel>
+                                        <Input
                                           id={`grist-mash-ta-${r.id}`}
-                                          type="number"
-                                          inputMode="decimal"
-                                          step={0.1}
                                           value={r.mashTaToPh57_mEqPerKg ?? ""}
-                                          onChange={(e) =>
+                                          onChangeText={(text) =>
                                             updateGristRow(r.id, {
-                                              mashTaToPh57_mEqPerKg: e.target.value === "" ? null : Number(e.target.value),
+                                              mashTaToPh57_mEqPerKg: text === "" ? null : Number(text),
                                               mashPhModelSource: "override",
                                             })
                                           }
-                                          style={{ width: "100%", padding: 8 }}
+                                          keyboardType="decimal-pad"
+                                          size="$3"
+                                          w="100%"
+                                          bg="var(--surface)"
+                                          borderWidth={1}
+                                          borderColor="var(--border)"
+                                          rounded="$2"
+                                          fontFamily="$body"
                                         />
-                                      </div>
-                                      <div style={{ width: 200, maxWidth: "100%" }}>
-                                        <label className="muted" style={{ display: "block", fontSize: 12 }}>
-                                          Source
-                                        </label>
-                                        <input
-                                          value={r.mashPhModelSource ?? "unknown"}
-                                          readOnly
-                                          style={{ width: "100%", padding: 8 }}
-                                          tabIndex={-1}
-                                        />
-                                      </div>
-                                    </div>
+                                      </YStack>
+                                      <YStack gap="$1" w={200} maxW="100%">
+                                        <RecipeEditFieldLabel>Source</RecipeEditFieldLabel>
+                                        <RecipeEditReadOnlyValue>{r.mashPhModelSource ?? "unknown"}</RecipeEditReadOnlyValue>
+                                      </YStack>
+                                    </XStack>
                                   </details>
-                                </div>
-                              </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                                </View>
+                              </XStack>
+                            </RecipeEditIngredientCard>
+                  ))}
+                </YStack>
+              </View>
             ) : (
-              <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                 No fermentables yet.
-              </p>
+              </SizableText>
             )}
 
-                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                <XStack mt="$3" justify="flex-end">
+                  <Button
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                    onPress={onSave}
+                    disabled={!canCallAccountScoped || saving}
+                  >
                     {saving ? "Saving…" : "Save (including grist)"}
-                  </button>
-                </div>
+                  </Button>
+                </XStack>
 
-                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                   {t("rawMaterialsCtaPrefix")}{" "}
                   <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
-                </p>
-              </div>
-            </details>
-          </section>
+                </SizableText>
+          </RecipeEditSection>
 
           <AdSlot placement="recipe_edit_after_fermentables" />
 
-          <section id="hops" className="panel">
-            <details open={openSections.hops} onToggle={(e) => setSectionOpen("hops", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="hops-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.hops")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  {t("hopsHelp")}
-                </p>
+          <RecipeEditSection
+            id="hops"
+            headingId="hops-heading"
+            label={t("sections.hops")}
+            open={openSections.hops}
+            onOpenChange={(open) => setSectionOpen("hops", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              {t("hopsHelp")}
+            </SizableText>
 
-            <form onSubmit={onSearchHops} style={{ marginTop: 12 }}>
-              <label htmlFor="hop-search" className="muted" style={{ display: "block", fontSize: 12 }}>
-                Search hops database
-              </label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input
+            <View mt="$3">
+              <form onSubmit={onSearchHops}>
+                <RecipeEditFieldLabel htmlFor="hop-search">Search hops database</RecipeEditFieldLabel>
+              <XStack gap="$2" items="center" flexWrap="wrap">
+                <Input
                   id="hop-search"
                   value={hopQuery}
-                  onChange={(e) => setHopQuery(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
+                  onChangeText={setHopQuery}
+                  flex={1}
+                  minW={200}
                   autoComplete="off"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
-                <button type="submit" disabled={!canCallAccountScoped || hopSearching}>
+                <Button
+                  type="submit"
+                  disabled={!canCallAccountScoped || hopSearching}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
                   {hopSearching ? "Searching…" : "Search"}
-                </button>
-                <button
-                  type="button"
-                  onClick={clearHopSearchResults}
+                </Button>
+                <Button
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                  onPress={clearHopSearchResults}
                   disabled={hopSearching || (!hopSearchError && hopResults.length === 0)}
                 >
                   {t("buttons.clear")}
-                </button>
-              </div>
-              {hopSearchError ? (
-                <pre className="errorBox" role="alert" style={{ marginTop: 8 }}>
-                  {hopSearchError}
-                </pre>
-              ) : null}
+                </Button>
+              </XStack>
+              {hopSearchError ? <ErrorBox mt="$2">{hopSearchError}</ErrorBox> : null}
               {hopResults.length ? (
-                <div style={{ overflowX: "auto", marginTop: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <View overflowX="auto" mt="$2">
+                  <table className="recipeEditTable">
                     <thead>
                       <tr>
                         <th align="left">Name</th>
@@ -2402,225 +2431,260 @@ export default function RecipeEditPage() {
                           <td align="right">{typeof it.alphaMin === "number" ? it.alphaMin.toFixed(1) : ""}</td>
                           <td align="right">{typeof it.alphaMax === "number" ? it.alphaMax.toFixed(1) : ""}</td>
                           <td>
-                            <button type="button" onClick={() => addHopFromDb(it)} disabled={!canCallAccountScoped}>
+                            <Button
+                              size="$2"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="$body"
+                              onPress={() => addHopFromDb(it)}
+                              disabled={!canCallAccountScoped}
+                            >
                               Add
-                            </button>
+                            </Button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </View>
               ) : null}
-            </form>
+              </form>
+            </View>
 
-            <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-              <button type="button" onClick={() => addHopRow()} disabled={!canCallAccountScoped}>
+            <XStack gap="$3" items="center" mt="$3">
+              <Button
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+                onPress={() => addHopRow()}
+                disabled={!canCallAccountScoped}
+              >
                 Add hop
-              </button>
-            </div>
+              </Button>
+            </XStack>
 
             {hopsRows.length ? (
-              <div style={{ overflowX: "auto", marginTop: 12 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <tbody>
-                    {hopsRows.map((r, idx) => {
-                      return (
-                        <Fragment key={r.id}>
-                          <tr>
-                            <td colSpan={6} style={{ paddingTop: idx === 0 ? 0 : 12 }}>
-                              <div className="ingredientCard">
-                                <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-                                  <div style={{ flex: 1, minWidth: 280 }}>
-                                    <label className="muted ingredientCardLabel" htmlFor={`hop-name-${r.id}`}>
-                                      Name
-                                    </label>
-                                    <input
+              <View overflowX="auto" mt="$3">
+                <YStack gap="$3">
+                  {hopsRows.map((r, idx) => (
+                    <RecipeEditIngredientCard key={r.id}>
+                                <XStack gap="$3" flexWrap="wrap" items="flex-end">
+                                  <View alignSelf="center">
+                                    <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                                      {idx + 1}
+                                    </SizableText>
+                                  </View>
+                                  <YStack gap="$1" flex={1} minW={280} minWidth={0}>
+                                    <RecipeEditFieldLabel htmlFor={`hop-name-${r.id}`}>Name</RecipeEditFieldLabel>
+                                    <Input
                                       id={`hop-name-${r.id}`}
                                       value={r.name}
-                                      onChange={(e) =>
-                                        updateHopRow(r.id, { name: e.target.value, ingredientId: null, country: null })
+                                      onChangeText={(text) =>
+                                        updateHopRow(r.id, { name: text, ingredientId: null, country: null })
                                       }
-                                      style={{ width: "100%", padding: 8 }}
                                       autoComplete="off"
+                                      size="$3"
+                                      w="100%"
+                                      bg="var(--surface)"
+                                      borderWidth={1}
+                                      borderColor="var(--border)"
+                                      rounded="$2"
+                                      fontFamily="$body"
                                     />
-                                  </div>
-                                  <div style={{ width: 240, maxWidth: "100%" }}>
-                                    <label className="muted ingredientCardLabel" htmlFor={`hop-country-${r.id}`}>
-                                      Country
-                                    </label>
-                                    <input
-                                      id={`hop-country-${r.id}`}
-                                      value={r.country ?? ""}
-                                      readOnly
-                                      style={{ width: "100%", padding: 8 }}
-                                    />
-                                  </div>
-                                  <div style={{ flex: "0 0 auto" }}>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeHopRow(r.id)}
-                                      aria-label={`Remove hop row ${idx + 1}`}
-                                    >
-                                      Remove
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
-                                <div>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12, textAlign: "left" }}
-                                    htmlFor={`hop-g-${r.id}`}
+                                  </YStack>
+                                  {(r.country ?? "") ? (
+                                    <YStack gap="$1" w={240} maxW="100%">
+                                      <RecipeEditFieldLabel>Country</RecipeEditFieldLabel>
+                                      <RecipeEditReadOnlyValue>{r.country}</RecipeEditReadOnlyValue>
+                                    </YStack>
+                                  ) : null}
+                                  <Button
+                                    size="$2"
+                                    bg="var(--surface-2)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    color="var(--text)"
+                                    fontFamily="$body"
+                                    onPress={() => removeHopRow(r.id)}
+                                    aria-label={`Remove hop row ${idx + 1}`}
                                   >
+                                    Remove
+                                  </Button>
+                                </XStack>
+
+                                <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
+                                <YStack gap="$1" minW={100}>
+                                  <RecipeEditFieldLabel htmlFor={`hop-g-${r.id}`}>
                                     {t("amountLabel", { unit: tUnits("g") })}
-                                  </label>
-                                  <input
+                                  </RecipeEditFieldLabel>
+                                  <Input
                                     id={`hop-g-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={0.1}
-                                    value={r.amountGrams}
-                                    onChange={(e) => updateHopRow(r.id, { amountGrams: Number(e.target.value) })}
-                                    style={{ width: 120, padding: 8 }}
+                                    value={String(r.amountGrams)}
+                                    onChangeText={(text) =>
+                                      updateHopRow(r.id, { amountGrams: text === "" ? 0 : Number(text) })
+                                    }
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w={120}
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12, textAlign: "left" }}
-                                    htmlFor={`hop-aa-${r.id}`}
-                                  >
-                                    Alpha (%)
-                                  </label>
-                                  <input
+                                <YStack gap="$1" minW={90}>
+                                  <RecipeEditFieldLabel htmlFor={`hop-aa-${r.id}`}>Alpha (%)</RecipeEditFieldLabel>
+                                  <Input
                                     id={`hop-aa-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={0.1}
                                     value={r.alphaAcidPercent ?? ""}
-                                    onChange={(e) =>
+                                    onChangeText={(text) =>
                                       updateHopRow(r.id, {
-                                        alphaAcidPercent: e.target.value === "" ? null : Number(e.target.value),
+                                        alphaAcidPercent: text === "" ? null : Number(text),
                                       })
                                     }
-                                    style={{ width: 110, padding: 8 }}
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w={110}
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor={`hop-use-${r.id}`}>
-                                    Use
-                                  </label>
+                                <YStack gap="$1" minW={130}>
+                                  <RecipeEditFieldLabel htmlFor={`hop-use-${r.id}`}>Use</RecipeEditFieldLabel>
                                   <select
                                     id={`hop-use-${r.id}`}
                                     value={r.use}
                                     onChange={(e) => updateHopRow(r.id, { use: e.target.value as HopUse })}
-                                    style={{ width: 150, padding: 8 }}
+                                    className="recipeEditSelect"
                                   >
                                     <option value="boil">Boil</option>
                                     <option value="whirlpool">Whirlpool</option>
                                     <option value="dryhop">Dry hop</option>
                                   </select>
-                                </div>
+                                </YStack>
 
-                                <div>
-                                  <label
-                                    className="muted"
-                                    style={{ display: "block", fontSize: 12, textAlign: "left" }}
-                                    htmlFor={`hop-min-${r.id}`}
-                                  >
-                                    Time (min)
-                                  </label>
-                                  <input
+                                <YStack gap="$1" minW={90}>
+                                  <RecipeEditFieldLabel htmlFor={`hop-min-${r.id}`}>Time (min)</RecipeEditFieldLabel>
+                                  <Input
                                     id={`hop-min-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={1}
                                     value={r.timeMinutes ?? ""}
-                                    onChange={(e) =>
-                                      updateHopRow(r.id, { timeMinutes: e.target.value === "" ? null : Number(e.target.value) })
+                                    onChangeText={(text) =>
+                                      updateHopRow(r.id, { timeMinutes: text === "" ? null : Number(text) })
                                     }
-                                    style={{ width: 110, padding: 8 }}
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w={110}
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
-                              </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                                </YStack>
+                              </XStack>
+                            </RecipeEditIngredientCard>
+                  ))}
+                </YStack>
+              </View>
             ) : (
-              <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                 No hops yet.
-              </p>
+              </SizableText>
             )}
 
-                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                <XStack mt="$3" justify="flex-end">
+                  <Button
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                    onPress={onSave}
+                    disabled={!canCallAccountScoped || saving}
+                  >
                     {saving ? "Saving…" : "Save (including hops)"}
-                  </button>
-                </div>
+                  </Button>
+                </XStack>
 
-                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                   {t("rawMaterialsCtaPrefix")}{" "}
                   <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
-                </p>
-              </div>
-            </details>
-          </section>
+                </SizableText>
+          </RecipeEditSection>
 
           <AdSlot placement="recipe_edit_after_hops" />
 
-          <section id="yeast" className="panel">
-            <details open={openSections.yeast} onToggle={(e) => setSectionOpen("yeast", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="yeast-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.yeast")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <p className="muted" style={{ marginTop: 0 }}>
-                  {t("yeastHelp")}
-                </p>
+          <RecipeEditSection
+            id="yeast"
+            headingId="yeast-heading"
+            label={t("sections.yeast")}
+            open={openSections.yeast}
+            onOpenChange={(open) => setSectionOpen("yeast", open)}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+              {t("yeastHelp")}
+            </SizableText>
 
-            <form onSubmit={onSearchYeasts} style={{ marginTop: 12 }}>
-              <label htmlFor="yeast-search" className="muted" style={{ display: "block", fontSize: 12 }}>
-                Search yeast database
-              </label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input
+            <View mt="$3">
+              <form onSubmit={onSearchYeasts}>
+                <RecipeEditFieldLabel htmlFor="yeast-search">Search yeast database</RecipeEditFieldLabel>
+              <XStack gap="$2" items="center" flexWrap="wrap">
+                <Input
                   id="yeast-search"
                   value={yeastQuery}
-                  onChange={(e) => setYeastQuery(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
+                  onChangeText={setYeastQuery}
+                  flex={1}
+                  minW={200}
                   autoComplete="off"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
-                <button type="submit" disabled={!canCallAccountScoped || yeastSearching}>
+                <Button
+                  type="submit"
+                  disabled={!canCallAccountScoped || yeastSearching}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
                   {yeastSearching ? "Searching…" : "Search"}
-                </button>
-                <button
-                  type="button"
-                  onClick={clearYeastSearchResults}
+                </Button>
+                <Button
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                  onPress={clearYeastSearchResults}
                   disabled={yeastSearching || (!yeastSearchError && yeastResults.length === 0)}
                 >
                   {t("buttons.clear")}
-                </button>
-              </div>
-              {yeastSearchError ? (
-                <pre className="errorBox" role="alert" style={{ marginTop: 8 }}>
-                  {yeastSearchError}
-                </pre>
-              ) : null}
+                </Button>
+              </XStack>
+              {yeastSearchError ? <ErrorBox mt="$2">{yeastSearchError}</ErrorBox> : null}
               {yeastResults.length ? (
-                <div style={{ overflowX: "auto", marginTop: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <View overflowX="auto" mt="$2">
+                  <table className="recipeEditTable">
                     <thead>
                       <tr>
                         <th align="left">Name</th>
@@ -2638,44 +2702,62 @@ export default function RecipeEditPage() {
                           <td>{it.productId ?? ""}</td>
                           <td>{it.type ?? ""}</td>
                           <td>
-                            <button type="button" onClick={() => addYeastFromDb(it)} disabled={!canCallAccountScoped}>
+                            <Button
+                              size="$2"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="$body"
+                              onPress={() => addYeastFromDb(it)}
+                              disabled={!canCallAccountScoped}
+                            >
                               Add
-                            </button>
+                            </Button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </View>
               ) : null}
-            </form>
+              </form>
+            </View>
 
-            <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-              <button type="button" onClick={() => addYeastRow()} disabled={!canCallAccountScoped}>
+            <XStack gap="$3" items="center" mt="$3">
+              <Button
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+                onPress={() => addYeastRow()}
+                disabled={!canCallAccountScoped}
+              >
                 Add yeast
-              </button>
-            </div>
+              </Button>
+            </XStack>
 
             {yeastRows.length ? (
-              <div style={{ overflowX: "auto", marginTop: 12 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <tbody>
-                    {yeastRows.map((r, idx) => {
-                      return (
-                        <tr key={r.id}>
-                          <td colSpan={2} style={{ paddingTop: idx === 0 ? 0 : 12 }}>
-                            <div className="ingredientCard">
-                              <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-                                <div style={{ flex: 1, minWidth: 280 }}>
-                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-name-${r.id}`}>
-                                    Name
-                                  </label>
-                                  <input
+              <View overflowX="auto" mt="$3">
+                <YStack gap="$3">
+                  {yeastRows.map((r, idx) => (
+                    <RecipeEditIngredientCard key={r.id}>
+                              <XStack gap="$3" flexWrap="wrap" items="flex-end">
+                                <View alignSelf="center">
+                                  <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                                    {idx + 1}
+                                  </SizableText>
+                                </View>
+                                <YStack gap="$1" flex={1} minW={280} minWidth={0}>
+                                  <RecipeEditFieldLabel htmlFor={`yeast-name-${r.id}`}>Name</RecipeEditFieldLabel>
+                                  <Input
                                     id={`yeast-name-${r.id}`}
                                     value={r.name}
-                                    onChange={(e) =>
+                                    onChangeText={(text) =>
                                       updateYeastRow(r.id, {
-                                        name: e.target.value,
+                                        name: text,
                                         ingredientId: null,
                                         lab: null,
                                         productId: null,
@@ -2683,156 +2765,166 @@ export default function RecipeEditPage() {
                                         attenuationMax: null,
                                       })
                                     }
-                                    style={{ width: "100%", padding: 8 }}
                                     autoComplete="off"
+                                    size="$3"
+                                    w="100%"
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
-                                <div style={{ width: 240, maxWidth: "100%" }}>
-                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-lab-${r.id}`}>
-                                    Lab
-                                  </label>
-                                  <input
-                                    id={`yeast-lab-${r.id}`}
-                                    value={r.lab ?? ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                  />
-                                </div>
-                                <div style={{ width: 160, maxWidth: "100%" }}>
-                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-product-${r.id}`}>
-                                    Product ID
-                                  </label>
-                                  <input
-                                    id={`yeast-product-${r.id}`}
-                                    value={r.productId ?? ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                  />
-                                </div>
-                                <div style={{ width: 160, maxWidth: "100%" }}>
-                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-atten-min-${r.id}`}>
-                                    Atten min (%)
-                                  </label>
-                                  <input
-                                    id={`yeast-atten-min-${r.id}`}
-                                    value={typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                  />
-                                </div>
-                                <div style={{ width: 160, maxWidth: "100%" }}>
-                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-atten-max-${r.id}`}>
-                                    Atten max (%)
-                                  </label>
-                                  <input
-                                    id={`yeast-atten-max-${r.id}`}
-                                    value={typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
-                                    readOnly
-                                    style={{ width: "100%", padding: 8 }}
-                                  />
-                                </div>
-                                <div style={{ width: 200, maxWidth: "100%" }}>
-                                  <label className="muted ingredientCardLabel" htmlFor={`yeast-atten-override-${r.id}`}>
+                                </YStack>
+                                {(r.lab ?? "") ? (
+                                  <YStack gap="$1" w={240} maxW="100%">
+                                    <RecipeEditFieldLabel>Lab</RecipeEditFieldLabel>
+                                    <RecipeEditReadOnlyValue>{r.lab}</RecipeEditReadOnlyValue>
+                                  </YStack>
+                                ) : null}
+                                {(r.productId ?? "") ? (
+                                  <YStack gap="$1" w={160} maxW="100%">
+                                    <RecipeEditFieldLabel>Product ID</RecipeEditFieldLabel>
+                                    <RecipeEditReadOnlyValue>{r.productId}</RecipeEditReadOnlyValue>
+                                  </YStack>
+                                ) : null}
+                                <YStack gap="$1" w={160} maxW="100%">
+                                  <RecipeEditFieldLabel>Atten min (%)</RecipeEditFieldLabel>
+                                  <RecipeEditReadOnlyValue>
+                                    {typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
+                                  </RecipeEditReadOnlyValue>
+                                </YStack>
+                                <YStack gap="$1" w={160} maxW="100%">
+                                  <RecipeEditFieldLabel>Atten max (%)</RecipeEditFieldLabel>
+                                  <RecipeEditReadOnlyValue>
+                                    {typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
+                                  </RecipeEditReadOnlyValue>
+                                </YStack>
+                                <YStack gap="$1" w={200} maxW="100%">
+                                  <RecipeEditFieldLabel htmlFor={`yeast-atten-override-${r.id}`}>
                                     {tAnalysis("customAttenuationPercentLabel")}
-                                  </label>
-                                  <input
+                                  </RecipeEditFieldLabel>
+                                  <Input
                                     id={`yeast-atten-override-${r.id}`}
-                                    type="number"
-                                    inputMode="decimal"
-                                    step={0.1}
                                     value={yeastAttenuationOverrides[r.id] ?? ""}
-                                    onChange={(e) =>
-                                      setYeastAttenuationOverrides((prev) => ({ ...prev, [r.id]: e.target.value }))
+                                    onChangeText={(text) =>
+                                      setYeastAttenuationOverrides((prev) => ({ ...prev, [r.id]: text }))
                                     }
-                                    style={{ width: "100%", padding: 8 }}
+                                    keyboardType="decimal-pad"
+                                    size="$3"
+                                    w="100%"
+                                    bg="var(--surface)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    rounded="$2"
+                                    fontFamily="$body"
                                   />
-                                </div>
-                                <div style={{ flex: "0 0 auto" }}>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeYeastRow(r.id)}
-                                    aria-label={`Remove yeast row ${idx + 1}`}
-                                  >
-                                    Remove
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                                </YStack>
+                                <Button
+                                  size="$2"
+                                  bg="var(--surface-2)"
+                                  borderWidth={1}
+                                  borderColor="var(--border)"
+                                  color="var(--text)"
+                                  fontFamily="$body"
+                                  onPress={() => removeYeastRow(r.id)}
+                                  aria-label={`Remove yeast row ${idx + 1}`}
+                                >
+                                  Remove
+                                </Button>
+                              </XStack>
+                            </RecipeEditIngredientCard>
+                  ))}
+                </YStack>
+              </View>
             ) : (
-              <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                 No yeast yet.
-              </p>
+              </SizableText>
             )}
 
-                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                <XStack mt="$3" justify="flex-end">
+                  <Button
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                    onPress={onSave}
+                    disabled={!canCallAccountScoped || saving}
+                  >
                     {saving ? "Saving…" : "Save (including yeast)"}
-                  </button>
-                </div>
+                  </Button>
+                </XStack>
 
-                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                   {t("rawMaterialsCtaPrefix")}{" "}
                   <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
-                </p>
-              </div>
-            </details>
-          </section>
+                </SizableText>
+          </RecipeEditSection>
 
           <AdSlot placement="recipe_edit_after_yeast" />
 
-          <section id="other" className="panel">
-            <details open={openSections.other} onToggle={(e) => setSectionOpen("other", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="other-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.other")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <div style={{ marginTop: 0, display: "flex", justifyContent: "space-between", gap: 12 }}>
-                  <p className="muted" style={{ margin: 0 }}>
-                    {t("otherHelp")}
-                  </p>
-                  <button type="button" onClick={addMiscRow}>
-                    {t("buttons.addOtherIngredient")}
-                  </button>
-                </div>
+          <RecipeEditSection
+            id="other"
+            headingId="other-heading"
+            label={t("sections.other")}
+            open={openSections.other}
+            onOpenChange={(open) => setSectionOpen("other", open)}
+          >
+            <XStack jc="space-between" gap="$3" flexWrap="wrap">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
+                {t("otherHelp")}
+              </SizableText>
+              <Button
+                onPress={addMiscRow}
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {t("buttons.addOtherIngredient")}
+              </Button>
+            </XStack>
 
             {miscRows.length ? (
-              <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
+              <YStack gap="$3" mt="$3" w="100%" minWidth={0}>
                 {miscRows.map((r, idx) => {
                   const amountLabel = t("amountLabel", { unit: r.amountIsWeight ? tUnits("kg") : tUnits("L") });
                   return (
-                    <div key={r.id} className="ingredientCard">
-                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 12 }}>
-                        <div style={{ flex: "1 1 280px", minWidth: 240 }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-name-${r.id}`}>
-                            Name
-                          </label>
-                          <input
+                    <RecipeEditIngredientCard key={r.id}>
+                      <XStack gap="$3" flexWrap="wrap" items="flex-end" w="100%" minWidth={0}>
+                        <View alignSelf="center" flexShrink={0}>
+                          <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                            {idx + 1}
+                          </SizableText>
+                        </View>
+                        <YStack gap="$1" flex={1} minW={280} flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-name-${r.id}`}>Name</RecipeEditFieldLabel>
+                          <Input
                             id={`misc-name-${r.id}`}
                             value={r.name}
-                            onChange={(e) => updateMiscRow(r.id, { name: e.target.value })}
-                            style={{ width: "100%", padding: 8 }}
+                            onChangeText={(text) => updateMiscRow(r.id, { name: text })}
+                            size="$3"
+                            w="100%"
+                            bg="var(--surface)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            rounded="$2"
+                            fontFamily="$body"
                             aria-label={`Other ingredient name ${idx + 1}`}
                           />
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "0 0 auto", width: 180, maxWidth: "100%" }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-type-${r.id}`}>
-                            Type
-                          </label>
+                        <YStack gap="$1" w={180} maxW="100%" flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-type-${r.id}`}>Type</RecipeEditFieldLabel>
                           <select
                             id={`misc-type-${r.id}`}
                             value={r.type}
                             onChange={(e) => updateMiscRow(r.id, { type: e.target.value as MiscType })}
-                            style={{ width: "100%", padding: 8 }}
+                            className="recipeEditSelect recipeEditSelectFull"
                             aria-label={`Other ingredient type ${idx + 1}`}
                           >
                             {miscTypeOptions.map((o) => (
@@ -2841,17 +2933,15 @@ export default function RecipeEditPage() {
                               </option>
                             ))}
                           </select>
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "0 0 auto", width: 160, maxWidth: "100%" }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-use-${r.id}`}>
-                            Use
-                          </label>
+                        <YStack gap="$1" w={160} maxW="100%" flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-use-${r.id}`}>Use</RecipeEditFieldLabel>
                           <select
                             id={`misc-use-${r.id}`}
                             value={r.use}
                             onChange={(e) => updateMiscRow(r.id, { use: e.target.value as MiscUse })}
-                            style={{ width: "100%", padding: 8 }}
+                            className="recipeEditSelect recipeEditSelectFull"
                             aria-label={`Other ingredient use ${idx + 1}`}
                           >
                             {miscUseOptions.map((o) => (
@@ -2860,153 +2950,223 @@ export default function RecipeEditPage() {
                               </option>
                             ))}
                           </select>
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "0 0 auto", width: 140, maxWidth: "100%" }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-time-${r.id}`}>
-                            Time (min)
-                          </label>
-                          <input
+                        <YStack gap="$1" w={140} maxW="100%" flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-time-${r.id}`}>Time (min)</RecipeEditFieldLabel>
+                          <Input
                             id={`misc-time-${r.id}`}
-                            type="number"
-                            value={typeof r.timeMinutes === "number" ? r.timeMinutes : ""}
-                            onChange={(e) => {
-                              const v = e.target.value;
-                              updateMiscRow(r.id, { timeMinutes: v === "" ? null : Number(v) });
-                            }}
-                            style={{ width: "100%", padding: 8 }}
+                            value={typeof r.timeMinutes === "number" ? String(r.timeMinutes) : ""}
+                            onChangeText={(text) =>
+                              updateMiscRow(r.id, { timeMinutes: text === "" ? null : Number(text) })
+                            }
+                            keyboardType="decimal-pad"
+                            size="$3"
+                            w="100%"
+                            bg="var(--surface)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            rounded="$2"
+                            fontFamily="$body"
                             aria-label={`Other ingredient time minutes ${idx + 1}`}
                           />
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "0 0 auto", width: 200, maxWidth: "100%" }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-amount-is-weight-${r.id}`}>
-                            Amount kind
-                          </label>
+                        <YStack gap="$1" w={200} maxW="100%" flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-amount-is-weight-${r.id}`}>Amount kind</RecipeEditFieldLabel>
                           <select
                             id={`misc-amount-is-weight-${r.id}`}
                             value={r.amountIsWeight ? "weight" : "volume"}
                             onChange={(e) => updateMiscRow(r.id, { amountIsWeight: e.target.value === "weight" })}
-                            style={{ width: "100%", padding: 8 }}
+                            className="recipeEditSelect recipeEditSelectFull"
                             aria-label={`Other ingredient amount kind ${idx + 1}`}
                           >
                             <option value="weight">Weight</option>
                             <option value="volume">Volume</option>
                           </select>
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "0 0 auto", width: 180, maxWidth: "100%" }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-amount-${r.id}`}>
-                            {amountLabel}
-                          </label>
-                          <input
+                        <YStack gap="$1" w={180} maxW="100%" flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-amount-${r.id}`}>{amountLabel}</RecipeEditFieldLabel>
+                          <Input
                             id={`misc-amount-${r.id}`}
-                            type="number"
-                            value={Number.isFinite(r.amount) ? r.amount : ""}
-                            onChange={(e) => updateMiscRow(r.id, { amount: Number(e.target.value || 0) })}
-                            style={{ width: "100%", padding: 8 }}
+                            value={
+                              Number.isFinite(r.amount)
+                                ? r.amountIsWeight
+                                  ? formatFixed(locale, r.amount, 3)
+                                  : formatFixed(locale, r.amount, 2)
+                                : ""
+                            }
+                            onChangeText={(text) => {
+                              const normalized = text.replace(",", ".");
+                              const parsed = parseFloat(normalized);
+                              updateMiscRow(r.id, {
+                                amount: Number.isFinite(parsed) ? Math.max(0, parsed) : 0,
+                              });
+                            }}
+                            onBlur={() => {
+                              if (!Number.isFinite(r.amount)) return;
+                              const decimals = r.amountIsWeight ? 3 : 2;
+                              const rounded =
+                                Math.round(r.amount * 10 ** decimals) / 10 ** decimals;
+                              if (rounded !== r.amount) {
+                                updateMiscRow(r.id, { amount: rounded });
+                              }
+                            }}
+                            keyboardType="decimal-pad"
+                            size="$3"
+                            w="100%"
+                            bg="var(--surface)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            rounded="$2"
+                            fontFamily="$body"
                             aria-label={`Other ingredient amount ${idx + 1}`}
                           />
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "1 1 240px", minWidth: 240 }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-use-for-${r.id}`}>
-                            Use for
-                          </label>
-                          <input
+                        <YStack gap="$1" flex={1} minW={240} flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-use-for-${r.id}`}>Use for</RecipeEditFieldLabel>
+                          <Input
                             id={`misc-use-for-${r.id}`}
                             value={r.useFor ?? ""}
-                            onChange={(e) => updateMiscRow(r.id, { useFor: e.target.value || null })}
-                            style={{ width: "100%", padding: 8 }}
+                            onChangeText={(text) => updateMiscRow(r.id, { useFor: text || null })}
+                            size="$3"
+                            w="100%"
+                            bg="var(--surface)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            rounded="$2"
+                            fontFamily="$body"
                             aria-label={`Other ingredient use for ${idx + 1}`}
                           />
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "1 1 320px", minWidth: 260 }}>
-                          <label className="muted ingredientCardLabel" htmlFor={`misc-notes-${r.id}`}>
-                            Notes
-                          </label>
-                          <input
+                        <YStack gap="$1" flex={1} minW={260} flexShrink={0}>
+                          <RecipeEditFieldLabel htmlFor={`misc-notes-${r.id}`}>Notes</RecipeEditFieldLabel>
+                          <Input
                             id={`misc-notes-${r.id}`}
                             value={r.notes ?? ""}
-                            onChange={(e) => updateMiscRow(r.id, { notes: e.target.value || null })}
-                            style={{ width: "100%", padding: 8 }}
+                            onChangeText={(text) => updateMiscRow(r.id, { notes: text || null })}
+                            size="$3"
+                            w="100%"
+                            bg="var(--surface)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            rounded="$2"
+                            fontFamily="$body"
                             aria-label={`Other ingredient notes ${idx + 1}`}
                           />
-                        </div>
+                        </YStack>
 
-                        <div style={{ flex: "0 0 auto" }}>
-                          <button
-                            type="button"
-                            onClick={() => removeMiscRow(r.id)}
-                            aria-label={`Remove other ingredient row ${idx + 1}`}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                        <Button
+                          size="$2"
+                          flexShrink={0}
+                          bg="var(--surface-2)"
+                          borderWidth={1}
+                          borderColor="var(--border)"
+                          color="var(--text)"
+                          fontFamily="$body"
+                          onPress={() => removeMiscRow(r.id)}
+                          aria-label={`Remove other ingredient row ${idx + 1}`}
+                        >
+                          Remove
+                        </Button>
+                      </XStack>
+                    </RecipeEditIngredientCard>
                   );
                 })}
-              </div>
+              </YStack>
             ) : (
-              <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                 No other ingredients yet.
-              </p>
+              </SizableText>
             )}
 
-                <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-                  <button type="button" onClick={onSave} disabled={!canCallAccountScoped || saving}>
+                <XStack mt="$3" justify="flex-end">
+                  <Button
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                    onPress={onSave}
+                    disabled={!canCallAccountScoped || saving}
+                  >
                     {saving ? "Saving…" : "Save (including other ingredients)"}
-                  </button>
-                </div>
+                  </Button>
+                </XStack>
 
-                <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
                   {t("rawMaterialsCtaPrefix")}{" "}
                   <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
-                </p>
-              </div>
-            </details>
-          </section>
+                </SizableText>
+          </RecipeEditSection>
 
-          <section id="notes" className="panel">
-            <details open={openSections.notes} onToggle={(e) => setSectionOpen("notes", e.currentTarget.open)}>
-              <summary style={{ cursor: "pointer" }}>
-                <h2 id="notes-heading" style={{ margin: 0, display: "inline" }}>
-                  {t("sections.notes")}
-                </h2>
-              </summary>
-              <div style={{ marginTop: 12 }}>
-                <label htmlFor="recipe-notes" className="muted" style={{ display: "block", fontSize: 12 }}>
-                  {t("sections.notes")}
-                </label>
-                <textarea
-                  id="recipe-notes"
-                  rows={6}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  style={{ width: "100%", padding: 8 }}
-                />
-              </div>
-            </details>
-          </section>
+          <RecipeEditSection
+            id="notes"
+            headingId="notes-heading"
+            label={t("sections.notes")}
+            open={openSections.notes}
+            onOpenChange={(open) => setSectionOpen("notes", open)}
+          >
+            <RecipeEditField id="recipe-notes" label={t("sections.notes")}>
+              <TextArea
+                id="recipe-notes"
+                numberOfLines={6}
+                value={notes}
+                onChangeText={setNotes}
+                size="$3"
+                w="100%"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="$2"
+                fontFamily="$body"
+              />
+            </RecipeEditField>
+          </RecipeEditSection>
 
-          <section id="water" className="panel" aria-labelledby="water-heading">
-            <h2 id="water-heading" style={{ marginTop: 0 }}>
+          <View
+            as="section"
+            id="water"
+            aria-labelledby="water-heading"
+            bg="var(--surface)"
+            borderWidth={1}
+            borderColor="var(--border)"
+            rounded="$3"
+            p="$3"
+          >
+            <H2 id="water-heading" m={0} size="$5" fontFamily="$heading" color="var(--text)">
               {t("sections.water")}
-            </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
+            </H2>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("waterHelp")}
-            </p>
-            <p style={{ marginBottom: 0 }}>
-              <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
-            </p>
-            <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+            </SizableText>
+            <XStack gap="$2" flexWrap="wrap" ai="center" mt="$2">
+              <SizableText size="$2" fontFamily="$body" as="span">
+                <Link href={`/recipes/${recipeId}/water`}>{t("nav.openWaterCalculator")}</Link>
+              </SizableText>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                ·
+              </SizableText>
+              <SizableText size="$2" fontFamily="$body" as="span">
+                <Link href={`/recipes/${recipeId}/water/mash`}>{tWater("mashWater")}</Link>
+              </SizableText>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                ·
+              </SizableText>
+              <SizableText size="$2" fontFamily="$body" as="span">
+                <Link href={`/recipes/${recipeId}/water/sparge`}>{tWater("spargeWater")}</Link>
+              </SizableText>
+            </XStack>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
               {t("waterProfilesManageText")} <Link href="/water-profiles">{tNav("waterProfiles")}</Link>.
-            </p>
-          </section>
-        </div>
-      </div>
+            </SizableText>
+          </View>
+        </YStack>
+      </XStack>
     </>
   );
 }

@@ -3,26 +3,51 @@
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
+import { Button, XStack } from "tamagui";
+
 export function SurfaceMathToggleRow(props: {
   left: ReactNode;
   rightHint?: ReactNode;
   surfaceMath: boolean;
   onToggle: () => void;
+  mt?: number | string;
+  mb?: number | string;
   style?: React.CSSProperties;
 }) {
   const tMath = useTranslations("math");
-  const { left, rightHint, surfaceMath, onToggle, style } = props;
+  const { left, rightHint, surfaceMath, onToggle, mt, mb, style } = props;
 
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", ...style }}>
+    <XStack
+      gap="$3"
+      alignItems="center"
+      flexWrap="wrap"
+      mt={mt}
+      mb={mb}
+      style={style}
+    >
       {left}
-      <div style={{ marginLeft: "auto", display: "inline-flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+      <XStack
+        marginLeft="auto"
+        gap="$2.5"
+        alignItems="center"
+        flexWrap="wrap"
+      >
         {rightHint}
-        <button type="button" onClick={onToggle}>
+        <Button
+          size="$2"
+          chromeless
+          onPress={onToggle}
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          fontFamily="$body"
+        >
           {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </XStack>
+    </XStack>
   );
 }
 

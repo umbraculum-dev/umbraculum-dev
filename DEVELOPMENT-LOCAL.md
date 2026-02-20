@@ -120,6 +120,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 
 - **Coding standards (TypeScript/React)**
   - **Default**: use `interface` for object contracts (DTOs, component props, service inputs/outputs). Use `type` for unions/compositions.
+  - **Styling**: avoid inline styles where you can; Tamagui props and components are the preferred replacement. Use `className` when Tamagui does not apply (e.g. native `<select>`, `<table>`).
   - **External APIs (future: malt/hops/yeast DBs)**:
     - Define an `interface` for the server response shape.
     - Always validate runtime `unknown` payloads via a `parseXxx()`/`assertIsXxx()` function (or schema validation later). Avoid `as SomeType` casts on network payloads.

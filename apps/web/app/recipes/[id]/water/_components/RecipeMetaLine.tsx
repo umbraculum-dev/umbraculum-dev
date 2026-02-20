@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { SizableText, View } from "tamagui";
+
+import { CodeInline } from "../../../../_components/CodeInline";
 import { apiFetch } from "../../../../_lib/apiClient";
 
 type Props = {
@@ -55,16 +58,21 @@ export function RecipeMetaLine(props: Props) {
   }, [enabled, recipeId]);
 
   return (
-    <p className="muted" style={{ marginTop: 0 }}>
-      {t("recipeId")}: <code>{recipeId}</code>
-      {recipeName ? (
-        <>
-          {" "}
-          -{" "}
-          {t("recipeName")}: <strong>{recipeName}</strong>
-        </>
-      ) : null}
-    </p>
+    <View display="block" mt={0}>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+        {t("recipeId")}: <CodeInline>{recipeId}</CodeInline>
+        {recipeName ? (
+          <>
+            {" "}
+            -{" "}
+            {t("recipeName")}:{" "}
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" fontWeight="bold" as="span">
+              {recipeName}
+            </SizableText>
+          </>
+        ) : null}
+      </SizableText>
+    </View>
   );
 }
 

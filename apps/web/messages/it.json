@@ -587,7 +587,7 @@
         "yeast": "Lievito",
         "other": "Altri ingredienti",
         "notes": "Note",
-        "water": "Chimica dell’acqua"
+        "water": "Chimica dell'acqua e volumi"
       },
       "mashingHelp": "Programma di ammostamento (procedura mash BeerJSON). Importa una ricetta BeerJSON/BeerXML con step mash o aggiungili manualmente nelle pagine calcolatore acqua Mash e/o Sparge.",
       "mashingEmpty": "Nessuno step di ammostamento. Aggiungi step o importa una ricetta con programma mash.",

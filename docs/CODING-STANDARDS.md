@@ -2,6 +2,9 @@
 
 This repo is **TypeScript-first**. The goal is clarity + safe refactors (including AI-assisted code changes).
 
+### Styling: avoid inline styles
+Avoid inline styles where you can. In this codebase **Tamagui props and components are the preferred replacement** for layout, spacing, colors, borders, and typography. Use `className` with CSS classes when Tamagui does not apply (e.g. native `<select>`, `<table>`, `<details>`/`<summary>`).
+
 ### TypeScript: `interface` vs `type`
 - **Use `interface` for object contracts**:
   - API DTOs (our API responses and requests)

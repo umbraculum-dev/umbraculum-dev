@@ -178,6 +178,14 @@ code {
   max-width: 1100px;
   margin: 24px auto;
   padding: var(--app-shell-padding);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.appShell > main {
+  flex: 1;
+  min-height: 0;
 }
 
 .panel {
@@ -225,6 +233,33 @@ code {
 .ingredientCardLabel {
   display: block;
   font-size: 12px;
+}
+
+.recipeEditSelect {
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 160px;
+  font-family: inherit;
+}
+.recipeEditSelectFull {
+  width: 100%;
+}
+.recipeEditTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.recipeEditDetailsSummary {
+  font-size: 12px;
+  cursor: pointer;
+}
+.recipeEditAnalysisLabelCell {
+  padding-right: 12px;
+}
+.recipeEditListDisc {
+  list-style: disc;
+  padding-left: 20px;
 }
 
 .mashStepsEditor input,
@@ -314,51 +349,6 @@ code {
 
 .mathFxButton--md {
   padding: 4px 10px;
-  font-size: 12px;
-}
-
-.recipeEditLayout {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 881px) {
-  .recipeEditLayout {
-    flex-direction: row;
-  }
-  .recipeEditLayout-sidebar {
-    width: 240px;
-  }
-}
-
-.recipeEditContent {
-  display: grid;
-  gap: 16px;
-}
-
-.adSlotWrap {
-  margin: 12px 0;
-}
-
-.adSlot {
-  background: color-mix(in srgb, var(--surface-2) 45%, var(--surface));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px;
-  display: grid;
-  gap: 6px;
-}
-
-.adSlotImage {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-.adSlotLine {
-  margin: 0;
   font-size: 12px;
 }
 
