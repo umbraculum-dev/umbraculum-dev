@@ -10,7 +10,7 @@ export function SwitchAccountLink() {
   return (
     <Link
       href="/select-account"
-      style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}
+      className="brew-link-inline-flex"
     >
       <XStack ai="center" height={28}>
         <SizableText

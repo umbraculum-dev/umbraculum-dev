@@ -22,7 +22,7 @@ export function AppMainNav({ items, ariaLabel }: AppMainNavProps) {
     <nav aria-label={ariaLabel}>
       <XStack
         flexWrap="wrap"
-        gap="$2"
+        gap={media.mobile ? "$1.5" : "$2"}
         width="100%"
         p="$2"
         mt="$2"
@@ -31,18 +31,13 @@ export function AppMainNav({ items, ariaLabel }: AppMainNavProps) {
         borderColor="var(--border)"
         borderRadius="var(--radius)"
         backgroundColor="color-mix(in srgb, var(--surface-2) 25%, var(--surface))"
-        style={
-          media.mobile
-            ? { padding: 8, gap: 6 }
-            : undefined
-        }
       >
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             aria-current={item.isActive ? "page" : undefined}
-            style={{ display: "contents" }}
+            className="brew-link-contents"
           >
             <XStack
               flex={1}

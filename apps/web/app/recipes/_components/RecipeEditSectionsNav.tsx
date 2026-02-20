@@ -35,7 +35,7 @@ function SectionsNavContent({
           <a
             key={s.id}
             href={`#${s.id}`}
-            style={{ display: "contents", textDecoration: "none" }}
+            className="brew-link-contents"
           >
             <XStack
               display="block"
@@ -66,7 +66,7 @@ function SectionsNavContent({
         border={0}
       />
       <YStack gap="$1">
-        <Link href={`/recipes/${recipeId}/water`} style={{ display: "contents", textDecoration: "none" }}>
+        <Link href={`/recipes/${recipeId}/water`} className="brew-link-contents">
           <XStack
             display="block"
             width="100%"
@@ -87,7 +87,7 @@ function SectionsNavContent({
             </SizableText>
           </XStack>
         </Link>
-        <Link href="/recipes" style={{ display: "contents", textDecoration: "none" }}>
+        <Link href="/recipes" className="brew-link-contents">
           <XStack
             display="block"
             width="100%"
@@ -170,9 +170,9 @@ export function RecipeEditSectionsNav({
     if (typeof left !== "number") {
       // If we can't compute an exact gutter position, fall back to sheet mode.
       return (
-        <div style={{ position: "fixed", top: 16, right: 16, zIndex: 1000 }}>
+        <YStack position="fixed" top={16} right={16} zIndex={1000}>
           {navSheet}
-        </div>
+        </YStack>
       );
     }
 

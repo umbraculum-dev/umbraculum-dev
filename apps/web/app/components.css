@@ -279,3 +279,25 @@
 .brew-ml1 {
   margin-left: 6px;
 }
+
+.brew-link-inline-flex {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.brew-link-inline-flex-shrink-0 {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.brew-link-contents {
+  display: contents;
+  text-decoration: none;
+}
+.brew-main-margin {
+  margin-top: 16px;
+}
+.brew-block {
+  display: block;
+}

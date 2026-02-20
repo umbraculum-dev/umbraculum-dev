@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Button, Sheet, Text, useMedia } from "tamagui";
+import { Button, Sheet, Text, useMedia, YStack } from "tamagui";
 
 export interface NavSheetProps {
   children: ReactNode;
@@ -100,26 +100,23 @@ export function NavSheet({
           padding={16}
           maxHeight="85%"
         >
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
+          <Button
+            unstyled
+            position="absolute"
+            top={8}
+            right={8}
+            p="$1"
+            backgroundColor="transparent"
+            borderWidth={0}
+            cursor="pointer"
+            fontSize={18}
+            onPress={() => setOpen(false)}
             aria-label="Close"
-            style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              padding: 4,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 18,
-              lineHeight: 1,
-            }}
           >
             ×
-          </button>
-          <div
-            style={{ paddingTop: 24 }}
+          </Button>
+          <YStack
+            pt="$4"
             onClickCapture={(e) => {
               if (!open) return;
               const target = e.target;
@@ -131,7 +128,7 @@ export function NavSheet({
             }}
           >
             {children}
-          </div>
+          </YStack>
         </Sheet.Frame>
       </Sheet>
     </>

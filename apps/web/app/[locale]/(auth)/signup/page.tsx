@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { H1, Input, SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { LocaleSelect } from "../_components/LocaleSelect";
 
@@ -15,7 +17,6 @@ export default function SignupPage() {
   const locale = useLocale();
   const router = useRouter();
 
-  // Avoid hydration mismatches from password managers injecting DOM pre-hydration.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -27,12 +28,19 @@ export default function SignupPage() {
 
   if (!mounted) {
     return (
-      <section className="brew-panel" style={{ maxWidth: 520 }}>
-        <h1 style={{ marginTop: 0 }}>{t("signupTitle")}</h1>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+      <View
+        maxWidth={520}
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+      >
+        <H1 mt={0}>{t("signupTitle")}</H1>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("submitting")}
-        </p>
-      </section>
+        </SizableText>
+      </View>
     );
   }
 
@@ -73,81 +81,111 @@ export default function SignupPage() {
   };
 
   return (
-    <section className="brew-panel" style={{ maxWidth: 520 }}>
-      <h1 style={{ marginTop: 0 }}>{t("signupTitle")}</h1>
+    <View
+      maxWidth={520}
+      bg="var(--surface)"
+      borderWidth={1}
+      borderColor="var(--border)"
+      rounded="$2"
+      p="$3"
+    >
+      <H1 mt={0}>{t("signupTitle")}</H1>
 
-      <form onSubmit={onSubmit}>
-        <div style={{ display: "grid", gap: 12 }}>
-          <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-              {t("emailLabel")}
-            </label>
-            <input
+      <form onSubmit={onSubmit} aria-describedby={error ? "signup-error" : undefined}>
+        <YStack gap="$3">
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="signup-email">{t("emailLabel")}</RecipeEditFieldLabel>
+            <Input
+              id="signup-email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
+              onChangeText={setEmail}
+              type="email"
               autoComplete="email"
               data-lpignore="true"
               data-1p-ignore="true"
               data-bwignore="true"
               required
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
             />
-          </div>
+          </YStack>
 
-          <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-              {t("passwordLabel")}
-            </label>
-            <input
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="signup-password">{t("passwordLabel")}</RecipeEditFieldLabel>
+            <Input
+              id="signup-password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
+              onChangeText={setPassword}
               autoComplete="new-password"
               data-lpignore="true"
               data-1p-ignore="true"
               data-bwignore="true"
               required
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
             />
-          </div>
+          </YStack>
 
-          <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-              {t("accountNameLabel")}
-            </label>
-            <input
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="signup-accountName">{t("accountNameLabel")}</RecipeEditFieldLabel>
+            <Input
+              id="signup-accountName"
               value={accountName}
-              onChange={(e) => setAccountName(e.target.value)}
-              style={{ width: "100%", padding: 8 }}
+              onChangeText={setAccountName}
               autoComplete="organization"
               data-lpignore="true"
               data-1p-ignore="true"
               data-bwignore="true"
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
             />
-          </div>
+          </YStack>
 
-          <LocaleSelect />
+          <LocaleSelect id="signup-locale" />
 
           <button type="submit" disabled={submitting}>
             {submitting ? t("submitting") : t("submitSignup")}
           </button>
-        </div>
+        </YStack>
       </form>
 
       {error ? (
-        <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-          {error}
-        </pre>
+        <View mt="$3">
+          <pre id="signup-error" className="brew-error-box" role="alert">
+            {error}
+          </pre>
+        </View>
       ) : null}
 
-      <div className="brew-muted" style={{ marginTop: 12 }}>
-        <strong>{t("noteTitle")}</strong>
-        <div style={{ marginTop: 6 }}>{t("noteBody")}</div>
-        <div style={{ marginTop: 8 }}>
-          <Link href="/contributing?topic=i18n">{t("helpTranslate")}</Link>
-        </div>
-      </div>
-    </section>
+      <View mt="$3">
+        <YStack gap="$1.5">
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" fontWeight="bold">
+            {t("noteTitle")}
+          </SizableText>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            {t("noteBody")}
+          </SizableText>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            <Link href="/contributing?topic=i18n">{t("helpTranslate")}</Link>
+          </SizableText>
+        </YStack>
+      </View>
+    </View>
   );
 }
-

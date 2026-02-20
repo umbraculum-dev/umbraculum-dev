@@ -29,7 +29,7 @@ export default async function LocaleLayout({
       <div className="brew-app-shell">
         <PrimaryNav />
         <AdSlot placement="global_top" />
-        <main id="main" style={{ marginTop: 16 }}>
+        <main id="main" className="brew-main-margin">
           {children}
         </main>
         <AdSlot placement="global_bottom" />

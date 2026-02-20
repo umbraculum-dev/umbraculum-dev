@@ -10,12 +10,7 @@ export function AccessibilityLink() {
   return (
     <Link
       href="/accessibility"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        textDecoration: "none",
-        flexShrink: 0,
-      }}
+      className="brew-link-inline-flex-shrink-0"
     >
       <XStack
         ai="center"

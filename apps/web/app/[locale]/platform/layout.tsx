@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { usePathname } from "next/navigation";
+import { XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -22,24 +23,26 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
     pathnameNoLocale === href || pathnameNoLocale.startsWith(`${href}/`);
 
   return (
-    <div style={{ display: "grid", gap: 16 }}>
-      <nav aria-label={t("navLabel")} style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <Link
-          href="/platform/ads"
-          aria-current={isActive("/platform/ads") ? "page" : undefined}
-          className="brew-muted"
-        >
-          {t("ads")}
-        </Link>
-        <Link
-          href="/platform/recipes"
-          aria-current={isActive("/platform/recipes") ? "page" : undefined}
-          className="brew-muted"
-        >
-          {t("recipes")}
-        </Link>
+    <YStack gap="$4">
+      <nav aria-label={t("navLabel")}>
+        <XStack flexWrap="wrap" gap="$3">
+          <Link
+            href="/platform/ads"
+            aria-current={isActive("/platform/ads") ? "page" : undefined}
+            className="brew-muted"
+          >
+            {t("ads")}
+          </Link>
+          <Link
+            href="/platform/recipes"
+            aria-current={isActive("/platform/recipes") ? "page" : undefined}
+            className="brew-muted"
+          >
+            {t("recipes")}
+          </Link>
+        </XStack>
       </nav>
       {children}
-    </div>
+    </YStack>
   );
 }

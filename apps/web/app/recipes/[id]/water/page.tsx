@@ -318,7 +318,7 @@ export default function WaterHubPage() {
             {summary && displayStreams ? (
               <>
                 <H3 mt="$3">{t("perStream")}</H3>
-                <View className="brew-table-wrap">
+                <View className="brew-table-wrap" mb="$4">
                   <table className="brew-table">
                     <thead>
                       <tr>
@@ -331,9 +331,7 @@ export default function WaterHubPage() {
                     <tbody>
                       {displayStreams.map((s) => (
                         <tr key={`${s.key}-summary`}>
-                          <td align="left">
-                            <SizableText size="$2" fontWeight="bold" fontFamily="$body">{s.label}</SizableText>
-                          </td>
+                          <td><strong>{s.label}</strong></td>
                           <td align="right">
                             {s.volumeLiters == null ? "—" : fmt("L", s.volumeLiters, 2)}
                           </td>
@@ -441,7 +439,7 @@ export default function WaterHubPage() {
                         <thead>
                           <tr>
                             <th align="left">{t("ion")}</th>
-                            <th align="left">{t("mergedPpm")}</th>
+                            <th align="right">{t("mergedPpm")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -457,7 +455,7 @@ export default function WaterHubPage() {
                           ).map(([label, v]) => (
                             <tr key={label}>
                               <td>{label}</td>
-                              <td align="left">{fmt("ppm", v, 0)}</td>
+                              <td align="right">{fmt("ppm", v, 0)}</td>
                             </tr>
                           ))}
                         </tbody>

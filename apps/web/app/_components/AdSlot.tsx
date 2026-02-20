@@ -79,7 +79,7 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
                 maxW="100%"
                 h="auto"
                 rounded="$2"
-                style={{ display: "block" }}
+                className="brew-block"
               />
             </a>
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>

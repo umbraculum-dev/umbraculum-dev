@@ -907,7 +907,7 @@
     "perStream": "Per stream",
     "colStream": "Stream",
     "colVolumeL": "Volume (L)",
-    "colPh": "pH",
+    "colPh": "Mash pH",
     "colFinalAlk": "Final alkalinity (ppm as CaCO3)",
     "mergedSummary": "Merged summary",
     "totalVolume": "Total volume",
