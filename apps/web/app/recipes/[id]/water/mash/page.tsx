@@ -1146,24 +1146,24 @@ export default function MashWaterPage() {
       />
 
       {authState.status === "error" ? (
-        <pre role="alert" className="errorBox">
+        <pre role="alert" className="brew-error-box">
           {authState.error}
         </pre>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
-        <section className="panel" aria-labelledby="adjustment-heading">
+        <section className="brew-panel" aria-labelledby="adjustment-heading">
           <h2 id="adjustment-heading" style={{ marginTop: 0 }}>
             {t("adjustmentHeading")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
             Manage profiles on <Link href="/water-profiles">Water profiles</Link>.
           </p>
 
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
             <div>
-              <label htmlFor="source-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="source-profile" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 Source water profile (starting water)
               </label>
               <select
@@ -1180,7 +1180,7 @@ export default function MashWaterPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="target-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="target-profile" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 Target water profile
               </label>
               <select
@@ -1197,7 +1197,7 @@ export default function MashWaterPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="dilution-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="dilution-profile" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 Dilution water profile
               </label>
               <select
@@ -1214,7 +1214,7 @@ export default function MashWaterPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="tap-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="tap-volume" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
@@ -1228,7 +1228,7 @@ export default function MashWaterPage() {
               />
             </div>
             <div>
-              <label htmlFor="dilution-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="dilution-volume" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
@@ -1251,22 +1251,22 @@ export default function MashWaterPage() {
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
             </button>
             {adjustmentSaveStatus ? (
-              <span className="muted" role="status" aria-live="polite">
+              <span className="brew-muted" role="status" aria-live="polite">
                 {adjustmentSaveStatus}
               </span>
             ) : null}
           </div>
 
-          <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 12, marginBottom: 0 }}>
             {t("adjustmentHint")}
           </p>
 
           {mixedSourceProfile ? (
-            <details className="fieldBlock fieldBlock--readonly" style={{ marginTop: 12 }}>
-              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+            <details className="brew-field-block brew-field-block--readonly" style={{ marginTop: 12 }}>
+              <summary className="brew-field-block-header" style={{ cursor: "pointer" }}>
                 <strong>Mixed water ions</strong>
-                <span className="fieldBadge">Read-only</span>
-                <span className="muted">Computed from profiles + volumes</span>
+                <span className="brew-field-badge">Read-only</span>
+                <span className="brew-muted">Computed from profiles + volumes</span>
               </summary>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -1306,20 +1306,20 @@ export default function MashWaterPage() {
           ) : null}
 
           {profilesError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {profilesError}
             </pre>
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="grist-summary-heading">
+        <section className="brew-panel" aria-labelledby="grist-summary-heading">
           <h2 id="grist-summary-heading" style={{ marginTop: 0 }}>
             {t("gristSummaryHeading")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             {t("gristSummaryHelp")}
           </p>
-          <p className="muted" style={{ marginTop: 4, marginBottom: 0, fontSize: 12 }}>
+          <p className="brew-muted" style={{ marginTop: 4, marginBottom: 0, fontSize: 12 }}>
             {t("lateExtractExcludedNote")}
           </p>
           <ul style={{ marginTop: 0 }}>
@@ -1338,16 +1338,16 @@ export default function MashWaterPage() {
               {importingGrist ? "Importing…" : "Import/update grist snapshot"}
             </button>
             <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
-            {gristImportStatus ? <span className="muted">{gristImportStatus}</span> : null}
+            {gristImportStatus ? <span className="brew-muted">{gristImportStatus}</span> : null}
           </div>
           {gristImportError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {gristImportError}
             </pre>
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="mash-heading">
+        <section className="brew-panel" aria-labelledby="mash-heading">
           <h2 id="mash-heading" style={{ marginTop: 0 }}>
             {t("acidificationHeading")}
           </h2>
@@ -1366,7 +1366,7 @@ export default function MashWaterPage() {
 
             <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
               <div>
-                <label htmlFor="mash-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-starting-alk" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </label>
                 <input
@@ -1383,10 +1383,10 @@ export default function MashWaterPage() {
                 />
               </div>
               <div>
-                <label htmlFor="mash-volume-l" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-volume-l" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   {t("mashWaterVolumeLabel", { unit: tUnits("L") })}
                 </label>
-                <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                <div className="brew-muted" style={{ fontSize: 12, marginTop: 4 }}>
                   Derived from Water adjustment volumes above (Source + Dilution).
                 </div>
                 <input
@@ -1402,7 +1402,7 @@ export default function MashWaterPage() {
                 />
               </div>
               <div>
-                <label htmlFor="mash-starting-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-starting-ph" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Starting pH
                 </label>
                 <input
@@ -1416,7 +1416,7 @@ export default function MashWaterPage() {
                 />
               </div>
               <div>
-                <label htmlFor="mash-target-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-target-ph" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Target pH
                 </label>
                 <input
@@ -1431,7 +1431,7 @@ export default function MashWaterPage() {
                 />
               </div>
               <div>
-                <label htmlFor="mash-acid-type" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-acid-type" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Acid type
                 </label>
                 <select
@@ -1451,7 +1451,7 @@ export default function MashWaterPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="mash-strength-kind" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-strength-kind" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Strength kind
                 </label>
                 <select
@@ -1467,7 +1467,7 @@ export default function MashWaterPage() {
                 </select>
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
-                <label htmlFor="mash-strength-value" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="mash-strength-value" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Strength value {mashStrengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </label>
                 <input
@@ -1483,7 +1483,7 @@ export default function MashWaterPage() {
               </div>
               {mashAcidificationMode === "manual" ? (
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="mash-manual-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="mash-manual-acid-added" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     Acid added ({mashStrengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </label>
                   <input
@@ -1513,7 +1513,7 @@ export default function MashWaterPage() {
             </div>
 
             {mashError ? (
-              <pre id="mash-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              <pre id="mash-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
                 {mashError}
               </pre>
             ) : null}
@@ -1635,11 +1635,11 @@ export default function MashWaterPage() {
           ) : null}
 
           {mashAcidificationMode === "manual" && mashManualResult ? (
-            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+            <details className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <summary className="brew-field-block-header" style={{ cursor: "pointer" }}>
                 <strong>Result (manual acid amount mode)</strong>
-                <span className="fieldBadge">Computed</span>
-                <span className="muted">Estimated from manual acid amount</span>
+                <span className="brew-field-badge">Computed</span>
+                <span className="brew-muted">Estimated from manual acid amount</span>
               </summary>
               <ul>
                 <li>
@@ -1667,7 +1667,7 @@ export default function MashWaterPage() {
           <hr style={{ margin: "16px 0" }} />
 
           <h3 style={{ marginTop: 0 }}>{t("saltAdditionsManualV0")}</h3>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
           </p>
 
@@ -1685,20 +1685,20 @@ export default function MashWaterPage() {
             <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
               {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
-            {saltsStatus ? <span className="muted" role="status" aria-live="polite">{saltsStatus}</span> : null}
-            {saltsSaveStatus ? <span className="muted" role="status" aria-live="polite">{saltsSaveStatus}</span> : null}
-            {saltsCalcSaveStatus ? <span className="muted" role="status" aria-live="polite">{saltsCalcSaveStatus}</span> : null}
+            {saltsStatus ? <span className="brew-muted" role="status" aria-live="polite">{saltsStatus}</span> : null}
+            {saltsSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{saltsSaveStatus}</span> : null}
+            {saltsCalcSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{saltsCalcSaveStatus}</span> : null}
           </div>
 
           {saltsError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {saltsError}
             </pre>
           ) : null}
 
           {saltsResult ? (
-            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+            <details className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <summary className="brew-field-block-header" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after salts only)</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["mash.ionsAfterSalts"];
@@ -1725,8 +1725,8 @@ body={buildWaterMathBody({
                     />
                   );
                 })() : null}
-                <span className="fieldBadge">Computed</span>
-                <span className="muted">
+                <span className="brew-field-badge">Computed</span>
+                <span className="brew-muted">
                   Does not consider acid; see &quot;Overall mash water result&quot; for combined output
                 </span>
               </summary>
@@ -1772,7 +1772,7 @@ body={buildWaterMathBody({
           <h3 id="overall-mash-water-result" style={{ marginTop: 0 }}>
             {t("overallResultHeading")}
           </h3>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </p>
           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -1782,18 +1782,18 @@ body={buildWaterMathBody({
             <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
             </button>
-            {overallStatus ? <span className="muted">{overallStatus}</span> : null}
-            {overallSaveStatus ? <span className="muted">{overallSaveStatus}</span> : null}
+            {overallStatus ? <span className="brew-muted">{overallStatus}</span> : null}
+            {overallSaveStatus ? <span className="brew-muted">{overallSaveStatus}</span> : null}
           </div>
           {overallError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {overallError}
             </pre>
           ) : null}
 
           {overallResult ? (
-            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
+            <div className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <div className="brew-field-block-header">
                 <strong>Overall mash snapshot</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["mash.overallSnapshot"];
@@ -1820,8 +1820,8 @@ body={buildWaterMathBody({
                     />
                   );
                 })() : null}
-                <span className="fieldBadge">Computed</span>
-                <span className="muted">Uses latest inputs; persist a snapshot to debug</span>
+                <span className="brew-field-badge">Computed</span>
+                <span className="brew-muted">Uses latest inputs; persist a snapshot to debug</span>
               </div>
               <ul>
                 <li>
@@ -1891,12 +1891,12 @@ body={buildWaterMathBody({
           ) : null}
         </section>
 
-        <section id="mash-steps" className="panel" aria-labelledby="mash-steps-heading">
+        <section id="mash-steps" className="brew-panel" aria-labelledby="mash-steps-heading">
           <h2 id="mash-steps-heading" style={{ marginTop: 0 }}>
             {t("mashStepsHeading")}
           </h2>
           {mashStepsSaveError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 0, marginBottom: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 0, marginBottom: 12 }}>
               {mashStepsSaveError}
             </pre>
           ) : null}
@@ -1930,18 +1930,18 @@ body={buildWaterMathBody({
         </section>
 
         {savingError ? (
-          <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+          <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
             {savingError}
           </pre>
         ) : null}
         {settingsError ? (
-          <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+          <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
             {settingsError}
           </pre>
         ) : null}
 
         {!admin ? (
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             Only <code>owner</code> and <code>brewery_admin</code> can manage water profiles. Current role:{" "}
             <code>{me?.role ?? "—"}</code>
           </p>

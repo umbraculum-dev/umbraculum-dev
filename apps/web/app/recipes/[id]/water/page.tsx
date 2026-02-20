@@ -179,36 +179,36 @@ export default function WaterHubPage() {
       />
 
       {authState.status === "error" ? (
-        <pre className="errorBox" role="alert">
+        <pre className="brew-error-box" role="alert">
           {authState.error}
         </pre>
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
-        <section className="panel" aria-labelledby="water-hub-links">
+        <section className="brew-panel" aria-labelledby="water-hub-links">
           <h2 id="water-hub-links" style={{ marginTop: 0 }}>
             {t("chooseArea")}
           </h2>
           <ul>
             <li>
               <Link href={`/recipes/${recipeId}/water/mash`}>{t("mashWater")}</Link>
-              <span className="muted"> · {t("lastCalculated")}: {mashLast}</span>
+              <span className="brew-muted"> · {t("lastCalculated")}: {mashLast}</span>
             </li>
             <li>
               <Link href={`/recipes/${recipeId}/water/sparge`}>{t("spargeWater")}</Link>
-              <span className="muted"> · {t("lastCalculated")}: {spargeLast}</span>
+              <span className="brew-muted"> · {t("lastCalculated")}: {spargeLast}</span>
             </li>
             <li>
               <Link href={`/recipes/${recipeId}/water/boil`}>{t("additionalBoilWater")}</Link>
-              <span className="muted"> · {t("lastCalculated")}: {boilLast}</span>
+              <span className="brew-muted"> · {t("lastCalculated")}: {boilLast}</span>
             </li>
           </ul>
-          <p className="muted" style={{ marginBottom: 0 }}>
+          <p className="brew-muted" style={{ marginBottom: 0 }}>
             {t("manageProfilesOn")} <Link href="/water-profiles">{t("waterProfilesLink")}</Link>.
           </p>
         </section>
 
-        <section className="panel" aria-labelledby="water-hub-status">
+        <section className="brew-panel" aria-labelledby="water-hub-status">
           <h2 id="water-hub-status" style={{ marginTop: 0 }}>
             {t("quickStatus")}
           </h2>
@@ -227,7 +227,7 @@ export default function WaterHubPage() {
                   <code>{fmt("ppm_as_CaCO3", summary.status.mashOverallSnapshot.finalAlkalinityPpmCaCO3, 0)}</code>
                 </>
               ) : (
-                <span className="muted">—</span>
+                <span className="brew-muted">—</span>
               )}
               {" · "}
               <Link href={`/recipes/${recipeId}/water/mash#overall-mash-water-result`}>{t("openMashOverall")}</Link>
@@ -238,23 +238,23 @@ export default function WaterHubPage() {
             <button type="button" onClick={() => void refresh()} disabled={authState.status !== "ready" || loading}>
               {loading ? t("refreshing") : t("refresh")}
             </button>
-            <span className="muted" role="status" aria-live="polite">
+            <span className="brew-muted" role="status" aria-live="polite">
               {profiles ? t("profilesLoaded") : t("profilesNotLoaded")}
             </span>
           </div>
 
           {error ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {error}
             </pre>
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="water-hub-recap">
+        <section className="brew-panel" aria-labelledby="water-hub-recap">
           <h2 id="water-hub-recap" style={{ marginTop: 0 }}>
             {t("recap")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             {t("recapSubtitle")}
           </p>
 
@@ -295,8 +295,8 @@ export default function WaterHubPage() {
                     );
                   })()
                 : null}
-              <span className="fieldBadge">{t("computed")}</span>
-              <span className="muted">{t("clickToExpand")}</span>
+              <span className="brew-field-badge">{t("computed")}</span>
+              <span className="brew-muted">{t("clickToExpand")}</span>
             </summary>
 
             {summary && displayStreams ? (
@@ -361,17 +361,17 @@ export default function WaterHubPage() {
                         {(s.saltsAddedLabel ? s.saltsAddedLabel.split("; ") : []).length ? (
                           (s.saltsAddedLabel as string).split("; ").map((p) => (
                             <li key={`adds-${s.key}-salt-${p}`}>
-                              <span className="muted">{t("salt")}</span> <code>{p}</code>
+                              <span className="brew-muted">{t("salt")}</span> <code>{p}</code>
                             </li>
                           ))
                         ) : (
                           <li>
-                            <span className="muted">{t("salt")}</span> <code>—</code>
+                            <span className="brew-muted">{t("salt")}</span> <code>—</code>
                           </li>
                         )}
                         <li>
-                          <span className="muted">{t("acid")}</span> <code>{s.acidType ?? "—"}</code>
-                          {s.acidAmountLabel ? <span className="muted"> · {s.acidAmountLabel}</span> : null}
+                          <span className="brew-muted">{t("acid")}</span> <code>{s.acidType ?? "—"}</code>
+                          {s.acidAmountLabel ? <span className="brew-muted"> · {s.acidAmountLabel}</span> : null}
                         </li>
                       </ul>
                     </li>
@@ -409,7 +409,7 @@ export default function WaterHubPage() {
                   })()
                 : null}
                     </div>
-                    <p className="muted" style={{ marginTop: 8, marginBottom: 8 }}>
+                    <p className="brew-muted" style={{ marginTop: 8, marginBottom: 8 }}>
                       {t("mergedIonsDescription")}
                     </p>
                     <div style={{ overflowX: "auto", marginTop: 8 }}>
@@ -441,24 +441,24 @@ export default function WaterHubPage() {
                     </div>
                   </>
                 ) : (
-                  <p className="muted" style={{ marginTop: 8 }}>
+                  <p className="brew-muted" style={{ marginTop: 8 }}>
                     {t("noMergedProfile")}
                   </p>
                 )}
               </>
             ) : (
-              <p className="muted" style={{ marginTop: 8 }}>
+              <p className="brew-muted" style={{ marginTop: 8 }}>
                 {t("noSettingsLoaded")}
               </p>
             )}
           </details>
         </section>
 
-        <section className="panel" aria-labelledby="water-hub-final-recap">
+        <section className="brew-panel" aria-labelledby="water-hub-final-recap">
           <h2 id="water-hub-final-recap" style={{ marginTop: 0 }}>
             {t("finalRecapTitle")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             {t("finalRecapSubtitle")}
           </p>
 
@@ -468,10 +468,10 @@ export default function WaterHubPage() {
               {summary?.finalRecap.predictedMashPh ? (
                 <>
                   <code>{fmt("pH", summary.finalRecap.predictedMashPh.value, 2)}</code>{" "}
-                  <span className="muted">({summary.finalRecap.predictedMashPh.kind})</span>
+                  <span className="brew-muted">({summary.finalRecap.predictedMashPh.kind})</span>
                 </>
               ) : (
-                <span className="muted">—</span>
+                <span className="brew-muted">—</span>
               )}
             </li>
             <li>
@@ -482,18 +482,18 @@ export default function WaterHubPage() {
                   {summary?.finalRecap.residualAlkalinityMashOverallPpmCaCO3 != null ? (
                     <code>{fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMashOverallPpmCaCO3, 0)}</code>
                   ) : (
-                    <span className="muted">—</span>
+                    <span className="brew-muted">—</span>
                   )}{" "}
-                  <span className="muted">{tUnits("ppmAsCaCO3")}</span>
+                  <span className="brew-muted">{tUnits("ppmAsCaCO3")}</span>
                 </li>
                 <li>
                   {t("raMerged")}: {" "}
                   {summary?.finalRecap.residualAlkalinityMergedPpmCaCO3 != null ? (
                     <code>{fmt("ppm_as_CaCO3", summary.finalRecap.residualAlkalinityMergedPpmCaCO3, 0)}</code>
                   ) : (
-                    <span className="muted">—</span>
+                    <span className="brew-muted">—</span>
                   )}{" "}
-                  <span className="muted">{tUnits("ppmAsCaCO3")}</span>
+                  <span className="brew-muted">{tUnits("ppmAsCaCO3")}</span>
                 </li>
               </ul>
             </li>
@@ -504,25 +504,25 @@ export default function WaterHubPage() {
                   <code>
                     {fmt("ppm_as_CaCO3", summary.finalRecap.styleExpectedRa.min, 0)}..{fmt("ppm_as_CaCO3", summary.finalRecap.styleExpectedRa.max, 0)}
                   </code>{" "}
-                  <span className="muted">{tUnits("ppmAsCaCO3")}</span>{" "}
-                  <span className="muted">· {t(summary.finalRecap.styleExpectedRa.rationaleKey)}</span>
+                  <span className="brew-muted">{tUnits("ppmAsCaCO3")}</span>{" "}
+                  <span className="brew-muted">· {t(summary.finalRecap.styleExpectedRa.rationaleKey)}</span>
                 </>
               ) : (
-                <span className="muted">{t("styleExpectedRaNa")}</span>
+                <span className="brew-muted">{t("styleExpectedRaNa")}</span>
               )}
             </li>
           </ul>
 
-          <p className="muted" style={{ marginBottom: 0 }}>
+          <p className="brew-muted" style={{ marginBottom: 0 }}>
             {t("finalRecapCaveat")}
           </p>
         </section>
 
-        <section className="panel" aria-labelledby="water-hub-alkalinity-vs-bicarbonate">
+        <section className="brew-panel" aria-labelledby="water-hub-alkalinity-vs-bicarbonate">
           <h2 id="water-hub-alkalinity-vs-bicarbonate" style={{ marginTop: 0 }}>
             {t("alkVsBicarbTitle")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             {t("alkVsBicarbSubtitle")}
           </p>
           <ul style={{ marginTop: 0 }}>

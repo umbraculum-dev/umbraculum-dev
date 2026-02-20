@@ -13,10 +13,10 @@ export function ModeFieldset<T extends string>(props: {
 
   return (
     <fieldset
-      className="modeFieldset"
+      className="brew-mode-fieldset"
       suppressHydrationWarning
     >
-      <legend className="muted" style={{ fontSize: 12, padding: "0 6px" }}>
+      <legend className="brew-muted" style={{ fontSize: 12, padding: "0 6px" }}>
         {legend}
       </legend>
       <div style={{ display: "grid", gap: 8 }}>

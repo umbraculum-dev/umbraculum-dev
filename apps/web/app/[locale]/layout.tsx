@@ -26,7 +26,7 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <TamaguiProviderWrapper>
-      <div className="appShell">
+      <div className="brew-app-shell">
         <PrimaryNav />
         <AdSlot placement="global_top" />
         <main id="main" style={{ marginTop: 16 }}>

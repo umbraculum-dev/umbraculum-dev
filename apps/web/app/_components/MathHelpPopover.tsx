@@ -17,7 +17,7 @@ export function MathHelpPopover(props: {
   const [open, setOpen] = useState(false);
 
   const className = useMemo(() => {
-    const base = "mathFxButton";
+    const base = "brew-math-fx-button";
     return size === "md" ? `${base} ${base}--md` : base;
   }, [size]);
 
@@ -47,7 +47,7 @@ export function MathHelpPopover(props: {
   }, [open]);
 
   return (
-    <span ref={wrapRef} className="mathFxWrap">
+    <span ref={wrapRef} className="brew-math-fx-wrap">
       <button
         type="button"
         className={className}
@@ -59,9 +59,9 @@ export function MathHelpPopover(props: {
         {tUi("fx")}
       </button>
       {open ? (
-        <div id={popoverId} className="mathPopover" role="dialog" aria-label={title}>
-          <div className="mathPopoverTitle">{title}</div>
-          <div className="mathPopoverBody">{body}</div>
+        <div id={popoverId} className="brew-math-popover" role="dialog" aria-label={title}>
+          <div className="brew-math-popover-title">{title}</div>
+          <div className="brew-math-popover-body">{body}</div>
         </div>
       ) : null}
     </span>

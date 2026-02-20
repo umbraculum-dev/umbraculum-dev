@@ -32,7 +32,7 @@ export function DashboardClient() {
     };
   }, [locale, mounted, router]);
 
-  if (!mounted) return <p className="muted">{tCommon("loading")}</p>;
+  if (!mounted) return <p className="brew-muted">{tCommon("loading")}</p>;
   return null;
 }
 

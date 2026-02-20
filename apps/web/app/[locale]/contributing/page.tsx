@@ -46,17 +46,17 @@ export default function ContributingPage() {
   return (
     <div style={{ maxWidth: 860, display: "grid", gap: 16 }}>
       <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
 
-      <section className="panel">
+      <section className="brew-panel">
         <details ref={i18nRef} open={openI18n} onToggle={(e) => setOpenI18n(e.currentTarget.open)}>
           <summary style={{ cursor: "pointer" }}>
             <h2 style={{ margin: 0, display: "inline" }}>{t("sections.i18n.title")}</h2>
           </summary>
           <div style={{ marginTop: 12 }}>
-            <p className="muted" style={{ marginTop: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 0 }}>
               {tI18n("subtitle")}
             </p>
 
@@ -78,7 +78,7 @@ export default function ContributingPage() {
             </ul>
 
             <h3 style={{ marginBottom: 6 }}>{tI18n("githubFallbackTitle")}</h3>
-            <p className="muted">{tI18n("githubFallbackBody")}</p>
+            <p className="brew-muted">{tI18n("githubFallbackBody")}</p>
 
             <h3 style={{ marginBottom: 6 }}>{tI18n("rulesTitle")}</h3>
             <ul>
@@ -90,13 +90,13 @@ export default function ContributingPage() {
         </details>
       </section>
 
-      <section className="panel">
+      <section className="brew-panel">
         <details ref={rawMaterialsRef} open={openRawMaterials} onToggle={(e) => setOpenRawMaterials(e.currentTarget.open)}>
           <summary style={{ cursor: "pointer" }}>
             <h2 style={{ margin: 0, display: "inline" }}>{t("sections.rawMaterials.title")}</h2>
           </summary>
           <div style={{ marginTop: 12 }}>
-            <p className="muted" style={{ marginTop: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 0 }}>
               {t("sections.rawMaterials.subtitle")}
             </p>
             <ol>
@@ -104,7 +104,7 @@ export default function ContributingPage() {
               <li>{t("sections.rawMaterials.step2")}</li>
               <li>{t("sections.rawMaterials.step3")}</li>
             </ol>
-            <p className="muted" style={{ marginBottom: 0 }}>
+            <p className="brew-muted" style={{ marginBottom: 0 }}>
               {t("sections.rawMaterials.issueTemplateNote")}
             </p>
           </div>

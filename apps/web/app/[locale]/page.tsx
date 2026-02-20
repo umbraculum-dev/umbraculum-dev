@@ -11,13 +11,13 @@ export default function Home() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
       <HealthPanel />
       <ImportExportPanel headingId="import-export-heading" className="" />
 
-      <section className="panel" aria-labelledby="dashboard-links-heading" style={{ marginTop: 16 }}>
+      <section className="brew-panel" aria-labelledby="dashboard-links-heading" style={{ marginTop: 16 }}>
         <h2 id="dashboard-links-heading" style={{ marginTop: 0 }}>
           {t("links.title")}
         </h2>

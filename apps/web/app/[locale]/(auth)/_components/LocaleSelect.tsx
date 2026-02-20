@@ -11,7 +11,7 @@ export function LocaleSelect({ id }: { id?: string }) {
   const searchParams = useSearchParams();
 
   return (
-    <label className="muted" style={{ display: "block", fontSize: 12 }}>
+    <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
       {t("languageLabel")}
       <select
         id={id}

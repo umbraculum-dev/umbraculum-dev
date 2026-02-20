@@ -74,6 +74,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - CI hygiene: no new critical a11y lint issues; if axe checks exist for the flow, they must pass or be justified + tracked as tech debt.
   - If accessibility requirements conflict with design, propose an accessible alternative—do not ship inaccessible UI.
 
+- **CSS structure**: See `docs/CODING-STANDARDS.md` → "CSS structure" for file layout and naming.
 - **Big picture**: `docs/architechture.md`
 - **Roadmap**: `docs/ROADMAP.md`
 - **Work tracker**: `TODOs.md`

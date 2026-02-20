@@ -295,7 +295,7 @@ export default function EquipmentPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{tNav("equipment")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
 
@@ -303,18 +303,18 @@ export default function EquipmentPage() {
         <button type="button" onClick={() => void refresh()} disabled={loading}>
           {loading ? t("refreshing") : t("refresh")}
         </button>
-        <Link href="/recipes" className="muted" style={{ marginLeft: "auto" }}>
+        <Link href="/recipes" className="brew-muted" style={{ marginLeft: "auto" }}>
           {t("backToRecipes")}
         </Link>
       </div>
 
       {error ? (
-        <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+        <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
           {error}
         </pre>
       ) : null}
 
-      <details className="panel" style={{ marginTop: 16 }}>
+      <details className="brew-panel" style={{ marginTop: 16 }}>
         <summary style={{ cursor: "pointer" }}>
           <h2 id="equipment-list" style={{ marginTop: 0, display: "inline" }}>
             {t("listTitle")}
@@ -354,7 +354,7 @@ export default function EquipmentPage() {
               </table>
             </div>
           ) : (
-            <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
               {t("noProfiles")}
             </p>
           )}
@@ -362,14 +362,14 @@ export default function EquipmentPage() {
       </details>
 
       {canWrite && editingId ? (
-        <section className="panel" aria-labelledby="equipment-edit" style={{ marginTop: 16 }}>
+        <section className="brew-panel" aria-labelledby="equipment-edit" style={{ marginTop: 16 }}>
           <h2 id="equipment-edit" style={{ marginTop: 0 }}>
             {t("editTitle")}
           </h2>
           <form onSubmit={onSaveEdit} aria-describedby={editError ? "equipment-edit-error" : undefined}>
             <div style={{ display: "grid", gap: 12 }}>
               <div>
-                <label htmlFor="equip-edit-name" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="equip-edit-name" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   {t("nameLabel")}
                 </label>
                 <input
@@ -384,7 +384,7 @@ export default function EquipmentPage() {
                 <legend style={{ padding: "0 6px" }}>{t("sectionTitles.kettle")}</legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
-                    <label htmlFor="equip-edit-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-kettle-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -398,7 +398,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-kettle-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -412,7 +412,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-evap" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-evap" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleBoilEvaporationRatePercentPerHourLabel")}
                     </label>
                     <input
@@ -426,7 +426,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-shrink" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-shrink" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleCoolingShrinkagePercentLabel")}
                     </label>
                     <input
@@ -440,7 +440,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-hops-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
                     </label>
                     <input
@@ -460,7 +460,7 @@ export default function EquipmentPage() {
                 <legend style={{ padding: "0 6px" }}>{t("sectionTitles.mash")}</legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
-                    <label htmlFor="equip-edit-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-mash-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -474,7 +474,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-mash-eff" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-mash-eff" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashEfficiencyPercentLabel")}
                     </label>
                     <input
@@ -488,7 +488,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-mash-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -502,7 +502,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-thickness" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
@@ -516,7 +516,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-grain-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
@@ -530,7 +530,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-edit-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-water-leftover" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -550,7 +550,7 @@ export default function EquipmentPage() {
                 <legend style={{ padding: "0 6px" }}>{t("sectionTitles.misc")}</legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
-                    <label htmlFor="equip-edit-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-edit-other-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("otherLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -584,7 +584,7 @@ export default function EquipmentPage() {
               </button>
             </div>
             {editError ? (
-              <pre id="equipment-edit-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              <pre id="equipment-edit-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
                 {editError}
               </pre>
             ) : null}
@@ -593,7 +593,7 @@ export default function EquipmentPage() {
       ) : null}
 
       {canWrite ? (
-        <details className="panel" style={{ marginTop: 16 }}>
+        <details className="brew-panel" style={{ marginTop: 16 }}>
           <summary style={{ cursor: "pointer" }}>
             <h2 id="equipment-create" style={{ marginTop: 0, display: "inline" }}>
               {t("createTitle")}
@@ -602,7 +602,7 @@ export default function EquipmentPage() {
           <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined} style={{ marginTop: 12 }}>
             <div style={{ display: "grid", gap: 12 }}>
               <div>
-                <label htmlFor="equip-name" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="equip-name" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   {t("nameLabel")}
                 </label>
                 <input
@@ -617,7 +617,7 @@ export default function EquipmentPage() {
                 <legend style={{ padding: "0 6px" }}>{t("sectionTitles.kettle")}</legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
-                    <label htmlFor="equip-kettle-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-kettle-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -631,7 +631,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-kettle-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-kettle-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -645,7 +645,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-evap" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-evap" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleBoilEvaporationRatePercentPerHourLabel")}
                     </label>
                     <input
@@ -659,7 +659,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-shrink" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-shrink" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleCoolingShrinkagePercentLabel")}
                     </label>
                     <input
@@ -673,7 +673,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-hops-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-hops-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
                     </label>
                     <input
@@ -693,7 +693,7 @@ export default function EquipmentPage() {
                 <legend style={{ padding: "0 6px" }}>{t("sectionTitles.mash")}</legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
-                    <label htmlFor="equip-mash-vol" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-mash-vol" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashVolumeLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -707,7 +707,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-mash-eff" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-mash-eff" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashEfficiencyPercentLabel")}
                     </label>
                     <input
@@ -721,7 +721,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-mash-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-mash-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -735,7 +735,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-mash-thickness" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-mash-thickness" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
@@ -749,7 +749,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-grain-abs" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-grain-abs" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
                     </label>
                     <input
@@ -763,7 +763,7 @@ export default function EquipmentPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="equip-water-leftover" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-water-leftover" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -783,7 +783,7 @@ export default function EquipmentPage() {
                 <legend style={{ padding: "0 6px" }}>{t("sectionTitles.misc")}</legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                   <div>
-                    <label htmlFor="equip-other-losses" className="muted" style={{ display: "block", fontSize: 12 }}>
+                    <label htmlFor="equip-other-losses" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                       {t("otherLossesLitersLabel", { unit: tUnits("L") })}
                     </label>
                     <input
@@ -805,7 +805,7 @@ export default function EquipmentPage() {
               </button>
             </div>
             {createError ? (
-              <pre id="equipment-create-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              <pre id="equipment-create-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
                 {createError}
               </pre>
             ) : null}

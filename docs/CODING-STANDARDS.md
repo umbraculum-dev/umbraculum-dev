@@ -5,6 +5,17 @@ This repo is **TypeScript-first**. The goal is clarity + safe refactors (includi
 ### Styling: avoid inline styles
 Avoid inline styles where you can. In this codebase **Tamagui props and components are the preferred replacement** for layout, spacing, colors, borders, and typography. Use `className` with CSS classes when Tamagui does not apply (e.g. native `<select>`, `<table>`, `<details>`/`<summary>`).
 
+### CSS structure (web app)
+The web app uses two CSS sources: `apps/web/app/globals.css` (imports) and `apps/web/public/tamagui.generated.css` (Tamagui). `globals.css` imports three files:
+
+- **variables.css** — `:root` tokens and theme presets (`data-theme`, `data-brand`, `data-density`, `data-font-scale`)
+- **layout.css** — Reset, base elements (html/body, a, button/input/select/textarea), `:focus-visible`, reduced-motion, and layout classes (`.brew-app-shell`, `.brew-panel`, `.brew-code-block`)
+- **components.css** — App-specific component classes (`.brew-error-box`, `.brew-muted`, `.brew-recipe-edit-select`, `.brew-field-block`, etc.)
+
+**Naming:** All custom classes use the `brew-` prefix (e.g. `brew-panel`, `brew-recipe-edit-select`) to avoid clashes with Tamagui and third-party styles.
+
+**Where to add new styles:** Variables → `variables.css`; layout/shell → `layout.css`; component classes → `components.css`.
+
 ### TypeScript: `interface` vs `type`
 - **Use `interface` for object contracts**:
   - API DTOs (our API responses and requests)

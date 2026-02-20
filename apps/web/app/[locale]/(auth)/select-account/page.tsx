@@ -80,21 +80,21 @@ export default function SelectAccountPage() {
   };
 
   return (
-    <section className="panel" style={{ maxWidth: 720 }}>
+    <section className="brew-panel" style={{ maxWidth: 720 }}>
       <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
 
-      {loading ? <p className="muted">{t("loading")}</p> : null}
+      {loading ? <p className="brew-muted">{t("loading")}</p> : null}
 
       {error ? (
-        <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+        <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
           {error}
         </pre>
       ) : null}
 
-      {!loading && !hasAccounts ? <p className="muted">{t("noAccountsFound")}</p> : null}
+      {!loading && !hasAccounts ? <p className="brew-muted">{t("noAccountsFound")}</p> : null}
 
       {hasAccounts ? (
         <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
@@ -106,8 +106,8 @@ export default function SelectAccountPage() {
               disabled={Boolean(submittingId)}
               style={{ textAlign: "left" }}
             >
-              <strong>{a.name}</strong> <span className="muted">· {a.role}</span>
-              {submittingId === a.id ? <span className="muted"> · Saving…</span> : null}
+              <strong>{a.name}</strong> <span className="brew-muted">· {a.role}</span>
+              {submittingId === a.id ? <span className="brew-muted"> · Saving…</span> : null}
             </button>
           ))}
         </div>

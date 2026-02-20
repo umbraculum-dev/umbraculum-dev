@@ -86,14 +86,14 @@ export default function PlatformRecipesPage() {
     ? `/api/platform/recipes/export/beerjson?accountId=${encodeURIComponent(accountId)}`
     : undefined;
 
-  if (auth.status === "loading") return <p className="muted">{t("loading")}</p>;
-  if (auth.status === "error") return <pre className="errorBox" role="alert">{auth.error}</pre>;
+  if (auth.status === "loading") return <p className="brew-muted">{t("loading")}</p>;
+  if (auth.status === "error") return <pre className="brew-error-box" role="alert">{auth.error}</pre>;
 
   if (!isPlatformAdmin) {
     return (
-      <section className="panel" style={{ maxWidth: 900 }}>
+      <section className="brew-panel" style={{ maxWidth: 900 }}>
         <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="muted" style={{ marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginBottom: 0 }}>
           {t("notAuthorized")}
         </p>
       </section>
@@ -102,14 +102,14 @@ export default function PlatformRecipesPage() {
 
   return (
     <div style={{ display: "grid", gap: 16, maxWidth: 900 }}>
-      <section className="panel">
+      <section className="brew-panel">
         <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="muted" style={{ marginTop: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0 }}>
           {t("subtitle")}
         </p>
 
         <div style={{ marginTop: 12 }}>
-          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="platform-account">
+          <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="platform-account">
             {t("accountLabel")}
           </label>
           <select
@@ -127,20 +127,20 @@ export default function PlatformRecipesPage() {
             ))}
           </select>
           {accountsError ? (
-            <p className="muted" style={{ marginTop: 6 }}>{accountsError}</p>
+            <p className="brew-muted" style={{ marginTop: 6 }}>{accountsError}</p>
           ) : null}
         </div>
       </section>
 
       {accountId ? (
         <>
-          <section className="panel" aria-labelledby="platform-export-heading">
+          <section className="brew-panel" aria-labelledby="platform-export-heading">
             <h2 id="platform-export-heading" style={{ marginTop: 0 }}>
               {t("exportSectionTitle")}
             </h2>
             <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <div style={{ minWidth: 200 }}>
-                <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="platform-export-recipe">
+                <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="platform-export-recipe">
                   {t("exportSingleLabel")}
                 </label>
                 <select
@@ -173,7 +173,7 @@ export default function PlatformRecipesPage() {
                 {t("exportBulkCta")}
               </a>
             </div>
-            <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 10, marginBottom: 0 }}>
               {t("exportFullNote")}
             </p>
           </section>
@@ -186,7 +186,7 @@ export default function PlatformRecipesPage() {
           />
         </>
       ) : (
-        <p className="muted">{t("accountRequired")}</p>
+        <p className="brew-muted">{t("accountRequired")}</p>
       )}
     </div>
   );

@@ -718,12 +718,12 @@ export default function BoilWaterPage() {
 
   const selectedProfileInfo = (p: WaterProfile | null, label: string) =>
     p ? (
-      <span className="muted">
+      <span className="brew-muted">
         {label}: <code>{p.name}</code>
       </span>
     ) : (
-      <span className="muted">
-        {label}: <span className="muted">—</span>
+      <span className="brew-muted">
+        {label}: <span className="brew-muted">—</span>
       </span>
     );
 
@@ -743,7 +743,7 @@ export default function BoilWaterPage() {
       />
 
       {authChecked && !canCall ? (
-        <p role="alert" className="errorBox">
+        <p role="alert" className="brew-error-box">
           {tWater.rich("notAuthenticated", {
             signIn: (chunks) => <Link href={`/login?next=/${locale}/recipes/${recipeId}/water/boil`}>{chunks}</Link>,
           })}
@@ -751,17 +751,17 @@ export default function BoilWaterPage() {
       ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
-        <section className="panel" aria-labelledby="boil-adjustment-heading">
+        <section className="brew-panel" aria-labelledby="boil-adjustment-heading">
           <h2 id="boil-adjustment-heading" style={{ marginTop: 0 }}>
             {t("adjustmentHeading")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             {t("adjustmentHelp")}
           </p>
 
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr 1fr" }}>
             <div>
-              <label htmlFor="boil-source-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="boil-source-profile" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 Source water profile
               </label>
               <select
@@ -781,7 +781,7 @@ export default function BoilWaterPage() {
             </div>
 
             <div>
-              <label htmlFor="boil-target-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="boil-target-profile" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 Target water profile
               </label>
               <select
@@ -801,7 +801,7 @@ export default function BoilWaterPage() {
             </div>
 
             <div>
-              <label htmlFor="boil-dilution-profile" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="boil-dilution-profile" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 Dilution water profile
               </label>
               <select
@@ -823,7 +823,7 @@ export default function BoilWaterPage() {
 
           <div style={{ marginTop: 12, display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
             <div>
-              <label htmlFor="boil-source-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="boil-source-volume" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
@@ -837,7 +837,7 @@ export default function BoilWaterPage() {
               />
             </div>
             <div>
-              <label htmlFor="boil-dilution-volume" className="muted" style={{ display: "block", fontSize: 12 }}>
+              <label htmlFor="boil-dilution-volume" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </label>
               <input
@@ -860,18 +860,18 @@ export default function BoilWaterPage() {
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
             </button>
             {adjustmentSaveStatus ? (
-              <span className="muted" role="status" aria-live="polite">
+              <span className="brew-muted" role="status" aria-live="polite">
                 {adjustmentSaveStatus}
               </span>
             ) : null}
           </div>
 
           {mixedSourceProfile ? (
-            <details className="fieldBlock fieldBlock--readonly" style={{ marginTop: 12 }}>
-              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+            <details className="brew-field-block brew-field-block--readonly" style={{ marginTop: 12 }}>
+              <summary className="brew-field-block-header" style={{ cursor: "pointer" }}>
                 <strong>Mixed water ions</strong>
-                <span className="fieldBadge">Read-only</span>
-                <span className="muted">Computed from profiles + volumes</span>
+                <span className="brew-field-badge">Read-only</span>
+                <span className="brew-muted">Computed from profiles + volumes</span>
               </summary>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -909,23 +909,23 @@ export default function BoilWaterPage() {
               </div>
             </details>
           ) : (
-            <p className="muted" style={{ marginTop: 12, marginBottom: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 12, marginBottom: 0 }}>
               {t("saltAdditionsHelp")}
             </p>
           )}
 
           {profilesError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {profilesError}
             </pre>
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="boil-salts-heading">
+        <section className="brew-panel" aria-labelledby="boil-salts-heading">
           <h2 id="boil-salts-heading" style={{ marginTop: 0 }}>
             {t("saltAdditionsHeading")}
           </h2>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             {t("saltAdditionsBaseHelp")}
           </p>
 
@@ -939,31 +939,31 @@ export default function BoilWaterPage() {
               {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
             </button>
             {saltsStatus ? (
-              <span className="muted" role="status" aria-live="polite">
+              <span className="brew-muted" role="status" aria-live="polite">
                 {saltsStatus}
               </span>
             ) : null}
             {saltsSaveStatus ? (
-              <span className="muted" role="status" aria-live="polite">
+              <span className="brew-muted" role="status" aria-live="polite">
                 {saltsSaveStatus}
               </span>
             ) : null}
             {saltsCalcSaveStatus ? (
-              <span className="muted" role="status" aria-live="polite">
+              <span className="brew-muted" role="status" aria-live="polite">
                 {saltsCalcSaveStatus}
               </span>
             ) : null}
           </div>
 
           {saltsError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {saltsError}
             </pre>
           ) : null}
 
           {saltsResult ? (
-            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+            <details className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <summary className="brew-field-block-header" style={{ cursor: "pointer" }}>
                 <strong>Resulting ions (after salts only)</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["boil.ionsAfterSalts"];
@@ -990,7 +990,7 @@ export default function BoilWaterPage() {
                     />
                   );
                 })() : null}
-                <span className="fieldBadge">Computed</span>
+                <span className="brew-field-badge">Computed</span>
               </summary>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -1023,7 +1023,7 @@ export default function BoilWaterPage() {
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="boil-acid-heading">
+        <section className="brew-panel" aria-labelledby="boil-acid-heading">
           <h2 id="boil-acid-heading" style={{ marginTop: 0 }}>
             {t("acidificationHeading")}
           </h2>
@@ -1044,7 +1044,7 @@ export default function BoilWaterPage() {
               </div>
 
               <div>
-                <label htmlFor="boil-starting-alk" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="boil-starting-alk" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </label>
                 <input
@@ -1062,7 +1062,7 @@ export default function BoilWaterPage() {
               </div>
 
               <div>
-                <label htmlFor="boil-starting-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="boil-starting-ph" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Starting pH
                 </label>
                 <input
@@ -1078,7 +1078,7 @@ export default function BoilWaterPage() {
 
               {acidificationMode === "targetPh" ? (
                 <div>
-                  <label htmlFor="boil-target-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="boil-target-ph" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     Target pH
                   </label>
                   <input
@@ -1094,7 +1094,7 @@ export default function BoilWaterPage() {
               ) : null}
 
               <div>
-                <label htmlFor="boil-acid-type" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="boil-acid-type" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Acid type
                 </label>
                 <select
@@ -1115,7 +1115,7 @@ export default function BoilWaterPage() {
               </div>
 
               <div>
-                <label htmlFor="boil-strength-kind" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="boil-strength-kind" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Strength kind
                 </label>
                 <select
@@ -1132,7 +1132,7 @@ export default function BoilWaterPage() {
               </div>
 
               <div style={{ gridColumn: "1 / -1" }}>
-                <label htmlFor="boil-strength-value" className="muted" style={{ display: "block", fontSize: 12 }}>
+                <label htmlFor="boil-strength-value" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                   Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </label>
                 <input
@@ -1149,7 +1149,7 @@ export default function BoilWaterPage() {
 
               {acidificationMode === "manual" ? (
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="boil-manual-acid-added" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="boil-manual-acid-added" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </label>
                   <input
@@ -1176,24 +1176,24 @@ export default function BoilWaterPage() {
               <button type="button" onClick={() => void onSaveInputs()} disabled={!canCall || savingInputs}>
                 {savingInputs ? "Saving…" : "Save boil draft"}
               </button>
-              {boilStatus ? <span className="muted" role="status" aria-live="polite">{boilStatus}</span> : null}
-              {boilSaveStatus ? <span className="muted" role="status" aria-live="polite">{boilSaveStatus}</span> : null}
-              {calcSaveStatus ? <span className="muted" role="status" aria-live="polite">{calcSaveStatus}</span> : null}
+              {boilStatus ? <span className="brew-muted" role="status" aria-live="polite">{boilStatus}</span> : null}
+              {boilSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{boilSaveStatus}</span> : null}
+              {calcSaveStatus ? <span className="brew-muted" role="status" aria-live="polite">{calcSaveStatus}</span> : null}
             </div>
 
             {boilError ? (
-              <pre id="boil-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              <pre id="boil-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
                 {boilError}
               </pre>
             ) : null}
           </form>
 
           {acidificationMode === "targetPh" && acidResult ? (
-            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
+            <div className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <div className="brew-field-block-header">
                 <strong>Result</strong>
-                <span className="fieldBadge">Computed</span>
-                <span className="muted">From current inputs</span>
+                <span className="brew-field-badge">Computed</span>
+                <span className="brew-muted">From current inputs</span>
               </div>
               <ul>
                 {acidResult.acidRequiredMl !== null ? (
@@ -1225,11 +1225,11 @@ export default function BoilWaterPage() {
           ) : null}
 
           {acidificationMode === "manual" && manualResult ? (
-            <details className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <summary className="fieldBlockHeader" style={{ cursor: "pointer" }}>
+            <details className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <summary className="brew-field-block-header" style={{ cursor: "pointer" }}>
                 <strong>Result (manual acid amount mode)</strong>
-                <span className="fieldBadge">Computed</span>
-                <span className="muted">Estimated from manual acid amount</span>
+                <span className="brew-field-badge">Computed</span>
+                <span className="brew-muted">Estimated from manual acid amount</span>
               </summary>
               <ul>
                 <li>
@@ -1249,7 +1249,7 @@ export default function BoilWaterPage() {
           <h3 id="overall-boil-water-result" style={{ marginTop: 0 }}>
             {t("overallResultHeading")}
           </h3>
-          <p className="muted" style={{ marginTop: 0 }}>
+          <p className="brew-muted" style={{ marginTop: 0 }}>
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </p>
           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -1259,18 +1259,18 @@ export default function BoilWaterPage() {
             <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
             </button>
-            {overallStatus ? <span className="muted">{overallStatus}</span> : null}
-            {overallSaveStatus ? <span className="muted">{overallSaveStatus}</span> : null}
+            {overallStatus ? <span className="brew-muted">{overallStatus}</span> : null}
+            {overallSaveStatus ? <span className="brew-muted">{overallSaveStatus}</span> : null}
           </div>
           {overallError ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {overallError}
             </pre>
           ) : null}
 
           {overallResult ? (
-            <div className="fieldBlock fieldBlock--computed" style={{ marginTop: 12 }}>
-              <div className="fieldBlockHeader">
+            <div className="brew-field-block brew-field-block--computed" style={{ marginTop: 12 }}>
+              <div className="brew-field-block-header">
                 <strong>Overall boil snapshot</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["boil.overallSnapshot"];
@@ -1297,8 +1297,8 @@ export default function BoilWaterPage() {
                     />
                   );
                 })() : null}
-                <span className="fieldBadge">Computed</span>
-                <span className="muted">Uses latest inputs; persist a snapshot to debug</span>
+                <span className="brew-field-badge">Computed</span>
+                <span className="brew-muted">Uses latest inputs; persist a snapshot to debug</span>
               </div>
               <ul>
                 <li>
@@ -1340,8 +1340,8 @@ export default function BoilWaterPage() {
           ) : null}
         </section>
 
-        {settingsError ? <pre className="errorBox" role="alert">{settingsError}</pre> : null}
-        {savingError ? <pre className="errorBox" role="alert">{savingError}</pre> : null}
+        {settingsError ? <pre className="brew-error-box" role="alert">{settingsError}</pre> : null}
+        {savingError ? <pre className="brew-error-box" role="alert">{savingError}</pre> : null}
       </div>
     </>
   );

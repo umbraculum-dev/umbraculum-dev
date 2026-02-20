@@ -27,14 +27,14 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
         <Link
           href="/platform/ads"
           aria-current={isActive("/platform/ads") ? "page" : undefined}
-          className="muted"
+          className="brew-muted"
         >
           {t("ads")}
         </Link>
         <Link
           href="/platform/recipes"
           aria-current={isActive("/platform/recipes") ? "page" : undefined}
-          className="muted"
+          className="brew-muted"
         >
           {t("recipes")}
         </Link>

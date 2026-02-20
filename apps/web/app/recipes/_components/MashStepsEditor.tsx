@@ -167,7 +167,7 @@ export function MashStepsEditor({
   };
 
   return (
-    <View className="mashStepsEditor" alignItems="flex-start" w="100%">
+    <View className="brew-mash-steps-editor" alignItems="flex-start" w="100%">
       {mashWaterBudgetLiters != null && !readOnly ? (
         <YStack gap="$2" mb="$3">
           <SizableText size="$2" color="$gray10">{t("mashStepsWaterBudgetNote")}</SizableText>
@@ -239,7 +239,7 @@ export function MashStepsEditor({
                       ) : (
                         <select
                           id={`mash-step-type-${r.id}`}
-                          className="recipeEditSelect recipeEditSelectFull"
+                          className="brew-recipe-edit-select brew-recipe-edit-select-full"
                           value={r.type}
                           onChange={(e) => onUpdateStep?.(r.id, { type: e.target.value as EditorMashStepType })}
                         >

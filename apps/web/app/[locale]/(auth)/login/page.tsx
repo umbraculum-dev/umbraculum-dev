@@ -28,9 +28,9 @@ export default function LoginPage() {
 
   if (!mounted) {
     return (
-      <section className="panel" style={{ maxWidth: 520 }}>
+      <section className="brew-panel" style={{ maxWidth: 520 }}>
         <h1 style={{ marginTop: 0 }}>{t("loginTitle")}</h1>
-        <p className="muted" style={{ marginTop: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0 }}>
           {t("submitting")}
         </p>
       </section>
@@ -69,13 +69,13 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="panel" style={{ maxWidth: 520 }}>
+    <section className="brew-panel" style={{ maxWidth: 520 }}>
       <h1 style={{ marginTop: 0 }}>{t("loginTitle")}</h1>
 
       <form onSubmit={onSubmit}>
         <div style={{ display: "grid", gap: 12 }}>
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }}>
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
               {t("emailLabel")}
             </label>
             <input
@@ -91,7 +91,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }}>
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
               {t("passwordLabel")}
             </label>
             <input
@@ -116,12 +116,12 @@ export default function LoginPage() {
       </form>
 
       {error ? (
-        <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+        <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
           {error}
         </pre>
       ) : null}
 
-      <div className="muted" style={{ marginTop: 12 }}>
+      <div className="brew-muted" style={{ marginTop: 12 }}>
         <strong>{t("noteTitle")}</strong>
         <div style={{ marginTop: 6 }}>{t("noteBody")}</div>
         <div style={{ marginTop: 8 }}>

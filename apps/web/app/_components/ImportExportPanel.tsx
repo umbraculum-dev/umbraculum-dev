@@ -12,17 +12,17 @@ export function ImportExportPanel(props: { headingId: string; className?: string
       <h2 id={headingId} style={{ marginTop: 0 }}>
         {t("importExport.title")}
       </h2>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("importExport.supportedNote")}
       </p>
-      <ul className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+      <ul className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
         <li>{t("importExport.importFormats")}</li>
         <li>{t("importExport.exportFormats")}</li>
       </ul>
-      <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 10, marginBottom: 0 }}>
         {t("importExport.actionsLiveInRecipes")} <Link href="/recipes">{t("importExport.actionsCta")}</Link>
       </p>
-      <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 10, marginBottom: 0 }}>
         {t("importExport.customImportNote")} <Link href="/contact">{t("importExport.customImportCta")}</Link>
       </p>
     </section>

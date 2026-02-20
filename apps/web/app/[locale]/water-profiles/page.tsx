@@ -137,12 +137,12 @@ export default function WaterProfilesPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("activeAccount")}: <code>{activeAccountId ?? "—"}</code>
       </p>
 
       <div style={{ display: "grid", gap: 16 }}>
-        <section className="panel" aria-labelledby="profiles-table-heading">
+        <section className="brew-panel" aria-labelledby="profiles-table-heading">
           <h2 id="profiles-table-heading" style={{ marginTop: 0 }}>
             {t("viewAllTableTitle")}
           </h2>
@@ -151,13 +151,13 @@ export default function WaterProfilesPage() {
             <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
               {loading ? "Refreshing…" : "Refresh"}
             </button>
-            <span className="muted" role="status" aria-live="polite">
+            <span className="brew-muted" role="status" aria-live="polite">
               {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
             </span>
           </div>
 
           {error ? (
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {error}
             </pre>
           ) : null}
@@ -191,11 +191,11 @@ export default function WaterProfilesPage() {
                     }}
                   >
                     <td>{p.name}</td>
-                    <td className="muted">
+                    <td className="brew-muted">
                       {p.scope}/{p.type}
                     </td>
-                    <td className="muted">{p.verificationStatus}</td>
-                    <td align="right" className="muted">
+                    <td className="brew-muted">{p.verificationStatus}</td>
+                    <td align="right" className="brew-muted">
                       {p.ph == null ? "—" : p.ph.toFixed(2)}
                     </td>
                     <td align="right">{p.calcium}</td>
@@ -219,7 +219,7 @@ export default function WaterProfilesPage() {
                           </button>
                         </div>
                       ) : (
-                        <span className="muted">—</span>
+                        <span className="brew-muted">—</span>
                       )}
                     </td>
                   </tr>
@@ -229,25 +229,25 @@ export default function WaterProfilesPage() {
           </div>
 
           {!admin ? (
-            <p className="muted" style={{ marginBottom: 0 }}>
+            <p className="brew-muted" style={{ marginBottom: 0 }}>
               Only <code>owner</code> and <code>brewery_admin</code> can add/verify profiles.
             </p>
           ) : null}
         </section>
 
         {admin ? (
-          <section className="panel" aria-labelledby="admin-profiles-heading">
+          <section className="brew-panel" aria-labelledby="admin-profiles-heading">
             <h2 id="admin-profiles-heading" style={{ marginTop: 0 }}>
               {t("adminAddTitle")}
             </h2>
-            <p className="muted" style={{ marginTop: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 0 }}>
               {t("createdProfilesStartUnverified")}
             </p>
 
             <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
               <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="create-name" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="create-name" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     Profile name
                   </label>
                   <input
@@ -259,7 +259,7 @@ export default function WaterProfilesPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="create-scope" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="create-scope" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     Scope
                   </label>
                   <select
@@ -273,7 +273,7 @@ export default function WaterProfilesPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="create-type" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="create-type" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     Type
                   </label>
                   <select
@@ -287,7 +287,7 @@ export default function WaterProfilesPage() {
                   </select>
                 </div>
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="create-ph" className="muted" style={{ display: "block", fontSize: 12 }}>
+                  <label htmlFor="create-ph" className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                     pH (optional)
                   </label>
                   <input
@@ -304,7 +304,7 @@ export default function WaterProfilesPage() {
               </div>
 
               <fieldset style={{ border: 0, padding: 0, marginTop: 12 }}>
-                <legend className="muted" style={{ fontSize: 12 }}>
+                <legend className="brew-muted" style={{ fontSize: 12 }}>
                   {t("ionsLegend", { unit: tUnits("ppm") })}
                 </legend>
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(3, 1fr)" }}>
@@ -319,7 +319,7 @@ export default function WaterProfilesPage() {
                     ] as const
                   ).map(([k, label]) => (
                     <div key={k}>
-                      <label htmlFor={`ion-${k}`} className="muted" style={{ display: "block", fontSize: 12 }}>
+                      <label htmlFor={`ion-${k}`} className="brew-muted" style={{ display: "block", fontSize: 12 }}>
                         {label}
                       </label>
                       <input
@@ -339,13 +339,13 @@ export default function WaterProfilesPage() {
                 <button type="submit" disabled={!createName.trim() || createSubmitting}>
                   {createSubmitting ? "Creating…" : "Create profile"}
                 </button>
-                <span className="muted" role="status" aria-live="polite">
+                <span className="brew-muted" role="status" aria-live="polite">
                   Profiles in this section require admin privileges.
                 </span>
               </div>
 
               {createError ? (
-                <pre id="create-error" className="errorBox" role="alert" style={{ marginTop: 12 }}>
+                <pre id="create-error" className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
                   {createError}
                 </pre>
               ) : null}
@@ -353,7 +353,7 @@ export default function WaterProfilesPage() {
           </section>
         ) : null}
 
-        <section className="panel" aria-labelledby="nav-heading">
+        <section className="brew-panel" aria-labelledby="nav-heading">
           <h2 id="nav-heading" style={{ marginTop: 0 }}>
             {t("navigationTitle")}
           </h2>
@@ -361,7 +361,7 @@ export default function WaterProfilesPage() {
             <li>
               <Link href="/recipes">Back to Recipes</Link>
             </li>
-            <li className="muted" style={{ marginTop: 8 }}>
+            <li className="brew-muted" style={{ marginTop: 8 }}>
               {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
             </li>
           </ul>

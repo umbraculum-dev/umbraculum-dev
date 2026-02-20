@@ -143,14 +143,14 @@ export default function PlatformAdsPage() {
     }
   };
 
-  if (auth.status === "loading") return <p className="muted">{t("loading")}</p>;
-  if (auth.status === "error") return <pre className="errorBox" role="alert">{auth.error}</pre>;
+  if (auth.status === "loading") return <p className="brew-muted">{t("loading")}</p>;
+  if (auth.status === "error") return <pre className="brew-error-box" role="alert">{auth.error}</pre>;
 
   if (!isPlatformAdmin) {
     return (
-      <section className="panel" style={{ maxWidth: 900 }}>
+      <section className="brew-panel" style={{ maxWidth: 900 }}>
         <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="muted" style={{ marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginBottom: 0 }}>
           {t("notAuthorized")}
         </p>
       </section>
@@ -159,17 +159,17 @@ export default function PlatformAdsPage() {
 
   return (
     <div style={{ display: "grid", gap: 16, maxWidth: 900 }}>
-      <section className="panel">
+      <section className="brew-panel">
         <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-        <p className="muted" style={{ marginTop: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0 }}>
           {t("subtitle")}
         </p>
-        <p className="muted" style={{ marginTop: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0 }}>
           {t("hint", { locale })}
         </p>
 
         {error ? (
-          <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+          <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
             {error}
           </pre>
         ) : null}
@@ -177,7 +177,7 @@ export default function PlatformAdsPage() {
         <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
             <div>
-              <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-placement">
+              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-placement">
                 {t("form.placement")}
               </label>
               <select
@@ -194,7 +194,7 @@ export default function PlatformAdsPage() {
               </select>
             </div>
             <div>
-              <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-priority">
+              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-priority">
                 {t("form.priority")}
               </label>
               <input
@@ -210,7 +210,7 @@ export default function PlatformAdsPage() {
           </div>
 
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-image-url">
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-image-url">
               {t("form.imageUrl")}
             </label>
             <input
@@ -223,7 +223,7 @@ export default function PlatformAdsPage() {
           </div>
 
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-link-url">
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-link-url">
               {t("form.linkUrl")}
             </label>
             <input
@@ -236,7 +236,7 @@ export default function PlatformAdsPage() {
           </div>
 
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-alt-text">
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="ad-alt-text">
               {t("form.altText")}
             </label>
             <input
@@ -248,7 +248,7 @@ export default function PlatformAdsPage() {
             />
           </div>
 
-          <label className="muted" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <label className="brew-muted" style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
             {t("form.isActive")}
           </label>
@@ -264,10 +264,10 @@ export default function PlatformAdsPage() {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="brew-panel">
         <h2 style={{ marginTop: 0 }}>{t("listTitle")}</h2>
 
-        {!items.length ? <p className="muted">{t("noAds")}</p> : null}
+        {!items.length ? <p className="brew-muted">{t("noAds")}</p> : null}
 
         {items.length ? (
           <div style={{ overflowX: "auto" }}>
@@ -298,7 +298,7 @@ export default function PlatformAdsPage() {
                       </a>
                     </td>
                     <td style={{ verticalAlign: "top", paddingTop: 8 }}>
-                      <label className="muted" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                      <label className="brew-muted" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                         <input
                           type="checkbox"
                           checked={a.isActive}

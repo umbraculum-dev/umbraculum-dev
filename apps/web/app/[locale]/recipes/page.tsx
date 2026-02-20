@@ -145,18 +145,18 @@ export default function RecipesPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
 
-      <section className="panel" aria-labelledby="recipes-create-heading">
+      <section className="brew-panel" aria-labelledby="recipes-create-heading">
         <h2 id="recipes-create-heading" style={{ marginTop: 0 }}>
           {t("createTitle")}
         </h2>
         <form onSubmit={onCreate}>
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
             <div>
-              <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-name">
+              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-name">
                 {t("nameLabel")}
               </label>
               <input
@@ -168,7 +168,7 @@ export default function RecipesPage() {
               />
             </div>
             <div>
-              <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-style">
+              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-style">
                 {t("styleLabel")}
               </label>
               <select
@@ -187,7 +187,7 @@ export default function RecipesPage() {
                 ))}
               </select>
               {stylesError ? (
-                <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+                <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
                   {String(stylesError)}
                 </p>
               ) : null}
@@ -203,17 +203,17 @@ export default function RecipesPage() {
           </div>
         </form>
         {error ? (
-          <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+          <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
             {error}
           </pre>
         ) : null}
       </section>
 
-      <section className="panel" aria-labelledby="recipes-import-heading" style={{ marginTop: 16 }}>
+      <section className="brew-panel" aria-labelledby="recipes-import-heading" style={{ marginTop: 16 }}>
         <h2 id="recipes-import-heading" style={{ marginTop: 0 }}>
           {tImport("title")}
         </h2>
-        <p className="muted" style={{ marginTop: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0 }}>
           {tImport("subtitle")}
         </p>
         <p style={{ marginBottom: 0 }}>
@@ -221,24 +221,24 @@ export default function RecipesPage() {
         </p>
       </section>
 
-      <section className="panel" aria-labelledby="recipes-list-heading" style={{ marginTop: 16 }}>
+      <section className="brew-panel" aria-labelledby="recipes-list-heading" style={{ marginTop: 16 }}>
         <h2 id="recipes-list-heading" style={{ marginTop: 0 }}>
           {t("listTitle")}
         </h2>
-        {!loading && !hasRecipes ? <p className="muted">{t("noRecipes")}</p> : null}
+        {!loading && !hasRecipes ? <p className="brew-muted">{t("noRecipes")}</p> : null}
         {hasRecipes ? (
-          <ul className="recipeList" style={{ marginBottom: 0 }}>
+          <ul className="brew-recipe-list" style={{ marginBottom: 0 }}>
             {pageRecipes.map((r) => (
-              <li key={r.id} className="recipeListRow" style={{ display: "grid", gap: 6 }}>
+              <li key={r.id} className="brew-recipe-list-row" style={{ display: "grid", gap: 6 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: 12, rowGap: 2, alignItems: "start" }}>
                   <div>
-                    <strong>{r.name}</strong> {r.style ? <span className="muted">({r.style})</span> : null}
+                    <strong>{r.name}</strong> {r.style ? <span className="brew-muted">({r.style})</span> : null}
                   </div>
                   <button
                     type="button"
                     onClick={() => onAskDelete(r.id)}
                     disabled={!canCall || deletingId === r.id}
-                    className="recipeListDeleteButton"
+                    className="brew-recipe-list-delete-button"
                     style={{ alignSelf: "start", justifySelf: "end" }}
                   >
                     {t("delete.cta")}
@@ -249,10 +249,10 @@ export default function RecipesPage() {
                   </div>
                 </div>
                 {deleteConfirmId === r.id ? (
-                  <div className="errorBox" role="alert" style={{ marginTop: 6 }}>
+                  <div className="brew-error-box" role="alert" style={{ marginTop: 6 }}>
                     <p style={{ marginTop: 0, marginBottom: 8 }}>
                       <strong>{t("delete.confirmTitle")}</strong>{" "}
-                      <span className="muted">{t("delete.confirmBody")}</span>
+                      <span className="brew-muted">{t("delete.confirmBody")}</span>
                     </p>
                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                       <button type="button" onClick={() => void onDelete(r.id)} disabled={!canCall || deletingId === r.id}>
@@ -274,7 +274,7 @@ export default function RecipesPage() {
             <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
               {t("pagination.prev")}
             </button>
-            <span className="muted" aria-live="polite">
+            <span className="brew-muted" aria-live="polite">
               {t("pagination.status", { page, pages: pageCount })}
             </span>
             <button type="button" onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount}>
@@ -284,17 +284,17 @@ export default function RecipesPage() {
         ) : null}
       </section>
 
-      <section className="panel" aria-labelledby="recipes-export-heading" style={{ marginTop: 16 }}>
+      <section className="brew-panel" aria-labelledby="recipes-export-heading" style={{ marginTop: 16 }}>
         <h2 id="recipes-export-heading" style={{ marginTop: 0 }}>
           {t("export.title")}
         </h2>
-        <p className="muted" style={{ marginTop: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0 }}>
           {t("export.subtitle")}
         </p>
 
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="export-recipe">
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="export-recipe">
               {t("export.selectLabel")}
             </label>
             <select
@@ -331,7 +331,7 @@ export default function RecipesPage() {
             {t("export.exportAllCta")}
           </a>
         </div>
-        <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 10, marginBottom: 0 }}>
           {t("export.strictNote")}
         </p>
       </section>

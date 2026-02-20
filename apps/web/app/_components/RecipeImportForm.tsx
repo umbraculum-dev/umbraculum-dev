@@ -296,13 +296,13 @@ export function RecipeImportForm({
         <strong>{t("legendTitle")}</strong>
       </div>
       <div>
-        <p className="muted" style={{ marginTop: 0, marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 0, marginBottom: 0 }}>
           {props.subtitle}
         </p>
-        <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
           {t("unitsNote")}
         </p>
-        <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
           {t("customImportNote")} <Link href="/contact">{t("customImportCta")}</Link>
         </p>
         {props.children ? <div style={{ marginTop: 8 }}>{props.children}</div> : null}
@@ -312,13 +312,13 @@ export function RecipeImportForm({
 
   return (
     <>
-      <section className="panel" aria-labelledby="import-single-heading" style={{ marginTop: 16 }}>
+      <section className="brew-panel" aria-labelledby="import-single-heading" style={{ marginTop: 16 }}>
         <h2 id="import-single-heading" style={{ marginTop: 0 }}>
           {t("singleHeading")}
         </h2>
         <LegendBox subtitle={t("singleSubtitle")} />
 
-        <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-file">
+        <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-file">
           {t("fileLabel")}
         </label>
         <input
@@ -329,13 +329,13 @@ export function RecipeImportForm({
           disabled={!canCall}
           aria-describedby="import-file-help"
         />
-        <p id="import-file-help" className="muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
+        <p id="import-file-help" className="brew-muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
           {fileName ? t("filePicked", { name: fileName }) : t("fileNotPicked")}
         </p>
 
         <div style={{ marginTop: 12, display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-format">
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-format">
               {t("formatLabel")}
             </label>
             <select
@@ -348,12 +348,12 @@ export function RecipeImportForm({
               <option value="beerjson">{t("formatBeerJson")}</option>
               <option value="beerxml">{t("formatBeerXml")}</option>
             </select>
-            <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+            <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
               {format ? t("formatResolved", { format: formatLabel }) : t("formatNotResolved")}
             </p>
           </div>
           <div>
-            <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-style">
+            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-style">
               {t("styleLabel")}
             </label>
             <select
@@ -370,7 +370,7 @@ export function RecipeImportForm({
               ))}
             </select>
             {stylesError ? (
-              <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+              <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
                 {String(stylesError)}
               </p>
             ) : null}
@@ -398,11 +398,11 @@ export function RecipeImportForm({
 
         {previewError ? (
           <>
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {previewError}
             </pre>
             {isFileTooLargeError(previewError) ? (
-              <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
                 {t("errors.fileTooLargeHelp")}
               </p>
             ) : null}
@@ -411,7 +411,7 @@ export function RecipeImportForm({
       </section>
 
       {preview ? (
-        <section className="panel" aria-labelledby="import-preview-heading" style={{ marginTop: 16 }}>
+        <section className="brew-panel" aria-labelledby="import-preview-heading" style={{ marginTop: 16 }}>
           <h2 id="import-preview-heading" style={{ marginTop: 0 }}>
             {t("previewHeading")}
           </h2>
@@ -431,7 +431,7 @@ export function RecipeImportForm({
                   <td style={{ paddingRight: 12 }}>
                     <strong>{t("previewNotesLabel")}</strong>
                   </td>
-                  <td className="muted">{preview.notes ? preview.notes : dash}</td>
+                  <td className="brew-muted">{preview.notes ? preview.notes : dash}</td>
                 </tr>
               </tbody>
             </table>
@@ -443,12 +443,12 @@ export function RecipeImportForm({
               {preview.warnings.map((w, idx) => (
                 <li key={`${String(w?.code ?? "warn")}-${idx}`}>
                   <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
-                  <span className="muted">{typeof w?.message === "string" ? w.message : ""}</span>
+                  <span className="brew-muted">{typeof w?.message === "string" ? w.message : ""}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="muted" style={{ marginTop: 0 }}>
+            <p className="brew-muted" style={{ marginTop: 0 }}>
               {t("noWarnings")}
             </p>
           )}
@@ -458,18 +458,18 @@ export function RecipeImportForm({
               {importing ? t("importing") : t("import")}
             </button>
             {importError ? (
-              <span className="muted" aria-live="polite">
+              <span className="brew-muted" aria-live="polite">
                 {importError}
               </span>
             ) : null}
           </div>
           {importError ? (
             <>
-              <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+              <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
                 {importError}
               </pre>
               {isFileTooLargeError(importError) ? (
-                <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+                <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
                   {t("errors.fileTooLargeHelp")}
                 </p>
               ) : null}
@@ -478,17 +478,17 @@ export function RecipeImportForm({
         </section>
       ) : null}
 
-      <section className="panel" aria-labelledby="import-bulk-heading" style={{ marginTop: 16 }}>
+      <section className="brew-panel" aria-labelledby="import-bulk-heading" style={{ marginTop: 16 }}>
         <h2 id="import-bulk-heading" style={{ marginTop: 0 }}>
           {t("bulkHeading")}
         </h2>
         <LegendBox subtitle={t("bulkSubtitle")}>
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="brew-muted" style={{ margin: 0 }}>
             {t("bulkStyleRule")}
           </p>
         </LegendBox>
 
-        <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-file">
+        <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-file">
           {t("fileLabel")}
         </label>
         <input
@@ -499,12 +499,12 @@ export function RecipeImportForm({
           disabled={!canCall}
           aria-describedby="bulk-import-file-help"
         />
-        <p id="bulk-import-file-help" className="muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
+        <p id="bulk-import-file-help" className="brew-muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
           {bulkFileName ? t("filePicked", { name: bulkFileName }) : t("fileNotPicked")}
         </p>
 
         <div style={{ marginTop: 12 }}>
-          <label className="muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-format">
+          <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-format">
             {t("formatLabel")}
           </label>
           <select
@@ -517,7 +517,7 @@ export function RecipeImportForm({
             <option value="beerjson">{t("formatBeerJson")}</option>
             <option value="beerxml">{t("formatBeerXml")}</option>
           </select>
-          <p className="muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+          <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
             {bulkFormat ? t("formatResolved", { format: bulkFormatLabel }) : t("formatNotResolved")}
           </p>
         </div>
@@ -545,11 +545,11 @@ export function RecipeImportForm({
 
         {bulkPreviewError ? (
           <>
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {bulkPreviewError}
             </pre>
             {isFileTooLargeError(bulkPreviewError) ? (
-              <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
                 {t("errors.fileTooLargeHelp")}
               </p>
             ) : null}
@@ -557,11 +557,11 @@ export function RecipeImportForm({
         ) : null}
         {bulkImportError ? (
           <>
-            <pre className="errorBox" role="alert" style={{ marginTop: 12 }}>
+            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
               {bulkImportError}
             </pre>
             {isFileTooLargeError(bulkImportError) ? (
-              <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
                 {t("errors.fileTooLargeHelp")}
               </p>
             ) : null}
@@ -576,7 +576,7 @@ export function RecipeImportForm({
                 <li key={String(it?.index ?? Math.random())} style={{ marginBottom: 8 }}>
                   <div>
                     <strong>{String(it?.name ?? dash)}</strong>{" "}
-                    <span className="muted">
+                    <span className="brew-muted">
                       ({t("resolvedStyleLabel")}:{" "}
                       <code>{String(it?.resolvedStyleCode ?? t("customStyleCode"))}</code>{" "}
                       {String(it?.resolvedStyleName ?? t("customStyleName"))})
@@ -587,7 +587,7 @@ export function RecipeImportForm({
                       {it.warnings.map((w: any, idx: number) => (
                         <li key={`${String(w?.code ?? "warn")}-${idx}`}>
                           <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
-                          <span className="muted">{typeof w?.message === "string" ? w.message : ""}</span>
+                          <span className="brew-muted">{typeof w?.message === "string" ? w.message : ""}</span>
                         </li>
                       ))}
                     </ul>
@@ -603,7 +603,7 @@ export function RecipeImportForm({
             <div className="fieldBlock fieldBlock--computed">
               <div className="fieldBlockHeader">
                 <strong>{t("bulkCreatedHeading")}</strong>
-                <span className="muted">
+                <span className="brew-muted">
                   {t("bulkCreatedCount", { count: bulkResult.created.length })}
                 </span>
               </div>
@@ -612,19 +612,19 @@ export function RecipeImportForm({
                   {bulkResult.created.map((x: any) => (
                     <li key={String(x?.recipeId ?? Math.random())}>
                       <Link href={`/recipes/${String(x.recipeId)}/edit`}>{String(x?.name ?? "") || dash}</Link>{" "}
-                      <span className="muted">({String(x?.style ?? t("customStyleName"))})</span>
+                      <span className="brew-muted">({String(x?.style ?? t("customStyleName"))})</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="muted" style={{ margin: 0 }}>
+                <p className="brew-muted" style={{ margin: 0 }}>
                   {t("bulkNoneCreated")}
                 </p>
               )}
             </div>
 
             {bulkResult.failed.length ? (
-              <pre className="errorBox" role="alert">
+              <pre className="brew-error-box" role="alert">
                 {t("bulkFailedHeading")}\n
                 {bulkResult.failed.map((f: any) => `#${String(f?.index ?? "?")}: ${String(f?.name ?? "")} — ${String(f?.error ?? "")}`).join("\n")}
               </pre>

@@ -173,7 +173,7 @@ export default function AccessibilityPage() {
                     density,
                   })
                 }
-                className="recipeEditSelect recipeEditSelectFull"
+                className="brew-recipe-edit-select brew-recipe-edit-select-full"
               >
                 <option value="default">{t("theme.default")}</option>
                 <option value="hc_dark">{t("theme.hcDark")}</option>
@@ -193,7 +193,7 @@ export default function AccessibilityPage() {
                     density,
                   })
                 }
-                className="recipeEditSelect recipeEditSelectFull"
+                className="brew-recipe-edit-select brew-recipe-edit-select-full"
               >
                 <option value="sm">{t("font.sm")}</option>
                 <option value="md">{t("font.md")}</option>
@@ -214,7 +214,7 @@ export default function AccessibilityPage() {
                     density: oneOf(e.target.value, allowedDensity, "comfortable"),
                   })
                 }
-                className="recipeEditSelect recipeEditSelectFull"
+                className="brew-recipe-edit-select brew-recipe-edit-select-full"
               >
                 <option value="comfortable">{t("densityOptions.comfortable")}</option>
                 <option value="compact">{t("densityOptions.compact")}</option>

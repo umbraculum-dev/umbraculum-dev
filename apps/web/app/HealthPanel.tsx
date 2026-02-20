@@ -34,10 +34,10 @@ export function HealthPanel() {
   return (
     <section>
       <h2 style={{ marginTop: 24 }}>{t("title")}</h2>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle", { url: `${apiBase}/health` })}
       </p>
-      <pre className="codeBlock">
+      <pre className="brew-code-block">
         {JSON.stringify(state, null, 2)}
       </pre>
     </section>

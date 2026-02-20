@@ -17,13 +17,13 @@ export default function RecipesImportPage() {
   return (
     <>
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
 
-      {authState.status === "loading" ? <p className="muted">{t("loading")}</p> : null}
+      {authState.status === "loading" ? <p className="brew-muted">{t("loading")}</p> : null}
       {authState.status === "error" ? (
-        <p className="errorBox" role="alert">
+        <p className="brew-error-box" role="alert">
           {authState.error}
         </p>
       ) : null}

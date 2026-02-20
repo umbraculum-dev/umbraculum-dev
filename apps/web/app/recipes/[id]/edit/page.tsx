@@ -129,7 +129,7 @@ export default function RecipeEditPage() {
   useEffect(() => {
     let raf = 0;
     const update = () => {
-      const appShell = document.querySelector(".appShell");
+      const appShell = document.querySelector(".brew-app-shell");
       const mainEl = document.getElementById("main");
       const leftGutterPx = appShell instanceof HTMLElement ? appShell.getBoundingClientRect().left : null;
       const railTopPx = mainEl instanceof HTMLElement ? Math.max(mainEl.getBoundingClientRect().top, 16) : null;
@@ -1025,7 +1025,7 @@ export default function RecipeEditPage() {
                     value={styleKey}
                     onChange={(e) => setStyleKey(e.target.value)}
                     disabled={stylesLoading || styles.length === 0}
-                    className="recipeEditSelect recipeEditSelectFull"
+                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   >
                     {styles.map((s) => (
                       <option key={s.key} value={s.key}>
@@ -1713,7 +1713,7 @@ export default function RecipeEditPage() {
                     value={selectedEquipmentProfileId}
                     onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
                     disabled={equipmentProfilesLoading}
-                    className="recipeEditSelect recipeEditSelectFull"
+                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
                   >
                     <option value="">{tEquip("noneOption")}</option>
                     {equipmentProfiles.map((p) => (
@@ -2127,7 +2127,7 @@ export default function RecipeEditPage() {
                                     id={`grist-class-${r.id}`}
                                     value={r.maltClass}
                                     onChange={(e) => updateGristRow(r.id, { maltClass: e.target.value as any })}
-                                    className="recipeEditSelect"
+                                    className="brew-recipe-edit-select"
                                   >
                                     <option value="base">Base</option>
                                     <option value="crystal">Crystal</option>
@@ -2148,7 +2148,7 @@ export default function RecipeEditPage() {
                                         timingUse: e.target.value === "add_to_boil" ? "add_to_boil" : "add_to_mash",
                                       })
                                     }
-                                    className="recipeEditSelect"
+                                    className="brew-recipe-edit-select"
                                   >
                                     <option value="add_to_mash">{t("fermentableTimingMash")}</option>
                                     <option value="add_to_boil">{t("fermentableTimingKettle")}</option>
@@ -2169,7 +2169,7 @@ export default function RecipeEditPage() {
                                         potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) },
                                       });
                                     }}
-                                    className="recipeEditSelect"
+                                    className="brew-recipe-edit-select"
                                   >
                                     <option value="">(none)</option>
                                     <option value="ppg">PPG</option>
@@ -2259,7 +2259,7 @@ export default function RecipeEditPage() {
                                                   });
                                                 }
                                               }}
-                                              className="recipeEditSelect recipeEditSelectFull"
+                                              className="brew-recipe-edit-select brew-recipe-edit-select-full"
                                             >
                                               <option value="auto">Auto (detect)</option>
                                               <option value="force_husked">Force husked</option>
@@ -2566,7 +2566,7 @@ export default function RecipeEditPage() {
                                     id={`hop-use-${r.id}`}
                                     value={r.use}
                                     onChange={(e) => updateHopRow(r.id, { use: e.target.value as HopUse })}
-                                    className="recipeEditSelect"
+                                    className="brew-recipe-edit-select"
                                   >
                                     <option value="boil">Boil</option>
                                     <option value="whirlpool">Whirlpool</option>
@@ -2920,7 +2920,7 @@ export default function RecipeEditPage() {
                             id={`misc-type-${r.id}`}
                             value={r.type}
                             onChange={(e) => updateMiscRow(r.id, { type: e.target.value as MiscType })}
-                            className="recipeEditSelect recipeEditSelectFull"
+                            className="brew-recipe-edit-select brew-recipe-edit-select-full"
                             aria-label={`Other ingredient type ${idx + 1}`}
                           >
                             {miscTypeOptions.map((o) => (
@@ -2937,7 +2937,7 @@ export default function RecipeEditPage() {
                             id={`misc-use-${r.id}`}
                             value={r.use}
                             onChange={(e) => updateMiscRow(r.id, { use: e.target.value as MiscUse })}
-                            className="recipeEditSelect recipeEditSelectFull"
+                            className="brew-recipe-edit-select brew-recipe-edit-select-full"
                             aria-label={`Other ingredient use ${idx + 1}`}
                           >
                             {miscUseOptions.map((o) => (
@@ -2974,7 +2974,7 @@ export default function RecipeEditPage() {
                             id={`misc-amount-is-weight-${r.id}`}
                             value={r.amountIsWeight ? "weight" : "volume"}
                             onChange={(e) => updateMiscRow(r.id, { amountIsWeight: e.target.value === "weight" })}
-                            className="recipeEditSelect recipeEditSelectFull"
+                            className="brew-recipe-edit-select brew-recipe-edit-select-full"
                             aria-label={`Other ingredient amount kind ${idx + 1}`}
                           >
                             <option value="weight">Weight</option>

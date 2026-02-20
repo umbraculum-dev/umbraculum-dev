@@ -13,19 +13,19 @@ export default function FermDataIntegrationPage() {
       <DashboardClient />
 
       <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <p className="brew-muted" style={{ marginTop: 0 }}>
         {t("subtitle")}
       </p>
 
-      <p className="muted">
+      <p className="brew-muted">
         <Link href="/">{t("backToDashboard")}</Link>
       </p>
 
-      <section className="panel" aria-labelledby="integration-heading">
+      <section className="brew-panel" aria-labelledby="integration-heading">
         <h2 id="integration-heading" style={{ marginTop: 0 }}>
           {t("sections.integration.title")}
         </h2>
-        <p className="muted" style={{ marginBottom: 0 }}>
+        <p className="brew-muted" style={{ marginBottom: 0 }}>
           {t("sections.integration.empty")}
         </p>
       </section>

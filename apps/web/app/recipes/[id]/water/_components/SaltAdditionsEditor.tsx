@@ -29,7 +29,7 @@ export function SaltAdditionsEditor(props: {
               <div>
                 <label
                   htmlFor={`${idPrefix}-salt-key-${idx}`}
-                  className="muted"
+                  className="brew-muted"
                   style={{ display: "block", fontSize: 12 }}
                 >
                   Salt
@@ -51,7 +51,7 @@ export function SaltAdditionsEditor(props: {
               <div>
                 <label
                   htmlFor={`${idPrefix}-salt-grams-${idx}`}
-                  className="muted"
+                  className="brew-muted"
                   style={{ display: "block", fontSize: 12 }}
                 >
                   {tUi("amountLabel", { unit: tUnits("g") })}
@@ -76,7 +76,7 @@ export function SaltAdditionsEditor(props: {
           ))}
         </div>
       ) : (
-        <p className="muted" style={{ margin: 0 }}>
+        <p className="brew-muted" style={{ margin: 0 }}>
           No salts added yet.
         </p>
       )}
