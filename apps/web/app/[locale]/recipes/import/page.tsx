@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { H1, SizableText, View, YStack } from "tamagui";
 
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
@@ -15,17 +16,23 @@ export default function RecipesImportPage() {
   const canCall = authState.status === "ready";
 
   return (
-    <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$3">
+      <H1 mb="$2">{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      {authState.status === "loading" ? <p className="brew-muted">{t("loading")}</p> : null}
+      {authState.status === "loading" ? (
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("loading")}
+        </SizableText>
+      ) : null}
       {authState.status === "error" ? (
-        <p className="brew-error-box" role="alert">
-          {authState.error}
-        </p>
+        <View>
+          <pre className="brew-error-box" role="alert">
+            {authState.error}
+          </pre>
+        </View>
       ) : null}
 
       <RecipeImportForm
@@ -34,6 +41,6 @@ export default function RecipesImportPage() {
         onSingleImportSuccess={(recipeId) => router.push(`/${locale}/recipes/${recipeId}/edit`)}
         showImportExportPanel={true}
       />
-    </>
+    </YStack>
   );
 }

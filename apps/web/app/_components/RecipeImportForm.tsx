@@ -2,9 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
+import { H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
+import { RecipeEditFieldLabel } from "./recipe-edit";
 import { ImportExportPanel } from "./ImportExportPanel";
 
 const RECIPES_IMPORT_SINGLE_MAX_BYTES = 1 * 1024 * 1024;
@@ -291,36 +293,36 @@ export function RecipeImportForm({
   const bulkFormatLabel = bulkFormat === "beerjson" ? t("formatBeerJson") : bulkFormat === "beerxml" ? t("formatBeerXml") : "";
 
   const LegendBox = (props: { subtitle: string; children?: React.ReactNode }) => (
-    <div className="fieldBlock fieldBlock--readonly" style={{ marginTop: 10, marginBottom: 16 }}>
-      <div className="fieldBlockHeader">
-        <strong>{t("legendTitle")}</strong>
-      </div>
-      <div>
-        <p className="brew-muted" style={{ marginTop: 0, marginBottom: 0 }}>
+    <View className="brew-field-block brew-field-block--readonly" mt="$2.5" mb="$4">
+      <View className="brew-field-block-header">
+        <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+          {t("legendTitle")}
+        </SizableText>
+      </View>
+      <YStack gap="$2">
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb={0}>
           {props.subtitle}
-        </p>
-        <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+        </SizableText>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb={0}>
           {t("unitsNote")}
-        </p>
-        <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+        </SizableText>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb={0}>
           {t("customImportNote")} <Link href="/contact">{t("customImportCta")}</Link>
-        </p>
-        {props.children ? <div style={{ marginTop: 8 }}>{props.children}</div> : null}
-      </div>
-    </div>
+        </SizableText>
+        {props.children ? <View mt="$2">{props.children}</View> : null}
+      </YStack>
+    </View>
   );
 
   return (
     <>
-      <section className="brew-panel" aria-labelledby="import-single-heading" style={{ marginTop: 16 }}>
-        <h2 id="import-single-heading" style={{ marginTop: 0 }}>
+      <View className="brew-panel" aria-labelledby="import-single-heading" mt="$4">
+        <H2 id="import-single-heading" mt={0}>
           {t("singleHeading")}
-        </h2>
+        </H2>
         <LegendBox subtitle={t("singleSubtitle")} />
 
-        <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-file">
-          {t("fileLabel")}
-        </label>
+        <RecipeEditFieldLabel htmlFor="import-file">{t("fileLabel")}</RecipeEditFieldLabel>
         <input
           id="import-file"
           type="file"
@@ -329,39 +331,37 @@ export function RecipeImportForm({
           disabled={!canCall}
           aria-describedby="import-file-help"
         />
-        <p id="import-file-help" className="brew-muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
+        <SizableText id="import-file-help" size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5" mb="$3" display="block">
           {fileName ? t("filePicked", { name: fileName }) : t("fileNotPicked")}
-        </p>
+        </SizableText>
 
-        <div style={{ marginTop: 12, display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-          <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-format">
-              {t("formatLabel")}
-            </label>
+        <div className="brew-grid-2col">
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="import-format">{t("formatLabel")}</RecipeEditFieldLabel>
             <select
               id="import-format"
               value={formatOverride}
               onChange={(e) => setFormatOverride(e.target.value as "" | ImportFormat)}
               disabled={!canCall}
+              className="brew-recipe-edit-select brew-recipe-edit-select-full"
             >
               <option value="">{t("formatAuto")}</option>
               <option value="beerjson">{t("formatBeerJson")}</option>
               <option value="beerxml">{t("formatBeerXml")}</option>
             </select>
-            <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
               {format ? t("formatResolved", { format: formatLabel }) : t("formatNotResolved")}
-            </p>
-          </div>
-          <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="import-style">
-              {t("styleLabel")}
-            </label>
+            </SizableText>
+          </YStack>
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="import-style">{t("styleLabel")}</RecipeEditFieldLabel>
             <select
               id="import-style"
               value={styleKey}
               onChange={(e) => setStyleKey(e.target.value)}
               disabled={!canCall || stylesLoading || styles.length === 0}
               required
+              className="brew-recipe-edit-select brew-recipe-edit-select-full"
             >
               {styles.map((s) => (
                 <option key={s.key} value={s.key}>
@@ -370,14 +370,14 @@ export function RecipeImportForm({
               ))}
             </select>
             {stylesError ? (
-              <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
                 {String(stylesError)}
-              </p>
+              </SizableText>
             ) : null}
-          </div>
+          </YStack>
         </div>
 
-        <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
           <button type="button" onClick={() => void onPreview()} disabled={!canPreview}>
             {previewLoading ? t("previewing") : t("preview")}
           </button>
@@ -394,103 +394,117 @@ export function RecipeImportForm({
           </button>
           <Link href="/recipes">{t("backToRecipes")}</Link>
           <Link href="/">{c("backToDashboard")}</Link>
-        </div>
+        </XStack>
 
         {previewError ? (
           <>
-            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-              {previewError}
-            </pre>
+            <View mt="$3">
+              <pre className="brew-error-box" role="alert">
+                {previewError}
+              </pre>
+            </View>
             {isFileTooLargeError(previewError) ? (
-              <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                 {t("errors.fileTooLargeHelp")}
-              </p>
+              </SizableText>
             ) : null}
           </>
         ) : null}
-      </section>
+      </View>
 
       {preview ? (
-        <section className="brew-panel" aria-labelledby="import-preview-heading" style={{ marginTop: 16 }}>
-          <h2 id="import-preview-heading" style={{ marginTop: 0 }}>
+        <View className="brew-panel" aria-labelledby="import-preview-heading" mt="$4">
+          <H2 id="import-preview-heading" mt={0}>
             {t("previewHeading")}
-          </h2>
+          </H2>
 
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <View className="brew-table-wrap">
+            <table className="brew-table">
               <tbody>
                 <tr>
-                  <td style={{ paddingRight: 12 }}>
-                    <strong>{t("previewNameLabel")}</strong>
+                  <td className="brew-preview-label">
+                    <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+                      {t("previewNameLabel")}
+                    </SizableText>
                   </td>
                   <td>
                     <code>{preview.name || dash}</code>
                   </td>
                 </tr>
                 <tr>
-                  <td style={{ paddingRight: 12 }}>
-                    <strong>{t("previewNotesLabel")}</strong>
+                  <td className="brew-preview-label">
+                    <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+                      {t("previewNotesLabel")}
+                    </SizableText>
                   </td>
-                  <td className="brew-muted">{preview.notes ? preview.notes : dash}</td>
+                  <td>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {preview.notes ? preview.notes : dash}
+                    </SizableText>
+                  </td>
                 </tr>
               </tbody>
             </table>
-          </div>
+          </View>
 
-          <h3 style={{ marginTop: 16, marginBottom: 6 }}>{t("warningsHeading")}</h3>
+          <H3 mt="$4" mb="$1.5">
+            {t("warningsHeading")}
+          </H3>
           {preview.warnings.length ? (
-            <ul style={{ marginTop: 0 }}>
+            <ul className="brew-recipe-edit-list-disc brew-list-mt0">
               {preview.warnings.map((w, idx) => (
                 <li key={`${String(w?.code ?? "warn")}-${idx}`}>
-                  <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
-                  <span className="brew-muted">{typeof w?.message === "string" ? w.message : ""}</span>
+                  <SizableText size="$2" fontFamily="$body">
+                    <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
+                    <SizableText color="var(--text-muted)">{typeof w?.message === "string" ? w.message : ""}</SizableText>
+                  </SizableText>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="brew-muted" style={{ marginTop: 0 }}>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("noWarnings")}
-            </p>
+            </SizableText>
           )}
 
-          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
             <button type="button" onClick={() => void onImport()} disabled={!canImport}>
               {importing ? t("importing") : t("import")}
             </button>
             {importError ? (
-              <span className="brew-muted" aria-live="polite">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
                 {importError}
-              </span>
+              </SizableText>
             ) : null}
-          </div>
+          </XStack>
           {importError ? (
             <>
-              <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-                {importError}
-              </pre>
+              <View mt="$3">
+                <pre className="brew-error-box" role="alert">
+                  {importError}
+                </pre>
+              </View>
               {isFileTooLargeError(importError) ? (
-                <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                   {t("errors.fileTooLargeHelp")}
-                </p>
+                </SizableText>
               ) : null}
             </>
           ) : null}
-        </section>
+        </View>
       ) : null}
 
-      <section className="brew-panel" aria-labelledby="import-bulk-heading" style={{ marginTop: 16 }}>
-        <h2 id="import-bulk-heading" style={{ marginTop: 0 }}>
+      <View className="brew-panel" aria-labelledby="import-bulk-heading" mt="$4">
+        <H2 id="import-bulk-heading" mt={0}>
           {t("bulkHeading")}
-        </h2>
+        </H2>
         <LegendBox subtitle={t("bulkSubtitle")}>
-          <p className="brew-muted" style={{ margin: 0 }}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb={0}>
             {t("bulkStyleRule")}
-          </p>
+          </SizableText>
         </LegendBox>
 
-        <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-file">
-          {t("fileLabel")}
-        </label>
+        <RecipeEditFieldLabel htmlFor="bulk-import-file">{t("fileLabel")}</RecipeEditFieldLabel>
         <input
           id="bulk-import-file"
           type="file"
@@ -499,30 +513,29 @@ export function RecipeImportForm({
           disabled={!canCall}
           aria-describedby="bulk-import-file-help"
         />
-        <p id="bulk-import-file-help" className="brew-muted" style={{ margin: "6px 0 12px", fontSize: 12 }}>
+        <SizableText id="bulk-import-file-help" size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5" mb="$3" display="block">
           {bulkFileName ? t("filePicked", { name: bulkFileName }) : t("fileNotPicked")}
-        </p>
+        </SizableText>
 
-        <div style={{ marginTop: 12 }}>
-          <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="bulk-import-format">
-            {t("formatLabel")}
-          </label>
+        <YStack gap="$1.5" mt="$3">
+          <RecipeEditFieldLabel htmlFor="bulk-import-format">{t("formatLabel")}</RecipeEditFieldLabel>
           <select
             id="bulk-import-format"
             value={bulkFormatOverride}
             onChange={(e) => setBulkFormatOverride(e.target.value as "" | ImportFormat)}
             disabled={!canCall}
+            className="brew-recipe-edit-select brew-recipe-edit-select-full"
           >
             <option value="">{t("formatAuto")}</option>
             <option value="beerjson">{t("formatBeerJson")}</option>
             <option value="beerxml">{t("formatBeerXml")}</option>
           </select>
-          <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
             {bulkFormat ? t("formatResolved", { format: bulkFormatLabel }) : t("formatNotResolved")}
-          </p>
-        </div>
+          </SizableText>
+        </YStack>
 
-        <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
           <button type="button" onClick={() => void onBulkPreview()} disabled={!canBulkPreview}>
             {bulkPreviewLoading ? t("previewing") : t("preview")}
           </button>
@@ -541,53 +554,59 @@ export function RecipeImportForm({
           >
             {t("reset")}
           </button>
-        </div>
+        </XStack>
 
         {bulkPreviewError ? (
           <>
-            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-              {bulkPreviewError}
-            </pre>
+            <View mt="$3">
+              <pre className="brew-error-box" role="alert">
+                {bulkPreviewError}
+              </pre>
+            </View>
             {isFileTooLargeError(bulkPreviewError) ? (
-              <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                 {t("errors.fileTooLargeHelp")}
-              </p>
+              </SizableText>
             ) : null}
           </>
         ) : null}
         {bulkImportError ? (
           <>
-            <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-              {bulkImportError}
-            </pre>
+            <View mt="$3">
+              <pre className="brew-error-box" role="alert">
+                {bulkImportError}
+              </pre>
+            </View>
             {isFileTooLargeError(bulkImportError) ? (
-              <p className="brew-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
                 {t("errors.fileTooLargeHelp")}
-              </p>
+              </SizableText>
             ) : null}
           </>
         ) : null}
 
         {bulkPreviewItems ? (
-          <div style={{ marginTop: 12 }}>
-            <h3 style={{ margin: "0 0 6px" }}>{t("bulkPreviewHeading")}</h3>
-            <ul style={{ marginTop: 0 }}>
+          <View mt="$3">
+            <H3 mb="$1.5">{t("bulkPreviewHeading")}</H3>
+            <ul className="brew-recipe-edit-list-disc brew-list-mt0">
               {bulkPreviewItems.map((it: any) => (
-                <li key={String(it?.index ?? Math.random())} style={{ marginBottom: 8 }}>
-                  <div>
-                    <strong>{String(it?.name ?? dash)}</strong>{" "}
-                    <span className="brew-muted">
-                      ({t("resolvedStyleLabel")}:{" "}
+                <li key={String(it?.index ?? Math.random())} className="brew-list-item-mb">
+                  <SizableText size="$2" fontFamily="$body">
+                    <SizableText fontWeight="bold">{String(it?.name ?? dash)}</SizableText>
+                    <SizableText color="var(--text-muted)">
+                      {" "}({t("resolvedStyleLabel")}:{" "}
                       <code>{String(it?.resolvedStyleCode ?? t("customStyleCode"))}</code>{" "}
                       {String(it?.resolvedStyleName ?? t("customStyleName"))})
-                    </span>
-                  </div>
+                    </SizableText>
+                  </SizableText>
                   {Array.isArray(it?.warnings) && it.warnings.length ? (
-                    <ul style={{ marginTop: 4 }}>
+                    <ul className="brew-recipe-edit-list-disc brew-list-mt1">
                       {it.warnings.map((w: any, idx: number) => (
                         <li key={`${String(w?.code ?? "warn")}-${idx}`}>
-                          <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
-                          <span className="brew-muted">{typeof w?.message === "string" ? w.message : ""}</span>
+                          <SizableText size="$2" fontFamily="$body">
+                            <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
+                            <SizableText color="var(--text-muted)">{typeof w?.message === "string" ? w.message : ""}</SizableText>
+                          </SizableText>
                         </li>
                       ))}
                     </ul>
@@ -595,33 +614,37 @@ export function RecipeImportForm({
                 </li>
               ))}
             </ul>
-          </div>
+          </View>
         ) : null}
 
         {bulkResult ? (
-          <div style={{ marginTop: 12, display: "grid", gap: 12 }}>
-            <div className="fieldBlock fieldBlock--computed">
-              <div className="fieldBlockHeader">
-                <strong>{t("bulkCreatedHeading")}</strong>
-                <span className="brew-muted">
+          <YStack gap="$3" mt="$3">
+            <View className="brew-field-block brew-field-block--computed">
+              <View className="brew-field-block-header">
+                <SizableText size="$2" fontWeight="bold" fontFamily="$body">
+                  {t("bulkCreatedHeading")}
+                </SizableText>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
                   {t("bulkCreatedCount", { count: bulkResult.created.length })}
-                </span>
-              </div>
+                </SizableText>
+              </View>
               {bulkResult.created.length ? (
-                <ul style={{ margin: 0 }}>
+                <ul className="brew-recipe-edit-list-disc brew-list-mt0">
                   {bulkResult.created.map((x: any) => (
                     <li key={String(x?.recipeId ?? Math.random())}>
-                      <Link href={`/recipes/${String(x.recipeId)}/edit`}>{String(x?.name ?? "") || dash}</Link>{" "}
-                      <span className="brew-muted">({String(x?.style ?? t("customStyleName"))})</span>
+                      <SizableText size="$2" fontFamily="$body">
+                        <Link href={`/recipes/${String(x.recipeId)}/edit`}>{String(x?.name ?? "") || dash}</Link>
+                        <SizableText color="var(--text-muted)"> ({String(x?.style ?? t("customStyleName"))})</SizableText>
+                      </SizableText>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="brew-muted" style={{ margin: 0 }}>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("bulkNoneCreated")}
-                </p>
+                </SizableText>
               )}
-            </div>
+            </View>
 
             {bulkResult.failed.length ? (
               <pre className="brew-error-box" role="alert">
@@ -629,14 +652,14 @@ export function RecipeImportForm({
                 {bulkResult.failed.map((f: any) => `#${String(f?.index ?? "?")}: ${String(f?.name ?? "")} — ${String(f?.error ?? "")}`).join("\n")}
               </pre>
             ) : null}
-          </div>
+          </YStack>
         ) : null}
-      </section>
+      </View>
 
       {showImportExportPanel ? (
-        <div style={{ marginTop: 16 }}>
+        <View mt="$4">
           <ImportExportPanel headingId="import-export-panel-heading" className="" />
-        </div>
+        </View>
       ) : null}
     </>
   );

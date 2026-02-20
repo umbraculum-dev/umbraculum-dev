@@ -2,8 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
+import { H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
+import { RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
 
@@ -143,166 +145,178 @@ export default function RecipesPage() {
   const pageRecipes = useMemo(() => recipes.slice((page - 1) * pageSize, page * pageSize), [page, pageSize, recipes]);
 
   return (
-    <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$3">
+      <H1 mb="$2">{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      <section className="brew-panel" aria-labelledby="recipes-create-heading">
-        <h2 id="recipes-create-heading" style={{ marginTop: 0 }}>
+      <View className="brew-panel" aria-labelledby="recipes-create-heading">
+        <H2 id="recipes-create-heading" mt={0}>
           {t("createTitle")}
-        </h2>
+        </H2>
         <form onSubmit={onCreate}>
-          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
-            <div>
-              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-name">
-                {t("nameLabel")}
-              </label>
-              <input
-                id="recipe-name"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                style={{ width: "100%", padding: 8 }}
-                required
-              />
+            <div className="brew-grid-2col">
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="recipe-name">{t("nameLabel")}</RecipeEditFieldLabel>
+                <Input
+                  id="recipe-name"
+                  value={newName}
+                  onChangeText={setNewName}
+                  required
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
+                />
+              </YStack>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="recipe-style">{t("styleLabel")}</RecipeEditFieldLabel>
+                <select
+                  id="recipe-style"
+                  value={newStyleKey}
+                  onChange={(e) => setNewStyleKey(e.target.value)}
+                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  disabled={!canCall || stylesLoading || styles.length === 0}
+                  required
+                >
+                  <option value="">{stylesLoading ? t("stylesLoading") : t("stylePlaceholder")}</option>
+                  {styles.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
+                    </option>
+                  ))}
+                </select>
+                {stylesError ? (
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+                    {String(stylesError)}
+                  </SizableText>
+                ) : null}
+              </YStack>
             </div>
-            <div>
-              <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="recipe-style">
-                {t("styleLabel")}
-              </label>
-              <select
-                id="recipe-style"
-                value={newStyleKey}
-                onChange={(e) => setNewStyleKey(e.target.value)}
-                style={{ width: "100%", padding: 8 }}
-                disabled={!canCall || stylesLoading || styles.length === 0}
-                required
-              >
-                <option value="">{stylesLoading ? t("stylesLoading") : t("stylePlaceholder")}</option>
-                {styles.map((s) => (
-                  <option key={s.key} value={s.key}>
-                    {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
-                  </option>
-                ))}
-              </select>
-              {stylesError ? (
-                <p className="brew-muted" style={{ margin: "6px 0 0", fontSize: 12 }}>
-                  {String(stylesError)}
-                </p>
-              ) : null}
-            </div>
-          </div>
-          <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-            <button type="submit" disabled={!canCall || creating || !newName.trim() || !newStyleKey.trim()}>
-              {creating ? t("creating") : t("createButton")}
-            </button>
-            <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
-              {loading ? t("refreshing") : t("refresh")}
-            </button>
-          </div>
+            <XStack gap="$3" mt="$3" alignItems="center">
+              <button type="submit" disabled={!canCall || creating || !newName.trim() || !newStyleKey.trim()}>
+                {creating ? t("creating") : t("createButton")}
+              </button>
+              <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
+                {loading ? t("refreshing") : t("refresh")}
+              </button>
+            </XStack>
         </form>
         {error ? (
-          <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-            {error}
-          </pre>
+            <View mt="$3">
+              <pre className="brew-error-box" role="alert">
+                {error}
+              </pre>
+            </View>
         ) : null}
-      </section>
+      </View>
 
-      <section className="brew-panel" aria-labelledby="recipes-import-heading" style={{ marginTop: 16 }}>
-        <h2 id="recipes-import-heading" style={{ marginTop: 0 }}>
+      <View className="brew-panel" aria-labelledby="recipes-import-heading" mt="$3">
+        <H2 id="recipes-import-heading" mt={0}>
           {tImport("title")}
-        </h2>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+        </H2>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {tImport("subtitle")}
-        </p>
-        <p style={{ marginBottom: 0 }}>
+        </SizableText>
+        <SizableText size="$2" fontFamily="$body" mb={0}>
           <Link href="/recipes/import">{tImport("cta")}</Link>
-        </p>
-      </section>
+        </SizableText>
+      </View>
 
-      <section className="brew-panel" aria-labelledby="recipes-list-heading" style={{ marginTop: 16 }}>
-        <h2 id="recipes-list-heading" style={{ marginTop: 0 }}>
+      <View className="brew-panel" aria-labelledby="recipes-list-heading" mt="$3">
+        <H2 id="recipes-list-heading" mt={0}>
           {t("listTitle")}
-        </h2>
-        {!loading && !hasRecipes ? <p className="brew-muted">{t("noRecipes")}</p> : null}
+        </H2>
+        {!loading && !hasRecipes ? (
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            {t("noRecipes")}
+          </SizableText>
+        ) : null}
         {hasRecipes ? (
-          <ul className="brew-recipe-list" style={{ marginBottom: 0 }}>
+          <ul className="brew-recipe-list">
             {pageRecipes.map((r) => (
-              <li key={r.id} className="brew-recipe-list-row" style={{ display: "grid", gap: 6 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: 12, rowGap: 2, alignItems: "start" }}>
-                  <div>
-                    <strong>{r.name}</strong> {r.style ? <span className="brew-muted">({r.style})</span> : null}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onAskDelete(r.id)}
-                    disabled={!canCall || deletingId === r.id}
-                    className="brew-recipe-list-delete-button"
-                    style={{ alignSelf: "start", justifySelf: "end" }}
-                  >
-                    {t("delete.cta")}
-                  </button>
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", gridColumn: "1 / 2" }}>
+              <li key={r.id} className="brew-recipe-list-row">
+                <YStack gap="$1.5">
+                  <XStack justifyContent="space-between" alignItems="flex-start" columnGap="$3" rowGap="$0.5">
+                    <SizableText flex={1} fontFamily="$body">
+                      <SizableText fontWeight="bold">{r.name}</SizableText>
+                      {r.style ? (
+                        <SizableText color="var(--text-muted)"> ({r.style})</SizableText>
+                      ) : null}
+                    </SizableText>
+                    <button
+                      type="button"
+                      onClick={() => onAskDelete(r.id)}
+                      disabled={!canCall || deletingId === r.id}
+                      className="brew-recipe-list-delete-button"
+                    >
+                      {t("delete.cta")}
+                    </button>
+                  </XStack>
+                  <XStack gap="$3" flexWrap="wrap">
                     <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
                     <Link href={`/recipes/${r.id}/water`}>{t("openWater")}</Link>
-                  </div>
-                </div>
-                {deleteConfirmId === r.id ? (
-                  <div className="brew-error-box" role="alert" style={{ marginTop: 6 }}>
-                    <p style={{ marginTop: 0, marginBottom: 8 }}>
-                      <strong>{t("delete.confirmTitle")}</strong>{" "}
-                      <span className="brew-muted">{t("delete.confirmBody")}</span>
-                    </p>
-                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-                      <button type="button" onClick={() => void onDelete(r.id)} disabled={!canCall || deletingId === r.id}>
-                        {deletingId === r.id ? t("delete.deleting") : t("delete.confirmCta")}
-                      </button>
-                      <button type="button" onClick={() => setDeleteConfirmId(null)} disabled={deletingId === r.id}>
-                        {t("delete.cancel")}
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
+                  </XStack>
+                  {deleteConfirmId === r.id ? (
+                    <View className="brew-error-box" role="alert" mt="$1.5">
+                      <SizableText size="$2" fontFamily="$body" mt={0} mb="$2">
+                        <SizableText fontWeight="bold">{t("delete.confirmTitle")}</SizableText>
+                        <SizableText color="var(--text-muted)"> {t("delete.confirmBody")}</SizableText>
+                      </SizableText>
+                      <XStack gap="$3" flexWrap="wrap" alignItems="center">
+                        <button type="button" onClick={() => void onDelete(r.id)} disabled={!canCall || deletingId === r.id}>
+                          {deletingId === r.id ? t("delete.deleting") : t("delete.confirmCta")}
+                        </button>
+                        <button type="button" onClick={() => setDeleteConfirmId(null)} disabled={deletingId === r.id}>
+                          {t("delete.cancel")}
+                        </button>
+                      </XStack>
+                    </View>
+                  ) : null}
+                </YStack>
               </li>
             ))}
           </ul>
         ) : null}
 
         {hasRecipes && pageCount > 1 ? (
-          <nav aria-label={t("pagination.ariaLabel")} style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-            <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
-              {t("pagination.prev")}
-            </button>
-            <span className="brew-muted" aria-live="polite">
-              {t("pagination.status", { page, pages: pageCount })}
-            </span>
-            <button type="button" onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount}>
-              {t("pagination.next")}
-            </button>
+          <nav aria-label={t("pagination.ariaLabel")}>
+            <XStack gap="$3" mt="$3" alignItems="center">
+              <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+                {t("pagination.prev")}
+              </button>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+                {t("pagination.status", { page, pages: pageCount })}
+              </SizableText>
+              <button type="button" onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount}>
+                {t("pagination.next")}
+              </button>
+            </XStack>
           </nav>
         ) : null}
-      </section>
+      </View>
 
-      <section className="brew-panel" aria-labelledby="recipes-export-heading" style={{ marginTop: 16 }}>
-        <h2 id="recipes-export-heading" style={{ marginTop: 0 }}>
+      <View className="brew-panel" aria-labelledby="recipes-export-heading" mt="$3">
+        <H2 id="recipes-export-heading" mt={0}>
           {t("export.title")}
-        </h2>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+        </H2>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("export.subtitle")}
-        </p>
+        </SizableText>
 
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto auto", alignItems: "end" }}>
-          <div>
-            <label className="brew-muted" style={{ display: "block", fontSize: 12 }} htmlFor="export-recipe">
-              {t("export.selectLabel")}
-            </label>
+        <div className="brew-grid-export">
+          <YStack gap="$1.5">
+            <RecipeEditFieldLabel htmlFor="export-recipe">{t("export.selectLabel")}</RecipeEditFieldLabel>
             <select
               id="export-recipe"
               value={exportRecipeId}
               onChange={(e) => setExportRecipeId(e.target.value)}
               disabled={!hasRecipes}
-              style={{ width: "100%", padding: 8 }}
+              className="brew-recipe-edit-select brew-recipe-edit-select-full"
             >
               {hasRecipes ? null : <option value="">{t("export.noneAvailable")}</option>}
               {recipes.map((r) => (
@@ -311,7 +325,7 @@ export default function RecipesPage() {
                 </option>
               ))}
             </select>
-          </div>
+          </YStack>
           <a
             href={exportRecipeId ? `/api/recipes/${exportRecipeId}/export/beerjson` : undefined}
             aria-disabled={!exportRecipeId}
@@ -331,11 +345,11 @@ export default function RecipesPage() {
             {t("export.exportAllCta")}
           </a>
         </div>
-        <p className="brew-muted" style={{ marginTop: 10, marginBottom: 0 }}>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2.5" mb={0}>
           {t("export.strictNote")}
-        </p>
-      </section>
-    </>
+        </SizableText>
+      </View>
+    </YStack>
   );
 }
 
