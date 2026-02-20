@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { H2, View } from "tamagui";
+import { Accordion, H2, View } from "tamagui";
 
 export interface RecipeEditSectionProps {
   id: string;
@@ -31,17 +31,25 @@ export function RecipeEditSection({
       rounded="$3"
       p="$3"
     >
-      <details
-        open={open}
-        onToggle={(e) => onOpenChange((e.target as HTMLDetailsElement).open)}
+      <Accordion
+        type="single"
+        collapsible
+        value={open ? id : ""}
+        onValueChange={(v) => onOpenChange(v === id)}
       >
-        <summary className="recipeEditDetailsSummary">
-          <H2 id={headingId} m={0} size="$5" fontFamily="$heading" color="var(--text)">
-            {label}
-          </H2>
-        </summary>
-        <View mt="$3">{children}</View>
-      </details>
+        <Accordion.Item value={id}>
+          <Accordion.Header>
+            <Accordion.Trigger unstyled cursor="pointer">
+              <H2 id={headingId} m={0} size="$5" fontFamily="$heading" color="var(--text)">
+                {label}
+              </H2>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>
+            <View mt="$3">{children}</View>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
     </View>
   );
 }

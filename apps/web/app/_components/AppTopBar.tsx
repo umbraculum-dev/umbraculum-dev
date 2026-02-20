@@ -22,13 +22,11 @@ export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
       mb="$2.5"
       borderBottomWidth={1}
       borderColor="var(--border)"
-      style={{ lineHeight: 1.2 }}
       minWidth={0}
     >
       <XStack
-        ai={narrow ? "stretch" : "center"}
+        ai="center"
         jc="space-between"
-        flexDirection={narrow ? "column" : "row"}
         gap={narrow ? "$2" : "$3"}
         flexWrap="wrap"
         minWidth={0}
@@ -38,13 +36,13 @@ export function AppTopBar({ left, right, bottom, ariaLabel }: AppTopBarProps) {
           gap="$3"
           flexWrap={narrow ? "wrap" : "nowrap"}
           minWidth={0}
-          flex={narrow ? undefined : 1}
+          flex={1}
         >
           {left}
         </XStack>
         <XStack
           ai="center"
-          jc={narrow ? "flex-start" : "flex-end"}
+          jc="flex-end"
           gap="$3"
           flexWrap={narrow ? "wrap" : "nowrap"}
           minWidth={0}

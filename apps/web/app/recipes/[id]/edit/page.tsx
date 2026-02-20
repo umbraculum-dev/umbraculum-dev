@@ -18,8 +18,10 @@ import {
   RecipeEditFieldBlock,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
+  RecipeEditList,
   RecipeEditReadOnlyValue,
   RecipeEditSection,
+  RecipeEditSummary,
 } from "../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import {
@@ -1245,11 +1247,10 @@ export default function RecipeEditPage() {
                   return (
                     <>
                       <View overflowX="auto">
-                        <table className="recipeEditTable">
-                          <tbody>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                        <YStack gap="$2">
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
+                              <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.abv")}</SizableText>
                                   {renderMath(
                                     "analysis.abv",
@@ -1267,15 +1268,17 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</CodeInline>{" "}
+                            </View>
+                            <View>
+                              <XStack gap="$1" ai="baseline" display="inline-flex">
+                                <CodeInline>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</CodeInline>
                                 {typeof a?.abvEstimatedPercent === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText> : null}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                              </XStack>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
+                              <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuTinseth")}</SizableText>
                                   {renderMath(
                                     "analysis.ibuTinseth",
@@ -1299,13 +1302,13 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</CodeInline>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</CodeInline>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuRager")}</SizableText>
                                   {renderMath(
@@ -1330,13 +1333,13 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmMorey")}</SizableText>
                                   {renderMath(
@@ -1363,13 +1366,13 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</CodeInline>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</CodeInline>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmDaniels")}</SizableText>
                                   {renderMath(
@@ -1396,13 +1399,13 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</CodeInline>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</CodeInline>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.kettleVolume")}</SizableText>
                                   {renderMath(
@@ -1425,14 +1428,16 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</CodeInline>{" "}
+                            </View>
+                            <View>
+                              <XStack gap="$1" ai="baseline" display="inline-flex">
+                                <CodeInline>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</CodeInline>
                                 {typeof a?.kettleVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                              </XStack>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.preBoilVolume")}</SizableText>
                                   {renderMath(
@@ -1455,14 +1460,16 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</CodeInline>{" "}
+                            </View>
+                            <View>
+                              <XStack gap="$1" ai="baseline" display="inline-flex">
+                                <CodeInline>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</CodeInline>
                                 {typeof a?.preBoilVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                              </XStack>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.og")}</SizableText>
                                   {renderMath(
@@ -1515,13 +1522,13 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3)}</CodeInline>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3)}</CodeInline>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.fg")}</SizableText>
                                   {renderMath(
@@ -1540,13 +1547,13 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3)}</CodeInline>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3)}</CodeInline>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.attenuation")}</SizableText>
                                   {renderMath(
@@ -1567,16 +1574,18 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</CodeInline>{" "}
+                            </View>
+                            <View>
+                              <XStack gap="$1" ai="baseline" display="inline-flex">
+                                <CodeInline>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</CodeInline>
                                 {typeof a?.attenuationEffectivePercent === "number" ? (
                                   <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText>
                                 ) : null}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="recipeEditAnalysisLabelCell">
+                              </XStack>
+                            </View>
+                          </XStack>
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
                                   <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
                                   {renderMath(
@@ -1629,13 +1638,12 @@ export default function RecipeEditPage() {
                                     }),
                                   )}
                                 </XStack>
-                              </td>
-                              <td>
-                                <CodeInline>{fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3)}</CodeInline>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3)}</CodeInline>
+                            </View>
+                          </XStack>
+                        </YStack>
                       </View>
 
                       {warnings.length ? (
@@ -1648,7 +1656,7 @@ export default function RecipeEditPage() {
                           p="$3"
                           mt="$3"
                         >
-                          <summary className="recipeEditDetailsSummary">
+                          <RecipeEditSummary>
                             <XStack gap="$2" flexWrap="wrap" items="baseline" display="inline-flex">
                               <SizableText size="$3" fontWeight="bold" fontFamily="$body" color="var(--text)">
                                 {tAnalysis("warningsTitle")}
@@ -1657,8 +1665,8 @@ export default function RecipeEditPage() {
                                 {tAnalysis("warningsClickToExpand")}
                               </SizableText>
                             </XStack>
-                          </summary>
-                          <YStack as="ul" gap="$1" mt="$2" className="recipeEditListDisc">
+                          </RecipeEditSummary>
+                          <RecipeEditList gap="$1" mt="$2">
                             {warnings.map((w, idx) => (
                               <SizableText
                                 as="li"
@@ -1673,7 +1681,7 @@ export default function RecipeEditPage() {
                                 </SizableText>
                               </SizableText>
                             ))}
-                          </YStack>
+                          </RecipeEditList>
                         </View>
                       ) : null}
                     </>
@@ -1771,14 +1779,14 @@ export default function RecipeEditPage() {
                 mt="$3"
                 mb="$3"
               >
-                <YStack as="ul" gap="$1" mt="$2" mb={0} className="recipeEditListDisc">
+                <RecipeEditList gap="$1" mt="$2" mb={0}>
                   <SizableText as="li" size="$2" fontFamily="$body" color="var(--text)">
                     Mash water: <CodeInline>{formatFixed(locale, waterVolumes.mashLiters, 2)}</CodeInline> {tUnits("L")}
                   </SizableText>
                   <SizableText as="li" size="$2" fontFamily="$body" color="var(--text)">
                     Sparge water: <CodeInline>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</CodeInline> {tUnits("L")}
                   </SizableText>
-                </YStack>
+                </RecipeEditList>
               </RecipeEditFieldBlock>
             ) : (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb="$3">
@@ -1942,43 +1950,39 @@ export default function RecipeEditPage() {
               ) : null}
               {fermentableResults.length ? (
                 <View overflowX="auto" mt="$2">
-                  <table className="recipeEditTable">
-                    <thead>
-                      <tr>
-                        <th align="left">Name</th>
-                        <th align="left">Producer</th>
-                        <th align="left">°L</th>
-                        <th align="left">Yield %</th>
-                        <th align="left">PPG</th>
-                        <th align="left">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {fermentableResults.slice(0, 20).map((it) => (
-                        <tr key={it.id}>
-                          <td>{it.name}</td>
-                          <td>{it.producer ?? ""}</td>
-                          <td align="right">{typeof it.colorLovibond === "number" ? it.colorLovibond.toFixed(1) : ""}</td>
-                          <td align="right">{typeof it.yieldPercent === "number" ? it.yieldPercent.toFixed(3) : ""}</td>
-                          <td align="right">{typeof it.ppg === "number" ? it.ppg.toFixed(3) : ""}</td>
-                          <td>
-                            <Button
-                              size="$2"
-                              bg="var(--surface-2)"
-                              borderWidth={1}
-                              borderColor="var(--border)"
-                              color="var(--text)"
-                              fontFamily="$body"
-                              onPress={() => addFermentableFromDb(it)}
-                              disabled={!canCallAccountScoped}
-                            >
-                              Add
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <YStack gap="$1">
+                    <XStack gap="$2" ai="center" minW="max-content">
+                      <View minW={140}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Name</SizableText></View>
+                      <View minW={100}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Producer</SizableText></View>
+                      <View minW={50}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">°L</SizableText></View>
+                      <View minW={70}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Yield %</SizableText></View>
+                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">PPG</SizableText></View>
+                      <View minW={60} />
+                    </XStack>
+                    {fermentableResults.slice(0, 20).map((it) => (
+                      <XStack key={it.id} gap="$2" ai="center" minW="max-content">
+                        <View minW={140}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
+                        <View minW={100}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.producer ?? ""}</SizableText></View>
+                        <View minW={50}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.colorLovibond === "number" ? it.colorLovibond.toFixed(1) : ""}</SizableText></View>
+                        <View minW={70}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.yieldPercent === "number" ? it.yieldPercent.toFixed(3) : ""}</SizableText></View>
+                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.ppg === "number" ? it.ppg.toFixed(3) : ""}</SizableText></View>
+                        <View minW={60}>
+                          <Button
+                            size="$2"
+                            bg="var(--surface-2)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            color="var(--text)"
+                            fontFamily="$body"
+                            onPress={() => addFermentableFromDb(it)}
+                            disabled={!canCallAccountScoped}
+                          >
+                            Add
+                          </Button>
+                        </View>
+                      </XStack>
+                    ))}
+                  </YStack>
                 </View>
               ) : null}
               </form>
@@ -2201,11 +2205,11 @@ export default function RecipeEditPage() {
 
                                 <View flexBasis="100%" w="100%">
                                   <details>
-                                    <summary className="recipeEditDetailsSummary">
+                                    <RecipeEditSummary>
                                       <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
                                         Mash pH model (v1) – Advanced users
                                       </SizableText>
-                                    </summary>
+                                    </RecipeEditSummary>
                                     <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
                                       {isRoastedLike(r) ? (
                                         <>
@@ -2413,41 +2417,37 @@ export default function RecipeEditPage() {
               {hopSearchError ? <ErrorBox mt="$2">{hopSearchError}</ErrorBox> : null}
               {hopResults.length ? (
                 <View overflowX="auto" mt="$2">
-                  <table className="recipeEditTable">
-                    <thead>
-                      <tr>
-                        <th align="left">Name</th>
-                        <th align="left">Country</th>
-                        <th align="left">α min</th>
-                        <th align="left">α max</th>
-                        <th align="left">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hopResults.slice(0, 20).map((it) => (
-                        <tr key={it.id}>
-                          <td>{it.name}</td>
-                          <td>{it.country ?? ""}</td>
-                          <td align="right">{typeof it.alphaMin === "number" ? it.alphaMin.toFixed(1) : ""}</td>
-                          <td align="right">{typeof it.alphaMax === "number" ? it.alphaMax.toFixed(1) : ""}</td>
-                          <td>
-                            <Button
-                              size="$2"
-                              bg="var(--surface-2)"
-                              borderWidth={1}
-                              borderColor="var(--border)"
-                              color="var(--text)"
-                              fontFamily="$body"
-                              onPress={() => addHopFromDb(it)}
-                              disabled={!canCallAccountScoped}
-                            >
-                              Add
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <YStack gap="$1">
+                    <XStack gap="$2" ai="center" minW="max-content">
+                      <View minW={180}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Name</SizableText></View>
+                      <View minW={80}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Country</SizableText></View>
+                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">α min</SizableText></View>
+                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">α max</SizableText></View>
+                      <View minW={60} />
+                    </XStack>
+                    {hopResults.slice(0, 20).map((it) => (
+                      <XStack key={it.id} gap="$2" ai="center" minW="max-content">
+                        <View minW={180}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
+                        <View minW={80}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.country ?? ""}</SizableText></View>
+                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.alphaMin === "number" ? it.alphaMin.toFixed(1) : ""}</SizableText></View>
+                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.alphaMax === "number" ? it.alphaMax.toFixed(1) : ""}</SizableText></View>
+                        <View minW={60}>
+                          <Button
+                            size="$2"
+                            bg="var(--surface-2)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            color="var(--text)"
+                            fontFamily="$body"
+                            onPress={() => addHopFromDb(it)}
+                            disabled={!canCallAccountScoped}
+                          >
+                            Add
+                          </Button>
+                        </View>
+                      </XStack>
+                    ))}
+                  </YStack>
                 </View>
               ) : null}
               </form>
@@ -2684,41 +2684,37 @@ export default function RecipeEditPage() {
               {yeastSearchError ? <ErrorBox mt="$2">{yeastSearchError}</ErrorBox> : null}
               {yeastResults.length ? (
                 <View overflowX="auto" mt="$2">
-                  <table className="recipeEditTable">
-                    <thead>
-                      <tr>
-                        <th align="left">Name</th>
-                        <th align="left">Lab</th>
-                        <th align="left">Product ID</th>
-                        <th align="left">Type</th>
-                        <th align="left">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {yeastResults.slice(0, 20).map((it) => (
-                        <tr key={it.id}>
-                          <td>{it.name}</td>
-                          <td>{it.lab ?? ""}</td>
-                          <td>{it.productId ?? ""}</td>
-                          <td>{it.type ?? ""}</td>
-                          <td>
-                            <Button
-                              size="$2"
-                              bg="var(--surface-2)"
-                              borderWidth={1}
-                              borderColor="var(--border)"
-                              color="var(--text)"
-                              fontFamily="$body"
-                              onPress={() => addYeastFromDb(it)}
-                              disabled={!canCallAccountScoped}
-                            >
-                              Add
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <YStack gap="$1">
+                    <XStack gap="$2" ai="center" minW="max-content">
+                      <View minW={180}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Name</SizableText></View>
+                      <View minW={100}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Lab</SizableText></View>
+                      <View minW={100}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Product ID</SizableText></View>
+                      <View minW={80}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Type</SizableText></View>
+                      <View minW={60} />
+                    </XStack>
+                    {yeastResults.slice(0, 20).map((it) => (
+                      <XStack key={it.id} gap="$2" ai="center" minW="max-content">
+                        <View minW={180}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
+                        <View minW={100}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.lab ?? ""}</SizableText></View>
+                        <View minW={100}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.productId ?? ""}</SizableText></View>
+                        <View minW={80}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.type ?? ""}</SizableText></View>
+                        <View minW={60}>
+                          <Button
+                            size="$2"
+                            bg="var(--surface-2)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            color="var(--text)"
+                            fontFamily="$body"
+                            onPress={() => addYeastFromDb(it)}
+                            disabled={!canCallAccountScoped}
+                          >
+                            Add
+                          </Button>
+                        </View>
+                      </XStack>
+                    ))}
+                  </YStack>
                 </View>
               ) : null}
               </form>

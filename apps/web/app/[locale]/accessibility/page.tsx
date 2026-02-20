@@ -148,90 +148,92 @@ export default function AccessibilityPage() {
   };
 
   return (
-    <View as="section" bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" maxW={720}>
-      <H1 mt={0}>{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-        {t("subtitle")}
-      </SizableText>
-
-      {!loaded ? (
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
-          {t("loading")}
+    <section>
+      <View bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" maxW={720}>
+        <H1 mt={0}>{t("title")}</H1>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+          {t("subtitle")}
         </SizableText>
-      ) : (
-        <YStack gap="$3">
-          <YStack gap="$1.5">
-            <RecipeEditFieldLabel htmlFor="ui-theme">{t("themePreset")}</RecipeEditFieldLabel>
-            <select
-              id="ui-theme"
-              value={theme}
-              onChange={(e) =>
-                applyAndPersist({
-                  theme: oneOf(e.target.value, allowedTheme, "default"),
-                  fontScale,
-                  density,
-                })
-              }
-              style={{ width: "100%" }}
-            >
-              <option value="default">{t("theme.default")}</option>
-              <option value="hc_dark">{t("theme.hcDark")}</option>
-              <option value="hc_light">{t("theme.hcLight")}</option>
-            </select>
-          </YStack>
 
-          <YStack gap="$1.5">
-            <RecipeEditFieldLabel htmlFor="ui-font-scale">{t("fontScale")}</RecipeEditFieldLabel>
-            <select
-              id="ui-font-scale"
-              value={fontScale}
-              onChange={(e) =>
-                applyAndPersist({
-                  theme,
-                  fontScale: oneOf(e.target.value, allowedFont, "md"),
-                  density,
-                })
-              }
-              style={{ width: "100%" }}
-            >
-              <option value="sm">{t("font.sm")}</option>
-              <option value="md">{t("font.md")}</option>
-              <option value="lg">{t("font.lg")}</option>
-              <option value="xl">{t("font.xl")}</option>
-            </select>
-          </YStack>
-
-          <YStack gap="$1.5">
-            <RecipeEditFieldLabel htmlFor="ui-density">{t("density")}</RecipeEditFieldLabel>
-            <select
-              id="ui-density"
-              value={density}
-              onChange={(e) =>
-                applyAndPersist({
-                  theme,
-                  fontScale,
-                  density: oneOf(e.target.value, allowedDensity, "comfortable"),
-                })
-              }
-              style={{ width: "100%" }}
-            >
-              <option value="comfortable">{t("densityOptions.comfortable")}</option>
-              <option value="compact">{t("densityOptions.compact")}</option>
-            </select>
-          </YStack>
-
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-            {saving ? t("saving") : t("savingHint")}
+        {!loaded ? (
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+            {t("loading")}
           </SizableText>
+        ) : (
+          <YStack gap="$3">
+            <YStack gap="$1.5">
+              <RecipeEditFieldLabel htmlFor="ui-theme">{t("themePreset")}</RecipeEditFieldLabel>
+              <select
+                id="ui-theme"
+                value={theme}
+                onChange={(e) =>
+                  applyAndPersist({
+                    theme: oneOf(e.target.value, allowedTheme, "default"),
+                    fontScale,
+                    density,
+                  })
+                }
+                className="recipeEditSelect recipeEditSelectFull"
+              >
+                <option value="default">{t("theme.default")}</option>
+                <option value="hc_dark">{t("theme.hcDark")}</option>
+                <option value="hc_light">{t("theme.hcLight")}</option>
+              </select>
+            </YStack>
 
-          {error ? <ErrorBox>{error}</ErrorBox> : null}
+            <YStack gap="$1.5">
+              <RecipeEditFieldLabel htmlFor="ui-font-scale">{t("fontScale")}</RecipeEditFieldLabel>
+              <select
+                id="ui-font-scale"
+                value={fontScale}
+                onChange={(e) =>
+                  applyAndPersist({
+                    theme,
+                    fontScale: oneOf(e.target.value, allowedFont, "md"),
+                    density,
+                  })
+                }
+                className="recipeEditSelect recipeEditSelectFull"
+              >
+                <option value="sm">{t("font.sm")}</option>
+                <option value="md">{t("font.md")}</option>
+                <option value="lg">{t("font.lg")}</option>
+                <option value="xl">{t("font.xl")}</option>
+              </select>
+            </YStack>
 
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-            {t("note", { locale })}
-          </SizableText>
-        </YStack>
-      )}
-    </View>
+            <YStack gap="$1.5">
+              <RecipeEditFieldLabel htmlFor="ui-density">{t("density")}</RecipeEditFieldLabel>
+              <select
+                id="ui-density"
+                value={density}
+                onChange={(e) =>
+                  applyAndPersist({
+                    theme,
+                    fontScale,
+                    density: oneOf(e.target.value, allowedDensity, "comfortable"),
+                  })
+                }
+                className="recipeEditSelect recipeEditSelectFull"
+              >
+                <option value="comfortable">{t("densityOptions.comfortable")}</option>
+                <option value="compact">{t("densityOptions.compact")}</option>
+              </select>
+            </YStack>
+
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {saving ? t("saving") : t("savingHint")}
+            </SizableText>
+
+            {error ? <ErrorBox>{error}</ErrorBox> : null}
+
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {t("note", { locale })}
+            </SizableText>
+          </YStack>
+        )}
+      </View>
+    </section>
   );
 }
 

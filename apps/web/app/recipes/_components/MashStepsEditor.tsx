@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "../../../src/i18n/navigation";
-import { Button, Input, View, XStack, YStack } from "tamagui";
+import { Button, Checkbox, Input, View, XStack, YStack } from "tamagui";
 import { SizableText } from "tamagui";
 
 import { CodeInline } from "../../_components/CodeInline";
@@ -343,18 +343,21 @@ export function MashStepsEditor({
                     </YStack>
                     {idx > 0 ? (
                       <XStack gap="$2" alignSelf="center" pt="$4" ai="center">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           id={`mash-step-deduce-${r.id}`}
                           checked={r.deduceFromMashIn === true}
-                          onChange={(e) =>
+                          onCheckedChange={(checked) =>
                             onUpdateStep?.(r.id, {
-                              deduceFromMashIn: e.target.checked,
-                              ...(e.target.checked ? {} : { amountL: 0 }),
+                              deduceFromMashIn: checked === true,
+                              ...(checked === true ? {} : { amountL: 0 }),
                             })
                           }
                           aria-label={t("mashingDeduceFromMashIn")}
-                        />
+                          size="$2"
+                          native
+                        >
+                          <Checkbox.Indicator />
+                        </Checkbox>
                         <SizableText size="$2" color="$gray10" as="label" htmlFor={`mash-step-deduce-${r.id}`}>
                           {t("mashingDeduceFromMashIn")}
                         </SizableText>

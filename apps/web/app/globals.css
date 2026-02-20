@@ -246,22 +246,10 @@ code {
 .recipeEditSelectFull {
   width: 100%;
 }
-.recipeEditTable {
-  width: 100%;
-  border-collapse: collapse;
-}
-.recipeEditDetailsSummary {
-  font-size: 12px;
-  cursor: pointer;
-}
-.recipeEditAnalysisLabelCell {
-  padding-right: 12px;
-}
 .recipeEditListDisc {
   list-style: disc;
   padding-left: 20px;
 }
-
 .mashStepsEditor input,
 .mashStepsEditor select {
   text-align: left !important;
