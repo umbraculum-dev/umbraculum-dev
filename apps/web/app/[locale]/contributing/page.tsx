@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { H1, H2, H3, SizableText, View, YStack } from "tamagui";
 
 type Topic = "i18n" | "raw-materials" | null;
 
@@ -29,7 +30,6 @@ export default function ContributingPage() {
     if (topic === "i18n") {
       setOpenI18n(true);
       setOpenRawMaterials(false);
-      // After state applies, scroll.
       setTimeout(() => i18nRef.current?.scrollIntoView({ block: "start" }), 0);
       return;
     }
@@ -44,23 +44,29 @@ export default function ContributingPage() {
   }, [topic]);
 
   return (
-    <div style={{ maxWidth: 860, display: "grid", gap: 16 }}>
-      <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$4" maxWidth={860}>
+      <H1 mt={0}>{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      <section className="brew-panel">
+      <View
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+      >
         <details ref={i18nRef} open={openI18n} onToggle={(e) => setOpenI18n(e.currentTarget.open)}>
-          <summary style={{ cursor: "pointer" }}>
-            <h2 style={{ margin: 0, display: "inline" }}>{t("sections.i18n.title")}</h2>
+          <summary className="brew-details-summary">
+            <H2 mt={0} display="inline">{t("sections.i18n.title")}</H2>
           </summary>
-          <div style={{ marginTop: 12 }}>
-            <p className="brew-muted" style={{ marginTop: 0 }}>
+          <YStack mt="$3">
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {tI18n("subtitle")}
-            </p>
+            </SizableText>
 
-            <h3 style={{ marginBottom: 6 }}>{tI18n("howItWorksTitle")}</h3>
+            <H3 mb="$1.5">{tI18n("howItWorksTitle")}</H3>
             <ul>
               <li>{tI18n("howItWorks1")}</li>
               <li>
@@ -70,47 +76,57 @@ export default function ContributingPage() {
               <li>{tI18n("howItWorks3")}</li>
             </ul>
 
-            <h3 style={{ marginBottom: 6 }}>{tI18n("recommendedToolTitle")}</h3>
-            <p>{tI18n("recommendedToolBody")}</p>
+            <H3 mb="$1.5">{tI18n("recommendedToolTitle")}</H3>
+            <SizableText size="$3" color="var(--text)" fontFamily="$body">
+              {tI18n("recommendedToolBody")}
+            </SizableText>
             <ul>
               <li>{tI18n("recommendedTool1")}</li>
               <li>{tI18n("recommendedTool2")}</li>
             </ul>
 
-            <h3 style={{ marginBottom: 6 }}>{tI18n("githubFallbackTitle")}</h3>
-            <p className="brew-muted">{tI18n("githubFallbackBody")}</p>
+            <H3 mb="$1.5">{tI18n("githubFallbackTitle")}</H3>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {tI18n("githubFallbackBody")}
+            </SizableText>
 
-            <h3 style={{ marginBottom: 6 }}>{tI18n("rulesTitle")}</h3>
+            <H3 mb="$1.5">{tI18n("rulesTitle")}</H3>
             <ul>
               <li>{tI18n("rule1", { url: "{url}" })}</li>
               <li>{tI18n("rule2")}</li>
               <li>{tI18n("rule3")}</li>
             </ul>
-          </div>
+          </YStack>
         </details>
-      </section>
+      </View>
 
-      <section className="brew-panel">
+      <View
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+      >
         <details ref={rawMaterialsRef} open={openRawMaterials} onToggle={(e) => setOpenRawMaterials(e.currentTarget.open)}>
-          <summary style={{ cursor: "pointer" }}>
-            <h2 style={{ margin: 0, display: "inline" }}>{t("sections.rawMaterials.title")}</h2>
+          <summary className="brew-details-summary">
+            <H2 mt={0} display="inline">{t("sections.rawMaterials.title")}</H2>
           </summary>
-          <div style={{ marginTop: 12 }}>
-            <p className="brew-muted" style={{ marginTop: 0 }}>
+          <YStack mt="$3">
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("sections.rawMaterials.subtitle")}
-            </p>
+            </SizableText>
             <ol>
               <li>{t("sections.rawMaterials.step1")}</li>
               <li>{t("sections.rawMaterials.step2")}</li>
               <li>{t("sections.rawMaterials.step3")}</li>
             </ol>
-            <p className="brew-muted" style={{ marginBottom: 0 }}>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
               {t("sections.rawMaterials.issueTemplateNote")}
-            </p>
-          </div>
+            </SizableText>
+          </YStack>
         </details>
-      </section>
-    </div>
+      </View>
+    </YStack>
   );
 }
 

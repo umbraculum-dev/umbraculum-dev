@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { H1, H2, SizableText, View, YStack } from "tamagui";
 
 import { DashboardClient } from "../../DashboardClient";
 import { Link } from "../../../src/i18n/navigation";
@@ -9,27 +10,34 @@ export default function FermDataIntegrationPage() {
   const t = useTranslations("dashboard.fermDataIntegration");
 
   return (
-    <>
+    <YStack gap="$3">
       <DashboardClient />
 
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+      <H1 mb="$2">{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      <p className="brew-muted">
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         <Link href="/">{t("backToDashboard")}</Link>
-      </p>
+      </SizableText>
 
-      <section className="brew-panel" aria-labelledby="integration-heading">
-        <h2 id="integration-heading" style={{ marginTop: 0 }}>
+      <View
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+        aria-labelledby="integration-heading"
+      >
+        <H2 id="integration-heading" mt={0}>
           {t("sections.integration.title")}
-        </h2>
-        <p className="brew-muted" style={{ marginBottom: 0 }}>
+        </H2>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
           {t("sections.integration.empty")}
-        </p>
-      </section>
-    </>
+        </SizableText>
+      </View>
+    </YStack>
   );
 }
 

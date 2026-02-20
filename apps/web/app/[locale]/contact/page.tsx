@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { H1, H2, SizableText, View, YStack } from "tamagui";
 
 export default function ContactPage() {
   const t = useTranslations("contact");
@@ -10,24 +11,32 @@ export default function ContactPage() {
   const href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 
   return (
-    <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$3">
+      <H1 mb="$2">{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      <section className="brew-panel" aria-labelledby="contact-email-heading" style={{ marginTop: 16 }}>
-        <h2 id="contact-email-heading" style={{ marginTop: 0 }}>
+      <View
+        mt="$3"
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+        aria-labelledby="contact-email-heading"
+      >
+        <H2 id="contact-email-heading" mt={0}>
           {t("emailHeading")}
-        </h2>
-        <p className="brew-muted" style={{ marginTop: 0 }}>
+        </H2>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("emailLabel")} <code>{email}</code>
-        </p>
-        <p style={{ marginBottom: 0 }}>
+        </SizableText>
+        <SizableText size="$2" color="var(--text)" fontFamily="$body" mb={0}>
           <a href={href}>{t("emailCta")}</a>
-        </p>
-      </section>
-    </>
+        </SizableText>
+      </View>
+    </YStack>
   );
 }
 

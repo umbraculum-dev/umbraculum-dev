@@ -2,8 +2,11 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { YStack } from "tamagui";
 
-export function LocaleSelect({ id }: { id?: string }) {
+import { RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+
+export function LocaleSelect({ id = "auth-locale" }: { id?: string }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
@@ -11,8 +14,8 @@ export function LocaleSelect({ id }: { id?: string }) {
   const searchParams = useSearchParams();
 
   return (
-    <label className="brew-muted" style={{ display: "block", fontSize: 12 }}>
-      {t("languageLabel")}
+    <YStack gap="$1.5">
+      <RecipeEditFieldLabel htmlFor={id}>{t("languageLabel")}</RecipeEditFieldLabel>
       <select
         id={id}
         value={locale}
@@ -24,12 +27,12 @@ export function LocaleSelect({ id }: { id?: string }) {
           const qs = searchParams?.toString();
           router.push(qs ? `${nextPath}?${qs}` : nextPath);
         }}
-        style={{ width: "100%", padding: 8, marginTop: 4 }}
+        className="brew-recipe-edit-select brew-recipe-edit-select-full"
       >
         <option value="en">English</option>
         <option value="it">Italiano</option>
       </select>
-    </label>
+    </YStack>
   );
 }
 

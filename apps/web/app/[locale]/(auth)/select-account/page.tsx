@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
 
@@ -80,39 +81,72 @@ export default function SelectAccountPage() {
   };
 
   return (
-    <section className="brew-panel" style={{ maxWidth: 720 }}>
-      <h1 style={{ marginTop: 0 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <View
+      maxWidth={720}
+      bg="var(--surface)"
+      borderWidth={1}
+      borderColor="var(--border)"
+      rounded="$2"
+      p="$3"
+    >
+      <H1 mt={0}>{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
+      </SizableText>
 
-      {loading ? <p className="brew-muted">{t("loading")}</p> : null}
+      {loading ? (
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("loading")}
+        </SizableText>
+      ) : null}
 
       {error ? (
-        <pre className="brew-error-box" role="alert" style={{ marginTop: 12 }}>
-          {error}
-        </pre>
+        <View mt="$3">
+          <pre className="brew-error-box" role="alert">
+            {error}
+          </pre>
+        </View>
       ) : null}
 
-      {!loading && !hasAccounts ? <p className="brew-muted">{t("noAccountsFound")}</p> : null}
+      {!loading && !hasAccounts ? (
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("noAccountsFound")}
+        </SizableText>
+      ) : null}
 
       {hasAccounts ? (
-        <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+        <YStack gap="$2" mt="$3">
           {accounts.map((a) => (
-            <button
+            <Button
               key={a.id}
-              type="button"
-              onClick={() => void onPick(a.id)}
+              onPress={() => void onPick(a.id)}
               disabled={Boolean(submittingId)}
-              style={{ textAlign: "left" }}
+              justifyContent="flex-start"
+              width="100%"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              size="$3"
             >
-              <strong>{a.name}</strong> <span className="brew-muted">· {a.role}</span>
-              {submittingId === a.id ? <span className="brew-muted"> · Saving…</span> : null}
-            </button>
+              <XStack gap="$1" flex={1} justifyContent="flex-start" alignItems="center">
+                <SizableText size="$3" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                  {a.name}
+                </SizableText>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                  · {a.role}
+                </SizableText>
+                {submittingId === a.id ? (
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    · Saving…
+                  </SizableText>
+                ) : null}
+              </XStack>
+            </Button>
           ))}
-        </div>
+        </YStack>
       ) : null}
-    </section>
+    </View>
   );
 }
 

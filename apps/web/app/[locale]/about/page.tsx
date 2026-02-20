@@ -1,24 +1,25 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { H1, SizableText, YStack } from "tamagui";
 import { Link } from "../../../src/i18n/navigation";
 
 export default function AboutPage() {
   const t = useTranslations("about");
   return (
-    <>
-      <h1 style={{ marginBottom: 8 }}>{t("title")}</h1>
-      <p className="brew-muted" style={{ marginTop: 0 }}>
+    <YStack gap="$3">
+      <H1 mb="$2">{t("title")}</H1>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}
-      </p>
-      <p className="brew-muted" style={{ marginTop: 12 }}>
+      </SizableText>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         {t("translationsRowPrefix")}{" "}
         <Link href="/contributing?topic=i18n">{t("translationsRowLinkText")}</Link> {t("translationsRowSuffix")}
-      </p>
-      <p className="brew-muted" style={{ marginTop: 8 }}>
+      </SizableText>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
         {t("translationsSideNote")}
-      </p>
-    </>
+      </SizableText>
+    </YStack>
   );
 }
 
