@@ -18,7 +18,7 @@ import {
 } from "../../../_lib/beerjsonRecipe";
 import { MashStepsEditor } from "../../../_components/MashStepsEditor";
 import { BrewSelect } from "../../../../_components/BrewSelect";
-import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
@@ -1255,19 +1255,27 @@ export default function MashWaterPage() {
             </View>
           </XStack>
 
-          <XStack gap="$3" mt="$3" alignItems="center">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
-              {loadingProfiles ? "Reloading…" : "Reload water profiles"}
-            </Button>
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
-              {savingAdjustment ? "Saving…" : "Save profile and volumes"}
-            </Button>
+          <YStack gap="$2" mt="$3">
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
+                {loadingProfiles ? "Reloading…" : "Reload water profiles"}
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
+                {savingAdjustment ? "Saving…" : "Save profile and volumes"}
+              </Button>
+            </XStack>
             {adjustmentSaveStatus ? (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
+              <MessageBox
+                variant="success"
+                role="status"
+                aria-live="polite"
+                dismissAfter={5000}
+                onDismiss={() => setAdjustmentSaveStatus(null)}
+              >
                 {adjustmentSaveStatus}
-              </SizableText>
+              </MessageBox>
             ) : null}
-          </XStack>
+          </YStack>
 
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
             {t("adjustmentHint")}
@@ -1550,18 +1558,34 @@ export default function MashWaterPage() {
               ) : null}
             </XStack>
 
-            <XStack gap="$3" mt="$3" alignItems="center">
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
-                {savingMash ? "Saving…" : "Save mash draft"}
-              </Button>
-              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || mashSubmitting}>
-                {mashSubmitting
-                  ? "Working…"
-                  : mashAcidificationMode === "manual"
-                    ? "Estimate & save snapshot"
-                    : "Calculate & save snapshot"}
-              </Button>
-            </XStack>
+            <YStack gap="$2" mt="$3">
+              <XStack gap="$3" alignItems="center" flexWrap="wrap">
+                <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
+                  {savingMash ? "Saving…" : "Save mash draft"}
+                </Button>
+                <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || mashSubmitting}>
+                  {mashSubmitting
+                    ? "Working…"
+                    : mashAcidificationMode === "manual"
+                      ? "Estimate & save snapshot"
+                      : "Calculate & save snapshot"}
+                </Button>
+              </XStack>
+              {(mashSaveStatus || mashCalcSaveStatus) ? (
+                <MessageBox
+                  variant="success"
+                  role="status"
+                  aria-live="polite"
+                  dismissAfter={5000}
+                  onDismiss={() => {
+                    setMashSaveStatus(null);
+                    setMashCalcSaveStatus(null);
+                  }}
+                >
+                  {mashSaveStatus ?? mashCalcSaveStatus}
+                </MessageBox>
+              ) : null}
+            </YStack>
 
             {mashError ? (
               <ErrorBox id="mash-error" mt="$3">{mashError}</ErrorBox>
@@ -1727,17 +1751,31 @@ export default function MashWaterPage() {
             disabled={!canCall}
           />
 
-          <XStack gap="$3" mt="$3" alignItems="center">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
-              {savingSalts ? "Saving…" : "Save salts draft"}
-            </Button>
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
-              {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-            </Button>
-            {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
-            {saltsSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsSaveStatus}</SizableText> : null}
-            {saltsCalcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsCalcSaveStatus}</SizableText> : null}
-          </XStack>
+          <YStack gap="$2" mt="$3">
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+                {savingSalts ? "Saving…" : "Save salts draft"}
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+                {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
+              </Button>
+              {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
+            </XStack>
+            {(saltsSaveStatus || saltsCalcSaveStatus) ? (
+              <MessageBox
+                variant="success"
+                role="status"
+                aria-live="polite"
+                dismissAfter={5000}
+                onDismiss={() => {
+                  setSaltsSaveStatus(null);
+                  setSaltsCalcSaveStatus(null);
+                }}
+              >
+                {saltsSaveStatus ?? saltsCalcSaveStatus}
+              </MessageBox>
+            ) : null}
+          </YStack>
 
           {saltsError ? (
             <ErrorBox mt="$3">{saltsError}</ErrorBox>
@@ -1822,16 +1860,28 @@ body={buildWaterMathBody({
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </SizableText>
-          <XStack gap="$3" alignItems="center" flexWrap="wrap">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
-              {savingOverall ? "Calculating…" : "Preview overall"}
-            </Button>
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
-              {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
-            </Button>
-            {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
-            {overallSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallSaveStatus}</SizableText> : null}
-          </XStack>
+          <YStack gap="$2" mt="$3">
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
+                {savingOverall ? "Calculating…" : "Preview overall"}
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
+                {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
+              </Button>
+              {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
+            </XStack>
+            {overallSaveStatus ? (
+              <MessageBox
+                variant="success"
+                role="status"
+                aria-live="polite"
+                dismissAfter={5000}
+                onDismiss={() => setOverallSaveStatus(null)}
+              >
+                {overallSaveStatus}
+              </MessageBox>
+            ) : null}
+          </YStack>
           {overallError ? (
             <ErrorBox mt="$3">{overallError}</ErrorBox>
           ) : null}
@@ -1965,6 +2015,7 @@ body={buildWaterMathBody({
             canSave={canCall && !!recipe?.beerJsonRecipeJson}
             saving={mashStepsSaving}
             saveStatus={mashStepsSaveStatus}
+            onDismissSaveStatus={() => setMashStepsSaveStatus(null)}
             t={tEdit}
             tUnits={tUnits}
             locale={locale}

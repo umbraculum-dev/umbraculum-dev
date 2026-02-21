@@ -14,7 +14,7 @@ import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleR
 import { parseWaterProfilesResponse } from "@brewery/contracts";
 import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -864,21 +864,35 @@ export default function SpargeWaterPage() {
               ) : null}
             </XStack>
 
-            <XStack mt="$3" gap="$3" alignItems="center">
-              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || spargeSubmitting}>
-                {spargeSubmitting
-                  ? "Working…"
-                  : spargeAcidificationMode === "manual"
-                    ? "Estimate & save snapshot"
-                    : "Calculate & save snapshot"}
-              </Button>
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
-                {savingSparge ? "Saving…" : "Save sparge draft"}
-              </Button>
-              {spargeStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeStatus}</SizableText> : null}
-              {spargeSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaveStatus}</SizableText> : null}
-              {calcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{calcSaveStatus}</SizableText> : null}
-            </XStack>
+            <YStack mt="$3" gap="$2">
+              <XStack gap="$3" alignItems="center" flexWrap="wrap">
+                <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || spargeSubmitting}>
+                  {spargeSubmitting
+                    ? "Working…"
+                    : spargeAcidificationMode === "manual"
+                      ? "Estimate & save snapshot"
+                      : "Calculate & save snapshot"}
+                </Button>
+                <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
+                  {savingSparge ? "Saving…" : "Save sparge draft"}
+                </Button>
+                {spargeStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeStatus}</SizableText> : null}
+              </XStack>
+              {(spargeSaveStatus || calcSaveStatus) ? (
+                <MessageBox
+                  variant="success"
+                  role="status"
+                  aria-live="polite"
+                  dismissAfter={5000}
+                  onDismiss={() => {
+                    setSpargeSaveStatus(null);
+                    setCalcSaveStatus(null);
+                  }}
+                >
+                  {spargeSaveStatus ?? calcSaveStatus}
+                </MessageBox>
+              ) : null}
+            </YStack>
 
             {spargeError ? (
               <ErrorBox id="sparge-error" mt="$3">{spargeError}</ErrorBox>
@@ -1063,17 +1077,31 @@ export default function SpargeWaterPage() {
             disabled={!canCall}
           />
 
-          <XStack mt="$3" gap="$3" alignItems="center" flexWrap="wrap">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
-              {savingSpargeSalts ? "Saving…" : "Save salts draft"}
-            </Button>
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
-              {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-            </Button>
-            {spargeSaltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsStatus}</SizableText> : null}
-            {spargeSaltsSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsSaveStatus}</SizableText> : null}
-            {spargeSaltsCalcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsCalcSaveStatus}</SizableText> : null}
-          </XStack>
+          <YStack mt="$3" gap="$2">
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
+                {savingSpargeSalts ? "Saving…" : "Save salts draft"}
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
+                {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
+              </Button>
+              {spargeSaltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsStatus}</SizableText> : null}
+            </XStack>
+            {(spargeSaltsSaveStatus || spargeSaltsCalcSaveStatus) ? (
+              <MessageBox
+                variant="success"
+                role="status"
+                aria-live="polite"
+                dismissAfter={5000}
+                onDismiss={() => {
+                  setSpargeSaltsSaveStatus(null);
+                  setSpargeSaltsCalcSaveStatus(null);
+                }}
+              >
+                {spargeSaltsSaveStatus ?? spargeSaltsCalcSaveStatus}
+              </MessageBox>
+            ) : null}
+          </YStack>
 
           {spargeSaltsError ? <ErrorBox mt="$3">{spargeSaltsError}</ErrorBox> : null}
 

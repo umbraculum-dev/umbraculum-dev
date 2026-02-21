@@ -284,6 +284,27 @@ Recommended display decimals (v1 defaults; can be tuned later):
 - If a formula is expressed in imperial units in brewing literature, the **API** may convert canonical metric inputs to imperial **internally** as part of the calculation (example: lb/gal based MCU), but clients must not re-implement the formula.
 - Web/native clients should render API outputs; they may only convert for display and for input capture.
 
+### MessageBox success auto-dismiss (MANDATORY for save feedback)
+The shared `MessageBox` component (`apps/web/app/_components/recipe-edit/MessageBox.tsx`) supports optional auto-dismiss for **success** messages only.
+
+**Rule:** Errors and warnings stay visible until the user acts. Only `variant="success"` messages may auto-dismiss.
+
+**Usage:** When showing a save-success message, pass `dismissAfter={5000}` and `onDismiss` so the message disappears after 5 seconds:
+
+```tsx
+<MessageBox
+  variant="success"
+  role="status"
+  aria-live="polite"
+  dismissAfter={5000}
+  onDismiss={() => setSaveStatus(null)}
+>
+  {saveStatus}
+</MessageBox>
+```
+
+**Rationale:** Success feedback is transient; the user has already seen the confirmation. Errors and warnings require attention and must remain until dismissed or resolved.
+
 ### Analysis derivations (Medium-ROI; unified “result + derivation” pattern)
 The “result + derivation” pattern is not water-only.
 

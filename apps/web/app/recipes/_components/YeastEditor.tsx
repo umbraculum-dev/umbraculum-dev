@@ -12,6 +12,7 @@ import { apiFetch } from "../../_lib/apiClient";
 import {
   ErrorBox,
   FieldBadge,
+  MessageBox,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
   RecipeEditReadOnlyValue,
@@ -56,6 +57,7 @@ type YeastEditorProps = {
   canSave?: boolean;
   saving?: boolean;
   saveStatus?: string | null;
+  onDismissSaveStatus?: () => void;
   canCallAccountScoped?: boolean;
   t: (key: string, values?: Record<string, string | number>) => string;
   tAnalysis: (key: string) => string;
@@ -91,6 +93,7 @@ export function YeastEditor({
   canSave = false,
   saving = false,
   saveStatus = null,
+  onDismissSaveStatus,
   canCallAccountScoped = false,
   t,
   tAnalysis,
@@ -303,6 +306,7 @@ export function YeastEditor({
       canSave={canSave}
       saving={saving}
       saveStatus={saveStatus}
+      onDismissSaveStatus={onDismissSaveStatus}
       canCallAccountScoped={canCallAccountScoped}
       t={t}
       tAnalysis={tAnalysis}
@@ -329,6 +333,7 @@ type YeastEditorEditableProps = {
   canSave: boolean;
   saving: boolean;
   saveStatus: string | null;
+  onDismissSaveStatus?: () => void;
   canCallAccountScoped: boolean;
   t: (key: string, values?: Record<string, string | number>) => string;
   tAnalysis: (key: string) => string;
@@ -352,6 +357,7 @@ function YeastEditorEditable({
   canSave,
   saving,
   saveStatus,
+  onDismissSaveStatus,
   canCallAccountScoped,
   t,
   tAnalysis,
@@ -728,7 +734,49 @@ function YeastEditorEditable({
                       {surfaceMath && (r.format === "liquid" || r.format === "slurry") ? (
                         <MathHelpPopover
                           title={tMath(mathExplain["yeast.amountL"].titleKey)}
-                          body={tMath("yeast.amountL.body")}
+                          body={(() => {
+                            const base = tMath("yeast.amountL.body");
+                            const cellsB =
+                              batchSizeForCells != null &&
+                              analysisOg != null &&
+                              r.pitchRate &&
+                              r.pitchRate in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P
+                                ? computeEstimatedCellsB(
+                                    batchSizeForCells,
+                                    analysisOg,
+                                    r.pitchRate as YeastPitchRateKey,
+                                  )
+                                : null;
+                            const cellsPerL =
+                              r.format === "slurry" && r.manualCellCount
+                                ? computeCellsPerLFromManualCount(r.manualCellCount)
+                                : r.cellsPerLOverride != null &&
+                                    Number.isFinite(r.cellsPerLOverride) &&
+                                    r.cellsPerLOverride > 0
+                                  ? r.cellsPerLOverride
+                                  : r.format === "liquid"
+                                    ? CELLS_PER_L_LIQUID
+                                    : CELLS_PER_L_SLURRY;
+                            const amountL =
+                              r.amountL != null && Number.isFinite(r.amountL) ? r.amountL : null;
+                            if (
+                              cellsB != null &&
+                              cellsPerL != null &&
+                              cellsPerL > 0 &&
+                              amountL != null
+                            ) {
+                              return (
+                                base +
+                                "\n\n" +
+                                t("yeastAmountCalcExample", {
+                                  cellsB: Math.round(cellsB),
+                                  cellsPerL: Math.round(cellsPerL),
+                                  amountL: formatAmount(amountL, 2),
+                                })
+                              );
+                            }
+                            return base;
+                          })()}
                           ariaLabel={tMath("fxLabel", {
                             topic: tMath(mathExplain["yeast.amountL"].titleKey),
                           })}
@@ -750,38 +798,11 @@ function YeastEditorEditable({
                       const displayVal = rawVal != null ? String(rawVal) : "";
                       const amountDecimals = r.format === "dry" ? 3 : 2;
                       if (isComputed) {
-                        const cellsB =
-                          batchSizeForCells != null && analysisOg != null && r.pitchRate && r.pitchRate in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P
-                            ? computeEstimatedCellsB(
-                                batchSizeForCells,
-                                analysisOg,
-                                r.pitchRate as YeastPitchRateKey,
-                              )
-                            : null;
-                        const cellsPerL =
-                          r.format === "slurry" && r.manualCellCount
-                            ? computeCellsPerLFromManualCount(r.manualCellCount)
-                            : null;
-                        const showBreakdown =
-                          r.format === "slurry" &&
-                          r.manualCellCount &&
-                          cellsB != null &&
-                          cellsPerL != null &&
-                          rawVal != null;
                         return (
                           <YStack gap="$1">
                             <RecipeEditReadOnlyValue>
                               {rawVal != null ? formatAmount(rawVal, amountDecimals) : "—"}
                             </RecipeEditReadOnlyValue>
-                            {showBreakdown ? (
-                              <SizableText size="$1" color="var(--text-muted)" fontFamily="$body">
-                                {t("yeastAmountCalcBreakdown", {
-                                  cellsB: Math.round(cellsB),
-                                  cellsPerL: Math.round(cellsPerL),
-                                  amountL: formatAmount(rawVal, amountDecimals),
-                                })}
-                              </SizableText>
-                            ) : null}
                           </YStack>
                         );
                       }
@@ -1005,6 +1026,14 @@ function YeastEditorEditable({
                           />
                         </YStack>
                       ) : null}
+                      <XStack gap="$2" flexBasis="100%" w="100%" mt={-4} flexWrap="wrap" alignItems="center">
+                        <SizableText size="$1" color="var(--text-muted)" fontFamily="$body" mb={0}>
+                          {t("yeastCellsPerDefaultNote")}
+                        </SizableText>
+                        <SizableText size="$1" color="var(--text-muted)" fontFamily="$body" mb={0}>
+                          {t("yeastCellsPerOverrideNote")}
+                        </SizableText>
+                      </XStack>
                       {r.format === "slurry" ? (
                         <YStack gap="$2" flexBasis="100%" w="100%" mt="$2" pt="$2" borderTopWidth={1} borderColor="var(--border)">
                           <SizableText size="$2" fontFamily="$body" color="var(--text)" fontWeight="600">
@@ -1294,6 +1323,8 @@ function YeastEditorEditable({
                           </YStack>
                         </YStack>
                       ) : null}
+                    </XStack>
+                    <XStack gap="$3" flexWrap="wrap" items="flex-end" mt="$2">
                       <YStack gap="$1" minW={200}>
                         <RecipeEditFieldLabel htmlFor={`yeast-species-${r.id}`}>
                           {t("yeastSpeciesLabel")}
@@ -1352,12 +1383,6 @@ function YeastEditorEditable({
                         />
                       </YStack>
                     </XStack>
-                    <SizableText size="$1" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
-                      {t("yeastCellsPerDefaultNote")}
-                    </SizableText>
-                    <SizableText size="$1" color="var(--text-muted)" fontFamily="$body" mb={0}>
-                      {t("yeastCellsPerOverrideNote")}
-                    </SizableText>
                   </details>
                 </View>
               </RecipeEditIngredientCard>
@@ -1370,7 +1395,7 @@ function YeastEditorEditable({
         </SizableText>
       )}
 
-      <XStack mt="$3" mb="$4" justify="flex-end" gap="$2" alignItems="center">
+      <YStack mt="$3" mb="$4" gap="$2" alignItems="flex-end">
         <Button
           size="$3"
           bg="var(--surface-2)"
@@ -1384,11 +1409,17 @@ function YeastEditorEditable({
           {saving ? "Saving…" : t("yeastSaveButton")}
         </Button>
         {saveStatus ? (
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
+          <MessageBox
+            variant="success"
+            role="status"
+            aria-live="polite"
+            dismissAfter={5000}
+            onDismiss={onDismissSaveStatus}
+          >
             {saveStatus}
-          </SizableText>
+          </MessageBox>
         ) : null}
-      </XStack>
+      </YStack>
     </View>
   );
 }

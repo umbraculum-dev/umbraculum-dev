@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { SizableText, View } from "tamagui";
 
@@ -32,6 +32,10 @@ export interface MessageBoxProps {
   id?: string;
   mt?: string | number;
   mb?: string | number;
+  /** Auto-dismiss after this many ms. Only for variant="success." Errors and warnings stay visible. */
+  dismissAfter?: number;
+  /** Called when dismissAfter timer fires. Required when dismissAfter is set. */
+  onDismiss?: () => void;
 }
 
 export function MessageBox({
@@ -42,13 +46,30 @@ export function MessageBox({
   id,
   mt,
   mb,
+  dismissAfter,
+  onDismiss,
 }: MessageBoxProps) {
+  useEffect(() => {
+    if (
+      variant !== "success" ||
+      dismissAfter == null ||
+      onDismiss == null ||
+      dismissAfter <= 0
+    ) {
+      return;
+    }
+    const t = setTimeout(onDismiss, dismissAfter);
+    return () => clearTimeout(t);
+  }, [variant, dismissAfter, onDismiss, children]);
+
   const styles = VARIANT_STYLES[variant];
   return (
     <View
       id={id}
       mt={mt}
       mb={mb}
+      alignSelf="stretch"
+      w="100%"
       bg={styles.bg}
       borderWidth={1}
       borderColor={styles.borderColor}

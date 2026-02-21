@@ -15,7 +15,8 @@ export type NumberFormatUnit =
   | "percent"
   | "sg"
   | "ibu"
-  | "srm";
+  | "srm"
+  | "min";
 
 export interface NumberFormatHintV1 {
   version: 1;

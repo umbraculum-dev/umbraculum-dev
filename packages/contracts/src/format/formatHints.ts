@@ -19,6 +19,7 @@ export const waterFormatHints: Record<string, NumberFormatHintV1> = {
 };
 
 export const analysisFormatHints: Record<string, NumberFormatHintV1> = {
+  boilTimeMinutes: hintFixed({ decimals: 0, unit: "min" }),
   kettleVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
   preBoilVolumeLiters: hintFixed({ decimals: 2, unit: "L" }),
   ogEstimatedSg: hintFixed({ decimals: 3, unit: "sg" }),

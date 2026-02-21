@@ -590,6 +590,7 @@ export default function YeastPage() {
             canSave={canCallAccountScoped}
             saving={saving}
             saveStatus={saveStatus}
+            onDismissSaveStatus={() => setSaveStatus(null)}
             canCallAccountScoped={canCallAccountScoped}
             t={t}
             tAnalysis={tAnalysis}

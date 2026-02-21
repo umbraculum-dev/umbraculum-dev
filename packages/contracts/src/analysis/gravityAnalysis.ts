@@ -32,6 +32,7 @@ export interface GravityAnalysisCanonicalModelsV1 {
 }
 
 export interface GravityAnalysisResultV1 {
+  boilTimeMinutes: number | null;
   kettleVolumeLiters: number | null;
   preBoilVolumeLiters: number | null;
   ogEstimatedSg: number | null;

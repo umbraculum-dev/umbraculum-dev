@@ -16,6 +16,7 @@ import { CodeInline } from "../../../_components/CodeInline";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   ErrorBox,
+  MessageBox,
   RecipeEditField,
   RecipeEditFieldBlock,
   RecipeEditFieldLabel,
@@ -188,11 +189,12 @@ export default function RecipeEditPage() {
     { id: "hops", label: t("sections.hops") },
     { id: "yeast", label: t("sections.yeast") },
     { id: "other", label: t("sections.other") },
+    { id: "boil", label: t("sections.boil") },
     { id: "notes", label: t("sections.notes") },
     { id: "water", label: t("sections.water") },
   ] as const;
 
-  const collapsibleSectionIds = ["basics", "analysis", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "notes"] as const;
+  const collapsibleSectionIds = ["basics", "analysis", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes"] as const;
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
@@ -247,6 +249,7 @@ export default function RecipeEditPage() {
   const [spargeStepTempSaving, setSpargeStepTempSaving] = useState(false);
   const [spargeStepTempLocal, setSpargeStepTempLocal] = useState<number | null>(null);
   const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
+  const [boilTimeMinutes, setBoilTimeMinutes] = useState<string>("");
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
   const [stylesLoading, setStylesLoading] = useState(false);
@@ -428,6 +431,27 @@ export default function RecipeEditPage() {
           throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
         }
         const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
+
+        const boilTimeMinutesOverride =
+          ext && typeof ext === "object" && typeof (ext as any).boilTimeMinutesOverride === "number" && Number.isFinite((ext as any).boilTimeMinutesOverride)
+            ? (ext as any).boilTimeMinutesOverride
+            : null;
+        if (boilTimeMinutesOverride != null && boilTimeMinutesOverride >= 0) {
+          setBoilTimeMinutes(String(Math.round(boilTimeMinutesOverride)));
+        } else {
+          const hopsForBoil = s.hopsRows.filter((h) => h.use === "boil");
+          const maxMin =
+            hopsForBoil.length > 0
+              ? Math.max(
+                  ...hopsForBoil
+                    .map((h) => (typeof h.timeMinutes === "number" && Number.isFinite(h.timeMinutes) ? h.timeMinutes : 0))
+                    .filter((m) => m > 0),
+                0,
+                )
+              : 0;
+          setBoilTimeMinutes(maxMin > 0 ? String(Math.round(maxMin)) : "60");
+        }
+
         const grist = s.gristRows.map((row) => {
           const ingredientId = typeof links?.grist?.[row.id] === "string" ? (links.grist[row.id] as string) : null;
           const m = row.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[row.id] : null;
@@ -651,6 +675,19 @@ export default function RecipeEditPage() {
       const extBase = (recipe as any)?.recipeExtJson;
       const extBaseForSave =
         extBase && typeof extBase === "object" && !Array.isArray(extBase) ? ({ ...(extBase as any) } as any) : ({} as any);
+
+      const boilTimeMinutesVal = (() => {
+        const trimmed = boilTimeMinutes.trim();
+        if (!trimmed) return null;
+        const n = Number(trimmed);
+        if (!Number.isFinite(n) || n < 0 || n > 600) return null;
+        return Math.round(n);
+      })();
+      if (boilTimeMinutesVal != null) {
+        extBaseForSave.boilTimeMinutesOverride = boilTimeMinutesVal;
+      } else {
+        delete extBaseForSave.boilTimeMinutesOverride;
+      }
 
       const yeastAttenuationOverridesPercent = Object.fromEntries(
         Object.entries(yeastAttenuationOverrides)
@@ -1185,6 +1222,38 @@ export default function RecipeEditPage() {
         />
       ) : null}
 
+      {(saveStatus || saveError) ? (
+        <View
+          position="fixed"
+          top={16}
+          left="50%"
+          style={{ transform: "translateX(-50%)" }}
+          zIndex={1000}
+          width="100%"
+          maxWidth={600}
+          px="$4"
+        >
+          <YStack gap="$2" width="100%">
+          {saveStatus ? (
+            <MessageBox
+              variant="success"
+              role="status"
+              aria-live="polite"
+              dismissAfter={5000}
+              onDismiss={() => setSaveStatus(null)}
+            >
+              {saveStatus}
+            </MessageBox>
+          ) : null}
+          {saveError ? (
+            <ErrorBox aria-live="polite">
+              {saveError}
+            </ErrorBox>
+          ) : null}
+          </YStack>
+        </View>
+      ) : null}
+
       <XStack
         flexDirection="column"
         gap="$4"
@@ -1252,34 +1321,27 @@ export default function RecipeEditPage() {
               </View>
             </XStack>
 
-            <XStack gap="$3" items="center" mt="$3" flexWrap="wrap">
-              <Button
-                onPress={onSave}
-                disabled={!canCallAccountScoped || saving}
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-              >
-                {saving ? "Saving…" : "Save"}
-              </Button>
-              {saveStatus ? (
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
-                  {saveStatus}
-                </SizableText>
-              ) : null}
-              {recipe ? (
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                  Updated: <CodeInline>{recipe.updatedAt}</CodeInline>
-                </SizableText>
-              ) : null}
-            </XStack>
-
-            {saveError ? (
-              <ErrorBox mt="$3">{saveError}</ErrorBox>
-            ) : null}
+            <YStack gap="$2" mt="$3">
+              <XStack gap="$3" items="center" flexWrap="wrap">
+                <Button
+                  onPress={onSave}
+                  disabled={!canCallAccountScoped || saving}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
+                  {saving ? "Saving…" : "Save"}
+                </Button>
+                {recipe ? (
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    Updated: <CodeInline>{recipe.updatedAt}</CodeInline>
+                  </SizableText>
+                ) : null}
+              </XStack>
+            </YStack>
           </RecipeEditSection>
 
           <RecipeEditSection
@@ -1625,6 +1687,21 @@ export default function RecipeEditPage() {
                           </XStack>
                           </View>
                           <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.boilTimeMinutes")}</SizableText>
+                                </XStack>
+                            </View>
+                            <View>
+                              <XStack gap="$1" ai="baseline" display="inline-flex">
+                                <CodeInline>{fmtField("boilTimeMinutes", a?.boilTimeMinutes, 0)}</CodeInline>
+                                {typeof a?.boilTimeMinutes === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span"> min</SizableText> : null}
+                              </XStack>
+                            </View>
+                          </XStack>
+                          </View>
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -3122,6 +3199,48 @@ export default function RecipeEditPage() {
                   {t("rawMaterialsCtaPrefix")}{" "}
                   <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
                 </SizableText>
+          </RecipeEditSection>
+
+          <RecipeEditSection
+            id="boil"
+            headingId="boil-heading"
+            label={t("sections.boil")}
+            open={openSections.boil}
+            onOpenChange={(open) => setSectionOpen("boil", open)}
+          >
+            <RecipeEditField id="recipe-boil-time" label={t("sections.boil")}>
+              <Input
+                id="recipe-boil-time"
+                value={boilTimeMinutes}
+                onChangeText={setBoilTimeMinutes}
+                keyboardType="numeric"
+                placeholder="60"
+                size="$3"
+                w={120}
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="$2"
+                fontFamily="$body"
+              />
+            </RecipeEditField>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+              {t("boilTimeHelp")}
+            </SizableText>
+            <XStack mt="$3" justify="flex-end">
+              <Button
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+                onPress={onSave}
+                disabled={!canCallAccountScoped || saving}
+              >
+                {saving ? "Saving…" : t("boilSave")}
+              </Button>
+            </XStack>
           </RecipeEditSection>
 
           <RecipeEditSection

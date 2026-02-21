@@ -8,6 +8,7 @@ export interface GravityAnalysisWarning {
 }
 
 export interface GravityAnalysis {
+  boilTimeMinutes: number | null;
   kettleVolumeLiters: number | null;
   preBoilVolumeLiters: number | null;
   ogEstimatedSg: number | null;
@@ -304,8 +305,15 @@ function extractEquipment(ext: unknown): ExtractedEquipment {
   };
 }
 
-function extractBoilTimeHours(beerJsonRecipeJson: unknown): number {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
+function extractBoilTimeHours(args: { beerJsonRecipeJson: unknown; recipeExtJson: unknown }): number {
+  const override =
+    args.recipeExtJson && typeof args.recipeExtJson === "object" && !Array.isArray(args.recipeExtJson)
+      ? (args.recipeExtJson as any).boilTimeMinutesOverride
+      : null;
+  if (typeof override === "number" && Number.isFinite(override) && override >= 0) {
+    return override / 60;
+  }
+  const r0 = (args.beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
   const hops = r0?.ingredients?.hop_additions;
   const list = Array.isArray(hops) ? hops : [];
   let maxMinutes = 0;
@@ -444,6 +452,7 @@ export function computeRecipeGravityAnalysis(args: {
 
   if (!args.beerJsonRecipeJson) {
     const result: GravityAnalysis = {
+      boilTimeMinutes: null,
       kettleVolumeLiters: null,
       preBoilVolumeLiters: null,
       ogEstimatedSg: null,
@@ -481,7 +490,10 @@ export function computeRecipeGravityAnalysis(args: {
     ? water.boilWaterVolumeLiters
     : 0;
 
-  const boilTimeHours = extractBoilTimeHours(args.beerJsonRecipeJson);
+  const boilTimeHours = extractBoilTimeHours({
+    beerJsonRecipeJson: args.beerJsonRecipeJson,
+    recipeExtJson: args.recipeExtJson,
+  });
   const kettleHopMassGrams = extractKettleHopMassGrams(args.beerJsonRecipeJson);
   const kettleHopAbsorptionLiters = equipment.kettleHopsAbsorptionLitersPerGram * kettleHopMassGrams;
 
@@ -644,7 +656,10 @@ export function computeRecipeGravityAnalysis(args: {
   const abvEstimatedPercent =
     ogEstimatedSg != null && fgEstimatedSg != null ? (ogEstimatedSg - fgEstimatedSg) * ABV_FACTOR : null;
 
+  const boilTimeMinutes = Math.round(boilTimeHours * 60);
+
   const result: GravityAnalysis = {
+    boilTimeMinutes,
     kettleVolumeLiters,
     preBoilVolumeLiters,
     ogEstimatedSg,

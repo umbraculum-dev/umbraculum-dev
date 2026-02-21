@@ -223,6 +223,10 @@ const recipeExtSchemaV1 = {
       type: "object",
       additionalProperties: { type: "boolean" },
     },
+    /**
+     * Manual boil time override (minutes). When present, used for analysis in preference to hop-based inference.
+     */
+    boilTimeMinutesOverride: { type: "number", minimum: 0, maximum: 600 },
   },
   required: ["version"],
 } as const;

@@ -7,6 +7,7 @@ import { SizableText } from "tamagui";
 import { BrewSelect } from "../../_components/BrewSelect";
 import { CodeInline } from "../../_components/CodeInline";
 import {
+  MessageBox,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
   RecipeEditReadOnlyValue,
@@ -34,6 +35,7 @@ type MashStepsEditorProps = {
   canSave?: boolean;
   saving?: boolean;
   saveStatus?: string | null;
+  onDismissSaveStatus?: () => void;
   t: (key: string, values?: Record<string, string | number>) => string;
   tUnits: (key: string) => string;
   locale: string;
@@ -58,6 +60,7 @@ export function MashStepsEditor({
   canSave = false,
   saving = false,
   saveStatus = null,
+  onDismissSaveStatus,
   t,
   tUnits,
   locale,
@@ -405,22 +408,30 @@ export function MashStepsEditor({
           ))}
         </XStack>
       </XStack>
-      {onSave ? (
+      {(onSave || saveStatus) ? (
         <YStack gap="$2" mt="$3">
-          <Button size="$2" onPress={onSave} disabled={!canSave || saving}>
-            {saving ? "Saving…" : t("mashingSaveMashSteps")}
-          </Button>
+          {onSave ? (
+            <Button size="$2" onPress={onSave} disabled={!canSave || saving}>
+              {saving ? "Saving…" : t("mashingSaveMashSteps")}
+            </Button>
+          ) : null}
           {recipeId ? (
             <SizableText size="$2" mt="$2" mb={0}>
               <Link href={`/recipes/${recipeId}/edit#mashing`}>{t("mashStepsSeeRecapLink")}</Link>
             </SizableText>
           ) : null}
+          {saveStatus ? (
+            <MessageBox
+              variant="success"
+              role="status"
+              aria-live="polite"
+              dismissAfter={5000}
+              onDismiss={onDismissSaveStatus}
+            >
+              {saveStatus}
+            </MessageBox>
+          ) : null}
         </YStack>
-      ) : null}
-      {saveStatus ? (
-        <SizableText size="$2" color="$gray10" aria-live="polite" display="block" mt="$2">
-          {saveStatus}
-        </SizableText>
       ) : null}
     </View>
   );

@@ -98,6 +98,7 @@ export function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisRespo
     .map((code: string) => ({ code: code as GravityAnalysisWarningCode }));
 
   const result = {
+    boilTimeMinutes: rr.boilTimeMinutes === null ? null : isFiniteNumber(rr.boilTimeMinutes) ? rr.boilTimeMinutes : null,
     kettleVolumeLiters: rr.kettleVolumeLiters === null ? null : isFiniteNumber(rr.kettleVolumeLiters) ? rr.kettleVolumeLiters : null,
     preBoilVolumeLiters: rr.preBoilVolumeLiters === null ? null : isFiniteNumber(rr.preBoilVolumeLiters) ? rr.preBoilVolumeLiters : null,
     ogEstimatedSg: rr.ogEstimatedSg === null ? null : isFiniteNumber(rr.ogEstimatedSg) ? rr.ogEstimatedSg : null,
