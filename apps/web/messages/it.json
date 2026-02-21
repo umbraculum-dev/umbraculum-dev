@@ -609,6 +609,7 @@
       "sections": {
         "basics": "Basi",
         "analysis": "Analisi",
+        "brew": "Brew",
         "equipment": "Attrezzatura",
         "mashing": "Ammostamento e Sparge",
         "fermentables": "Fermentabili",
@@ -675,6 +676,9 @@
       "duplicateRecipeNote": "Questo crea una nuova ricetta clonando la ricetta corrente.",
       "duplicateRecipeButton": "Duplica ricetta dalla ricetta corrente",
       "duplicateRecipeWorking": "Duplicazione…",
+      "brewNote": "Lanciare la ricetta di brassaggio crea gli step di brassaggio e inizializza i log se applicabile.",
+      "brewButton": "Brassa la ricetta corrente",
+      "brewFeatureSoon": "Funzionalità disponibile a breve...",
       "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "yeastHelp": "Scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "yeastEditInYeastPage": "Modifica lievito nella pagina Lievito",

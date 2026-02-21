@@ -602,6 +602,7 @@
       "sections": {
         "basics": "Basics",
         "analysis": "Analysis",
+        "brew": "Brew",
         "equipment": "Equipment",
         "mashing": "Mashing & Sparging",
         "fermentables": "Fermentables",
@@ -668,6 +669,9 @@
       "duplicateRecipeNote": "This create a new recipe cloning current recipe.",
       "duplicateRecipeButton": "Duplicate recipe from current recipe",
       "duplicateRecipeWorking": "Duplicating…",
+      "brewNote": "Launching the brew recipe create the brew steps and initialize logs if applicable.",
+      "brewButton": "Brew the current recipe",
+      "brewFeatureSoon": "Feature available soon...",
       "hopsHelp": "Pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
       "yeastHelp": "Select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
       "yeastEditInYeastPage": "Edit yeast in Yeast page",

@@ -17,6 +17,7 @@ import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   ErrorBox,
   MessageBox,
+  WarningBox,
   RecipeEditField,
   RecipeEditFieldBlock,
   RecipeEditFieldLabel,
@@ -194,6 +195,7 @@ export default function RecipeEditPage() {
   const sections = [
     { id: "basics", label: t("sections.basics") },
     { id: "analysis", label: t("sections.analysis") },
+    { id: "brew", label: t("sections.brew") },
     { id: "equipment", label: t("sections.equipment") },
     { id: "mashing", label: t("sections.mashing") },
     { id: "fermentables", label: t("sections.fermentables") },
@@ -205,7 +207,7 @@ export default function RecipeEditPage() {
     { id: "water", label: t("sections.water") },
   ] as const;
 
-  const collapsibleSectionIds = ["basics", "analysis", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes"] as const;
+  const collapsibleSectionIds = ["basics", "analysis", "brew", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes"] as const;
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
@@ -253,6 +255,7 @@ export default function RecipeEditPage() {
   const [creatingVersion, setCreatingVersion] = useState(false);
   const [createVersionError, setCreateVersionError] = useState<string | null>(null);
   const [duplicatingRecipe, setDuplicatingRecipe] = useState(false);
+  const [brewFeatureSoonShown, setBrewFeatureSoonShown] = useState(false);
   const [duplicateRecipeError, setDuplicateRecipeError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
@@ -996,6 +999,10 @@ export default function RecipeEditPage() {
     } finally {
       setDuplicatingRecipe(false);
     }
+  };
+
+  const onBrewRecipe = () => {
+    setBrewFeatureSoonShown(true);
   };
 
   const addGristRow = () => {
@@ -2154,6 +2161,35 @@ export default function RecipeEditPage() {
                     </>
                   );
                 })()}
+          </RecipeEditSection>
+
+          <RecipeEditSection
+            id="brew"
+            headingId="brew-heading"
+            label={t("sections.brew")}
+            open={openSections.brew}
+            onOpenChange={(open) => setSectionOpen("brew", open)}
+          >
+            <YStack gap="$2" mt="$2">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                {t("brewNote")}
+              </SizableText>
+              <Button
+                onPress={onBrewRecipe}
+                disabled={!canCallAccountScoped}
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {t("brewButton")}
+              </Button>
+              {brewFeatureSoonShown ? (
+                <WarningBox mt="$1.5">{t("brewFeatureSoon")}</WarningBox>
+              ) : null}
+            </YStack>
           </RecipeEditSection>
 
           <RecipeEditSection
