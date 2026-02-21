@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Checkbox, H1, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, Checkbox, H1, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
 import { BrewSelect } from "../../_components/BrewSelect";
 import {
   ErrorBox,
   MessageBox,
+  RecipeEditField,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
   RecipeEditSection,
@@ -88,6 +89,7 @@ export default function BrewdayStepsSettingsPage() {
   const [customStepMinutes, setCustomStepMinutes] = useState("");
   const [customStepSectionId, setCustomStepSectionId] = useState<string>("");
   const [customBrewingMethodName, setCustomBrewingMethodName] = useState("");
+  const [brewdayNotes, setBrewdayNotes] = useState("");
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     brewdayStepsRecap: true,
@@ -95,6 +97,7 @@ export default function BrewdayStepsSettingsPage() {
     brewdayStepsSections: true,
     brewdayStepsDefault: true,
     brewdayStepsCustom: true,
+    brewdayNotes: true,
   });
 
   const setSectionOpen = (id: string, open: boolean) => {
@@ -125,6 +128,7 @@ export default function BrewdayStepsSettingsPage() {
             sections?: BrewdaySectionConfig;
             defaultSteps?: BrewdayStep[];
             customSteps?: BrewdayStep[];
+            notes?: string | null;
           };
         };
         const s = data?.settings;
@@ -136,6 +140,7 @@ export default function BrewdayStepsSettingsPage() {
           const loadedDefault = Array.isArray(s.defaultSteps) ? s.defaultSteps : [];
           setDefaultSteps(loadedDefault.length > 0 ? loadedDefault : DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
           setCustomSteps(Array.isArray(s.customSteps) ? s.customSteps : []);
+          setBrewdayNotes(s.notes ?? "");
         } else {
           setSections({ presetExcludes: {}, customSections: [], customBrewingMethods: [] });
           setDefaultSteps(DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
@@ -168,6 +173,7 @@ export default function BrewdayStepsSettingsPage() {
           sections,
           defaultSteps,
           customSteps,
+          notes: brewdayNotes || null,
         }),
       });
       if (!res.ok) {
@@ -184,7 +190,7 @@ export default function BrewdayStepsSettingsPage() {
     } finally {
       setSaving(false);
     }
-  }, [canCallAccountScoped, brewingType, sections, defaultSteps, customSteps, t]);
+  }, [canCallAccountScoped, brewingType, sections, defaultSteps, customSteps, brewdayNotes, t]);
 
   const addBrewingMethodFromDropdown = () => {
     const value = brewingType?.trim();
@@ -1083,6 +1089,30 @@ export default function BrewdayStepsSettingsPage() {
                 : t("save")}
             </Button>
           </XStack>
+        </RecipeEditSection>
+
+        <RecipeEditSection
+          id="brewday-notes"
+          headingId="brewday-notes-heading"
+          label={t("sections.brewdayNotes.title")}
+          open={openSections.brewdayNotes}
+          onOpenChange={(open) => setSectionOpen("brewdayNotes", open)}
+        >
+          <RecipeEditField id="brewday-notes" label={t("sections.brewdayNotes.title")}>
+            <TextArea
+              id="brewday-notes"
+              numberOfLines={6}
+              value={brewdayNotes}
+              onChangeText={setBrewdayNotes}
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
+            />
+          </RecipeEditField>
         </RecipeEditSection>
       </YStack>
     </YStack>

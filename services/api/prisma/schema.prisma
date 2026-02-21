@@ -126,6 +126,7 @@ model BrewdaySettings {
   sectionsJson Json  @map("sections_json")
   customSectionsJson Json? @map("custom_sections_json")
   defaultStepsJson Json? @map("default_steps_json")
+  notes     String?  @map("notes")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

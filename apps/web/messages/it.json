@@ -996,6 +996,9 @@
         "brewdayStepsCustom": {
           "title": "Step brewday - personalizzato",
           "placeholder": "Prossimamente."
+        },
+        "brewdayNotes": {
+          "title": "Note brewday"
         }
       }
     }

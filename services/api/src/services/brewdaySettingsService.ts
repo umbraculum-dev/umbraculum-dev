@@ -51,6 +51,7 @@ export type BrewdaySettingsPayload = {
   sections: BrewdaySectionConfig;
   defaultSteps: BrewdayDefaultStep[];
   customSteps: BrewdayCustomStep[];
+  notes?: string | null;
 };
 
 const DEFAULT_STEPS_SEED: BrewdayDefaultStep[] = [
@@ -155,6 +156,7 @@ export class BrewdaySettingsService {
       sections,
       defaultSteps,
       customSteps,
+      notes: row.notes ?? null,
     };
   }
 
@@ -173,6 +175,9 @@ export class BrewdaySettingsService {
     const customSectionsJson = Array.isArray(payload.customSteps) ? payload.customSteps : [];
     const defaultStepsJson = Array.isArray(payload.defaultSteps) ? payload.defaultSteps : [];
 
+    const notes =
+      typeof payload.notes === "string" ? payload.notes : payload.notes === null ? null : undefined;
+
     const row = await this.prisma.brewdaySettings.upsert({
       where: { accountId },
       create: {
@@ -181,12 +186,14 @@ export class BrewdaySettingsService {
         sectionsJson,
         customSectionsJson,
         defaultStepsJson,
+        notes: notes ?? null,
       },
       update: {
         brewingType: payload.brewingType,
         sectionsJson,
         customSectionsJson,
         defaultStepsJson,
+        notes: notes !== undefined ? notes : undefined,
       },
     });
 
@@ -199,6 +206,7 @@ export class BrewdaySettingsService {
       sections,
       defaultSteps: defaultSteps.length === 0 ? DEFAULT_STEPS_SEED.map((s) => ({ ...s, id: crypto.randomUUID() })) : defaultSteps,
       customSteps,
+      notes: row.notes ?? null,
     };
   }
 }

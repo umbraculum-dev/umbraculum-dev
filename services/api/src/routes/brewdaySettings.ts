@@ -45,12 +45,15 @@ export async function brewdaySettingsRoutes(app: FastifyInstance) {
     const sections = parseSections(body.sections);
     const defaultSteps = Array.isArray(body.defaultSteps) ? (body.defaultSteps as BrewdayDefaultStep[]) : [];
     const customSteps = Array.isArray(body.customSteps) ? (body.customSteps as BrewdayCustomStep[]) : [];
+    const notes =
+      body.notes === null ? null : typeof body.notes === "string" ? body.notes : undefined;
 
     const updated = await svc.upsertSettings(ctx.userId, ctx.activeAccountId, {
       brewingType,
       sections,
       defaultSteps,
       customSteps,
+      ...(notes !== undefined && { notes }),
     });
     return { ok: true, settings: updated };
   });

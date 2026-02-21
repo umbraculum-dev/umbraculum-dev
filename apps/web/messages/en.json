@@ -989,6 +989,9 @@
         "brewdayStepsCustom": {
           "title": "Brewday steps - custom",
           "placeholder": "Coming soon."
+        },
+        "brewdayNotes": {
+          "title": "Brewday notes"
         }
       }
     }
