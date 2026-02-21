@@ -92,6 +92,73 @@ const recipeExtSchemaV1 = {
       additionalProperties: { type: "number", minimum: 0, maximum: 100 },
     },
     /**
+     * Per-yeast-row pitch rate preset. Keyed by BeerJSON culture_additions[*].id.
+     * Value is a preset key (e.g. mfg_rec_0_35_ales, pro_1_0_ales).
+     */
+    yeastPitchRateOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", minLength: 1 },
+    },
+    /**
+     * Per-yeast-row fermentation temperature (°C). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastFermentationTempOverrides: {
+      type: "object",
+      additionalProperties: { type: "number", minimum: -10, maximum: 50 },
+    },
+    /**
+     * Per-yeast-row oxygenation (yes/no). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastOxygenationOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["yes", "no"] },
+    },
+    /**
+     * Per-yeast-row diacetyl rest (yes/no). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastDiacetylRestOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["yes", "no"] },
+    },
+    /**
+     * Per-yeast-row format (dry/liquid/slurry). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastFormatOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["dry", "liquid", "slurry"] },
+    },
+    /**
+     * Per-yeast-row species. Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastSpeciesOverrides: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+        enum: ["saccharomyces_cerevisiae", "saccharomyces_pastorianus", "brettanomyces", "diastaticus", "other"],
+      },
+    },
+    /**
+     * Per-yeast-row needs propagation (yes/no). Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastNeedsPropagationOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["yes", "no"] },
+    },
+    /**
+     * Per-yeast-row cells per L override (B/L) for liquid/slurry. Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastCellsPerLOverrides: {
+      type: "object",
+      additionalProperties: { type: "number", exclusiveMinimum: 0 },
+    },
+    /**
+     * Per-yeast-row cells per kg override (B/kg) for dry yeast. Keyed by BeerJSON culture_additions[*].id.
+     */
+    yeastCellsPerKGOverrides: {
+      type: "object",
+      additionalProperties: { type: "number", exclusiveMinimum: 0 },
+    },
+    /**
      * Snapshot provenance for `equipment`.
      * - We snapshot/copy from an account-scoped equipment template (no live reference).
      * - This records which template was copied and when, enabling an explicit “reload template” action.

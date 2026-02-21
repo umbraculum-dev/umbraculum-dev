@@ -40,6 +40,7 @@ import {
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 import { MashStepsEditor } from "../../_components/MashStepsEditor";
+import { YeastEditor } from "../../_components/YeastEditor";
 import { RecipeEditSectionsNav } from "../../_components/RecipeEditSectionsNav";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
 import {
@@ -50,6 +51,7 @@ import {
 import { mathExplain } from "./_lib/mathExplain";
 import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
 import { renderDerivationBody } from "../water/_lib/mathBodies";
+import { formatSgWithPlato } from "../../../_lib/gravity";
 
 type Recipe = {
   id: string;
@@ -270,11 +272,6 @@ export default function RecipeEditPage() {
   const [hopSearching, setHopSearching] = useState(false);
   const [hopSearchError, setHopSearchError] = useState<string | null>(null);
 
-  const [yeastQuery, setYeastQuery] = useState("");
-  const [yeastResults, setYeastResults] = useState<any[]>([]);
-  const [yeastSearching, setYeastSearching] = useState(false);
-  const [yeastSearchError, setYeastSearchError] = useState<string | null>(null);
-
   const canCallAccountScoped =
     authState.status === "ready" && Boolean(recipeId);
 
@@ -337,6 +334,8 @@ export default function RecipeEditPage() {
     }
   };
 
+  const [visibilityRefreshTrigger, setVisibilityRefreshTrigger] = useState(0);
+
   useEffect(() => {
     const applyHashOpen = () => {
       const raw = window.location.hash || "";
@@ -349,6 +348,17 @@ export default function RecipeEditPage() {
     applyHashOpen();
     window.addEventListener("hashchange", applyHashOpen);
     return () => window.removeEventListener("hashchange", applyHashOpen);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const handler = () => {
+      if (document.visibilityState === "visible") {
+        setVisibilityRefreshTrigger((t) => t + 1);
+      }
+    };
+    document.addEventListener("visibilitychange", handler);
+    return () => document.removeEventListener("visibilitychange", handler);
   }, []);
 
   useEffect(() => {
@@ -385,6 +395,28 @@ export default function RecipeEditPage() {
           setYeastAttenuationOverrides({});
         }
 
+        const yeastPitchRateRaw = ext && typeof ext === "object" ? (ext as any).yeastPitchRateOverrides : null;
+        const yeastFermentationTempRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastFermentationTempOverrides : null;
+        const yeastOxygenationRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastOxygenationOverrides : null;
+        const yeastDiacetylRestRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastDiacetylRestOverrides : null;
+        const yeastFormatRaw =
+          ext && typeof ext === "object"
+            ? (ext as any).yeastFormatOverrides ?? (ext as any).yeastTypeOverrides
+            : null;
+        const yeastSpeciesRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastSpeciesOverrides : null;
+        const yeastNeedsPropagationRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastNeedsPropagationOverrides : null;
+        const yeastCellsPerLRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastCellsPerLOverrides : null;
+        const yeastCellsPerKGRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastCellsPerKGOverrides : null;
+        const yeastCellsPerGRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastCellsPerGOverrides : null;
+
         const equipmentSource = ext && typeof ext === "object" ? (ext as any).equipmentSource : null;
         const equipmentProfileId =
           equipmentSource && typeof equipmentSource === "object" && typeof (equipmentSource as any).equipmentProfileId === "string"
@@ -413,10 +445,92 @@ export default function RecipeEditPage() {
           ...row,
           ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
         })) as EditorHopRow[];
-        const yeast = s.yeastRows.map((row) => ({
-          ...row,
-          ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
-        })) as EditorYeastRow[];
+        const yeast = s.yeastRows.map((row) => {
+          const pitchRate =
+            yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string"
+              ? (yeastPitchRateRaw[row.id] as string)
+              : null;
+          const fermentationTempC =
+            yeastFermentationTempRaw &&
+            typeof yeastFermentationTempRaw === "object" &&
+            typeof yeastFermentationTempRaw[row.id] === "number" &&
+            Number.isFinite(yeastFermentationTempRaw[row.id])
+              ? (yeastFermentationTempRaw[row.id] as number)
+              : null;
+          const oxygenation =
+            yeastOxygenationRaw &&
+            typeof yeastOxygenationRaw === "object" &&
+            (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no")
+              ? (yeastOxygenationRaw[row.id] as "yes" | "no")
+              : null;
+          const diacetylRest =
+            yeastDiacetylRestRaw &&
+            typeof yeastDiacetylRestRaw === "object" &&
+            (yeastDiacetylRestRaw[row.id] === "yes" || yeastDiacetylRestRaw[row.id] === "no")
+              ? (yeastDiacetylRestRaw[row.id] as "yes" | "no")
+              : null;
+          const format =
+            yeastFormatRaw &&
+            typeof yeastFormatRaw === "object" &&
+            (yeastFormatRaw[row.id] === "dry" || yeastFormatRaw[row.id] === "liquid" || yeastFormatRaw[row.id] === "slurry")
+              ? (yeastFormatRaw[row.id] as "dry" | "liquid" | "slurry")
+              : null;
+          const speciesRaw =
+            yeastSpeciesRaw && typeof yeastSpeciesRaw === "object" ? yeastSpeciesRaw[row.id] : null;
+          const validSpecies = [
+            "saccharomyces_cerevisiae",
+            "saccharomyces_pastorianus",
+            "brettanomyces",
+            "diastaticus",
+            "other",
+          ] as const;
+          const species =
+            typeof speciesRaw === "string" && validSpecies.includes(speciesRaw as any) ? speciesRaw : null;
+          const needsPropagation =
+            yeastNeedsPropagationRaw &&
+            typeof yeastNeedsPropagationRaw === "object" &&
+            (yeastNeedsPropagationRaw[row.id] === "yes" || yeastNeedsPropagationRaw[row.id] === "no")
+              ? (yeastNeedsPropagationRaw[row.id] as "yes" | "no")
+              : null;
+          const cellsPerLOverride =
+            yeastCellsPerLRaw &&
+            typeof yeastCellsPerLRaw === "object" &&
+            typeof yeastCellsPerLRaw[row.id] === "number" &&
+            Number.isFinite(yeastCellsPerLRaw[row.id]) &&
+            yeastCellsPerLRaw[row.id] > 0
+              ? (yeastCellsPerLRaw[row.id] as number)
+              : null;
+          const cellsPerKGFromKG =
+            yeastCellsPerKGRaw &&
+            typeof yeastCellsPerKGRaw === "object" &&
+            typeof yeastCellsPerKGRaw[row.id] === "number" &&
+            Number.isFinite(yeastCellsPerKGRaw[row.id]) &&
+            yeastCellsPerKGRaw[row.id] > 0
+              ? (yeastCellsPerKGRaw[row.id] as number)
+              : null;
+          const cellsPerKGFromG =
+            yeastCellsPerGRaw &&
+            typeof yeastCellsPerGRaw === "object" &&
+            typeof yeastCellsPerGRaw[row.id] === "number" &&
+            Number.isFinite(yeastCellsPerGRaw[row.id]) &&
+            yeastCellsPerGRaw[row.id] > 0
+              ? (yeastCellsPerGRaw[row.id] as number) * 1000
+              : null;
+          const cellsPerKGOverride = cellsPerKGFromKG ?? cellsPerKGFromG ?? null;
+          return {
+            ...row,
+            ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+            pitchRate: pitchRate ?? undefined,
+            fermentationTempC: fermentationTempC ?? undefined,
+            oxygenation: oxygenation ?? undefined,
+            diacetylRest: diacetylRest ?? undefined,
+            format: format ?? undefined,
+            species: species ?? undefined,
+            needsPropagation: needsPropagation ?? undefined,
+            cellsPerLOverride: cellsPerLOverride ?? undefined,
+            cellsPerKGOverride: cellsPerKGOverride ?? undefined,
+          };
+        }) as EditorYeastRow[];
         const misc = s.miscRows.map((row) => ({
           ...row,
           ingredientId: typeof links?.misc?.[row.id] === "string" ? (links.misc[row.id] as string) : null,
@@ -445,7 +559,7 @@ export default function RecipeEditPage() {
     return () => {
       cancelled = true;
     };
-  }, [canCallAccountScoped, recipeId]);
+  }, [canCallAccountScoped, recipeId, visibilityRefreshTrigger]);
 
   useEffect(() => {
     if (authState.status !== "ready") return;
@@ -554,6 +668,117 @@ export default function RecipeEditPage() {
       } else {
         delete extBaseForSave.yeastAttenuationOverridesPercent;
       }
+      const yeastPitchRateOverrides = Object.fromEntries(
+        yeastRows
+          .filter((r) => r.pitchRate != null && String(r.pitchRate).trim())
+          .map((r) => [r.id, String(r.pitchRate).trim()]),
+      );
+      const yeastFermentationTempOverrides = Object.fromEntries(
+        yeastRows
+          .filter(
+            (r) =>
+              r.fermentationTempC != null &&
+              Number.isFinite(r.fermentationTempC) &&
+              r.fermentationTempC >= -10 &&
+              r.fermentationTempC <= 50,
+          )
+          .map((r) => [r.id, r.fermentationTempC as number]),
+      );
+      const yeastOxygenationOverrides = Object.fromEntries(
+        yeastRows
+          .filter((r) => r.oxygenation === "yes" || r.oxygenation === "no")
+          .map((r) => [r.id, r.oxygenation as "yes" | "no"]),
+      );
+      const yeastDiacetylRestOverrides = Object.fromEntries(
+        yeastRows
+          .filter((r) => r.diacetylRest === "yes" || r.diacetylRest === "no")
+          .map((r) => [r.id, r.diacetylRest as "yes" | "no"]),
+      );
+      const yeastFormatOverrides = Object.fromEntries(
+        yeastRows
+          .filter((r) => r.format === "dry" || r.format === "liquid" || r.format === "slurry")
+          .map((r) => [r.id, r.format as "dry" | "liquid" | "slurry"]),
+      );
+      const yeastSpeciesOverrides = Object.fromEntries(
+        yeastRows
+          .filter(
+            (r) =>
+              r.species === "saccharomyces_cerevisiae" ||
+              r.species === "saccharomyces_pastorianus" ||
+              r.species === "brettanomyces" ||
+              r.species === "diastaticus" ||
+              r.species === "other",
+          )
+          .map((r) => [r.id, r.species!]),
+      );
+      const yeastNeedsPropagationOverrides = Object.fromEntries(
+        yeastRows
+          .filter((r) => r.needsPropagation === "yes" || r.needsPropagation === "no")
+          .map((r) => [r.id, r.needsPropagation as "yes" | "no"]),
+      );
+      const yeastCellsPerLOverrides = Object.fromEntries(
+        yeastRows
+          .filter(
+            (r) =>
+              r.cellsPerLOverride != null && Number.isFinite(r.cellsPerLOverride) && r.cellsPerLOverride > 0,
+          )
+          .map((r) => [r.id, r.cellsPerLOverride as number]),
+      );
+      const yeastCellsPerKGOverrides = Object.fromEntries(
+        yeastRows
+          .filter(
+            (r) =>
+              r.cellsPerKGOverride != null && Number.isFinite(r.cellsPerKGOverride) && r.cellsPerKGOverride > 0,
+          )
+          .map((r) => [r.id, r.cellsPerKGOverride as number]),
+      );
+      if (Object.keys(yeastPitchRateOverrides).length) {
+        extBaseForSave.yeastPitchRateOverrides = yeastPitchRateOverrides;
+      } else {
+        delete extBaseForSave.yeastPitchRateOverrides;
+      }
+      if (Object.keys(yeastFermentationTempOverrides).length) {
+        extBaseForSave.yeastFermentationTempOverrides = yeastFermentationTempOverrides;
+      } else {
+        delete extBaseForSave.yeastFermentationTempOverrides;
+      }
+      if (Object.keys(yeastOxygenationOverrides).length) {
+        extBaseForSave.yeastOxygenationOverrides = yeastOxygenationOverrides;
+      } else {
+        delete extBaseForSave.yeastOxygenationOverrides;
+      }
+      if (Object.keys(yeastDiacetylRestOverrides).length) {
+        extBaseForSave.yeastDiacetylRestOverrides = yeastDiacetylRestOverrides;
+      } else {
+        delete extBaseForSave.yeastDiacetylRestOverrides;
+      }
+      if (Object.keys(yeastFormatOverrides).length) {
+        extBaseForSave.yeastFormatOverrides = yeastFormatOverrides;
+      } else {
+        delete extBaseForSave.yeastFormatOverrides;
+      }
+      if (Object.keys(yeastSpeciesOverrides).length) {
+        extBaseForSave.yeastSpeciesOverrides = yeastSpeciesOverrides;
+      } else {
+        delete extBaseForSave.yeastSpeciesOverrides;
+      }
+      delete (extBaseForSave as any).yeastTypeOverrides;
+      if (Object.keys(yeastNeedsPropagationOverrides).length) {
+        extBaseForSave.yeastNeedsPropagationOverrides = yeastNeedsPropagationOverrides;
+      } else {
+        delete extBaseForSave.yeastNeedsPropagationOverrides;
+      }
+      if (Object.keys(yeastCellsPerLOverrides).length) {
+        extBaseForSave.yeastCellsPerLOverrides = yeastCellsPerLOverrides;
+      } else {
+        delete extBaseForSave.yeastCellsPerLOverrides;
+      }
+      if (Object.keys(yeastCellsPerKGOverrides).length) {
+        extBaseForSave.yeastCellsPerKGOverrides = yeastCellsPerKGOverrides;
+      } else {
+        delete extBaseForSave.yeastCellsPerKGOverrides;
+      }
+      delete (extBaseForSave as any).yeastCellsPerGOverrides;
 
       const batchSizeLiters =
         typeof extBaseForSave.batchSizeLiters === "number" ? extBaseForSave.batchSizeLiters
@@ -799,33 +1024,6 @@ export default function RecipeEditPage() {
   const updateHopRow = (id: string, patch: Partial<HopRow>) =>
     setHopsRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
-  const addYeastRow = (row?: Partial<YeastRow>) => {
-    setYeastRows((prev) => [
-      ...prev,
-      {
-        id: newRowId(),
-        ingredientId: null,
-        name: "",
-        lab: null,
-        productId: null,
-        attenuationMin: null,
-        attenuationMax: null,
-        ...row,
-      },
-    ]);
-  };
-  const removeYeastRow = (id: string) => {
-    setYeastRows((prev) => prev.filter((r) => r.id !== id));
-    setYeastAttenuationOverrides((prev) => {
-      if (!(id in prev)) return prev;
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-  };
-  const updateYeastRow = (id: string, patch: Partial<YeastRow>) =>
-    setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-
   const addMiscRow = () => {
     setMiscRows((prev) => [
       ...prev,
@@ -925,28 +1123,6 @@ export default function RecipeEditPage() {
   const clearHopSearchResults = () => {
     setHopSearchError(null);
     setHopResults([]);
-  };
-
-  const onSearchYeasts = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setYeastSearchError(null);
-    setYeastSearching(true);
-    try {
-      const res = await apiFetch(`/api/ingredients/yeasts?query=${encodeURIComponent(yeastQuery)}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as any)?.items;
-      setYeastResults(Array.isArray(items) ? items : []);
-    } catch (err) {
-      setYeastSearchError(String(err));
-      setYeastResults([]);
-    } finally {
-      setYeastSearching(false);
-    }
-  };
-
-  const clearYeastSearchResults = () => {
-    setYeastSearchError(null);
-    setYeastResults([]);
   };
 
   const gristTotals = useMemo(() => {
@@ -1282,6 +1458,7 @@ export default function RecipeEditPage() {
                     <>
                       <View overflowX="auto">
                         <YStack gap="$2">
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                               <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1310,6 +1487,8 @@ export default function RecipeEditPage() {
                               </XStack>
                             </View>
                           </XStack>
+                          </View>
+                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                               <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1341,6 +1520,8 @@ export default function RecipeEditPage() {
                               <CodeInline>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</CodeInline>
                             </View>
                           </XStack>
+                          </View>
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1372,6 +1553,8 @@ export default function RecipeEditPage() {
                               <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
                             </View>
                           </XStack>
+                          </View>
+                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1405,6 +1588,8 @@ export default function RecipeEditPage() {
                               <CodeInline>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</CodeInline>
                             </View>
                           </XStack>
+                          </View>
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1438,6 +1623,8 @@ export default function RecipeEditPage() {
                               <CodeInline>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</CodeInline>
                             </View>
                           </XStack>
+                          </View>
+                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1470,6 +1657,8 @@ export default function RecipeEditPage() {
                               </XStack>
                             </View>
                           </XStack>
+                          </View>
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1502,6 +1691,8 @@ export default function RecipeEditPage() {
                               </XStack>
                             </View>
                           </XStack>
+                          </View>
+                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1558,9 +1749,11 @@ export default function RecipeEditPage() {
                                 </XStack>
                             </View>
                             <View>
-                              <CodeInline>{fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3)}</CodeInline>
+                              <CodeInline>{formatSgWithPlato(a?.ogEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
                             </View>
                           </XStack>
+                          </View>
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1583,9 +1776,72 @@ export default function RecipeEditPage() {
                                 </XStack>
                             </View>
                             <View>
-                              <CodeInline>{fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3)}</CodeInline>
+                              <CodeInline>{formatSgWithPlato(a?.fgEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
                             </View>
                           </XStack>
+                          </View>
+                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
+                                  {renderMath(
+                                    "analysis.pbg",
+                                    renderDerivationMath(
+                                      "analysis.pbg",
+                                      tMath("analysis.pbg.body", {
+                                        pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
+                                        preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
+                                        efficiency: (() => {
+                                          const ext = (recipe as any)?.recipeExtJson;
+                                          const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                          const mashEff =
+                                            typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                              ? e.equipment.mash.mashEfficiencyPercent
+                                              : null;
+                                          const brewEff =
+                                            typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                              ? e.equipment.mash.mashEfficiencyPercent
+                                              : null;
+                                          const bjEff =
+                                            (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                              ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                              : null;
+                                          const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                          return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                        })(),
+                                      }),
+                                    ) ?? tMath("analysis.pbg.body", {
+                                      pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
+                                      preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
+                                      efficiency: (() => {
+                                        const ext = (recipe as any)?.recipeExtJson;
+                                        const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                        const mashEff =
+                                          typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                            ? e.equipment.mash.mashEfficiencyPercent
+                                            : null;
+                                        const brewEff =
+                                          typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                            ? e.equipment.mash.mashEfficiencyPercent
+                                            : null;
+                                        const bjEff =
+                                          (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                            ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                            : null;
+                                        const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                        return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                      })(),
+                                    }),
+                                  )}
+                                </XStack>
+                            </View>
+                            <View>
+                              <CodeInline>{formatSgWithPlato(a?.pbgEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
+                            </View>
+                          </XStack>
+                          </View>
+                          <View px="$2" py="$1" borderRadius="$2">
                           <XStack gap="$2" ai="baseline">
                             <View minW={180} pr="$3">
                                 <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
@@ -1618,72 +1874,14 @@ export default function RecipeEditPage() {
                               </XStack>
                             </View>
                           </XStack>
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
-                                  {renderMath(
-                                    "analysis.pbg",
-                                    renderDerivationMath(
-                                      "analysis.pbg",
-                                      tMath("analysis.pbg.body", {
-                                        pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
-                                        preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
-                                        efficiency: (() => {
-                                          const ext = (recipe as any)?.recipeExtJson;
-                                          const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                          const mashEff =
-                                            typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                              ? e.equipment.mash.mashEfficiencyPercent
-                                              : null;
-                                          const brewEff =
-                                            typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                              ? e.brewhouseEfficiencyPercent
-                                              : null;
-                                          const bjEff =
-                                            (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                              ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                              : null;
-                                          const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
-                                          return eff != null ? fmt(eff, 1) : tAnalysis("na");
-                                        })(),
-                                      }),
-                                    ) ?? tMath("analysis.pbg.body", {
-                                      pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
-                                      preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
-                                      efficiency: (() => {
-                                        const ext = (recipe as any)?.recipeExtJson;
-                                        const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                        const mashEff =
-                                          typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                            ? e.equipment.mash.mashEfficiencyPercent
-                                            : null;
-                                        const brewEff =
-                                          typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                            ? e.brewhouseEfficiencyPercent
-                                            : null;
-                                        const bjEff =
-                                          (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                            ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                            : null;
-                                        const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
-                                        return eff != null ? fmt(eff, 1) : tAnalysis("na");
-                                      })(),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3)}</CodeInline>
-                            </View>
-                          </XStack>
+                          </View>
                         </YStack>
                       </View>
 
                       {warnings.length ? (
                         <View
                           as="details"
-                          bg="var(--field-computed-bg)"
+                          bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
                           borderWidth={1}
                           borderColor="var(--field-computed-border)"
                           rounded="$2"
@@ -2212,6 +2410,7 @@ export default function RecipeEditPage() {
                                       { value: "ppg", label: "PPG" },
                                       { value: "yieldPercent", label: "Yield %" },
                                       { value: "sg", label: "SG (e.g. 1.037)" },
+                                      { value: "plato", label: "Plato (°P)" },
                                     ]}
                                   />
                                 </YStack>
@@ -2674,227 +2873,23 @@ export default function RecipeEditPage() {
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("yeastHelp")}
             </SizableText>
-
             <View mt="$3">
-              <form onSubmit={onSearchYeasts}>
-                <RecipeEditFieldLabel htmlFor="yeast-search">Search yeast database</RecipeEditFieldLabel>
-              <XStack gap="$2" items="center" flexWrap="wrap">
-                <Input
-                  id="yeast-search"
-                  value={yeastQuery}
-                  onChangeText={setYeastQuery}
-                  flex={1}
-                  minW={200}
-                  autoComplete="off"
-                  size="$3"
-                  w="100%"
-                  bg="var(--surface)"
-                  borderWidth={1}
-                  borderColor="var(--border)"
-                  rounded="$2"
-                  fontFamily="$body"
-                />
-                <Button
-                  type="submit"
-                  disabled={!canCallAccountScoped || yeastSearching}
-                  size="$3"
-                  bg="var(--surface-2)"
-                  borderWidth={1}
-                  borderColor="var(--border)"
-                  color="var(--text)"
-                  fontFamily="$body"
-                >
-                  {yeastSearching ? "Searching…" : "Search"}
-                </Button>
-                <Button
-                  size="$3"
-                  bg="var(--surface-2)"
-                  borderWidth={1}
-                  borderColor="var(--border)"
-                  color="var(--text)"
-                  fontFamily="$body"
-                  onPress={clearYeastSearchResults}
-                  disabled={yeastSearching || (!yeastSearchError && yeastResults.length === 0)}
-                >
-                  {t("buttons.clear")}
-                </Button>
-              </XStack>
-              {yeastSearchError ? <ErrorBox mt="$2">{yeastSearchError}</ErrorBox> : null}
-              {yeastResults.length ? (
-                <View overflowX="auto" mt="$2">
-                  <YStack gap="$1">
-                    <XStack gap="$2" ai="center" minW="max-content">
-                      <View minW={180}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Name</SizableText></View>
-                      <View minW={100}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Lab</SizableText></View>
-                      <View minW={100}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Product ID</SizableText></View>
-                      <View minW={80}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Type</SizableText></View>
-                      <View minW={60} />
-                    </XStack>
-                    {yeastResults.slice(0, 20).map((it) => (
-                      <XStack key={it.id} gap="$2" ai="center" minW="max-content">
-                        <View minW={180}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
-                        <View minW={100}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.lab ?? ""}</SizableText></View>
-                        <View minW={100}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.productId ?? ""}</SizableText></View>
-                        <View minW={80}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.type ?? ""}</SizableText></View>
-                        <View minW={60}>
-                          <Button
-                            size="$2"
-                            bg="var(--surface-2)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            color="var(--text)"
-                            fontFamily="$body"
-                            onPress={() => addYeastFromDb(it)}
-                            disabled={!canCallAccountScoped}
-                          >
-                            Add
-                          </Button>
-                        </View>
-                      </XStack>
-                    ))}
-                  </YStack>
-                </View>
-              ) : null}
-              </form>
+              <YeastEditor
+                yeastRows={yeastRows}
+                yeastAttenuationOverrides={yeastAttenuationOverrides}
+                readOnly
+                recipeId={recipeId}
+                t={t}
+                tAnalysis={tAnalysis}
+                tUnits={tUnits}
+                locale={locale}
+                formatFixed={formatFixed}
+              />
             </View>
-
-            <XStack gap="$3" items="center" mt="$3">
-              <Button
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-                onPress={() => addYeastRow()}
-                disabled={!canCallAccountScoped}
-              >
-                Add yeast
-              </Button>
-            </XStack>
-
-            {yeastRows.length ? (
-              <View overflowX="auto" mt="$3">
-                <YStack gap="$3">
-                  {yeastRows.map((r, idx) => (
-                    <RecipeEditIngredientCard key={r.id}>
-                              <XStack gap="$3" flexWrap="wrap" items="flex-end">
-                                <View alignSelf="center">
-                                  <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
-                                    {idx + 1}
-                                  </SizableText>
-                                </View>
-                                <YStack gap="$1" flex={1} minW={280} minWidth={0}>
-                                  <RecipeEditFieldLabel htmlFor={`yeast-name-${r.id}`}>Name</RecipeEditFieldLabel>
-                                  <Input
-                                    id={`yeast-name-${r.id}`}
-                                    value={r.name}
-                                    onChangeText={(text) =>
-                                      updateYeastRow(r.id, {
-                                        name: text,
-                                        ingredientId: null,
-                                        lab: null,
-                                        productId: null,
-                                        attenuationMin: null,
-                                        attenuationMax: null,
-                                      })
-                                    }
-                                    autoComplete="off"
-                                    size="$3"
-                                    w="100%"
-                                    bg="var(--surface)"
-                                    borderWidth={1}
-                                    borderColor="var(--border)"
-                                    rounded="$2"
-                                    fontFamily="$body"
-                                  />
-                                </YStack>
-                                {(r.lab ?? "") ? (
-                                  <YStack gap="$1" w={240} maxW="100%">
-                                    <RecipeEditFieldLabel>Lab</RecipeEditFieldLabel>
-                                    <RecipeEditReadOnlyValue>{r.lab}</RecipeEditReadOnlyValue>
-                                  </YStack>
-                                ) : null}
-                                {(r.productId ?? "") ? (
-                                  <YStack gap="$1" w={160} maxW="100%">
-                                    <RecipeEditFieldLabel>Product ID</RecipeEditFieldLabel>
-                                    <RecipeEditReadOnlyValue>{r.productId}</RecipeEditReadOnlyValue>
-                                  </YStack>
-                                ) : null}
-                                <YStack gap="$1" w={160} maxW="100%">
-                                  <RecipeEditFieldLabel>Atten min (%)</RecipeEditFieldLabel>
-                                  <RecipeEditReadOnlyValue>
-                                    {typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
-                                  </RecipeEditReadOnlyValue>
-                                </YStack>
-                                <YStack gap="$1" w={160} maxW="100%">
-                                  <RecipeEditFieldLabel>Atten max (%)</RecipeEditFieldLabel>
-                                  <RecipeEditReadOnlyValue>
-                                    {typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
-                                  </RecipeEditReadOnlyValue>
-                                </YStack>
-                                <YStack gap="$1" w={200} maxW="100%">
-                                  <RecipeEditFieldLabel htmlFor={`yeast-atten-override-${r.id}`}>
-                                    {tAnalysis("customAttenuationPercentLabel")}
-                                  </RecipeEditFieldLabel>
-                                  <Input
-                                    id={`yeast-atten-override-${r.id}`}
-                                    value={yeastAttenuationOverrides[r.id] ?? ""}
-                                    onChangeText={(text) =>
-                                      setYeastAttenuationOverrides((prev) => ({ ...prev, [r.id]: text }))
-                                    }
-                                    keyboardType="decimal-pad"
-                                    size="$3"
-                                    w="100%"
-                                    bg="var(--surface)"
-                                    borderWidth={1}
-                                    borderColor="var(--border)"
-                                    rounded="$2"
-                                    fontFamily="$body"
-                                  />
-                                </YStack>
-                                <Button
-                                  size="$2"
-                                  bg="var(--surface-2)"
-                                  borderWidth={1}
-                                  borderColor="var(--border)"
-                                  color="var(--text)"
-                                  fontFamily="$body"
-                                  onPress={() => removeYeastRow(r.id)}
-                                  aria-label={`Remove yeast row ${idx + 1}`}
-                                >
-                                  Remove
-                                </Button>
-                              </XStack>
-                            </RecipeEditIngredientCard>
-                  ))}
-                </YStack>
-              </View>
-            ) : (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
-                No yeast yet.
-              </SizableText>
-            )}
-
-                <XStack mt="$3" justify="flex-end">
-                  <Button
-                    size="$3"
-                    bg="var(--surface-2)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    color="var(--text)"
-                    fontFamily="$body"
-                    onPress={onSave}
-                    disabled={!canCallAccountScoped || saving}
-                  >
-                    {saving ? "Saving…" : "Save (including yeast)"}
-                  </Button>
-                </XStack>
-
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
-                  {t("rawMaterialsCtaPrefix")}{" "}
-                  <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
-                </SizableText>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+              {t("rawMaterialsCtaPrefix")}{" "}
+              <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+            </SizableText>
           </RecipeEditSection>
 
           <AdSlot placement="recipe_edit_after_yeast" />

@@ -143,6 +143,29 @@ export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknow
     });
   }
 
+  const cultures = asArray<any>(ing.culture_additions);
+  for (let idx = 0; idx < cultures.length; idx += 1) {
+    const c = cultures[idx];
+    const amount = c?.amount;
+    if (!amount || typeof amount !== "object") continue;
+    const unit = typeof amount.unit === "string" ? amount.unit : "";
+    const value = safeNum(amount.value);
+    if (value == null || !unit) continue;
+    if (isMassUnitV1(unit)) {
+      const kg = massToKg(value, unit);
+      if (kg != null && kg >= 0) {
+        if (unit !== "kg")
+          warnNormalized(warnings, {
+            path: `beerjson.recipes[0].ingredients.culture_additions[${idx}].amount`,
+            fromUnit: unit,
+            toUnit: "kg",
+          });
+        amount.unit = "kg";
+        amount.value = kg;
+      }
+    }
+  }
+
   return { normalized: doc, warnings };
 }
 

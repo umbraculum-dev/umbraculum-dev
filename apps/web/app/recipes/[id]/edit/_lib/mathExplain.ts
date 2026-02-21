@@ -10,6 +10,7 @@ export const mathExplain = {
   "analysis.fg": { titleKey: "analysis.fg.title" },
   "analysis.attenuation": { titleKey: "analysis.attenuation.title" },
   "analysis.pbg": { titleKey: "analysis.pbg.title" },
+  "yeast.estimatedCells": { titleKey: "yeast.estimatedCells.title" },
 } as const;
 
 export type MathExplainKey = keyof typeof mathExplain;

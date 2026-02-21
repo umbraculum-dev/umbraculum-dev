@@ -242,6 +242,7 @@ When normalizing BeerJSON recipes, enforce these canonical targets:
 - `beerjson.recipes[0].ingredients.miscellaneous_additions[*].amount`:
   - if amount is a **mass**: always `kg`
   - if amount is a **volume**: always `l`
+- `beerjson.recipes[0].ingredients.culture_additions[*].amount` (dry yeast mass): always `kg`
 
 #### Precision + rounding policy (prevents “5.0 gal → 4.999 gal”)
 We must avoid UX regressions caused by floating point conversions:

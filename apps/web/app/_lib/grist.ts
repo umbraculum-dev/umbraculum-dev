@@ -5,7 +5,7 @@
  * - Keep this as a *contract* used by multiple pages; prefer `interface`.
  */
 
-export type GristPotentialKind = "ppg" | "yieldPercent" | "sg";
+export type GristPotentialKind = "ppg" | "yieldPercent" | "sg" | "plato";
 export type GristPotential = { kind: GristPotentialKind; value: number } | null;
 
 export type GristMaltClass = "base" | "crystal" | "roast" | "acid";
@@ -115,7 +115,7 @@ export function parseGristJson(value: unknown): GristRow[] {
         const kind = p.kind;
         const v = p.value;
         if (
-          (kind === "ppg" || kind === "yieldPercent" || kind === "sg") &&
+          (kind === "ppg" || kind === "yieldPercent" || kind === "sg" || kind === "plato") &&
           typeof v === "number" &&
           Number.isFinite(v)
         ) {

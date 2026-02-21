@@ -87,6 +87,27 @@ function SectionsNavContent({
             </SizableText>
           </XStack>
         </Link>
+        <Link href={`/recipes/${recipeId}/yeast`} className="brew-link-contents">
+          <XStack
+            display="block"
+            width="100%"
+            p="$2.5"
+            borderRadius="$2"
+            color="var(--text-muted)"
+            backgroundColor="color-mix(in srgb, var(--surface-2) 35%, transparent)"
+            textDecoration="none"
+            cursor="pointer"
+            hoverStyle={{
+              textDecoration: "none",
+              color: "var(--text)",
+            }}
+            focusStyle={{ outlineWidth: 2, outlineColor: "var(--focus-ring)" }}
+          >
+            <SizableText size="$3" color="inherit" fontFamily="$body">
+              {t("nav.editYeast")}
+            </SizableText>
+          </XStack>
+        </Link>
         <Link href="/recipes" className="brew-link-contents">
           <XStack
             display="block"

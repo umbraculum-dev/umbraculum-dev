@@ -73,7 +73,8 @@ export function MathHelpPopover(props: {
           top="calc(100% + 6px)"
           left={0}
           zIndex={50}
-          width="min(460px, 75vw)"
+          width="min(360px, 85vw)"
+          minWidth={0}
           bg="var(--surface)"
           borderWidth={1}
           borderColor="var(--border)"
@@ -81,12 +82,26 @@ export function MathHelpPopover(props: {
           p="$2.5"
           role="dialog"
           aria-label={title}
-          style={{ boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)" }}
+          style={{
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
+            overflowWrap: "break-word",
+            wordBreak: "break-word",
+          }}
         >
           <SizableText size="$2" fontWeight="bold" fontFamily="$body" mb="$1.5" display="block">
             {title}
           </SizableText>
-          <SizableText size="$1" fontFamily="$body" color="var(--text)" style={{ whiteSpace: "pre-wrap", lineHeight: 1.35 }}>
+          <SizableText
+            size="$1"
+            fontFamily="$body"
+            color="var(--text)"
+            style={{
+              whiteSpace: "pre-wrap",
+              lineHeight: 1.35,
+              overflowWrap: "break-word",
+              wordBreak: "break-word",
+            }}
+          >
             {body}
           </SizableText>
         </View>

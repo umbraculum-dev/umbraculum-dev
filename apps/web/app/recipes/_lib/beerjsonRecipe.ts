@@ -1,3 +1,7 @@
+import { platoToSg, sgToPlato } from "../../_lib/gravity";
+
+export { sgToPlato };
+
 type BeerJsonDocument = {
   beerjson: {
     version: number;
@@ -9,6 +13,7 @@ type GristPotential =
   | { kind: "ppg"; value: number }
   | { kind: "yieldPercent"; value: number }
   | { kind: "sg"; value: number }
+  | { kind: "plato"; value: number }
   | null;
 
 export type EditorGristRow = {
@@ -41,6 +46,39 @@ export type EditorHopRow = {
   timeMinutes: number | null;
 };
 
+export type YeastPitchRateKey =
+  | "mfg_rec_0_35_ales"
+  | "mfg_rec_0_5_ales"
+  | "pro_0_75_ales"
+  | "pro_1_0_ales"
+  | "pro_1_25_ales"
+  | "pro_1_5_lager"
+  | "pro_1_75_lager"
+  | "pro_2_0_lager";
+
+/** Pitch rate preset key → million cells per mL per °Plato (for estimated cells formula). */
+export const PITCH_RATE_TO_MILLION_CELLS_PER_ML_P: Record<YeastPitchRateKey, number> = {
+  mfg_rec_0_35_ales: 0.35,
+  mfg_rec_0_5_ales: 0.5,
+  pro_0_75_ales: 0.75,
+  pro_1_0_ales: 1.0,
+  pro_1_25_ales: 1.25,
+  pro_1_5_lager: 1.5,
+  pro_1_75_lager: 1.75,
+  pro_2_0_lager: 2.0,
+};
+
+export const YEAST_PITCH_RATE_OPTIONS: { value: YeastPitchRateKey; labelKey: string }[] = [
+  { value: "mfg_rec_0_35_ales", labelKey: "yeastPitchRateMfgRec035Ales" },
+  { value: "mfg_rec_0_5_ales", labelKey: "yeastPitchRateMfgRec05Ales" },
+  { value: "pro_0_75_ales", labelKey: "yeastPitchRatePro075Ales" },
+  { value: "pro_1_0_ales", labelKey: "yeastPitchRatePro10Ales" },
+  { value: "pro_1_25_ales", labelKey: "yeastPitchRatePro125Ales" },
+  { value: "pro_1_5_lager", labelKey: "yeastPitchRatePro15Lager" },
+  { value: "pro_1_75_lager", labelKey: "yeastPitchRatePro175Lager" },
+  { value: "pro_2_0_lager", labelKey: "yeastPitchRatePro20Lager" },
+];
+
 export type EditorYeastRow = {
   id: string;
   ingredientId: string | null;
@@ -49,7 +87,118 @@ export type EditorYeastRow = {
   productId?: string | null;
   attenuationMin?: number | null;
   attenuationMax?: number | null;
+  /** Volume in liters (BeerJSON amount unit "l"). Used for liquid/slurry. */
+  amountL?: number | null;
+  /** Mass in kilograms (BeerJSON amount unit "kg"). Used for dry yeast. */
+  amountKg?: number | null;
+  /** Pitch rate preset key (stored in recipeExtJson). */
+  pitchRate?: YeastPitchRateKey | string | null;
+  /** Fermentation temperature in °C (stored in recipeExtJson). */
+  fermentationTempC?: number | null;
+  /** Oxygenation yes/no (stored in recipeExtJson). */
+  oxygenation?: "yes" | "no" | null;
+  /** Diacetyl rest yes/no (stored in recipeExtJson). */
+  diacetylRest?: "yes" | "no" | null;
+  /** Yeast format: dry, liquid, slurry (stored in recipeExtJson). */
+  format?: "dry" | "liquid" | "slurry" | null;
+  /** Yeast species (stored in recipeExtJson). */
+  species?:
+    | "saccharomyces_cerevisiae"
+    | "saccharomyces_pastorianus"
+    | "brettanomyces"
+    | "diastaticus"
+    | "other"
+    | null;
+  /** Needs propagation yes/no (stored in recipeExtJson). */
+  needsPropagation?: "yes" | "no" | null;
+  /** Override cells per L for liquid/slurry (B/L). Stored in recipeExtJson.yeastCellsPerLOverrides. */
+  cellsPerLOverride?: number | null;
+  /** Override cells per kg for dry (B/kg). Stored in recipeExtJson.yeastCellsPerKGOverrides. */
+  cellsPerKGOverride?: number | null;
 };
+
+export type YeastSpeciesKey = EditorYeastRow["species"] extends infer S
+  ? S extends string
+    ? S
+    : never
+  : never;
+
+/**
+ * Compute estimated yeast cells needed (billions) from batch size, OG, and pitch rate.
+ * Formula: cells_B = batchSize_L × OG_plato × pitch_rate
+ *
+ * @param batchSizeLiters - Batch size in liters (from recipeExtJson or analysis)
+ * @param ogEstimatedSg - OG as specific gravity (from analysis)
+ * @param pitchRateKey - Pitch rate preset key (e.g. mfg_rec_0_35_ales)
+ * @returns Billions of cells, or null if any input is missing/invalid
+ */
+export function computeEstimatedCellsB(
+  batchSizeLiters: number | null | undefined,
+  ogEstimatedSg: number | null | undefined,
+  pitchRateKey: YeastPitchRateKey | string | null | undefined,
+): number | null {
+  if (
+    typeof batchSizeLiters !== "number" ||
+    !Number.isFinite(batchSizeLiters) ||
+    batchSizeLiters <= 0
+  )
+    return null;
+  if (
+    typeof ogEstimatedSg !== "number" ||
+    !Number.isFinite(ogEstimatedSg) ||
+    ogEstimatedSg <= 1
+  )
+    return null;
+  const plato = sgToPlato(ogEstimatedSg);
+  if (plato == null || plato <= 0) return null;
+  const rate =
+    pitchRateKey && pitchRateKey in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P
+      ? PITCH_RATE_TO_MILLION_CELLS_PER_ML_P[pitchRateKey as YeastPitchRateKey]
+      : null;
+  if (rate == null) return null;
+  const cellsB = batchSizeLiters * plato * rate;
+  return Number.isFinite(cellsB) && cellsB > 0 ? cellsB : null;
+}
+
+/** Cell density for liquid yeast (White Labs PurePitch Next Gen). B/L */
+export const CELLS_PER_L_LIQUID = 2150;
+/** Cell density for slurry yeast. B/L */
+export const CELLS_PER_L_SLURRY = 1200;
+/** Cell density for dry yeast (~1500 B/kg, yeastman-derived from ~1.5 B/g). */
+export const CELLS_PER_KG_DRY = 1500;
+
+export type YeastFormat = "dry" | "liquid" | "slurry";
+
+/**
+ * Compute Amount (L or kg) from estimated cells based on format.
+ * Liquid/slurry: amount_L = cells_B / cells_per_L
+ * Dry: amount_kg = cells_B / cells_per_kg
+ * Uses override values when provided and valid; otherwise falls back to default constants.
+ */
+export function computeAmountFromCellsB(
+  cellsB: number,
+  format: YeastFormat,
+  cellsPerLOverride?: number | null,
+  cellsPerKGOverride?: number | null,
+): { amountL: number | null; amountKg: number | null } {
+  if (!Number.isFinite(cellsB) || cellsB <= 0) return { amountL: null, amountKg: null };
+  if (format === "dry") {
+    const cellsPerKg =
+      cellsPerKGOverride != null && Number.isFinite(cellsPerKGOverride) && cellsPerKGOverride > 0
+        ? cellsPerKGOverride
+        : CELLS_PER_KG_DRY;
+    const amountKg = cellsB / cellsPerKg;
+    return { amountL: null, amountKg: Number.isFinite(amountKg) && amountKg > 0 ? amountKg : null };
+  }
+  const cellsPerL =
+    cellsPerLOverride != null && Number.isFinite(cellsPerLOverride) && cellsPerLOverride > 0
+      ? cellsPerLOverride
+      : format === "liquid"
+        ? CELLS_PER_L_LIQUID
+        : CELLS_PER_L_SLURRY;
+  const amountL = cellsB / cellsPerL;
+  return { amountL: Number.isFinite(amountL) && amountL > 0 ? amountL : null, amountKg: null };
+}
 
 export type EditorMiscRow = {
   id: string;
@@ -201,14 +350,20 @@ function miscTypeToBeerJsonType(t: EditorMiscRow["type"]) {
 }
 
 function buildFermentableAddition(row: EditorGristRow) {
+  let sgValue: number | null = null;
+  if (row.potential?.kind === "sg") {
+    sgValue = row.potential.value;
+  } else if (row.potential?.kind === "ppg") {
+    sgValue = ppgToSg(row.potential.value);
+  } else if (row.potential?.kind === "plato") {
+    sgValue = platoToSg(row.potential.value);
+  }
   const yieldObj =
     row.potential?.kind === "yieldPercent"
       ? { fine_grind: { unit: "%", value: row.potential.value } }
-      : row.potential?.kind === "sg"
-        ? { potential: { unit: "sg", value: row.potential.value } }
-        : row.potential?.kind === "ppg"
-          ? { potential: { unit: "sg", value: ppgToSg(row.potential.value) } }
-          : { fine_grind: { unit: "%", value: 0 } };
+      : sgValue != null && sgValue > 1
+        ? { potential: { unit: "sg", value: sgValue } }
+        : { fine_grind: { unit: "%", value: 0 } };
 
   const colorLovibond =
     typeof row.colorLovibond === "number" && Number.isFinite(row.colorLovibond) && row.colorLovibond >= 0
@@ -249,15 +404,27 @@ function buildCultureAddition(row: EditorYeastRow) {
   const attMax = typeof row.attenuationMax === "number" && Number.isFinite(row.attenuationMax) ? row.attenuationMax : null;
   const attenuation =
     attMin != null && attMax != null ? (attMin + attMax) / 2 : attMin != null ? attMin : attMax != null ? attMax : null;
+  const amountL =
+    typeof row.amountL === "number" && Number.isFinite(row.amountL) && row.amountL >= 0 ? row.amountL : null;
+  const amountKg =
+    typeof row.amountKg === "number" && Number.isFinite(row.amountKg) && row.amountKg >= 0 ? row.amountKg : null;
+  const format = row.format === "dry" || row.format === "liquid" || row.format === "slurry" ? row.format : null;
+  let amount: { unit: string; value: number };
+  if (format === "dry" && amountKg != null) {
+    amount = { unit: "kg", value: amountKg };
+  } else if (amountL != null) {
+    amount = { unit: "l", value: amountL };
+  } else {
+    amount = { unit: "pkg", value: 1 };
+  }
   const out: any = {
     id: row.id,
     name: row.name,
-    // BeerJSON required fields:
     type: "ale",
     form: "dry",
     producer: row.lab ?? undefined,
     product_id: row.productId ?? undefined,
-    amount: { unit: "pkg", value: 1 },
+    amount,
   };
   if (attenuation != null) out.attenuation = { unit: "%", value: attenuation };
   return out;
@@ -682,6 +849,15 @@ export function editorStateFromBeerJson(doc: unknown): {
       const name = typeof c?.name === "string" ? c.name : "";
       if (!name) return null;
       const att = c?.attenuation?.unit === "%" ? safeNum(c?.attenuation?.value, 0) : null;
+      const amtUnit = typeof c?.amount?.unit === "string" ? c.amount.unit : "";
+      const amtVal = typeof c?.amount?.value === "number" && Number.isFinite(c.amount.value) ? c.amount.value : null;
+      const amountL = amtUnit === "l" && amtVal != null && amtVal >= 0 ? amtVal : null;
+      const amountKg =
+        amtUnit === "kg" && amtVal != null && amtVal >= 0
+          ? amtVal
+          : amtUnit === "g" && amtVal != null && amtVal >= 0
+            ? amtVal / 1000
+            : null;
       return {
         id,
         ingredientId: null,
@@ -690,6 +866,8 @@ export function editorStateFromBeerJson(doc: unknown): {
         productId: typeof c?.product_id === "string" ? c.product_id : null,
         attenuationMin: att,
         attenuationMax: att,
+        amountL: amountL != null ? amountL : null,
+        amountKg: amountKg != null ? amountKg : null,
       } as EditorYeastRow;
     })
     .filter(Boolean) as EditorYeastRow[];
