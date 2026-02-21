@@ -589,7 +589,7 @@
       }
     },
     "edit": {
-      "title": "Modifica ricetta",
+      "title": "Visualizza e modifica ricetta",
       "loading": "Caricamento…",
       "shapeNote": "Editor a pagina singola con navigazione per sezioni. La chimica dell’acqua apre il calcolatore dedicato.",
       "notReadyToLoad": "Non pronto per caricare questa ricetta.",
@@ -672,6 +672,9 @@
       "versionCreateButton": "Crea un'altra versione dalla ricetta corrente",
       "versionCreateWorking": "Creazione versione…",
       "versionLimitReached": "Limite versioni raggiunto (00–99).",
+      "duplicateRecipeNote": "Questo crea una nuova ricetta clonando la ricetta corrente.",
+      "duplicateRecipeButton": "Duplica ricetta dalla ricetta corrente",
+      "duplicateRecipeWorking": "Duplicazione…",
       "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "yeastHelp": "Scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "yeastEditInYeastPage": "Modifica lievito nella pagina Lievito",

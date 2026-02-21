@@ -166,6 +166,63 @@ export class RecipesService {
     });
   }
 
+  async duplicateRecipe(userId: string, accountId: string, recipeId: string) {
+    await this.accounts.assertMembership(userId, accountId);
+
+    const source = await this.getRecipe(userId, accountId, recipeId);
+
+    return this.prisma.$transaction(async (tx) => {
+      const newRecipeId = crypto.randomUUID();
+      const newName = ((source as any).name ?? "").trim() + " - duplicated";
+
+      const doc = (source as any).beerJsonRecipeJson;
+      const docCopy =
+        doc && typeof doc === "object" ? (JSON.parse(JSON.stringify(doc)) as any) : null;
+      if (docCopy?.beerjson?.recipes?.[0]) {
+        docCopy.beerjson.recipes[0].name = newName;
+      }
+
+      const created = await tx.recipe.create({
+        data: {
+          id: newRecipeId,
+          accountId,
+          versionGroupId: newRecipeId,
+          version: 0,
+          name: newName,
+          style: (source as any).style,
+          styleKey: (source as any).styleKey,
+          notes: (source as any).notes,
+          beerJsonRecipeJson: docCopy ?? ((source as any).beerJsonRecipeJson as any),
+          recipeExtJson: (source as any).recipeExtJson,
+        },
+      });
+
+      const sourceWater = await tx.recipeWaterSettings.findUnique({
+        where: { recipeId: (source as any).id },
+      });
+
+      if (sourceWater) {
+        const {
+          id,
+          recipeId: _sourceRecipeId,
+          createdAt,
+          updatedAt,
+          ...rest
+        } = sourceWater as any;
+
+        await tx.recipeWaterSettings.create({
+          data: {
+            ...rest,
+            recipeId: newRecipeId,
+            accountId,
+          },
+        });
+      }
+
+      return created;
+    });
+  }
+
   private async createRecipeCore(accountId: string, input: CreateRecipeInput) {
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");

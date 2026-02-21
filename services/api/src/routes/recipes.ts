@@ -72,6 +72,15 @@ export async function recipesRoutes(app: FastifyInstance) {
     return { ok: true, recipe: created };
   });
 
+  app.post("/recipes/:id/duplicate", async (req) => {
+    const ctx = requireActiveAccount(req);
+    const params = (req.params ?? {}) as { id?: unknown };
+    const id = typeof params.id === "string" ? params.id : "";
+
+    const created = await recipes.duplicateRecipe(ctx.userId, ctx.activeAccountId, id);
+    return { ok: true, recipe: created };
+  });
+
   app.patch("/recipes/:id", async (req) => {
     const ctx = requireActiveAccount(req);
     const params = (req.params ?? {}) as { id?: unknown };

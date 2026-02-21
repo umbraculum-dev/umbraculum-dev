@@ -252,6 +252,8 @@ export default function RecipeEditPage() {
   const [versionsError, setVersionsError] = useState<string | null>(null);
   const [creatingVersion, setCreatingVersion] = useState(false);
   const [createVersionError, setCreateVersionError] = useState<string | null>(null);
+  const [duplicatingRecipe, setDuplicatingRecipe] = useState(false);
+  const [duplicateRecipeError, setDuplicateRecipeError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
   const [notes, setNotes] = useState("");
@@ -973,6 +975,29 @@ export default function RecipeEditPage() {
     }
   };
 
+  const onDuplicateRecipe = async () => {
+    if (!recipeId) return;
+    if (!canCallAccountScoped) return;
+    setDuplicateRecipeError(null);
+    setDuplicatingRecipe(true);
+    try {
+      const res = await apiFetch(`/api/recipes/${recipeId}/duplicate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const newId = (res.data as any)?.recipe?.id;
+      if (typeof newId !== "string" || !newId) {
+        throw new Error("Duplicate response is missing recipe.id");
+      }
+      router.push(`/recipes/${newId}/edit`);
+    } catch (err) {
+      setDuplicateRecipeError(String(err));
+    } finally {
+      setDuplicatingRecipe(false);
+    }
+  };
+
   const addGristRow = () => {
     setGristRows((prev) => [
       ...prev,
@@ -1340,12 +1365,9 @@ export default function RecipeEditPage() {
             open={openSections.basics}
             onOpenChange={(open) => setSectionOpen("basics", open)}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-              {t("basicsHelp")}
-            </SizableText>
             <XStack
               gap="$3"
-              mt="$3"
+              mt="$2"
               flexWrap="wrap"
               $gtNarrow={{ flexWrap: "nowrap" }}
             >
@@ -1455,6 +1477,27 @@ export default function RecipeEditPage() {
                 <ErrorBox mt="$1.5">
                   {createVersionError ? createVersionError : versionsError}
                 </ErrorBox>
+              ) : null}
+            </YStack>
+
+            <YStack gap="$2" mt="$3">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                {t("duplicateRecipeNote")}
+              </SizableText>
+              <Button
+                onPress={onDuplicateRecipe}
+                disabled={!canCallAccountScoped || duplicatingRecipe}
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {duplicatingRecipe ? t("duplicateRecipeWorking") : t("duplicateRecipeButton")}
+              </Button>
+              {duplicateRecipeError ? (
+                <ErrorBox mt="$1.5">{duplicateRecipeError}</ErrorBox>
               ) : null}
             </YStack>
           </RecipeEditSection>

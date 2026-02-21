@@ -582,7 +582,7 @@
       }
     },
     "edit": {
-      "title": "Edit recipe",
+      "title": "View & Edit recipe",
       "loading": "Loading…",
       "shapeNote": "Single-page editor with section navigation. Water chemistry is a link-out to the dedicated calculator page.",
       "notReadyToLoad": "Not ready to load this recipe.",
@@ -665,6 +665,9 @@
       "versionCreateButton": "Create another version from current recipe",
       "versionCreateWorking": "Creating version…",
       "versionLimitReached": "Version limit reached (00–99).",
+      "duplicateRecipeNote": "This create a new recipe cloning current recipe.",
+      "duplicateRecipeButton": "Duplicate recipe from current recipe",
+      "duplicateRecipeWorking": "Duplicating…",
       "hopsHelp": "Pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
       "yeastHelp": "Select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
       "yeastEditInYeastPage": "Edit yeast in Yeast page",
