@@ -21,6 +21,7 @@ import {
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 import { formatFixed } from "../../../../src/i18n/format";
+import { ManualCellCountHelpBox } from "../../_components/ManualCellCountHelpBox";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
@@ -528,6 +529,7 @@ export default function YeastPage() {
             locale={locale}
             formatFixed={formatFixed}
           />
+          <ManualCellCountHelpBox t={t} />
           {saveError ? (
             <ErrorBox mt="$3">{saveError}</ErrorBox>
           ) : null}

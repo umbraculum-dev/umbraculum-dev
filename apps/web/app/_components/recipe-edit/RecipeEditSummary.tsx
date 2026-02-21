@@ -1,10 +1,12 @@
 "use client";
 
-import { styled, View } from "tamagui";
+import React, { type ReactNode } from "react";
 
-export const RecipeEditSummary = styled(View, {
-  name: "RecipeEditSummary",
-  as: "summary",
-  fontSize: 12,
-  cursor: "pointer",
-});
+export function RecipeEditSummary(props: { children: ReactNode }) {
+  const { children } = props;
+  return (
+    <summary className="brew-details-summary" style={{ fontSize: 12 }}>
+      {children}
+    </summary>
+  );
+}

@@ -82,6 +82,8 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
+- **Tamagui non-boolean DOM attributes**: Tamagui components (e.g. `Select.Viewport`) may default `elevate={true}` or `bordered={true}`, causing React to warn: "Received `true`/`false` for a non-boolean attribute". Fix: pass `elevate={undefined}` and `bordered={undefined}` to override defaults and prevent forwarding to the DOM. Example: `<Select.Viewport elevate={undefined} bordered={undefined} elevation={0}>`.
+- **`<details>/<summary>` (IMPORTANT for i18n + UX)**: Browsers show a built-in fallback label (often “Details”) when a `<details>` does not have a real `<summary>` element as its first child. That fallback does **not** follow app locale/i18n. In this repo, use `RecipeEditSummary` (`apps/web/app/_components/recipe-edit/RecipeEditSummary.tsx`) so we always render a real `<summary>` and keep native click-to-expand behavior.
 - **Auth (local dev)**:
   - Auth is **cookie-session-based** (`sid` httpOnly cookie). Dev header auth (`X-User-Id` / `X-Account-Id`) is not supported.
   - Use `http://localhost:18080/en/signup` or `http://localhost:18080/en/login`.

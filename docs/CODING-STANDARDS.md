@@ -7,6 +7,16 @@ Avoid inline styles where you can. In this codebase **Tamagui props and componen
 
 **Form field rows:** For horizontal rows of label+input fields, use `ai="flex-end"` on the row `XStack` so inputs stay horizontally aligned when labels wrap.
 
+### Native `<details>/<summary>` (required pattern)
+When using the native HTML `<details>` element, always ensure the **first child is a real `<summary>` element**.
+
+Why:
+- If there is no valid `<summary>`, browsers render a built-in fallback label (often “Details”), which **does not follow our app locale** and cannot be translated via `next-intl`.
+
+Standard in this repo:
+- Use `RecipeEditSummary` (`apps/web/app/_components/recipe-edit/RecipeEditSummary.tsx`) as the summary element.
+- Do not rely on “fake summary” patterns like a `<div as="summary">…</div>`—verify in DevTools that the DOM contains `<summary>`.
+
 ### CSS structure (web app)
 The web app uses two CSS sources: `apps/web/app/globals.css` (imports) and `apps/web/public/tamagui.generated.css` (Tamagui). `globals.css` imports three files:
 

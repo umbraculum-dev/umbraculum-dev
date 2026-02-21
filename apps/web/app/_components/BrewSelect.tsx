@@ -67,7 +67,7 @@ export function BrewSelect({
         <Select.Value placeholder={placeholder} />
       </Select.Trigger>
       <Select.Content bordered={undefined}>
-        <Select.Viewport elevate="false" elevation={0} bordered={undefined}>
+        <Select.Viewport elevate={undefined} bordered={undefined} elevation={0}>
           <Select.Group>
             {options.map((opt, idx) => (
               <Select.Item key={opt.value} index={idx} value={opt.value}>

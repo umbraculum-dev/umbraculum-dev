@@ -58,7 +58,7 @@ export function LanguageSwitcher() {
           <Select.Value placeholder={t("language")} />
         </Select.Trigger>
         <Select.Content>
-          <Select.Viewport elevate={false} elevation={0}>
+          <Select.Viewport elevate={undefined} bordered={undefined} elevation={0}>
             <Select.Group>
               <Select.Item index={0} value="en">
                 <Select.ItemText>EN</Select.ItemText>
