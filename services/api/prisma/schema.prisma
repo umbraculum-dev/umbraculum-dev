@@ -114,8 +114,25 @@ model Account {
   fermentables Fermentable[]
   hops         Hop[]
   yeasts       Yeast[]
+  brewdaySettings BrewdaySettings?
 
   @@map("accounts")
+}
+
+model BrewdaySettings {
+  id        String   @id @default(uuid())
+  accountId String   @unique @map("account_id")
+  brewingType String @default("all_grain") @map("brewing_type")
+  sectionsJson Json  @map("sections_json")
+  customSectionsJson Json? @map("custom_sections_json")
+  defaultStepsJson Json? @map("default_steps_json")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@map("brewday_settings")
 }
 
 model Ad {

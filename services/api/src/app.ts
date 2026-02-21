@@ -20,6 +20,7 @@ import { ingredientsRoutes } from "./routes/ingredients.js";
 import { adsRoutes } from "./routes/ads.js";
 import { platformAdsRoutes } from "./routes/platformAds.js";
 import { platformRecipesRoutes } from "./routes/platformRecipes.js";
+import { brewdaySettingsRoutes } from "./routes/brewdaySettings.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -46,6 +47,7 @@ export function buildApp() {
   app.register(adsRoutes);
   app.register(platformAdsRoutes);
   app.register(platformRecipesRoutes);
+  app.register(brewdaySettingsRoutes);
 
   return app;
 }

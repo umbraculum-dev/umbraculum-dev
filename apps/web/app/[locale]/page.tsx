@@ -31,7 +31,7 @@ export default function Home() {
         </H2>
         <YStack gap="$2" mt="$2" mb={0}>
           <Link href="/ferm-data-integration">{t("links.fermDataIntegration")}</Link>
-          <Link href="/brewday-steps">{t("links.brewdaySteps")}</Link>
+          <Link href="/brewday-steps-settings">{t("links.brewdayStepsSettings")}</Link>
           <Link href="/water-profiles">{t("links.waterProfiles")}</Link>
         </YStack>
       </View>

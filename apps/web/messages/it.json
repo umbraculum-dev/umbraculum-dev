@@ -917,7 +917,7 @@
     "links": {
       "title": "Brew day e dati di produzione",
       "fermDataIntegration": "Dati fermentazione e integrazione",
-      "brewdaySteps": "Step brewday",
+      "brewdayStepsSettings": "Impostazioni step brewday",
       "waterProfiles": "Profili acqua"
     },
     "importExport": {
@@ -941,14 +941,60 @@
         }
       }
     },
-    "brewdaySteps": {
-      "title": "Step brewday",
-      "subtitle": "Una checklist strutturata per il brew day (timer, step, note).",
+    "brewdayStepsSettings": {
+      "title": "Impostazioni step brewday",
+      "subtitle": "Configura step del brew day, timer e tipo di birra.",
       "backToDashboard": "Torna alla dashboard",
+      "brewingTypeAllGrain": "All grain",
+      "brewingTypeExtractPartialBiab": "Extract/Partial-mash/BIAB (homebrewing)",
+      "saveSuccess": "Salvato.",
+      "loading": "Caricamento…",
+      "saving": "Salvataggio…",
+      "accountRequired": "Seleziona un account per continuare.",
+      "exclude": "Escludi",
+      "addCustomSection": "Aggiungi sezione personalizzata",
+      "addCustomStep": "Aggiungi step personalizzato",
+      "assignedSection": "Sezione assegnata",
+      "minutes": "Minuti",
+      "presetSections": {
+        "preparation": "Preparazione",
+        "mash": "Mash",
+        "lauter": "Lauter",
+        "sparge": "Sparge",
+        "boil": "Bollitura",
+        "fermentor": "Fermentatore",
+        "cleanup": "Pulizia",
+        "quality": "Qualità",
+        "miscellaneous": "Varie"
+      },
+      "defaultSectionNote": "Sezioni step brew: aggiungi alla tua configurazione predefinita: puoi escluderle nel brew day se le usi solo per ricette specifiche ma non puoi aggiungerle nel flusso brew day se non aggiunte qui.",
+      "customSectionNote": "Aggiungi step personalizzati con nome, minuti opzionali e sezione assegnata.",
+      "add": "Aggiungi",
+      "save": "Salva",
+      "name": "Nome",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "remove": "Rimuovi",
       "sections": {
-        "brewSteps": {
-          "title": "Step di brew",
+        "brewdayStepsRecap": {
+          "title": "Riepilogo step brewday",
           "empty": "Nessuno step per ora."
+        },
+        "brewingType": {
+          "title": "Tipo di birra",
+          "label": "Tipo di birra"
+        },
+        "brewdayStepsSections": {
+          "title": "Step brewday - sezioni",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayStepsDefault": {
+          "title": "Step brewday - predefinito",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayStepsCustom": {
+          "title": "Step brewday - personalizzato",
+          "placeholder": "Prossimamente."
         }
       }
     }

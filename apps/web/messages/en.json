@@ -910,7 +910,7 @@
     "links": {
       "title": "Brew day & Brewing data",
       "fermDataIntegration": "Ferm Data & Integration",
-      "brewdaySteps": "Brewday Steps",
+      "brewdayStepsSettings": "Brewday Steps Settings",
       "waterProfiles": "Water profiles"
     },
     "importExport": {
@@ -934,14 +934,60 @@
         }
       }
     },
-    "brewdaySteps": {
-      "title": "Brewday Steps",
-      "subtitle": "A structured checklist for brew day (timers, steps, notes).",
+    "brewdayStepsSettings": {
+      "title": "Brewday Steps Settings",
+      "subtitle": "Configure brew day steps, timers, and brewing type.",
       "backToDashboard": "Back to dashboard",
+      "brewingTypeAllGrain": "All grain",
+      "brewingTypeExtractPartialBiab": "Extract/Partial-mash/BIAB (homebrewing)",
+      "saveSuccess": "Saved.",
+      "loading": "Loading…",
+      "saving": "Saving…",
+      "accountRequired": "Select an account to continue.",
+      "exclude": "Exclude",
+      "addCustomSection": "Add custom section",
+      "addCustomStep": "Add custom step",
+      "assignedSection": "Assigned section",
+      "minutes": "Minutes",
+      "presetSections": {
+        "preparation": "Preparation",
+        "mash": "Mash",
+        "lauter": "Lauter",
+        "sparge": "Sparge",
+        "boil": "Boil",
+        "fermentor": "Fermentor",
+        "cleanup": "Cleanup",
+        "quality": "Quality",
+        "miscellaneous": "Miscellaneous"
+      },
+      "defaultSectionNote": "Brew steps: add to your default setup. You can exclude them in brew day if you use only for specific recipes but you can not add in brew day workflow if not added here.",
+      "customSectionNote": "Add custom steps with name, optional minutes, and assigned section.",
+      "add": "Add",
+      "save": "Save",
+      "name": "Name",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove",
       "sections": {
-        "brewSteps": {
-          "title": "Brew Steps",
+        "brewdayStepsRecap": {
+          "title": "Brewday Steps Recap",
           "empty": "No brew steps yet."
+        },
+        "brewingType": {
+          "title": "Brewing type",
+          "label": "Brewing type"
+        },
+        "brewdayStepsSections": {
+          "title": "Brewday steps - sections",
+          "placeholder": "Coming soon."
+        },
+        "brewdayStepsDefault": {
+          "title": "Brewday steps - default",
+          "placeholder": "Coming soon."
+        },
+        "brewdayStepsCustom": {
+          "title": "Brewday steps - custom",
+          "placeholder": "Coming soon."
         }
       }
     }
