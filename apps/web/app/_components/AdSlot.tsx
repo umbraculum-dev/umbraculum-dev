@@ -31,7 +31,7 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
 
   const [disabled, setDisabled] = useState(false);
   const [ad, setAd] = useState<SlotResponse["ad"]>(null);
-
+  const mediaHeightPx = placement === "global_top" ? 120 : 160;
 
   useEffect(() => {
     let cancelled = false;
@@ -68,34 +68,40 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
         p="$2.5"
       >
         <YStack gap="$1.5">
-        {ad ? (
-          <>
-            <a href={ad.linkUrl} target="_blank" rel="noreferrer noopener">
-              <Image
-                src={ad.imageUrl}
-                alt={ad.altText}
-                loading="lazy"
-                w="100%"
-                maxW="100%"
-                h="auto"
-                rounded="$2"
+          <View
+            h={mediaHeightPx}
+            w="100%"
+            maxW="100%"
+            overflow="hidden"
+            rounded="$2"
+            bg="var(--surface)"
+          >
+            {ad ? (
+              <a
+                href={ad.linkUrl}
+                target="_blank"
+                rel="noreferrer noopener"
                 className="brew-block"
-              />
-            </a>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
-              {t("upgradeLine")}
-            </SizableText>
-          </>
-        ) : (
-          <>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
-              <Link href="/contact">{t("contactLine")}</Link>
-            </SizableText>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
-              {t("upgradeLine")}
-            </SizableText>
-          </>
-        )}
+                style={{ height: "100%" }}
+              >
+                <Image
+                  src={ad.imageUrl}
+                  alt={ad.altText}
+                  loading="lazy"
+                  w="100%"
+                  h="100%"
+                  style={{ objectFit: "cover" }}
+                />
+              </a>
+            ) : null}
+          </View>
+
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
+            <Link href="/contact">{t("contactLine")}</Link>
+          </SizableText>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
+            {t("upgradeLine")}
+          </SizableText>
         </YStack>
       </View>
     </YStack>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 
@@ -143,9 +143,9 @@ export default function WaterProfilesPage() {
           </H2>
 
           <XStack gap="$3" alignItems="center">
-            <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refresh()} disabled={!canCall || loading}>
               {loading ? "Refreshing…" : "Refresh"}
-            </button>
+            </Button>
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
               {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
             </SizableText>
@@ -200,16 +200,20 @@ export default function WaterProfilesPage() {
                     <td>
                       {admin && p.scope !== "system" ? (
                         <XStack gap="$2" alignItems="center">
-                          <button type="button" onClick={() => void onToggleVerify(p)}>
+                          <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onToggleVerify(p)}>
                             {p.verificationStatus === "verified" ? "Mark unverified" : "Mark verified"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void onDeleteProfile(p)}
+                          </Button>
+                          <Button
+                            size="$3"
+                            bg="var(--surface-2)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            color="var(--text)"
+                            onPress={() => void onDeleteProfile(p)}
                             aria-label={`Delete water profile ${p.name}`}
                           >
                             Delete
-                          </button>
+                          </Button>
                         </XStack>
                       ) : (
                         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
@@ -299,8 +303,10 @@ export default function WaterProfilesPage() {
               </XStack>
 
               <fieldset className="brew-fieldset-noborder">
-                <legend className="brew-muted brew-fieldset-legend">
-                  {t("ionsLegend", { unit: tUnits("ppm") })}
+                <legend className="brew-fieldset-legend">
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                    {t("ionsLegend", { unit: tUnits("ppm") })}
+                  </SizableText>
                 </legend>
                 <XStack gap="$3" flexWrap="wrap">
                   {(
@@ -331,9 +337,9 @@ export default function WaterProfilesPage() {
               </fieldset>
 
               <XStack gap="$3" mt="$3" alignItems="center">
-                <button type="submit" disabled={!createName.trim() || createSubmitting}>
+                <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!createName.trim() || createSubmitting}>
                   {createSubmitting ? "Creating…" : "Create profile"}
-                </button>
+                </Button>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                   Profiles in this section require admin privileges.
                 </SizableText>

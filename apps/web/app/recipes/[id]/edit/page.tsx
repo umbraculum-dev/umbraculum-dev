@@ -3,11 +3,12 @@
 import { Link } from "../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
+import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { formatFixed } from "../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { AdSlot } from "../../../_components/AdSlot";
@@ -121,6 +122,7 @@ export default function RecipeEditPage() {
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
+  const authState = useRequireAuth({ requireActiveAccount: true });
   const [layoutMetrics, setLayoutMetrics] = useState<{
     leftGutterPx: number | null;
     railTopPx: number | null;
@@ -151,6 +153,14 @@ export default function RecipeEditPage() {
       if (raf) window.cancelAnimationFrame(raf);
       window.removeEventListener("resize", schedule);
       window.removeEventListener("scroll", schedule);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.classList.add("brew-hide-global-bottom-ad");
+    return () => {
+      document.body.classList.remove("brew-hide-global-bottom-ad");
     };
   }, []);
 
@@ -213,7 +223,6 @@ export default function RecipeEditPage() {
     setOpenSections((prev) => (prev[id] === open ? prev : { ...prev, [id]: open }));
   };
 
-  const [authLoaded, setAuthLoaded] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -252,6 +261,8 @@ export default function RecipeEditPage() {
   const [fermentableResults, setFermentableResults] = useState<any[]>([]);
   const [fermentableSearching, setFermentableSearching] = useState(false);
   const [fermentableSearchError, setFermentableSearchError] = useState<string | null>(null);
+  const [fermentableAddMessage, setFermentableAddMessage] = useState<string | null>(null);
+  const fermentableAddMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [hopQuery, setHopQuery] = useState("");
   const [hopResults, setHopResults] = useState<any[]>([]);
@@ -263,10 +274,8 @@ export default function RecipeEditPage() {
   const [yeastSearching, setYeastSearching] = useState(false);
   const [yeastSearchError, setYeastSearchError] = useState<string | null>(null);
 
-  const canCallAccountScoped = useMemo(
-    () => Boolean(recipeId),
-    [recipeId],
-  );
+  const canCallAccountScoped =
+    authState.status === "ready" && Boolean(recipeId);
 
   const waterVolumes = useMemo(() => {
     if (!analysis) return null;
@@ -438,6 +447,7 @@ export default function RecipeEditPage() {
   }, [canCallAccountScoped, recipeId]);
 
   useEffect(() => {
+    if (authState.status !== "ready") return;
     let cancelled = false;
     (async () => {
       setStylesLoading(true);
@@ -456,9 +466,10 @@ export default function RecipeEditPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authState.status]);
 
   useEffect(() => {
+    if (authState.status !== "ready") return;
     let cancelled = false;
     (async () => {
       setEquipmentProfilesLoading(true);
@@ -477,7 +488,7 @@ export default function RecipeEditPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authState.status]);
 
   const applyEquipmentProfileToRecipe = async (mode: "apply" | "reload") => {
     if (!recipeId) return;
@@ -706,7 +717,24 @@ export default function RecipeEditPage() {
         timingUse: "add_to_mash",
       },
     ]);
+    const msg = t("fermentableAddedSaveHint");
+    setFermentableAddMessage(msg);
+    if (fermentableAddMessageTimeoutRef.current) {
+      clearTimeout(fermentableAddMessageTimeoutRef.current);
+    }
+    fermentableAddMessageTimeoutRef.current = setTimeout(() => {
+      setFermentableAddMessage(null);
+      fermentableAddMessageTimeoutRef.current = null;
+    }, 5000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (fermentableAddMessageTimeoutRef.current) {
+        clearTimeout(fermentableAddMessageTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const addHopFromDb = (item: any) => {
     const id = typeof item?.id === "string" ? item.id : null;
@@ -949,7 +977,15 @@ export default function RecipeEditPage() {
         mb="$2"
       />
 
-      {authLoaded && !canCallAccountScoped ? (
+      {authState.status === "loading" ? (
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("loading")}
+        </SizableText>
+      ) : null}
+      {authState.status === "error" ? (
+        <ErrorBox>{authState.error}</ErrorBox>
+      ) : null}
+      {authState.status === "ready" && !canCallAccountScoped ? (
         <ErrorBox>{t("notReadyToLoad")}</ErrorBox>
       ) : null}
 
@@ -1895,7 +1931,7 @@ export default function RecipeEditPage() {
             onOpenChange={(open) => setSectionOpen("fermentables", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-              v0: enter your grist here. Water calculator can import a read-only snapshot.
+              Enter your grist here. Water calculator can import a read-only snapshot.
             </SizableText>
 
             <View mt="$3">
@@ -1988,6 +2024,14 @@ export default function RecipeEditPage() {
               </form>
             </View>
 
+            {fermentableAddMessage ? (
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite" mt="$2">
+                {fermentableAddMessage}
+              </SizableText>
+            ) : null}
+
+            <View borderTopWidth={1} borderColor="var(--border)" my="$3" />
+
             <XStack gap="$3" items="center" flexWrap="wrap">
               <Button
                 size="$3"
@@ -1999,7 +2043,7 @@ export default function RecipeEditPage() {
                 onPress={addGristRow}
                 disabled={!canCallAccountScoped}
               >
-                {t("buttons.addFermentable")}
+                {t("buttons.addCustomFermentable")}
               </Button>
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
                 {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}

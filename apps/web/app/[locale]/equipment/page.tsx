@@ -301,8 +301,10 @@ export default function EquipmentPage() {
         {t("subtitle")}
       </SizableText>
 
-      <Link href="/recipes" className="brew-muted">
-        {t("backToRecipes")}
+      <Link href="/recipes">
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+          {t("backToRecipes")}
+        </SizableText>
       </Link>
 
       {error ? (
@@ -677,12 +679,16 @@ export default function EquipmentPage() {
             </YStack>
 
             <XStack gap="$3" mt="$3">
-              <button type="submit" disabled={editSubmitting}>
+              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={editSubmitting}>
                 {editSubmitting ? t("saving") : t("save")}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
+              </Button>
+              <Button
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                onPress={() => {
                   setEditingId(null);
                   setEditDraft({});
                   setEditError(null);
@@ -690,7 +696,7 @@ export default function EquipmentPage() {
                 disabled={editSubmitting}
               >
                 {t("cancel")}
-              </button>
+              </Button>
             </XStack>
             {editError ? (
               <ErrorBox id="equipment-edit-error" mt="$3">{editError}</ErrorBox>
@@ -996,9 +1002,9 @@ export default function EquipmentPage() {
                 </fieldset>
               </YStack>
               <XStack gap="$3" mt="$3" alignItems="center">
-                <button type="submit" disabled={createSubmitting}>
+                <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={createSubmitting}>
                   {createSubmitting ? t("creating") : t("create")}
-                </button>
+                </Button>
               </XStack>
               {createError ? (
                 <ErrorBox id="equipment-create-error" mt="$3">{createError}</ErrorBox>

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { H2, H3, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
@@ -382,12 +382,16 @@ export function RecipeImportForm({
         </XStack>
 
         <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-          <button type="button" onClick={() => void onPreview()} disabled={!canPreview}>
+          <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onPreview()} disabled={!canPreview}>
             {previewLoading ? t("previewing") : t("preview")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
+          </Button>
+          <Button
+            size="$3"
+            bg="var(--surface-2)"
+            borderWidth={1}
+            borderColor="var(--border)"
+            color="var(--text)"
+            onPress={() => {
               setPreview(null);
               setPreviewError(null);
               setImportError(null);
@@ -395,7 +399,7 @@ export function RecipeImportForm({
             disabled={!canCall || (!preview && !previewError && !importError)}
           >
             {t("reset")}
-          </button>
+          </Button>
           <Link href="/recipes">{t("backToRecipes")}</Link>
           <Link href="/">{c("backToDashboard")}</Link>
         </XStack>
@@ -468,9 +472,9 @@ export function RecipeImportForm({
           )}
 
           <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-            <button type="button" onClick={() => void onImport()} disabled={!canImport}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onImport()} disabled={!canImport}>
               {importing ? t("importing") : t("import")}
-            </button>
+            </Button>
             {importError ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
                 {importError}
@@ -532,15 +536,19 @@ export function RecipeImportForm({
         </YStack>
 
         <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-          <button type="button" onClick={() => void onBulkPreview()} disabled={!canBulkPreview}>
+          <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onBulkPreview()} disabled={!canBulkPreview}>
             {bulkPreviewLoading ? t("previewing") : t("preview")}
-          </button>
-          <button type="button" onClick={() => void onBulkImport()} disabled={!canBulkImport}>
+          </Button>
+          <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onBulkImport()} disabled={!canBulkImport}>
             {bulkImporting ? t("importing") : t("import")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
+          </Button>
+          <Button
+            size="$3"
+            bg="var(--surface-2)"
+            borderWidth={1}
+            borderColor="var(--border)"
+            color="var(--text)"
+            onPress={() => {
               setBulkPreviewItems(null);
               setBulkPreviewError(null);
               setBulkImportError(null);
@@ -549,7 +557,7 @@ export function RecipeImportForm({
             disabled={!canCall || (!bulkPreviewItems && !bulkPreviewError && !bulkImportError && !bulkResult)}
           >
             {t("reset")}
-          </button>
+          </Button>
         </XStack>
 
         {bulkPreviewError ? (

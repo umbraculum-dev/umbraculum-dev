@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { H1, Input, SizableText, View, YStack } from "tamagui";
+import { Button, H1, Input, SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
@@ -135,9 +135,9 @@ export default function LoginPage() {
 
           <LocaleSelect id="login-locale" />
 
-          <button type="submit" disabled={submitting}>
+          <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={submitting}>
             {submitting ? t("submitting") : t("submitLogin")}
-          </button>
+          </Button>
         </YStack>
       </form>
 

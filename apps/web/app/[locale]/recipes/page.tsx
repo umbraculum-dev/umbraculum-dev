@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
@@ -200,12 +200,12 @@ export default function RecipesPage() {
               </View>
             </XStack>
             <XStack gap="$3" mt="$3" alignItems="center">
-              <button type="submit" disabled={!canCall || creating || !newName.trim() || !newStyleKey.trim()}>
+              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || creating || !newName.trim() || !newStyleKey.trim()}>
                 {creating ? t("creating") : t("createButton")}
-              </button>
-              <button type="button" onClick={() => void refresh()} disabled={!canCall || loading}>
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refresh()} disabled={!canCall || loading}>
                 {loading ? t("refreshing") : t("refresh")}
-              </button>
+              </Button>
             </XStack>
         </form>
         {error ? (
@@ -246,14 +246,16 @@ export default function RecipesPage() {
                         <SizableText color="var(--text-muted)"> ({r.style})</SizableText>
                       ) : null}
                     </SizableText>
-                    <button
-                      type="button"
-                      onClick={() => onAskDelete(r.id)}
+                    <Button
+                      size="$3"
+                      chromeless
+                      color="var(--danger)"
+                      onPress={() => onAskDelete(r.id)}
                       disabled={!canCall || deletingId === r.id}
                       className="brew-recipe-list-delete-button"
                     >
                       {t("delete.cta")}
-                    </button>
+                    </Button>
                   </XStack>
                   <XStack gap="$3" flexWrap="wrap">
                     <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
@@ -266,12 +268,12 @@ export default function RecipesPage() {
                         <SizableText color="var(--text-muted)"> {t("delete.confirmBody")}</SizableText>
                       </SizableText>
                       <XStack gap="$3" flexWrap="wrap" alignItems="center">
-                        <button type="button" onClick={() => void onDelete(r.id)} disabled={!canCall || deletingId === r.id}>
+                        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onDelete(r.id)} disabled={!canCall || deletingId === r.id}>
                           {deletingId === r.id ? t("delete.deleting") : t("delete.confirmCta")}
-                        </button>
-                        <button type="button" onClick={() => setDeleteConfirmId(null)} disabled={deletingId === r.id}>
+                        </Button>
+                        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => setDeleteConfirmId(null)} disabled={deletingId === r.id}>
                           {t("delete.cancel")}
-                        </button>
+                        </Button>
                       </XStack>
                     </View>
                   ) : null}
@@ -284,15 +286,15 @@ export default function RecipesPage() {
         {hasRecipes && pageCount > 1 ? (
           <nav aria-label={t("pagination.ariaLabel")}>
             <XStack gap="$3" mt="$3" alignItems="center">
-              <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
                 {t("pagination.prev")}
-              </button>
+              </Button>
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
                 {t("pagination.status", { page, pages: pageCount })}
               </SizableText>
-              <button type="button" onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount}>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount}>
                 {t("pagination.next")}
-              </button>
+              </Button>
             </XStack>
           </nav>
         ) : null}

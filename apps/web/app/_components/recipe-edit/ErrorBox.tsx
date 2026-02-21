@@ -40,7 +40,7 @@ export function ErrorBox({
         fontFamily="$body"
         color="var(--text)"
         whiteSpace="pre-wrap"
-        wordBreak="break-word"
+        style={{ wordBreak: "break-word" }}
       >
         {children}
       </SizableText>

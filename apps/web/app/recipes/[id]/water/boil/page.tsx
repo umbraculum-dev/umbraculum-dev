@@ -9,10 +9,10 @@ import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
-import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -864,12 +864,12 @@ export default function BoilWaterPage() {
           </XStack>
 
           <XStack gap="$3" mt="$3" alignItems="center" flexWrap="wrap">
-            <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
               {loadingProfiles ? "Reloading…" : "Reload water profiles"}
-            </button>
-            <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
-            </button>
+            </Button>
             {adjustmentSaveStatus ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {adjustmentSaveStatus}
@@ -881,7 +881,7 @@ export default function BoilWaterPage() {
             <details className="brew-field-block brew-field-block--readonly brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <SizableText fontWeight="bold">Mixed water ions</SizableText>
-                <span className="brew-field-badge">Read-only</span>
+                <FieldBadge>Read-only</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Computed from profiles + volumes</SizableText>
               </summary>
               <View className="brew-table-wrap">
@@ -941,12 +941,12 @@ export default function BoilWaterPage() {
           <SaltAdditionsEditor rows={saltAdditions} onChange={setSaltAdditions} idPrefix="boil" disabled={!canCall} />
 
           <XStack mt="$3" gap="$3" alignItems="center" flexWrap="wrap">
-            <button type="button" onClick={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
               {savingSalts ? "Saving…" : "Save salts draft"}
-            </button>
-            <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
               {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-            </button>
+            </Button>
             {saltsStatus ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {saltsStatus}
@@ -997,7 +997,7 @@ export default function BoilWaterPage() {
                     />
                   );
                 })() : null}
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
               </summary>
               <View className="brew-table-wrap">
                 <table className="brew-table">
@@ -1187,16 +1187,16 @@ export default function BoilWaterPage() {
             </XStack>
 
             <XStack mt="$3" gap="$3" alignItems="center" flexWrap="wrap">
-              <button type="submit" disabled={!canCall || submitting}>
+              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || submitting}>
                 {submitting
                   ? "Working…"
                   : acidificationMode === "manual"
                     ? "Estimate & save snapshot"
                     : "Calculate & save snapshot"}
-              </button>
-              <button type="button" onClick={() => void onSaveInputs()} disabled={!canCall || savingInputs}>
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveInputs()} disabled={!canCall || savingInputs}>
                 {savingInputs ? "Saving…" : "Save boil draft"}
-              </button>
+              </Button>
               {boilStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{boilStatus}</SizableText> : null}
               {boilSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{boilSaveStatus}</SizableText> : null}
               {calcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{calcSaveStatus}</SizableText> : null}
@@ -1211,7 +1211,7 @@ export default function BoilWaterPage() {
             <View className="brew-field-block brew-field-block--computed brew-mt3">
               <View className="brew-field-block-header">
                 <SizableText fontWeight="bold">Result</SizableText>
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">From current inputs</SizableText>
               </View>
               <ul>
@@ -1247,7 +1247,7 @@ export default function BoilWaterPage() {
             <details className="brew-field-block brew-field-block--computed brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <SizableText fontWeight="bold">Result (manual acid amount mode)</SizableText>
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Estimated from manual acid amount</SizableText>
               </summary>
               <ul>
@@ -1272,12 +1272,12 @@ export default function BoilWaterPage() {
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </SizableText>
           <XStack mt="$3" gap="$3" alignItems="center" flexWrap="wrap">
-            <button type="button" onClick={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Preview overall"}
-            </button>
-            <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
-            </button>
+            </Button>
             {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
             {overallSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallSaveStatus}</SizableText> : null}
           </XStack>
@@ -1314,7 +1314,7 @@ export default function BoilWaterPage() {
                     />
                   );
                 })() : null}
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
               </View>
               <ul>

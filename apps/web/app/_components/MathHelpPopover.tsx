@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Button, SizableText, View } from "tamagui";
 
 export function MathHelpPopover(props: {
   title: string;
@@ -13,13 +14,8 @@ export function MathHelpPopover(props: {
   const tUi = useTranslations("ui");
   const { title, body, ariaLabel, size = "sm" } = props;
   const popoverId = useId();
-  const wrapRef = useRef<HTMLSpanElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
-
-  const className = useMemo(() => {
-    const base = "brew-math-fx-button";
-    return size === "md" ? `${base} ${base}--md` : base;
-  }, [size]);
 
   useEffect(() => {
     if (!open) return;
@@ -47,24 +43,53 @@ export function MathHelpPopover(props: {
   }, [open]);
 
   return (
-    <span ref={wrapRef} className="brew-math-fx-wrap">
-      <button
+    <View
+      ref={wrapRef}
+      position="relative"
+      display="inline-flex"
+      alignItems="center"
+    >
+      <Button
         type="button"
-        className={className}
+        size={size === "md" ? "$3" : "$2"}
+        chromeless
+        circular
+        bg="color-mix(in srgb, var(--info) 14%, var(--surface-2))"
+        borderWidth={1}
+        borderColor="color-mix(in srgb, var(--info) 25%, var(--border))"
         aria-label={ariaLabel}
         aria-expanded={open}
         aria-controls={popoverId}
-        onClick={() => setOpen((v) => !v)}
+        onPress={() => setOpen((v) => !v)}
       >
         {tUi("fx")}
-      </button>
+      </Button>
       {open ? (
-        <div id={popoverId} className="brew-math-popover" role="dialog" aria-label={title}>
-          <div className="brew-math-popover-title">{title}</div>
-          <div className="brew-math-popover-body">{body}</div>
-        </div>
+        <View
+          id={popoverId}
+          position="absolute"
+          top="calc(100% + 6px)"
+          left={0}
+          zIndex={50}
+          width="min(460px, 75vw)"
+          bg="var(--surface)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          rounded="$2"
+          p="$2.5"
+          role="dialog"
+          aria-label={title}
+          style={{ boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)" }}
+        >
+          <SizableText size="$2" fontWeight="bold" fontFamily="$body" mb="$1.5" display="block">
+            {title}
+          </SizableText>
+          <SizableText size="$1" fontFamily="$body" color="var(--text)" style={{ whiteSpace: "pre-wrap", lineHeight: 1.35 }}>
+            {body}
+          </SizableText>
+        </View>
       ) : null}
-    </span>
+    </View>
   );
 }
 

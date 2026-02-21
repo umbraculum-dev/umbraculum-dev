@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { SizableText, XStack, YStack } from "tamagui";
+import { Button, SizableText, XStack, YStack } from "tamagui";
 
 import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
@@ -63,9 +63,9 @@ export function SaltAdditionsEditor(props: {
                 />
               </YStack>
               <YStack alignSelf="flex-end">
-                <button type="button" onClick={() => removeRow(idx)} disabled={disabled}>
+                <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => removeRow(idx)} disabled={disabled}>
                   Remove
-                </button>
+                </Button>
               </YStack>
             </XStack>
           ))}
@@ -79,9 +79,9 @@ export function SaltAdditionsEditor(props: {
       )}
 
       <YStack>
-        <button type="button" onClick={addRow} disabled={disabled}>
+        <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={addRow} disabled={disabled}>
           {tUi("addSalt")}
-        </button>
+        </Button>
       </YStack>
     </YStack>
   );

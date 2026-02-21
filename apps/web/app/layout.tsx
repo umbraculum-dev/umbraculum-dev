@@ -36,6 +36,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       data-brand={brand}
       suppressHydrationWarning
     >
+      <head>
+        <meta name="darkreader-lock" />
+      </head>
       <body>
         {children}
       </body>

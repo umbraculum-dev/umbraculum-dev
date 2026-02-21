@@ -17,7 +17,7 @@ import {
   type EditorMashStep,
 } from "../../../_lib/beerjsonRecipe";
 import { MashStepsEditor } from "../../../_components/MashStepsEditor";
-import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
@@ -25,7 +25,7 @@ import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
-import { H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
   bicarbonatePpmToAlkalinityPpmCaCO3,
@@ -1253,12 +1253,12 @@ export default function MashWaterPage() {
           </XStack>
 
           <XStack gap="$3" mt="$3" alignItems="center">
-            <button type="button" onClick={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
               {loadingProfiles ? "Reloading…" : "Reload water profiles"}
-            </button>
-            <button type="button" onClick={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
               {savingAdjustment ? "Saving…" : "Save profile and volumes"}
-            </button>
+            </Button>
             {adjustmentSaveStatus ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
                 {adjustmentSaveStatus}
@@ -1274,7 +1274,7 @@ export default function MashWaterPage() {
             <details className="brew-field-block brew-field-block--readonly brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Mixed water ions</strong>
-                <span className="brew-field-badge">Read-only</span>
+                <FieldBadge>Read-only</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Computed from profiles + volumes</SizableText>
               </summary>
               <View className="brew-table-wrap">
@@ -1341,9 +1341,9 @@ export default function MashWaterPage() {
             </li>
           </ul>
           <XStack gap="$3" alignItems="center">
-            <button type="button" onClick={() => void onImportGristFromRecipe()} disabled={!canCall || importingGrist}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onImportGristFromRecipe()} disabled={!canCall || importingGrist}>
               {importingGrist ? "Importing…" : "Import/update grist snapshot"}
-            </button>
+            </Button>
             <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
             {gristImportStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{gristImportStatus}</SizableText> : null}
           </XStack>
@@ -1521,16 +1521,16 @@ export default function MashWaterPage() {
             </XStack>
 
             <XStack gap="$3" mt="$3" alignItems="center">
-              <button type="button" onClick={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
                 {savingMash ? "Saving…" : "Save mash draft"}
-              </button>
-              <button type="submit" disabled={!canCall || mashSubmitting}>
+              </Button>
+              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || mashSubmitting}>
                 {mashSubmitting
                   ? "Working…"
                   : mashAcidificationMode === "manual"
                     ? "Estimate & save snapshot"
                     : "Calculate & save snapshot"}
-              </button>
+              </Button>
             </XStack>
 
             {mashError ? (
@@ -1657,7 +1657,7 @@ export default function MashWaterPage() {
             <details className="brew-field-block brew-field-block--computed" mt="$3">
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Result (manual acid amount mode)</strong>
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Estimated from manual acid amount</SizableText>
               </summary>
               <ul>
@@ -1698,12 +1698,12 @@ export default function MashWaterPage() {
           />
 
           <XStack gap="$3" mt="$3" alignItems="center">
-            <button type="button" onClick={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
               {savingSalts ? "Saving…" : "Save salts draft"}
-            </button>
-            <button type="button" onClick={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
               {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-            </button>
+            </Button>
             {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
             {saltsSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsSaveStatus}</SizableText> : null}
             {saltsCalcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsCalcSaveStatus}</SizableText> : null}
@@ -1742,7 +1742,7 @@ body={buildWaterMathBody({
                     />
                   );
                 })() : null}
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
                   Does not consider acid; see &quot;Overall mash water result&quot; for combined output
                 </SizableText>
@@ -1793,12 +1793,12 @@ body={buildWaterMathBody({
             Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
           </SizableText>
           <XStack gap="$3" alignItems="center" flexWrap="wrap">
-            <button type="button" onClick={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Preview overall"}
-            </button>
-            <button type="button" onClick={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
               {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
-            </button>
+            </Button>
             {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
             {overallSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallSaveStatus}</SizableText> : null}
           </XStack>
@@ -1835,7 +1835,7 @@ body={buildWaterMathBody({
                     />
                   );
                 })() : null}
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
               </View>
               <ul>

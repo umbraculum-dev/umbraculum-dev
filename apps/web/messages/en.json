@@ -42,6 +42,7 @@
     "title": "Platform ads",
     "subtitle": "Manage platform-scoped ads (web). Visible across accounts unless ads are disabled for a workspace.",
     "hint": "Tip: preview placements by opening any page and hard-reloading (locale: {locale}).",
+    "globalBottomNote": "Note: the Global bottom placement is hidden on the recipe edit page to avoid layout jumps on mobile.",
     "loading": "Loading…",
     "notAuthorized": "You are not authorized to manage platform ads.",
     "refresh": "Refresh",
@@ -640,8 +641,10 @@
       "buttons": {
         "clear": "Clear",
         "addFermentable": "Add fermentable",
+        "addCustomFermentable": "Add custom fermentable",
         "addOtherIngredient": "Add other ingredient"
       },
+      "fermentableAddedSaveHint": "Fermentable added. You must save the section to persist data.",
       "amountLabel": "Amount ({unit})",
       "colorLabel": "Color ({unit})",
       "gristTotalKg": "Total: {value} {unit}",

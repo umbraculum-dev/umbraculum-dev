@@ -42,6 +42,7 @@
     "title": "Pubblicità piattaforma",
     "subtitle": "Gestisci le pubblicità a livello piattaforma (web). Visibili su tutti gli account, salvo disattivazione per uno specifico workspace.",
     "hint": "Suggerimento: per vedere i posizionamenti apri una pagina e fai un hard reload (lingua: {locale}).",
+    "globalBottomNote": "Nota: il posizionamento Globale: in basso è nascosto nella pagina di modifica ricetta per evitare salti di layout su mobile.",
     "loading": "Caricamento…",
     "notAuthorized": "Non sei autorizzato a gestire le pubblicità piattaforma.",
     "refresh": "Aggiorna",
@@ -647,8 +648,10 @@
       "buttons": {
         "clear": "Pulisci",
         "addFermentable": "Aggiungi fermentabile",
+        "addCustomFermentable": "Aggiungi fermentabile personalizzato",
         "addOtherIngredient": "Aggiungi altro ingrediente"
       },
+      "fermentableAddedSaveHint": "Fermentabile aggiunto. Salva la sezione per conservare i dati.",
       "amountLabel": "Quantità ({unit})",
       "colorLabel": "Colore ({unit})",
       "gristTotalKg": "Totale: {value} {unit}",

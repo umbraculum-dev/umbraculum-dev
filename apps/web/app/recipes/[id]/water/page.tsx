@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { IonProfilePpm } from "@brewery/contracts";
 
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { H1, H2, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
@@ -18,7 +18,7 @@ import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 import { mathExplain } from "./_lib/mathExplain";
 import { buildWaterMathBody } from "./_lib/mathBodies";
-import { ErrorBox } from "../../../_components/recipe-edit";
+import { ErrorBox, FieldBadge } from "../../../_components/recipe-edit";
 import { RecipeMetaLine } from "./_components/RecipeMetaLine";
 
 type DisplayStream = {
@@ -246,9 +246,9 @@ export default function WaterHubPage() {
           </ul>
 
           <XStack gap="$3" alignItems="center">
-            <button type="button" onClick={() => void refresh()} disabled={authState.status !== "ready" || loading}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refresh()} disabled={authState.status !== "ready" || loading}>
               {loading ? t("refreshing") : t("refresh")}
-            </button>
+            </Button>
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
               {profiles ? t("profilesLoaded") : t("profilesNotLoaded")}
             </SizableText>
@@ -304,7 +304,7 @@ export default function WaterHubPage() {
                     );
                   })()
                 : null}
-              <span className="brew-field-badge">{t("computed")}</span>
+              <FieldBadge>{t("computed")}</FieldBadge>
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("clickToExpand")}</SizableText>
             </summary>
 

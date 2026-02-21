@@ -32,7 +32,9 @@ export default async function LocaleLayout({
         <main id="main" className="brew-main-margin">
           {children}
         </main>
-        <AdSlot placement="global_bottom" />
+        <div className="brew-global-bottom-slot">
+          <AdSlot placement="global_bottom" />
+        </div>
       </div>
       </TamaguiProviderWrapper>
     </NextIntlClientProvider>

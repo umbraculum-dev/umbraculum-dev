@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Checkbox, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, Checkbox, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
@@ -171,6 +171,9 @@ export default function PlatformAdsPage() {
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
           {t("hint", { locale })}
         </SizableText>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
+          {t("globalBottomNote")}
+        </SizableText>
 
         {error ? (
           <ErrorBox mt="$3">{error}</ErrorBox>
@@ -271,12 +274,12 @@ export default function PlatformAdsPage() {
           </XStack>
 
           <XStack gap="$2" justifyContent="flex-end">
-            <button type="button" onClick={() => void refresh()} disabled={loading}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refresh()} disabled={loading}>
               {loading ? t("refreshing") : t("refresh")}
-            </button>
-            <button type="button" onClick={() => void onCreate()} disabled={loading}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCreate()} disabled={loading}>
               {loading ? t("creating") : t("create")}
-            </button>
+            </Button>
           </XStack>
         </YStack>
       </View>
@@ -336,9 +339,9 @@ export default function PlatformAdsPage() {
                       </XStack>
                     </td>
                     <td className="brew-table-cell-top">
-                      <button type="button" onClick={() => void onDelete(a.id)} disabled={loading}>
+                      <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onDelete(a.id)} disabled={loading}>
                         {t("table.delete")}
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

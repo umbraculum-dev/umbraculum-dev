@@ -1,6 +1,6 @@
 "use client";
 
-import { SizableText, YStack } from "tamagui";
+import { SizableText, View, XStack, YStack } from "tamagui";
 
 export type ModeOption<T extends string> = { value: T; label: string };
 
@@ -14,8 +14,17 @@ export function ModeFieldset<T extends string>(props: {
   const { legend, name, value, onChange, options } = props;
 
   return (
-    <fieldset className="brew-mode-fieldset" suppressHydrationWarning>
-      <legend className="brew-muted brew-fieldset-legend">{legend}</legend>
+    <View
+      borderWidth={1}
+      borderColor="var(--border)"
+      rounded="$2"
+      p="$3"
+      mb="$3"
+      suppressHydrationWarning
+    >
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2" display="block">
+        {legend}
+      </SizableText>
       <YStack gap="$2">
         {options.map((o) => (
           <label key={o.value} className="brew-radio-label">
@@ -32,6 +41,6 @@ export function ModeFieldset<T extends string>(props: {
           </label>
         ))}
       </YStack>
-    </fieldset>
+    </View>
   );
 }

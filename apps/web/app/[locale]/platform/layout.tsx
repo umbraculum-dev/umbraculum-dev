@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import { usePathname } from "next/navigation";
-import { XStack, YStack } from "tamagui";
+import { SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -29,16 +29,18 @@ export default function PlatformLayout({ children }: { children: ReactNode }) {
           <Link
             href="/platform/ads"
             aria-current={isActive("/platform/ads") ? "page" : undefined}
-            className="brew-muted"
           >
-            {t("ads")}
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+              {t("ads")}
+            </SizableText>
           </Link>
           <Link
             href="/platform/recipes"
             aria-current={isActive("/platform/recipes") ? "page" : undefined}
-            className="brew-muted"
           >
-            {t("recipes")}
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+              {t("recipes")}
+            </SizableText>
           </Link>
         </XStack>
       </nav>

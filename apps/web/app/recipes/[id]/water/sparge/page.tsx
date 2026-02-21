@@ -11,9 +11,9 @@ import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_com
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
-import { ErrorBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -591,7 +591,7 @@ export default function SpargeWaterPage() {
     <View className="brew-field-block brew-field-block--readonly brew-mt3">
       <View className="brew-field-block-header">
         <strong>Selected profile info</strong>
-        <span className="brew-field-badge">Read-only</span>
+        <FieldBadge>Read-only</FieldBadge>
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">From selected profile</SizableText>
       </View>
       <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
@@ -600,16 +600,20 @@ export default function SpargeWaterPage() {
         {" · "}pH: {selectedSpargeProfile.ph == null ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">—</SizableText> : <code>{fmt("pH", selectedSpargeProfile.ph, 2)}</code>}
       </SizableText>
       <XStack mt="$2" gap="$3" alignItems="center" flexWrap="wrap">
-        <button
-          type="button"
-          onClick={() => {
+        <Button
+          size="$3"
+          bg="var(--surface-2)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          color="var(--text)"
+          onPress={() => {
             setStartingAlk(bicarbonatePpmToAlkalinityPpmCaCO3(selectedSpargeProfile.bicarbonate));
             setStartingPh(selectedSpargeProfile.ph == null ? "" : String(selectedSpargeProfile.ph));
           }}
           disabled={!canCall}
         >
           Use profile alkalinity + pH
-        </button>
+        </Button>
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">If profile pH is missing, we clear Starting pH so you can enter it.</SizableText>
       </XStack>
     </View>
@@ -833,16 +837,16 @@ export default function SpargeWaterPage() {
             </XStack>
 
             <XStack mt="$3" gap="$3" alignItems="center">
-              <button type="submit" disabled={!canCall || spargeSubmitting}>
+              <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!canCall || spargeSubmitting}>
                 {spargeSubmitting
                   ? "Working…"
                   : spargeAcidificationMode === "manual"
                     ? "Estimate & save snapshot"
                     : "Calculate & save snapshot"}
-              </button>
-              <button type="button" onClick={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
+              </Button>
+              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeInputs()} disabled={!canCall || savingSparge}>
                 {savingSparge ? "Saving…" : "Save sparge draft"}
-              </button>
+              </Button>
               {spargeStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeStatus}</SizableText> : null}
               {spargeSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaveStatus}</SizableText> : null}
               {calcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{calcSaveStatus}</SizableText> : null}
@@ -857,7 +861,7 @@ export default function SpargeWaterPage() {
             <View className="brew-field-block brew-field-block--computed brew-mt3">
               <View className="brew-field-block-header">
                 <strong>Result</strong>
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">From current inputs</SizableText>
               </View>
               <H3 mt={0}>{t("resultLastCalculated")}</H3>
@@ -983,7 +987,7 @@ export default function SpargeWaterPage() {
             <details className="brew-field-block brew-field-block--computed brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Result (manual acid amount mode)</strong>
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Estimated from manual acid amount</SizableText>
               </summary>
               <ul>
@@ -1032,12 +1036,12 @@ export default function SpargeWaterPage() {
           />
 
           <XStack mt="$3" gap="$3" alignItems="center" flexWrap="wrap">
-            <button type="button" onClick={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
               {savingSpargeSalts ? "Saving…" : "Save salts draft"}
-            </button>
-            <button type="button" onClick={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
+            </Button>
+            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
               {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-            </button>
+            </Button>
             {spargeSaltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsStatus}</SizableText> : null}
             {spargeSaltsSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsSaveStatus}</SizableText> : null}
             {spargeSaltsCalcSaveStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsCalcSaveStatus}</SizableText> : null}
@@ -1074,7 +1078,7 @@ export default function SpargeWaterPage() {
                     />
                   );
                 })() : null}
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
               </summary>
               <div className="brew-table-wrap">
                 <table className="brew-table">
@@ -1135,14 +1139,14 @@ export default function SpargeWaterPage() {
                     />
                   );
                 })() : null}
-                <span className="brew-field-badge">Computed</span>
+                <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
                   Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
                   {surfaceMath ? (() => {
                     const ex = mathExplain["sparge.alkalinityHeuristic"];
                     const title = tMath(ex.titleKey);
                     return (
-                      <span className="brew-ml1">
+                      <View as="span" display="inline" ml="$1">
                         <MathHelpPopover
                           title={title}
                           body={buildWaterMathBody({
@@ -1160,7 +1164,7 @@ export default function SpargeWaterPage() {
                           })}
                           ariaLabel={tMath("fxLabel", { topic: title })}
                         />
-                      </span>
+                      </View>
                     );
                   })() : null}
                 </SizableText>
