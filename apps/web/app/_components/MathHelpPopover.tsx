@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, SizableText, View } from "tamagui";
+import { Button, View } from "tamagui";
 
 export function MathHelpPopover(props: {
   title: string;
@@ -67,44 +67,15 @@ export function MathHelpPopover(props: {
         {tUi("fx")}
       </Button>
       {open ? (
-        <View
+        <div
           id={popoverId}
-          position="absolute"
-          top="calc(100% + 6px)"
-          left={0}
-          zIndex={50}
-          width="min(360px, 85vw)"
-          minWidth={0}
-          bg="var(--surface)"
-          borderWidth={1}
-          borderColor="var(--border)"
-          rounded="$2"
-          p="$2.5"
+          className="brew-math-popover"
           role="dialog"
           aria-label={title}
-          style={{
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
-            overflowWrap: "break-word",
-            wordBreak: "break-word",
-          }}
         >
-          <SizableText size="$2" fontWeight="bold" fontFamily="$body" mb="$1.5" display="block">
-            {title}
-          </SizableText>
-          <SizableText
-            size="$1"
-            fontFamily="$body"
-            color="var(--text)"
-            style={{
-              whiteSpace: "pre-wrap",
-              lineHeight: 1.35,
-              overflowWrap: "break-word",
-              wordBreak: "break-word",
-            }}
-          >
-            {body}
-          </SizableText>
-        </View>
+          <div className="brew-math-popover-title">{title}</div>
+          <div className="brew-math-popover-body">{body}</div>
+        </div>
       ) : null}
     </View>
   );
