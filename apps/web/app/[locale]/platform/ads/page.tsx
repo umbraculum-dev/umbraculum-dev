@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Button, Checkbox, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, Checkbox, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
+import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
@@ -180,24 +181,19 @@ export default function PlatformAdsPage() {
         ) : null}
 
         <YStack mt="$3" gap="$3">
-          <XStack gap="$3" flexWrap="wrap">
+          <XStack gap="$3" flexWrap="wrap" ai="flex-end">
             <View flex={1} minWidth={200}>
               <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="ad-placement">
                 {t("form.placement")}
               </RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="ad-placement"
                 value={placement}
-                onChange={(e) => setPlacement(e.target.value as Placement)}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                {placements.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {t(p.labelKey)}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(v) => setPlacement(v as Placement)}
+                options={placements.map((p) => ({ value: p.value, label: t(p.labelKey) }))}
+                width="full"
+              />
               </YStack>
             </View>
             <View flex={1} minWidth={200}>
@@ -205,14 +201,18 @@ export default function PlatformAdsPage() {
                 <RecipeEditFieldLabel htmlFor="ad-priority">
                 {t("form.priority")}
               </RecipeEditFieldLabel>
-              <input
+              <Input
                 id="ad-priority"
-                type="number"
-                inputMode="numeric"
-                step={1}
+                keyboardType="numeric"
                 value={String(priority)}
-                onChange={(e) => setPriority(e.target.value === "" ? 0 : Number(e.target.value))}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                onChangeText={(text) => setPriority(text === "" ? 0 : Number(text))}
+                size="$3"
+                w="100%"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="$2"
+                fontFamily="$body"
               />
               </YStack>
             </View>
@@ -222,11 +222,17 @@ export default function PlatformAdsPage() {
             <RecipeEditFieldLabel htmlFor="ad-image-url">
               {t("form.imageUrl")}
             </RecipeEditFieldLabel>
-            <input
+            <Input
               id="ad-image-url"
               value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="brew-recipe-edit-select brew-recipe-edit-select-full"
+              onChangeText={setImageUrl}
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
               autoComplete="off"
             />
           </YStack>
@@ -235,11 +241,17 @@ export default function PlatformAdsPage() {
             <RecipeEditFieldLabel htmlFor="ad-link-url">
               {t("form.linkUrl")}
             </RecipeEditFieldLabel>
-            <input
+            <Input
               id="ad-link-url"
               value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              className="brew-recipe-edit-select brew-recipe-edit-select-full"
+              onChangeText={setLinkUrl}
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
               autoComplete="off"
             />
           </YStack>
@@ -248,11 +260,17 @@ export default function PlatformAdsPage() {
             <RecipeEditFieldLabel htmlFor="ad-alt-text">
               {t("form.altText")}
             </RecipeEditFieldLabel>
-            <input
+            <Input
               id="ad-alt-text"
               value={altText}
-              onChange={(e) => setAltText(e.target.value)}
-              className="brew-recipe-edit-select brew-recipe-edit-select-full"
+              onChangeText={setAltText}
+              size="$3"
+              w="100%"
+              bg="var(--surface)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              rounded="$2"
+              fontFamily="$body"
               autoComplete="off"
             />
           </YStack>

@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { H1, SizableText, View, YStack } from "tamagui";
 
+import { BrewSelect } from "../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 
@@ -163,62 +164,65 @@ export default function AccessibilityPage() {
           <YStack gap="$3">
             <YStack gap="$1.5">
               <RecipeEditFieldLabel htmlFor="ui-theme">{t("themePreset")}</RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="ui-theme"
                 value={theme}
-                onChange={(e) =>
+                onValueChange={(v) =>
                   applyAndPersist({
-                    theme: oneOf(e.target.value, allowedTheme, "default"),
+                    theme: oneOf(v, allowedTheme, "default"),
                     fontScale,
                     density,
                   })
                 }
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                <option value="default">{t("theme.default")}</option>
-                <option value="hc_dark">{t("theme.hcDark")}</option>
-                <option value="hc_light">{t("theme.hcLight")}</option>
-              </select>
+                options={[
+                  { value: "default", label: t("theme.default") },
+                  { value: "hc_dark", label: t("theme.hcDark") },
+                  { value: "hc_light", label: t("theme.hcLight") },
+                ]}
+                width="full"
+              />
             </YStack>
 
             <YStack gap="$1.5">
               <RecipeEditFieldLabel htmlFor="ui-font-scale">{t("fontScale")}</RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="ui-font-scale"
                 value={fontScale}
-                onChange={(e) =>
+                onValueChange={(v) =>
                   applyAndPersist({
                     theme,
-                    fontScale: oneOf(e.target.value, allowedFont, "md"),
+                    fontScale: oneOf(v, allowedFont, "md"),
                     density,
                   })
                 }
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                <option value="sm">{t("font.sm")}</option>
-                <option value="md">{t("font.md")}</option>
-                <option value="lg">{t("font.lg")}</option>
-                <option value="xl">{t("font.xl")}</option>
-              </select>
+                options={[
+                  { value: "sm", label: t("font.sm") },
+                  { value: "md", label: t("font.md") },
+                  { value: "lg", label: t("font.lg") },
+                  { value: "xl", label: t("font.xl") },
+                ]}
+                width="full"
+              />
             </YStack>
 
             <YStack gap="$1.5">
               <RecipeEditFieldLabel htmlFor="ui-density">{t("density")}</RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="ui-density"
                 value={density}
-                onChange={(e) =>
+                onValueChange={(v) =>
                   applyAndPersist({
                     theme,
                     fontScale,
-                    density: oneOf(e.target.value, allowedDensity, "comfortable"),
+                    density: oneOf(v, allowedDensity, "comfortable"),
                   })
                 }
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                <option value="comfortable">{t("densityOptions.comfortable")}</option>
-                <option value="compact">{t("densityOptions.compact")}</option>
-              </select>
+                options={[
+                  { value: "comfortable", label: t("densityOptions.comfortable") },
+                  { value: "compact", label: t("densityOptions.compact") },
+                ]}
+                width="full"
+              />
             </YStack>
 
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">

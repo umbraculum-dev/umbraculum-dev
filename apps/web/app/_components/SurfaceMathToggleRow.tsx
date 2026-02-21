@@ -30,6 +30,7 @@ export function SurfaceMathToggleRow(props: {
         gap="$2.5"
         alignItems="center"
         flexWrap="wrap"
+        suppressHydrationWarning
       >
         {rightHint}
         <Button
@@ -41,6 +42,7 @@ export function SurfaceMathToggleRow(props: {
           borderColor="var(--border)"
           color="var(--text)"
           fontFamily="$body"
+          suppressHydrationWarning
         >
           {surfaceMath ? tMath("toggleHide") : tMath("toggleShow")}
         </Button>

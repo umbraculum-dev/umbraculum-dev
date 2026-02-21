@@ -55,6 +55,20 @@ textarea {
   padding: var(--control-padding) !important;
 }
 
+input[readonly],
+input:disabled,
+textarea[readonly],
+textarea:disabled {
+  background: var(--field-readonly-bg) !important;
+  border-color: var(--field-readonly-border) !important;
+}
+
+input:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
 button {
   background: var(--surface-2);
   color: var(--text);

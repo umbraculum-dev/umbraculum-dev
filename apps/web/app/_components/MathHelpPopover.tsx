@@ -48,6 +48,7 @@ export function MathHelpPopover(props: {
       position="relative"
       display="inline-flex"
       alignItems="center"
+      suppressHydrationWarning
     >
       <Button
         type="button"
@@ -57,6 +58,7 @@ export function MathHelpPopover(props: {
         bg="color-mix(in srgb, var(--info) 14%, var(--surface-2))"
         borderWidth={1}
         borderColor="color-mix(in srgb, var(--info) 25%, var(--border))"
+        suppressHydrationWarning
         aria-label={ariaLabel}
         aria-expanded={open}
         aria-controls={popoverId}

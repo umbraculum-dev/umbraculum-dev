@@ -6,6 +6,7 @@ import { Button, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
+import { BrewSelect } from "./BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "./recipe-edit";
 import { ImportExportPanel } from "./ImportExportPanel";
 
@@ -335,21 +336,22 @@ export function RecipeImportForm({
           {fileName ? t("filePicked", { name: fileName }) : t("fileNotPicked")}
         </SizableText>
 
-        <XStack gap="$3" flexWrap="wrap">
+        <XStack gap="$3" flexWrap="wrap" ai="flex-end">
           <View flex={1} minWidth={200}>
             <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="import-format">{t("formatLabel")}</RecipeEditFieldLabel>
-            <select
+            <BrewSelect
               id="import-format"
               value={formatOverride}
-              onChange={(e) => setFormatOverride(e.target.value as "" | ImportFormat)}
+              onValueChange={(v) => setFormatOverride(v as "" | ImportFormat)}
+              options={[
+                { value: "", label: t("formatAuto") },
+                { value: "beerjson", label: t("formatBeerJson") },
+                { value: "beerxml", label: t("formatBeerXml") },
+              ]}
               disabled={!canCall}
-              className="brew-recipe-edit-select brew-recipe-edit-select-full"
-            >
-              <option value="">{t("formatAuto")}</option>
-              <option value="beerjson">{t("formatBeerJson")}</option>
-              <option value="beerxml">{t("formatBeerXml")}</option>
-            </select>
+              width="full"
+            />
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
               {format ? t("formatResolved", { format: formatLabel }) : t("formatNotResolved")}
             </SizableText>
@@ -358,20 +360,17 @@ export function RecipeImportForm({
           <View flex={1} minWidth={200}>
             <YStack gap="$1.5">
               <RecipeEditFieldLabel htmlFor="import-style">{t("styleLabel")}</RecipeEditFieldLabel>
-            <select
+            <BrewSelect
               id="import-style"
               value={styleKey}
-              onChange={(e) => setStyleKey(e.target.value)}
+              onValueChange={setStyleKey}
+              options={styles.map((s) => ({
+                value: s.key,
+                label: s.key === "custom" ? s.name : `${s.code} — ${s.name}`,
+              }))}
               disabled={!canCall || stylesLoading || styles.length === 0}
-              required
-              className="brew-recipe-edit-select brew-recipe-edit-select-full"
-            >
-              {styles.map((s) => (
-                <option key={s.key} value={s.key}>
-                  {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
-                </option>
-              ))}
-            </select>
+              width="full"
+            />
             {stylesError ? (
               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
                 {String(stylesError)}
@@ -519,17 +518,18 @@ export function RecipeImportForm({
 
         <YStack gap="$1.5" mt="$3">
           <RecipeEditFieldLabel htmlFor="bulk-import-format">{t("formatLabel")}</RecipeEditFieldLabel>
-          <select
+          <BrewSelect
             id="bulk-import-format"
             value={bulkFormatOverride}
-            onChange={(e) => setBulkFormatOverride(e.target.value as "" | ImportFormat)}
+            onValueChange={(v) => setBulkFormatOverride(v as "" | ImportFormat)}
+            options={[
+              { value: "", label: t("formatAuto") },
+              { value: "beerjson", label: t("formatBeerJson") },
+              { value: "beerxml", label: t("formatBeerXml") },
+            ]}
             disabled={!canCall}
-            className="brew-recipe-edit-select brew-recipe-edit-select-full"
-          >
-            <option value="">{t("formatAuto")}</option>
-            <option value="beerjson">{t("formatBeerJson")}</option>
-            <option value="beerxml">{t("formatBeerXml")}</option>
-          </select>
+            width="full"
+          />
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
             {bulkFormat ? t("formatResolved", { format: bulkFormatLabel }) : t("formatNotResolved")}
           </SizableText>

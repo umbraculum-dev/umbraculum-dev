@@ -9,10 +9,11 @@ import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
+import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { Button, H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -760,25 +761,25 @@ export default function BoilWaterPage() {
             {t("adjustmentHelp")}
           </SizableText>
 
-          <XStack gap="$3" flexWrap="wrap">
+          <XStack gap="$3" flexWrap="wrap" ai="flex-end">
             <View flex={1} minWidth={180}>
               <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="boil-source-profile">
                 Source water profile
               </RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="boil-source-profile"
                 value={sourceProfileId}
-                onChange={(e) => setSourceProfileId(e.target.value)}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                <option value="">(none)</option>
-                {waterProfiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} [{p.scope}/{p.verificationStatus}]
-                  </option>
-                ))}
-              </select>
+                onValueChange={setSourceProfileId}
+                options={[
+                  { value: "", label: "(none)" },
+                  ...waterProfiles.map((p) => ({
+                    value: p.id,
+                    label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                  })),
+                ]}
+                width="full"
+              />
               <View mt="$1.5">{selectedProfileInfo(selectedSource, "Selected")}</View>
               </YStack>
             </View>
@@ -788,19 +789,19 @@ export default function BoilWaterPage() {
                 <RecipeEditFieldLabel htmlFor="boil-target-profile">
                 Target water profile
               </RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="boil-target-profile"
                 value={targetProfileId}
-                onChange={(e) => setTargetProfileId(e.target.value)}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                <option value="">(none)</option>
-                {waterProfiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} [{p.scope}/{p.verificationStatus}]
-                  </option>
-                ))}
-              </select>
+                onValueChange={setTargetProfileId}
+                options={[
+                  { value: "", label: "(none)" },
+                  ...waterProfiles.map((p) => ({
+                    value: p.id,
+                    label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                  })),
+                ]}
+                width="full"
+              />
               <View mt="$1.5">{selectedProfileInfo(selectedTarget, "Selected")}</View>
               </YStack>
             </View>
@@ -810,38 +811,42 @@ export default function BoilWaterPage() {
                 <RecipeEditFieldLabel htmlFor="boil-dilution-profile">
                 Dilution water profile
               </RecipeEditFieldLabel>
-              <select
+              <BrewSelect
                 id="boil-dilution-profile"
                 value={dilutionProfileId}
-                onChange={(e) => setDilutionProfileId(e.target.value)}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
-              >
-                <option value="">(none)</option>
-                {dilutionProfiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} [{p.scope}/{p.verificationStatus}]
-                  </option>
-                ))}
-              </select>
+                onValueChange={setDilutionProfileId}
+                options={[
+                  { value: "", label: "(none)" },
+                  ...dilutionProfiles.map((p) => ({
+                    value: p.id,
+                    label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                  })),
+                ]}
+                width="full"
+              />
               <View mt="$1.5">{selectedProfileInfo(selectedDilution, "Selected")}</View>
               </YStack>
             </View>
           </XStack>
 
-          <XStack gap="$3" flexWrap="wrap" mt="$3">
+          <XStack gap="$3" flexWrap="wrap" mt="$3" ai="flex-end">
             <View flex={1} minWidth={200}>
               <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="boil-source-volume">
                 {t("sourceVolumeLabel", { unit: tUnits("L") })}
               </RecipeEditFieldLabel>
-              <input
+              <Input
                 id="boil-source-volume"
-                type="number"
-                inputMode="decimal"
-                step={0.1}
-                value={tapVolumeLiters}
-                onChange={(e) => setTapVolumeLiters(Number(e.target.value))}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                keyboardType="decimal-pad"
+                value={String(tapVolumeLiters)}
+                onChangeText={(text) => setTapVolumeLiters(Number(text) || 0)}
+                size="$3"
+                w="100%"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="$2"
+                fontFamily="$body"
               />
               </YStack>
             </View>
@@ -850,14 +855,18 @@ export default function BoilWaterPage() {
                 <RecipeEditFieldLabel htmlFor="boil-dilution-volume">
                 {t("dilutionVolumeLabel", { unit: tUnits("L") })}
               </RecipeEditFieldLabel>
-              <input
+              <Input
                 id="boil-dilution-volume"
-                type="number"
-                inputMode="decimal"
-                step={0.1}
-                value={dilutionVolumeLiters}
-                onChange={(e) => setDilutionVolumeLiters(Number(e.target.value))}
-                className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                keyboardType="decimal-pad"
+                value={String(dilutionVolumeLiters)}
+                onChangeText={(text) => setDilutionVolumeLiters(Number(text) || 0)}
+                size="$3"
+                w="100%"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="$2"
+                fontFamily="$body"
               />
               </YStack>
             </View>
@@ -1036,7 +1045,7 @@ export default function BoilWaterPage() {
           </H2>
 
           <form onSubmit={onSubmitAcid} aria-describedby={boilError ? "boil-error" : undefined}>
-            <XStack gap="$3" flexWrap="wrap">
+            <XStack gap="$3" flexWrap="wrap" ai="flex-end">
               <View width="100%" flexBasis="100%">
                 <ModeFieldset
                   legend="Mode"
@@ -1055,17 +1064,22 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-starting-alk">
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="boil-starting-alk"
-                  type="number"
-                  inputMode="decimal"
-                  value={startingAlk}
-                  onChange={(e) => {
+                  keyboardType="decimal-pad"
+                  value={String(startingAlk)}
+                  onChangeText={(text) => {
                     setStartingAlkTouched(true);
-                    const n = Number(e.target.value);
+                    const n = Number(text);
                     setStartingAlk(Number.isFinite(n) ? n : 0);
                   }}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -1075,14 +1089,18 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-starting-ph">
                   Starting pH
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="boil-starting-ph"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
+                  keyboardType="decimal-pad"
                   value={startingPh}
-                  onChange={(e) => setStartingPh(e.target.value)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  onChangeText={setStartingPh}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -1093,14 +1111,18 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-target-ph">
                     Target pH
                   </RecipeEditFieldLabel>
-                  <input
+                  <Input
                     id="boil-target-ph"
-                    type="number"
-                    inputMode="decimal"
-                    step={0.01}
-                    value={targetPh}
-                    onChange={(e) => setTargetPh(Number(e.target.value))}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                    keyboardType="decimal-pad"
+                    value={String(targetPh)}
+                    onChangeText={(text) => setTargetPh(Number(text) || 0)}
+                    size="$3"
+                    w="100%"
+                    bg="var(--surface)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    rounded="$2"
+                    fontFamily="$body"
                   />
                   </YStack>
                 </View>
@@ -1111,21 +1133,22 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-acid-type">
                   Acid type
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="boil-acid-type"
                   value={acidType}
-                  onChange={(e) => setAcidType(e.target.value)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                >
-                  <option value="phosphoric">Phosphoric</option>
-                  <option value="lactic">Lactic</option>
-                  <option value="hydrochloric">Hydrochloric</option>
-                  <option value="sulfuric">Sulfuric</option>
-                  <option value="acetic">Acetic</option>
-                  <option value="citric">Citric (solid)</option>
-                  <option value="tartaric">Tartaric (solid)</option>
-                  <option value="malic">Malic (solid)</option>
-                </select>
+                  onValueChange={setAcidType}
+                  options={[
+                    { value: "phosphoric", label: "Phosphoric" },
+                    { value: "lactic", label: "Lactic" },
+                    { value: "hydrochloric", label: "Hydrochloric" },
+                    { value: "sulfuric", label: "Sulfuric" },
+                    { value: "acetic", label: "Acetic" },
+                    { value: "citric", label: "Citric (solid)" },
+                    { value: "tartaric", label: "Tartaric (solid)" },
+                    { value: "malic", label: "Malic (solid)" },
+                  ]}
+                  width="full"
+                />
                 </YStack>
               </View>
 
@@ -1134,17 +1157,18 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-strength-kind">
                   Strength kind
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="boil-strength-kind"
                   value={strengthKind}
-                  onChange={(e) => setStrengthKind(e.target.value as any)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                >
-                  <option value="percent">Percent (%)</option>
-                  <option value="normality">Normality (N)</option>
-                  <option value="molarity">Molarity (M)</option>
-                  <option value="solid">Solid (pure)</option>
-                </select>
+                  onValueChange={(v) => setStrengthKind(v as "percent" | "normality" | "molarity" | "solid")}
+                  options={[
+                    { value: "percent", label: "Percent (%)" },
+                    { value: "normality", label: "Normality (N)" },
+                    { value: "molarity", label: "Molarity (M)" },
+                    { value: "solid", label: "Solid (pure)" },
+                  ]}
+                  width="full"
+                />
                 </YStack>
               </View>
 
@@ -1153,15 +1177,19 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-strength-value">
                   Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="boil-strength-value"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={strengthValue}
-                  onChange={(e) => setStrengthValue(Number(e.target.value))}
+                  keyboardType="decimal-pad"
+                  value={String(strengthValue)}
+                  onChangeText={(text) => setStrengthValue(Number(text) || 0)}
                   disabled={strengthKind === "solid"}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -1172,14 +1200,18 @@ export default function BoilWaterPage() {
                   <RecipeEditFieldLabel htmlFor="boil-manual-acid-added">
                     Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </RecipeEditFieldLabel>
-                  <input
+                  <Input
                     id="boil-manual-acid-added"
-                    type="number"
-                    inputMode="decimal"
-                    step={0.1}
-                    value={manualAcidAdded}
-                    onChange={(e) => setManualAcidAdded(Number(e.target.value))}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                    keyboardType="decimal-pad"
+                    value={String(manualAcidAdded)}
+                    onChangeText={(text) => setManualAcidAdded(Number(text) || 0)}
+                    size="$3"
+                    w="100%"
+                    bg="var(--surface)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    rounded="$2"
+                    fontFamily="$body"
                   />
                   </YStack>
                 </View>

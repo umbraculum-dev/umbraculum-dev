@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
+import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -116,20 +117,17 @@ export default function PlatformRecipesPage() {
           <RecipeEditFieldLabel htmlFor="platform-account">
             {t("accountLabel")}
           </RecipeEditFieldLabel>
-          <select
+          <BrewSelect
             id="platform-account"
             value={accountId}
-            onChange={(e) => setAccountId(e.target.value)}
+            onValueChange={setAccountId}
+            options={[
+              { value: "", label: t("accountPlaceholder") },
+              ...accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.id})` })),
+            ]}
             disabled={accountsLoading || accounts.length === 0}
-            className="brew-recipe-edit-select brew-recipe-edit-select-full brew-select-max400"
-          >
-            <option value="">{t("accountPlaceholder")}</option>
-            {accounts.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name} ({a.id})
-              </option>
-            ))}
-          </select>
+            width="full"
+          />
           {accountsError ? (
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
               {accountsError}
@@ -149,20 +147,18 @@ export default function PlatformRecipesPage() {
                 <RecipeEditFieldLabel htmlFor="platform-export-recipe">
                   {t("exportSingleLabel")}
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="platform-export-recipe"
                   value={exportRecipeId}
-                  onChange={(e) => setExportRecipeId(e.target.value)}
+                  onValueChange={setExportRecipeId}
+                  options={
+                    !hasRecipes
+                      ? [{ value: "", label: t("exportNoneAvailable") }]
+                      : recipes.map((r) => ({ value: r.id, label: r.name }))
+                  }
                   disabled={recipesLoading || !hasRecipes}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                >
-                  {!hasRecipes ? <option value="">{t("exportNoneAvailable")}</option> : null}
-                  {recipes.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
+                  width="full"
+                />
               </View>
               <a
                 href={singleExportHref}

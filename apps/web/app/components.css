@@ -29,27 +29,11 @@
   font-size: 12px;
 }
 
-.brew-recipe-edit-select {
-  padding: 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  width: 160px;
-  font-family: inherit;
-}
-.brew-recipe-edit-select-full {
-  width: 100%;
-}
-
-.brew-select-max400 {
-  max-width: 400px;
-}
 .brew-recipe-edit-list-disc {
   list-style: disc;
   padding-left: 20px;
 }
-.brew-mash-steps-editor input,
-.brew-mash-steps-editor select {
+.brew-mash-steps-editor input {
   text-align: left !important;
 }
 

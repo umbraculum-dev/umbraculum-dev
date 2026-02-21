@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
+import { BrewSelect } from "../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
@@ -156,7 +157,7 @@ export default function RecipesPage() {
           {t("createTitle")}
         </H2>
         <form onSubmit={onCreate}>
-            <XStack gap="$3" flexWrap="wrap">
+            <XStack gap="$3" flexWrap="wrap" ai="flex-end">
               <View flex={1} minWidth={200}>
                 <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="recipe-name">{t("nameLabel")}</RecipeEditFieldLabel>
@@ -176,21 +177,20 @@ export default function RecipesPage() {
               </YStack>
               <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="recipe-style">{t("styleLabel")}</RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="recipe-style"
                   value={newStyleKey}
-                  onChange={(e) => setNewStyleKey(e.target.value)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  onValueChange={setNewStyleKey}
+                  options={[
+                    { value: "", label: stylesLoading ? t("stylesLoading") : t("stylePlaceholder") },
+                    ...styles.map((s) => ({
+                      value: s.key,
+                      label: s.key === "custom" ? s.name : `${s.code} — ${s.name}`,
+                    })),
+                  ]}
                   disabled={!canCall || stylesLoading || styles.length === 0}
-                  required
-                >
-                  <option value="">{stylesLoading ? t("stylesLoading") : t("stylePlaceholder")}</option>
-                  {styles.map((s) => (
-                    <option key={s.key} value={s.key}>
-                      {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
-                    </option>
-                  ))}
-                </select>
+                  width="full"
+                />
                 {stylesError ? (
                   <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
                     {String(stylesError)}
@@ -308,24 +308,22 @@ export default function RecipesPage() {
           {t("export.subtitle")}
         </SizableText>
 
-        <XStack gap="$3" flexWrap="wrap" alignItems="flex-end">
+        <XStack gap="$3" flexWrap="wrap" ai="flex-end">
           <View flex={1} minWidth={180}>
             <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="export-recipe">{t("export.selectLabel")}</RecipeEditFieldLabel>
-            <select
+            <BrewSelect
               id="export-recipe"
               value={exportRecipeId}
-              onChange={(e) => setExportRecipeId(e.target.value)}
+              onValueChange={setExportRecipeId}
+              options={
+                hasRecipes
+                  ? recipes.map((r) => ({ value: r.id, label: r.name }))
+                  : [{ value: "", label: t("export.noneAvailable") }]
+              }
               disabled={!hasRecipes}
-              className="brew-recipe-edit-select brew-recipe-edit-select-full"
-            >
-              {hasRecipes ? null : <option value="">{t("export.noneAvailable")}</option>}
-              {recipes.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
+              width="full"
+            />
             </YStack>
           </View>
           <a

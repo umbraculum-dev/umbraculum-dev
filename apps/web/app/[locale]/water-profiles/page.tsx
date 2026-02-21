@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 
@@ -10,6 +10,7 @@ import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewe
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 
 import { apiFetch } from "../../_lib/apiClient";
+import { BrewSelect } from "../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 
 function isAdmin(role: string | null) {
@@ -244,15 +245,21 @@ export default function WaterProfilesPage() {
             </SizableText>
 
             <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
-              <XStack gap="$3" flexWrap="wrap">
+              <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                 <View width="100%" flexBasis="100%">
                   <YStack gap="$1.5">
                     <RecipeEditFieldLabel htmlFor="create-name">Profile name</RecipeEditFieldLabel>
-                    <input
+                    <Input
                       id="create-name"
                       value={createName}
-                      onChange={(e) => setCreateName(e.target.value)}
-                      className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                      onChangeText={setCreateName}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                       required
                     />
                   </YStack>
@@ -260,42 +267,48 @@ export default function WaterProfilesPage() {
                 <View flex={1} minWidth={200}>
                   <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="create-scope">Scope</RecipeEditFieldLabel>
-                  <select
+                  <BrewSelect
                     id="create-scope"
                     value={createScope}
-                    onChange={(e) => setCreateScope(e.target.value as "account" | "public")}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                  >
-                    <option value="public">Public</option>
-                    <option value="account">Account</option>
-                  </select>
+                    onValueChange={(v) => setCreateScope(v as "account" | "public")}
+                    options={[
+                      { value: "public", label: "Public" },
+                      { value: "account", label: "Account" },
+                    ]}
+                    width="full"
+                  />
                 </YStack>
                 </View>
                 <View flex={1} minWidth={200}>
                   <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="create-type">Type</RecipeEditFieldLabel>
-                  <select
+                  <BrewSelect
                     id="create-type"
                     value={createType}
-                    onChange={(e) => setCreateType(e.target.value as "water" | "dilution")}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                  >
-                    <option value="water">Water</option>
-                    <option value="dilution">Dilution</option>
-                  </select>
+                    onValueChange={(v) => setCreateType(v as "water" | "dilution")}
+                    options={[
+                      { value: "water", label: "Water" },
+                      { value: "dilution", label: "Dilution" },
+                    ]}
+                    width="full"
+                  />
                 </YStack>
                 </View>
                 <View width="100%" flexBasis="100%">
                   <YStack gap="$1.5">
                     <RecipeEditFieldLabel htmlFor="create-ph">pH (optional)</RecipeEditFieldLabel>
-                    <input
+                    <Input
                       id="create-ph"
-                      type="number"
-                      inputMode="decimal"
-                      step={0.01}
+                      keyboardType="decimal-pad"
                       value={createPh}
-                      onChange={(e) => setCreatePh(e.target.value)}
-                      className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                      onChangeText={setCreatePh}
+                      size="$3"
+                      w="100%"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
                       placeholder={t("phPlaceholder")}
                     />
                   </YStack>
@@ -308,7 +321,7 @@ export default function WaterProfilesPage() {
                     {t("ionsLegend", { unit: tUnits("ppm") })}
                   </SizableText>
                 </legend>
-                <XStack gap="$3" flexWrap="wrap">
+                <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                   {(
                     [
                       ["calcium", "Calcium (Ca)"],
@@ -322,13 +335,18 @@ export default function WaterProfilesPage() {
                     <View key={k} flex={1} minWidth={180}>
                       <YStack gap="$1.5">
                       <RecipeEditFieldLabel htmlFor={`ion-${k}`}>{label}</RecipeEditFieldLabel>
-                      <input
+                      <Input
                         id={`ion-${k}`}
-                        type="number"
-                        inputMode="decimal"
-                        value={(createIon as Record<string, number>)[k]}
-                        onChange={(e) => setCreateIon((prev) => ({ ...prev, [k]: Number(e.target.value) }))}
-                        className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                        keyboardType="decimal-pad"
+                        value={String((createIon as Record<string, number>)[k])}
+                        onChangeText={(text) => setCreateIon((prev) => ({ ...prev, [k]: Number(text) || 0 }))}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
                       />
                     </YStack>
                     </View>

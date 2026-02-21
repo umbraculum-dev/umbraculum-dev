@@ -5,6 +5,8 @@ This repo is **TypeScript-first**. The goal is clarity + safe refactors (includi
 ### Styling: avoid inline styles
 Avoid inline styles where you can. In this codebase **Tamagui props and components are the preferred replacement** for layout, spacing, colors, borders, and typography. Use `className` with CSS classes when Tamagui does not apply (e.g. native `<select>`, `<table>`, `<details>`/`<summary>`).
 
+**Form field rows:** For horizontal rows of label+input fields, use `ai="flex-end"` on the row `XStack` so inputs stay horizontally aligned when labels wrap.
+
 ### CSS structure (web app)
 The web app uses two CSS sources: `apps/web/app/globals.css` (imports) and `apps/web/public/tamagui.generated.css` (Tamagui). `globals.css` imports three files:
 

@@ -13,6 +13,7 @@ import { formatFixed } from "../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { AdSlot } from "../../../_components/AdSlot";
 import { CodeInline } from "../../../_components/CodeInline";
+import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   ErrorBox,
   RecipeEditField,
@@ -1055,20 +1056,17 @@ export default function RecipeEditPage() {
               </View>
               <View flex={1} minW={200}>
                 <RecipeEditField id="recipe-style" label="Style">
-                  <select
+                  <BrewSelect
                     id="recipe-style"
-                    name="styleKey"
                     value={styleKey}
-                    onChange={(e) => setStyleKey(e.target.value)}
+                    onValueChange={setStyleKey}
+                    options={styles.map((s) => ({
+                      value: s.key,
+                      label: s.key === "custom" ? s.name : `${s.code} — ${s.name}`,
+                    }))}
                     disabled={stylesLoading || styles.length === 0}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                  >
-                    {styles.map((s) => (
-                      <option key={s.key} value={s.key}>
-                        {s.key === "custom" ? s.name : `${s.code} — ${s.name}`}
-                      </option>
-                    ))}
-                  </select>
+                    width="full"
+                  />
                 {stylesError ? (
                   <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
                     {String(stylesError)}
@@ -1743,21 +1741,17 @@ export default function RecipeEditPage() {
             <XStack gap="$3" mt="$3" flexWrap="wrap" items="flex-end">
               <View flex={1} minW={200}>
                 <RecipeEditField id="equipment-profile" label={tEquip("profileLabel")}>
-                  <select
+                  <BrewSelect
                     id="equipment-profile"
-                    name="equipmentProfileId"
                     value={selectedEquipmentProfileId}
-                    onChange={(e) => setSelectedEquipmentProfileId(e.target.value)}
+                    onValueChange={setSelectedEquipmentProfileId}
+                    options={[
+                      { value: "", label: tEquip("noneOption") },
+                      ...equipmentProfiles.map((p) => ({ value: p.id, label: p.name })),
+                    ]}
                     disabled={equipmentProfilesLoading}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                  >
-                    <option value="">{tEquip("noneOption")}</option>
-                    {equipmentProfiles.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
+                    width="full"
+                  />
                 </RecipeEditField>
               </View>
               <Button
@@ -2167,59 +2161,59 @@ export default function RecipeEditPage() {
                                   <RecipeEditFieldLabel htmlFor={`grist-class-${r.id}`}>
                                     Mash pH class (legacy)
                                   </RecipeEditFieldLabel>
-                                  <select
+                                  <BrewSelect
                                     id={`grist-class-${r.id}`}
                                     value={r.maltClass}
-                                    onChange={(e) => updateGristRow(r.id, { maltClass: e.target.value as any })}
-                                    className="brew-recipe-edit-select"
-                                  >
-                                    <option value="base">Base</option>
-                                    <option value="crystal">Crystal</option>
-                                    <option value="roast">Roast</option>
-                                    <option value="acid">Acid malt</option>
-                                  </select>
+                                    onValueChange={(v) => updateGristRow(r.id, { maltClass: v as any })}
+                                    options={[
+                                      { value: "base", label: "Base" },
+                                      { value: "crystal", label: "Crystal" },
+                                      { value: "roast", label: "Roast" },
+                                      { value: "acid", label: "Acid malt" },
+                                    ]}
+                                  />
                                 </YStack>
 
                                 <YStack gap="$1" minW={140}>
                                   <RecipeEditFieldLabel htmlFor={`grist-timing-${r.id}`}>
                                     {t("fermentableTimingLabel")}
                                   </RecipeEditFieldLabel>
-                                  <select
+                                  <BrewSelect
                                     id={`grist-timing-${r.id}`}
                                     value={r.timingUse ?? "add_to_mash"}
-                                    onChange={(e) =>
+                                    onValueChange={(v) =>
                                       updateGristRow(r.id, {
-                                        timingUse: e.target.value === "add_to_boil" ? "add_to_boil" : "add_to_mash",
+                                        timingUse: v === "add_to_boil" ? "add_to_boil" : "add_to_mash",
                                       })
                                     }
-                                    className="brew-recipe-edit-select"
-                                  >
-                                    <option value="add_to_mash">{t("fermentableTimingMash")}</option>
-                                    <option value="add_to_boil">{t("fermentableTimingKettle")}</option>
-                                  </select>
+                                    options={[
+                                      { value: "add_to_mash", label: t("fermentableTimingMash") },
+                                      { value: "add_to_boil", label: t("fermentableTimingKettle") },
+                                    ]}
+                                  />
                                 </YStack>
 
                                 <YStack gap="$1" minW={140}>
                                   <RecipeEditFieldLabel htmlFor={`grist-pot-kind-${r.id}`}>
                                     Potential kind
                                   </RecipeEditFieldLabel>
-                                  <select
+                                  <BrewSelect
                                     id={`grist-pot-kind-${r.id}`}
                                     value={r.potential?.kind ?? ""}
-                                    onChange={(e) => {
-                                      const kind = e.target.value as GristPotentialKind | "";
+                                    onValueChange={(v) => {
+                                      const kind = v as GristPotentialKind | "";
                                       if (!kind) return updateGristRow(r.id, { potential: null });
                                       updateGristRow(r.id, {
                                         potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) },
                                       });
                                     }}
-                                    className="brew-recipe-edit-select"
-                                  >
-                                    <option value="">(none)</option>
-                                    <option value="ppg">PPG</option>
-                                    <option value="yieldPercent">Yield %</option>
-                                    <option value="sg">SG (e.g. 1.037)</option>
-                                  </select>
+                                    options={[
+                                      { value: "", label: "(none)" },
+                                      { value: "ppg", label: "PPG" },
+                                      { value: "yieldPercent", label: "Yield %" },
+                                      { value: "sg", label: "SG (e.g. 1.037)" },
+                                    ]}
+                                  />
                                 </YStack>
 
                                 <YStack gap="$1" minW={100}>
@@ -2275,7 +2269,7 @@ export default function RecipeEditPage() {
                                             <RecipeEditFieldLabel htmlFor={`grist-roast-dehusked-override-${r.id}`}>
                                               Override
                                             </RecipeEditFieldLabel>
-                                            <select
+                                            <BrewSelect
                                               id={`grist-roast-dehusked-override-${r.id}`}
                                               value={
                                                 typeof r.mashRoastDehuskedOverride === "boolean"
@@ -2284,8 +2278,7 @@ export default function RecipeEditPage() {
                                                     : "force_husked"
                                                   : "auto"
                                               }
-                                              onChange={(e) => {
-                                                const v = e.target.value;
+                                              onValueChange={(v) => {
                                                 if (v === "auto") {
                                                   updateGristRow(r.id, {
                                                     mashRoastDehuskedOverride: null,
@@ -2303,12 +2296,13 @@ export default function RecipeEditPage() {
                                                   });
                                                 }
                                               }}
-                                              className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                                            >
-                                              <option value="auto">Auto (detect)</option>
-                                              <option value="force_husked">Force husked</option>
-                                              <option value="force_dehusked">Force dehusked/de-bittered</option>
-                                            </select>
+                                              options={[
+                                                { value: "auto", label: "Auto (detect)" },
+                                                { value: "force_husked", label: "Force husked" },
+                                                { value: "force_dehusked", label: "Force dehusked/de-bittered" },
+                                              ]}
+                                              width="full"
+                                            />
                                           </YStack>
                                           <YStack gap="$1" w={200} maxW="100%">
                                             <RecipeEditFieldLabel>Dehusked source</RecipeEditFieldLabel>
@@ -2606,16 +2600,16 @@ export default function RecipeEditPage() {
 
                                 <YStack gap="$1" minW={130}>
                                   <RecipeEditFieldLabel htmlFor={`hop-use-${r.id}`}>Use</RecipeEditFieldLabel>
-                                  <select
+                                  <BrewSelect
                                     id={`hop-use-${r.id}`}
                                     value={r.use}
-                                    onChange={(e) => updateHopRow(r.id, { use: e.target.value as HopUse })}
-                                    className="brew-recipe-edit-select"
-                                  >
-                                    <option value="boil">Boil</option>
-                                    <option value="whirlpool">Whirlpool</option>
-                                    <option value="dryhop">Dry hop</option>
-                                  </select>
+                                    onValueChange={(v) => updateHopRow(r.id, { use: v as HopUse })}
+                                    options={[
+                                      { value: "boil", label: "Boil" },
+                                      { value: "whirlpool", label: "Whirlpool" },
+                                      { value: "dryhop", label: "Dry hop" },
+                                    ]}
+                                  />
                                 </YStack>
 
                                 <YStack gap="$1" minW={90}>
@@ -2960,36 +2954,26 @@ export default function RecipeEditPage() {
 
                         <YStack gap="$1" w={180} maxW="100%" flexShrink={0}>
                           <RecipeEditFieldLabel htmlFor={`misc-type-${r.id}`}>Type</RecipeEditFieldLabel>
-                          <select
+                          <BrewSelect
                             id={`misc-type-${r.id}`}
                             value={r.type}
-                            onChange={(e) => updateMiscRow(r.id, { type: e.target.value as MiscType })}
-                            className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                            onValueChange={(v) => updateMiscRow(r.id, { type: v as MiscType })}
+                            options={miscTypeOptions}
                             aria-label={`Other ingredient type ${idx + 1}`}
-                          >
-                            {miscTypeOptions.map((o) => (
-                              <option key={o.value} value={o.value}>
-                                {o.label}
-                              </option>
-                            ))}
-                          </select>
+                            width="full"
+                          />
                         </YStack>
 
                         <YStack gap="$1" w={160} maxW="100%" flexShrink={0}>
                           <RecipeEditFieldLabel htmlFor={`misc-use-${r.id}`}>Use</RecipeEditFieldLabel>
-                          <select
+                          <BrewSelect
                             id={`misc-use-${r.id}`}
                             value={r.use}
-                            onChange={(e) => updateMiscRow(r.id, { use: e.target.value as MiscUse })}
-                            className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                            onValueChange={(v) => updateMiscRow(r.id, { use: v as MiscUse })}
+                            options={miscUseOptions}
                             aria-label={`Other ingredient use ${idx + 1}`}
-                          >
-                            {miscUseOptions.map((o) => (
-                              <option key={o.value} value={o.value}>
-                                {o.label}
-                              </option>
-                            ))}
-                          </select>
+                            width="full"
+                          />
                         </YStack>
 
                         <YStack gap="$1" w={140} maxW="100%" flexShrink={0}>
@@ -3014,16 +2998,17 @@ export default function RecipeEditPage() {
 
                         <YStack gap="$1" w={200} maxW="100%" flexShrink={0}>
                           <RecipeEditFieldLabel htmlFor={`misc-amount-is-weight-${r.id}`}>Amount kind</RecipeEditFieldLabel>
-                          <select
+                          <BrewSelect
                             id={`misc-amount-is-weight-${r.id}`}
                             value={r.amountIsWeight ? "weight" : "volume"}
-                            onChange={(e) => updateMiscRow(r.id, { amountIsWeight: e.target.value === "weight" })}
-                            className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                            onValueChange={(v) => updateMiscRow(r.id, { amountIsWeight: v === "weight" })}
+                            options={[
+                              { value: "weight", label: "Weight" },
+                              { value: "volume", label: "Volume" },
+                            ]}
                             aria-label={`Other ingredient amount kind ${idx + 1}`}
-                          >
-                            <option value="weight">Weight</option>
-                            <option value="volume">Volume</option>
-                          </select>
+                            width="full"
+                          />
                         </YStack>
 
                         <YStack gap="$1" w={180} maxW="100%" flexShrink={0}>

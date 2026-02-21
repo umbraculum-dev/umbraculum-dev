@@ -1,11 +1,20 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Button, SizableText, XStack, YStack } from "tamagui";
+import { Button, Input, SizableText, XStack, YStack } from "tamagui";
 
+import { BrewSelect } from "../../../../_components/BrewSelect";
 import { RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
 export type SaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";
+
+const SALT_OPTIONS: Array<{ value: SaltKey; label: string }> = [
+  { value: "gypsum", label: "Gypsum (CaSO4·2H2O)" },
+  { value: "calcium_chloride", label: "Calcium chloride (CaCl2·2H2O)" },
+  { value: "epsom", label: "Epsom (MgSO4·7H2O)" },
+  { value: "table_salt", label: "Table salt (NaCl)" },
+  { value: "baking_soda", label: "Baking soda (NaHCO3)" },
+];
 export type SaltAdditionRow = { saltKey: SaltKey; grams: number };
 
 export function SaltAdditionsEditor(props: {
@@ -33,32 +42,31 @@ export function SaltAdditionsEditor(props: {
                 <RecipeEditFieldLabel htmlFor={`${idPrefix}-salt-key-${idx}`}>
                   Salt
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id={`${idPrefix}-salt-key-${idx}`}
                   value={row.saltKey}
-                  onChange={(e) => updateRow(idx, { saltKey: e.target.value as SaltKey })}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  onValueChange={(v) => updateRow(idx, { saltKey: v as SaltKey })}
+                  options={SALT_OPTIONS}
                   disabled={disabled}
-                >
-                  <option value="gypsum">Gypsum (CaSO4·2H2O)</option>
-                  <option value="calcium_chloride">Calcium chloride (CaCl2·2H2O)</option>
-                  <option value="epsom">Epsom (MgSO4·7H2O)</option>
-                  <option value="table_salt">Table salt (NaCl)</option>
-                  <option value="baking_soda">Baking soda (NaHCO3)</option>
-                </select>
+                  width="full"
+                />
               </YStack>
               <YStack flex={1} minWidth={120} gap="$1.5">
                 <RecipeEditFieldLabel htmlFor={`${idPrefix}-salt-grams-${idx}`}>
                   {tUi("amountLabel", { unit: tUnits("g") })}
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id={`${idPrefix}-salt-grams-${idx}`}
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={row.grams}
-                  onChange={(e) => updateRow(idx, { grams: Number(e.target.value) })}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  keyboardType="decimal-pad"
+                  value={String(row.grams)}
+                  onChangeText={(text) => updateRow(idx, { grams: Number(text) || 0 })}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                   disabled={disabled}
                 />
               </YStack>

@@ -4,6 +4,7 @@ import { Link } from "../../../src/i18n/navigation";
 import { Button, Checkbox, Input, View, XStack, YStack } from "tamagui";
 import { SizableText } from "tamagui";
 
+import { BrewSelect } from "../../_components/BrewSelect";
 import { CodeInline } from "../../_components/CodeInline";
 import {
   RecipeEditFieldLabel,
@@ -237,21 +238,17 @@ export function MashStepsEditor({
                       {isSpargeStep ? (
                         <RecipeEditReadOnlyValue>Sparge</RecipeEditReadOnlyValue>
                       ) : (
-                        <select
+                        <BrewSelect
                           id={`mash-step-type-${r.id}`}
-                          className="brew-recipe-edit-select brew-recipe-edit-select-full"
                           value={r.type}
-                          onChange={(e) => onUpdateStep?.(r.id, { type: e.target.value as EditorMashStepType })}
-                        >
-                          {(hideSpargeFromTypeOptions
-                            ? MASH_STEP_TYPE_OPTIONS.filter((o) => o.value !== "sparge")
-                            : MASH_STEP_TYPE_OPTIONS
-                          ).map((o) => (
-                            <option key={o.value} value={o.value}>
-                              {o.label}
-                            </option>
-                          ))}
-                        </select>
+                          onValueChange={(v) => onUpdateStep?.(r.id, { type: v as EditorMashStepType })}
+                          options={
+                            hideSpargeFromTypeOptions
+                              ? MASH_STEP_TYPE_OPTIONS.filter((o) => o.value !== "sparge")
+                              : MASH_STEP_TYPE_OPTIONS
+                          }
+                          width="full"
+                        />
                       )}
                     </YStack>
                     <YStack gap="$1" minW={60}>

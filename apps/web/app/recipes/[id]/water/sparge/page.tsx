@@ -5,13 +5,14 @@ import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ModeFieldset } from "../_components/ModeFieldset";
 import { RecipeMetaLine } from "../_components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { Button, H1, H2, H3, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox, FieldBadge, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
@@ -654,25 +655,25 @@ export default function SpargeWaterPage() {
           </H2>
 
           <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
-            <XStack gap="$3" flexWrap="wrap">
+            <XStack gap="$3" flexWrap="wrap" ai="flex-end">
               <View width="100%" flexBasis="100%">
                 <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="sparge-profile">
                   Sparge water profile
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="sparge-profile"
                   value={spargeWaterProfileId}
-                  onChange={(e) => setSpargeWaterProfileId(e.target.value)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                >
-                  <option value="">(none)</option>
-                  {waterProfiles.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} [{p.scope}/{p.verificationStatus}]
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={setSpargeWaterProfileId}
+                  options={[
+                    { value: "", label: "(none)" },
+                    ...waterProfiles.map((p) => ({
+                      value: p.id,
+                      label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                    })),
+                  ]}
+                  width="full"
+                />
                 {selectedSpargeProfileInfo}
                 </YStack>
               </View>
@@ -695,17 +696,22 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="starting-alk">
                   {t("startingAlkalinityLabel", { unit: tUnits("ppmAsCaCO3") })}
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="starting-alk"
-                  type="number"
-                  inputMode="decimal"
-                  value={startingAlk}
-                  onChange={(e) => {
+                  keyboardType="decimal-pad"
+                  value={String(startingAlk)}
+                  onChangeText={(text) => {
                     setStartingAlkTouched(true);
-                    const n = Number(e.target.value);
+                    const n = Number(text);
                     setStartingAlk(Number.isFinite(n) ? n : 0);
                   }}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -714,14 +720,18 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="volume-l">
                   {t("waterVolumeLabel", { unit: tUnits("L") })}
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="volume-l"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.1}
-                  value={volumeLiters}
-                  onChange={(e) => setVolumeLiters(Number(e.target.value))}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  keyboardType="decimal-pad"
+                  value={String(volumeLiters)}
+                  onChangeText={(text) => setVolumeLiters(Number(text) || 0)}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -730,14 +740,18 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="starting-ph">
                   Starting pH
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="starting-ph"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
+                  keyboardType="decimal-pad"
                   value={startingPh}
-                  onChange={(e) => setStartingPh(e.target.value)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  onChangeText={setStartingPh}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -747,14 +761,18 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="target-ph">
                     Target pH
                   </RecipeEditFieldLabel>
-                  <input
+                  <Input
                     id="target-ph"
-                    type="number"
-                    inputMode="decimal"
-                    step={0.01}
-                    value={targetPh}
-                    onChange={(e) => setTargetPh(Number(e.target.value))}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                    keyboardType="decimal-pad"
+                    value={String(targetPh)}
+                    onChangeText={(text) => setTargetPh(Number(text) || 0)}
+                    size="$3"
+                    w="100%"
+                    bg="var(--surface)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    rounded="$2"
+                    fontFamily="$body"
                   />
                   </YStack>
                 </View>
@@ -764,21 +782,22 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="acid-type">
                   Acid type
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="acid-type"
                   value={acidType}
-                  onChange={(e) => setAcidType(e.target.value)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                >
-                  <option value="phosphoric">Phosphoric</option>
-                  <option value="lactic">Lactic</option>
-                  <option value="hydrochloric">Hydrochloric</option>
-                  <option value="sulfuric">Sulfuric</option>
-                  <option value="acetic">Acetic</option>
-                  <option value="citric">Citric (solid)</option>
-                  <option value="tartaric">Tartaric (solid)</option>
-                  <option value="malic">Malic (solid)</option>
-                </select>
+                  onValueChange={setAcidType}
+                  options={[
+                    { value: "phosphoric", label: "Phosphoric" },
+                    { value: "lactic", label: "Lactic" },
+                    { value: "hydrochloric", label: "Hydrochloric" },
+                    { value: "sulfuric", label: "Sulfuric" },
+                    { value: "acetic", label: "Acetic" },
+                    { value: "citric", label: "Citric (solid)" },
+                    { value: "tartaric", label: "Tartaric (solid)" },
+                    { value: "malic", label: "Malic (solid)" },
+                  ]}
+                  width="full"
+                />
                 </YStack>
               </View>
               <View flex={1} minWidth={200}>
@@ -786,17 +805,18 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="strength-kind">
                   Strength kind
                 </RecipeEditFieldLabel>
-                <select
+                <BrewSelect
                   id="strength-kind"
                   value={strengthKind}
-                  onChange={(e) => setStrengthKind(e.target.value as any)}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
-                >
-                  <option value="percent">Percent (%)</option>
-                  <option value="normality">Normality (N)</option>
-                  <option value="molarity">Molarity (M)</option>
-                  <option value="solid">Solid (pure)</option>
-                </select>
+                  onValueChange={(v) => setStrengthKind(v as "percent" | "normality" | "molarity" | "solid")}
+                  options={[
+                    { value: "percent", label: "Percent (%)" },
+                    { value: "normality", label: "Normality (N)" },
+                    { value: "molarity", label: "Molarity (M)" },
+                    { value: "solid", label: "Solid (pure)" },
+                  ]}
+                  width="full"
+                />
                 </YStack>
               </View>
               <View width="100%" flexBasis="100%">
@@ -804,15 +824,19 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="strength-value">
                   Strength value {strengthKind === "percent" ? "(whole %, e.g. 88)" : ""}
                 </RecipeEditFieldLabel>
-                <input
+                <Input
                   id="strength-value"
-                  type="number"
-                  inputMode="decimal"
-                  step={0.01}
-                  value={strengthValue}
-                  onChange={(e) => setStrengthValue(Number(e.target.value))}
+                  keyboardType="decimal-pad"
+                  value={String(strengthValue)}
+                  onChangeText={(text) => setStrengthValue(Number(text) || 0)}
                   disabled={strengthKind === "solid"}
-                  className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
                 />
                 </YStack>
               </View>
@@ -822,14 +846,18 @@ export default function SpargeWaterPage() {
                   <RecipeEditFieldLabel htmlFor="sparge-manual-acid-added">
                     Acid added ({strengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                   </RecipeEditFieldLabel>
-                  <input
+                  <Input
                     id="sparge-manual-acid-added"
-                    type="number"
-                    inputMode="decimal"
-                    step={0.1}
-                    value={spargeManualAcidAdded}
-                    onChange={(e) => setSpargeManualAcidAdded(Number(e.target.value))}
-                    className="brew-recipe-edit-select brew-recipe-edit-select-full"
+                    keyboardType="decimal-pad"
+                    value={String(spargeManualAcidAdded)}
+                    onChangeText={(text) => setSpargeManualAcidAdded(Number(text) || 0)}
+                    size="$3"
+                    w="100%"
+                    bg="var(--surface)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    rounded="$2"
+                    fontFamily="$body"
                   />
                   </YStack>
                 </View>

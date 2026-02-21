@@ -409,7 +409,7 @@ export default function EquipmentPage() {
 
               <fieldset className="brew-fieldset">
                 <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
-                <XStack gap="$3" flexWrap="wrap">
+                <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                   <View flex={1} minWidth={200}>
                     <YStack gap="$1.5">
                     <RecipeEditFieldLabel htmlFor="equip-edit-kettle-vol">
@@ -520,7 +520,7 @@ export default function EquipmentPage() {
 
               <fieldset className="brew-fieldset">
                 <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
-                <XStack gap="$3" flexWrap="wrap">
+                <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                   <View flex={1} minWidth={200}>
                     <YStack gap="$1.5">
                       <RecipeEditFieldLabel htmlFor="equip-edit-mash-vol">
@@ -652,7 +652,7 @@ export default function EquipmentPage() {
 
               <fieldset className="brew-fieldset">
                 <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
-                <XStack gap="$3" flexWrap="wrap">
+                <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                   <View flex={1} minWidth={200}>
                     <YStack gap="$1.5">
                       <RecipeEditFieldLabel htmlFor="equip-edit-other-losses">
@@ -733,7 +733,7 @@ export default function EquipmentPage() {
 
                 <fieldset className="brew-fieldset">
                   <legend className="brew-fieldset-legend">{t("sectionTitles.kettle")}</legend>
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                     <View flex={1} minWidth={200}>
                       <YStack gap="$1.5">
                         <RecipeEditFieldLabel htmlFor="equip-kettle-vol">
@@ -844,7 +844,7 @@ export default function EquipmentPage() {
 
                 <fieldset className="brew-fieldset">
                   <legend className="brew-fieldset-legend">{t("sectionTitles.mash")}</legend>
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                     <View flex={1} minWidth={200}>
                       <YStack gap="$1.5">
                       <RecipeEditFieldLabel htmlFor="equip-mash-vol">
@@ -976,7 +976,7 @@ export default function EquipmentPage() {
 
                 <fieldset className="brew-fieldset">
                   <legend className="brew-fieldset-legend">{t("sectionTitles.misc")}</legend>
-                  <XStack gap="$3" flexWrap="wrap">
+                  <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                     <View flex={1} minWidth={200}>
                       <YStack gap="$1.5">
                         <RecipeEditFieldLabel htmlFor="equip-other-losses">
