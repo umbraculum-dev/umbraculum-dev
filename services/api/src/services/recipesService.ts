@@ -33,6 +33,28 @@ export class RecipesService {
     this.accounts = new AccountsService(prisma);
   }
 
+  private async listLatestVersionsForAccount(accountId: string) {
+    const groups = await this.prisma.recipe.groupBy({
+      by: ["versionGroupId"],
+      where: { accountId },
+      _max: { version: true },
+    });
+
+    const latestKeys = groups
+      .map((g) => ({
+        accountId,
+        versionGroupId: g.versionGroupId,
+        version: g._max.version ?? 0,
+      }));
+
+    if (latestKeys.length === 0) return [];
+
+    return this.prisma.recipe.findMany({
+      where: { OR: latestKeys },
+      orderBy: { updatedAt: "desc" },
+    });
+  }
+
   private async resolveStyleKey(styleKeyRaw: string) {
     const styleKey = styleKeyRaw.trim();
     if (!styleKey) throw new BadRequestError("invalid_style_key", "Body.styleKey is required");
@@ -48,10 +70,7 @@ export class RecipesService {
   async listRecipes(userId: string, accountId: string) {
     await this.accounts.assertMembership(userId, accountId);
 
-    return this.prisma.recipe.findMany({
-      where: { accountId },
-      orderBy: { createdAt: "desc" },
-    });
+    return this.listLatestVersionsForAccount(accountId);
   }
 
   async getRecipe(userId: string, accountId: string, recipeId: string) {
@@ -62,6 +81,89 @@ export class RecipesService {
     });
     if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
     return recipe;
+  }
+
+  async listRecipeVersions(userId: string, accountId: string, recipeId: string) {
+    await this.accounts.assertMembership(userId, accountId);
+
+    const recipe = await this.getRecipe(userId, accountId, recipeId);
+    const versionGroupId = (recipe as any).versionGroupId ?? (recipe as any).id ?? recipeId;
+
+    return this.prisma.recipe.findMany({
+      where: { accountId, versionGroupId },
+      orderBy: { version: "desc" },
+      select: {
+        id: true,
+        version: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async createRecipeVersionFromCurrent(userId: string, accountId: string, recipeId: string) {
+    await this.accounts.assertMembership(userId, accountId);
+
+    const source = await this.getRecipe(userId, accountId, recipeId);
+    const versionGroupId = (source as any).versionGroupId ?? (source as any).id ?? recipeId;
+
+    return this.prisma.$transaction(async (tx) => {
+      const agg = await tx.recipe.aggregate({
+        where: { accountId, versionGroupId },
+        _max: { version: true },
+      });
+
+      const maxVersion = agg._max.version ?? 0;
+      if (maxVersion >= 99) {
+        throw new BadRequestError(
+          "max_versions_reached",
+          "Maximum versions reached (0–99)."
+        );
+      }
+
+      const nextVersion = maxVersion + 1;
+      const newRecipeId = crypto.randomUUID();
+
+      const created = await tx.recipe.create({
+        data: {
+          id: newRecipeId,
+          accountId,
+          versionGroupId,
+          version: nextVersion,
+          name: (source as any).name,
+          style: (source as any).style,
+          styleKey: (source as any).styleKey,
+          notes: (source as any).notes,
+          beerJsonRecipeJson: (source as any).beerJsonRecipeJson,
+          recipeExtJson: (source as any).recipeExtJson,
+        },
+      });
+
+      const sourceWater = await tx.recipeWaterSettings.findUnique({
+        where: { recipeId: (source as any).id },
+      });
+
+      if (sourceWater) {
+        const {
+          id,
+          recipeId: _sourceRecipeId,
+          createdAt,
+          updatedAt,
+          ...rest
+        } = sourceWater as any;
+
+        await tx.recipeWaterSettings.create({
+          data: {
+            ...rest,
+            recipeId: newRecipeId,
+            accountId,
+          },
+        });
+      }
+
+      return created;
+    });
   }
 
   private async createRecipeCore(accountId: string, input: CreateRecipeInput) {
@@ -117,9 +219,14 @@ export class RecipesService {
     // Enforce supported domain rules directly on BeerJSON (no legacy-row mapping).
     validateBeerJsonRecipeDomain(doc);
 
+    const recipeId = crypto.randomUUID();
+
     return this.prisma.recipe.create({
       data: {
+        id: recipeId,
         accountId,
+        versionGroupId: recipeId,
+        version: 0,
         name,
         style,
         styleKey,
@@ -153,10 +260,7 @@ export class RecipesService {
   }
 
   async listRecipesForAccount(accountId: string) {
-    return this.prisma.recipe.findMany({
-      where: { accountId },
-      orderBy: { createdAt: "desc" },
-    });
+    return this.listLatestVersionsForAccount(accountId);
   }
 
   async updateRecipe(userId: string, accountId: string, recipeId: string, input: UpdateRecipeInput) {

@@ -17,6 +17,7 @@ type RecipeGetResponse = {
   ok: true;
   recipe: {
     name?: unknown;
+    version?: unknown;
   };
 };
 
@@ -31,16 +32,28 @@ function extractRecipeName(data: unknown): string | null {
   return trimmed ? trimmed : null;
 }
 
+function extractRecipeVersion(data: unknown): number | null {
+  if (!data || typeof data !== "object") return null;
+  const d = data as Partial<RecipeGetResponse>;
+  const r = d.recipe;
+  if (!r || typeof r !== "object") return null;
+  const version = (r as any).version;
+  if (typeof version !== "number" || !Number.isInteger(version) || version < 0) return null;
+  return version;
+}
+
 export function RecipeMetaLine(props: Props) {
   const t = useTranslations("waterHub");
   const recipeId = props.recipeId;
   const enabled = props.enabled !== false;
 
   const [recipeName, setRecipeName] = useState<string | null>(null);
+  const [recipeVersion, setRecipeVersion] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setRecipeName(null);
+    setRecipeVersion(null);
 
     if (!enabled) return () => {};
     if (!recipeId) return () => {};
@@ -49,7 +62,11 @@ export function RecipeMetaLine(props: Props) {
       const res = await apiFetch(`/api/recipes/${recipeId}`);
       if (!res.ok) return;
       const name = extractRecipeName(res.data);
-      if (!cancelled) setRecipeName(name);
+      const version = extractRecipeVersion(res.data);
+      if (!cancelled) {
+        setRecipeName(name);
+        setRecipeVersion(version);
+      }
     })().catch(() => {});
 
     return () => {
@@ -68,6 +85,16 @@ export function RecipeMetaLine(props: Props) {
             {t("recipeName")}:{" "}
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" fontWeight="bold" as="span">
               {recipeName}
+            </SizableText>
+          </>
+        ) : null}
+        {recipeVersion !== null ? (
+          <>
+            {" "}
+            -{" "}
+            {t("recipeVersion")}:{" "}
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" fontWeight="bold" as="span">
+              {String(recipeVersion).padStart(2, "0")}
             </SizableText>
           </>
         ) : null}

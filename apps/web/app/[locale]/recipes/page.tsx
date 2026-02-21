@@ -10,7 +10,13 @@ import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
 
-type RecipeListItem = { id: string; accountId: string; name: string; style: string | null };
+type RecipeListItem = {
+  id: string;
+  accountId: string;
+  name: string;
+  style: string | null;
+  version?: number;
+};
 type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
 
 export default function RecipesPage() {
@@ -245,6 +251,15 @@ export default function RecipesPage() {
                       {r.style ? (
                         <SizableText color="var(--text-muted)"> ({r.style})</SizableText>
                       ) : null}
+                      {typeof r.version === "number" ? (
+                        <SizableText color="var(--text-muted)">
+                          {" "}
+                          · {t("versionShort")}{" "}
+                          <SizableText color="var(--text-muted)" fontWeight="bold" as="span">
+                            {String(r.version).padStart(2, "0")}
+                          </SizableText>
+                        </SizableText>
+                      ) : null}
                     </SizableText>
                     <Button
                       size="$3"
@@ -260,6 +275,7 @@ export default function RecipesPage() {
                   <XStack gap="$3" flexWrap="wrap">
                     <Link href={`/recipes/${r.id}/edit`}>{t("openEditor")}</Link>
                     <Link href={`/recipes/${r.id}/water`}>{t("openWater")}</Link>
+                    <Link href={`/recipes/${r.id}/versions`}>{t("openVersions")}</Link>
                   </XStack>
                   {deleteConfirmId === r.id ? (
                     <View className="brew-error-box" role="alert" mt="$1.5">

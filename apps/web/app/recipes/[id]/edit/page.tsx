@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "../../../../src/i18n/navigation";
+import { Link, useRouter } from "../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
@@ -59,10 +59,20 @@ type Recipe = {
   accountId: string;
   name: string;
   style: string | null;
+  version?: number;
+  versionGroupId?: string;
   styleKey?: string | null;
   notes: string | null;
   beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type RecipeVersionListItem = {
+  id: string;
+  version: number;
+  name: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -124,6 +134,7 @@ export default function RecipeEditPage() {
   const tUnits = useTranslations("units");
   const tWater = useTranslations("waterHub");
   const locale = useLocale();
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
   const authState = useRequireAuth({ requireActiveAccount: true });
@@ -236,6 +247,11 @@ export default function RecipeEditPage() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [analysis, setAnalysis] = useState<any | null>(null);
+  const [versions, setVersions] = useState<RecipeVersionListItem[] | null>(null);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [versionsError, setVersionsError] = useState<string | null>(null);
+  const [creatingVersion, setCreatingVersion] = useState(false);
+  const [createVersionError, setCreateVersionError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
   const [notes, setNotes] = useState("");
@@ -586,6 +602,33 @@ export default function RecipeEditPage() {
   }, [canCallAccountScoped, recipeId, visibilityRefreshTrigger]);
 
   useEffect(() => {
+    if (!canCallAccountScoped) return;
+    let cancelled = false;
+
+    (async () => {
+      setVersionsLoading(true);
+      setVersionsError(null);
+      try {
+        const res = await apiFetch(`/api/recipes/${recipeId}/versions`);
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const items = (res.data as any)?.versions;
+        if (!cancelled) setVersions(Array.isArray(items) ? (items as RecipeVersionListItem[]) : []);
+      } catch (err) {
+        if (!cancelled) {
+          setVersions(null);
+          setVersionsError(String(err));
+        }
+      } finally {
+        if (!cancelled) setVersionsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [canCallAccountScoped, recipeId, visibilityRefreshTrigger]);
+
+  useEffect(() => {
     if (authState.status !== "ready") return;
     let cancelled = false;
     (async () => {
@@ -904,6 +947,29 @@ export default function RecipeEditPage() {
       setSaveError(String(err));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const onCreateAnotherVersion = async () => {
+    if (!recipeId) return;
+    if (!canCallAccountScoped) return;
+    setCreateVersionError(null);
+    setCreatingVersion(true);
+    try {
+      const res = await apiFetch(`/api/recipes/${recipeId}/versions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const newId = (res.data as any)?.recipe?.id;
+      if (typeof newId !== "string" || !newId) {
+        throw new Error("Version create response is missing recipe.id");
+      }
+      router.push(`/recipes/${newId}/edit`);
+    } catch (err) {
+      setCreateVersionError(String(err));
+    } finally {
+      setCreatingVersion(false);
     }
   };
 
@@ -1285,18 +1351,35 @@ export default function RecipeEditPage() {
             >
               <View flex={1} minW={200}>
                 <RecipeEditField id="recipe-name" label="Name">
-                <Input
-                  id="recipe-name"
-                  value={name}
-                  onChangeText={setName}
-                  size="$3"
-                  w="100%"
-                  bg="var(--surface)"
-                  borderWidth={1}
-                  borderColor="var(--border)"
-                  rounded="$2"
-                  fontFamily="$body"
-                />
+                  <XStack gap="$2" items="center" flexWrap="wrap">
+                    <Input
+                      id="recipe-name"
+                      value={name}
+                      onChangeText={setName}
+                      size="$3"
+                      flex={1}
+                      minW={180}
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {t("versionLabel")}{" "}
+                      <SizableText
+                        size="$2"
+                        color="var(--text-muted)"
+                        fontFamily="$body"
+                        fontWeight="bold"
+                        as="span"
+                      >
+                        {typeof (recipe as any)?.version === "number"
+                          ? String((recipe as any).version).padStart(2, "0")
+                          : "—"}
+                      </SizableText>
+                    </SizableText>
+                  </XStack>
                 </RecipeEditField>
               </View>
               <View flex={1} minW={200}>
@@ -1341,6 +1424,38 @@ export default function RecipeEditPage() {
                   </SizableText>
                 ) : null}
               </XStack>
+            </YStack>
+
+            <YStack gap="$2" mt="$3">
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                {t("versionCreateNote")}
+              </SizableText>
+              <Button
+                onPress={onCreateAnotherVersion}
+                disabled={
+                  !canCallAccountScoped ||
+                  creatingVersion ||
+                  (Array.isArray(versions) && versions.some((v) => v.version >= 99))
+                }
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                fontFamily="$body"
+              >
+                {creatingVersion ? t("versionCreateWorking") : t("versionCreateButton")}
+              </Button>
+              {Array.isArray(versions) && versions.some((v) => v.version >= 99) ? (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  {t("versionLimitReached")}
+                </SizableText>
+              ) : null}
+              {(versionsError || createVersionError) ? (
+                <ErrorBox mt="$1.5">
+                  {createVersionError ? createVersionError : versionsError}
+                </ErrorBox>
+              ) : null}
             </YStack>
           </RecipeEditSection>
 

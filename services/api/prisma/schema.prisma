@@ -255,6 +255,10 @@ model Recipe {
   accountId String   @map("account_id")
   name      String
   style     String?
+  /** Version family id (all versions share this id). */
+  versionGroupId String @map("version_group_id")
+  /** Integer version number within `versionGroupId` (starts at 0). */
+  version   Int    @default(0)
   /** Canonical style reference (preferred). */
   styleKey  String?  @map("style_key")
   notes     String?  @db.Text
@@ -270,6 +274,8 @@ model Recipe {
   beerStyle     BeerStyle?           @relation(fields: [styleKey], references: [key], onDelete: Restrict)
 
   @@index([accountId])
+  @@index([accountId, versionGroupId])
+  @@unique([accountId, versionGroupId, version])
   @@index([styleKey])
   @@map("recipes")
 }

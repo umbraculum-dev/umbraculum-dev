@@ -54,6 +54,24 @@ export async function recipesRoutes(app: FastifyInstance) {
     return { ok: true, recipe: { ...recipe, analysis } };
   });
 
+  app.get("/recipes/:id/versions", async (req) => {
+    const ctx = requireActiveAccount(req);
+    const params = (req.params ?? {}) as { id?: unknown };
+    const id = typeof params.id === "string" ? params.id : "";
+
+    const versions = await recipes.listRecipeVersions(ctx.userId, ctx.activeAccountId, id);
+    return { ok: true, versions };
+  });
+
+  app.post("/recipes/:id/versions", async (req) => {
+    const ctx = requireActiveAccount(req);
+    const params = (req.params ?? {}) as { id?: unknown };
+    const id = typeof params.id === "string" ? params.id : "";
+
+    const created = await recipes.createRecipeVersionFromCurrent(ctx.userId, ctx.activeAccountId, id);
+    return { ok: true, recipe: created };
+  });
+
   app.patch("/recipes/:id", async (req) => {
     const ctx = requireActiveAccount(req);
     const params = (req.params ?? {}) as { id?: unknown };
