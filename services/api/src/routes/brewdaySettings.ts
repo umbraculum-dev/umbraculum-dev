@@ -12,6 +12,7 @@ function parseSections(body: unknown): BrewdaySectionConfig {
     return {
       presetExcludes: {},
       customSections: [],
+      customBrewingMethods: [],
     };
   }
   const obj = body as Record<string, unknown>;
@@ -22,7 +23,10 @@ function parseSections(body: unknown): BrewdaySectionConfig {
   const customSections = Array.isArray(obj.customSections)
     ? (obj.customSections as BrewdaySectionConfig["customSections"])
     : [];
-  return { presetExcludes, customSections };
+  const customBrewingMethods = Array.isArray(obj.customBrewingMethods)
+    ? (obj.customBrewingMethods as string[]).filter((x) => typeof x === "string")
+    : [];
+  return { presetExcludes, customSections, customBrewingMethods };
 }
 
 export async function brewdaySettingsRoutes(app: FastifyInstance) {
@@ -37,7 +41,7 @@ export async function brewdaySettingsRoutes(app: FastifyInstance) {
   app.patch("/brewday-settings", async (req) => {
     const ctx = requireActiveAccount(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
-    const brewingType = typeof body.brewingType === "string" ? body.brewingType : "all_grain";
+    const brewingType = typeof body.brewingType === "string" ? body.brewingType : "";
     const sections = parseSections(body.sections);
     const defaultSteps = Array.isArray(body.defaultSteps) ? (body.defaultSteps as BrewdayDefaultStep[]) : [];
     const customSteps = Array.isArray(body.customSteps) ? (body.customSteps as BrewdayCustomStep[]) : [];

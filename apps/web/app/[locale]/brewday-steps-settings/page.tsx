@@ -34,6 +34,7 @@ type PresetKey = (typeof PRESET_KEYS)[number];
 interface BrewdaySectionConfig {
   presetExcludes: Record<string, boolean>;
   customSections: { id: string; name: string; exclude: boolean }[];
+  customBrewingMethods?: string[];
 }
 
 interface BrewdayStep {
@@ -69,7 +70,7 @@ export default function BrewdayStepsSettingsPage() {
   const authState = useRequireAuth({ requireActiveAccount: true });
   const canCallAccountScoped = authState.status === "ready" && !!authState.me?.activeAccountId;
 
-  const [brewingType, setBrewingType] = useState<string>("all_grain");
+  const [brewingType, setBrewingType] = useState<string>("");
   const [sections, setSections] = useState<BrewdaySectionConfig>({
     presetExcludes: {},
     customSections: [],
@@ -86,6 +87,7 @@ export default function BrewdayStepsSettingsPage() {
   const [customStepName, setCustomStepName] = useState("");
   const [customStepMinutes, setCustomStepMinutes] = useState("");
   const [customStepSectionId, setCustomStepSectionId] = useState<string>("");
+  const [customBrewingMethodName, setCustomBrewingMethodName] = useState("");
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     brewdayStepsRecap: true,
@@ -127,14 +129,15 @@ export default function BrewdayStepsSettingsPage() {
         };
         const s = data?.settings;
         if (s) {
-          setBrewingType(s.brewingType ?? "all_grain");
+          if (s.brewingType != null) setBrewingType(s.brewingType);
           setSections(
-            s.sections ?? { presetExcludes: {}, customSections: [] }
+            s.sections ?? { presetExcludes: {}, customSections: [], customBrewingMethods: [] }
           );
           const loadedDefault = Array.isArray(s.defaultSteps) ? s.defaultSteps : [];
           setDefaultSteps(loadedDefault.length > 0 ? loadedDefault : DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
           setCustomSteps(Array.isArray(s.customSteps) ? s.customSteps : []);
         } else {
+          setSections({ presetExcludes: {}, customSections: [], customBrewingMethods: [] });
           setDefaultSteps(DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
         }
         setLoading(false);
@@ -182,6 +185,36 @@ export default function BrewdayStepsSettingsPage() {
       setSaving(false);
     }
   }, [canCallAccountScoped, brewingType, sections, defaultSteps, customSteps, t]);
+
+  const addBrewingMethodFromDropdown = () => {
+    const value = brewingType?.trim();
+    if (!value) return;
+    setSections((prev) => ({
+      ...prev,
+      customBrewingMethods: [...(prev.customBrewingMethods ?? []), value],
+    }));
+    setCustomBrewingMethodName("");
+  };
+
+  const addCustomBrewingMethod = () => {
+    const name = customBrewingMethodName.trim();
+    if (!name) return;
+    setSections((prev) => ({
+      ...prev,
+      customBrewingMethods: [...(prev.customBrewingMethods ?? []), name],
+    }));
+    setCustomBrewingMethodName("");
+  };
+
+  const removeBrewingMethodFromList = (index: number) => {
+    setSections((prev) => {
+      const list = prev.customBrewingMethods ?? [];
+      return {
+        ...prev,
+        customBrewingMethods: list.filter((_, i) => i !== index),
+      };
+    });
+  };
 
   const addCustomSection = () => {
     const name = customSectionName.trim();
@@ -311,10 +344,12 @@ export default function BrewdayStepsSettingsPage() {
     })),
   ];
 
-  const brewingTypeOptions = BREWING_TYPE_OPTIONS.map((o) => ({
-    value: o.value,
-    label: t(o.labelKey),
-  }));
+  const brewingTypeOptions = [
+    { value: "", label: "—" },
+    ...[...BREWING_TYPE_OPTIONS]
+      .map((o) => ({ value: o.value, label: t(o.labelKey) }))
+      .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" })),
+  ];
 
   const presetExcludes: Record<string, boolean> = {};
   for (const k of PRESET_KEYS) {
@@ -391,18 +426,112 @@ export default function BrewdayStepsSettingsPage() {
           open={openSections.brewingType}
           onOpenChange={(open) => setSectionOpen("brewingType", open)}
         >
-          <View>
-            <RecipeEditFieldLabel htmlFor="brewing-type-select">
-              {t("sections.brewingType.label")}
-            </RecipeEditFieldLabel>
-            <BrewSelect
-              id="brewing-type-select"
-              value={brewingType}
-              onValueChange={setBrewingType}
-              options={brewingTypeOptions}
-              width="full"
-            />
-          </View>
+          <XStack gap="$2" items="flex-end" flexWrap="wrap">
+            <View flex={1} minW={180}>
+              <RecipeEditFieldLabel htmlFor="brewing-type-select">
+                {t("sections.brewingType.label")}
+              </RecipeEditFieldLabel>
+              <BrewSelect
+                id="brewing-type-select"
+                value={brewingType}
+                onValueChange={setBrewingType}
+                options={brewingTypeOptions}
+                width="full"
+              />
+            </View>
+            <Button
+              size="$3"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              fontFamily="$body"
+              onPress={addBrewingMethodFromDropdown}
+              disabled={!canCallAccountScoped || !brewingType}
+              aria-label={`${t("add")} ${brewingType}`}
+            >
+              {t("add")}
+            </Button>
+          </XStack>
+          <XStack gap="$2" items="flex-end" flexWrap="wrap" mt="$3">
+            <View flex={1} minW={180}>
+              <RecipeEditFieldLabel htmlFor="add-custom-brewing-method">
+                {t("addCustomBrewingMethod")}
+              </RecipeEditFieldLabel>
+              <Input
+                id="add-custom-brewing-method"
+                value={customBrewingMethodName}
+                onChangeText={setCustomBrewingMethodName}
+                placeholder={t("name")}
+                size="$3"
+                w="100%"
+                bg="var(--surface)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                rounded="$2"
+                fontFamily="$body"
+              />
+            </View>
+            <Button
+              size="$3"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              fontFamily="$body"
+              onPress={addCustomBrewingMethod}
+              disabled={!canCallAccountScoped || !customBrewingMethodName.trim()}
+            >
+              {t("add")}
+            </Button>
+          </XStack>
+          <YStack gap="$2" mt="$3">
+            {(sections.customBrewingMethods ?? []).map((name, idx) => {
+              const preset = BREWING_TYPE_OPTIONS.find((o) => o.value === name);
+              const displayName = preset ? t(preset.labelKey) : name;
+              return (
+                <RecipeEditIngredientCard key={`${name}-${idx}`}>
+                  <XStack gap="$2" items="center" flexWrap="wrap">
+                    <SizableText
+                      size="$3"
+                      fontFamily="$body"
+                      color="var(--text)"
+                      flex={1}
+                      minW={0}
+                    >
+                      {displayName}
+                    </SizableText>
+                    <Button
+                      size="$2"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      fontFamily="$body"
+                      onPress={() => removeBrewingMethodFromList(idx)}
+                      aria-label={`${t("remove")} ${displayName}`}
+                    >
+                      {t("remove")}
+                    </Button>
+                  </XStack>
+                </RecipeEditIngredientCard>
+              );
+            })}
+          </YStack>
+          <XStack gap="$3" items="center" mt="$3">
+            <Button
+              size="$3"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              fontFamily="$body"
+              onPress={onSave}
+              disabled={!canCallAccountScoped || saving}
+            >
+              {saving ? t("saving") : t("save")}
+            </Button>
+          </XStack>
         </RecipeEditSection>
 
         <RecipeEditSection

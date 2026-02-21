@@ -946,6 +946,7 @@
       "accountRequired": "Select an account to continue.",
       "exclude": "Exclude",
       "addCustomSection": "Add custom section",
+      "addCustomBrewingMethod": "Add custom brewing method",
       "addCustomStep": "Add custom step",
       "assignedSection": "Assigned section",
       "minutes": "Minutes",
@@ -974,8 +975,8 @@
           "empty": "No brew steps yet."
         },
         "brewingType": {
-          "title": "Brewing type",
-          "label": "Brewing type"
+          "title": "Brewing methods",
+          "label": "Brewing method"
         },
         "brewdayStepsSections": {
           "title": "Brewday steps - sections",

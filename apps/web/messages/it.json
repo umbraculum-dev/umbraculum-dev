@@ -953,6 +953,7 @@
       "accountRequired": "Seleziona un account per continuare.",
       "exclude": "Escludi",
       "addCustomSection": "Aggiungi sezione personalizzata",
+      "addCustomBrewingMethod": "Aggiungi metodo di birra personalizzato",
       "addCustomStep": "Aggiungi step personalizzato",
       "assignedSection": "Sezione assegnata",
       "minutes": "Minuti",
@@ -981,8 +982,8 @@
           "empty": "Nessuno step per ora."
         },
         "brewingType": {
-          "title": "Tipo di birra",
-          "label": "Tipo di birra"
+          "title": "Metodi di birra",
+          "label": "Metodo di birra"
         },
         "brewdayStepsSections": {
           "title": "Step brewday - sezioni",

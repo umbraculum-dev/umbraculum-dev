@@ -15,10 +15,11 @@ const PRESET_KEYS = [
 
 export type PresetSectionKey = (typeof PRESET_KEYS)[number];
 
-/** Section config: preset excludes + custom sections. */
+/** Section config: preset excludes + custom sections + custom brewing methods. */
 export type BrewdaySectionConfig = {
   presetExcludes: Record<string, boolean>;
   customSections: BrewdayCustomSectionConfig[];
+  customBrewingMethods?: string[];
 };
 
 export type BrewdayCustomSectionConfig = {
@@ -75,7 +76,7 @@ function parseSectionsJson(val: unknown): BrewdaySectionConfig {
     for (const k of PRESET_KEYS) {
       presetExcludes[k] = false;
     }
-    return { presetExcludes, customSections: [] };
+    return { presetExcludes, customSections: [], customBrewingMethods: [] };
   }
   const obj = val as Record<string, unknown>;
   const presetExcludes: Record<string, boolean> = {};
@@ -92,7 +93,10 @@ function parseSectionsJson(val: unknown): BrewdaySectionConfig {
       name: typeof item.name === "string" ? item.name : "",
       exclude: item.exclude === true,
     }));
-  return { presetExcludes, customSections };
+  const customBrewingMethods = Array.isArray(obj.customBrewingMethods)
+    ? (obj.customBrewingMethods as string[]).filter((x) => typeof x === "string")
+    : [];
+  return { presetExcludes, customSections, customBrewingMethods };
 }
 
 function parseStepArray(
