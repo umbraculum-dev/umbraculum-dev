@@ -21,6 +21,7 @@ services:
       - web_node_modules:/app/node_modules
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
+      - ./packages/media:/packages/media:ro
 
   api:
     build: ./services/api
@@ -38,6 +39,7 @@ services:
       - ./services/api/node_modules:/app/node_modules
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
+      - ./packages/media:/packages/media:ro
 
   beerproto-sync:
     profiles: ["jobs"]

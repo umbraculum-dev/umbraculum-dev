@@ -1,0 +1,7 @@
+{
+  "name": "@brewery/media",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Shared media assets for web and native apps",
+  "files": ["assets", "README.md"]
+}

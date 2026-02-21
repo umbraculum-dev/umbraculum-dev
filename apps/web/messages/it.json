@@ -694,7 +694,7 @@
       "yeastNeedsPropagationNo": "No",
       "yeastPitchRateLabel": "Tasso di inoculo",
       "yeastPitchRateNone": "nessuno",
-      "yeastPitchRateNote": "Un tasso di inoculo più alto per lo stesso stile (Ale) è importante quando l'OG aumenta.",
+      "yeastPitchRateNote": "Un tasso di inoculo più alto per lo stesso stile (es. Ale, Lager, altri stili di birra, Mead) è importante quando l'OG aumenta.",
       "yeastPitchRateMfgRec035Ales": "Raccomandato produttore 0.35 (Ale)",
       "yeastPitchRateMfgRec05Ales": "Raccomandato produttore 0.5 (Ale)",
       "yeastPitchRatePro075Ales": "Pro Brewer 0.75 (Ale)",

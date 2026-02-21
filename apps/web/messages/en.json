@@ -687,7 +687,7 @@
       "yeastNeedsPropagationNo": "No",
       "yeastPitchRateLabel": "Pitch rate",
       "yeastPitchRateNone": "none",
-      "yeastPitchRateNote": "Higher pitching rate for same style (Ale) is important when OG increases.",
+      "yeastPitchRateNote": "Higher pitching rate for same style (i.e. Ale, Lager, other beer styles, Mead) is important when OG increases.",
       "yeastPitchRateMfgRec035Ales": "MFG Recommended 0.35 (Ales)",
       "yeastPitchRateMfgRec05Ales": "MFG Recommended 0.5 (Ales)",
       "yeastPitchRatePro075Ales": "Pro Brewer 0.75 (Ales)",

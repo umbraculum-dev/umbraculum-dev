@@ -37,7 +37,7 @@ export function ManualCellCountHelpBox({ t }: ManualCellCountHelpBoxProps) {
         <StepBlock step={1} title={t("yeastManualCellCountStep1Title")} body={t("yeastManualCellCountStep1Body")} />
         <View mt="$2">
           <img
-            src="/yeast/dilution-1-100.png"
+            src="/media/yeast/dilution-1-100.png"
             alt={t("yeastManualCellCountStep1ImageAlt")}
             loading="lazy"
             style={{ maxWidth: 320, width: "100%", height: "auto" }}
@@ -50,7 +50,7 @@ export function ManualCellCountHelpBox({ t }: ManualCellCountHelpBoxProps) {
         <StepBlock step={3} title={t("yeastManualCellCountStep3Title")} body={t("yeastManualCellCountStep3Body")} />
         <View mt="$2">
           <img
-            src="/yeast/hemocytometer-5-squares.png"
+            src="/media/yeast/hemocytometer-5-squares.png"
             alt={t("yeastManualCellCountStep3ImageAlt")}
             loading="lazy"
             style={{ maxWidth: 320, width: "100%", height: "auto" }}
