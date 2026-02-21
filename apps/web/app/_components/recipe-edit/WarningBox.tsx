@@ -4,26 +4,26 @@ import type { ReactNode } from "react";
 
 import { MessageBox } from "./MessageBox";
 
-export interface ErrorBoxProps {
+export interface WarningBoxProps {
   children: ReactNode;
-  role?: "alert";
+  role?: "status" | "alert";
   "aria-live"?: "polite";
   id?: string;
   mt?: string | number;
   mb?: string | number;
 }
 
-export function ErrorBox({
+export function WarningBox({
   children,
-  role = "alert",
+  role = "status",
   "aria-live": ariaLive,
   id,
   mt,
   mb,
-}: ErrorBoxProps) {
+}: WarningBoxProps) {
   return (
     <MessageBox
-      variant="error"
+      variant="warning"
       id={id}
       mt={mt}
       mb={mb}

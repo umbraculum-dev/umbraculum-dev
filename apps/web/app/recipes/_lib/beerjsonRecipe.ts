@@ -115,6 +115,8 @@ export type EditorYeastRow = {
   cellsPerLOverride?: number | null;
   /** Override cells per kg for dry (B/kg). Stored in recipeExtJson.yeastCellsPerKGOverrides. */
   cellsPerKGOverride?: number | null;
+  /** Manual hemocytometer count for slurry density. Stored in recipeExtJson.yeastManualCellCountOverrides. */
+  manualCellCount?: { dilutionFactor: 200 | 2000; aliveCells: number; totalCells: number } | null;
 };
 
 export type YeastSpeciesKey = EditorYeastRow["species"] extends infer S
@@ -175,6 +177,32 @@ export type YeastFormat = "dry" | "liquid" | "slurry";
  * Dry: amount_kg = cells_B / cells_per_kg
  * Uses override values when provided and valid; otherwise falls back to default constants.
  */
+/**
+ * Derive cells per L (B/L) from manual hemocytometer count (Step 5 formula).
+ * live cells/g = alive × 5 × DF × 10,000; B/L = live cells/g × 1000 / 1e9 = alive × DF × 0.05
+ *
+ * @param manual - dilutionFactor (200 or 2000), aliveCells, totalCells
+ * @returns B/L or null if invalid
+ */
+export function computeCellsPerLFromManualCount(manual: {
+  dilutionFactor: 200 | 2000;
+  aliveCells: number;
+  totalCells: number;
+}): number | null {
+  const { dilutionFactor, aliveCells, totalCells } = manual;
+  if (
+    !Number.isFinite(aliveCells) ||
+    aliveCells <= 0 ||
+    !Number.isFinite(totalCells) ||
+    totalCells <= 0 ||
+    aliveCells > totalCells
+  )
+    return null;
+  if (dilutionFactor !== 200 && dilutionFactor !== 2000) return null;
+  const cellsPerL = aliveCells * dilutionFactor * 0.05;
+  return Number.isFinite(cellsPerL) && cellsPerL > 0 ? cellsPerL : null;
+}
+
 export function computeAmountFromCellsB(
   cellsB: number,
   format: YeastFormat,

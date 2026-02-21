@@ -62,6 +62,7 @@ export default function YeastPage() {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [lowViabilityWarning, setLowViabilityWarning] = useState<number | null>(null);
 
   const [gristRows, setGristRows] = useState<EditorGristRow[]>([]);
   const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
@@ -136,6 +137,8 @@ export default function YeastPage() {
           ext && typeof ext === "object" ? (ext as any).yeastCellsPerKGOverrides : null;
         const yeastCellsPerGRaw =
           ext && typeof ext === "object" ? (ext as any).yeastCellsPerGOverrides : null;
+        const yeastManualCellCountRaw =
+          ext && typeof ext === "object" ? (ext as any).yeastManualCellCountOverrides : null;
 
         if (!(r as any).beerJsonRecipeJson) {
           throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
@@ -221,6 +224,29 @@ export default function YeastPage() {
                 ? (yeastCellsPerGRaw[row.id] as number) * 1000
                 : null;
             const cellsPerKGOverride = cellsPerKGFromKG ?? cellsPerKGFromG ?? null;
+            const manualRaw =
+              yeastManualCellCountRaw &&
+              typeof yeastManualCellCountRaw === "object" &&
+              yeastManualCellCountRaw[row.id] &&
+              typeof yeastManualCellCountRaw[row.id] === "object"
+                ? (yeastManualCellCountRaw[row.id] as { dilutionFactor?: number; aliveCells?: number; totalCells?: number })
+                : null;
+            const dilutionFactor =
+              manualRaw?.dilutionFactor === 200 || manualRaw?.dilutionFactor === 2000
+                ? (manualRaw.dilutionFactor as 200 | 2000)
+                : undefined;
+            const aliveCells =
+              typeof manualRaw?.aliveCells === "number" && Number.isFinite(manualRaw.aliveCells) && manualRaw.aliveCells > 0
+                ? manualRaw.aliveCells
+                : undefined;
+            const totalCells =
+              typeof manualRaw?.totalCells === "number" && Number.isFinite(manualRaw.totalCells) && manualRaw.totalCells > 0
+                ? manualRaw.totalCells
+                : undefined;
+            const manualCellCount =
+              dilutionFactor != null && aliveCells != null && totalCells != null
+                ? { dilutionFactor, aliveCells, totalCells }
+                : undefined;
             return {
               ...row,
               ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
@@ -233,6 +259,7 @@ export default function YeastPage() {
               needsPropagation: needsPropagation ?? undefined,
               cellsPerLOverride: cellsPerLOverride ?? undefined,
               cellsPerKGOverride: cellsPerKGOverride ?? undefined,
+              manualCellCount: manualCellCount ?? undefined,
             };
           }) as EditorYeastRow[],
         );
@@ -336,6 +363,27 @@ export default function YeastPage() {
       )
       .map((r) => [r.id, r.cellsPerKGOverride as number]),
   );
+  const yeastManualCellCountOverrides = Object.fromEntries(
+    yeastRows
+      .filter(
+        (r) =>
+          r.manualCellCount != null &&
+          (r.manualCellCount.dilutionFactor === 200 || r.manualCellCount.dilutionFactor === 2000) &&
+          Number.isFinite(r.manualCellCount.aliveCells) &&
+          r.manualCellCount.aliveCells > 0 &&
+          Number.isFinite(r.manualCellCount.totalCells) &&
+          r.manualCellCount.totalCells > 0 &&
+          r.manualCellCount.aliveCells <= r.manualCellCount.totalCells,
+      )
+      .map((r) => [
+        r.id,
+        {
+          dilutionFactor: r.manualCellCount!.dilutionFactor,
+          aliveCells: r.manualCellCount!.aliveCells,
+          totalCells: r.manualCellCount!.totalCells,
+        },
+      ]),
+  );
 
   const updateYeastRow = (id: string, patch: Partial<EditorYeastRow>) =>
     setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
@@ -348,6 +396,7 @@ export default function YeastPage() {
     setSaving(true);
     setSaveError(null);
     setSaveStatus(null);
+    setLowViabilityWarning(null);
     try {
       const extBase = (recipe as any)?.recipeExtJson;
       const extBaseForSave =
@@ -415,6 +464,11 @@ export default function YeastPage() {
       } else {
         delete extBaseForSave.yeastCellsPerKGOverrides;
       }
+      if (Object.keys(yeastManualCellCountOverrides).length) {
+        extBaseForSave.yeastManualCellCountOverrides = yeastManualCellCountOverrides;
+      } else {
+        delete extBaseForSave.yeastManualCellCountOverrides;
+      }
       delete (extBaseForSave as any).yeastCellsPerGOverrides;
 
       const batchSizeLiters =
@@ -460,6 +514,20 @@ export default function YeastPage() {
       const r = (reload.data as any).recipe as Recipe;
       setRecipe(r);
       setSaveStatus(t("status.saved"));
+      let minViability: number | null = null;
+      for (const row of yeastRows) {
+        if (
+          row.format === "slurry" &&
+          row.manualCellCount &&
+          row.manualCellCount.totalCells > 0 &&
+          Number.isFinite(row.manualCellCount.aliveCells)
+        ) {
+          const v =
+            (row.manualCellCount.aliveCells / row.manualCellCount.totalCells) * 100;
+          if (v < 85 && (minViability == null || v < minViability)) minViability = v;
+        }
+      }
+      if (minViability != null) setLowViabilityWarning(minViability);
     } catch (err) {
       setSaveError(String(err));
     } finally {
@@ -528,6 +596,7 @@ export default function YeastPage() {
             tUnits={tUnits}
             locale={locale}
             formatFixed={formatFixed}
+            lowViabilityWarning={lowViabilityWarning}
           />
           <ManualCellCountHelpBox t={t} />
           {saveError ? (

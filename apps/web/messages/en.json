@@ -422,7 +422,27 @@
     "yeast": {
       "estimatedCells": {
         "title": "Estimated cells needed (B)",
-        "body": "cells_B = batch_size_L × OG_plato × pitch_rate\n\nWhere:\n- batch_size_L: kettle/batch volume in liters\n- OG_plato: original gravity converted to °Plato\n- pitch_rate: million cells per mL per °Plato (e.g. 0.75 for Pro Brewer 0.75 Ales)\n\nB = billions of cells."
+        "body": "cells_B = batch_size_L × OG_plato × pitch_rate\n\nWhere:\n- batch_size_L: kettle/batch volume in liters\n- OG_plato: original gravity converted to °Plato\n- pitch_rate: million cells per mL per °Plato (e.g. 0.75 for Pro Brewer 0.75 Ales)\n\nB = billions of cells.\n\nNote: When 'Use Manual count for slurry density and viability (from alive/total cells)' is active for slurry (via selecting inputs in its section), 'Estimated cells needed (B)' is unchanged. Only slurry density (and thus Amount L) comes from the manual count."
+      },
+      "amountL": {
+        "title": "Amount (L) for liquid/slurry",
+        "body": "amount_L = cells_B / cells_per_L\n\nWhere cells_B comes from batch × OG × pitch rate (unchanged by the manual count feature) then cells_per_L is the slurry/liquid density in billions per liter.\n\nWhen 'Use Manual count' is active for slurry, cells_per_L is derived from: alive cells × 5 × DF × 10,000 → live cells/g; then B/L = live cells/g × 1000 / 1e9. This directly influences Amount (L)."
+      },
+      "manualCountViability": {
+        "title": "Calculated % viability",
+        "body": "viability_% = (alive cells / total cells) × 100\n\nWhere alive and total are raw counts from the five hemocytometer squares.\n\nSee Manual cell count methodology (hemocytometer) below for full procedure."
+      },
+      "manualCountLiveCellsPerGram": {
+        "title": "Calculated live cells per gram of suspension",
+        "body": "live cells/g = alive × 5 × DF × 10,000\n\nWhere alive is the raw count of live cells, DF is the dilution factor (200× or 2000×).\n\nSee Manual cell count methodology (hemocytometer) below for full procedure."
+      },
+      "manualCountAliveInfluence": {
+        "title": "Influences pitching Amount (L)",
+        "body": "Alive cells directly influences pitching Amount (L): it’s used to derive cells/L from the manual count (cells_per_L = alive × DF × 0.05)."
+      },
+      "manualCountTotalInfluence": {
+        "title": "Does not influence Amount (L)",
+        "body": "Total cells does not directly influence Amount (L). It’s used to compute viability (alive/total × 100). Low viability should prompt a careful vitality check."
       }
     },
     "sparge": {
@@ -663,7 +683,7 @@
       "yeastNameLabel": "Name",
       "yeastAmountLabel": "Amount ({unit})",
       "yeastFermentationTempLabel": "Fermentation temp. ({unit})",
-      "yeastOxygenationLabel": "Oxygenation",
+      "yeastOxygenationLabel": "Needs Oxygenation",
       "yeastOxygenationYes": "Yes",
       "yeastOxygenationNo": "No",
       "yeastDiacetylRestLabel": "Diacetyl rest",
@@ -682,6 +702,7 @@
       "yeastEstimatedCellsLabel": "Estimated cells needed (B)",
       "yeastEstimatedCellsTooltip": "B = billions of cells. Based on batch size × OG (°Plato) × pitch rate.",
       "yeastEstimatedCellsValue": "{value} B",
+      "yeastAmountCalcBreakdown": "cells_B / cells_per_L = {cellsB} / {cellsPerL} = {amountL} L",
       "yeastNeedsPropagationLabel": "Needs Propagation",
       "yeastNeedsPropagationYes": "Yes",
       "yeastNeedsPropagationNo": "No",
@@ -718,6 +739,21 @@
       "yeastManualCellCountGlossaryTitle": "Glossary",
       "yeastManualCellCountGlossary": "HL = Hectoliters of wort\nDF = Dilution factor\nPR = Pitch rate (cells/mL/°P): Ale ~1.0×10⁶, Lager ~1.5×10⁶\n°P = Plato (density/4)\ng / 1000 = kg",
       "yeastManualCellCountReference": "For a more detailed methodology, refer to ASBC Methods, Yeast 4: Microscopic Yeast Cell Counting.",
+      "yeastManualCountSectionTitle": "Use Manual count for slurry density and viability (from alive/total cells)",
+      "yeastManualCountFirstNote": "By choosing manual count to derive cells per L, the field 'Estimated cells needed (B)' is unchanged; only the slurry density (and thus Amount (L)) comes from the manual count. This fully reuses existing formulas and logic.",
+      "yeastManualCountDirectlyInfluencesAmount": "These inputs directly influence Amount (L).",
+      "yeastManualCountDFLabel": "DF (Dilution factor)",
+      "yeastManualCountDF200": "200×",
+      "yeastManualCountDF2000": "2000×",
+      "yeastManualCountAliveCellsLabel": "Alive cells",
+      "yeastManualCountTotalCellsLabel": "Total cells",
+      "yeastManualCountTotalTooLow": "Must be ≥ Alive cells (viability ≤ 100%)",
+      "yeastManualCountViabilityLabel": "Viability (%)",
+      "yeastManualCountCalculatedViabilityLabel": "Calculated % viability",
+      "yeastManualCountCalculatedLiveCellsPerGramLabel": "Calculated live cells per gram of suspension",
+      "yeastManualCountSaveCalculatedValues": "Save calculated values",
+      "yeastLowViabilityWarning": "Vitality is {pct}%: consider a viability check.",
+      "yeastManualCountDisclaimer": "DISCLAIMER: calculations never replace experience and common sense: use your experience to compare to previous batches: a calculation is meant to confirm you're using the right approach and for fine tuning procedures and is BY NO MEANS meant to replace empiric controls and experience. Never trust numbers alone and use them for validation instead.",
       "otherHelp": "Spices, finings, flavorings, etc.",
       "waterHelp": "The full mash chemistry + water calculator lives on its own page (not embedded here).",
       "waterProfilesManageText": "Manage profiles on",

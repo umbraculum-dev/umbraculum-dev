@@ -11,6 +11,11 @@ export const mathExplain = {
   "analysis.attenuation": { titleKey: "analysis.attenuation.title" },
   "analysis.pbg": { titleKey: "analysis.pbg.title" },
   "yeast.estimatedCells": { titleKey: "yeast.estimatedCells.title" },
+  "yeast.amountL": { titleKey: "yeast.amountL.title" },
+  "yeast.manualCountViability": { titleKey: "yeast.manualCountViability.title" },
+  "yeast.manualCountLiveCellsPerGram": { titleKey: "yeast.manualCountLiveCellsPerGram.title" },
+  "yeast.manualCountAliveInfluence": { titleKey: "yeast.manualCountAliveInfluence.title" },
+  "yeast.manualCountTotalInfluence": { titleKey: "yeast.manualCountTotalInfluence.title" },
 } as const;
 
 export type MathExplainKey = keyof typeof mathExplain;

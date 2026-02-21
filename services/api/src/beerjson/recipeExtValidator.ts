@@ -159,6 +159,23 @@ const recipeExtSchemaV1 = {
       additionalProperties: { type: "number", exclusiveMinimum: 0 },
     },
     /**
+     * Per-yeast-row manual hemocytometer count for slurry density. Keyed by BeerJSON culture_additions[*].id.
+     * When present for slurry, derives cells_per_L and directly influences Amount (L). B is unchanged.
+     */
+    yeastManualCellCountOverrides: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          dilutionFactor: { type: "number", enum: [200, 2000] },
+          aliveCells: { type: "number", exclusiveMinimum: 0 },
+          totalCells: { type: "number", exclusiveMinimum: 0 },
+        },
+        required: ["dilutionFactor", "aliveCells", "totalCells"],
+      },
+    },
+    /**
      * Snapshot provenance for `equipment`.
      * - We snapshot/copy from an account-scoped equipment template (no live reference).
      * - This records which template was copied and when, enabling an explicit “reload template” action.

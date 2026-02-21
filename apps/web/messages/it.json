@@ -429,7 +429,27 @@
     "yeast": {
       "estimatedCells": {
         "title": "Cellule stimate necessarie (B)",
-        "body": "cells_B = batch_size_L × OG_plato × pitch_rate\n\nDove:\n- batch_size_L: volume kettle/batch in litri\n- OG_plato: gravità originale convertita in °Plato\n- pitch_rate: milioni di cellule per mL per °Plato (es. 0,75 per Pro Brewer 0,75 Ales)\n\nB = miliardi di cellule."
+        "body": "cells_B = batch_size_L × OG_plato × pitch_rate\n\nDove:\n- batch_size_L: volume kettle/batch in litri\n- OG_plato: gravità originale convertita in °Plato\n- pitch_rate: milioni di cellule per mL per °Plato (es. 0,75 per Pro Brewer 0,75 Ales)\n\nB = miliardi di cellule.\n\nNota: Quando 'Usa conta manuale per densità sospensione e vitalità (da cellule vive/totali)' è attivo per la sospensione (selezionando gli input nella sua sezione), 'Cellule stimate necessarie (B)' non cambia. Solo la densità della sospensione (e quindi Quantità L) deriva dalla conta manuale."
+      },
+      "amountL": {
+        "title": "Quantità (L) per liquido/sospensione",
+        "body": "quantità_L = cells_B / cells_per_L\n\nDove cells_B deriva da batch × OG × pitch rate (invariato dalla funzione di conta manuale) poi cells_per_L è la densità sospensione/liquido in miliardi per litro.\n\nQuando 'Usa conta manuale' è attivo per la sospensione, cells_per_L si deriva da: cellule vive × 5 × DF × 10.000 → cellule vive/g; poi B/L = cellule vive/g × 1000 / 1e9. Questo influenza direttamente la Quantità (L)."
+      },
+      "manualCountViability": {
+        "title": "Vitalità % calcolata",
+        "body": "vitalità_% = (cellule vive / cellule totali) × 100\n\nDove cellule vive e totali sono i conteggi grezzi dai cinque quadrati dell'emocitometro.\n\nVedi Metodologia conta manuale (emocitometro) sotto per la procedura completa."
+      },
+      "manualCountLiveCellsPerGram": {
+        "title": "Cellule vive per grammo di sospensione (calcolate)",
+        "body": "cellule vive/g = cellule vive × 5 × DF × 10.000\n\nDove cellule vive è il conteggio grezzo delle cellule vive, DF è il fattore di diluizione (200× o 2000×).\n\nVedi Metodologia conta manuale (emocitometro) sotto per la procedura completa."
+      },
+      "manualCountAliveInfluence": {
+        "title": "Influisce sulla Quantità (L) da inoculare",
+        "body": "Le cellule vive influenzano direttamente la Quantità (L): vengono usate per derivare le cellule/L dalla conta manuale (cells_per_L = cellule vive × DF × 0,05)."
+      },
+      "manualCountTotalInfluence": {
+        "title": "Non influenza la Quantità (L)",
+        "body": "Le cellule totali non influenzano direttamente la Quantità (L). Servono a calcolare la vitalità (cellule vive/totali × 100). Una vitalità bassa richiede una verifica attenta della vitalità/attività del lievito."
       }
     },
     "sparge": {
@@ -670,7 +690,7 @@
       "yeastNameLabel": "Nome",
       "yeastAmountLabel": "Quantità ({unit})",
       "yeastFermentationTempLabel": "Temp. fermentazione ({unit})",
-      "yeastOxygenationLabel": "Ossigenazione",
+      "yeastOxygenationLabel": "Richiede ossigenazione",
       "yeastOxygenationYes": "Sì",
       "yeastOxygenationNo": "No",
       "yeastDiacetylRestLabel": "Diacetil rest",
@@ -689,6 +709,7 @@
       "yeastEstimatedCellsLabel": "Cellule stimate necessarie (B)",
       "yeastEstimatedCellsTooltip": "B = miliardi di cellule. Basato su volume × OG (°Plato) × tasso di inoculo.",
       "yeastEstimatedCellsValue": "{value} B",
+      "yeastAmountCalcBreakdown": "cells_B / cells_per_L = {cellsB} / {cellsPerL} = {amountL} L",
       "yeastNeedsPropagationLabel": "Richiede propagazione",
       "yeastNeedsPropagationYes": "Sì",
       "yeastNeedsPropagationNo": "No",
@@ -725,6 +746,21 @@
       "yeastManualCellCountGlossaryTitle": "Glossario",
       "yeastManualCellCountGlossary": "HL = Ettolitri di mosto\nDF = Fattore di diluizione\nPR = Tasso di inoculo (cellule/mL/°P): Ale ~1,0×10⁶, Lager ~1,5×10⁶\n°P = Plato (densità/4)\ng / 1000 = kg",
       "yeastManualCellCountReference": "Per una metodologia più dettagliata, fare riferimento a Metodi ASBC, Yeast 4: Microscopic Yeast Cell Counting.",
+      "yeastManualCountSectionTitle": "Usa conta manuale per densità sospensione e vitalità (da cellule vive/totali)",
+      "yeastManualCountFirstNote": "Scegliendo la conta manuale per derivare le cellule per L, il campo 'Cellule stimate necessarie (B)' non cambia; solo la densità della sospensione (e quindi Quantità L) deriva dalla conta manuale. Riusa completamente le formule e la logica esistenti.",
+      "yeastManualCountDirectlyInfluencesAmount": "Questi campi influenzano direttamente la Quantità (L).",
+      "yeastManualCountDFLabel": "DF (Fattore di diluizione)",
+      "yeastManualCountDF200": "200×",
+      "yeastManualCountDF2000": "2000×",
+      "yeastManualCountAliveCellsLabel": "Cellule vive",
+      "yeastManualCountTotalCellsLabel": "Cellule totali",
+      "yeastManualCountTotalTooLow": "Deve essere ≥ Cellule vive (vitalità ≤ 100%)",
+      "yeastManualCountViabilityLabel": "Vitalità (%)",
+      "yeastManualCountCalculatedViabilityLabel": "Vitalità % calcolata",
+      "yeastManualCountCalculatedLiveCellsPerGramLabel": "Cellule vive per grammo di sospensione (calcolate)",
+      "yeastManualCountSaveCalculatedValues": "Salva valori calcolati",
+      "yeastLowViabilityWarning": "Vitalità {pct}%: considera una verifica di vitalità.",
+      "yeastManualCountDisclaimer": "DISCLAIMER: i calcoli non sostituiscono mai l’esperienza e il buon senso: usa la tua esperienza per confrontare con i lotti precedenti. Un calcolo serve a confermare che stai seguendo l’approccio giusto e a fare fine-tuning delle procedure e NON è in alcun modo pensato per sostituire controlli empirici ed esperienza. Non fidarti mai solo dei numeri: usali invece per validare.",
       "otherHelp": "Spezie, chiarificanti, aromi, ecc.",
       "waterHelp": "Il calcolatore completo (chimica mash + acqua) vive in una pagina dedicata (non integrata qui).",
       "waterProfilesManageText": "Gestisci i profili su",

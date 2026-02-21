@@ -49,6 +49,23 @@ amount_L = cells_B / cells_per_L
 
 **Overridable:** The user can override `cells_per_L` per yeast row via "Cells per L (overridable)". Stored in `recipeExtJson.yeastCellsPerLOverrides`.
 
+## Use Manual count for slurry density and viability
+
+By choosing manual count to derive cells per L, the field **Estimated cells needed (B)** is unchanged; only the slurry density (and thus Amount (L)) comes from the manual count. This fully reuses existing formulas and logic.
+
+**Formulas (from hemocytometer methodology Step 5):**
+
+```
+live cells/g = alive × 5 × DF × 10,000
+cells_per_L (B/L) = live cells/g × 1000 / 1e9 = alive × DF × 0.05
+```
+
+**Inputs:** DF (dilution factor: 200× or 2000×), alive cells, total cells (raw counts from five hemocytometer squares).
+
+**Storage:** `recipeExtJson.yeastManualCellCountOverrides` keyed by yeast row ID. When present for a slurry row, it **directly influences Amount (L)** via `amount_L = cells_B / cells_per_L`.
+
+Viability (%) = (alive cells / total cells) × 100 (display only).
+
 ## Amount (kg) for Dry
 
 **Formula:**
@@ -79,10 +96,12 @@ flowchart LR
     pitchRate[pitch rate preset]
     format[format: dry/liquid/slurry]
     cellsPerL[cellsPerL override]
+    manualCount[manualCellCount: DF, alive, total]
     cellsPerKG[cellsPerKG override]
   end
   subgraph Calc
-    cellsB[cells_B = batch × OG_plato × rate]
+    cellsB[cells_B unchanged]
+    derivedCellsPerL[derived cells_per_L from manual]
     amount[amount_L or amount_kg]
   end
   batchSize --> cellsB
@@ -90,9 +109,36 @@ flowchart LR
   pitchRate --> cellsB
   cellsB --> amount
   format --> amount
-  cellsPerL --> amount
+  manualCount -->|when slurry| derivedCellsPerL
+  derivedCellsPerL --> amount
+  cellsPerL -->|when no manual| amount
   cellsPerKG --> amount
   amount --> RowState[yeast row amountL or amountKg]
+```
+
+## Worked example (manual count)
+
+**Inputs:**
+- Batch: 20 L
+- OG: 1.048 SG → 12°Plato
+- Pitch rate: Pro Brewer 0.75 Ales → 0.75 million cells/mL/°P
+- Manual count: alive=50, total=60, DF=200×
+
+**Step 1 – cells_B:**
+```
+cells_B = 20 × 12 × 0.75 = 180 billion
+```
+
+**Step 2 – cells_per_L (from manual):**
+```
+live cells/g = 50 × 5 × 200 × 10,000 = 500,000,000
+cells_per_L = 500,000,000 × 1000 / 1e9 = 500 B/L
+```
+Or directly: `cells_per_L = alive × DF × 0.05 = 50 × 200 × 0.05 = 500 B/L`
+
+**Step 3 – amount_L:**
+```
+amount_L = 180 / 500 = 0.36 L
 ```
 
 ## Source of Defaults

@@ -11,16 +11,19 @@ import { MathHelpPopover } from "../../_components/MathHelpPopover";
 import { apiFetch } from "../../_lib/apiClient";
 import {
   ErrorBox,
+  FieldBadge,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
   RecipeEditReadOnlyValue,
   RecipeEditSummary,
+  WarningBox,
 } from "../../_components/recipe-edit";
 import {
   CELLS_PER_KG_DRY,
   CELLS_PER_L_LIQUID,
   CELLS_PER_L_SLURRY,
   computeAmountFromCellsB,
+  computeCellsPerLFromManualCount,
   computeEstimatedCellsB,
   PITCH_RATE_TO_MILLION_CELLS_PER_ML_P,
   YEAST_PITCH_RATE_OPTIONS,
@@ -60,6 +63,8 @@ type YeastEditorProps = {
   /** For locale-aware number formatting (e.g. Amount L/g). */
   locale?: string;
   formatFixed?: (locale: string, value: number, decimals: number) => string;
+  /** Show low viability warning after save (yeast page only). */
+  lowViabilityWarning?: number | null;
 };
 
 function newRowId(): string {
@@ -92,6 +97,7 @@ export function YeastEditor({
   tUnits = (k: string) => k,
   locale = "en",
   formatFixed: formatFixedProp,
+  lowViabilityWarning = null,
 }: YeastEditorProps) {
   const formatAmount = (value: number, decimals: number) =>
     formatFixedProp ? formatFixedProp(locale, value, decimals) : String(roundTo(value, decimals));
@@ -302,6 +308,8 @@ export function YeastEditor({
       tAnalysis={tAnalysis}
       tUnits={tUnits}
       formatAmount={formatAmount}
+      locale={locale}
+      lowViabilityWarning={lowViabilityWarning}
     />
   );
 }
@@ -326,6 +334,8 @@ type YeastEditorEditableProps = {
   tAnalysis: (key: string) => string;
   tUnits: (key: string) => string;
   formatAmount: (value: number, decimals: number) => string;
+  locale: string;
+  lowViabilityWarning?: number | null;
 };
 
 function YeastEditorEditable({
@@ -347,8 +357,18 @@ function YeastEditorEditable({
   tAnalysis,
   tUnits,
   formatAmount,
+  locale,
+  lowViabilityWarning = null,
 }: YeastEditorEditableProps) {
   const tMath = useTranslations("math");
+  const firstManualCountRowIdx = yeastRows.findIndex(
+    (r) =>
+      r.format === "slurry" &&
+      r.manualCellCount &&
+      r.manualCellCount.aliveCells > 0 &&
+      r.manualCellCount.totalCells > 0 &&
+      (r.manualCellCount.dilutionFactor === 200 || r.manualCellCount.dilutionFactor === 2000),
+  );
   const [yeastQuery, setYeastQuery] = useState("");
   const [yeastResults, setYeastResults] = useState<any[]>([]);
   const [yeastSearching, setYeastSearching] = useState(false);
@@ -393,6 +413,9 @@ function YeastEditorEditable({
     onAddRow();
   };
 
+  const [amountRecalcTrigger, setAmountRecalcTrigger] = useState(0);
+  const requestAmountRecalc = () => setAmountRecalcTrigger((n) => n + 1);
+
   useEffect(() => {
     for (const r of yeastRows) {
       const format = r.format === "dry" || r.format === "liquid" || r.format === "slurry" ? r.format : null;
@@ -404,10 +427,14 @@ function YeastEditorEditable({
         r.pitchRate as YeastPitchRateKey,
       );
       if (cellsB == null) continue;
+      const cellsPerLOverride =
+        format === "slurry" && r.manualCellCount
+          ? computeCellsPerLFromManualCount(r.manualCellCount)
+          : r.cellsPerLOverride;
       const { amountL, amountKg } = computeAmountFromCellsB(
         cellsB,
         format,
-        r.cellsPerLOverride,
+        cellsPerLOverride,
         r.cellsPerKGOverride,
       );
       if (format === "dry" && amountKg != null) {
@@ -418,7 +445,7 @@ function YeastEditorEditable({
         if (curr == null || Math.abs(curr - amountL) > 0.0001) onUpdateRow(r.id, { amountL });
       }
     }
-  }, [yeastRows, batchSizeForCells, analysisOg, onUpdateRow]);
+  }, [yeastRows, batchSizeForCells, analysisOg, onUpdateRow, amountRecalcTrigger]);
 
   return (
     <View>
@@ -692,11 +719,22 @@ function YeastEditorEditable({
                     />
                   </YStack>
                   <YStack gap="$1" minW={100}>
-                    <RecipeEditFieldLabel htmlFor={`yeast-amount-${r.id}`}>
-                      {t("yeastAmountLabel", {
-                        unit: r.format === "dry" ? tUnits("kg") : tUnits("L"),
-                      })}
-                    </RecipeEditFieldLabel>
+                    <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+                      <RecipeEditFieldLabel htmlFor={`yeast-amount-${r.id}`}>
+                        {t("yeastAmountLabel", {
+                          unit: r.format === "dry" ? tUnits("kg") : tUnits("L"),
+                        })}
+                      </RecipeEditFieldLabel>
+                      {surfaceMath && (r.format === "liquid" || r.format === "slurry") ? (
+                        <MathHelpPopover
+                          title={tMath(mathExplain["yeast.amountL"].titleKey)}
+                          body={tMath("yeast.amountL.body")}
+                          ariaLabel={tMath("fxLabel", {
+                            topic: tMath(mathExplain["yeast.amountL"].titleKey),
+                          })}
+                        />
+                      ) : null}
+                    </XStack>
                     {(() => {
                       const format = r.format === "dry" || r.format === "liquid" || r.format === "slurry" ? r.format : null;
                       const pitchRateSet = r.pitchRate && r.pitchRate in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P;
@@ -712,10 +750,39 @@ function YeastEditorEditable({
                       const displayVal = rawVal != null ? String(rawVal) : "";
                       const amountDecimals = r.format === "dry" ? 3 : 2;
                       if (isComputed) {
+                        const cellsB =
+                          batchSizeForCells != null && analysisOg != null && r.pitchRate && r.pitchRate in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P
+                            ? computeEstimatedCellsB(
+                                batchSizeForCells,
+                                analysisOg,
+                                r.pitchRate as YeastPitchRateKey,
+                              )
+                            : null;
+                        const cellsPerL =
+                          r.format === "slurry" && r.manualCellCount
+                            ? computeCellsPerLFromManualCount(r.manualCellCount)
+                            : null;
+                        const showBreakdown =
+                          r.format === "slurry" &&
+                          r.manualCellCount &&
+                          cellsB != null &&
+                          cellsPerL != null &&
+                          rawVal != null;
                         return (
-                          <RecipeEditReadOnlyValue>
-                            {rawVal != null ? formatAmount(rawVal, amountDecimals) : "—"}
-                          </RecipeEditReadOnlyValue>
+                          <YStack gap="$1">
+                            <RecipeEditReadOnlyValue>
+                              {rawVal != null ? formatAmount(rawVal, amountDecimals) : "—"}
+                            </RecipeEditReadOnlyValue>
+                            {showBreakdown ? (
+                              <SizableText size="$1" color="var(--text-muted)" fontFamily="$body">
+                                {t("yeastAmountCalcBreakdown", {
+                                  cellsB: Math.round(cellsB),
+                                  cellsPerL: Math.round(cellsPerL),
+                                  amountL: formatAmount(rawVal, amountDecimals),
+                                })}
+                              </SizableText>
+                            ) : null}
+                          </YStack>
                         );
                       }
                       return (
@@ -872,32 +939,40 @@ function YeastEditorEditable({
                           <RecipeEditFieldLabel htmlFor={`yeast-cells-per-l-${r.id}`}>
                             {t("yeastCellsPerLLabel")}
                           </RecipeEditFieldLabel>
-                          <Input
-                            id={`yeast-cells-per-l-${r.id}`}
-                            value={
-                              r.cellsPerLOverride != null && Number.isFinite(r.cellsPerLOverride)
-                                ? String(r.cellsPerLOverride)
-                                : r.format === "liquid"
-                                  ? String(CELLS_PER_L_LIQUID)
-                                  : String(CELLS_PER_L_SLURRY)
-                            }
-                            onChangeText={(text) => {
-                              const trimmed = text.trim();
-                              const parsed = trimmed === "" ? null : Number(trimmed);
-                              onUpdateRow(r.id, {
-                                cellsPerLOverride:
-                                  parsed != null && Number.isFinite(parsed) && parsed > 0 ? parsed : null,
-                              });
-                            }}
-                            keyboardType="decimal-pad"
-                            size="$3"
-                            w={100}
-                            bg="var(--surface)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            rounded="$2"
-                            fontFamily="$body"
-                          />
+                          {r.format === "slurry" &&
+                          r.manualCellCount &&
+                          computeCellsPerLFromManualCount(r.manualCellCount) != null ? (
+                            <RecipeEditReadOnlyValue>
+                              {roundTo(computeCellsPerLFromManualCount(r.manualCellCount)!, 0)}
+                            </RecipeEditReadOnlyValue>
+                          ) : (
+                            <Input
+                              id={`yeast-cells-per-l-${r.id}`}
+                              value={
+                                r.cellsPerLOverride != null && Number.isFinite(r.cellsPerLOverride)
+                                  ? String(r.cellsPerLOverride)
+                                  : r.format === "liquid"
+                                    ? String(CELLS_PER_L_LIQUID)
+                                    : String(CELLS_PER_L_SLURRY)
+                              }
+                              onChangeText={(text) => {
+                                const trimmed = text.trim();
+                                const parsed = trimmed === "" ? null : Number(trimmed);
+                                onUpdateRow(r.id, {
+                                  cellsPerLOverride:
+                                    parsed != null && Number.isFinite(parsed) && parsed > 0 ? parsed : null,
+                                });
+                              }}
+                              keyboardType="decimal-pad"
+                              size="$3"
+                              w={100}
+                              bg="var(--surface)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              rounded="$2"
+                              fontFamily="$body"
+                            />
+                          )}
                         </YStack>
                       ) : r.format === "dry" ? (
                         <YStack gap="$1" minW={140}>
@@ -928,6 +1003,295 @@ function YeastEditorEditable({
                             rounded="$2"
                             fontFamily="$body"
                           />
+                        </YStack>
+                      ) : null}
+                      {r.format === "slurry" ? (
+                        <YStack gap="$2" flexBasis="100%" w="100%" mt="$2" pt="$2" borderTopWidth={1} borderColor="var(--border)">
+                          <SizableText size="$2" fontFamily="$body" color="var(--text)" fontWeight="600">
+                            {t("yeastManualCountSectionTitle")}
+                          </SizableText>
+                          <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" whiteSpace="pre-line">
+                            {t("yeastManualCountFirstNote")}
+                          </SizableText>
+                          <SizableText
+                            size="$2"
+                            fontFamily="$body"
+                            color="var(--text-muted)"
+                            whiteSpace="pre-line"
+                            textDecorationLine="underline"
+                          >
+                            {t("yeastManualCountDisclaimer")}
+                          </SizableText>
+                          <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" fontWeight="600">
+                            {t("yeastManualCountDirectlyInfluencesAmount")}
+                          </SizableText>
+                          <YStack gap="$2">
+                          <XStack gap="$3" flexWrap="wrap" items="flex-end">
+                            <YStack gap="$1" minW={140}>
+                              <RecipeEditFieldLabel htmlFor={`yeast-manual-df-${r.id}`}>
+                                {t("yeastManualCountDFLabel")}
+                              </RecipeEditFieldLabel>
+                              <BrewSelect
+                                id={`yeast-manual-df-${r.id}`}
+                                value={
+                                  r.manualCellCount?.dilutionFactor === 200 ||
+                                  r.manualCellCount?.dilutionFactor === 2000
+                                    ? String(r.manualCellCount.dilutionFactor)
+                                    : ""
+                                }
+                                onValueChange={(v) => {
+                                  const df = v === "200" ? 200 : v === "2000" ? 2000 : null;
+                                  if (df == null) {
+                                    onUpdateRow(r.id, { manualCellCount: null });
+                                    return;
+                                  }
+                                  const prev = r.manualCellCount;
+                                  onUpdateRow(r.id, {
+                                    manualCellCount: {
+                                      dilutionFactor: df,
+                                      aliveCells:
+                                        prev?.aliveCells != null && Number.isFinite(prev.aliveCells) && prev.aliveCells > 0
+                                          ? prev.aliveCells
+                                          : 0,
+                                      totalCells:
+                                        prev?.totalCells != null && Number.isFinite(prev.totalCells) && prev.totalCells > 0
+                                          ? prev.totalCells
+                                          : 0,
+                                    },
+                                  });
+                                }}
+                                options={[
+                                  { value: "", label: "—" },
+                                  { value: "200", label: t("yeastManualCountDF200") },
+                                  { value: "2000", label: t("yeastManualCountDF2000") },
+                                ]}
+                                placeholder="—"
+                              />
+                            </YStack>
+                            <YStack gap="$1" minW={100}>
+                              <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+                                <RecipeEditFieldLabel htmlFor={`yeast-manual-alive-${r.id}`}>
+                                  {t("yeastManualCountAliveCellsLabel")}
+                                </RecipeEditFieldLabel>
+                                {surfaceMath ? (
+                                  <MathHelpPopover
+                                    title={tMath(mathExplain["yeast.manualCountAliveInfluence"].titleKey)}
+                                    body={tMath("yeast.manualCountAliveInfluence.body")}
+                                    ariaLabel={tMath("fxLabel", {
+                                      topic: tMath(mathExplain["yeast.manualCountAliveInfluence"].titleKey),
+                                    })}
+                                  />
+                                ) : null}
+                              </XStack>
+                              <Input
+                                id={`yeast-manual-alive-${r.id}`}
+                                value={
+                                  r.manualCellCount?.aliveCells != null && Number.isFinite(r.manualCellCount.aliveCells)
+                                    ? String(Math.round(r.manualCellCount.aliveCells))
+                                    : ""
+                                }
+                                onChangeText={(text) => {
+                                  const trimmed = text.trim();
+                                  const parsed = trimmed === "" ? null : Number(trimmed);
+                                  const alive = parsed != null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+                                  const df = r.manualCellCount?.dilutionFactor;
+                                  if (df !== 200 && df !== 2000) return;
+                                  const prevTotal =
+                                    r.manualCellCount?.totalCells != null &&
+                                    Number.isFinite(r.manualCellCount.totalCells) &&
+                                    r.manualCellCount.totalCells > 0
+                                      ? r.manualCellCount.totalCells
+                                      : 0;
+                                  onUpdateRow(r.id, {
+                                    manualCellCount: {
+                                      dilutionFactor: df,
+                                      aliveCells: alive ?? 0,
+                                      totalCells: prevTotal,
+                                    },
+                                  });
+                                }}
+                                onBlur={requestAmountRecalc}
+                                keyboardType="number-pad"
+                                size="$3"
+                                w={80}
+                                bg="var(--surface)"
+                                borderWidth={1}
+                                borderColor="var(--border)"
+                                rounded="$2"
+                                fontFamily="$body"
+                              />
+                            </YStack>
+                            <YStack gap="$1" minW={100}>
+                              <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+                                <RecipeEditFieldLabel htmlFor={`yeast-manual-total-${r.id}`}>
+                                  {t("yeastManualCountTotalCellsLabel")}
+                                </RecipeEditFieldLabel>
+                                {surfaceMath ? (
+                                  <MathHelpPopover
+                                    title={tMath(mathExplain["yeast.manualCountTotalInfluence"].titleKey)}
+                                    body={tMath("yeast.manualCountTotalInfluence.body")}
+                                    ariaLabel={tMath("fxLabel", {
+                                      topic: tMath(mathExplain["yeast.manualCountTotalInfluence"].titleKey),
+                                    })}
+                                  />
+                                ) : null}
+                              </XStack>
+                              <Input
+                                id={`yeast-manual-total-${r.id}`}
+                                value={
+                                  r.manualCellCount?.totalCells != null && Number.isFinite(r.manualCellCount.totalCells)
+                                    ? String(Math.round(r.manualCellCount.totalCells))
+                                    : ""
+                                }
+                                onChangeText={(text) => {
+                                  const trimmed = text.trim();
+                                  const parsed = trimmed === "" ? null : Number(trimmed);
+                                  const total = parsed != null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+                                  const df = r.manualCellCount?.dilutionFactor;
+                                  if (df !== 200 && df !== 2000) return;
+                                  const prevAlive =
+                                    r.manualCellCount?.aliveCells != null &&
+                                    Number.isFinite(r.manualCellCount.aliveCells) &&
+                                    r.manualCellCount.aliveCells >= 0
+                                      ? r.manualCellCount.aliveCells
+                                      : 0;
+                                  onUpdateRow(r.id, {
+                                    manualCellCount: {
+                                      dilutionFactor: df,
+                                      aliveCells: prevAlive,
+                                      totalCells: total ?? 0,
+                                    },
+                                  });
+                                }}
+                                onBlur={requestAmountRecalc}
+                                keyboardType="number-pad"
+                                size="$3"
+                                w={80}
+                                bg="var(--surface)"
+                                borderWidth={1}
+                                borderColor={
+                                  r.manualCellCount?.aliveCells != null &&
+                                  r.manualCellCount?.aliveCells > 0 &&
+                                  r.manualCellCount?.totalCells != null &&
+                                  r.manualCellCount.totalCells > 0 &&
+                                  r.manualCellCount.totalCells < r.manualCellCount.aliveCells
+                                    ? "$red10"
+                                    : "var(--border)"
+                                }
+                                rounded="$2"
+                                fontFamily="$body"
+                              />
+                              {r.manualCellCount?.aliveCells != null &&
+                              r.manualCellCount.aliveCells > 0 &&
+                              r.manualCellCount?.totalCells != null &&
+                              r.manualCellCount.totalCells > 0 &&
+                              r.manualCellCount.totalCells < r.manualCellCount.aliveCells ? (
+                                <SizableText size="$1" color="$red10" fontFamily="$body" mt="$1">
+                                  {t("yeastManualCountTotalTooLow")}
+                                </SizableText>
+                              ) : null}
+                            </YStack>
+                            {r.manualCellCount &&
+                            r.manualCellCount.totalCells > 0 &&
+                            Number.isFinite(r.manualCellCount.aliveCells) ? (() => {
+                              const rawViability =
+                                (r.manualCellCount!.aliveCells / r.manualCellCount!.totalCells) * 100;
+                              const displayViability = Math.min(100, rawViability);
+                              const isInvalid = rawViability > 100;
+                              return (
+                                <YStack gap="$1" minW={100}>
+                                  <XStack gap="$2" alignItems="center" flexWrap="wrap">
+                                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                                      {t("yeastManualCountViabilityLabel")}
+                                    </SizableText>
+                                    {surfaceMath ? (
+                                      <MathHelpPopover
+                                        title={tMath(mathExplain["yeast.manualCountViability"].titleKey)}
+                                        body={tMath("yeast.manualCountViability.body")}
+                                        ariaLabel={tMath("fxLabel", {
+                                          topic: tMath(mathExplain["yeast.manualCountViability"].titleKey),
+                                        })}
+                                      />
+                                    ) : null}
+                                  </XStack>
+                                  <View
+                                    p="$2"
+                                    bg="var(--surface-2)"
+                                    rounded="$2"
+                                    borderWidth={1}
+                                    borderColor={isInvalid ? "$red10" : "var(--border)"}
+                                  >
+                                    <SizableText
+                                      size="$2"
+                                      fontFamily="$body"
+                                      color={isInvalid ? "$red10" : "var(--text)"}
+                                    >
+                                      {roundTo(displayViability, 1)}%
+                                    </SizableText>
+                                  </View>
+                                </YStack>
+                              );
+                            })() : null}
+                          </XStack>
+                          {r.manualCellCount &&
+                          r.manualCellCount.aliveCells > 0 &&
+                          r.manualCellCount.totalCells > 0 &&
+                          (r.manualCellCount.dilutionFactor === 200 ||
+                            r.manualCellCount.dilutionFactor === 2000) ? (
+                            <Button
+                              size="$2"
+                              alignSelf="flex-start"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="$body"
+                              onPress={onSave}
+                              disabled={!canCallAccountScoped || saving}
+                            >
+                              {t("yeastManualCountSaveCalculatedValues")}
+                            </Button>
+                          ) : null}
+                          {lowViabilityWarning != null && idx === firstManualCountRowIdx ? (
+                            <WarningBox mt="$2" role="status" aria-live="polite">
+                              {t("yeastLowViabilityWarning", { pct: Math.round(lowViabilityWarning) })}
+                            </WarningBox>
+                          ) : null}
+                          {r.manualCellCount &&
+                          r.manualCellCount.aliveCells > 0 &&
+                          r.manualCellCount.totalCells > 0 &&
+                          (r.manualCellCount.dilutionFactor === 200 ||
+                            r.manualCellCount.dilutionFactor === 2000) ? (
+                            <View className="brew-field-block brew-field-block--computed" mt="$2">
+                              <YStack gap="$2">
+                                <YStack gap="$1">
+                                  <XStack gap="$2" alignItems="center" flexWrap="nowrap">
+                                    <RecipeEditFieldLabel>
+                                      {t("yeastManualCountCalculatedLiveCellsPerGramLabel")}
+                                    </RecipeEditFieldLabel>
+                                    {surfaceMath ? (
+                                      <MathHelpPopover
+                                        title={tMath(mathExplain["yeast.manualCountLiveCellsPerGram"].titleKey)}
+                                        body={tMath("yeast.manualCountLiveCellsPerGram.body")}
+                                        ariaLabel={tMath("fxLabel", {
+                                          topic: tMath(mathExplain["yeast.manualCountLiveCellsPerGram"].titleKey),
+                                        })}
+                                      />
+                                    ) : null}
+                                  </XStack>
+                                  <RecipeEditReadOnlyValue>
+                                    {(
+                                      r.manualCellCount.aliveCells *
+                                      5 *
+                                      r.manualCellCount.dilutionFactor *
+                                      10000
+                                    ).toLocaleString(locale)}
+                                  </RecipeEditReadOnlyValue>
+                                </YStack>
+                              </YStack>
+                            </View>
+                          ) : null}
+                          </YStack>
                         </YStack>
                       ) : null}
                       <YStack gap="$1" minW={200}>
@@ -1006,7 +1370,7 @@ function YeastEditorEditable({
         </SizableText>
       )}
 
-      <XStack mt="$3" justify="flex-end" gap="$2" alignItems="center">
+      <XStack mt="$3" mb="$4" justify="flex-end" gap="$2" alignItems="center">
         <Button
           size="$3"
           bg="var(--surface-2)"
