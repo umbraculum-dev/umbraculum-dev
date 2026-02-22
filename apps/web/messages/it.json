@@ -664,6 +664,7 @@
       "sections": {
         "basics": "Basi",
         "analysis": "Analisi",
+        "brewingHistory": "Storico brassaggi",
         "brew": "Brew",
         "equipment": "Attrezzatura",
         "mashing": "Ammostamento e Sparge",
@@ -732,6 +733,9 @@
       "duplicateRecipeButton": "Duplica ricetta dalla ricetta corrente",
       "duplicateRecipeWorking": "Duplicazione…",
       "brewNote": "Lanciare la ricetta di brassaggio crea gli step di brassaggio, carica le materie prime necessarie e inizializza i log se applicabile.",
+      "lastBrewedLabel": "Ultimi brassaggi",
+      "lastBrewedLoading": "Caricamento sessioni di brassaggio…",
+      "brewingHistoryEmpty": "Nessuna sessione di brassaggio per questa ricetta.",
       "brewButton": "Brassa la ricetta corrente",
       "brewFeatureSoon": "Funzionalità disponibile a breve...",
       "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",

@@ -657,6 +657,7 @@
       "sections": {
         "basics": "Basics",
         "analysis": "Analysis",
+        "brewingHistory": "Brewing history",
         "brew": "Brew",
         "equipment": "Equipment",
         "mashing": "Mashing & Sparging",
@@ -725,6 +726,9 @@
       "duplicateRecipeButton": "Duplicate recipe from current recipe",
       "duplicateRecipeWorking": "Duplicating…",
       "brewNote": "Launching the brew recipe creates the brew steps, lods necessary raw materiales and initialize logs if applicable.",
+      "lastBrewedLabel": "Last brewed",
+      "lastBrewedLoading": "Loading brew sessions…",
+      "brewingHistoryEmpty": "No brew sessions yet for this recipe.",
       "brewButton": "Brew the current recipe",
       "brewFeatureSoon": "Feature available soon...",
       "hopsHelp": "Pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
