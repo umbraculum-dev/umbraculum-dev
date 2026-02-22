@@ -70,6 +70,47 @@ enum ColorUnit {
   @@map("color_unit")
 }
 
+enum BrewSessionStatus {
+  draft
+  running
+  paused
+  stopped
+
+  @@map("brew_session_status")
+}
+
+enum BrewSessionStepStatus {
+  pending
+  done
+  skipped
+  not_applicable
+
+  @@map("brew_session_step_status")
+}
+
+enum BrewSessionStepTimerState {
+  idle
+  running
+  paused
+  stopped
+
+  @@map("brew_session_step_timer_state")
+}
+
+enum BrewSessionLogKind {
+  session_created
+  session_started
+  session_paused
+  session_stopped
+  steps_saved
+  step_status_saved
+  step_timer_started
+  step_timer_paused
+  step_timer_stopped
+
+  @@map("brew_session_log_kind")
+}
+
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
@@ -115,6 +156,7 @@ model Account {
   hops         Hop[]
   yeasts       Yeast[]
   brewdaySettings BrewdaySettings?
+  brewSessions  BrewSession[]
 
   @@map("accounts")
 }
@@ -134,6 +176,32 @@ model BrewdaySettings {
 
   @@index([accountId])
   @@map("brewday_settings")
+}
+
+model BrewSession {
+  id        String           @id @default(uuid())
+  accountId String           @map("account_id")
+  recipeId  String           @map("recipe_id")
+  code      String
+
+  status    BrewSessionStatus @default(draft)
+  startedAt DateTime?        @map("started_at")
+  pausedAt  DateTime?        @map("paused_at")
+  stoppedAt DateTime?        @map("stopped_at")
+
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  account   Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  recipe    Recipe           @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  steps     BrewSessionStep[]
+  logs      BrewSessionLog[]
+
+  @@index([accountId])
+  @@index([recipeId])
+  @@index([accountId, recipeId])
+  @@unique([accountId, code])
+  @@map("brew_sessions")
 }
 
 model Ad {
@@ -272,12 +340,73 @@ model Recipe {
   account       Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
   waterSettings RecipeWaterSettings?
   beerStyle     BeerStyle?           @relation(fields: [styleKey], references: [key], onDelete: Restrict)
+  brewSessions  BrewSession[]
 
   @@index([accountId])
   @@index([accountId, versionGroupId])
   @@unique([accountId, versionGroupId, version])
   @@index([styleKey])
   @@map("recipes")
+}
+
+model BrewSessionStep {
+  id            String                   @id @default(uuid())
+  brewSessionId String                   @map("brew_session_id")
+
+  sectionId     String                   @map("section_id")
+  /** Custom section display name snapshot (preset sections use i18n labels). */
+  sectionName   String?                  @map("section_name")
+  name          String
+  isDisabled    Boolean                  @default(false) @map("is_disabled")
+  sortOrder     Int                      @map("sort_order")
+  minutesPlanned Int?                    @map("minutes_planned")
+
+  status        BrewSessionStepStatus    @default(pending)
+  note          String?                  @db.Text
+
+  timerState    BrewSessionStepTimerState @default(idle) @map("timer_state")
+  timerStartedAt DateTime?               @map("timer_started_at")
+  timerLastStartedAt DateTime?           @map("timer_last_started_at")
+  timerPausedAt DateTime?                @map("timer_paused_at")
+  timerStoppedAt DateTime?               @map("timer_stopped_at")
+  timerAccumulatedSeconds Int            @default(0) @map("timer_accumulated_seconds")
+
+  /** Optional relative scheduling to another step's timer (e.g. -15 min from end of Boil). */
+  relativeToStepId String?               @map("relative_to_step_id")
+  /** Minutes from end of base step. Example: -15 means 15 minutes before the end. */
+  offsetMinutesFromEnd Int?              @map("offset_minutes_from_end")
+
+  createdAt     DateTime                 @default(now()) @map("created_at")
+  updatedAt     DateTime                 @updatedAt @map("updated_at")
+
+  brewSession   BrewSession              @relation(fields: [brewSessionId], references: [id], onDelete: Cascade)
+  logs          BrewSessionLog[]
+  relativeToStep BrewSessionStep?        @relation("BrewSessionStepRelative", fields: [relativeToStepId], references: [id], onDelete: SetNull)
+  relativeSteps  BrewSessionStep[]       @relation("BrewSessionStepRelative")
+
+  @@index([brewSessionId])
+  @@index([brewSessionId, sortOrder])
+  @@index([sectionId])
+  @@index([relativeToStepId])
+  @@map("brew_session_steps")
+}
+
+model BrewSessionLog {
+  id           String            @id @default(uuid())
+  brewSessionId String           @map("brew_session_id")
+  stepId       String?           @map("step_id")
+  kind         BrewSessionLogKind
+  message      String
+  payloadJson  Json?             @map("payload_json")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  brewSession  BrewSession       @relation(fields: [brewSessionId], references: [id], onDelete: Cascade)
+  step         BrewSessionStep?  @relation(fields: [stepId], references: [id], onDelete: SetNull)
+
+  @@index([brewSessionId])
+  @@index([stepId])
+  @@index([brewSessionId, createdAt])
+  @@map("brew_session_logs")
 }
 
 model RecipeWaterSettings {

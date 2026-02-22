@@ -17,7 +17,6 @@ import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   ErrorBox,
   MessageBox,
-  WarningBox,
   RecipeEditField,
   RecipeEditFieldBlock,
   RecipeEditFieldLabel,
@@ -255,7 +254,8 @@ export default function RecipeEditPage() {
   const [creatingVersion, setCreatingVersion] = useState(false);
   const [createVersionError, setCreateVersionError] = useState<string | null>(null);
   const [duplicatingRecipe, setDuplicatingRecipe] = useState(false);
-  const [brewFeatureSoonShown, setBrewFeatureSoonShown] = useState(false);
+  const [creatingBrewSession, setCreatingBrewSession] = useState(false);
+  const [brewSessionError, setBrewSessionError] = useState<string | null>(null);
   const [duplicateRecipeError, setDuplicateRecipeError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
@@ -1001,8 +1001,28 @@ export default function RecipeEditPage() {
     }
   };
 
-  const onBrewRecipe = () => {
-    setBrewFeatureSoonShown(true);
+  const onBrewRecipe = async () => {
+    if (!recipeId) return;
+    if (!canCallAccountScoped) return;
+    setBrewSessionError(null);
+    setCreatingBrewSession(true);
+    try {
+      const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const id = (res.data as any)?.brewSession?.id;
+      if (typeof id !== "string" || !id) {
+        throw new Error("Create brew session response is missing brewSession.id");
+      }
+      router.push(`/recipes/${recipeId}/brew-sessions/${id}`);
+    } catch (err) {
+      setBrewSessionError(String(err));
+    } finally {
+      setCreatingBrewSession(false);
+    }
   };
 
   const addGristRow = () => {
@@ -2176,7 +2196,7 @@ export default function RecipeEditPage() {
               </SizableText>
               <Button
                 onPress={onBrewRecipe}
-                disabled={!canCallAccountScoped}
+                disabled={!canCallAccountScoped || creatingBrewSession}
                 size="$3"
                 bg="var(--surface-2)"
                 borderWidth={1}
@@ -2186,9 +2206,7 @@ export default function RecipeEditPage() {
               >
                 {t("brewButton")}
               </Button>
-              {brewFeatureSoonShown ? (
-                <WarningBox mt="$1.5">{t("brewFeatureSoon")}</WarningBox>
-              ) : null}
+              {brewSessionError ? <ErrorBox mt="$1.5">{brewSessionError}</ErrorBox> : null}
             </YStack>
           </RecipeEditSection>
 

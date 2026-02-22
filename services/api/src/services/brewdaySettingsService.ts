@@ -7,6 +7,7 @@ const PRESET_KEYS = [
   "lauter",
   "sparge",
   "boil",
+  "post_boil",
   "fermentor",
   "cleanup",
   "quality",
@@ -54,22 +55,282 @@ export type BrewdaySettingsPayload = {
   notes?: string | null;
 };
 
-const DEFAULT_STEPS_SEED: BrewdayDefaultStep[] = [
+export const DEFAULT_STEPS_SEED: BrewdayDefaultStep[] = [
   {
     id: crypto.randomUUID(),
-    name: "Make sure all ingredients are on hand",
+    name: "Check ingredients are available",
     sectionId: "preparation",
     exclude: false,
     minutes: null,
   },
   {
     id: crypto.randomUUID(),
-    name: "Start boil timer",
+    name: "Ensure tool and equipment are on hand; if using tank for suel ensuer available quantity.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Make sure kettle, mash and quipment valves are closed.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Ensure the requested water quantity is available.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Prepare brewing salts additions.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Prepare acids addition.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Prepare hops additions.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Make sure yeast is available, vital and viable.",
+    sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Add strike water volume to mash.",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Begin heating mash.",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Volauf.",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Use bug filter for lautering.",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Connect recirculating pump to mash.",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Collect mash pH.",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Check mash conversion (iodium can be used).",
+    sectionId: "mash",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Begin heating sparge water",
+    sectionId: "sparge",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Transfer sparge water to sparge container if using a 2 kettle system.",
+    sectionId: "sparge",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Conenct pump for transferring sparge water to mash.",
+    sectionId: "sparge",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Add first wort hops to boil.",
     sectionId: "boil",
     exclude: false,
     minutes: null,
   },
+  {
+    id: crypto.randomUUID(),
+    name: "Collect pre boil gravituy sample.",
+    sectionId: "boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Fire kettle. Bring to a strong boil.",
+    sectionId: "boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Completely open kettlelid.",
+    sectionId: "boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Add yeast nutrients to boil.",
+    sectionId: "boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Remove bittering hops.",
+    sectionId: "boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Turn off boil kettle flame.",
+    sectionId: "boil",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Sanitize heat exchanger.",
+    sectionId: "post_boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Cool wort to fermentation temparature or to desired pitching temperature.",
+    sectionId: "post_boil",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Take final gravity reading.",
+    sectionId: "post_boil",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Make sure primary fermenter is sanitized, empty and valves are closed.",
+    sectionId: "fermentor",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Transfer cooled wort to fermenter.",
+    sectionId: "fermentor",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Pitch yeast and add zinc or other yeast nutrients.",
+    sectionId: "fermentor",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Set spunding valve to desired pressure or fit airlock.",
+    sectionId: "fermentor",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "If registration/logginf tools must be put into fermenteer sanitize them, turn on and put in the fermenter.",
+    sectionId: "fermentor",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Clean mill.",
+    sectionId: "cleanup",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Clean mash and boil kettle.",
+    sectionId: "cleanup",
+    exclude: false,
+    minutes: null,
+  },
+  {
+    id: crypto.randomUUID(),
+    name: "Clean tools.",
+    sectionId: "cleanup",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Close LPG valve.",
+    sectionId: "miscellaneous",
+    exclude: false,
+    minutes: null,
+  },
 ];
+
+function isLegacyDefaultStepsSeed(steps: BrewdayDefaultStep[]) {
+  if (!Array.isArray(steps) || steps.length === 0) return true;
+  // Back-compat: earlier seed contained just these steps.
+  if (steps.some((s) => s?.name === "Start boil timer")) return true;
+  if (steps.some((s) => s?.name === "Make sure all ingredients are on hand")) return true;
+  return false;
+}
 
 function parseSectionsJson(val: unknown): BrewdaySectionConfig {
   if (!val || typeof val !== "object" || !("presetExcludes" in val)) {
@@ -146,10 +407,19 @@ export class BrewdaySettingsService {
     if (!row) return null;
 
     const sections = parseSectionsJson(row.sectionsJson);
-    const defaultStepsRaw = parseStepArray(row.defaultStepsJson, DEFAULT_STEPS_SEED);
-    const defaultSteps =
-      defaultStepsRaw.length === 0 ? DEFAULT_STEPS_SEED.map((s) => ({ ...s, id: crypto.randomUUID() })) : defaultStepsRaw as BrewdayDefaultStep[];
+    const defaultStepsRaw = parseStepArray(row.defaultStepsJson, DEFAULT_STEPS_SEED) as BrewdayDefaultStep[];
+    const shouldUpgradeSeed = isLegacyDefaultStepsSeed(defaultStepsRaw);
+    const defaultSteps = shouldUpgradeSeed
+      ? DEFAULT_STEPS_SEED.map((s) => ({ ...s, id: crypto.randomUUID() }))
+      : defaultStepsRaw;
     const customSteps = parseStepArray(row.customSectionsJson, null) as BrewdayCustomStep[];
+
+    if (shouldUpgradeSeed) {
+      await this.prisma.brewdaySettings.update({
+        where: { accountId },
+        data: { defaultStepsJson: defaultSteps as unknown as any },
+      });
+    }
 
     return {
       brewingType: row.brewingType,

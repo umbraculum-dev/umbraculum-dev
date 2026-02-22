@@ -85,8 +85,9 @@ describe("recipe water-settings", () => {
   });
 
   it("upserts then fetches water settings for a recipe", async () => {
+    const recipeId = crypto.randomUUID();
     const recipe = await app.prisma.recipe.create({
-      data: { accountId: accountAId, name: "Water Settings Recipe", style: null, notes: null },
+      data: { id: recipeId, accountId: accountAId, versionGroupId: recipeId, version: 0, name: "Water Settings Recipe", style: null, notes: null },
     });
     const spargeProfileA = await app.prisma.waterProfile.create({
       data: {
@@ -237,8 +238,9 @@ describe("recipe water-settings", () => {
   });
 
   it("does not leak settings across accounts", async () => {
+    const recipeAId = crypto.randomUUID();
     const recipeA = await app.prisma.recipe.create({
-      data: { accountId: accountAId, name: "Scoped WS", style: null, notes: null },
+      data: { id: recipeAId, accountId: accountAId, versionGroupId: recipeAId, version: 0, name: "Scoped WS", style: null, notes: null },
     });
 
     await app.inject({
@@ -261,8 +263,9 @@ describe("recipe water-settings", () => {
   });
 
   it("rejects saving an account-scoped profile from another account", async () => {
+    const recipeId = crypto.randomUUID();
     const recipe = await app.prisma.recipe.create({
-      data: { accountId: accountAId, name: "Profile Validation", style: null, notes: null },
+      data: { id: recipeId, accountId: accountAId, versionGroupId: recipeId, version: 0, name: "Profile Validation", style: null, notes: null },
     });
     const profileB = await app.prisma.waterProfile.create({
       data: {
