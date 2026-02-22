@@ -2,6 +2,8 @@ import type { BrewSessionLogKind, BrewSessionStatus, BrewSessionStepStatus, Brew
 import { BadRequestError, NotFoundError } from "../errors.js";
 import { AccountsService } from "./accountsService.js";
 import { BrewdaySettingsService, DEFAULT_STEPS_SEED } from "./brewdaySettingsService.js";
+import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
+import { RecipesService } from "./recipesService.js";
 
 export type BrewSessionStepInput = {
   id?: string | null;
@@ -14,15 +16,30 @@ export type BrewSessionStepInput = {
   offsetMinutesFromEnd?: number | null;
   status?: BrewSessionStepStatus;
   note?: string | null;
+  customTimerEnabled?: boolean;
+};
+
+type RecipeDrivenStepSeed = {
+  id?: string;
+  sectionId: string;
+  sectionName?: string | null;
+  name: string;
+  minutesPlanned?: number | null;
+  relativeToStepId?: string | null;
+  offsetMinutesFromEnd?: number | null;
 };
 
 export class BrewSessionsService {
   private readonly accounts: AccountsService;
   private readonly brewdaySettings: BrewdaySettingsService;
+  private readonly recipeWaterSettings: RecipeWaterSettingsService;
+  private readonly recipes: RecipesService;
 
   constructor(private readonly prisma: PrismaClient) {
     this.accounts = new AccountsService(prisma);
     this.brewdaySettings = new BrewdaySettingsService(prisma);
+    this.recipeWaterSettings = new RecipeWaterSettingsService(prisma);
+    this.recipes = new RecipesService(prisma);
   }
 
   private async assertRecipeInAccount(userId: string, accountId: string, recipeId: string) {
@@ -33,6 +50,130 @@ export class BrewSessionsService {
     });
     if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
     return recipe;
+  }
+
+  private buildRecipeDrivenSteps(args: {
+    beerJsonRecipeJson: unknown;
+    recipeExtJson: unknown;
+    waterSettings: Awaited<ReturnType<RecipeWaterSettingsService["get"]>>;
+  }): RecipeDrivenStepSeed[] {
+    const steps: RecipeDrivenStepSeed[] = [];
+    const d = (args.beerJsonRecipeJson as any) ?? {};
+    const r0 = d?.beerjson?.recipes?.[0];
+    const ing = r0?.ingredients ?? {};
+    const ext = args.recipeExtJson && typeof args.recipeExtJson === "object" && !Array.isArray(args.recipeExtJson)
+      ? (args.recipeExtJson as Record<string, unknown>)
+      : null;
+
+    const boilTimeMinutes =
+      (ext && typeof (ext as any).boilTimeMinutesOverride === "number" && Number.isFinite((ext as any).boilTimeMinutesOverride))
+        ? (ext as any).boilTimeMinutesOverride
+        : 60;
+    const boilBaseStepId = crypto.randomUUID();
+
+    const hops = Array.isArray(ing?.hop_additions) ? ing.hop_additions : [];
+    const cultures = Array.isArray(ing?.culture_additions) ? ing.culture_additions : [];
+    const misc = Array.isArray(ing?.miscellaneous_additions) ? ing.miscellaneous_additions : [];
+
+    const hasBoilHops = hops.some(
+      (h: any) =>
+        (typeof h?.timing?.use === "string" && h.timing.use === "add_to_boil") ||
+        (typeof h?.brewery_app_use === "string" && (h.brewery_app_use === "boil" || h.brewery_app_use === "whirlpool"))
+    );
+    if (hasBoilHops) {
+      steps.push({
+        id: boilBaseStepId,
+        sectionId: "boil",
+        sectionName: null,
+        name: "Start boil",
+        minutesPlanned: boilTimeMinutes,
+      });
+    }
+
+    for (const h of hops) {
+      const name = typeof h?.name === "string" ? h.name : "";
+      if (!name) continue;
+      const use =
+        typeof h?.brewery_app_use === "string" && (h.brewery_app_use === "boil" || h.brewery_app_use === "whirlpool" || h.brewery_app_use === "dryhop")
+          ? h.brewery_app_use
+          : typeof h?.timing?.use === "string" && h.timing.use === "add_to_fermentation"
+            ? "dryhop"
+            : "boil";
+      const timeMinutes = h?.timing?.duration?.unit === "min" ? Number(h?.timing?.duration?.value) : null;
+
+      if (use === "dryhop") {
+        steps.push({
+          sectionId: "fermentor",
+          sectionName: null,
+          name: `Add dry hop: ${name}`,
+        });
+      } else {
+        const offset = timeMinutes != null && Number.isFinite(timeMinutes) ? -timeMinutes : null;
+        steps.push({
+          sectionId: "boil",
+          sectionName: null,
+          name: `Add hops: ${name}`,
+          relativeToStepId: boilBaseStepId,
+          offsetMinutesFromEnd: offset,
+        });
+      }
+    }
+
+    for (const c of cultures) {
+      const name = typeof c?.name === "string" ? c.name : "";
+      if (!name) continue;
+      steps.push({
+        sectionId: "fermentor",
+        sectionName: null,
+        name: `Pitch yeast: ${name}`,
+      });
+    }
+
+    const miscUseToSection: Record<string, string> = {
+      mash: "mash",
+      boil: "boil",
+      primary: "fermentor",
+      secondary: "fermentor",
+      bottling: "post_boil",
+    };
+    for (const m of misc) {
+      const name = typeof m?.name === "string" ? m.name : "";
+      if (!name) continue;
+      const useRaw = typeof m?.timing?.use === "string" ? m.timing.use : "";
+      const use = useRaw === "add_to_mash" ? "mash" : useRaw === "add_to_boil" ? "boil" : useRaw === "add_to_fermentation" ? "primary" : useRaw === "add_to_secondary" ? "secondary" : useRaw === "add_to_package" ? "bottling" : "boil";
+      const sectionId = miscUseToSection[use] ?? "boil";
+      steps.push({
+        sectionId,
+        sectionName: null,
+        name: `Add ${name}`,
+      });
+    }
+
+    const ws = args.waterSettings;
+    if (ws && typeof ws === "object") {
+      const mashVol = (ws as any).mashWaterVolumeLiters;
+      if (typeof mashVol === "number" && mashVol > 0) {
+        steps.push({ sectionId: "mash", sectionName: null, name: `Add mash water (${Math.round(mashVol * 10) / 10} L)` });
+      }
+      const mashSalts = (ws as any).mashSaltAdditionsJson;
+      if (Array.isArray(mashSalts) && mashSalts.length > 0) {
+        steps.push({ sectionId: "mash", sectionName: null, name: "Add mash salts" });
+      }
+      const spargeVol = (ws as any).spargeVolumeLiters;
+      if (typeof spargeVol === "number" && spargeVol > 0) {
+        steps.push({ sectionId: "sparge", sectionName: null, name: `Add sparge water (${Math.round(spargeVol * 10) / 10} L)` });
+      }
+      const spargeSalts = (ws as any).spargeSaltAdditionsJson;
+      if (Array.isArray(spargeSalts) && spargeSalts.length > 0) {
+        steps.push({ sectionId: "sparge", sectionName: null, name: "Add sparge salts" });
+      }
+      const boilVol = (ws as any).boilWaterVolumeLiters;
+      if (typeof boilVol === "number" && boilVol > 0) {
+        steps.push({ sectionId: "boil", sectionName: null, name: `Add boil water (${Math.round(boilVol * 10) / 10} L)` });
+      }
+    }
+
+    return steps;
   }
 
   private buildStepSeedFromSettings(args: {
@@ -82,8 +223,63 @@ export class BrewSessionsService {
   async createSessionFromRecipe(userId: string, accountId: string, recipeId: string) {
     await this.assertRecipeInAccount(userId, accountId, recipeId);
 
-    const settings = await this.brewdaySettings.getSettings(userId, accountId);
+    const [settings, recipe, waterSettings] = await Promise.all([
+      this.brewdaySettings.getSettings(userId, accountId),
+      this.recipes.getRecipe(userId, accountId, recipeId),
+      this.recipeWaterSettings.get(userId, accountId, recipeId).catch(() => null),
+    ]);
+
     const stepSeed = this.buildStepSeedFromSettings({ settings });
+    const recipeSteps = this.buildRecipeDrivenSteps({
+      beerJsonRecipeJson: (recipe as any).beerJsonRecipeJson,
+      recipeExtJson: (recipe as any).recipeExtJson,
+      waterSettings,
+    });
+
+    const sectionOrder = ["preparation", "mash", "lauter", "sparge", "boil", "post_boil", "fermentor", "cleanup", "quality", "miscellaneous"];
+    const sectionRank = (sid: string) => {
+      const i = sectionOrder.indexOf(sid);
+      return i >= 0 ? i : sectionOrder.length;
+    };
+    const seedBySection = new Map<string, typeof stepSeed>();
+    for (const s of stepSeed) {
+      const list = seedBySection.get(s.sectionId) ?? [];
+      list.push(s);
+      seedBySection.set(s.sectionId, list);
+    }
+    const recipeBySection = new Map<string, RecipeDrivenStepSeed[]>();
+    for (const s of recipeSteps) {
+      const list = recipeBySection.get(s.sectionId) ?? [];
+      list.push(s);
+      recipeBySection.set(s.sectionId, list);
+    }
+    const allSections = new Set([...seedBySection.keys(), ...recipeBySection.keys()]);
+    const sortedSections = [...allSections].sort((a, b) => sectionRank(a) - sectionRank(b));
+
+    const merged: Array<{ sectionId: string; sectionName: string | null; name: string; minutesPlanned: number | null; id?: string; relativeToStepId?: string | null; offsetMinutesFromEnd?: number | null }> = [];
+    for (const sid of sortedSections) {
+      const seedList = seedBySection.get(sid) ?? [];
+      const recipeList = recipeBySection.get(sid) ?? [];
+      for (const s of seedList) {
+        merged.push({
+          sectionId: s.sectionId,
+          sectionName: s.sectionName ?? null,
+          name: s.name,
+          minutesPlanned: s.minutesPlanned ?? null,
+        });
+      }
+      for (const s of recipeList) {
+        merged.push({
+          sectionId: s.sectionId,
+          sectionName: s.sectionName ?? null,
+          name: s.name,
+          minutesPlanned: s.minutesPlanned ?? null,
+          id: s.id,
+          relativeToStepId: s.relativeToStepId ?? null,
+          offsetMinutesFromEnd: s.offsetMinutesFromEnd ?? null,
+        });
+      }
+    }
 
     const prefix = `BREW-${recipeId.slice(0, 6).toUpperCase()}`;
     const now = new Date();
@@ -106,9 +302,10 @@ export class BrewSessionsService {
             },
           });
 
-          if (stepSeed.length > 0) {
+          if (merged.length > 0) {
             await tx.brewSessionStep.createMany({
-              data: stepSeed.map((s, idx) => ({
+              data: merged.map((s, idx) => ({
+                id: s.id ?? crypto.randomUUID(),
                 brewSessionId: session.id,
                 sectionId: s.sectionId,
                 sectionName: s.sectionName,
@@ -116,8 +313,8 @@ export class BrewSessionsService {
                 isDisabled: false,
                 sortOrder: idx,
                 minutesPlanned: s.minutesPlanned,
-                relativeToStepId: null,
-                offsetMinutesFromEnd: null,
+                relativeToStepId: s.relativeToStepId ?? null,
+                offsetMinutesFromEnd: s.offsetMinutesFromEnd ?? null,
                 status: "pending" satisfies BrewSessionStepStatus,
                 note: null,
                 timerState: "idle" satisfies BrewSessionStepTimerState,
@@ -211,6 +408,7 @@ export class BrewSessionsService {
             : s.offsetMinutesFromEnd === null
               ? null
               : null;
+        const customTimerEnabled = s.customTimerEnabled === true;
         return {
           id,
           sectionId,
@@ -221,6 +419,7 @@ export class BrewSessionsService {
           minutesPlanned,
           relativeToStepId,
           offsetMinutesFromEnd,
+          customTimerEnabled,
         };
       })
       .filter((s) => s.name.length > 0);
@@ -247,6 +446,7 @@ export class BrewSessionsService {
               minutesPlanned: s.minutesPlanned,
               relativeToStepId: s.relativeToStepId,
               offsetMinutesFromEnd: s.offsetMinutesFromEnd,
+              customTimerEnabled: s.customTimerEnabled,
             },
           });
         } else {
@@ -262,6 +462,7 @@ export class BrewSessionsService {
               minutesPlanned: s.minutesPlanned,
               relativeToStepId: s.relativeToStepId,
               offsetMinutesFromEnd: s.offsetMinutesFromEnd,
+              customTimerEnabled: s.customTimerEnabled,
               status: "pending",
               note: null,
               timerState: "idle",

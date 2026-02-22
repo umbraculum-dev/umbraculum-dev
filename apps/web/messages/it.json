@@ -613,7 +613,7 @@
       "minutesPlannedLabel": "Minuti",
       "addStepButton": "Aggiungi step",
       "saveSuccess": "Salvato.",
-      "saveStepsButton": "Salva sezione brewing",
+      "saveStepsButton": "Salva sessione brewing",
       "saving": "Salvataggio…",
       "noteSaveSteps": "Le modifiche di riordino/disabilitazione vengono salvate quando salvi la sezione brewing.",
       "moveUp": "Sposta su",
@@ -628,6 +628,9 @@
       "disableYes": "Sì",
       "stepNoteLabel": "Nota",
       "saveLogButton": "Salva log",
+      "removeStepButton": "Rimuovi step",
+      "removeStepRemoving": "Rimozione…",
+      "removeStepSuccess": "Step rimosso da questa sessione di brassaggio.",
       "deleteSessionButton": "Elimina sessione di brewing",
       "deleteSessionConfirm": "Questo eliminerà definitivamente questa sessione di brewing (inclusi step e log).",
       "confirmDelete": "Conferma eliminazione",
@@ -641,7 +644,10 @@
       "relativeCountdownLine": "relativo {remaining}",
       "timerStart": "Start",
       "timerPause": "Pausa",
-      "timerStop": "Stop"
+      "timerStop": "Stop",
+      "startTimerForSection": "Avvia timer per sezione",
+      "startBoilTimerMin": "Avvia timer bollitura ({minutes})",
+      "activateCustomTimerLabel": "Attiva timer personalizzato"
     },
     "edit": {
       "title": "Visualizza e modifica ricetta",
@@ -675,6 +681,9 @@
         "boil": "Bollitura",
         "notes": "Note",
         "water": "Chimica dell'acqua e volumi"
+      },
+      "hops": {
+        "timeBeforeEndOfBoilMin": "Minuti prima della fine della bollitura (min)"
       },
       "mashingHelp": "Programma di ammostamento (procedura mash BeerJSON). Importa una ricetta BeerJSON/BeerXML con step mash o aggiungili manualmente nelle pagine calcolatore acqua Mash e/o Sparge.",
       "mashingEmpty": "Nessuno step di ammostamento. Aggiungi step o importa una ricetta con programma mash.",
@@ -739,6 +748,7 @@
       "brewButton": "Brassa la ricetta corrente",
       "brewFeatureSoon": "Funzionalità disponibile a breve...",
       "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "timeBeforeEndOfBoilMin": "Minuti prima della fine della bollitura (min)",
       "yeastHelp": "Scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
       "yeastEditInYeastPage": "Modifica lievito nella pagina Lievito",
       "yeastPageTitle": "Lievito",

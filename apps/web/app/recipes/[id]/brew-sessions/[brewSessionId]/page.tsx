@@ -5,9 +5,10 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Button, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
+import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
 import { BrewSelect } from "../../../../_components/BrewSelect";
+import { PageWideActionBar } from "../../../../_components/PageWideActionBar";
 import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { CodeInline } from "../../../../_components/CodeInline";
@@ -16,6 +17,7 @@ import {
   MessageBox,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
+  RecipeEditReadOnlyValue,
   RecipeEditSection,
   RecipeEditSummary,
   WarningBox,
@@ -50,6 +52,7 @@ type BrewSessionStep = {
   timerPausedAt: string | null;
   timerStoppedAt: string | null;
   timerAccumulatedSeconds: number;
+  customTimerEnabled?: boolean;
 };
 
 type BrewSessionLog = {
@@ -115,6 +118,8 @@ export default function BrewSessionDetailPage() {
   const [sessionActionError, setSessionActionError] = useState<string | null>(null);
 
   const [stepActionError, setStepActionError] = useState<string | null>(null);
+  const [removeStepWorking, setRemoveStepWorking] = useState<string | null>(null);
+  const [removeStepSuccess, setRemoveStepSuccess] = useState<string | null>(null);
 
   const [deleteConfirmShown, setDeleteConfirmShown] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -259,6 +264,7 @@ export default function BrewSessionDetailPage() {
         minutesPlanned: s.minutesPlanned,
         relativeToStepId: s.relativeToStepId,
         offsetMinutesFromEnd: s.offsetMinutesFromEnd,
+        customTimerEnabled: s.customTimerEnabled ?? false,
       }));
       const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps`, {
         method: "PATCH",
@@ -322,15 +328,50 @@ export default function BrewSessionDetailPage() {
     try {
       const step = steps.find((s) => s.id === stepId);
       if (!step) return;
+      const derivedStatus = step.isDisabled ? "skipped" : "pending";
       const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${stepId}/log`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: step.status, note: step.note ?? null }),
+        body: JSON.stringify({ status: derivedStatus, note: step.note ?? null }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       await refresh();
     } catch (err) {
       setStepActionError(String(err));
+    }
+  };
+
+  const onRemoveStep = async (stepId: string) => {
+    if (!canCall || !brewSessionId) return;
+    setStepActionError(null);
+    setRemoveStepSuccess(null);
+    setRemoveStepWorking(stepId);
+    try {
+      const remaining = steps.filter((s) => s.id !== stepId);
+      const payload = remaining.map((s) => ({
+        id: s.id,
+        sectionId: s.sectionId,
+        sectionName: s.sectionName,
+        name: s.name,
+        isDisabled: s.isDisabled,
+        minutesPlanned: s.minutesPlanned,
+        relativeToStepId: s.relativeToStepId,
+        offsetMinutesFromEnd: s.offsetMinutesFromEnd,
+        customTimerEnabled: s.customTimerEnabled ?? false,
+      }));
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ steps: payload }),
+      });
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const nextSteps = (res.data as { steps?: BrewSessionStep[] })?.steps;
+      setSteps(Array.isArray(nextSteps) ? (nextSteps as BrewSessionStep[]) : remaining);
+      setRemoveStepSuccess(t("removeStepSuccess"));
+    } catch (err) {
+      setStepActionError(String(err));
+    } finally {
+      setRemoveStepWorking(null);
     }
   };
 
@@ -395,6 +436,7 @@ export default function BrewSessionDetailPage() {
         timerPausedAt: null,
         timerStoppedAt: null,
         timerAccumulatedSeconds: 0,
+        customTimerEnabled: false,
       },
     ]);
     setCustomStepName("");
@@ -669,9 +711,20 @@ export default function BrewSessionDetailPage() {
 
       {saveStatus ? <MessageBox variant="success" dismissAfter={3500} onDismiss={() => setSaveStatus(null)}>{saveStatus}</MessageBox> : null}
       {saveError ? <ErrorBox>{saveError}</ErrorBox> : null}
+      {removeStepSuccess ? (
+        <MessageBox variant="success" dismissAfter={3500} onDismiss={() => setRemoveStepSuccess(null)}>
+          {removeStepSuccess}
+        </MessageBox>
+      ) : null}
       {stepActionError ? <ErrorBox>{stepActionError}</ErrorBox> : null}
 
-      {grouped.map((g) => (
+      {grouped.map((g) => {
+        const boilFirstStep = g.sectionId === "boil" && g.steps.length > 0
+          ? g.steps.reduce((a, b) => (a.sortOrder < b.sortOrder ? a : b))
+          : null;
+        const boilMinutes = boilFirstStep?.minutesPlanned ?? null;
+        const showBoilSectionTimer = g.sectionId === "boil" && session?.startedAt;
+        return (
         <RecipeEditSection
           key={g.sectionId}
           id={`section-${g.sectionId}`}
@@ -681,6 +734,55 @@ export default function BrewSessionDetailPage() {
           onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, [g.sectionId]: open }))}
         >
           <YStack gap="$2">
+            {showBoilSectionTimer && boilFirstStep ? (
+              <XStack gap="$2" items="center" flexWrap="wrap" p="$2" bg="var(--surface-2)" rounded="$2" borderWidth={1} borderColor="var(--border)">
+                <SizableText size="$3" fontFamily="$body" color="var(--text)">
+                  {t("startBoilTimerMin", { minutes: boilMinutes != null ? `${boilMinutes} min` : "—" })}
+                </SizableText>
+                {boilFirstStep.timerState === "idle" || boilFirstStep.timerState === "paused" ? (
+                  <Button
+                    onPress={() => void onStepTimer(boilFirstStep.id, "start")}
+                    disabled={!canCall}
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                  >
+                    {t("timerStart")}
+                  </Button>
+                ) : null}
+                {boilFirstStep.timerState === "running" ? (
+                  <Button
+                    onPress={() => void onStepTimer(boilFirstStep.id, "pause")}
+                    disabled={!canCall}
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                  >
+                    {t("timerPause")}
+                  </Button>
+                ) : null}
+                {boilFirstStep.timerState !== "stopped" ? (
+                  <Button
+                    onPress={() => void onStepTimer(boilFirstStep.id, "stop")}
+                    disabled={!canCall}
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    fontFamily="$body"
+                  >
+                    {t("timerStop")}
+                  </Button>
+                ) : null}
+              </XStack>
+            ) : null}
             {g.steps.map((st, idxInSection) => {
               const globalIdx = steps.findIndex((x) => x.id === st.id);
               const elapsed = computeElapsedSeconds(st);
@@ -742,27 +844,9 @@ export default function BrewSessionDetailPage() {
 
                       <View minW={120}>
                         <RecipeEditFieldLabel htmlFor={`step-status-${st.id}`}>{t("stepStatusLabel")}</RecipeEditFieldLabel>
-                        <BrewSelect
-                          id={`step-status-${st.id}`}
-                          value={st.status}
-                          onValueChange={(v) =>
-                            setSteps((prev) =>
-                              prev.map((s) =>
-                                s.id === st.id
-                                  ? { ...s, status: v as any }
-                                  : s
-                              )
-                            )
-                          }
-                          options={[
-                            { value: "pending", label: t("statusPending") },
-                            { value: "done", label: t("statusDone") },
-                            { value: "skipped", label: t("statusSkipped") },
-                            { value: "not_applicable", label: t("statusNotApplicable") },
-                          ]}
-                          width="full"
-                          aria-label={t("stepStatusLabel")}
-                        />
+                        <RecipeEditReadOnlyValue>
+                          {st.isDisabled ? t("statusSkipped") : t("statusPending")}
+                        </RecipeEditReadOnlyValue>
                       </View>
 
                       <View minW={140}>
@@ -789,53 +873,140 @@ export default function BrewSessionDetailPage() {
                       </View>
                     </XStack>
 
-                    <XStack gap="$2" items="flex-end" flexWrap="wrap">
-                      <View minW={240} flex={1}>
-                        <RecipeEditFieldLabel htmlFor={`step-relative-to-${st.id}`}>
-                          {t("relativeToLabel")}
-                        </RecipeEditFieldLabel>
-                        <BrewSelect
-                          id={`step-relative-to-${st.id}`}
-                          value={st.relativeToStepId ?? ""}
-                          onValueChange={(v) =>
-                            setSteps((prev) =>
-                              prev.map((s) =>
-                                s.id === st.id ? { ...s, relativeToStepId: v || null } : s
-                              )
+                    <XStack gap="$2" items="center" flexWrap="wrap">
+                      <Checkbox
+                        id={`step-custom-timer-${st.id}`}
+                        checked={st.customTimerEnabled ?? false}
+                        onCheckedChange={(checked) =>
+                          setSteps((prev) =>
+                            prev.map((s) =>
+                              s.id === st.id ? { ...s, customTimerEnabled: checked === true } : s
                             )
-                          }
-                          options={relativeBaseOptions.filter((o) => o.value !== st.id)}
-                          width="full"
-                          aria-label={t("relativeToLabel")}
-                        />
-                      </View>
-                      <View minW={140}>
-                        <RecipeEditFieldLabel htmlFor={`step-offset-${st.id}`}>
-                          {t("offsetFromEndLabel")}
-                        </RecipeEditFieldLabel>
-                        <Input
-                          id={`step-offset-${st.id}`}
-                          value={st.offsetMinutesFromEnd == null ? "" : String(st.offsetMinutesFromEnd)}
-                          onChangeText={(v) => {
-                            const parsed = parseOffsetMinutes(v);
-                            setSteps((prev) =>
-                              prev.map((s) =>
-                                s.id === st.id ? { ...s, offsetMinutesFromEnd: parsed } : s
-                              )
-                            );
-                          }}
-                          placeholder="—"
-                          keyboardType="numeric"
-                          size="$3"
-                          w="100%"
-                          bg="var(--surface)"
-                          borderWidth={1}
-                          borderColor="var(--border)"
-                          rounded="$2"
-                          fontFamily="$body"
-                        />
-                      </View>
+                          )
+                        }
+                        aria-label={t("activateCustomTimerLabel")}
+                      >
+                        <Checkbox.Indicator />
+                      </Checkbox>
+                      <RecipeEditFieldLabel htmlFor={`step-custom-timer-${st.id}`}>
+                        {t("activateCustomTimerLabel")}
+                      </RecipeEditFieldLabel>
                     </XStack>
+
+                    {(st.customTimerEnabled ?? false) ? (
+                      <>
+                        <XStack gap="$2" items="flex-end" flexWrap="wrap">
+                          <View minW={240} flex={1}>
+                            <RecipeEditFieldLabel htmlFor={`step-relative-to-${st.id}`}>
+                              {t("relativeToLabel")}
+                            </RecipeEditFieldLabel>
+                            <BrewSelect
+                              id={`step-relative-to-${st.id}`}
+                              value={st.relativeToStepId ?? ""}
+                              onValueChange={(v) =>
+                                setSteps((prev) =>
+                                  prev.map((s) =>
+                                    s.id === st.id ? { ...s, relativeToStepId: v || null } : s
+                                  )
+                                )
+                              }
+                              options={relativeBaseOptions.filter((o) => o.value !== st.id)}
+                              width="full"
+                              aria-label={t("relativeToLabel")}
+                            />
+                          </View>
+                          <View minW={140}>
+                            <RecipeEditFieldLabel htmlFor={`step-offset-${st.id}`}>
+                              {t("offsetFromEndLabel")}
+                            </RecipeEditFieldLabel>
+                            <Input
+                              id={`step-offset-${st.id}`}
+                              value={st.offsetMinutesFromEnd == null ? "" : String(st.offsetMinutesFromEnd)}
+                              onChangeText={(v) => {
+                                const parsed = parseOffsetMinutes(v);
+                                setSteps((prev) =>
+                                  prev.map((s) =>
+                                    s.id === st.id ? { ...s, offsetMinutesFromEnd: parsed } : s
+                                  )
+                                );
+                              }}
+                              placeholder="—"
+                              keyboardType="numeric"
+                              size="$3"
+                              w="100%"
+                              bg="var(--surface)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              rounded="$2"
+                              fontFamily="$body"
+                            />
+                          </View>
+                        </XStack>
+
+                        <YStack gap="$1">
+                          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                            {t("timerLine", {
+                              elapsed: formatElapsedSeconds(elapsed),
+                              planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
+                            })}
+                            {remainingSeconds != null ? (
+                              <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+                                {" "}· {t("countdownLine", { remaining: formatElapsedSeconds(remainingSeconds) })}
+                              </SizableText>
+                            ) : null}
+                            {relativeCountdownSeconds != null ? (
+                              <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+                                {" "}· {t("relativeCountdownLine", { remaining: formatElapsedSeconds(relativeCountdownSeconds) })}
+                              </SizableText>
+                            ) : null}
+                          </SizableText>
+                          <XStack gap="$2" items="center" flexWrap="wrap" width="100%">
+                            {st.timerState === "idle" || st.timerState === "paused" ? (
+                              <Button
+                                onPress={() => void onStepTimer(st.id, "start")}
+                                disabled={!canCall || !session?.startedAt}
+                                size="$3"
+                                bg="var(--surface-2)"
+                                borderWidth={1}
+                                borderColor="var(--border)"
+                                color="var(--text)"
+                                fontFamily="$body"
+                              >
+                                {t("timerStart")}
+                              </Button>
+                            ) : null}
+                            {st.timerState === "running" ? (
+                              <Button
+                                onPress={() => void onStepTimer(st.id, "pause")}
+                                disabled={!canCall || !session?.startedAt}
+                                size="$3"
+                                bg="var(--surface-2)"
+                                borderWidth={1}
+                                borderColor="var(--border)"
+                                color="var(--text)"
+                                fontFamily="$body"
+                              >
+                                {t("timerPause")}
+                              </Button>
+                            ) : null}
+                            {st.timerState !== "stopped" ? (
+                              <Button
+                                onPress={() => void onStepTimer(st.id, "stop")}
+                                disabled={!canCall || !session?.startedAt}
+                                size="$3"
+                                bg="var(--surface-2)"
+                                borderWidth={1}
+                                borderColor="var(--border)"
+                                color="var(--text)"
+                                fontFamily="$body"
+                              >
+                                {t("timerStop")}
+                              </Button>
+                            ) : null}
+                          </XStack>
+                        </YStack>
+                      </>
+                    ) : null}
 
                     <View flexBasis="100%" w="100%">
                       <details>
@@ -863,90 +1034,44 @@ export default function BrewSessionDetailPage() {
                       </details>
                     </View>
 
-                    <YStack gap="$1">
-                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-                        {t("timerLine", {
-                          elapsed: formatElapsedSeconds(elapsed),
-                          planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
-                        })}
-                        {remainingSeconds != null ? (
-                          <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
-                            {" "}· {t("countdownLine", { remaining: formatElapsedSeconds(remainingSeconds) })}
-                          </SizableText>
-                        ) : null}
-                        {relativeCountdownSeconds != null ? (
-                          <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
-                            {" "}· {t("relativeCountdownLine", { remaining: formatElapsedSeconds(relativeCountdownSeconds) })}
-                          </SizableText>
-                        ) : null}
-                      </SizableText>
-                      <XStack gap="$2" items="center" flexWrap="wrap" width="100%">
-                        {st.timerState === "idle" || st.timerState === "paused" ? (
-                          <Button
-                            onPress={() => void onStepTimer(st.id, "start")}
-                            disabled={!canCall}
-                            size="$3"
-                            bg="var(--surface-2)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            color="var(--text)"
-                            fontFamily="$body"
-                          >
-                            {t("timerStart")}
-                          </Button>
-                        ) : null}
-                        {st.timerState === "running" ? (
-                          <Button
-                            onPress={() => void onStepTimer(st.id, "pause")}
-                            disabled={!canCall}
-                            size="$3"
-                            bg="var(--surface-2)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            color="var(--text)"
-                            fontFamily="$body"
-                          >
-                            {t("timerPause")}
-                          </Button>
-                        ) : null}
-                        {st.timerState !== "stopped" ? (
-                          <Button
-                            onPress={() => void onStepTimer(st.id, "stop")}
-                            disabled={!canCall}
-                            size="$3"
-                            bg="var(--surface-2)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            color="var(--text)"
-                            fontFamily="$body"
-                          >
-                            {t("timerStop")}
-                          </Button>
-                        ) : null}
-                        <View flex={1} minWidth={0} />
-                        <Button
-                          onPress={() => void onSaveStepLog(st.id)}
-                          disabled={!canCall}
-                          size="$3"
-                          bg="var(--surface-2)"
-                          borderWidth={1}
-                          borderColor="var(--border)"
-                          color="var(--text)"
-                          fontFamily="$body"
-                        >
-                          {t("saveLogButton")}
-                        </Button>
-                      </XStack>
-                    </YStack>
+                    <XStack gap="$2" items="center" flexWrap="wrap" width="100%">
+                      <View flex={1} minWidth={0} />
+                      <Button
+                        onPress={() => void onSaveStepLog(st.id)}
+                        disabled={!canCall}
+                        size="$3"
+                        bg="var(--surface-2)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        color="var(--text)"
+                        fontFamily="$body"
+                      >
+                        {t("saveLogButton")}
+                      </Button>
+                      <Button
+                        onPress={() => void onRemoveStep(st.id)}
+                        disabled={!canCall || removeStepWorking != null}
+                        size="$3"
+                        bg="var(--surface-2)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        color="var(--text)"
+                        fontFamily="$body"
+                        aria-label={t("removeStepButton")}
+                      >
+                        {removeStepWorking === st.id ? t("removeStepRemoving") : t("removeStepButton")}
+                      </Button>
+                    </XStack>
                   </YStack>
                 </RecipeEditIngredientCard>
               );
             })}
           </YStack>
         </RecipeEditSection>
-      ))}
+      );
+      })}
 
-      <XStack gap="$2" items="center" flexWrap="wrap" mt="$2">
+      <PageWideActionBar>
         <Button
           onPress={() => void onSaveSteps()}
           disabled={!canCall || savingSteps}
@@ -971,11 +1096,10 @@ export default function BrewSessionDetailPage() {
         >
           {t("refresh")}
         </Button>
-      </XStack>
-
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-        {t("noteSaveSteps")}
-      </SizableText>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" flex={1}>
+          {t("noteSaveSteps")}
+        </SizableText>
+      </PageWideActionBar>
     </YStack>
   );
 }

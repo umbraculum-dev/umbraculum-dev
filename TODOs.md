@@ -63,6 +63,7 @@ Before implementing native app login, complete these items.
 - [ ] Extend style parsing for imports (BeerXML and likely BeerJSON): some exporters may split style/classification over multiple fields/lines (e.g. BeerXML `<CATEGORY>English Pale Ale</CATEGORY>` + `<CATEGORY_NUMBER>8</CATEGORY_NUMBER>` + `<STYLE_LETTER>B</STYLE_LETTER>` + `<STYLE_GUIDE>BJCP</STYLE_GUIDE>` + `<TYPE>Ale</TYPE>`). Consider this when extracting style name/code candidates for BJCP matching.
 - [x] Add recipe **Other ingredients** editor (BeerJSON-aligned) and persist canonically in `Recipe.beerJsonRecipeJson`.
 - [ ] Assess whether the Recipe Edit sidebar “Sections” nav is still useful now that recipe sections default-collapsed (especially on mobile/touch).
+- [ ] **Edit recipe page, Brew section**: (a) Disable the "Brew the current recipe" button for 5 seconds after click to avoid session duplication; show "Creating new brewing session...." while disabled. (b) Improve the note above the button to clarify that this action creates a new brewing session (does not start it); the session can be started later from the brew session detail page.
 
 ## Raw materials DB + collaboration (high priority)
 

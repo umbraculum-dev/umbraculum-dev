@@ -606,7 +606,7 @@
       "minutesPlannedLabel": "Minutes",
       "addStepButton": "Add step",
       "saveSuccess": "Saved.",
-      "saveStepsButton": "Save brewing section",
+      "saveStepsButton": "Save brewing session",
       "saving": "Saving…",
       "noteSaveSteps": "Reorder/disable changes are stored when you save the brewing section.",
       "moveUp": "Move up",
@@ -621,6 +621,9 @@
       "disableYes": "Yes",
       "stepNoteLabel": "Note",
       "saveLogButton": "Save log",
+      "removeStepButton": "Remove step",
+      "removeStepRemoving": "Removing…",
+      "removeStepSuccess": "Step removed from this brew session.",
       "deleteSessionButton": "Delete brewing session",
       "deleteSessionConfirm": "This will permanently delete this brewing session (including steps and logs).",
       "confirmDelete": "Confirm delete",
@@ -634,7 +637,10 @@
       "relativeCountdownLine": "relative {remaining}",
       "timerStart": "Start",
       "timerPause": "Pause",
-      "timerStop": "Stop"
+      "timerStop": "Stop",
+      "startTimerForSection": "Start timer for section",
+      "startBoilTimerMin": "Start boil timer ({minutes})",
+      "activateCustomTimerLabel": "Activate custom timer"
     },
     "edit": {
       "title": "View & Edit recipe",
@@ -668,6 +674,9 @@
         "boil": "Boil",
         "notes": "Notes",
         "water": "Water Chemistry & Volumes"
+      },
+      "hops": {
+        "timeBeforeEndOfBoilMin": "Time before end of boil (min)"
       },
       "mashingHelp": "Mash schedule (BeerJSON mash procedure). Import a BeerJSON/BeerXML recipe with mash steps, or add steps manually in the Mash and/or Sparge water calculator pages.",
       "mashingEmpty": "No mash steps. Add steps or import a recipe with a mash schedule.",
@@ -732,6 +741,7 @@
       "brewButton": "Brew the current recipe",
       "brewFeatureSoon": "Feature available soon...",
       "hopsHelp": "Pick hops from the database (or enter manually). Stored as a snapshot on the recipe.",
+      "timeBeforeEndOfBoilMin": "Time before end of boil (min)",
       "yeastHelp": "Select yeast from the database (or enter manually). Stored as a snapshot on the recipe.",
       "yeastEditInYeastPage": "Edit yeast in Yeast page",
       "yeastPageTitle": "Yeast",

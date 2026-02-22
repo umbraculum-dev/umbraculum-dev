@@ -127,6 +127,7 @@ const miscUseOptions: { value: MiscUse; label: string }[] = [
 
 export default function RecipeEditPage() {
   const t = useTranslations("recipes.edit");
+  const tHops = useTranslations("recipes.edit.hops");
   const tEquip = useTranslations("recipes.edit.equipmentSection");
   const tAnalysis = useTranslations("recipes.analysis");
   const tMath = useTranslations("math");
@@ -3180,7 +3181,7 @@ export default function RecipeEditPage() {
                                 </YStack>
 
                                 <YStack gap="$1" minW={90}>
-                                  <RecipeEditFieldLabel htmlFor={`hop-min-${r.id}`}>Time (min)</RecipeEditFieldLabel>
+                                  <RecipeEditFieldLabel htmlFor={`hop-min-${r.id}`}>{tHops("timeBeforeEndOfBoilMin")}</RecipeEditFieldLabel>
                                   <Input
                                     id={`hop-min-${r.id}`}
                                     value={r.timeMinutes ?? ""}

@@ -376,6 +376,9 @@ model BrewSessionStep {
   /** Minutes from end of base step. Example: -15 means 15 minutes before the end. */
   offsetMinutesFromEnd Int?              @map("offset_minutes_from_end")
 
+  /** When true, show per-step timer UI (elapsed, Start/Pause/Stop, Relative to, Offset). */
+  customTimerEnabled Boolean             @default(false) @map("custom_timer_enabled")
+
   createdAt     DateTime                 @default(now()) @map("created_at")
   updatedAt     DateTime                 @updatedAt @map("updated_at")
 
