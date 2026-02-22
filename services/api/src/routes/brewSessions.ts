@@ -38,6 +38,25 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     return { ok: true };
   });
 
+  app.patch("/brew-sessions/:brewSessionId", async (req) => {
+    const ctx = requireActiveAccount(req);
+    const params = (req.params ?? {}) as { brewSessionId?: unknown };
+    const brewSessionId = typeof params.brewSessionId === "string" ? params.brewSessionId : "";
+    const body = (req.body ?? {}) as { scheduledDate?: string | null };
+    const raw = body.scheduledDate;
+    const scheduledDate =
+      raw === null || raw === undefined
+        ? null
+        : typeof raw === "string" && raw.trim()
+          ? new Date(raw.trim())
+          : null;
+    if (scheduledDate !== null && Number.isNaN(scheduledDate.getTime())) {
+      throw new BadRequestError("invalid_scheduled_date", "scheduledDate must be a valid ISO date string");
+    }
+    const updated = await svc.updateSessionDate(ctx.userId, ctx.activeAccountId, brewSessionId, scheduledDate);
+    return { ok: true, brewSession: updated };
+  });
+
   app.patch("/brew-sessions/:brewSessionId/steps", async (req) => {
     const ctx = requireActiveAccount(req);
     const params = (req.params ?? {}) as { brewSessionId?: unknown };

@@ -372,6 +372,24 @@ export class BrewSessionsService {
     return session;
   }
 
+  async updateSessionDate(
+    userId: string,
+    accountId: string,
+    brewSessionId: string,
+    scheduledDate: Date | null
+  ) {
+    await this.accounts.assertMembership(userId, accountId);
+    const existing = await this.prisma.brewSession.findFirst({
+      where: { id: brewSessionId, accountId },
+    });
+    if (!existing) throw new NotFoundError("brew_session_not_found", "Brew session not found");
+    const updated = await this.prisma.brewSession.update({
+      where: { id: brewSessionId },
+      data: { scheduledDate },
+    });
+    return updated;
+  }
+
   async saveSteps(
     userId: string,
     accountId: string,

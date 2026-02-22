@@ -1,7 +1,9 @@
 {
   "common": {
     "backToDashboard": "Back to Dashboard",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "dateLabel": "Date",
+    "timeLabel": "Time"
   },
   "units": {
     "C": "°C",
@@ -599,7 +601,7 @@
       "pauseSession": "Pause",
       "stopSession": "Stop",
       "logsTitle": "Logs",
-      "addCustomStepTitle": "Add new custom step for recipe",
+      "addCustomStepTitle": "Add new custom step for current recipe",
       "stepNameLabel": "Name",
       "stepNamePlaceholder": "Enter step name",
       "assignedSectionLabel": "Section",
@@ -640,7 +642,18 @@
       "timerStop": "Stop",
       "startTimerForSection": "Start timer for section",
       "startBoilTimerMin": "Start boil timer ({minutes})",
-      "activateCustomTimerLabel": "Activate custom timer"
+      "activateCustomTimerLabel": "Activate custom timer",
+      "dateSectionTitle": "Date",
+      "datePickerLabel": "Scheduled date & time",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "dateSave": "Save",
+      "dateRemove": "Remove",
+      "dateEdit": "Edit date",
+      "dateAdd": "Add date",
+      "dateCancel": "Cancel",
+      "dateNotSet": "No date set",
+      "dateScheduledLabel": "Scheduled"
     },
     "edit": {
       "title": "View & Edit recipe",
@@ -735,6 +748,7 @@
       "duplicateRecipeButton": "Duplicate recipe from current recipe",
       "duplicateRecipeWorking": "Duplicating…",
       "brewNote": "Launching the brew recipe creates the brew steps, lods necessary raw materiales and initialize logs if applicable.",
+      "programmedSectionLabel": "Programmed",
       "lastBrewedLabel": "Last brewed",
       "lastBrewedLoading": "Loading brew sessions…",
       "brewingHistoryEmpty": "No brew sessions yet for this recipe.",

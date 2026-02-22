@@ -1,7 +1,9 @@
 {
   "common": {
     "backToDashboard": "Torna alla Dashboard",
-    "loading": "Caricamento…"
+    "loading": "Caricamento…",
+    "dateLabel": "Data",
+    "timeLabel": "Ora"
   },
   "units": {
     "C": "°C",
@@ -606,7 +608,7 @@
       "pauseSession": "Pausa",
       "stopSession": "Stop",
       "logsTitle": "Log",
-      "addCustomStepTitle": "Aggiungi nuovo step personalizzato per la ricetta",
+      "addCustomStepTitle": "Aggiungi nuovo step personalizzato per la ricetta corrente",
       "stepNameLabel": "Nome",
       "stepNamePlaceholder": "Inserisci nome step",
       "assignedSectionLabel": "Sezione",
@@ -647,7 +649,18 @@
       "timerStop": "Stop",
       "startTimerForSection": "Avvia timer per sezione",
       "startBoilTimerMin": "Avvia timer bollitura ({minutes})",
-      "activateCustomTimerLabel": "Attiva timer personalizzato"
+      "activateCustomTimerLabel": "Attiva timer personalizzato",
+      "dateSectionTitle": "Data",
+      "datePickerLabel": "Data e ora programmate",
+      "dateLabel": "Data",
+      "timeLabel": "Ora",
+      "dateSave": "Salva",
+      "dateRemove": "Rimuovi",
+      "dateEdit": "Modifica data",
+      "dateAdd": "Aggiungi data",
+      "dateCancel": "Annulla",
+      "dateNotSet": "Nessuna data impostata",
+      "dateScheduledLabel": "Programmato"
     },
     "edit": {
       "title": "Visualizza e modifica ricetta",
@@ -742,6 +755,7 @@
       "duplicateRecipeButton": "Duplica ricetta dalla ricetta corrente",
       "duplicateRecipeWorking": "Duplicazione…",
       "brewNote": "Lanciare la ricetta di brassaggio crea gli step di brassaggio, carica le materie prime necessarie e inizializza i log se applicabile.",
+      "programmedSectionLabel": "Programmati",
       "lastBrewedLabel": "Ultimi brassaggi",
       "lastBrewedLoading": "Caricamento sessioni di brassaggio…",
       "brewingHistoryEmpty": "Nessuna sessione di brassaggio per questa ricetta.",

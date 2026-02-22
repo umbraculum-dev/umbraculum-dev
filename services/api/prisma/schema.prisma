@@ -189,6 +189,9 @@ model BrewSession {
   pausedAt  DateTime?        @map("paused_at")
   stoppedAt DateTime?        @map("stopped_at")
 
+  /** Optional scheduled/programmed date for the brew session (date only, no time). */
+  scheduledDate DateTime?    @map("scheduled_date")
+
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
 

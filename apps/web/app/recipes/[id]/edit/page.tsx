@@ -258,10 +258,17 @@ export default function RecipeEditPage() {
   const [duplicatingRecipe, setDuplicatingRecipe] = useState(false);
   const [creatingBrewSession, setCreatingBrewSession] = useState(false);
   const [brewSessionError, setBrewSessionError] = useState<string | null>(null);
-  const [lastBrewSessions, setLastBrewSessions] = useState<
-    { id: string; code: string; status: string; createdAt: string; startedAt: string | null }[]
+  const [brewSessions, setBrewSessions] = useState<
+    {
+      id: string;
+      code: string;
+      status: string;
+      createdAt: string;
+      startedAt: string | null;
+      scheduledDate: string | null;
+    }[]
   >([]);
-  const [lastBrewSessionsLoading, setLastBrewSessionsLoading] = useState(false);
+  const [brewSessionsLoading, setBrewSessionsLoading] = useState(false);
   const [duplicateRecipeError, setDuplicateRecipeError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("custom");
@@ -350,32 +357,43 @@ export default function RecipeEditPage() {
   useEffect(() => {
     if (!canCallAccountScoped || !recipeId) return;
     let cancelled = false;
-    setLastBrewSessionsLoading(true);
+    setBrewSessionsLoading(true);
     (async () => {
       try {
         const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`);
         if (cancelled) return;
         const list = (res.data as { brewSessions?: unknown[] })?.brewSessions;
-        const sessions = Array.isArray(list) ? list.slice(0, 10) : [];
-        setLastBrewSessions(
+        const sessions = Array.isArray(list) ? list.slice(0, 20) : [];
+        setBrewSessions(
           sessions.map((s: any) => ({
             id: s?.id ?? "",
             code: s?.code ?? "",
             status: s?.status ?? "",
             createdAt: s?.createdAt ?? "",
             startedAt: s?.startedAt ?? null,
+            scheduledDate: s?.scheduledDate ?? null,
           })),
         );
       } catch {
-        if (!cancelled) setLastBrewSessions([]);
+        if (!cancelled) setBrewSessions([]);
       } finally {
-        if (!cancelled) setLastBrewSessionsLoading(false);
+        if (!cancelled) setBrewSessionsLoading(false);
       }
     })();
     return () => {
       cancelled = true;
     };
   }, [canCallAccountScoped, recipeId]);
+
+  const programmedSessions = useMemo(
+    () =>
+      brewSessions.filter((s) => s.scheduledDate != null && s.startedAt == null),
+    [brewSessions]
+  );
+  const lastBrewSessions = useMemo(
+    () => brewSessions.filter((s) => s.startedAt != null),
+    [brewSessions]
+  );
 
   const spargeStepTempDisplay =
     spargeStepTempLocal ?? waterSettings?.spargeStepTemperatureC ?? 76;
@@ -2227,6 +2245,32 @@ export default function RecipeEditPage() {
             onOpenChange={(open) => setSectionOpen("brewingHistory", open)}
           >
             <YStack gap="$2" mt="$2">
+              {programmedSessions.length > 0 ? (
+                <RecipeEditFieldBlock variant="computed" header={t("programmedSectionLabel")} mt={0} mb={0}>
+                  <RecipeEditList gap="$1" mt="$1" mb={0}>
+                    {programmedSessions.map((s) => {
+                      const displayDate = s.scheduledDate
+                        ? new Date(s.scheduledDate).toLocaleString(locale, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "—";
+                      return (
+                        <SizableText as="li" key={s.id} size="$2" fontFamily="$body" color="var(--text)">
+                          <Link href={`/recipes/${recipeId}/brew-sessions/${s.id}`}>{s.code}</Link>
+                          {" · "}
+                          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                            {displayDate}
+                          </SizableText>
+                        </SizableText>
+                      );
+                    })}
+                  </RecipeEditList>
+                </RecipeEditFieldBlock>
+              ) : null}
               {lastBrewSessions.length > 0 ? (
                 <RecipeEditFieldBlock variant="computed" header={t("lastBrewedLabel")} mt={0} mb={0}>
                   <RecipeEditList gap="$1" mt="$1" mb={0}>
@@ -2251,15 +2295,16 @@ export default function RecipeEditPage() {
                     })}
                   </RecipeEditList>
                 </RecipeEditFieldBlock>
-              ) : lastBrewSessionsLoading ? (
+              ) : null}
+              {brewSessionsLoading ? (
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("lastBrewedLoading")}
                 </SizableText>
-              ) : (
+              ) : programmedSessions.length === 0 && lastBrewSessions.length === 0 ? (
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("brewingHistoryEmpty")}
                 </SizableText>
-              )}
+              ) : null}
             </YStack>
           </RecipeEditSection>
 

@@ -31,6 +31,7 @@ type BrewSession = {
   startedAt: string | null;
   pausedAt: string | null;
   stoppedAt: string | null;
+  scheduledDate: string | null;
   createdAt: string;
 };
 
@@ -125,6 +126,12 @@ export default function BrewSessionDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const [dateEditing, setDateEditing] = useState(false);
+  const [dateInputValue, setDateInputValue] = useState("");
+  const [timeInputValue, setTimeInputValue] = useState("");
+  const [dateSaving, setDateSaving] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
+
   const [customStepName, setCustomStepName] = useState("");
   const [customStepMinutes, setCustomStepMinutes] = useState("");
   const [customStepSectionId, setCustomStepSectionId] = useState<string>("");
@@ -145,6 +152,16 @@ export default function BrewSessionDetailPage() {
       const s = (data as any)?.brewSession;
       setSession(s ?? null);
       setRecipe(s?.recipe ?? null);
+      const sd = s?.scheduledDate;
+      if (sd) {
+        const d = new Date(sd);
+        const pad = (n: number) => String(n).padStart(2, "0");
+        setDateInputValue(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
+        setTimeInputValue(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+      } else {
+        setDateInputValue("");
+        setTimeInputValue("");
+      }
       setSteps(Array.isArray(s?.steps) ? (s.steps as BrewSessionStep[]) : []);
       setLogs(Array.isArray(s?.logs) ? (s.logs as BrewSessionLog[]) : []);
 
@@ -375,6 +392,54 @@ export default function BrewSessionDetailPage() {
     }
   };
 
+  const onSaveDate = async () => {
+    if (!canCall || !brewSessionId) return;
+    setDateError(null);
+    setDateSaving(true);
+    try {
+      const datePart = dateInputValue.trim();
+      const timePart = timeInputValue.trim() || "00:00";
+      const combined = datePart ? `${datePart}T${timePart}` : null;
+      const payload = combined ? { scheduledDate: combined } : { scheduledDate: null };
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const next = (res.data as any)?.brewSession;
+      if (next) setSession(next as BrewSession);
+      setDateEditing(false);
+    } catch (err) {
+      setDateError(String(err));
+    } finally {
+      setDateSaving(false);
+    }
+  };
+
+  const onRemoveDate = async () => {
+    if (!canCall || !brewSessionId) return;
+    setDateError(null);
+    setDateSaving(true);
+    try {
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduledDate: null }),
+      });
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const next = (res.data as any)?.brewSession;
+      if (next) setSession(next as BrewSession);
+      setDateInputValue("");
+      setTimeInputValue("");
+      setDateEditing(false);
+    } catch (err) {
+      setDateError(String(err));
+    } finally {
+      setDateSaving(false);
+    }
+  };
+
   const onStepTimer = async (stepId: string, action: "start" | "pause" | "stop") => {
     if (!canCall || !brewSessionId) return;
     setStepActionError(null);
@@ -543,7 +608,7 @@ export default function BrewSessionDetailPage() {
                 {sessionActionWorking === "pause" ? t("working") : t("pauseSession")}
               </Button>
             ) : null}
-            {session.status !== "stopped" ? (
+            {session.startedAt != null && session.status !== "stopped" ? (
               <Button
                 onPress={() => void onSessionAction("stop")}
                 disabled={!canCall || sessionActionWorking != null}
@@ -610,6 +675,163 @@ export default function BrewSessionDetailPage() {
               </YStack>
             </WarningBox>
           ) : null}
+        </View>
+      ) : null}
+
+      {session ? (
+        <View
+          bg="var(--surface)"
+          borderWidth={1}
+          borderColor="var(--border)"
+          rounded="$3"
+          p="$3"
+        >
+          <H2 mt={0}>{t("dateSectionTitle")}</H2>
+          <YStack gap="$2" mt="$2">
+            {dateEditing ? (
+              <>
+                <XStack gap="$2" items="flex-end" flexWrap="wrap">
+                  <View minW={160}>
+                    <RecipeEditFieldLabel htmlFor="session-date-picker">
+                      {t("dateLabel")}
+                    </RecipeEditFieldLabel>
+                    <input
+                      id="session-date-picker"
+                      type="date"
+                      value={dateInputValue}
+                      onChange={(e) => setDateInputValue(e.target.value)}
+                      style={{
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        width: "100%",
+                        minWidth: 140,
+                        backgroundColor: "var(--surface)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 8,
+                        fontFamily: "var(--font-body)",
+                        color: "var(--text)",
+                      }}
+                    />
+                  </View>
+                  <View minW={120}>
+                    <RecipeEditFieldLabel htmlFor="session-time-picker">
+                      {t("timeLabel")}
+                    </RecipeEditFieldLabel>
+                    <input
+                      id="session-time-picker"
+                      type="time"
+                      value={timeInputValue}
+                      onChange={(e) => setTimeInputValue(e.target.value)}
+                      style={{
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        width: "100%",
+                        minWidth: 100,
+                        backgroundColor: "var(--surface)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 8,
+                        fontFamily: "var(--font-body)",
+                        color: "var(--text)",
+                      }}
+                    />
+                  </View>
+                  <XStack gap="$2" items="flex-end" flexWrap="wrap">
+                    <Button
+                      onPress={() => void onSaveDate()}
+                      disabled={!canCall || dateSaving}
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      fontFamily="$body"
+                    >
+                      {dateSaving ? t("working") : t("dateSave")}
+                    </Button>
+                    <Button
+                      onPress={() => void onRemoveDate()}
+                      disabled={!canCall || dateSaving}
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      fontFamily="$body"
+                    >
+                      {dateSaving ? t("working") : t("dateRemove")}
+                    </Button>
+                    <Button
+                      onPress={() => {
+                        setDateEditing(false);
+                        if (session?.scheduledDate) {
+                          const d = new Date(session.scheduledDate);
+                          const pad = (n: number) => String(n).padStart(2, "0");
+                          setDateInputValue(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
+                          setTimeInputValue(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+                        } else {
+                          setDateInputValue("");
+                          setTimeInputValue("");
+                        }
+                      }}
+                      disabled={dateSaving}
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      fontFamily="$body"
+                    >
+                      {t("dateCancel")}
+                    </Button>
+                  </XStack>
+                </XStack>
+                {dateError ? <ErrorBox>{dateError}</ErrorBox> : null}
+              </>
+            ) : (
+              <YStack gap="$2" width="100%">
+                <XStack gap="$2" items="center" flexWrap="wrap">
+                  <SizableText size="$3" fontFamily="$body" color="var(--text)" flexShrink={0}>
+                    {session.scheduledDate
+                      ? (() => {
+                          const d = new Date(session.scheduledDate);
+                          if (Number.isNaN(d.getTime())) return t("dateNotSet");
+                          return `${t("dateScheduledLabel")}: ${d.toLocaleString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`;
+                        })()
+                      : t("dateNotSet")}
+                  </SizableText>
+                  <Button
+                    onPress={() => {
+                    setDateEditing(true);
+                    if (session.scheduledDate) {
+                      const d = new Date(session.scheduledDate);
+                      const pad = (n: number) => String(n).padStart(2, "0");
+                      setDateInputValue(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
+                      setTimeInputValue(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+                    } else {
+                      setDateInputValue("");
+                      setTimeInputValue("");
+                    }
+                  }}
+                  disabled={!canCall}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
+                  {session.scheduledDate ? t("dateEdit") : t("dateAdd")}
+                </Button>
+                </XStack>
+              </YStack>
+            )}
+          </YStack>
         </View>
       ) : null}
 
