@@ -39,6 +39,7 @@ export interface GravityAnalysisResultV1 {
   pbgEstimatedSg: number | null;
   ibuTinsethEstimated: number | null;
   ibuRagerEstimated: number | null;
+  buGuRatio: number | null;
   colorSrmMoreyEstimated: number | null;
   colorSrmDanielsEstimated: number | null;
   fgEstimatedSg: number | null;

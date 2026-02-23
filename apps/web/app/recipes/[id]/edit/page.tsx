@@ -541,10 +541,22 @@ export default function RecipeEditPage() {
               "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : row.mashRoastDehuskedOverride ?? null,
           } as EditorGristRow;
         });
-        const hops = s.hopsRows.map((row) => ({
-          ...row,
-          ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
-        })) as EditorHopRow[];
+        const hopFormOverrides =
+          ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any).hopFormOverrides : null;
+        const hops = s.hopsRows.map((row) => {
+          const override =
+            hopFormOverrides &&
+            typeof hopFormOverrides === "object" &&
+            !Array.isArray(hopFormOverrides) &&
+            (hopFormOverrides[row.id] === "debittered_leaf" || hopFormOverrides[row.id] === "hop_extract")
+              ? (hopFormOverrides[row.id] as "debittered_leaf" | "hop_extract")
+              : null;
+          return {
+            ...row,
+            ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
+            form: override ?? (row.form ?? "pellet"),
+          };
+        }) as EditorHopRow[];
         const yeast = s.yeastRows.map((row) => {
           const pitchRate =
             yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string"
@@ -1222,6 +1234,7 @@ export default function RecipeEditPage() {
         ingredientId: null,
         name: "",
         country: null,
+        form: "pellet",
         amountGrams: 0,
         alphaAcidPercent: null,
         use: "boil",
@@ -1874,6 +1887,18 @@ export default function RecipeEditPage() {
                             </View>
                             <View>
                               <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
+                            </View>
+                          </XStack>
+                          </View>
+                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
+                          <XStack gap="$2" ai="baseline">
+                            <View minW={180} pr="$3">
+                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.buGu")}</SizableText>
+                                </XStack>
+                            </View>
+                            <View>
+                              <CodeInline>{fmtField("buGuRatio", a?.buGuRatio, 2)}</CodeInline>
                             </View>
                           </XStack>
                           </View>
@@ -3281,6 +3306,29 @@ export default function RecipeEditPage() {
                                     borderColor="var(--border)"
                                     rounded="$2"
                                     fontFamily="$body"
+                                  />
+                                </YStack>
+
+                                <YStack gap="$1" minW={170}>
+                                  <RecipeEditFieldLabel htmlFor={`hop-form-${r.id}`}>{tHops("typeLabel")}</RecipeEditFieldLabel>
+                                  <BrewSelect
+                                    id={`hop-form-${r.id}`}
+                                    value={r.form ?? "pellet"}
+                                    onValueChange={(v) =>
+                                      updateHopRow(r.id, {
+                                        form: v as any,
+                                      })
+                                    }
+                                    options={[
+                                      { value: "pellet", label: tHops("typeOptions.pellet") },
+                                      { value: "leaf", label: tHops("typeOptions.leaf") },
+                                      { value: "leaf (wet)", label: tHops("typeOptions.leafWet") },
+                                      { value: "powder", label: tHops("typeOptions.powder") },
+                                      { value: "extract", label: tHops("typeOptions.extract") },
+                                      { value: "hop_extract", label: tHops("typeOptions.hopExtract") },
+                                      { value: "plug", label: tHops("typeOptions.plug") },
+                                      { value: "debittered_leaf", label: tHops("typeOptions.debitteredLeaf") },
+                                    ]}
                                   />
                                 </YStack>
 

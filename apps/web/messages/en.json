@@ -729,7 +729,18 @@
         "water": "Water Chemistry & Volumes"
       },
       "hops": {
-        "timeBeforeEndOfBoilMin": "Time before end of boil (min)"
+        "timeBeforeEndOfBoilMin": "Time before end of boil (min)",
+        "typeLabel": "Type",
+        "typeOptions": {
+          "pellet": "Pellet",
+          "leaf": "Leaf/Whole (dry)",
+          "leafWet": "Leaf/Whole (fresh)",
+          "powder": "Lupulin (pellet)",
+          "extract": "Extract",
+          "hopExtract": "Hop Extract",
+          "plug": "Plugs",
+          "debitteredLeaf": "Debittered Leaf"
+        }
       },
       "mashingHelp": "Mash schedule (BeerJSON mash procedure). Import a BeerJSON/BeerXML recipe with mash steps, or add steps manually in the Mash and/or Sparge water calculator pages.",
       "mashingEmpty": "No mash steps. Add steps or import a recipe with a mash schedule.",
@@ -921,6 +932,7 @@
         "abv": "ABV (estimated)",
         "ibuTinseth": "IBU (Tinseth, estimated)",
         "ibuRager": "IBU (Rager, estimated)",
+        "buGu": "BU/GU",
         "srmMorey": "Color (SRM, Morey, estimated)",
         "srmDaniels": "Color (SRM, Daniels, estimated)",
         "boilTimeMinutes": "Boil time (minutes)",

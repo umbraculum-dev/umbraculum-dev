@@ -802,6 +802,7 @@ type HopRow = {
   ingredientId?: string | null;
   name: string;
   country?: string | null;
+  form?: "extract" | "leaf" | "leaf (wet)" | "pellet" | "powder" | "plug" | "debittered_leaf" | "hop_extract" | null;
   amountGrams: number;
   alphaAcidPercent: number | null;
   use: HopUse;
@@ -844,6 +845,33 @@ function validateHopsJson(value: unknown): HopRow[] | null | undefined {
               throw new BadRequestError(
                 "invalid_hop_row_country",
                 `Body.hopsJson[${idx}].country must be a string or null`,
+              );
+            })();
+
+    const formRaw = o.form;
+    const form =
+      formRaw === null || formRaw === undefined
+        ? null
+        : typeof formRaw === "string"
+          ? (formRaw === "extract" ||
+              formRaw === "leaf" ||
+              formRaw === "leaf (wet)" ||
+              formRaw === "pellet" ||
+              formRaw === "powder" ||
+              formRaw === "plug" ||
+              formRaw === "debittered_leaf" ||
+              formRaw === "hop_extract"
+              ? (formRaw as HopRow["form"])
+              : (() => {
+                  throw new BadRequestError(
+                    "invalid_hop_row_form",
+                    `Body.hopsJson[${idx}].form must be one of: extract, leaf, leaf (wet), pellet, powder, plug, debittered_leaf, hop_extract`,
+                  );
+                })())
+          : (() => {
+              throw new BadRequestError(
+                "invalid_hop_row_form",
+                `Body.hopsJson[${idx}].form must be a string or null`,
               );
             })();
 
@@ -897,6 +925,7 @@ function validateHopsJson(value: unknown): HopRow[] | null | undefined {
       timeMinutes,
     };
     if (country) out.country = country;
+    if (form) out.form = form;
     return out as HopRow;
   });
 }

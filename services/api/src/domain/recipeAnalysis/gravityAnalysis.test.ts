@@ -8,6 +8,7 @@ function beerJsonDoc(args: {
   hops?: Array<{
     id?: string;
     name?: string;
+    form?: "extract" | "leaf" | "leaf (wet)" | "pellet" | "powder" | "plug";
     amountGrams: number;
     alphaAcidPercent: number;
     timeMinutes?: number | null;
@@ -32,6 +33,7 @@ function beerJsonDoc(args: {
     return {
       id: h.id ?? `h-${idx + 1}`,
       name: h.name ?? `Hop${idx + 1}`,
+      ...(h.form ? { form: h.form } : {}),
       alpha_acid: { unit: "%", value: h.alphaAcidPercent },
       amount: { unit: "g", value: h.amountGrams },
       timing,
@@ -424,6 +426,60 @@ describe("recipeAnalysis.gravityAnalysis (v1)", () => {
 
     expect(res.result.ibuTinsethEstimated).toBeCloseTo(expectedTinseth, 9);
     expect(res.result.ibuRagerEstimated).toBeCloseTo(expectedRager, 9);
+
+    const expectedBuGu = expectedTinseth / (((res.result.ogEstimatedSg as number) - 1) * 1000);
+    expect(res.result.buGuRatio).toBeCloseTo(expectedBuGu, 9);
+  });
+
+  it("applies hop form factors for IBU (leaf vs pellet, wet vs pellet)", () => {
+    const mk = (hop: any, ext: any = {}) =>
+      computeRecipeGravityAnalysis({
+        beerJsonRecipeJson: beerJsonDoc({
+          fermentables: [{ amountKg: 5, yieldPercent: 80 }],
+          yeasts: [{ id: "y-1", attenuationPercent: 75 }],
+          hops: [hop],
+        }),
+        recipeExtJson: {
+          version: 1,
+          equipment: {
+            kettle: {
+              kettleVolumeLiters: 30,
+              kettleLossesLiters: 10,
+              kettleHopsAbsorptionLiters: 0,
+              kettleCoolingShrinkagePercent: 0,
+              kettleBoilEvaporationRatePercentPerHour: 0,
+            },
+            mash: { mashEfficiencyPercent: 75, mashGrainAbsorptionLPerKg: 0 },
+            misc: { otherLossesLiters: 0 },
+          },
+          ...ext,
+        },
+        recipeWaterSettings: {
+          mashWaterVolumeLiters: 20,
+          spargeVolumeLiters: 10,
+          boilWaterVolumeLiters: 0,
+        },
+      });
+
+    const baseHop = { id: "h-1", name: "Hop", amountGrams: 10, alphaAcidPercent: 10, timeMinutes: 60, use: "boil" };
+
+    const pellet = mk({ ...baseHop, form: "pellet" });
+    const leaf = mk({ ...baseHop, form: "leaf" });
+    const wet = mk({ ...baseHop, form: "leaf (wet)" });
+
+    expect(pellet.result.ibuTinsethEstimated).not.toBeNull();
+    expect(leaf.result.ibuTinsethEstimated).not.toBeNull();
+    expect(wet.result.ibuTinsethEstimated).not.toBeNull();
+
+    const ibuPellet = pellet.result.ibuTinsethEstimated as number;
+    const ibuLeaf = leaf.result.ibuTinsethEstimated as number;
+    const ibuWet = wet.result.ibuTinsethEstimated as number;
+
+    expect(ibuLeaf / ibuPellet).toBeCloseTo(0.9, 9);
+    expect(ibuWet / ibuPellet).toBeCloseTo(1 / 4.5, 9);
+
+    const debittered = mk({ ...baseHop, form: "pellet" }, { hopFormOverrides: { "h-1": "debittered_leaf" } });
+    expect((debittered.result.ibuTinsethEstimated as number) / ibuPellet).toBeCloseTo(0.5, 9);
   });
 
   it("applies whirlpool utilization multiplier (0.5x) for IBU", () => {

@@ -736,7 +736,18 @@
         "water": "Chimica dell'acqua e volumi"
       },
       "hops": {
-        "timeBeforeEndOfBoilMin": "Minuti prima della fine della bollitura (min)"
+        "timeBeforeEndOfBoilMin": "Minuti prima della fine della bollitura (min)",
+        "typeLabel": "Tipo",
+        "typeOptions": {
+          "pellet": "Pellet",
+          "leaf": "Cono/Intero (secco)",
+          "leafWet": "Cono/Intero (fresco)",
+          "powder": "Lupulina (pellet)",
+          "extract": "Estratto",
+          "hopExtract": "Estratto di luppolo",
+          "plug": "Plugs",
+          "debitteredLeaf": "Foglia deamaricata"
+        }
       },
       "mashingHelp": "Programma di ammostamento (procedura mash BeerJSON). Importa una ricetta BeerJSON/BeerXML con step mash o aggiungili manualmente nelle pagine calcolatore acqua Mash e/o Sparge.",
       "mashingEmpty": "Nessuno step di ammostamento. Aggiungi step o importa una ricetta con programma mash.",
@@ -928,6 +939,7 @@
         "abv": "ABV (stimata)",
         "ibuTinseth": "IBU (Tinseth, stimata)",
         "ibuRager": "IBU (Rager, stimata)",
+        "buGu": "BU/GU",
         "srmMorey": "Colore (SRM, Morey, stimato)",
         "srmDaniels": "Colore (SRM, Daniels, stimato)",
         "boilTimeMinutes": "Tempo bollitura (minuti)",

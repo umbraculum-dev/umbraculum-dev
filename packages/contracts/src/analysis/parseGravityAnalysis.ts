@@ -105,6 +105,7 @@ export function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisRespo
     pbgEstimatedSg: rr.pbgEstimatedSg === null ? null : isFiniteNumber(rr.pbgEstimatedSg) ? rr.pbgEstimatedSg : null,
     ibuTinsethEstimated: rr.ibuTinsethEstimated === null ? null : isFiniteNumber(rr.ibuTinsethEstimated) ? rr.ibuTinsethEstimated : null,
     ibuRagerEstimated: rr.ibuRagerEstimated === null ? null : isFiniteNumber(rr.ibuRagerEstimated) ? rr.ibuRagerEstimated : null,
+    buGuRatio: rr.buGuRatio === null ? null : isFiniteNumber(rr.buGuRatio) ? rr.buGuRatio : null,
     colorSrmMoreyEstimated:
       rr.colorSrmMoreyEstimated === null ? null : isFiniteNumber(rr.colorSrmMoreyEstimated) ? rr.colorSrmMoreyEstimated : null,
     colorSrmDanielsEstimated:

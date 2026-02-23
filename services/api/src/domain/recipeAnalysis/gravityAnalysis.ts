@@ -15,6 +15,7 @@ export interface GravityAnalysis {
   pbgEstimatedSg: number | null;
   ibuTinsethEstimated: number | null;
   ibuRagerEstimated: number | null;
+  buGuRatio: number | null;
   colorSrmMoreyEstimated: number | null;
   colorSrmDanielsEstimated: number | null;
   fgEstimatedSg: number | null;
@@ -57,9 +58,12 @@ function clamp(v: number, min: number, max: number): number {
 
 type HopUse = "boil" | "whirlpool" | "dryhop";
 
+type HopForm = "extract" | "leaf" | "leaf (wet)" | "pellet" | "powder" | "plug" | "debittered_leaf" | "hop_extract";
+
 interface ExtractedHopAddition {
   id: string | null;
   name: string | null;
+  form: HopForm | null;
   use: HopUse;
   timeMinutes: number | null;
   amountGrams: number | null;
@@ -128,15 +132,49 @@ function srmDanielsFromMcu(mcu: number): number {
   return 0.2 * Math.max(0, mcu) + 8.4;
 }
 
-function extractHopAdditions(beerJsonRecipeJson: unknown): ExtractedHopAddition[] {
+const WET_HOPS_DRY_EQUIVALENT_WEIGHT_FACTOR = 4.5;
+
+const HOP_FORM_FACTOR: Record<HopForm, number> = {
+  pellet: 1,
+  leaf: 0.9,
+  plug: 0.9,
+  "leaf (wet)": 1 / WET_HOPS_DRY_EQUIVALENT_WEIGHT_FACTOR,
+  powder: 1,
+  extract: 1,
+  hop_extract: 1,
+  debittered_leaf: 0.5,
+};
+
+function extractHopFormOverrides(recipeExtJson: unknown): Record<string, HopForm> | null {
+  const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? (recipeExtJson as any) : null;
+  const raw = ext?.hopFormOverrides;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const out: Record<string, HopForm> = {};
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof k !== "string" || !k.trim()) continue;
+    if (v === "debittered_leaf") out[k] = "debittered_leaf";
+    if (v === "hop_extract") out[k] = "hop_extract";
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown): ExtractedHopAddition[] {
   const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
   const hops = r0?.ingredients?.hop_additions;
   const list = Array.isArray(hops) ? hops : [];
+  const overrides = extractHopFormOverrides(recipeExtJson);
 
   const out: ExtractedHopAddition[] = [];
   for (const h of list) {
     const id = typeof h?.id === "string" ? h.id : null;
     const name = typeof h?.name === "string" ? h.name : null;
+    const override = id && overrides ? overrides[id] : null;
+    const formRaw = typeof h?.form === "string" ? h.form : "";
+    const formFromBeerJson: HopForm | null =
+      formRaw === "extract" || formRaw === "leaf" || formRaw === "leaf (wet)" || formRaw === "pellet" || formRaw === "powder" || formRaw === "plug"
+        ? (formRaw as HopForm)
+        : null;
+    const form: HopForm | null = override ?? formFromBeerJson;
 
     const timingUse = typeof h?.timing?.use === "string" ? h.timing.use : "";
     const savedUseRaw = typeof h?.brewery_app_use === "string" ? h.brewery_app_use : "";
@@ -167,6 +205,7 @@ function extractHopAdditions(beerJsonRecipeJson: unknown): ExtractedHopAddition[
     out.push({
       id,
       name,
+      form,
       use,
       timeMinutes,
       amountGrams,
@@ -219,6 +258,7 @@ function computeIbuTinseth(args: {
     const aaFrac = h.alphaAcidPercent / 100;
     let u = tinsethUtilization({ boilTimeMinutes: h.timeMinutes, boilGravitySg: args.boilGravitySg });
     if (h.use === "whirlpool") u *= WHIRLPOOL_UTILIZATION_MULTIPLIER;
+    if (h.form) u *= HOP_FORM_FACTOR[h.form];
 
     total += (h.amountGrams * aaFrac * u * 1000) / args.postBoilVolumeLiters;
   }
@@ -256,6 +296,7 @@ function computeIbuRager(args: {
     const aaFrac = h.alphaAcidPercent / 100;
     let u = ragerUtilizationFraction({ boilTimeMinutes: h.timeMinutes, boilGravitySg: args.boilGravitySg });
     if (h.use === "whirlpool") u *= WHIRLPOOL_UTILIZATION_MULTIPLIER;
+    if (h.form) u *= HOP_FORM_FACTOR[h.form];
 
     total += (h.amountGrams * aaFrac * u * 1000) / args.postBoilVolumeLiters;
   }
@@ -589,7 +630,7 @@ export function computeRecipeGravityAnalysis(args: {
       ? estimateSgFromPpg({ fermentables, volumeLiters: preBoilVolumeLiters, efficiencyPercent })
       : null;
 
-  const hops = extractHopAdditions(args.beerJsonRecipeJson);
+  const hops = extractHopAdditions(args.beerJsonRecipeJson, args.recipeExtJson);
 
   const ibuVolumeLiters =
     kettleVolumeLiters ??
@@ -617,6 +658,11 @@ export function computeRecipeGravityAnalysis(args: {
   const ibuRagerEstimated =
     ibuVolumeLiters != null && ibuGravitySg != null
       ? computeIbuRager({ hops, boilGravitySg: ibuGravitySg, postBoilVolumeLiters: ibuVolumeLiters, warnings })
+      : null;
+  const ibuForBuGu = ibuTinsethEstimated ?? ibuRagerEstimated ?? null;
+  const buGuRatio =
+    ibuForBuGu != null && ogEstimatedSg != null && ogEstimatedSg > 1
+      ? ibuForBuGu / ((ogEstimatedSg - 1) * 1000)
       : null;
 
   const colorFermentables = extractFermentablesForColor(args.beerJsonRecipeJson);
@@ -666,6 +712,7 @@ export function computeRecipeGravityAnalysis(args: {
     pbgEstimatedSg,
     ibuTinsethEstimated,
     ibuRagerEstimated,
+    buGuRatio,
     colorSrmMoreyEstimated,
     colorSrmDanielsEstimated,
     fgEstimatedSg,

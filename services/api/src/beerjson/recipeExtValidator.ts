@@ -204,6 +204,14 @@ const recipeExtSchemaV1 = {
       },
     },
     /**
+     * Hop form overrides keyed by BeerJSON hop_additions[*].id.
+     * Used for app-specific options not representable in BeerJSON `form` enum.
+     */
+    hopFormOverrides: {
+      type: "object",
+      additionalProperties: { type: "string", enum: ["debittered_leaf", "hop_extract"] },
+    },
+    /**
      * Internal-only mash pH model parameters, keyed by fermentable row ID.
      * (BeerJSON does not have a place for these today.)
      */

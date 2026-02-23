@@ -40,6 +40,13 @@ export type EditorHopRow = {
   ingredientId: string | null;
   name: string;
   country?: string | null;
+  /**
+   * Hop form / type.
+   *
+   * - BeerJSON allowed values: extract | leaf | leaf (wet) | pellet | powder | plug
+   * - App extensions (stored in recipeExtJson.hopFormOverrides): debittered_leaf | hop_extract
+   */
+  form?: "extract" | "leaf" | "leaf (wet)" | "pellet" | "powder" | "plug" | "debittered_leaf" | "hop_extract" | null;
   amountGrams: number;
   alphaAcidPercent: number | null;
   use: "boil" | "whirlpool" | "dryhop";
@@ -414,10 +421,20 @@ function buildFermentableAddition(row: EditorGristRow) {
 }
 
 function buildHopAddition(row: EditorHopRow) {
+  const formRaw = row.form ?? null;
+  const formForBeerJson =
+    formRaw === "extract" || formRaw === "leaf" || formRaw === "leaf (wet)" || formRaw === "pellet" || formRaw === "powder" || formRaw === "plug"
+      ? formRaw
+      : formRaw === "debittered_leaf"
+        ? "leaf"
+        : formRaw === "hop_extract"
+          ? "extract"
+        : null;
   return {
     id: row.id,
     name: row.name,
     origin: row.country ?? undefined,
+    ...(formForBeerJson ? { form: formForBeerJson } : {}),
     alpha_acid: { unit: "%", value: row.alphaAcidPercent ?? 0 },
     amount: { unit: "g", value: row.amountGrams },
     timing: hopUseToTiming(row.use, row.timeMinutes),
@@ -672,10 +689,21 @@ export function buildRecipeExtJsonFromEditorState(args: {
       .filter(Boolean) as Array<readonly [string, unknown]>,
   );
 
+  const hopFormOverrides = Object.fromEntries(
+    args.hopsRows
+      .map((r) =>
+        r.form === "debittered_leaf" || r.form === "hop_extract"
+          ? ([r.id, r.form] as const)
+          : null,
+      )
+      .filter(Boolean) as Array<readonly [string, unknown]>,
+  );
+
   return {
     ...(extBase ? extBase : {}),
     version: 1,
     ingredientLinks,
+    ...(Object.keys(hopFormOverrides).length ? { hopFormOverrides } : {}),
     mashPhModel,
   };
 }
@@ -847,6 +875,16 @@ export function editorStateFromBeerJson(doc: unknown): {
       const id = typeof h?.id === "string" ? h.id : `${Date.now()}-${Math.random()}`;
       const name = typeof h?.name === "string" ? h.name : "";
       if (!name) return null;
+      const formRaw = typeof h?.form === "string" ? h.form : "";
+      const form: EditorHopRow["form"] =
+        formRaw === "extract" ||
+        formRaw === "leaf" ||
+        formRaw === "leaf (wet)" ||
+        formRaw === "pellet" ||
+        formRaw === "powder" ||
+        formRaw === "plug"
+          ? (formRaw as any)
+          : null;
       const amountGrams =
         h?.amount?.unit === "g" ? safeNum(h?.amount?.value, 0) : h?.amount?.unit === "kg" ? safeNum(h?.amount?.value, 0) * 1000 : 0;
       const alphaAcidPercent = h?.alpha_acid?.unit === "%" ? safeNum(h?.alpha_acid?.value, 0) : null;
@@ -863,6 +901,7 @@ export function editorStateFromBeerJson(doc: unknown): {
         ingredientId: null,
         name,
         country: typeof h?.origin === "string" ? h.origin : null,
+        form,
         amountGrams,
         alphaAcidPercent,
         use,
