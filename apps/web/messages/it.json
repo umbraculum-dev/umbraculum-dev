@@ -593,7 +593,7 @@
     "brewSessions": {
       "listTitle": "Sessioni di brew",
       "detailTitle": "Sessione di brew",
-      "backToRecipeEdit": "Torna alla modifica ricetta",
+      "backToRecipeEdit": "Torna a visualizza/modifica ricetta",
       "backToSessions": "Torna alle sessioni di brew",
       "createButton": "Crea sessione di brew",
       "creating": "Creazione…",
@@ -614,6 +614,7 @@
       "sectionStatusPending": "In attesa",
       "sectionStatusInProgress": "In corso",
       "sectionStatusDone": "Completata",
+      "sectionStatusForcedFinished": "Forzata come completata",
       "sessionAutoFinishedAtLine": "Sessione segnata automaticamente come completata il: {at}",
       "sessionManualFinishedAtLine": "Sessione segnata manualmente come completata il: {at}",
       "logsTitle": "Log",

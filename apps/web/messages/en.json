@@ -586,7 +586,7 @@
     "brewSessions": {
       "listTitle": "Brew sessions",
       "detailTitle": "Brew session",
-      "backToRecipeEdit": "Back to recipe edit",
+      "backToRecipeEdit": "Back to view/edit recipe",
       "backToSessions": "Back to brew sessions",
       "createButton": "Create brew session",
       "creating": "Creating…",
@@ -607,6 +607,7 @@
       "sectionStatusPending": "Pending",
       "sectionStatusInProgress": "In progress",
       "sectionStatusDone": "Done",
+      "sectionStatusForcedFinished": "Forced as finished",
       "sessionAutoFinishedAtLine": "Session automatically marked as finished on: {at}",
       "sessionManualFinishedAtLine": "Session manually marked as finished on: {at}",
       "logsTitle": "Logs",

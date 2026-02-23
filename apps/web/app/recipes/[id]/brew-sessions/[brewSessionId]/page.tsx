@@ -601,39 +601,71 @@ export default function BrewSessionDetailPage() {
     return n;
   };
 
-  const addCustomStep = () => {
+  const addCustomStep = async () => {
     const name = customStepName.trim();
     if (!name) return;
     const sectionId = customStepSectionId || PRESET_SECTION_ORDER[0];
     const minutes = parseMinutes(customStepMinutes);
     const sectionName =
       (PRESET_SECTION_ORDER as readonly string[]).includes(sectionId) ? null : (sectionOptions.find((o) => o.value === sectionId)?.label ?? null);
-    setSteps((prev) => [
-      ...prev,
-      {
-        id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
-        sectionId,
-        sectionName,
-        name,
-        isDisabled: false,
-        sortOrder: prev.length,
-        minutesPlanned: minutes,
-        relativeToStepId: null,
-        offsetMinutesFromEnd: null,
-        status: "pending",
-        note: null,
-        timerState: "idle",
-        timerStartedAt: null,
-        timerLastStartedAt: null,
-        timerPausedAt: null,
-        timerStoppedAt: null,
-        timerAccumulatedSeconds: 0,
-        customTimerEnabled: false,
-      },
-    ]);
+    const nextLocal: BrewSessionStep = {
+      id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
+      sectionId,
+      sectionName,
+      name,
+      isDisabled: false,
+      sortOrder: steps.length,
+      minutesPlanned: minutes,
+      relativeToStepId: null,
+      offsetMinutesFromEnd: null,
+      status: "pending",
+      note: null,
+      timerState: "idle",
+      timerStartedAt: null,
+      timerLastStartedAt: null,
+      timerPausedAt: null,
+      timerStoppedAt: null,
+      timerAccumulatedSeconds: 0,
+      customTimerEnabled: false,
+    };
+    const nextSteps = [...steps, nextLocal].map((s, idx) => ({ ...s, sortOrder: idx }));
+    setSteps(nextSteps);
     setCustomStepName("");
     setCustomStepMinutes("");
     setCustomStepSectionId("");
+
+    if (!canCall || !brewSessionId) return;
+    setSaveStatus(null);
+    setSaveError(null);
+    setSavingSteps(true);
+    try {
+      const payload = nextSteps.map((s) => ({
+        id: s.id,
+        sectionId: s.sectionId,
+        sectionName: s.sectionName,
+        name: s.name,
+        isDisabled: s.isDisabled,
+        minutesPlanned: s.minutesPlanned,
+        relativeToStepId: s.relativeToStepId,
+        offsetMinutesFromEnd: s.offsetMinutesFromEnd,
+        customTimerEnabled: s.customTimerEnabled ?? false,
+      }));
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ steps: payload }),
+      });
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const nextSaved = (res.data as any)?.steps;
+      if (Array.isArray(nextSaved)) {
+        setSteps(nextSaved as BrewSessionStep[]);
+      }
+      await refresh();
+    } catch (err) {
+      setSaveError(String(err));
+    } finally {
+      setSavingSteps(false);
+    }
   };
 
   const computeElapsedSeconds = (s: BrewSessionStep) => {
@@ -1303,11 +1335,14 @@ export default function BrewSessionDetailPage() {
         );
         const sectionInProgress = !sectionDone && (sectionHasAnyDone || sectionHasAnyTimerStarted);
         const sectionPending = !sectionDone && !sectionInProgress;
-        const sectionStatus: "pending" | "in_progress" | "done" = sectionDone
+        const sectionForcedFinished = session?.status === "stopped" && stoppedBy === "manual" && !sectionDone;
+        const sectionStatus: "pending" | "in_progress" | "done" | "forced_finished" = sectionDone
           ? "done"
-          : sectionInProgress
-            ? "in_progress"
-            : "pending";
+          : sectionForcedFinished
+            ? "forced_finished"
+            : sectionInProgress
+              ? "in_progress"
+              : "pending";
 
         const sectionPillStyles =
           sectionStatus === "done"
@@ -1316,17 +1351,23 @@ export default function BrewSessionDetailPage() {
                 borderColor: "color-mix(in srgb, var(--success) 40%, var(--border))",
                 textColor: "var(--text)",
               }
-            : sectionStatus === "in_progress"
+            : sectionStatus === "forced_finished"
               ? {
                   bg: "color-mix(in srgb, var(--warning) 18%, var(--surface))",
                   borderColor: "color-mix(in srgb, var(--warning) 40%, var(--border))",
                   textColor: "var(--text)",
                 }
-              : {
-                  bg: "color-mix(in srgb, var(--info) 14%, var(--surface))",
-                  borderColor: "color-mix(in srgb, var(--info) 35%, var(--border))",
-                  textColor: "var(--text)",
-                };
+              : sectionStatus === "in_progress"
+                ? {
+                    bg: "color-mix(in srgb, var(--warning) 18%, var(--surface))",
+                    borderColor: "color-mix(in srgb, var(--warning) 40%, var(--border))",
+                    textColor: "var(--text)",
+                  }
+                : {
+                    bg: "color-mix(in srgb, var(--info) 14%, var(--surface))",
+                    borderColor: "color-mix(in srgb, var(--info) 35%, var(--border))",
+                    textColor: "var(--text)",
+                  };
 
         const boilFirstStep =
           g.sectionId === "boil" && g.steps.length > 0
@@ -1369,9 +1410,11 @@ export default function BrewSessionDetailPage() {
               <SizableText size="$2" fontFamily="$body" color={sectionPillStyles.textColor} mt={0}>
                 {sectionStatus === "done"
                   ? t("sectionStatusDone")
-                  : sectionStatus === "in_progress"
-                    ? t("sectionStatusInProgress")
-                    : t("sectionStatusPending")}
+                  : sectionStatus === "forced_finished"
+                    ? t("sectionStatusForcedFinished")
+                    : sectionStatus === "in_progress"
+                      ? t("sectionStatusInProgress")
+                      : t("sectionStatusPending")}
               </SizableText>
             </View>
           }
