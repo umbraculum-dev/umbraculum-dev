@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import { waterFormatHints } from "@brewery/contracts";
 import {
@@ -20,7 +20,7 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
   const svc = new RecipeWaterComputeAndSaveService(app.prisma);
 
   app.post("/recipes/:id/water-settings/mash/compute-and-save", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const recipeId = parseRecipeId(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -57,12 +57,12 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
       grist: Array.isArray(body.grist) ? (body.grist as any) : undefined,
     };
 
-    const computed = await svc.computeAndSaveMash(ctx.userId, ctx.activeAccountId, recipeId, input);
+    const computed = await svc.computeAndSaveMash(ctx.userId, ctx.activeWorkspaceId, recipeId, input);
     return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 
   app.post("/recipes/:id/water-settings/sparge/compute-and-save", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const recipeId = parseRecipeId(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -90,12 +90,12 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
             : null,
     };
 
-    const computed = await svc.computeAndSaveSparge(ctx.userId, ctx.activeAccountId, recipeId, input);
+    const computed = await svc.computeAndSaveSparge(ctx.userId, ctx.activeWorkspaceId, recipeId, input);
     return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 
   app.post("/recipes/:id/water-settings/boil/compute-and-save", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const recipeId = parseRecipeId(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -132,7 +132,7 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
       boilSaltAdditionsJson: body.boilSaltAdditionsJson,
     };
 
-    const computed = await svc.computeAndSaveBoil(ctx.userId, ctx.activeAccountId, recipeId, input);
+    const computed = await svc.computeAndSaveBoil(ctx.userId, ctx.activeWorkspaceId, recipeId, input);
     return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 }

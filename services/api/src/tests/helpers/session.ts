@@ -10,6 +10,7 @@ function opaqueId(bytes = 32) {
 export async function createSessionForTestUser(
   app: FastifyInstance,
   options?: {
+    activeWorkspace?: boolean;
     activeAccount?: boolean;
     role?: Role;
     email?: string;
@@ -21,16 +22,16 @@ export async function createSessionForTestUser(
     `test_${Date.now()}_${Math.random().toString(16).slice(2)}@example.com`.toLowerCase();
   const preferredLocale = options?.preferredLocale ?? "en";
   const role: Role = options?.role ?? "brewery_admin";
-  const activeAccount = options?.activeAccount ?? true;
+  const activeWorkspace = options?.activeWorkspace ?? options?.activeAccount ?? true;
 
   const user = await app.prisma.user.create({
     data: { email, preferredLocale },
     select: { id: true, email: true },
   });
 
-  const account = await app.prisma.account.create({
+  const workspace = await app.prisma.workspace.create({
     data: {
-      name: "Test Account",
+      name: "Test Workspace",
       members: { create: { userId: user.id, role } },
     },
     select: { id: true, name: true },
@@ -41,17 +42,19 @@ export async function createSessionForTestUser(
     data: {
       id: sid,
       userId: user.id,
-      activeAccountId: activeAccount ? account.id : null,
+      activeWorkspaceId: activeWorkspace ? workspace.id : null,
       expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
     },
-    select: { id: true, activeAccountId: true },
+    select: { id: true, activeWorkspaceId: true },
   });
 
   return {
     userId: user.id,
-    accountId: account.id,
+    workspaceId: workspace.id,
+    accountId: workspace.id,
     cookie: `sid=${session.id}`,
-    activeAccountId: session.activeAccountId,
+    activeWorkspaceId: session.activeWorkspaceId,
+    activeAccountId: session.activeWorkspaceId,
   };
 }
 

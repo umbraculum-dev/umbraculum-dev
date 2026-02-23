@@ -1,6 +1,6 @@
 import type { BrewSessionLogKind, BrewSessionStatus, BrewSessionStepStatus, BrewSessionStepTimerState, PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 import { BrewdaySettingsService, DEFAULT_STEPS_SEED } from "./brewdaySettingsService.js";
 import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
 import { RecipesService } from "./recipesService.js";
@@ -30,22 +30,22 @@ type RecipeDrivenStepSeed = {
 };
 
 export class BrewSessionsService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
   private readonly brewdaySettings: BrewdaySettingsService;
   private readonly recipeWaterSettings: RecipeWaterSettingsService;
   private readonly recipes: RecipesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
     this.brewdaySettings = new BrewdaySettingsService(prisma);
     this.recipeWaterSettings = new RecipeWaterSettingsService(prisma);
     this.recipes = new RecipesService(prisma);
   }
 
-  private async assertRecipeInAccount(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  private async assertRecipeInWorkspace(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const recipe = await this.prisma.recipe.findFirst({
-      where: { id: recipeId, accountId },
+      where: { id: recipeId, workspaceId },
       select: { id: true, name: true, version: true },
     });
     if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
@@ -328,13 +328,13 @@ export class BrewSessionsService {
       .filter((s) => s.name.length > 0);
   }
 
-  async createSessionFromRecipe(userId: string, accountId: string, recipeId: string) {
-    await this.assertRecipeInAccount(userId, accountId, recipeId);
+  async createSessionFromRecipe(userId: string, workspaceId: string, recipeId: string) {
+    await this.assertRecipeInWorkspace(userId, workspaceId, recipeId);
 
     const [settings, recipe, waterSettings] = await Promise.all([
-      this.brewdaySettings.getSettings(userId, accountId),
-      this.recipes.getRecipe(userId, accountId, recipeId),
-      this.recipeWaterSettings.get(userId, accountId, recipeId).catch(() => null),
+      this.brewdaySettings.getSettings(userId, workspaceId),
+      this.recipes.getRecipe(userId, workspaceId, recipeId),
+      this.recipeWaterSettings.get(userId, workspaceId, recipeId).catch(() => null),
     ]);
 
     const stepSeed = this.buildStepSeedFromSettings({ settings });
@@ -394,7 +394,7 @@ export class BrewSessionsService {
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
       const existingCount = await this.prisma.brewSession.count({
-        where: { accountId, recipeId },
+        where: { workspaceId, recipeId },
       });
       const seq = existingCount + 1 + attempt;
       const code = `${prefix}-${String(seq).padStart(2, "0")}`;
@@ -403,7 +403,7 @@ export class BrewSessionsService {
         return await this.prisma.$transaction(async (tx) => {
           const session = await tx.brewSession.create({
             data: {
-              accountId,
+              workspaceId,
               recipeId,
               code,
               status: "draft" satisfies BrewSessionStatus,
@@ -448,7 +448,7 @@ export class BrewSessionsService {
         });
       } catch (err) {
         const msg = String(err);
-        if (msg.includes("brew_sessions_account_id_code_key")) {
+        if (msg.includes("brew_sessions_workspace_id_code_key")) {
           continue;
         }
         throw err;
@@ -458,18 +458,18 @@ export class BrewSessionsService {
     throw new BadRequestError("session_code_conflict", "Failed to generate unique brew session code");
   }
 
-  async listSessionsForRecipe(userId: string, accountId: string, recipeId: string) {
-    await this.assertRecipeInAccount(userId, accountId, recipeId);
+  async listSessionsForRecipe(userId: string, workspaceId: string, recipeId: string) {
+    await this.assertRecipeInWorkspace(userId, workspaceId, recipeId);
     return this.prisma.brewSession.findMany({
-      where: { accountId, recipeId },
+      where: { workspaceId, recipeId },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  async getSessionDetail(userId: string, accountId: string, brewSessionId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async getSessionDetail(userId: string, workspaceId: string, brewSessionId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const session = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
       include: {
         steps: { orderBy: { sortOrder: "asc" } },
         logs: { orderBy: { createdAt: "desc" }, take: 200 },
@@ -482,13 +482,13 @@ export class BrewSessionsService {
 
   async updateSessionDate(
     userId: string,
-    accountId: string,
+    workspaceId: string,
     brewSessionId: string,
     scheduledDate: Date | null
   ) {
-    await this.accounts.assertMembership(userId, accountId);
+    await this.workspaces.assertMembership(userId, workspaceId);
     const existing = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
     });
     if (!existing) throw new NotFoundError("brew_session_not_found", "Brew session not found");
     const updated = await this.prisma.brewSession.update({
@@ -500,13 +500,13 @@ export class BrewSessionsService {
 
   async saveSteps(
     userId: string,
-    accountId: string,
+    workspaceId: string,
     brewSessionId: string,
     steps: BrewSessionStepInput[]
   ) {
-    await this.accounts.assertMembership(userId, accountId);
+    await this.workspaces.assertMembership(userId, workspaceId);
     const existing = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
       include: { steps: { select: { id: true } } },
     });
     if (!existing) throw new NotFoundError("brew_session_not_found", "Brew session not found");
@@ -618,10 +618,10 @@ export class BrewSessionsService {
     return result;
   }
 
-  async startSession(userId: string, accountId: string, brewSessionId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async startSession(userId: string, workspaceId: string, brewSessionId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const session = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
     });
     if (!session) throw new NotFoundError("brew_session_not_found", "Brew session not found");
     if (session.status === "stopped") {
@@ -675,10 +675,10 @@ export class BrewSessionsService {
     return next;
   }
 
-  async pauseSession(userId: string, accountId: string, brewSessionId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async pauseSession(userId: string, workspaceId: string, brewSessionId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const session = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
     });
     if (!session) throw new NotFoundError("brew_session_not_found", "Brew session not found");
     if (session.status !== "running") {
@@ -725,13 +725,13 @@ export class BrewSessionsService {
 
   async stopSession(
     userId: string,
-    accountId: string,
+    workspaceId: string,
     brewSessionId: string,
     args?: { reason: "manual" | "auto" | null }
   ) {
-    await this.accounts.assertMembership(userId, accountId);
+    await this.workspaces.assertMembership(userId, workspaceId);
     const session = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
     });
     if (!session) throw new NotFoundError("brew_session_not_found", "Brew session not found");
     if (session.status === "stopped") {
@@ -782,12 +782,12 @@ export class BrewSessionsService {
 
   async saveStepLog(
     userId: string,
-    accountId: string,
+    workspaceId: string,
     brewSessionId: string,
     stepId: string,
     args: { status: BrewSessionStepStatus; note: string | null; name: string | null; isDisabled: boolean | null }
   ) {
-    await this.accounts.assertMembership(userId, accountId);
+    await this.workspaces.assertMembership(userId, workspaceId);
     const step = await this.prisma.brewSessionStep.findFirst({
       where: { id: stepId, brewSessionId },
     });
@@ -840,8 +840,8 @@ export class BrewSessionsService {
     });
   }
 
-  async startStepTimer(userId: string, accountId: string, brewSessionId: string, stepId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async startStepTimer(userId: string, workspaceId: string, brewSessionId: string, stepId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const step = await this.prisma.brewSessionStep.findFirst({
       where: { id: stepId, brewSessionId },
     });
@@ -872,8 +872,8 @@ export class BrewSessionsService {
     return updated;
   }
 
-  async pauseStepTimer(userId: string, accountId: string, brewSessionId: string, stepId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async pauseStepTimer(userId: string, workspaceId: string, brewSessionId: string, stepId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const step = await this.prisma.brewSessionStep.findFirst({
       where: { id: stepId, brewSessionId },
     });
@@ -906,8 +906,8 @@ export class BrewSessionsService {
     return updated;
   }
 
-  async stopStepTimer(userId: string, accountId: string, brewSessionId: string, stepId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async stopStepTimer(userId: string, workspaceId: string, brewSessionId: string, stepId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const step = await this.prisma.brewSessionStep.findFirst({
       where: { id: stepId, brewSessionId },
     });
@@ -943,10 +943,10 @@ export class BrewSessionsService {
     return updated;
   }
 
-  async deleteSession(userId: string, accountId: string, brewSessionId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async deleteSession(userId: string, workspaceId: string, brewSessionId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     const session = await this.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, accountId },
+      where: { id: brewSessionId, workspaceId },
       select: { id: true, status: true },
     });
     if (!session) throw new NotFoundError("brew_session_not_found", "Brew session not found");

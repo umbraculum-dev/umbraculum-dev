@@ -24,7 +24,7 @@ describe("auth (signup/login) + cookie sessions", () => {
     const signup = await app.inject({
       method: "POST",
       url: "/auth/signup",
-      payload: { email, password: "password123", preferredLocale: "it", accountName: "Test Brewery" },
+      payload: { email, password: "password123", preferredLocale: "it", workspaceName: "Test Workspace" },
     });
     expect(signup.statusCode).toBe(200);
 
@@ -41,28 +41,28 @@ describe("auth (signup/login) + cookie sessions", () => {
     expect(body.ok).toBe(true);
     expect(body.user.email).toBe(email.toLowerCase());
     expect(body.user.preferredLocale).toBe("it");
-    expect(Array.isArray(body.accounts)).toBe(true);
-    expect(typeof body.activeAccountId === "string").toBe(true);
+    expect(Array.isArray(body.workspaces)).toBe(true);
+    expect(typeof body.activeWorkspaceId === "string").toBe(true);
   });
 
-  it("login returns activeAccountId null when user has multiple accounts; /auth/active-account sets it", async () => {
+  it("login returns activeWorkspaceId null when user has multiple workspaces; /auth/active-workspace sets it", async () => {
     const email = `multi_${Date.now()}@example.com`;
     const password = "password123";
 
-    // signup (1 account + session)
+    // signup (1 workspace + session)
     const signup = await app.inject({
       method: "POST",
       url: "/auth/signup",
-      payload: { email, password, preferredLocale: "en", accountName: "First" },
+      payload: { email, password, preferredLocale: "en", workspaceName: "First" },
     });
     expect(signup.statusCode).toBe(200);
     const sidCookie1 = extractSidCookie(signup.headers["set-cookie"]);
     expect(sidCookie1).toBeTruthy();
 
-    // create second account while logged in
+    // create second workspace while logged in
     const created = await app.inject({
       method: "POST",
-      url: "/accounts",
+      url: "/workspaces",
       headers: { cookie: sidCookie1 as string },
       payload: { name: "Second" },
     });
@@ -76,7 +76,7 @@ describe("auth (signup/login) + cookie sessions", () => {
     });
     expect(logout.statusCode).toBe(200);
 
-    // login again -> 2 accounts => activeAccountId null
+    // login again -> 2 workspaces => activeWorkspaceId null
     const login = await app.inject({
       method: "POST",
       url: "/auth/login",
@@ -88,11 +88,11 @@ describe("auth (signup/login) + cookie sessions", () => {
 
     const loginBody = login.json() as any;
     expect(loginBody.ok).toBe(true);
-    expect(Array.isArray(loginBody.accounts)).toBe(true);
-    expect(loginBody.accounts.length).toBe(2);
-    expect(loginBody.activeAccountId).toBe(null);
+    expect(Array.isArray(loginBody.workspaces)).toBe(true);
+    expect(loginBody.workspaces.length).toBe(2);
+    expect(loginBody.activeWorkspaceId).toBe(null);
 
-    // with no active account, account-scoped endpoints should fail
+    // with no active workspace, workspace-scoped endpoints should fail
     const recipesNoAcct = await app.inject({
       method: "GET",
       url: "/recipes",
@@ -101,20 +101,20 @@ describe("auth (signup/login) + cookie sessions", () => {
     expect(recipesNoAcct.statusCode).toBe(401);
     expect(recipesNoAcct.json()).toEqual({
       ok: false,
-      error: { code: "missing_active_account", message: "No active account selected" },
+      error: { code: "missing_active_workspace", message: "No active workspace selected" },
     });
 
-    // choose active account
-    const secondAccountId = loginBody.accounts[1].id as string;
+    // choose active workspace
+    const secondWorkspaceId = loginBody.workspaces[1].id as string;
     const pick = await app.inject({
       method: "POST",
-      url: "/auth/active-account",
+      url: "/auth/active-workspace",
       headers: { cookie: sidCookie2 as string },
-      payload: { accountId: secondAccountId },
+      payload: { workspaceId: secondWorkspaceId },
     });
     expect(pick.statusCode).toBe(200);
 
-    // now account-scoped endpoints work
+    // now workspace-scoped endpoints work
     const recipesOk = await app.inject({
       method: "GET",
       url: "/recipes",
@@ -131,7 +131,7 @@ describe("auth (signup/login) + cookie sessions", () => {
     const signup = await app.inject({
       method: "POST",
       url: "/auth/signup",
-      payload: { email, password, preferredLocale: "en", accountName: "Native Test" },
+      payload: { email, password, preferredLocale: "en", workspaceName: "Native Test" },
     });
     expect(signup.statusCode).toBe(200);
 

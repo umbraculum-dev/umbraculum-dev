@@ -16,8 +16,8 @@ export async function createUserWithPassword(app: FastifyInstance, email: string
   });
 }
 
-export async function createAccountForUser(app: FastifyInstance, userId: string, name: string) {
-  return await app.prisma.account.create({
+export async function createWorkspaceForUser(app: FastifyInstance, userId: string, name: string) {
+  return await app.prisma.workspace.create({
     data: {
       name,
       members: { create: { userId, role: "brewery_admin" } },
@@ -26,14 +26,20 @@ export async function createAccountForUser(app: FastifyInstance, userId: string,
   });
 }
 
-export async function createSession(app: FastifyInstance, userId: string, activeAccountId: string | null) {
+export const createAccountForUser = createWorkspaceForUser;
+
+export async function createSession(app: FastifyInstance, userId: string, activeWorkspaceId: string | null) {
   const id = makeOpaqueId();
   const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
   const s = await app.prisma.session.create({
-    data: { id, userId, activeAccountId, expiresAt },
+    data: { id, userId, activeWorkspaceId, expiresAt },
     select: { id: true },
   });
   return s.id;
+}
+
+export async function createSessionWithActiveAccountId(app: FastifyInstance, userId: string, activeAccountId: string | null) {
+  return await createSession(app, userId, activeAccountId);
 }
 
 export function sidCookieHeader(sid: string) {

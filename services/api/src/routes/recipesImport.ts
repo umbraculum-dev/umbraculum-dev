@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import { RecipesService } from "../services/recipesService.js";
 import {
@@ -17,7 +17,7 @@ export async function recipesImportRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
   app.post("/recipes/import/preview", { bodyLimit: RECIPES_IMPORT_SINGLE_MAX_BYTES }, async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as { format?: unknown; content?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
@@ -42,12 +42,12 @@ export async function recipesImportRoutes(app: FastifyInstance) {
         beerJsonRecipeJson: mapped.beerJsonRecipeJson,
         warnings: mapped.warnings,
       },
-      accountId: ctx.activeAccountId,
+      workspaceId: ctx.activeWorkspaceId,
     };
   });
 
   app.post("/recipes/import", { bodyLimit: RECIPES_IMPORT_SINGLE_MAX_BYTES }, async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as { format?: unknown; content?: unknown; styleKey?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
@@ -62,7 +62,7 @@ export async function recipesImportRoutes(app: FastifyInstance) {
     }
 
     const mapped = parseSingleImportContent(format, content);
-    const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
+    const created = await recipes.createRecipe(ctx.userId, ctx.activeWorkspaceId, {
       name: mapped.recipeName,
       styleKey,
       notes: mapped.notes,
@@ -73,7 +73,7 @@ export async function recipesImportRoutes(app: FastifyInstance) {
   });
 
   app.post("/recipes/import/bulk/preview", { bodyLimit: RECIPES_IMPORT_BULK_MAX_BYTES }, async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as { format?: unknown; content?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
@@ -100,11 +100,11 @@ export async function recipesImportRoutes(app: FastifyInstance) {
       });
     }
 
-    return { ok: true, format, previewItems, accountId: ctx.activeAccountId };
+    return { ok: true, format, previewItems, workspaceId: ctx.activeWorkspaceId };
   });
 
   app.post("/recipes/import/bulk", { bodyLimit: RECIPES_IMPORT_BULK_MAX_BYTES }, async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as { format?: unknown; content?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
@@ -123,7 +123,7 @@ export async function recipesImportRoutes(app: FastifyInstance) {
     for (const it of items) {
       try {
         const resolved = await resolveBjcp2021Style(app.prisma, it.styleCandidate);
-        const recipe = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
+        const recipe = await recipes.createRecipe(ctx.userId, ctx.activeWorkspaceId, {
           name: it.recipeName,
           styleKey: resolved.styleKey,
           notes: it.notes,

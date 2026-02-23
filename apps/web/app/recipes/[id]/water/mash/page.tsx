@@ -105,7 +105,7 @@ export default function MashWaterPage() {
   const tEdit = useTranslations("recipes.edit");
   const tUnits = useTranslations("units");
   const tMath = useTranslations("math");
-  const authState = useRequireAuth({ requireActiveAccount: true });
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 

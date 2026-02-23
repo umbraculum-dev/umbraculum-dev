@@ -35,6 +35,7 @@ function isFileTooLargeError(msg: string | null): boolean {
 
 export interface RecipeImportFormProps {
   apiBasePath: string;
+  workspaceId?: string | null;
   accountId?: string | null;
   canCall: boolean;
   onSingleImportSuccess?: (recipeId: string) => void;
@@ -43,6 +44,7 @@ export interface RecipeImportFormProps {
 
 export function RecipeImportForm({
   apiBasePath,
+  workspaceId,
   accountId,
   canCall,
   onSingleImportSuccess,
@@ -121,7 +123,8 @@ export function RecipeImportForm({
 
   const buildBody = (payload: Record<string, unknown>) => {
     const body = { ...payload };
-    if (accountId) body.accountId = accountId;
+    const effectiveWorkspaceId = workspaceId ?? accountId ?? null;
+    if (effectiveWorkspaceId) body.workspaceId = effectiveWorkspaceId;
     return body;
   };
 
@@ -179,7 +182,7 @@ export function RecipeImportForm({
     setImportError(null);
     if (!content.trim()) return setPreviewError(t("errors.noContent"));
     if (!format) return setPreviewError(t("errors.unknownFormat"));
-    if (apiBasePath.includes("platform") && !accountId) return setPreviewError("Account is required");
+    if (apiBasePath.includes("platform") && !(workspaceId ?? accountId)) return setPreviewError("Workspace is required");
 
     setPreviewLoading(true);
     try {
@@ -212,7 +215,7 @@ export function RecipeImportForm({
     setBulkResult(null);
     if (!bulkContent.trim()) return setBulkPreviewError(t("errors.noContent"));
     if (!bulkFormat) return setBulkPreviewError(t("errors.unknownFormat"));
-    if (apiBasePath.includes("platform") && !accountId) return setBulkPreviewError("Account is required");
+    if (apiBasePath.includes("platform") && !(workspaceId ?? accountId)) return setBulkPreviewError("Workspace is required");
 
     setBulkPreviewLoading(true);
     try {
@@ -238,7 +241,7 @@ export function RecipeImportForm({
     if (!content.trim()) return setImportError(t("errors.noContent"));
     if (!format) return setImportError(t("errors.unknownFormat"));
     if (!styleKey.trim()) return setImportError(t("errors.styleRequired"));
-    if (apiBasePath.includes("platform") && !accountId) return setImportError("Account is required");
+    if (apiBasePath.includes("platform") && !(workspaceId ?? accountId)) return setImportError("Workspace is required");
 
     setImporting(true);
     try {
@@ -264,7 +267,7 @@ export function RecipeImportForm({
     setBulkImportError(null);
     if (!bulkContent.trim()) return setBulkImportError(t("errors.noContent"));
     if (!bulkFormat) return setBulkImportError(t("errors.unknownFormat"));
-    if (apiBasePath.includes("platform") && !accountId) return setBulkImportError("Account is required");
+    if (apiBasePath.includes("platform") && !(workspaceId ?? accountId)) return setBulkImportError("Workspace is required");
 
     setBulkImporting(true);
     try {

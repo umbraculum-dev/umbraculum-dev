@@ -12,15 +12,13 @@ describe("water-profiles", () => {
   let cookieAdmin = "";
   let cookieViewer = "";
   let cookieNoSession = "";
-  let accountId = "";
 
   beforeAll(async () => {
     await app.ready();
-    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "brewery_admin" });
+    const admin = await createSessionForTestUser(app, { activeWorkspace: true, role: "brewery_admin" });
     cookieAdmin = admin.cookie;
-    accountId = admin.accountId;
 
-    const viewer = await createSessionForTestUser(app, { activeAccount: true, role: "viewer" });
+    const viewer = await createSessionForTestUser(app, { activeWorkspace: true, role: "viewer" });
     cookieViewer = viewer.cookie;
 
     // Used only to validate "not authenticated" behavior
@@ -32,15 +30,15 @@ describe("water-profiles", () => {
       update: { email: "test-water-profiles-admin@brewery.local" },
     });
 
-    await app.prisma.account.upsert({
+    await app.prisma.workspace.upsert({
       where: { id: TEST_ACCOUNT_A },
       create: { id: TEST_ACCOUNT_A, name: "Test Brewery A (water-profiles)" },
       update: { name: "Test Brewery A (water-profiles)" },
     });
 
-    await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID, role: "brewery_admin" },
+    await app.prisma.workspaceMember.upsert({
+      where: { workspaceId_userId: { workspaceId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID } },
+      create: { workspaceId: TEST_ACCOUNT_A, userId: TEST_ADMIN_USER_ID, role: "brewery_admin" },
       update: { role: "brewery_admin" },
     });
 
@@ -49,19 +47,19 @@ describe("water-profiles", () => {
       create: { id: TEST_VIEWER_USER_ID, email: "test-water-profiles-viewer@brewery.local" },
       update: { email: "test-water-profiles-viewer@brewery.local" },
     });
-    await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_VIEWER_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_A, userId: TEST_VIEWER_USER_ID, role: "viewer" },
+    await app.prisma.workspaceMember.upsert({
+      where: { workspaceId_userId: { workspaceId: TEST_ACCOUNT_A, userId: TEST_VIEWER_USER_ID } },
+      create: { workspaceId: TEST_ACCOUNT_A, userId: TEST_VIEWER_USER_ID, role: "viewer" },
       update: { role: "viewer" },
     });
 
     // Idempotence: wipe test-created (user-sourced) profiles from earlier runs.
-    await app.prisma.waterProfile.deleteMany({ where: { accountId: TEST_ACCOUNT_A, source: "user" } });
+    await app.prisma.waterProfile.deleteMany({ where: { workspaceId: TEST_ACCOUNT_A, source: "user" } });
   });
 
   afterAll(async () => {
     // Cleanup: keep shared dev DB tidy.
-    await app.prisma.waterProfile.deleteMany({ where: { accountId: TEST_ACCOUNT_A, source: "user" } });
+    await app.prisma.waterProfile.deleteMany({ where: { workspaceId: TEST_ACCOUNT_A, source: "user" } });
     await app.close();
   });
 
@@ -86,8 +84,8 @@ describe("water-profiles", () => {
     expect(Array.isArray(body.system)).toBe(true);
     expect(body.system.length).toBeGreaterThan(10);
     expect(Array.isArray(body.public)).toBe(true);
-    expect(Array.isArray(body.account)).toBe(true);
-    expect(body.account.length).toBe(0);
+    expect(Array.isArray(body.workspace)).toBe(true);
+    expect(body.workspace.length).toBe(0);
   });
 
   it("prevents non-admin from creating a profile", async () => {

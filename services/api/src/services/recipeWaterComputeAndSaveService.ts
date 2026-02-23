@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { BadRequestError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
 import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
 import {
@@ -26,7 +26,7 @@ type Mode = "targetPh" | "manual";
 type WaterProfileLite = {
   id: string;
   scope: "system" | "public" | "account";
-  accountId: string | null;
+  workspaceId: string | null;
   calcium: number;
   magnesium: number;
   sodium: number;
@@ -157,12 +157,12 @@ export type BoilComputeAndSaveInput = {
 };
 
 export class RecipeWaterComputeAndSaveService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
   private readonly recipes: RecipesService;
   private readonly settings: RecipeWaterSettingsService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
     this.recipes = new RecipesService(prisma);
     this.settings = new RecipeWaterSettingsService(prisma);
   }
@@ -173,7 +173,7 @@ export class RecipeWaterComputeAndSaveService {
       select: {
         id: true,
         scope: true,
-        accountId: true,
+        workspaceId: true,
         calcium: true,
         magnesium: true,
         sodium: true,
@@ -186,25 +186,25 @@ export class RecipeWaterComputeAndSaveService {
     return profile as any as WaterProfileLite;
   }
 
-  private async assertProfileAccessible(accountId: string, profileId: string) {
-    const profile = await this.prisma.waterProfile.findUnique({ where: { id: profileId }, select: { id: true, scope: true, accountId: true } });
+  private async assertProfileAccessible(workspaceId: string, profileId: string) {
+    const profile = await this.prisma.waterProfile.findUnique({ where: { id: profileId }, select: { id: true, scope: true, workspaceId: true } });
     if (!profile) throw new BadRequestError("invalid_profile_id", "Unknown water profile id");
     const scope = profile.scope as "system" | "public" | "account";
     if (scope === "system" || scope === "public") return;
-    if (scope === "account" && profile.accountId === accountId) return;
-    throw new BadRequestError("profile_not_accessible", "Water profile is not accessible to this account");
+    if (scope === "account" && profile.workspaceId === workspaceId) return;
+    throw new BadRequestError("profile_not_accessible", "Water profile is not accessible to this workspace");
   }
 
-  async computeAndSaveMash(userId: string, accountId: string, recipeId: string, input: MashComputeAndSaveInput) {
-    await this.accounts.assertMembership(userId, accountId);
-    await this.recipes.getRecipe(userId, accountId, recipeId);
+  async computeAndSaveMash(userId: string, workspaceId: string, recipeId: string, input: MashComputeAndSaveInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    await this.recipes.getRecipe(userId, workspaceId, recipeId);
 
     if (!input.sourceWaterProfileId) {
       throw new BadRequestError("invalid_profile_id", "Body.sourceWaterProfileId is required");
     }
 
-    await this.assertProfileAccessible(accountId, input.sourceWaterProfileId);
-    if (input.dilutionWaterProfileId) await this.assertProfileAccessible(accountId, input.dilutionWaterProfileId);
+    await this.assertProfileAccessible(workspaceId, input.sourceWaterProfileId);
+    if (input.dilutionWaterProfileId) await this.assertProfileAccessible(workspaceId, input.dilutionWaterProfileId);
 
     const tap = ensureFinite(input.tapWaterVolumeLiters, "tapWaterVolumeLiters");
     const dil = ensureFinite(input.dilutionWaterVolumeLiters, "dilutionWaterVolumeLiters");
@@ -465,7 +465,7 @@ export class RecipeWaterComputeAndSaveService {
       patch.mashLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, accountId, recipeId, patch as any);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch as any);
 
     return {
       settings: { recipeId },
@@ -480,14 +480,14 @@ export class RecipeWaterComputeAndSaveService {
     };
   }
 
-  async computeAndSaveSparge(userId: string, accountId: string, recipeId: string, input: SpargeComputeAndSaveInput) {
-    await this.accounts.assertMembership(userId, accountId);
-    await this.recipes.getRecipe(userId, accountId, recipeId);
+  async computeAndSaveSparge(userId: string, workspaceId: string, recipeId: string, input: SpargeComputeAndSaveInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    await this.recipes.getRecipe(userId, workspaceId, recipeId);
 
     if (!input.spargeWaterProfileId) {
       throw new BadRequestError("invalid_profile_id", "Body.spargeWaterProfileId is required");
     }
-    await this.assertProfileAccessible(accountId, input.spargeWaterProfileId);
+    await this.assertProfileAccessible(workspaceId, input.spargeWaterProfileId);
 
     const baseProfileRec = await this.loadProfileLite(input.spargeWaterProfileId);
     const baseProfile: IonProfilePpm = {
@@ -621,7 +621,7 @@ export class RecipeWaterComputeAndSaveService {
       patch.spargeLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, accountId, recipeId, patch as any);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch as any);
 
     return {
       settings: { recipeId },
@@ -633,16 +633,16 @@ export class RecipeWaterComputeAndSaveService {
     };
   }
 
-  async computeAndSaveBoil(userId: string, accountId: string, recipeId: string, input: BoilComputeAndSaveInput) {
-    await this.accounts.assertMembership(userId, accountId);
-    await this.recipes.getRecipe(userId, accountId, recipeId);
+  async computeAndSaveBoil(userId: string, workspaceId: string, recipeId: string, input: BoilComputeAndSaveInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    await this.recipes.getRecipe(userId, workspaceId, recipeId);
 
     if (!input.boilSourceWaterProfileId) {
       throw new BadRequestError("invalid_profile_id", "Body.boilSourceWaterProfileId is required");
     }
 
-    await this.assertProfileAccessible(accountId, input.boilSourceWaterProfileId);
-    if (input.boilDilutionWaterProfileId) await this.assertProfileAccessible(accountId, input.boilDilutionWaterProfileId);
+    await this.assertProfileAccessible(workspaceId, input.boilSourceWaterProfileId);
+    if (input.boilDilutionWaterProfileId) await this.assertProfileAccessible(workspaceId, input.boilDilutionWaterProfileId);
 
     const tap = ensureFinite(input.boilTapWaterVolumeLiters, "boilTapWaterVolumeLiters");
     const dil = ensureFinite(input.boilDilutionWaterVolumeLiters, "boilDilutionWaterVolumeLiters");
@@ -856,7 +856,7 @@ export class RecipeWaterComputeAndSaveService {
       patch.boilLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, accountId, recipeId, patch as any);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch as any);
 
     return {
       settings: { recipeId },

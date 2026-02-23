@@ -7,12 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum AccountRole {
+enum WorkspaceRole {
   brewery_admin
   member
   viewer
 
-  @@map("account_role")
+  @@map("workspace_role")
 }
 
 enum AdPlacement {
@@ -127,7 +127,7 @@ model User {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  memberships             AccountMember[]
+  memberships             WorkspaceMember[]
   sessions                Session[]
   emailVerificationTokens EmailVerificationToken[]
 
@@ -135,18 +135,18 @@ model User {
   @@map("users")
 }
 
-model Account {
+model Workspace {
   id        String   @id @default(uuid())
   name      String
-  /** Optional account/company branding accent key (e.g. "default", "acme"). */
+  /** Optional workspace/company branding accent key (e.g. "default", "acme"). */
   brandKey  String?  @default("default") @map("brand_key")
-  /** If true, ads are disabled for this account/workspace (platform-controlled). */
+  /** If true, ads are disabled for this workspace (platform-controlled). */
   adsDisabled Boolean @default(false) @map("ads_disabled")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  members             AccountMember[]
-  sessions            Session[]             @relation("SessionActiveAccount")
+  members             WorkspaceMember[]
+  sessions            Session[]             @relation("SessionActiveWorkspace")
   recipes             Recipe[]
   waterProfiles       WaterProfile[]
   equipmentProfiles   EquipmentProfile[]
@@ -159,12 +159,12 @@ model Account {
   brewSessions  BrewSession[]
   inventoryItems InventoryItem[]
 
-  @@map("accounts")
+  @@map("workspaces")
 }
 
 model BrewdaySettings {
   id        String   @id @default(uuid())
-  accountId String   @unique @map("account_id")
+  workspaceId String   @unique @map("workspace_id")
   brewingType String @default("all_grain") @map("brewing_type")
   sectionsJson Json  @map("sections_json")
   customSectionsJson Json? @map("custom_sections_json")
@@ -173,15 +173,15 @@ model BrewdaySettings {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@index([accountId])
+  @@index([workspaceId])
   @@map("brewday_settings")
 }
 
 model BrewSession {
   id        String           @id @default(uuid())
-  accountId String           @map("account_id")
+  workspaceId String           @map("workspace_id")
   recipeId  String           @map("recipe_id")
   code      String
 
@@ -196,15 +196,15 @@ model BrewSession {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
 
-  account   Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  workspace Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   recipe    Recipe           @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   steps     BrewSessionStep[]
   logs      BrewSessionLog[]
 
-  @@index([accountId])
+  @@index([workspaceId])
   @@index([recipeId])
-  @@index([accountId, recipeId])
-  @@unique([accountId, code])
+  @@index([workspaceId, recipeId])
+  @@unique([workspaceId, code])
   @@map("brew_sessions")
 }
 
@@ -236,35 +236,35 @@ model Ad {
   @@map("ads")
 }
 
-model AccountMember {
+model WorkspaceMember {
   id        String      @id @default(uuid())
-  accountId String      @map("account_id")
+  workspaceId String      @map("workspace_id")
   userId    String      @map("user_id")
-  role      AccountRole @default(member)
+  role      WorkspaceRole @default(member)
   createdAt DateTime    @default(now()) @map("created_at")
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([accountId, userId])
+  @@unique([workspaceId, userId])
   @@index([userId])
-  @@index([accountId])
-  @@map("account_members")
+  @@index([workspaceId])
+  @@map("workspace_members")
 }
 
 model Session {
   id              String   @id
   userId          String   @map("user_id")
-  activeAccountId String?  @map("active_account_id")
+  activeWorkspaceId String?  @map("active_workspace_id")
   createdAt       DateTime @default(now()) @map("created_at")
   expiresAt       DateTime @map("expires_at")
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  activeAccount Account? @relation("SessionActiveAccount", fields: [activeAccountId], references: [id], onDelete: SetNull)
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeWorkspace Workspace? @relation("SessionActiveWorkspace", fields: [activeWorkspaceId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([expiresAt])
-  @@index([activeAccountId])
+  @@index([activeWorkspaceId])
   @@map("sessions")
 }
 
@@ -324,7 +324,7 @@ model BeerStyleAlias {
 
 model Recipe {
   id        String   @id @default(uuid())
-  accountId String   @map("account_id")
+  workspaceId String   @map("workspace_id")
   name      String
   style     String?
   /** Version family id (all versions share this id). */
@@ -341,14 +341,14 @@ model Recipe {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  account       Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  workspace     Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   waterSettings RecipeWaterSettings?
   beerStyle     BeerStyle?           @relation(fields: [styleKey], references: [key], onDelete: Restrict)
   brewSessions  BrewSession[]
 
-  @@index([accountId])
-  @@index([accountId, versionGroupId])
-  @@unique([accountId, versionGroupId, version])
+  @@index([workspaceId])
+  @@index([workspaceId, versionGroupId])
+  @@unique([workspaceId, versionGroupId, version])
   @@index([styleKey])
   @@map("recipes")
 }
@@ -418,7 +418,7 @@ model BrewSessionLog {
 
 model RecipeWaterSettings {
   id        String @id @default(uuid())
-  accountId String @map("account_id")
+  workspaceId String @map("workspace_id")
   recipeId  String @unique @map("recipe_id")
 
   // Profile selections
@@ -560,10 +560,10 @@ model RecipeWaterSettings {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   recipe  Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([recipeId])
-  @@index([accountId])
+  @@index([workspaceId])
   @@map("recipe_water_settings")
 }
 
@@ -574,8 +574,8 @@ model WaterProfile {
   scope WaterProfileScope
   type  WaterProfileType
 
-  // `accountId` is only set for account-scoped profiles and for audit of admin-created public ones.
-  accountId String? @map("account_id")
+  // `workspaceId` is only set for workspace-scoped profiles and for audit of admin-created public ones.
+  workspaceId String? @map("workspace_id")
   name      String
 
   // ppm (mg/L) ions
@@ -599,17 +599,17 @@ model WaterProfile {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  account Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
 
   @@index([scope])
   @@index([type])
-  @@index([accountId])
+  @@index([workspaceId])
   @@map("water_profiles")
 }
 
 model EquipmentProfile {
   id        String   @id @default(uuid())
-  accountId String   @map("account_id")
+  workspaceId String   @map("workspace_id")
   name      String
 
   kettleVolumeLiters                     Float? @map("kettle_volume_liters")
@@ -630,17 +630,17 @@ model EquipmentProfile {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@unique([accountId, name])
-  @@index([accountId])
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
   @@map("equipment_profiles")
 }
 
 model Fermentable {
   id        String  @id @default(uuid())
-  // null for system-wide canonical records; set for future brewery-specific overrides
-  accountId String? @map("account_id")
+  // null for system-wide canonical records; set for future workspace-specific overrides
+  workspaceId String? @map("workspace_id")
 
   name     String
   producer String?
@@ -676,10 +676,10 @@ model Fermentable {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  account    Account?              @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  workspace  Workspace?            @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   sourceMaps IngredientSourceMap[]
 
-  @@index([accountId])
+  @@index([workspaceId])
   @@index([name])
   @@index([producer])
   @@map("fermentables")
@@ -687,7 +687,7 @@ model Fermentable {
 
 model Hop {
   id        String  @id @default(uuid())
-  accountId String? @map("account_id")
+  workspaceId String? @map("workspace_id")
 
   name    String
   country String?
@@ -704,17 +704,17 @@ model Hop {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  account    Account?              @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  workspace  Workspace?            @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   sourceMaps IngredientSourceMap[]
 
-  @@index([accountId])
+  @@index([workspaceId])
   @@index([name])
   @@map("hops")
 }
 
 model Yeast {
   id        String  @id @default(uuid())
-  accountId String? @map("account_id")
+  workspaceId String? @map("workspace_id")
 
   name             String
   lab              String?
@@ -742,10 +742,10 @@ model Yeast {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  account    Account?              @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  workspace  Workspace?            @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   sourceMaps IngredientSourceMap[]
 
-  @@index([accountId])
+  @@index([workspaceId])
   @@index([name])
   @@index([lab])
   @@index([productId])
@@ -863,7 +863,7 @@ enum InventoryUnit {
 
 model InventoryItem {
   id           String            @id @default(uuid())
-  accountId    String            @map("account_id")
+  workspaceId  String            @map("workspace_id")
   category     InventoryCategory
   ingredientId String?           @map("ingredient_id")
   name         String
@@ -872,9 +872,9 @@ model InventoryItem {
   createdAt    DateTime         @default(now()) @map("created_at")
   updatedAt    DateTime         @updatedAt @map("updated_at")
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@index([accountId])
-  @@index([accountId, category])
+  @@index([workspaceId])
+  @@index([workspaceId, category])
   @@map("inventory_items")
 }

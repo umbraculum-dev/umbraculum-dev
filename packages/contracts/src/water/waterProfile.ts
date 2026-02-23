@@ -7,7 +7,7 @@ export interface WaterProfile {
   key: string;
   scope: "system" | "account" | "public";
   type: "water" | "dilution";
-  accountId: string | null;
+  workspaceId: string | null;
   name: string;
   /** Optional: may be missing/unknown for some sources. Range 0–14. */
   ph?: number | null;
@@ -31,7 +31,7 @@ export interface WaterProfilesResponse {
   ok: true;
   system: WaterProfile[];
   public: WaterProfile[];
-  account: WaterProfile[];
+  workspace: WaterProfile[];
 }
 
 function isString(v: unknown): v is string {
@@ -56,7 +56,16 @@ function parseWaterProfile(v: unknown): WaterProfile {
   const key = isString(v.key) ? v.key : "";
   const scope = isString(v.scope) && SCOPES.includes(v.scope as any) ? (v.scope as WaterProfile["scope"]) : "system";
   const type = isString(v.type) && TYPES.includes(v.type as any) ? (v.type as WaterProfile["type"]) : "water";
-  const accountId = v.accountId === null ? null : isString(v.accountId) ? v.accountId : null;
+  const workspaceId =
+    (v as any).workspaceId === null
+      ? null
+      : isString((v as any).workspaceId)
+        ? ((v as any).workspaceId as string)
+        : (v as any).accountId === null
+          ? null
+          : isString((v as any).accountId)
+            ? ((v as any).accountId as string)
+            : null;
   const name = isString(v.name) ? v.name : "";
   const ph = v.ph === null || v.ph === undefined ? undefined : isNumber(v.ph) ? v.ph : undefined;
   const calcium = isNumber(v.calcium) ? v.calcium : 0;
@@ -75,7 +84,7 @@ function parseWaterProfile(v: unknown): WaterProfile {
     key,
     scope,
     type,
-    accountId,
+    workspaceId,
     name,
     ph,
     calcium,
@@ -115,6 +124,12 @@ export function parseWaterProfilesResponse(payload: unknown): WaterProfilesRespo
   if (payload.ok !== true) throw new Error("Invalid WaterProfilesResponse: ok must be true");
   const system = parseArray(payload.system, parseWaterProfile);
   const publicProfiles = parseArray(payload.public, parseWaterProfile);
-  const account = parseArray(payload.account, parseWaterProfile);
-  return { ok: true, system, public: publicProfiles, account };
+  const workspaceRaw = Array.isArray((payload as any).workspace)
+    ? (payload as any).workspace
+    : Array.isArray((payload as any).account)
+      ? (payload as any).account
+      : null;
+  if (!workspaceRaw) throw new Error("Invalid WaterProfilesResponse: workspace must be array");
+  const workspace = parseArray(workspaceRaw, parseWaterProfile);
+  return { ok: true, system, public: publicProfiles, workspace };
 }

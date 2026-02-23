@@ -1,7 +1,7 @@
 import type { InventoryCategory, InventoryUnit } from "@prisma/client";
 import type { PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 
 export type CreateInventoryItemInput = {
   category: InventoryCategory;
@@ -51,25 +51,25 @@ function assertUnit(v: unknown): InventoryUnit {
 }
 
 export class InventoryService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
   }
 
-  async listItems(userId: string, accountId: string, category?: InventoryCategory) {
-    await this.accounts.assertMembership(userId, accountId);
+  async listItems(userId: string, workspaceId: string, category?: InventoryCategory) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     return this.prisma.inventoryItem.findMany({
       where: {
-        accountId,
+        workspaceId,
         ...(category ? { category } : {}),
       },
       orderBy: [{ category: "asc" }, { name: "asc" }, { id: "asc" }],
     });
   }
 
-  async createItem(userId: string, accountId: string, input: CreateInventoryItemInput) {
-    await this.accounts.assertMembership(userId, accountId);
+  async createItem(userId: string, workspaceId: string, input: CreateInventoryItemInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");
@@ -88,7 +88,7 @@ export class InventoryService {
 
     return this.prisma.inventoryItem.create({
       data: {
-        accountId,
+        workspaceId,
         category,
         ingredientId,
         name,
@@ -98,11 +98,11 @@ export class InventoryService {
     });
   }
 
-  async updateItem(userId: string, accountId: string, id: string, input: UpdateInventoryItemInput) {
-    await this.accounts.assertMembership(userId, accountId);
+  async updateItem(userId: string, workspaceId: string, id: string, input: UpdateInventoryItemInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const existing = await this.prisma.inventoryItem.findFirst({
-      where: { id, accountId },
+      where: { id, workspaceId },
     });
     if (!existing) throw new NotFoundError("inventory_item_not_found", "Inventory item not found");
 
@@ -126,11 +126,11 @@ export class InventoryService {
     });
   }
 
-  async deleteItem(userId: string, accountId: string, id: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async deleteItem(userId: string, workspaceId: string, id: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const existing = await this.prisma.inventoryItem.findFirst({
-      where: { id, accountId },
+      where: { id, workspaceId },
     });
     if (!existing) throw new NotFoundError("inventory_item_not_found", "Inventory item not found");
 

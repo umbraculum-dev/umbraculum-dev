@@ -7,7 +7,7 @@ const TEST_USER_ID = "11111111-1111-1111-1111-111111111111";
 const TEST_ACCOUNT_A = "22222222-2222-2222-2222-222222222222";
 const TEST_ACCOUNT_B = "33333333-3333-3333-3333-333333333333";
 
-describe("recipes (account scoped)", () => {
+describe("recipes (workspace scoped)", () => {
   const app = buildApp();
   let cookieA = "";
   let cookieB = "";
@@ -18,15 +18,15 @@ describe("recipes (account scoped)", () => {
   beforeAll(async () => {
     await app.ready();
 
-    const sessA = await createSessionForTestUser(app, { activeAccount: true });
+    const sessA = await createSessionForTestUser(app, { activeWorkspace: true });
     cookieA = sessA.cookie;
-    accountAId = sessA.accountId;
+    accountAId = sessA.workspaceId;
 
-    const sessB = await createSessionForTestUser(app, { activeAccount: true });
+    const sessB = await createSessionForTestUser(app, { activeWorkspace: true });
     cookieB = sessB.cookie;
-    accountBId = sessB.accountId;
+    accountBId = sessB.workspaceId;
 
-    const sessNo = await createSessionForTestUser(app, { activeAccount: false });
+    const sessNo = await createSessionForTestUser(app, { activeWorkspace: false });
     cookieNoAccount = sessNo.cookie;
 
     await app.prisma.user.upsert({
@@ -35,43 +35,43 @@ describe("recipes (account scoped)", () => {
       update: { email: "test-recipes@brewery.local" },
     });
 
-    await app.prisma.account.upsert({
+    await app.prisma.workspace.upsert({
       where: { id: TEST_ACCOUNT_A },
       create: { id: TEST_ACCOUNT_A, name: "Test Brewery A (recipes)" },
       update: { name: "Test Brewery A (recipes)" },
     });
-    await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "brewery_admin" },
+    await app.prisma.workspaceMember.upsert({
+      where: { workspaceId_userId: { workspaceId: TEST_ACCOUNT_A, userId: TEST_USER_ID } },
+      create: { workspaceId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "brewery_admin" },
       update: { role: "brewery_admin" },
     });
 
-    await app.prisma.account.upsert({
+    await app.prisma.workspace.upsert({
       where: { id: TEST_ACCOUNT_B },
       create: { id: TEST_ACCOUNT_B, name: "Test Brewery B (recipes)" },
       update: { name: "Test Brewery B (recipes)" },
     });
-    await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "brewery_admin" },
+    await app.prisma.workspaceMember.upsert({
+      where: { workspaceId_userId: { workspaceId: TEST_ACCOUNT_B, userId: TEST_USER_ID } },
+      create: { workspaceId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "brewery_admin" },
       update: { role: "brewery_admin" },
     });
 
     // Idempotence: wipe test data if it exists from earlier runs.
-    await app.prisma.recipeWaterSettings.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
-    await app.prisma.recipe.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipeWaterSettings.deleteMany({ where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipe.deleteMany({ where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
   });
 
   afterAll(async () => {
     // Cleanup: keep shared dev DB tidy.
     await app.prisma.recipeWaterSettings.deleteMany({
-      where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } },
+      where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } },
     });
-    await app.prisma.recipe.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipe.deleteMany({ where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
     await app.close();
   });
 
-  it("returns 401 when active account is missing in session", async () => {
+  it("returns 401 when active workspace is missing in session", async () => {
     const res = await app.inject({
       method: "GET",
       url: "/recipes",
@@ -80,11 +80,11 @@ describe("recipes (account scoped)", () => {
     expect(res.statusCode).toBe(401);
     expect(res.json()).toEqual({
       ok: false,
-      error: { code: "missing_active_account", message: "No active account selected" },
+      error: { code: "missing_active_workspace", message: "No active workspace selected" },
     });
   });
 
-  it("can create then list recipes for active account", async () => {
+  it("can create then list recipes for active workspace", async () => {
     const beerJsonRecipeJson = {
       beerjson: {
         version: 1,
@@ -128,7 +128,7 @@ describe("recipes (account scoped)", () => {
     expect(create.statusCode).toBe(200);
     const created = create.json() as any;
     expect(created.ok).toBe(true);
-    expect(created.recipe.accountId).toBe(accountAId);
+    expect(created.recipe.workspaceId).toBe(accountAId);
     expect(created.recipe.styleKey).toBe("custom");
     expect(created.recipe.style).toBe("Custom");
     expect(created.recipe.beerJsonRecipeJson?.beerjson?.version).toBe(1);
@@ -215,7 +215,7 @@ describe("recipes (account scoped)", () => {
     expect(h0?.amount?.value).toBeCloseTo(56.699_046_25, 8);
   });
 
-  it("does not leak recipes across accounts", async () => {
+  it("does not leak recipes across workspaces", async () => {
     // Create recipe in A
     const create = await app.inject({
       method: "POST",
@@ -261,7 +261,7 @@ describe("recipes (account scoped)", () => {
     expect(bodyB.recipes.some((r: any) => r.id === created.recipe.id)).toBe(false);
   });
 
-  it("can load and update a recipe (name/style/notes) within an account", async () => {
+  it("can load and update a recipe (name/style/notes) within a workspace", async () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",
@@ -305,7 +305,7 @@ describe("recipes (account scoped)", () => {
     expect(getA.statusCode).toBe(200);
     const gotA = getA.json() as any;
     expect(gotA.ok).toBe(true);
-    expect(gotA.recipe.accountId).toBe(accountAId);
+    expect(gotA.recipe.workspaceId).toBe(accountAId);
     expect(gotA.recipe.notes).toBe("Initial notes");
 
     const patchA = await app.inject({
@@ -334,7 +334,7 @@ describe("recipes (account scoped)", () => {
     });
   });
 
-  it("can delete a recipe within an account", async () => {
+  it("can delete a recipe within a workspace", async () => {
     const create = await app.inject({
       method: "POST",
       url: "/recipes",

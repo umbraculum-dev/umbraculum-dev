@@ -59,13 +59,15 @@ export default function LoginPage() {
 
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 
-      const activeAccountId =
-        res.data && typeof res.data === "object" && "activeAccountId" in (res.data as any)
-          ? ((res.data as any).activeAccountId as string | null)
-          : null;
+      const activeWorkspaceId =
+        res.data && typeof res.data === "object" && "activeWorkspaceId" in (res.data as any)
+          ? ((res.data as any).activeWorkspaceId as string | null)
+          : res.data && typeof res.data === "object" && "activeAccountId" in (res.data as any)
+            ? ((res.data as any).activeAccountId as string | null)
+            : null;
 
-      if (!activeAccountId) {
-        router.replace(`/${locale}/select-account`);
+      if (!activeWorkspaceId) {
+        router.replace(`/${locale}/select-workspace`);
         return;
       }
       router.replace(next && next.startsWith("/") ? next : `/${locale}`);

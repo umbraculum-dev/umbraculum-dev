@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import {
   spargeAcidification,
@@ -41,7 +41,7 @@ function mashPhModelKeyFromMaltClass(maltClass: string) {
 
 export async function waterCalcRoutes(app: FastifyInstance) {
   app.post("/water-calc/sparge-acidification", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const acidType = body.acidType as SpargeAcidType;
@@ -110,7 +110,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
   // Sparge acidification manual-entry mode (Sheet 2, v0): user enters acid amount; we estimate achieved pH.
   app.post("/water-calc/sparge-acidification-manual", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const acidType = body.acidType as SpargeAcidType;
@@ -199,7 +199,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
   // Mash water acidification (Sheet 4, v0): same math as sparge acidification, but stored/displayed separately.
   app.post("/water-calc/mash-acidification", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const acidType = body.acidType as SpargeAcidType;
@@ -278,7 +278,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
   // Mash water acidification manual-entry mode (Sheet 4, v0): user enters acid amount; we estimate achieved pH.
   app.post("/water-calc/mash-acidification-manual", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const acidType = body.acidType as SpargeAcidType;
@@ -368,7 +368,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   app.post("/water-calc/mash-ph-estimate", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const volumeLiters =
@@ -523,7 +523,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   // the older maltClass/color inputs (it derives v1 defaults when needed).
 
   app.post("/water-calc/mash-acidification-target-mash-ph", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const acidType = body.acidType as SpargeAcidType;
@@ -663,7 +663,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   app.post("/water-calc/salt-additions", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : NaN;
@@ -710,7 +710,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   app.post("/water-calc/mash-overall", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const mashMode = body.mashMode === "manual" ? "manual" : "targetPh";
@@ -971,7 +971,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   app.post("/water-calc/sparge-overall", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const spargeMode = body.spargeMode === "manual" ? "manual" : "targetPh";
@@ -1135,7 +1135,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   app.post("/water-calc/boil-overall", async (req) => {
-    requireActiveAccount(req);
+    requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const boilMode = body.boilMode === "manual" ? "manual" : "targetPh";

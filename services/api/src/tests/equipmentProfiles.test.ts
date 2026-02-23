@@ -2,49 +2,49 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
-const TEST_ACCOUNT_ID = "22222222-2222-2222-2222-222222222225";
+const TEST_WORKSPACE_ID = "22222222-2222-2222-2222-222222222225";
 
 describe("equipment-profiles", () => {
   const app = buildApp();
   let cookieAdmin = "";
   let cookieViewer = "";
-  let adminAccountId = "";
-  let viewerAccountId = "";
+  let adminWorkspaceId = "";
+  let viewerWorkspaceId = "";
 
   beforeAll(async () => {
     await app.ready();
 
-    const admin = await createSessionForTestUser(app, { activeAccount: true, role: "brewery_admin" });
+    const admin = await createSessionForTestUser(app, { activeWorkspace: true, role: "brewery_admin" });
     cookieAdmin = admin.cookie;
-    adminAccountId = admin.accountId;
+    adminWorkspaceId = admin.workspaceId;
 
-    const viewer = await createSessionForTestUser(app, { activeAccount: true, role: "viewer" });
+    const viewer = await createSessionForTestUser(app, { activeWorkspace: true, role: "viewer" });
     cookieViewer = viewer.cookie;
-    viewerAccountId = viewer.accountId;
+    viewerWorkspaceId = viewer.workspaceId;
 
     // Ensure we have a stable account to attach profiles to across test runs.
     // (createSessionForTestUser creates its own account, but we also keep this one tidy for cleanup.)
-    await app.prisma.account.upsert({
-      where: { id: TEST_ACCOUNT_ID },
-      create: { id: TEST_ACCOUNT_ID, name: "Test Brewery (equipment-profiles)" },
+    await app.prisma.workspace.upsert({
+      where: { id: TEST_WORKSPACE_ID },
+      create: { id: TEST_WORKSPACE_ID, name: "Test Brewery (equipment-profiles)" },
       update: { name: "Test Brewery (equipment-profiles)" },
     });
 
     await app.prisma.equipmentProfile.deleteMany({
-      where: { accountId: adminAccountId, name: { startsWith: "Test Equipment Profile" } },
+      where: { workspaceId: adminWorkspaceId, name: { startsWith: "Test Equipment Profile" } },
     });
     await app.prisma.equipmentProfile.deleteMany({
-      where: { accountId: viewerAccountId, name: { startsWith: "Test Equipment Profile" } },
+      where: { workspaceId: viewerWorkspaceId, name: { startsWith: "Test Equipment Profile" } },
     });
   });
 
   afterAll(async () => {
     // Cleanup: keep shared dev DB tidy.
     await app.prisma.equipmentProfile.deleteMany({
-      where: { accountId: adminAccountId, name: { startsWith: "Test Equipment Profile" } },
+      where: { workspaceId: adminWorkspaceId, name: { startsWith: "Test Equipment Profile" } },
     });
     await app.prisma.equipmentProfile.deleteMany({
-      where: { accountId: viewerAccountId, name: { startsWith: "Test Equipment Profile" } },
+      where: { workspaceId: viewerWorkspaceId, name: { startsWith: "Test Equipment Profile" } },
     });
     await app.close();
   });

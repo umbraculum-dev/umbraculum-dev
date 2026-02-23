@@ -27,27 +27,32 @@ function safeFilenamePart(v: string) {
 export async function platformRecipesRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
-  app.get("/platform/accounts", async (req) => {
+  app.get("/platform/workspaces", async (req) => {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const list = await app.prisma.account.findMany({
+    const list = await app.prisma.workspace.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true },
       take: 500,
     });
-    return { ok: true, accounts: list };
+    return { ok: true, workspaces: list };
   });
 
   app.get("/platform/recipes/list", async (req) => {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const query = (req.query ?? {}) as { accountId?: unknown };
-    const accountId = typeof query.accountId === "string" ? query.accountId : "";
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Query.accountId is required");
+    const query = (req.query ?? {}) as { workspaceId?: unknown; accountId?: unknown };
+    const workspaceId =
+      typeof query.workspaceId === "string"
+        ? query.workspaceId
+        : typeof query.accountId === "string"
+          ? query.accountId
+          : "";
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Query.workspaceId is required");
 
-    const list = await recipes.listRecipesForAccount(accountId);
+    const list = await recipes.listRecipesForWorkspace(workspaceId);
     return { ok: true, recipes: list };
   });
 
@@ -56,13 +61,18 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
     await requirePlatformAdmin(app, s.userId);
 
     const params = (req.params ?? {}) as { id?: unknown };
-    const query = (req.query ?? {}) as { accountId?: unknown };
+    const query = (req.query ?? {}) as { workspaceId?: unknown; accountId?: unknown };
     const recipeId = typeof params.id === "string" ? params.id : "";
-    const accountId = typeof query.accountId === "string" ? query.accountId : "";
+    const workspaceId =
+      typeof query.workspaceId === "string"
+        ? query.workspaceId
+        : typeof query.accountId === "string"
+          ? query.accountId
+          : "";
     if (!recipeId) throw new BadRequestError("invalid_recipe_id", "Params.id is required");
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Query.accountId is required");
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Query.workspaceId is required");
 
-    const recipe = await recipes.getRecipeForAccount(recipeId, accountId);
+    const recipe = await recipes.getRecipeForWorkspace(recipeId, workspaceId);
     const full = exportRecipeFull(recipe as any);
 
     const namePart = safeFilenamePart((recipe as any)?.name ?? "");
@@ -77,11 +87,16 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const query = (req.query ?? {}) as { accountId?: unknown };
-    const accountId = typeof query.accountId === "string" ? query.accountId : "";
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Query.accountId is required");
+    const query = (req.query ?? {}) as { workspaceId?: unknown; accountId?: unknown };
+    const workspaceId =
+      typeof query.workspaceId === "string"
+        ? query.workspaceId
+        : typeof query.accountId === "string"
+          ? query.accountId
+          : "";
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Query.workspaceId is required");
 
-    const list = await recipes.listRecipesForAccount(accountId);
+    const list = await recipes.listRecipesForWorkspace(workspaceId);
     const outRecipes: any[] = [];
     for (const r of list as any[]) {
       const full = exportRecipeFull(r);
@@ -100,15 +115,20 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; accountId?: unknown };
+    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; workspaceId?: unknown; accountId?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
-    const accountId = typeof body.accountId === "string" ? body.accountId : "";
+    const workspaceId =
+      typeof body.workspaceId === "string"
+        ? body.workspaceId
+        : typeof body.accountId === "string"
+          ? body.accountId
+          : "";
     if (format !== "beerjson" && format !== "beerxml") {
       throw new BadRequestError("invalid_import_format", "Body.format must be beerjson|beerxml");
     }
     if (!content) throw new BadRequestError("invalid_import_content", "Body.content is required");
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Body.accountId is required");
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Body.workspaceId is required");
     if (Buffer.byteLength(content, "utf8") > RECIPES_IMPORT_SINGLE_MAX_BYTES) {
       throw new BadRequestError("file_too_large", "File too large. Maximum size is 1 MB for single recipe import.");
     }
@@ -126,7 +146,7 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
         beerJsonRecipeJson: mapped.beerJsonRecipeJson,
         warnings: mapped.warnings,
       },
-      accountId,
+      workspaceId,
     };
   });
 
@@ -134,24 +154,36 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; styleKey?: unknown; accountId?: unknown; recipeExtJson?: unknown };
+    const body = (req.body ?? {}) as {
+      format?: unknown;
+      content?: unknown;
+      styleKey?: unknown;
+      workspaceId?: unknown;
+      accountId?: unknown;
+      recipeExtJson?: unknown;
+    };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
     const styleKey = typeof body.styleKey === "string" ? body.styleKey : "custom";
-    const accountId = typeof body.accountId === "string" ? body.accountId : "";
+    const workspaceId =
+      typeof body.workspaceId === "string"
+        ? body.workspaceId
+        : typeof body.accountId === "string"
+          ? body.accountId
+          : "";
     const recipeExtJson = body.recipeExtJson;
 
     if (format !== "beerjson" && format !== "beerxml") {
       throw new BadRequestError("invalid_import_format", "Body.format must be beerjson|beerxml");
     }
     if (!content) throw new BadRequestError("invalid_import_content", "Body.content is required");
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Body.accountId is required");
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Body.workspaceId is required");
     if (Buffer.byteLength(content, "utf8") > RECIPES_IMPORT_SINGLE_MAX_BYTES) {
       throw new BadRequestError("file_too_large", "File too large. Maximum size is 1 MB for single recipe import.");
     }
 
     const mapped = parseSingleImportContent(format, content);
-    const created = await recipes.createRecipeForAccount(accountId, {
+    const created = await recipes.createRecipeForWorkspace(workspaceId, {
       name: mapped.recipeName,
       styleKey,
       notes: mapped.notes,
@@ -166,15 +198,20 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; accountId?: unknown };
+    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; workspaceId?: unknown; accountId?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
-    const accountId = typeof body.accountId === "string" ? body.accountId : "";
+    const workspaceId =
+      typeof body.workspaceId === "string"
+        ? body.workspaceId
+        : typeof body.accountId === "string"
+          ? body.accountId
+          : "";
     if (format !== "beerjson" && format !== "beerxml") {
       throw new BadRequestError("invalid_import_format", "Body.format must be beerjson|beerxml");
     }
     if (!content) throw new BadRequestError("invalid_import_content", "Body.content is required");
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Body.accountId is required");
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Body.workspaceId is required");
     if (Buffer.byteLength(content, "utf8") > RECIPES_IMPORT_BULK_MAX_BYTES) {
       throw new BadRequestError("file_too_large", "File too large. Maximum size is 5 MB for bulk import.");
     }
@@ -194,22 +231,27 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
       });
     }
 
-    return { ok: true, format, previewItems, accountId };
+    return { ok: true, format, previewItems, workspaceId };
   });
 
   app.post("/platform/recipes/import/bulk", { bodyLimit: RECIPES_IMPORT_BULK_MAX_BYTES }, async (req) => {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);
 
-    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; accountId?: unknown };
+    const body = (req.body ?? {}) as { format?: unknown; content?: unknown; workspaceId?: unknown; accountId?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;
     const content = typeof body.content === "string" ? body.content : "";
-    const accountId = typeof body.accountId === "string" ? body.accountId : "";
+    const workspaceId =
+      typeof body.workspaceId === "string"
+        ? body.workspaceId
+        : typeof body.accountId === "string"
+          ? body.accountId
+          : "";
     if (format !== "beerjson" && format !== "beerxml") {
       throw new BadRequestError("invalid_import_format", "Body.format must be beerjson|beerxml");
     }
     if (!content) throw new BadRequestError("invalid_import_content", "Body.content is required");
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Body.accountId is required");
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Body.workspaceId is required");
     if (Buffer.byteLength(content, "utf8") > RECIPES_IMPORT_BULK_MAX_BYTES) {
       throw new BadRequestError("file_too_large", "File too large. Maximum size is 5 MB for bulk import.");
     }
@@ -221,7 +263,7 @@ export async function platformRecipesRoutes(app: FastifyInstance) {
     for (const it of items) {
       try {
         const resolved = await resolveBjcp2021Style(app.prisma, it.styleCandidate);
-        const recipe = await recipes.createRecipeForAccount(accountId, {
+        const recipe = await recipes.createRecipeForWorkspace(workspaceId, {
           name: it.recipeName,
           styleKey: resolved.styleKey,
           notes: it.notes,

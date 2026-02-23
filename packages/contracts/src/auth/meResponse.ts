@@ -13,7 +13,7 @@ export interface AuthMeResponseUser {
   isPlatformAdmin?: boolean;
 }
 
-export interface AuthMeResponseAccount {
+export interface AuthMeResponseWorkspace {
   id: string;
   name: string;
   role: string;
@@ -23,8 +23,8 @@ export interface AuthMeResponseAccount {
 export interface AuthMeResponse {
   ok: true;
   user: AuthMeResponseUser;
-  accounts: AuthMeResponseAccount[];
-  activeAccountId: string | null;
+  workspaces: AuthMeResponseWorkspace[];
+  activeWorkspaceId: string | null;
   role: string | null;
 }
 
@@ -53,12 +53,12 @@ function parseUser(v: unknown): AuthMeResponseUser {
   };
 }
 
-function parseAccount(v: unknown): AuthMeResponseAccount {
-  if (!isObject(v)) throw new Error("Invalid AuthMeResponse.accounts item");
+function parseWorkspace(v: unknown): AuthMeResponseWorkspace {
+  if (!isObject(v)) throw new Error("Invalid AuthMeResponse.workspaces item");
   const id = isString(v.id) ? v.id : "";
   const name = isString(v.name) ? v.name : "";
   const role = isString(v.role) ? v.role : "";
-  if (!id || !name) throw new Error("Invalid AuthMeResponse.accounts item: id and name required");
+  if (!id || !name) throw new Error("Invalid AuthMeResponse.workspaces item: id and name required");
   return {
     id,
     name,
@@ -74,16 +74,29 @@ export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
   if (!isObject(payload)) throw new Error("Invalid AuthMeResponse: expected object");
   if (payload.ok !== true) throw new Error("Invalid AuthMeResponse: ok must be true");
   const user = parseUser(payload.user);
-  const accountsRaw = payload.accounts;
-  if (!Array.isArray(accountsRaw)) throw new Error("Invalid AuthMeResponse: accounts must be array");
-  const accounts = accountsRaw.map((a, i) => {
+  const workspacesRaw = Array.isArray((payload as any).workspaces)
+    ? (payload as any).workspaces
+    : Array.isArray((payload as any).accounts)
+      ? (payload as any).accounts
+      : null;
+  if (!workspacesRaw) throw new Error("Invalid AuthMeResponse: workspaces must be array");
+  const workspaces = workspacesRaw.map((a, i) => {
     try {
-      return parseAccount(a);
+      return parseWorkspace(a);
     } catch (e) {
-      throw new Error("Invalid AuthMeResponse.accounts[" + i + "]: " + (e instanceof Error ? e.message : String(e)));
+      throw new Error("Invalid AuthMeResponse.workspaces[" + i + "]: " + (e instanceof Error ? e.message : String(e)));
     }
   });
-  const activeAccountId = payload.activeAccountId === null ? null : isString(payload.activeAccountId) ? payload.activeAccountId : null;
+  const activeWorkspaceId =
+    (payload as any).activeWorkspaceId === null
+      ? null
+      : isString((payload as any).activeWorkspaceId)
+        ? ((payload as any).activeWorkspaceId as string)
+        : (payload as any).activeAccountId === null
+          ? null
+          : isString((payload as any).activeAccountId)
+            ? ((payload as any).activeAccountId as string)
+            : null;
   const role = payload.role === null ? null : isString(payload.role) ? payload.role : null;
-  return { ok: true, user, accounts, activeAccountId, role };
+  return { ok: true, user, workspaces, activeWorkspaceId, role };
 }

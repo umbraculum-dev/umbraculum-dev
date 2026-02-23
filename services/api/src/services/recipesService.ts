@@ -1,6 +1,6 @@
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 import { normalizeBeerJsonRecipeUnits, validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 import { validateBeerJsonRecipeDomain } from "../beerjson/recipeDomainValidator.js";
 import {
@@ -27,22 +27,22 @@ export type UpdateRecipeInput = {
 };
 
 export class RecipesService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
   }
 
-  private async listLatestVersionsForAccount(accountId: string) {
+  private async listLatestVersionsForWorkspace(workspaceId: string) {
     const groups = await this.prisma.recipe.groupBy({
       by: ["versionGroupId"],
-      where: { accountId },
+      where: { workspaceId },
       _max: { version: true },
     });
 
     const latestKeys = groups
       .map((g) => ({
-        accountId,
+        workspaceId,
         versionGroupId: g.versionGroupId,
         version: g._max.version ?? 0,
       }));
@@ -67,30 +67,30 @@ export class RecipesService {
     return style;
   }
 
-  async listRecipes(userId: string, accountId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async listRecipes(userId: string, workspaceId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
-    return this.listLatestVersionsForAccount(accountId);
+    return this.listLatestVersionsForWorkspace(workspaceId);
   }
 
-  async getRecipe(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async getRecipe(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const recipe = await this.prisma.recipe.findFirst({
-      where: { id: recipeId, accountId },
+      where: { id: recipeId, workspaceId },
     });
     if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
     return recipe;
   }
 
-  async listRecipeVersions(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async listRecipeVersions(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
-    const recipe = await this.getRecipe(userId, accountId, recipeId);
+    const recipe = await this.getRecipe(userId, workspaceId, recipeId);
     const versionGroupId = (recipe as any).versionGroupId ?? (recipe as any).id ?? recipeId;
 
     return this.prisma.recipe.findMany({
-      where: { accountId, versionGroupId },
+      where: { workspaceId, versionGroupId },
       orderBy: { version: "desc" },
       select: {
         id: true,
@@ -102,15 +102,15 @@ export class RecipesService {
     });
   }
 
-  async createRecipeVersionFromCurrent(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async createRecipeVersionFromCurrent(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
-    const source = await this.getRecipe(userId, accountId, recipeId);
+    const source = await this.getRecipe(userId, workspaceId, recipeId);
     const versionGroupId = (source as any).versionGroupId ?? (source as any).id ?? recipeId;
 
     return this.prisma.$transaction(async (tx) => {
       const agg = await tx.recipe.aggregate({
-        where: { accountId, versionGroupId },
+        where: { workspaceId, versionGroupId },
         _max: { version: true },
       });
 
@@ -128,7 +128,7 @@ export class RecipesService {
       const created = await tx.recipe.create({
         data: {
           id: newRecipeId,
-          accountId,
+          workspaceId,
           versionGroupId,
           version: nextVersion,
           name: (source as any).name,
@@ -157,7 +157,7 @@ export class RecipesService {
           data: {
             ...rest,
             recipeId: newRecipeId,
-            accountId,
+            workspaceId,
           },
         });
       }
@@ -166,10 +166,10 @@ export class RecipesService {
     });
   }
 
-  async duplicateRecipe(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async duplicateRecipe(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
-    const source = await this.getRecipe(userId, accountId, recipeId);
+    const source = await this.getRecipe(userId, workspaceId, recipeId);
 
     return this.prisma.$transaction(async (tx) => {
       const newRecipeId = crypto.randomUUID();
@@ -185,7 +185,7 @@ export class RecipesService {
       const created = await tx.recipe.create({
         data: {
           id: newRecipeId,
-          accountId,
+          workspaceId,
           versionGroupId: newRecipeId,
           version: 0,
           name: newName,
@@ -214,7 +214,7 @@ export class RecipesService {
           data: {
             ...rest,
             recipeId: newRecipeId,
-            accountId,
+            workspaceId,
           },
         });
       }
@@ -223,7 +223,7 @@ export class RecipesService {
     });
   }
 
-  private async createRecipeCore(accountId: string, input: CreateRecipeInput) {
+  private async createRecipeCore(workspaceId: string, input: CreateRecipeInput) {
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");
 
@@ -281,7 +281,7 @@ export class RecipesService {
     return this.prisma.recipe.create({
       data: {
         id: recipeId,
-        accountId,
+        workspaceId,
         versionGroupId: recipeId,
         version: 0,
         name,
@@ -294,37 +294,37 @@ export class RecipesService {
     });
   }
 
-  async createRecipe(userId: string, accountId: string, input: CreateRecipeInput) {
-    await this.accounts.assertMembership(userId, accountId);
-    return this.createRecipeCore(accountId, input);
+  async createRecipe(userId: string, workspaceId: string, input: CreateRecipeInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    return this.createRecipeCore(workspaceId, input);
   }
 
-  async createRecipeForAccount(accountId: string, input: CreateRecipeInput) {
-    const account = await this.prisma.account.findUnique({
-      where: { id: accountId },
+  async createRecipeForWorkspace(workspaceId: string, input: CreateRecipeInput) {
+    const workspace = await this.prisma.workspace.findUnique({
+      where: { id: workspaceId },
       select: { id: true },
     });
-    if (!account) throw new NotFoundError("account_not_found", "Account not found");
-    return this.createRecipeCore(accountId, input);
+    if (!workspace) throw new NotFoundError("workspace_not_found", "Workspace not found");
+    return this.createRecipeCore(workspaceId, input);
   }
 
-  async getRecipeForAccount(recipeId: string, accountId: string) {
+  async getRecipeForWorkspace(recipeId: string, workspaceId: string) {
     const recipe = await this.prisma.recipe.findFirst({
-      where: { id: recipeId, accountId },
+      where: { id: recipeId, workspaceId },
     });
     if (!recipe) throw new NotFoundError("recipe_not_found", "Recipe not found");
     return recipe;
   }
 
-  async listRecipesForAccount(accountId: string) {
-    return this.listLatestVersionsForAccount(accountId);
+  async listRecipesForWorkspace(workspaceId: string) {
+    return this.listLatestVersionsForWorkspace(workspaceId);
   }
 
-  async updateRecipe(userId: string, accountId: string, recipeId: string, input: UpdateRecipeInput) {
-    await this.accounts.assertMembership(userId, accountId);
+  async updateRecipe(userId: string, workspaceId: string, recipeId: string, input: UpdateRecipeInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
-    // Ensure account scoping is enforced even if IDs collide across accounts.
-    const existing = await this.getRecipe(userId, accountId, recipeId);
+    // Ensure workspace scoping is enforced even if IDs collide across workspaces.
+    const existing = await this.getRecipe(userId, workspaceId, recipeId);
 
     const data: any = {};
 
@@ -442,11 +442,11 @@ export class RecipesService {
     });
   }
 
-  async deleteRecipe(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async deleteRecipe(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
-    // Enforce account scoping.
-    await this.getRecipe(userId, accountId, recipeId);
+    // Enforce workspace scoping.
+    await this.getRecipe(userId, workspaceId, recipeId);
 
     await this.prisma.recipe.delete({ where: { id: recipeId } });
     return { ok: true as const };

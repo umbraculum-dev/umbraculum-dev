@@ -5,7 +5,7 @@ import { randomBytes } from "node:crypto";
 
 import { BadRequestError, UnauthorizedError } from "../errors.js";
 import { SESSION_COOKIE_NAME, readBearerToken, requireSession } from "../plugins/sessionAuth.js";
-import { AccountsService } from "../services/accountsService.js";
+import { WorkspacesService } from "../services/workspacesService.js";
 
 const SESSION_TTL_DAYS = 14;
 
@@ -46,7 +46,7 @@ function assertUiDensity(v: unknown): UiDensityKey {
 }
 
 export async function authRoutes(app: FastifyInstance) {
-  const accounts = new AccountsService(app.prisma);
+  const workspaces = new WorkspacesService(app.prisma);
 
   await app.register(rateLimit, { global: false });
 
@@ -54,11 +54,23 @@ export async function authRoutes(app: FastifyInstance) {
     "/auth/signup",
     { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
     async (req, reply) => {
-      const body = (req.body ?? {}) as { email?: unknown; password?: unknown; preferredLocale?: unknown; accountName?: unknown };
+      const body = (req.body ?? {}) as {
+        email?: unknown;
+        password?: unknown;
+        preferredLocale?: unknown;
+        workspaceName?: unknown;
+        accountName?: unknown;
+      };
       const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
       const password = typeof body.password === "string" ? body.password : "";
       const preferredLocale = assertLocale(body.preferredLocale);
-      const accountName = typeof body.accountName === "string" ? body.accountName.trim() : "";
+      const workspaceNameRaw =
+        typeof body.workspaceName === "string"
+          ? body.workspaceName
+          : typeof body.accountName === "string"
+            ? body.accountName
+            : "";
+      const workspaceName = workspaceNameRaw.trim();
 
       if (!email || !email.includes("@")) throw new BadRequestError("invalid_email", "Email is required");
       if (password.length < 8) throw new BadRequestError("weak_password", "Password must be at least 8 characters");
@@ -77,18 +89,18 @@ export async function authRoutes(app: FastifyInstance) {
         select: { id: true, email: true, preferredLocale: true },
       });
 
-      // Create an account for onboarding (recommended default)
-      const createdAccount = await accounts.createAccountForUser(created.id, accountName || "My Brewery");
+      // Create a workspace for onboarding (recommended default)
+      const createdWorkspace = await workspaces.createWorkspaceForUser(created.id, workspaceName || "My workspace");
 
       const sessionId = makeOpaqueId();
       const session = await app.prisma.session.create({
         data: {
           id: sessionId,
           userId: created.id,
-          activeAccountId: createdAccount.id,
+          activeWorkspaceId: createdWorkspace.id,
           expiresAt: nowPlusDays(SESSION_TTL_DAYS),
         },
-        select: { id: true, activeAccountId: true },
+        select: { id: true, activeWorkspaceId: true },
       });
 
       reply
@@ -102,7 +114,7 @@ export async function authRoutes(app: FastifyInstance) {
         .send({
           ok: true,
           user: created,
-          activeAccountId: session.activeAccountId,
+          activeWorkspaceId: session.activeWorkspaceId,
         });
     },
   );
@@ -135,8 +147,8 @@ export async function authRoutes(app: FastifyInstance) {
         });
       }
 
-      const memberships = await accounts.listAccountsForUser(user.id);
-      const activeAccountId =
+      const memberships = await workspaces.listWorkspacesForUser(user.id);
+      const activeWorkspaceId =
         memberships.length === 1
           ? memberships[0]!.id
           : null;
@@ -146,10 +158,10 @@ export async function authRoutes(app: FastifyInstance) {
         data: {
           id: sessionId,
           userId: user.id,
-          activeAccountId,
+          activeWorkspaceId,
           expiresAt: nowPlusDays(SESSION_TTL_DAYS),
         },
-        select: { id: true, activeAccountId: true },
+        select: { id: true, activeWorkspaceId: true },
       });
 
       reply
@@ -162,8 +174,8 @@ export async function authRoutes(app: FastifyInstance) {
         .send({
           ok: true,
           user: { id: user.id, email: user.email, preferredLocale },
-          accounts: memberships,
-          activeAccountId: session.activeAccountId,
+          workspaces: memberships,
+          activeWorkspaceId: session.activeWorkspaceId,
         });
     },
   );
@@ -196,8 +208,8 @@ export async function authRoutes(app: FastifyInstance) {
         });
       }
 
-      const memberships = await accounts.listAccountsForUser(user.id);
-      const activeAccountId =
+      const memberships = await workspaces.listWorkspacesForUser(user.id);
+      const activeWorkspaceId =
         memberships.length === 1
           ? memberships[0]!.id
           : null;
@@ -207,18 +219,18 @@ export async function authRoutes(app: FastifyInstance) {
         data: {
           id: sessionId,
           userId: user.id,
-          activeAccountId,
+          activeWorkspaceId,
           expiresAt: nowPlusDays(SESSION_TTL_DAYS),
         },
-        select: { id: true, activeAccountId: true },
+        select: { id: true, activeWorkspaceId: true },
       });
 
       reply.send({
         ok: true,
         token: session.id,
         user: { id: user.id, email: user.email, preferredLocale },
-        accounts: memberships,
-        activeAccountId: session.activeAccountId,
+        workspaces: memberships,
+        activeWorkspaceId: session.activeWorkspaceId,
       });
     },
   );
@@ -251,10 +263,10 @@ export async function authRoutes(app: FastifyInstance) {
     });
     if (!user) throw new UnauthorizedError("invalid_session", "Not authenticated");
 
-    const memberships = await accounts.listAccountsForUser(user.id);
-    const role = s.activeAccountId ? await accounts.getMembershipRole(user.id, s.activeAccountId) : null;
+    const memberships = await workspaces.listWorkspacesForUser(user.id);
+    const role = s.activeWorkspaceId ? await workspaces.getMembershipRole(user.id, s.activeWorkspaceId) : null;
 
-    return { ok: true, user, accounts: memberships, activeAccountId: s.activeAccountId, role };
+    return { ok: true, user, workspaces: memberships, activeWorkspaceId: s.activeWorkspaceId, role };
   });
 
   app.patch("/auth/preferences", async (req) => {
@@ -278,21 +290,26 @@ export async function authRoutes(app: FastifyInstance) {
     return { ok: true, preferences: updated };
   });
 
-  app.post("/auth/active-account", async (req) => {
+  app.post("/auth/active-workspace", async (req) => {
     const s = requireSession(req);
-    const body = (req.body ?? {}) as { accountId?: unknown };
-    const accountId = typeof body.accountId === "string" ? body.accountId : "";
-    if (!accountId) throw new BadRequestError("invalid_account_id", "Body.accountId is required");
+    const body = (req.body ?? {}) as { workspaceId?: unknown; accountId?: unknown };
+    const workspaceId =
+      typeof body.workspaceId === "string"
+        ? body.workspaceId
+        : typeof body.accountId === "string"
+          ? body.accountId
+          : "";
+    if (!workspaceId) throw new BadRequestError("invalid_workspace_id", "Body.workspaceId is required");
 
-    await accounts.assertMembership(s.userId, accountId);
+    await workspaces.assertMembership(s.userId, workspaceId);
 
     const updated = await app.prisma.session.update({
       where: { id: s.sessionId },
-      data: { activeAccountId: accountId },
-      select: { activeAccountId: true },
+      data: { activeWorkspaceId: workspaceId },
+      select: { activeWorkspaceId: true },
     });
 
-    return { ok: true, activeAccountId: updated.activeAccountId };
+    return { ok: true, activeWorkspaceId: updated.activeWorkspaceId };
   });
 }
 

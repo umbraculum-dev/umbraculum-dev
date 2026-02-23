@@ -23,8 +23,8 @@ export default function RecipeVersionsPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const authState = useRequireAuth({ requireActiveAccount: true });
-  const canCall = authState.status === "ready" && !!authState.me?.activeAccountId;
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
+  const canCall = authState.status === "ready" && !!authState.me?.activeWorkspaceId;
 
   const [versions, setVersions] = useState<VersionListItem[]>([]);
   const [loading, setLoading] = useState(false);

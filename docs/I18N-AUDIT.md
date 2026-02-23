@@ -23,9 +23,9 @@ This document tracks the initial audit of user-facing strings that should be mig
   - `Loading…`
 - `apps/web/app/DashboardClient.tsx`
   - `Loading…`
-- `apps/web/app/[locale]/(auth)/select-account/page.tsx`
+- `apps/web/app/[locale]/(auth)/select-workspace/page.tsx`
   - `Loading…`
-  - `No accounts found.`
+  - `No workspaces found.`
 
 ## Known hard-coded accessibility text (examples)
 

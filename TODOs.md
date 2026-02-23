@@ -97,7 +97,7 @@ Before implementing native app login, complete these items.
 - [x] **DB-backed sessions** with `sid` httpOnly cookie
 - [x] Add a scheduled cleanup job: `DELETE FROM "Session" WHERE "expiresAt" < now()` to prevent unbounded growth (indexed by `expiresAt`). Job exists (`job:session-cleanup`); scheduling documented in `docs/AUTH-STRATEGY.md`.
 - [x] Persist `preferredLocale` from login/signup, and ensure locale-prefixed routes work for auth pages (`/en/...`, `/it/...`)
-- [x] “Active account” selection after login when user has multiple accounts
+- [x] “Active workspace” selection after login when user has multiple workspaces
 - [ ] Add “i18n contributing” flow/tooling (recommended: Weblate) and keep translation catalogs maintained.
 
 ## Authentication (dev shortcuts)
@@ -106,15 +106,37 @@ Before implementing native app login, complete these items.
 
 ## Tenancy + ACL (always enforce)
 
-- [ ] All domain tables must include `account_id` (or `accountId`) and be scoped server-side.
+- [ ] All domain tables must include `workspace_id` (or `workspaceId`) and be scoped server-side.
 - [ ] Enforce membership/role checks centrally (service layer), not ad-hoc in routes.
-- [ ] Keep “active account” explicit (`activeAccountId`), never implicit.
+- [ ] Keep “active workspace” explicit (`activeWorkspaceId`), never implicit.
+- [ ] **Tenancy isolation hardening (prevent cross-workspace leaks)**:
+  - Why: a single missed `workspaceId` filter (or missing membership check) can leak another workspace’s inventory/recipes/etc. This is a high-severity privacy + security issue.
+  - Review rule of thumb:
+    - Every workspace-scoped request must derive scope from session `activeWorkspaceId` (not from user input).
+    - Every workspace-scoped service method must enforce access (at least `WorkspacesService.assertMembership`) and ensure every Prisma query includes `where: { workspaceId: activeWorkspaceId, ... }`.
+    - For ID-based operations (update/delete/get-by-id), avoid `findUnique({ where: { id } })` unless you additionally constrain by `workspaceId` (e.g. `findFirst({ where: { id, workspaceId } })`).
+  - Follow-up: add targeted tests that create data in two workspaces and assert it is never readable/mutable across workspace boundaries.
+- [ ] **System-wide ACL gaps (workspace roles)**:
+  - Today most endpoints are effectively “member of workspace” gated (or only check active workspace), but **role-based authorization is not consistently enforced**.
+  - We should define a clear policy (suggested baseline):
+    - **viewer**: read-only
+    - **member**: create/update domain data (recipes, brew sessions, inventory, profiles)
+    - **brewery_admin**: workspace settings + admin-only operations (e.g. branding)
+  - Missing/partial enforcement areas (non-exhaustive):
+    - `services/api/src/routes/recipes.ts`: create/update/delete/duplicate should require at least **member**
+    - `services/api/src/routes/brewSessions.ts`: create/start/pause/stop + step edits should require at least **member**
+    - `services/api/src/routes/inventory.ts`: CRUD should require at least **member**
+    - `services/api/src/routes/equipmentProfiles.ts`: create/update/delete should require at least **member**
+    - `services/api/src/routes/waterProfiles.ts`: create/update/delete (workspace-scoped) should require at least **member**
+    - `services/api/src/routes/brewdaySettings.ts`: update should require at least **brewery_admin** (or a decided policy)
+    - Ensure platform-admin routes remain guarded by `user.isPlatformAdmin` and are not workspace-role dependent
+  - Follow-up: centralize these checks via `services/api/src/services/acl.ts` and apply consistently in service methods.
 
 ## Near-term milestones
 
-- [ ] Core schema: `User`, `Account`, `AccountMember` (+ roles)
-- [ ] Minimal endpoints: `/me`, `/accounts` (GET/POST)
-- [ ] Web thin shell: account list + create account (dev only)
+- [ ] Core schema: `User`, `Workspace`, `WorkspaceMember` (+ roles)
+- [ ] Minimal endpoints: `/me`, `/workspaces` (GET/POST)
+- [ ] Web thin shell: workspace list + create workspace (dev only)
 
 ## Web SEO / SSR assessment
 

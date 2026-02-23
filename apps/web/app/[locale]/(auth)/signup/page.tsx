@@ -22,7 +22,7 @@ export default function SignupPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [accountName, setAccountName] = useState("");
+  const [workspaceName, setWorkspaceName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,20 +56,22 @@ export default function SignupPage() {
           email,
           password,
           preferredLocale: locale,
-          accountName: accountName.trim() ? accountName.trim() : undefined,
+          workspaceName: workspaceName.trim() ? workspaceName.trim() : undefined,
         }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
 
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 
-      const activeAccountId =
-        res.data && typeof res.data === "object" && "activeAccountId" in (res.data as any)
-          ? ((res.data as any).activeAccountId as string | null)
-          : null;
+      const activeWorkspaceId =
+        res.data && typeof res.data === "object" && "activeWorkspaceId" in (res.data as any)
+          ? ((res.data as any).activeWorkspaceId as string | null)
+          : res.data && typeof res.data === "object" && "activeAccountId" in (res.data as any)
+            ? ((res.data as any).activeAccountId as string | null)
+            : null;
 
-      if (!activeAccountId) {
-        router.replace(`/${locale}/select-account`);
+      if (!activeWorkspaceId) {
+        router.replace(`/${locale}/select-workspace`);
         return;
       }
       router.replace(`/${locale}`);
@@ -138,11 +140,11 @@ export default function SignupPage() {
           </YStack>
 
           <YStack gap="$1.5">
-            <RecipeEditFieldLabel htmlFor="signup-accountName">{t("accountNameLabel")}</RecipeEditFieldLabel>
+            <RecipeEditFieldLabel htmlFor="signup-workspaceName">{t("workspaceNameLabel")}</RecipeEditFieldLabel>
             <Input
-              id="signup-accountName"
-              value={accountName}
-              onChangeText={setAccountName}
+              id="signup-workspaceName"
+              value={workspaceName}
+              onChangeText={setWorkspaceName}
               autoComplete="organization"
               data-lpignore="true"
               data-1p-ignore="true"

@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { BadRequestError, ForbiddenError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
 
 export type UpsertRecipeWaterSettingsInput = {
@@ -163,49 +163,49 @@ function validateSaltAdditionsJson(value: unknown, field: string) {
 }
 
 export class RecipeWaterSettingsService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
   private readonly recipes: RecipesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
     this.recipes = new RecipesService(prisma);
   }
 
-  async get(userId: string, accountId: string, recipeId: string) {
-    await this.accounts.assertMembership(userId, accountId);
-    await this.recipes.getRecipe(userId, accountId, recipeId);
+  async get(userId: string, workspaceId: string, recipeId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    await this.recipes.getRecipe(userId, workspaceId, recipeId);
 
     return this.prisma.recipeWaterSettings.findUnique({
       where: { recipeId },
     });
   }
 
-  private async assertProfileAccessible(accountId: string, profileId: string) {
+  private async assertProfileAccessible(workspaceId: string, profileId: string) {
     const profile = await this.prisma.waterProfile.findUnique({ where: { id: profileId } });
     if (!profile) throw new BadRequestError("invalid_profile_id", "Unknown water profile id");
 
     const scope = profile.scope as "system" | "public" | "account";
     if (scope === "system" || scope === "public") return;
-    if (scope === "account" && profile.accountId === accountId) return;
+    if (scope === "account" && profile.workspaceId === workspaceId) return;
 
-    throw new ForbiddenError("profile_not_accessible", "Water profile is not accessible to this account");
+    throw new ForbiddenError("profile_not_accessible", "Water profile is not accessible to this workspace");
   }
 
-  async upsert(userId: string, accountId: string, recipeId: string, input: UpsertRecipeWaterSettingsInput) {
-    await this.accounts.assertMembership(userId, accountId);
-    await this.recipes.getRecipe(userId, accountId, recipeId);
+  async upsert(userId: string, workspaceId: string, recipeId: string, input: UpsertRecipeWaterSettingsInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    await this.recipes.getRecipe(userId, workspaceId, recipeId);
 
-    if (input.sourceWaterProfileId) await this.assertProfileAccessible(accountId, input.sourceWaterProfileId);
-    if (input.targetWaterProfileId) await this.assertProfileAccessible(accountId, input.targetWaterProfileId);
-    if (input.dilutionWaterProfileId) await this.assertProfileAccessible(accountId, input.dilutionWaterProfileId);
-    if (input.spargeWaterProfileId) await this.assertProfileAccessible(accountId, input.spargeWaterProfileId);
-    if (input.boilSourceWaterProfileId) await this.assertProfileAccessible(accountId, input.boilSourceWaterProfileId);
-    if (input.boilTargetWaterProfileId) await this.assertProfileAccessible(accountId, input.boilTargetWaterProfileId);
+    if (input.sourceWaterProfileId) await this.assertProfileAccessible(workspaceId, input.sourceWaterProfileId);
+    if (input.targetWaterProfileId) await this.assertProfileAccessible(workspaceId, input.targetWaterProfileId);
+    if (input.dilutionWaterProfileId) await this.assertProfileAccessible(workspaceId, input.dilutionWaterProfileId);
+    if (input.spargeWaterProfileId) await this.assertProfileAccessible(workspaceId, input.spargeWaterProfileId);
+    if (input.boilSourceWaterProfileId) await this.assertProfileAccessible(workspaceId, input.boilSourceWaterProfileId);
+    if (input.boilTargetWaterProfileId) await this.assertProfileAccessible(workspaceId, input.boilTargetWaterProfileId);
     if (input.boilDilutionWaterProfileId)
-      await this.assertProfileAccessible(accountId, input.boilDilutionWaterProfileId);
+      await this.assertProfileAccessible(workspaceId, input.boilDilutionWaterProfileId);
 
     const existing = await this.prisma.recipeWaterSettings.findUnique({ where: { recipeId } });
-    const data: Record<string, unknown> = { accountId, recipeId };
+    const data: Record<string, unknown> = { workspaceId, recipeId };
 
     if (input.sourceWaterProfileId !== undefined) data.sourceWaterProfileId = input.sourceWaterProfileId;
     if (input.targetWaterProfileId !== undefined) data.targetWaterProfileId = input.targetWaterProfileId;

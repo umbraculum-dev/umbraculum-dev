@@ -4,12 +4,12 @@ import { useTranslations } from "next-intl";
 import { Link } from "../../src/i18n/navigation";
 import { SizableText, XStack } from "tamagui";
 
-export function SwitchAccountLink() {
+export function SwitchWorkspaceLink() {
   const t = useTranslations("nav");
 
   return (
     <Link
-      href="/select-account"
+      href="/select-workspace"
       className="brew-link-inline-flex"
     >
       <XStack ai="center" height={28}>
@@ -19,9 +19,12 @@ export function SwitchAccountLink() {
           fontFamily="$body"
           hoverStyle={{ textDecoration: "underline" }}
         >
-          {t("switchAccount")}
+          {t("switchWorkspace")}
         </SizableText>
       </XStack>
     </Link>
   );
 }
+
+/** Backward-compatible export (old name). */
+export const SwitchAccountLink = SwitchWorkspaceLink;

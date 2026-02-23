@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import {
   BrewdaySettingsService,
   type BrewdaySectionConfig,
@@ -33,13 +33,13 @@ export async function brewdaySettingsRoutes(app: FastifyInstance) {
   const svc = new BrewdaySettingsService(app.prisma);
 
   app.get("/brewday-settings", async (req) => {
-    const ctx = requireActiveAccount(req);
-    const settings = await svc.getSettings(ctx.userId, ctx.activeAccountId);
+    const ctx = requireActiveWorkspace(req);
+    const settings = await svc.getSettings(ctx.userId, ctx.activeWorkspaceId);
     return { ok: true, settings };
   });
 
   app.patch("/brewday-settings", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
     const brewingType = typeof body.brewingType === "string" ? body.brewingType : "";
     const sections = parseSections(body.sections);
@@ -48,7 +48,7 @@ export async function brewdaySettingsRoutes(app: FastifyInstance) {
     const notes =
       body.notes === null ? null : typeof body.notes === "string" ? body.notes : undefined;
 
-    const updated = await svc.upsertSettings(ctx.userId, ctx.activeAccountId, {
+    const updated = await svc.upsertSettings(ctx.userId, ctx.activeWorkspaceId, {
       brewingType,
       sections,
       defaultSteps,

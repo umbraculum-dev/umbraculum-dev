@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 
 const PRESET_KEYS = [
   "preparation",
@@ -400,17 +400,17 @@ function parseStepArray(
 }
 
 export class BrewdaySettingsService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
   }
 
-  async getSettings(userId: string, accountId: string): Promise<BrewdaySettingsPayload | null> {
-    await this.accounts.assertMembership(userId, accountId);
+  async getSettings(userId: string, workspaceId: string): Promise<BrewdaySettingsPayload | null> {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const row = await this.prisma.brewdaySettings.findUnique({
-      where: { accountId },
+      where: { workspaceId },
     });
 
     if (!row) return null;
@@ -425,7 +425,7 @@ export class BrewdaySettingsService {
 
     if (shouldUpgradeSeed) {
       await this.prisma.brewdaySettings.update({
-        where: { accountId },
+        where: { workspaceId },
         data: { defaultStepsJson: defaultSteps as unknown as any },
       });
     }
@@ -441,10 +441,10 @@ export class BrewdaySettingsService {
 
   async upsertSettings(
     userId: string,
-    accountId: string,
+    workspaceId: string,
     payload: BrewdaySettingsPayload
   ): Promise<BrewdaySettingsPayload> {
-    await this.accounts.assertMembership(userId, accountId);
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const sectionsToStore =
       payload.sections && typeof payload.sections === "object" && "presetExcludes" in payload.sections
@@ -458,9 +458,9 @@ export class BrewdaySettingsService {
       typeof payload.notes === "string" ? payload.notes : payload.notes === null ? null : undefined;
 
     const row = await this.prisma.brewdaySettings.upsert({
-      where: { accountId },
+      where: { workspaceId },
       create: {
-        accountId,
+        workspaceId,
         brewingType: payload.brewingType,
         sectionsJson,
         customSectionsJson,

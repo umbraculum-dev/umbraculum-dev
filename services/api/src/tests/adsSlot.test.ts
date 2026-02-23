@@ -7,20 +7,20 @@ const SAMPLE_AD_GLOBAL_TOP_ID = "00000000-0000-0000-0000-00000000ad01";
 describe("ads slot resolution", () => {
   const app = buildApp();
   let cookie = "";
-  let accountId = "";
+  let workspaceId = "";
 
   beforeAll(async () => {
     await app.ready();
 
-    const sess = await createSessionForTestUser(app, { activeAccount: true });
+    const sess = await createSessionForTestUser(app, { activeWorkspace: true });
     cookie = sess.cookie;
-    accountId = sess.accountId;
+    workspaceId = sess.workspaceId;
 
-    await app.prisma.account.update({ where: { id: accountId }, data: { adsDisabled: false }, select: { id: true } });
+    await app.prisma.workspace.update({ where: { id: workspaceId }, data: { adsDisabled: false }, select: { id: true } });
   });
 
   afterAll(async () => {
-    await app.prisma.account.update({ where: { id: accountId }, data: { adsDisabled: false }, select: { id: true } }).catch(() => {});
+    await app.prisma.workspace.update({ where: { id: workspaceId }, data: { adsDisabled: false }, select: { id: true } }).catch(() => {});
     await app.close();
   });
 
@@ -59,7 +59,7 @@ describe("ads slot resolution", () => {
   });
 
   it("returns disabled=true for accounts with ads disabled", async () => {
-    await app.prisma.account.update({ where: { id: accountId }, data: { adsDisabled: true }, select: { id: true } });
+    await app.prisma.workspace.update({ where: { id: workspaceId }, data: { adsDisabled: true }, select: { id: true } });
 
     const res = await app.inject({
       method: "GET",
@@ -75,7 +75,7 @@ describe("ads slot resolution", () => {
       ad: null,
     });
 
-    await app.prisma.account.update({ where: { id: accountId }, data: { adsDisabled: false }, select: { id: true } });
+    await app.prisma.workspace.update({ where: { id: workspaceId }, data: { adsDisabled: false }, select: { id: true } });
   });
 });
 

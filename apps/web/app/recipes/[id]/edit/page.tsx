@@ -139,7 +139,7 @@ export default function RecipeEditPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
-  const authState = useRequireAuth({ requireActiveAccount: true });
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
   const [layoutMetrics, setLayoutMetrics] = useState<{
     leftGutterPx: number | null;
     railTopPx: number | null;
@@ -2669,9 +2669,9 @@ export default function RecipeEditPage() {
                     <XStack gap="$2" ai="center" minW="max-content">
                       <View minW={140}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Name</SizableText></View>
                       <View minW={100}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Producer</SizableText></View>
-                      <View minW={50}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">°L</SizableText></View>
-                      <View minW={70}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">Yield %</SizableText></View>
-                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">PPG</SizableText></View>
+                      <View minW={50} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">°L</SizableText></View>
+                      <View minW={70} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">Yield %</SizableText></View>
+                      <View minW={60} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">PPG</SizableText></View>
                       <View minW={60} />
                     </XStack>
                     {fermentableResults.slice(0, 20).map((it) => (

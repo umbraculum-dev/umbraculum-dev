@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipesService } from "../services/recipesService.js";
 import { computeRecipeGravityAnalysis } from "../domain/recipeAnalysis/gravityAnalysis.js";
 
@@ -7,13 +7,13 @@ export async function recipesRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
   app.get("/recipes", async (req) => {
-    const ctx = requireActiveAccount(req);
-    const list = await recipes.listRecipes(ctx.userId, ctx.activeAccountId);
+    const ctx = requireActiveWorkspace(req);
+    const list = await recipes.listRecipes(ctx.userId, ctx.activeWorkspaceId);
     return { ok: true, recipes: list };
   });
 
   app.post("/recipes", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as {
       name?: unknown;
       styleKey?: unknown;
@@ -27,7 +27,7 @@ export async function recipesRoutes(app: FastifyInstance) {
     const beerJsonRecipeJson = body.beerJsonRecipeJson;
     const recipeExtJson = body.recipeExtJson;
 
-    const created = await recipes.createRecipe(ctx.userId, ctx.activeAccountId, {
+    const created = await recipes.createRecipe(ctx.userId, ctx.activeWorkspaceId, {
       name,
       styleKey,
       notes,
@@ -38,11 +38,11 @@ export async function recipesRoutes(app: FastifyInstance) {
   });
 
   app.get("/recipes/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const recipe = await recipes.getRecipe(ctx.userId, ctx.activeAccountId, id);
+    const recipe = await recipes.getRecipe(ctx.userId, ctx.activeWorkspaceId, id);
     const waterSettings = await app.prisma.recipeWaterSettings.findUnique({
       where: { recipeId: (recipe as any).id },
     });
@@ -55,34 +55,34 @@ export async function recipesRoutes(app: FastifyInstance) {
   });
 
   app.get("/recipes/:id/versions", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const versions = await recipes.listRecipeVersions(ctx.userId, ctx.activeAccountId, id);
+    const versions = await recipes.listRecipeVersions(ctx.userId, ctx.activeWorkspaceId, id);
     return { ok: true, versions };
   });
 
   app.post("/recipes/:id/versions", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const created = await recipes.createRecipeVersionFromCurrent(ctx.userId, ctx.activeAccountId, id);
+    const created = await recipes.createRecipeVersionFromCurrent(ctx.userId, ctx.activeWorkspaceId, id);
     return { ok: true, recipe: created };
   });
 
   app.post("/recipes/:id/duplicate", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const created = await recipes.duplicateRecipe(ctx.userId, ctx.activeAccountId, id);
+    const created = await recipes.duplicateRecipe(ctx.userId, ctx.activeWorkspaceId, id);
     return { ok: true, recipe: created };
   });
 
   app.patch("/recipes/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
@@ -99,7 +99,7 @@ export async function recipesRoutes(app: FastifyInstance) {
     const beerJsonRecipeJson = body.beerJsonRecipeJson;
     const recipeExtJson = body.recipeExtJson;
 
-    const updated = await recipes.updateRecipe(ctx.userId, ctx.activeAccountId, id, {
+    const updated = await recipes.updateRecipe(ctx.userId, ctx.activeWorkspaceId, id, {
       name,
       styleKey,
       notes,
@@ -110,11 +110,11 @@ export async function recipesRoutes(app: FastifyInstance) {
   });
 
   app.delete("/recipes/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    await recipes.deleteRecipe(ctx.userId, ctx.activeAccountId, id);
+    await recipes.deleteRecipe(ctx.userId, ctx.activeWorkspaceId, id);
     return { ok: true };
   });
 }

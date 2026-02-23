@@ -42,7 +42,7 @@ export default function WaterHubPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const authState = useRequireAuth({ requireActiveAccount: true });
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [summaryRes, setSummaryRes] = useState<RecipeWaterHubSummaryResponse | null>(null);

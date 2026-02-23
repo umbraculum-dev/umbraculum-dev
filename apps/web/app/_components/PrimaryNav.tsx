@@ -70,8 +70,13 @@ export function PrimaryNav() {
         setMe(next);
 
         const active =
-          next && next.activeAccountId
-            ? (next.accounts as any[]).find((a) => a && typeof a === "object" && (a as any).id === next.activeAccountId) ?? null
+          next && next.activeWorkspaceId
+            ? (next.workspaces as any[]).find(
+                (w) =>
+                  w &&
+                  typeof w === "object" &&
+                  (w as any).id === next.activeWorkspaceId,
+              ) ?? null
             : null;
         const brandKey =
           active && typeof (active as any).brandKey === "string" && (active as any).brandKey
@@ -105,7 +110,9 @@ export function PrimaryNav() {
   }, [pathname]);
 
   const active =
-    me && me.activeAccountId ? me.accounts.find((a) => a.id === me.activeAccountId) ?? null : null;
+    me && me.activeWorkspaceId
+      ? me.workspaces.find((w) => w.id === me.activeWorkspaceId) ?? null
+      : null;
 
   const showMainNav = authKnown && Boolean(me);
 
@@ -150,7 +157,7 @@ export function PrimaryNav() {
           <>
             {authKnown && me ? (
               <XStack ai="center" gap="$3" flexWrap="wrap" minWidth={0}>
-                <AuthStatus me={me} activeAccount={active} />
+                <AuthStatus me={me} activeWorkspace={active} />
                 <SwitchAccountLink />
               </XStack>
             ) : null}

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipesService } from "../services/recipesService.js";
 import { exportRecipeStrict } from "../beerjson/strictExport.js";
 
@@ -16,11 +16,11 @@ export async function recipesExportRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
   app.get("/recipes/:id/export/beerjson", async (req, reply) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const recipeId = typeof params.id === "string" ? params.id : "";
 
-    const recipe = await recipes.getRecipe(ctx.userId, ctx.activeAccountId, recipeId);
+    const recipe = await recipes.getRecipe(ctx.userId, ctx.activeWorkspaceId, recipeId);
     const strictDoc = exportRecipeStrict(recipe as any);
 
     const namePart = safeFilenamePart((recipe as any)?.name ?? "");
@@ -32,8 +32,8 @@ export async function recipesExportRoutes(app: FastifyInstance) {
   });
 
   app.get("/recipes/export/beerjson", async (req, reply) => {
-    const ctx = requireActiveAccount(req);
-    const list = await recipes.listRecipes(ctx.userId, ctx.activeAccountId);
+    const ctx = requireActiveWorkspace(req);
+    const list = await recipes.listRecipes(ctx.userId, ctx.activeWorkspaceId);
 
     const outRecipes: any[] = [];
     for (const r of list as any[]) {

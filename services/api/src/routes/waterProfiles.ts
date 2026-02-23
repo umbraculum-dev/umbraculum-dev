@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount, requireUser } from "../plugins/requestContext.js";
+import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
 import { WaterProfilesService } from "../services/waterProfilesService.js";
 
 export async function waterProfilesRoutes(app: FastifyInstance) {
@@ -7,15 +7,15 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
 
   app.get("/water-profiles", async (req) => {
     const ctx = requireUser(req);
-    const list = await svc.listProfiles(ctx.userId, ctx.activeAccountId);
+    const list = await svc.listProfiles(ctx.userId, ctx.activeWorkspaceId);
     return { ok: true, ...list };
   });
 
   app.post("/water-profiles", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const created = await svc.createProfile(ctx.userId, ctx.activeAccountId, {
+    const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
       scope: typeof body.scope === "string" ? (body.scope as any) : undefined,
       type: (typeof body.type === "string" ? body.type : "water") as any,
       name: typeof body.name === "string" ? body.name : "",
@@ -32,12 +32,12 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
   });
 
   app.patch("/water-profiles/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const updated = await svc.updateProfile(ctx.userId, ctx.activeAccountId, id, {
+    const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
       scope: typeof body.scope === "string" ? (body.scope as any) : undefined,
       type: typeof body.type === "string" ? (body.type as any) : undefined,
       name: typeof body.name === "string" ? body.name : undefined,
@@ -56,29 +56,29 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
   });
 
   app.post("/water-profiles/:id/verify", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeAccountId, id, "verified");
+    const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeWorkspaceId, id, "verified");
     return { ok: true, profile: updated };
   });
 
   app.post("/water-profiles/:id/unverify", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeAccountId, id, "unverified");
+    const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeWorkspaceId, id, "unverified");
     return { ok: true, profile: updated };
   });
 
   app.delete("/water-profiles/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
 
-    await svc.deleteProfile(ctx.userId, ctx.activeAccountId, id);
+    await svc.deleteProfile(ctx.userId, ctx.activeWorkspaceId, id);
     return { ok: true };
   });
 }

@@ -114,8 +114,8 @@ function parseMinutes(val: string): number | null {
 
 export default function BrewdayStepsSettingsPage() {
   const t = useTranslations("dashboard.brewdayStepsSettings");
-  const authState = useRequireAuth({ requireActiveAccount: true });
-  const canCallAccountScoped = authState.status === "ready" && !!authState.me?.activeAccountId;
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
+  const canCallAccountScoped = authState.status === "ready" && !!authState.me?.activeWorkspaceId;
 
   const [brewingType, setBrewingType] = useState<string>("");
   const [sections, setSections] = useState<BrewdaySectionConfig>({

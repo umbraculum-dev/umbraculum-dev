@@ -14,14 +14,14 @@ export type ResolveAdSlotResult =
 export class AdsService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async resolveSlot(args: { placement: AdPlacement; platform: AdPlatform; activeAccountId: string | null }): Promise<ResolveAdSlotResult> {
-    if (args.activeAccountId) {
-      const account = await this.prisma.account.findUnique({
-        where: { id: args.activeAccountId },
+  async resolveSlot(args: { placement: AdPlacement; platform: AdPlatform; activeWorkspaceId: string | null }): Promise<ResolveAdSlotResult> {
+    if (args.activeWorkspaceId) {
+      const workspace = await this.prisma.workspace.findUnique({
+        where: { id: args.activeWorkspaceId },
         select: { adsDisabled: true },
       });
 
-      if (account?.adsDisabled) return { disabled: true, ad: null };
+      if (workspace?.adsDisabled) return { disabled: true, ad: null };
     }
 
     const now = new Date();

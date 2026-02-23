@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 
 export type CreateWaterProfileInput = {
   scope?: "system" | "account" | "public"; // defaults to "account"
@@ -43,13 +43,13 @@ function toOptionalPh(val: unknown) {
 }
 
 export class WaterProfilesService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
   }
 
-  async listProfiles(userId: string, activeAccountId: string | null) {
+  async listProfiles(userId: string, activeWorkspaceId: string | null) {
     const system = await this.prisma.waterProfile.findMany({
       where: { scope: "system" },
       orderBy: { name: "asc" },
@@ -60,20 +60,20 @@ export class WaterProfilesService {
       orderBy: { name: "asc" },
     });
 
-    let account: typeof system = [];
-    if (activeAccountId) {
-      await this.accounts.assertMembership(userId, activeAccountId);
-      account = await this.prisma.waterProfile.findMany({
-        where: { scope: "account", accountId: activeAccountId },
+    let workspace: typeof system = [];
+    if (activeWorkspaceId) {
+      await this.workspaces.assertMembership(userId, activeWorkspaceId);
+      workspace = await this.prisma.waterProfile.findMany({
+        where: { scope: "account", workspaceId: activeWorkspaceId },
         orderBy: { name: "asc" },
       });
     }
 
-    return { system, public: publicProfiles, account };
+    return { system, public: publicProfiles, workspace };
   }
 
-  async createProfile(userId: string, accountId: string, input: CreateWaterProfileInput) {
-    const role = await this.accounts.assertMembership(userId, accountId);
+  async createProfile(userId: string, workspaceId: string, input: CreateWaterProfileInput) {
+    const role = await this.workspaces.assertMembership(userId, workspaceId);
     if (!isAdminRole(role)) {
       throw new ForbiddenError("insufficient_role", "Only brewery admins can manage water profiles");
     }
@@ -89,7 +89,7 @@ export class WaterProfilesService {
         key: `user:${randomUUID()}`,
         scope,
         type,
-        accountId, // keep audit trail even if scope is "public"
+        workspaceId, // keep audit trail even if scope is "public"
         name,
         ph: toOptionalPh(input.ph),
         calcium: toNumber(input.calcium, "calcium"),
@@ -105,8 +105,8 @@ export class WaterProfilesService {
     });
   }
 
-  async updateProfile(userId: string, accountId: string, profileId: string, input: UpdateWaterProfileInput) {
-    const role = await this.accounts.assertMembership(userId, accountId);
+  async updateProfile(userId: string, workspaceId: string, profileId: string, input: UpdateWaterProfileInput) {
+    const role = await this.workspaces.assertMembership(userId, workspaceId);
     if (!isAdminRole(role)) {
       throw new ForbiddenError("insufficient_role", "Only brewery admins can manage water profiles");
     }
@@ -119,8 +119,8 @@ export class WaterProfilesService {
     }
 
     // Only allow updating profiles tied to this account (account scope) or admin-created public ones (audited).
-    if (existing.accountId !== accountId) {
-      throw new ForbiddenError("wrong_account", "Water profile does not belong to this account");
+    if (existing.workspaceId !== workspaceId) {
+      throw new ForbiddenError("wrong_workspace", "Water profile does not belong to this workspace");
     }
 
     const data: Record<string, unknown> = {};
@@ -164,11 +164,11 @@ export class WaterProfilesService {
 
   async setVerificationStatus(
     userId: string,
-    accountId: string,
+    workspaceId: string,
     profileId: string,
     verificationStatus: "unverified" | "verified",
   ) {
-    const role = await this.accounts.assertMembership(userId, accountId);
+    const role = await this.workspaces.assertMembership(userId, workspaceId);
     if (!isAdminRole(role)) {
       throw new ForbiddenError("insufficient_role", "Only brewery admins can verify water profiles");
     }
@@ -178,8 +178,8 @@ export class WaterProfilesService {
     if (existing.scope === "system") {
       throw new ForbiddenError("system_profile_readonly", "System water profiles are read-only");
     }
-    if (existing.accountId !== accountId) {
-      throw new ForbiddenError("wrong_account", "Water profile does not belong to this account");
+    if (existing.workspaceId !== workspaceId) {
+      throw new ForbiddenError("wrong_workspace", "Water profile does not belong to this workspace");
     }
 
     return this.prisma.waterProfile.update({
@@ -192,8 +192,8 @@ export class WaterProfilesService {
     });
   }
 
-  async deleteProfile(userId: string, accountId: string, profileId: string) {
-    const role = await this.accounts.assertMembership(userId, accountId);
+  async deleteProfile(userId: string, workspaceId: string, profileId: string) {
+    const role = await this.workspaces.assertMembership(userId, workspaceId);
     if (!isAdminRole(role)) {
       throw new ForbiddenError("insufficient_role", "Only brewery admins can manage water profiles");
     }
@@ -206,8 +206,8 @@ export class WaterProfilesService {
     }
 
     // Only allow deleting profiles tied to this account (account scope) or admin-created public ones (audited).
-    if (existing.accountId !== accountId) {
-      throw new ForbiddenError("wrong_account", "Water profile does not belong to this account");
+    if (existing.workspaceId !== workspaceId) {
+      throw new ForbiddenError("wrong_workspace", "Water profile does not belong to this workspace");
     }
 
     await this.prisma.waterProfile.delete({ where: { id: profileId } });

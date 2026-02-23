@@ -31,8 +31,10 @@
     "login": "Accedi",
     "logout": "Esci",
     "signedInAs": "Accesso come",
-    "activeAccount": "Account attivo",
-    "switchAccount": "Cambia account",
+    "activeWorkspace": "Workspace attivo",
+    "switchWorkspace": "Cambia workspace",
+    "activeAccount": "Workspace attivo",
+    "switchAccount": "Cambia workspace",
     "ariaPrimary": "Principale",
     "ariaSession": "Sessione",
     "menu": "Menu"
@@ -90,12 +92,15 @@
   },
   "platformRecipes": {
     "title": "Import/export ricette piattaforma",
-    "subtitle": "Importa o esporta ricette per qualsiasi account. Seleziona prima un account.",
+    "subtitle": "Importa o esporta ricette per qualsiasi workspace. Seleziona prima un workspace.",
     "loading": "Caricamento…",
     "notAuthorized": "Non sei autorizzato a gestire le ricette piattaforma.",
-    "accountLabel": "Account",
-    "accountPlaceholder": "Seleziona account…",
-    "accountRequired": "Seleziona un account per importare o esportare.",
+    "workspaceLabel": "Workspace",
+    "workspacePlaceholder": "Seleziona workspace…",
+    "workspaceRequired": "Seleziona un workspace per importare o esportare.",
+    "accountLabel": "Workspace",
+    "accountPlaceholder": "Seleziona workspace…",
+    "accountRequired": "Seleziona un workspace per importare o esportare.",
     "exportSectionTitle": "Export (BeerJSON completo)",
     "exportSingleLabel": "Esporta singola ricetta",
     "exportSingleCta": "Scarica selezionata",
@@ -1171,7 +1176,16 @@
   },
   "health": {
     "title": "Stato API",
-    "subtitle": "Richiesta di {url} dal browser (via Nginx)."
+    "subtitle": "Richiesta di {url} dal browser (via Nginx).",
+    "appPermissions": {
+      "title": "Permessi app",
+      "subtitle": "User = identità di accesso. Workspace = confine di condivisione/tenant. Ruoli (brewery_admin/member/viewer) e ACL determinano cosa puoi fare.",
+      "userLabel": "User",
+      "activeWorkspaceLabel": "Workspace attivo",
+      "roleLabel": "Il tuo ruolo in questo workspace",
+      "roleUnknown": "sconosciuto",
+      "selectWorkspaceCta": "Seleziona workspace"
+    }
   },
   "devDashboard": {
     "loading": "Caricamento…"
@@ -1296,16 +1310,23 @@
   },
   "auth": {
     "selectAccount": {
-      "title": "Seleziona account",
-      "subtitle": "Scegli su quale birrificio/account vuoi lavorare.",
+      "title": "Seleziona workspace",
+      "subtitle": "Scegli su quale workspace vuoi lavorare.",
       "loading": "Caricamento…",
-      "noAccountsFound": "Nessun account trovato."
+      "noAccountsFound": "Nessun workspace trovato."
+    },
+    "selectWorkspace": {
+      "title": "Seleziona workspace",
+      "subtitle": "Scegli su quale workspace vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noWorkspacesFound": "Nessun workspace trovato."
     },
     "loginTitle": "Accedi",
     "signupTitle": "Crea account",
     "emailLabel": "Email",
     "passwordLabel": "Password",
-    "accountNameLabel": "Nome account (opzionale)",
+    "workspaceNameLabel": "Nome workspace (opzionale)",
+    "accountNameLabel": "Nome workspace (opzionale)",
     "submitLogin": "Accedi",
     "submitSignup": "Crea account",
     "submitting": "Invio…",

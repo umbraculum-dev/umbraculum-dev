@@ -28,7 +28,7 @@ type InventoryUnit = "kg" | "g" | "ml" | "count";
 
 type InventoryItem = {
   id: string;
-  accountId: string;
+  workspaceId: string;
   category: InventoryCategory;
   ingredientId: string | null;
   name: string;
@@ -71,8 +71,8 @@ export default function InventoryPage() {
   const t = useTranslations("inventory");
   const tCommon = useTranslations("common");
   const tUnits = useTranslations("units");
-  const authState = useRequireAuth({ requireActiveAccount: true });
-  const canCall = authState.status === "ready" && !!authState.me?.activeAccountId;
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
+  const canCall = authState.status === "ready" && !!authState.me?.activeWorkspaceId;
 
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -33,9 +33,9 @@ export async function adsRoutes(app: FastifyInstance) {
     const platform = assertPlatform((req.query as any)?.platform);
 
     const ctx = getOptionalContext(req);
-    const activeAccountId = ctx?.activeAccountId ?? null;
+    const activeWorkspaceId = ctx?.activeWorkspaceId ?? null;
 
-    const slot = await ads.resolveSlot({ placement, platform, activeAccountId });
+    const slot = await ads.resolveSlot({ placement, platform, activeWorkspaceId });
     return { ok: true, placement, platform, ...slot };
   });
 }

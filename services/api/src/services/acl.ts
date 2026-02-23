@@ -1,18 +1,18 @@
-import type { PrismaClient, AccountRole } from "@prisma/client";
+import type { PrismaClient, WorkspaceRole } from "@prisma/client";
 import { ForbiddenError, UnauthorizedError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 
 export class AclService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
   }
 
-  async requireRole(userId: string | null | undefined, accountId: string, allowed: AccountRole[]) {
+  async requireRole(userId: string | null | undefined, workspaceId: string, allowed: WorkspaceRole[]) {
     if (!userId) throw new UnauthorizedError("missing_user", "Not authenticated");
-    const role = await this.accounts.getMembershipRole(userId, accountId);
-    if (!role) throw new ForbiddenError("not_a_member", "User is not a member of this account");
+    const role = await this.workspaces.getMembershipRole(userId, workspaceId);
+    if (!role) throw new ForbiddenError("not_a_member", "User is not a member of this workspace");
     if (!allowed.includes(role)) {
       throw new ForbiddenError("insufficient_role", `Requires role: ${allowed.join(", ")}`);
     }

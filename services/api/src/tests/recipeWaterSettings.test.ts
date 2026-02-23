@@ -18,15 +18,15 @@ describe("recipe water-settings", () => {
   beforeAll(async () => {
     await app.ready();
 
-    const sessA = await createSessionForTestUser(app, { activeAccount: true });
+    const sessA = await createSessionForTestUser(app, { activeWorkspace: true });
     cookieA = sessA.cookie;
-    accountAId = sessA.accountId;
+    accountAId = sessA.workspaceId;
 
-    const sessB = await createSessionForTestUser(app, { activeAccount: true });
+    const sessB = await createSessionForTestUser(app, { activeWorkspace: true });
     cookieB = sessB.cookie;
-    accountBId = sessB.accountId;
+    accountBId = sessB.workspaceId;
 
-    const sessNo = await createSessionForTestUser(app, { activeAccount: false });
+    const sessNo = await createSessionForTestUser(app, { activeWorkspace: false });
     cookieNoAccount = sessNo.cookie;
 
     await app.prisma.user.upsert({
@@ -35,43 +35,43 @@ describe("recipe water-settings", () => {
       update: { email: "test-water-settings@brewery.local" },
     });
 
-    await app.prisma.account.upsert({
+    await app.prisma.workspace.upsert({
       where: { id: TEST_ACCOUNT_A },
       create: { id: TEST_ACCOUNT_A, name: "Test Brewery A (water-settings)" },
       update: { name: "Test Brewery A (water-settings)" },
     });
-    await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "brewery_admin" },
+    await app.prisma.workspaceMember.upsert({
+      where: { workspaceId_userId: { workspaceId: TEST_ACCOUNT_A, userId: TEST_USER_ID } },
+      create: { workspaceId: TEST_ACCOUNT_A, userId: TEST_USER_ID, role: "brewery_admin" },
       update: { role: "brewery_admin" },
     });
 
-    await app.prisma.account.upsert({
+    await app.prisma.workspace.upsert({
       where: { id: TEST_ACCOUNT_B },
       create: { id: TEST_ACCOUNT_B, name: "Test Brewery B (water-settings)" },
       update: { name: "Test Brewery B (water-settings)" },
     });
-    await app.prisma.accountMember.upsert({
-      where: { accountId_userId: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID } },
-      create: { accountId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "brewery_admin" },
+    await app.prisma.workspaceMember.upsert({
+      where: { workspaceId_userId: { workspaceId: TEST_ACCOUNT_B, userId: TEST_USER_ID } },
+      create: { workspaceId: TEST_ACCOUNT_B, userId: TEST_USER_ID, role: "brewery_admin" },
       update: { role: "brewery_admin" },
     });
 
     // Idempotence: wipe test data if it exists from earlier runs.
-    await app.prisma.recipeWaterSettings.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
-    await app.prisma.recipe.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipeWaterSettings.deleteMany({ where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipe.deleteMany({ where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
   });
 
   afterAll(async () => {
     // Cleanup: keep shared dev DB tidy.
     await app.prisma.recipeWaterSettings.deleteMany({
-      where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } },
+      where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } },
     });
-    await app.prisma.recipe.deleteMany({ where: { accountId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
+    await app.prisma.recipe.deleteMany({ where: { workspaceId: { in: [TEST_ACCOUNT_A, TEST_ACCOUNT_B] } } });
     await app.close();
   });
 
-  it("returns 401 when active account is missing", async () => {
+  it("returns 401 when active workspace is missing", async () => {
     const res = await app.inject({
       method: "GET",
       url: "/recipes/some-recipe-id/water-settings",
@@ -80,21 +80,21 @@ describe("recipe water-settings", () => {
     expect(res.statusCode).toBe(401);
     expect(res.json()).toEqual({
       ok: false,
-      error: { code: "missing_active_account", message: "No active account selected" },
+      error: { code: "missing_active_workspace", message: "No active workspace selected" },
     });
   });
 
   it("upserts then fetches water settings for a recipe", async () => {
     const recipeId = crypto.randomUUID();
     const recipe = await app.prisma.recipe.create({
-      data: { id: recipeId, accountId: accountAId, versionGroupId: recipeId, version: 0, name: "Water Settings Recipe", style: null, notes: null },
+      data: { id: recipeId, workspaceId: accountAId, versionGroupId: recipeId, version: 0, name: "Water Settings Recipe", style: null, notes: null },
     });
     const spargeProfileA = await app.prisma.waterProfile.create({
       data: {
         key: `test:spargeProfileA:${Date.now()}`,
         scope: "account",
         type: "water",
-        accountId: accountAId,
+        workspaceId: accountAId,
         name: "Sparge Water A",
         calcium: 1,
         magnesium: 1,
@@ -189,7 +189,7 @@ describe("recipe water-settings", () => {
     const putBody = put.json() as any;
     expect(putBody.ok).toBe(true);
     expect(putBody.settings.recipeId).toBe(recipe.id);
-    expect(putBody.settings.accountId).toBe(accountAId);
+    expect(putBody.settings.workspaceId).toBe(accountAId);
 
     const get = await app.inject({
       method: "GET",
@@ -237,10 +237,10 @@ describe("recipe water-settings", () => {
     expect(body.settings.spargeSaltAdditionsJson).toEqual([{ saltKey: "gypsum", grams: 1.2 }]);
   });
 
-  it("does not leak settings across accounts", async () => {
+  it("does not leak settings across workspaces", async () => {
     const recipeAId = crypto.randomUUID();
     const recipeA = await app.prisma.recipe.create({
-      data: { id: recipeAId, accountId: accountAId, versionGroupId: recipeAId, version: 0, name: "Scoped WS", style: null, notes: null },
+      data: { id: recipeAId, workspaceId: accountAId, versionGroupId: recipeAId, version: 0, name: "Scoped WS", style: null, notes: null },
     });
 
     await app.inject({
@@ -265,14 +265,14 @@ describe("recipe water-settings", () => {
   it("rejects saving an account-scoped profile from another account", async () => {
     const recipeId = crypto.randomUUID();
     const recipe = await app.prisma.recipe.create({
-      data: { id: recipeId, accountId: accountAId, versionGroupId: recipeId, version: 0, name: "Profile Validation", style: null, notes: null },
+      data: { id: recipeId, workspaceId: accountAId, versionGroupId: recipeId, version: 0, name: "Profile Validation", style: null, notes: null },
     });
     const profileB = await app.prisma.waterProfile.create({
       data: {
         key: `test:accountB:${Date.now()}`,
         scope: "account",
         type: "water",
-        accountId: accountBId,
+        workspaceId: accountBId,
         name: "Account B Water",
         calcium: 1,
         magnesium: 1,
@@ -296,7 +296,7 @@ describe("recipe water-settings", () => {
       ok: false,
       error: {
         code: "profile_not_accessible",
-        message: "Water profile is not accessible to this account",
+        message: "Water profile is not accessible to this workspace",
       },
     });
 
@@ -311,7 +311,7 @@ describe("recipe water-settings", () => {
       ok: false,
       error: {
         code: "profile_not_accessible",
-        message: "Water profile is not accessible to this account",
+        message: "Water profile is not accessible to this workspace",
       },
     });
   });

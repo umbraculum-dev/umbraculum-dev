@@ -8,10 +8,10 @@ import { CodeInline } from "./CodeInline";
 
 export interface AuthStatusProps {
   me: AuthMeResponse;
-  activeAccount: { id: string; name: string } | null;
+  activeWorkspace: { id: string; name: string } | null;
 }
 
-export function AuthStatus({ me, activeAccount }: AuthStatusProps) {
+export function AuthStatus({ me, activeWorkspace }: AuthStatusProps) {
   const t = useTranslations("nav");
 
   return (
@@ -20,11 +20,11 @@ export function AuthStatus({ me, activeAccount }: AuthStatusProps) {
         {t("signedInAs")}: <CodeInline>{me.user.email}</CodeInline>
       </SizableText>
       <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-        {t("activeAccount")}:{" "}
-        {activeAccount ? (
-          activeAccount.name
+        {t("activeWorkspace")}:{" "}
+        {activeWorkspace ? (
+          activeWorkspace.name
         ) : (
-          <CodeInline>{me.activeAccountId ?? "—"}</CodeInline>
+          <CodeInline>{me.activeWorkspaceId ?? "—"}</CodeInline>
         )}
       </SizableText>
     </XStack>

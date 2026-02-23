@@ -1,26 +1,26 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipeWaterSettingsService } from "../services/recipeWaterSettingsService.js";
 
 export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
   const svc = new RecipeWaterSettingsService(app.prisma);
 
   app.get("/recipes/:id/water-settings", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const recipeId = typeof params.id === "string" ? params.id : "";
 
-    const settings = await svc.get(ctx.userId, ctx.activeAccountId, recipeId);
+    const settings = await svc.get(ctx.userId, ctx.activeWorkspaceId, recipeId);
     return { ok: true, settings };
   });
 
   app.put("/recipes/:id/water-settings", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const recipeId = typeof params.id === "string" ? params.id : "";
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const upserted = await svc.upsert(ctx.userId, ctx.activeAccountId, recipeId, {
+    const upserted = await svc.upsert(ctx.userId, ctx.activeWorkspaceId, recipeId, {
       sourceWaterProfileId:
         typeof body.sourceWaterProfileId === "string"
           ? body.sourceWaterProfileId

@@ -1,11 +1,11 @@
 import type { FastifyInstance } from "fastify";
-import { requireActiveAccount } from "../plugins/requestContext.js";
+import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { EquipmentProfilesService } from "../services/equipmentProfilesService.js";
 
 function toEquipmentPayload(p: any) {
   return {
     id: p.id,
-    accountId: p.accountId,
+    workspaceId: p.workspaceId,
     name: p.name,
     equipment: {
       kettle: {
@@ -38,15 +38,15 @@ export async function equipmentProfilesRoutes(app: FastifyInstance) {
   const svc = new EquipmentProfilesService(app.prisma);
 
   app.get("/equipment-profiles", async (req) => {
-    const ctx = requireActiveAccount(req);
-    const profiles = await svc.listProfiles(ctx.userId, ctx.activeAccountId);
+    const ctx = requireActiveWorkspace(req);
+    const profiles = await svc.listProfiles(ctx.userId, ctx.activeWorkspaceId);
     return { ok: true, profiles: profiles.map(toEquipmentPayload) };
   });
 
   app.post("/equipment-profiles", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
-    const created = await svc.createProfile(ctx.userId, ctx.activeAccountId, {
+    const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
       name: typeof body.name === "string" ? body.name : "",
       kettleVolumeLiters: body.kettleVolumeLiters as any,
       kettleLossesLiters: body.kettleLossesLiters as any,
@@ -65,12 +65,12 @@ export async function equipmentProfilesRoutes(app: FastifyInstance) {
   });
 
   app.patch("/equipment-profiles/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const updated = await svc.updateProfile(ctx.userId, ctx.activeAccountId, id, {
+    const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
       name: typeof body.name === "string" ? body.name : undefined,
       kettleVolumeLiters: body.kettleVolumeLiters as any,
       kettleLossesLiters: body.kettleLossesLiters as any,
@@ -89,10 +89,10 @@ export async function equipmentProfilesRoutes(app: FastifyInstance) {
   });
 
   app.delete("/equipment-profiles/:id", async (req) => {
-    const ctx = requireActiveAccount(req);
+    const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { id?: unknown };
     const id = typeof params.id === "string" ? params.id : "";
-    await svc.deleteProfile(ctx.userId, ctx.activeAccountId, id);
+    await svc.deleteProfile(ctx.userId, ctx.activeWorkspaceId, id);
     return { ok: true };
   });
 }

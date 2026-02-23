@@ -52,7 +52,7 @@ export default function YeastPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
 
-  const authState = useRequireAuth({ requireActiveAccount: true });
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);

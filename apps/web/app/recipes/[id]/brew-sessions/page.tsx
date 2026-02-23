@@ -22,8 +22,8 @@ type BrewSessionListItem = {
 
 export default function RecipeBrewSessionsPage() {
   const t = useTranslations("recipes.brewSessions");
-  const authState = useRequireAuth({ requireActiveAccount: true });
-  const canCall = authState.status === "ready" && !!authState.me.activeAccountId;
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
+  const canCall = authState.status === "ready" && !!authState.me.activeWorkspaceId;
 
   const router = useRouter();
   const params = useParams() as { id?: string };

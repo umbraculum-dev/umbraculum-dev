@@ -10,7 +10,7 @@ import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
-type AccountItem = { id: string; name: string };
+type WorkspaceItem = { id: string; name: string };
 type RecipeItem = { id: string; name: string };
 
 export default function PlatformRecipesPage() {
@@ -19,10 +19,10 @@ export default function PlatformRecipesPage() {
 
   const isPlatformAdmin = auth.status === "ready" ? Boolean((auth.me.user as { isPlatformAdmin?: boolean })?.isPlatformAdmin) : false;
 
-  const [accounts, setAccounts] = useState<AccountItem[]>([]);
-  const [accountsLoading, setAccountsLoading] = useState(false);
-  const [accountsError, setAccountsError] = useState<string | null>(null);
-  const [accountId, setAccountId] = useState<string>("");
+  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
+  const [workspacesLoading, setWorkspacesLoading] = useState(false);
+  const [workspacesError, setWorkspacesError] = useState<string | null>(null);
+  const [workspaceId, setWorkspaceId] = useState<string>("");
 
   const [recipes, setRecipes] = useState<RecipeItem[]>([]);
   const [recipesLoading, setRecipesLoading] = useState(false);
@@ -34,17 +34,17 @@ export default function PlatformRecipesPage() {
     if (!canLoad) return;
     let cancelled = false;
     (async () => {
-      setAccountsError(null);
-      setAccountsLoading(true);
+      setWorkspacesError(null);
+      setWorkspacesLoading(true);
       try {
-        const res = await apiFetch("/api/platform/accounts");
+        const res = await apiFetch("/api/platform/workspaces");
         if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-        const list = (res.data as { accounts?: AccountItem[] })?.accounts;
-        if (!cancelled) setAccounts(Array.isArray(list) ? list : []);
+        const list = (res.data as any)?.workspaces ?? (res.data as any)?.accounts;
+        if (!cancelled) setWorkspaces(Array.isArray(list) ? list : []);
       } catch (err) {
-        if (!cancelled) setAccountsError(String(err));
+        if (!cancelled) setWorkspacesError(String(err));
       } finally {
-        if (!cancelled) setAccountsLoading(false);
+        if (!cancelled) setWorkspacesLoading(false);
       }
     })();
     return () => {
@@ -53,7 +53,7 @@ export default function PlatformRecipesPage() {
   }, [canLoad]);
 
   useEffect(() => {
-    if (!canLoad || !accountId) {
+    if (!canLoad || !workspaceId) {
       setRecipes([]);
       setExportRecipeId("");
       return;
@@ -62,7 +62,7 @@ export default function PlatformRecipesPage() {
     (async () => {
       setRecipesLoading(true);
       try {
-        const res = await apiFetch(`/api/platform/recipes/list?accountId=${encodeURIComponent(accountId)}`);
+        const res = await apiFetch(`/api/platform/recipes/list?workspaceId=${encodeURIComponent(workspaceId)}`);
         if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
         const list = (res.data as { recipes?: RecipeItem[] })?.recipes;
         const items = Array.isArray(list) ? list : [];
@@ -79,14 +79,14 @@ export default function PlatformRecipesPage() {
     return () => {
       cancelled = true;
     };
-  }, [canLoad, accountId]);
+  }, [canLoad, workspaceId]);
 
   const hasRecipes = recipes.length > 0;
-  const singleExportHref = accountId && exportRecipeId
-    ? `/api/platform/recipes/${encodeURIComponent(exportRecipeId)}/export/beerjson?accountId=${encodeURIComponent(accountId)}`
+  const singleExportHref = workspaceId && exportRecipeId
+    ? `/api/platform/recipes/${encodeURIComponent(exportRecipeId)}/export/beerjson?workspaceId=${encodeURIComponent(workspaceId)}`
     : undefined;
-  const bulkExportHref = accountId && hasRecipes
-    ? `/api/platform/recipes/export/beerjson?accountId=${encodeURIComponent(accountId)}`
+  const bulkExportHref = workspaceId && hasRecipes
+    ? `/api/platform/recipes/export/beerjson?workspaceId=${encodeURIComponent(workspaceId)}`
     : undefined;
 
   if (auth.status === "loading") return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("loading")}</SizableText>;
@@ -114,29 +114,29 @@ export default function PlatformRecipesPage() {
         </SizableText>
 
         <View mt="$3">
-          <RecipeEditFieldLabel htmlFor="platform-account">
-            {t("accountLabel")}
+          <RecipeEditFieldLabel htmlFor="platform-workspace">
+            {t("workspaceLabel")}
           </RecipeEditFieldLabel>
           <BrewSelect
-            id="platform-account"
-            value={accountId}
-            onValueChange={setAccountId}
+            id="platform-workspace"
+            value={workspaceId}
+            onValueChange={setWorkspaceId}
             options={[
-              { value: "", label: t("accountPlaceholder") },
-              ...accounts.map((a) => ({ value: a.id, label: `${a.name} (${a.id})` })),
+              { value: "", label: t("workspacePlaceholder") },
+              ...workspaces.map((w) => ({ value: w.id, label: `${w.name} (${w.id})` })),
             ]}
-            disabled={accountsLoading || accounts.length === 0}
+            disabled={workspacesLoading || workspaces.length === 0}
             width="full"
           />
-          {accountsError ? (
+          {workspacesError ? (
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1.5">
-              {accountsError}
+              {workspacesError}
             </SizableText>
           ) : null}
         </View>
       </View>
 
-      {accountId ? (
+      {workspaceId ? (
         <>
           <View className="brew-panel" aria-labelledby="platform-export-heading">
             <H2 id="platform-export-heading" mt={0}>
@@ -182,14 +182,14 @@ export default function PlatformRecipesPage() {
 
           <RecipeImportForm
             apiBasePath="/api/platform/recipes"
-            accountId={accountId}
+            workspaceId={workspaceId}
             canCall={canLoad}
             showImportExportPanel={false}
           />
         </>
       ) : (
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-          {t("accountRequired")}
+          {t("workspaceRequired")}
         </SizableText>
       )}
     </YStack>

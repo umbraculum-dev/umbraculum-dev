@@ -8,7 +8,7 @@ export const SESSION_COOKIE_NAME = "sid";
 
 type SessionContext = {
   userId: string;
-  activeAccountId: string | null;
+  activeWorkspaceId: string | null;
   sessionId: string;
 };
 
@@ -40,7 +40,7 @@ export const sessionAuthPlugin = fp(async (app: FastifyInstance) => {
 
     const session = await app.prisma.session.findUnique({
       where: { id: sessionId },
-      select: { id: true, userId: true, activeAccountId: true, expiresAt: true },
+      select: { id: true, userId: true, activeWorkspaceId: true, expiresAt: true },
     });
     if (!session) return;
 
@@ -53,7 +53,7 @@ export const sessionAuthPlugin = fp(async (app: FastifyInstance) => {
     req.sessionContext = {
       sessionId: session.id,
       userId: session.userId,
-      activeAccountId: session.activeAccountId ?? null,
+      activeWorkspaceId: session.activeWorkspaceId ?? null,
     };
   });
 });
@@ -64,13 +64,13 @@ export function requireSession(req: FastifyRequest): SessionContext {
   return ctx;
 }
 
-export function requireActiveAccountInSession(
+export function requireActiveWorkspaceInSession(
   req: FastifyRequest,
-): SessionContext & { activeAccountId: string } {
+): SessionContext & { activeWorkspaceId: string } {
   const ctx = requireSession(req);
-  if (!ctx.activeAccountId) {
-    throw new UnauthorizedError("missing_active_account", "No active account selected");
+  if (!ctx.activeWorkspaceId) {
+    throw new UnauthorizedError("missing_active_workspace", "No active workspace selected");
   }
-  return { ...ctx, activeAccountId: ctx.activeAccountId };
+  return { ...ctx, activeWorkspaceId: ctx.activeWorkspaceId };
 }
 

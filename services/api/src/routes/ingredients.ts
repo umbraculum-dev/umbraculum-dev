@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { ForbiddenError } from "../errors.js";
-import { requireActiveAccount, requireUser } from "../plugins/requestContext.js";
-import { AccountsService } from "../services/accountsService.js";
+import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
+import { WorkspacesService } from "../services/workspacesService.js";
 import { importBeerprotoAll } from "../seed/sources/beerproto/beerproto.js";
 import { getMashPhModelDefaultsV1 } from "../domain/waterCalc/mashPhDefaultsV1.js";
 
@@ -15,7 +15,7 @@ function getQueryString(raw: unknown): string {
 }
 
 export async function ingredientsRoutes(app: FastifyInstance) {
-  const accounts = new AccountsService(app.prisma);
+  const workspaces = new WorkspacesService(app.prisma);
 
   app.get("/ingredients/fermentables", async (req) => {
     const ctx = requireUser(req);
@@ -24,7 +24,7 @@ export async function ingredientsRoutes(app: FastifyInstance) {
     const items = await app.prisma.fermentable.findMany({
       where: {
         deprecatedAt: null,
-        ...(ctx.activeAccountId ? { OR: [{ accountId: null }, { accountId: ctx.activeAccountId }] } : { accountId: null }),
+        ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
         ...(q
           ? {
               OR: [
@@ -38,7 +38,7 @@ export async function ingredientsRoutes(app: FastifyInstance) {
       take: 50,
       select: {
         id: true,
-        accountId: true,
+        workspaceId: true,
         name: true,
         producer: true,
         group: true,
@@ -85,14 +85,14 @@ export async function ingredientsRoutes(app: FastifyInstance) {
     const items = await app.prisma.hop.findMany({
       where: {
         deprecatedAt: null,
-        ...(ctx.activeAccountId ? { OR: [{ accountId: null }, { accountId: ctx.activeAccountId }] } : { accountId: null }),
+        ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
         ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
       },
       orderBy: { name: "asc" },
       take: 50,
       select: {
         id: true,
-        accountId: true,
+        workspaceId: true,
         name: true,
         country: true,
         type: true,
@@ -113,7 +113,7 @@ export async function ingredientsRoutes(app: FastifyInstance) {
     const items = await app.prisma.yeast.findMany({
       where: {
         deprecatedAt: null,
-        ...(ctx.activeAccountId ? { OR: [{ accountId: null }, { accountId: ctx.activeAccountId }] } : { accountId: null }),
+        ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
         ...(q
           ? {
               OR: [
@@ -128,7 +128,7 @@ export async function ingredientsRoutes(app: FastifyInstance) {
       take: 50,
       select: {
         id: true,
-        accountId: true,
+        workspaceId: true,
         name: true,
         lab: true,
         productId: true,
@@ -145,8 +145,8 @@ export async function ingredientsRoutes(app: FastifyInstance) {
   });
 
   app.get("/admin/ingredients/sync-runs", async (req) => {
-    const ctx = requireActiveAccount(req);
-    const role = await accounts.assertMembership(ctx.userId, ctx.activeAccountId);
+    const ctx = requireActiveWorkspace(req);
+    const role = await workspaces.assertMembership(ctx.userId, ctx.activeWorkspaceId);
     if (!isAdminRole(role)) throw new ForbiddenError("not_admin", "Admin role required");
 
     const runs = await app.prisma.ingredientImportRun.findMany({
@@ -158,8 +158,8 @@ export async function ingredientsRoutes(app: FastifyInstance) {
   });
 
   app.post("/admin/ingredients/sync", async (req) => {
-    const ctx = requireActiveAccount(req);
-    const role = await accounts.assertMembership(ctx.userId, ctx.activeAccountId);
+    const ctx = requireActiveWorkspace(req);
+    const role = await workspaces.assertMembership(ctx.userId, ctx.activeWorkspaceId);
     if (!isAdminRole(role)) throw new ForbiddenError("not_admin", "Admin role required");
 
     const result = await importBeerprotoAll(app.prisma, { dryRun: false });

@@ -13,7 +13,7 @@ export default function RecipesImportPage() {
   const locale = useLocale();
   const router = useRouter();
 
-  const authState = useRequireAuth({ requireActiveAccount: true });
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
   const canCall = authState.status === "ready";
 
   return (

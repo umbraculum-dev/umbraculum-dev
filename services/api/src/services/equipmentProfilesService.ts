@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 
 export type CreateEquipmentProfileInput = {
   name: string;
@@ -33,29 +33,29 @@ function toOptionalNumber(val: unknown, field: string) {
 }
 
 export class EquipmentProfilesService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
   }
 
-  async listProfiles(userId: string, accountId: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async listProfiles(userId: string, workspaceId: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
     return this.prisma.equipmentProfile.findMany({
-      where: { accountId },
+      where: { workspaceId },
       orderBy: [{ name: "asc" }, { id: "asc" }],
     });
   }
 
-  async createProfile(userId: string, accountId: string, input: CreateEquipmentProfileInput) {
-    await this.accounts.assertMembership(userId, accountId);
+  async createProfile(userId: string, workspaceId: string, input: CreateEquipmentProfileInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");
 
     return this.prisma.equipmentProfile.create({
       data: {
-        accountId,
+        workspaceId,
         name,
 
         kettleVolumeLiters: toOptionalNumber(input.kettleVolumeLiters, "kettleVolumeLiters") ?? null,
@@ -77,12 +77,12 @@ export class EquipmentProfilesService {
     });
   }
 
-  async updateProfile(userId: string, accountId: string, id: string, input: UpdateEquipmentProfileInput) {
-    await this.accounts.assertMembership(userId, accountId);
+  async updateProfile(userId: string, workspaceId: string, id: string, input: UpdateEquipmentProfileInput) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const existing = await this.prisma.equipmentProfile.findUnique({ where: { id } });
     if (!existing) throw new NotFoundError("equipment_profile_not_found", "Equipment profile not found");
-    if (existing.accountId !== accountId) throw new ForbiddenError("wrong_account", "Equipment profile does not belong to this account");
+    if (existing.workspaceId !== workspaceId) throw new ForbiddenError("wrong_workspace", "Equipment profile does not belong to this workspace");
 
     const data: Record<string, unknown> = {};
     if (input.name !== undefined) {
@@ -115,12 +115,12 @@ export class EquipmentProfilesService {
     return this.prisma.equipmentProfile.update({ where: { id }, data: data as any });
   }
 
-  async deleteProfile(userId: string, accountId: string, id: string) {
-    await this.accounts.assertMembership(userId, accountId);
+  async deleteProfile(userId: string, workspaceId: string, id: string) {
+    await this.workspaces.assertMembership(userId, workspaceId);
 
     const existing = await this.prisma.equipmentProfile.findUnique({ where: { id } });
     if (!existing) throw new NotFoundError("equipment_profile_not_found", "Equipment profile not found");
-    if (existing.accountId !== accountId) throw new ForbiddenError("wrong_account", "Equipment profile does not belong to this account");
+    if (existing.workspaceId !== workspaceId) throw new ForbiddenError("wrong_workspace", "Equipment profile does not belong to this workspace");
 
     await this.prisma.equipmentProfile.delete({ where: { id } });
   }

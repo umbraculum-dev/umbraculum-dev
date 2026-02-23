@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import type { ExpectedRaRange, RecipeWaterHubStreamSummary, RecipeWaterHubSummary } from "@brewery/contracts";
-import { AccountsService } from "./accountsService.js";
+import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
 import type { IonProfilePpm } from "../domain/waterCalc/saltAdditions.js";
 import { combineAfterSaltsAndAcid } from "../domain/waterCalc/overall.js";
@@ -131,17 +131,17 @@ function inferExpectedRa(style: { name: string; category: string | null }): Expe
 }
 
 export class RecipeWaterHubSummaryService {
-  private readonly accounts: AccountsService;
+  private readonly workspaces: WorkspacesService;
   private readonly recipes: RecipesService;
 
   constructor(private readonly prisma: PrismaClient) {
-    this.accounts = new AccountsService(prisma);
+    this.workspaces = new WorkspacesService(prisma);
     this.recipes = new RecipesService(prisma);
   }
 
-  async get(userId: string, accountId: string, recipeId: string): Promise<RecipeWaterHubSummary> {
-    await this.accounts.assertMembership(userId, accountId);
-    const recipe = await this.recipes.getRecipe(userId, accountId, recipeId);
+  async get(userId: string, workspaceId: string, recipeId: string): Promise<RecipeWaterHubSummary> {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    const recipe = await this.recipes.getRecipe(userId, workspaceId, recipeId);
 
     const settings = await this.prisma.recipeWaterSettings.findUnique({ where: { recipeId } });
 

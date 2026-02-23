@@ -7,16 +7,16 @@ import {
   sidCookieHeader,
 } from "./authTestUtils.js";
 
-describe("sessions + accounts", () => {
+describe("sessions + workspaces", () => {
   const app = buildApp();
   let sid: string;
-  let accountId: string;
+  let workspaceId: string;
 
   beforeAll(async () => {
     await app.ready();
     const user = await createUserWithPassword(app, "acct-tests@brewery.local", "password123");
     const acct = await createAccountForUser(app, user.id, "Dev Brewery");
-    accountId = acct.id;
+    workspaceId = acct.id;
     sid = await createSession(app, user.id, acct.id);
   });
 
@@ -33,18 +33,18 @@ describe("sessions + accounts", () => {
     });
   });
 
-  it("lists accounts for authenticated user", async () => {
+  it("lists workspaces for authenticated user", async () => {
     const res = await app.inject({
       method: "GET",
-      url: "/accounts",
+      url: "/workspaces",
       headers: sidCookieHeader(sid),
     });
     expect(res.statusCode).toBe(200);
 
     const body = res.json() as any;
     expect(body.ok).toBe(true);
-    expect(Array.isArray(body.accounts)).toBe(true);
-    expect(body.accounts.some((a: any) => a.id === accountId)).toBe(true);
+    expect(Array.isArray(body.workspaces)).toBe(true);
+    expect(body.workspaces.some((w: any) => w.id === workspaceId)).toBe(true);
   });
 });
 

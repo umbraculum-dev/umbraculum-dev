@@ -9,15 +9,15 @@ describe("water-calc routes", () => {
 
   beforeAll(async () => {
     await app.ready();
-    cookieWithAccount = (await createSessionForTestUser(app, { activeAccount: true })).cookie;
-    cookieNoAccount = (await createSessionForTestUser(app, { activeAccount: false })).cookie;
+    cookieWithAccount = (await createSessionForTestUser(app, { activeWorkspace: true })).cookie;
+    cookieNoAccount = (await createSessionForTestUser(app, { activeWorkspace: false })).cookie;
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it("returns 401 when active account is missing", async () => {
+  it("returns 401 when active workspace is missing", async () => {
     const res = await app.inject({
       method: "POST",
       url: "/water-calc/sparge-acidification",
@@ -27,7 +27,7 @@ describe("water-calc routes", () => {
     expect(res.statusCode).toBe(401);
     expect(res.json()).toEqual({
       ok: false,
-      error: { code: "missing_active_account", message: "No active account selected" },
+      error: { code: "missing_active_workspace", message: "No active workspace selected" },
     });
   });
 

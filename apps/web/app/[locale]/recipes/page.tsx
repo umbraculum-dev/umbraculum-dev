@@ -23,7 +23,7 @@ export default function RecipesPage() {
   const t = useTranslations("recipes");
   const tImport = useTranslations("recipes.import");
 
-  const authState = useRequireAuth({ requireActiveAccount: true });
+  const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const [recipes, setRecipes] = useState<RecipeListItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function RecipesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const canCall = authState.status === "ready";
-  const activeAccountId = authState.status === "ready" ? authState.me.activeAccountId : null;
+  const activeWorkspaceId = authState.status === "ready" ? authState.me.activeWorkspaceId : null;
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
   const [stylesLoading, setStylesLoading] = useState(false);

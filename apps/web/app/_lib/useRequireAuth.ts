@@ -16,8 +16,8 @@ type State =
   | { status: "ready"; me: AuthMeResponse }
   | { status: "error"; error: string };
 
-export function useRequireAuth(options?: { requireActiveAccount?: boolean }) {
-  const requireActiveAccount = Boolean(options?.requireActiveAccount);
+export function useRequireAuth(options?: { requireActiveWorkspace?: boolean; requireActiveAccount?: boolean }) {
+  const requireActiveWorkspace = Boolean(options?.requireActiveWorkspace ?? options?.requireActiveAccount);
 
   const locale = useLocale();
   const router = useRouter();
@@ -40,8 +40,8 @@ export function useRequireAuth(options?: { requireActiveAccount?: boolean }) {
           return;
         }
         const me = parseAuthMeResponse(res.data);
-        if (requireActiveAccount && !me.activeAccountId) {
-          router.replace(`/${locale}/select-account`);
+        if (requireActiveWorkspace && !me.activeWorkspaceId) {
+          router.replace(`/${locale}/select-workspace`);
           return;
         }
         if (!cancelled) setState({ status: "ready", me });
@@ -52,7 +52,7 @@ export function useRequireAuth(options?: { requireActiveAccount?: boolean }) {
     return () => {
       cancelled = true;
     };
-  }, [locale, pathname, requireActiveAccount, router, searchParams]);
+  }, [locale, pathname, requireActiveWorkspace, router, searchParams]);
 
   return state;
 }

@@ -5,7 +5,7 @@ import { sessionAuthPlugin } from "./plugins/sessionAuth.js";
 import { errorHandlerPlugin } from "./plugins/errorHandler.js";
 import { healthRoutes } from "./routes/health.js";
 import { authRoutes } from "./routes/auth.js";
-import { accountsRoutes } from "./routes/accounts.js";
+import { workspacesRoutes } from "./routes/workspaces.js";
 import { recipesRoutes } from "./routes/recipes.js";
 import { recipesImportRoutes } from "./routes/recipesImport.js";
 import { recipesExportRoutes } from "./routes/recipesExport.js";
@@ -34,7 +34,7 @@ export function buildApp() {
 
   app.register(healthRoutes);
   app.register(authRoutes);
-  app.register(accountsRoutes);
+  app.register(workspacesRoutes);
   app.register(recipesRoutes);
   app.register(recipesImportRoutes);
   app.register(recipesExportRoutes);
