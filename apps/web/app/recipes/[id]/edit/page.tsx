@@ -53,6 +53,7 @@ import { mathExplain } from "./_lib/mathExplain";
 import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
 import { renderDerivationBody } from "../water/_lib/mathBodies";
 import { formatSgWithPlato } from "../../../_lib/gravity";
+import { parseGristJson } from "../../../_lib/grist";
 
 type Recipe = {
   id: string;
@@ -1349,6 +1350,27 @@ export default function RecipeEditPage() {
     return { totalKg, weightedAvgLovibond };
   }, [gristRows]);
 
+  const gristWaterConsistency = useMemo(() => {
+    const recipeMashTotalKg = gristRows
+      .filter((r) => (r.timingUse ?? "add_to_mash") === "add_to_mash")
+      .reduce((acc, r) => acc + (Number.isFinite(r.amountKg) ? r.amountKg : 0), 0);
+    const mashRows = waterSettings?.mashGristImportedJson != null
+      ? parseGristJson(waterSettings.mashGristImportedJson)
+      : [];
+    const mashGristTotalKg = mashRows.reduce(
+      (acc, r) => acc + (Number.isFinite(r.amountKg) ? r.amountKg : 0),
+      0,
+    );
+    if (waterSettings == null) return { status: "na" as const, diffPct: null };
+    const mashJsonEmpty = !Array.isArray(waterSettings.mashGristImportedJson) || waterSettings.mashGristImportedJson.length === 0;
+    if (mashJsonEmpty && recipeMashTotalKg > 0) return { status: "error" as const, diffPct: 100 };
+    if (recipeMashTotalKg === 0 && mashGristTotalKg === 0) return { status: "passed" as const, diffPct: 0 };
+    const denom = Math.max(recipeMashTotalKg, mashGristTotalKg, 0.0001);
+    const diffPct = (Math.abs(recipeMashTotalKg - mashGristTotalKg) / denom) * 100;
+    const status = diffPct <= 0.1 ? ("passed" as const) : ("error" as const);
+    return { status, diffPct };
+  }, [gristRows, waterSettings]);
+
   return (
     <>
       <H1 mb="$2">{t("title")}</H1>
@@ -2191,6 +2213,57 @@ export default function RecipeEditPage() {
                             </View>
                           </XStack>
                           </View>
+
+                          <View px="$2" py="$1" borderRadius="$2">
+                            <XStack gap="$2" ai="baseline">
+                              <View minW={180} pr="$3">
+                                <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">
+                                  {tAnalysis("gristWaterConsistencyCheck")}
+                                </SizableText>
+                              </View>
+                              <View>
+                                {gristWaterConsistency.status === "passed" ? (
+                                  <CodeInline style={{ color: "var(--success)" }}>
+                                    {tAnalysis("gristWaterConsistencyPassed")}
+                                  </CodeInline>
+                                ) : gristWaterConsistency.status === "error" ? (
+                                  <CodeInline style={{ color: "var(--danger)" }}>
+                                    {tAnalysis("gristWaterConsistencyError")}
+                                  </CodeInline>
+                                ) : (
+                                  <CodeInline>—</CodeInline>
+                                )}
+                              </View>
+                            </XStack>
+                          </View>
+                          {gristWaterConsistency.status === "error" ? (
+                            <View
+                              mt="$2"
+                              px="$3"
+                              py="$2"
+                              bg="color-mix(in srgb, var(--warning) 18%, var(--surface))"
+                              borderWidth={1}
+                              borderColor="color-mix(in srgb, var(--warning) 40%, var(--border))"
+                              rounded="$2"
+                            >
+                              <SizableText size="$2" fontFamily="$body" color="var(--text)">
+                                {tAnalysis.rich("gristWaterConsistencyWarning", {
+                                  link: (chunks) => (
+                                    <Link href={`/recipes/${recipeId}/water/mash#grist-summary-heading`}>
+                                      {chunks}
+                                    </Link>
+                                  ),
+                                })}
+                              </SizableText>
+                              {gristWaterConsistency.diffPct != null ? (
+                                <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$1">
+                                  {tAnalysis("gristWaterConsistencyDifference", {
+                                    value: formatFixed(locale, gristWaterConsistency.diffPct, 2),
+                                  })}
+                                </SizableText>
+                              ) : null}
+                            </View>
+                          ) : null}
                         </YStack>
                       </View>
 

@@ -911,6 +911,11 @@
         "attenuation": "Attenuazione (effettiva)",
         "pbg": "PBG (gravità pre-boil, stimata) Plato/SG"
       },
+      "gristWaterConsistencyCheck": "Controllo coerenza Grist ricetta-mash",
+      "gristWaterConsistencyPassed": "ok",
+      "gristWaterConsistencyError": "errore",
+      "gristWaterConsistencyWarning": "Ricalcola quantità acqua mash e modifiche importando il grist della ricetta <link>sezione grist pagina mash</link> perché il grist in questa pagina ricetta (sezione Fermentabili) non corrisponde al grist nella pagina Mash.",
+      "gristWaterConsistencyDifference": "Differenza: {value}%",
       "warningsTitle": "Note / input mancanti",
       "warningsClickToExpand": "Clicca per espandere",
       "warnings": {
