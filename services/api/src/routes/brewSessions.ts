@@ -89,7 +89,10 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     const ctx = requireActiveAccount(req);
     const params = (req.params ?? {}) as { brewSessionId?: unknown };
     const brewSessionId = typeof params.brewSessionId === "string" ? params.brewSessionId : "";
-    const updated = await svc.stopSession(ctx.userId, ctx.activeAccountId, brewSessionId);
+    const body = (req.body ?? {}) as { reason?: unknown };
+    const reasonRaw = typeof body.reason === "string" ? body.reason : "";
+    const reason = reasonRaw === "auto" || reasonRaw === "manual" ? (reasonRaw as "auto" | "manual") : null;
+    const updated = await svc.stopSession(ctx.userId, ctx.activeAccountId, brewSessionId, { reason });
     return { ok: true, brewSession: updated };
   });
 
@@ -98,15 +101,20 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     const params = (req.params ?? {}) as { brewSessionId?: unknown; stepId?: unknown };
     const brewSessionId = typeof params.brewSessionId === "string" ? params.brewSessionId : "";
     const stepId = typeof params.stepId === "string" ? params.stepId : "";
-    const body = (req.body ?? {}) as { status?: unknown; note?: unknown };
+    const body = (req.body ?? {}) as { status?: unknown; note?: unknown; name?: unknown; isDisabled?: unknown };
     const status = typeof body.status === "string" ? body.status : "";
     if (!["pending", "done", "skipped", "not_applicable"].includes(status)) {
       throw new BadRequestError("invalid_step_status", "Body.status is invalid");
     }
     const note = body.note === null ? null : typeof body.note === "string" ? body.note : null;
+    const name = typeof body.name === "string" ? body.name.trim() : null;
+    const isDisabled =
+      body.isDisabled === true ? true : body.isDisabled === false ? false : null;
     const updated = await svc.saveStepLog(ctx.userId, ctx.activeAccountId, brewSessionId, stepId, {
       status: status as any,
       note,
+      name,
+      isDisabled,
     });
     return { ok: true, step: updated };
   });

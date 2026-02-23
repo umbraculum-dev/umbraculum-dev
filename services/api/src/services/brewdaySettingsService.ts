@@ -3,6 +3,7 @@ import { AccountsService } from "./accountsService.js";
 
 const PRESET_KEYS = [
   "preparation",
+  "pre_mash",
   "mash",
   "lauter",
   "sparge",
@@ -109,6 +110,14 @@ export const DEFAULT_STEPS_SEED: BrewdayDefaultStep[] = [
     id: crypto.randomUUID(),
     name: "Make sure yeast is available, vital and viable.",
     sectionId: "preparation",
+    exclude: false,
+    minutes: null,
+  },
+
+  {
+    id: crypto.randomUUID(),
+    name: "Begin heating mash water",
+    sectionId: "pre_mash",
     exclude: false,
     minutes: null,
   },

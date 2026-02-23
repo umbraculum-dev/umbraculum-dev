@@ -20,6 +20,7 @@ import { Link } from "../../../src/i18n/navigation";
 
 const PRESET_KEYS = [
   "preparation",
+  "pre_mash",
   "mash",
   "lauter",
   "sparge",
@@ -65,6 +66,8 @@ const DEFAULT_STEPS_SEED: BrewdayStep[] = [
   { id: newId(), name: "Prepare acids addition.", sectionId: "preparation", exclude: false, minutes: null },
   { id: newId(), name: "Prepare hops additions.", sectionId: "preparation", exclude: false, minutes: null },
   { id: newId(), name: "Make sure yeast is available, vital and viable.", sectionId: "preparation", exclude: false, minutes: null },
+
+  { id: newId(), name: "Begin heating mash water", sectionId: "pre_mash", exclude: false, minutes: null },
 
   { id: newId(), name: "Add strike water volume to mash.", sectionId: "mash", exclude: false, minutes: null },
   { id: newId(), name: "Begin heating mash.", sectionId: "mash", exclude: false, minutes: null },

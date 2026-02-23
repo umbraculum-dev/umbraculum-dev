@@ -17,6 +17,7 @@ export interface BrewSelectProps {
   "aria-label"?: string;
   "aria-labelledby"?: string;
   width?: "auto" | "full";
+  tone?: "default" | "success" | "warning" | "info" | "danger";
 }
 
 export function BrewSelect({
@@ -29,7 +30,34 @@ export function BrewSelect({
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   width = "auto",
+  tone = "default",
 }: BrewSelectProps) {
+  const triggerStyles =
+    tone === "success"
+      ? {
+          backgroundColor: "color-mix(in srgb, var(--success) 14%, var(--surface))",
+          borderColor: "color-mix(in srgb, var(--success) 40%, var(--border))",
+        }
+      : tone === "warning"
+        ? {
+            backgroundColor: "color-mix(in srgb, var(--warning) 14%, var(--surface))",
+            borderColor: "color-mix(in srgb, var(--warning) 40%, var(--border))",
+          }
+        : tone === "info"
+          ? {
+              backgroundColor: "color-mix(in srgb, var(--info) 14%, var(--surface))",
+              borderColor: "color-mix(in srgb, var(--info) 35%, var(--border))",
+            }
+          : tone === "danger"
+            ? {
+                backgroundColor: "color-mix(in srgb, var(--danger) 12%, var(--surface))",
+                borderColor: "color-mix(in srgb, var(--danger) 35%, var(--border))",
+              }
+            : {
+                backgroundColor: "var(--surface)",
+                borderColor: "var(--border)",
+              };
+
   return (
     <Select
       value={value}
@@ -58,9 +86,9 @@ export function BrewSelect({
         px="$2"
         py="$2"
         color="var(--text)"
-        backgroundColor="var(--surface)"
+        backgroundColor={triggerStyles.backgroundColor}
         borderWidth={1}
-        borderColor="var(--border)"
+        borderColor={triggerStyles.borderColor}
         borderRadius="$2"
         fontFamily="$body"
       >

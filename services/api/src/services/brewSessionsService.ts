@@ -74,6 +74,49 @@ export class BrewSessionsService {
     const hops = Array.isArray(ing?.hop_additions) ? ing.hop_additions : [];
     const cultures = Array.isArray(ing?.culture_additions) ? ing.culture_additions : [];
     const misc = Array.isArray(ing?.miscellaneous_additions) ? ing.miscellaneous_additions : [];
+    const mash = r0?.mash && typeof r0.mash === "object" ? r0.mash : null;
+    const mashStepsRaw =
+      mash && Array.isArray((mash as any).mash_steps)
+        ? (mash as any).mash_steps
+        : mash && Array.isArray((mash as any).mashSteps)
+          ? (mash as any).mashSteps
+          : [];
+
+    const toFiniteNumber = (v: unknown): number | null => {
+      if (typeof v === "number" && Number.isFinite(v)) return v;
+      if (typeof v === "string" && v.trim()) {
+        const n = Number(v.trim());
+        return Number.isFinite(n) ? n : null;
+      }
+      return null;
+    };
+
+    const extractMashStepMinutes = (s: any): number => {
+      const rawStepTime = s?.step_time;
+      if (rawStepTime && typeof rawStepTime === "object") {
+        const unit = typeof rawStepTime.unit === "string" ? rawStepTime.unit.trim().toLowerCase() : "";
+        const value = toFiniteNumber(rawStepTime.value);
+        if (value == null) return 0;
+        if (!unit || unit.startsWith("min")) return Math.max(0, Math.round(value));
+        if (unit.startsWith("h")) return Math.max(0, Math.round(value * 60));
+        return 0;
+      }
+
+      const direct = toFiniteNumber(rawStepTime);
+      if (direct != null) return Math.max(0, Math.round(direct));
+
+      const rawDuration = s?.duration;
+      if (rawDuration && typeof rawDuration === "object") {
+        const unit = typeof rawDuration.unit === "string" ? rawDuration.unit.trim().toLowerCase() : "";
+        const value = toFiniteNumber(rawDuration.value);
+        if (value == null) return 0;
+        if (!unit || unit.startsWith("min")) return Math.max(0, Math.round(value));
+        if (unit.startsWith("h")) return Math.max(0, Math.round(value * 60));
+        return 0;
+      }
+
+      return 0;
+    };
 
     const hasBoilHops = hops.some(
       (h: any) =>
@@ -149,6 +192,46 @@ export class BrewSessionsService {
       });
     }
 
+    const mashScheduleSteps = mashStepsRaw
+      .filter((s: any) => s && typeof s === "object")
+      .filter((s: any) => typeof s?.name === "string" && s.name.trim())
+      .filter((s: any) => !(typeof s?.type === "string" && s.type === "sparge"))
+      .map((s: any) => {
+        const name = String(s.name).trim();
+        const minutes = extractMashStepMinutes(s);
+        return { name, minutes };
+      });
+
+    if (mashScheduleSteps.length > 0) {
+      const mashBaseStepId = crypto.randomUUID();
+      const totalMashMin = mashScheduleSteps.reduce(
+        (acc: number, s: { minutes: number }) => acc + s.minutes,
+        0
+      );
+
+      steps.push({
+        id: mashBaseStepId,
+        sectionId: "mash",
+        sectionName: null,
+        name: "Start mash",
+        minutesPlanned: totalMashMin,
+      });
+
+      let startAtMin = 0;
+      for (const st of mashScheduleSteps) {
+        const offsetMinutesFromEnd = -(totalMashMin - startAtMin);
+        steps.push({
+          sectionId: "mash",
+          sectionName: null,
+          name: st.name,
+          minutesPlanned: st.minutes,
+          relativeToStepId: mashBaseStepId,
+          offsetMinutesFromEnd,
+        });
+        startAtMin += st.minutes;
+      }
+    }
+
     const ws = args.waterSettings;
     if (ws && typeof ws === "object") {
       const mashVol = (ws as any).mashWaterVolumeLiters;
@@ -157,7 +240,32 @@ export class BrewSessionsService {
       }
       const mashSalts = (ws as any).mashSaltAdditionsJson;
       if (Array.isArray(mashSalts) && mashSalts.length > 0) {
-        steps.push({ sectionId: "mash", sectionName: null, name: "Add mash salts" });
+        const parts = mashSalts
+          .filter((a: any) => a && typeof a === "object")
+          .map((a: any) => {
+            const saltKey = typeof a.saltKey === "string" ? a.saltKey : "";
+            const grams = typeof a.grams === "number" && Number.isFinite(a.grams) ? a.grams : null;
+            if (!saltKey || grams == null) return null;
+            const saltLabel = saltKey.replaceAll("_", " ");
+            const gramsLabel = Math.round(grams * 10) / 10;
+            return `${saltLabel} ${gramsLabel} g`;
+          })
+          .filter(Boolean) as string[];
+        steps.push({
+          sectionId: "pre_mash",
+          sectionName: null,
+          name: parts.length > 0 ? `Add mash salts: ${parts.join(", ")}` : "Add mash salts",
+        });
+      }
+      const mashAcidMl = (ws as any).mashLastAcidRequiredMl;
+      if (typeof mashAcidMl === "number" && Number.isFinite(mashAcidMl) && mashAcidMl > 0) {
+        const acidType = typeof (ws as any).mashAcidType === "string" ? String((ws as any).mashAcidType).trim() : "";
+        const mlLabel = Math.round(mashAcidMl * 10) / 10;
+        steps.push({
+          sectionId: "pre_mash",
+          sectionName: null,
+          name: acidType ? `Add mash acid (${acidType}): ${mlLabel} ml` : `Add mash acid: ${mlLabel} ml`,
+        });
       }
       const spargeVol = (ws as any).spargeVolumeLiters;
       if (typeof spargeVol === "number" && spargeVol > 0) {
@@ -523,6 +631,29 @@ export class BrewSessionsService {
     const now = new Date();
     const nextStartedAt = session.startedAt ?? now;
     const next = await this.prisma.$transaction(async (tx) => {
+      let resumedCount = 0;
+      if (session.status === "paused" && session.pausedAt) {
+        const pausedBySession = await tx.brewSessionStep.findMany({
+          where: {
+            brewSessionId,
+            timerState: "paused",
+            timerPausedAt: session.pausedAt,
+          },
+          select: { id: true },
+        });
+        for (const st of pausedBySession) {
+          await tx.brewSessionStep.update({
+            where: { id: st.id },
+            data: {
+              timerState: "running",
+              timerLastStartedAt: now,
+              timerPausedAt: null,
+            },
+          });
+        }
+        resumedCount = pausedBySession.length;
+      }
+
       const updated = await tx.brewSession.update({
         where: { id: brewSessionId },
         data: {
@@ -536,6 +667,7 @@ export class BrewSessionsService {
           brewSessionId,
           kind: "session_started",
           message: `Brewing started at ${now.toISOString()}`,
+          payloadJson: { resumedStepTimers: resumedCount },
         },
       });
       return updated;
@@ -555,6 +687,22 @@ export class BrewSessionsService {
 
     const now = new Date();
     const next = await this.prisma.$transaction(async (tx) => {
+      const runningSteps = await tx.brewSessionStep.findMany({
+        where: { brewSessionId, timerState: "running" },
+        select: { id: true },
+      });
+      for (const st of runningSteps) {
+        await this.addStepTimerDeltaSeconds({ tx, stepId: st.id, now });
+        await tx.brewSessionStep.update({
+          where: { id: st.id },
+          data: {
+            timerState: "paused",
+            timerPausedAt: now,
+            timerLastStartedAt: null,
+          },
+        });
+      }
+
       const updated = await tx.brewSession.update({
         where: { id: brewSessionId },
         data: {
@@ -567,6 +715,7 @@ export class BrewSessionsService {
           brewSessionId,
           kind: "session_paused",
           message: `Brewing paused at ${now.toISOString()}`,
+          payloadJson: { pausedStepTimers: runningSteps.length },
         },
       });
       return updated;
@@ -574,7 +723,12 @@ export class BrewSessionsService {
     return next;
   }
 
-  async stopSession(userId: string, accountId: string, brewSessionId: string) {
+  async stopSession(
+    userId: string,
+    accountId: string,
+    brewSessionId: string,
+    args?: { reason: "manual" | "auto" | null }
+  ) {
     await this.accounts.assertMembership(userId, accountId);
     const session = await this.prisma.brewSession.findFirst({
       where: { id: brewSessionId, accountId },
@@ -586,6 +740,25 @@ export class BrewSessionsService {
 
     const now = new Date();
     const next = await this.prisma.$transaction(async (tx) => {
+      const activeSteps = await tx.brewSessionStep.findMany({
+        where: { brewSessionId, timerState: { in: ["running", "paused"] } },
+        select: { id: true, timerState: true },
+      });
+      for (const st of activeSteps) {
+        if (st.timerState === "running") {
+          await this.addStepTimerDeltaSeconds({ tx, stepId: st.id, now });
+        }
+        await tx.brewSessionStep.update({
+          where: { id: st.id },
+          data: {
+            timerState: "stopped",
+            timerStoppedAt: now,
+            timerLastStartedAt: null,
+            timerPausedAt: null,
+          },
+        });
+      }
+
       const updated = await tx.brewSession.update({
         where: { id: brewSessionId },
         data: {
@@ -599,6 +772,7 @@ export class BrewSessionsService {
           brewSessionId,
           kind: "session_stopped",
           message: `Brewing stopped at ${now.toISOString()}`,
+          payloadJson: { stoppedStepTimers: activeSteps.length, reason: args?.reason ?? null },
         },
       });
       return updated;
@@ -611,7 +785,7 @@ export class BrewSessionsService {
     accountId: string,
     brewSessionId: string,
     stepId: string,
-    args: { status: BrewSessionStepStatus; note: string | null }
+    args: { status: BrewSessionStepStatus; note: string | null; name: string | null; isDisabled: boolean | null }
   ) {
     await this.accounts.assertMembership(userId, accountId);
     const step = await this.prisma.brewSessionStep.findFirst({
@@ -626,6 +800,8 @@ export class BrewSessionsService {
         data: {
           status: args.status,
           note: args.note,
+          name: args.name != null && args.name.trim() ? args.name.trim() : step.name,
+          isDisabled: args.isDisabled ?? step.isDisabled,
         },
       });
       await tx.brewSessionLog.create({
@@ -634,7 +810,11 @@ export class BrewSessionsService {
           stepId,
           kind: "step_status_saved",
           message: `Step saved (${args.status}) at ${now.toISOString()}`,
-          payloadJson: { status: args.status },
+          payloadJson: {
+            status: args.status,
+            nameChanged: args.name != null,
+            isDisabledChanged: args.isDisabled != null,
+          },
         },
       });
       return u;
