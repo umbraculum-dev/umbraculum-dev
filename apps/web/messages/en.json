@@ -8,6 +8,7 @@
   "units": {
     "C": "°C",
     "L": "L",
+    "count": "count",
     "g": "g",
     "mL": "mL",
     "kg": "kg",
@@ -148,6 +149,27 @@
       "kettleVolumeMustBePositive": "Kettle volume must be > 0.",
       "mashEfficiencyRange": "Mash efficiency must be between 0 and 100."
     }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Track fermentables, hops, acids, salts, and other brewing supplies.",
+    "backToDashboard": "Back to Dashboard",
+    "addCustom": "Add custom",
+    "addFromList": "Add from list",
+    "remove": "Remove",
+    "sections": {
+      "fermentables": "Fermentables",
+      "hops": "Hops",
+      "specialities": "Specialities",
+      "acidSalts": "Acid & Salts",
+      "detergentsSanitizers": "Detergents & Sanitizers",
+      "kegging": "Kegging"
+    },
+    "searchPlaceholder": "Search…",
+    "search": "Search",
+    "noItems": "No items yet.",
+    "quantityLabel": "Quantity ({unit})",
+    "nameLabel": "Name"
   },
   "accessibility": {
     "title": "Accessibility",
@@ -1041,7 +1063,10 @@
       "title": "Brew day & Brewing data",
       "fermDataIntegration": "Ferm Data & Integration",
       "brewdayStepsSettings": "Brewday Steps Settings",
-      "waterProfiles": "Water profiles"
+      "waterProfiles": "Water profiles",
+      "brewery": "Brewery",
+      "equipment": "Equipment",
+      "inventory": "Inventory"
     },
     "importExport": {
       "title": "Import / Export",

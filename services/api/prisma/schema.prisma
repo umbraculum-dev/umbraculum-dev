@@ -157,6 +157,7 @@ model Account {
   yeasts       Yeast[]
   brewdaySettings BrewdaySettings?
   brewSessions  BrewSession[]
+  inventoryItems InventoryItem[]
 
   @@map("accounts")
 }
@@ -838,4 +839,42 @@ model IngredientSourceMap {
   @@index([hopId])
   @@index([yeastId])
   @@map("ingredient_source_maps")
+}
+
+enum InventoryCategory {
+  fermentable
+  hop
+  speciality
+  acid_salt
+  detergent_sanitizer
+  kegging
+
+  @@map("inventory_category")
+}
+
+enum InventoryUnit {
+  kg
+  g
+  ml
+  count
+
+  @@map("inventory_unit")
+}
+
+model InventoryItem {
+  id           String            @id @default(uuid())
+  accountId    String            @map("account_id")
+  category     InventoryCategory
+  ingredientId String?           @map("ingredient_id")
+  name         String
+  quantity     Float
+  unit         InventoryUnit     @default(kg)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([accountId, category])
+  @@map("inventory_items")
 }

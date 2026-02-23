@@ -36,6 +36,23 @@ export default function Home() {
         </YStack>
       </View>
 
+      <View
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+        aria-labelledby="dashboard-brewery-heading"
+      >
+        <H2 id="dashboard-brewery-heading" mt={0}>
+          {t("links.brewery")}
+        </H2>
+        <YStack gap="$2" mt="$2" mb={0}>
+          <Link href="/equipment">{t("links.equipment")}</Link>
+          <Link href="/inventory">{t("links.inventory")}</Link>
+        </YStack>
+      </View>
+
       <DashboardClient />
     </YStack>
   );

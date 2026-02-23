@@ -8,6 +8,7 @@
   "units": {
     "C": "°C",
     "L": "L",
+    "count": "pz",
     "g": "g",
     "mL": "mL",
     "kg": "kg",
@@ -148,6 +149,27 @@
       "kettleVolumeMustBePositive": "Il volume del kettle deve essere > 0.",
       "mashEfficiencyRange": "L’efficienza mash deve essere tra 0 e 100."
     }
+  },
+  "inventory": {
+    "title": "Inventario",
+    "subtitle": "Traccia fermentabili, luppoli, acidi, sali e altri materiali di produzione.",
+    "backToDashboard": "Torna alla Dashboard",
+    "addCustom": "Aggiungi personalizzato",
+    "addFromList": "Aggiungi da elenco",
+    "remove": "Rimuovi",
+    "sections": {
+      "fermentables": "Fermentabili",
+      "hops": "Luppoli",
+      "specialities": "Specialità",
+      "acidSalts": "Acidi e sali",
+      "detergentsSanitizers": "Detergenti e sanificanti",
+      "kegging": "Kegging"
+    },
+    "searchPlaceholder": "Cerca…",
+    "search": "Cerca",
+    "noItems": "Nessun articolo ancora.",
+    "quantityLabel": "Quantità ({unit})",
+    "nameLabel": "Nome"
   },
   "accessibility": {
     "title": "Accessibilità",
@@ -1048,7 +1070,10 @@
       "title": "Brew day e dati di produzione",
       "fermDataIntegration": "Dati fermentazione e integrazione",
       "brewdayStepsSettings": "Impostazioni step brewday",
-      "waterProfiles": "Profili acqua"
+      "waterProfiles": "Profili acqua",
+      "brewery": "Birrificio",
+      "equipment": "Attrezzatura",
+      "inventory": "Inventario"
     },
     "importExport": {
       "title": "Import / Export",
