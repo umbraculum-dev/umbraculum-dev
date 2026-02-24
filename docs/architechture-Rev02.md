@@ -80,6 +80,29 @@ Implemented package:
     - Node (if used): treat as **bearer-only**
   - **Webview caveat**: opening a web route inside a native webview is not automatically authenticated by the native bearer token. If we want “already logged in” webviews, we must implement an explicit bridge (cookie/session handoff or token → webview session mechanism).
 
+### 0.7 Webview auth bridge (bearer → cookie session handoff)
+
+To support the “block-first + whitelist web fallback” direction without weakening the core auth split (native bearer-only, web cookie-session), the API implements a **system-browser-first** bridge that:
+
+- starts from a **native bearer session**
+- mints a short-lived, single-use exchange code
+- then exchanges it for a normal web cookie session (`sid`) and redirects to a safe in-app path
+
+Implemented pieces:
+
+- DB model: `services/api/prisma/schema.prisma` → `WebviewExchangeCode` (`webview_exchange_codes` table)
+  - stores `code_hash` (never stores raw code), `session_id`, `user_id`, `expires_at`, `used_at`
+- Routes: `services/api/src/routes/auth.ts`
+  - `POST /auth/webview-exchange` (bearer-only)
+    - body `{ next: "/en/<path>" }`
+    - response `{ ok, code, expiresAt, bridgeUrl }` where `bridgeUrl` is under `/api/auth/webview-bridge?...` (nginx rewrite)
+  - `GET /auth/webview-bridge?code=...&next=...`
+    - validates `next` is a safe locale-prefixed relative path (`/en...` or `/it...`)
+    - validates and consumes the code (single-use, 60s TTL)
+    - creates a normal cookie session and `302` redirects to `next`
+
+This is the mechanism that enables “Continue on web” from native for whitelisted routes while being **already logged in** in the system browser.
+
 ---
 
 ## 1. Product goals and non-goals

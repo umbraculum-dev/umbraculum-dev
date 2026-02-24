@@ -25,6 +25,37 @@ If we later open web-only flows in a native webview (e.g. whitelisted fallback p
 
 To achieve “open web page in webview and it’s already logged in” without manual token handling, we must implement an explicit bridge (e.g. cookie/session handoff or a token → webview session mechanism).
 
+## Webview auth bridge (bearer → cookie, system browser first)
+
+This repo implements a **system-browser-first** bridge to open a web-only flow from native while being **already logged in** on web.
+
+### Flow
+
+1) **Native** (bearer-only) creates a short-lived, single-use exchange code:
+
+- `POST /auth/webview-exchange`
+- Headers: `Authorization: Bearer <token>`
+- Body: `{ "next": "/en/inventory" }` (safe, locale-prefixed relative path)
+- Response: `{ ok, code, expiresAt, bridgeUrl }`
+
+2) **Native** opens `bridgeUrl` in the **system browser** (note: through nginx the URL is under `/api/...`).
+
+3) API consumes the exchange code, mints a normal cookie session, and redirects:
+
+- `GET /auth/webview-bridge?code=...&next=/en/inventory`
+- Behavior:
+  - validates `next` (safe relative path, locale-prefixed)
+  - validates `code` (must exist, not expired, not already used)
+  - creates a new cookie session (`sid`) and sets it as an httpOnly cookie
+  - `302` redirects to `next`
+
+### Security properties
+
+- Exchange codes are:
+  - **single-use**
+  - **short-lived** (60 seconds)
+  - stored **hashed** in the database (raw code is never persisted)
+
 ## Logout (both)
 
 `POST /auth/logout` accepts either:

@@ -129,6 +129,7 @@ model User {
 
   memberships             WorkspaceMember[]
   sessions                Session[]
+  webviewExchangeCodes    WebviewExchangeCode[]
   emailVerificationTokens EmailVerificationToken[]
 
   @@index([email])
@@ -261,11 +262,38 @@ model Session {
 
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   activeWorkspace Workspace? @relation("SessionActiveWorkspace", fields: [activeWorkspaceId], references: [id], onDelete: SetNull)
+  webviewExchangeCodes WebviewExchangeCode[]
 
   @@index([userId])
   @@index([expiresAt])
   @@index([activeWorkspaceId])
   @@map("sessions")
+}
+
+model WebviewExchangeCode {
+  id        String   @id @default(uuid())
+  codeHash  String   @unique @map("code_hash")
+  /** Session id that created this code (traceability). */
+  sessionId String   @map("session_id")
+  /** User id tied to this code (authoritative for minting a cookie session). */
+  userId    String   @map("user_id")
+  /** Snapshot of active workspace when the code was issued (optional). */
+  activeWorkspaceId String? @map("active_workspace_id")
+  /** Optional audit/debug snapshot of requested redirect path. */
+  requestedNextPath String? @map("requested_next_path")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([usedAt])
+  @@map("webview_exchange_codes")
 }
 
 model EmailVerificationToken {

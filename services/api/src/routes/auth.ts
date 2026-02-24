@@ -1,24 +1,52 @@
 import type { FastifyInstance } from "fastify";
 import rateLimit from "@fastify/rate-limit";
 import argon2 from "argon2";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 import { BadRequestError, UnauthorizedError } from "../errors.js";
 import { SESSION_COOKIE_NAME, readBearerToken, requireSession } from "../plugins/sessionAuth.js";
 import { WorkspacesService } from "../services/workspacesService.js";
 
 const SESSION_TTL_DAYS = 14;
+const WEBVIEW_EXCHANGE_TTL_SECONDS = 60;
 
 function nowPlusDays(days: number) {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+}
+
+function nowPlusSeconds(seconds: number) {
+  return new Date(Date.now() + seconds * 1000);
 }
 
 function makeOpaqueId(bytes = 32) {
   return randomBytes(bytes).toString("hex");
 }
 
+function sha256Hex(value: string) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
+}
+
+function assertSafeNextPath(v: unknown, label: string): string {
+  if (typeof v !== "string") throw new BadRequestError("invalid_next", `${label} is required`);
+  const next = v.trim();
+  if (!next) throw new BadRequestError("invalid_next", `${label} is required`);
+
+  // Safe relative path only. Prevent open redirects and scheme-relative URLs.
+  if (!next.startsWith("/")) throw new BadRequestError("invalid_next", `${label} must start with '/'`);
+  if (next.startsWith("//")) throw new BadRequestError("invalid_next", `${label} must not start with '//'`);
+  if (next.includes("://")) throw new BadRequestError("invalid_next", `${label} must be a relative path`);
+
+  // Keep the bridge scoped to known locale-prefixed web routes.
+  const isLocalePrefixed = next === "/en" || next.startsWith("/en/") || next === "/it" || next.startsWith("/it/");
+  if (!isLocalePrefixed) {
+    throw new BadRequestError("invalid_next", `${label} must start with '/en' or '/it'`);
+  }
+
+  return next;
 }
 
 function assertLocale(v: unknown): "en" | "it" {
@@ -245,6 +273,99 @@ export async function authRoutes(app: FastifyInstance) {
     reply
       .clearCookie(SESSION_COOKIE_NAME, { path: "/" })
       .send({ ok: true });
+  });
+
+  app.post(
+    "/auth/webview-exchange",
+    { config: { rateLimit: { max: 30, timeWindow: "1 minute" } } },
+    async (req) => {
+      // Require bearer token specifically (native/Node auth), not a cookie session.
+      if (!readBearerToken(req)) throw new UnauthorizedError("missing_bearer", "Bearer token required");
+
+      const s = requireSession(req);
+      const body = (req.body ?? {}) as { next?: unknown };
+      const next = assertSafeNextPath(body.next, "Body.next");
+
+      const code = makeOpaqueId(32);
+      const codeHash = sha256Hex(code);
+      const expiresAt = nowPlusSeconds(WEBVIEW_EXCHANGE_TTL_SECONDS);
+
+      await app.prisma.webviewExchangeCode.create({
+        data: {
+          codeHash,
+          sessionId: s.sessionId,
+          userId: s.userId,
+          activeWorkspaceId: s.activeWorkspaceId,
+          requestedNextPath: next,
+          expiresAt,
+        },
+        select: { id: true },
+      });
+
+      const bridgeUrl = `/api/auth/webview-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`;
+
+      return {
+        ok: true,
+        code,
+        expiresAt: expiresAt.toISOString(),
+        bridgeUrl,
+      };
+    },
+  );
+
+  app.get("/auth/webview-bridge", async (req, reply) => {
+    const query = (req.query ?? {}) as { code?: unknown; next?: unknown };
+    const code = typeof query.code === "string" ? query.code.trim() : "";
+    if (!code) throw new BadRequestError("invalid_code", "Query.code is required");
+
+    const next = assertSafeNextPath(query.next, "Query.next");
+    const codeHash = sha256Hex(code);
+
+    const mintedSession = await app.prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const claimed = await tx.webviewExchangeCode.updateMany({
+        where: {
+          codeHash,
+          usedAt: null,
+          expiresAt: { gt: now },
+        },
+        data: { usedAt: now },
+      });
+
+      if (claimed.count !== 1) {
+        throw new UnauthorizedError("invalid_webview_exchange_code", "Invalid or expired exchange code");
+      }
+
+      const record = await tx.webviewExchangeCode.findUnique({
+        where: { codeHash },
+        select: { userId: true, activeWorkspaceId: true },
+      });
+      if (!record) {
+        throw new UnauthorizedError("invalid_webview_exchange_code", "Invalid or expired exchange code");
+      }
+
+      const sessionId = makeOpaqueId();
+      const session = await tx.session.create({
+        data: {
+          id: sessionId,
+          userId: record.userId,
+          activeWorkspaceId: record.activeWorkspaceId,
+          expiresAt: nowPlusDays(SESSION_TTL_DAYS),
+        },
+        select: { id: true },
+      });
+
+      return session;
+    });
+
+    reply
+      .setCookie(SESSION_COOKIE_NAME, mintedSession.id, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      })
+      .redirect(next);
   });
 
   app.get("/auth/me", async (req) => {
