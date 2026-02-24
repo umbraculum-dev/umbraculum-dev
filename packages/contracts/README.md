@@ -19,3 +19,14 @@ Shared DTOs, types, and runtime parsers for the Brewery app. Used by web and fut
 ### Format
 - `NumberFormatHintV1`, `NumberFormatUnit` — numeric display hints for consistent web/native rendering
 - Water hub and compute-and-save responses include `formatHints` keyed by unit (L, pH, ppm_as_CaCO3, ppm, g, mL, kg)
+
+## Build output (native-ready)
+
+This package is consumed by web and native clients and must ship runtime-safe JS + types:
+
+- Runtime entrypoint: `dist/index.js`
+- Type entrypoint: `dist/index.d.ts`
+
+When you change `packages/contracts/src/**`, rebuild the package outputs (from repo root):
+
+- `npm run build:packages`

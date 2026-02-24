@@ -11,7 +11,7 @@ services:
 
   web:
     build: ./apps/web
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "mkdir -p /packages && ln -snf /app/node_modules /packages/node_modules && npm install && npm run dev"
     environment:
       - NEXT_PUBLIC_API_BASE_URL=/api
     ports:
@@ -23,6 +23,7 @@ services:
       - ./packages/core:/packages/core:ro
       - ./packages/i18n:/packages/i18n:ro
       - ./packages/media:/packages/media:ro
+      - ./packages/ui:/packages/ui:ro
 
   api:
     build: ./services/api

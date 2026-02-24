@@ -80,7 +80,7 @@ export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
       ? (payload as any).accounts
       : null;
   if (!workspacesRaw) throw new Error("Invalid AuthMeResponse: workspaces must be array");
-  const workspaces = workspacesRaw.map((a, i) => {
+  const workspaces = workspacesRaw.map((a: unknown, i: number) => {
     try {
       return parseWorkspace(a);
     } catch (e) {

@@ -4,7 +4,7 @@ This repository is the start of a BrewersFriend-style product: a **desktop-first
 
 ## Big picture (start here)
 
-- Architecture and implementation plan: `docs/architechture.md`
+- Architecture and implementation plan: `docs/architechture-Rev01.md`
 
 ## Intended stack (early plan)
 

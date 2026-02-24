@@ -4,7 +4,7 @@ This roadmap captures the agreed “direction of travel” for the product so im
 
 ## Big picture
 
-- Source of truth: `docs/architechture.md`
+- Source of truth: `docs/architechture-Rev01.md`
 - Accessibility hard constraint: `docs/DEVELOPMENT-ACCESSIBILITY.md`
 - Seed data sources + licensing notes: `docs/RAW-MATERIALS-SEEDABLE-SOURCES.md`
 

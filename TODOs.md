@@ -9,6 +9,18 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 - **Edit Recipe sections nav**: While migrating to Tamagui, the "active section" highlight in the recipe edit sidebar was intentionally removed and is flagged for permanent removal. It is not needed for the core workflow.
 
+## Native readiness: buildable packages + shared UI (MANDATORY before starting `apps/native`)
+
+- [x] Make native-consumed packages **runtime-safe** (ship `dist/**/*.js` + `dist/**/*.d.ts`) and stop exporting raw TS at the package boundary:
+  - `@brewery/i18n`
+  - `@brewery/contracts`
+  - `@brewery/api-client`
+- [x] Create `@brewery/ui` and split Tamagui config into web vs native entrypoints:
+  - web uses `@tamagui/animations-css`
+  - native must not import web-only animation/CSS drivers
+- [ ] Choose and document the native animation driver (Expo-friendly) for Tamagui animations (e.g. reanimated/moti), then wire it into `@brewery/ui` native config.
+- [ ] Add initial `apps/native` bootstrap (Expo) once the above is stable.
+
 ## Native login gate (MANDATORY before React Native auth)
 
 Before implementing native app login, complete these items.

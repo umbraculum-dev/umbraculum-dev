@@ -2,6 +2,48 @@
 
 This repo is **TypeScript-first**. The goal is clarity + safe refactors (including AI-assisted code changes).
 
+### Native-ready packages: buildable workspaces (MANDATORY)
+We are intentionally building toward **React Native (Expo)**. Metro is much less forgiving than Next.js about consuming raw TypeScript from monorepo workspaces.
+
+Rule:
+- Any package that will be imported by a native app MUST be **runtime-safe** at the package boundary:
+  - runtime entrypoints must be **plain JS** (`dist/**/*.js`)
+  - type entrypoints must be **`.d.ts`** (`dist/**/*.d.ts`)
+  - app code must import from the package **exports**, not from `packages/*/src/**`
+
+Current buildable packages (native-consumed):
+- `packages/i18n` (`@brewery/i18n`)
+- `packages/contracts` (`@brewery/contracts`)
+- `packages/api-client` (`@brewery/api-client`)
+- `packages/ui` (`@brewery/ui`)
+
+Build workflow:
+- When you change any of the packages above, rebuild `dist/` and commit the updated `dist/` outputs.
+- Preferred command (from repo root): `npm run build:packages`
+
+Why we commit `dist/`:
+- Our Docker dev stack mounts shared packages read-only (`docker-compose.yml` `:ro`), so containers must be able to consume prebuilt outputs.
+- It reduces Metro/Expo kickoff risk by avoiding “transpile external workspace TS” configuration during early native bootstrapping.
+
+### Strict code placement rule (MANDATORY): if it might be reused, it must be shared
+Decision rule:
+- If code has a plausible path to reuse in native (UI components, domain logic, DTOs/parsers, formatting, validation, i18n helpers, API clients), it MUST be implemented under `packages/**` first and then imported by `apps/web/**` (and later `apps/native/**`).
+
+Non-goal:
+- Do not implement something in `apps/web/**` and plan to “port it later” by copy/paste. That creates drift and makes native harder.
+
+Allowed in `apps/web/**`:
+- Next.js-only wiring (routing/layouts, server components, web-only providers)
+- web-only CSS and DOM-specific code
+- thin integration wrappers around shared UI (e.g. Tamagui provider wiring)
+
+### Cursor rules/skills upstream backlog (process)
+When we discover a reusable Cursor Rule/Skill improvement while evolving this repo (for example, a buildable-packages runbook or a Metro monorepo pitfall), capture it in:
+
+- `CURSOR-RULES-SKILLS-TODO.md` (repo root)
+
+This file is intentionally “upstream-ready” so it can be periodically ported into the canonical rules/skills repo (outside this project) or a Cursor plugin.
+
 ### Styling: avoid inline styles
 Avoid inline styles where you can. In this codebase **Tamagui props and components are the preferred replacement** for layout, spacing, colors, borders, and typography. Use `className` with CSS classes when Tamagui does not apply (e.g. native `<select>`, `<table>`, `<details>`/`<summary>`).
 

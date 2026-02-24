@@ -24,10 +24,9 @@ export function cookieAuth(): AuthStrategy {
  */
 export function bearerTokenAuth(getToken: () => string | null): AuthStrategy {
   return {
-    getHeaders: () => {
+    getHeaders: (): Record<string, string> => {
       const token = getToken();
-      if (!token) return {};
-      return { Authorization: `Bearer ${token}` };
+      return token ? { Authorization: `Bearer ${token}` } : {};
     },
     credentials: "omit",
   };

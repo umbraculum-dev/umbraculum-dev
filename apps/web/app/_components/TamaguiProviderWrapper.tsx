@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { TamaguiProvider } from "@tamagui/core";
-import config from "../../tamagui.config";
+import config from "@brewery/ui/tamagui-config-web";
 
 export function TamaguiProviderWrapper({ children }: { children: ReactNode }) {
   return (

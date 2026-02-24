@@ -1,15 +1,21 @@
 {
   "name": "brewery-app",
   "private": true,
+  "version": "0.0.0",
   "workspaces": [
     "apps/*",
     "services/*",
     "packages/*"
   ],
   "scripts": {
+    "build:packages": "npm run build -w @brewery/i18n && npm run build -w @brewery/contracts && npm run build -w @brewery/api-client && npm run build -w @brewery/ui",
     "dev": "docker compose up --build",
     "down": "docker compose down",
     "logs": "docker compose logs -f --tail=200"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0"
   },
   "engines": {
     "node": ">=20"

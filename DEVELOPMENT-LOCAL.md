@@ -11,7 +11,7 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 
 - This is a **custom TypeScript project** (not Magento, not PHP).
 - Planned stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.
-- Canonical big-picture plan: `docs/architechture.md`
+- Canonical big-picture plan: `docs/architechture-Rev01.md`
 
 ## Announcements (from cursor-rules)
 
@@ -75,10 +75,18 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - If accessibility requirements conflict with design, propose an accessible alternative—do not ship inaccessible UI.
 
 - **CSS structure**: See `docs/CODING-STANDARDS.md` → "CSS structure" for file layout and naming.
-- **Big picture**: `docs/architechture.md`
+- **Big picture**: `docs/architechture-Rev01.md`
 - **Roadmap**: `docs/ROADMAP.md`
 - **Work tracker**: `TODOs.md`
 - **Local dev entrypoint**: `docker compose up --build`
+- **Shared packages build (native-ready)**:
+  - Packages consumed by native apps ship runtime JS + `.d.ts` under `dist/` and we commit those build outputs.
+  - When you change anything under `packages/i18n`, `packages/contracts`, `packages/api-client`, or `packages/ui`, rebuild the shared packages from repo root:
+    - `npm run build:packages`
+  - Reminder: do not run npm on the host in this repo. Run the build via Docker if needed.
+- **Monorepo workspace deps in Docker (important)**:
+  - Workspace packages are mounted under `/packages/*` in the `web` container.
+  - To ensure workspace package dependencies resolve correctly, `/packages/node_modules` is symlinked to `/app/node_modules` at container startup.
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
@@ -125,6 +133,8 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - We intentionally bind-mount `services/api/node_modules` into the `api` container (see `docker-compose.yml`) so the editor can resolve devDependencies like `vitest`.
   - Treat `node_modules/` as **generated artifacts**: never edit them directly; always change dependencies via `package.json` and run installs.
   - If Docker creates the folder with unexpected ownership, prefer reinstalling from the host or adjusting ownership rather than manually editing contents.
+- **Cursor rules/skills upstream backlog**:
+  - If you identify a reusable Cursor Rule/Skill improvement while working, add it to `CURSOR-RULES-SKILLS-TODO.md` (repo root) so it can be periodically upstreamed into the canonical rules/skills repo/plugin.
 
 - **Coding standards (TypeScript/React)**
   - **Default**: use `interface` for object contracts (DTOs, component props, service inputs/outputs). Use `type` for unions/compositions.
