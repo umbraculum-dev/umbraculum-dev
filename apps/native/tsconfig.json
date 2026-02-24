@@ -1,15 +1,25 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
+    "lib": [
+      "ES2022"
+    ],
     "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["react", "react-native"]
+    "types": [
+      "react",
+      "react-native"
+    ]
   },
-  "include": ["App.tsx", "index.js", "tamagui.config.ts", "src/**/*"]
+  "include": [
+    "App.tsx",
+    "index.js",
+    "tamagui.config.ts",
+    "src/**/*"
+  ],
+  "extends": "expo/tsconfig.base"
 }
-

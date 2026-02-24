@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Button } from "tamagui";
+import { Button } from "@brewery/ui";
 
 import { apiFetch } from "../_lib/apiClient";
 

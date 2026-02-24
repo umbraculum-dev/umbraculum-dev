@@ -3,7 +3,12 @@
     "backToDashboard": "Torna alla Dashboard",
     "loading": "Caricamento…",
     "dateLabel": "Data",
-    "timeLabel": "Ora"
+    "timeLabel": "Ora",
+    "localeLabel": "Lingua",
+    "toggle": "Cambia",
+    "toggleLanguage": "Cambia lingua",
+    "dilutionDiagramLabel": "Diagramma diluizione 1:100",
+    "imageUnavailable": "Immagine non disponibile"
   },
   "units": {
     "C": "°C",

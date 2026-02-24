@@ -41,6 +41,8 @@ declare function isWebviewWhitelistRouteId(id: RouteId): boolean;
 declare function getRouteAvailability(id: RouteId, platform: AppPlatform): RouteAvailability;
 declare function hasWebFallback(id: RouteId, platform: AppPlatform): boolean;
 declare function routeToPath(ref: RouteRef): string;
+declare function prefixLocalePath(pathname: string, locale: string): string;
+declare function routeToLocalePath(ref: RouteRef, locale: string): string;
 interface AppRouter {
     push(ref: RouteRef): void;
     replace(ref: RouteRef): void;
@@ -49,4 +51,4 @@ interface AppRouter {
     href(ref: RouteRef): string;
 }
 
-export { type AppPlatform, type AppRouter, type RouteAvailability, type RouteId, type RouteParamsById, type RouteRef, WEBVIEW_WHITELIST_ROUTE_IDS, getRouteAvailability, hasWebFallback, isWebviewWhitelistRouteId, routeToPath };
+export { type AppPlatform, type AppRouter, type RouteAvailability, type RouteId, type RouteParamsById, type RouteRef, WEBVIEW_WHITELIST_ROUTE_IDS, getRouteAvailability, hasWebFallback, isWebviewWhitelistRouteId, prefixLocalePath, routeToLocalePath, routeToPath };

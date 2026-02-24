@@ -8,6 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "i18n:guardrail": "node scripts/i18n-guardrail.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -17,17 +18,16 @@
     "@brewery/navigation": "file:../../packages/navigation",
     "@brewery/ui": "file:../../packages/ui",
     "@tamagui/core": "^2.0.0-rc.12",
-    "expo": "next",
+    "expo": "^54.0.0",
     "expo-image": "^3.0.11",
-    "expo-localization": "^15.0.3",
-    "expo-secure-store": "^14.0.1",
-    "react": "19.2.0",
-    "react-native": "0.83.1",
+    "expo-localization": "~17.0.8",
+    "expo-secure-store": "~15.0.8",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
     "tamagui": "^2.0.0-rc.11"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
+    "@types/react": "~19.1.10",
     "typescript": "^5.8.0"
   }
 }
-

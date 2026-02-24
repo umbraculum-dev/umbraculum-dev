@@ -43,11 +43,24 @@ function routeToPath(ref) {
   const exhaustive = ref;
   throw new Error(`Unhandled route ref: ${String(exhaustive)}`);
 }
+function prefixLocalePath(pathname, locale) {
+  const l = String(locale || "").replace(/^\/+|\/+$/g, "");
+  const p = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  if (!l) return p;
+  if (p === `/${l}` || p.startsWith(`/${l}/`)) return p;
+  if (p === "/") return `/${l}`;
+  return `/${l}${p}`;
+}
+function routeToLocalePath(ref, locale) {
+  return prefixLocalePath(routeToPath(ref), locale);
+}
 
 export {
   WEBVIEW_WHITELIST_ROUTE_IDS,
   isWebviewWhitelistRouteId,
   getRouteAvailability,
   hasWebFallback,
-  routeToPath
+  routeToPath,
+  prefixLocalePath,
+  routeToLocalePath
 };

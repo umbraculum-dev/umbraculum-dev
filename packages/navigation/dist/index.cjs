@@ -24,6 +24,8 @@ __export(index_exports, {
   getRouteAvailability: () => getRouteAvailability,
   hasWebFallback: () => hasWebFallback,
   isWebviewWhitelistRouteId: () => isWebviewWhitelistRouteId,
+  prefixLocalePath: () => prefixLocalePath,
+  routeToLocalePath: () => routeToLocalePath,
   routeToPath: () => routeToPath
 });
 module.exports = __toCommonJS(index_exports);
@@ -71,11 +73,24 @@ function routeToPath(ref) {
   const exhaustive = ref;
   throw new Error(`Unhandled route ref: ${String(exhaustive)}`);
 }
+function prefixLocalePath(pathname, locale) {
+  const l = String(locale || "").replace(/^\/+|\/+$/g, "");
+  const p = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  if (!l) return p;
+  if (p === `/${l}` || p.startsWith(`/${l}/`)) return p;
+  if (p === "/") return `/${l}`;
+  return `/${l}${p}`;
+}
+function routeToLocalePath(ref, locale) {
+  return prefixLocalePath(routeToPath(ref), locale);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   WEBVIEW_WHITELIST_ROUTE_IDS,
   getRouteAvailability,
   hasWebFallback,
   isWebviewWhitelistRouteId,
+  prefixLocalePath,
+  routeToLocalePath,
   routeToPath
 });

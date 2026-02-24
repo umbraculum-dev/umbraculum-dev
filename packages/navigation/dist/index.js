@@ -3,12 +3,16 @@ import {
   getRouteAvailability,
   hasWebFallback,
   isWebviewWhitelistRouteId,
+  prefixLocalePath,
+  routeToLocalePath,
   routeToPath
-} from "./chunk-UL6JRGF6.js";
+} from "./chunk-ZFSKANIC.js";
 export {
   WEBVIEW_WHITELIST_ROUTE_IDS,
   getRouteAvailability,
   hasWebFallback,
   isWebviewWhitelistRouteId,
+  prefixLocalePath,
+  routeToLocalePath,
   routeToPath
 };

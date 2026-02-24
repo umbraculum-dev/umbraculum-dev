@@ -90,6 +90,20 @@ export function routeToPath(ref: RouteRef): string {
   throw new Error(`Unhandled route ref: ${String(exhaustive)}`);
 }
 
+export function prefixLocalePath(pathname: string, locale: string): string {
+  const l = String(locale || "").replace(/^\/+|\/+$/g, "");
+  const p = pathname.startsWith("/") ? pathname : `/${pathname}`;
+
+  if (!l) return p;
+  if (p === `/${l}` || p.startsWith(`/${l}/`)) return p;
+  if (p === "/") return `/${l}`;
+  return `/${l}${p}`;
+}
+
+export function routeToLocalePath(ref: RouteRef, locale: string): string {
+  return prefixLocalePath(routeToPath(ref), locale);
+}
+
 export interface AppRouter {
   push(ref: RouteRef): void;
   replace(ref: RouteRef): void;

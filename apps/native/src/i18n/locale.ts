@@ -5,7 +5,7 @@ import * as Localization from "expo-localization";
 export const LOCALE_STORAGE_KEY = "brewery.locale";
 
 export function getDeviceLocale(): SupportedLocale {
-  const raw = Localization.getLocales?.()?.[0]?.languageTag ?? Localization.locale ?? "";
+  const raw = Localization.getLocales?.()?.[0]?.languageTag ?? "";
   const normalized = raw.toLowerCase();
 
   const base = normalized.split("-")[0] ?? "";

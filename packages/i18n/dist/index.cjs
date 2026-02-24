@@ -35,7 +35,12 @@ var en_default = {
     backToDashboard: "Back to Dashboard",
     loading: "Loading\u2026",
     dateLabel: "Date",
-    timeLabel: "Time"
+    timeLabel: "Time",
+    localeLabel: "Language",
+    toggle: "Toggle",
+    toggleLanguage: "Toggle language",
+    dilutionDiagramLabel: "Dilution 1:100 diagram",
+    imageUnavailable: "Image unavailable"
   },
   units: {
     C: "\xB0C",
@@ -1426,7 +1431,12 @@ var it_default = {
     backToDashboard: "Torna alla Dashboard",
     loading: "Caricamento\u2026",
     dateLabel: "Data",
-    timeLabel: "Ora"
+    timeLabel: "Ora",
+    localeLabel: "Lingua",
+    toggle: "Cambia",
+    toggleLanguage: "Cambia lingua",
+    dilutionDiagramLabel: "Diagramma diluizione 1:100",
+    imageUnavailable: "Immagine non disponibile"
   },
   units: {
     C: "\xB0C",

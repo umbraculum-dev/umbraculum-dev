@@ -8,6 +8,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends openssl \
 
 # Install dependencies first (better caching)
 COPY package.json ./
+COPY prisma ./prisma
 RUN npm install
 
 # Copy source

@@ -9,11 +9,13 @@ import { getMediaBaseUrl } from "./mediaBaseUrl";
 export function RemoteImage({
   assetKey,
   accessibilityLabel,
+  unavailableText,
   width,
   height,
 }: {
   assetKey: MediaAssetKey;
   accessibilityLabel: string;
+  unavailableText: string;
   width: number;
   height: number;
 }) {
@@ -39,7 +41,9 @@ export function RemoteImage({
           justifyContent: "center",
         }}
       >
-        <Text style={{ color: "#6B7280", fontSize: 12, paddingHorizontal: 8, textAlign: "center" }}>Image unavailable</Text>
+        <Text style={{ color: "#6B7280", fontSize: 12, paddingHorizontal: 8, textAlign: "center" }}>
+          {unavailableText}
+        </Text>
       </View>
     );
   }
