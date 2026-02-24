@@ -20,9 +20,9 @@
     "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts"
   },
   "dependencies": {
-    "@brewery/core": "file:../../packages/core",
-    "@brewery/contracts": "file:../../packages/contracts",
     "@beerjson/beerjson": "^1.0.2",
+    "@brewery/contracts": "file:../../packages/contracts",
+    "@brewery/core": "file:../../packages/core",
     "@fastify/cookie": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",
     "@prisma/client": "^6.0.0",
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "esbuild": "^0.27.3",
     "prisma": "^6.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",

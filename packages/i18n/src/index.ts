@@ -9,7 +9,14 @@ import itData from "./it.json";
 const en = enData as Record<string, unknown>;
 const it = itData as Record<string, unknown>;
 
-export type SupportedLocale = "en" | "it";
+export const locales = ["en", "it"] as const;
+export type SupportedLocale = (typeof locales)[number];
+
+export const defaultLocale: SupportedLocale = "en";
+
+export function isLocale(value: string): value is SupportedLocale {
+  return (locales as readonly string[]).includes(value);
+}
 
 /**
  * Get shared messages for the given locale.

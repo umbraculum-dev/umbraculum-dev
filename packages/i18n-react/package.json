@@ -1,0 +1,30 @@
+{
+  "name": "@brewery/i18n-react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.tsx src/next-intl.ts --format esm --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./next-intl": {
+      "types": "./dist/next-intl.d.ts",
+      "default": "./dist/next-intl.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@brewery/i18n": "file:../i18n",
+    "intl-messageformat": "^10.7.14"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "next-intl": ">=4"
+  }
+}
+

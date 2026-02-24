@@ -11,7 +11,7 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 
 - This is a **custom TypeScript project** (not Magento, not PHP).
 - Planned stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.
-- Canonical big-picture plan: `docs/architechture-Rev01.md`
+- Canonical big-picture plan: `docs/architechture-Rev02.md`
 
 ## Announcements (from cursor-rules)
 
@@ -75,7 +75,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - If accessibility requirements conflict with design, propose an accessible alternative—do not ship inaccessible UI.
 
 - **CSS structure**: See `docs/CODING-STANDARDS.md` → "CSS structure" for file layout and naming.
-- **Big picture**: `docs/architechture-Rev01.md`
+- **Big picture**: `docs/architechture-Rev02.md`
 - **Roadmap**: `docs/ROADMAP.md`
 - **Work tracker**: `TODOs.md`
 - **Local dev entrypoint**: `docker compose up --build`
@@ -87,6 +87,11 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Monorepo workspace deps in Docker (important)**:
   - Workspace packages are mounted under `/packages/*` in the `web` container.
   - To ensure workspace package dependencies resolve correctly, `/packages/node_modules` is symlinked to `/app/node_modules` at container startup.
+- **Troubleshooting: 502 Bad Gateway on login / API calls**:
+  - If Nginx returns `502 Bad Gateway` for `/api/*`, the API upstream is unreachable (often the `api` container process crashed or is still starting).
+  - Quick fix (from repo root):
+    - `docker compose exec api npm install`
+    - `docker compose restart api`
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.

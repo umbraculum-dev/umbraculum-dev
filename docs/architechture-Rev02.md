@@ -1,10 +1,73 @@
 # Brewing SaaS - Architecture & Implementation Plan (AI-first)
 
-**NOTE:** This revision has been superseded by `docs/architechture-Rev02.md` (new source of truth). Keep Rev01 as historical context; apply new decisions in Rev02.
-
-**Status:** v0.2 (living document)  
-**Primary goal:** ship a BrewersFriend-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2-codex).  
+**Status:** v0.3 (living document)  
+**Primary goal:** ship a BrewersFriend-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2).  
 **Guiding principle:** keep the backend *boring* (monolith, predictable patterns), make offline reliable without early sync complexity, and keep decisions easy to review and evolve.
+
+---
+
+## 0. Current “implemented architecture decisions” (high signal)
+
+This section describes decisions that are now **implemented in the repo**.
+
+### 0.1 Supported locales are single-source-of-truth
+
+- **Canonical locale ownership**: `packages/i18n` (`@brewery/i18n`)
+- Implemented exports:
+  - `locales` (readonly tuple)
+  - `SupportedLocale`
+  - `defaultLocale`
+  - `isLocale(value)`
+  - `getSharedMessages(locale)` (full message tree)
+
+Web integrates via a thin re-export:
+- `apps/web/src/i18n/routing.ts` re-exports from `@brewery/i18n` so web can keep its existing structure while avoiding drift.
+
+### 0.2 Cross-platform routing boundary (route IDs + typed params)
+
+We do **not** try to share Next.js routes or file-based routing across web/native. Instead we share a **route manifest** that allows:
+- shared screens to navigate without importing Next.js or React Navigation modules
+- push notifications / deep links to target stable route IDs later
+- explicit policy for “ported vs not ported” flows
+
+Implemented package:
+- `packages/navigation` (`@brewery/navigation`)
+  - `RouteId`, `RouteParamsById`, `RouteRef`
+  - `routeToPath(RouteRef)` produces a **non-locale** web path (e.g. `/inventory`, `/recipes/:id/water/mash`)
+  - `getRouteAvailability(id, platform)` returns:
+    - `available` (web)
+    - `blocked` (native default)
+    - `whitelisted_web_fallback` (native, for safe webview fallback candidates)
+  - `WEBVIEW_WHITELIST_ROUTE_IDS` currently starts with: `inventory`
+
+### 0.3 “Block-first + whitelist webview fallback” policy (native)
+
+**Policy direction (agreed)**:
+- If a user hits a not-yet-ported route on native, show **“Not available on mobile yet”** first.
+- Some routes may be **webview whitelisted** for later fallback (read-only / safe surfaces).
+- Inventory is the first example whitelist candidate; later candidates may include MPR console.
+
+### 0.4 Universal i18n React hook boundary (`useT` + `rich`)
+
+To share screens across web and native while keeping message syntax consistent, shared code must not import `next-intl` directly.
+
+Implemented package:
+- `packages/i18n-react` (`@brewery/i18n-react`)
+  - Universal runtime:
+    - `LocaleProvider({ locale, messages })`
+    - `useT(namespace)` returning `{ t(key, values), rich(key, values) }`
+    - Native-ready formatting uses ICU via `intl-messageformat`, fed by `getSharedMessages(locale)`
+  - Web adapter entrypoint (optional):
+    - `@brewery/i18n-react/next-intl` provides a `useT(namespace)` implemented via `next-intl` (thin wrapper)
+
+### 0.5 Web adapter scaffolding (Next.js)
+
+Web keeps Next App Router + `next-intl` locale-prefixed URLs.
+
+Implemented file:
+- `apps/web/src/navigation/appRouter.ts`
+  - `useAppRouter()` implements `AppRouter` over `next-intl` navigation + locale prefixing
+  - It uses `routeToPath()` from `@brewery/navigation` and prefixes `/${locale}`.
 
 ---
 
@@ -50,6 +113,36 @@
   - runtime: `dist/**/*.js`
   - types: `dist/**/*.d.ts`
 - Shared UI uses Tamagui, with a dedicated `@brewery/ui` package and platform-specific config entrypoints (web vs native) to avoid importing web-only dependencies in native.
+- **Strict placement rule**: if code might be reused in native, it lives under `packages/**` first.
+
+### Cross-platform boundaries (routing + i18n)
+
+#### Boundary rule: shared screens must not import platform frameworks
+If code is intended to be shared between web and native (screens/flows/components), it must **not import**:
+- `next/*` modules
+- `next-intl/*` modules
+- React Navigation modules
+- Expo Router modules
+
+Instead it depends on small shared interfaces:
+- routing: `@brewery/navigation`
+- i18n: `@brewery/i18n` + `@brewery/i18n-react`
+
+#### Implemented boundary modules (source of truth)
+- **Locales + messages**: `packages/i18n` (`@brewery/i18n`)
+- **Universal translation hook**: `packages/i18n-react` (`@brewery/i18n-react`)
+- **Universal route IDs + policy**: `packages/navigation` (`@brewery/navigation`)
+- **Web adapter**: `apps/web/src/navigation/appRouter.ts` (`useAppRouter()`)
+
+#### Route policy: avoid accidental “not ported” drift
+We treat porting as an explicit capability decision:
+- every route has a stable `RouteId`
+- native can mark a route as:
+  - **blocked** (default)
+  - **available** (ported)
+  - **whitelisted_web_fallback** (safe webview candidate later)
+
+This keeps the “not ported yet” state deliberate, and avoids silent divergence.
 
 ### Why these choices (summary)
 - **TypeScript everywhere** reduces context switching and increases AI effectiveness (types catch mistakes).
@@ -58,7 +151,8 @@
 - **PostgreSQL** is a strong general-purpose DB, great for evolving SaaS needs.
 - **SQLite on device** provides true offline persistence (brew-day reliability).
 - **Nginx** is familiar and great for TLS, routing, and deployment predictability.
-- **Option 1: separate web and mobile UIs** preserves best-in-class UX on each platform while still sharing core logic and contracts.
+- **Route manifest + adapters** keeps Next App Router stable while adding native without forcing a router migration.
+- **Universal i18n hook** preserves your ICU message investment and supports `.rich()` patterns cross-platform.
 
 ---
 
@@ -218,7 +312,6 @@ We will need database entities for:
 - salts
 - acids
 - water profiles and water additions
-(chemistry is complex but manageable: we follow the John Palmer’s Water App "rules": they have proven to be super effective; the key constraint is “single source of truth” to keep sync and recalculations sane). pH, residual alkalinity, CaCo3 and all the chemistry "stack" must be taken into account. bob's app also an interesting insight.
 
 ### Single source of truth principle (global rule)
 We must avoid storing the same conceptual data in two editable places.
@@ -227,6 +320,7 @@ Reason: offline sync and recalculation become unreliable when updates do not pro
 ---
 
 ## 8. Brew-day steps, reminders, and safety
+
 We want support for custom, user-defined brew-day steps (including safety steps):
 - examples: “close LPG valve”, “sanitise pump”, “open chiller bypass”, etc.
 - steps can be defined at:
@@ -289,11 +383,16 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 
 ### Phase 0 - Repository and standards
 - Create monorepo structure (`apps/`, `services/`, `packages/`, `infra/`, `docs/`)
-- Add `docs/architechture-Rev02.md` as source of truth for Cursor
+- Use `docs/architechture-Rev02.md` as the source-of-truth for Cursor + humans
 - Native-ready packages (Metro-safe boundaries):
   - Shared packages imported by native apps ship `dist/**/*.js` + `dist/**/*.d.ts`
   - Do not export raw TS at the runtime boundary for native-consumed packages
   - Strict placement rule: if code might be reused in native, it lives under `packages/**` first
+- Cross-platform boundaries (implemented early to reduce rework):
+  - locales/messages: `@brewery/i18n`
+  - route manifest + policy: `@brewery/navigation`
+  - universal translation hook: `@brewery/i18n-react`
+  - web adapter: `apps/web/src/navigation/appRouter.ts`
 - Shared UI direction:
   - Keep Tamagui tokens/config/components in `packages/ui`
   - Split Tamagui config into web vs native entrypoints to avoid importing web-only drivers in native (e.g. CSS animations)
@@ -380,226 +479,13 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 
 ## Appendix A - Initial Prisma schema (v0.2)
 
-```prisma
-enum AccountRole {
-  owner
-  brewery_admin
-  member
-  viewer
-}
-
-enum SubscriptionStatus {
-  trialing
-  active
-  past_due
-  canceled
-  unpaid
-  incomplete
-}
-
-enum BrewEventType {
-  gravity
-  temperature
-  ph
-  note
-  timer_started
-  timer_stopped
-  timer_lap
-}
-
-model User {
-  id            String          @id @default(uuid())
-  email         String          @unique
-  displayName   String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  memberships   AccountMember[]
-  devices       Device[]
-  subscriptions Subscription[]
-  entitlement   Entitlement?
-}
-
-model Account {
-  id        String          @id @default(uuid())
-  name      String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-
-  members   AccountMember[]
-  recipes   Recipe[]
-  batches   Batch[]
-}
-
-model AccountMember {
-  id        String      @id @default(uuid())
-  accountId String
-  userId    String
-  role      AccountRole @default(member)
-  createdAt DateTime    @default(now())
-
-  account   Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([accountId, userId])
-  @@index([userId])
-}
-
-model Recipe {
-  id        String   @id @default(uuid())
-  accountId String
-  name      String
-  style     String?
-  version   Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  batches   Batch[]
-
-  @@index([accountId])
-}
-
-model Batch {
-  id          String   @id @default(uuid())
-  accountId   String
-  recipeId    String?
-  name        String
-  status      String   @default("planned")
-  startedAt   DateTime?
-  completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  recipe      Recipe?  @relation(fields: [recipeId], references: [id], onDelete: SetNull)
-  events      BrewEvent[]
-
-  @@index([accountId])
-}
-
-model Device {
-  id         String   @id @default(uuid())
-  userId     String
-  deviceName String?
-  platform   String?  // ios|android|web
-  createdAt  DateTime @default(now())
-  lastSeenAt DateTime?
-
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model BrewEvent {
-  id          String        @id
-  accountId   String
-  batchId     String
-  deviceId    String?
-  createdById String?
-  type        BrewEventType
-  occurredAt  DateTime
-  payload     Json
-  createdAt   DateTime      @default(now())
-  supersedesEventId String?
-
-  batch       Batch         @relation(fields: [batchId], references: [id], onDelete: Cascade)
-
-  @@index([accountId, batchId, occurredAt])
-  @@index([batchId, occurredAt])
-}
-
-model Subscription {
-  id                   String              @id @default(uuid())
-  userId               String
-  provider             String
-  status               SubscriptionStatus
-  planCode             String
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  currentPeriodEnd     DateTime?
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
-
-  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([provider, stripeSubscriptionId])
-}
-
-model Entitlement {
-  id         String   @id @default(uuid())
-  userId     String   @unique
-  planCode   String
-  features   Json
-  limits     Json
-  validUntil DateTime?
-  updatedAt  DateTime @updatedAt
-  createdAt  DateTime @default(now())
-
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model StripeEvent {
-  id          String   @id
-  type        String
-  livemode    Boolean
-  receivedAt  DateTime @default(now())
-  processedAt DateTime?
-  payload     Json
-
-  @@index([type])
-}
-```
+*(Intentionally unchanged from Rev01; update when schema stabilizes.)*
 
 ---
 
 ## Appendix B - Local development Docker Compose (outline)
 
-```yaml
-services:
-  nginx:
-    image: nginx:stable
-    ports:
-      - "8080:80"
-    volumes:
-      - ./infra/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - web
-      - api
-
-  web:
-    build: ./apps/web
-    command: npm run dev
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=/api
-    ports:
-      - "3000:3000"
-
-  api:
-    build: ./services/api
-    command: npm run dev
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/brewapp
-      - STRIPE_WEBHOOK_SECRET=...
-    ports:
-      - "4000:4000"
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres:16
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=brewapp
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
-```
+*(Intentionally unchanged from Rev01; runtime stack changes require explicit coordination.)*
 
 ---
 
@@ -611,3 +497,4 @@ Minimum pipeline stages:
 3. unit tests (Vitest)
 4. build (web + api)
 5. e2e (Playwright) against a compose stack (optional early, recommended soon)
+

@@ -17,6 +17,7 @@
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/core": "file:../../packages/core",
     "@brewery/i18n": "file:../../packages/i18n",
+    "@brewery/navigation": "file:../../packages/navigation",
     "@brewery/media": "file:../../packages/media",
     "@brewery/ui": "file:../../packages/ui",
     "@tamagui/animations-css": "^2.0.0-rc.11",

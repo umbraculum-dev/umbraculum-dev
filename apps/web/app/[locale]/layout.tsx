@@ -22,7 +22,7 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const messages = getSharedMessages(locale as "en" | "it");
+  const messages = getSharedMessages(locale);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

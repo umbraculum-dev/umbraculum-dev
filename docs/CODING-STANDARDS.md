@@ -13,6 +13,8 @@ Rule:
 
 Current buildable packages (native-consumed):
 - `packages/i18n` (`@brewery/i18n`)
+- `packages/i18n-react` (`@brewery/i18n-react`)
+- `packages/navigation` (`@brewery/navigation`)
 - `packages/contracts` (`@brewery/contracts`)
 - `packages/api-client` (`@brewery/api-client`)
 - `packages/ui` (`@brewery/ui`)

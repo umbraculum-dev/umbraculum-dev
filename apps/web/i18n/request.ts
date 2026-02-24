@@ -9,7 +9,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   return {
     locale,
-    messages: getSharedMessages(locale as "en" | "it"),
+    messages: getSharedMessages(locale),
   };
 });
 
