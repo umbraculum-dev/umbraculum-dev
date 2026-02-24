@@ -4,9 +4,11 @@
  * - Bearer: native apps send Authorization: Bearer <token>.
  */
 
+import type { ApiClientCredentials } from "./fetchTypes.js";
+
 export interface AuthStrategy {
   getHeaders?: () => Record<string, string>;
-  credentials?: RequestCredentials;
+  credentials?: ApiClientCredentials;
 }
 
 /**
@@ -28,6 +30,5 @@ export function bearerTokenAuth(getToken: () => string | null): AuthStrategy {
       const token = getToken();
       return token ? { Authorization: `Bearer ${token}` } : {};
     },
-    credentials: "omit",
   };
 }

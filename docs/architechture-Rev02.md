@@ -69,6 +69,17 @@ Implemented file:
   - `useAppRouter()` implements `AppRouter` over `next-intl` navigation + locale prefixing
   - It uses `routeToPath()` from `@brewery/navigation` and prefixes `/${locale}`.
 
+### 0.6 Cross-platform API client (fetch boundary + auth)
+
+Implemented package:
+- `packages/api-client` (`@brewery/api-client`)
+  - Uses a minimal cross-platform fetch contract (injectable `fetch`) and avoids DOM-only typing in its public API.
+  - **Auth direction (current)**:
+    - Web: cookie sessions (`sid`) via `cookieAuth()`
+    - Native: **bearer-only** via `bearerTokenAuth(getToken)`
+    - Node (if used): treat as **bearer-only**
+  - **Webview caveat**: opening a web route inside a native webview is not automatically authenticated by the native bearer token. If we want “already logged in” webviews, we must implement an explicit bridge (cookie/session handoff or token → webview session mechanism).
+
 ---
 
 ## 1. Product goals and non-goals

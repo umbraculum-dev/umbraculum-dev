@@ -17,6 +17,14 @@ This document describes how authentication works for the web app and native (Rea
 - **Subsequent requests**: Send `Authorization: Bearer <token>` on every API request
 - **Logout**: `POST /auth/logout` with `Authorization: Bearer <token>` — invalidates the session
 
+**Direction (current)**: native auth is **bearer-only** (no cookie-session support).
+
+## Webview fallback auth caveat
+
+If we later open web-only flows in a native webview (e.g. whitelisted fallback pages), they will **not** automatically be logged in via the native bearer token.
+
+To achieve “open web page in webview and it’s already logged in” without manual token handling, we must implement an explicit bridge (e.g. cookie/session handoff or a token → webview session mechanism).
+
 ## Logout (both)
 
 `POST /auth/logout` accepts either:

@@ -3,6 +3,7 @@
  */
 
 import type { AuthStrategy } from "./auth.js";
+import type { ApiRequestInit, FetchLike, FetchResponseLike } from "./fetchTypes.js";
 
 export interface ApiResponse<T = unknown> {
   ok: boolean;
@@ -26,22 +27,42 @@ function joinPath(base: string, path: string): string {
 /**
  * Create an API client with the given base URL and auth strategy.
  */
-export function createApiClient(baseUrl: string, auth: AuthStrategy): ApiClient {
+export function createApiClient(
+  baseUrl: string,
+  auth: AuthStrategy,
+  options?: {
+    fetch?: FetchLike;
+  }
+): ApiClient {
   const headers = (): Record<string, string> => ({
     "Content-Type": "application/json",
     ...auth.getHeaders?.(),
   });
 
-  async function request(path: string, init: RequestInit): Promise<ApiResponse> {
+  const resolvedFetch = (() => {
+    if (options?.fetch) return options.fetch;
+
+    const f = (globalThis as unknown as { fetch?: unknown }).fetch;
+    if (typeof f !== "function") {
+      throw new Error("fetch is not available. Provide options.fetch when creating the API client.");
+    }
+    return f as unknown as FetchLike;
+  })();
+
+  async function request(path: string, init: ApiRequestInit): Promise<ApiResponse> {
     const url = joinPath(baseUrl, path);
-    const res = await fetch(url, {
+
+    const creds = init.credentials ?? auth.credentials;
+    const requestInit: ApiRequestInit = {
       ...init,
-      credentials: auth.credentials ?? "same-origin",
       headers: {
         ...headers(),
-        ...(init.headers as Record<string, string>),
+        ...(init.headers ?? {}),
       },
-    });
+      ...(creds ? { credentials: creds } : {}),
+    };
+
+    const res: FetchResponseLike = await resolvedFetch(url, requestInit);
     const text = await res.text();
     let data: unknown = text;
     try {
