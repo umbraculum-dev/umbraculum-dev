@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, H1, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { BrewSelect } from "../../_components/BrewSelect";
+// BrewSelect (../../_components/BrewSelect) available for future use if needed.
 import {
   ErrorBox,
   RecipeEditFieldLabel,
