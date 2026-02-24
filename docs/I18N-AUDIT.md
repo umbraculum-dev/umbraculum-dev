@@ -37,6 +37,6 @@ This document tracks the initial audit of user-facing strings that should be mig
 
 ## Next steps
 
-- Migrate the core recipe + water pages to message keys in `apps/web/messages/en.json` + `apps/web/messages/it.json`.
+- Migrate the core recipe + water pages to message keys in `packages/i18n/src/en.json` + `packages/i18n/src/it.json`.
 - Add a guardrail check script to prevent new hard-coded strings under `apps/web/app/**`.
 

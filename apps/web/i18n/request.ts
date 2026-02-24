@@ -1,5 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
 
+import { getSharedMessages } from "@brewery/i18n";
 import { defaultLocale, isLocale } from "../src/i18n/routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -8,7 +9,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    messages: getSharedMessages(locale as "en" | "it"),
   };
 });
 

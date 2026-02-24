@@ -139,7 +139,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Internationalization / i18n (MANDATORY for all user-facing web UI)**
   - **Routing**: all app routes are **locale-prefixed**: `/en/...`, `/it/...` (default: `en`). Unprefixed URLs are redirected by middleware.
   - **No hard-coded UI strings**: do not add new user-facing text inline in JSX.
-    - Put strings in `apps/web/messages/en.json` and `apps/web/messages/it.json`.
+    - Put strings in `packages/i18n/src/en.json` and `packages/i18n/src/it.json`.
     - Use `useTranslations('namespace')` and `t('key')` (or `t.rich(...)` when you need markup).
   - **Multi-line strings (MathHelpPopover / formula bodies)**:
     - Use JSON `\\n` escapes as `\n` (single backslash) to create real newlines.

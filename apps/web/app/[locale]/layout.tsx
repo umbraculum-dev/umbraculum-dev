@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { getSharedMessages } from "@brewery/i18n";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -21,7 +22,7 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const messages = (await import(`../../messages/${locale}.json`)).default;
+  const messages = getSharedMessages(locale as "en" | "it");
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

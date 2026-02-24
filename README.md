@@ -19,7 +19,7 @@ This repository is the start of a BrewersFriend-style product: a **desktop-first
 ## Internationalization (i18n)
 
 - The web app uses **locale-prefixed routing**: `/en/...` and `/it/...` (default: `en`).
-- User-facing UI text should be sourced from `apps/web/messages/*.json` (no new hard-coded JSX strings).
+- User-facing UI text should be sourced from `packages/i18n/src/*.json` (no new hard-coded JSX strings).
 
 This README will be expanded as implementation lands.
 

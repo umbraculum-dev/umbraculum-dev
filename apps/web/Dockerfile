@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Install deps first (better caching)
 COPY package.json ./
+COPY package-lock.json ./
 COPY scripts ./scripts
 RUN npm install
 
@@ -16,4 +17,3 @@ COPY app ./app
 EXPOSE 3000
 
 CMD ["npm", "run", "dev"]
-

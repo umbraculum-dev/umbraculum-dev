@@ -1,6 +1,6 @@
 /**
- * Shared i18n messages for native apps.
- * Web continues to use apps/web/messages; native should consume from this package.
+ * Shared i18n messages for web and native apps.
+ * Single source of truth: both Next.js web and React Native consume from this package.
  */
 
 import enData from "./en.json";
@@ -13,7 +13,7 @@ export type SupportedLocale = "en" | "it";
 
 /**
  * Get shared messages for the given locale.
- * Contains math.derivation (labels, formulas, etc.) and auth.errors.
+ * Returns the full message tree for next-intl (web) or i18next (native).
  */
 export function getSharedMessages(locale: SupportedLocale): Record<string, unknown> {
   return locale === "it" ? (it as Record<string, unknown>) : (en as Record<string, unknown>);

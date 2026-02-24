@@ -189,8 +189,8 @@ Derivation contract:
 Web rendering rules:
 - Use `apps/web/app/recipes/[id]/water/_lib/mathBodies.ts` as the shared renderer.
 - Labels/copy live under:
-  - `apps/web/messages/en.json` → `math.derivation.*`
-  - `apps/web/messages/it.json` → `math.derivation.*`
+  - `packages/i18n/src/en.json` → `math.derivation.*`
+  - `packages/i18n/src/it.json` → `math.derivation.*`
 - Prefer showing:
   - the formula skeleton (from `derivation.formulas.<formulaId>`)
   - the minimal inputs + intermediates needed to follow the computation
