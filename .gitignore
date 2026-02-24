@@ -36,6 +36,12 @@ coverage/
 .eslintcache
 *.tsbuildinfo
 
+# ------------------------------------------------------------
+# Shared packages: commit dist outputs (native-ready)
+# ------------------------------------------------------------
+!packages/*/dist/
+!packages/*/dist/**
+
 # npm/yarn/pnpm debug logs
 npm-debug.log*
 yarn-debug.log*

@@ -17,6 +17,7 @@
       "default": "./dist/next-intl.js"
     }
   },
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@brewery/i18n": "file:../i18n",

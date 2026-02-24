@@ -21,11 +21,27 @@ Current buildable packages (native-consumed):
 
 Build workflow:
 - When you change any of the packages above, rebuild `dist/` and commit the updated `dist/` outputs.
-- Preferred command (from repo root): `npm run build:packages`
+  - We intentionally commit `packages/*/dist/**` so:
+    - Docker can mount shared packages read-only (`docker-compose.yml` `:ro`) and still run from a fresh checkout.
+    - Expo/Metro can consume runtime JS without “transpile external workspace TS” bootstrapping during early native kickoff.
+
+- Do not run `npm` on the host in this repo. Use the container-only scripts (from repo root):
+  - Build: `./scripts/build-packages-in-docker.sh`
+  - Verify `dist` is up to date: `./scripts/check-packages-dist-up-to-date.sh`
 
 Why we commit `dist/`:
 - Our Docker dev stack mounts shared packages read-only (`docker-compose.yml` `:ro`), so containers must be able to consume prebuilt outputs.
 - It reduces Metro/Expo kickoff risk by avoiding “transpile external workspace TS” configuration during early native bootstrapping.
+
+#### `@brewery/ui` import rules (important for native safety)
+- The root entrypoint `@brewery/ui` is intentionally **platform-neutral** (may be empty).
+- Import Tamagui configs via explicit subpaths:
+  - Web: `@brewery/ui/tamagui-config-web` (uses `@tamagui/animations-css`)
+  - Native: `@brewery/ui/tamagui-config-native` (native-safe)
+
+#### `@brewery/i18n-react` import rules (web vs native)
+- Shared/native: import `useT` from `@brewery/i18n-react`.
+- Web-only adapter: import `useT` from `@brewery/i18n-react/next-intl` (Next.js only).
 
 ### Strict code placement rule (MANDATORY): if it might be reused, it must be shared
 Decision rule:

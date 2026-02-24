@@ -21,6 +21,7 @@
       "default": "./dist/tamagui/config.native.js"
     }
   },
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@tamagui/animations-css": "^2.0.0-rc.11",
