@@ -4,19 +4,21 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     },
     "./en": {
-      "default": "./src/en.json"
+      "default": "./dist/en.json"
     },
     "./it": {
-      "default": "./src/it.json"
+      "default": "./dist/it.json"
     }
   },
   "main": "./dist/index.js",

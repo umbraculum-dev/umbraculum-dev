@@ -1,0 +1,33 @@
+{
+  "name": "@brewery/native",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@brewery/api-client": "file:../../packages/api-client",
+    "@brewery/i18n": "file:../../packages/i18n",
+    "@brewery/i18n-react": "file:../../packages/i18n-react",
+    "@brewery/navigation": "file:../../packages/navigation",
+    "@brewery/ui": "file:../../packages/ui",
+    "@tamagui/core": "^2.0.0-rc.12",
+    "expo": "next",
+    "expo-image": "^3.0.11",
+    "expo-localization": "^15.0.3",
+    "expo-secure-store": "^14.0.1",
+    "react": "19.2.0",
+    "react-native": "0.83.1",
+    "tamagui": "^2.0.0-rc.11"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.8.0"
+  }
+}
+

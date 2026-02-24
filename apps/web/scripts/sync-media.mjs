@@ -21,22 +21,31 @@ if (!fs.existsSync(assetsDir)) {
   process.exit(0);
 }
 
-/** @param {string} srcDir */
-/** @param {string} destDir */
-function syncDir(srcDir, destDir) {
-  for (const ent of fs.readdirSync(srcDir, { withFileTypes: true })) {
-    const srcPath = path.join(srcDir, ent.name);
-    const destPath = path.join(destDir, ent.name);
-    if (ent.isDirectory()) {
-      if (!fs.existsSync(destPath)) fs.mkdirSync(destPath, { recursive: true });
-      syncDir(srcPath, destPath);
-    } else {
-      fs.mkdirSync(path.dirname(destPath), { recursive: true });
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
+fs.mkdirSync(publicMediaDir, { recursive: true });
+
+const manifestPath = path.join(mediaPkg, "src", "manifest.generated.json");
+if (!fs.existsSync(manifestPath)) {
+  console.warn("sync-media: manifest not found (run @brewery/media build first):", manifestPath);
+  process.exit(0);
 }
 
-fs.mkdirSync(publicMediaDir, { recursive: true });
-syncDir(assetsDir, publicMediaDir);
-console.log("sync-media: synced", assetsDir, "->", publicMediaDir);
+const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+const entries = Object.entries(manifest);
+
+for (const [key, value] of entries) {
+  const srcPath = path.join(assetsDir, key);
+  const publicPath = String(value.publicPath ?? "");
+  if (!publicPath.startsWith("/media/")) continue;
+  const relOut = publicPath.replace(/^\/media\//, "");
+  const destPath = path.join(publicMediaDir, relOut);
+
+  if (!fs.existsSync(srcPath)) {
+    console.warn("sync-media: missing source file:", srcPath);
+    continue;
+  }
+
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  fs.copyFileSync(srcPath, destPath);
+}
+
+console.log("sync-media: synced", entries.length, "assets ->", publicMediaDir);

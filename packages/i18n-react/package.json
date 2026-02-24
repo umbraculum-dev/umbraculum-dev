@@ -4,16 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.tsx src/next-intl.ts --format esm --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.tsx src/next-intl.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     },
     "./next-intl": {
       "types": "./dist/next-intl.d.ts",
+      "import": "./dist/next-intl.js",
+      "require": "./dist/next-intl.cjs",
       "default": "./dist/next-intl.js"
     }
   },

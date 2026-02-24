@@ -4,20 +4,26 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts src/tamagui/config.web.ts src/tamagui/config.native.ts --format esm --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.ts src/tamagui/config.web.ts src/tamagui/config.native.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     },
     "./tamagui-config-web": {
       "types": "./dist/tamagui/config.web.d.ts",
+      "import": "./dist/tamagui/config.web.js",
+      "require": "./dist/tamagui/config.web.cjs",
       "default": "./dist/tamagui/config.web.js"
     },
     "./tamagui-config-native": {
       "types": "./dist/tamagui/config.native.d.ts",
+      "import": "./dist/tamagui/config.native.js",
+      "require": "./dist/tamagui/config.native.cjs",
       "default": "./dist/tamagui/config.native.js"
     }
   },
@@ -25,6 +31,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@tamagui/animations-css": "^2.0.0-rc.11",
+    "@tamagui/animations-react-native": "^2.0.0-rc.11",
     "@tamagui/config": "^2.0.0-rc.7",
     "tamagui": "^2.0.0-rc.11"
   }

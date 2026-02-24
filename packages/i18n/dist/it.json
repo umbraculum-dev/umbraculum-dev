@@ -1,0 +1,1397 @@
+{
+  "common": {
+    "backToDashboard": "Torna alla Dashboard",
+    "loading": "Caricamento…",
+    "dateLabel": "Data",
+    "timeLabel": "Ora"
+  },
+  "units": {
+    "C": "°C",
+    "L": "L",
+    "count": "pz",
+    "g": "g",
+    "mL": "mL",
+    "kg": "kg",
+    "lovibond": "°L",
+    "LPerKg": "L/kg",
+    "LPerG": "L/g",
+    "ppm": "ppm",
+    "ppmAsCaCO3": "ppm come CaCO3",
+    "tsp": "cucch. da tè",
+    "pH": "pH"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "recipes": "Ricette",
+    "waterProfiles": "Profili acqua",
+    "equipment": "Attrezzatura",
+    "about": "Info",
+    "language": "Lingua",
+    "accessibility": "Accessibilità",
+    "login": "Accedi",
+    "logout": "Esci",
+    "signedInAs": "Accesso come",
+    "activeWorkspace": "Workspace attivo",
+    "switchWorkspace": "Cambia workspace",
+    "activeAccount": "Workspace attivo",
+    "switchAccount": "Cambia workspace",
+    "ariaPrimary": "Principale",
+    "ariaSession": "Sessione",
+    "menu": "Menu"
+  },
+  "ads": {
+    "ariaLabel": "Pubblicità",
+    "contactLine": "Contattaci per ospitare qui la tua pubblicità.",
+    "upgradeLine": "Passa a un piano a pagamento per rimuoverle."
+  },
+  "platformAds": {
+    "title": "Pubblicità piattaforma",
+    "subtitle": "Gestisci le pubblicità a livello piattaforma (web). Visibili su tutti gli account, salvo disattivazione per uno specifico workspace.",
+    "hint": "Suggerimento: per vedere i posizionamenti apri una pagina e fai un hard reload (lingua: {locale}).",
+    "globalBottomNote": "Nota: il posizionamento Globale: in basso è nascosto nella pagina di modifica ricetta per evitare salti di layout su mobile.",
+    "loading": "Caricamento…",
+    "notAuthorized": "Non sei autorizzato a gestire le pubblicità piattaforma.",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "create": "Crea pubblicità",
+    "creating": "Creazione…",
+    "listTitle": "Pubblicità",
+    "noAds": "Ancora nessuna pubblicità.",
+    "form": {
+      "placement": "Posizionamento",
+      "priority": "Priorità",
+      "imageUrl": "URL immagine",
+      "linkUrl": "URL link",
+      "altText": "Testo alt",
+      "isActive": "Attiva"
+    },
+    "placements": {
+      "globalTop": "Globale: in alto",
+      "globalBottom": "Globale: in basso",
+      "recipeEditAfterFermentables": "Modifica ricetta: dopo Fermentabili",
+      "recipeEditAfterHops": "Modifica ricetta: dopo Luppoli",
+      "recipeEditAfterYeast": "Modifica ricetta: dopo Lievito"
+    },
+    "table": {
+      "placement": "Posizionamento",
+      "imageUrl": "Immagine",
+      "linkUrl": "Link",
+      "active": "Attiva",
+      "actions": "Azioni",
+      "open": "Apri",
+      "yes": "sì",
+      "no": "no",
+      "delete": "Elimina",
+      "toggleActiveAria": "Attiva/disattiva la pubblicità {id}"
+    }
+  },
+  "platform": {
+    "navLabel": "Admin piattaforma",
+    "ads": "Pubblicità",
+    "recipes": "Ricette"
+  },
+  "platformRecipes": {
+    "title": "Import/export ricette piattaforma",
+    "subtitle": "Importa o esporta ricette per qualsiasi workspace. Seleziona prima un workspace.",
+    "loading": "Caricamento…",
+    "notAuthorized": "Non sei autorizzato a gestire le ricette piattaforma.",
+    "workspaceLabel": "Workspace",
+    "workspacePlaceholder": "Seleziona workspace…",
+    "workspaceRequired": "Seleziona un workspace per importare o esportare.",
+    "accountLabel": "Workspace",
+    "accountPlaceholder": "Seleziona workspace…",
+    "accountRequired": "Seleziona un workspace per importare o esportare.",
+    "exportSectionTitle": "Export (BeerJSON completo)",
+    "exportSingleLabel": "Esporta singola ricetta",
+    "exportSingleCta": "Scarica selezionata",
+    "exportBulkCta": "Esporta tutte le ricette",
+    "exportNoneAvailable": "Nessuna ricetta",
+    "exportFullNote": "L'export piattaforma include BeerJSON completo e recipeExtJson."
+  },
+  "equipment": {
+    "subtitle": "Profili attrezzatura (per account) usati dalle ricette (copia snapshot; nessun riferimento live).",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "backToRecipes": "Torna alle Ricette",
+    "listTitle": "Profili attrezzatura",
+    "noProfiles": "Ancora nessun profilo attrezzatura.",
+    "colName": "Nome",
+    "colKettleVol": "Volume kettle ({unit})",
+    "colMashEff": "Efficienza mash (%)",
+    "colActions": "Azioni",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "createTitle": "Aggiungi profilo attrezzatura",
+    "editTitle": "Modifica profilo attrezzatura",
+    "nameLabel": "Nome",
+    "kettleVolumeLitersLabel": "Volume kettle ({unit})",
+    "kettleLossesLitersLabel": "Perdite kettle ({unit})",
+    "kettleBoilEvaporationRatePercentPerHourLabel": "Evaporazione (% per ora)",
+    "kettleCoolingShrinkagePercentLabel": "Contrazione raffreddamento (%)",
+    "kettleHopsAbsorptionLitersLabel": "Assorbimento luppolo ({unit})",
+    "mashVolumeLitersLabel": "Volume mash ({unit})",
+    "mashEfficiencyPercentLabel": "Efficienza mash (%)",
+    "mashLossesLitersLabel": "Perdite mash ({unit})",
+    "mashThicknessLPerKgLabel": "Spessore mash ({unit})",
+    "mashGrainAbsorptionLPerKgLabel": "Assorbimento grani ({unit})",
+    "mashWaterLeftoverLitersLabel": "Acqua mash residua ({unit})",
+    "otherLossesLitersLabel": "Altre perdite non specificate ({unit})",
+    "create": "Crea",
+    "creating": "Creazione…",
+    "save": "Salva modifiche",
+    "saving": "Salvataggio…",
+    "cancel": "Annulla",
+    "sectionTitles": {
+      "kettle": "Kettle",
+      "mash": "Mash",
+      "misc": "Varie"
+    },
+    "errors": {
+      "nameRequired": "Il nome è obbligatorio.",
+      "notAuthenticated": "Non autenticato.",
+      "lossesMustBeNonNegative": "Questo valore deve essere ≥ 0.",
+      "percentRange": "La percentuale deve essere tra 0 e 100.",
+      "kettleVolumeMustBePositive": "Il volume del kettle deve essere > 0.",
+      "mashEfficiencyRange": "L’efficienza mash deve essere tra 0 e 100."
+    }
+  },
+  "inventory": {
+    "title": "Gestione inventario",
+    "subtitle": "Traccia fermentabili, luppoli, acidi, sali e altri materiali di produzione.",
+    "backToDashboard": "Torna alla Dashboard",
+    "addCustom": "Aggiungi personalizzato",
+    "addFromList": "Aggiungi da elenco",
+    "addFromListAdd": "Aggiungi",
+    "remove": "Rimuovi",
+    "clearSearch": "Svuota ricerca",
+    "producerLabel": "Produttore",
+    "lovibondLabel": "Colore ({unit})",
+    "yieldPercentLabel": "Resa (%)",
+    "ppgLabel": "PPG",
+    "alphaAcid": "Acidi alfa",
+    "alphaMinLabel": "α min (%)",
+    "alphaMaxLabel": "α max (%)",
+    "addCustomGuidance": "Aggiungi ingrediente personalizzato: per evitare duplicazioni, controlla attentamente che non sia già presente nell’elenco qui sopra (potrebbe avere un nome leggermente diverso). L’elenco esistente dovrebbe già comprendere tutti i tipi e sottotipi dell’ingrediente.",
+    "columns": {
+      "name": "Nome",
+      "producer": "Produttore",
+      "type": "Tipo",
+      "lovibondShort": "°L",
+      "yieldPercentShort": "Resa %",
+      "ppg": "PPG",
+      "alphaMin": "α min",
+      "alphaMax": "α max"
+    },
+    "sections": {
+      "fermentables": "Fermentabili",
+      "hops": "Luppoli",
+      "specialities": "Specialità",
+      "acidSalts": "Acidi e sali",
+      "detergentsSanitizers": "Detergenti e sanificanti",
+      "kegging": "Kegging & imbottigliamento"
+    },
+    "searchPlaceholder": "Cerca…",
+    "search": "Cerca nel database pubblico",
+    "noResultsTryAnotherKey": "Nessun risultato. Prova un’altra chiave.",
+    "pagination": {
+      "ariaLabel": "Paginazione ricerca inventario",
+      "prev": "Precedente",
+      "next": "Successivo",
+      "status": "Pagina {page} di {pages}"
+    },
+    "noItems": "Nessun articolo ancora.",
+    "quantityLabel": "Quantità ({unit})",
+    "nameLabel": "Nome"
+  },
+  "accessibility": {
+    "title": "Accessibilità",
+    "subtitle": "Regola contrasto, dimensione del testo e spaziatura. Salvato su questo dispositivo; se hai effettuato l’accesso, le impostazioni si sincronizzano anche con il tuo account.",
+    "loading": "Caricamento…",
+    "themePreset": "Tema",
+    "fontScale": "Dimensione testo",
+    "density": "Spaziatura",
+    "saving": "Salvataggio…",
+    "savingHint": "Le modifiche si applicano subito.",
+    "theme": {
+      "default": "Predefinito",
+      "hcDark": "Alto contrasto (scuro)",
+      "hcLight": "Alto contrasto (chiaro)"
+    },
+    "font": {
+      "sm": "Piccolo (90%)",
+      "md": "Normale (100%)",
+      "lg": "Grande (110%)",
+      "xl": "Molto grande (125%)"
+    },
+    "densityOptions": {
+      "comfortable": "Confortevole",
+      "compact": "Compatto"
+    },
+    "note": "Suggerimento: funziona anche lo zoom del browser e rispetta la lingua ({locale})."
+  },
+  "math": {
+    "toggleShow": "Mostra formule",
+    "toggleHide": "Nascondi formule",
+    "fxLabel": "Mostra formula: {topic}",
+    "common": {
+      "none": "(nessuno)",
+      "yes": "sì",
+      "no": "no",
+      "more": "(+{count} in più…)",
+      "ionLine": "- {ion}: {ppm} {ppmUnit}",
+      "saltLine": "- {salt}: {grams} {g}",
+      "detailLine": "- {label}: {value}"
+    },
+    "derivation": {
+      "headings": {
+        "formula": "Formula:",
+        "inputs": "Input:",
+        "intermediates": "Passi / intermedi:",
+        "breakdowns": "Dettagli:",
+        "notes": "Note:"
+      },
+      "common": {
+        "kvLine": "- {label}: {value}",
+        "ionDelta": "{ion} {ppm} {ppmUnit}",
+        "more": "(+{count} in più…)",
+        "yes": "sì",
+        "no": "no",
+        "null": "—",
+        "unknown": "sconosciuto",
+        "none": "(nessuno)",
+        "missing": "(ricalcola per vedere la derivazione)"
+      },
+      "labels": {
+        "volumeLiters": "Volume ({unit})",
+        "startingAlk": "Alcalinità iniziale ({unit})",
+        "startingPh": "pH iniziale",
+        "targetPh": "pH target/raggiunto",
+        "alkAfterSalts": "Alcalinità dopo i sali ({unit})",
+        "acidSulfateAddedPpm": "Solfato aggiunto dall'acido ({unit})",
+        "acidChlorideAddedPpm": "Cloruro aggiunto dall'acido ({unit})",
+        "mode": "Modalità",
+        "startingAlkalinityPpmCaCO3": "Alcalinità iniziale ({unit})",
+        "effectiveAlkalinityPpmCaCO3": "Alcalinità efficace ({unit})",
+        "alkalinityReductionFromCaMgPpmCaCO3": "Riduzione alcalinità da Ca/Mg ({unit})",
+        "acidRequired_mEqPerL": "Acido richiesto (mEq/L)",
+        "mMRequired_mmolPerL": "mM richiesti (mmol/L)",
+        "frac_equivalentsPerMole": "Equivalenti per mole (frazione)",
+        "sg_mgPerMl": "Densità soluzione (mg/mL)",
+        "acidType": "Tipo di acido",
+        "strengthKind": "Tipo concentrazione",
+        "strengthValue": "Valore concentrazione",
+        "breakdownSum": "Come si combinano i delta",
+        "base": {
+          "calciumPpm": "Ca base ({unit})",
+          "magnesiumPpm": "Mg base ({unit})",
+          "sodiumPpm": "Na base ({unit})",
+          "sulfatePpm": "SO4 base ({unit})",
+          "chloridePpm": "Cl base ({unit})",
+          "bicarbonatePpm": "HCO3 base ({unit})"
+        },
+        "mashWaterVolumeLiters": "Volume acqua mash ({unit})",
+        "spargeVolumeLiters": "Volume acqua sparge ({unit})",
+        "boilWaterVolumeLiters": "Volume acqua boil aggiuntiva ({unit})",
+        "mashLossesLiters": "Perdite mash ({unit})",
+        "mashWaterLeftoverLiters": "Acqua residua mash ({unit})",
+        "mashGrainAbsorptionLPerKg": "Assorbimento grani ({unit})",
+        "preBoilVolumeLiters": "Volume pre-boil ({unit})",
+        "boilTimeHours": "Tempo bollitura (ore)",
+        "evaporationRatePercentPerHour": "Evaporazione (% per ora)",
+        "coolingShrinkagePercent": "Ritiro raffreddamento (%)",
+        "kettleLossesLiters": "Perdite kettle ({unit})",
+        "otherLossesLiters": "Altre perdite ({unit})",
+        "kettleHopAbsorptionLiters": "Assorbimento luppolo ({unit})",
+        "kettleVolumeLiters": "Volume kettle ({unit})",
+        "efficiencyPercent": "Efficienza (%)",
+        "ogEstimatedSg": "Stima OG (SG)",
+        "pbgEstimatedSg": "Stima PBG (SG)",
+        "attenuationEffectivePercent": "Attenuazione effettiva (%)",
+        "fgEstimatedSg": "Stima FG (SG)",
+        "abvEstimatedPercent": "Stima ABV (%)",
+        "postBoilVolumeLiters": "Volume post-boil ({unit})",
+        "boilGravitySg": "Gravità boil (SG)",
+        "ibuTinsethEstimated": "IBU (Tinseth, stimata)",
+        "ibuRagerEstimated": "IBU (Rager, stimata)",
+        "mcu": "MCU",
+        "colorSrmMoreyEstimated": "SRM (Morey, stimato)",
+        "colorSrmDanielsEstimated": "SRM (Daniels, stimato)"
+      },
+      "rows": {
+        "saltDelta": "- {saltKey} ({grams} {g}): {deltas}"
+      },
+      "breakdowns": {
+        "salt_additions": {
+          "perSaltDeltas": {
+            "title": "Delta per sale (ppm)"
+          }
+        },
+        "mash_overall": {
+          "saltBreakdown": {
+            "title": "Contributi dei sali (delta per sale)"
+          }
+        },
+        "sparge_overall": {
+          "saltBreakdown": {
+            "title": "Contributi dei sali (delta per sale)"
+          }
+        },
+        "boil_overall": {
+          "saltBreakdown": {
+            "title": "Contributi dei sali (delta per sale)"
+          }
+        }
+      },
+      "notes": {
+        "generic": "- {note}",
+        "counterIonsOnlyStrongAcids": "Contro-ioni: solo l’acido solforico aggiunge SO4 e solo l’acido cloridrico aggiunge Cl. Con altri acidi questi valori sono 0."
+      },
+      "formulas": {
+        "water": {
+          "salt_additions": {
+            "v1": "ppm = mg/L\n\nPer ogni sale:\n- Converti grammi -> moli di sale\n- Usa la stechiometria per ottenere le moli di ogni gruppo ionico\n- Converti in mg di ogni gruppo ionico\n- Dividi per il volume (L) per ottenere ppm\n\nIoni finali = ioni base + somma(delta per sale)"
+          },
+          "acidification": {
+            "v1": "Risolviamo la quantità di acido che porta al pH target dato alcalinità e volume.\n\nRelazioni chiave (semplificate):\n- alcalinità_finale = alcalinità_efficace - acido_richiesto(mEq/L) × 50\n- acido_richiesto dipende dalla distribuzione dei carbonati + dissociazione dell’acido al pH target\n\nContro-ioni:\n- solforico aggiunge SO4\n- cloridrico aggiunge Cl"
+          },
+          "mash_overall": {
+            "v1": "Ioni complessivi = ioni(dopo sali) + contro-ioni dell’acido, e HCO3 è derivato dall’alcalinità finale.\n\nCombina:\n- aggiunta sali (bilancio di massa su ppm)\n- acidificazione (alcalinità finale + contro-ioni SO4/Cl)"
+          },
+          "sparge_overall": {
+            "v1": "Ioni complessivi = ioni(dopo sali) + contro-ioni dell’acido, e HCO3 è derivato dall’alcalinità finale."
+          },
+          "boil_overall": {
+            "v1": "Ioni complessivi = ioni(dopo sali) + contro-ioni dell’acido, e HCO3 è derivato dall’alcalinità finale."
+          }
+        },
+        "analysis": {
+          "pre_boil_volume": {
+            "v1": "volume_pre_boil = acqua_mash + acqua_sparge - assorbimento_grani - perdite_mash - residuo + aggiunte_boil"
+          },
+          "kettle_volume": {
+            "v1": "volume_kettle = raffreddato(volume_post_boil_hot(volume_pre_boil)) - perdite_kettle - assorbimento_luppolo - altre_perdite"
+          },
+          "og": {
+            "v1": "OG stimata da resa fermentabili, efficienza (%) e volume kettle."
+          },
+          "pbg": {
+            "v1": "PBG stimata da resa fermentabili, efficienza (%) e volume pre-boil."
+          },
+          "attenuation": {
+            "v1": "Attenuazione effettiva = media delle 2 attenuazioni lievito più alte (override prioritari)."
+          },
+          "fg": {
+            "v1": "FG = 1 + (OG - 1) × (1 - attenuazione/100)"
+          },
+          "abv": {
+            "v1": "ABV% = (OG - FG) × 131,25"
+          },
+          "ibu_tinseth": {
+            "v1": "IBU Tinseth calcolata da aggiunte luppolo, utilizzo, gravità boil e volume."
+          },
+          "ibu_rager": {
+            "v1": "IBU Rager calcolata da aggiunte luppolo, utilizzo, gravità boil e volume."
+          },
+          "mcu": {
+            "v1": "MCU (Malt Color Units) = Σ(lb × °L) / gal, usando il volume post-boil/kettle."
+          },
+          "srm_morey": {
+            "v1": "SRM (Morey) = 1,4922 × MCU^0,6859"
+          },
+          "srm_daniels": {
+            "v1": "SRM (Daniels) ≈ 0,2 × MCU + 8,4"
+          }
+        }
+      }
+    },
+    "analysis": {
+      "common": {
+        "toggleHint": "Si applica a tutte le sezioni di questa pagina (dove disponibile).",
+        "sources": {
+          "kettleVolume": "volume kettle",
+          "batchSize": "batch size BeerJSON",
+          "pbg": "PBG",
+          "og": "OG",
+          "unknown": "sconosciuto"
+        },
+        "hopUse": {
+          "boil": "boil",
+          "whirlpool": "whirlpool (0,5×)",
+          "dryhop": "dry hop"
+        },
+        "excludeDryhop": "il dry hop non contribuisce all’IBU",
+        "excludeMissingInputs": "mancano quantità/AA%/tempo",
+        "hopLine": "- {name}: {use}, {amountG} g @ {alpha}% AA, {timeMin} min",
+        "hopLineExcluded": "- {name}: escluso ({reason})",
+        "noHops": "(nessun luppolo nell’editor)",
+        "yeastSource": {
+          "override": "override",
+          "beerjson": "BeerJSON",
+          "missing": "mancante"
+        },
+        "yeastLine": "- {name}: {value}% ({source})",
+        "yeastSelectedLine": "- {name}: {value}%",
+        "noYeast": "(nessun lievito nell’editor)",
+        "noYeastSelected": "(attenuazione lievito non disponibile)",
+        "noteDependsOnWaterAndEquipment": "Dipende da impostazioni acqua salvate e snapshot attrezzatura.",
+        "noteMissingWaterSettings": "Impostazioni acqua salvate mancanti; i volumi stimati potrebbero non essere disponibili.",
+        "noteMissingFermentableColors": "Colore fermentabile (Lovibond) mancante su una o più righe."
+      },
+      "abv": {
+        "title": "ABV (stimata)",
+        "body": "Formula:\nABV = (OG - FG) × 131,25\n\nQuesta ricetta:\nOG = {og}\nFG = {fg}\nABV = {abv}%\n\nNote:\n- OG/FG sono stime derivate (non misurate)."
+      },
+      "ibuTinseth": {
+        "title": "IBU (Tinseth, stimata)",
+        "body": "Modello (Tinseth):\nU = 1,65 × 0,000125^(G - 1) × (1 - e^(-0,04 × t)) / 4,15\nIBU = Σ (g × (AA%/100) × U × 1000 / V_L)\n\nQuesta ricetta:\nGravità usata (SG) = {gravity} ({gravitySource})\nVolume usato (L) = {volume} ({volumeSource})\n\nAggiunte luppolo (dall’editor):\n{hopsLines}\n\nRisultato:\nIBU (Tinseth) = {ibu}"
+      },
+      "ibuRager": {
+        "title": "IBU (Rager, stimata)",
+        "body": "Modello (Rager):\nU% ≈ 18,11 + 13,86 × tanh((t - 31,32) / 18,27)\nCorrezione gravità (se G > 1,050): GA = (G - 1,050) / 0,2\nIBU = Σ (g × (AA%/100) × (U%/(1+GA)) × 1000 / V_L)\n\nQuesta ricetta:\nGravità usata (SG) = {gravity} ({gravitySource})\nVolume usato (L) = {volume} ({volumeSource})\n\nAggiunte luppolo (dall’editor):\n{hopsLines}\n\nRisultato:\nIBU (Rager) = {ibu}"
+      },
+      "srmMorey": {
+        "title": "Colore (SRM, Morey, stimato)",
+        "body": "Modello (Morey):\nMCU = Σ (lb × °L) / gal\nSRM = 1,4922 × MCU^0,6859\n\nQuesta ricetta:\nVolume kettle usato = {volume} L\nNote:\n- {notes}\n\nRisultato:\nSRM (Morey) = {srm}"
+      },
+      "srmDaniels": {
+        "title": "Colore (SRM, Daniels, stimato)",
+        "body": "Modello (Daniels, lineare):\nMCU = Σ (lb × °L) / gal\nSRM ≈ 0,2 × MCU + 8,4\n\nQuesta ricetta:\nVolume kettle usato = {volume} L\nNote:\n- {notes}\n\nRisultato:\nSRM (Daniels) = {srm}"
+      },
+      "kettleVolume": {
+        "title": "Volume (kettle)",
+        "body": "Questo valore è derivato da impostazioni acqua salvate e perdite/evaporazione dell’attrezzatura.\n\nQuesta ricetta:\nVolume kettle = {kettleVolume} L\n\nNote:\n- {notes}"
+      },
+      "preBoilVolume": {
+        "title": "Volume pre-boil (stimato)",
+        "body": "Questo valore è derivato da impostazioni acqua salvate e perdite dell’attrezzatura.\n\nQuesta ricetta:\nVolume pre-boil = {preBoilVolume} L\n\nNote:\n- {notes}"
+      },
+      "og": {
+        "title": "OG (stimata)",
+        "body": "L’OG è stimata da potenziale fermentabili + volume + efficienza.\n\nQuesta ricetta:\nOG = {og}\nVolume (kettle) = {volume} L\nEfficienza usata = {efficiency}%\n\nNote:\n- Se mancano efficienza/fermentabili, l’OG può non essere disponibile."
+      },
+      "fg": {
+        "title": "FG (stimata)",
+        "body": "Formula:\nFG = 1 + (OG - 1) × (1 - Attenuazione/100)\n\nQuesta ricetta:\nOG = {og}\nAttenuazione = {attenuation}%\nFG = {fg}"
+      },
+      "attenuation": {
+        "title": "Attenuazione (effettiva)",
+        "body": "Modello:\n- Per ogni lievito: usa override% se presente, altrimenti attenuazione BeerJSON (media(min,max) se disponibile).\n- Attenuazione effettiva = media dei 2 valori effettivi più alti.\n\nQuesta ricetta:\nTutti i lieviti:\n{yeastLines}\n\nSelezionati (top 2):\n{selectedLines}\n\nMedia top-2 = {topAvg}%\nAttenuazione effettiva = {attenuation}%"
+      },
+      "pbg": {
+        "title": "PBG (gravità pre-boil, stimata)",
+        "body": "La PBG è stimata come l’OG, ma usando il volume pre-boil.\n\nQuesta ricetta:\nPBG = {pbg}\nVolume pre-boil = {preBoilVolume} L\nEfficienza usata = {efficiency}%\n\nNote:\n- Richiede volumi acqua salvati per stimare il volume pre-boil."
+      }
+    },
+    "yeast": {
+      "estimatedCells": {
+        "title": "Cellule stimate necessarie (B)",
+        "body": "cells_B = batch_size_L × OG_plato × pitch_rate\n\nDove:\n- batch_size_L: volume kettle/batch in litri\n- OG_plato: gravità originale convertita in °Plato\n- pitch_rate: milioni di cellule per mL per °Plato (es. 0,75 per Pro Brewer 0,75 Ales)\n\nB = miliardi di cellule.\n\nNota: Quando 'Usa conta manuale per densità sospensione e vitalità (da cellule vive/totali)' è attivo per la sospensione (selezionando gli input nella sua sezione), 'Cellule stimate necessarie (B)' non cambia. Solo la densità della sospensione (e quindi Quantità L) deriva dalla conta manuale."
+      },
+      "amountL": {
+        "title": "Quantità (L) per liquido/sospensione",
+        "body": "quantità_L = cells_B / cells_per_L\n\nDove cells_B deriva da batch × OG × pitch rate (invariato dalla funzione di conta manuale) poi cells_per_L è la densità sospensione/liquido in miliardi per litro.\n\nQuando 'Usa conta manuale' è attivo per la sospensione, cells_per_L si deriva da: cellule vive × 5 × DF × 10.000 → cellule vive/g; poi B/L = cellule vive/g × 1000 / 1e9. Questo influenza direttamente la Quantità (L)."
+      },
+      "manualCountViability": {
+        "title": "Vitalità % calcolata",
+        "body": "vitalità_% = (cellule vive / cellule totali) × 100\n\nDove cellule vive e totali sono i conteggi grezzi dai cinque quadrati dell'emocitometro.\n\nVedi Metodologia conta manuale (emocitometro) sotto per la procedura completa."
+      },
+      "manualCountLiveCellsPerGram": {
+        "title": "Cellule vive per grammo di sospensione (calcolate)",
+        "body": "cellule vive/g = cellule vive × 5 × DF × 10.000\n\nDove cellule vive è il conteggio grezzo delle cellule vive, DF è il fattore di diluizione (200× o 2000×).\n\nVedi Metodologia conta manuale (emocitometro) sotto per la procedura completa."
+      },
+      "manualCountAliveInfluence": {
+        "title": "Influisce sulla Quantità (L) da inoculare",
+        "body": "Le cellule vive influenzano direttamente la Quantità (L): vengono usate per derivare le cellule/L dalla conta manuale (cells_per_L = cellule vive × DF × 0,05)."
+      },
+      "manualCountTotalInfluence": {
+        "title": "Non influenza la Quantità (L)",
+        "body": "Le cellule totali non influenzano direttamente la Quantità (L). Servono a calcolare la vitalità (cellule vive/totali × 100). Una vitalità bassa richiede una verifica attenta della vitalità/attività del lievito."
+      }
+    },
+    "sparge": {
+      "acidRequired": {
+        "title": "Acido necessario (pH target)",
+        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, dato alcalinità iniziale e volume.\n\nNote:\n- Se il profilo selezionato non ha il pH, usiamo solo il pH iniziale inserito manualmente.\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico: usa come guida, poi misura e correggi.",
+        "bodyWithValues": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, dato alcalinità iniziale e volume.\n\nQuesta ricetta:\npH iniziale = {startingPh}\npH target = {targetPh}\nAlcalinità iniziale = {startingAlk} ppm come CaCO3\nVolume = {volumeL} L\nIl profilo selezionato ha pH = {profilePhKnown}\n\nRisultato:\n{detailsLines}\n\nNote:\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico: usa come guida, poi misura e correggi."
+      },
+      "finalAlkalinity": {
+        "title": "Alcalinità finale (ppm come CaCO3)",
+        "body": "Significato:\n- Alcalinità dopo l’aggiunta di acido calcolata.\n\nNote:\n- Può essere vicina a 0 quando l’acido neutralizza la capacità tampone.\n- Riportiamo in ppm come CaCO3 (convenzione standard).",
+        "bodyWithValues": "Significato:\n- Alcalinità dopo l’aggiunta di acido calcolata.\n\nQuesta ricetta:\nAlcalinità iniziale = {startingAlk} ppm come CaCO3\nAlcalinità finale = {finalAlk} ppm come CaCO3\n\nNote:\n- Può essere vicina a 0 quando l’acido neutralizza la capacità tampone.\n- Riportiamo in ppm come CaCO3 (convenzione standard)."
+      },
+      "ionsAfterSalts": {
+        "title": "Ioni risultanti (solo sali)",
+        "body": "Significato:\n- Partendo dal profilo acqua di sparge selezionato, aggiungiamo gli ioni dovuti ai grammi di sali inseriti sul volume di sparge.\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione.",
+        "bodyWithValues": "Significato:\n- Partendo dal profilo acqua di sparge selezionato, aggiungiamo gli ioni dovuti ai grammi di sali inseriti sul volume di sparge.\n\nQuesta ricetta:\nVolume = {volumeL} L\n\nSali:\n{saltsLines}\n\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione."
+      },
+      "ionsAfterSaltsAndAcid": {
+        "title": "Ioni risultanti (sali + acido)",
+        "body": "Significato:\n- Come “solo sali”, poi applichiamo il risultato dell’acido.\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato.",
+        "bodyWithValues": "Significato:\n- Come “solo sali”, poi applichiamo il risultato dell’acido.\n\nQuesta ricetta:\nVolume = {volumeL} L\nAlcalinità finale = {finalAlk} ppm come CaCO3\n\nSali:\n{saltsLines}\n\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      },
+      "alkalinityHeuristic": {
+        "title": "Euristica: Ca/Mg riducono l’alcalinità efficace",
+        "body": "Applichiamo un aggiustamento stile alcalinità residua:\n- Calcio e magnesio dai sali riducono leggermente l’alcalinità efficace, quindi l’acido necessario può cambiare un po’ quando si aggiungono sali.\n\nNote:\n- L’effetto è volutamente modesto; migliora il realismo senza sovra-adattare.",
+        "bodyWithValues": "{note}"
+      }
+    },
+    "mash": {
+      "acidRequired": {
+        "title": "Acido necessario (pH target)",
+        "body": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, data alcalinità iniziale e volume acqua di mash.\n\nNote:\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico: usa come guida, poi misura e correggi.",
+        "bodyWithValues": "Modello concettuale:\n- Risolviamo la quantità di acido che porta il pH da Iniziale a Target, data alcalinità iniziale e volume acqua di mash.\n\nQuesta ricetta:\npH iniziale = {startingPh}\npH target = {targetPh}\nAlcalinità iniziale = {startingAlk} ppm come CaCO3\nVolume acqua mash = {volumeL} L\n\nRisultato:\n{detailsLines}\n\nNote:\n- Tipo/concentrazione dell’acido cambiano la conversione in mL/grammi.\n- Calcolatore euristico: usa come guida, poi misura e correggi."
+      },
+      "finalAlkalinity": {
+        "title": "Alcalinità finale (ppm come CaCO3)",
+        "body": "Significato:\n- Alcalinità dopo l’aggiunta di acido calcolata.\n\nNote:\n- Può essere vicina a 0 quando l’acido neutralizza la capacità tampone.\n- Riportiamo in ppm come CaCO3 (convenzione standard).",
+        "bodyWithValues": "Significato:\n- Alcalinità dopo l’aggiunta di acido calcolata.\n\nQuesta ricetta:\nAlcalinità iniziale = {startingAlk} ppm come CaCO3\nAlcalinità finale = {finalAlk} ppm come CaCO3\n\nNote:\n- Può essere vicina a 0 quando l’acido neutralizza la capacità tampone.\n- Riportiamo in ppm come CaCO3 (convenzione standard)."
+      },
+      "ionsAfterSalts": {
+        "title": "Ioni risultanti (solo sali)",
+        "body": "Significato:\n- Partendo dall’acqua di partenza miscelata, aggiungiamo gli ioni dovuti ai grammi di sali inseriti.\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione.\n- Questa tabella non include l’acido; vedi il risultato complessivo per l’output combinato.",
+        "bodyWithValues": "Significato:\n- Partendo dall’acqua di partenza miscelata, aggiungiamo gli ioni dovuti ai grammi di sali inseriti.\n\nQuesta ricetta:\nVolume acqua mash = {volumeL} L\n\nSali:\n{saltsLines}\n\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione.\n- Questa tabella non include l’acido; vedi il risultato complessivo per l’output combinato."
+      },
+      "overallSnapshot": {
+        "title": "Snapshot complessivo mash (sali + acido)",
+        "body": "Significato:\n- Risultato combinato dopo l’applicazione di sali e acido.\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato.",
+        "bodyWithValues": "Significato:\n- Risultato combinato dopo l’applicazione di sali e acido.\n\nQuesta ricetta:\npH = {ph}\nVolume acqua mash = {volumeL} L\nAlcalinità finale = {finalAlk} ppm come CaCO3\n\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      }
+    },
+    "boil": {
+      "ionsAfterSalts": {
+        "title": "Ioni risultanti (solo sali)",
+        "body": "Significato:\n- Partendo dall’acqua di partenza miscelata, aggiungiamo gli ioni dovuti ai grammi di sali inseriti.\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione.",
+        "bodyWithValues": "Significato:\n- Partendo dall’acqua di partenza miscelata, aggiungiamo gli ioni dovuti ai grammi di sali inseriti.\n\nQuesta ricetta:\nVolume acqua bollitura = {volumeL} L\n\nSali:\n{saltsLines}\n\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- I valori sono in ppm (mg/L) per ciascun ione."
+      },
+      "overallSnapshot": {
+        "title": "Snapshot complessivo bollitura (sali + acido)",
+        "body": "Significato:\n- Risultato combinato dopo l’applicazione di sali e acido.\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato.",
+        "bodyWithValues": "Significato:\n- Risultato combinato dopo l’applicazione di sali e acido.\n\nQuesta ricetta:\npH = {ph}\nAlcalinità finale = {finalAlk} ppm come CaCO3\n\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- Gli aumenti di SO4/Cl dipendono dal contro-ione dell’acido (se applicabile).\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      }
+    },
+    "waterHub": {
+      "mergedWaterRecap": {
+        "title": "Riepilogo acqua unificato",
+        "body": "Significato:\n- Questa sezione riassume ogni flusso (mash/sparge/acqua aggiuntiva in bollitura) e il riepilogo unificato.\n\nNote:\n- Il pH unificato è una stima (media volumetrica di [H+], regola pratica).\n- I flussi senza snapshot salvati sono esclusi dagli ioni unificati.",
+        "bodyWithValues": "Significato:\n- Questa sezione riassume ogni flusso (mash/sparge/acqua aggiuntiva in bollitura) e il riepilogo unificato.\n\nQuesta ricetta:\nVolume totale = {totalVolumeL} {L}\npH unificato (stima) = {mergedPh}\nAlcalinità finale unificata = {mergedFinalAlk} {ppmAsCaCO3}\n\nFlussi:\n{streamLines}\n\nNote:\n- Il pH unificato è una stima (media volumetrica di [H+], regola pratica).\n- I flussi senza snapshot salvati sono esclusi dagli ioni unificati.",
+        "streamLine": "- {label}: {volumeL} {L}, pH {ph}, alc {alk} {ppmAsCaCO3}"
+      },
+      "mergedIons": {
+        "title": "Ioni unificati (ppm)",
+        "body": "Significato:\n- Calcolati dagli snapshot salvati di mash/sparge/bollitura dopo sali + acido (solo contro-ioni SO4/Cl) e mediati per volume.\n\nNote:\n- I flussi senza snapshot salvati sono esclusi.\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato.",
+        "bodyWithValues": "Significato:\n- Calcolati dagli snapshot salvati di mash/sparge/bollitura dopo sali + acido (solo contro-ioni SO4/Cl) e mediati per volume.\n\nQuesta ricetta:\nIoni ({ppm}):\n{ionsLines}\n\nNote:\n- I flussi senza snapshot salvati sono esclusi.\n- HCO3 è derivato dall’alcalinità (proxy), non bicarbonato misurato."
+      }
+    }
+  },
+  "recipes": {
+    "title": "Ricette",
+    "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",
+    "import": {
+      "title": "Importa ricetta",
+      "subtitle": "Importa un file e crea una nuova ricetta nel tuo account.",
+      "cta": "Importa da BeerJSON / BeerXML",
+      "loading": "Caricamento…",
+      "backToRecipes": "Torna alle Ricette",
+      "singleHeading": "Importa ricetta singola",
+      "singleSubtitle": "Importa un singolo file ricetta nel tuo account (scegli tu lo stile).",
+      "legendTitle": "Note import",
+      "unitsNote": "Unità: sono accettate unità metriche e US customary. I galloni imperiali (UK) non sono ancora supportati.",
+      "customImportNote": "Hai bisogno di galloni imperiali (UK) o dell’import di un altro sistema?",
+      "customImportCta": "Contattaci per un import personalizzato a un costo accessibile.",
+      "bulkHeading": "Import massivo (più ricette)",
+      "bulkSubtitle": "Importa un file che contiene più ricette e creale tutte in una volta.",
+      "fileHeading": "File",
+      "fileLabel": "File ricetta (BeerJSON .json o BeerXML .xml)",
+      "filePicked": "Selezionato: {name}",
+      "fileNotPicked": "Nessun file selezionato.",
+      "formatLabel": "Formato",
+      "formatAuto": "Auto",
+      "formatBeerJson": "BeerJSON (.json)",
+      "formatBeerXml": "BeerXML (.xml)",
+      "formatResolved": "Formato rilevato: {format}",
+      "formatNotResolved": "Impossibile rilevare il formato dal nome file. Seleziona un formato sopra.",
+      "styleLabel": "Stile",
+      "bulkStyleRule": "L’import massivo associa lo stile a BJCP 2021 prima per nome esatto, poi per codice. Se non c’è corrispondenza, assegniamo Personalizzato.",
+      "preview": "Anteprima",
+      "previewing": "Anteprima…",
+      "reset": "Reset",
+      "previewHeading": "Anteprima",
+      "previewNameLabel": "Nome",
+      "previewNotesLabel": "Note",
+      "bulkPreviewHeading": "Anteprima massiva",
+      "resolvedStyleLabel": "Stile risolto",
+      "customStyleName": "Personalizzato",
+      "customStyleCode": "custom",
+      "warningsHeading": "Avvisi",
+      "noWarnings": "Nessun avviso.",
+      "import": "Importa ricetta",
+      "importing": "Importazione…",
+      "bulkCreatedHeading": "Ricette create",
+      "bulkCreatedCount": "{count} create",
+      "bulkNoneCreated": "Non è stata creata nessuna ricetta.",
+      "bulkFailedHeading": "Import falliti",
+      "dash": "—",
+      "unknownWarningCode": "avviso",
+      "errors": {
+        "notAuthenticated": "Non autenticato.",
+        "noActiveAccount": "Nessun account attivo selezionato.",
+        "noContent": "Seleziona prima un file.",
+        "unknownFormat": "Formato sconosciuto. Seleziona BeerJSON o BeerXML.",
+        "previewMissing": "La risposta di anteprima non contiene i dati attesi.",
+        "styleRequired": "Lo stile è obbligatorio.",
+        "importMissingId": "La risposta di import non contiene l’id ricetta.",
+        "fileTooLarge": "File troppo grande. Dimensione massima: {max}.",
+        "fileTooLargeHelp": "Se riscontri questo errore, prova a dividere il file in parti più piccole. Gli utenti con piano a pagamento possono contattare il nostro supporto per assistenza."
+      }
+    },
+    "brewSessions": {
+      "listTitle": "Sessioni di brew",
+      "detailTitle": "Sessione di brew",
+      "backToRecipeEdit": "Torna a visualizza/modifica ricetta",
+      "backToSessions": "Torna alle sessioni di brew",
+      "createButton": "Crea sessione di brew",
+      "creating": "Creazione…",
+      "refresh": "Aggiorna",
+      "loading": "Caricamento…",
+      "empty": "Nessuna sessione di brew per ora.",
+      "statusLine": "Stato: {status}",
+      "sessionTimerLine": "Timer sessione: {elapsed}",
+      "sessionPausedAtLine": "In pausa alle: {at}",
+      "sessionStoppedAtLine": "Fermata alle: {at}",
+      "sessionCode": "Codice sessione",
+      "recipeLine": "Ricetta: {name} - Versione {version}",
+      "working": "In corso…",
+      "startSession": "Avvia sessione di brew",
+      "resumeSession": "Riprendi sessione di brew",
+      "pauseSession": "Pausa",
+      "stopSession": "Segna sessione come completata",
+      "sectionStatusPending": "In attesa",
+      "sectionStatusInProgress": "In corso",
+      "sectionStatusDone": "Completata",
+      "sectionStatusForcedFinished": "Forzata come completata",
+      "sessionAutoFinishedAtLine": "Sessione segnata automaticamente come completata il: {at}",
+      "sessionManualFinishedAtLine": "Sessione segnata manualmente come completata il: {at}",
+      "logsTitle": "Log",
+      "addCustomStepTitle": "Aggiungi nuovo step personalizzato per la ricetta corrente",
+      "stepNameLabel": "Nome",
+      "stepNamePlaceholder": "Inserisci nome step",
+      "assignedSectionLabel": "Sezione",
+      "minutesPlannedLabel": "Minuti",
+      "addStepButton": "Aggiungi step",
+      "saveSuccess": "Salvato.",
+      "saveStepsButton": "Salva sessione brewing",
+      "saving": "Salvataggio…",
+      "noteSaveSteps": "Le modifiche di riordino/disabilitazione vengono salvate quando salvi la sezione brewing.",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "stepStatusLabel": "Stato",
+      "statusPending": "In attesa",
+      "statusDone": "Fatto",
+      "statusSkipped": "Saltato",
+      "statusNotApplicable": "Non applicabile",
+      "disableStepLabel": "Disabilita",
+      "disableNo": "No",
+      "disableYes": "Sì",
+      "stepNoteLabel": "Nota",
+      "saveLogButton": "Salva log",
+      "removeStepButton": "Rimuovi step",
+      "removeStepRemoving": "Rimozione…",
+      "removeStepSuccess": "Step rimosso da questa sessione di brassaggio.",
+      "deleteSessionButton": "Elimina sessione di brewing",
+      "deleteSessionConfirm": "Questo eliminerà definitivamente questa sessione di brewing (inclusi step e log).",
+      "confirmDelete": "Conferma eliminazione",
+      "cancelDelete": "Annulla",
+      "deleting": "Eliminazione…",
+      "timerLine": "Timer: trascorso {elapsed} · pianificato {planned} min",
+      "countdownLine": "rimanente {remaining}",
+      "relativeToLabel": "Relativo a",
+      "relativeToNone": "(nessuno)",
+      "offsetFromEndLabel": "Offset dalla fine (min)",
+      "relativeRemainingBeforeStartLine": "Rimanente prima dell'inizio step: {remaining}",
+      "relativeOverdueByLine": "In ritardo di: {overdue}",
+      "pleaseSaveModifications": "Per favore salva le modifiche.",
+      "timerStart": "Start",
+      "timerPause": "Pausa",
+      "timerStop": "Stop",
+      "startTimerForSection": "Avvia timer per sezione",
+      "startMashTimerMin": "Avvia timer mash ({minutes})",
+      "startBoilTimerMin": "Avvia timer bollitura ({minutes})",
+      "activateCustomTimerLabel": "Attiva timer personalizzato",
+      "dateSectionTitle": "Data",
+      "datePickerLabel": "Data e ora programmate",
+      "dateLabel": "Data",
+      "timeLabel": "Ora",
+      "dateSave": "Salva",
+      "dateRemove": "Rimuovi",
+      "dateEdit": "Modifica data",
+      "dateAdd": "Aggiungi data",
+      "dateCancel": "Annulla",
+      "dateNotSet": "Nessuna data impostata",
+      "dateScheduledLabel": "Programmato"
+    },
+    "edit": {
+      "title": "Visualizza e modifica ricetta",
+      "loading": "Caricamento…",
+      "shapeNote": "Editor a pagina singola con navigazione per sezioni. La chimica dell’acqua apre il calcolatore dedicato.",
+      "notReadyToLoad": "Non pronto per caricare questa ricetta.",
+      "status": {
+        "saved": "Salvato.",
+        "equipmentApplied": "Attrezzatura applicata e analisi aggiornata.",
+        "equipmentReloaded": "Attrezzatura ricaricata e analisi aggiornata."
+      },
+      "nav": {
+        "sectionsAriaLabel": "Sezioni ricetta",
+        "sectionsTitle": "Sezioni",
+        "openWaterCalculator": "Apri calcolatore acqua",
+        "editYeast": "Modifica lievito",
+        "openEquipment": "Apri attrezzatura",
+        "backToRecipes": "Torna alle Ricette"
+      },
+      "sections": {
+        "basics": "Basi",
+        "analysis": "Analisi",
+        "brewingHistory": "Storico brassaggi",
+        "brew": "Brew",
+        "equipment": "Attrezzatura",
+        "mashing": "Ammostamento e Sparge",
+        "fermentables": "Fermentabili",
+        "hops": "Luppoli",
+        "yeast": "Lieviti, Nutrienti, Batteri",
+        "other": "Altri ingredienti",
+        "boil": "Bollitura",
+        "notes": "Note",
+        "water": "Chimica dell'acqua e volumi"
+      },
+      "hops": {
+        "timeBeforeEndOfBoilMin": "Minuti prima della fine della bollitura (min)",
+        "typeLabel": "Tipo",
+        "typeOptions": {
+          "pellet": "Pellet",
+          "leaf": "Cono/Intero (secco)",
+          "leafWet": "Cono/Intero (fresco)",
+          "powder": "Lupulina (pellet)",
+          "extract": "Estratto",
+          "hopExtract": "Estratto di luppolo",
+          "plug": "Plugs",
+          "debitteredLeaf": "Foglia deamaricata"
+        }
+      },
+      "mashingHelp": "Programma di ammostamento (procedura mash BeerJSON). Importa una ricetta BeerJSON/BeerXML con step mash o aggiungili manualmente nelle pagine calcolatore acqua Mash e/o Sparge.",
+      "mashingEmpty": "Nessuno step di ammostamento. Aggiungi step o importa una ricetta con programma mash.",
+      "mashingAddStep": "Aggiungi step",
+      "mashingAddFromTemplate": "Aggiungi da modello",
+      "mashingTemplateSingleInfusion": "Infusione singola",
+      "mashingTemplateStepMash": "Step mash",
+      "mashingTemplateTemperature": "Temperatura",
+      "mashingTemplateDecoction": "Decozione",
+      "mashingProcedureName": "Nome procedura",
+      "mashingGrainTemp": "Temp. grani",
+      "mashingStepName": "Nome",
+      "mashingStepType": "Tipo",
+      "mashingStepTemp": "Temp ({unit})",
+      "mashingStepTime": "Tempo ({unit})",
+      "mashingStepAmount": "Quantità ({unit})",
+      "mashingStepRamp": "Rampa ({unit})",
+      "mashingDeleteStep": "Elimina step",
+      "mashingDeduceFromMashIn": "Deduci da Mash in",
+      "mashingSave": "Salva (inclusa mash)",
+      "mashingSaveMashSteps": "Salva",
+      "mashingEditInMashPage": "Modifica programma mash in Acqua mash e Step mash",
+      "spargeStepFromWaterPage": "Step sparge (da pagina Acqua sparge)",
+      "spargeStepConfigureLink": "Configura acqua sparge",
+      "mashingWaterVolumesTitle": "Volumi acqua (mash + sparge)",
+      "mashingWaterVolumesSource": "Dal calcolatore acqua",
+      "mashingWaterVolumesUnavailable": "Configura i volumi acqua nel Calcolatore acqua per vedere i volumi mash e sparge qui.",
+      "mashingFirstStepSuggested": "Suggerito: {amount} {unit} (dal volume acqua mash)",
+      "mashingSpargeStepAmountSource": "Dal calcolatore acqua",
+      "mashStepsWaterBudgetNote": "L'acqua totale di tutti gli step mash non può superare il 'Volume acqua mash [totale]' sopra. Solo gli step con 'Deduci da Mash in' selezionato deducono dal volume acqua mash. Utile per i birrai che usano acqua calda per aumentare la temperatura.",
+      "mashStepsMashInAlwaysPresentNote": "Lo step \"Mash in\" è sempre presente per design: garantisce la correttezza della quantità totale. Se serve uno step successivo immediato (es. 'Protein rest') usa il pulsante \"Aggiungi step\" e aggiungilo. Puoi avere un nuovo step con quantità 0.",
+      "mashStepsTypeFallbackNote": "Se non trovi lo step mash che cerchi nell'elenco 'Tipo' usa 'Temperature' e aggiungi il nome (es. 'Protein rest' o 'Ferulic rest') nel campo 'Nome'.",
+      "mashStepsSeeRecapLink": "Vedi riepilogo mash nel riepilogo ricetta qui.",
+      "mashingSpargeStepAmountUnavailable": "Configura i volumi acqua nel Calcolatore acqua",
+      "mashingTemplateSparge": "Sparge",
+      "equipmentSection": {
+        "help": "Scegli un profilo attrezzatura (per account) da copiare nella ricetta (nessun riferimento live).",
+        "profileLabel": "Profilo attrezzatura",
+        "noneOption": "(nessuno)",
+        "apply": "Applica alla ricetta",
+        "reload": "Ricarica profilo attrezzatura e ricalcola",
+        "working": "In corso…",
+        "manageTemplatesText": "Gestisci i profili attrezzatura in",
+        "manageTemplatesLinkText": "Attrezzatura",
+        "errors": {
+          "selectFirst": "Seleziona prima un profilo attrezzatura."
+        }
+      },
+      "basicsHelp": "Caricamento/salvataggio via GET/PATCH /api/recipes/:id.",
+      "versionLabel": "Versione",
+      "versionCreateNote": "Questo crea una nuova versione della ricetta (clonando la ricetta corrente): la vecchia versione può comunque essere modificata.",
+      "versionCreateButton": "Crea un'altra versione dalla ricetta corrente",
+      "versionCreateWorking": "Creazione versione…",
+      "versionLimitReached": "Limite versioni raggiunto (00–99).",
+      "duplicateRecipeNote": "Questo crea una nuova ricetta clonando la ricetta corrente.",
+      "duplicateRecipeButton": "Duplica ricetta dalla ricetta corrente",
+      "duplicateRecipeWorking": "Duplicazione…",
+      "brewNote": "Lanciare la ricetta di brassaggio crea gli step di brassaggio, carica le materie prime necessarie e inizializza i log se applicabile.",
+      "programmedSectionLabel": "Programmati",
+      "lastBrewedLabel": "Ultimi brassaggi",
+      "lastBrewedLoading": "Caricamento sessioni di brassaggio…",
+      "brewingHistoryEmpty": "Nessuna sessione di brassaggio per questa ricetta.",
+      "brewButton": "Brassa la ricetta corrente",
+      "brewFeatureSoon": "Funzionalità disponibile a breve...",
+      "hopsHelp": "Scegli luppoli dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "timeBeforeEndOfBoilMin": "Minuti prima della fine della bollitura (min)",
+      "yeastHelp": "Scegli il lievito dal database (o inserisci manualmente). Salvato come snapshot nella ricetta.",
+      "yeastEditInYeastPage": "Modifica lievito nella pagina Lievito",
+      "yeastPageTitle": "Lievito",
+      "yeastSectionHeading": "Ceppi di lievito e tassi di inoculo.",
+      "yeastAdvancedSubsectionHeading": "Avanzato e calcolo tasso di inoculo.",
+      "yeastPitchRateAmountNote": "Se il tasso di inoculo è selezionato, la Quantità (L o kg) da inoculare verrà calcolata e sincronizzata.",
+      "yeastEstimatedCellsRecalcNote": "Se il tasso di inoculo è selezionato, 'Cellule stimate necessarie (B)' verrà ricalcolato in base alla sezione Analisi della pagina Modifica ricetta.",
+      "yeastPitchRateRequiresFormat": "Tasso di inoculo – seleziona il formato per attivare",
+      "yeastCellsPerLLabel": "Cellule per L (modificabile)",
+      "yeastCellsPerKGLabel": "Cellule per kg (modificabile)",
+      "yeastCellsPerDefaultNote": "Le densità cellulari predefinite sono da yeastman.",
+      "yeastCellsPerOverrideNote": "Modifica solo se hai dati di laboratorio o del produttore.",
+      "yeastBackToRecipe": "Torna alla ricetta",
+      "yeastEmpty": "Nessun lievito ancora.",
+      "yeastSearchLabel": "Cerca nel database lieviti",
+      "yeastAddButton": "Aggiungi lievito",
+      "yeastAddCustomButton": "Aggiungi lievito personalizzato",
+      "yeastCustomNamePlaceholder": "Inserisci nome lievito",
+      "yeastSaveButton": "Salva (incluso lievito)",
+      "yeastRemove": "Rimuovi",
+      "yeastNameLabel": "Nome",
+      "yeastAmountLabel": "Quantità ({unit})",
+      "yeastFermentationTempLabel": "Temp. fermentazione ({unit})",
+      "yeastOxygenationLabel": "Richiede ossigenazione",
+      "yeastOxygenationYes": "Sì",
+      "yeastOxygenationNo": "No",
+      "yeastDiacetylRestLabel": "Diacetil rest",
+      "yeastDiacetylRestYes": "Sì",
+      "yeastDiacetylRestNo": "No",
+      "yeastFormatLabel": "Formato",
+      "yeastFormatDry": "Secco",
+      "yeastFormatLiquid": "Liquido",
+      "yeastFormatSlurry": "Slurry",
+      "yeastSpeciesLabel": "Specie",
+      "yeastSpeciesSaccharomycesCerevisiae": "Saccharomyces cerevisiae",
+      "yeastSpeciesSaccharomycesPastorianus": "Saccharomyces pastorianus",
+      "yeastSpeciesBrettanomyces": "Brettanomyces",
+      "yeastSpeciesDiastaticus": "Diastaticus",
+      "yeastSpeciesOther": "Altro",
+      "yeastEstimatedCellsLabel": "Cellule stimate necessarie (B)",
+      "yeastEstimatedCellsTooltip": "B = miliardi di cellule. Basato su volume × OG (°Plato) × tasso di inoculo.",
+      "yeastEstimatedCellsValue": "{value} B",
+      "yeastAmountCalcBreakdown": "cells_B / cells_per_L = {cellsB} / {cellsPerL} = {amountL} L",
+      "yeastAmountCalcExample": "quantità_L = cells_B / cells_per_L = {cellsB} / {cellsPerL} = {amountL} L",
+      "yeastNeedsPropagationLabel": "Richiede propagazione",
+      "yeastNeedsPropagationYes": "Sì",
+      "yeastNeedsPropagationNo": "No",
+      "yeastPitchRateLabel": "Tasso di inoculo",
+      "yeastPitchRateNone": "nessuno",
+      "yeastPitchRateNote": "Un tasso di inoculo più alto per lo stesso stile (es. Ale, Lager, altri stili di birra, Mead) è importante quando l'OG aumenta.",
+      "yeastPitchRateMfgRec035Ales": "Raccomandato produttore 0.35 (Ale)",
+      "yeastPitchRateMfgRec05Ales": "Raccomandato produttore 0.5 (Ale)",
+      "yeastPitchRatePro075Ales": "Pro Brewer 0.75 (Ale)",
+      "yeastPitchRatePro10Ales": "Pro Brewer 1.0 (Ale)",
+      "yeastPitchRatePro125Ales": "Pro Brewer 1.25 (Ale)",
+      "yeastPitchRatePro15Lager": "Pro Brewer 1.5 (Lager)",
+      "yeastPitchRatePro175Lager": "Pro Brewer 1.75 (Lager)",
+      "yeastPitchRatePro20Lager": "Pro Brewer 2.0 (Lager)",
+      "yeastManualCellCountSummary": "Metodologia conta cellulare manuale (emocitometro)",
+      "yeastManualCellCountTitle": "Come calcolare il lievito da inoculare (kg) tramite conta cellulare manuale al microscopio",
+      "yeastManualCellCountPrerequisitesTitle": "Prerequisiti: strumenti e materiali",
+      "yeastManualCellCountPrerequisitesBody": "Microscopio (con ingrandimenti 100× e 400×), provette, blu di metilene (0,01%), pipette, calcolatrice scientifica (disponibile anche come app su smartphone) e idealmente un piccolo portaprovette.",
+      "yeastManualCellCountStep1Title": "Diluire il campione di lievito in serie",
+      "yeastManualCellCountStep1Body": "Usare acqua o altro diluente appropriato. Obiettivo: 5–50 cellule per quadratino. Diluizione tipica 1:200 (es. 10× poi 10× poi 1:1 con blu di metilene 0,01%). Se troppo denso, aggiungere 1:10 per DF = 2000×.\n\nImportante: annotare il DF (Fattore di diluizione) scelto (1:200 o 1:2000) perché verrà inserito nelle formule successive.",
+      "yeastManualCellCountStep1ImageAlt": "Diagramma di due provette che mostrano diluizione seriale 1:10 poi 1:100 (1/10 lievito + 9/10 acqua).",
+      "yeastManualCellCountStep1ImageLegend": "Diluendo 1:1 con blu di metilene (0,01%) si ottiene 1:200 complessivo.",
+      "yeastManualCellCountStep2Title": "Caricare l'emocitometro",
+      "yeastManualCellCountStep2Body": "Posizionare prima il vetrino coprioggetto, poi applicare 10 µl sull'emocitometro. Mettere a fuoco a 100×, poi 400×.",
+      "yeastManualCellCountStep3Title": "Contare le cellule in cinque quadratini",
+      "yeastManualCellCountStep3Body": "Contare tutte le cellule vive (trasparenti) e morte (blu) nei cinque quadratini indicati.\n\nRegole: contare le cellule nei 5 quadratini indicati del quadrato centrale dell'emocitometro. Contare le cellule che toccano le linee superiore o sinistra del mini-quadratino; escludere quelle che toccano inferiore o destra. Contare le cellule figlie che superano il 50% della dimensione della cellula madre.",
+      "yeastManualCellCountStep3ImageAlt": "Griglia di emocitometro che mostra i cinque quadratini (quattro angoli e centro) dove si contano le cellule. Ogni quadratino è 0,04 mm².",
+      "yeastManualCellCountStep4Title": "Calcolare la % di cellule vive",
+      "yeastManualCellCountStep4Body": "Formula:\n(cellule vive) / (cellule totali) × 100 = % cellule vive\n\nInput: cellule totali, cellule vive (da Passo 3).",
+      "yeastManualCellCountStep5Title": "Calcolare le cellule vive per grammo di sospensione",
+      "yeastManualCellCountStep5Body": "Formula:\ncellule vive × 5 × DF × 10.000 = cellule vive/g di sospensione\n\nInput: cellule vive (conteggio grezzo da Passo 3), DF (fattore di diluizione da Passo 1).",
+      "yeastManualCellCountStep6Title": "Calcolare il lievito da inoculare (kg)",
+      "yeastManualCellCountStep6Body": "Formula:\n(HL × 100.000 × PR × °P) / (cellule vive/g × 1000) = lievito da inoculare (kg)\n\nInput: HL (ettolitri di mosto), PR (tasso di inoculo), °P (Plato) e il risultato del Passo 5 (cellule vive/g di sospensione).",
+      "yeastManualCellCountGlossaryTitle": "Glossario",
+      "yeastManualCellCountGlossary": "HL = Ettolitri di mosto\nDF = Fattore di diluizione\nPR = Tasso di inoculo (cellule/mL/°P): Ale ~1,0×10⁶, Lager ~1,5×10⁶\n°P = Plato (densità/4)\ng / 1000 = kg",
+      "yeastManualCellCountReference": "Per una metodologia più dettagliata, fare riferimento a Metodi ASBC, Yeast 4: Microscopic Yeast Cell Counting.",
+      "yeastManualCountSectionTitle": "Usa conta manuale per densità sospensione e vitalità (da cellule vive/totali)",
+      "yeastManualCountFirstNote": "Scegliendo la conta manuale per derivare le cellule per L, il campo 'Cellule stimate necessarie (B)' non cambia; solo la densità della sospensione (e quindi Quantità L) deriva dalla conta manuale. Riusa completamente le formule e la logica esistenti.",
+      "yeastManualCountDirectlyInfluencesAmount": "Questi campi influenzano direttamente la Quantità (L).",
+      "yeastManualCountDFLabel": "DF (Fattore di diluizione)",
+      "yeastManualCountDF200": "200×",
+      "yeastManualCountDF2000": "2000×",
+      "yeastManualCountAliveCellsLabel": "Cellule vive",
+      "yeastManualCountTotalCellsLabel": "Cellule totali",
+      "yeastManualCountTotalTooLow": "Deve essere ≥ Cellule vive (vitalità ≤ 100%)",
+      "yeastManualCountViabilityLabel": "Vitalità (%)",
+      "yeastManualCountCalculatedViabilityLabel": "Vitalità % calcolata",
+      "yeastManualCountCalculatedLiveCellsPerGramLabel": "Cellule vive per grammo di sospensione (calcolate)",
+      "yeastManualCountSaveCalculatedValues": "Salva valori calcolati",
+      "yeastLowViabilityWarning": "Vitalità {pct}%: considera una verifica di vitalità.",
+      "yeastManualCountDisclaimer": "DISCLAIMER: i calcoli non sostituiscono mai l’esperienza e il buon senso: usa la tua esperienza per confrontare con i lotti precedenti. Un calcolo serve a confermare che stai seguendo l’approccio giusto e a fare fine-tuning delle procedure e NON è in alcun modo pensato per sostituire controlli empirici ed esperienza. Non fidarti mai solo dei numeri: usali invece per validare.",
+      "otherHelp": "Spezie, chiarificanti, aromi, ecc.",
+      "boilTimeHelp": "Durata bollitura manuale in minuti. Usata per calcoli volume kettle ed evaporazione. Se vuoto, inferita dall’addizione luppolo bollitura più lunga.",
+      "boilSave": "Salva (inclusa bollitura)",
+      "waterHelp": "Il calcolatore completo (chimica mash + acqua) vive in una pagina dedicata (non integrata qui).",
+      "waterProfilesManageText": "Gestisci i profili su",
+      "rawMaterialsCtaPrefix": "Hai trovato una materia prima mancante o errata?",
+      "rawMaterialsCtaLinkText": "Aiuta a migliorare il database materie prime",
+      "buttons": {
+        "clear": "Pulisci",
+        "addFermentable": "Aggiungi fermentabile",
+        "addCustomFermentable": "Aggiungi fermentabile personalizzato",
+        "addOtherIngredient": "Aggiungi altro ingrediente"
+      },
+      "fermentableAddedSaveHint": "Fermentabile aggiunto. Salva la sezione per conservare i dati.",
+      "amountLabel": "Quantità ({unit})",
+      "colorLabel": "Colore ({unit})",
+      "gristTotalKg": "Totale: {value} {unit}",
+      "gristAvgColor": "Colore medio: {value} {unit}",
+      "fermentableTimingLabel": "Aggiungi a",
+      "fermentableTimingMash": "Mash",
+      "fermentableTimingKettle": "Kettle (estratto a fine bollitura)"
+    },
+    "analysis": {
+      "help": "Stime derivate. Se mancano input necessari, i valori mostrano “Dati insufficienti”.",
+      "na": "Dati insufficienti",
+      "customAttenuationPercentLabel": "Attenuazione personalizzata (%)",
+      "fields": {
+        "abv": "ABV (stimata)",
+        "ibuTinseth": "IBU (Tinseth, stimata)",
+        "ibuRager": "IBU (Rager, stimata)",
+        "buGu": "BU/GU",
+        "srmMorey": "Colore (SRM, Morey, stimato)",
+        "srmDaniels": "Colore (SRM, Daniels, stimato)",
+        "boilTimeMinutes": "Tempo bollitura (minuti)",
+        "kettleVolume": "Volume (kettle)",
+        "preBoilVolume": "Volume pre-boil (stimato)",
+        "og": "OG (stimata) Plato/SG",
+        "fg": "FG (stimata) Plato/SG",
+        "attenuation": "Attenuazione (effettiva)",
+        "pbg": "PBG (gravità pre-boil, stimata) Plato/SG"
+      },
+      "gristWaterConsistencyCheck": "Controllo coerenza Grist ricetta-mash",
+      "gristWaterConsistencyPassed": "ok",
+      "gristWaterConsistencyError": "errore",
+      "gristWaterConsistencyWarning": "Ricalcola quantità acqua mash e modifiche importando il grist della ricetta <link>sezione grist pagina mash</link> perché il grist in questa pagina ricetta (sezione Fermentabili) non corrisponde al grist nella pagina Mash.",
+      "gristWaterConsistencyDifference": "Differenza: {value}%",
+      "warningsTitle": "Note / input mancanti",
+      "warningsClickToExpand": "Clicca per espandere",
+      "warnings": {
+        "missing_beerjson": "La ricetta non ha BeerJSON; impossibile calcolare l’analisi.",
+        "missing_water_settings": "Impostazioni acqua salvate mancanti; i volumi stimati potrebbero non essere disponibili.",
+        "missing_water_volumes": "Volumi mash/sparge mancanti; i volumi stimati potrebbero non essere disponibili.",
+        "invalid_runoff_volume": "Volumi mash/sparge e perdite implicano un runoff nullo o negativo; controlla acqua e attrezzatura mash.",
+        "invalid_evaporation": "Evaporazione/tempo di bollitura implicano un volume post-boil nullo o negativo; controlla l’attrezzatura.",
+        "invalid_kettle_volume": "Il volume kettle calcolato è nullo o negativo; controlla perdite attrezzatura e input acqua.",
+        "exceeds_kettle_capacity": "Il volume kettle calcolato supera la capacità/target del profilo attrezzatura.",
+        "missing_efficiency": "Efficienza mancante; OG/PBG richiedono una % di efficienza.",
+        "missing_fermentables": "Nessun fermentabile con quantità e resa/potenziale utilizzabili; impossibile stimare OG/PBG.",
+        "missing_color_volume": "Volume kettle calcolato mancante; l’SRM richiede impostazioni acqua salvate e volumi.",
+        "missing_fermentable_colors": "Colore fermentabile (Lovibond) mancante su una o più righe; l’SRM richiede i colori dei fermentabili.",
+        "used_batch_size_volume": "Uso il batch_size BeerJSON per stimare l’IBU perché il volume kettle calcolato non è disponibile.",
+        "missing_ibu_gravity": "Gravità di bollitura mancante; l’IBU richiede PBG/OG.",
+        "missing_ibu_inputs": "Nessuna aggiunta di luppolo boil/whirlpool utilizzabile (quantità, AA%, tempo); impossibile stimare l’IBU.",
+        "missing_attenuation": "Attenuazione lievito mancante; FG/ABV richiedono attenuazione o un override."
+      }
+    },
+    "water": {
+      "common": {
+        "backToHub": "Torna al centro acqua",
+        "goToSparge": "Vai allo sparge",
+        "goToMash": "Vai al mash",
+        "mashWaterAndSteps": "Acqua mash e Step mash",
+        "viewEditGrist": "Vedi/modifica grist nella ricetta",
+        "notAuthenticated": "Non autenticato. {signIn}."
+      },
+      "mash": {
+        "title": "Acqua mash e Step mash",
+        "mashStepsHeading": "Step mash",
+        "adjustmentHeading": "Regolazione acqua mash",
+        "adjustmentHint": "Seleziona un profilo sorgente + diluizione e imposta i volumi per vedere gli ioni miscelati.",
+        "gristSummaryHeading": "Grist (riepilogo)",
+        "gristSummaryHelp": "Evitiamo di duplicare qui la tabella completa del grist. Usa l’editor ricetta per i dettagli; questa pagina mantiene solo uno snapshot per i calcoli.",
+        "lateExtractExcludedNote": "Gli aggiunti di estratto a fine bollitura (kettle) sono esclusi dal grist mash per la chimica dell'acqua.",
+        "acidificationHeading": "Acidificazione acqua mash",
+        "resultLastCalculated": "Risultato (ultimo calcolo)",
+        "overallResultHeading": "Risultato complessivo acqua mash (HCO3 derivato dall’alcalinità)",
+        "saltAdditionsManualV0": "Aggiunte di sali (manuale)",
+        "startingAlkalinityLabel": "Alcalinità iniziale ({unit})",
+        "sourceVolumeLabel": "Volume sorgente ({unit})",
+        "dilutionVolumeLabel": "Volume diluizione ({unit})",
+        "mashWaterVolumeLabel": "Volume acqua mash ({unit})"
+      },
+      "sparge": {
+        "title": "Acqua sparge",
+        "acidificationHeading": "Acidificazione sparge",
+        "resultLastCalculated": "Risultato (ultimo calcolo)",
+        "saltAdditionsManualV0": "Aggiunte di sali sparge (manuale)",
+        "saltAdditionsHelp": "Il profilo base è quello selezionato sopra. Aggiungi sali in grammi; calcoliamo gli ioni risultanti (ppm) per il volume di sparge.",
+        "startingAlkalinityLabel": "Alcalinità iniziale ({unit})",
+        "waterVolumeLabel": "Volume acqua ({unit})"
+      },
+      "boil": {
+        "title": "Acqua aggiuntiva in bollitura",
+        "adjustmentHeading": "Regolazione acqua bollitura",
+        "saltAdditionsHeading": "Aggiunte di sali (manuale)",
+        "acidificationHeading": "Acidificazione acqua bollitura",
+        "overallResultHeading": "Risultato complessivo acqua bollitura (HCO3 derivato dall’alcalinità)",
+        "adjustmentHelp": "Scegli profili sorgente/target/diluizione e volumi per calcolare un profilo acqua iniziale miscelato.",
+        "saltAdditionsHelp": "Seleziona un profilo Sorgente e imposta il volume. La diluizione è opzionale, ma se il volume di diluizione è > 0 devi selezionare un profilo di diluizione.",
+        "saltAdditionsBaseHelp": "Il profilo base è l’acqua sorgente miscelata sopra. Aggiungi sali in grammi; calcoliamo gli ioni risultanti (ppm).",
+        "startingAlkalinityLabel": "Alcalinità iniziale ({unit})",
+        "sourceVolumeLabel": "Volume sorgente ({unit})",
+        "dilutionVolumeLabel": "Volume diluizione ({unit})"
+      }
+    },
+    "activeAccount": "Account attivo:",
+    "createTitle": "Crea ricetta",
+    "nameLabel": "Nome",
+    "styleLabel": "Stile",
+    "stylePlaceholder": "Seleziona uno stile",
+    "stylesLoading": "Caricamento stili…",
+    "createButton": "Crea",
+    "creating": "Creazione…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "listTitle": "Le tue ricette",
+    "noRecipes": "Ancora nessuna ricetta.",
+    "openEditor": "Apri editor",
+    "openWater": "Apri calcolatore acqua",
+    "openVersions": "Vedi versioni",
+    "versionShort": "Versione",
+    "versions": {
+      "title": "Versioni ricetta",
+      "subtitle": "Tutte le versioni salvate per questa ricetta (la versione 00 è la prima).",
+      "backToRecipes": "Torna alle Ricette",
+      "backToEditor": "Torna all’editor ricetta",
+      "listTitle": "Versioni",
+      "listAriaLabel": "Elenco versioni ricetta",
+      "empty": "Nessuna versione trovata.",
+      "refresh": "Aggiorna",
+      "refreshing": "Aggiornamento…",
+      "versionLabel": "Versione",
+      "openEditor": "Apri editor",
+      "openWater": "Apri calcolatore acqua",
+      "updatedAt": "Aggiornato"
+    },
+    "exportBeerJson": "Esporta (BeerJSON)",
+    "pagination": {
+      "ariaLabel": "Paginazione elenco ricette",
+      "prev": "Precedente",
+      "next": "Successiva",
+      "status": "Pagina {page} di {pages}"
+    },
+    "delete": {
+      "cta": "Elimina",
+      "confirmTitle": "Eliminare la ricetta?",
+      "confirmBody": "Questa azione non può essere annullata. Fai clic su “Elimina ora” per confermare, oppure Annulla per mantenerla.",
+      "confirmCta": "Elimina ora",
+      "deleting": "Eliminazione…",
+      "cancel": "Annulla"
+    },
+    "export": {
+      "title": "Esporta",
+      "subtitle": "Scarica BeerJSON strict per una ricetta o per tutte le ricette.",
+      "selectLabel": "Ricetta",
+      "noneAvailable": "Nessuna ricetta disponibile",
+      "exportSelectedCta": "Esporta selezionata",
+      "exportAllCta": "Esporta tutte",
+      "strictNote": "Le esportazioni sono BeerJSON strict (gli id interni delle aggiunte vengono rimossi per interoperabilità)."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Web app desktop-first + app mobile native, log del brew-day offline-first.",
+    "links": {
+      "title": "Brew day e dati di produzione",
+      "fermDataIntegration": "Dati fermentazione e integrazione",
+      "brewdayStepsSettings": "Impostazioni step brewday",
+      "waterProfiles": "Profili acqua",
+      "brewery": "Birrificio",
+      "equipment": "Attrezzatura",
+      "inventory": "Inventario"
+    },
+    "importExport": {
+      "title": "Import / Export",
+      "supportedNote": "L’interoperabilità di import/export ricette è centrata su BeerJSON (canonico).",
+      "importFormats": "Import: BeerJSON (.json) e BeerXML (.xml).",
+      "exportFormats": "Export: BeerJSON (.json).",
+      "actionsLiveInRecipes": "Le azioni di import/export sono in Ricette:",
+      "actionsCta": "Vai alle Ricette",
+      "customImportNote": "Hai bisogno di un altro sistema?",
+      "customImportCta": "Contattaci per un import personalizzato a un costo accessibile."
+    },
+    "fermDataIntegration": {
+      "title": "Dati fermentazione e integrazione",
+      "subtitle": "Integrazioni e dati di fermentazione (statistiche e insight).",
+      "backToDashboard": "Torna alla dashboard",
+      "sections": {
+        "integration": {
+          "title": "Integrazione",
+          "empty": "Nessuna integrazione per ora."
+        }
+      }
+    },
+    "brewdayStepsSettings": {
+      "title": "Impostazioni step brewday",
+      "subtitle": "Configura step del brew day, timer e tipo di birra.",
+      "backToDashboard": "Torna alla dashboard",
+      "brewingTypeAllGrain": "All grain",
+      "brewingTypeExtractPartialBiab": "Extract/Partial-mash/BIAB (homebrewing)",
+      "saveSuccess": "Salvato.",
+      "loading": "Caricamento…",
+      "saving": "Salvataggio…",
+      "accountRequired": "Seleziona un account per continuare.",
+      "exclude": "Escludi",
+      "addCustomSection": "Aggiungi sezione personalizzata",
+      "addCustomBrewingMethod": "Aggiungi metodo di birra personalizzato",
+      "addCustomStep": "Aggiungi step personalizzato",
+      "assignedSection": "Sezione assegnata",
+      "minutes": "Minuti",
+      "presetSections": {
+        "preparation": "Preparazione",
+        "pre_mash": "Pre mash",
+        "mash": "Mash",
+        "lauter": "Lauter",
+        "sparge": "Sparge",
+        "boil": "Bollitura",
+        "post_boil": "Post bollitura",
+        "fermentor": "Fermentatore",
+        "cleanup": "Pulizia",
+        "quality": "Qualità",
+        "miscellaneous": "Varie"
+      },
+      "defaultSectionNote": "Sezioni step brew: aggiungi alla tua configurazione predefinita: puoi escluderle nel brew day se le usi solo per ricette specifiche ma non puoi aggiungerle nel flusso brew day se non aggiunte qui.",
+      "customSectionNote": "Aggiungi step personalizzati con nome, minuti opzionali e sezione assegnata.",
+      "add": "Aggiungi",
+      "save": "Salva",
+      "name": "Nome",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "remove": "Rimuovi",
+      "sections": {
+        "brewdayStepsRecap": {
+          "title": "Riepilogo step brewday",
+          "empty": "Nessuno step per ora."
+        },
+        "brewingType": {
+          "title": "Metodi di birra",
+          "label": "Metodo di birra"
+        },
+        "brewdayStepsSections": {
+          "title": "Step brewday - sezioni",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayStepsDefault": {
+          "title": "Step brewday - predefinito",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayStepsCustom": {
+          "title": "Step brewday - personalizzato",
+          "placeholder": "Prossimamente."
+        },
+        "brewdayNotes": {
+          "title": "Note brewday"
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Contatti",
+    "subtitle": "Per richieste di import personalizzati, scrivici: risponderemo con i prossimi passi e una stima.",
+    "emailHeading": "Email",
+    "emailLabel": "Email:",
+    "emailAddress": "aabrewery@proton.me",
+    "mailtoSubject": "Richiesta import personalizzato",
+    "emailCta": "Scrivici"
+  },
+  "health": {
+    "title": "Stato API",
+    "subtitle": "Richiesta di {url} dal browser (via Nginx).",
+    "appPermissions": {
+      "title": "Permessi app",
+      "subtitle": "User = identità di accesso. Workspace = confine di condivisione/tenant. Ruoli (brewery_admin/member/viewer) e ACL determinano cosa puoi fare.",
+      "userLabel": "User",
+      "activeWorkspaceLabel": "Workspace attivo",
+      "roleLabel": "Il tuo ruolo in questo workspace",
+      "roleUnknown": "sconosciuto",
+      "selectWorkspaceCta": "Seleziona workspace"
+    }
+  },
+  "devDashboard": {
+    "loading": "Caricamento…"
+  },
+  "waterProfiles": {
+    "title": "Profili acqua",
+    "ionsLegend": "Ioni ({unit})",
+    "activeAccount": "Account attivo",
+    "viewAllTableTitle": "Vedi tutti i profili acqua (tabella)",
+    "adminAddTitle": "Admin: aggiungi profilo acqua",
+    "createdProfilesStartUnverified": "I profili creati iniziano come non verificati. Usa le azioni nella tabella per verificare/non verificare.",
+    "navigationTitle": "Navigazione",
+    "phPlaceholder": "es. 7,80",
+    "rawMaterialsCtaPrefix": "Hai trovato una materia prima mancante o errata?",
+    "rawMaterialsCtaLinkText": "Aiuta a migliorare il database materie prime"
+  },
+  "contributing": {
+    "title": "Contribuire",
+    "subtitle": "Aiuta a migliorare traduzioni e dataset di birrificazione usati dall’app.",
+    "sections": {
+      "i18n": {
+        "title": "Aiuta a tradurre (i18n contributing)"
+      },
+      "rawMaterials": {
+        "title": "Aiuta a migliorare il database materie prime",
+        "subtitle": "Se trovi fermentabili/luppoli/lieviti/altri ingredienti mancanti o errati (o profili acqua), segnalacelo per migliorare il dataset canonico.",
+        "step1": "Annota cosa manca o cosa è errato (nome, produttore, specifiche chiave come colore/resa/AA% quando applicabile).",
+        "step2": "Se possibile includi uno screenshot o i valori esatti (aiuta a evitare ambiguità).",
+        "step3": "Apri una segnalazione usando il nostro template GitHub “Raw materials” (in arrivo).",
+        "issueTemplateNote": "Aggiungeremo un link diretto quando il workflow di contribuzione su GitHub sarà finalizzato."
+      }
+    }
+  },
+  "ui": {
+    "addSalt": "Aggiungi sale",
+    "amountLabel": "Quantità ({unit})",
+    "fx": "fx"
+  },
+  "salts": {
+    "gypsum": "Gesso (gypsum)",
+    "calciumChloride": "Cloruro di calcio",
+    "epsom": "Sali di Epsom",
+    "tableSalt": "Sale da cucina",
+    "bakingSoda": "Bicarbonato di sodio",
+    "modeManualSuffix": "(manuale)",
+    "modeRequiredSuffix": "(richiesto)"
+  },
+  "waterHub": {
+    "title": "Gestione acqua",
+    "recipeId": "ID ricetta",
+    "recipeName": "Nome",
+    "recipeVersion": "Versione",
+    "backToRecipeEditor": "Torna all’editor ricetta",
+    "missingHeaders": "Header dev mancanti. Vai in Dashboard e clicca <strong>Salva header</strong> (Utente + Account attivo), poi torna qui.",
+    "chooseArea": "Scegli un’area",
+    "mashWater": "Acqua mash e Step mash",
+    "spargeWater": "Acqua sparge",
+    "additionalBoilWater": "Acqua aggiuntiva in bollitura",
+    "lastCalculated": "ultimo calcolo",
+    "manageProfilesOn": "Gestisci i profili in",
+    "waterProfilesLink": "Profili acqua",
+    "quickStatus": "Stato rapido (sola lettura)",
+    "mashAcidMode": "Modalità acido mash",
+    "spargeAcidMode": "Modalità acido sparge",
+    "mashOverallSnapshot": "Snapshot complessivo mash",
+    "finalAlkalinity": "Alcalinità finale",
+    "openMashOverall": "Apri il riepilogo mash",
+    "refreshing": "Aggiornamento…",
+    "refresh": "Aggiorna",
+    "profilesLoaded": "Riepilogo caricato.",
+    "profilesNotLoaded": "Riepilogo non caricato.",
+    "recap": "Riepilogo (sola lettura)",
+    "recapSubtitle": "Usa snapshot salvati quando disponibili; il pH unito è una approssimazione tramite [H+] pesato sul volume.",
+    "mergedWaterRecap": "Riepilogo acqua unita",
+    "computed": "Calcolato",
+    "clickToExpand": "Clicca per espandere",
+    "perStream": "Per flusso",
+    "colStream": "Flusso",
+    "colVolumeL": "Volume (L)",
+    "colPh": "pH mash",
+    "colFinalAlk": "Alcalinità finale (ppm come CaCO3)",
+    "mergedSummary": "Riepilogo unito",
+    "totalVolume": "Volume totale",
+    "approxMergedPh": "pH unito (approx)",
+    "mergedFinalAlk": "Alcalinità finale unita",
+    "additionsPerStream": "Aggiunte (per flusso)",
+    "salt": "Sali",
+    "acid": "Acido",
+    "mergedIonsTitle": "Ioni uniti",
+    "mergedIonsDescription": "Gli ioni uniti (ppm) sono calcolati da snapshot mash/sparge/boil salvati dopo sali + acido (solo contro-ioni SO4/Cl) e mediati per volume. I flussi senza snapshot salvati sono esclusi.",
+    "ion": "Ione",
+    "mergedPpm": "Unito (ppm)",
+    "noMergedProfile": "Profilo unito non ancora disponibile (servono snapshot sali + acido salvati per almeno un flusso).",
+    "noSettingsLoaded": "Nessuna impostazione caricata.",
+    "finalRecapTitle": "Riepilogo finale",
+    "finalRecapSubtitle": "Sintesi rapida ed euristica (non è un modello completo di chimica dell’acqua).",
+    "predictedMashPh": "pH mash previsto",
+    "residualAlkalinity": "Alcalinità residua (RA)",
+    "raMashOverall": "Mash complessivo (dopo sali + acido)",
+    "raMerged": "Acqua unita (se disponibile)",
+    "ppmAsCaCO3": "ppm come CaCO3",
+    "styleExpectedRa": "RA attesa per lo stile (regola pratica)",
+    "styleExpectedRaNa": "N/A",
+    "finalRecapCaveat": "Nota: la RA è un’euristica; i risultati dipendono da assunzioni e non sostituiscono un modello completo di pH/chimica.",
+    "styleExpectedRaPale": "Gli stili chiari / orientati al luppolo spesso beneficiano di RA più bassa.",
+    "styleExpectedRaAmber": "Gli stili ambrati / maltati spesso tollerano una RA moderata.",
+    "styleExpectedRaDark": "Gli stili scuri / tostati spesso beneficiano di RA più alta.",
+    "alkVsBicarbTitle": "Alcalinità (come CaCO3) vs bicarbonato (HCO3)",
+    "alkVsBicarbSubtitle": "Perché l’app usa CaCO3 per alcalinità/RA e HCO3 nelle tabelle degli ioni.",
+    "alkVsBicarbPoint1": "“ppm come CaCO3” è un’unità di alcalinità: esprime la capacità di neutralizzare acido (non CaCO3 disciolto).",
+    "alkVsBicarbPoint2": "Le tabelle degli ioni riportano concentrazioni (ppm): Ca, Mg, Na, SO4, Cl e HCO3.",
+    "alkVsBicarbPoint3": "Quando la tabella dice “HCO3 derivato dall’alcalinità”, converte l’alcalinità equivalente CaCO3 in una stima in ppm di HCO3: HCO3 ≈ alcalinità × 61/50.",
+    "alkVsBicarbPoint4": "In modo rigoroso, alcalinità e bicarbonato non coincidono sempre a tutti i pH/condizioni; questa conversione è un’approssimazione pratica per acque da birrificazione tipiche."
+  },
+  "about": {
+    "title": "Info",
+    "subtitle": "Brewery App è uno strumento interno per lo sviluppo ricette e il logging del brew-day, con un calcolatore di chimica dell’acqua ispirato a BrunWater, Troester e altri. Supporto completo allo schema Beer.json. Il database materie prime scelto per la v0 è BeerProto.",
+    "translationsRowPrefix": "I contributi alle traduzioni sono benvenuti e gestiti tramite il nostro workflow (vedi",
+    "translationsRowLinkText": "Aiuta a tradurre",
+    "translationsRowSuffix": ").",
+    "translationsSideNote": "Nota: è solo un’introduzione — il workflow di contributo traduzioni è pianificato, ma non è ancora pienamente operativo."
+  },
+  "auth": {
+    "selectAccount": {
+      "title": "Seleziona workspace",
+      "subtitle": "Scegli su quale workspace vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noAccountsFound": "Nessun workspace trovato."
+    },
+    "selectWorkspace": {
+      "title": "Seleziona workspace",
+      "subtitle": "Scegli su quale workspace vuoi lavorare.",
+      "loading": "Caricamento…",
+      "noWorkspacesFound": "Nessun workspace trovato."
+    },
+    "loginTitle": "Accedi",
+    "signupTitle": "Crea account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "workspaceNameLabel": "Nome workspace (opzionale)",
+    "accountNameLabel": "Nome workspace (opzionale)",
+    "submitLogin": "Accedi",
+    "submitSignup": "Crea account",
+    "submitting": "Invio…",
+    "languageLabel": "Lingua",
+    "noteTitle": "Stato traduzioni",
+    "noteBody": "L’inglese è la lingua originale. Le altre lingue (a partire dall’italiano) saranno presto supportate al 100%. Spagnolo e tedesco arriveranno presto.",
+    "helpTranslate": "Aiuta a tradurre (contributi i18n)"
+  },
+  "i18nContributing": {
+    "title": "Aiuta a tradurre (i18n contributing)",
+    "subtitle": "Accettiamo volentieri contributi alle traduzioni. L’inglese è la fonte; l’italiano è la prima lingua community.",
+    "howItWorksTitle": "Come funzionano le traduzioni",
+    "howItWorks1": "La web app usa URL con prefisso lingua (es. /en/..., /it/...).",
+    "howItWorks2Prefix": "Le traduzioni stanno in",
+    "howItWorks2Middle": "e",
+    "howItWorks3": "Le chiavi devono restare stabili. Non cambiare le chiavi a meno di un refactor intenzionale.",
+    "recommendedToolTitle": "Strumento consigliato (più semplice)",
+    "recommendedToolBody": "Consigliamo Weblate (interfaccia web) collegato a GitHub. Permette a chiunque di tradurre senza usare git e apre PR automaticamente.",
+    "recommendedTool1": "Traduci dal browser (senza git).",
+    "recommendedTool2": "I maintainer revisionano e mergiano le PR di Weblate.",
+    "githubFallbackTitle": "Alternativa GitHub",
+    "githubFallbackBody": "Se sei a tuo agio con git/GitHub, puoi aprire una PR modificando direttamente i file JSON delle traduzioni.",
+    "rulesTitle": "Regole",
+    "rule1": "Mantieni intatti i placeholder (es. {url}).",
+    "rule2": "Mantieni il significato; evita traduzioni troppo letterali se suonano innaturali.",
+    "rule3": "Non tradurre identificatori tecnici come path di file, path API o codice.",
+    "backToLogin": "Torna ad Accedi"
+  }
+}
