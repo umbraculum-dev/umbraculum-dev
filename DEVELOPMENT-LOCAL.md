@@ -92,6 +92,8 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - If Nginx returns `502 Bad Gateway` for `/api/*`, the API upstream is unreachable (often the `api` container process crashed or is still starting).
   - Quick fix (from repo root):
     - `docker compose exec api npm install`
+    - If API logs mention Prisma client not initialized, also run:
+      - `docker compose exec -T api npx prisma generate`
     - `docker compose restart api`
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
