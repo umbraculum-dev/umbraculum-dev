@@ -11,6 +11,7 @@ function toItemPayload(item: any) {
     name: item.name,
     quantity: item.quantity,
     unit: item.unit,
+    metadataJson: item.metadataJson ?? null,
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
   };
@@ -43,6 +44,7 @@ export async function inventoryRoutes(app: FastifyInstance) {
       name: typeof body.name === "string" ? body.name : "",
       quantity: Number.isFinite(quantity) ? quantity : 0,
       unit: (body.unit as any) ?? "kg",
+      metadata: (body as any).metadata,
     });
     return { ok: true, item: toItemPayload(created) };
   });
@@ -56,6 +58,7 @@ export async function inventoryRoutes(app: FastifyInstance) {
       name: typeof body.name === "string" ? body.name : undefined,
       quantity: body.quantity as any,
       unit: body.unit as any,
+      metadata: (body as any).metadata,
     });
     return { ok: true, item: toItemPayload(updated) };
   });

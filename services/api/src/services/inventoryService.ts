@@ -9,12 +9,14 @@ export type CreateInventoryItemInput = {
   name: string;
   quantity: number;
   unit: InventoryUnit;
+  metadata?: unknown;
 };
 
 export type UpdateInventoryItemInput = {
   name?: string;
   quantity?: number;
   unit?: InventoryUnit;
+  metadata?: unknown;
 };
 
 function toOptionalNumber(val: unknown, field: string): number | undefined {
@@ -23,6 +25,47 @@ function toOptionalNumber(val: unknown, field: string): number | undefined {
     throw new BadRequestError("invalid_number", `Body.${field} must be a number`);
   }
   return val;
+}
+
+function toOptionalString(val: unknown): string | undefined {
+  if (val === undefined || val === null) return undefined;
+  if (typeof val !== "string") return undefined;
+  const s = val.trim();
+  return s ? s : undefined;
+}
+
+function parseMetadata(category: InventoryCategory, raw: unknown): Record<string, unknown> | null {
+  if (raw === undefined || raw === null) return null;
+  if (typeof raw !== "object" || Array.isArray(raw)) {
+    throw new BadRequestError("invalid_metadata", "Body.metadata must be an object");
+  }
+  const o = raw as Record<string, unknown>;
+
+  if (category === "fermentable") {
+    const producer = toOptionalString(o.producer);
+    const colorLovibond = toOptionalNumber(o.colorLovibond, "metadata.colorLovibond");
+    const yieldPercent = toOptionalNumber(o.yieldPercent, "metadata.yieldPercent");
+    const ppg = toOptionalNumber(o.ppg, "metadata.ppg");
+    const out: Record<string, unknown> = {
+      ...(producer ? { producer } : {}),
+      ...(colorLovibond !== undefined ? { colorLovibond: Math.max(0, colorLovibond) } : {}),
+      ...(yieldPercent !== undefined ? { yieldPercent: Math.max(0, yieldPercent) } : {}),
+      ...(ppg !== undefined ? { ppg: Math.max(0, ppg) } : {}),
+    };
+    return Object.keys(out).length ? out : null;
+  }
+
+  if (category === "hop") {
+    const alphaMin = toOptionalNumber(o.alphaMin, "metadata.alphaMin");
+    const alphaMax = toOptionalNumber(o.alphaMax, "metadata.alphaMax");
+    const out: Record<string, unknown> = {
+      ...(alphaMin !== undefined ? { alphaMin: Math.max(0, alphaMin) } : {}),
+      ...(alphaMax !== undefined ? { alphaMax: Math.max(0, alphaMax) } : {}),
+    };
+    return Object.keys(out).length ? out : null;
+  }
+
+  return null;
 }
 
 const VALID_CATEGORIES: InventoryCategory[] = [
@@ -85,6 +128,7 @@ export class InventoryService {
       input.ingredientId != null && typeof input.ingredientId === "string" && input.ingredientId.trim()
         ? input.ingredientId.trim()
         : null;
+    const metadataJson = parseMetadata(category, input.metadata);
 
     return this.prisma.inventoryItem.create({
       data: {
@@ -94,6 +138,7 @@ export class InventoryService {
         name,
         quantity,
         unit,
+        ...(metadataJson ? { metadataJson } : {}),
       },
     });
   }
@@ -115,6 +160,7 @@ export class InventoryService {
     }
 
     const unit = input.unit !== undefined ? assertUnit(input.unit) : undefined;
+    const metadataJson = input.metadata !== undefined ? parseMetadata(existing.category, input.metadata) : undefined;
 
     return this.prisma.inventoryItem.update({
       where: { id },
@@ -122,6 +168,7 @@ export class InventoryService {
         ...(name !== undefined ? { name } : {}),
         ...(quantity !== undefined ? { quantity } : {}),
         ...(unit !== undefined ? { unit } : {}),
+        ...(metadataJson !== undefined ? { metadataJson } : {}),
       },
     });
   }

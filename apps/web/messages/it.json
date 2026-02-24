@@ -156,22 +156,49 @@
     }
   },
   "inventory": {
-    "title": "Inventario",
+    "title": "Gestione inventario",
     "subtitle": "Traccia fermentabili, luppoli, acidi, sali e altri materiali di produzione.",
     "backToDashboard": "Torna alla Dashboard",
     "addCustom": "Aggiungi personalizzato",
     "addFromList": "Aggiungi da elenco",
+    "addFromListAdd": "Aggiungi",
     "remove": "Rimuovi",
+    "clearSearch": "Svuota ricerca",
+    "producerLabel": "Produttore",
+    "lovibondLabel": "Colore ({unit})",
+    "yieldPercentLabel": "Resa (%)",
+    "ppgLabel": "PPG",
+    "alphaAcid": "Acidi alfa",
+    "alphaMinLabel": "α min (%)",
+    "alphaMaxLabel": "α max (%)",
+    "addCustomGuidance": "Aggiungi ingrediente personalizzato: per evitare duplicazioni, controlla attentamente che non sia già presente nell’elenco qui sopra (potrebbe avere un nome leggermente diverso). L’elenco esistente dovrebbe già comprendere tutti i tipi e sottotipi dell’ingrediente.",
+    "columns": {
+      "name": "Nome",
+      "producer": "Produttore",
+      "type": "Tipo",
+      "lovibondShort": "°L",
+      "yieldPercentShort": "Resa %",
+      "ppg": "PPG",
+      "alphaMin": "α min",
+      "alphaMax": "α max"
+    },
     "sections": {
       "fermentables": "Fermentabili",
       "hops": "Luppoli",
       "specialities": "Specialità",
       "acidSalts": "Acidi e sali",
       "detergentsSanitizers": "Detergenti e sanificanti",
-      "kegging": "Kegging"
+      "kegging": "Kegging & imbottigliamento"
     },
     "searchPlaceholder": "Cerca…",
-    "search": "Cerca",
+    "search": "Cerca nel database pubblico",
+    "noResultsTryAnotherKey": "Nessun risultato. Prova un’altra chiave.",
+    "pagination": {
+      "ariaLabel": "Paginazione ricerca inventario",
+      "prev": "Precedente",
+      "next": "Successivo",
+      "status": "Pagina {page} di {pages}"
+    },
     "noItems": "Nessun articolo ancora.",
     "quantityLabel": "Quantità ({unit})",
     "nameLabel": "Nome"

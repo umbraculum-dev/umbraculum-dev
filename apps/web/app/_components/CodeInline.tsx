@@ -8,14 +8,15 @@ const MONO_FONT =
 
 export interface CodeInlineProps {
   children: ReactNode;
+  color?: string;
 }
 
-export function CodeInline({ children }: CodeInlineProps) {
+export function CodeInline({ children, color }: CodeInlineProps) {
   return (
     <SizableText
       size="$2"
       fontFamily={MONO_FONT}
-      color="inherit"
+      color={color ?? "inherit"}
       as="code"
     >
       {children}

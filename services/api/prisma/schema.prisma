@@ -869,6 +869,7 @@ model InventoryItem {
   name         String
   quantity     Float
   unit         InventoryUnit     @default(kg)
+  metadataJson Json?             @map("metadata_json")
   createdAt    DateTime         @default(now()) @map("created_at")
   updatedAt    DateTime         @updatedAt @map("updated_at")
 

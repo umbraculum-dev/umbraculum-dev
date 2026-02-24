@@ -13,6 +13,7 @@ import { formatFixed } from "../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { AdSlot } from "../../../_components/AdSlot";
 import { CodeInline } from "../../../_components/CodeInline";
+import { StripedRow } from "../../../_components/StripedRow";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   ErrorBox,
@@ -1433,31 +1434,32 @@ export default function RecipeEditPage() {
         <View
           position="fixed"
           top={16}
-          left="50%"
-          style={{ transform: "translateX(-50%)" }}
+          left={0}
+          right={0}
           zIndex={1000}
           width="100%"
-          maxWidth={600}
           px="$4"
         >
-          <YStack gap="$2" width="100%">
-          {saveStatus ? (
-            <MessageBox
-              variant="success"
-              role="status"
-              aria-live="polite"
-              dismissAfter={5000}
-              onDismiss={() => setSaveStatus(null)}
-            >
-              {saveStatus}
-            </MessageBox>
-          ) : null}
-          {saveError ? (
-            <ErrorBox aria-live="polite">
-              {saveError}
-            </ErrorBox>
-          ) : null}
-          </YStack>
+          <View width="100%" maxWidth={600} mx="auto">
+            <YStack gap="$2" width="100%">
+              {saveStatus ? (
+                <MessageBox
+                  variant="success"
+                  role="status"
+                  aria-live="polite"
+                  dismissAfter={5000}
+                  onDismiss={() => setSaveStatus(null)}
+                >
+                  {saveStatus}
+                </MessageBox>
+              ) : null}
+              {saveError ? (
+                <ErrorBox aria-live="polite">
+                  {saveError}
+                </ErrorBox>
+              ) : null}
+            </YStack>
+          </View>
         </View>
       ) : null}
 
@@ -1794,46 +1796,55 @@ export default function RecipeEditPage() {
                     <>
                       <View overflowX="auto">
                         <YStack gap="$2">
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                              <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.abv")}</SizableText>
-                                  {renderMath(
-                                    "analysis.abv",
-                                    renderDerivationMath(
+                          {[
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.abv")}</SizableText>
+                                    {renderMath(
                                       "analysis.abv",
-                                      tMath("analysis.abv.body", {
+                                      renderDerivationMath(
+                                        "analysis.abv",
+                                        tMath("analysis.abv.body", {
+                                          og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                          fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
+                                          abv: fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2),
+                                        }),
+                                      ) ?? tMath("analysis.abv.body", {
                                         og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
                                         fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
                                         abv: fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2),
                                       }),
-                                    ) ?? tMath("analysis.abv.body", {
-                                      og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
-                                      fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
-                                      abv: fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <XStack gap="$1" ai="baseline" display="inline-flex">
-                                <CodeInline>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</CodeInline>
-                                {typeof a?.abvEstimatedPercent === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText> : null}
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <XStack gap="$1" ai="baseline" display="inline-flex">
+                                    <CodeInline>{fmtField("abvEstimatedPercent", a?.abvEstimatedPercent, 2)}</CodeInline>
+                                    {typeof a?.abvEstimatedPercent === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText> : null}
+                                  </XStack>
+                                </View>
                               </XStack>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                              <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuTinseth")}</SizableText>
-                                  {renderMath(
-                                    "analysis.ibuTinseth",
-                                    renderDerivationMath(
-                                      "analysis.ibu_tinseth",
-                                      tMath("analysis.ibuTinseth.body", {
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuTinseth")}</SizableText>
+                                    {renderMath(
+                                      "analysis.ibuTinseth",
+                                      renderDerivationMath(
+                                        "analysis.ibu_tinseth",
+                                        tMath("analysis.ibuTinseth.body", {
+                                          ibu: fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1),
+                                          gravity: ibuGravityUsed.value,
+                                          gravitySource: ibuGravityUsed.source,
+                                          volume: ibuVolumeUsed.value,
+                                          volumeSource: ibuVolumeUsed.source,
+                                          hopsLines: hopLines,
+                                        }),
+                                      ) ?? tMath("analysis.ibuTinseth.body", {
                                         ibu: fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1),
                                         gravity: ibuGravityUsed.value,
                                         gravitySource: ibuGravityUsed.source,
@@ -1841,32 +1852,32 @@ export default function RecipeEditPage() {
                                         volumeSource: ibuVolumeUsed.source,
                                         hopsLines: hopLines,
                                       }),
-                                    ) ?? tMath("analysis.ibuTinseth.body", {
-                                      ibu: fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1),
-                                      gravity: ibuGravityUsed.value,
-                                      gravitySource: ibuGravityUsed.source,
-                                      volume: ibuVolumeUsed.value,
-                                      volumeSource: ibuVolumeUsed.source,
-                                      hopsLines: hopLines,
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuRager")}</SizableText>
-                                  {renderMath(
-                                    "analysis.ibuRager",
-                                    renderDerivationMath(
-                                      "analysis.ibu_rager",
-                                      tMath("analysis.ibuRager.body", {
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{fmtField("ibuTinsethEstimated", a?.ibuTinsethEstimated, 1)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.ibuRager")}</SizableText>
+                                    {renderMath(
+                                      "analysis.ibuRager",
+                                      renderDerivationMath(
+                                        "analysis.ibu_rager",
+                                        tMath("analysis.ibuRager.body", {
+                                          ibu: fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1),
+                                          gravity: ibuGravityUsed.value,
+                                          gravitySource: ibuGravityUsed.source,
+                                          volume: ibuVolumeUsed.value,
+                                          volumeSource: ibuVolumeUsed.source,
+                                          hopsLines: hopLines,
+                                        }),
+                                      ) ?? tMath("analysis.ibuRager.body", {
                                         ibu: fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1),
                                         gravity: ibuGravityUsed.value,
                                         gravitySource: ibuGravityUsed.source,
@@ -1874,44 +1885,45 @@ export default function RecipeEditPage() {
                                         volumeSource: ibuVolumeUsed.source,
                                         hopsLines: hopLines,
                                       }),
-                                    ) ?? tMath("analysis.ibuRager.body", {
-                                      ibu: fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1),
-                                      gravity: ibuGravityUsed.value,
-                                      gravitySource: ibuGravityUsed.source,
-                                      volume: ibuVolumeUsed.value,
-                                      volumeSource: ibuVolumeUsed.source,
-                                      hopsLines: hopLines,
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.buGu")}</SizableText>
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{fmtField("buGuRatio", a?.buGuRatio, 2)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmMorey")}</SizableText>
-                                  {renderMath(
-                                    "analysis.srmMorey",
-                                    renderDerivationMath(
-                                      "analysis.srm_morey",
-                                      tMath("analysis.srmMorey.body", {
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{fmtField("ibuRagerEstimated", a?.ibuRagerEstimated, 1)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.buGu")}</SizableText>
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{fmtField("buGuRatio", a?.buGuRatio, 2)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmMorey")}</SizableText>
+                                    {renderMath(
+                                      "analysis.srmMorey",
+                                      renderDerivationMath(
+                                        "analysis.srm_morey",
+                                        tMath("analysis.srmMorey.body", {
+                                          srm: fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1),
+                                          volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                          notes: warningCodes.has("missing_color_volume")
+                                            ? tMath("analysis.common.noteMissingWaterSettings")
+                                            : warningCodes.has("missing_fermentable_colors")
+                                              ? tMath("analysis.common.noteMissingFermentableColors")
+                                              : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                        }),
+                                      ) ?? tMath("analysis.srmMorey.body", {
                                         srm: fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1),
                                         volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                         notes: warningCodes.has("missing_color_volume")
@@ -1920,33 +1932,33 @@ export default function RecipeEditPage() {
                                             ? tMath("analysis.common.noteMissingFermentableColors")
                                             : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                       }),
-                                    ) ?? tMath("analysis.srmMorey.body", {
-                                      srm: fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1),
-                                      volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
-                                      notes: warningCodes.has("missing_color_volume")
-                                        ? tMath("analysis.common.noteMissingWaterSettings")
-                                        : warningCodes.has("missing_fermentable_colors")
-                                          ? tMath("analysis.common.noteMissingFermentableColors")
-                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmDaniels")}</SizableText>
-                                  {renderMath(
-                                    "analysis.srmDaniels",
-                                    renderDerivationMath(
-                                      "analysis.srm_daniels",
-                                      tMath("analysis.srmDaniels.body", {
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{fmtField("colorSrmMoreyEstimated", a?.colorSrmMoreyEstimated, 1)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.srmDaniels")}</SizableText>
+                                    {renderMath(
+                                      "analysis.srmDaniels",
+                                      renderDerivationMath(
+                                        "analysis.srm_daniels",
+                                        tMath("analysis.srmDaniels.body", {
+                                          srm: fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1),
+                                          volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                          notes: warningCodes.has("missing_color_volume")
+                                            ? tMath("analysis.common.noteMissingWaterSettings")
+                                            : warningCodes.has("missing_fermentable_colors")
+                                              ? tMath("analysis.common.noteMissingFermentableColors")
+                                              : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                        }),
+                                      ) ?? tMath("analysis.srmDaniels.body", {
                                         srm: fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1),
                                         volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                         notes: warningCodes.has("missing_color_volume")
@@ -1955,116 +1967,129 @@ export default function RecipeEditPage() {
                                             ? tMath("analysis.common.noteMissingFermentableColors")
                                             : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                       }),
-                                    ) ?? tMath("analysis.srmDaniels.body", {
-                                      srm: fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1),
-                                      volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
-                                      notes: warningCodes.has("missing_color_volume")
-                                        ? tMath("analysis.common.noteMissingWaterSettings")
-                                        : warningCodes.has("missing_fermentable_colors")
-                                          ? tMath("analysis.common.noteMissingFermentableColors")
-                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.boilTimeMinutes")}</SizableText>
-                                </XStack>
-                            </View>
-                            <View>
-                              <XStack gap="$1" ai="baseline" display="inline-flex">
-                                <CodeInline>{fmtField("boilTimeMinutes", a?.boilTimeMinutes, 0)}</CodeInline>
-                                {typeof a?.boilTimeMinutes === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span"> min</SizableText> : null}
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{fmtField("colorSrmDanielsEstimated", a?.colorSrmDanielsEstimated, 1)}</CodeInline>
+                                </View>
                               </XStack>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.kettleVolume")}</SizableText>
-                                  {renderMath(
-                                    "analysis.kettleVolume",
-                                    renderDerivationMath(
-                                      "analysis.kettle_volume",
-                                      tMath("analysis.kettleVolume.body", {
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.boilTimeMinutes")}</SizableText>
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <XStack gap="$1" ai="baseline" display="inline-flex">
+                                    <CodeInline>{fmtField("boilTimeMinutes", a?.boilTimeMinutes, 0)}</CodeInline>
+                                    {typeof a?.boilTimeMinutes === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span"> min</SizableText> : null}
+                                  </XStack>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.kettleVolume")}</SizableText>
+                                    {renderMath(
+                                      "analysis.kettleVolume",
+                                      renderDerivationMath(
+                                        "analysis.kettle_volume",
+                                        tMath("analysis.kettleVolume.body", {
+                                          kettleVolume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                          notes:
+                                            warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
+                                              ? tMath("analysis.common.noteMissingWaterSettings")
+                                              : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                        }),
+                                      ) ?? tMath("analysis.kettleVolume.body", {
                                         kettleVolume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                         notes:
                                           warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
                                             ? tMath("analysis.common.noteMissingWaterSettings")
                                             : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                       }),
-                                    ) ?? tMath("analysis.kettleVolume.body", {
-                                      kettleVolume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
-                                      notes:
-                                        warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
-                                          ? tMath("analysis.common.noteMissingWaterSettings")
-                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <XStack gap="$1" ai="baseline" display="inline-flex">
-                                <CodeInline>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</CodeInline>
-                                {typeof a?.kettleVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <XStack gap="$1" ai="baseline" display="inline-flex">
+                                    <CodeInline>{fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2)}</CodeInline>
+                                    {typeof a?.kettleVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
+                                  </XStack>
+                                </View>
                               </XStack>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.preBoilVolume")}</SizableText>
-                                  {renderMath(
-                                    "analysis.preBoilVolume",
-                                    renderDerivationMath(
-                                      "analysis.pre_boil_volume",
-                                      tMath("analysis.preBoilVolume.body", {
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.preBoilVolume")}</SizableText>
+                                    {renderMath(
+                                      "analysis.preBoilVolume",
+                                      renderDerivationMath(
+                                        "analysis.pre_boil_volume",
+                                        tMath("analysis.preBoilVolume.body", {
+                                          preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
+                                          notes:
+                                            warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
+                                              ? tMath("analysis.common.noteMissingWaterSettings")
+                                              : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
+                                        }),
+                                      ) ?? tMath("analysis.preBoilVolume.body", {
                                         preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
                                         notes:
                                           warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
                                             ? tMath("analysis.common.noteMissingWaterSettings")
                                             : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
                                       }),
-                                    ) ?? tMath("analysis.preBoilVolume.body", {
-                                      preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
-                                      notes:
-                                        warningCodes.has("missing_water_settings") || warningCodes.has("missing_water_volumes")
-                                          ? tMath("analysis.common.noteMissingWaterSettings")
-                                          : tMath("analysis.common.noteDependsOnWaterAndEquipment"),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <XStack gap="$1" ai="baseline" display="inline-flex">
-                                <CodeInline>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</CodeInline>
-                                {typeof a?.preBoilVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <XStack gap="$1" ai="baseline" display="inline-flex">
+                                    <CodeInline>{fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2)}</CodeInline>
+                                    {typeof a?.preBoilVolumeLiters === "number" ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">L</SizableText> : null}
+                                  </XStack>
+                                </View>
                               </XStack>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.og")}</SizableText>
-                                  {renderMath(
-                                    "analysis.og",
-                                    renderDerivationMath(
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.og")}</SizableText>
+                                    {renderMath(
                                       "analysis.og",
-                                      tMath("analysis.og.body", {
+                                      renderDerivationMath(
+                                        "analysis.og",
+                                        tMath("analysis.og.body", {
+                                          og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                          volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
+                                          efficiency: (() => {
+                                            const ext = (recipe as any)?.recipeExtJson;
+                                            const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                            const mashEff =
+                                              typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                                ? e.equipment.mash.mashEfficiencyPercent
+                                                : null;
+                                            const brewEff =
+                                              typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                                ? e.brewhouseEfficiencyPercent
+                                                : null;
+                                            const bjEff =
+                                              (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                                ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                                : null;
+                                            const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                            return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                          })(),
+                                        }),
+                                      ) ?? tMath("analysis.og.body", {
                                         og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
                                         volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                         efficiency: (() => {
@@ -2086,73 +2111,73 @@ export default function RecipeEditPage() {
                                           return eff != null ? fmt(eff, 1) : tAnalysis("na");
                                         })(),
                                       }),
-                                    ) ?? tMath("analysis.og.body", {
-                                      og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
-                                      volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
-                                      efficiency: (() => {
-                                        const ext = (recipe as any)?.recipeExtJson;
-                                        const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                        const mashEff =
-                                          typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                            ? e.equipment.mash.mashEfficiencyPercent
-                                            : null;
-                                        const brewEff =
-                                          typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                            ? e.brewhouseEfficiencyPercent
-                                            : null;
-                                        const bjEff =
-                                          (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                            ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                            : null;
-                                        const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
-                                        return eff != null ? fmt(eff, 1) : tAnalysis("na");
-                                      })(),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{formatSgWithPlato(a?.ogEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.fg")}</SizableText>
-                                  {renderMath(
-                                    "analysis.fg",
-                                    renderDerivationMath(
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{formatSgWithPlato(a?.ogEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.fg")}</SizableText>
+                                    {renderMath(
                                       "analysis.fg",
-                                      tMath("analysis.fg.body", {
+                                      renderDerivationMath(
+                                        "analysis.fg",
+                                        tMath("analysis.fg.body", {
+                                          og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
+                                          attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
+                                          fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
+                                        }),
+                                      ) ?? tMath("analysis.fg.body", {
                                         og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
                                         attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
                                         fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
                                       }),
-                                    ) ?? tMath("analysis.fg.body", {
-                                      og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
-                                      attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
-                                      fg: fmtField("fgEstimatedSg", a?.fgEstimatedSg, 3),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{formatSgWithPlato(a?.fgEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))" px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
-                                  {renderMath(
-                                    "analysis.pbg",
-                                    renderDerivationMath(
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{formatSgWithPlato(a?.fgEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.pbg")}</SizableText>
+                                    {renderMath(
                                       "analysis.pbg",
-                                      tMath("analysis.pbg.body", {
+                                      renderDerivationMath(
+                                        "analysis.pbg",
+                                        tMath("analysis.pbg.body", {
+                                          pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
+                                          preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
+                                          efficiency: (() => {
+                                            const ext = (recipe as any)?.recipeExtJson;
+                                            const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
+                                            const mashEff =
+                                              typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
+                                                ? e.equipment.mash.mashEfficiencyPercent
+                                                : null;
+                                            const brewEff =
+                                              typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
+                                                ? e.equipment.mash.mashEfficiencyPercent
+                                                : null;
+                                            const bjEff =
+                                              (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
+                                                ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
+                                                : null;
+                                            const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                            return eff != null ? fmt(eff, 1) : tAnalysis("na");
+                                          })(),
+                                        }),
+                                      ) ?? tMath("analysis.pbg.body", {
                                         pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
                                         preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
                                         efficiency: (() => {
@@ -2174,93 +2199,75 @@ export default function RecipeEditPage() {
                                           return eff != null ? fmt(eff, 1) : tAnalysis("na");
                                         })(),
                                       }),
-                                    ) ?? tMath("analysis.pbg.body", {
-                                      pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
-                                      preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
-                                      efficiency: (() => {
-                                        const ext = (recipe as any)?.recipeExtJson;
-                                        const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                        const mashEff =
-                                          typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                            ? e.equipment.mash.mashEfficiencyPercent
-                                            : null;
-                                        const brewEff =
-                                          typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                            ? e.equipment.mash.mashEfficiencyPercent
-                                            : null;
-                                        const bjEff =
-                                          (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                            ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                            : null;
-                                        const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
-                                        return eff != null ? fmt(eff, 1) : tAnalysis("na");
-                                      })(),
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <CodeInline>{formatSgWithPlato(a?.pbgEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
-                            </View>
-                          </XStack>
-                          </View>
-                          <View px="$2" py="$1" borderRadius="$2">
-                          <XStack gap="$2" ai="baseline">
-                            <View minW={180} pr="$3">
-                                <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
-                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.attenuation")}</SizableText>
-                                  {renderMath(
-                                    "analysis.attenuation",
-                                    renderDerivationMath(
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <CodeInline>{formatSgWithPlato(a?.pbgEstimatedSg, (v, d) => formatFixed(locale, v, d), 3, 1)}</CodeInline>
+                                </View>
+                              </XStack>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <XStack gap="$2" alignItems="baseline" flexWrap="wrap">
+                                    <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">{tAnalysis("fields.attenuation")}</SizableText>
+                                    {renderMath(
                                       "analysis.attenuation",
-                                      tMath("analysis.attenuation.body", {
+                                      renderDerivationMath(
+                                        "analysis.attenuation",
+                                        tMath("analysis.attenuation.body", {
+                                          attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
+                                          yeastLines: yeastLines.lines,
+                                          selectedLines: yeastLines.selectedLines,
+                                          topAvg: yeastLines.topAvg,
+                                        }),
+                                      ) ?? tMath("analysis.attenuation.body", {
                                         attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
                                         yeastLines: yeastLines.lines,
                                         selectedLines: yeastLines.selectedLines,
                                         topAvg: yeastLines.topAvg,
                                       }),
-                                    ) ?? tMath("analysis.attenuation.body", {
-                                      attenuation: fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1),
-                                      yeastLines: yeastLines.lines,
-                                      selectedLines: yeastLines.selectedLines,
-                                      topAvg: yeastLines.topAvg,
-                                    }),
-                                  )}
-                                </XStack>
-                            </View>
-                            <View>
-                              <XStack gap="$1" ai="baseline" display="inline-flex">
-                                <CodeInline>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</CodeInline>
-                                {typeof a?.attenuationEffectivePercent === "number" ? (
-                                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText>
-                                ) : null}
+                                    )}
+                                  </XStack>
+                                </View>
+                                <View>
+                                  <XStack gap="$1" ai="baseline" display="inline-flex">
+                                    <CodeInline>{fmtField("attenuationEffectivePercent", a?.attenuationEffectivePercent, 1)}</CodeInline>
+                                    {typeof a?.attenuationEffectivePercent === "number" ? (
+                                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">%</SizableText>
+                                    ) : null}
+                                  </XStack>
+                                </View>
                               </XStack>
-                            </View>
-                          </XStack>
-                          </View>
-
-                          <View px="$2" py="$1" borderRadius="$2">
-                            <XStack gap="$2" ai="baseline">
-                              <View minW={180} pr="$3">
-                                <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">
-                                  {tAnalysis("gristWaterConsistencyCheck")}
-                                </SizableText>
-                              </View>
-                              <View>
-                                {gristWaterConsistency.status === "passed" ? (
-                                  <CodeInline style={{ color: "var(--success)" }}>
-                                    {tAnalysis("gristWaterConsistencyPassed")}
-                                  </CodeInline>
-                                ) : gristWaterConsistency.status === "error" ? (
-                                  <CodeInline style={{ color: "var(--danger)" }}>
-                                    {tAnalysis("gristWaterConsistencyError")}
-                                  </CodeInline>
-                                ) : (
-                                  <CodeInline>—</CodeInline>
-                                )}
-                              </View>
-                            </XStack>
-                          </View>
+                            ),
+                            (
+                              <XStack gap="$2" ai="baseline">
+                                <View minW={180} pr="$3">
+                                  <SizableText fontWeight="bold" fontFamily="$body" color="var(--text)">
+                                    {tAnalysis("gristWaterConsistencyCheck")}
+                                  </SizableText>
+                                </View>
+                                <View>
+                                  {gristWaterConsistency.status === "passed" ? (
+                                    <CodeInline color="var(--success)">
+                                      {tAnalysis("gristWaterConsistencyPassed")}
+                                    </CodeInline>
+                                  ) : gristWaterConsistency.status === "error" ? (
+                                    <CodeInline color="var(--danger)">
+                                      {tAnalysis("gristWaterConsistencyError")}
+                                    </CodeInline>
+                                  ) : (
+                                    <CodeInline>—</CodeInline>
+                                  )}
+                                </View>
+                              </XStack>
+                            ),
+                          ].map((row, idx) => (
+                            <StripedRow key={idx} odd={idx % 2 === 1}>
+                              {row}
+                            </StripedRow>
+                          ))}
                           {gristWaterConsistency.status === "error" ? (
                             <View
                               mt="$2"

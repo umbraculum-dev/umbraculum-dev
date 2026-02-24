@@ -14,48 +14,71 @@ function getQueryString(raw: unknown): string {
   return raw.trim();
 }
 
+function getQueryInt(raw: unknown): number | null {
+  if (typeof raw !== "string") return null;
+  const v = raw.trim();
+  if (!v) return null;
+  const n = Number.parseInt(v, 10);
+  if (!Number.isFinite(n)) return null;
+  return n;
+}
+
+function clampInt(n: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, n));
+}
+
 export async function ingredientsRoutes(app: FastifyInstance) {
   const workspaces = new WorkspacesService(app.prisma);
 
   app.get("/ingredients/fermentables", async (req) => {
     const ctx = requireUser(req);
     const q = getQueryString((req.query as any)?.query);
+    const offsetRaw = getQueryInt((req.query as any)?.offset);
+    const limitRaw = getQueryInt((req.query as any)?.limit);
+    const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
+    const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
-    const items = await app.prisma.fermentable.findMany({
-      where: {
-        deprecatedAt: null,
-        ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
-        ...(q
-          ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" } },
-                { producer: { contains: q, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: { name: "asc" },
-      take: 50,
-      select: {
-        id: true,
-        workspaceId: true,
-        name: true,
-        producer: true,
-        group: true,
-        type: true,
-        notes: true,
-        country: true,
-        colorEbc: true,
-        colorLovibond: true,
-        yieldPercent: true,
-        ppg: true,
-        mashDiPh: true,
-        mashTaToPh57_mEqPerKg: true,
-        mashPhModelKey: true,
-        mashPhModelSource: true,
-        mashPhModelVersion: true,
-      },
-    });
+    const where = {
+      deprecatedAt: null,
+      ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: "insensitive" } },
+              { producer: { contains: q, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    } as const;
+
+    const [total, items] = await Promise.all([
+      app.prisma.fermentable.count({ where }),
+      app.prisma.fermentable.findMany({
+        where,
+        orderBy: { name: "asc" },
+        skip: offset,
+        take: limit,
+        select: {
+          id: true,
+          workspaceId: true,
+          name: true,
+          producer: true,
+          group: true,
+          type: true,
+          notes: true,
+          country: true,
+          colorEbc: true,
+          colorLovibond: true,
+          yieldPercent: true,
+          ppg: true,
+          mashDiPh: true,
+          mashTaToPh57_mEqPerKg: true,
+          mashPhModelKey: true,
+          mashPhModelSource: true,
+          mashPhModelVersion: true,
+        },
+      }),
+    ]);
 
     const computed = items.map((it) => {
       const defaults = getMashPhModelDefaultsV1({
@@ -75,35 +98,45 @@ export async function ingredientsRoutes(app: FastifyInstance) {
       };
     });
 
-    return { ok: true, items: computed };
+    return { ok: true, items: computed, total, offset, limit };
   });
 
   app.get("/ingredients/hops", async (req) => {
     const ctx = requireUser(req);
     const q = getQueryString((req.query as any)?.query);
+    const offsetRaw = getQueryInt((req.query as any)?.offset);
+    const limitRaw = getQueryInt((req.query as any)?.limit);
+    const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
+    const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
-    const items = await app.prisma.hop.findMany({
-      where: {
-        deprecatedAt: null,
-        ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
-        ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
-      },
-      orderBy: { name: "asc" },
-      take: 50,
-      select: {
-        id: true,
-        workspaceId: true,
-        name: true,
-        country: true,
-        type: true,
-        alphaMin: true,
-        alphaMax: true,
-        betaMin: true,
-        betaMax: true,
-      },
-    });
+    const where = {
+      deprecatedAt: null,
+      ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
+      ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
+    } as const;
 
-    return { ok: true, items };
+    const [total, items] = await Promise.all([
+      app.prisma.hop.count({ where }),
+      app.prisma.hop.findMany({
+        where,
+        orderBy: { name: "asc" },
+        skip: offset,
+        take: limit,
+        select: {
+          id: true,
+          workspaceId: true,
+          name: true,
+          country: true,
+          type: true,
+          alphaMin: true,
+          alphaMax: true,
+          betaMin: true,
+          betaMax: true,
+        },
+      }),
+    ]);
+
+    return { ok: true, items, total, offset, limit };
   });
 
   app.get("/ingredients/yeasts", async (req) => {

@@ -156,22 +156,49 @@
     }
   },
   "inventory": {
-    "title": "Inventory",
+    "title": "Inventory Management",
     "subtitle": "Track fermentables, hops, acids, salts, and other brewing supplies.",
     "backToDashboard": "Back to Dashboard",
     "addCustom": "Add custom",
     "addFromList": "Add from list",
+    "addFromListAdd": "Add",
     "remove": "Remove",
+    "clearSearch": "Clear search",
+    "producerLabel": "Producer",
+    "lovibondLabel": "Color ({unit})",
+    "yieldPercentLabel": "Yield (%)",
+    "ppgLabel": "PPG",
+    "alphaAcid": "Alpha acid",
+    "alphaMinLabel": "α min (%)",
+    "alphaMaxLabel": "α max (%)",
+    "addCustomGuidance": "Add custom ingredient: to avoid duplication, double-check carefully that it is not already present in the above list (it could have a slightly different name). The existing list should already comprise all existing types and subtypes for the ingredient.",
+    "columns": {
+      "name": "Name",
+      "producer": "Producer",
+      "type": "Type",
+      "lovibondShort": "°L",
+      "yieldPercentShort": "Yield %",
+      "ppg": "PPG",
+      "alphaMin": "α min",
+      "alphaMax": "α max"
+    },
     "sections": {
       "fermentables": "Fermentables",
       "hops": "Hops",
       "specialities": "Specialities",
       "acidSalts": "Acid & Salts",
       "detergentsSanitizers": "Detergents & Sanitizers",
-      "kegging": "Kegging"
+      "kegging": "Kegging & Bottling"
     },
     "searchPlaceholder": "Search…",
-    "search": "Search",
+    "search": "Search in public database",
+    "noResultsTryAnotherKey": "No results. Try another key.",
+    "pagination": {
+      "ariaLabel": "Inventory search pagination",
+      "prev": "Previous",
+      "next": "Next",
+      "status": "Page {page} of {pages}"
+    },
     "noItems": "No items yet.",
     "quantityLabel": "Quantity ({unit})",
     "nameLabel": "Name"

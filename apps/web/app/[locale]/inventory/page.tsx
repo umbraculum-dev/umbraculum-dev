@@ -15,6 +15,7 @@ import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
 import { DashboardClient } from "../../DashboardClient";
 import { Link } from "../../../src/i18n/navigation";
+import { StripedRow } from "../../_components/StripedRow";
 
 type InventoryCategory =
   | "fermentable"
@@ -34,6 +35,7 @@ type InventoryItem = {
   name: string;
   quantity: number;
   unit: InventoryUnit;
+  metadataJson: unknown | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -67,6 +69,8 @@ const DEFAULT_UNIT: Record<InventoryCategory, InventoryUnit> = {
   kegging: "count",
 };
 
+const PUBLIC_DB_PAGE_SIZE = 20;
+
 export default function InventoryPage() {
   const t = useTranslations("inventory");
   const tCommon = useTranslations("common");
@@ -88,13 +92,30 @@ export default function InventoryPage() {
 
   const [customName, setCustomName] = useState<Record<string, string>>({});
   const [customQty, setCustomQty] = useState<Record<string, string>>({});
+  const [customFermentableProducer, setCustomFermentableProducer] = useState("");
+  const [customFermentableLovibond, setCustomFermentableLovibond] = useState("");
+  const [customFermentableYieldPercent, setCustomFermentableYieldPercent] = useState("");
+  const [customFermentablePpg, setCustomFermentablePpg] = useState("");
+  const [customHopAlphaMin, setCustomHopAlphaMin] = useState("");
+  const [customHopAlphaMax, setCustomHopAlphaMax] = useState("");
   const [qtyDraft, setQtyDraft] = useState<Record<string, string>>({});
   const [fermentableQuery, setFermentableQuery] = useState("");
+  const [fermentableActiveQuery, setFermentableActiveQuery] = useState("");
   const [fermentableResults, setFermentableResults] = useState<any[]>([]);
   const [fermentableSearching, setFermentableSearching] = useState(false);
+  const [fermentableSearched, setFermentableSearched] = useState(false);
+  const [fermentablePage, setFermentablePage] = useState(0);
+  const [fermentableTotal, setFermentableTotal] = useState<number | null>(null);
   const [hopQuery, setHopQuery] = useState("");
+  const [hopActiveQuery, setHopActiveQuery] = useState("");
   const [hopResults, setHopResults] = useState<any[]>([]);
   const [hopSearching, setHopSearching] = useState(false);
+  const [hopSearched, setHopSearched] = useState(false);
+  const [hopPage, setHopPage] = useState(0);
+  const [hopTotal, setHopTotal] = useState<number | null>(null);
+  const [acidSaltQuery, setAcidSaltQuery] = useState("");
+  const [acidSaltResults, setAcidSaltResults] = useState<(typeof ACID_SALT_OPTIONS)[number][]>([]);
+  const [acidSaltSearched, setAcidSaltSearched] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!canCall) return;
@@ -130,24 +151,65 @@ export default function InventoryPage() {
     const qtyStr = customQty[category] ?? "0";
     const qty = parseFloat(qtyStr);
     const unit = category === "acid_salt" ? "ml" : DEFAULT_UNIT[category];
+    const metadata = (() => {
+      if (category === "fermentable") {
+        const producer = customFermentableProducer.trim() || undefined;
+        const colorLovibond = Number.isFinite(parseFloat(customFermentableLovibond)) ? parseFloat(customFermentableLovibond) : undefined;
+        const yieldPercent = Number.isFinite(parseFloat(customFermentableYieldPercent)) ? parseFloat(customFermentableYieldPercent) : undefined;
+        const ppg = Number.isFinite(parseFloat(customFermentablePpg)) ? parseFloat(customFermentablePpg) : undefined;
+        const out: Record<string, unknown> = {
+          ...(producer ? { producer } : {}),
+          ...(colorLovibond !== undefined ? { colorLovibond } : {}),
+          ...(yieldPercent !== undefined ? { yieldPercent } : {}),
+          ...(ppg !== undefined ? { ppg } : {}),
+        };
+        return Object.keys(out).length ? out : undefined;
+      }
+      if (category === "hop") {
+        const alphaMin = Number.isFinite(parseFloat(customHopAlphaMin)) ? parseFloat(customHopAlphaMin) : undefined;
+        const alphaMax = Number.isFinite(parseFloat(customHopAlphaMax)) ? parseFloat(customHopAlphaMax) : undefined;
+        const out: Record<string, unknown> = {
+          ...(alphaMin !== undefined ? { alphaMin } : {}),
+          ...(alphaMax !== undefined ? { alphaMax } : {}),
+        };
+        return Object.keys(out).length ? out : undefined;
+      }
+      return undefined;
+    })();
     try {
       const res = await apiFetch("/api/inventory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, name, quantity: Number.isFinite(qty) ? qty : 0, unit }),
+        body: JSON.stringify({ category, name, quantity: Number.isFinite(qty) ? qty : 0, unit, metadata }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       setCustomName((prev) => ({ ...prev, [category]: "" }));
       setCustomQty((prev) => ({ ...prev, [category]: "" }));
+      if (category === "fermentable") {
+        setCustomFermentableProducer("");
+        setCustomFermentableLovibond("");
+        setCustomFermentableYieldPercent("");
+        setCustomFermentablePpg("");
+      }
+      if (category === "hop") {
+        setCustomHopAlphaMin("");
+        setCustomHopAlphaMax("");
+      }
       await refresh();
     } catch (err) {
       setError(String(err));
     }
   };
 
-  const addFromFermentable = async (item: { id: string; name: string }) => {
+  const addFromFermentable = async (item: any) => {
     if (!canCall) return;
     try {
+      const metadata = {
+        ...(typeof item?.producer === "string" && item.producer.trim() ? { producer: item.producer.trim() } : {}),
+        ...(typeof item?.colorLovibond === "number" && Number.isFinite(item.colorLovibond) ? { colorLovibond: item.colorLovibond } : {}),
+        ...(typeof item?.yieldPercent === "number" && Number.isFinite(item.yieldPercent) ? { yieldPercent: item.yieldPercent } : {}),
+        ...(typeof item?.ppg === "number" && Number.isFinite(item.ppg) ? { ppg: item.ppg } : {}),
+      };
       const res = await apiFetch("/api/inventory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,6 +219,7 @@ export default function InventoryPage() {
           name: item.name,
           quantity: 0,
           unit: "kg",
+          metadata,
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
@@ -168,9 +231,13 @@ export default function InventoryPage() {
     }
   };
 
-  const addFromHop = async (item: { id: string; name: string }) => {
+  const addFromHop = async (item: any) => {
     if (!canCall) return;
     try {
+      const metadata = {
+        ...(typeof item?.alphaMin === "number" && Number.isFinite(item.alphaMin) ? { alphaMin: item.alphaMin } : {}),
+        ...(typeof item?.alphaMax === "number" && Number.isFinite(item.alphaMax) ? { alphaMax: item.alphaMax } : {}),
+      };
       const res = await apiFetch("/api/inventory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,6 +247,7 @@ export default function InventoryPage() {
           name: item.name,
           quantity: 0,
           unit: "kg",
+          metadata,
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
@@ -244,47 +312,151 @@ export default function InventoryPage() {
 
   const onSearchFermentables = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canCall) return;
-    setFermentableSearching(true);
-    try {
-      const res = await apiFetch(`/api/ingredients/fermentables?query=${encodeURIComponent(fermentableQuery)}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const data = res.data as { ok: boolean; items?: any[] };
-      setFermentableResults(Array.isArray(data.items) ? data.items : []);
-    } catch {
-      setFermentableResults([]);
-    } finally {
-      setFermentableSearching(false);
-    }
+    const q = fermentableQuery;
+    setFermentableActiveQuery(q);
+    void fetchFermentablesPage(0, q);
   };
+
+  const clearFermentablesSearch = () => {
+    setFermentableQuery("");
+    setFermentableActiveQuery("");
+    setFermentableResults([]);
+    setFermentableTotal(null);
+    setFermentablePage(0);
+    setFermentableSearched(false);
+  };
+
+  const fetchFermentablesPage = useCallback(
+    async (page: number, query: string) => {
+      if (!canCall) return;
+      const safePage = Math.max(0, page);
+      const offset = safePage * PUBLIC_DB_PAGE_SIZE;
+      setFermentableSearching(true);
+      setFermentableSearched(false);
+      try {
+        const res = await apiFetch(
+          `/api/ingredients/fermentables?query=${encodeURIComponent(query)}&limit=${PUBLIC_DB_PAGE_SIZE}&offset=${offset}`
+        );
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const data = res.data as { ok: boolean; items?: any[]; total?: number };
+        const items = Array.isArray(data.items) ? data.items : [];
+        setFermentableResults(items);
+        setFermentableTotal(typeof data.total === "number" && Number.isFinite(data.total) ? data.total : null);
+        setFermentablePage(safePage);
+      } catch {
+        setFermentableResults([]);
+        setFermentableTotal(0);
+        setFermentablePage(0);
+      } finally {
+        setFermentableSearched(true);
+        setFermentableSearching(false);
+      }
+    },
+    [canCall]
+  );
 
   const onSearchHops = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canCall) return;
-    setHopSearching(true);
-    try {
-      const res = await apiFetch(`/api/ingredients/hops?query=${encodeURIComponent(hopQuery)}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const data = res.data as { ok: boolean; items?: any[] };
-      setHopResults(Array.isArray(data.items) ? data.items : []);
-    } catch {
-      setHopResults([]);
-    } finally {
-      setHopSearching(false);
-    }
+    const q = hopQuery;
+    setHopActiveQuery(q);
+    void fetchHopsPage(0, q);
   };
+
+  const clearHopsSearch = () => {
+    setHopQuery("");
+    setHopActiveQuery("");
+    setHopResults([]);
+    setHopTotal(null);
+    setHopPage(0);
+    setHopSearched(false);
+  };
+
+  const onSearchAcidSalts = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = acidSaltQuery.trim().toLowerCase();
+    const results =
+      q
+        ? ACID_SALT_OPTIONS.filter(
+            (x) => x.label.toLowerCase().includes(q) || x.value.toLowerCase().includes(q)
+          )
+        : ACID_SALT_OPTIONS;
+    setAcidSaltResults(results);
+    setAcidSaltSearched(true);
+  };
+
+  const clearAcidSaltsSearch = () => {
+    setAcidSaltQuery("");
+    setAcidSaltResults([]);
+    setAcidSaltSearched(false);
+  };
+
+  const fetchHopsPage = useCallback(
+    async (page: number, query: string) => {
+      if (!canCall) return;
+      const safePage = Math.max(0, page);
+      const offset = safePage * PUBLIC_DB_PAGE_SIZE;
+      setHopSearching(true);
+      setHopSearched(false);
+      try {
+        const res = await apiFetch(
+          `/api/ingredients/hops?query=${encodeURIComponent(query)}&limit=${PUBLIC_DB_PAGE_SIZE}&offset=${offset}`
+        );
+        if (!res.ok) throw new Error(JSON.stringify(res.data));
+        const data = res.data as { ok: boolean; items?: any[]; total?: number };
+        const items = Array.isArray(data.items) ? data.items : [];
+        setHopResults(items);
+        setHopTotal(typeof data.total === "number" && Number.isFinite(data.total) ? data.total : null);
+        setHopPage(safePage);
+      } catch {
+        setHopResults([]);
+        setHopTotal(0);
+        setHopPage(0);
+      } finally {
+        setHopSearched(true);
+        setHopSearching(false);
+      }
+    },
+    [canCall]
+  );
 
   const unitLabel = (u: InventoryUnit) => (u === "kg" ? tUnits("kg") : u === "g" ? tUnits("g") : u === "ml" ? tUnits("mL") : tUnits("count"));
 
   const renderItemRow = (it: InventoryItem) => {
     const draft = qtyDraft[it.id];
     const displayQty = draft !== undefined ? draft : String(it.quantity);
+    const meta =
+      it.metadataJson && typeof it.metadataJson === "object" && !Array.isArray(it.metadataJson)
+        ? (it.metadataJson as any)
+        : null;
+    const producer = typeof meta?.producer === "string" ? meta.producer : null;
+    const colorLovibond = typeof meta?.colorLovibond === "number" && Number.isFinite(meta.colorLovibond) ? meta.colorLovibond : null;
+    const yieldPercent = typeof meta?.yieldPercent === "number" && Number.isFinite(meta.yieldPercent) ? meta.yieldPercent : null;
+    const ppg = typeof meta?.ppg === "number" && Number.isFinite(meta.ppg) ? meta.ppg : null;
+    const alphaMin = typeof meta?.alphaMin === "number" && Number.isFinite(meta.alphaMin) ? meta.alphaMin : null;
+    const alphaMax = typeof meta?.alphaMax === "number" && Number.isFinite(meta.alphaMax) ? meta.alphaMax : null;
+
     return (
       <RecipeEditIngredientCard key={it.id}>
         <XStack gap="$3" flexWrap="wrap" alignItems="center">
-          <SizableText size="$2" fontFamily="$body" color="var(--text)" flex={1} minWidth={120}>
-            {it.name}
-          </SizableText>
+          <YStack flex={1} minWidth={160} gap="$1">
+            <SizableText size="$2" fontFamily="$body" color="var(--text)">
+              {it.name}
+            </SizableText>
+            {it.category === "fermentable" && (producer || colorLovibond != null || yieldPercent != null || ppg != null) ? (
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                {(producer ?? "").trim() ? `${t("producerLabel")}: ${producer}` : null}
+                {colorLovibond != null ? ` · ${t("columns.lovibondShort")}: ${colorLovibond.toFixed(1)}` : null}
+                {yieldPercent != null ? ` · ${t("yieldPercentLabel")}: ${yieldPercent.toFixed(1)}%` : null}
+                {ppg != null ? ` · ${t("ppgLabel")}: ${ppg.toFixed(3)}` : null}
+              </SizableText>
+            ) : null}
+            {it.category === "hop" && (alphaMin != null || alphaMax != null) ? (
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                {alphaMin != null ? `${t("alphaMinLabel")}: ${alphaMin.toFixed(1)}%` : null}
+                {alphaMax != null ? `${alphaMin != null ? " · " : ""}${t("alphaMaxLabel")}: ${alphaMax.toFixed(1)}%` : null}
+              </SizableText>
+            ) : null}
+          </YStack>
           <YStack minWidth={100} gap="$1">
             <RecipeEditFieldLabel htmlFor={`inv-qty-${it.id}`}>
               {t("quantityLabel", { unit: unitLabel(it.unit) })}
@@ -379,54 +551,211 @@ export default function InventoryPage() {
                     <Button type="submit" size="$3" disabled={fermentableSearching}>
                       {fermentableSearching ? "…" : t("search")}
                     </Button>
+                    <Button
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      onPress={clearFermentablesSearch}
+                      disabled={fermentableSearching || (!fermentableQuery && !fermentableResults.length && !fermentableSearched)}
+                    >
+                      {t("clearSearch")}
+                    </Button>
                   </XStack>
                 </form>
-                {fermentableResults.length > 0 ? (
-                  <BrewSelect
-                    value=""
-                    onValueChange={(v) => {
-                      if (!v) return;
-                      const it = fermentableResults.find((x) => x.id === v);
-                      if (it) void addFromFermentable(it);
-                    }}
-                    options={[{ value: "", label: `— ${t("addFromList")} —` }, ...fermentableResults.slice(0, 20).map((x) => ({ value: x.id, label: x.name }))]}
-                    width={220}
-                  />
-                ) : null}
               </XStack>
-              <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
-                <YStack minWidth={120} gap="$1">
-                  <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
-                  <Input
-                    value={customName.fermentable ?? ""}
-                    onChangeText={(v) => setCustomName((p) => ({ ...p, fermentable: v }))}
-                    placeholder={t("nameLabel")}
+              {fermentableResults.length ? (
+                <View overflowX="auto" mt="$2">
+                  <YStack gap="$1">
+                    <StripedRow odd={false}>
+                      <XStack gap="$2" ai="center" minW="max-content">
+                        <View minW={185}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.name")}</SizableText></View>
+                      <View minW={110}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.producer")}</SizableText></View>
+                      <View minW={50} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">{t("columns.lovibondShort")}</SizableText></View>
+                      <View minW={70} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">{t("columns.yieldPercentShort")}</SizableText></View>
+                      <View minW={60} jc="flex-end"><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)" textAlign="right" width="100%">{t("columns.ppg")}</SizableText></View>
+                      <View minW={60} />
+                      </XStack>
+                    </StripedRow>
+                    {fermentableResults.map((it, idx) => (
+                      <StripedRow key={it.id} odd={idx % 2 === 1}>
+                        <XStack gap="$2" ai="center" minW="max-content">
+                          <View minW={185}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
+                        <View minW={110}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.producer ?? ""}</SizableText></View>
+                        <View minW={50}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.colorLovibond === "number" ? it.colorLovibond.toFixed(1) : ""}</SizableText></View>
+                        <View minW={70}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.yieldPercent === "number" ? it.yieldPercent.toFixed(3) : ""}</SizableText></View>
+                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.ppg === "number" ? it.ppg.toFixed(3) : ""}</SizableText></View>
+                        <View minW={60}>
+                          <Button
+                            size="$2"
+                            bg="var(--surface-2)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            color="var(--text)"
+                            fontFamily="$body"
+                            onPress={() => void addFromFermentable(it)}
+                            disabled={!canCall}
+                          >
+                            {t("addFromListAdd")}
+                          </Button>
+                        </View>
+                        </XStack>
+                      </StripedRow>
+                    ))}
+                  </YStack>
+                </View>
+              ) : null}
+              {fermentableSearched && !fermentableSearching && fermentableResults.length === 0 ? (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+                  {t("noResultsTryAnotherKey")}
+                </SizableText>
+              ) : null}
+              {fermentableResults.length && (fermentableTotal ?? fermentableResults.length) > PUBLIC_DB_PAGE_SIZE ? (
+                <XStack
+                  mt="$2"
+                  gap="$2"
+                  ai="center"
+                  jc="flex-end"
+                  aria-label={t("pagination.ariaLabel")}
+                >
+                  <Button
+                    size="$2"
+                    disabled={fermentablePage <= 0 || fermentableSearching}
+                    onPress={() => void fetchFermentablesPage(fermentablePage - 1, fermentableActiveQuery)}
+                  >
+                    {t("pagination.prev")}
+                  </Button>
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    {t("pagination.status", {
+                      page: fermentablePage + 1,
+                      pages: Math.max(
+                        1,
+                        Math.ceil((fermentableTotal ?? fermentableResults.length) / PUBLIC_DB_PAGE_SIZE)
+                      ),
+                    })}
+                  </SizableText>
+                  <Button
+                    size="$2"
+                    disabled={
+                      fermentableSearching ||
+                      (fermentableTotal != null
+                        ? (fermentablePage + 1) * PUBLIC_DB_PAGE_SIZE >= fermentableTotal
+                        : fermentableResults.length < PUBLIC_DB_PAGE_SIZE)
+                    }
+                    onPress={() => void fetchFermentablesPage(fermentablePage + 1, fermentableActiveQuery)}
+                  >
+                    {t("pagination.next")}
+                  </Button>
+                </XStack>
+              ) : null}
+              <View
+                borderWidth={1}
+                borderColor="var(--border)"
+                bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
+                rounded="$2"
+                p="$3"
+              >
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb="$2">
+                  {t("addCustomGuidance")}
+                </SizableText>
+                <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
+                  <YStack minWidth={120} gap="$1">
+                    <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customName.fermentable ?? ""}
+                      onChangeText={(v) => setCustomName((p) => ({ ...p, fermentable: v }))}
+                      placeholder={t("nameLabel")}
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={140} gap="$1">
+                    <RecipeEditFieldLabel>{t("producerLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customFermentableProducer}
+                      onChangeText={setCustomFermentableProducer}
+                      placeholder={t("producerLabel")}
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={80} gap="$1">
+                    <RecipeEditFieldLabel>{t("lovibondLabel", { unit: tUnits("lovibond") })}</RecipeEditFieldLabel>
+                    <Input
+                      value={customFermentableLovibond}
+                      onChangeText={setCustomFermentableLovibond}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={90} gap="$1">
+                    <RecipeEditFieldLabel>{t("yieldPercentLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customFermentableYieldPercent}
+                      onChangeText={setCustomFermentableYieldPercent}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={90} gap="$1">
+                    <RecipeEditFieldLabel>{t("ppgLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customFermentablePpg}
+                      onChangeText={setCustomFermentablePpg}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={80} gap="$1">
+                    <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
+                    <Input
+                      value={customQty.fermentable ?? ""}
+                      onChangeText={(v) => setCustomQty((p) => ({ ...p, fermentable: v }))}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <Button
                     size="$3"
-                    bg="var(--surface)"
+                    onPress={() => void addCustom("fermentable")}
+                    bg="var(--surface-2)"
                     borderWidth={1}
                     borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
-                  />
-                </YStack>
-                <YStack minWidth={80} gap="$1">
-                  <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
-                  <Input
-                    value={customQty.fermentable ?? ""}
-                    onChangeText={(v) => setCustomQty((p) => ({ ...p, fermentable: v }))}
-                    keyboardType="decimal-pad"
-                    size="$3"
-                    bg="var(--surface)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
-                  />
-                </YStack>
-                <Button size="$3" onPress={() => void addCustom("fermentable")} bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)">
-                  {t("addCustom")}
-                </Button>
-              </XStack>
+                    color="var(--text)"
+                  >
+                    {t("addCustom")}
+                  </Button>
+                </XStack>
+              </View>
               {itemsByCategory("fermentable").length === 0 ? (
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("noItems")}</SizableText>
               ) : (
@@ -461,54 +790,178 @@ export default function InventoryPage() {
                     <Button type="submit" size="$3" disabled={hopSearching}>
                       {hopSearching ? "…" : t("search")}
                     </Button>
+                    <Button
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      onPress={clearHopsSearch}
+                      disabled={hopSearching || (!hopQuery && !hopResults.length && !hopSearched)}
+                    >
+                      {t("clearSearch")}
+                    </Button>
                   </XStack>
                 </form>
-                {hopResults.length > 0 ? (
-                  <BrewSelect
-                    value=""
-                    onValueChange={(v) => {
-                      if (!v) return;
-                      const it = hopResults.find((x) => x.id === v);
-                      if (it) void addFromHop(it);
-                    }}
-                    options={[{ value: "", label: `— ${t("addFromList")} —` }, ...hopResults.slice(0, 20).map((x) => ({ value: x.id, label: x.name }))]}
-                    width={220}
-                  />
-                ) : null}
               </XStack>
-              <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
-                <YStack minWidth={120} gap="$1">
-                  <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
-                  <Input
-                    value={customName.hop ?? ""}
-                    onChangeText={(v) => setCustomName((p) => ({ ...p, hop: v }))}
-                    placeholder={t("nameLabel")}
+              {hopResults.length ? (
+                <View overflowX="auto" mt="$2">
+                  <YStack gap="$1">
+                    <StripedRow odd={false}>
+                      <XStack gap="$2" ai="center" minW="max-content">
+                        <View minW={235}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.name")}</SizableText></View>
+                        <View minW={120}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.type")}</SizableText></View>
+                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.alphaMin")}</SizableText></View>
+                      <View minW={60}><SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">{t("columns.alphaMax")}</SizableText></View>
+                      <View minW={60} />
+                      </XStack>
+                    </StripedRow>
+                    {hopResults.map((it, idx) => (
+                      <StripedRow key={it.id} odd={idx % 2 === 1}>
+                        <XStack gap="$2" ai="center" minW="max-content">
+                          <View minW={235}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.name}</SizableText></View>
+                          <View minW={120}><SizableText size="$2" fontFamily="$body" color="var(--text)">{it.type ?? ""}</SizableText></View>
+                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.alphaMin === "number" ? it.alphaMin.toFixed(1) : ""}</SizableText></View>
+                        <View minW={60}><SizableText size="$2" fontFamily="$body" color="var(--text)" textAlign="right">{typeof it.alphaMax === "number" ? it.alphaMax.toFixed(1) : ""}</SizableText></View>
+                        <View minW={60}>
+                          <Button
+                            size="$2"
+                            bg="var(--surface-2)"
+                            borderWidth={1}
+                            borderColor="var(--border)"
+                            color="var(--text)"
+                            fontFamily="$body"
+                            onPress={() => void addFromHop(it)}
+                            disabled={!canCall}
+                          >
+                            {t("addFromListAdd")}
+                          </Button>
+                        </View>
+                        </XStack>
+                      </StripedRow>
+                    ))}
+                  </YStack>
+                </View>
+              ) : null}
+              {hopSearched && !hopSearching && hopResults.length === 0 ? (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+                  {t("noResultsTryAnotherKey")}
+                </SizableText>
+              ) : null}
+              {hopResults.length && (hopTotal ?? hopResults.length) > PUBLIC_DB_PAGE_SIZE ? (
+                <XStack
+                  mt="$2"
+                  gap="$2"
+                  ai="center"
+                  jc="flex-end"
+                  aria-label={t("pagination.ariaLabel")}
+                >
+                  <Button
+                    size="$2"
+                    disabled={hopPage <= 0 || hopSearching}
+                    onPress={() => void fetchHopsPage(hopPage - 1, hopActiveQuery)}
+                  >
+                    {t("pagination.prev")}
+                  </Button>
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    {t("pagination.status", {
+                      page: hopPage + 1,
+                      pages: Math.max(1, Math.ceil((hopTotal ?? hopResults.length) / PUBLIC_DB_PAGE_SIZE)),
+                    })}
+                  </SizableText>
+                  <Button
+                    size="$2"
+                    disabled={
+                      hopSearching ||
+                      (hopTotal != null
+                        ? (hopPage + 1) * PUBLIC_DB_PAGE_SIZE >= hopTotal
+                        : hopResults.length < PUBLIC_DB_PAGE_SIZE)
+                    }
+                    onPress={() => void fetchHopsPage(hopPage + 1, hopActiveQuery)}
+                  >
+                    {t("pagination.next")}
+                  </Button>
+                </XStack>
+              ) : null}
+              <View
+                borderWidth={1}
+                borderColor="var(--border)"
+                bg="color-mix(in srgb, var(--surface-2) 35%, var(--surface))"
+                rounded="$2"
+                p="$3"
+              >
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0} mb="$2">
+                  {t("addCustomGuidance")}
+                </SizableText>
+                <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
+                  <YStack minWidth={120} gap="$1">
+                    <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customName.hop ?? ""}
+                      onChangeText={(v) => setCustomName((p) => ({ ...p, hop: v }))}
+                      placeholder={t("nameLabel")}
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={90} gap="$1">
+                    <RecipeEditFieldLabel>{t("alphaMinLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customHopAlphaMin}
+                      onChangeText={setCustomHopAlphaMin}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={90} gap="$1">
+                    <RecipeEditFieldLabel>{t("alphaMaxLabel")}</RecipeEditFieldLabel>
+                    <Input
+                      value={customHopAlphaMax}
+                      onChangeText={setCustomHopAlphaMax}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <YStack minWidth={80} gap="$1">
+                    <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
+                    <Input
+                      value={customQty.hop ?? ""}
+                      onChangeText={(v) => setCustomQty((p) => ({ ...p, hop: v }))}
+                      keyboardType="decimal-pad"
+                      size="$3"
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                  </YStack>
+                  <Button
                     size="$3"
-                    bg="var(--surface)"
+                    onPress={() => void addCustom("hop")}
+                    bg="var(--surface-2)"
                     borderWidth={1}
                     borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
-                  />
-                </YStack>
-                <YStack minWidth={80} gap="$1">
-                  <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
-                  <Input
-                    value={customQty.hop ?? ""}
-                    onChangeText={(v) => setCustomQty((p) => ({ ...p, hop: v }))}
-                    keyboardType="decimal-pad"
-                    size="$3"
-                    bg="var(--surface)"
-                    borderWidth={1}
-                    borderColor="var(--border)"
-                    rounded="$2"
-                    fontFamily="$body"
-                  />
-                </YStack>
-                <Button size="$3" onPress={() => void addCustom("hop")} bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)">
-                  {t("addCustom")}
-                </Button>
-              </XStack>
+                    color="var(--text)"
+                  >
+                    {t("addCustom")}
+                  </Button>
+                </XStack>
+              </View>
               {itemsByCategory("hop").length === 0 ? (
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{t("noItems")}</SizableText>
               ) : (
@@ -574,19 +1027,84 @@ export default function InventoryPage() {
             onOpenChange={(o) => setSectionOpen("acidSalts", o)}
           >
             <YStack gap="$2">
-              <XStack gap="$2" flexWrap="wrap" alignItems="center">
-                <SizableText size="$2" fontFamily="$body" color="var(--text)">{t("addFromList")}:</SizableText>
-                <BrewSelect
-                  value=""
-                  onValueChange={(v) => {
-                    if (!v) return;
-                    const opt = ACID_SALT_OPTIONS.find((x) => x.value === v);
-                    if (opt) void addFromAcidSalt(opt);
-                  }}
-                  options={[{ value: "", label: `— ${t("addFromList")} —` }, ...ACID_SALT_OPTIONS.map((x) => ({ value: x.value, label: x.label }))]}
-                  width={220}
-                />
+              <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
+                <form onSubmit={onSearchAcidSalts}>
+                  <XStack gap="$2" alignItems="center">
+                    <Input
+                      value={acidSaltQuery}
+                      onChangeText={setAcidSaltQuery}
+                      placeholder={t("searchPlaceholder")}
+                      size="$3"
+                      minWidth={180}
+                      bg="var(--surface)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      rounded="$2"
+                      fontFamily="$body"
+                    />
+                    <Button type="submit" size="$3">
+                      {t("search")}
+                    </Button>
+                    <Button
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      onPress={clearAcidSaltsSearch}
+                      disabled={!acidSaltQuery && !acidSaltResults.length && !acidSaltSearched}
+                    >
+                      {t("clearSearch")}
+                    </Button>
+                  </XStack>
+                </form>
               </XStack>
+              {acidSaltResults.length ? (
+                <View overflowX="auto" mt="$2">
+                  <YStack gap="$1">
+                    <StripedRow odd={false}>
+                      <XStack gap="$2" ai="center" minW="max-content">
+                        <View minW={260}>
+                          <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
+                            {t("columns.name")}
+                          </SizableText>
+                        </View>
+                        <View minW={60} />
+                      </XStack>
+                    </StripedRow>
+                    {acidSaltResults.map((opt, idx) => (
+                      <StripedRow key={opt.value} odd={idx % 2 === 1}>
+                        <XStack gap="$2" ai="center" minW="max-content">
+                          <View minW={260}>
+                            <SizableText size="$2" fontFamily="$body" color="var(--text)">
+                              {opt.label}
+                            </SizableText>
+                          </View>
+                          <View minW={60}>
+                            <Button
+                              size="$2"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="$body"
+                              onPress={() => void addFromAcidSalt(opt)}
+                              disabled={!canCall}
+                            >
+                              {t("addFromListAdd")}
+                            </Button>
+                          </View>
+                        </XStack>
+                      </StripedRow>
+                    ))}
+                  </YStack>
+                </View>
+              ) : null}
+              {acidSaltSearched && acidSaltResults.length === 0 ? (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2">
+                  {t("noResultsTryAnotherKey")}
+                </SizableText>
+              ) : null}
               <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
                 <YStack minWidth={120} gap="$1">
                   <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
