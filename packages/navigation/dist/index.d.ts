@@ -1,9 +1,11 @@
 type AppPlatform = "web" | "native";
-type RouteId = "dashboard" | "inventory" | "recipes" | "recipeEdit" | "waterHub" | "waterMash" | "waterSparge" | "waterBoil" | "yeast" | "equipment" | "fermDataIntegration" | "quality" | "login";
+type RouteId = "dashboard" | "inventory" | "recipes" | "brewdayStepsSettings" | "waterProfiles" | "recipeEdit" | "waterHub" | "waterMash" | "waterSparge" | "waterBoil" | "yeast" | "equipment" | "fermDataIntegration" | "quality" | "login";
 interface RouteParamsById {
     dashboard: Record<string, never>;
     inventory: Record<string, never>;
     recipes: Record<string, never>;
+    brewdayStepsSettings: Record<string, never>;
+    waterProfiles: Record<string, never>;
     recipeEdit: {
         recipeId: string;
     };

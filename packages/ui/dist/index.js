@@ -50,6 +50,7 @@ function Screen({ flex, style, ...props }) {
     YStack2,
     {
       flex: flex ?? 1,
+      backgroundColor: props.backgroundColor ?? "$background",
       style: [{ padding: 16, gap: 16 }, style],
       ...props
     }

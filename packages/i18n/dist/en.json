@@ -2,13 +2,22 @@
   "common": {
     "backToDashboard": "Back to Dashboard",
     "loading": "Loading…",
+    "refresh": "Refresh",
+    "close": "Close",
     "dateLabel": "Date",
     "timeLabel": "Time",
     "localeLabel": "Language",
     "toggle": "Toggle",
+    "changeLanguage": "Change language",
     "toggleLanguage": "Toggle language",
     "dilutionDiagramLabel": "Dilution 1:100 diagram",
     "imageUnavailable": "Image unavailable"
+  },
+  "locales": {
+    "en": "English",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español"
   },
   "units": {
     "C": "°C",

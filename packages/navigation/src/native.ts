@@ -29,6 +29,10 @@ export function routeToNativeTarget(ref: RouteRef): NativeRouteTarget {
       return { screen: "Inventory", params: {} };
     case "recipes":
       return { screen: "Recipes", params: {} };
+    case "brewdayStepsSettings":
+      return { screen: "BrewdayStepsSettings", params: {} };
+    case "waterProfiles":
+      return { screen: "WaterProfiles", params: {} };
     case "recipeEdit":
       return { screen: "RecipeEdit", params: { recipeId: ref.params.recipeId } };
     case "waterHub":

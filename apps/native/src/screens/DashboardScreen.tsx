@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import type { RouteRef } from "@brewery/navigation";
 import { useT } from "@brewery/i18n-react";
-import type { SupportedLocale } from "@brewery/i18n";
+import { locales, type SupportedLocale } from "@brewery/i18n";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
 import { useAuth } from "../auth/AuthProvider";
@@ -19,6 +19,7 @@ export function DashboardScreen() {
   const { t } = useT("dashboard");
   const { t: tCommon } = useT("common");
   const { t: tHealth } = useT("health");
+  const { t: tLocales } = useT("locales");
 
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
@@ -32,6 +33,7 @@ export function DashboardScreen() {
   const [openWebState, setOpenWebState] = useState<{ status: "idle" | "opening"; error?: string }>({
     status: "idle",
   });
+  const [languagePickerOpen, setLanguagePickerOpen] = useState(false);
 
   const healthFetchInFlightRef = useRef(false);
 
@@ -226,20 +228,82 @@ export function DashboardScreen() {
           </Card>
 
           <Card gap="$2" aria-label={tNav("language")}>
-            <Heading fontSize={18}>{tNav("language")}</Heading>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
               <Text fontSize={14}>
-                {tCommon("localeLabel")}: {locale}
+                {tCommon("localeLabel")}: {tLocales(locale)}
               </Text>
               <Button
-                onPress={() => setLocale((locale === "en" ? "it" : "en") satisfies SupportedLocale)}
+                onPress={() => setLanguagePickerOpen(true)}
                 accessibilityRole="button"
                 accessibilityLabel={tCommon("toggleLanguage")}
               >
-                <Text>{tCommon("toggle")}</Text>
+                <Text>{tCommon("changeLanguage")}</Text>
               </Button>
             </View>
           </Card>
+
+          <Modal
+            visible={languagePickerOpen}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setLanguagePickerOpen(false)}
+          >
+            <Pressable
+              style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "flex-end" }}
+              onPress={() => setLanguagePickerOpen(false)}
+              accessibilityRole="button"
+              accessibilityLabel={tCommon("close")}
+            >
+              <Pressable
+                onPress={() => {}}
+                style={{
+                  backgroundColor: "#141820",
+                  borderTopLeftRadius: 16,
+                  borderTopRightRadius: 16,
+                  padding: 16,
+                  borderTopWidth: 1,
+                  borderTopColor: "#2a2f3a",
+                }}
+                accessibilityRole="none"
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <Heading fontSize={18}>{tNav("language")}</Heading>
+                  <Button
+                    onPress={() => setLanguagePickerOpen(false)}
+                    accessibilityRole="button"
+                    accessibilityLabel={tCommon("close")}
+                  >
+                    <Text>{tCommon("close")}</Text>
+                  </Button>
+                </View>
+
+                <View style={{ gap: 10, marginTop: 12 }}>
+                  {(locales as readonly SupportedLocale[]).map((l) => {
+                    const selected = l === locale;
+                    return (
+                      <Button
+                        key={l}
+                        onPress={() => {
+                          setLocale(l);
+                          setLanguagePickerOpen(false);
+                        }}
+                        accessibilityRole="button"
+                        accessibilityLabel={tLocales(l)}
+                        background={selected ? "$color4" : "$background"}
+                        borderWidth={1}
+                        borderColor="$borderColor"
+                      >
+                        <Text fontWeight={selected ? "700" : "400"}>
+                          {tLocales(l)}
+                          {selected ? " ✓" : ""}
+                        </Text>
+                      </Button>
+                    );
+                  })}
+                </View>
+              </Pressable>
+            </Pressable>
+          </Modal>
 
           <Button
             onPress={() => void auth.logout()}

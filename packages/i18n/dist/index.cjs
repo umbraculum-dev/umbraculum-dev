@@ -34,13 +34,22 @@ var en_default = {
   common: {
     backToDashboard: "Back to Dashboard",
     loading: "Loading\u2026",
+    refresh: "Refresh",
+    close: "Close",
     dateLabel: "Date",
     timeLabel: "Time",
     localeLabel: "Language",
     toggle: "Toggle",
+    changeLanguage: "Change language",
     toggleLanguage: "Toggle language",
     dilutionDiagramLabel: "Dilution 1:100 diagram",
     imageUnavailable: "Image unavailable"
+  },
+  locales: {
+    en: "English",
+    it: "Italiano",
+    de: "Deutsch",
+    es: "Espa\xF1ol"
   },
   units: {
     C: "\xB0C",
@@ -1434,13 +1443,22 @@ var it_default = {
   common: {
     backToDashboard: "Torna alla Dashboard",
     loading: "Caricamento\u2026",
+    refresh: "Aggiorna",
+    close: "Chiudi",
     dateLabel: "Data",
     timeLabel: "Ora",
     localeLabel: "Lingua",
     toggle: "Cambia",
+    changeLanguage: "Cambia lingua",
     toggleLanguage: "Cambia lingua",
     dilutionDiagramLabel: "Diagramma diluizione 1:100",
     imageUnavailable: "Immagine non disponibile"
+  },
+  locales: {
+    en: "Inglese",
+    it: "Italiano",
+    de: "Tedesco",
+    es: "Spagnolo"
   },
   units: {
     C: "\xB0C",

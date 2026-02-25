@@ -2,13 +2,22 @@
   "common": {
     "backToDashboard": "Torna alla Dashboard",
     "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "close": "Chiudi",
     "dateLabel": "Data",
     "timeLabel": "Ora",
     "localeLabel": "Lingua",
     "toggle": "Cambia",
+    "changeLanguage": "Cambia lingua",
     "toggleLanguage": "Cambia lingua",
     "dilutionDiagramLabel": "Diagramma diluizione 1:100",
     "imageUnavailable": "Immagine non disponibile"
+  },
+  "locales": {
+    "en": "Inglese",
+    "it": "Italiano",
+    "de": "Tedesco",
+    "es": "Spagnolo"
   },
   "units": {
     "C": "°C",

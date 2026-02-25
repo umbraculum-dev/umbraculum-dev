@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { enableScreens } from "react-native-screens";
-import { NavigationContainer } from "@react-navigation/native";
+import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { useT } from "@brewery/i18n-react";
@@ -45,12 +45,18 @@ export function AppNavigator() {
   if (state.status === "logged_out") return <LoginScreen />;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={DarkTheme}>
       <Tab.Navigator
         initialRouteName="Dashboard"
         screenOptions={{
           headerShown: false,
           headerTitleStyle: { fontFamily: "System" },
+          tabBarStyle: {
+            backgroundColor: "#141820",
+            borderTopColor: "#2a2f3a",
+          },
+          tabBarActiveTintColor: "#e7eaf0",
+          tabBarInactiveTintColor: "#b7bdc9",
         }}
       >
         <Tab.Screen

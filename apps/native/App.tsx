@@ -10,8 +10,8 @@ import { AppNavigator } from "./src/navigation/AppNavigator";
 
 export default function App() {
   return (
-    <TamaguiProvider config={config} defaultTheme="light">
-      <Theme name="light">
+    <TamaguiProvider config={config} defaultTheme="dark">
+      <Theme name="dark">
         <SafeAreaProvider>
           <I18nProvider>
             <AuthProvider>

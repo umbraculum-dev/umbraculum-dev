@@ -34,6 +34,10 @@ function routeToPath(ref) {
       return "/inventory";
     case "recipes":
       return "/recipes";
+    case "brewdayStepsSettings":
+      return "/brewday-steps-settings";
+    case "waterProfiles":
+      return "/water-profiles";
     case "recipeEdit":
       return `/recipes/${ref.params.recipeId}/edit`;
     case "waterHub":
@@ -68,6 +72,10 @@ function routeToNativeTarget(ref) {
       return { screen: "Inventory", params: {} };
     case "recipes":
       return { screen: "Recipes", params: {} };
+    case "brewdayStepsSettings":
+      return { screen: "BrewdayStepsSettings", params: {} };
+    case "waterProfiles":
+      return { screen: "WaterProfiles", params: {} };
     case "recipeEdit":
       return { screen: "RecipeEdit", params: { recipeId: ref.params.recipeId } };
     case "waterHub":

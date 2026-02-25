@@ -81,6 +81,7 @@ function Screen({ flex, style, ...props }) {
     import_tamagui3.YStack,
     {
       flex: flex ?? 1,
+      backgroundColor: props.backgroundColor ?? "$background",
       style: [{ padding: 16, gap: 16 }, style],
       ...props
     }

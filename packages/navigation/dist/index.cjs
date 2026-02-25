@@ -49,6 +49,10 @@ function routeToPath(ref) {
       return "/inventory";
     case "recipes":
       return "/recipes";
+    case "brewdayStepsSettings":
+      return "/brewday-steps-settings";
+    case "waterProfiles":
+      return "/water-profiles";
     case "recipeEdit":
       return `/recipes/${ref.params.recipeId}/edit`;
     case "waterHub":

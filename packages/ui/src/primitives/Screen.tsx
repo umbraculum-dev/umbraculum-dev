@@ -10,6 +10,7 @@ export function Screen({ flex, style, ...props }: ScreenProps) {
   return (
     <YStack
       flex={flex ?? 1}
+      backgroundColor={props.backgroundColor ?? "$background"}
       style={[{ padding: 16, gap: 16 }, style]}
       {...props}
     />

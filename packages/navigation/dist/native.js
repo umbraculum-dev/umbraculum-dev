@@ -1,6 +1,6 @@
 import {
   routeToPath
-} from "./chunk-ZFSKANIC.js";
+} from "./chunk-UYL6RSGQ.js";
 
 // src/native.ts
 function routeToNativeTarget(ref) {
@@ -11,6 +11,10 @@ function routeToNativeTarget(ref) {
       return { screen: "Inventory", params: {} };
     case "recipes":
       return { screen: "Recipes", params: {} };
+    case "brewdayStepsSettings":
+      return { screen: "BrewdayStepsSettings", params: {} };
+    case "waterProfiles":
+      return { screen: "WaterProfiles", params: {} };
     case "recipeEdit":
       return { screen: "RecipeEdit", params: { recipeId: ref.params.recipeId } };
     case "waterHub":
