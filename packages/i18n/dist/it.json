@@ -4,6 +4,7 @@
     "loading": "Caricamento…",
     "refresh": "Aggiorna",
     "close": "Chiudi",
+    "remove": "Rimuovi",
     "dateLabel": "Data",
     "timeLabel": "Ora",
     "localeLabel": "Lingua",
@@ -961,6 +962,16 @@
       "waterProfilesManageText": "Gestisci i profili su",
       "rawMaterialsCtaPrefix": "Hai trovato una materia prima mancante o errata?",
       "rawMaterialsCtaLinkText": "Aiuta a migliorare il database materie prime",
+      "fermentables": {
+        "buttons": {
+          "clear": "Pulisci",
+          "addCustomFermentable": "Aggiungi fermentabile personalizzato"
+        },
+        "amountLabel": "Quantità ({unit})",
+        "colorLabel": "Colore ({unit})",
+        "gristTotalKg": "Totale: {value} {unit}",
+        "gristAvgColor": "Colore medio: {value} {unit}"
+      },
       "buttons": {
         "clear": "Pulisci",
         "addFermentable": "Aggiungi fermentabile",

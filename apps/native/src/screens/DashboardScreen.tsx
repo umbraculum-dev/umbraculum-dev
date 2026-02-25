@@ -214,7 +214,7 @@ export function DashboardScreen() {
               {t("importExport.actionsLiveInRecipes")}
             </Text>
             <Button
-              onPress={() => void openWeb({ id: "recipes", params: {} })}
+              onPress={() => navigation.navigate("Recipes")}
               accessibilityRole="button"
               accessibilityLabel={t("importExport.actionsCta")}
             >

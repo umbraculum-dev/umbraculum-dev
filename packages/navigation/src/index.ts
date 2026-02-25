@@ -47,11 +47,14 @@ export function isWebviewWhitelistRouteId(id: RouteId): boolean {
   return (WEBVIEW_WHITELIST_ROUTE_IDS as readonly RouteId[]).includes(id);
 }
 
+const NATIVE_AVAILABLE_ROUTE_IDS = ["recipes", "recipeEdit"] as const satisfies readonly RouteId[];
+
 export function getRouteAvailability(id: RouteId, platform: AppPlatform): RouteAvailability {
   if (platform === "web") return "available";
 
   // Native is "block by default" during the porting phase.
   // Promote routes to "available" as they get real native screens.
+  if ((NATIVE_AVAILABLE_ROUTE_IDS as readonly RouteId[]).includes(id)) return "available";
   if (isWebviewWhitelistRouteId(id)) return "whitelisted_web_fallback";
   return "blocked";
 }

@@ -14,6 +14,7 @@
     "i18n:guardrail": "node scripts/i18n-guardrail.mjs"
   },
   "dependencies": {
+    "@brewery/beerjson": "file:../../packages/beerjson",
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/core": "file:../../packages/core",
     "@brewery/i18n": "file:../../packages/i18n",
@@ -25,8 +26,8 @@
     "@tamagui/core": "^2.0.0-rc.12",
     "next": "^15.0.0",
     "next-intl": "^4.0.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "react-native-web": "^0.20.0",
     "tamagui": "^2.0.0-rc.11"
   },

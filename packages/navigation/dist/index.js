@@ -6,7 +6,7 @@ import {
   prefixLocalePath,
   routeToLocalePath,
   routeToPath
-} from "./chunk-UYL6RSGQ.js";
+} from "./chunk-YJSMPQZN.js";
 export {
   WEBVIEW_WHITELIST_ROUTE_IDS,
   getRouteAvailability,

@@ -20,3 +20,6 @@ export function kgToLb(kg: number): number;
 
 export function roundTo(value: number, decimals: number): number;
 
+export function platoToSg(plato: number): number | null;
+export function sgToPlato(sg: number): number | null;
+

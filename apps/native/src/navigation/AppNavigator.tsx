@@ -13,6 +13,8 @@ import { useAuth } from "../auth/AuthProvider";
 import { DashboardScreen } from "../screens/DashboardScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { BlockedRouteScreen } from "../screens/BlockedRouteScreen";
+import { RecipeEditScreen } from "../screens/RecipeEditScreen";
+import { RecipesListScreen } from "../screens/RecipesListScreen";
 import { SelectWorkspaceScreen } from "../screens/SelectWorkspaceScreen";
 
 enableScreens();
@@ -28,6 +30,7 @@ const Tab = createBottomTabNavigator<TabParamList>();
 type RootStackParamList = {
   Tabs: undefined;
   SelectWorkspace: undefined;
+  RecipeEdit: { recipeId: string };
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -54,7 +57,7 @@ function TabsNavigator({ tabLabels }: { tabLabels: { dashboard: string; recipes:
       }}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ title: tabLabels.dashboard }} />
-      <Tab.Screen name="Recipes" component={makeBlocked("recipes")} options={{ title: tabLabels.recipes }} />
+      <Tab.Screen name="Recipes" component={RecipesListScreen} options={{ title: tabLabels.recipes }} />
       <Tab.Screen name="Inventory" component={makeBlocked("inventory")} options={{ title: tabLabels.inventory }} />
     </Tab.Navigator>
   );
@@ -82,6 +85,17 @@ export function AppNavigator() {
         <RootStack.Screen name="SelectWorkspace">
           {({ navigation }) => <SelectWorkspaceScreen onDone={() => navigation.goBack()} />}
         </RootStack.Screen>
+        <RootStack.Screen
+          name="RecipeEdit"
+          component={RecipeEditScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
       </RootStack.Navigator>
     </NavigationContainer>
   );

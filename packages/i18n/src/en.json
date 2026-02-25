@@ -4,6 +4,7 @@
     "loading": "Loading…",
     "refresh": "Refresh",
     "close": "Close",
+    "remove": "Remove",
     "dateLabel": "Date",
     "timeLabel": "Time",
     "localeLabel": "Language",
@@ -954,6 +955,16 @@
       "waterProfilesManageText": "Manage profiles on",
       "rawMaterialsCtaPrefix": "Found a missing or incorrect raw material?",
       "rawMaterialsCtaLinkText": "Help improve the raw material database",
+      "fermentables": {
+        "buttons": {
+          "clear": "Clear",
+          "addCustomFermentable": "Add custom fermentable"
+        },
+        "amountLabel": "Amount ({unit})",
+        "colorLabel": "Color ({unit})",
+        "gristTotalKg": "Total: {value} {unit}",
+        "gristAvgColor": "Avg color: {value} {unit}"
+      },
       "buttons": {
         "clear": "Clear",
         "addFermentable": "Add fermentable",

@@ -33,8 +33,10 @@ var WEBVIEW_WHITELIST_ROUTE_IDS = ["inventory"];
 function isWebviewWhitelistRouteId(id) {
   return WEBVIEW_WHITELIST_ROUTE_IDS.includes(id);
 }
+var NATIVE_AVAILABLE_ROUTE_IDS = ["recipes", "recipeEdit"];
 function getRouteAvailability(id, platform) {
   if (platform === "web") return "available";
+  if (NATIVE_AVAILABLE_ROUTE_IDS.includes(id)) return "available";
   if (isWebviewWhitelistRouteId(id)) return "whitelisted_web_fallback";
   return "blocked";
 }

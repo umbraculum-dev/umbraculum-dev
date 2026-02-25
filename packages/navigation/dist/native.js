@@ -1,6 +1,6 @@
 import {
   routeToPath
-} from "./chunk-UYL6RSGQ.js";
+} from "./chunk-YJSMPQZN.js";
 
 // src/native.ts
 function routeToNativeTarget(ref) {
