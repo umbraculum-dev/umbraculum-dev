@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import {
@@ -186,12 +186,17 @@ const YEAST_FORMAT_OPTIONS: { value: NonNullable<EditorYeastRow["format"]>; labe
 export function RecipeEditScreen() {
   const auth = useAuth();
   const route = useRoute();
+  const navigation = useNavigation();
   const recipeId = (route.params as { recipeId?: string })?.recipeId ?? "";
   const { t } = useT("recipes.edit");
   const { t: tRecipes } = useT("recipes");
   const { t: tCommon } = useT("common");
   const { t: tEquip } = useT("equipment");
   const { t: tUnits } = useT("units");
+
+  useEffect(() => {
+    navigation.setOptions({ headerTitle: t("title") });
+  }, [navigation, t]);
 
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
