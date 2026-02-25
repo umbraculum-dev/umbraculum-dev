@@ -6,6 +6,9 @@ import config from "./tamagui.config";
 
 import { I18nProvider } from "./src/i18n/I18nProvider";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
+import { AuthProvider, useAuth } from "./src/auth/AuthProvider";
+import { LoginScreen } from "./src/screens/LoginScreen";
+import { Screen, Spinner } from "@brewery/ui";
 
 export default function App() {
   return (
@@ -13,11 +16,31 @@ export default function App() {
       <Theme name="light">
         <SafeAreaView style={{ flex: 1 }}>
           <I18nProvider>
-            <DashboardScreen />
+            <AuthProvider>
+              <AppGate />
+            </AuthProvider>
           </I18nProvider>
         </SafeAreaView>
       </Theme>
     </TamaguiProvider>
   );
+}
+
+function AppGate() {
+  const { state } = useAuth();
+
+  if (state.status === "loading") {
+    return (
+      <Screen>
+        <Spinner />
+      </Screen>
+    );
+  }
+
+  if (state.status === "logged_out") {
+    return <LoginScreen />;
+  }
+
+  return <DashboardScreen />;
 }
 

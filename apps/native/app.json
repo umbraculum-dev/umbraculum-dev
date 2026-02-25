@@ -6,7 +6,10 @@
     "version": "0.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": ["**/*"],
+    "extra": {
+      "EXPO_PUBLIC_API_BASE_URL": "http://192.168.1.124:18080"
+    }
   }
 }
 
