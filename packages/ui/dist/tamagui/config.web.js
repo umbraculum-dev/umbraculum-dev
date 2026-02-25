@@ -1,5 +1,3 @@
-import "../chunk-JSBRDJBE.js";
-
 // src/tamagui/config.web.ts
 import { createAnimations } from "@tamagui/animations-css";
 import { defaultConfig } from "@tamagui/config/v5";
