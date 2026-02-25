@@ -9,6 +9,18 @@ Repo root (canonical): `/home/rf/dkprojects/rfapps/brewery-app`
 
 This repo prefers running Node/npm in containers. If you do run Expo tooling on the host, keep Node aligned with repo `engines` and expect drift.
 
+## UI system (Tamagui, shared with web)
+
+- Native UI is built with **Tamagui** system-wide.
+- The shared cross-platform design system lives in `packages/ui` (`@brewery/ui`) and is used by **both**:
+  - `apps/native` (React Native / Expo)
+  - `apps/web` (Next.js)
+- Tamagui config must be imported via platform-safe entrypoints:
+  - Native: `@brewery/ui/tamagui-config-native`
+  - Web: `@brewery/ui/tamagui-config-web`
+- Styling preference:
+  - Prefer Tamagui components + props/tokens over React Native `style={{ ... }}` so web/native stay visually consistent.
+
 ## 1) Build shared packages (required after changes under `packages/**`)
 
 ```bash

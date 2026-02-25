@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
@@ -6,6 +6,7 @@ import type { RouteRef } from "@brewery/navigation";
 import { useT } from "@brewery/i18n-react";
 import { locales, type SupportedLocale } from "@brewery/i18n";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
@@ -62,14 +63,16 @@ export function DashboardScreen() {
     }
   }
 
-  useEffect(() => {
-    if (!token) return;
+  const navigation = useNavigation<any>();
+
+  const loadHealthAndMe = useCallback(() => {
+    if (!token) return () => {};
     if (!baseUrl) {
       setHealthState({ status: "error", errorKey: "missingApiBaseUrl" });
-      return;
+      return () => {};
     }
 
-    if (healthFetchInFlightRef.current) return;
+    if (healthFetchInFlightRef.current) return () => {};
     healthFetchInFlightRef.current = true;
 
     let cancelled = false;
@@ -94,6 +97,8 @@ export function DashboardScreen() {
       cancelled = true;
     };
   }, [baseUrl, token]);
+
+  useFocusEffect(loadHealthAndMe);
 
   const openWeb = useCallback(
     async (route: RouteRef) => {
@@ -189,6 +194,13 @@ export function DashboardScreen() {
                 <Text fontSize={12} opacity={0.85}>
                   {tHealth("appPermissions.roleLabel")}: {(healthState.me as any)?.role ?? tHealth("appPermissions.roleUnknown")}
                 </Text>
+                <Button
+                  onPress={() => navigation.navigate("SelectWorkspace")}
+                  accessibilityRole="button"
+                  accessibilityLabel={tHealth("appPermissions.selectWorkspaceCta")}
+                >
+                  <Text>{tHealth("appPermissions.selectWorkspaceCta")}</Text>
+                </Button>
               </View>
             ) : null}
           </Card>
