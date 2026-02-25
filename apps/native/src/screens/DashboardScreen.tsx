@@ -157,6 +157,29 @@ export function DashboardScreen() {
               </Text>
             ) : healthState.status === "ok" ? (
               <View style={{ gap: 6 }}>
+                <Text fontSize={11} opacity={0.75}>
+                  {jsonPreview(healthState.health)}
+                </Text>
+              </View>
+            ) : null}
+          </Card>
+
+          <Card gap="$2" aria-label={tHealth("appPermissions.title")}>
+            <Heading fontSize={18}>{tHealth("appPermissions.title")}</Heading>
+            <Text fontSize={12} opacity={0.8}>
+              {tHealth("appPermissions.subtitle")}
+            </Text>
+
+            {healthState.status === "loading" ? (
+              <View style={{ paddingVertical: 8 }}>
+                <Spinner />
+              </View>
+            ) : healthState.status === "error" ? (
+              <Text color="$red10" fontSize={12}>
+                {healthState.errorKey ? tNav(healthState.errorKey) : healthState.error}
+              </Text>
+            ) : healthState.status === "ok" ? (
+              <View style={{ gap: 6 }}>
                 <Text fontSize={12} opacity={0.85}>
                   {tHealth("appPermissions.userLabel")}: {(healthState.me as any)?.user?.email ?? "—"}
                 </Text>
@@ -165,9 +188,6 @@ export function DashboardScreen() {
                 </Text>
                 <Text fontSize={12} opacity={0.85}>
                   {tHealth("appPermissions.roleLabel")}: {(healthState.me as any)?.role ?? tHealth("appPermissions.roleUnknown")}
-                </Text>
-                <Text fontSize={11} opacity={0.75}>
-                  {jsonPreview(healthState.health)}
                 </Text>
               </View>
             ) : null}

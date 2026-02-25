@@ -45,17 +45,24 @@ cd /home/rf/dkprojects/rfapps/brewery-app
 docker run --rm -it \
   -p 19000:19000 -p 19001:19001 -p 19002:19002 \
   -p 8081:8081 \
+  -e REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.124 \
   -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
   -w /repo/apps/native \
   node:20-slim \
-  bash -lc "npm install && npx expo start --lan"
+  bash -lc "./node_modules/.bin/expo start --lan -c"
 ```
+
+Notes:
+
+- If `./node_modules/.bin/expo` is missing, run `npm install` in the same container workdir first.
+- Web preview is available at `http://192.168.1.124:8081/` (useful to inspect browser console errors while iterating).
 
 ### Environment variables (native)
 
 `apps/native` reads:
 
-- `EXPO_PUBLIC_MEDIA_BASE_URL` (used by `RemoteImage`)
+- `EXPO_PUBLIC_API_BASE_URL` (used by native auth + API calls; see `apps/native/src/auth/apiBaseUrl.ts`)
+- `EXPO_PUBLIC_MEDIA_BASE_URL` (used by `RemoteImage`; see `apps/native/src/media/mediaBaseUrl.ts`)
 
 Recommended values depend on where the app runs:
 
@@ -63,9 +70,16 @@ Recommended values depend on where the app runs:
 - iOS simulator can usually use `http://localhost:<NGINX_HTTP_PORT>`
 - Physical device should use your LAN IP (same network as the dev server), for example `http://192.168.1.50:<NGINX_HTTP_PORT>`
 
+## Device testing (Expo Go)
+
+- Android emulator: use Android Studio emulator, open Expo Go, connect to `exp://<LAN_IP>:8081`.
+- Android device: install Expo Go from Play Store, ensure it is on the same Wi-Fi/LAN as `REACT_NATIVE_PACKAGER_HOSTNAME`, then scan the QR.
+- iOS device: install Expo Go, same Wi-Fi/LAN, then scan the QR from `expo start --lan`.
+- iOS simulator: requires macOS + Xcode (cannot run the iOS Simulator on Linux).
+
 ## Quick validation checklist
 
-- **i18n**: open the app and use the “Toggle” button; locale should switch and persist across reloads.
+- **i18n**: open the app and change language; locale should switch and persist across reloads.
 - **media**: the sample image on the dashboard should load when `EXPO_PUBLIC_MEDIA_BASE_URL` is set correctly.
 - **offline behavior**:
   - load the screen once online (warm cache)
