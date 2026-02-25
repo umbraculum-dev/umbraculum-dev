@@ -12,7 +12,7 @@ import {
   type EditorYeastRow,
 } from "@brewery/beerjson";
 import { useT } from "@brewery/i18n-react";
-import { Input, TextArea } from "tamagui";
+import { Accordion, Input, TextArea } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
 import { useAuth } from "../auth/AuthProvider";
@@ -204,6 +204,7 @@ export function RecipeEditScreen() {
   const [styleKey, setStyleKey] = useState("");
   const [notes, setNotes] = useState("");
   const [boilTimeMinutes, setBoilTimeMinutes] = useState("");
+  const [openSections, setOpenSections] = useState<string[]>(["basics"]);
 
   const [gristRows, setGristRows] = useState<EditorGristRow[]>([]);
   const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
@@ -723,386 +724,777 @@ export function RecipeEditScreen() {
           </Card>
         ) : null}
 
-        <Card gap="$2" aria-label={t("sections.basics")}>
-          <Heading fontSize={18}>{t("sections.basics")}</Heading>
-          <View style={{ gap: 12 }}>
-            <View>
-              <Text fontSize={12} opacity={0.8} mb="$1">
-                Name
-              </Text>
-              <Input
-                value={name}
-                onChangeText={setName}
-                placeholder="Recipe name"
-                size="$3"
-                background="$background"
-                borderWidth={1}
-                borderColor="$borderColor"
-              />
-            </View>
-            <View>
-              <Text fontSize={12} opacity={0.8} mb="$1">
-                {t("sections.basics")} — Style
-              </Text>
-              <Button
-                onPress={() => setStylePickerOpen(true)}
-                disabled={stylesLoading || styles.length === 0}
-                background="$background"
-                borderWidth={1}
-                borderColor="$borderColor"
-                width="100%"
-                p="$3"
-                accessibilityRole="button"
-                accessibilityLabel={selectedStyleLabel}
-              >
-                <Text fontSize={14}>{selectedStyleLabel}</Text>
-              </Button>
-            </View>
-          </View>
-        </Card>
-
-        <Card gap="$2" mt="$3" aria-label={t("sections.fermentables")}>
-          <Heading fontSize={18}>{t("sections.fermentables")}</Heading>
-          <Text fontSize={12} opacity={0.8} mb="$2">
-            Enter your grist here.
-          </Text>
-          <View style={{ gap: 8, marginBottom: 12 }}>
-            <Input
-              value={fermentableQuery}
-              onChangeText={setFermentableQuery}
-              placeholder="Search fermentables"
-              size="$3"
-              background="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-            />
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Button onPress={() => void searchFermentables()} disabled={fermentableSearching} size="$3">
-                <Text>{fermentableSearching ? "Searching…" : "Search"}</Text>
-              </Button>
-              <Button
-                onPress={() => {
-                  setFermentableQuery("");
-                  setFermentableResults([]);
-                }}
-                disabled={fermentableSearching}
-                size="$3"
-                chromeless
-              >
-                <Text>{t("buttons.clear")}</Text>
-              </Button>
-            </View>
-          </View>
-          {fermentableSearchError ? (
-            <Text fontSize={12} color="$red10" mb="$2">
-              {fermentableSearchError}
-            </Text>
-          ) : null}
-          {fermentableResults.length > 0 ? (
-            <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
-              <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                {fermentableResults.slice(0, 20).map((it) => (
-                  <Button
-                    key={it.id}
-                    onPress={() => addFermentableFromDb(it)}
-                    size="$2"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  >
-                    <Text fontSize={12}>
-                      {it.name} {it.producer ? `(${it.producer})` : ""} — Add
+        <Accordion
+          type="multiple"
+          value={openSections}
+          onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : (next ? [next] : []))}
+        >
+          <Accordion.Item value="basics">
+            <Card gap="$2" aria-label={t("sections.basics")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.basics")}
+                  accessibilityState={{ expanded: openSections.includes("basics") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.basics")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("basics") ? "▾" : "▸"}
                     </Text>
-                  </Button>
-                ))}
-              </View>
-            </ScrollView>
-          ) : null}
-          <View style={{ marginTop: 8 }}>
-            <Button onPress={addGristRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor">
-              <Text>{t("buttons.addCustomFermentable")}</Text>
-            </Button>
-          </View>
-          <View style={{ height: 1, backgroundColor: "#2a2f3a", marginVertical: 12 }} />
-          <Text fontSize={12} opacity={0.8} style={{ marginBottom: 12 }}>
-            {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
-            {gristTotals.weightedAvgLovibond != null ? ` · ${t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}` : ""}
-          </Text>
-          {gristRows.map((r, idx) => (
-            <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text fontSize={14} fontWeight="600">
-                  {idx + 1}. {r.name || "(unnamed)"}
-                </Text>
-                <Button onPress={() => removeGristRow(r.id)} size="$2" chromeless>
-                  <Text color="$red10">{tCommon("remove")}</Text>
-                </Button>
-              </View>
-              <View style={{ gap: 8 }}>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    Name
-                  </Text>
-                  <Input
-                    value={r.name}
-                    onChangeText={(text) => updateGristRow(r.id, { name: text, ingredientId: undefined, producer: null, group: null })}
-                    placeholder="Fermentable name"
-                    size="$3"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  />
-                </View>
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text fontSize={11} opacity={0.8} mb="$1">
-                      {t("amountLabel", { unit: tUnits("kg") })}
-                    </Text>
-                    <Input
-                      value={String(r.amountKg)}
-                      onChangeText={(text) => {
-                        const n = parseFloat(text);
-                        updateGristRow(r.id, { amountKg: Number.isFinite(n) ? n : 0 });
-                      }}
-                      placeholder="0"
-                      keyboardType="decimal-pad"
-                      size="$3"
-                      background="$background"
-                      borderWidth={1}
-                      borderColor="$borderColor"
-                    />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text fontSize={11} opacity={0.8} mb="$1">
-                      {t("colorLabel", { unit: "°L" })}
-                    </Text>
-                    <Input
-                      value={r.colorLovibond != null ? String(r.colorLovibond) : ""}
-                      onChangeText={(text) => {
-                        const n = text.trim() ? parseFloat(text) : null;
-                        updateGristRow(r.id, { colorLovibond: n != null && Number.isFinite(n) ? n : null });
-                      }}
-                      placeholder="—"
-                      keyboardType="decimal-pad"
-                      size="$3"
-                      background="$background"
-                      borderWidth={1}
-                      borderColor="$borderColor"
-                    />
-                  </View>
-                </View>
-                <PickerField
-                  label={t("fermentables.mashPhClassLegacyLabel")}
-                  value={r.maltClass ?? "base"}
-                  options={MALT_CLASS_OPTIONS as unknown as PickerOption[]}
-                  onChange={(v) => updateGristRow(r.id, { maltClass: v as EditorGristRow["maltClass"] })}
-                  closeLabel={tCommon("close")}
-                  accessibilityLabel={t("fermentables.mashPhClassLegacyLabel")}
-                />
-                <PickerField
-                  label={t("fermentableTimingLabel")}
-                  value={r.timingUse ?? "add_to_mash"}
-                  options={[
-                    { value: "add_to_mash", label: t("fermentableTimingMash") },
-                    { value: "add_to_boil", label: t("fermentableTimingKettle") },
-                  ]}
-                  onChange={(v) => updateGristRow(r.id, { timingUse: v === "add_to_boil" ? "add_to_boil" : "add_to_mash" })}
-                  closeLabel={tCommon("close")}
-                  accessibilityLabel={t("fermentableTimingLabel")}
-                />
-                {(r.group ?? "") ? (
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ gap: 12, marginTop: 12 }}>
                   <View>
-                    <Text fontSize={11} opacity={0.8} mb="$1">
-                      {t("fermentables.groupLabel")}
+                    <Text fontSize={12} opacity={0.8} mb="$1">
+                      Name
                     </Text>
                     <Input
-                      value={r.group ?? ""}
-                      editable={false}
+                      value={name}
+                      onChangeText={setName}
+                      placeholder="Recipe name"
                       size="$3"
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
                     />
                   </View>
-                ) : null}
-                <View>
-                  <PickerField
-                    label={t("fermentables.potentialKindLabel")}
-                    value={r.potential?.kind ?? ""}
-                    options={[
-                      { value: "", label: "(none)" },
-                      { value: "ppg", label: "PPG" },
-                      { value: "yieldPercent", label: "Yield %" },
-                      { value: "sg", label: "SG (e.g. 1.037)" },
-                      { value: "plato", label: "Plato (°P)" },
-                    ]}
-                    onChange={(v) => {
-                      const kind = v as "" | NonNullable<EditorGristRow["potential"]>["kind"];
-                      if (!kind) return updateGristRow(r.id, { potential: null });
-                      updateGristRow(r.id, { potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) } as any });
-                    }}
-                    closeLabel={tCommon("close")}
-                    accessibilityLabel={t("fermentables.potentialKindLabel")}
-                  />
+                  <View>
+                    <Text fontSize={12} opacity={0.8} mb="$1">
+                      {t("sections.basics")} — Style
+                    </Text>
+                    <Button
+                      onPress={() => setStylePickerOpen(true)}
+                      disabled={stylesLoading || styles.length === 0}
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                      width="100%"
+                      p="$3"
+                      accessibilityRole="button"
+                      accessibilityLabel={selectedStyleLabel}
+                    >
+                      <Text fontSize={14}>{selectedStyleLabel}</Text>
+                    </Button>
+                  </View>
                 </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    {t("fermentables.potentialValueLabel")}
-                  </Text>
-                  <Input
-                    value={r.potential ? String(roundTo(r.potential.value, 3)) : ""}
-                    onChangeText={(text) => {
-                      if (!r.potential) return;
-                      const v = text === "" ? null : Number(text);
-                      if (v === null) return updateGristRow(r.id, { potential: null });
-                      updateGristRow(r.id, { potential: { ...r.potential, value: roundTo(v, 3) } as any });
-                    }}
-                    placeholder="—"
-                    keyboardType="decimal-pad"
-                    disabled={!r.potential}
-                    size="$3"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  />
-                </View>
-              </View>
+              </Accordion.Content>
             </Card>
-          ))}
-        </Card>
+          </Accordion.Item>
 
-        <Card gap="$2" mt="$3" aria-label={t("sections.hops")}>
-          <Heading fontSize={18}>{t("sections.hops")}</Heading>
-          <Text fontSize={12} opacity={0.8} mb="$2">
-            {t("hopsHelp")}
-          </Text>
-          <View style={{ gap: 8, marginBottom: 12 }}>
-            <Input
-              value={hopQuery}
-              onChangeText={setHopQuery}
-              placeholder="Search hops"
-              size="$3"
-              background="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-            />
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Button onPress={() => void searchHops()} disabled={hopSearching} size="$3">
-                <Text>{hopSearching ? "Searching…" : "Search"}</Text>
-              </Button>
-              <Button
-                onPress={() => {
-                  setHopQuery("");
-                  setHopResults([]);
-                }}
-                disabled={hopSearching}
-                size="$3"
-                chromeless
-              >
-                <Text>{t("buttons.clear")}</Text>
-              </Button>
-            </View>
-          </View>
-          {hopSearchError ? (
-            <Text fontSize={12} color="$red10" mb="$2">
-              {hopSearchError}
-            </Text>
-          ) : null}
-          {hopResults.length > 0 ? (
-            <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
-              <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                {hopResults.slice(0, 20).map((it) => (
-                  <Button
-                    key={it.id}
-                    onPress={() => addHopFromDb(it)}
-                    size="$2"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  >
-                    <Text fontSize={12}>
-                      {it.name} {it.country ? `(${it.country})` : ""} — Add
+          <Accordion.Item value="fermentables">
+            <Card gap="$2" mt="$3" aria-label={t("sections.fermentables")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.fermentables")}
+                  accessibilityState={{ expanded: openSections.includes("fermentables") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.fermentables")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("fermentables") ? "▾" : "▸"}
                     </Text>
-                  </Button>
-                ))}
-              </View>
-            </ScrollView>
-          ) : null}
-          <Button onPress={addHopRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
-            <Text>Add hop</Text>
-          </Button>
-          {hopsRows.map((r, idx) => (
-            <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text fontSize={14} fontWeight="600">
-                  {idx + 1}. {r.name || "(unnamed)"}
-                </Text>
-                <Button onPress={() => removeHopRow(r.id)} size="$2" chromeless>
-                  <Text color="$red10">{tCommon("remove")}</Text>
-                </Button>
-              </View>
-              <View style={{ gap: 8 }}>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    Name
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <Text fontSize={12} opacity={0.8} mb="$2">
+                    Enter your grist here.
                   </Text>
-                  <Input
-                    value={r.name}
-                    onChangeText={(text) => updateHopRow(r.id, { name: text, ingredientId: null, country: null })}
-                    placeholder="Hop name"
-                    size="$3"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  />
+                  <View style={{ gap: 8, marginBottom: 12 }}>
+                    <Input
+                      value={fermentableQuery}
+                      onChangeText={setFermentableQuery}
+                      placeholder="Search fermentables"
+                      size="$3"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                    />
+                    <View style={{ flexDirection: "row", gap: 8 }}>
+                      <Button onPress={() => void searchFermentables()} disabled={fermentableSearching} size="$3">
+                        <Text>{fermentableSearching ? "Searching…" : "Search"}</Text>
+                      </Button>
+                      <Button
+                        onPress={() => {
+                          setFermentableQuery("");
+                          setFermentableResults([]);
+                        }}
+                        disabled={fermentableSearching}
+                        size="$3"
+                        chromeless
+                      >
+                        <Text>{t("buttons.clear")}</Text>
+                      </Button>
+                    </View>
+                  </View>
+                  {fermentableSearchError ? (
+                    <Text fontSize={12} color="$red10" mb="$2">
+                      {fermentableSearchError}
+                    </Text>
+                  ) : null}
+                  {fermentableResults.length > 0 ? (
+                    <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
+                      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                        {fermentableResults.slice(0, 20).map((it) => (
+                          <Button
+                            key={it.id}
+                            onPress={() => addFermentableFromDb(it)}
+                            size="$2"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          >
+                            <Text fontSize={12}>
+                              {it.name} {it.producer ? `(${it.producer})` : ""} — Add
+                            </Text>
+                          </Button>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  ) : null}
+                  <View style={{ marginTop: 8 }}>
+                    <Button onPress={addGristRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor">
+                      <Text>{t("buttons.addCustomFermentable")}</Text>
+                    </Button>
+                  </View>
+                  <View style={{ height: 1, backgroundColor: "#2a2f3a", marginVertical: 12 }} />
+                  <Text fontSize={12} opacity={0.8} style={{ marginBottom: 12 }}>
+                    {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
+                    {gristTotals.weightedAvgLovibond != null
+                      ? ` · ${t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}`
+                      : ""}
+                  </Text>
+                  {gristRows.map((r, idx) => (
+                    <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text fontSize={14} fontWeight="600">
+                          {idx + 1}. {r.name || "(unnamed)"}
+                        </Text>
+                        <Button onPress={() => removeGristRow(r.id)} size="$2" chromeless>
+                          <Text color="$red10">{tCommon("remove")}</Text>
+                        </Button>
+                      </View>
+                      <View style={{ gap: 8 }}>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            Name
+                          </Text>
+                          <Input
+                            value={r.name}
+                            onChangeText={(text) =>
+                              updateGristRow(r.id, { name: text, ingredientId: undefined, producer: null, group: null })
+                            }
+                            placeholder="Fermentable name"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 8 }}>
+                          <View style={{ flex: 1 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("amountLabel", { unit: tUnits("kg") })}
+                            </Text>
+                            <Input
+                              value={String(r.amountKg)}
+                              onChangeText={(text) => {
+                                const n = parseFloat(text);
+                                updateGristRow(r.id, { amountKg: Number.isFinite(n) ? n : 0 });
+                              }}
+                              placeholder="0"
+                              keyboardType="decimal-pad"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("colorLabel", { unit: "°L" })}
+                            </Text>
+                            <Input
+                              value={r.colorLovibond != null ? String(r.colorLovibond) : ""}
+                              onChangeText={(text) => {
+                                const n = text.trim() ? parseFloat(text) : null;
+                                updateGristRow(r.id, { colorLovibond: n != null && Number.isFinite(n) ? n : null });
+                              }}
+                              placeholder="—"
+                              keyboardType="decimal-pad"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                        </View>
+                        <PickerField
+                          label={t("fermentables.mashPhClassLegacyLabel")}
+                          value={r.maltClass ?? "base"}
+                          options={MALT_CLASS_OPTIONS as unknown as PickerOption[]}
+                          onChange={(v) => updateGristRow(r.id, { maltClass: v as EditorGristRow["maltClass"] })}
+                          closeLabel={tCommon("close")}
+                          accessibilityLabel={t("fermentables.mashPhClassLegacyLabel")}
+                        />
+                        <PickerField
+                          label={t("fermentableTimingLabel")}
+                          value={r.timingUse ?? "add_to_mash"}
+                          options={[
+                            { value: "add_to_mash", label: t("fermentableTimingMash") },
+                            { value: "add_to_boil", label: t("fermentableTimingKettle") },
+                          ]}
+                          onChange={(v) =>
+                            updateGristRow(r.id, { timingUse: v === "add_to_boil" ? "add_to_boil" : "add_to_mash" })
+                          }
+                          closeLabel={tCommon("close")}
+                          accessibilityLabel={t("fermentableTimingLabel")}
+                        />
+                        {(r.group ?? "") ? (
+                          <View>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("fermentables.groupLabel")}
+                            </Text>
+                            <Input
+                              value={r.group ?? ""}
+                              editable={false}
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                        ) : null}
+                        <View>
+                          <PickerField
+                            label={t("fermentables.potentialKindLabel")}
+                            value={r.potential?.kind ?? ""}
+                            options={[
+                              { value: "", label: "(none)" },
+                              { value: "ppg", label: "PPG" },
+                              { value: "yieldPercent", label: "Yield %" },
+                              { value: "sg", label: "SG (e.g. 1.037)" },
+                              { value: "plato", label: "Plato (°P)" },
+                            ]}
+                            onChange={(v) => {
+                              const kind = v as "" | NonNullable<EditorGristRow["potential"]>["kind"];
+                              if (!kind) return updateGristRow(r.id, { potential: null });
+                              updateGristRow(r.id, { potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) } as any });
+                            }}
+                            closeLabel={tCommon("close")}
+                            accessibilityLabel={t("fermentables.potentialKindLabel")}
+                          />
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("fermentables.potentialValueLabel")}
+                          </Text>
+                          <Input
+                            value={r.potential ? String(roundTo(r.potential.value, 3)) : ""}
+                            onChangeText={(text) => {
+                              if (!r.potential) return;
+                              const v = text === "" ? null : Number(text);
+                              if (v === null) return updateGristRow(r.id, { potential: null });
+                              updateGristRow(r.id, { potential: { ...r.potential, value: roundTo(v, 3) } as any });
+                            }}
+                            placeholder="—"
+                            keyboardType="decimal-pad"
+                            disabled={!r.potential}
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                      </View>
+                    </Card>
+                  ))}
                 </View>
-                <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                  <View style={{ flex: 1, minWidth: 80 }}>
-                    <Text fontSize={11} opacity={0.8} mb="$1">
-                      Amount (g)
+              </Accordion.Content>
+            </Card>
+          </Accordion.Item>
+
+          <Accordion.Item value="hops">
+            <Card gap="$2" mt="$3" aria-label={t("sections.hops")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.hops")}
+                  accessibilityState={{ expanded: openSections.includes("hops") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.hops")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("hops") ? "▾" : "▸"}
                     </Text>
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <Text fontSize={12} opacity={0.8} mb="$2">
+                    {t("hopsHelp")}
+                  </Text>
+                  <View style={{ gap: 8, marginBottom: 12 }}>
                     <Input
-                      value={String(r.amountGrams)}
-                      onChangeText={(text) => {
-                        const n = parseFloat(text);
-                        updateHopRow(r.id, { amountGrams: Number.isFinite(n) ? n : 0 });
-                      }}
-                      placeholder="0"
-                      keyboardType="decimal-pad"
+                      value={hopQuery}
+                      onChangeText={setHopQuery}
+                      placeholder="Search hops"
                       size="$3"
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
                     />
+                    <View style={{ flexDirection: "row", gap: 8 }}>
+                      <Button onPress={() => void searchHops()} disabled={hopSearching} size="$3">
+                        <Text>{hopSearching ? "Searching…" : "Search"}</Text>
+                      </Button>
+                      <Button
+                        onPress={() => {
+                          setHopQuery("");
+                          setHopResults([]);
+                        }}
+                        disabled={hopSearching}
+                        size="$3"
+                        chromeless
+                      >
+                        <Text>{t("buttons.clear")}</Text>
+                      </Button>
+                    </View>
                   </View>
-                  <View style={{ flex: 1, minWidth: 80 }}>
-                    <Text fontSize={11} opacity={0.8} mb="$1">
-                      α %
+                  {hopSearchError ? (
+                    <Text fontSize={12} color="$red10" mb="$2">
+                      {hopSearchError}
                     </Text>
+                  ) : null}
+                  {hopResults.length > 0 ? (
+                    <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
+                      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                        {hopResults.slice(0, 20).map((it) => (
+                          <Button
+                            key={it.id}
+                            onPress={() => addHopFromDb(it)}
+                            size="$2"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          >
+                            <Text fontSize={12}>
+                              {it.name} {it.country ? `(${it.country})` : ""} — Add
+                            </Text>
+                          </Button>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  ) : null}
+                  <Button onPress={addHopRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
+                    <Text>Add hop</Text>
+                  </Button>
+                  {hopsRows.map((r, idx) => (
+                    <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text fontSize={14} fontWeight="600">
+                          {idx + 1}. {r.name || "(unnamed)"}
+                        </Text>
+                        <Button onPress={() => removeHopRow(r.id)} size="$2" chromeless>
+                          <Text color="$red10">{tCommon("remove")}</Text>
+                        </Button>
+                      </View>
+                      <View style={{ gap: 8 }}>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            Name
+                          </Text>
+                          <Input
+                            value={r.name}
+                            onChangeText={(text) => updateHopRow(r.id, { name: text, ingredientId: null, country: null })}
+                            placeholder="Hop name"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                          <View style={{ flex: 1, minWidth: 80 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              Amount (g)
+                            </Text>
+                            <Input
+                              value={String(r.amountGrams)}
+                              onChangeText={(text) => {
+                                const n = parseFloat(text);
+                                updateHopRow(r.id, { amountGrams: Number.isFinite(n) ? n : 0 });
+                              }}
+                              placeholder="0"
+                              keyboardType="decimal-pad"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                          <View style={{ flex: 1, minWidth: 80 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              α %
+                            </Text>
+                            <Input
+                              value={r.alphaAcidPercent != null ? String(r.alphaAcidPercent) : ""}
+                              onChangeText={(text) => {
+                                const n = text.trim() ? parseFloat(text) : null;
+                                updateHopRow(r.id, { alphaAcidPercent: n != null && Number.isFinite(n) ? n : null });
+                              }}
+                              placeholder="—"
+                              keyboardType="decimal-pad"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                          <View style={{ flex: 1, minWidth: 80 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              Time (min)
+                            </Text>
+                            <Input
+                              value={r.timeMinutes != null ? String(r.timeMinutes) : ""}
+                              onChangeText={(text) => {
+                                const n = text.trim() ? parseFloat(text) : null;
+                                updateHopRow(r.id, { timeMinutes: n != null && Number.isFinite(n) ? n : null });
+                              }}
+                              placeholder="60"
+                              keyboardType="number-pad"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            Use
+                          </Text>
+                          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                            {HOP_USE_OPTIONS.map((opt) => (
+                              <Button
+                                key={opt.value}
+                                onPress={() => updateHopRow(r.id, { use: opt.value })}
+                                size="$2"
+                                background={r.use === opt.value ? "$color4" : "$background"}
+                                borderWidth={1}
+                                borderColor="$borderColor"
+                              >
+                                <Text fontSize={12}>{opt.label}</Text>
+                              </Button>
+                            ))}
+                          </View>
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            Form
+                          </Text>
+                          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                            {HOP_FORM_OPTIONS.map((opt) => (
+                              <Button
+                                key={opt.value}
+                                onPress={() => updateHopRow(r.id, { form: opt.value })}
+                                size="$2"
+                                background={(r.form ?? "pellet") === opt.value ? "$color4" : "$background"}
+                                borderWidth={1}
+                                borderColor="$borderColor"
+                              >
+                                <Text fontSize={12}>{opt.label}</Text>
+                              </Button>
+                            ))}
+                          </View>
+                        </View>
+                      </View>
+                    </Card>
+                  ))}
+                </View>
+              </Accordion.Content>
+            </Card>
+          </Accordion.Item>
+
+          <Accordion.Item value="yeast">
+            <Card gap="$2" mt="$3" aria-label={t("sections.yeast")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.yeast")}
+                  accessibilityState={{ expanded: openSections.includes("yeast") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.yeast")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("yeast") ? "▾" : "▸"}
+                    </Text>
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <Text fontSize={12} opacity={0.8} mb="$2">
+                    {t("yeastHelp")}
+                  </Text>
+                  <View style={{ gap: 8, marginBottom: 12 }}>
                     <Input
-                      value={r.alphaAcidPercent != null ? String(r.alphaAcidPercent) : ""}
-                      onChangeText={(text) => {
-                        const n = text.trim() ? parseFloat(text) : null;
-                        updateHopRow(r.id, { alphaAcidPercent: n != null && Number.isFinite(n) ? n : null });
-                      }}
-                      placeholder="—"
-                      keyboardType="decimal-pad"
+                      value={yeastQuery}
+                      onChangeText={setYeastQuery}
+                      placeholder="Search yeast"
                       size="$3"
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
                     />
+                    <View style={{ flexDirection: "row", gap: 8 }}>
+                      <Button onPress={() => void searchYeasts()} disabled={yeastSearching} size="$3">
+                        <Text>{yeastSearching ? "Searching…" : "Search"}</Text>
+                      </Button>
+                    </View>
                   </View>
-                  <View style={{ flex: 1, minWidth: 80 }}>
-                    <Text fontSize={11} opacity={0.8} mb="$1">
-                      Time (min)
+                  {yeastResults.length > 0 ? (
+                    <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
+                      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                        {yeastResults.slice(0, 20).map((it) => (
+                          <Button
+                            key={it.id}
+                            onPress={() => addYeastFromDb(it)}
+                            size="$2"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          >
+                            <Text fontSize={12}>
+                              {it.name} {it.lab ? `(${it.lab})` : ""} — Add
+                            </Text>
+                          </Button>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  ) : null}
+                  <Button onPress={addYeastRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
+                    <Text>{t("yeastAddButton")}</Text>
+                  </Button>
+                  {yeastRows.map((r, idx) => (
+                    <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <Text fontSize={14} fontWeight="600">
+                          {idx + 1}. {r.name || "(unnamed)"}
+                        </Text>
+                        <Button onPress={() => removeYeastRow(r.id)} size="$2" chromeless>
+                          <Text color="$red10">{t("yeastRemove")}</Text>
+                        </Button>
+                      </View>
+                      <View style={{ gap: 8 }}>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("yeastNameLabel")}
+                          </Text>
+                          <Input
+                            value={r.name}
+                            onChangeText={(text) => updateYeastRow(r.id, { name: text, ingredientId: null })}
+                            placeholder={t("yeastCustomNamePlaceholder")}
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("yeastFormatLabel")}
+                          </Text>
+                          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                            {YEAST_FORMAT_OPTIONS.map((opt) => (
+                              <Button
+                                key={opt.value}
+                                onPress={() => updateYeastRow(r.id, { format: opt.value })}
+                                size="$2"
+                                background={(r.format ?? "liquid") === opt.value ? "$color4" : "$background"}
+                                borderWidth={1}
+                                borderColor="$borderColor"
+                              >
+                                <Text fontSize={12}>{opt.label}</Text>
+                              </Button>
+                            ))}
+                          </View>
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : "L" })}
+                          </Text>
+                          <Input
+                            value={
+                              r.format === "dry"
+                                ? (r.amountKg != null ? String(r.amountKg) : "")
+                                : (r.amountL != null ? String(r.amountL) : "")
+                            }
+                            onChangeText={(text) => {
+                              const n = text.trim() ? parseFloat(text) : null;
+                              if (r.format === "dry") {
+                                updateYeastRow(r.id, { amountKg: n, amountL: null });
+                              } else {
+                                updateYeastRow(r.id, { amountL: n, amountKg: null });
+                              }
+                            }}
+                            placeholder="—"
+                            keyboardType="decimal-pad"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {tRecipes("analysis.customAttenuationPercentLabel")}
+                          </Text>
+                          <Input
+                            value={yeastAttenuationOverrides[r.id] ?? ""}
+                            onChangeText={(text) =>
+                              setYeastAttenuationOverrides((prev) =>
+                                text.trim() ? { ...prev, [r.id]: text } : (({ [r.id]: _, ...rest }) => rest)(prev)
+                              )
+                            }
+                            placeholder="—"
+                            keyboardType="decimal-pad"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                      </View>
+                    </Card>
+                  ))}
+                </View>
+              </Accordion.Content>
+            </Card>
+          </Accordion.Item>
+
+          <Accordion.Item value="equipment">
+            <Card gap="$2" mt="$3" aria-label={t("sections.equipment")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.equipment")}
+                  accessibilityState={{ expanded: openSections.includes("equipment") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.equipment")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("equipment") ? "▾" : "▸"}
+                    </Text>
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <Text fontSize={12} opacity={0.8} mb="$2">
+                    {t("equipmentSection.help")}
+                  </Text>
+                  {equipmentProfilesError ? (
+                    <Text fontSize={12} color="$red10" mb="$2">
+                      {equipmentProfilesError}
+                    </Text>
+                  ) : null}
+                  <View style={{ gap: 8 }}>
+                    <View>
+                      <Text fontSize={11} opacity={0.8} mb="$1">
+                        {t("equipmentSection.profileLabel")}
+                      </Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                          <Button
+                            onPress={() => setSelectedEquipmentProfileId("")}
+                            size="$3"
+                            background={!selectedEquipmentProfileId ? "$color4" : "$background"}
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          >
+                            <Text fontSize={14}>{t("equipmentSection.noneOption")}</Text>
+                          </Button>
+                          {equipmentProfiles.map((p) => (
+                            <Button
+                              key={p.id}
+                              onPress={() => setSelectedEquipmentProfileId(p.id)}
+                              size="$3"
+                              background={selectedEquipmentProfileId === p.id ? "$color4" : "$background"}
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            >
+                              <Text fontSize={14}>{p.name}</Text>
+                            </Button>
+                          ))}
+                        </View>
+                      </ScrollView>
+                    </View>
+                    <View style={{ flexDirection: "row", gap: 8 }}>
+                      <Button
+                        onPress={() => void applyEquipmentProfileToRecipe("apply")}
+                        disabled={!selectedEquipmentProfileId || equipmentApplying}
+                        size="$3"
+                      >
+                        <Text>{equipmentApplying ? t("equipmentSection.working") : t("equipmentSection.apply")}</Text>
+                      </Button>
+                      <Button
+                        onPress={() => void applyEquipmentProfileToRecipe("reload")}
+                        disabled={!selectedEquipmentProfileId || equipmentApplying}
+                        size="$3"
+                        chromeless
+                      >
+                        <Text>{t("equipmentSection.reload")}</Text>
+                      </Button>
+                    </View>
+                  </View>
+                  {equipmentApplyError ? (
+                    <Text fontSize={12} color="$red10" mt="$2">
+                      {equipmentApplyError}
+                    </Text>
+                  ) : null}
+                </View>
+              </Accordion.Content>
+            </Card>
+          </Accordion.Item>
+
+          <Accordion.Item value="boil">
+            <Card gap="$2" mt="$3" aria-label={t("sections.boil")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.boil")}
+                  accessibilityState={{ expanded: openSections.includes("boil") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.boil")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("boil") ? "▾" : "▸"}
+                    </Text>
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <View>
+                    <Text fontSize={12} opacity={0.8} mb="$1">
+                      Boil time (min)
                     </Text>
                     <Input
-                      value={r.timeMinutes != null ? String(r.timeMinutes) : ""}
-                      onChangeText={(text) => {
-                        const n = text.trim() ? parseFloat(text) : null;
-                        updateHopRow(r.id, { timeMinutes: n != null && Number.isFinite(n) ? n : null });
-                      }}
+                      value={boilTimeMinutes}
+                      onChangeText={setBoilTimeMinutes}
                       placeholder="60"
                       keyboardType="number-pad"
                       size="$3"
@@ -1112,283 +1504,44 @@ export function RecipeEditScreen() {
                     />
                   </View>
                 </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    Use
-                  </Text>
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                    {HOP_USE_OPTIONS.map((opt) => (
-                      <Button
-                        key={opt.value}
-                        onPress={() => updateHopRow(r.id, { use: opt.value })}
-                        size="$2"
-                        background={r.use === opt.value ? "$color4" : "$background"}
-                        borderWidth={1}
-                        borderColor="$borderColor"
-                      >
-                        <Text fontSize={12}>{opt.label}</Text>
-                      </Button>
-                    ))}
-                  </View>
-                </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    Form
-                  </Text>
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                    {HOP_FORM_OPTIONS.map((opt) => (
-                      <Button
-                        key={opt.value}
-                        onPress={() => updateHopRow(r.id, { form: opt.value })}
-                        size="$2"
-                        background={(r.form ?? "pellet") === opt.value ? "$color4" : "$background"}
-                        borderWidth={1}
-                        borderColor="$borderColor"
-                      >
-                        <Text fontSize={12}>{opt.label}</Text>
-                      </Button>
-                    ))}
-                  </View>
-                </View>
-              </View>
+              </Accordion.Content>
             </Card>
-          ))}
-        </Card>
+          </Accordion.Item>
 
-        <Card gap="$2" mt="$3" aria-label={t("sections.yeast")}>
-          <Heading fontSize={18}>{t("sections.yeast")}</Heading>
-          <Text fontSize={12} opacity={0.8} mb="$2">
-            {t("yeastHelp")}
-          </Text>
-          <View style={{ gap: 8, marginBottom: 12 }}>
-            <Input
-              value={yeastQuery}
-              onChangeText={setYeastQuery}
-              placeholder="Search yeast"
-              size="$3"
-              background="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-            />
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Button onPress={() => void searchYeasts()} disabled={yeastSearching} size="$3">
-                <Text>{yeastSearching ? "Searching…" : "Search"}</Text>
-              </Button>
-            </View>
-          </View>
-          {yeastResults.length > 0 ? (
-            <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
-              <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                {yeastResults.slice(0, 20).map((it) => (
-                  <Button
-                    key={it.id}
-                    onPress={() => addYeastFromDb(it)}
-                    size="$2"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  >
-                    <Text fontSize={12}>
-                      {it.name} {it.lab ? `(${it.lab})` : ""} — Add
+          <Accordion.Item value="notes">
+            <Card gap="$2" mt="$3" aria-label={t("sections.notes")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.notes")}
+                  accessibilityState={{ expanded: openSections.includes("notes") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.notes")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("notes") ? "▾" : "▸"}
                     </Text>
-                  </Button>
-                ))}
-              </View>
-            </ScrollView>
-          ) : null}
-          <Button onPress={addYeastRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
-            <Text>{t("yeastAddButton")}</Text>
-          </Button>
-          {yeastRows.map((r, idx) => (
-            <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text fontSize={14} fontWeight="600">
-                  {idx + 1}. {r.name || "(unnamed)"}
-                </Text>
-                <Button onPress={() => removeYeastRow(r.id)} size="$2" chromeless>
-                  <Text color="$red10">{t("yeastRemove")}</Text>
-                </Button>
-              </View>
-              <View style={{ gap: 8 }}>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    {t("yeastNameLabel")}
-                  </Text>
-                  <Input
-                    value={r.name}
-                    onChangeText={(text) => updateYeastRow(r.id, { name: text, ingredientId: null })}
-                    placeholder={t("yeastCustomNamePlaceholder")}
-                    size="$3"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  />
-                </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    {t("yeastFormatLabel")}
-                  </Text>
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                    {YEAST_FORMAT_OPTIONS.map((opt) => (
-                      <Button
-                        key={opt.value}
-                        onPress={() => updateYeastRow(r.id, { format: opt.value })}
-                        size="$2"
-                        background={(r.format ?? "liquid") === opt.value ? "$color4" : "$background"}
-                        borderWidth={1}
-                        borderColor="$borderColor"
-                      >
-                        <Text fontSize={12}>{opt.label}</Text>
-                      </Button>
-                    ))}
                   </View>
-                </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : "L" })}
-                  </Text>
-                  <Input
-                    value={
-                      r.format === "dry"
-                        ? (r.amountKg != null ? String(r.amountKg) : "")
-                        : (r.amountL != null ? String(r.amountL) : "")
-                    }
-                    onChangeText={(text) => {
-                      const n = text.trim() ? parseFloat(text) : null;
-                      if (r.format === "dry") {
-                        updateYeastRow(r.id, { amountKg: n, amountL: null });
-                      } else {
-                        updateYeastRow(r.id, { amountL: n, amountKg: null });
-                      }
-                    }}
-                    placeholder="—"
-                    keyboardType="decimal-pad"
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <TextArea
+                    value={notes}
+                    onChangeText={setNotes}
+                    placeholder="Notes"
                     size="$3"
                     background="$background"
                     borderWidth={1}
                     borderColor="$borderColor"
+                    height={80}
                   />
                 </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    {tRecipes("analysis.customAttenuationPercentLabel")}
-                  </Text>
-                  <Input
-                    value={yeastAttenuationOverrides[r.id] ?? ""}
-                    onChangeText={(text) =>
-                      setYeastAttenuationOverrides((prev) => (text.trim() ? { ...prev, [r.id]: text } : (({ [r.id]: _, ...rest }) => rest)(prev)))
-                    }
-                    placeholder="—"
-                    keyboardType="decimal-pad"
-                    size="$3"
-                    background="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  />
-                </View>
-              </View>
+              </Accordion.Content>
             </Card>
-          ))}
-        </Card>
-
-        <Card gap="$2" mt="$3" aria-label={t("sections.equipment")}>
-          <Heading fontSize={18}>{t("sections.equipment")}</Heading>
-          <Text fontSize={12} opacity={0.8} mb="$2">
-            {t("equipmentSection.help")}
-          </Text>
-          {equipmentProfilesError ? (
-            <Text fontSize={12} color="$red10" mb="$2">
-              {equipmentProfilesError}
-            </Text>
-          ) : null}
-          <View style={{ gap: 8 }}>
-            <View>
-              <Text fontSize={11} opacity={0.8} mb="$1">
-                {t("equipmentSection.profileLabel")}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                  <Button
-                    onPress={() => setSelectedEquipmentProfileId("")}
-                    size="$3"
-                    background={!selectedEquipmentProfileId ? "$color4" : "$background"}
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  >
-                    <Text fontSize={14}>{t("equipmentSection.noneOption")}</Text>
-                  </Button>
-                  {equipmentProfiles.map((p) => (
-                    <Button
-                      key={p.id}
-                      onPress={() => setSelectedEquipmentProfileId(p.id)}
-                      size="$3"
-                      background={selectedEquipmentProfileId === p.id ? "$color4" : "$background"}
-                      borderWidth={1}
-                      borderColor="$borderColor"
-                    >
-                      <Text fontSize={14}>{p.name}</Text>
-                    </Button>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Button
-                onPress={() => void applyEquipmentProfileToRecipe("apply")}
-                disabled={!selectedEquipmentProfileId || equipmentApplying}
-                size="$3"
-              >
-                <Text>{equipmentApplying ? t("equipmentSection.working") : t("equipmentSection.apply")}</Text>
-              </Button>
-              <Button
-                onPress={() => void applyEquipmentProfileToRecipe("reload")}
-                disabled={!selectedEquipmentProfileId || equipmentApplying}
-                size="$3"
-                chromeless
-              >
-                <Text>{t("equipmentSection.reload")}</Text>
-              </Button>
-            </View>
-          </View>
-          {equipmentApplyError ? (
-            <Text fontSize={12} color="$red10" mt="$2">
-              {equipmentApplyError}
-            </Text>
-          ) : null}
-        </Card>
-
-        <Card gap="$2" mt="$3" aria-label={t("sections.boil")}>
-          <Heading fontSize={18}>{t("sections.boil")}</Heading>
-          <View>
-            <Text fontSize={12} opacity={0.8} mb="$1">
-              Boil time (min)
-            </Text>
-            <Input
-              value={boilTimeMinutes}
-              onChangeText={setBoilTimeMinutes}
-              placeholder="60"
-              keyboardType="number-pad"
-              size="$3"
-              background="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-            />
-          </View>
-        </Card>
-
-        <Card gap="$2" mt="$3" aria-label={t("sections.notes")}>
-          <Heading fontSize={18}>{t("sections.notes")}</Heading>
-          <TextArea
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Notes"
-            size="$3"
-            background="$background"
-            borderWidth={1}
-            borderColor="$borderColor"
-            height={80}
-          />
-        </Card>
+          </Accordion.Item>
+        </Accordion>
 
         <Button
           onPress={() => void save()}
