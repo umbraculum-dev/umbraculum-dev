@@ -1,49 +1,255 @@
-import React from "react";
-import { View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ScrollView, View } from "react-native";
 
+import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import type { RouteRef } from "@brewery/navigation";
 import { useT } from "@brewery/i18n-react";
 import type { SupportedLocale } from "@brewery/i18n";
-import { Button, Heading, Screen, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
+import { useAuth } from "../auth/AuthProvider";
+import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
-import { RemoteImage } from "../media/RemoteImage";
+import { openWebFallbackRoute } from "../navigation/openWebFallback";
 
 export function DashboardScreen() {
+  const auth = useAuth();
   const { locale, setLocale } = useLocaleController();
-  const { t } = useT("common");
+  const { t: tNav } = useT("nav");
+  const { t } = useT("dashboard");
+  const { t: tCommon } = useT("common");
+  const { t: tHealth } = useT("health");
+
+  const baseUrl = getApiBaseUrl();
+  const token = auth.state.status === "logged_in" ? auth.state.token : null;
+
+  type HealthState =
+    | { status: "idle" | "loading" }
+    | { status: "ok"; health: unknown; me: unknown }
+    | { status: "error"; errorKey?: "missingApiBaseUrl"; error?: string };
+
+  const [healthState, setHealthState] = useState<HealthState>({ status: "idle" });
+  const [openWebState, setOpenWebState] = useState<{ status: "idle" | "opening"; error?: string }>({
+    status: "idle",
+  });
+
+  const healthFetchInFlightRef = useRef(false);
+
+  function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const t = setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms);
+      promise.then(
+        (v) => {
+          clearTimeout(t);
+          resolve(v);
+        },
+        (err) => {
+          clearTimeout(t);
+          reject(err);
+        },
+      );
+    });
+  }
+
+  function jsonPreview(data: unknown): string {
+    try {
+      const s = JSON.stringify(data);
+      return s.length > 600 ? `${s.slice(0, 600)}…` : s;
+    } catch {
+      return String(data);
+    }
+  }
+
+  useEffect(() => {
+    if (!token) return;
+    if (!baseUrl) {
+      setHealthState({ status: "error", errorKey: "missingApiBaseUrl" });
+      return;
+    }
+
+    if (healthFetchInFlightRef.current) return;
+    healthFetchInFlightRef.current = true;
+
+    let cancelled = false;
+    setHealthState({ status: "loading" });
+
+    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    withTimeout(Promise.all([api.get("/api/health"), api.get("/api/auth/me")]), 15000)
+      .then(([healthRes, meRes]) => {
+        if (cancelled) return;
+        if (!healthRes.ok) throw new Error(`health failed with status ${healthRes.status}`);
+        if (!meRes.ok) throw new Error(`me failed with status ${meRes.status}`);
+        setHealthState({ status: "ok", health: healthRes.data, me: meRes.data });
+      })
+      .catch((err) => {
+        if (!cancelled) setHealthState({ status: "error", error: String(err) });
+      })
+      .finally(() => {
+        healthFetchInFlightRef.current = false;
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [baseUrl, token]);
+
+  const openWeb = useCallback(
+    async (route: RouteRef) => {
+      try {
+        if (!token) throw new Error("Not authenticated");
+        if (!baseUrl) throw new Error(tNav("missingApiBaseUrl"));
+        setOpenWebState({ status: "opening" });
+        const res = await openWebFallbackRoute({ baseUrl, token, locale, route });
+        if (!res.ok) throw new Error(res.error || "Failed to open web");
+        setOpenWebState({ status: "idle" });
+      } catch (err) {
+        setOpenWebState({ status: "idle", error: String(err) });
+      }
+    },
+    [baseUrl, locale, tNav, token],
+  );
+
+  const links = useMemo(
+    () =>
+      [
+        { key: "fermDataIntegration", label: t("links.fermDataIntegration"), route: { id: "fermDataIntegration", params: {} } as const },
+        { key: "brewdayStepsSettings", label: t("links.brewdayStepsSettings"), route: { id: "brewdayStepsSettings", params: {} } as const },
+        { key: "waterProfiles", label: t("links.waterProfiles"), route: { id: "waterProfiles", params: {} } as const },
+      ] satisfies readonly { key: string; label: string; route: RouteRef }[],
+    [t],
+  );
+
+  const breweryLinks = useMemo(
+    () =>
+      [
+        { key: "equipment", label: t("links.equipment"), route: { id: "equipment", params: {} } as const },
+        { key: "inventory", label: t("links.inventory"), route: { id: "inventory", params: {} } as const },
+      ] satisfies readonly { key: string; label: string; route: RouteRef }[],
+    [t],
+  );
 
   return (
     <Screen>
-      <Heading fontSize={28}>{t("backToDashboard")}</Heading>
-      <Text fontSize={16}>{t("loading")}</Text>
-      <RemoteImage
-        assetKey="yeast/dilution-1-100.png"
-        accessibilityLabel={t("dilutionDiagramLabel")}
-        unavailableText={t("imageUnavailable")}
-        width={320}
-        height={180}
-      />
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-        <Text fontSize={16}>
-          {t("localeLabel")}: {locale}
-        </Text>
-        <Button
-          onPress={() => setLocale((locale === "en" ? "it" : "en") satisfies SupportedLocale)}
-          accessibilityRole="button"
-          accessibilityLabel={t("toggleLanguage")}
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 12,
-            borderRadius: 8,
-            backgroundColor: "#111827",
-          }}
-          pressStyle={{ opacity: 0.9 }}
-        >
-          <Text color="#fff" fontWeight="600">
-            {t("toggle")}
-          </Text>
-        </Button>
-      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+        <View style={{ gap: 16 }}>
+          <View style={{ gap: 6 }}>
+            <Heading fontSize={28}>{t("title")}</Heading>
+            <Text fontSize={14} opacity={0.8}>
+              {t("subtitle")}
+            </Text>
+          </View>
+
+          <Card gap="$2" aria-label={tHealth("title")}>
+            <Heading fontSize={18}>{tHealth("title")}</Heading>
+            <Text fontSize={12} opacity={0.8}>
+              {tHealth("subtitle", { url: baseUrl ?? "(missing)" })}
+            </Text>
+
+            {healthState.status === "loading" ? (
+              <View style={{ paddingVertical: 8 }}>
+                <Spinner />
+              </View>
+            ) : healthState.status === "error" ? (
+              <Text color="$red10" fontSize={12}>
+                {healthState.errorKey ? tNav(healthState.errorKey) : healthState.error}
+              </Text>
+            ) : healthState.status === "ok" ? (
+              <View style={{ gap: 6 }}>
+                <Text fontSize={12} opacity={0.85}>
+                  {tHealth("appPermissions.userLabel")}: {(healthState.me as any)?.user?.email ?? "—"}
+                </Text>
+                <Text fontSize={12} opacity={0.85}>
+                  {tHealth("appPermissions.activeWorkspaceLabel")}: {(healthState.me as any)?.activeWorkspaceId ?? "—"}
+                </Text>
+                <Text fontSize={12} opacity={0.85}>
+                  {tHealth("appPermissions.roleLabel")}: {(healthState.me as any)?.role ?? tHealth("appPermissions.roleUnknown")}
+                </Text>
+                <Text fontSize={11} opacity={0.75}>
+                  {jsonPreview(healthState.health)}
+                </Text>
+              </View>
+            ) : null}
+          </Card>
+
+          <Card gap="$2" aria-label={t("importExport.title")}>
+            <Heading fontSize={18}>{t("importExport.title")}</Heading>
+            <Text fontSize={12} opacity={0.85}>
+              {t("importExport.supportedNote")}
+            </Text>
+            <Text fontSize={12} opacity={0.85}>
+              {t("importExport.actionsLiveInRecipes")}
+            </Text>
+            <Button
+              onPress={() => void openWeb({ id: "recipes", params: {} })}
+              accessibilityRole="button"
+              accessibilityLabel={t("importExport.actionsCta")}
+            >
+              <Text>{t("importExport.actionsCta")}</Text>
+            </Button>
+            {openWebState.error ? (
+              <Text color="$red10" fontSize={12}>
+                {openWebState.error}
+              </Text>
+            ) : null}
+          </Card>
+
+          <Card gap="$2" aria-label={t("links.title")}>
+            <Heading fontSize={18}>{t("links.title")}</Heading>
+            <View style={{ gap: 8, marginTop: 4 }}>
+              {links.map((l) => (
+                <Button
+                  key={l.key}
+                  onPress={() => void openWeb(l.route)}
+                  accessibilityRole="button"
+                  accessibilityLabel={l.label}
+                >
+                  <Text>{l.label}</Text>
+                </Button>
+              ))}
+            </View>
+          </Card>
+
+          <Card gap="$2" aria-label={t("links.brewery")}>
+            <Heading fontSize={18}>{t("links.brewery")}</Heading>
+            <View style={{ gap: 8, marginTop: 4 }}>
+              {breweryLinks.map((l) => (
+                <Button
+                  key={l.key}
+                  onPress={() => void openWeb(l.route)}
+                  accessibilityRole="button"
+                  accessibilityLabel={l.label}
+                >
+                  <Text>{l.label}</Text>
+                </Button>
+              ))}
+            </View>
+          </Card>
+
+          <Card gap="$2" aria-label={tNav("language")}>
+            <Heading fontSize={18}>{tNav("language")}</Heading>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <Text fontSize={14}>
+                {tCommon("localeLabel")}: {locale}
+              </Text>
+              <Button
+                onPress={() => setLocale((locale === "en" ? "it" : "en") satisfies SupportedLocale)}
+                accessibilityRole="button"
+                accessibilityLabel={tCommon("toggleLanguage")}
+              >
+                <Text>{tCommon("toggle")}</Text>
+              </Button>
+            </View>
+          </Card>
+
+          <Button
+            onPress={() => void auth.logout()}
+            accessibilityRole="button"
+            accessibilityLabel={tNav("logout")}
+          >
+            <Text>{tNav("logout")}</Text>
+          </Button>
+        </View>
+      </ScrollView>
     </Screen>
   );
 }

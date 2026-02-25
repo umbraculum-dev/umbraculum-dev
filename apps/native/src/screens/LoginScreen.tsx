@@ -41,7 +41,7 @@ export function LoginScreen() {
     <Screen>
       <Heading fontSize={28}>{t("loginTitle")}</Heading>
 
-      <YStack gap="$3" maxWidth={420}>
+      <YStack gap="$3" style={{ width: "100%", maxWidth: 420 }}>
         <YStack gap="$1.5">
           <Text fontSize={14}>{t("emailLabel")}</Text>
           <Input

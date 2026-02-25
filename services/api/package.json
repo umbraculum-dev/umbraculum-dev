@@ -24,6 +24,7 @@
     "@beerjson/beerjson": "^1.0.2",
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/core": "file:../../packages/core",
+    "@fastify/cors": "^10.0.0",
     "@fastify/cookie": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",
     "@prisma/client": "^6.0.0",

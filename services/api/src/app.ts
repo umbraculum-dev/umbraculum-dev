@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
 import { sessionAuthPlugin } from "./plugins/sessionAuth.js";
@@ -28,6 +29,24 @@ export function buildApp() {
   const app = Fastify({ logger: true });
 
   app.register(errorHandlerPlugin);
+  // Dev-only CORS to allow Expo web preview (Metro) to call the API directly.
+  // Native requests don't use browser CORS, but `expo start --web` does.
+  if (process.env.NODE_ENV !== "production") {
+    app.register(cors, {
+      credentials: true,
+      origin: (origin, cb) => {
+        // Allow non-browser tools (curl, server-to-server).
+        if (!origin) return cb(null, true);
+
+        // Allow the Expo/Metro dev server origin (typically :8081).
+        if (origin.startsWith("http://") && origin.endsWith(":8081")) return cb(null, true);
+        if (origin.startsWith("https://") && origin.endsWith(":8081")) return cb(null, true);
+
+        // Deny by default.
+        return cb(null, false);
+      },
+    });
+  }
   app.register(prismaPlugin);
   app.register(sessionAuthPlugin);
   app.register(requestContextPlugin);

@@ -28,6 +28,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "recipes": "Recipes",
+    "inventory": "Inventory",
     "waterProfiles": "Water profiles",
     "equipment": "Equipment",
     "about": "About",
@@ -35,6 +36,9 @@
     "accessibility": "Accessibility",
     "login": "Log in",
     "logout": "Log out",
+    "notAvailableOnMobileYet": "Not available on mobile yet.",
+    "openOnWeb": "Open on web",
+    "missingApiBaseUrl": "Missing API base URL (EXPO_PUBLIC_API_BASE_URL).",
     "signedInAs": "Signed in as",
     "activeWorkspace": "Active workspace",
     "switchWorkspace": "Switch workspace",

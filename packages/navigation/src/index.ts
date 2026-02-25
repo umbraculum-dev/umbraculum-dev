@@ -4,6 +4,8 @@ export type RouteId =
   | "dashboard"
   | "inventory"
   | "recipes"
+  | "brewdayStepsSettings"
+  | "waterProfiles"
   | "recipeEdit"
   | "waterHub"
   | "waterMash"
@@ -19,6 +21,8 @@ export interface RouteParamsById {
   dashboard: Record<string, never>;
   inventory: Record<string, never>;
   recipes: Record<string, never>;
+  brewdayStepsSettings: Record<string, never>;
+  waterProfiles: Record<string, never>;
   recipeEdit: { recipeId: string };
   waterHub: { recipeId: string };
   waterMash: { recipeId: string };
@@ -64,6 +68,10 @@ export function routeToPath(ref: RouteRef): string {
       return "/inventory";
     case "recipes":
       return "/recipes";
+    case "brewdayStepsSettings":
+      return "/brewday-steps-settings";
+    case "waterProfiles":
+      return "/water-profiles";
     case "recipeEdit":
       return `/recipes/${ref.params.recipeId}/edit`;
     case "waterHub":
