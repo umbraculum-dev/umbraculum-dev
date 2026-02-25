@@ -986,6 +986,12 @@ var en_default = {
       waterProfilesManageText: "Manage profiles on",
       rawMaterialsCtaPrefix: "Found a missing or incorrect raw material?",
       rawMaterialsCtaLinkText: "Help improve the raw material database",
+      fermentables: {
+        mashPhClassLegacyLabel: "Mash pH class (legacy)",
+        potentialKindLabel: "Potential kind",
+        potentialValueLabel: "Potential value",
+        groupLabel: "Group"
+      },
       buttons: {
         clear: "Clear",
         addFermentable: "Add fermentable",
@@ -2404,6 +2410,12 @@ var it_default = {
       waterProfilesManageText: "Gestisci i profili su",
       rawMaterialsCtaPrefix: "Hai trovato una materia prima mancante o errata?",
       rawMaterialsCtaLinkText: "Aiuta a migliorare il database materie prime",
+      fermentables: {
+        mashPhClassLegacyLabel: "Classe pH mash (legacy)",
+        potentialKindLabel: "Tipo potenziale",
+        potentialValueLabel: "Valore potenziale",
+        groupLabel: "Gruppo"
+      },
       buttons: {
         clear: "Pulisci",
         addFermentable: "Aggiungi fermentabile",

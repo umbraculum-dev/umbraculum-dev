@@ -98,6 +98,22 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Local ports** (repo-local `.env`, not committed):
   - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
+- **Troubleshooting: web dev gets a corrupted `.next` (missing chunks / missing `routes-manifest.json`)**:
+  - Symptoms:
+    - `ENOENT: no such file or directory, open '/app/.next/routes-manifest.json'`
+    - `Cannot find module './5611.js'` (or other missing `.next/server/*.js` chunk)
+    - `/en/*` routes return 500
+  - Fast reset (safe: move aside, don’t delete). Run from repo root:
+    - `cd /home/rf/dkprojects/rfapps/brewery-app`
+    - `docker compose stop web`
+    - `mv apps/web/.next "apps/web/.next.bak-$(date +%s)"` (skip if missing)
+    - `docker compose up -d web`
+  - Full rebuild/redeploy (if fast reset didn’t help):
+    - `cd /home/rf/dkprojects/rfapps/brewery-app`
+    - `docker compose up -d --build web`
+  - Quick verification:
+    - `curl -i "http://localhost:3000/en/login" | head -n 5`
+    - `docker compose logs --tail=80 web`
 - **Tamagui non-boolean DOM attributes**: Tamagui components (e.g. `Select.Viewport`) may default `elevate={true}` or `bordered={true}`, causing React to warn: "Received `true`/`false` for a non-boolean attribute". Fix: pass `elevate={undefined}` and `bordered={undefined}` to override defaults and prevent forwarding to the DOM. Example: `<Select.Viewport elevate={undefined} bordered={undefined} elevation={0}>`.
 - **`<details>/<summary>` (IMPORTANT for i18n + UX)**: Browsers show a built-in fallback label (often “Details”) when a `<details>` does not have a real `<summary>` element as its first child. That fallback does **not** follow app locale/i18n. In this repo, use `RecipeEditSummary` (`apps/web/app/_components/recipe-edit/RecipeEditSummary.tsx`) so we always render a real `<summary>` and keep native click-to-expand behavior.
 - **Shared media (MANDATORY)**:

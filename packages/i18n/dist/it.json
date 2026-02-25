@@ -969,6 +969,10 @@
         },
         "amountLabel": "Quantità ({unit})",
         "colorLabel": "Colore ({unit})",
+        "mashPhClassLegacyLabel": "Classe pH mash (legacy)",
+        "potentialKindLabel": "Tipo potenziale",
+        "potentialValueLabel": "Valore potenziale",
+        "groupLabel": "Gruppo",
         "gristTotalKg": "Totale: {value} {unit}",
         "gristAvgColor": "Colore medio: {value} {unit}"
       },

@@ -962,6 +962,10 @@
         },
         "amountLabel": "Amount ({unit})",
         "colorLabel": "Color ({unit})",
+        "mashPhClassLegacyLabel": "Mash pH class (legacy)",
+        "potentialKindLabel": "Potential kind",
+        "potentialValueLabel": "Potential value",
+        "groupLabel": "Group",
         "gristTotalKg": "Total: {value} {unit}",
         "gristAvgColor": "Avg color: {value} {unit}"
       },

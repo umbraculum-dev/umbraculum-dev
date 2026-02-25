@@ -27,6 +27,91 @@ function newRowId(): string {
   }
 }
 
+type PickerOption = { value: string; label: string };
+
+function roundTo(n: number, decimals: number) {
+  const f = 10 ** decimals;
+  return Math.round(n * f) / f;
+}
+
+function inferMaltClass(
+  group: string | null | undefined,
+  fermentableName: string
+): EditorGristRow["maltClass"] {
+  const g = (group ?? "").toLowerCase();
+  const n = (fermentableName ?? "").toLowerCase();
+  if (g.includes("caramel") || g.includes("crystal")) return "crystal";
+  if (g.includes("roast") || g.includes("roasted")) return "roast";
+  if (n.includes("acid")) return "acid";
+  return "base";
+}
+
+function PickerField(props: {
+  label: string;
+  value: string;
+  options: PickerOption[];
+  onChange: (nextValue: string) => void;
+  placeholder?: string;
+  modalTitle?: string;
+  closeLabel: string;
+  accessibilityLabel?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const selectedLabel = props.options.find((o) => o.value === props.value)?.label ?? "";
+  const buttonText = selectedLabel || props.placeholder || "—";
+
+  return (
+    <View>
+      <Text fontSize={11} opacity={0.8} mb="$1">
+        {props.label}
+      </Text>
+      <Button
+        onPress={() => setOpen(true)}
+        size="$3"
+        background="$background"
+        borderWidth={1}
+        borderColor="$borderColor"
+        accessibilityLabel={props.accessibilityLabel ?? props.label}
+      >
+        <Text fontSize={12}>{buttonText}</Text>
+      </Button>
+
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "center", padding: 16 }}
+          onPress={() => setOpen(false)}
+        >
+          <Pressable onPress={() => null}>
+            <Card gap="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+              <Heading fontSize={16}>{props.modalTitle ?? props.label}</Heading>
+              <View style={{ gap: 8 }}>
+                {props.options.map((opt) => (
+                  <Button
+                    key={opt.value || "__empty"}
+                    onPress={() => {
+                      props.onChange(opt.value);
+                      setOpen(false);
+                    }}
+                    size="$3"
+                    background={opt.value === props.value ? "$color4" : "$background"}
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <Text fontSize={12}>{opt.label}</Text>
+                  </Button>
+                ))}
+              </View>
+              <Button onPress={() => setOpen(false)} size="$3" chromeless>
+                <Text>{props.closeLabel}</Text>
+              </Button>
+            </Card>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
+  );
+}
+
 type Recipe = {
   id: string;
   name: string;
@@ -49,6 +134,7 @@ type FermentableSearchItem = {
   id: string;
   name: string;
   producer?: string | null;
+  group?: string | null;
   colorLovibond?: number | null;
   yieldPercent?: number | null;
   ppg?: number | null;
@@ -74,7 +160,7 @@ const MALT_CLASS_OPTIONS: { value: EditorGristRow["maltClass"]; label: string }[
   { value: "base", label: "Base" },
   { value: "crystal", label: "Crystal" },
   { value: "roast", label: "Roast" },
-  { value: "acid", label: "Acid" },
+  { value: "acid", label: "Acid malt" },
 ];
 
 const HOP_USE_OPTIONS: { value: EditorHopRow["use"]; label: string }[] = [
@@ -332,6 +418,8 @@ export function RecipeEditScreen() {
     const yieldPct = typeof item.yieldPercent === "number" && Number.isFinite(item.yieldPercent) ? item.yieldPercent : null;
     const ppg = typeof item.ppg === "number" && Number.isFinite(item.ppg) ? item.ppg : null;
     const potential = yieldPct != null ? { kind: "yieldPercent" as const, value: yieldPct } : ppg != null ? { kind: "ppg" as const, value: ppg } : null;
+    const group = typeof item.group === "string" ? item.group : null;
+    const maltClass = inferMaltClass(group, item.name);
     setGristRows((prev) => [
       ...prev,
       {
@@ -339,10 +427,11 @@ export function RecipeEditScreen() {
         ingredientId: item.id,
         name: item.name,
         producer: item.producer ?? null,
+        group,
         amountKg: 0,
         colorLovibond: typeof item.colorLovibond === "number" ? item.colorLovibond : null,
         potential,
-        maltClass: "base",
+        maltClass,
         timingUse: "add_to_mash",
       } as EditorGristRow,
     ]);
@@ -729,15 +818,16 @@ export function RecipeEditScreen() {
               </View>
             </ScrollView>
           ) : null}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <View style={{ marginTop: 8 }}>
             <Button onPress={addGristRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor">
               <Text>{t("buttons.addCustomFermentable")}</Text>
             </Button>
-            <Text fontSize={12} opacity={0.8}>
-              {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
-              {gristTotals.weightedAvgLovibond != null ? ` · ${t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}` : ""}
-            </Text>
           </View>
+          <View style={{ height: 1, backgroundColor: "#2a2f3a", marginVertical: 12 }} />
+          <Text fontSize={12} opacity={0.8} style={{ marginBottom: 12 }}>
+            {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
+            {gristTotals.weightedAvgLovibond != null ? ` · ${t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}` : ""}
+          </Text>
           {gristRows.map((r, idx) => (
             <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -801,39 +891,75 @@ export function RecipeEditScreen() {
                     />
                   </View>
                 </View>
-                <View>
-                  <Text fontSize={11} opacity={0.8} mb="$1">
-                    Malt class
-                  </Text>
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                    {MALT_CLASS_OPTIONS.map((opt) => (
-                      <Button
-                        key={opt.value}
-                        onPress={() => updateGristRow(r.id, { maltClass: opt.value })}
-                        size="$2"
-                        background={r.maltClass === opt.value ? "$color4" : "$background"}
-                        borderWidth={1}
-                        borderColor="$borderColor"
-                      >
-                        <Text fontSize={12}>{opt.label}</Text>
-                      </Button>
-                    ))}
+                <PickerField
+                  label={t("fermentables.mashPhClassLegacyLabel")}
+                  value={r.maltClass ?? "base"}
+                  options={MALT_CLASS_OPTIONS as unknown as PickerOption[]}
+                  onChange={(v) => updateGristRow(r.id, { maltClass: v as EditorGristRow["maltClass"] })}
+                  closeLabel={tCommon("close")}
+                  accessibilityLabel={t("fermentables.mashPhClassLegacyLabel")}
+                />
+                <PickerField
+                  label={t("fermentableTimingLabel")}
+                  value={r.timingUse ?? "add_to_mash"}
+                  options={[
+                    { value: "add_to_mash", label: t("fermentableTimingMash") },
+                    { value: "add_to_boil", label: t("fermentableTimingKettle") },
+                  ]}
+                  onChange={(v) => updateGristRow(r.id, { timingUse: v === "add_to_boil" ? "add_to_boil" : "add_to_mash" })}
+                  closeLabel={tCommon("close")}
+                  accessibilityLabel={t("fermentableTimingLabel")}
+                />
+                {(r.group ?? "") ? (
+                  <View>
+                    <Text fontSize={11} opacity={0.8} mb="$1">
+                      {t("fermentables.groupLabel")}
+                    </Text>
+                    <Input
+                      value={r.group ?? ""}
+                      editable={false}
+                      size="$3"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                    />
                   </View>
+                ) : null}
+                <View>
+                  <PickerField
+                    label={t("fermentables.potentialKindLabel")}
+                    value={r.potential?.kind ?? ""}
+                    options={[
+                      { value: "", label: "(none)" },
+                      { value: "ppg", label: "PPG" },
+                      { value: "yieldPercent", label: "Yield %" },
+                      { value: "sg", label: "SG (e.g. 1.037)" },
+                      { value: "plato", label: "Plato (°P)" },
+                    ]}
+                    onChange={(v) => {
+                      const kind = v as "" | NonNullable<EditorGristRow["potential"]>["kind"];
+                      if (!kind) return updateGristRow(r.id, { potential: null });
+                      updateGristRow(r.id, { potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) } as any });
+                    }}
+                    closeLabel={tCommon("close")}
+                    accessibilityLabel={t("fermentables.potentialKindLabel")}
+                  />
                 </View>
                 <View>
                   <Text fontSize={11} opacity={0.8} mb="$1">
-                    Yield (%)
+                    {t("fermentables.potentialValueLabel")}
                   </Text>
                   <Input
-                    value={r.potential?.kind === "yieldPercent" ? String(r.potential.value) : ""}
+                    value={r.potential ? String(roundTo(r.potential.value, 3)) : ""}
                     onChangeText={(text) => {
-                      const n = text.trim() ? parseFloat(text) : null;
-                      updateGristRow(r.id, {
-                        potential: n != null && Number.isFinite(n) ? { kind: "yieldPercent", value: n } : null,
-                      });
+                      if (!r.potential) return;
+                      const v = text === "" ? null : Number(text);
+                      if (v === null) return updateGristRow(r.id, { potential: null });
+                      updateGristRow(r.id, { potential: { ...r.potential, value: roundTo(v, 3) } as any });
                     }}
                     placeholder="—"
                     keyboardType="decimal-pad"
+                    disabled={!r.potential}
                     size="$3"
                     background="$background"
                     borderWidth={1}

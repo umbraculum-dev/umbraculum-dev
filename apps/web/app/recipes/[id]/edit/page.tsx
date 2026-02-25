@@ -2741,31 +2741,34 @@ export default function RecipeEditPage() {
               </SizableText>
             ) : null}
 
+            <YStack gap="$2" mt="$3">
+              <XStack gap="$3" items="center" flexWrap="wrap" mt="$1">
+                <Button
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                  onPress={addGristRow}
+                  disabled={!canCallAccountScoped}
+                >
+                  {t("buttons.addCustomFermentable")}
+                </Button>
+              </XStack>
+            </YStack>
+
             <View borderTopWidth={1} borderColor="var(--border)" my="$3" />
 
-            <XStack gap="$3" items="center" flexWrap="wrap">
-              <Button
-                size="$3"
-                bg="var(--surface-2)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                color="var(--text)"
-                fontFamily="$body"
-                onPress={addGristRow}
-                disabled={!canCallAccountScoped}
-              >
-                {t("buttons.addCustomFermentable")}
-              </Button>
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
-                {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
-                {gristTotals.weightedAvgLovibond !== null ? (
-                  <> · {t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}</>
-                ) : null}
-              </SizableText>
-            </XStack>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" aria-live="polite">
+              {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
+              {gristTotals.weightedAvgLovibond !== null ? (
+                <> · {t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}</>
+              ) : null}
+            </SizableText>
 
             {gristRows.length ? (
-              <View overflowX="auto" mt="$3">
+              <View overflowX="auto" mt="$2">
                 <YStack gap="$3">
                   {gristRows.map((r, idx) => (
                     <RecipeEditIngredientCard key={r.id}>
@@ -3203,7 +3206,7 @@ export default function RecipeEditPage() {
                         </View>
                       </XStack>
                     ))}
-                  </YStack>
+                </YStack>
                 </View>
               ) : null}
               </form>
