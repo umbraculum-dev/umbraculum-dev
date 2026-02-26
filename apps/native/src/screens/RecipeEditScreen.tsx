@@ -602,11 +602,10 @@ export function RecipeEditScreen() {
   }, []);
 
   const addYeastFromDb = useCallback((item: YeastSearchItem) => {
-    const att = typeof item.attenuationMin === "number" && Number.isFinite(item.attenuationMin)
-      ? item.attenuationMin
-      : typeof item.attenuationMax === "number" && Number.isFinite(item.attenuationMax)
-        ? item.attenuationMax
-        : null;
+    const attenuationMin =
+      typeof item.attenuationMin === "number" && Number.isFinite(item.attenuationMin) ? item.attenuationMin : null;
+    const attenuationMax =
+      typeof item.attenuationMax === "number" && Number.isFinite(item.attenuationMax) ? item.attenuationMax : null;
     setYeastRows((prev) => [
       ...prev,
       {
@@ -614,8 +613,8 @@ export function RecipeEditScreen() {
         ingredientId: item.id,
         name: item.name,
         lab: item.lab ?? null,
-        attenuationMin: att,
-        attenuationMax: att,
+        attenuationMin: attenuationMin ?? attenuationMax,
+        attenuationMax: attenuationMax ?? attenuationMin,
         amountL: null,
         amountKg: null,
         format: "liquid",

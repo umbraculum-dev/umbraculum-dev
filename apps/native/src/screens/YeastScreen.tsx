@@ -543,8 +543,16 @@ export function YeastScreen() {
                       <Button
                         key={it.id}
                         onPress={() => {
-                          const att = typeof it.attenuationMin === "number" && Number.isFinite(it.attenuationMin) ? it.attenuationMin : typeof it.attenuationMax === "number" && Number.isFinite(it.attenuationMax) ? it.attenuationMax : null;
-                          addYeastRow({ ingredientId: it.id, name: it.name, lab: it.lab ?? null, productId: it.productId ?? null, attenuationMin: att, attenuationMax: typeof it.attenuationMax === "number" ? it.attenuationMax : null });
+                          const attMin = typeof it.attenuationMin === "number" && Number.isFinite(it.attenuationMin) ? it.attenuationMin : null;
+                          const attMax = typeof it.attenuationMax === "number" && Number.isFinite(it.attenuationMax) ? it.attenuationMax : null;
+                          addYeastRow({
+                            ingredientId: it.id,
+                            name: it.name,
+                            lab: it.lab ?? null,
+                            productId: it.productId ?? null,
+                            attenuationMin: attMin ?? attMax,
+                            attenuationMax: attMax ?? attMin,
+                          });
                         }}
                         size="$2"
                         background="$background"
