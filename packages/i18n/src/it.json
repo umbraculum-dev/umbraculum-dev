@@ -1430,7 +1430,13 @@
     "languageLabel": "Lingua",
     "noteTitle": "Stato traduzioni",
     "noteBody": "L’inglese è la lingua originale. Le altre lingue (a partire dall’italiano) saranno presto supportate al 100%. Spagnolo e tedesco arriveranno presto.",
-    "helpTranslate": "Aiuta a tradurre (contributi i18n)"
+    "helpTranslate": "Aiuta a tradurre (contributi i18n)",
+    "sessionExpired": {
+      "title": "Sessione scaduta",
+      "body": "Sei stato disconnesso. Reindirizzamento alla pagina di accesso.",
+      "cta": "Accedi ora",
+      "countdown": "Reindirizzamento tra {seconds}s…"
+    }
   },
   "i18nContributing": {
     "title": "Aiuta a tradurre (i18n contributing)",

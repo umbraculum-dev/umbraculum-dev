@@ -8,6 +8,7 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
+import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
 
 type WorkspaceListItem = { id: string; name: string; role: string; brandKey?: string | null };
 
@@ -33,6 +34,7 @@ export default function SelectWorkspacePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [authExpired, setAuthExpired] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,7 +43,10 @@ export default function SelectWorkspacePage() {
     (async () => {
       try {
         const res = await apiFetch("/api/auth/me");
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+        if (!res.ok) {
+          setAuthExpired(true);
+          return;
+        }
         const list = (res.data as any)?.workspaces ?? (res.data as any)?.accounts;
         const items: WorkspaceListItem[] = Array.isArray(list) ? list : [];
         if (!cancelled) setWorkspaces(items);
@@ -90,6 +95,7 @@ export default function SelectWorkspacePage() {
       rounded="$2"
       p="$3"
     >
+      {authExpired ? <AuthExpiredNotice forceVisible nextOverride={`/${locale}/select-workspace`} /> : null}
       <H1 mt={0}>{t("title")}</H1>
       <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
         {t("subtitle")}

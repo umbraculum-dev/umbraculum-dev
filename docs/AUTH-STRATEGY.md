@@ -8,6 +8,7 @@ This document describes how authentication works for the web app and native (Rea
 - **Response**: API sets an httpOnly `sid` cookie and returns `{ ok, user, accounts, activeAccountId }`
 - **Subsequent requests**: Browser sends the `sid` cookie automatically (`credentials: same-origin`)
 - **Logout**: `POST /auth/logout` — clears the cookie and deletes the session
+- **Session expiry UX (web)**: when a request returns 401, the web app shows a “Session expired” notice (scrolls to top) and redirects to `/{locale}/login?next=...` after ~10 seconds.
 
 ## Native: opaque session token
 

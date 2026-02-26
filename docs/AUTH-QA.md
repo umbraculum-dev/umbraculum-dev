@@ -13,6 +13,11 @@
 - Login redirects:
   - unauthenticated access to protected pages redirects to `/{locale}/login?next=...`
   - login redirects back to `next` when provided
+- Session-expired UX (401):
+  - when an authenticated page hits a 401, a “Session expired” notice appears at the top
+  - the page scrolls to the top so the notice is visible
+  - after ~10 seconds, the app redirects to `/{locale}/login?next=...`
+  - the notice includes a “Log in now” CTA that redirects immediately
 - If user has multiple workspaces:
   - after login → `/[locale]/select-workspace`
   - selecting a workspace → dashboard

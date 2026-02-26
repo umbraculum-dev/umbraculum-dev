@@ -10,6 +10,7 @@ import { SizableText, XStack } from "tamagui";
 
 import { apiFetch } from "../_lib/apiClient";
 import { AccessibilityLink } from "./AccessibilityLink";
+import { AuthExpiredNotice } from "./AuthExpiredNotice";
 import { AppMainNav } from "./AppMainNav";
 import { AppTopBar } from "./AppTopBar";
 import { AuthStatus } from "./AuthStatus";
@@ -125,6 +126,7 @@ export function PrimaryNav() {
 
   return (
     <nav aria-label={t("ariaPrimary")}>
+      <AuthExpiredNotice />
       <AppTopBar
         ariaLabel={t("ariaSession")}
         left={

@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { SizableText } from "tamagui";
+
+import { apiFetch } from "./_lib/apiClient";
 
 export function DashboardClient() {
   const locale = useLocale();
   const tCommon = useTranslations("common");
-  const router = useRouter();
   // Avoid hydration mismatches caused by browser extensions (e.g. password managers)
   // injecting DOM into form fields before React hydrates.
   const [mounted, setMounted] = useState(false);
@@ -19,19 +19,14 @@ export function DashboardClient() {
     if (!mounted) return;
     let cancelled = false;
     (async () => {
-      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
       if (cancelled) return;
-      if (res.status === 401) router.replace(`/${locale}/login?next=/${locale}`);
-      else if (res.ok) return;
-      // For any other error, also route to login (simple behavior for now)
-      else router.replace(`/${locale}/login?next=/${locale}`);
-    })().catch(() => {
-      if (!cancelled) router.replace(`/${locale}/login?next=/${locale}`);
-    });
+      // Trigger centralized 401 handling (banner + timed redirect) via apiFetch.
+      await apiFetch("/api/auth/me");
+    })().catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [locale, mounted, router]);
+  }, [locale, mounted]);
 
   if (!mounted) return <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{tCommon("loading")}</SizableText>;
   return null;

@@ -1454,7 +1454,13 @@ var en_default = {
     languageLabel: "Language",
     noteTitle: "Translations status",
     noteBody: "English is the original language. Other languages (starting with Italian) will soon be 100% supported. Spanish and German are coming soon as well.",
-    helpTranslate: "Help translate (i18n contributing)"
+    helpTranslate: "Help translate (i18n contributing)",
+    sessionExpired: {
+      title: "Session expired",
+      body: "You have been signed out. Redirecting you to sign in again.",
+      cta: "Log in now",
+      countdown: "Redirecting in {seconds}s\u2026"
+    }
   },
   i18nContributing: {
     title: "Help translate (i18n contributing)",
@@ -2911,7 +2917,13 @@ var it_default = {
     languageLabel: "Lingua",
     noteTitle: "Stato traduzioni",
     noteBody: "L\u2019inglese \xE8 la lingua originale. Le altre lingue (a partire dall\u2019italiano) saranno presto supportate al 100%. Spagnolo e tedesco arriveranno presto.",
-    helpTranslate: "Aiuta a tradurre (contributi i18n)"
+    helpTranslate: "Aiuta a tradurre (contributi i18n)",
+    sessionExpired: {
+      title: "Sessione scaduta",
+      body: "Sei stato disconnesso. Reindirizzamento alla pagina di accesso.",
+      cta: "Accedi ora",
+      countdown: "Reindirizzamento tra {seconds}s\u2026"
+    }
   },
   i18nContributing: {
     title: "Aiuta a tradurre (i18n contributing)",

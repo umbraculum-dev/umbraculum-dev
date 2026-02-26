@@ -26,6 +26,8 @@ DEVELOPMENT.md
 # ------------------------------------------------------------
 node_modules/
 .next/
+# Backup dirs created by our “move aside .next” reset
+apps/web/.next.bak-*/
 # Generated from packages/media (do not commit; sync via apps/web/scripts/sync-media.mjs)
 apps/web/public/media/
 out/
