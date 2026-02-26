@@ -103,6 +103,33 @@ Implemented pieces:
 
 This is the mechanism that enables “Continue on web” from native for whitelisted routes while being **already logged in** in the system browser.
 
+### 0.8 Database routing foundation (pgpool-II + sync replication + auto-degrade)
+
+To enable “single URL” scaling (Magento-cloud-like) while keeping **auth/session correctness**, the repo implements a production-like local stack with:
+
+- **Postgres primary + hot standby** (streaming replication)
+- **Replication slot + WAL archive** so a standby can catch up without re-seeding after outages
+- **pgpool-II** as a **single DB entrypoint** (`DATABASE_URL`)
+- **Synchronous replication when healthy** (`remote_apply`) to keep replica reads consistent
+- **Auto-degrade** to primary-only when the replica is unhealthy/lagging (preserves availability and correctness)
+
+Implemented pieces:
+
+- Compose wiring: `docker-compose.yml`
+  - `postgres`, `postgres-replica`, `pgpool`, `db-guard`
+- Postgres durability:
+  - archive volume: `wal_archive` mounted at `/wal-archive`
+  - slot: `replica1`
+- Guard:
+  - `infra/db-guard/db-guard.sh` toggles `synchronous_standby_names` and pgpool standby attach/detach
+- Prisma “safe lane” for migrations:
+  - `services/api/prisma/schema.prisma` uses `directUrl = env("DATABASE_URL_DIRECT")`
+
+Docs:
+
+- `docs/Posgres-master-slave-replicas-architechture.md`
+- `docs/PGPOOL-VERIFICATION.md`
+
 ---
 
 ## 1. Product goals and non-goals

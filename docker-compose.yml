@@ -34,8 +34,10 @@ services:
     build: ./services/api
     command: sh -c "npm install && npm run dev"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/brewapp
+      - DATABASE_URL=postgresql://postgres:postgres@pgpool:5432/brewapp
       - DATABASE_URL_TEST=postgresql://postgres:postgres@postgres:5432/brewapp_test
+      - DATABASE_URL_RO=postgresql://postgres:postgres@postgres-replica:5432/brewapp
+      - DATABASE_URL_DIRECT=postgresql://postgres:postgres@postgres:5432/brewapp
       - REDIS_URL=redis://redis:6379/0
       - STRIPE_WEBHOOK_SECRET=...
     ports:
@@ -43,6 +45,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - pgpool
     volumes:
       - ./services/api:/app
       - ./services/api/node_modules:/app/node_modules
@@ -73,6 +76,24 @@ services:
 
   postgres:
     image: postgres:16
+    entrypoint: ["/bin/bash", "/primary-entrypoint.sh"]
+    command:
+      [
+        "-c",
+        "wal_level=replica",
+        "-c",
+        "max_wal_senders=10",
+        "-c",
+        "max_replication_slots=10",
+        "-c",
+        "archive_mode=on",
+        "-c",
+        "archive_command=test ! -f /wal-archive/%f && cp %p /wal-archive/%f",
+        "-c",
+        "max_slot_wal_keep_size=1024MB",
+        "-c",
+        "hot_standby=on"
+      ]
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=brewapp
@@ -80,9 +101,73 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - wal_archive:/wal-archive
+      - ./infra/postgres/primary/primary-entrypoint.sh:/primary-entrypoint.sh:ro
       - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+
+  postgres-replica:
+    image: postgres:16
+    user: postgres
+    entrypoint: ["/bin/bash", "/replica-entrypoint.sh"]
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_replica:/var/lib/postgresql/data
+      - wal_archive:/wal-archive:ro
+      - ./infra/postgres/replica/replica-entrypoint.sh:/replica-entrypoint.sh:ro
+
+  pgpool:
+    image: public.ecr.aws/bitnami/pgpool:4.6.3
+    environment:
+      - PGPOOL_BACKEND_NODES=0:postgres:5432,1:postgres-replica:5432
+      - PGPOOL_SR_CHECK_USER=postgres
+      - PGPOOL_SR_CHECK_PASSWORD=postgres
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=postgres
+      - PGPOOL_ADMIN_USERNAME=pgpooladmin
+      - PGPOOL_ADMIN_PASSWORD=pgpooladmin
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+      - PGPOOL_DISABLE_LOAD_BALANCE_ON_WRITE=transaction
+      - PGPOOL_AUTHENTICATION_METHOD=scram-sha-256
+      - PGPOOL_USER_CONF_FILE=/config/pgpool-extra.conf
+      - PGPOOL_USER_HBA_FILE=/config/pool_hba.conf
+    depends_on:
+      - postgres
+      - postgres-replica
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./infra/pgpool/pgpool-extra.conf:/config/pgpool-extra.conf:ro
+      - ./infra/pgpool/pool_hba.conf:/config/pool_hba.conf:ro
+
+  db-guard:
+    image: public.ecr.aws/bitnami/pgpool:4.6.3
+    command: bash /db-guard.sh
+    environment:
+      - PGPOOL_HOST=pgpool
+      - PCP_USER=pgpooladmin
+      - PCP_PASSWORD=pgpooladmin
+      - PCP_NODE_REPLICA_ID=1
+      - PRIMARY_HOST=postgres
+      - PRIMARY_USER=postgres
+      - PRIMARY_PASSWORD=postgres
+      - SYNC_STANDBY_NAME=walreceiver
+      - REPLAY_LAG_MAX_MS=1000
+      - CHECK_INTERVAL_SECONDS=5
+    depends_on:
+      - pgpool
+      - postgres
+      - postgres-replica
+    volumes:
+      - ./infra/db-guard/db-guard.sh:/db-guard.sh:ro
 
 volumes:
   pgdata:
+  pgdata_replica:
+  wal_archive:
   redisdata:
   web_node_modules:
