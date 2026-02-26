@@ -3,7 +3,7 @@ import { Modal, Pressable, View } from "react-native";
 
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Text } from "@brewery/ui";
-import { Input } from "tamagui";
+import { Input } from "./AppInput";
 
 export type SaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";
 

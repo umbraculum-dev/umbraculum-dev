@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { Alert } from "react-native";
-import { Input, YStack } from "tamagui";
+import { YStack } from "tamagui";
 
 import { useT } from "@brewery/i18n-react";
 import { Button, Heading, Screen, Text } from "@brewery/ui";
 
 import { AdSlot } from "../components/AdSlot";
+import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { useLocaleController } from "../i18n/I18nProvider";
 

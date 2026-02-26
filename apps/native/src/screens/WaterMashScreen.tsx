@@ -15,13 +15,13 @@ import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseW
 import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
-import { Input } from "tamagui";
 import { Accordion } from "tamagui";
 
 import { ModeFieldset } from "../components/ModeFieldset";
 import { RecipeMetaLine } from "../components/RecipeMetaLine";
 import { SaltAdditionsEditor, type SaltAdditionRow } from "../components/SaltAdditionsEditor";
 import { MashStepsEditor, type WaterVolumes } from "../components/MashStepsEditor";
+import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
@@ -32,6 +32,36 @@ function formatFixed(locale: string, value: number, fractionDigits: number): str
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   }).format(value);
+}
+
+type IonProfilePpm = {
+  calcium: number;
+  magnesium: number;
+  sodium: number;
+  sulfate: number;
+  chloride: number;
+  bicarbonate: number;
+};
+
+function mixIonProfilesByVolume(
+  a: IonProfilePpm,
+  aVolumeLiters: number,
+  b: IonProfilePpm,
+  bVolumeLiters: number,
+): IonProfilePpm | null {
+  const av = Math.max(0, aVolumeLiters);
+  const bv = Math.max(0, bVolumeLiters);
+  const total = av + bv;
+  if (!(total > 0)) return null;
+  const mix = (x: number, y: number) => (x * av + y * bv) / total;
+  return {
+    calcium: mix(a.calcium, b.calcium),
+    magnesium: mix(a.magnesium, b.magnesium),
+    sodium: mix(a.sodium, b.sodium),
+    sulfate: mix(a.sulfate, b.sulfate),
+    chloride: mix(a.chloride, b.chloride),
+    bicarbonate: mix(a.bicarbonate, b.bicarbonate),
+  };
 }
 
 function PickerField(props: {
@@ -149,6 +179,11 @@ export function WaterMashScreen() {
   const [mashStepsDirty, setMashStepsDirty] = useState(false);
   const [mashStepsSaving, setMashStepsSaving] = useState(false);
 
+  const [gristImportedRows, setGristImportedRows] = useState<Record<string, unknown>[]>([]);
+  const [gristImportError, setGristImportError] = useState<string | null>(null);
+  const [gristImportStatus, setGristImportStatus] = useState<string | null>(null);
+  const [importingGrist, setImportingGrist] = useState(false);
+
   const canCall = Boolean(recipeId && baseUrl && token);
 
   const tapNum = Math.max(0, Number(tapVolumeLiters) || 0);
@@ -175,6 +210,67 @@ export function WaterMashScreen() {
 
   const profileOptions = (list: WaterProfile[]) =>
     list.map((p) => ({ value: p.id, label: p.name }));
+
+  const selectedSource = useMemo(
+    () => waterProfiles.find((p) => p.id === sourceProfileId) ?? null,
+    [sourceProfileId, waterProfiles],
+  );
+  const selectedTarget = useMemo(
+    () => waterProfiles.find((p) => p.id === targetProfileId) ?? null,
+    [targetProfileId, waterProfiles],
+  );
+  const selectedDilution = useMemo(
+    () => dilutionProfiles.find((p) => p.id === dilutionProfileId) ?? null,
+    [dilutionProfileId, dilutionProfiles],
+  );
+
+  const mixedSourceProfile = useMemo(() => {
+    const tap = Math.max(0, Number(tapVolumeLiters) || 0);
+    const dil = Math.max(0, Number(dilutionVolumeLiters) || 0);
+    const total = tap + dil;
+    if (!(total > 0)) return null;
+    if (!(tap > 0) || !selectedSource) return null;
+    if (dil > 0 && !selectedDilution) return null;
+    if (!(dil > 0)) {
+      return {
+        name: `Source (${selectedSource.name})`,
+        totalVolumeLiters: tap,
+        calcium: selectedSource.calcium,
+        magnesium: selectedSource.magnesium,
+        sodium: selectedSource.sodium,
+        sulfate: selectedSource.sulfate,
+        chloride: selectedSource.chloride,
+        bicarbonate: selectedSource.bicarbonate,
+      };
+    }
+    if (!selectedSource || !selectedDilution) return null;
+    const mixed = mixIonProfilesByVolume(
+      {
+        calcium: selectedSource.calcium,
+        magnesium: selectedSource.magnesium,
+        sodium: selectedSource.sodium,
+        sulfate: selectedSource.sulfate,
+        chloride: selectedSource.chloride,
+        bicarbonate: selectedSource.bicarbonate,
+      },
+      tap,
+      {
+        calcium: selectedDilution.calcium,
+        magnesium: selectedDilution.magnesium,
+        sodium: selectedDilution.sodium,
+        sulfate: selectedDilution.sulfate,
+        chloride: selectedDilution.chloride,
+        bicarbonate: selectedDilution.bicarbonate,
+      },
+      dil,
+    );
+    if (!mixed) return null;
+    return {
+      name: "Mixed",
+      totalVolumeLiters: total,
+      ...mixed,
+    };
+  }, [selectedSource, selectedDilution, tapVolumeLiters, dilutionVolumeLiters]);
 
   const waterVolumes = useMemo((): WaterVolumes | null => {
     const analysis = recipe?.analysis;
@@ -224,6 +320,7 @@ export function WaterMashScreen() {
           setMashStrengthValue(Number(s.mashStrengthValue) ?? 88);
           setMashManualAcidAdded(Number(s.mashManualAcidAddedMl ?? s.mashManualAcidAddedGrams ?? 0));
           if (Array.isArray(s.mashSaltAdditionsJson)) setSaltAdditions(s.mashSaltAdditionsJson as SaltAdditionRow[]);
+          if (Array.isArray(s.mashGristImportedJson)) setGristImportedRows(s.mashGristImportedJson as Record<string, unknown>[]);
           if (s.mashOverallLastResultJson && typeof s.mashOverallLastResultJson === "object") {
             setOverallResult(s.mashOverallLastResultJson as Record<string, unknown>);
           }
@@ -290,6 +387,37 @@ export function WaterMashScreen() {
       });
     } catch (err) {
       setError(String(err));
+    }
+  };
+
+  const onImportGristFromRecipe = async () => {
+    if (!canCall || !recipeId) return;
+    setGristImportError(null);
+    setGristImportStatus(null);
+    setImportingGrist(true);
+    try {
+      const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+      const res = await api.get(`/api/recipes/${recipeId}`);
+      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      const data = res.data as { recipe?: { beerJsonRecipeJson?: unknown; recipeExtJson?: unknown; updatedAt?: string } };
+      const r = data?.recipe;
+      if (!r?.beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
+      const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
+      const mashOnlyRows = (s.gristRows as Record<string, unknown>[]).filter(
+        (row) => (row.timingUse as string ?? "add_to_mash") === "add_to_mash",
+      );
+      const nowIso = new Date().toISOString();
+      await saveSettings({
+        mashGristImportedJson: mashOnlyRows,
+        mashGristImportedAt: nowIso,
+        mashGristSourceRecipeUpdatedAt: r.updatedAt ?? nowIso,
+      });
+      setGristImportedRows(mashOnlyRows);
+      setGristImportStatus("Imported grist snapshot.");
+    } catch (err) {
+      setGristImportError(String(err));
+    } finally {
+      setImportingGrist(false);
     }
   };
 
@@ -662,6 +790,61 @@ export function WaterMashScreen() {
                   <Button size="$3" onPress={onSaveAdjustment}>
                     <Text>Save</Text>
                   </Button>
+                  {mixedSourceProfile ? (
+                    <View style={{ marginTop: 12, padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
+                      <Text fontSize={12} fontWeight="bold" mb="$2">
+                        Mixed water ions
+                      </Text>
+                      <Text fontSize={11} opacity={0.8} mb="$2">
+                        Computed from profiles + volumes
+                      </Text>
+                      {[
+                        ["Ca", mixedSourceProfile.calcium, selectedTarget?.calcium ?? null],
+                        ["Mg", mixedSourceProfile.magnesium, selectedTarget?.magnesium ?? null],
+                        ["Na", mixedSourceProfile.sodium, selectedTarget?.sodium ?? null],
+                        ["SO4", mixedSourceProfile.sulfate, selectedTarget?.sulfate ?? null],
+                        ["Cl", mixedSourceProfile.chloride, selectedTarget?.chloride ?? null],
+                        ["HCO3", mixedSourceProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                      ].map(([label, mixed, target]) => {
+                        const delta = target === null ? null : (mixed as number) - (target as number);
+                        return (
+                          <View key={String(label)} style={{ flexDirection: "row", gap: 8, marginBottom: 4 }}>
+                            <Text fontSize={12} style={{ minWidth: 40 }}>{label}</Text>
+                            <Text fontSize={12}>{formatFixed(locale, mixed as number, 0)} {tUnits("ppm")}</Text>
+                            {target !== null ? (
+                              <>
+                                <Text fontSize={12} opacity={0.7}>Target: {formatFixed(locale, target as number, 0)}</Text>
+                                <Text fontSize={12} opacity={0.7}>Δ: {formatFixed(locale, delta as number, 0)}</Text>
+                              </>
+                            ) : null}
+                          </View>
+                        );
+                      })}
+                    </View>
+                  ) : null}
+                  <View style={{ marginTop: 12, flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+                    <Button
+                      size="$3"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                      onPress={onImportGristFromRecipe}
+                      disabled={!canCall || importingGrist}
+                    >
+                      <Text>{importingGrist ? "Importing…" : "Import/update grist snapshot"}</Text>
+                    </Button>
+                    {gristImportStatus ? (
+                      <Text fontSize={12} opacity={0.85}>{gristImportStatus}</Text>
+                    ) : null}
+                  </View>
+                  {gristImportError ? (
+                    <Text fontSize={12} color="$red10" mt="$2">{gristImportError}</Text>
+                  ) : null}
+                  {gristImportedRows.length > 0 ? (
+                    <Text fontSize={12} opacity={0.8} mt="$2">
+                      Rows: {gristImportedRows.length} · Total: {formatFixed(locale, gristImportedRows.reduce((sum, r) => sum + (Number.isFinite(r.amountKg as number) ? (r.amountKg as number) : 0), 0), 2)} {tUnits("kg")}
+                    </Text>
+                  ) : null}
                 </View>
               </Accordion.Content>
             </Card>
@@ -735,15 +918,33 @@ export function WaterMashScreen() {
                     label="Acid type"
                     value={mashAcidType}
                     options={[
-                      { value: "lactic", label: "Lactic" },
                       { value: "phosphoric", label: "Phosphoric" },
+                      { value: "lactic", label: "Lactic" },
+                      { value: "hydrochloric", label: "Hydrochloric" },
+                      { value: "sulfuric", label: "Sulfuric" },
+                      { value: "acetic", label: "Acetic" },
+                      { value: "citric", label: "Citric (solid)" },
+                      { value: "tartaric", label: "Tartaric (solid)" },
+                      { value: "malic", label: "Malic (solid)" },
                     ]}
                     onChange={setMashAcidType}
                     closeLabel={tCommon("close")}
                   />
+                  <PickerField
+                    label="Strength kind"
+                    value={mashStrengthKind}
+                    options={[
+                      { value: "percent", label: "Percent (%)" },
+                      { value: "normality", label: "Normality (N)" },
+                      { value: "molarity", label: "Molarity (M)" },
+                      { value: "solid", label: "Solid (pure)" },
+                    ]}
+                    onChange={(v) => setMashStrengthKind(v as "percent" | "normality" | "molarity" | "solid")}
+                    closeLabel={tCommon("close")}
+                  />
                   <View>
                     <Text fontSize={11} opacity={0.8} mb="$1">
-                      Strength ({mashStrengthKind === "percent" ? "%" : ""})
+                      Strength value {mashStrengthKind === "percent" ? "(%)" : ""}
                     </Text>
                     <Input
                       keyboardType="decimal-pad"
@@ -753,12 +954,13 @@ export function WaterMashScreen() {
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
+                      disabled={mashStrengthKind === "solid"}
                     />
                   </View>
                   {mashAcidificationMode === "manual" ? (
                     <View>
                       <Text fontSize={11} opacity={0.8} mb="$1">
-                        Acid added (mL)
+                        Acid added ({mashStrengthKind === "solid" ? tUnits("g") : tUnits("mL")})
                       </Text>
                       <Input
                         keyboardType="decimal-pad"

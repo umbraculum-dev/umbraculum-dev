@@ -5,8 +5,9 @@ import { useNavigation } from "@react-navigation/native";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
-import { Input, TextArea } from "tamagui";
+import { TextArea } from "tamagui";
 
+import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 

@@ -13,6 +13,7 @@ export {
   computeEstimatedCellsB,
   editorStateFromBeerJson,
   mergeMashDeduceFromExt,
+  mergeYeastAttenuationRangeFromExt,
   MASH_STEP_TYPE_OPTIONS,
   MASH_TEMPLATES,
   newMashRowId,

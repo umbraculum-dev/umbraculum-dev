@@ -9,6 +9,7 @@ import { Text } from "@brewery/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useAuth } from "../auth/AuthProvider";
+import { SURFACE_BACKGROUND_SEMI, SURFACE_BORDER } from "../theme/colors";
 
 export type AdPlacementV1 =
   | "global_top"
@@ -71,9 +72,9 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
         marginVertical: 12,
         gap: 6,
         padding: 10,
-        backgroundColor: "rgba(42, 47, 58, 0.45)",
+        backgroundColor: SURFACE_BACKGROUND_SEMI,
         borderWidth: 1,
-        borderColor: "#2a2f3a",
+        borderColor: SURFACE_BORDER,
         borderRadius: 8,
       }}
       accessibilityLabel={t("ariaLabel")}

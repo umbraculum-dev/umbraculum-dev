@@ -23,11 +23,12 @@ import {
 } from "@brewery/beerjson";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
-import { Accordion, Input } from "tamagui";
+import { Accordion } from "tamagui";
 
 import { ManualCellCountHelpBox } from "../components/ManualCellCountHelpBox";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { RecipeMetaLine } from "../components/RecipeMetaLine";
+import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";

@@ -5,7 +5,7 @@ import type { EditorMashStep, EditorMashStepType } from "@brewery/beerjson";
 import { MASH_STEP_TYPE_OPTIONS, newMashRowId } from "@brewery/beerjson";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Text } from "@brewery/ui";
-import { Input } from "tamagui";
+import { Input } from "./AppInput";
 
 export type WaterVolumes = { mashLiters: number; spargeLiters: number };
 

@@ -7,8 +7,9 @@ import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewe
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
-import { Accordion, Input } from "tamagui";
+import { Accordion } from "tamagui";
 
+import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 

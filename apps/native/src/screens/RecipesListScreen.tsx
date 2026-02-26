@@ -3,10 +3,10 @@ import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
-import { Input } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
+import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 

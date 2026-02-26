@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
@@ -7,16 +7,22 @@ import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
+  mergeMashDeduceFromExt,
   mergeYeastAttenuationRangeFromExt,
   type EditorGristRow,
   type EditorHopRow,
+  type EditorMashStep,
   type EditorYeastRow,
 } from "@brewery/beerjson";
+import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
-import { Accordion, Input, TextArea } from "tamagui";
+import { Accordion, TextArea } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
 import { AdSlot } from "../components/AdSlot";
+import { Input } from "../components/AppInput";
+import { SURFACE_BACKGROUND, SURFACE_BORDER } from "../theme/colors";
+import { MashStepsEditor, type WaterVolumes } from "../components/MashStepsEditor";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
@@ -220,6 +226,7 @@ export function RecipeEditScreen() {
   const [name, setName] = useState("");
   const [styleKey, setStyleKey] = useState("");
   const [notes, setNotes] = useState("");
+  const scrollRef = useRef<ScrollView>(null);
   const [boilTimeMinutes, setBoilTimeMinutes] = useState("");
   const [openSections, setOpenSections] = useState<string[]>(["basics"]);
   const [openFermentableIds, setOpenFermentableIds] = useState<string[]>([]);
@@ -261,12 +268,42 @@ export function RecipeEditScreen() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
+  const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
+  const [waterSettings, setWaterSettings] = useState<{
+    spargeStepTemperatureC?: number | null;
+  } | null>(null);
+
   const canCall = auth.state.status === "logged_in" && Boolean(baseUrl) && Boolean(token);
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
     return createApiClient(baseUrl, bearerTokenAuth(() => token));
   }, [baseUrl, token]);
+
+  const analysis = (recipe as { analysis?: unknown })?.analysis;
+  const waterVolumes = useMemo((): WaterVolumes | null => {
+    if (!analysis) return null;
+    try {
+      const parsed = parseGravityAnalysisResponseV1(analysis);
+      const preBoil = parsed?.derivations?.["analysis.pre_boil_volume"];
+      if (!preBoil?.inputs) return null;
+      const mashIn = preBoil.inputs.find((i) => i.id === "mashWaterVolumeLiters")?.value;
+      const spargeIn = preBoil.inputs.find((i) => i.id === "spargeVolumeLiters")?.value;
+      const mashL = mashIn?.kind === "number" ? mashIn.value : null;
+      const spargeL = spargeIn?.kind === "number" ? spargeIn.value : null;
+      return mashL != null && spargeL != null ? { mashLiters: mashL, spargeLiters: spargeL } : null;
+    } catch {
+      return null;
+    }
+  }, [analysis]);
+
+  const spargeConfigured = waterVolumes != null && waterVolumes.spargeLiters > 0;
+  const mashRowsFiltered = useMemo(() => {
+    if (!spargeConfigured) return mashRows;
+    return mashRows.filter(
+      (r) => !(r.type === "sparge" && r.name.trim().toLowerCase() === "sparge"),
+    );
+  }, [mashRows, spargeConfigured]);
 
   const loadRecipe = useCallback(async () => {
     if (!api || !recipeId) return;
@@ -322,11 +359,14 @@ export function RecipeEditScreen() {
         setGristRows([]);
         setHopsRows([]);
         setYeastRows([]);
+        setMashRows([]);
         return;
       }
       const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
       setGristRows(s.gristRows);
       setHopsRows(s.hopsRows);
+      const mashMerged = mergeMashDeduceFromExt(s.mash, ext);
+      setMashRows(mashMerged?.steps ?? []);
       const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
       const mappedYeastRows: EditorYeastRow[] = baseYeast.map((row) => {
         const fermentationTempC =
@@ -436,6 +476,24 @@ export function RecipeEditScreen() {
       void loadEquipmentProfiles();
     }
   }, [canCall, recipeId, loadRecipe, loadStyles, loadEquipmentProfiles]);
+
+  useEffect(() => {
+    if (!canCall || !recipeId || !api) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.get(`/api/recipes/${recipeId}/water-settings`);
+        if (cancelled) return;
+        const data = (res.data as { settings?: { spargeStepTemperatureC?: number | null } })?.settings;
+        setWaterSettings(data ?? null);
+      } catch {
+        if (!cancelled) setWaterSettings(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [canCall, recipeId, api]);
 
   useFocusEffect(
     useCallback(() => {
@@ -847,7 +905,17 @@ export function RecipeEditScreen() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
         {(saveStatus || saveError) ? (
           <Card gap="$2" mb="$3" bg={saveError ? "rgba(255,80,80,0.15)" : "rgba(80,200,80,0.15)"}>
             {saveStatus ? <Text fontSize={14}>{saveStatus}</Text> : null}
@@ -861,7 +929,7 @@ export function RecipeEditScreen() {
           onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : (next ? [next] : []))}
         >
           <Accordion.Item value="basics">
-            <Card gap="$2" aria-label={t("sections.basics")}>
+            <Card gap="$2" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.basics")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -917,7 +985,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="fermentables">
-            <Card gap="$2" mt="$3" aria-label={t("sections.fermentables")}>
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.fermentables")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -995,7 +1063,7 @@ export function RecipeEditScreen() {
                       <Text>{t("buttons.addCustomFermentable")}</Text>
                     </Button>
                   </View>
-                  <View style={{ height: 1, backgroundColor: "#2a2f3a", marginVertical: 12 }} />
+                  <View style={{ height: 1, backgroundColor: SURFACE_BORDER, marginVertical: 12 }} />
                   <Text fontSize={12} opacity={0.8} style={{ marginBottom: 12 }}>
                     {t("gristTotalKg", { value: gristTotals.totalKg.toFixed(3), unit: tUnits("kg") })}
                     {gristTotals.weightedAvgLovibond != null
@@ -1009,7 +1077,7 @@ export function RecipeEditScreen() {
                   >
                     {gristRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`grist-${r.id}`}>
-                        <Card gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="$2" mb="$2" backgroundColor={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
                           <Accordion.Header>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                               <Accordion.Trigger
@@ -1179,7 +1247,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="hops">
-            <Card gap="$2" mt="$3" aria-label={t("sections.hops")}>
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.hops")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1262,7 +1330,7 @@ export function RecipeEditScreen() {
                   >
                     {hopsRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`hop-${r.id}`}>
-                        <Card gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="$2" mb="$2" backgroundColor={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
                           <Accordion.Header>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                               <Accordion.Trigger
@@ -1390,7 +1458,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="yeast">
-            <Card gap="$2" mt="$3" aria-label={t("sections.yeast")}>
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.yeast")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1415,7 +1483,7 @@ export function RecipeEditScreen() {
                   >
                     {yeastRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`yeast-${r.id}`}>
-                        <Card gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="$2" mb="$2" backgroundColor={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
                           <Accordion.Header>
                             <Accordion.Trigger
                               width="100%"
@@ -1575,7 +1643,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="equipment">
-            <Card gap="$2" mt="$3" aria-label={t("sections.equipment")}>
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.equipment")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1666,19 +1734,19 @@ export function RecipeEditScreen() {
             </Card>
           </Accordion.Item>
 
-          <Accordion.Item value="water">
-            <Card gap="$2" mt="$3" aria-label={t("sections.water")}>
+          <Accordion.Item value="mashing">
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.mashing")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
                   accessibilityRole="button"
-                  accessibilityLabel={t("sections.water")}
-                  accessibilityState={{ expanded: openSections.includes("water") }}
+                  accessibilityLabel={t("sections.mashing")}
+                  accessibilityState={{ expanded: openSections.includes("mashing") }}
                 >
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                    <Heading fontSize={18}>{t("sections.water")}</Heading>
+                    <Heading fontSize={18}>{t("sections.mashing")}</Heading>
                     <Text fontSize={18} opacity={0.7}>
-                      {openSections.includes("water") ? "▾" : "▸"}
+                      {openSections.includes("mashing") ? "▾" : "▸"}
                     </Text>
                   </View>
                 </Accordion.Trigger>
@@ -1686,8 +1754,99 @@ export function RecipeEditScreen() {
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
                   <Text fontSize={12} opacity={0.8} mb="$2">
-                    {t("waterHelp")}
+                    {t("mashingHelp")}
                   </Text>
+                  {waterVolumes ? (
+                    <View style={{ marginBottom: 12, padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
+                      <Text fontSize={12} fontWeight="bold" mb="$1">
+                        {t("mashingWaterVolumesTitle")}
+                      </Text>
+                      <Text fontSize={12} opacity={0.8} mb="$1">
+                        {t("mashingWaterVolumesSource")}
+                      </Text>
+                      <Text fontSize={12}>
+                        Mash water: {formatFixed(locale, waterVolumes.mashLiters, 2)} {tUnits("L")}
+                      </Text>
+                      <Text fontSize={12}>
+                        Sparge water: {formatFixed(locale, waterVolumes.spargeLiters, 2)} {tUnits("L")}
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text fontSize={12} opacity={0.8} mb="$2">
+                      {t("mashingWaterVolumesUnavailable")}
+                    </Text>
+                  )}
+                  <View style={{ marginBottom: 12 }}>
+                    <MashStepsEditor
+                      mashRows={mashRowsFiltered}
+                      waterVolumes={waterVolumes}
+                      readOnly
+                      t={t}
+                      tUnits={tUnits}
+                      locale={locale}
+                      formatFixed={formatFixed}
+                    />
+                  </View>
+                  {spargeConfigured && waterVolumes ? (
+                    <View style={{ marginBottom: 12 }}>
+                      <Text fontSize={12} opacity={0.8} mb="$2">
+                        {t("spargeStepFromWaterPage")}
+                      </Text>
+                      <View style={{ padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
+                          <View>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("mashingStepName")}
+                            </Text>
+                            <Text fontSize={12}>Sparge</Text>
+                          </View>
+                          <View>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("mashingStepType")}
+                            </Text>
+                            <Text fontSize={12}>Sparge</Text>
+                          </View>
+                          <View>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("mashingStepTemp", { unit: "°C" })}
+                            </Text>
+                            <Text fontSize={12}>
+                              {formatFixed(
+                                locale,
+                                waterSettings?.spargeStepTemperatureC != null ? waterSettings.spargeStepTemperatureC : 76,
+                                waterSettings?.spargeStepTemperatureC != null &&
+                                  !Number.isInteger(waterSettings.spargeStepTemperatureC)
+                                  ? 1
+                                  : 0,
+                              )}
+                            </Text>
+                          </View>
+                          <View>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("mashingStepTime", { unit: "min" })}
+                            </Text>
+                            <Text fontSize={12}>0</Text>
+                          </View>
+                          <View>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("mashingStepAmount", { unit: "L" })}
+                            </Text>
+                            <Text fontSize={12}>
+                              {formatFixed(locale, waterVolumes.spargeLiters, 2)} {tUnits("L")}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                      <Button
+                        chromeless
+                        size="$3"
+                        mt="$2"
+                        onPress={() => (navigation as any).navigate("WaterSparge", { recipeId })}
+                      >
+                        <Text fontSize={12} color="$blue10">{t("spargeStepConfigureLink")}</Text>
+                      </Button>
+                    </View>
+                  ) : null}
                   <Button
                     onPress={() => (navigation as any).navigate("WaterHub", { recipeId })}
                     size="$3"
@@ -1708,7 +1867,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="boil">
-            <Card gap="$2" mt="$3" aria-label={t("sections.boil")}>
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.boil")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1747,7 +1906,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="notes">
-            <Card gap="$2" mt="$3" aria-label={t("sections.notes")}>
+            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.notes")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1768,6 +1927,9 @@ export function RecipeEditScreen() {
                   <TextArea
                     value={notes}
                     onChangeText={setNotes}
+                    onFocus={() => {
+                      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+                    }}
                     placeholder="Notes"
                     size="$3"
                     background="$background"
@@ -1855,7 +2017,8 @@ export function RecipeEditScreen() {
             </Pressable>
           </Pressable>
         </Modal>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Screen>
   );
 }
