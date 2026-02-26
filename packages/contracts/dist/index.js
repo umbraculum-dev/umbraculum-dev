@@ -52,6 +52,151 @@ function parseAuthMeResponse(payload) {
   return { ok: true, user, workspaces, activeWorkspaceId, role };
 }
 
+// src/water/parseHubSummary.ts
+function isFiniteNumber(v) {
+  return typeof v === "number" && Number.isFinite(v);
+}
+function parseIonProfilePpm(v) {
+  if (!v || typeof v !== "object") return null;
+  const o = v;
+  const keys = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
+  for (const k of keys) if (!isFiniteNumber(o[k])) return null;
+  return {
+    calcium: o.calcium,
+    magnesium: o.magnesium,
+    sodium: o.sodium,
+    sulfate: o.sulfate,
+    chloride: o.chloride,
+    bicarbonate: o.bicarbonate
+  };
+}
+function parseExpectedRaRange(v) {
+  if (!v || typeof v !== "object") return null;
+  const o = v;
+  const rationaleKey = o.rationaleKey === "styleExpectedRaDark" || o.rationaleKey === "styleExpectedRaPale" || o.rationaleKey === "styleExpectedRaAmber" ? o.rationaleKey : null;
+  if (!rationaleKey) return null;
+  if (!isFiniteNumber(o.min) || !isFiniteNumber(o.max)) return null;
+  return { min: o.min, max: o.max, rationaleKey };
+}
+function parseStream(v) {
+  if (!v || typeof v !== "object") return null;
+  const o = v;
+  const key = o.key === "mash" || o.key === "sparge" || o.key === "boil" ? o.key : null;
+  if (!key) return null;
+  const volumeLiters = o.volumeLiters === null ? null : isFiniteNumber(o.volumeLiters) ? o.volumeLiters : null;
+  const ph = o.ph === null ? null : isFiniteNumber(o.ph) ? o.ph : null;
+  const finalAlkalinityPpmCaCO3 = o.finalAlkalinityPpmCaCO3 === null ? null : isFiniteNumber(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : null;
+  const ionsPpm = parseIonProfilePpm(o.ionsPpm);
+  const saltsBreakdown = (() => {
+    if (o.saltsBreakdown === null) return null;
+    if (!Array.isArray(o.saltsBreakdown)) return null;
+    const rows = [];
+    for (const row of o.saltsBreakdown) {
+      if (!row || typeof row !== "object") continue;
+      const r = row;
+      const saltKey = typeof r.saltKey === "string" ? r.saltKey : null;
+      const grams = isFiniteNumber(r.grams) ? r.grams : null;
+      if (!saltKey || grams === null) continue;
+      rows.push({ saltKey, grams });
+    }
+    return rows.length ? rows : null;
+  })();
+  const acidType = typeof o.acidType === "string" ? o.acidType : o.acidType === null ? null : null;
+  const acidMode = o.acidMode === "manual" || o.acidMode === "required" ? o.acidMode : null;
+  const acidStrengthKind = typeof o.acidStrengthKind === "string" ? o.acidStrengthKind : o.acidStrengthKind === null ? null : null;
+  const acidStrengthValue = o.acidStrengthValue === null ? null : isFiniteNumber(o.acidStrengthValue) ? o.acidStrengthValue : null;
+  const acidAmountMl = o.acidAmountMl === null ? null : isFiniteNumber(o.acidAmountMl) ? o.acidAmountMl : null;
+  const acidAmountGrams = o.acidAmountGrams === null ? null : isFiniteNumber(o.acidAmountGrams) ? o.acidAmountGrams : null;
+  return {
+    key,
+    volumeLiters,
+    ph,
+    finalAlkalinityPpmCaCO3,
+    ionsPpm,
+    saltsBreakdown,
+    acidType,
+    acidMode,
+    acidStrengthKind,
+    acidStrengthValue,
+    acidAmountMl,
+    acidAmountGrams
+  };
+}
+function parseRecipeWaterHubSummaryResponse(x) {
+  const root = x ?? {};
+  if (!root || typeof root !== "object") throw new Error("Invalid RecipeWaterHubSummaryResponse");
+  if (root.ok !== true) throw new Error("Invalid RecipeWaterHubSummaryResponse.ok");
+  const s = root.summary;
+  if (!s || typeof s !== "object") throw new Error("Invalid RecipeWaterHubSummaryResponse.summary");
+  const version = s.version === 1 ? 1 : null;
+  if (version === null) throw new Error("Invalid RecipeWaterHubSummaryResponse.summary.version");
+  const status = s.status ?? null;
+  if (!status || typeof status !== "object") throw new Error("Invalid RecipeWaterHubSummaryResponse.summary.status");
+  const statusObj = status;
+  const mashOverallSnapshot = (() => {
+    const v = statusObj.mashOverallSnapshot;
+    if (v === null) return null;
+    if (!v || typeof v !== "object") return null;
+    const o = v;
+    const ph = o.ph;
+    const kind = ph?.kind === "target" || ph?.kind === "estimated" ? ph.kind : null;
+    const value = isFiniteNumber(ph?.value) ? ph.value : null;
+    const finalAlk = isFiniteNumber(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : null;
+    if (!kind || value === null || finalAlk === null) return null;
+    return { ph: { kind, value }, finalAlkalinityPpmCaCO3: finalAlk };
+  })();
+  const sObj = s;
+  const streams = Array.isArray(sObj.streams) ? sObj.streams.map(parseStream).filter(Boolean) : [];
+  const merged = sObj.merged ?? null;
+  if (!merged || typeof merged !== "object") throw new Error("Invalid RecipeWaterHubSummaryResponse.summary.merged");
+  const mergedIons = parseIonProfilePpm(merged.ionsPpm);
+  const mergedPh = merged.ph === null ? null : isFiniteNumber(merged.ph) ? merged.ph : null;
+  const mergedFinalAlk = merged.finalAlkalinityPpmCaCO3 === null ? null : isFiniteNumber(merged.finalAlkalinityPpmCaCO3) ? merged.finalAlkalinityPpmCaCO3 : null;
+  const totalVolumeLiters = isFiniteNumber(merged.totalVolumeLiters) ? merged.totalVolumeLiters : 0;
+  const finalRecap = sObj.finalRecap ?? null;
+  if (!finalRecap || typeof finalRecap !== "object") throw new Error("Invalid RecipeWaterHubSummaryResponse.summary.finalRecap");
+  const predictedMashPh = (() => {
+    const v = finalRecap.predictedMashPh;
+    if (v === null) return null;
+    if (!v || typeof v !== "object") return null;
+    const o = v;
+    const kind = o.kind === "target" || o.kind === "estimated" ? o.kind : null;
+    const value = isFiniteNumber(o.value) ? o.value : null;
+    if (!kind || value === null) return null;
+    return { kind, value };
+  })();
+  const formatHints = root.formatHints && typeof root.formatHints === "object" && !Array.isArray(root.formatHints) ? root.formatHints : void 0;
+  return {
+    ok: true,
+    summary: {
+      version,
+      status: {
+        mashAcidificationMode: typeof statusObj.mashAcidificationMode === "string" ? statusObj.mashAcidificationMode : null,
+        spargeAcidificationMode: typeof statusObj.spargeAcidificationMode === "string" ? statusObj.spargeAcidificationMode : null,
+        boilAcidificationMode: typeof statusObj.boilAcidificationMode === "string" ? statusObj.boilAcidificationMode : null,
+        mashLastCalculatedAt: typeof statusObj.mashLastCalculatedAt === "string" ? statusObj.mashLastCalculatedAt : null,
+        spargeLastCalculatedAt: typeof statusObj.spargeLastCalculatedAt === "string" ? statusObj.spargeLastCalculatedAt : null,
+        boilLastCalculatedAt: typeof statusObj.boilLastCalculatedAt === "string" ? statusObj.boilLastCalculatedAt : null,
+        mashOverallSnapshot
+      },
+      streams,
+      merged: {
+        totalVolumeLiters,
+        ph: mergedPh,
+        finalAlkalinityPpmCaCO3: mergedFinalAlk,
+        ionsPpm: mergedIons
+      },
+      finalRecap: {
+        predictedMashPh,
+        residualAlkalinityMashOverallPpmCaCO3: isFiniteNumber(finalRecap.residualAlkalinityMashOverallPpmCaCO3) ? finalRecap.residualAlkalinityMashOverallPpmCaCO3 : finalRecap.residualAlkalinityMashOverallPpmCaCO3 === null ? null : null,
+        residualAlkalinityMergedPpmCaCO3: isFiniteNumber(finalRecap.residualAlkalinityMergedPpmCaCO3) ? finalRecap.residualAlkalinityMergedPpmCaCO3 : finalRecap.residualAlkalinityMergedPpmCaCO3 === null ? null : null,
+        styleExpectedRa: parseExpectedRaRange(finalRecap.styleExpectedRa)
+      }
+    },
+    formatHints
+  };
+}
+
 // src/water/waterProfile.ts
 function isString2(v) {
   return typeof v === "string";
@@ -126,15 +271,15 @@ function parseWaterProfilesResponse(payload) {
 }
 
 // src/water/parseComputeAndSave.ts
-function isFiniteNumber(v) {
+function isFiniteNumber2(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
-function parseIonProfilePpm(v, label) {
+function parseIonProfilePpm2(v, label) {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v;
   const keys = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
   for (const k of keys) {
-    if (!isFiniteNumber(o[k])) throw new Error(`Invalid ${label}.${String(k)}`);
+    if (!isFiniteNumber2(o[k])) throw new Error(`Invalid ${label}.${String(k)}`);
   }
   return {
     calcium: o.calcium,
@@ -149,7 +294,7 @@ function parseDerivationValue(v, label) {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v;
   if (o.kind === "number") {
-    if (!isFiniteNumber(o.value)) throw new Error(`Invalid ${label}.value`);
+    if (!isFiniteNumber2(o.value)) throw new Error(`Invalid ${label}.value`);
     const unit = typeof o.unit === "string" ? o.unit : void 0;
     return unit ? { kind: "number", value: o.value, unit } : { kind: "number", value: o.value };
   }
@@ -198,10 +343,10 @@ function parseSettingsSavedRef(v, label) {
 function parseSaltAdditionsResult(v, label) {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v;
-  const baseProfile = parseIonProfilePpm(o.baseProfile, `${label}.baseProfile`);
-  const resultingProfile = parseIonProfilePpm(o.resultingProfile, `${label}.resultingProfile`);
-  const deltasPpm = parseIonProfilePpm(o.deltasPpm, `${label}.deltasPpm`);
-  const breakdown = Array.isArray(o.breakdown) ? o.breakdown.filter((r) => r && typeof r === "object" && typeof r.saltKey === "string" && isFiniteNumber(r.grams)).map((r) => ({
+  const baseProfile = parseIonProfilePpm2(o.baseProfile, `${label}.baseProfile`);
+  const resultingProfile = parseIonProfilePpm2(o.resultingProfile, `${label}.resultingProfile`);
+  const deltasPpm = parseIonProfilePpm2(o.deltasPpm, `${label}.deltasPpm`);
+  const breakdown = Array.isArray(o.breakdown) ? o.breakdown.filter((r) => r && typeof r === "object" && typeof r.saltKey === "string" && isFiniteNumber2(r.grams)).map((r) => ({
     saltKey: r.saltKey,
     grams: r.grams,
     deltasPpm: r.deltasPpm && typeof r.deltasPpm === "object" ? r.deltasPpm : {}
@@ -211,17 +356,17 @@ function parseSaltAdditionsResult(v, label) {
 function parseAcidificationResult(v, label) {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v;
-  const finalAlkalinityPpmCaCO3 = isFiniteNumber(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : NaN;
-  const sulfateAddedPpm = isFiniteNumber(o.sulfateAddedPpm) ? o.sulfateAddedPpm : NaN;
-  const chlorideAddedPpm = isFiniteNumber(o.chlorideAddedPpm) ? o.chlorideAddedPpm : NaN;
+  const finalAlkalinityPpmCaCO3 = isFiniteNumber2(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : NaN;
+  const sulfateAddedPpm = isFiniteNumber2(o.sulfateAddedPpm) ? o.sulfateAddedPpm : NaN;
+  const chlorideAddedPpm = isFiniteNumber2(o.chlorideAddedPpm) ? o.chlorideAddedPpm : NaN;
   if (!Number.isFinite(finalAlkalinityPpmCaCO3)) throw new Error(`Invalid ${label}.finalAlkalinityPpmCaCO3`);
   if (!Number.isFinite(sulfateAddedPpm)) throw new Error(`Invalid ${label}.sulfateAddedPpm`);
   if (!Number.isFinite(chlorideAddedPpm)) throw new Error(`Invalid ${label}.chlorideAddedPpm`);
   return {
-    acidRequiredMl: o.acidRequiredMl === null ? null : isFiniteNumber(o.acidRequiredMl) ? o.acidRequiredMl : null,
-    acidRequiredTsp: o.acidRequiredTsp === null ? null : isFiniteNumber(o.acidRequiredTsp) ? o.acidRequiredTsp : null,
-    acidRequiredGrams: o.acidRequiredGrams === null ? null : isFiniteNumber(o.acidRequiredGrams) ? o.acidRequiredGrams : null,
-    acidRequiredKg: o.acidRequiredKg === null ? null : isFiniteNumber(o.acidRequiredKg) ? o.acidRequiredKg : null,
+    acidRequiredMl: o.acidRequiredMl === null ? null : isFiniteNumber2(o.acidRequiredMl) ? o.acidRequiredMl : null,
+    acidRequiredTsp: o.acidRequiredTsp === null ? null : isFiniteNumber2(o.acidRequiredTsp) ? o.acidRequiredTsp : null,
+    acidRequiredGrams: o.acidRequiredGrams === null ? null : isFiniteNumber2(o.acidRequiredGrams) ? o.acidRequiredGrams : null,
+    acidRequiredKg: o.acidRequiredKg === null ? null : isFiniteNumber2(o.acidRequiredKg) ? o.acidRequiredKg : null,
     finalAlkalinityPpmCaCO3,
     sulfateAddedPpm,
     chlorideAddedPpm,
@@ -231,12 +376,12 @@ function parseAcidificationResult(v, label) {
 function parseAcidificationManualResult(v, label) {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v;
-  const achievedPh = isFiniteNumber(o.achievedPh) ? o.achievedPh : NaN;
+  const achievedPh = isFiniteNumber2(o.achievedPh) ? o.achievedPh : NaN;
   if (!Number.isFinite(achievedPh)) throw new Error(`Invalid ${label}.achievedPh`);
   const clamped = o.clamped === "none" || o.clamped === "low" || o.clamped === "high" ? o.clamped : "none";
-  const iterations = isFiniteNumber(o.iterations) ? o.iterations : 0;
-  const targetAmount = isFiniteNumber(o.targetAmount) ? o.targetAmount : NaN;
-  const predictedAmount = isFiniteNumber(o.predictedAmount) ? o.predictedAmount : NaN;
+  const iterations = isFiniteNumber2(o.iterations) ? o.iterations : 0;
+  const targetAmount = isFiniteNumber2(o.targetAmount) ? o.targetAmount : NaN;
+  const predictedAmount = isFiniteNumber2(o.predictedAmount) ? o.predictedAmount : NaN;
   return {
     achievedPh,
     predicted: parseAcidificationResult(o.predicted, `${label}.predicted`),
@@ -249,7 +394,7 @@ function parseAcidificationManualResult(v, label) {
 function parseMashTargetMashPhResult(v, label) {
   const base = parseAcidificationResult(v, label);
   const o = v;
-  const estimatedMashPhRoomTemp = isFiniteNumber(o.estimatedMashPhRoomTemp) ? o.estimatedMashPhRoomTemp : NaN;
+  const estimatedMashPhRoomTemp = isFiniteNumber2(o.estimatedMashPhRoomTemp) ? o.estimatedMashPhRoomTemp : NaN;
   if (!Number.isFinite(estimatedMashPhRoomTemp)) throw new Error(`Invalid ${label}.estimatedMashPhRoomTemp`);
   return { ...base, estimatedMashPhRoomTemp };
 }
@@ -258,12 +403,12 @@ function parseOverallResult(v, label) {
   const o = v;
   const calculatedAt = typeof o.calculatedAt === "string" ? o.calculatedAt : "";
   if (!calculatedAt) throw new Error(`Invalid ${label}.calculatedAt`);
-  const ionsPpm = parseIonProfilePpm(o.ionsPpm, `${label}.ionsPpm`);
-  const finalAlkalinityPpmCaCO3 = isFiniteNumber(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : NaN;
+  const ionsPpm = parseIonProfilePpm2(o.ionsPpm, `${label}.ionsPpm`);
+  const finalAlkalinityPpmCaCO3 = isFiniteNumber2(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : NaN;
   if (!Number.isFinite(finalAlkalinityPpmCaCO3)) throw new Error(`Invalid ${label}.finalAlkalinityPpmCaCO3`);
   const ph = o.ph;
   const kind = ph?.kind === "target" || ph?.kind === "estimated" ? ph.kind : null;
-  const value = isFiniteNumber(ph?.value) ? ph.value : null;
+  const value = isFiniteNumber2(ph?.value) ? ph.value : null;
   if (!kind || value === null) throw new Error(`Invalid ${label}.ph`);
   return {
     calculatedAt,
@@ -353,12 +498,12 @@ function parseNumberFormatHintV1(v, label) {
   if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
   const style = o.style === "fixed" || o.style === "significant" ? o.style : null;
   if (!style) throw new Error(`Invalid ${label}.style`);
-  const decimals = isFiniteNumber(o.decimals) ? o.decimals : NaN;
+  const decimals = isFiniteNumber2(o.decimals) ? o.decimals : NaN;
   if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
   const unit = typeof o.unit === "string" ? o.unit : void 0;
   const clamp = o.clamp && typeof o.clamp === "object" ? {
-    min: isFiniteNumber(o.clamp.min) ? o.clamp.min : void 0,
-    max: isFiniteNumber(o.clamp.max) ? o.clamp.max : void 0
+    min: isFiniteNumber2(o.clamp.min) ? o.clamp.min : void 0,
+    max: isFiniteNumber2(o.clamp.max) ? o.clamp.max : void 0
   } : void 0;
   return { version: 1, style, decimals, unit, clamp };
 }
@@ -476,7 +621,7 @@ var analysisFormatHints = {
 };
 
 // src/analysis/parseGravityAnalysis.ts
-function isFiniteNumber2(v) {
+function isFiniteNumber3(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
 function parseCanonicalModels(v) {
@@ -491,12 +636,12 @@ function parseNumberFormatHintV12(v, label) {
   if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
   const style = o.style === "fixed" || o.style === "significant" ? o.style : null;
   if (!style) throw new Error(`Invalid ${label}.style`);
-  const decimals = isFiniteNumber2(o.decimals) ? o.decimals : NaN;
+  const decimals = isFiniteNumber3(o.decimals) ? o.decimals : NaN;
   if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
   const unit = typeof o.unit === "string" ? o.unit : void 0;
   const clamp = o.clamp && typeof o.clamp === "object" ? {
-    min: isFiniteNumber2(o.clamp.min) ? o.clamp.min : void 0,
-    max: isFiniteNumber2(o.clamp.max) ? o.clamp.max : void 0
+    min: isFiniteNumber3(o.clamp.min) ? o.clamp.min : void 0,
+    max: isFiniteNumber3(o.clamp.max) ? o.clamp.max : void 0
   } : void 0;
   return { version: 1, style, decimals, unit, clamp };
 }
@@ -504,7 +649,7 @@ function parseDerivationLineValue(v, label) {
   if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
   const o = v;
   if (o.kind === "number") {
-    if (!isFiniteNumber2(o.value)) throw new Error(`Invalid ${label}.value`);
+    if (!isFiniteNumber3(o.value)) throw new Error(`Invalid ${label}.value`);
     const unit = typeof o.unit === "string" ? o.unit : void 0;
     return unit ? { kind: "number", value: o.value, unit } : { kind: "number", value: o.value };
   }
@@ -555,19 +700,19 @@ function parseGravityAnalysisResponseV1(x) {
   const warningsRaw = Array.isArray(rr.warnings) ? rr.warnings : [];
   const warnings = warningsRaw.map((w) => w && typeof w === "object" ? typeof w.code === "string" ? w.code : "" : "").filter((c) => Boolean(c)).map((code) => ({ code }));
   const result = {
-    boilTimeMinutes: rr.boilTimeMinutes === null ? null : isFiniteNumber2(rr.boilTimeMinutes) ? rr.boilTimeMinutes : null,
-    kettleVolumeLiters: rr.kettleVolumeLiters === null ? null : isFiniteNumber2(rr.kettleVolumeLiters) ? rr.kettleVolumeLiters : null,
-    preBoilVolumeLiters: rr.preBoilVolumeLiters === null ? null : isFiniteNumber2(rr.preBoilVolumeLiters) ? rr.preBoilVolumeLiters : null,
-    ogEstimatedSg: rr.ogEstimatedSg === null ? null : isFiniteNumber2(rr.ogEstimatedSg) ? rr.ogEstimatedSg : null,
-    pbgEstimatedSg: rr.pbgEstimatedSg === null ? null : isFiniteNumber2(rr.pbgEstimatedSg) ? rr.pbgEstimatedSg : null,
-    ibuTinsethEstimated: rr.ibuTinsethEstimated === null ? null : isFiniteNumber2(rr.ibuTinsethEstimated) ? rr.ibuTinsethEstimated : null,
-    ibuRagerEstimated: rr.ibuRagerEstimated === null ? null : isFiniteNumber2(rr.ibuRagerEstimated) ? rr.ibuRagerEstimated : null,
-    buGuRatio: rr.buGuRatio === null ? null : isFiniteNumber2(rr.buGuRatio) ? rr.buGuRatio : null,
-    colorSrmMoreyEstimated: rr.colorSrmMoreyEstimated === null ? null : isFiniteNumber2(rr.colorSrmMoreyEstimated) ? rr.colorSrmMoreyEstimated : null,
-    colorSrmDanielsEstimated: rr.colorSrmDanielsEstimated === null ? null : isFiniteNumber2(rr.colorSrmDanielsEstimated) ? rr.colorSrmDanielsEstimated : null,
-    fgEstimatedSg: rr.fgEstimatedSg === null ? null : isFiniteNumber2(rr.fgEstimatedSg) ? rr.fgEstimatedSg : null,
-    abvEstimatedPercent: rr.abvEstimatedPercent === null ? null : isFiniteNumber2(rr.abvEstimatedPercent) ? rr.abvEstimatedPercent : null,
-    attenuationEffectivePercent: rr.attenuationEffectivePercent === null ? null : isFiniteNumber2(rr.attenuationEffectivePercent) ? rr.attenuationEffectivePercent : null,
+    boilTimeMinutes: rr.boilTimeMinutes === null ? null : isFiniteNumber3(rr.boilTimeMinutes) ? rr.boilTimeMinutes : null,
+    kettleVolumeLiters: rr.kettleVolumeLiters === null ? null : isFiniteNumber3(rr.kettleVolumeLiters) ? rr.kettleVolumeLiters : null,
+    preBoilVolumeLiters: rr.preBoilVolumeLiters === null ? null : isFiniteNumber3(rr.preBoilVolumeLiters) ? rr.preBoilVolumeLiters : null,
+    ogEstimatedSg: rr.ogEstimatedSg === null ? null : isFiniteNumber3(rr.ogEstimatedSg) ? rr.ogEstimatedSg : null,
+    pbgEstimatedSg: rr.pbgEstimatedSg === null ? null : isFiniteNumber3(rr.pbgEstimatedSg) ? rr.pbgEstimatedSg : null,
+    ibuTinsethEstimated: rr.ibuTinsethEstimated === null ? null : isFiniteNumber3(rr.ibuTinsethEstimated) ? rr.ibuTinsethEstimated : null,
+    ibuRagerEstimated: rr.ibuRagerEstimated === null ? null : isFiniteNumber3(rr.ibuRagerEstimated) ? rr.ibuRagerEstimated : null,
+    buGuRatio: rr.buGuRatio === null ? null : isFiniteNumber3(rr.buGuRatio) ? rr.buGuRatio : null,
+    colorSrmMoreyEstimated: rr.colorSrmMoreyEstimated === null ? null : isFiniteNumber3(rr.colorSrmMoreyEstimated) ? rr.colorSrmMoreyEstimated : null,
+    colorSrmDanielsEstimated: rr.colorSrmDanielsEstimated === null ? null : isFiniteNumber3(rr.colorSrmDanielsEstimated) ? rr.colorSrmDanielsEstimated : null,
+    fgEstimatedSg: rr.fgEstimatedSg === null ? null : isFiniteNumber3(rr.fgEstimatedSg) ? rr.fgEstimatedSg : null,
+    abvEstimatedPercent: rr.abvEstimatedPercent === null ? null : isFiniteNumber3(rr.abvEstimatedPercent) ? rr.abvEstimatedPercent : null,
+    attenuationEffectivePercent: rr.attenuationEffectivePercent === null ? null : isFiniteNumber3(rr.attenuationEffectivePercent) ? rr.attenuationEffectivePercent : null,
     warnings
   };
   const derivationsOut = {};
@@ -605,6 +750,7 @@ export {
   parseBoilComputeAndSaveResponse,
   parseGravityAnalysisResponseV1,
   parseMashComputeAndSaveResponse,
+  parseRecipeWaterHubSummaryResponse,
   parseSpargeComputeAndSaveResponse,
   parseWaterProfileItem,
   parseWaterProfilesResponse,

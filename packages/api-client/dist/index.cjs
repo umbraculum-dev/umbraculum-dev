@@ -90,6 +90,12 @@ function createApiClient(baseUrl, auth, options) {
         body: body != null ? JSON.stringify(body) : void 0
       });
     },
+    put(path, body) {
+      return request(path, {
+        method: "PUT",
+        body: body != null ? JSON.stringify(body) : void 0
+      });
+    },
     patch(path, body) {
       return request(path, {
         method: "PATCH",

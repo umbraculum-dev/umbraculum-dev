@@ -351,8 +351,11 @@ export function RecipesListScreen() {
                   <View style={{ flexDirection: "row", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
                     <Button
                       onPress={() => openEditor(r.id)}
-                      size="$2"
-                      chromeless
+                      size="$4"
+                      width="100%"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
                       accessibilityRole="button"
                       accessibilityLabel={t("openEditor")}
                     >

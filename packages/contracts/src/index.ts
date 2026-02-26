@@ -2,6 +2,7 @@ export * from "./auth/meResponse";
 export * from "./water/derivation";
 export * from "./water/ionProfile";
 export * from "./water/hubSummary";
+export * from "./water/parseHubSummary";
 export * from "./water/waterProfile";
 export * from "./water/computeAndSave";
 export * from "./water/parseComputeAndSave";

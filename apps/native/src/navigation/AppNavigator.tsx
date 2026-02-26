@@ -11,9 +11,16 @@ import { Spinner } from "@brewery/ui";
 
 import { useAuth } from "../auth/AuthProvider";
 import { AboutScreen } from "../screens/AboutScreen";
+import { BrewdayStepsSettingsScreen } from "../screens/BrewdayStepsSettingsScreen";
+import { ContributingScreen } from "../screens/ContributingScreen";
 import { DashboardScreen } from "../screens/DashboardScreen";
+import { EquipmentScreen } from "../screens/EquipmentScreen";
 import { FermDataIntegrationScreen } from "../screens/FermDataIntegrationScreen";
+import { WaterBoilScreen } from "../screens/WaterBoilScreen";
+import { WaterHubScreen } from "../screens/WaterHubScreen";
+import { WaterMashScreen } from "../screens/WaterMashScreen";
 import { WaterProfilesScreen } from "../screens/WaterProfilesScreen";
+import { WaterSpargeScreen } from "../screens/WaterSpargeScreen";
 import { YeastScreen } from "../screens/YeastScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { BlockedRouteScreen } from "../screens/BlockedRouteScreen";
@@ -36,7 +43,14 @@ type RootStackParamList = {
   SelectWorkspace: undefined;
   RecipeEdit: { recipeId: string };
   RecipeYeast: { recipeId: string };
+  WaterHub: { recipeId: string };
+  WaterMash: { recipeId: string };
+  WaterSparge: { recipeId: string };
+  WaterBoil: { recipeId: string };
   About: undefined;
+  Contributing: { topic?: "i18n" | "raw-materials" } | undefined;
+  Equipment: undefined;
+  BrewdayStepsSettings: undefined;
   FermDataIntegration: undefined;
   WaterProfiles: undefined;
 };
@@ -116,6 +130,39 @@ export function AppNavigator() {
           }}
         />
         <RootStack.Screen
+          name="Contributing"
+          component={ContributingScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="Equipment"
+          component={EquipmentScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="BrewdayStepsSettings"
+          component={BrewdayStepsSettingsScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
           name="FermDataIntegration"
           component={FermDataIntegrationScreen}
           options={{
@@ -132,6 +179,50 @@ export function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: "Water profiles",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="WaterHub"
+          component={WaterHubScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="WaterMash"
+          component={WaterMashScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="WaterSparge"
+          component={WaterSpargeScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="WaterBoil"
+          component={WaterBoilScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
             headerBackTitle: "Back",
             headerStyle: { backgroundColor: "#141820" },
             headerTintColor: "#e7eaf0",

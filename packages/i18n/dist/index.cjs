@@ -987,10 +987,18 @@ var en_default = {
       rawMaterialsCtaPrefix: "Found a missing or incorrect raw material?",
       rawMaterialsCtaLinkText: "Help improve the raw material database",
       fermentables: {
+        buttons: {
+          clear: "Clear",
+          addCustomFermentable: "Add custom fermentable"
+        },
+        amountLabel: "Amount ({unit})",
+        colorLabel: "Color ({unit})",
         mashPhClassLegacyLabel: "Mash pH class (legacy)",
         potentialKindLabel: "Potential kind",
         potentialValueLabel: "Potential value",
-        groupLabel: "Group"
+        groupLabel: "Group",
+        gristTotalKg: "Total: {value} {unit}",
+        gristAvgColor: "Avg color: {value} {unit}"
       },
       buttons: {
         clear: "Clear",
@@ -1075,7 +1083,31 @@ var en_default = {
         startingAlkalinityLabel: "Starting alkalinity ({unit})",
         sourceVolumeLabel: "Source volume ({unit})",
         dilutionVolumeLabel: "Dilution volume ({unit})",
-        mashWaterVolumeLabel: "Mash water volume ({unit})"
+        mashWaterVolumeLabel: "Mash water volume ({unit})",
+        mashingStepName: "Name",
+        mashingStepType: "Type",
+        mashingStepTemp: "Temp ({unit})",
+        mashingStepTime: "Time ({unit})",
+        mashingStepAmount: "Amount ({unit})",
+        mashingEmpty: "No mash steps. Add steps or import a recipe with a mash schedule.",
+        mashingAddStep: "Add step",
+        mashingAddFromTemplate: "Add from template",
+        mashingTemplateSingleInfusion: "Single infusion",
+        mashingTemplateStepMash: "Step mash",
+        mashingTemplateSparge: "Sparge",
+        mashingDeduceFromMashIn: "Deduce from Mash in",
+        mashStepsBudgetExceeded: "Mash step water exceeds the mash water volume. Reduce step amounts or increase mash water volume.",
+        saveMashDraft: "Save mash draft",
+        estimateAndSaveSnapshot: "Estimate & save snapshot",
+        calculateAndSaveSnapshot: "Calculate & save snapshot",
+        resultManualAcidAmountMode: "Result (manual acid amount mode)",
+        estimatedFromManualAcidAmount: "Estimated from manual acid amount",
+        mashDraftSaved: "Saved mash draft.",
+        mashSnapshotEstimatedAndSaved: "Estimated & saved snapshot.",
+        mashSnapshotCalculatedAndSaved: "Calculated & saved snapshot.",
+        overallSnapshotSaved: "Calculated & saved.",
+        saving: "Saving\u2026",
+        working: "Working\u2026"
       },
       sparge: {
         title: "Sparge water",
@@ -1280,6 +1312,7 @@ var en_default = {
   },
   waterProfiles: {
     title: "Water profiles",
+    backToRecipes: "Back to Recipes",
     ionsLegend: "Ions ({unit})",
     activeAccount: "Active account",
     viewAllTableTitle: "View all water profiles",
@@ -1345,7 +1378,7 @@ var en_default = {
     refresh: "Refresh",
     profilesLoaded: "Summary loaded.",
     profilesNotLoaded: "Summary not loaded.",
-    recap: "Recap (read-only)",
+    recap: "Recap",
     recapSubtitle: "Uses saved snapshots where available; merged pH is an approximation using volume-weighted [H+].",
     mergedWaterRecap: "Merged water recap",
     computed: "Computed",
@@ -2411,10 +2444,18 @@ var it_default = {
       rawMaterialsCtaPrefix: "Hai trovato una materia prima mancante o errata?",
       rawMaterialsCtaLinkText: "Aiuta a migliorare il database materie prime",
       fermentables: {
+        buttons: {
+          clear: "Pulisci",
+          addCustomFermentable: "Aggiungi fermentabile personalizzato"
+        },
+        amountLabel: "Quantit\xE0 ({unit})",
+        colorLabel: "Colore ({unit})",
         mashPhClassLegacyLabel: "Classe pH mash (legacy)",
         potentialKindLabel: "Tipo potenziale",
         potentialValueLabel: "Valore potenziale",
-        groupLabel: "Gruppo"
+        groupLabel: "Gruppo",
+        gristTotalKg: "Totale: {value} {unit}",
+        gristAvgColor: "Colore medio: {value} {unit}"
       },
       buttons: {
         clear: "Pulisci",
@@ -2499,7 +2540,31 @@ var it_default = {
         startingAlkalinityLabel: "Alcalinit\xE0 iniziale ({unit})",
         sourceVolumeLabel: "Volume sorgente ({unit})",
         dilutionVolumeLabel: "Volume diluizione ({unit})",
-        mashWaterVolumeLabel: "Volume acqua mash ({unit})"
+        mashWaterVolumeLabel: "Volume acqua mash ({unit})",
+        mashingStepName: "Nome",
+        mashingStepType: "Tipo",
+        mashingStepTemp: "Temp ({unit})",
+        mashingStepTime: "Tempo ({unit})",
+        mashingStepAmount: "Quantit\xE0 ({unit})",
+        mashingEmpty: "Nessuno step di ammostamento. Aggiungi step o importa una ricetta con programma mash.",
+        mashingAddStep: "Aggiungi step",
+        mashingAddFromTemplate: "Aggiungi da modello",
+        mashingTemplateSingleInfusion: "Infusione singola",
+        mashingTemplateStepMash: "Step mash",
+        mashingTemplateSparge: "Sparge",
+        mashingDeduceFromMashIn: "Deduci da Mash in",
+        mashStepsBudgetExceeded: "L'acqua degli step mash supera il volume acqua mash. Riduci le quantit\xE0 degli step o aumenta il volume acqua mash.",
+        saveMashDraft: "Salva bozza mash",
+        estimateAndSaveSnapshot: "Stima e salva snapshot",
+        calculateAndSaveSnapshot: "Calcola e salva snapshot",
+        resultManualAcidAmountMode: "Risultato (modalit\xE0 quantit\xE0 acido manuale)",
+        estimatedFromManualAcidAmount: "Stimato dalla quantit\xE0 acido manuale",
+        mashDraftSaved: "Bozza mash salvata.",
+        mashSnapshotEstimatedAndSaved: "Stima salvata come snapshot.",
+        mashSnapshotCalculatedAndSaved: "Snapshot calcolata e salvata.",
+        overallSnapshotSaved: "Calcolato e salvato.",
+        saving: "Salvataggio\u2026",
+        working: "Elaborazione\u2026"
       },
       sparge: {
         title: "Acqua sparge",
@@ -2704,6 +2769,7 @@ var it_default = {
   },
   waterProfiles: {
     title: "Profili acqua",
+    backToRecipes: "Torna alle Ricette",
     ionsLegend: "Ioni ({unit})",
     activeAccount: "Account attivo",
     viewAllTableTitle: "Vedi tutti i profili acqua",

@@ -970,7 +970,7 @@ export function RecipeEditScreen() {
                             </Text>
                             <Input
                               value={r.group ?? ""}
-                              editable={false}
+                              disabled
                               size="$3"
                               background="$background"
                               borderWidth={1}
@@ -1187,42 +1187,24 @@ export function RecipeEditScreen() {
                           </View>
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
-                            Use
-                          </Text>
-                          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                            {HOP_USE_OPTIONS.map((opt) => (
-                              <Button
-                                key={opt.value}
-                                onPress={() => updateHopRow(r.id, { use: opt.value })}
-                                size="$2"
-                                background={r.use === opt.value ? "$color4" : "$background"}
-                                borderWidth={1}
-                                borderColor="$borderColor"
-                              >
-                                <Text fontSize={12}>{opt.label}</Text>
-                              </Button>
-                            ))}
-                          </View>
+                          <PickerField
+                            label="Use"
+                            value={r.use ?? "boil"}
+                            options={HOP_USE_OPTIONS as unknown as PickerOption[]}
+                            onChange={(v) => updateHopRow(r.id, { use: v as EditorHopRow["use"] })}
+                            closeLabel={tCommon("close")}
+                            accessibilityLabel="Use"
+                          />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
-                            Form
-                          </Text>
-                          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                            {HOP_FORM_OPTIONS.map((opt) => (
-                              <Button
-                                key={opt.value}
-                                onPress={() => updateHopRow(r.id, { form: opt.value })}
-                                size="$2"
-                                background={(r.form ?? "pellet") === opt.value ? "$color4" : "$background"}
-                                borderWidth={1}
-                                borderColor="$borderColor"
-                              >
-                                <Text fontSize={12}>{opt.label}</Text>
-                              </Button>
-                            ))}
-                          </View>
+                          <PickerField
+                            label="Form"
+                            value={r.form ?? "pellet"}
+                            options={HOP_FORM_OPTIONS as unknown as PickerOption[]}
+                            onChange={(v) => updateHopRow(r.id, { form: v as EditorHopRow["form"] })}
+                            closeLabel={tCommon("close")}
+                            accessibilityLabel="Form"
+                          />
                         </View>
                       </View>
                     </Card>
@@ -1319,23 +1301,14 @@ export function RecipeEditScreen() {
                           />
                         </View>
                         <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
-                            {t("yeastFormatLabel")}
-                          </Text>
-                          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                            {YEAST_FORMAT_OPTIONS.map((opt) => (
-                              <Button
-                                key={opt.value}
-                                onPress={() => updateYeastRow(r.id, { format: opt.value })}
-                                size="$2"
-                                background={(r.format ?? "liquid") === opt.value ? "$color4" : "$background"}
-                                borderWidth={1}
-                                borderColor="$borderColor"
-                              >
-                                <Text fontSize={12}>{opt.label}</Text>
-                              </Button>
-                            ))}
-                          </View>
+                          <PickerField
+                            label={t("yeastFormatLabel")}
+                            value={r.format ?? "liquid"}
+                            options={YEAST_FORMAT_OPTIONS as unknown as PickerOption[]}
+                            onChange={(v) => updateYeastRow(r.id, { format: v as NonNullable<EditorYeastRow["format"]> })}
+                            closeLabel={tCommon("close")}
+                            accessibilityLabel={t("yeastFormatLabel")}
+                          />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
@@ -1386,7 +1359,7 @@ export function RecipeEditScreen() {
                     </Card>
                   ))}
                   <Button
-                    onPress={() => navigation.navigate("RecipeYeast", { recipeId })}
+                    onPress={() => (navigation as any).navigate("RecipeYeast", { recipeId })}
                     chromeless
                     size="$3"
                     mt="$2"
@@ -1480,6 +1453,53 @@ export function RecipeEditScreen() {
                       {equipmentApplyError}
                     </Text>
                   ) : null}
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 4, marginTop: 8 }}>
+                    <Text fontSize={12} opacity={0.8}>{t("equipmentSection.manageTemplatesText")}</Text>
+                    <Button chromeless size="$3" onPress={() => (navigation as any).navigate("Equipment")}>
+                      <Text fontSize={12} color="$blue10">{t("equipmentSection.manageTemplatesLinkText")}</Text>
+                    </Button>
+                  </View>
+                </View>
+              </Accordion.Content>
+            </Card>
+          </Accordion.Item>
+
+          <Accordion.Item value="water">
+            <Card gap="$2" mt="$3" aria-label={t("sections.water")}>
+              <Accordion.Header>
+                <Accordion.Trigger
+                  width="100%"
+                  accessibilityRole="button"
+                  accessibilityLabel={t("sections.water")}
+                  accessibilityState={{ expanded: openSections.includes("water") }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("sections.water")}</Heading>
+                    <Text fontSize={18} opacity={0.7}>
+                      {openSections.includes("water") ? "▾" : "▸"}
+                    </Text>
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ marginTop: 12 }}>
+                  <Text fontSize={12} opacity={0.8} mb="$2">
+                    {t("waterHelp")}
+                  </Text>
+                  <Button
+                    onPress={() => (navigation as any).navigate("WaterHub", { recipeId })}
+                    size="$3"
+                  >
+                    <Text>{t("nav.openWaterCalculator")}</Text>
+                  </Button>
+                  <Button
+                    chromeless
+                    size="$3"
+                    mt="$2"
+                    onPress={() => (navigation as any).navigate("WaterProfiles")}
+                  >
+                    <Text fontSize={12} opacity={0.9}>{t("waterProfilesManageText")}</Text>
+                  </Button>
                 </View>
               </Accordion.Content>
             </Card>

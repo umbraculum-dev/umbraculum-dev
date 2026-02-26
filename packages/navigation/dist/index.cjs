@@ -33,7 +33,19 @@ var WEBVIEW_WHITELIST_ROUTE_IDS = ["inventory"];
 function isWebviewWhitelistRouteId(id) {
   return WEBVIEW_WHITELIST_ROUTE_IDS.includes(id);
 }
-var NATIVE_AVAILABLE_ROUTE_IDS = ["recipes", "recipeEdit"];
+var NATIVE_AVAILABLE_ROUTE_IDS = [
+  "recipes",
+  "recipeEdit",
+  "equipment",
+  "waterHub",
+  "waterMash",
+  "waterSparge",
+  "waterBoil",
+  "waterProfiles",
+  "fermDataIntegration",
+  "yeast",
+  "brewdayStepsSettings"
+];
 function getRouteAvailability(id, platform) {
   if (platform === "web") return "available";
   if (NATIVE_AVAILABLE_ROUTE_IDS.includes(id)) return "available";

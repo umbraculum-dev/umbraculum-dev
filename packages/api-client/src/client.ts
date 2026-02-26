@@ -14,6 +14,7 @@ export interface ApiResponse<T = unknown> {
 export interface ApiClient {
   get(path: string): Promise<ApiResponse>;
   post(path: string, body?: unknown): Promise<ApiResponse>;
+  put(path: string, body?: unknown): Promise<ApiResponse>;
   patch(path: string, body?: unknown): Promise<ApiResponse>;
   delete(path: string): Promise<ApiResponse>;
 }
@@ -80,6 +81,12 @@ export function createApiClient(
     post(path: string, body?: unknown) {
       return request(path, {
         method: "POST",
+        body: body != null ? JSON.stringify(body) : undefined,
+      });
+    },
+    put(path: string, body?: unknown) {
+      return request(path, {
+        method: "PUT",
         body: body != null ? JSON.stringify(body) : undefined,
       });
     },

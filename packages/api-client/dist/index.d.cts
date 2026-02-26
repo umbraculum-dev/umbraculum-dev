@@ -44,6 +44,7 @@ interface ApiResponse<T = unknown> {
 interface ApiClient {
     get(path: string): Promise<ApiResponse>;
     post(path: string, body?: unknown): Promise<ApiResponse>;
+    put(path: string, body?: unknown): Promise<ApiResponse>;
     patch(path: string, body?: unknown): Promise<ApiResponse>;
     delete(path: string): Promise<ApiResponse>;
 }

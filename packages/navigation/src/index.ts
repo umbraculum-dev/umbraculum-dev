@@ -47,7 +47,19 @@ export function isWebviewWhitelistRouteId(id: RouteId): boolean {
   return (WEBVIEW_WHITELIST_ROUTE_IDS as readonly RouteId[]).includes(id);
 }
 
-const NATIVE_AVAILABLE_ROUTE_IDS = ["recipes", "recipeEdit"] as const satisfies readonly RouteId[];
+const NATIVE_AVAILABLE_ROUTE_IDS = [
+  "recipes",
+  "recipeEdit",
+  "equipment",
+  "waterHub",
+  "waterMash",
+  "waterSparge",
+  "waterBoil",
+  "waterProfiles",
+  "fermDataIntegration",
+  "yeast",
+  "brewdayStepsSettings",
+] as const satisfies readonly RouteId[];
 
 export function getRouteAvailability(id: RouteId, platform: AppPlatform): RouteAvailability {
   if (platform === "web") return "available";

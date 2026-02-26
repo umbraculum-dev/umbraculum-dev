@@ -240,7 +240,9 @@ export function DashboardScreen() {
                       ? navigation.navigate("WaterProfiles")
                       : l.key === "fermDataIntegration"
                         ? navigation.navigate("FermDataIntegration")
-                        : void openWeb(l.route)
+                        : l.key === "brewdayStepsSettings"
+                          ? navigation.navigate("BrewdayStepsSettings")
+                          : void openWeb(l.route)
                   }
                   accessibilityRole="button"
                   accessibilityLabel={l.label}
@@ -264,7 +266,11 @@ export function DashboardScreen() {
               {breweryLinks.map((l) => (
                 <Button
                   key={l.key}
-                  onPress={() => void openWeb(l.route)}
+                  onPress={() =>
+                    l.key === "equipment"
+                      ? navigation.navigate("Equipment")
+                      : void openWeb(l.route)
+                  }
                   accessibilityRole="button"
                   accessibilityLabel={l.label}
                 >

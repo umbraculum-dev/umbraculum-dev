@@ -14,6 +14,7 @@
   "dependencies": {
     "@brewery/api-client": "file:../../packages/api-client",
     "@brewery/beerjson": "file:../../packages/beerjson",
+    "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/i18n": "file:../../packages/i18n",
     "@brewery/i18n-react": "file:../../packages/i18n-react",
     "@brewery/media": "file:../../packages/media",

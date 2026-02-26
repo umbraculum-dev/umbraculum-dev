@@ -27,9 +27,6 @@ export function AboutScreen() {
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={{ gap: 12 }}>
-          <Heading fontSize={28} mb="$2">
-            {t("title")}
-          </Heading>
           <Text fontSize={14} opacity={0.85}>
             {t("subtitle")}
           </Text>
@@ -37,21 +34,15 @@ export function AboutScreen() {
             <Text fontSize={14} opacity={0.85}>
               {t("translationsRowPrefix")}{" "}
             </Text>
-            {contributingUrl ? (
-              <Pressable
-                onPress={() => Linking.openURL(contributingUrl)}
-                accessibilityRole="link"
-                accessibilityLabel={t("translationsRowLinkText")}
-              >
-                <Text fontSize={14} opacity={0.85} color="$blue10" textDecorationLine="underline">
-                  {t("translationsRowLinkText")}
-                </Text>
-              </Pressable>
-            ) : (
-              <Text fontSize={14} opacity={0.85}>
+            <Pressable
+              onPress={() => (navigation as any).navigate("Contributing", { topic: "i18n" })}
+              accessibilityRole="button"
+              accessibilityLabel={t("translationsRowLinkText")}
+            >
+              <Text fontSize={14} opacity={0.85} color="$blue10" textDecorationLine="underline">
                 {t("translationsRowLinkText")}
               </Text>
-            )}
+            </Pressable>
             <Text fontSize={14} opacity={0.85}>
               {" "}
               {t("translationsRowSuffix")}
