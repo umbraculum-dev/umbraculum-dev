@@ -7,6 +7,7 @@ import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
+  mergeYeastAttenuationRangeFromExt,
   type EditorGristRow,
   type EditorHopRow,
   type EditorYeastRow,
@@ -326,7 +327,8 @@ export function RecipeEditScreen() {
       const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
       setGristRows(s.gristRows);
       setHopsRows(s.hopsRows);
-      const mappedYeastRows: EditorYeastRow[] = s.yeastRows.map((row) => {
+      const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
+      const mappedYeastRows: EditorYeastRow[] = baseYeast.map((row) => {
         const fermentationTempC =
           yeastFermentationTempRaw &&
           typeof yeastFermentationTempRaw === "object" &&

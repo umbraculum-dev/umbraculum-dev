@@ -92,6 +92,22 @@ const recipeExtSchemaV1 = {
       additionalProperties: { type: "number", minimum: 0, maximum: 100 },
     },
     /**
+     * Per-yeast-row attenuation range (min/max %) from lab/ingredient DB.
+     * BeerJSON only stores a single attenuation; this preserves the range when the lab provides it.
+     */
+    yeastAttenuationRange: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          min: { type: "number", minimum: 0, maximum: 100 },
+          max: { type: "number", minimum: 0, maximum: 100 },
+        },
+        required: ["min", "max"],
+      },
+    },
+    /**
      * Per-yeast-row pitch rate preset. Keyed by BeerJSON culture_additions[*].id.
      * Value is a preset key (e.g. mfg_rec_0_35_ales, pro_1_0_ales).
      */

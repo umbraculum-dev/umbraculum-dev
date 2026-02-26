@@ -33,6 +33,7 @@ import {
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
   mergeMashDeduceFromExt,
+  mergeYeastAttenuationRangeFromExt,
   validateMashBeforeSave,
   type EditorGristRow,
   type EditorHopRow,
@@ -558,7 +559,8 @@ export default function RecipeEditPage() {
             form: override ?? (row.form ?? "pellet"),
           };
         }) as EditorHopRow[];
-        const yeast = s.yeastRows.map((row) => {
+        const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
+        const yeast = baseYeast.map((row) => {
           const pitchRate =
             yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string"
               ? (yeastPitchRateRaw[row.id] as string)

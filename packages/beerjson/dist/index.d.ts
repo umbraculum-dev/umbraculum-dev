@@ -173,5 +173,10 @@ declare function editorStateFromBeerJson(doc: unknown): {
     miscRows: EditorMiscRow[];
     mash: EditorMash;
 };
+/**
+ * Merges yeastAttenuationRange from recipeExtJson into yeast rows.
+ * When the lab provides min/max, we persist them in recipeExtJson; this restores them on load.
+ */
+declare function mergeYeastAttenuationRangeFromExt(yeastRows: EditorYeastRow[], recipeExtJson: unknown): EditorYeastRow[];
 
-export { CELLS_PER_KG_DRY, CELLS_PER_L_LIQUID, CELLS_PER_L_SLURRY, type EditorGristRow, type EditorHopRow, type EditorMash, type EditorMashStep, type EditorMashStepType, type EditorMiscRow, type EditorYeastRow, MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES, PITCH_RATE_TO_MILLION_CELLS_PER_ML_P, YEAST_PITCH_RATE_OPTIONS, type YeastFormat, type YeastPitchRateKey, type YeastSpeciesKey, buildBeerJsonRecipeDocument, buildRecipeExtJsonFromEditorState, computeAmountFromCellsB, computeCellsPerLFromManualCount, computeEstimatedCellsB, editorStateFromBeerJson, mergeMashDeduceFromExt, newMashRowId, replaceMashInBeerJsonDocument, validateMashBeforeSave };
+export { CELLS_PER_KG_DRY, CELLS_PER_L_LIQUID, CELLS_PER_L_SLURRY, type EditorGristRow, type EditorHopRow, type EditorMash, type EditorMashStep, type EditorMashStepType, type EditorMiscRow, type EditorYeastRow, MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES, PITCH_RATE_TO_MILLION_CELLS_PER_ML_P, YEAST_PITCH_RATE_OPTIONS, type YeastFormat, type YeastPitchRateKey, type YeastSpeciesKey, buildBeerJsonRecipeDocument, buildRecipeExtJsonFromEditorState, computeAmountFromCellsB, computeCellsPerLFromManualCount, computeEstimatedCellsB, editorStateFromBeerJson, mergeMashDeduceFromExt, mergeYeastAttenuationRangeFromExt, newMashRowId, replaceMashInBeerJsonDocument, validateMashBeforeSave };

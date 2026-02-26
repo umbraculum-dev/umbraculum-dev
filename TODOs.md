@@ -100,7 +100,7 @@ Before implementing native app login, complete these items.
 - [x] Add a product-facing **Analysis** section (OG/FG/ABV/PBG + volumes + attenuation) driven by derived estimates (null when insufficient data).
 - [x] Allow per-yeast **custom attenuation % override** (stored by yeast row ID in `recipeExtJson`) and use it for FG/ABV estimate.
 - [ ] Clarify semantics and units in docs: which volumes are “hot-side” vs “cold-side” today; add fermenter volume stage later.
-- [ ] Consider persisting yeast attenuation **min/max range** in `recipeExtJson` (BeerJSON currently stores a single attenuation value).
+- [x] Persist yeast attenuation **min/max range** in `recipeExtJson` (`yeastAttenuationRange` keyed by row ID; BeerJSON stores single value).
 - [ ] Add equipment template UX improvements: inline validation, preset suggestions, and import/export.
 
 ## Authentication (real, production-ready)

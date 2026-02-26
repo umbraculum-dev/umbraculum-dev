@@ -871,7 +871,7 @@ var en_default = {
       yeastAddButton: "Add yeast",
       yeastAddCustomButton: "Add custom yeast",
       yeastCustomNamePlaceholder: "Enter yeast name",
-      yeastSaveButton: "Save (including yeast)",
+      yeastSaveButton: "Save",
       yeastRemove: "Remove",
       yeastNameLabel: "Name",
       yeastLabLabel: "Lab",
@@ -2064,7 +2064,7 @@ var it_default = {
   },
   recipes: {
     title: "Ricette",
-    subtitle: "Questa \xE8 la pagina di ingresso dell\u2019area ricette (lista/modifica/calcolatore acqua).",
+    subtitle: "",
     import: {
       title: "Importa ricetta",
       subtitle: "Importa un file e crea una nuova ricetta nel tuo account.",
@@ -2338,7 +2338,7 @@ var it_default = {
       yeastAddButton: "Aggiungi lievito",
       yeastAddCustomButton: "Aggiungi lievito personalizzato",
       yeastCustomNamePlaceholder: "Inserisci nome lievito",
-      yeastSaveButton: "Salva (incluso lievito)",
+      yeastSaveButton: "Salva",
       yeastRemove: "Rimuovi",
       yeastNameLabel: "Nome",
       yeastLabLabel: "Lab",

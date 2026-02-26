@@ -13,6 +13,7 @@ import {
   computeCellsPerLFromManualCount,
   computeEstimatedCellsB,
   editorStateFromBeerJson,
+  mergeYeastAttenuationRangeFromExt,
   type EditorGristRow,
   type EditorHopRow,
   type EditorMash,
@@ -234,8 +235,9 @@ export function YeastScreen() {
       setMiscRows(s.miscRows);
       setMash(s.mash);
 
+      const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
       setYeastRows(
-        s.yeastRows.map((row) => {
+        baseYeast.map((row) => {
           const pitchRate = yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string" ? (yeastPitchRateRaw[row.id] as string) : null;
           const fermentationTempC = yeastFermentationTempRaw && typeof yeastFermentationTempRaw === "object" && typeof yeastFermentationTempRaw[row.id] === "number" && Number.isFinite(yeastFermentationTempRaw[row.id]) ? (yeastFermentationTempRaw[row.id] as number) : null;
           const oxygenation = yeastOxygenationRaw && typeof yeastOxygenationRaw === "object" && (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no") ? (yeastOxygenationRaw[row.id] as "yes" | "no") : null;

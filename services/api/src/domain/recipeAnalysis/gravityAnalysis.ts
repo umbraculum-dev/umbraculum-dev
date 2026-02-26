@@ -452,21 +452,37 @@ function extractYeastAttenuations(args: { beerJsonRecipeJson: unknown; recipeExt
   const cultures = r0?.ingredients?.culture_additions;
   const list = Array.isArray(cultures) ? cultures : [];
 
-  const overrides =
+  const ext =
     args.recipeExtJson && typeof args.recipeExtJson === "object" && !Array.isArray(args.recipeExtJson)
-      ? (args.recipeExtJson as any).yeastAttenuationOverridesPercent
+      ? (args.recipeExtJson as Record<string, unknown>)
       : null;
+  const overrides = ext?.yeastAttenuationOverridesPercent;
+  const rangeMap = ext?.yeastAttenuationRange;
 
   const out: ExtractedYeastAttenuation[] = [];
   for (const c of list) {
     const id = typeof c?.id === "string" ? c.id : "";
     if (!id) continue;
-    const attenuation = c?.attenuation?.unit === "%" ? safeNum(c?.attenuation?.value) : null;
+    const beerJsonAtt = c?.attenuation?.unit === "%" ? safeNum(c?.attenuation?.value) : null;
+    const rangeEntry =
+      rangeMap && typeof rangeMap === "object" && !Array.isArray(rangeMap) ? (rangeMap as Record<string, unknown>)[id] : null;
+    const rangeMin =
+      rangeEntry && typeof rangeEntry === "object" && !Array.isArray(rangeEntry) && typeof (rangeEntry as any).min === "number" && Number.isFinite((rangeEntry as any).min)
+        ? (rangeEntry as any).min
+        : null;
+    const rangeMax =
+      rangeEntry && typeof rangeEntry === "object" && !Array.isArray(rangeEntry) && typeof (rangeEntry as any).max === "number" && Number.isFinite((rangeEntry as any).max)
+        ? (rangeEntry as any).max
+        : null;
+    const rangeAvg =
+      rangeMin != null && rangeMax != null ? (rangeMin + rangeMax) / 2 : null;
+    const attenuationPercent =
+      beerJsonAtt != null ? clamp(beerJsonAtt, 0, 100) : rangeAvg != null ? clamp(rangeAvg, 0, 100) : null;
     const overrideRaw = overrides && typeof overrides === "object" ? safeNum((overrides as any)[id]) : null;
     const overridePercent = overrideRaw != null ? clamp(overrideRaw, 0, 100) : null;
     out.push({
       id,
-      attenuationPercent: attenuation != null ? clamp(attenuation, 0, 100) : null,
+      attenuationPercent,
       overridePercent,
     });
   }

@@ -14,6 +14,7 @@ import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
   editorStateFromBeerJson,
+  mergeYeastAttenuationRangeFromExt,
   type EditorGristRow,
   type EditorHopRow,
   type EditorMash,
@@ -151,8 +152,9 @@ export default function YeastPage() {
             ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
           })) as EditorHopRow[],
         );
+        const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
         setYeastRows(
-          s.yeastRows.map((row) => {
+          baseYeast.map((row) => {
             const pitchRate =
               yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string"
                 ? (yeastPitchRateRaw[row.id] as string)

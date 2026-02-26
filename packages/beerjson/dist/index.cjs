@@ -34,6 +34,7 @@ __export(index_exports, {
   computeEstimatedCellsB: () => computeEstimatedCellsB,
   editorStateFromBeerJson: () => editorStateFromBeerJson,
   mergeMashDeduceFromExt: () => mergeMashDeduceFromExt,
+  mergeYeastAttenuationRangeFromExt: () => mergeYeastAttenuationRangeFromExt,
   newMashRowId: () => newMashRowId,
   replaceMashInBeerJsonDocument: () => replaceMashInBeerJsonDocument,
   sgToPlato: () => import_core.sgToPlato,
@@ -423,12 +424,21 @@ function buildRecipeExtJsonFromEditorState(args) {
       (r) => r.form === "debittered_leaf" || r.form === "hop_extract" ? [r.id, r.form] : null
     ).filter(Boolean)
   );
+  const yeastAttenuationRange = Object.fromEntries(
+    args.yeastRows.map((r) => {
+      const min = typeof r.attenuationMin === "number" && Number.isFinite(r.attenuationMin) && r.attenuationMin >= 0 && r.attenuationMin <= 100 ? r.attenuationMin : null;
+      const max = typeof r.attenuationMax === "number" && Number.isFinite(r.attenuationMax) && r.attenuationMax >= 0 && r.attenuationMax <= 100 ? r.attenuationMax : null;
+      if (min == null || max == null) return null;
+      return [r.id, { min, max }];
+    }).filter(Boolean)
+  );
   return {
     ...extBase ? extBase : {},
     version: 1,
     ingredientLinks,
     ...Object.keys(hopFormOverrides).length ? { hopFormOverrides } : {},
-    mashPhModel
+    mashPhModel,
+    ...Object.keys(yeastAttenuationRange).length ? { yeastAttenuationRange } : {}
   };
 }
 function parseMashFromBeerJson(r0) {
@@ -590,6 +600,25 @@ function editorStateFromBeerJson(doc) {
   const mash = parseMashFromBeerJson(r0);
   return { gristRows, hopsRows, yeastRows, miscRows, mash };
 }
+function mergeYeastAttenuationRangeFromExt(yeastRows, recipeExtJson) {
+  const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? recipeExtJson : null;
+  const range = ext?.yeastAttenuationRange;
+  if (!range || typeof range !== "object" || Array.isArray(range)) return yeastRows;
+  const rangeObj = range;
+  return yeastRows.map((row) => {
+    const entry = rangeObj[row.id];
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return row;
+    const e = entry;
+    const min = typeof e.min === "number" && Number.isFinite(e.min) && e.min >= 0 && e.min <= 100 ? e.min : null;
+    const max = typeof e.max === "number" && Number.isFinite(e.max) && e.max >= 0 && e.max <= 100 ? e.max : null;
+    if (min == null && max == null) return row;
+    return {
+      ...row,
+      attenuationMin: min ?? row.attenuationMin,
+      attenuationMax: max ?? row.attenuationMax
+    };
+  });
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   CELLS_PER_KG_DRY,
@@ -606,6 +635,7 @@ function editorStateFromBeerJson(doc) {
   computeEstimatedCellsB,
   editorStateFromBeerJson,
   mergeMashDeduceFromExt,
+  mergeYeastAttenuationRangeFromExt,
   newMashRowId,
   replaceMashInBeerJsonDocument,
   sgToPlato,

@@ -655,12 +655,24 @@ export function buildRecipeExtJsonFromEditorState(args: {
       .filter(Boolean) as Array<readonly [string, unknown]>,
   );
 
+  const yeastAttenuationRange = Object.fromEntries(
+    args.yeastRows
+      .map((r) => {
+        const min = typeof r.attenuationMin === "number" && Number.isFinite(r.attenuationMin) && r.attenuationMin >= 0 && r.attenuationMin <= 100 ? r.attenuationMin : null;
+        const max = typeof r.attenuationMax === "number" && Number.isFinite(r.attenuationMax) && r.attenuationMax >= 0 && r.attenuationMax <= 100 ? r.attenuationMax : null;
+        if (min == null || max == null) return null;
+        return [r.id, { min, max }] as const;
+      })
+      .filter(Boolean) as Array<readonly [string, { min: number; max: number }]>,
+  );
+
   return {
     ...(extBase ? extBase : {}),
     version: 1,
     ingredientLinks,
     ...(Object.keys(hopFormOverrides).length ? { hopFormOverrides } : {}),
     mashPhModel,
+    ...(Object.keys(yeastAttenuationRange).length ? { yeastAttenuationRange } : {}),
   };
 }
 
@@ -927,4 +939,36 @@ export function editorStateFromBeerJson(doc: unknown): {
   const mash = parseMashFromBeerJson(r0);
 
   return { gristRows, hopsRows, yeastRows, miscRows, mash };
+}
+
+/**
+ * Merges yeastAttenuationRange from recipeExtJson into yeast rows.
+ * When the lab provides min/max, we persist them in recipeExtJson; this restores them on load.
+ */
+export function mergeYeastAttenuationRangeFromExt(
+  yeastRows: EditorYeastRow[],
+  recipeExtJson: unknown,
+): EditorYeastRow[] {
+  const ext =
+    recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson)
+      ? (recipeExtJson as Record<string, unknown>)
+      : null;
+  const range = ext?.yeastAttenuationRange;
+  if (!range || typeof range !== "object" || Array.isArray(range)) return yeastRows;
+  const rangeObj = range as Record<string, unknown>;
+  return yeastRows.map((row) => {
+    const entry = rangeObj[row.id];
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return row;
+    const e = entry as Record<string, unknown>;
+    const min =
+      typeof e.min === "number" && Number.isFinite(e.min) && e.min >= 0 && e.min <= 100 ? e.min : null;
+    const max =
+      typeof e.max === "number" && Number.isFinite(e.max) && e.max >= 0 && e.max <= 100 ? e.max : null;
+    if (min == null && max == null) return row;
+    return {
+      ...row,
+      attenuationMin: min ?? row.attenuationMin,
+      attenuationMax: max ?? row.attenuationMax,
+    };
+  });
 }
