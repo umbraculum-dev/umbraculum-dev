@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import {
@@ -16,6 +16,7 @@ import { Accordion, Input, TextArea } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
 import { AdSlot } from "../components/AdSlot";
+import { ReadOnlyField } from "../components/ReadOnlyField";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
@@ -433,6 +434,14 @@ export function RecipeEditScreen() {
       void loadEquipmentProfiles();
     }
   }, [canCall, recipeId, loadRecipe, loadStyles, loadEquipmentProfiles]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (canCall && recipeId && recipe) {
+        void loadRecipe();
+      }
+    }, [canCall, recipeId, recipe, loadRecipe]),
+  );
 
   const searchFermentables = useCallback(async () => {
     if (!api) return;
@@ -1431,67 +1440,39 @@ export function RecipeEditScreen() {
                             <Text fontSize={11} opacity={0.8} mb="$1">
                               {t("yeastLabLabel")}
                             </Text>
-                            <Input
-                              value={r.lab ?? ""}
-                              editable={false}
-                              placeholder="—"
-                              size="$3"
-                              background="$background"
-                              borderWidth={1}
-                              borderColor="$borderColor"
-                            />
+                            <ReadOnlyField value={r.lab ?? ""} />
                           </View>
                           <View style={{ minWidth: 140, flexGrow: 1 }}>
                             <Text fontSize={11} opacity={0.8} mb="$1">
                               {t("yeastProductIdLabel")}
                             </Text>
-                            <Input
-                              value={r.productId ?? ""}
-                              editable={false}
-                              placeholder="—"
-                              size="$3"
-                              background="$background"
-                              borderWidth={1}
-                              borderColor="$borderColor"
-                            />
+                            <ReadOnlyField value={r.productId ?? ""} />
                           </View>
                         </View>
                         <View style={{ flexDirection: "row", gap: 8 }}>
                           <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
-                            <Text fontSize={11} opacity={0.8} mb="$1" textAlign="center" numberOfLines={1}>
+                            <Text fontSize={11} opacity={0.8} mb="$1" style={{ textAlign: "center" }}>
                               {t("yeastAttenMinLabel")}
                             </Text>
-                            <Input
+                            <ReadOnlyField
                               value={
                                 typeof r.attenuationMin === "number" && Number.isFinite(r.attenuationMin)
                                   ? formatFixed(locale, r.attenuationMin, 3)
                                   : ""
                               }
-                              editable={false}
-                              placeholder="—"
-                              size="$3"
-                              background="$background"
-                              borderWidth={1}
-                              borderColor="$borderColor"
                               textAlign="center"
                             />
                           </View>
                           <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
-                            <Text fontSize={11} opacity={0.8} mb="$1" textAlign="center" numberOfLines={1}>
+                            <Text fontSize={11} opacity={0.8} mb="$1" style={{ textAlign: "center" }}>
                               {t("yeastAttenMaxLabel")}
                             </Text>
-                            <Input
+                            <ReadOnlyField
                               value={
                                 typeof r.attenuationMax === "number" && Number.isFinite(r.attenuationMax)
                                   ? formatFixed(locale, r.attenuationMax, 3)
                                   : ""
                               }
-                              editable={false}
-                              placeholder="—"
-                              size="$3"
-                              background="$background"
-                              borderWidth={1}
-                              borderColor="$borderColor"
                               textAlign="center"
                             />
                           </View>
@@ -1500,22 +1481,13 @@ export function RecipeEditScreen() {
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             {tRecipes("analysis.customAttenuationPercentLabel")}
                           </Text>
-                          <Input
-                            value={yeastAttenuationOverrides[r.id] ?? ""}
-                            editable={false}
-                            placeholder="—"
-                            keyboardType="decimal-pad"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
-                          />
+                          <ReadOnlyField value={yeastAttenuationOverrides[r.id] ?? ""} />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             {t("yeastFormatLabel")}
                           </Text>
-                          <Input
+                          <ReadOnlyField
                             value={
                               r.format === "dry"
                                 ? t("yeastFormatDry")
@@ -1523,57 +1495,37 @@ export function RecipeEditScreen() {
                                   ? t("yeastFormatSlurry")
                                   : t("yeastFormatLiquid")
                             }
-                            editable={false}
-                            placeholder="—"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
                           />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : tUnits("L") })}
                           </Text>
-                          <Input
+                          <ReadOnlyField
                             value={
                               r.format === "dry"
                                 ? (r.amountKg != null && Number.isFinite(r.amountKg) ? formatFixed(locale, r.amountKg, 3) : "")
                                 : (r.amountL != null && Number.isFinite(r.amountL) ? formatFixed(locale, r.amountL, 2) : "")
                             }
-                            editable={false}
-                            placeholder="—"
-                            keyboardType="decimal-pad"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
                           />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             {t("yeastFermentationTempLabel", { unit: tUnits("C") })}
                           </Text>
-                          <Input
+                          <ReadOnlyField
                             value={
                               r.fermentationTempC != null && Number.isFinite(r.fermentationTempC)
                                 ? formatFixed(locale, r.fermentationTempC, 1)
                                 : ""
                             }
-                            editable={false}
-                            placeholder="—"
-                            keyboardType="decimal-pad"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
                           />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             {t("yeastDiacetylRestLabel")}
                           </Text>
-                          <Input
+                          <ReadOnlyField
                             value={
                               r.diacetylRest === "yes"
                                 ? t("yeastDiacetylRestYes")
@@ -1581,19 +1533,13 @@ export function RecipeEditScreen() {
                                   ? t("yeastDiacetylRestNo")
                                   : ""
                             }
-                            editable={false}
-                            placeholder="—"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
                           />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             {t("yeastOxygenationLabel")}
                           </Text>
-                          <Input
+                          <ReadOnlyField
                             value={
                               r.oxygenation === "yes"
                                 ? t("yeastOxygenationYes")
@@ -1601,12 +1547,6 @@ export function RecipeEditScreen() {
                                   ? t("yeastOxygenationNo")
                                   : ""
                             }
-                            editable={false}
-                            placeholder="—"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
                           />
                         </View>
                       </View>
