@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { Text } from "react-native";
 import { enableScreens } from "react-native-screens";
 import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -64,10 +65,23 @@ function makeBlocked(routeId: RouteId) {
 }
 
 function TabsNavigator({ tabLabels }: { tabLabels: { dashboard: string; recipes: string; inventory: string } }) {
+  const iconFor = (routeName: keyof TabParamList) => {
+    switch (routeName) {
+      case "Dashboard":
+        return "🏠";
+      case "Recipes":
+        return "🍺";
+      case "Inventory":
+        return "📦";
+      default:
+        return "•";
+    }
+  };
+
   return (
     <Tab.Navigator
       initialRouteName="Dashboard"
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
         headerTitleStyle: { fontFamily: "System" },
         tabBarStyle: {
@@ -76,7 +90,17 @@ function TabsNavigator({ tabLabels }: { tabLabels: { dashboard: string; recipes:
         },
         tabBarActiveTintColor: "#e7eaf0",
         tabBarInactiveTintColor: "#b7bdc9",
-      }}
+        tabBarIcon: ({ color, size }) => (
+          <Text
+            style={{ color, fontSize: Math.max(14, Math.min(size, 22)) }}
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          >
+            {iconFor(route.name as keyof TabParamList)}
+          </Text>
+        ),
+      })}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ title: tabLabels.dashboard }} />
       <Tab.Screen name="Recipes" component={RecipesListScreen} options={{ title: tabLabels.recipes }} />

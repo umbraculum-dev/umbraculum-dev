@@ -198,9 +198,6 @@ export function RecipesListScreen() {
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <Heading fontSize={28}>{t("title")}</Heading>
-        <Text fontSize={14} opacity={0.8}>
-          {t("subtitle")}
-        </Text>
 
         {!canCall ? (
           <Text fontSize={14} color="$red10" mt="$2">

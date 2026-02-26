@@ -3415,9 +3415,6 @@ export default function RecipeEditPage() {
             open={openSections.yeast}
             onOpenChange={(open) => setSectionOpen("yeast", open)}
           >
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-              {t("yeastHelp")}
-            </SizableText>
             <View mt="$3">
               <YeastEditor
                 yeastRows={yeastRows}

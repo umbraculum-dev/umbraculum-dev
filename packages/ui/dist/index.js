@@ -43,15 +43,25 @@ function Card(props) {
 }
 
 // src/primitives/Screen.tsx
+import { Platform as Platform2, StatusBar } from "react-native";
 import { YStack as YStack2 } from "tamagui";
 import { jsx as jsx3 } from "react/jsx-runtime";
 function Screen({ flex, style, ...props }) {
+  const topInset = Platform2.OS === "web" ? 0 : Math.floor((StatusBar.currentHeight ?? 0) / 2);
   return /* @__PURE__ */ jsx3(
     YStack2,
     {
       flex: flex ?? 1,
       backgroundColor: props.backgroundColor ?? "$background",
-      style: [{ padding: 16, gap: 16 }, style],
+      style: [
+        {
+          paddingTop: 16 + topInset,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+          gap: 16
+        },
+        style
+      ],
       ...props
     }
   );

@@ -82,6 +82,23 @@ Recommended values depend on where the app runs:
 - iOS simulator can usually use `http://localhost:<NGINX_HTTP_PORT>`
 - Physical device should use your LAN IP (same network as the dev server), for example `http://192.168.1.50:<NGINX_HTTP_PORT>`
 
+Notes:
+
+- On Android **emulators**, `apps/native/src/auth/apiBaseUrl.ts` rewrites `localhost` / `127.0.0.1` / `0.0.0.0` to `10.0.2.2` automatically, but it cannot guess your LAN IP for real devices.
+- `apps/native/src/media/mediaBaseUrl.ts` falls back to `EXPO_PUBLIC_API_BASE_URL` if `EXPO_PUBLIC_MEDIA_BASE_URL` is unset.
+
+## Go-live checklist (native)
+
+- **Set production base URLs at build time**:
+  - `EXPO_PUBLIC_API_BASE_URL=https://<your-domain>` (nginx should route `/api/**`)
+  - `EXPO_PUBLIC_MEDIA_BASE_URL=https://<your-domain>` (nginx should serve `/media/**`)
+- **Verify media**:
+  - Test a known asset in a device browser: `https://<your-domain>/media/yeast/dilution-1-100.<hash>.png`
+  - In-app: open Yeast page → expand “Manual cell count methodology” → both images should render.
+- **Tabs icons**:
+  - Tab icons are defined in `apps/native/src/navigation/AppNavigator.tsx`.
+  - If you want non-emoji icons for production, add an icon library (e.g. `@expo/vector-icons`) and update `tabBarIcon`.
+
 ## Device testing (Expo Go)
 
 - Android emulator: use Android Studio emulator, open Expo Go, connect to `exp://<LAN_IP>:8081`.

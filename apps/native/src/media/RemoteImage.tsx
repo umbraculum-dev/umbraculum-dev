@@ -26,6 +26,7 @@ export function RemoteImage({
   }, [assetKey, baseUrl]);
 
   const [failed, setFailed] = useState(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   if (!uri || failed) {
     return (
@@ -43,6 +44,9 @@ export function RemoteImage({
       >
         <Text style={{ color: "#6B7280", fontSize: 12, paddingHorizontal: 8, textAlign: "center" }}>
           {unavailableText}
+          {__DEV__ ? `\n\nmediaBaseUrl=${baseUrl || "(empty)"}` : ""}
+          {__DEV__ ? `\nuri=${uri || "(empty)"}` : ""}
+          {__DEV__ && errorText ? `\nerror=${errorText}` : ""}
         </Text>
       </View>
     );
@@ -54,7 +58,19 @@ export function RemoteImage({
       style={{ width, height, borderRadius: 8, backgroundColor: "#E5E7EB" }}
       cachePolicy="disk"
       accessibilityLabel={accessibilityLabel}
-      onError={() => setFailed(true)}
+      onError={(e) => {
+        try {
+          const msg =
+            e && typeof e === "object" && "error" in (e as any) ? String((e as any).error) : "image_load_failed";
+          setErrorText(msg);
+          // eslint-disable-next-line no-console
+          console.warn("[RemoteImage] failed", { assetKey, baseUrl, uri, error: msg });
+        } catch {
+          setErrorText("image_load_failed");
+        } finally {
+          setFailed(true);
+        }
+      }}
     />
   );
 }

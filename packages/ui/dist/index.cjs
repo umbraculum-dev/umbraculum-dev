@@ -74,15 +74,25 @@ function Card(props) {
 }
 
 // src/primitives/Screen.tsx
+var import_react_native2 = require("react-native");
 var import_tamagui3 = require("tamagui");
 var import_jsx_runtime3 = require("react/jsx-runtime");
 function Screen({ flex, style, ...props }) {
+  const topInset = import_react_native2.Platform.OS === "web" ? 0 : Math.floor((import_react_native2.StatusBar.currentHeight ?? 0) / 2);
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
     import_tamagui3.YStack,
     {
       flex: flex ?? 1,
       backgroundColor: props.backgroundColor ?? "$background",
-      style: [{ padding: 16, gap: 16 }, style],
+      style: [
+        {
+          paddingTop: 16 + topInset,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+          gap: 16
+        },
+        style
+      ],
       ...props
     }
   );

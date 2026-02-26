@@ -154,9 +154,6 @@ export default function RecipesPage() {
   return (
     <YStack gap="$3">
       <H1 mb="$2">{t("title")}</H1>
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-        {t("subtitle")}
-      </SizableText>
 
       <View className="brew-panel" aria-labelledby="recipes-create-heading">
         <H2 id="recipes-create-heading" mt={0}>

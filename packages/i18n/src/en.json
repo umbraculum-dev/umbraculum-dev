@@ -597,7 +597,7 @@
   },
   "recipes": {
     "title": "Recipes",
-    "subtitle": "This is the recipe area entrypoint (list/edit/water calculator).",
+    "subtitle": "",
     "import": {
       "title": "Import recipe",
       "subtitle": "Import a recipe file and create a new recipe in your account.",
@@ -874,6 +874,10 @@
       "yeastSaveButton": "Save (including yeast)",
       "yeastRemove": "Remove",
       "yeastNameLabel": "Name",
+      "yeastLabLabel": "Lab",
+      "yeastProductIdLabel": "Product ID",
+      "yeastAttenMinLabel": "Atten min (%)",
+      "yeastAttenMaxLabel": "Atten max (%)",
       "yeastAmountLabel": "Amount ({unit})",
       "yeastFermentationTempLabel": "Fermentation temp. ({unit})",
       "yeastOxygenationLabel": "Needs Oxygenation",

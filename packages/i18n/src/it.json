@@ -604,7 +604,7 @@
   },
   "recipes": {
     "title": "Ricette",
-    "subtitle": "Questa è la pagina di ingresso dell’area ricette (lista/modifica/calcolatore acqua).",
+    "subtitle": "",
     "import": {
       "title": "Importa ricetta",
       "subtitle": "Importa un file e crea una nuova ricetta nel tuo account.",
@@ -881,6 +881,10 @@
       "yeastSaveButton": "Salva (incluso lievito)",
       "yeastRemove": "Rimuovi",
       "yeastNameLabel": "Nome",
+      "yeastLabLabel": "Lab",
+      "yeastProductIdLabel": "ID prodotto",
+      "yeastAttenMinLabel": "Atten min (%)",
+      "yeastAttenMaxLabel": "Atten max (%)",
       "yeastAmountLabel": "Quantità ({unit})",
       "yeastFermentationTempLabel": "Temp. fermentazione ({unit})",
       "yeastOxygenationLabel": "Richiede ossigenazione",

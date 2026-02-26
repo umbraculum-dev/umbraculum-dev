@@ -128,9 +128,6 @@ export function YeastEditor({
       <View>
         {yeastRows.length > 0 ? (
           <YStack gap="$3">
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
-              {t("yeastPitchRateNote")}
-            </SizableText>
             {yeastRows.map((r, idx) => (
               <RecipeEditIngredientCard key={r.id}>
                 <XStack gap="$3" flexWrap="wrap" items="flex-end" flexDirection="row">
@@ -145,24 +142,24 @@ export function YeastEditor({
                   </YStack>
                   {(r.lab ?? "") ? (
                     <YStack gap="$1" minW={120}>
-                      <RecipeEditFieldLabel>Lab</RecipeEditFieldLabel>
+                      <RecipeEditFieldLabel>{t("yeastLabLabel")}</RecipeEditFieldLabel>
                       <RecipeEditReadOnlyValue>{r.lab}</RecipeEditReadOnlyValue>
                     </YStack>
                   ) : null}
                   {(r.productId ?? "") ? (
                     <YStack gap="$1" minW={100}>
-                      <RecipeEditFieldLabel>Product ID</RecipeEditFieldLabel>
+                      <RecipeEditFieldLabel>{t("yeastProductIdLabel")}</RecipeEditFieldLabel>
                       <RecipeEditReadOnlyValue>{r.productId}</RecipeEditReadOnlyValue>
                     </YStack>
                   ) : null}
                   <YStack gap="$1" minW={100}>
-                    <RecipeEditFieldLabel>Atten min (%)</RecipeEditFieldLabel>
+                    <RecipeEditFieldLabel>{t("yeastAttenMinLabel")}</RecipeEditFieldLabel>
                     <RecipeEditReadOnlyValue>
                       {typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
                     </RecipeEditReadOnlyValue>
                   </YStack>
                   <YStack gap="$1" minW={100}>
-                    <RecipeEditFieldLabel>Atten max (%)</RecipeEditFieldLabel>
+                    <RecipeEditFieldLabel>{t("yeastAttenMaxLabel")}</RecipeEditFieldLabel>
                     <RecipeEditReadOnlyValue>
                       {typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
                     </RecipeEditReadOnlyValue>
@@ -505,17 +502,17 @@ function YeastEditorEditable({
               <XStack gap="$2" ai="center" minW="max-content">
                 <View minW={180}>
                   <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
-                    Name
+                    {t("yeastNameLabel")}
                   </SizableText>
                 </View>
                 <View minW={100}>
                   <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
-                    Lab
+                    {t("yeastLabLabel")}
                   </SizableText>
                 </View>
                 <View minW={100}>
                   <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
-                    Product ID
+                    {t("yeastProductIdLabel")}
                   </SizableText>
                 </View>
                 <View minW={80}>
@@ -585,10 +582,6 @@ function YeastEditorEditable({
         </Button>
       </XStack>
 
-      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb="$2">
-        {t("yeastPitchRateNote")}
-      </SizableText>
-
       {yeastRows.length ? (
         <View overflowX="auto" mt="$3">
           <YStack gap="$3">
@@ -634,24 +627,24 @@ function YeastEditorEditable({
                   </YStack>
                   {(r.lab ?? "") ? (
                     <YStack gap="$1" minW={120}>
-                      <RecipeEditFieldLabel>Lab</RecipeEditFieldLabel>
+                      <RecipeEditFieldLabel>{t("yeastLabLabel")}</RecipeEditFieldLabel>
                       <RecipeEditReadOnlyValue>{r.lab}</RecipeEditReadOnlyValue>
                     </YStack>
                   ) : null}
                   {(r.productId ?? "") ? (
                     <YStack gap="$1" minW={100}>
-                      <RecipeEditFieldLabel>Product ID</RecipeEditFieldLabel>
+                      <RecipeEditFieldLabel>{t("yeastProductIdLabel")}</RecipeEditFieldLabel>
                       <RecipeEditReadOnlyValue>{r.productId}</RecipeEditReadOnlyValue>
                     </YStack>
                   ) : null}
                   <YStack gap="$1" minW={100}>
-                    <RecipeEditFieldLabel>Atten min (%)</RecipeEditFieldLabel>
+                    <RecipeEditFieldLabel>{t("yeastAttenMinLabel")}</RecipeEditFieldLabel>
                     <RecipeEditReadOnlyValue>
                       {typeof r.attenuationMin === "number" ? roundTo(r.attenuationMin, 3) : ""}
                     </RecipeEditReadOnlyValue>
                   </YStack>
                   <YStack gap="$1" minW={100}>
-                    <RecipeEditFieldLabel>Atten max (%)</RecipeEditFieldLabel>
+                    <RecipeEditFieldLabel>{t("yeastAttenMaxLabel")}</RecipeEditFieldLabel>
                     <RecipeEditReadOnlyValue>
                       {typeof r.attenuationMax === "number" ? roundTo(r.attenuationMax, 3) : ""}
                     </RecipeEditReadOnlyValue>

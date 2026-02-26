@@ -18,6 +18,7 @@ import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 import { AdSlot } from "../components/AdSlot";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import { useLocaleController } from "../i18n/I18nProvider";
 
 function newRowId(): string {
   try {
@@ -33,6 +34,13 @@ type PickerOption = { value: string; label: string };
 function roundTo(n: number, decimals: number) {
   const f = 10 ** decimals;
   return Math.round(n * f) / f;
+}
+
+function formatFixed(locale: string, value: number, fractionDigits: number): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
 }
 
 function inferMaltClass(
@@ -194,6 +202,7 @@ export function RecipeEditScreen() {
   const { t: tCommon } = useT("common");
   const { t: tEquip } = useT("equipment");
   const { t: tUnits } = useT("units");
+  const { locale } = useLocaleController();
 
   useEffect(() => {
     navigation.setOptions({ headerTitle: t("title") });
@@ -230,6 +239,7 @@ export function RecipeEditScreen() {
   const [yeastQuery, setYeastQuery] = useState("");
   const [yeastResults, setYeastResults] = useState<YeastSearchItem[]>([]);
   const [yeastSearching, setYeastSearching] = useState(false);
+  const [yeastAmountTextById, setYeastAmountTextById] = useState<Record<string, string>>({});
 
   const [equipmentProfiles, setEquipmentProfiles] = useState<EquipmentProfile[]>([]);
   const [equipmentProfilesLoading, setEquipmentProfilesLoading] = useState(false);
@@ -268,6 +278,7 @@ export function RecipeEditScreen() {
       setNotes(typeof r.notes === "string" ? r.notes : "");
 
       const ext = (r as any).recipeExtJson;
+      const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
       const yeastOverridesRaw = ext && typeof ext === "object" ? (ext as any).yeastAttenuationOverridesPercent : null;
       if (yeastOverridesRaw && typeof yeastOverridesRaw === "object") {
         const out: Record<string, string> = {};
@@ -278,6 +289,12 @@ export function RecipeEditScreen() {
       } else {
         setYeastAttenuationOverrides({});
       }
+
+      const yeastFermentationTempRaw = ext && typeof ext === "object" ? (ext as any).yeastFermentationTempOverrides : null;
+      const yeastOxygenationRaw = ext && typeof ext === "object" ? (ext as any).yeastOxygenationOverrides : null;
+      const yeastDiacetylRestRaw = ext && typeof ext === "object" ? (ext as any).yeastDiacetylRestOverrides : null;
+      const yeastFormatRaw =
+        ext && typeof ext === "object" ? (ext as any).yeastFormatOverrides ?? (ext as any).yeastTypeOverrides : null;
 
       const equipmentSource = ext && typeof ext === "object" ? (ext as any).equipmentSource : null;
       const equipmentProfileId =
@@ -305,14 +322,74 @@ export function RecipeEditScreen() {
       const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
       setGristRows(s.gristRows);
       setHopsRows(s.hopsRows);
-      setYeastRows(s.yeastRows);
+      const mappedYeastRows: EditorYeastRow[] = s.yeastRows.map((row) => {
+        const fermentationTempC =
+          yeastFermentationTempRaw &&
+          typeof yeastFermentationTempRaw === "object" &&
+          typeof (yeastFermentationTempRaw as any)[row.id] === "number" &&
+          Number.isFinite((yeastFermentationTempRaw as any)[row.id])
+            ? ((yeastFermentationTempRaw as any)[row.id] as number)
+            : null;
+        const oxygenation =
+          yeastOxygenationRaw &&
+          typeof yeastOxygenationRaw === "object" &&
+          (((yeastOxygenationRaw as any)[row.id] as any) === "yes" ||
+            ((yeastOxygenationRaw as any)[row.id] as any) === "no")
+            ? ((yeastOxygenationRaw as any)[row.id] as "yes" | "no")
+            : null;
+        const diacetylRest =
+          yeastDiacetylRestRaw &&
+          typeof yeastDiacetylRestRaw === "object" &&
+          (((yeastDiacetylRestRaw as any)[row.id] as any) === "yes" ||
+            ((yeastDiacetylRestRaw as any)[row.id] as any) === "no")
+            ? ((yeastDiacetylRestRaw as any)[row.id] as "yes" | "no")
+            : null;
+        const formatOverride =
+          yeastFormatRaw &&
+          typeof yeastFormatRaw === "object" &&
+          (((yeastFormatRaw as any)[row.id] as any) === "dry" ||
+            ((yeastFormatRaw as any)[row.id] as any) === "liquid" ||
+            ((yeastFormatRaw as any)[row.id] as any) === "slurry")
+            ? ((yeastFormatRaw as any)[row.id] as "dry" | "liquid" | "slurry")
+            : null;
+
+        const inferredFormat: NonNullable<EditorYeastRow["format"]> =
+          formatOverride ??
+          (row.format === "dry" || row.format === "liquid" || row.format === "slurry" ? row.format : null) ??
+          (row.amountKg != null && Number.isFinite(row.amountKg) ? "dry" : "liquid");
+
+        return {
+          ...row,
+          ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+          fermentationTempC: fermentationTempC ?? undefined,
+          oxygenation: oxygenation ?? undefined,
+          diacetylRest: diacetylRest ?? undefined,
+          format: inferredFormat,
+        } as EditorYeastRow;
+      });
+
+      setYeastRows(mappedYeastRows);
+
+      setYeastAmountTextById(() => {
+        const next: Record<string, string> = {};
+        for (const y of mappedYeastRows) {
+          if (y.format === "dry") {
+            const v = y.amountKg;
+            if (typeof v === "number" && Number.isFinite(v)) next[y.id] = formatFixed(locale, v, 3);
+          } else {
+            const v = y.amountL;
+            if (typeof v === "number" && Number.isFinite(v)) next[y.id] = formatFixed(locale, v, 2);
+          }
+        }
+        return next;
+      });
     } catch (err) {
       setLoadError(String(err));
       setRecipe(null);
     } finally {
       setLoading(false);
     }
-  }, [api, recipeId]);
+  }, [api, recipeId, locale]);
 
   const loadStyles = useCallback(async () => {
     if (!api) return;
@@ -628,6 +705,41 @@ export function RecipeEditScreen() {
       if (Object.keys(yeastAttenuationOverridesPercent).length) {
         extBaseForSave.yeastAttenuationOverridesPercent = yeastAttenuationOverridesPercent;
       }
+
+      const yeastFermentationTempOverrides = Object.fromEntries(
+        yeastRows
+          .filter(
+            (r) =>
+              r.fermentationTempC != null &&
+              Number.isFinite(r.fermentationTempC) &&
+              r.fermentationTempC >= -10 &&
+              r.fermentationTempC <= 50,
+          )
+          .map((r) => [r.id, r.fermentationTempC as number]),
+      );
+      const yeastOxygenationOverrides = Object.fromEntries(
+        yeastRows.filter((r) => r.oxygenation === "yes" || r.oxygenation === "no").map((r) => [r.id, r.oxygenation as "yes" | "no"]),
+      );
+      const yeastDiacetylRestOverrides = Object.fromEntries(
+        yeastRows.filter((r) => r.diacetylRest === "yes" || r.diacetylRest === "no").map((r) => [r.id, r.diacetylRest as "yes" | "no"]),
+      );
+      const yeastFormatOverrides = Object.fromEntries(
+        yeastRows.filter((r) => r.format === "dry" || r.format === "liquid" || r.format === "slurry").map((r) => [r.id, r.format as "dry" | "liquid" | "slurry"]),
+      );
+
+      if (Object.keys(yeastFermentationTempOverrides).length) extBaseForSave.yeastFermentationTempOverrides = yeastFermentationTempOverrides;
+      else delete extBaseForSave.yeastFermentationTempOverrides;
+
+      if (Object.keys(yeastOxygenationOverrides).length) extBaseForSave.yeastOxygenationOverrides = yeastOxygenationOverrides;
+      else delete extBaseForSave.yeastOxygenationOverrides;
+
+      if (Object.keys(yeastDiacetylRestOverrides).length) extBaseForSave.yeastDiacetylRestOverrides = yeastDiacetylRestOverrides;
+      else delete extBaseForSave.yeastDiacetylRestOverrides;
+
+      if (Object.keys(yeastFormatOverrides).length) extBaseForSave.yeastFormatOverrides = yeastFormatOverrides;
+      else delete extBaseForSave.yeastFormatOverrides;
+
+      delete extBaseForSave.yeastTypeOverrides;
 
       const beerJsonDoc = buildBeerJsonRecipeDocument({
         name: name.trim() || recipe.name,
@@ -1233,67 +1345,98 @@ export function RecipeEditScreen() {
               </Accordion.Header>
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
-                  <Text fontSize={12} opacity={0.8} mb="$2">
-                    {t("yeastHelp")}
-                  </Text>
-                  <View style={{ gap: 8, marginBottom: 12 }}>
-                    <Input
-                      value={yeastQuery}
-                      onChangeText={setYeastQuery}
-                      placeholder="Search yeast"
-                      size="$3"
-                      background="$background"
-                      borderWidth={1}
-                      borderColor="$borderColor"
-                    />
-                    <View style={{ flexDirection: "row", gap: 8 }}>
-                      <Button onPress={() => void searchYeasts()} disabled={yeastSearching} size="$3">
-                        <Text>{yeastSearching ? "Searching…" : "Search"}</Text>
-                      </Button>
-                    </View>
-                  </View>
-                  {yeastResults.length > 0 ? (
-                    <ScrollView horizontal style={{ marginBottom: 12 }} showsHorizontalScrollIndicator={false}>
-                      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-                        {yeastResults.slice(0, 20).map((it) => (
-                          <Button
-                            key={it.id}
-                            onPress={() => addYeastFromDb(it)}
-                            size="$2"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
-                          >
-                            <Text fontSize={12}>
-                              {it.name} {it.lab ? `(${it.lab})` : ""} — Add
-                            </Text>
-                          </Button>
-                        ))}
-                      </View>
-                    </ScrollView>
-                  ) : null}
-                  <Button onPress={addYeastRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
-                    <Text>{t("yeastAddButton")}</Text>
-                  </Button>
                   {yeastRows.map((r, idx) => (
                     <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
                       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                         <Text fontSize={14} fontWeight="600">
                           {idx + 1}. {r.name || "(unnamed)"}
                         </Text>
-                        <Button onPress={() => removeYeastRow(r.id)} size="$2" chromeless>
-                          <Text color="$red10">{t("yeastRemove")}</Text>
-                        </Button>
                       </View>
                       <View style={{ gap: 8 }}>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                          <View style={{ minWidth: 140, flexGrow: 1 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("yeastLabLabel")}
+                            </Text>
+                            <Input
+                              value={r.lab ?? ""}
+                              editable={false}
+                              placeholder="—"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                          <View style={{ minWidth: 140, flexGrow: 1 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1">
+                              {t("yeastProductIdLabel")}
+                            </Text>
+                            <Input
+                              value={r.productId ?? ""}
+                              editable={false}
+                              placeholder="—"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                            />
+                          </View>
+                        </View>
+                        <View style={{ flexDirection: "row", gap: 8 }}>
+                          <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1" textAlign="center" numberOfLines={1}>
+                              {t("yeastAttenMinLabel")}
+                            </Text>
+                            <Input
+                              value={
+                                typeof r.attenuationMin === "number" && Number.isFinite(r.attenuationMin)
+                                  ? formatFixed(locale, r.attenuationMin, 3)
+                                  : ""
+                              }
+                              editable={false}
+                              placeholder="—"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                              textAlign="center"
+                            />
+                          </View>
+                          <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
+                            <Text fontSize={11} opacity={0.8} mb="$1" textAlign="center" numberOfLines={1}>
+                              {t("yeastAttenMaxLabel")}
+                            </Text>
+                            <Input
+                              value={
+                                typeof r.attenuationMax === "number" && Number.isFinite(r.attenuationMax)
+                                  ? formatFixed(locale, r.attenuationMax, 3)
+                                  : ""
+                              }
+                              editable={false}
+                              placeholder="—"
+                              size="$3"
+                              background="$background"
+                              borderWidth={1}
+                              borderColor="$borderColor"
+                              textAlign="center"
+                            />
+                          </View>
+                        </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
-                            {t("yeastNameLabel")}
+                            {t("yeastFormatLabel")}
                           </Text>
                           <Input
-                            value={r.name}
-                            onChangeText={(text) => updateYeastRow(r.id, { name: text, ingredientId: null })}
-                            placeholder={t("yeastCustomNamePlaceholder")}
+                            value={
+                              r.format === "dry"
+                                ? t("yeastFormatDry")
+                                : r.format === "slurry"
+                                  ? t("yeastFormatSlurry")
+                                  : t("yeastFormatLiquid")
+                            }
+                            editable={false}
+                            placeholder="—"
                             size="$3"
                             background="$background"
                             borderWidth={1}
@@ -1301,35 +1444,77 @@ export function RecipeEditScreen() {
                           />
                         </View>
                         <View>
-                          <PickerField
-                            label={t("yeastFormatLabel")}
-                            value={r.format ?? "liquid"}
-                            options={YEAST_FORMAT_OPTIONS as unknown as PickerOption[]}
-                            onChange={(v) => updateYeastRow(r.id, { format: v as NonNullable<EditorYeastRow["format"]> })}
-                            closeLabel={tCommon("close")}
-                            accessibilityLabel={t("yeastFormatLabel")}
-                          />
-                        </View>
-                        <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
-                            {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : "L" })}
+                            {t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : tUnits("L") })}
                           </Text>
                           <Input
                             value={
                               r.format === "dry"
-                                ? (r.amountKg != null ? String(r.amountKg) : "")
-                                : (r.amountL != null ? String(r.amountL) : "")
+                                ? (r.amountKg != null && Number.isFinite(r.amountKg) ? formatFixed(locale, r.amountKg, 3) : "")
+                                : (r.amountL != null && Number.isFinite(r.amountL) ? formatFixed(locale, r.amountL, 2) : "")
                             }
-                            onChangeText={(text) => {
-                              const n = text.trim() ? parseFloat(text) : null;
-                              if (r.format === "dry") {
-                                updateYeastRow(r.id, { amountKg: n, amountL: null });
-                              } else {
-                                updateYeastRow(r.id, { amountL: n, amountKg: null });
-                              }
-                            }}
+                            editable={false}
                             placeholder="—"
                             keyboardType="decimal-pad"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("yeastFermentationTempLabel", { unit: tUnits("C") })}
+                          </Text>
+                          <Input
+                            value={
+                              r.fermentationTempC != null && Number.isFinite(r.fermentationTempC)
+                                ? formatFixed(locale, r.fermentationTempC, 1)
+                                : ""
+                            }
+                            editable={false}
+                            placeholder="—"
+                            keyboardType="decimal-pad"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("yeastDiacetylRestLabel")}
+                          </Text>
+                          <Input
+                            value={
+                              r.diacetylRest === "yes"
+                                ? t("yeastDiacetylRestYes")
+                                : r.diacetylRest === "no"
+                                  ? t("yeastDiacetylRestNo")
+                                  : ""
+                            }
+                            editable={false}
+                            placeholder="—"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {t("yeastOxygenationLabel")}
+                          </Text>
+                          <Input
+                            value={
+                              r.oxygenation === "yes"
+                                ? t("yeastOxygenationYes")
+                                : r.oxygenation === "no"
+                                  ? t("yeastOxygenationNo")
+                                  : ""
+                            }
+                            editable={false}
+                            placeholder="—"
                             size="$3"
                             background="$background"
                             borderWidth={1}
@@ -1342,11 +1527,7 @@ export function RecipeEditScreen() {
                           </Text>
                           <Input
                             value={yeastAttenuationOverrides[r.id] ?? ""}
-                            onChangeText={(text) =>
-                              setYeastAttenuationOverrides((prev) =>
-                                text.trim() ? { ...prev, [r.id]: text } : (({ [r.id]: _, ...rest }) => rest)(prev)
-                              )
-                            }
+                            editable={false}
                             placeholder="—"
                             keyboardType="decimal-pad"
                             size="$3"
@@ -1360,12 +1541,16 @@ export function RecipeEditScreen() {
                   ))}
                   <Button
                     onPress={() => (navigation as any).navigate("RecipeYeast", { recipeId })}
-                    chromeless
                     size="$3"
                     mt="$2"
+                    width="100%"
+                    background="$background"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                    accessibilityRole="button"
                     accessibilityLabel={t("yeastEditInYeastPage")}
                   >
-                    <Text fontSize={12} opacity={0.9}>{t("yeastEditInYeastPage")}</Text>
+                    <Text fontSize={14}>{t("yeastEditInYeastPage")}</Text>
                   </Button>
                 </View>
               </Accordion.Content>
