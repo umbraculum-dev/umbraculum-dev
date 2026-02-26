@@ -22,6 +22,14 @@ import { ManualCellCountHelpBox } from "../components/ManualCellCountHelpBox";
 import { RecipeMetaLine } from "../components/RecipeMetaLine";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import { useLocaleController } from "../i18n/I18nProvider";
+
+function formatFixed(locale: string, value: number, fractionDigits: number): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
+}
 
 function newRowId(): string {
   try {
@@ -138,6 +146,7 @@ export function YeastScreen() {
   const { t: tAnalysis } = useT("recipes.analysis");
   const { t: tUnits } = useT("units");
   const { t: tCommon } = useT("common");
+  const { locale } = useLocaleController();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
@@ -514,13 +523,50 @@ export function YeastScreen() {
                       <Text fontSize={11} opacity={0.8} mb="$1">{t("yeastNameLabel")}</Text>
                       <Input value={r.name} onChangeText={(text) => updateYeastRow(r.id, { name: text, ingredientId: null })} placeholder={t("yeastCustomNamePlaceholder")} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" />
                     </View>
-                    {r.lab != null && r.lab !== "" ? <View><Text fontSize={11} opacity={0.8} mb="$1">Lab</Text><Text fontSize={12}>{r.lab}</Text></View> : null}
-                    {r.productId != null && r.productId !== "" ? <View><Text fontSize={11} opacity={0.8} mb="$1">Product ID</Text><Text fontSize={12}>{r.productId}</Text></View> : null}
-                    <View><Text fontSize={11} opacity={0.8} mb="$1">Atten min (%)</Text><Text fontSize={12}>{r.attenuationMin != null ? String(r.attenuationMin) : "—"}</Text></View>
-                    <View><Text fontSize={11} opacity={0.8} mb="$1">Atten max (%)</Text><Text fontSize={12}>{r.attenuationMax != null ? String(r.attenuationMax) : "—"}</Text></View>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                      <View style={{ minWidth: 140, flexGrow: 1 }}>
+                        <Text fontSize={11} opacity={0.8} mb="$1">{t("yeastLabLabel")}</Text>
+                        <Input value={r.lab ?? ""} editable={false} placeholder="—" size="$3" background="$background" borderWidth={1} borderColor="$borderColor" />
+                      </View>
+                      <View style={{ minWidth: 140, flexGrow: 1 }}>
+                        <Text fontSize={11} opacity={0.8} mb="$1">{t("yeastProductIdLabel")}</Text>
+                        <Input value={r.productId ?? ""} editable={false} placeholder="—" size="$3" background="$background" borderWidth={1} borderColor="$borderColor" />
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: "row", gap: 8 }}>
+                      <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
+                        <Text fontSize={11} opacity={0.8} mb="$1" textAlign="center" numberOfLines={1}>{t("yeastAttenMinLabel")}</Text>
+                        <Input
+                          value={typeof r.attenuationMin === "number" && Number.isFinite(r.attenuationMin) ? formatFixed(locale, r.attenuationMin, 3) : ""}
+                          editable={false}
+                          placeholder="—"
+                          size="$3"
+                          background="$background"
+                          borderWidth={1}
+                          borderColor="$borderColor"
+                          textAlign="center"
+                        />
+                      </View>
+                      <View style={{ flex: 1, minWidth: 0, flexShrink: 1 }}>
+                        <Text fontSize={11} opacity={0.8} mb="$1" textAlign="center" numberOfLines={1}>{t("yeastAttenMaxLabel")}</Text>
+                        <Input
+                          value={typeof r.attenuationMax === "number" && Number.isFinite(r.attenuationMax) ? formatFixed(locale, r.attenuationMax, 3) : ""}
+                          editable={false}
+                          placeholder="—"
+                          size="$3"
+                          background="$background"
+                          borderWidth={1}
+                          borderColor="$borderColor"
+                          textAlign="center"
+                        />
+                      </View>
+                    </View>
                     <View>
                       <Text fontSize={11} opacity={0.8} mb="$1">{tAnalysis("customAttenuationPercentLabel")}</Text>
                       <Input value={yeastAttenuationOverrides[r.id] ?? ""} onChangeText={(text) => onAttenuationOverrideChange(r.id, text)} keyboardType="decimal-pad" placeholder="—" size="$3" background="$background" borderWidth={1} borderColor="$borderColor" />
+                    </View>
+                    <View>
+                      <PickerField label={t("yeastFormatLabel")} value={r.format ?? ""} options={[{ value: "", label: "—" }, ...YEAST_FORMAT_OPTIONS.map((o) => ({ value: o.value, label: o.value === "dry" ? t("yeastFormatDry") : o.value === "liquid" ? t("yeastFormatLiquid") : t("yeastFormatSlurry") }))]} onChange={(v) => updateYeastRow(r.id, { format: v === "dry" || v === "liquid" || v === "slurry" ? v : null })} closeLabel={tCommon("close")} />
                     </View>
                     <View>
                       <Text fontSize={11} opacity={0.8} mb="$1">{t("yeastFermentationTempLabel", { unit: tUnits("C") })}</Text>
@@ -544,9 +590,14 @@ export function YeastScreen() {
                     <View>
                       <Text fontSize={11} opacity={0.8} mb="$1">{t("yeastAmountLabel", { unit: r.format === "dry" ? tUnits("kg") : tUnits("L") })}</Text>
                       <Input
-                        value={r.format === "dry" ? (r.amountKg != null ? String(r.amountKg) : "") : (r.amountL != null ? String(r.amountL) : "")}
+                        value={
+                          r.format === "dry"
+                            ? (r.amountKg != null && Number.isFinite(r.amountKg) ? formatFixed(locale, r.amountKg, 3) : "")
+                            : (r.amountL != null && Number.isFinite(r.amountL) ? formatFixed(locale, r.amountL, 2) : "")
+                        }
                         onChangeText={(text) => {
-                          const n = text.trim() ? parseFloat(text) : null;
+                          const normalized = text.trim().replace(",", ".");
+                          const n = normalized ? parseFloat(normalized) : null;
                           const valid = n != null && Number.isFinite(n) && n >= 0;
                           if (r.format === "dry") updateYeastRow(r.id, { amountKg: valid ? n : null });
                           else updateYeastRow(r.id, { amountL: valid ? n : null });
@@ -566,7 +617,6 @@ export function YeastScreen() {
                     <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderColor: "#2a2f3a" }}>
                       <Text fontSize={12} fontWeight="600" mb="$2">{t("yeastAdvancedSubsectionHeading")}</Text>
                       <View style={{ gap: 8 }}>
-                        <PickerField label={t("yeastFormatLabel")} value={r.format ?? ""} options={[{ value: "", label: "—" }, ...YEAST_FORMAT_OPTIONS.map((o) => ({ value: o.value, label: o.value === "dry" ? t("yeastFormatDry") : o.value === "liquid" ? t("yeastFormatLiquid") : t("yeastFormatSlurry") }))]} onChange={(v) => updateYeastRow(r.id, { format: v === "dry" || v === "liquid" || v === "slurry" ? v : null })} closeLabel={tCommon("close")} />
                         <PickerField
                           label={t("yeastPitchRateLabel")}
                           value={r.pitchRate ?? ""}

@@ -220,6 +220,9 @@ export function RecipeEditScreen() {
   const [notes, setNotes] = useState("");
   const [boilTimeMinutes, setBoilTimeMinutes] = useState("");
   const [openSections, setOpenSections] = useState<string[]>(["basics"]);
+  const [openFermentableIds, setOpenFermentableIds] = useState<string[]>([]);
+  const [openHopIds, setOpenHopIds] = useState<string[]>([]);
+  const [openYeastIds, setOpenYeastIds] = useState<string[]>([]);
 
   const [gristRows, setGristRows] = useState<EditorGristRow[]>([]);
   const [hopsRows, setHopsRows] = useState<EditorHopRow[]>([]);
@@ -989,17 +992,39 @@ export function RecipeEditScreen() {
                       ? ` · ${t("gristAvgColor", { value: gristTotals.weightedAvgLovibond.toFixed(1), unit: tUnits("lovibond") })}`
                       : ""}
                   </Text>
-                  {gristRows.map((r, idx) => (
-                    <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                        <Text fontSize={14} fontWeight="600">
-                          {idx + 1}. {r.name || "(unnamed)"}
-                        </Text>
-                        <Button onPress={() => removeGristRow(r.id)} size="$2" chromeless>
-                          <Text color="$red10">{tCommon("remove")}</Text>
-                        </Button>
-                      </View>
-                      <View style={{ gap: 8 }}>
+                  <Accordion
+                    type="multiple"
+                    value={openFermentableIds}
+                    onValueChange={(next) => setOpenFermentableIds(Array.isArray(next) ? next : next ? [next] : [])}
+                  >
+                    {gristRows.map((r, idx) => (
+                      <Accordion.Item key={r.id} value={`grist-${r.id}`}>
+                        <Card gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                          <Accordion.Header>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                              <Accordion.Trigger
+                                flex={1}
+                                unstyled
+                                accessibilityRole="button"
+                                accessibilityLabel={`${idx + 1}. ${r.name || "(unnamed)"}`}
+                                accessibilityState={{ expanded: openFermentableIds.includes(`grist-${r.id}`) }}
+                              >
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                  <Text fontSize={14} fontWeight="600">
+                                    {idx + 1}. {r.name || "(unnamed)"}
+                                  </Text>
+                                  <Text fontSize={14} opacity={0.7}>
+                                    {openFermentableIds.includes(`grist-${r.id}`) ? "▾" : "▸"}
+                                  </Text>
+                                </View>
+                              </Accordion.Trigger>
+                              <Button onPress={() => removeGristRow(r.id)} size="$2" chromeless>
+                                <Text color="$red10">{tCommon("remove")}</Text>
+                              </Button>
+                            </View>
+                          </Accordion.Header>
+                          <Accordion.Content>
+                            <View style={{ gap: 8, marginTop: 12 }}>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             Name
@@ -1132,8 +1157,11 @@ export function RecipeEditScreen() {
                           />
                         </View>
                       </View>
-                    </Card>
-                  ))}
+                          </Accordion.Content>
+                        </Card>
+                      </Accordion.Item>
+                    ))}
+                  </Accordion>
                 </View>
                 <AdSlot placement="recipe_edit_after_fermentables" />
               </Accordion.Content>
@@ -1217,17 +1245,39 @@ export function RecipeEditScreen() {
                   <Button onPress={addHopRow} size="$3" background="$background" borderWidth={1} borderColor="$borderColor" mb="$2">
                     <Text>Add hop</Text>
                   </Button>
-                  {hopsRows.map((r, idx) => (
-                    <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                        <Text fontSize={14} fontWeight="600">
-                          {idx + 1}. {r.name || "(unnamed)"}
-                        </Text>
-                        <Button onPress={() => removeHopRow(r.id)} size="$2" chromeless>
-                          <Text color="$red10">{tCommon("remove")}</Text>
-                        </Button>
-                      </View>
-                      <View style={{ gap: 8 }}>
+                  <Accordion
+                    type="multiple"
+                    value={openHopIds}
+                    onValueChange={(next) => setOpenHopIds(Array.isArray(next) ? next : next ? [next] : [])}
+                  >
+                    {hopsRows.map((r, idx) => (
+                      <Accordion.Item key={r.id} value={`hop-${r.id}`}>
+                        <Card gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                          <Accordion.Header>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                              <Accordion.Trigger
+                                flex={1}
+                                unstyled
+                                accessibilityRole="button"
+                                accessibilityLabel={`${idx + 1}. ${r.name || "(unnamed)"}`}
+                                accessibilityState={{ expanded: openHopIds.includes(`hop-${r.id}`) }}
+                              >
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                  <Text fontSize={14} fontWeight="600">
+                                    {idx + 1}. {r.name || "(unnamed)"}
+                                  </Text>
+                                  <Text fontSize={14} opacity={0.7}>
+                                    {openHopIds.includes(`hop-${r.id}`) ? "▾" : "▸"}
+                                  </Text>
+                                </View>
+                              </Accordion.Trigger>
+                              <Button onPress={() => removeHopRow(r.id)} size="$2" chromeless>
+                                <Text color="$red10">{tCommon("remove")}</Text>
+                              </Button>
+                            </View>
+                          </Accordion.Header>
+                          <Accordion.Content>
+                            <View style={{ gap: 8, marginTop: 12 }}>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
                             Name
@@ -1319,8 +1369,11 @@ export function RecipeEditScreen() {
                           />
                         </View>
                       </View>
-                    </Card>
-                  ))}
+                          </Accordion.Content>
+                        </Card>
+                      </Accordion.Item>
+                    ))}
+                  </Accordion>
                 </View>
               </Accordion.Content>
             </Card>
@@ -1345,14 +1398,34 @@ export function RecipeEditScreen() {
               </Accordion.Header>
               <Accordion.Content>
                 <View style={{ marginTop: 12 }}>
-                  {yeastRows.map((r, idx) => (
-                    <Card key={r.id} gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                        <Text fontSize={14} fontWeight="600">
-                          {idx + 1}. {r.name || "(unnamed)"}
-                        </Text>
-                      </View>
-                      <View style={{ gap: 8 }}>
+                  <Accordion
+                    type="multiple"
+                    value={openYeastIds}
+                    onValueChange={(next) => setOpenYeastIds(Array.isArray(next) ? next : next ? [next] : [])}
+                  >
+                    {yeastRows.map((r, idx) => (
+                      <Accordion.Item key={r.id} value={`yeast-${r.id}`}>
+                        <Card gap="$2" mb="$2" background="$background" borderWidth={1} borderColor="$borderColor" p="$3">
+                          <Accordion.Header>
+                            <Accordion.Trigger
+                              width="100%"
+                              unstyled
+                              accessibilityRole="button"
+                              accessibilityLabel={`${idx + 1}. ${r.name || "(unnamed)"}`}
+                              accessibilityState={{ expanded: openYeastIds.includes(`yeast-${r.id}`) }}
+                            >
+                              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                <Text fontSize={14} fontWeight="600">
+                                  {idx + 1}. {r.name || "(unnamed)"}
+                                </Text>
+                                <Text fontSize={14} opacity={0.7}>
+                                  {openYeastIds.includes(`yeast-${r.id}`) ? "▾" : "▸"}
+                                </Text>
+                              </View>
+                            </Accordion.Trigger>
+                          </Accordion.Header>
+                          <Accordion.Content>
+                            <View style={{ gap: 8, marginTop: 12 }}>
                         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                           <View style={{ minWidth: 140, flexGrow: 1 }}>
                             <Text fontSize={11} opacity={0.8} mb="$1">
@@ -1422,6 +1495,21 @@ export function RecipeEditScreen() {
                               textAlign="center"
                             />
                           </View>
+                        </View>
+                        <View>
+                          <Text fontSize={11} opacity={0.8} mb="$1">
+                            {tRecipes("analysis.customAttenuationPercentLabel")}
+                          </Text>
+                          <Input
+                            value={yeastAttenuationOverrides[r.id] ?? ""}
+                            editable={false}
+                            placeholder="—"
+                            keyboardType="decimal-pad"
+                            size="$3"
+                            background="$background"
+                            borderWidth={1}
+                            borderColor="$borderColor"
+                          />
                         </View>
                         <View>
                           <Text fontSize={11} opacity={0.8} mb="$1">
@@ -1521,24 +1609,12 @@ export function RecipeEditScreen() {
                             borderColor="$borderColor"
                           />
                         </View>
-                        <View>
-                          <Text fontSize={11} opacity={0.8} mb="$1">
-                            {tRecipes("analysis.customAttenuationPercentLabel")}
-                          </Text>
-                          <Input
-                            value={yeastAttenuationOverrides[r.id] ?? ""}
-                            editable={false}
-                            placeholder="—"
-                            keyboardType="decimal-pad"
-                            size="$3"
-                            background="$background"
-                            borderWidth={1}
-                            borderColor="$borderColor"
-                          />
-                        </View>
                       </View>
-                    </Card>
-                  ))}
+                          </Accordion.Content>
+                        </Card>
+                      </Accordion.Item>
+                    ))}
+                  </Accordion>
                   <Button
                     onPress={() => (navigation as any).navigate("RecipeYeast", { recipeId })}
                     size="$3"
