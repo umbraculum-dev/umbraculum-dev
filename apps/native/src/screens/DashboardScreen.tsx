@@ -8,6 +8,7 @@ import { locales, type SupportedLocale } from "@brewery/i18n";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
+import { AdSlot } from "../components/AdSlot";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
@@ -139,6 +140,7 @@ export function DashboardScreen() {
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={{ gap: 16 }}>
+          <AdSlot placement="global_top" />
           <View style={{ gap: 6 }}>
             <Heading fontSize={28}>{t("title")}</Heading>
             <Text fontSize={14} opacity={0.8}>
@@ -233,13 +235,26 @@ export function DashboardScreen() {
               {links.map((l) => (
                 <Button
                   key={l.key}
-                  onPress={() => void openWeb(l.route)}
+                  onPress={() =>
+                    l.key === "waterProfiles"
+                      ? navigation.navigate("WaterProfiles")
+                      : l.key === "fermDataIntegration"
+                        ? navigation.navigate("FermDataIntegration")
+                        : void openWeb(l.route)
+                  }
                   accessibilityRole="button"
                   accessibilityLabel={l.label}
                 >
                   <Text>{l.label}</Text>
                 </Button>
               ))}
+              <Button
+                onPress={() => navigation.navigate("About")}
+                accessibilityRole="button"
+                accessibilityLabel={tNav("about")}
+              >
+                <Text>{tNav("about")}</Text>
+              </Button>
             </View>
           </Card>
 
@@ -344,6 +359,8 @@ export function DashboardScreen() {
           >
             <Text>{tNav("logout")}</Text>
           </Button>
+
+          <AdSlot placement="global_bottom" />
         </View>
       </ScrollView>
     </Screen>

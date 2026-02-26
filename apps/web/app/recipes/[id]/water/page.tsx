@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { IonProfilePpm } from "@brewery/contracts";
 
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { Button, H1, H2, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H1, H2, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
@@ -51,6 +51,7 @@ export default function WaterHubPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(["links", "status"]);
   useEffect(() => {
     try {
       const v = sessionStorage.getItem("brewery:surfaceMath:waterHub");
@@ -165,15 +166,16 @@ export default function WaterHubPage() {
 
   return (
     <>
-      <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
+      <YStack width="100%" gap="$1" mb="$2">
+        <H1 mt={0} mb={0}>{t("title")}</H1>
+        <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
+        <SizableText size="$2" fontFamily="$body" mt={0} mb={0} display="block">
+          <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
+        </SizableText>
+      </YStack>
 
       <SurfaceMathToggleRow
-        left={
-          <SizableText size="$2" fontFamily="$body" mt={0}>
-            <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
-          </SizableText>
-        }
+        left={null}
         surfaceMath={surfaceMath}
         onToggle={() => setSurfaceMath((v) => !v)}
         mb="$2"
@@ -183,11 +185,26 @@ export default function WaterHubPage() {
         <ErrorBox>{authState.error}</ErrorBox>
       ) : null}
 
-      <YStack gap="$4">
-        <View className="brew-panel" aria-labelledby="water-hub-links">
-          <H2 id="water-hub-links" mt={0}>
-            {t("chooseArea")}
-          </H2>
+      <Accordion
+        type="multiple"
+        value={openSections}
+        onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : (next ? [next] : []))}
+      >
+        <Accordion.Item value="links">
+          <View className="brew-panel" aria-labelledby="water-hub-links">
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="water-hub-links" mt={0}>
+                    {t("chooseArea")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("links") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
           <ul className="brew-recipe-edit-list-disc brew-list-mt0">
             <li>
               <SizableText size="$2" fontFamily="$body">
@@ -211,12 +228,25 @@ export default function WaterHubPage() {
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
             {t("manageProfilesOn")} <Link href="/water-profiles">{t("waterProfilesLink")}</Link>.
           </SizableText>
-        </View>
+            </Accordion.Content>
+          </View>
+        </Accordion.Item>
 
-        <View className="brew-panel" aria-labelledby="water-hub-status">
-          <H2 id="water-hub-status" mt={0}>
-            {t("quickStatus")}
-          </H2>
+        <Accordion.Item value="status" mt="$3">
+          <View className="brew-panel" aria-labelledby="water-hub-status">
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="water-hub-status" mt={0}>
+                    {t("quickStatus")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("status") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
           <ul className="brew-recipe-edit-list-disc brew-list-mt0">
             <li>
               <SizableText size="$2" fontFamily="$body">
@@ -257,12 +287,25 @@ export default function WaterHubPage() {
           {error ? (
             <ErrorBox mt="$3">{error}</ErrorBox>
           ) : null}
-        </View>
+            </Accordion.Content>
+          </View>
+        </Accordion.Item>
 
-        <View className="brew-panel" aria-labelledby="water-hub-recap">
-          <H2 id="water-hub-recap" mt={0}>
-            {t("recap")}
-          </H2>
+        <Accordion.Item value="recap" mt="$3">
+          <View className="brew-panel" aria-labelledby="water-hub-recap">
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="water-hub-recap" mt={0}>
+                    {t("recap")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("recap") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             {t("recapSubtitle")}
           </SizableText>
@@ -467,12 +510,25 @@ export default function WaterHubPage() {
               </SizableText>
             )}
           </details>
-        </View>
+            </Accordion.Content>
+          </View>
+        </Accordion.Item>
 
-        <View className="brew-panel" aria-labelledby="water-hub-final-recap">
-          <H2 id="water-hub-final-recap" mt={0}>
-            {t("finalRecapTitle")}
-          </H2>
+        <Accordion.Item value="finalRecap" mt="$3">
+          <View className="brew-panel" aria-labelledby="water-hub-final-recap">
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="water-hub-final-recap" mt={0}>
+                    {t("finalRecapTitle")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("finalRecap") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             {t("finalRecapSubtitle")}
           </SizableText>
@@ -541,12 +597,25 @@ export default function WaterHubPage() {
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
             {t("finalRecapCaveat")}
           </SizableText>
-        </View>
+            </Accordion.Content>
+          </View>
+        </Accordion.Item>
 
-        <View className="brew-panel" aria-labelledby="water-hub-alkalinity-vs-bicarbonate">
-          <H2 id="water-hub-alkalinity-vs-bicarbonate" mt={0}>
-            {t("alkVsBicarbTitle")}
-          </H2>
+        <Accordion.Item value="alkVsBicarb" mt="$3">
+          <View className="brew-panel" aria-labelledby="water-hub-alkalinity-vs-bicarbonate">
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="water-hub-alkalinity-vs-bicarbonate" mt={0}>
+                    {t("alkVsBicarbTitle")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("alkVsBicarb") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
             {t("alkVsBicarbSubtitle")}
           </SizableText>
@@ -556,8 +625,10 @@ export default function WaterHubPage() {
             <li><SizableText size="$2" fontFamily="$body">{t("alkVsBicarbPoint3")}</SizableText></li>
             <li><SizableText size="$2" fontFamily="$body">{t("alkVsBicarbPoint4")}</SizableText></li>
           </ul>
-        </View>
-      </YStack>
+            </Accordion.Content>
+          </View>
+        </Accordion.Item>
+      </Accordion>
     </>
   );
 }

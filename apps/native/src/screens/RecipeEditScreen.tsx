@@ -15,6 +15,7 @@ import { useT } from "@brewery/i18n-react";
 import { Accordion, Input, TextArea } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
+import { AdSlot } from "../components/AdSlot";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 
@@ -1022,6 +1023,7 @@ export function RecipeEditScreen() {
                     </Card>
                   ))}
                 </View>
+                <AdSlot placement="recipe_edit_after_fermentables" />
               </Accordion.Content>
             </Card>
           </Accordion.Item>
@@ -1383,6 +1385,15 @@ export function RecipeEditScreen() {
                       </View>
                     </Card>
                   ))}
+                  <Button
+                    onPress={() => navigation.navigate("RecipeYeast", { recipeId })}
+                    chromeless
+                    size="$3"
+                    mt="$2"
+                    accessibilityLabel={t("yeastEditInYeastPage")}
+                  >
+                    <Text fontSize={12} opacity={0.9}>{t("yeastEditInYeastPage")}</Text>
+                  </Button>
                 </View>
               </Accordion.Content>
             </Card>

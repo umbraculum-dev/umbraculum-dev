@@ -10,7 +10,11 @@ import type { RouteId } from "@brewery/navigation";
 import { Spinner } from "@brewery/ui";
 
 import { useAuth } from "../auth/AuthProvider";
+import { AboutScreen } from "../screens/AboutScreen";
 import { DashboardScreen } from "../screens/DashboardScreen";
+import { FermDataIntegrationScreen } from "../screens/FermDataIntegrationScreen";
+import { WaterProfilesScreen } from "../screens/WaterProfilesScreen";
+import { YeastScreen } from "../screens/YeastScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { BlockedRouteScreen } from "../screens/BlockedRouteScreen";
 import { RecipeEditScreen } from "../screens/RecipeEditScreen";
@@ -31,6 +35,10 @@ type RootStackParamList = {
   Tabs: undefined;
   SelectWorkspace: undefined;
   RecipeEdit: { recipeId: string };
+  RecipeYeast: { recipeId: string };
+  About: undefined;
+  FermDataIntegration: undefined;
+  WaterProfiles: undefined;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -88,6 +96,50 @@ export function AppNavigator() {
         <RootStack.Screen
           name="RecipeEdit"
           component={RecipeEditScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="About"
+          component={AboutScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "About",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="FermDataIntegration"
+          component={FermDataIntegrationScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="WaterProfiles"
+          component={WaterProfilesScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "Water profiles",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="RecipeYeast"
+          component={YeastScreen}
           options={{
             headerShown: true,
             headerTitle: "",

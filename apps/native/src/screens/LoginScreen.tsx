@@ -5,6 +5,7 @@ import { Input, YStack } from "tamagui";
 import { useT } from "@brewery/i18n-react";
 import { Button, Heading, Screen, Text } from "@brewery/ui";
 
+import { AdSlot } from "../components/AdSlot";
 import { useAuth } from "../auth/AuthProvider";
 import { useLocaleController } from "../i18n/I18nProvider";
 
@@ -39,6 +40,7 @@ export function LoginScreen() {
 
   return (
     <Screen>
+      <AdSlot placement="global_top" />
       <Heading fontSize={28}>{t("loginTitle")}</Heading>
 
       <YStack gap="$3" style={{ width: "100%", maxWidth: 420 }}>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 
@@ -19,6 +19,7 @@ function isAdmin(role: string | null) {
 
 export default function WaterProfilesPage() {
   const t = useTranslations("waterProfiles");
+  const tEquipment = useTranslations("equipment");
   const tUnits = useTranslations("units");
   const [me, setMe] = useState<AuthMeResponse | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
@@ -39,6 +40,7 @@ export default function WaterProfilesPage() {
   });
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(["table"]);
 
   const canCall = true;
 
@@ -135,22 +137,36 @@ export default function WaterProfilesPage() {
 
   return (
     <>
-      <H1 mb="$2">{t("title")}</H1>
+      <YStack width="100%" gap="$1" mb="$2">
+        <H1 mt={0} mb={0}>{t("title")}</H1>
+        <SizableText size="$2" fontFamily="$body" mt={0} mb={0} display="block">
+          <Link href="/recipes">{tEquipment("backToRecipes")}</Link>
+        </SizableText>
+      </YStack>
 
-      <YStack gap="$4">
-        <View className="brew-panel" aria-labelledby="profiles-table-heading">
-          <H2 id="profiles-table-heading" mt={0}>
-            {t("viewAllTableTitle")}
-          </H2>
-
-          <XStack gap="$3" alignItems="center">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refresh()} disabled={!canCall || loading}>
-              {loading ? "Refreshing…" : "Refresh"}
-            </Button>
-            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
-              {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
-            </SizableText>
-          </XStack>
+      <Accordion
+        type="multiple"
+        value={openSections}
+        onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : (next ? [next] : []))}
+      >
+        <Accordion.Item value="table">
+          <View className="brew-panel" aria-labelledby="profiles-table-heading">
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="profiles-table-heading" mt={0}>
+                    {t("viewAllTableTitle")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("table") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
+            {profiles ? `${allProfiles.length} profiles loaded.` : "Not loaded yet."}
+          </SizableText>
 
           {error ? (
             <ErrorBox mt="$3">{error}</ErrorBox>
@@ -233,13 +249,26 @@ export default function WaterProfilesPage() {
               Only <code>owner</code> and <code>brewery_admin</code> can add/verify profiles.
             </SizableText>
           ) : null}
-        </View>
+            </Accordion.Content>
+          </View>
+        </Accordion.Item>
 
         {admin ? (
+        <Accordion.Item value="admin" mt="$3">
           <View className="brew-panel" aria-labelledby="admin-profiles-heading">
-            <H2 id="admin-profiles-heading" mt={0}>
-              {t("adminAddTitle")}
-            </H2>
+            <Accordion.Header>
+              <Accordion.Trigger unstyled cursor="pointer">
+                <XStack alignItems="center" justifyContent="space-between" width="100%">
+                  <H2 id="admin-profiles-heading" mt={0}>
+                    {t("adminAddTitle")}
+                  </H2>
+                  <SizableText size="$2" opacity={0.7}>
+                    {openSections.includes("admin") ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("createdProfilesStartUnverified")}
             </SizableText>
@@ -358,36 +387,27 @@ export default function WaterProfilesPage() {
                 <Button as="button" type="submit" size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" disabled={!createName.trim() || createSubmitting}>
                   {createSubmitting ? "Creating…" : "Create profile"}
                 </Button>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">
-                  Profiles in this section require admin privileges.
-                </SizableText>
               </XStack>
 
               {createError ? (
                 <ErrorBox id="create-error" mt="$3">{createError}</ErrorBox>
               ) : null}
             </form>
+            </Accordion.Content>
           </View>
+        </Accordion.Item>
         ) : null}
+      </Accordion>
 
-        <View className="brew-panel" aria-labelledby="nav-heading">
-          <H2 id="nav-heading" mt={0}>
-            {t("navigationTitle")}
-          </H2>
-          <ul className="brew-recipe-edit-list-disc brew-list-mb0">
-            <li>
-              <SizableText size="$2" fontFamily="$body">
-                <Link href="/recipes">Back to Recipes</Link>
-              </SizableText>
-            </li>
-            <li className="brew-list-mt2">
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
-              </SizableText>
-            </li>
-          </ul>
-        </View>
-      </YStack>
+      <View className="brew-panel" mt="$3">
+        <ul className="brew-recipe-edit-list-disc brew-list-mb0">
+          <li>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {t("rawMaterialsCtaPrefix")} <Link href="/contributing?topic=raw-materials">{t("rawMaterialsCtaLinkText")}</Link>.
+            </SizableText>
+          </li>
+        </ul>
+      </View>
     </>
   );
 }
