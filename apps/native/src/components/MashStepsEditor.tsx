@@ -5,7 +5,9 @@ import type { EditorMashStep, EditorMashStepType } from "@brewery/beerjson";
 import { MASH_STEP_TYPE_OPTIONS, newMashRowId } from "@brewery/beerjson";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Text } from "@brewery/ui";
+
 import { Input } from "./AppInput";
+import { SURFACE_BACKGROUND, SURFACE_BORDER } from "../theme/colors";
 
 export type WaterVolumes = { mashLiters: number; spargeLiters: number };
 
@@ -158,7 +160,16 @@ export function MashStepsEditor({
                   ? formatFixed(locale, r.amountL, 2)
                   : "—";
             return (
-              <View key={r.id} style={{ padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
+              <View
+                key={r.id}
+                style={{
+                  padding: 12,
+                  borderWidth: 1,
+                  borderColor: SURFACE_BORDER,
+                  borderRadius: 8,
+                  backgroundColor: SURFACE_BACKGROUND,
+                }}
+              >
                 <Text fontSize={12} fontWeight="bold">
                   {idx + 1}. {r.name}
                 </Text>

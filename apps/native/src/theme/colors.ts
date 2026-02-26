@@ -14,3 +14,12 @@ export const SURFACE_BORDER = "#454545";
 
 /** Surface background at 45% opacity (for ads container). */
 export const SURFACE_BACKGROUND_SEMI = "rgba(36, 36, 36, 0.45)";
+
+/** Computed field block (e.g. water volumes) – green tint like web. */
+export const FIELD_COMPUTED_BG = "#1e2e22";
+
+/** Computed field block border. */
+export const FIELD_COMPUTED_BORDER = "#2d5a3d";
+
+/** Card/tile background for mash steps, sparge step (ingredient-style boxes). */
+export const SURFACE_CARD = "#2e2e2e";

@@ -21,7 +21,7 @@ import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
 import { AdSlot } from "../components/AdSlot";
 import { Input } from "../components/AppInput";
-import { SURFACE_BACKGROUND, SURFACE_BORDER } from "../theme/colors";
+import { FIELD_COMPUTED_BG, FIELD_COMPUTED_BORDER, SURFACE_BACKGROUND, SURFACE_BORDER, SURFACE_CARD } from "../theme/colors";
 import { MashStepsEditor, type WaterVolumes } from "../components/MashStepsEditor";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { useAuth } from "../auth/AuthProvider";
@@ -304,6 +304,11 @@ export function RecipeEditScreen() {
       (r) => !(r.type === "sparge" && r.name.trim().toLowerCase() === "sparge"),
     );
   }, [mashRows, spargeConfigured]);
+
+  const spargeRows = useMemo(
+    () => mashRows.filter((r) => r.type === "sparge"),
+    [mashRows],
+  );
 
   const loadRecipe = useCallback(async () => {
     if (!api || !recipeId) return;
@@ -1757,7 +1762,16 @@ export function RecipeEditScreen() {
                     {t("mashingHelp")}
                   </Text>
                   {waterVolumes ? (
-                    <View style={{ marginBottom: 12, padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
+                    <View
+                      style={{
+                        marginBottom: 12,
+                        padding: 12,
+                        borderWidth: 1,
+                        borderColor: FIELD_COMPUTED_BORDER,
+                        borderRadius: 8,
+                        backgroundColor: FIELD_COMPUTED_BG,
+                      }}
+                    >
                       <Text fontSize={12} fontWeight="bold" mb="$1">
                         {t("mashingWaterVolumesTitle")}
                       </Text>
@@ -1776,7 +1790,7 @@ export function RecipeEditScreen() {
                       {t("mashingWaterVolumesUnavailable")}
                     </Text>
                   )}
-                  <View style={{ marginBottom: 12 }}>
+                  <View style={{ marginBottom: 12, padding: 12, borderWidth: 1, borderColor: SURFACE_BORDER, borderRadius: 8, backgroundColor: SURFACE_CARD }}>
                     <MashStepsEditor
                       mashRows={mashRowsFiltered}
                       waterVolumes={waterVolumes}
@@ -1787,64 +1801,144 @@ export function RecipeEditScreen() {
                       formatFixed={formatFixed}
                     />
                   </View>
-                  {spargeConfigured && waterVolumes ? (
-                    <View style={{ marginBottom: 12 }}>
+                  {(spargeRows.length > 0 || (spargeConfigured && waterVolumes)) ? (
+                    <View style={{ marginBottom: 12, padding: 12, borderWidth: 1, borderColor: SURFACE_BORDER, borderRadius: 8, backgroundColor: SURFACE_CARD }}>
                       <Text fontSize={12} opacity={0.8} mb="$2">
                         {t("spargeStepFromWaterPage")}
                       </Text>
-                      <View style={{ padding: 12, borderWidth: 1, borderColor: "var(--border)", borderRadius: 8 }}>
-                        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
-                          <View>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
-                              {t("mashingStepName")}
-                            </Text>
-                            <Text fontSize={12}>Sparge</Text>
-                          </View>
-                          <View>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
-                              {t("mashingStepType")}
-                            </Text>
-                            <Text fontSize={12}>Sparge</Text>
-                          </View>
-                          <View>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
-                              {t("mashingStepTemp", { unit: "°C" })}
-                            </Text>
-                            <Text fontSize={12}>
-                              {formatFixed(
-                                locale,
-                                waterSettings?.spargeStepTemperatureC != null ? waterSettings.spargeStepTemperatureC : 76,
-                                waterSettings?.spargeStepTemperatureC != null &&
-                                  !Number.isInteger(waterSettings.spargeStepTemperatureC)
-                                  ? 1
-                                  : 0,
-                              )}
-                            </Text>
-                          </View>
-                          <View>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
-                              {t("mashingStepTime", { unit: "min" })}
-                            </Text>
-                            <Text fontSize={12}>0</Text>
-                          </View>
-                          <View>
-                            <Text fontSize={11} opacity={0.8} mb="$1">
-                              {t("mashingStepAmount", { unit: "L" })}
-                            </Text>
-                            <Text fontSize={12}>
-                              {formatFixed(locale, waterVolumes.spargeLiters, 2)} {tUnits("L")}
-                            </Text>
-                          </View>
-                        </View>
+                      <View style={{ gap: 12 }}>
+                        {spargeRows.length > 0
+                          ? spargeRows.map((r, idx) => {
+                              const isCanonicalSparge =
+                                r.name.trim().toLowerCase() === "sparge" && waterVolumes != null;
+                              const tempC =
+                                isCanonicalSparge && waterSettings?.spargeStepTemperatureC != null
+                                  ? waterSettings.spargeStepTemperatureC
+                                  : r.stepTemperatureC;
+                              const amountDisplay =
+                                isCanonicalSparge && waterVolumes
+                                  ? formatFixed(locale, waterVolumes.spargeLiters, 2)
+                                  : r.amountL != null && Number.isFinite(r.amountL)
+                                    ? formatFixed(locale, r.amountL, 2)
+                                    : "—";
+                              return (
+                                <View
+                                  key={r.id}
+                                  style={{
+                                    padding: 12,
+                                    borderWidth: 1,
+                                    borderColor: SURFACE_BORDER,
+                                    borderRadius: 8,
+                                    backgroundColor: SURFACE_BACKGROUND,
+                                  }}
+                                >
+                                  <Text fontSize={12} fontWeight="bold" mb="$1">
+                                    {mashRowsFiltered.length + idx + 1}. {r.name}
+                                  </Text>
+                                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
+                                    <View>
+                                      <Text fontSize={11} opacity={0.8} mb="$1">
+                                        {t("mashingStepName")}
+                                      </Text>
+                                      <Text fontSize={12}>{r.name}</Text>
+                                    </View>
+                                    <View>
+                                      <Text fontSize={11} opacity={0.8} mb="$1">
+                                        {t("mashingStepType")}
+                                      </Text>
+                                      <Text fontSize={12}>{r.type}</Text>
+                                    </View>
+                                    <View>
+                                      <Text fontSize={11} opacity={0.8} mb="$1">
+                                        {t("mashingStepTemp", { unit: "°C" })}
+                                      </Text>
+                                      <Text fontSize={12}>
+                                        {formatFixed(
+                                          locale,
+                                          tempC,
+                                          !Number.isInteger(tempC) ? 1 : 0,
+                                        )}
+                                      </Text>
+                                    </View>
+                                    <View>
+                                      <Text fontSize={11} opacity={0.8} mb="$1">
+                                        {t("mashingStepTime", { unit: "min" })}
+                                      </Text>
+                                      <Text fontSize={12}>
+                                        {r.stepTimeMin != null ? String(r.stepTimeMin) : "0"}
+                                      </Text>
+                                    </View>
+                                    <View>
+                                      <Text fontSize={11} opacity={0.8} mb="$1">
+                                        {t("mashingStepAmount", { unit: "L" })}
+                                      </Text>
+                                      <Text fontSize={12}>
+                                        {amountDisplay} {tUnits("L")}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                </View>
+                              );
+                            })
+                          : (
+                            <View
+                              style={{
+                                padding: 12,
+                                borderWidth: 1,
+                                borderColor: SURFACE_BORDER,
+                                borderRadius: 8,
+                                backgroundColor: SURFACE_BACKGROUND,
+                              }}
+                            >
+                              <Text fontSize={12} fontWeight="bold" mb="$1">
+                                {mashRowsFiltered.length + 1}. Sparge
+                              </Text>
+                              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
+                                <View>
+                                  <Text fontSize={11} opacity={0.8} mb="$1">
+                                    {t("mashingStepName")}
+                                  </Text>
+                                  <Text fontSize={12}>Sparge</Text>
+                                </View>
+                                <View>
+                                  <Text fontSize={11} opacity={0.8} mb="$1">
+                                    {t("mashingStepType")}
+                                  </Text>
+                                  <Text fontSize={12}>Sparge</Text>
+                                </View>
+                                <View>
+                                  <Text fontSize={11} opacity={0.8} mb="$1">
+                                    {t("mashingStepTemp", { unit: "°C" })}
+                                  </Text>
+                                  <Text fontSize={12}>
+                                    {formatFixed(
+                                      locale,
+                                      waterSettings?.spargeStepTemperatureC != null ? waterSettings.spargeStepTemperatureC : 76,
+                                      waterSettings?.spargeStepTemperatureC != null &&
+                                        !Number.isInteger(waterSettings.spargeStepTemperatureC)
+                                        ? 1
+                                        : 0,
+                                    )}
+                                  </Text>
+                                </View>
+                                <View>
+                                  <Text fontSize={11} opacity={0.8} mb="$1">
+                                    {t("mashingStepTime", { unit: "min" })}
+                                  </Text>
+                                  <Text fontSize={12}>0</Text>
+                                </View>
+                                <View>
+                                  <Text fontSize={11} opacity={0.8} mb="$1">
+                                    {t("mashingStepAmount", { unit: "L" })}
+                                  </Text>
+                                  <Text fontSize={12}>
+                                    {waterVolumes ? formatFixed(locale, waterVolumes.spargeLiters, 2) : "—"} {tUnits("L")}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                          )}
                       </View>
-                      <Button
-                        chromeless
-                        size="$3"
-                        mt="$2"
-                        onPress={() => (navigation as any).navigate("WaterSparge", { recipeId })}
-                      >
-                        <Text fontSize={12} color="$blue10">{t("spargeStepConfigureLink")}</Text>
-                      </Button>
                     </View>
                   ) : null}
                   <Button
@@ -1854,12 +1948,11 @@ export function RecipeEditScreen() {
                     <Text>{t("nav.openWaterCalculator")}</Text>
                   </Button>
                   <Button
-                    chromeless
                     size="$3"
                     mt="$2"
                     onPress={() => (navigation as any).navigate("WaterProfiles")}
                   >
-                    <Text fontSize={12} opacity={0.9}>{t("waterProfilesManageText")}</Text>
+                    <Text>{t("waterProfilesManageText").replace(/\s+(on|su)$/i, "")}</Text>
                   </Button>
                 </View>
               </Accordion.Content>
