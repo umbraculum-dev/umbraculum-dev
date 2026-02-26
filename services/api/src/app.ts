@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { prismaPlugin } from "./plugins/prisma.js";
+import { redisClientPlugin } from "./plugins/redisClient.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
 import { sessionAuthPlugin } from "./plugins/sessionAuth.js";
 import { errorHandlerPlugin } from "./plugins/errorHandler.js";
@@ -48,6 +49,7 @@ export function buildApp() {
     });
   }
   app.register(prismaPlugin);
+  app.register(redisClientPlugin);
   app.register(sessionAuthPlugin);
   app.register(requestContextPlugin);
 

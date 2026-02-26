@@ -5,6 +5,7 @@ import { createHash, randomBytes } from "node:crypto";
 
 import { BadRequestError, UnauthorizedError } from "../errors.js";
 import { SESSION_COOKIE_NAME, readBearerToken, requireSession } from "../plugins/sessionAuth.js";
+import { deleteCachedSession, writeCachedSession } from "../services/sessionCache.js";
 import { WorkspacesService } from "../services/workspacesService.js";
 
 const SESSION_TTL_DAYS = 14;
@@ -121,15 +122,25 @@ export async function authRoutes(app: FastifyInstance) {
       const createdWorkspace = await workspaces.createWorkspaceForUser(created.id, workspaceName || "My workspace");
 
       const sessionId = makeOpaqueId();
+      const expiresAt = nowPlusDays(SESSION_TTL_DAYS);
       const session = await app.prisma.session.create({
         data: {
           id: sessionId,
           userId: created.id,
           activeWorkspaceId: createdWorkspace.id,
-          expiresAt: nowPlusDays(SESSION_TTL_DAYS),
+          expiresAt,
         },
         select: { id: true, activeWorkspaceId: true },
       });
+
+      if (app.redis) {
+        await writeCachedSession(app.redis, {
+          id: session.id,
+          userId: created.id,
+          activeWorkspaceId: session.activeWorkspaceId,
+          expiresAt,
+        });
+      }
 
       reply
         .setCookie(SESSION_COOKIE_NAME, session.id, {
@@ -182,15 +193,25 @@ export async function authRoutes(app: FastifyInstance) {
           : null;
 
       const sessionId = makeOpaqueId();
+      const expiresAt = nowPlusDays(SESSION_TTL_DAYS);
       const session = await app.prisma.session.create({
         data: {
           id: sessionId,
           userId: user.id,
           activeWorkspaceId,
-          expiresAt: nowPlusDays(SESSION_TTL_DAYS),
+          expiresAt,
         },
         select: { id: true, activeWorkspaceId: true },
       });
+
+      if (app.redis) {
+        await writeCachedSession(app.redis, {
+          id: session.id,
+          userId: user.id,
+          activeWorkspaceId: session.activeWorkspaceId,
+          expiresAt,
+        });
+      }
 
       reply
         .setCookie(SESSION_COOKIE_NAME, session.id, {
@@ -243,15 +264,25 @@ export async function authRoutes(app: FastifyInstance) {
           : null;
 
       const sessionId = makeOpaqueId();
+      const expiresAt = nowPlusDays(SESSION_TTL_DAYS);
       const session = await app.prisma.session.create({
         data: {
           id: sessionId,
           userId: user.id,
           activeWorkspaceId,
-          expiresAt: nowPlusDays(SESSION_TTL_DAYS),
+          expiresAt,
         },
         select: { id: true, activeWorkspaceId: true },
       });
+
+      if (app.redis) {
+        await writeCachedSession(app.redis, {
+          id: session.id,
+          userId: user.id,
+          activeWorkspaceId: session.activeWorkspaceId,
+          expiresAt,
+        });
+      }
 
       reply.send({
         ok: true,
@@ -267,6 +298,7 @@ export async function authRoutes(app: FastifyInstance) {
     const sessionId =
       (req.cookies as any)?.[SESSION_COOKIE_NAME] ?? readBearerToken(req);
     if (typeof sessionId === "string" && sessionId) {
+      if (app.redis) await deleteCachedSession(app.redis, sessionId);
       await app.prisma.session.delete({ where: { id: sessionId } }).catch(() => {});
     }
 
@@ -345,21 +377,31 @@ export async function authRoutes(app: FastifyInstance) {
       }
 
       const sessionId = makeOpaqueId();
+      const expiresAt = nowPlusDays(SESSION_TTL_DAYS);
       const session = await tx.session.create({
         data: {
           id: sessionId,
           userId: record.userId,
           activeWorkspaceId: record.activeWorkspaceId,
-          expiresAt: nowPlusDays(SESSION_TTL_DAYS),
+          expiresAt,
         },
         select: { id: true },
       });
 
-      return session;
+      return { session, record, expiresAt };
     });
 
+    if (app.redis) {
+      await writeCachedSession(app.redis, {
+        id: mintedSession.session.id,
+        userId: mintedSession.record.userId,
+        activeWorkspaceId: mintedSession.record.activeWorkspaceId,
+        expiresAt: mintedSession.expiresAt,
+      });
+    }
+
     reply
-      .setCookie(SESSION_COOKIE_NAME, mintedSession.id, {
+      .setCookie(SESSION_COOKIE_NAME, mintedSession.session.id, {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
@@ -427,8 +469,17 @@ export async function authRoutes(app: FastifyInstance) {
     const updated = await app.prisma.session.update({
       where: { id: s.sessionId },
       data: { activeWorkspaceId: workspaceId },
-      select: { activeWorkspaceId: true },
+      select: { id: true, userId: true, activeWorkspaceId: true, expiresAt: true },
     });
+
+    if (app.redis) {
+      await writeCachedSession(app.redis, {
+        id: updated.id,
+        userId: updated.userId,
+        activeWorkspaceId: updated.activeWorkspaceId,
+        expiresAt: updated.expiresAt,
+      });
+    }
 
     return { ok: true, activeWorkspaceId: updated.activeWorkspaceId };
   });

@@ -3,6 +3,7 @@ import fp from "fastify-plugin";
 import cookie from "@fastify/cookie";
 
 import { UnauthorizedError } from "../errors.js";
+import { deleteCachedSession, readCachedSession, writeCachedSession } from "../services/sessionCache.js";
 
 export const SESSION_COOKIE_NAME = "sid";
 
@@ -38,6 +39,24 @@ export const sessionAuthPlugin = fp(async (app: FastifyInstance) => {
     const sessionId = readCookieSessionId(req) ?? readBearerToken(req);
     if (!sessionId) return;
 
+    const redis = app.redis;
+    if (redis) {
+      const cached = await readCachedSession(redis, sessionId);
+      if (cached) {
+        if (cached.expiresAt.getTime() <= Date.now()) {
+          await deleteCachedSession(redis, sessionId);
+          return;
+        }
+
+        req.sessionContext = {
+          sessionId: cached.id,
+          userId: cached.userId,
+          activeWorkspaceId: cached.activeWorkspaceId ?? null,
+        };
+        return;
+      }
+    }
+
     const session = await app.prisma.session.findUnique({
       where: { id: sessionId },
       select: { id: true, userId: true, activeWorkspaceId: true, expiresAt: true },
@@ -47,7 +66,17 @@ export const sessionAuthPlugin = fp(async (app: FastifyInstance) => {
     if (session.expiresAt.getTime() <= Date.now()) {
       // Best-effort cleanup
       await app.prisma.session.delete({ where: { id: sessionId } }).catch(() => {});
+      if (redis) await deleteCachedSession(redis, sessionId);
       return;
+    }
+
+    if (redis) {
+      await writeCachedSession(redis, {
+        id: session.id,
+        userId: session.userId,
+        activeWorkspaceId: session.activeWorkspaceId ?? null,
+        expiresAt: session.expiresAt,
+      });
     }
 
     req.sessionContext = {
