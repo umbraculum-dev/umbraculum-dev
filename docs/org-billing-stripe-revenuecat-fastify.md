@@ -3,7 +3,7 @@
 **Context (what you have today)**
 - You already have **auth** and a multi-tenant model: **Workspaces** with **Users** and **Memberships** (many users per workspace).
 - Note: in practice, a **Workspace usually represents an organization/team** (brewery/club) for billing and limits.
-- You plan **tiers** (e.g., Free / Premium / Professional) that primarily control **limits/quotas**, e.g.:
+- You plan **tiers** (Free / Premium / Pro / Pro Plus) that primarily control **limits/quotas**, e.g.:
   - “number of recipes per workspace”
   - “number of versions per recipe”
 
@@ -120,12 +120,13 @@ Backend guardrails (v1):
 
 ---
 
-## Tier model (3 entitlements = tiers)
+## Tier model (4 entitlements = tiers)
 
 Example entitlements (mutually exclusive):
 - `tier_free` (optional, usually implied)
 - `tier_premium`
 - `tier_pro`
+- `tier_pro_plus`
 
 **Rule in backend:** “effective tier” is the highest active entitlement, or the explicit tier stored in your DB.
 
@@ -134,6 +135,8 @@ Example entitlements (mutually exclusive):
 - `free.max_versions_per_recipe = 2`
 - `pro.max_recipes_per_workspace = 99`
 - `pro.max_versions_per_recipe = 5`
+- `pro_plus.max_recipes_per_workspace = 1000`
+- `pro_plus.max_versions_per_recipe = 99`
 
 ---
 
@@ -178,7 +181,7 @@ Example entitlements (mutually exclusive):
 ### Billing
 - `workspace_billing`
   - `workspace_id` (PK)
-  - `tier` (enum: `free|premium|pro`)
+  - `tier` (enum: `free|premium|pro|pro_plus`)
   - `expires_at` (nullable)
   - `source` (enum: `stripe|apple|google|manual`)
   - `stripe_customer_id` (nullable)
@@ -342,7 +345,8 @@ You primarily care about:
 **Actions**
 1. Map `app_user_id` → `user_id`.
 2. Compute effective tier for this user:
-   - if `tier_pro` active → tier = `pro`
+   - if `tier_pro_plus` active → tier = `pro_plus`
+   - else if `tier_pro` active → tier = `pro`
    - else if `tier_premium` active → tier = `premium`
    - else → tier = `free`
 3. Resolve which workspace should receive this tier:
@@ -440,6 +444,7 @@ For each tier:
 - iOS product id(s): `com.yourapp.tier.pro.monthly`
 - Android product id(s): `tier_pro_monthly`
 - RevenueCat entitlement: `tier_pro`
+- RevenueCat entitlement: `tier_pro_plus`
 
 Ensure:
 - exactly one “tier entitlement” is active per workspace at a time (or compute “highest tier wins”).
