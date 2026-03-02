@@ -437,6 +437,46 @@ RevenueCat identity is user-scoped:
 
 ---
 
+## External accounts TODO checklist (Stripe + RevenueCat)
+
+This project can be implemented and tested locally without external accounts (stub mode), but production wiring requires the following.
+
+### Stripe TODOs
+
+- Create Stripe account + set up **4 tiers** (`free`, `premium`, `pro`, `pro_plus`) as products/prices.
+- Create Stripe Pricing Table(s) and capture:
+  - `STRIPE_PRICING_TABLE_ID`
+  - `STRIPE_PUBLISHABLE_KEY`
+- Configure Stripe webhook to call:
+  - `POST /webhooks/stripe`
+- Set `STRIPE_WEBHOOK_SECRET` in your runtime environment.
+  - Note: local dev may keep `STRIPE_WEBHOOK_SECRET="..."` as a placeholder; webhook strict mode should only be enabled when a real secret is configured.
+
+### RevenueCat TODOs
+
+- Create RevenueCat project + apps (iOS/Android).
+- Define entitlements:
+  - `tier_free` (optional)
+  - `tier_premium`
+  - `tier_pro`
+  - `tier_pro_plus`
+- Map products (Apple/Google product identifiers) into those entitlements.
+- Configure RevenueCat webhooks:
+  - endpoint URL: `POST /webhooks/revenuecat`
+  - configure a fixed Authorization header value and set it in your runtime environment:
+    - `REVENUECAT_WEBHOOK_AUTH` (exact match to the Authorization header that RevenueCat will send)
+- Server-side RevenueCat API access:
+  - set `REVENUECAT_SECRET_KEY` (RevenueCat secret key) for calling their API from Fastify
+  - implement Stripe→RevenueCat linking in the Stripe webhook handler:
+    - `POST /v1/receipts` with `X-Platform: stripe`, `fetch_token=sub_...`, `app_user_id=user_id`
+
+### Native TODOs
+
+- Configure RevenueCat SDK in native and call `Purchases.logIn(userId)` after `POST /auth/login/native`.
+- Implement “Restore purchases (v1)” UX from this doc (workspace picker + intent + restore + confirm).
+
+---
+
 ## Appendix: Tier mapping checklist
 
 For each tier:

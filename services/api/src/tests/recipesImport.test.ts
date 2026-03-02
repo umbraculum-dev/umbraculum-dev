@@ -5,19 +5,19 @@ import { createSessionForTestUser } from "./helpers/session.js";
 describe("recipes import (BeerXML/BeerJSON)", () => {
   const app = buildApp();
   let cookie = "";
-  let accountId = "";
+  let workspaceId = "";
   const createdRecipeIds: string[] = [];
 
   beforeAll(async () => {
     await app.ready();
     const sess = await createSessionForTestUser(app, { activeAccount: true });
     cookie = sess.cookie;
-    accountId = sess.accountId;
+    workspaceId = sess.workspaceId;
   });
 
   afterAll(async () => {
     if (createdRecipeIds.length) {
-      await app.prisma.recipe.deleteMany({ where: { id: { in: createdRecipeIds }, accountId } });
+      await app.prisma.recipe.deleteMany({ where: { id: { in: createdRecipeIds }, workspaceId } });
     }
     await app.close();
   });

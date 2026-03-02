@@ -5,7 +5,7 @@ import { createSessionForTestUser } from "./helpers/session.js";
 describe("brew sessions (account scoped)", () => {
   const app = buildApp();
   let cookie = "";
-  let accountId = "";
+  let workspaceId = "";
   let recipeId = "";
   let brewSessionId = "";
 
@@ -13,7 +13,7 @@ describe("brew sessions (account scoped)", () => {
     await app.ready();
     const sess = await createSessionForTestUser(app, { activeAccount: true });
     cookie = sess.cookie;
-    accountId = sess.accountId;
+    workspaceId = sess.workspaceId;
 
     const beerJsonRecipeJson = {
       beerjson: {
@@ -71,10 +71,10 @@ describe("brew sessions (account scoped)", () => {
     if (brewSessionId) {
       await app.prisma.brewSessionLog.deleteMany({ where: { brewSessionId } });
       await app.prisma.brewSessionStep.deleteMany({ where: { brewSessionId } });
-      await app.prisma.brewSession.deleteMany({ where: { id: brewSessionId, accountId } });
+      await app.prisma.brewSession.deleteMany({ where: { id: brewSessionId, workspaceId } });
     }
     if (recipeId) {
-      await app.prisma.recipe.deleteMany({ where: { id: recipeId, accountId } });
+      await app.prisma.recipe.deleteMany({ where: { id: recipeId, workspaceId } });
     }
     await app.close();
   });
@@ -212,7 +212,7 @@ describe("brew sessions (account scoped)", () => {
     } finally {
       await app.prisma.brewSessionLog.deleteMany({ where: { brewSessionId: id2 } });
       await app.prisma.brewSessionStep.deleteMany({ where: { brewSessionId: id2 } });
-      await app.prisma.brewSession.deleteMany({ where: { id: id2, accountId } });
+      await app.prisma.brewSession.deleteMany({ where: { id: id2, workspaceId } });
     }
   });
 
@@ -294,7 +294,7 @@ describe("brew sessions (account scoped)", () => {
     } finally {
       await app.prisma.brewSessionLog.deleteMany({ where: { brewSessionId: id2 } });
       await app.prisma.brewSessionStep.deleteMany({ where: { brewSessionId: id2 } });
-      await app.prisma.brewSession.deleteMany({ where: { id: id2, accountId } });
+      await app.prisma.brewSession.deleteMany({ where: { id: id2, workspaceId } });
     }
   });
 
@@ -363,7 +363,7 @@ describe("brew sessions (account scoped)", () => {
     } finally {
       await app.prisma.brewSessionLog.deleteMany({ where: { brewSessionId: id2 } });
       await app.prisma.brewSessionStep.deleteMany({ where: { brewSessionId: id2 } });
-      await app.prisma.brewSession.deleteMany({ where: { id: id2, accountId } });
+      await app.prisma.brewSession.deleteMany({ where: { id: id2, workspaceId } });
     }
   });
 

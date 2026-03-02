@@ -6,18 +6,18 @@ describe("recipes export (BeerJSON strict)", () => {
   const app = buildApp();
   let cookie = "";
   let createdRecipeId = "";
-  let accountId = "";
+  let workspaceId = "";
 
   beforeAll(async () => {
     await app.ready();
     const sess = await createSessionForTestUser(app, { activeAccount: true });
     cookie = sess.cookie;
-    accountId = sess.accountId;
+    workspaceId = sess.workspaceId;
   });
 
   afterAll(async () => {
     if (createdRecipeId) {
-      await app.prisma.recipe.deleteMany({ where: { id: createdRecipeId, accountId } });
+      await app.prisma.recipe.deleteMany({ where: { id: createdRecipeId, workspaceId } });
     }
     await app.close();
   });

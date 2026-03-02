@@ -5,6 +5,7 @@ import { redisClientPlugin } from "./plugins/redisClient.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
 import { sessionAuthPlugin } from "./plugins/sessionAuth.js";
 import { errorHandlerPlugin } from "./plugins/errorHandler.js";
+import { webhookRawBodyPlugin } from "./plugins/webhookRawBody.js";
 import { healthRoutes } from "./routes/health.js";
 import { authRoutes } from "./routes/auth.js";
 import { workspacesRoutes } from "./routes/workspaces.js";
@@ -25,11 +26,15 @@ import { platformRecipesRoutes } from "./routes/platformRecipes.js";
 import { brewdaySettingsRoutes } from "./routes/brewdaySettings.js";
 import { brewSessionsRoutes } from "./routes/brewSessions.js";
 import { inventoryRoutes } from "./routes/inventory.js";
+import { billingRoutes } from "./routes/billing.js";
+import { webhooksStripeRoutes } from "./routes/webhooksStripe.js";
+import { webhooksRevenuecatRoutes } from "./routes/webhooksRevenuecat.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
 
   app.register(errorHandlerPlugin);
+  app.register(webhookRawBodyPlugin);
   // Dev-only CORS to allow Expo web preview (Metro) to call the API directly.
   // Native requests don't use browser CORS, but `expo start --web` does.
   if (process.env.NODE_ENV !== "production") {
@@ -73,6 +78,9 @@ export function buildApp() {
   app.register(brewdaySettingsRoutes);
   app.register(brewSessionsRoutes);
   app.register(inventoryRoutes);
+  app.register(billingRoutes);
+  app.register(webhooksStripeRoutes);
+  app.register(webhooksRevenuecatRoutes);
 
   return app;
 }

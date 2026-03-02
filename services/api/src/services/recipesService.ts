@@ -1,8 +1,9 @@
-import { Prisma, type PrismaClient } from "@prisma/client";
-import { BadRequestError, NotFoundError } from "../errors.js";
+import { Prisma, type BillingTier, type PrismaClient } from "@prisma/client";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 import { normalizeBeerJsonRecipeUnits, validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 import { validateBeerJsonRecipeDomain } from "../beerjson/recipeDomainValidator.js";
+import { getTierLimits } from "./tierLimitsService.js";
 import {
   defaultMashDiPh,
   defaultMashTaToPh57_mEqPerKg,
@@ -31,6 +32,26 @@ export class RecipesService {
 
   constructor(private readonly prisma: PrismaClient) {
     this.workspaces = new WorkspacesService(prisma);
+  }
+
+  private async getWorkspaceTier(workspaceId: string): Promise<BillingTier> {
+    const rec = await this.prisma.workspaceBilling.findUnique({
+      where: { workspaceId },
+      select: { tier: true },
+    });
+    return rec?.tier ?? "free";
+  }
+
+  private async assertRecipeLimitForWorkspace(workspaceId: string): Promise<void> {
+    const tier = await this.getWorkspaceTier(workspaceId);
+    const limits = getTierLimits(tier);
+    const groups = await this.prisma.recipe.groupBy({
+      by: ["versionGroupId"],
+      where: { workspaceId },
+    });
+    if (groups.length >= limits.maxRecipesPerWorkspace) {
+      throw new ForbiddenError("plan_limit_recipes", "Recipe limit reached. Upgrade to add more.");
+    }
   }
 
   private async listLatestVersionsForWorkspace(workspaceId: string) {
@@ -107,6 +128,8 @@ export class RecipesService {
 
     const source = await this.getRecipe(userId, workspaceId, recipeId);
     const versionGroupId = (source as any).versionGroupId ?? (source as any).id ?? recipeId;
+    const tier = await this.getWorkspaceTier(workspaceId);
+    const limits = getTierLimits(tier);
 
     return this.prisma.$transaction(async (tx) => {
       const agg = await tx.recipe.aggregate({
@@ -115,6 +138,9 @@ export class RecipesService {
       });
 
       const maxVersion = agg._max.version ?? 0;
+      if (maxVersion >= limits.maxVersionsPerRecipe - 1) {
+        throw new ForbiddenError("plan_limit_versions", "Version limit reached. Upgrade to add more versions.");
+      }
       if (maxVersion >= 99) {
         throw new BadRequestError(
           "max_versions_reached",
@@ -168,6 +194,7 @@ export class RecipesService {
 
   async duplicateRecipe(userId: string, workspaceId: string, recipeId: string) {
     await this.workspaces.assertMembership(userId, workspaceId);
+    await this.assertRecipeLimitForWorkspace(workspaceId);
 
     const source = await this.getRecipe(userId, workspaceId, recipeId);
 
@@ -296,6 +323,7 @@ export class RecipesService {
 
   async createRecipe(userId: string, workspaceId: string, input: CreateRecipeInput) {
     await this.workspaces.assertMembership(userId, workspaceId);
+    await this.assertRecipeLimitForWorkspace(workspaceId);
     return this.createRecipeCore(workspaceId, input);
   }
 

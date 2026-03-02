@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
 
 const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
-const DEV_ACCOUNT_ID = "00000000-0000-0000-0000-0000000000a1";
+const DEV_WORKSPACE_ID = "00000000-0000-0000-0000-0000000000a1";
 const WATER_PROFILES_SOURCE = "brunwater_1_25";
 const BJCP2021_COMMIT_SHA = "fe9063dff1e86c3aa9d8c65a1c730b4a807e48c3";
 const SAMPLE_AD_GLOBAL_TOP_ID = "00000000-0000-0000-0000-00000000ad01";
@@ -204,10 +204,10 @@ async function main() {
     },
   });
 
-  await prisma.account.upsert({
-    where: { id: DEV_ACCOUNT_ID },
+  await prisma.workspace.upsert({
+    where: { id: DEV_WORKSPACE_ID },
     create: {
-      id: DEV_ACCOUNT_ID,
+      id: DEV_WORKSPACE_ID,
       name: "Dev Brewery",
       members: {
         create: {
@@ -222,16 +222,16 @@ async function main() {
     },
   });
 
-  // Ensure membership exists (in case account already existed without relation)
-  await prisma.accountMember.upsert({
+  // Ensure membership exists (in case workspace already existed without relation)
+  await prisma.workspaceMember.upsert({
     where: {
-      accountId_userId: {
-        accountId: DEV_ACCOUNT_ID,
+      workspaceId_userId: {
+        workspaceId: DEV_WORKSPACE_ID,
         userId: DEV_USER_ID,
       },
     },
     create: {
-      accountId: DEV_ACCOUNT_ID,
+      workspaceId: DEV_WORKSPACE_ID,
       userId: DEV_USER_ID,
       role: "brewery_admin",
     },
@@ -312,7 +312,7 @@ async function main() {
   if (typeof seededOwnerEmailRaw === "string" && typeof seededOwnerPassword === "string") {
     const seededOwnerEmail = normalizeEmail(seededOwnerEmailRaw);
     if (seededOwnerEmail && seededOwnerEmail.includes("@") && seededOwnerPassword.length >= 8) {
-      const SEEDED_OWNER_ACCOUNT_ID = "00000000-0000-0000-0000-0000000000a2";
+      const SEEDED_OWNER_WORKSPACE_ID = "00000000-0000-0000-0000-0000000000a2";
 
       const passwordHash = await argon2.hash(seededOwnerPassword, { type: argon2.argon2id });
       const user = await prisma.user.upsert({
@@ -322,10 +322,10 @@ async function main() {
         select: { id: true, email: true },
       });
 
-      await prisma.account.upsert({
-        where: { id: SEEDED_OWNER_ACCOUNT_ID },
+      await prisma.workspace.upsert({
+        where: { id: SEEDED_OWNER_WORKSPACE_ID },
         create: {
-          id: SEEDED_OWNER_ACCOUNT_ID,
+          id: SEEDED_OWNER_WORKSPACE_ID,
           name: "Seeded Owner Brewery",
           adsDisabled: true,
           members: {
@@ -338,19 +338,19 @@ async function main() {
         update: { name: "Seeded Owner Brewery", adsDisabled: true },
       });
 
-      await prisma.accountMember.upsert({
+      await prisma.workspaceMember.upsert({
         where: {
-          accountId_userId: {
-            accountId: SEEDED_OWNER_ACCOUNT_ID,
+          workspaceId_userId: {
+            workspaceId: SEEDED_OWNER_WORKSPACE_ID,
             userId: user.id,
           },
         },
-        create: { accountId: SEEDED_OWNER_ACCOUNT_ID, userId: user.id, role: "brewery_admin" },
+        create: { workspaceId: SEEDED_OWNER_WORKSPACE_ID, userId: user.id, role: "brewery_admin" },
         update: { role: "brewery_admin" },
       });
 
       // eslint-disable-next-line no-console
-      console.log(`Seeded admin login: ${user.email} (account: ${SEEDED_OWNER_ACCOUNT_ID})`);
+      console.log(`Seeded admin login: ${user.email} (workspace: ${SEEDED_OWNER_WORKSPACE_ID})`);
     } else {
       // eslint-disable-next-line no-console
       console.log("Skipping SEEDED_OWNER_*: invalid email or password too short.");
@@ -397,7 +397,7 @@ async function main() {
   // eslint-disable-next-line no-console
   console.log(`UserId: ${DEV_USER_ID}`);
   // eslint-disable-next-line no-console
-  console.log(`AccountId: ${DEV_ACCOUNT_ID}`);
+  console.log(`WorkspaceId: ${DEV_WORKSPACE_ID}`);
   // eslint-disable-next-line no-console
   console.log("Auth is cookie-session-based (sid). Use /en/signup or /en/login in the web app.");
 }

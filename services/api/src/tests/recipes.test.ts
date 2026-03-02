@@ -29,6 +29,18 @@ describe("recipes (workspace scoped)", () => {
     const sessNo = await createSessionForTestUser(app, { activeWorkspace: false });
     cookieNoAccount = sessNo.cookie;
 
+    // Keep recipe tests focused on BeerJSON/recipe behavior, not tier limits.
+    await app.prisma.workspaceBilling.upsert({
+      where: { workspaceId: accountAId },
+      create: { workspaceId: accountAId, tier: "pro_plus", source: "manual" },
+      update: { tier: "pro_plus", source: "manual" },
+    });
+    await app.prisma.workspaceBilling.upsert({
+      where: { workspaceId: accountBId },
+      create: { workspaceId: accountBId, tier: "pro_plus", source: "manual" },
+      update: { tier: "pro_plus", source: "manual" },
+    });
+
     await app.prisma.user.upsert({
       where: { id: TEST_USER_ID },
       create: { id: TEST_USER_ID, email: "test-recipes@brewery.local" },

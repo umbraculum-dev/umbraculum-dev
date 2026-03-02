@@ -132,6 +132,9 @@ model User {
   sessions                Session[]
   webviewExchangeCodes    WebviewExchangeCode[]
   emailVerificationTokens EmailVerificationToken[]
+  billingPurchaseIntents  BillingPurchaseIntent[]
+  billingWorkspaceBinding BillingUserWorkspaceBinding?
+  billingEvents           BillingEvent[]
 
   @@index([email])
   @@map("users")
@@ -160,6 +163,10 @@ model Workspace {
   brewdaySettings BrewdaySettings?
   brewSessions  BrewSession[]
   inventoryItems InventoryItem[]
+  billing       WorkspaceBilling?
+  billingPurchaseIntents BillingPurchaseIntent[]
+  billingWorkspaceBindings BillingUserWorkspaceBinding[]
+  billingEvents BillingEvent[]
 
   @@map("workspaces")
 }
@@ -907,4 +914,143 @@ model InventoryItem {
   @@index([workspaceId])
   @@index([workspaceId, category])
   @@map("inventory_items")
+}
+
+enum BillingTier {
+  free
+  premium
+  pro
+  pro_plus
+
+  @@map("billing_tier")
+}
+
+enum BillingSource {
+  stripe
+  apple
+  google
+  manual
+
+  @@map("billing_source")
+}
+
+enum BillingPurchaseProvider {
+  stripe
+  apple
+  google
+
+  @@map("billing_purchase_provider")
+}
+
+enum BillingPurchaseIntentMode {
+  purchase
+  restore
+
+  @@map("billing_purchase_intent_mode")
+}
+
+enum BillingPurchaseIntentStatus {
+  created
+  fulfilled
+  expired
+  cancelled
+
+  @@map("billing_purchase_intent_status")
+}
+
+enum BillingEventProvider {
+  stripe
+  revenuecat
+
+  @@map("billing_event_provider")
+}
+
+model WorkspaceBilling {
+  id          String      @id @default(uuid())
+  workspaceId String      @unique @map("workspace_id")
+  tier        BillingTier @default(free)
+  expiresAt   DateTime?   @map("expires_at")
+  source      BillingSource @default(manual)
+
+  stripeCustomerId     String? @map("stripe_customer_id")
+  stripeSubscriptionId String? @map("stripe_subscription_id")
+
+  /** The RevenueCat app_user_id (equals `user_id`). */
+  rcAppUserId String? @map("rc_app_user_id")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([stripeSubscriptionId])
+  @@map("workspace_billing")
+}
+
+model BillingPurchaseIntent {
+  id String @id @default(uuid())
+
+  userId      String @map("user_id")
+  workspaceId String @map("workspace_id")
+
+  planCode  String @map("plan_code")
+  provider  BillingPurchaseProvider
+  mode      BillingPurchaseIntentMode @default(purchase)
+  status    BillingPurchaseIntentStatus @default(created)
+  expiresAt DateTime @map("expires_at")
+
+  stripeCheckoutSessionId String? @map("stripe_checkout_session_id")
+  stripeSubscriptionId    String? @map("stripe_subscription_id")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  fulfilledAt DateTime? @map("fulfilled_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([userId, workspaceId])
+  @@map("billing_purchase_intents")
+}
+
+model BillingUserWorkspaceBinding {
+  userId      String @id @map("user_id")
+  workspaceId String @map("workspace_id")
+
+  provider BillingPurchaseProvider? @map("provider")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@map("billing_user_workspace_binding")
+}
+
+model BillingEvent {
+  id String @id @default(uuid())
+
+  provider BillingEventProvider
+  externalEventId String? @unique @map("external_event_id")
+
+  userId      String? @map("user_id")
+  workspaceId String? @map("workspace_id")
+
+  payloadJson Json @map("payload_json")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([provider])
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("billing_events")
 }
