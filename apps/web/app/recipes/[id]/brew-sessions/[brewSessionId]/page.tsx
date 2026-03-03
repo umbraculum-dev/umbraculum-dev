@@ -133,6 +133,8 @@ export default function BrewSessionDetailPage() {
   const [steps, setSteps] = useState<BrewSessionStep[]>([]);
   const [stepsBaselineById, setStepsBaselineById] = useState<Record<string, BrewSessionStepBaseline>>({});
   const [logs, setLogs] = useState<BrewSessionLog[]>([]);
+  const LOGS_PAGE_SIZE = 25;
+  const [logsPage, setLogsPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -197,6 +199,16 @@ export default function BrewSessionDetailPage() {
     return reason === "auto" ? "auto" : "manual";
   }, [logs]);
 
+  const sectionHasRunningTimer = useMemo(() => {
+    const running = new Set<string>();
+    for (const st of steps) {
+      if (st.customTimerEnabled === true && st.timerState === "running") {
+        running.add(st.sectionId);
+      }
+    }
+    return (sectionId: string) => running.has(sectionId);
+  }, [steps]);
+
   const refresh = async () => {
     if (!canCall || !brewSessionId) return;
     setError(null);
@@ -250,6 +262,11 @@ export default function BrewSessionDetailPage() {
       setOpenSections((prev) => {
         const nextOpen: Record<string, boolean> = {};
         for (const id of sectionIds) nextOpen[id] = prev[id] ?? false;
+        for (const st of incomingSteps) {
+          if (st.customTimerEnabled === true && st.timerState === "running") {
+            nextOpen[st.sectionId] = true;
+          }
+        }
         return nextOpen;
       });
     } catch (err) {
@@ -267,6 +284,23 @@ export default function BrewSessionDetailPage() {
   useEffect(() => {
     autoStopTriggeredRef.current = false;
   }, [brewSessionId]);
+
+  useEffect(() => {
+    setLogsPage(1);
+  }, [brewSessionId]);
+
+  const logsTotalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(logs.length / LOGS_PAGE_SIZE));
+  }, [logs.length]);
+
+  useEffect(() => {
+    setLogsPage((p) => Math.min(Math.max(1, p), logsTotalPages));
+  }, [logsTotalPages]);
+
+  const visibleLogs = useMemo(() => {
+    const start = (logsPage - 1) * LOGS_PAGE_SIZE;
+    return logs.slice(start, start + LOGS_PAGE_SIZE);
+  }, [logs, logsPage]);
 
   useEffect(() => {
     const anyRunning = steps.some((s) => s.timerState === "running");
@@ -380,12 +414,25 @@ export default function BrewSessionDetailPage() {
     });
   };
 
+  const isStepDirtyForLogs = (s: BrewSessionStep) => {
+    const baseline = stepsBaselineById[s.id];
+    if (!baseline) return false;
+    return (
+      baseline.name !== s.name ||
+      baseline.status !== s.status ||
+      baseline.isDisabled !== s.isDisabled ||
+      (baseline.note ?? "") !== (s.note ?? "")
+    );
+  };
+
   const onSaveSteps = async () => {
     if (!canCall || !brewSessionId) return;
     setSaveStatus(null);
     setSaveError(null);
     setSavingSteps(true);
     try {
+      const dirtyForLogs = steps.filter(isStepDirtyForLogs);
+
       const payload = steps.map((s) => ({
         id: s.id,
         sectionId: s.sectionId,
@@ -405,6 +452,25 @@ export default function BrewSessionDetailPage() {
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       const nextSteps = (res.data as any)?.steps;
       setSteps(Array.isArray(nextSteps) ? (nextSteps as BrewSessionStep[]) : steps);
+
+      // Persist log-relevant edits (status/note/name/isDisabled) too, so "Save brewing session"
+      // matches user expectations during brewing.
+      for (const st of dirtyForLogs) {
+        const derivedStatus = st.isDisabled ? "skipped" : st.status ?? "pending";
+        const r = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${st.id}/log`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: derivedStatus,
+            note: st.note ?? null,
+            name: st.name,
+            isDisabled: st.isDisabled,
+          }),
+        });
+        if (!r.ok) throw new Error(typeof r.data === "string" ? r.data : JSON.stringify(r.data));
+      }
+
+      await refresh();
       setSaveStatus(t("saveSuccess"));
     } catch (err) {
       setSaveError(String(err));
@@ -1410,6 +1476,19 @@ export default function BrewSessionDetailPage() {
         </XStack>
       </View>
 
+      <View
+        mt="$2"
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$2"
+        p="$3"
+      >
+        <SizableText size="$2" fontFamily="$body" color="var(--text)" mt={0}>
+          {t("timersAndLogsHelpNote")}
+        </SizableText>
+      </View>
+
       {saveStatus ? <MessageBox variant="success" dismissAfter={3500} onDismiss={() => setSaveStatus(null)}>{saveStatus}</MessageBox> : null}
       {saveError ? <ErrorBox>{saveError}</ErrorBox> : null}
       {removeStepSuccess ? (
@@ -1521,7 +1600,10 @@ export default function BrewSessionDetailPage() {
             </View>
           }
           open={openSections[g.sectionId] ?? false}
-          onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, [g.sectionId]: open }))}
+          onOpenChange={(open) => {
+            if (!open && sectionHasRunningTimer(g.sectionId)) return;
+            setOpenSections((prev) => ({ ...prev, [g.sectionId]: open }));
+          }}
         >
           <YStack gap="$2">
             {showMashSectionTimer && mashAnchorStep ? (
@@ -1674,9 +1756,14 @@ export default function BrewSessionDetailPage() {
               const relativeCountdownSecondsRaw = computeRelativeCountdownSeconds(st);
               const relativeCountdownSecondsDisplay =
                 relativeCountdownSecondsRaw == null ? null : Math.max(0, relativeCountdownSecondsRaw);
-              const showRelativeCountdown = relativeCountdownSecondsRaw != null && !!relativeBase?.timerStartedAt;
+              const isRelativeCountdownRelevant = !st.isDisabled && st.status === "pending";
+              const showRelativeCountdown =
+                isRelativeCountdownRelevant && relativeCountdownSecondsRaw != null && !!relativeBase?.timerStartedAt;
               const showOldestDueWarning =
-                st.id === oldestDueStepId && relativeCountdownSecondsRaw != null && relativeCountdownSecondsRaw <= 0;
+                isRelativeCountdownRelevant &&
+                st.id === oldestDueStepId &&
+                relativeCountdownSecondsRaw != null &&
+                relativeCountdownSecondsRaw <= 0;
               const relativeCountdownLine =
                 relativeCountdownSecondsRaw != null && relativeCountdownSecondsRaw < 0
                   ? t("relativeOverdueByLine", {
@@ -1962,16 +2049,21 @@ export default function BrewSessionDetailPage() {
 
                           <YStack gap="$1">
                             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-                              {t("timerLine", {
-                                elapsed: formatElapsedSeconds(elapsed),
-                                planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
-                              })}
-                              {remainingSeconds != null ? (
+                              {st.timerState === "stopped"
+                                ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) } as any)
+                                : t("timerLine", {
+                                    elapsed: formatElapsedSeconds(elapsed),
+                                    planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
+                                  })}
+                              {st.timerState !== "stopped" && remainingSeconds != null ? (
                                 <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
                                   {" "}· {t("countdownLine", { remaining: formatElapsedSeconds(remainingSeconds) })}
                                 </SizableText>
                               ) : null}
-                              {relativeCountdownSecondsDisplay != null && !showRelativeCountdown ? (
+                              {st.timerState !== "stopped" &&
+                              isRelativeCountdownRelevant &&
+                              relativeCountdownSecondsDisplay != null &&
+                              !showRelativeCountdown ? (
                                 <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
                                   {" "}· {relativeCountdownLine}
                                 </SizableText>
@@ -2077,8 +2169,46 @@ export default function BrewSessionDetailPage() {
                 </SizableText>
               </H2>
             </RecipeEditSummary>
+            {logsTotalPages > 1 ? (
+              <XStack
+                mt="$2"
+                gap="$2"
+                items="center"
+                flexWrap="wrap"
+                aria-label={t("logsPagination.ariaLabel")}
+              >
+                <Button
+                  onPress={() => setLogsPage((p) => Math.max(1, p - 1))}
+                  disabled={logsPage <= 1}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
+                  {t("logsPagination.prev")}
+                </Button>
+                <Button
+                  onPress={() => setLogsPage((p) => Math.min(logsTotalPages, p + 1))}
+                  disabled={logsPage >= logsTotalPages}
+                  size="$3"
+                  bg="var(--surface-2)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  color="var(--text)"
+                  fontFamily="$body"
+                >
+                  {t("logsPagination.next")}
+                </Button>
+                <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" mt={0}>
+                  {t("logsPagination.status", { page: String(logsPage), pages: String(logsTotalPages) } as any)}
+                </SizableText>
+              </XStack>
+            ) : null}
+
             <YStack gap="$1" mt="$2">
-              {logs.map((l) => (
+              {visibleLogs.map((l) => (
                 <SizableText key={l.id} size="$2" fontFamily="$body" color="var(--text)">
                   <SizableText as="span" size="$2" fontFamily="$body" color="var(--text-muted)">
                     <CodeInline>{l.createdAt}</CodeInline>{" "}

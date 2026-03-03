@@ -684,6 +684,12 @@
       "sessionAutoFinishedAtLine": "Session automatically marked as finished on: {at}",
       "sessionManualFinishedAtLine": "Session manually marked as finished on: {at}",
       "logsTitle": "Logs",
+      "logsPagination": {
+        "ariaLabel": "Brew session logs pagination",
+        "prev": "Previous",
+        "next": "Next",
+        "status": "Page {page} of {pages}"
+      },
       "addCustomStepTitle": "Add new custom step for current recipe",
       "stepNameLabel": "Name",
       "stepNamePlaceholder": "Enter step name",
@@ -716,6 +722,7 @@
       "cancelDelete": "Cancel",
       "deleting": "Deleting…",
       "timerLine": "Timer: elapsed {elapsed} · planned {planned} min",
+      "timerLineStopped": "Timer: stopped · elapsed {elapsed}",
       "countdownLine": "remaining {remaining}",
       "relativeToLabel": "Relative to",
       "relativeToNone": "(none)",
@@ -731,6 +738,7 @@
       "startBoilTimerMin": "Start boil timer ({minutes})",
       "activateCustomTimerLabel": "Activate custom timer",
       "dateSectionTitle": "Date",
+      "timersAndLogsHelpNote": "Timers run automatically for some steps, i.e. for 'hops additions' after boil timer gets started. It is also possible to start custom timers for single steps (often used when you want to check/log the duration of a specific step). IMPORTANT: when manually flagging a step (or multiple steps) to 'Done' or other status in a section, remember to click 'Save section logs' (or 'Save brewing session') otherwise your changes won't be saved.",
       "datePickerLabel": "Scheduled date & time",
       "dateLabel": "Date",
       "timeLabel": "Time",

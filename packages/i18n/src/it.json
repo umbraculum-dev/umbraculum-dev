@@ -691,6 +691,12 @@
       "sessionAutoFinishedAtLine": "Sessione segnata automaticamente come completata il: {at}",
       "sessionManualFinishedAtLine": "Sessione segnata manualmente come completata il: {at}",
       "logsTitle": "Log",
+      "logsPagination": {
+        "ariaLabel": "Paginazione log sessione di brew",
+        "prev": "Precedente",
+        "next": "Successiva",
+        "status": "Pagina {page} di {pages}"
+      },
       "addCustomStepTitle": "Aggiungi nuovo step personalizzato per la ricetta corrente",
       "stepNameLabel": "Nome",
       "stepNamePlaceholder": "Inserisci nome step",
@@ -723,6 +729,7 @@
       "cancelDelete": "Annulla",
       "deleting": "Eliminazione…",
       "timerLine": "Timer: trascorso {elapsed} · pianificato {planned} min",
+      "timerLineStopped": "Timer: fermato · trascorso {elapsed}",
       "countdownLine": "rimanente {remaining}",
       "relativeToLabel": "Relativo a",
       "relativeToNone": "(nessuno)",
@@ -738,6 +745,7 @@
       "startBoilTimerMin": "Avvia timer bollitura ({minutes})",
       "activateCustomTimerLabel": "Attiva timer personalizzato",
       "dateSectionTitle": "Data",
+      "timersAndLogsHelpNote": "Alcuni timer partono automaticamente per certi step (ad es. per le aggiunte di luppolo dopo l'avvio del timer bollitura). È anche possibile avviare timer personalizzati per singoli step per log personalizzati (di solito se vuoi misurare la durata di uno step specifico). IMPORTANTE: quando imposti manualmente uno step (o più step) su 'Fatto' o su un altro stato all'interno di una sezione, ricordati di cliccare su 'Salva log sezione' (o su 'Salva sessione brewing') altrimenti le modifiche non verranno salvate.",
       "datePickerLabel": "Data e ora programmate",
       "dateLabel": "Data",
       "timeLabel": "Ora",
