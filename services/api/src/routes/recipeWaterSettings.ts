@@ -269,6 +269,24 @@ export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
           : body.spargeStepTemperatureC === null
             ? null
             : undefined,
+      spargeStepTimeMin:
+        typeof body.spargeStepTimeMin === "number"
+          ? body.spargeStepTimeMin
+          : body.spargeStepTimeMin === null
+            ? null
+            : undefined,
+      spargeStepRampMin:
+        typeof body.spargeStepRampMin === "number"
+          ? body.spargeStepRampMin
+          : body.spargeStepRampMin === null
+            ? null
+            : undefined,
+      spargeMethodType:
+        typeof body.spargeMethodType === "string"
+          ? body.spargeMethodType
+          : body.spargeMethodType === null
+            ? null
+            : undefined,
 
       spargeLastAcidRequiredMl:
         typeof body.spargeLastAcidRequiredMl === "number"

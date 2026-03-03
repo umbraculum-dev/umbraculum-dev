@@ -79,6 +79,10 @@ export type UpsertRecipeWaterSettingsInput = {
 
   spargeStepTemperatureC?: number | null;
 
+  spargeStepTimeMin?: number | null;
+  spargeStepRampMin?: number | null;
+  spargeMethodType?: string | null;
+
   // Boil/kettle add-on water (v0)
   boilSourceWaterProfileId?: string | null;
   boilTargetWaterProfileId?: string | null;
@@ -484,6 +488,41 @@ export class RecipeWaterSettingsService {
           throw new BadRequestError("invalid_sparge_step_temperature", "Body.spargeStepTemperatureC must be 0–100");
         }
         data.spargeStepTemperatureC = v;
+      }
+    }
+
+    const SPARGE_METHOD_ALLOWLIST = new Set(["fly_sparge", "batch_sparge"]);
+    if (input.spargeStepTimeMin !== undefined) {
+      if (input.spargeStepTimeMin === null) data.spargeStepTimeMin = null;
+      else {
+        const v = input.spargeStepTimeMin;
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 600) {
+          throw new BadRequestError("invalid_sparge_step_time", "Body.spargeStepTimeMin must be 0–600");
+        }
+        data.spargeStepTimeMin = v;
+      }
+    }
+    if (input.spargeStepRampMin !== undefined) {
+      if (input.spargeStepRampMin === null) data.spargeStepRampMin = null;
+      else {
+        const v = input.spargeStepRampMin;
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 120) {
+          throw new BadRequestError("invalid_sparge_step_ramp", "Body.spargeStepRampMin must be 0–120");
+        }
+        data.spargeStepRampMin = v;
+      }
+    }
+    if (input.spargeMethodType !== undefined) {
+      if (input.spargeMethodType === null) data.spargeMethodType = null;
+      else {
+        const v = input.spargeMethodType;
+        if (typeof v !== "string" || !SPARGE_METHOD_ALLOWLIST.has(v)) {
+          throw new BadRequestError(
+            "invalid_sparge_method_type",
+            'Body.spargeMethodType must be "fly_sparge" or "batch_sparge"',
+          );
+        }
+        data.spargeMethodType = v;
       }
     }
 

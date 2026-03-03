@@ -22,7 +22,7 @@ import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "..
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseSpargeComputeAndSaveResponse } from "@brewery/contracts";
-import { formatWithHint } from "../../../../../src/i18n/format";
+import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -59,6 +59,7 @@ export default function SpargeWaterPage() {
   const locale = useLocale();
   const tWater = useTranslations("recipes.water.common");
   const t = useTranslations("recipes.water.sparge");
+  const tEdit = useTranslations("recipes.edit");
   const tUnits = useTranslations("units");
   const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
@@ -114,6 +115,13 @@ export default function SpargeWaterPage() {
   const [spargeOverall, setSpargeOverall] = useState<any | null>(null);
   const [spargeSaltsInputsKey, setSpargeSaltsInputsKey] = useState<string | null>(null);
   const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
+
+  const [spargeStepTimeMin, setSpargeStepTimeMin] = useState(60);
+  const [spargeStepRampMin, setSpargeStepRampMin] = useState(0);
+  const [spargeMethodType, setSpargeMethodType] = useState<"fly_sparge" | "batch_sparge">("fly_sparge");
+  const [spargeStepTemp, setSpargeStepTemp] = useState(75);
+  const [savingSpargeConfig, setSavingSpargeConfig] = useState(false);
+  const [spargeConfigSaveStatus, setSpargeConfigSaveStatus] = useState<string | null>(null);
 
   const fmt = (unitKey: string, value: unknown, fallback: number) =>
     formatWithHint(locale, value, formatHints, unitKey, fallback);
@@ -309,6 +317,25 @@ export default function SpargeWaterPage() {
   const saveSettings = async (patch: Record<string, unknown>) => {
     if (!canCall) return;
     await saveRecipeWaterSettings(recipeId, patch);
+  };
+
+  const onSaveSpargeConfig = async () => {
+    setSavingError(null);
+    setSpargeConfigSaveStatus(null);
+    setSavingSpargeConfig(true);
+    try {
+      await saveSettings({
+        spargeStepTimeMin: Math.max(0, Math.min(600, spargeStepTimeMin)),
+        spargeStepRampMin: Math.max(0, Math.min(120, spargeStepRampMin)),
+        spargeMethodType,
+        spargeStepTemperatureC: Math.round(Math.max(0, Math.min(100, spargeStepTemp)) * 10) / 10,
+      });
+      setSpargeConfigSaveStatus("Saved sparge configuration.");
+    } catch (err) {
+      setSavingError(String(err));
+    } finally {
+      setSavingSpargeConfig(false);
+    }
   };
 
   const onSaveSpargeInputs = async () => {
@@ -649,6 +676,120 @@ export default function SpargeWaterPage() {
       ) : null}
 
       <YStack gap="$4">
+        <View className="brew-panel" aria-labelledby="sparge-config-heading">
+          <H2 id="sparge-config-heading" mt={0}>
+            {t("spargeConfigurationHeading")}
+          </H2>
+          <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+            <View flex={1} minWidth={120}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="sparge-step-time">
+                  {tEdit("mashingStepTime", { unit: "min" })}
+                </RecipeEditFieldLabel>
+                <Input
+                  id="sparge-step-time"
+                  keyboardType="decimal-pad"
+                  value={String(spargeStepTimeMin)}
+                  onChangeText={(text) => setSpargeStepTimeMin(Math.max(0, Math.min(600, Number(text) || 0)))}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
+                />
+              </YStack>
+            </View>
+            <View flex={1} minWidth={120}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="sparge-step-ramp">
+                  {tEdit("mashingStepRamp", { unit: "min" })}
+                </RecipeEditFieldLabel>
+                <Input
+                  id="sparge-step-ramp"
+                  keyboardType="decimal-pad"
+                  value={String(spargeStepRampMin)}
+                  onChangeText={(text) => setSpargeStepRampMin(Math.max(0, Math.min(120, Number(text) || 0)))}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
+                />
+              </YStack>
+            </View>
+            <View flex={1} minWidth={120}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="sparge-method-type">
+                  {tEdit("mashingStepType")}
+                </RecipeEditFieldLabel>
+                <BrewSelect
+                  id="sparge-method-type"
+                  value={spargeMethodType}
+                  onValueChange={(v) => setSpargeMethodType(v as "fly_sparge" | "batch_sparge")}
+                  options={[
+                    { value: "fly_sparge", label: t("spargeMethodFlySparge") },
+                    { value: "batch_sparge", label: t("spargeMethodBatchSparge") },
+                  ]}
+                  width="full"
+                />
+              </YStack>
+            </View>
+            <View flex={1} minWidth={120}>
+              <YStack gap="$1.5">
+                <RecipeEditFieldLabel htmlFor="sparge-step-temp">
+                  {tEdit("mashingStepTemp", { unit: tUnits("C") })}
+                </RecipeEditFieldLabel>
+                <Input
+                  id="sparge-step-temp"
+                  keyboardType="decimal-pad"
+                  value={formatFixed(locale, spargeStepTemp, 1)}
+                  onChangeText={(text) => {
+                    const parsed = Number(String(text).replace(",", "."));
+                    setSpargeStepTemp(Math.max(0, Math.min(100, Number.isFinite(parsed) ? parsed : 0)));
+                  }}
+                  size="$3"
+                  w="100%"
+                  bg="var(--surface)"
+                  borderWidth={1}
+                  borderColor="var(--border)"
+                  rounded="$2"
+                  fontFamily="$body"
+                />
+              </YStack>
+            </View>
+          </XStack>
+          <YStack mt="$3" gap="$2">
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <Button
+                size="$3"
+                bg="var(--surface-2)"
+                borderWidth={1}
+                borderColor="var(--border)"
+                color="var(--text)"
+                onPress={() => void onSaveSpargeConfig()}
+                disabled={!canCall || savingSpargeConfig}
+              >
+                {savingSpargeConfig ? "Saving…" : "Save"}
+              </Button>
+            </XStack>
+            {spargeConfigSaveStatus ? (
+              <MessageBox
+                variant="success"
+                role="status"
+                aria-live="polite"
+                dismissAfter={5000}
+                onDismiss={() => setSpargeConfigSaveStatus(null)}
+              >
+                {spargeConfigSaveStatus}
+              </MessageBox>
+            ) : null}
+          </YStack>
+        </View>
+
         <View className="brew-panel" aria-labelledby="sparge-heading">
           <H2 id="sparge-heading" mt={0}>
             {t("acidificationHeading")}

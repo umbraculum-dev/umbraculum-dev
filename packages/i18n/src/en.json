@@ -859,6 +859,7 @@
       "duplicateRecipeWorking": "Duplicating…",
       "brewNote": "Launching the brew recipe creates the brew steps, lods necessary raw materiales and initialize logs if applicable.",
       "programmedSectionLabel": "Programmed",
+      "brewingNowLabel": "Brewing now",
       "lastBrewedLabel": "Last brewed",
       "lastBrewedLoading": "Loading brew sessions…",
       "brewingHistoryEmpty": "No brew sessions yet for this recipe.",
@@ -1097,6 +1098,9 @@
       },
       "sparge": {
         "title": "Sparge water",
+        "spargeConfigurationHeading": "Sparge configuration",
+        "spargeMethodFlySparge": "Fly Sparge",
+        "spargeMethodBatchSparge": "Batch Sparge",
         "acidificationHeading": "Sparge acidification",
         "resultLastCalculated": "Result (last calculated)",
         "saltAdditionsManualV0": "Sparge salt additions (manual)",

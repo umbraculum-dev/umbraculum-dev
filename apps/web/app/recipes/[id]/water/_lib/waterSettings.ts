@@ -71,6 +71,10 @@ export type RecipeWaterSettings = {
 
   spargeStepTemperatureC?: number | null;
 
+  spargeStepTimeMin?: number | null;
+  spargeStepRampMin?: number | null;
+  spargeMethodType?: string | null;
+
   spargeLastAcidRequiredMl: number | null;
   spargeLastAcidRequiredTsp: number | null;
   spargeLastAcidRequiredGrams: number | null;

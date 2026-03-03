@@ -67,7 +67,7 @@ For **non-dehusked** roasted malts, the v1 default TA uses a **weak saturating c
 
 ## Residual alkalinity (RA) appendix (Palmer/Kolbach)
 
-We plan to surface RA as a **secondary recap metric** because many brewers are familiar with it (and tools like BrewersFriend often show RA-style summaries). RA should be presented as a **rule-of-thumb** check, not as the core mash pH predictor.
+We plan to surface RA as a **secondary recap metric** because many brewers are familiar with it (and tools like bfr often show RA-style summaries). RA should be presented as a **rule-of-thumb** check, not as the core mash pH predictor.
 
 ### Definitions and unit conventions
 

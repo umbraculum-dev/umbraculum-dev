@@ -137,6 +137,7 @@ export default function RecipeEditPage() {
   const tNav = useTranslations("nav");
   const tUnits = useTranslations("units");
   const tWater = useTranslations("waterHub");
+  const tSparge = useTranslations("recipes.water.sparge");
   const locale = useLocale();
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -268,6 +269,7 @@ export default function RecipeEditPage() {
       status: string;
       createdAt: string;
       startedAt: string | null;
+      stoppedAt: string | null;
       scheduledDate: string | null;
     }[]
   >([]);
@@ -283,8 +285,6 @@ export default function RecipeEditPage() {
   const [mashProcedure, setMashProcedure] = useState<{ name: string; grainTemperatureC: number } | null>(null);
   const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
   const [waterSettings, setWaterSettings] = useState<RecipeWaterSettingsResponse["settings"]>(null);
-  const [spargeStepTempSaving, setSpargeStepTempSaving] = useState(false);
-  const [spargeStepTempLocal, setSpargeStepTempLocal] = useState<number | null>(null);
   const [yeastAttenuationOverrides, setYeastAttenuationOverrides] = useState<Record<string, string>>({});
   const [boilTimeMinutes, setBoilTimeMinutes] = useState<string>("");
 
@@ -374,6 +374,7 @@ export default function RecipeEditPage() {
             status: s?.status ?? "",
             createdAt: s?.createdAt ?? "",
             startedAt: s?.startedAt ?? null,
+            stoppedAt: s?.stoppedAt ?? null,
             scheduledDate: s?.scheduledDate ?? null,
           })),
         );
@@ -393,27 +394,21 @@ export default function RecipeEditPage() {
       brewSessions.filter((s) => s.scheduledDate != null && s.startedAt == null),
     [brewSessions]
   );
+  const brewingNowSessions = useMemo(
+    () =>
+      brewSessions.filter((s) => s.startedAt != null && s.stoppedAt == null),
+    [brewSessions]
+  );
   const lastBrewSessions = useMemo(
-    () => brewSessions.filter((s) => s.startedAt != null),
+    () => brewSessions.filter((s) => s.startedAt != null && s.stoppedAt != null),
     [brewSessions]
   );
 
-  const spargeStepTempDisplay =
-    spargeStepTempLocal ?? waterSettings?.spargeStepTemperatureC ?? 76;
-
-  const saveSpargeStepTemperature = async (tempC: number) => {
-    if (!canCallAccountScoped || !recipeId) return;
-    setSpargeStepTempSaving(true);
-    try {
-      const data = await saveRecipeWaterSettings(recipeId, { spargeStepTemperatureC: tempC });
-      setWaterSettings(data.settings);
-      setSpargeStepTempLocal(null);
-    } catch {
-      setSpargeStepTempLocal(null);
-    } finally {
-      setSpargeStepTempSaving(false);
-    }
-  };
+  const spargeStepTempDisplay = waterSettings?.spargeStepTemperatureC ?? 75;
+  const spargeMethodLabel =
+    waterSettings?.spargeMethodType === "batch_sparge"
+      ? tSparge("spargeMethodBatchSparge")
+      : tSparge("spargeMethodFlySparge");
 
   const [visibilityRefreshTrigger, setVisibilityRefreshTrigger] = useState(0);
 
@@ -2352,6 +2347,33 @@ export default function RecipeEditPage() {
             onOpenChange={(open) => setSectionOpen("brewingHistory", open)}
           >
             <YStack gap="$2" mt="$2">
+              {brewingNowSessions.length > 0 ? (
+                <RecipeEditFieldBlock variant="inProgress" header={t("brewingNowLabel")} mt={0} mb={0}>
+                  <RecipeEditList gap="$1" mt="$1" mb={0}>
+                    {brewingNowSessions.map((s) => {
+                      const dateStr = s.startedAt ?? s.createdAt;
+                      const displayDate = dateStr
+                        ? new Date(dateStr).toLocaleString(locale, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "—";
+                      return (
+                        <SizableText as="li" key={s.id} size="$2" fontFamily="$body" color="var(--text)">
+                          <Link href={`/recipes/${recipeId}/brew-sessions/${s.id}`}>{s.code}</Link>
+                          {" · "}
+                          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
+                            {displayDate}
+                          </SizableText>
+                        </SizableText>
+                      );
+                    })}
+                  </RecipeEditList>
+                </RecipeEditFieldBlock>
+              ) : null}
               {programmedSessions.length > 0 ? (
                 <RecipeEditFieldBlock variant="computed" header={t("programmedSectionLabel")} mt={0} mb={0}>
                   <RecipeEditList gap="$1" mt="$1" mb={0}>
@@ -2407,7 +2429,7 @@ export default function RecipeEditPage() {
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("lastBrewedLoading")}
                 </SizableText>
-              ) : programmedSessions.length === 0 && lastBrewSessions.length === 0 ? (
+              ) : programmedSessions.length === 0 && lastBrewSessions.length === 0 && brewingNowSessions.length === 0 ? (
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("brewingHistoryEmpty")}
                 </SizableText>
@@ -2575,45 +2597,19 @@ export default function RecipeEditPage() {
                         </YStack>
                         <YStack gap="$1" minW={80}>
                           <RecipeEditFieldLabel>{t("mashingStepType")}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>Sparge</RecipeEditReadOnlyValue>
+                          <RecipeEditReadOnlyValue>{spargeMethodLabel}</RecipeEditReadOnlyValue>
                         </YStack>
                         <YStack gap="$1" minW={60}>
-                          <RecipeEditFieldLabel htmlFor="sparge-step-temp">
-                            {t("mashingStepTemp", { unit: "°C" })}
-                          </RecipeEditFieldLabel>
-                          <Input
-                            id="sparge-step-temp"
-                            value={spargeStepTempDisplay === null || spargeStepTempDisplay === undefined ? "" : String(spargeStepTempDisplay)}
-                            onChangeText={(text) => {
-                              if (text === "") {
-                                setSpargeStepTempLocal(null);
-                              } else {
-                                const v = parseFloat(text);
-                                setSpargeStepTempLocal(Number.isFinite(v) ? v : null);
-                              }
-                            }}
-                            onBlur={() => {
-                              const v = spargeStepTempLocal;
-                              if (v !== null && Number.isFinite(v) && v >= 0 && v <= 100) {
-                                void saveSpargeStepTemperature(v);
-                              } else {
-                                setSpargeStepTempLocal(null);
-                              }
-                            }}
-                            keyboardType="numeric"
-                            disabled={spargeStepTempSaving}
-                            size="$3"
-                            w="100%"
-                            bg="var(--surface)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            rounded="$2"
-                            fontFamily="$body"
-                          />
+                          <RecipeEditFieldLabel>{t("mashingStepTemp", { unit: "°C" })}</RecipeEditFieldLabel>
+                          <RecipeEditReadOnlyValue>
+                            {formatFixed(locale, spargeStepTempDisplay, 1)}
+                          </RecipeEditReadOnlyValue>
                         </YStack>
                         <YStack gap="$1" minW={50}>
                           <RecipeEditFieldLabel>{t("mashingStepTime", { unit: "min" })}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>0</RecipeEditReadOnlyValue>
+                          <RecipeEditReadOnlyValue>
+                            {waterSettings?.spargeStepTimeMin ?? 60}
+                          </RecipeEditReadOnlyValue>
                         </YStack>
                         <YStack gap="$1" minW={80}>
                           <RecipeEditFieldLabel>{t("mashingStepAmount", { unit: "L" })}</RecipeEditFieldLabel>
@@ -2623,7 +2619,9 @@ export default function RecipeEditPage() {
                         </YStack>
                         <YStack gap="$1" minW={50}>
                           <RecipeEditFieldLabel>{t("mashingStepRamp", { unit: "min" })}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>—</RecipeEditReadOnlyValue>
+                          <RecipeEditReadOnlyValue>
+                            {waterSettings?.spargeStepRampMin ?? 0}
+                          </RecipeEditReadOnlyValue>
                         </YStack>
                       </XStack>
                     </RecipeEditIngredientCard>

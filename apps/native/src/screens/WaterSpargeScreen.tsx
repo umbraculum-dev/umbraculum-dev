@@ -21,6 +21,13 @@ function bicarbonatePpmToAlkalinityPpmCaCO3(bicarbPpm: number): number {
   return bicarbPpm * (50 / 61);
 }
 
+function formatFixed(locale: string, value: number, fractionDigits: number): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
+}
+
 function PickerField(props: {
   label: string;
   value: string;
@@ -100,6 +107,7 @@ export function WaterSpargeScreen() {
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
 
   const { t } = useT("recipes.water.sparge");
+  const { t: tEdit } = useT("recipes.edit");
   const { t: tCommon } = useT("common");
   const { t: tUnits } = useT("units");
   const { t: tWaterCommon } = useT("recipes.water.common");
@@ -110,7 +118,14 @@ export function WaterSpargeScreen() {
   const [settings, setSettings] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [openSections, setOpenSections] = useState<string[]>(["acidification", "salts"]);
+  const [openSections, setOpenSections] = useState<string[]>(["spargeConfig", "acidification", "salts"]);
+
+  const [spargeStepTimeMin, setSpargeStepTimeMin] = useState(60);
+  const [spargeStepRampMin, setSpargeStepRampMin] = useState(0);
+  const [spargeMethodType, setSpargeMethodType] = useState<"fly_sparge" | "batch_sparge">("fly_sparge");
+  const [spargeStepTemp, setSpargeStepTemp] = useState(75);
+  const [savingSpargeConfig, setSavingSpargeConfig] = useState(false);
+  const [spargeConfigSaveStatus, setSpargeConfigSaveStatus] = useState<string | null>(null);
 
   const [spargeWaterProfileId, setSpargeWaterProfileId] = useState("");
   const [startingAlk, setStartingAlk] = useState(0);
@@ -197,6 +212,12 @@ export function WaterSpargeScreen() {
           setStrengthKind(((s.spargeStrengthKind as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
           setStrengthValue((s.spargeStrengthValue as number) ?? 10);
           setAcidificationMode(s.spargeAcidificationMode === "manual" ? "manual" : "targetPh");
+          setSpargeStepTimeMin((s.spargeStepTimeMin as number) ?? 60);
+          setSpargeStepRampMin((s.spargeStepRampMin as number) ?? 0);
+          setSpargeMethodType(
+            (s.spargeMethodType as string) === "batch_sparge" ? "batch_sparge" : "fly_sparge",
+          );
+          setSpargeStepTemp((s.spargeStepTemperatureC as number) ?? 75);
           const savedManual =
             (s.spargeStrengthKind as string) === "solid"
               ? (s.spargeManualAcidAddedGrams as number) ?? 0
@@ -352,6 +373,26 @@ export function WaterSpargeScreen() {
     }
   };
 
+  const onSaveSpargeConfig = async () => {
+    if (!canCall) return;
+    setError(null);
+    setSpargeConfigSaveStatus(null);
+    setSavingSpargeConfig(true);
+    try {
+      await saveSettings({
+        spargeStepTimeMin: Math.max(0, Math.min(600, spargeStepTimeMin)),
+        spargeStepRampMin: Math.max(0, Math.min(120, spargeStepRampMin)),
+        spargeMethodType,
+        spargeStepTemperatureC: Math.round(Math.max(0, Math.min(100, spargeStepTemp)) * 10) / 10,
+      });
+      setSpargeConfigSaveStatus("Saved sparge configuration.");
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setSavingSpargeConfig(false);
+    }
+  };
+
   const onSaveSalts = async () => {
     if (!canCall) return;
     setError(null);
@@ -423,6 +464,97 @@ export function WaterSpargeScreen() {
           value={openSections}
           onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : next ? [next] : [])}
         >
+          <Accordion.Item value="spargeConfig">
+            <Card gap="$2" mt="$2">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Heading fontSize={18}>{t("spargeConfigurationHeading")}</Heading>
+                    <Text opacity={0.7}>{openSections.includes("spargeConfig") ? "▾" : "▸"}</Text>
+                  </View>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <View style={{ gap: 12 }}>
+                  <View>
+                    <Text fontSize={11} opacity={0.8} mb="$1">
+                      {tEdit("mashingStepTime", { unit: "min" })}
+                    </Text>
+                    <Input
+                      keyboardType="decimal-pad"
+                      value={String(spargeStepTimeMin)}
+                      onChangeText={(text) =>
+                        setSpargeStepTimeMin(Math.max(0, Math.min(600, Number(text) || 0)))
+                      }
+                      size="$3"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                    />
+                  </View>
+                  <View>
+                    <Text fontSize={11} opacity={0.8} mb="$1">
+                      {tEdit("mashingStepRamp", { unit: "min" })}
+                    </Text>
+                    <Input
+                      keyboardType="decimal-pad"
+                      value={String(spargeStepRampMin)}
+                      onChangeText={(text) =>
+                        setSpargeStepRampMin(Math.max(0, Math.min(120, Number(text) || 0)))
+                      }
+                      size="$3"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                    />
+                  </View>
+                  <PickerField
+                    label={tEdit("mashingStepType")}
+                    value={spargeMethodType}
+                    options={[
+                      { value: "fly_sparge", label: t("spargeMethodFlySparge") },
+                      { value: "batch_sparge", label: t("spargeMethodBatchSparge") },
+                    ]}
+                    onChange={(v) => setSpargeMethodType(v as "fly_sparge" | "batch_sparge")}
+                    closeLabel={tCommon("close")}
+                  />
+                  <View>
+                    <Text fontSize={11} opacity={0.8} mb="$1">
+                      {tEdit("mashingStepTemp", { unit: tUnits("C") })}
+                    </Text>
+                    <Input
+                      keyboardType="decimal-pad"
+                      value={formatFixed(locale, spargeStepTemp, 1)}
+                      onChangeText={(text) => {
+                        const parsed = Number(String(text).replace(",", "."));
+                        setSpargeStepTemp(
+                          Math.max(0, Math.min(100, Number.isFinite(parsed) ? parsed : 0)),
+                        );
+                      }}
+                      size="$3"
+                      background="$background"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                    />
+                  </View>
+                  <Button
+                    size="$3"
+                    chromeless
+                    onPress={onSaveSpargeConfig}
+                    disabled={!canCall || savingSpargeConfig}
+                  >
+                    <Text>{savingSpargeConfig ? "Saving…" : "Save"}</Text>
+                  </Button>
+                  {spargeConfigSaveStatus ? (
+                    <Text fontSize={12} color="$green11">
+                      {spargeConfigSaveStatus}
+                    </Text>
+                  ) : null}
+                </View>
+              </Accordion.Content>
+            </Card>
+          </Accordion.Item>
+
           <Accordion.Item value="acidification">
             <Card gap="$2" mt="$2">
               <Accordion.Header>

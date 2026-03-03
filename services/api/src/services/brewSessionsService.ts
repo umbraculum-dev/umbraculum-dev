@@ -295,6 +295,9 @@ export class BrewSessionsService {
       }
       const spargeVol = (ws as any).spargeVolumeLiters;
       if (typeof spargeVol === "number" && spargeVol > 0) {
+        const spargeMethodType = (ws as any).spargeMethodType;
+        const spargeMethodLabel = spargeMethodType === "batch_sparge" ? "Batch Sparge" : "Fly Sparge";
+        steps.push({ sectionId: "sparge", sectionName: null, name: `Sparge - ${spargeMethodLabel}` });
         steps.push({ sectionId: "sparge", sectionName: null, name: `Add sparge water (${Math.round(spargeVol * 10) / 10} L)` });
       }
       const spargeSalts = (ws as any).spargeSaltAdditionsJson;

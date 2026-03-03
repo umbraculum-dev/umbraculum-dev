@@ -3,7 +3,7 @@
 **NOTE:** This revision has been superseded by `docs/architechture-Rev02.md` (new source of truth). Keep Rev01 as historical context; apply new decisions in Rev02.
 
 **Status:** v0.2 (living document)  
-**Primary goal:** ship a BrewersFriend-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2-codex).  
+**Primary goal:** ship a bfr-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2-codex).  
 **Guiding principle:** keep the backend *boring* (monolith, predictable patterns), make offline reliable without early sync complexity, and keep decisions easy to review and evolve.
 
 ---

@@ -546,6 +546,11 @@ model RecipeWaterSettings {
   // Sparge step temperature (editable in Edit recipe when sparge is configured)
   spargeStepTemperatureC Float? @default(76) @map("sparge_step_temperature_c")
 
+  // Sparge configuration (Time, Ramp, Type)
+  spargeStepTimeMin Int?    @default(60) @map("sparge_step_time_min")
+  spargeStepRampMin Int?    @default(0) @map("sparge_step_ramp_min")
+  spargeMethodType  String? @default("fly_sparge") @map("sparge_method_type")
+
   // Boil/kettle add-on water (v0): separate from mash/sparge.
   // Profile selections (like mash)
   boilSourceWaterProfileId   String? @map("boil_source_water_profile_id")

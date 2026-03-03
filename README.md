@@ -1,6 +1,6 @@
 # Brewing SaaS (WIP)
 
-This repository is the start of a BrewersFriend-style product: a **desktop-first web app** plus **native mobile apps** focused on **brew-day reliability** and **offline-first logging**.
+This repository is the start of a bfr-style product: a **desktop-first web app** plus **native mobile apps** focused on **brew-day reliability** and **offline-first logging**.
 
 ## Big picture (start here)
 

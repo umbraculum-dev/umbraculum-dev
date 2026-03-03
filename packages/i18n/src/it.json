@@ -866,6 +866,7 @@
       "duplicateRecipeWorking": "Duplicazione…",
       "brewNote": "Lanciare la ricetta di brassaggio crea gli step di brassaggio, carica le materie prime necessarie e inizializza i log se applicabile.",
       "programmedSectionLabel": "Programmati",
+      "brewingNowLabel": "In corso",
       "lastBrewedLabel": "Ultimi brassaggi",
       "lastBrewedLoading": "Caricamento sessioni di brassaggio…",
       "brewingHistoryEmpty": "Nessuna sessione di brassaggio per questa ricetta.",
@@ -1104,6 +1105,9 @@
       },
       "sparge": {
         "title": "Acqua sparge",
+        "spargeConfigurationHeading": "Configurazione sparge",
+        "spargeMethodFlySparge": "Fly Sparge",
+        "spargeMethodBatchSparge": "Batch Sparge",
         "acidificationHeading": "Acidificazione sparge",
         "resultLastCalculated": "Risultato (ultimo calcolo)",
         "saltAdditionsManualV0": "Aggiunte di sali sparge (manuale)",

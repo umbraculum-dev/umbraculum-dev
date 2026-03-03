@@ -206,6 +206,7 @@ export function RecipeEditScreen() {
   const navigation = useNavigation();
   const recipeId = (route.params as { recipeId?: string })?.recipeId ?? "";
   const { t } = useT("recipes.edit");
+  const { t: tSparge } = useT("recipes.water.sparge");
   const { t: tRecipes } = useT("recipes");
   const { t: tCommon } = useT("common");
   const { t: tEquip } = useT("equipment");
@@ -271,6 +272,9 @@ export function RecipeEditScreen() {
   const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
   const [waterSettings, setWaterSettings] = useState<{
     spargeStepTemperatureC?: number | null;
+    spargeStepTimeMin?: number | null;
+    spargeStepRampMin?: number | null;
+    spargeMethodType?: string | null;
   } | null>(null);
 
   const canCall = auth.state.status === "logged_in" && Boolean(baseUrl) && Boolean(token);
@@ -489,7 +493,7 @@ export function RecipeEditScreen() {
       try {
         const res = await api.get(`/api/recipes/${recipeId}/water-settings`);
         if (cancelled) return;
-        const data = (res.data as { settings?: { spargeStepTemperatureC?: number | null } })?.settings;
+        const data = (res.data as { settings?: Record<string, unknown> })?.settings;
         setWaterSettings(data ?? null);
       } catch {
         if (!cancelled) setWaterSettings(null);
@@ -1807,13 +1811,13 @@ export function RecipeEditScreen() {
                         {t("spargeStepFromWaterPage")}
                       </Text>
                       <View style={{ gap: 12 }}>
-                        {spargeRows.length > 0
+                            {spargeRows.length > 0
                           ? spargeRows.map((r, idx) => {
                               const isCanonicalSparge =
                                 r.name.trim().toLowerCase() === "sparge" && waterVolumes != null;
                               const tempC =
-                                isCanonicalSparge && waterSettings?.spargeStepTemperatureC != null
-                                  ? waterSettings.spargeStepTemperatureC
+                                isCanonicalSparge
+                                  ? (waterSettings?.spargeStepTemperatureC ?? 75)
                                   : r.stepTemperatureC;
                               const amountDisplay =
                                 isCanonicalSparge && waterVolumes
@@ -1821,6 +1825,17 @@ export function RecipeEditScreen() {
                                   : r.amountL != null && Number.isFinite(r.amountL)
                                     ? formatFixed(locale, r.amountL, 2)
                                     : "—";
+                              const typeDisplay = isCanonicalSparge
+                                ? (waterSettings?.spargeMethodType === "batch_sparge"
+                                    ? tSparge("spargeMethodBatchSparge")
+                                    : tSparge("spargeMethodFlySparge"))
+                                : r.type;
+                              const timeDisplay = isCanonicalSparge
+                                ? (waterSettings?.spargeStepTimeMin ?? 60)
+                                : (r.stepTimeMin != null ? r.stepTimeMin : 0);
+                              const rampDisplay = isCanonicalSparge
+                                ? (waterSettings?.spargeStepRampMin ?? 0)
+                                : (r.rampTimeMin != null ? r.rampTimeMin : 0);
                               return (
                                 <View
                                   key={r.id}
@@ -1846,7 +1861,7 @@ export function RecipeEditScreen() {
                                       <Text fontSize={11} opacity={0.8} mb="$1">
                                         {t("mashingStepType")}
                                       </Text>
-                                      <Text fontSize={12}>{r.type}</Text>
+                                      <Text fontSize={12}>{typeDisplay}</Text>
                                     </View>
                                     <View>
                                       <Text fontSize={11} opacity={0.8} mb="$1">
@@ -1864,9 +1879,13 @@ export function RecipeEditScreen() {
                                       <Text fontSize={11} opacity={0.8} mb="$1">
                                         {t("mashingStepTime", { unit: "min" })}
                                       </Text>
-                                      <Text fontSize={12}>
-                                        {r.stepTimeMin != null ? String(r.stepTimeMin) : "0"}
+                                      <Text fontSize={12}>{timeDisplay}</Text>
+                                    </View>
+                                    <View>
+                                      <Text fontSize={11} opacity={0.8} mb="$1">
+                                        {t("mashingStepRamp", { unit: "min" })}
                                       </Text>
+                                      <Text fontSize={12}>{rampDisplay}</Text>
                                     </View>
                                     <View>
                                       <Text fontSize={11} opacity={0.8} mb="$1">
@@ -1904,7 +1923,11 @@ export function RecipeEditScreen() {
                                   <Text fontSize={11} opacity={0.8} mb="$1">
                                     {t("mashingStepType")}
                                   </Text>
-                                  <Text fontSize={12}>Sparge</Text>
+                                  <Text fontSize={12}>
+                                    {waterSettings?.spargeMethodType === "batch_sparge"
+                                      ? tSparge("spargeMethodBatchSparge")
+                                      : tSparge("spargeMethodFlySparge")}
+                                  </Text>
                                 </View>
                                 <View>
                                   <Text fontSize={11} opacity={0.8} mb="$1">
@@ -1913,7 +1936,7 @@ export function RecipeEditScreen() {
                                   <Text fontSize={12}>
                                     {formatFixed(
                                       locale,
-                                      waterSettings?.spargeStepTemperatureC != null ? waterSettings.spargeStepTemperatureC : 76,
+                                      waterSettings?.spargeStepTemperatureC ?? 75,
                                       waterSettings?.spargeStepTemperatureC != null &&
                                         !Number.isInteger(waterSettings.spargeStepTemperatureC)
                                         ? 1
@@ -1925,7 +1948,17 @@ export function RecipeEditScreen() {
                                   <Text fontSize={11} opacity={0.8} mb="$1">
                                     {t("mashingStepTime", { unit: "min" })}
                                   </Text>
-                                  <Text fontSize={12}>0</Text>
+                                  <Text fontSize={12}>
+                                    {waterSettings?.spargeStepTimeMin ?? 60}
+                                  </Text>
+                                </View>
+                                <View>
+                                  <Text fontSize={11} opacity={0.8} mb="$1">
+                                    {t("mashingStepRamp", { unit: "min" })}
+                                  </Text>
+                                  <Text fontSize={12}>
+                                    {waterSettings?.spargeStepRampMin ?? 0}
+                                  </Text>
                                 </View>
                                 <View>
                                   <Text fontSize={11} opacity={0.8} mb="$1">
