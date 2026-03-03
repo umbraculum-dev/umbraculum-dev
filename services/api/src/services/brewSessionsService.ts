@@ -42,6 +42,32 @@ export class BrewSessionsService {
     this.recipes = new RecipesService(prisma);
   }
 
+  async updateStepCustomTimerEnabled(
+    userId: string,
+    workspaceId: string,
+    brewSessionId: string,
+    stepId: string,
+    customTimerEnabled: boolean
+  ) {
+    await this.workspaces.assertMembership(userId, workspaceId);
+    const session = await this.prisma.brewSession.findFirst({
+      where: { id: brewSessionId, workspaceId },
+      select: { id: true },
+    });
+    if (!session) throw new NotFoundError("brew_session_not_found", "Brew session not found");
+
+    const step = await this.prisma.brewSessionStep.findFirst({
+      where: { id: stepId, brewSessionId },
+      select: { id: true },
+    });
+    if (!step) throw new NotFoundError("step_not_found", "Step not found");
+
+    return this.prisma.brewSessionStep.update({
+      where: { id: stepId },
+      data: { customTimerEnabled },
+    });
+  }
+
   private async assertRecipeInWorkspace(userId: string, workspaceId: string, recipeId: string) {
     await this.workspaces.assertMembership(userId, workspaceId);
     const recipe = await this.prisma.recipe.findFirst({

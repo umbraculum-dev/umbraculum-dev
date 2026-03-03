@@ -367,6 +367,60 @@ describe("brew sessions (account scoped)", () => {
     }
   });
 
+  it("persists customTimerEnabled on a step", async () => {
+    const created = await app.inject({
+      method: "POST",
+      url: `/recipes/${recipeId}/brew-sessions`,
+      headers: { cookie },
+    });
+    expect(created.statusCode).toBe(200);
+    const id2 = (created.json() as any).brewSession.id as string;
+
+    try {
+      const detail1 = await app.inject({
+        method: "GET",
+        url: `/brew-sessions/${id2}`,
+        headers: { cookie },
+      });
+      expect(detail1.statusCode).toBe(200);
+      const steps1 = ((detail1.json() as any).brewSession.steps ?? []) as any[];
+      expect(steps1.length).toBeGreaterThan(0);
+      const stepId = steps1[0].id as string;
+
+      const patch = await app.inject({
+        method: "PATCH",
+        url: `/brew-sessions/${id2}/steps/${stepId}`,
+        headers: { cookie },
+        payload: { customTimerEnabled: true },
+      });
+      expect(patch.statusCode).toBe(200);
+      expect((patch.json() as any)?.ok).toBe(true);
+      expect((patch.json() as any)?.step?.customTimerEnabled).toBe(true);
+
+      const timerStarted = await app.inject({
+        method: "POST",
+        url: `/brew-sessions/${id2}/steps/${stepId}/timer/start`,
+        headers: { cookie },
+      });
+      expect(timerStarted.statusCode).toBe(200);
+
+      const detail2 = await app.inject({
+        method: "GET",
+        url: `/brew-sessions/${id2}`,
+        headers: { cookie },
+      });
+      expect(detail2.statusCode).toBe(200);
+      const steps2 = ((detail2.json() as any).brewSession.steps ?? []) as any[];
+      const updated = steps2.find((s) => s.id === stepId);
+      expect(updated).toBeTruthy();
+      expect(updated.customTimerEnabled).toBe(true);
+    } finally {
+      await app.prisma.brewSessionLog.deleteMany({ where: { brewSessionId: id2 } });
+      await app.prisma.brewSessionStep.deleteMany({ where: { brewSessionId: id2 } });
+      await app.prisma.brewSession.deleteMany({ where: { id: id2, workspaceId } });
+    }
+  });
+
   it("allows deleting a stopped session", async () => {
     // Create another session, stop it, then delete.
     const created = await app.inject({

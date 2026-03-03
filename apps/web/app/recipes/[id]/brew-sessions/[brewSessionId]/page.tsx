@@ -145,6 +145,8 @@ export default function BrewSessionDetailPage() {
   const [sessionActionError, setSessionActionError] = useState<string | null>(null);
 
   const [stepActionError, setStepActionError] = useState<string | null>(null);
+  const [saveSectionLogsWorkingSectionId, setSaveSectionLogsWorkingSectionId] = useState<string | null>(null);
+  const [saveSectionLogsStatus, setSaveSectionLogsStatus] = useState<string | null>(null);
   const [removeStepWorking, setRemoveStepWorking] = useState<string | null>(null);
   const [removeStepSuccess, setRemoveStepSuccess] = useState<string | null>(null);
 
@@ -216,7 +218,17 @@ export default function BrewSessionDetailPage() {
         setDateInputValue("");
         setTimeInputValue("");
       }
-      setSteps(Array.isArray(s?.steps) ? (s.steps as BrewSessionStep[]) : []);
+      const incomingSteps = Array.isArray(s?.steps) ? (s.steps as BrewSessionStep[]) : [];
+      setSteps((prev) => {
+        const prevById = new Map(prev.map((st) => [st.id, st]));
+        return incomingSteps.map((st) => {
+          const prevStep = prevById.get(st.id);
+          if (prevStep?.customTimerEnabled === true && st.customTimerEnabled !== true) {
+            return { ...st, customTimerEnabled: true };
+          }
+          return st;
+        });
+      });
       setStepsBaselineById(() => {
         const list = Array.isArray(s?.steps) ? (s.steps as BrewSessionStep[]) : [];
         const entries: [string, BrewSessionStepBaseline][] = list.map((st) => [
@@ -232,12 +244,14 @@ export default function BrewSessionDetailPage() {
       });
       setLogs(Array.isArray(s?.logs) ? (s.logs as BrewSessionLog[]) : []);
 
-      const nextOpen: Record<string, boolean> = {};
       const sectionIds = Array.isArray(s?.steps)
         ? [...new Set((s.steps as BrewSessionStep[]).map((st) => st.sectionId))]
         : [];
-      for (const id of sectionIds) nextOpen[id] = openSections[id] ?? false;
-      setOpenSections(nextOpen);
+      setOpenSections((prev) => {
+        const nextOpen: Record<string, boolean> = {};
+        for (const id of sectionIds) nextOpen[id] = prev[id] ?? false;
+        return nextOpen;
+      });
     } catch (err) {
       setError(String(err));
     } finally {
@@ -446,6 +460,11 @@ export default function BrewSessionDetailPage() {
 
   const onDeleteSession = async () => {
     if (!canCall || !brewSessionId) return;
+    if (!canDeleteSession) {
+      setDeleteConfirmShown(false);
+      setDeleteError(t("deleteSessionStopBeforeDelete"));
+      return;
+    }
     setDeleteError(null);
     setDeleting(true);
     try {
@@ -464,24 +483,69 @@ export default function BrewSessionDetailPage() {
   const onSaveStepLog = async (stepId: string) => {
     if (!canCall || !brewSessionId) return;
     setStepActionError(null);
+    setSaveSectionLogsStatus(null);
     try {
       const step = steps.find((s) => s.id === stepId);
       if (!step) return;
-      const derivedStatus = step.isDisabled ? "skipped" : step.status ?? "pending";
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${stepId}/log`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: derivedStatus,
-          note: step.note ?? null,
-          name: step.name,
-          isDisabled: step.isDisabled,
-        }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+
+      const sectionId = step.sectionId;
+      const sectionSteps = steps.filter((s) => s.sectionId === sectionId).slice().sort((a, b) => a.sortOrder - b.sortOrder);
+      const isDirty = (s: BrewSessionStep) => {
+        const baseline = stepsBaselineById[s.id];
+        if (!baseline) return false;
+        return (
+          baseline.name !== s.name ||
+          baseline.status !== s.status ||
+          baseline.isDisabled !== s.isDisabled ||
+          (baseline.note ?? "") !== (s.note ?? "")
+        );
+      };
+      const dirtySteps = sectionSteps.filter(isDirty);
+      const toSave = dirtySteps.length > 0 ? dirtySteps : [step];
+
+      setSaveSectionLogsWorkingSectionId(sectionId);
+      for (const st of toSave) {
+        const derivedStatus = st.isDisabled ? "skipped" : st.status ?? "pending";
+        const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${st.id}/log`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: derivedStatus,
+            note: st.note ?? null,
+            name: st.name,
+            isDisabled: st.isDisabled,
+          }),
+        });
+        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      }
+
       await refresh();
+      setSaveSectionLogsStatus(t("saveSuccess"));
     } catch (err) {
       setStepActionError(String(err));
+    } finally {
+      setSaveSectionLogsWorkingSectionId(null);
+    }
+  };
+
+  const onToggleCustomTimerEnabled = async (stepId: string, enabled: boolean) => {
+    setStepActionError(null);
+    setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, customTimerEnabled: enabled } : s)));
+    if (!canCall || !brewSessionId) return;
+    try {
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${stepId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customTimerEnabled: enabled }),
+      });
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const updated = (res.data as any)?.step as Partial<BrewSessionStep> | undefined;
+      if (updated) {
+        setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...updated } : s)));
+      }
+    } catch (err) {
+      setStepActionError(String(err));
+      setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, customTimerEnabled: !enabled } : s)));
     }
   };
 
@@ -526,8 +590,33 @@ export default function BrewSessionDetailPage() {
     try {
       const datePart = dateInputValue.trim();
       const timePart = timeInputValue.trim() || "00:00";
-      const combined = datePart ? `${datePart}T${timePart}` : null;
-      const payload = combined ? { scheduledDate: combined } : { scheduledDate: null };
+      const buildScheduledDateIsoUtc = () => {
+        if (!datePart) return null;
+        const [yRaw, mRaw, dRaw] = datePart.split("-");
+        const [hhRaw, mmRaw] = timePart.split(":");
+        const y = parseInt(yRaw ?? "", 10);
+        const m = parseInt(mRaw ?? "", 10);
+        const d = parseInt(dRaw ?? "", 10);
+        const hh = parseInt(hhRaw ?? "", 10);
+        const mm = parseInt(mmRaw ?? "", 10);
+        if (
+          !Number.isFinite(y) ||
+          !Number.isFinite(m) ||
+          !Number.isFinite(d) ||
+          !Number.isFinite(hh) ||
+          !Number.isFinite(mm)
+        ) {
+          throw new Error("Invalid scheduled date/time");
+        }
+        const local = new Date(y, m - 1, d, hh, mm, 0, 0);
+        if (Number.isNaN(local.getTime())) {
+          throw new Error("Invalid scheduled date/time");
+        }
+        return local.toISOString();
+      };
+
+      const scheduledDate = buildScheduledDateIsoUtc();
+      const payload = scheduledDate ? { scheduledDate } : { scheduledDate: null };
       const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -1007,8 +1096,16 @@ export default function BrewSessionDetailPage() {
             ) : null}
 
             <Button
-              onPress={() => setDeleteConfirmShown((v) => !v)}
-              disabled={!canCall || deleting || !canDeleteSession}
+              onPress={() => {
+                if (!canDeleteSession) {
+                  setDeleteConfirmShown(false);
+                  setDeleteError(t("deleteSessionStopBeforeDelete"));
+                  return;
+                }
+                setDeleteError(null);
+                setDeleteConfirmShown((v) => !v);
+              }}
+              disabled={!canCall || deleting}
               size="$3"
               bg="var(--surface-2)"
               borderWidth={1}
@@ -1049,7 +1146,7 @@ export default function BrewSessionDetailPage() {
                 <XStack gap="$2" items="center" flexWrap="wrap">
                   <Button
                     onPress={() => void onDeleteSession()}
-                    disabled={!canCall || deleting || !canDeleteSession}
+                    disabled={!canCall || deleting}
                     size="$3"
                     bg="var(--surface-2)"
                     borderWidth={1}
@@ -1318,6 +1415,11 @@ export default function BrewSessionDetailPage() {
       {removeStepSuccess ? (
         <MessageBox variant="success" dismissAfter={3500} onDismiss={() => setRemoveStepSuccess(null)}>
           {removeStepSuccess}
+        </MessageBox>
+      ) : null}
+      {saveSectionLogsStatus ? (
+        <MessageBox variant="success" dismissAfter={3500} onDismiss={() => setSaveSectionLogsStatus(null)}>
+          {saveSectionLogsStatus}
         </MessageBox>
       ) : null}
       {stepActionError ? <ErrorBox>{stepActionError}</ErrorBox> : null}
@@ -1731,13 +1833,7 @@ export default function BrewSessionDetailPage() {
                           <Checkbox
                             id={`step-custom-timer-${st.id}`}
                             checked={st.customTimerEnabled ?? false}
-                            onCheckedChange={(checked) =>
-                              setSteps((prev) =>
-                                prev.map((s) =>
-                                  s.id === st.id ? { ...s, customTimerEnabled: checked === true } : s
-                                )
-                              )
-                            }
+                            onCheckedChange={(checked) => void onToggleCustomTimerEnabled(st.id, checked === true)}
                             aria-label={t("activateCustomTimerLabel")}
                             size="$4"
                             bg="var(--surface-2)"
@@ -1762,7 +1858,7 @@ export default function BrewSessionDetailPage() {
                         <XStack gap="$2" items="center" flexShrink={0}>
                           <Button
                             onPress={() => void onSaveStepLog(st.id)}
-                            disabled={!canCall}
+                            disabled={!canCall || saveSectionLogsWorkingSectionId === st.sectionId}
                             size="$3"
                             bg="var(--surface-2)"
                             borderWidth={1}

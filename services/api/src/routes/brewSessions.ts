@@ -69,6 +69,20 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     return { ok: true, steps: res.steps };
   });
 
+  app.patch("/brew-sessions/:brewSessionId/steps/:stepId", async (req) => {
+    const ctx = requireActiveWorkspace(req);
+    const params = (req.params ?? {}) as { brewSessionId?: unknown; stepId?: unknown };
+    const brewSessionId = typeof params.brewSessionId === "string" ? params.brewSessionId : "";
+    const stepId = typeof params.stepId === "string" ? params.stepId : "";
+    const body = (req.body ?? {}) as { customTimerEnabled?: unknown };
+    const enabled = body.customTimerEnabled === true ? true : body.customTimerEnabled === false ? false : null;
+    if (enabled === null) {
+      throw new BadRequestError("invalid_custom_timer_enabled", "Body.customTimerEnabled must be a boolean");
+    }
+    const step = await svc.updateStepCustomTimerEnabled(ctx.userId, ctx.activeWorkspaceId, brewSessionId, stepId, enabled);
+    return { ok: true, step };
+  });
+
   app.post("/brew-sessions/:brewSessionId/start", async (req) => {
     const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { brewSessionId?: unknown };
