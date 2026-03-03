@@ -421,6 +421,74 @@ describe("brew sessions (account scoped)", () => {
     }
   });
 
+  it("allows removing a step even if others referenced it", async () => {
+    const created = await app.inject({
+      method: "POST",
+      url: `/recipes/${recipeId}/brew-sessions`,
+      headers: { cookie },
+    });
+    expect(created.statusCode).toBe(200);
+    const id2 = (created.json() as any).brewSession.id as string;
+
+    try {
+      const detail1 = await app.inject({
+        method: "GET",
+        url: `/brew-sessions/${id2}`,
+        headers: { cookie },
+      });
+      expect(detail1.statusCode).toBe(200);
+      const steps1 = ((detail1.json() as any).brewSession.steps ?? []) as any[];
+      expect(steps1.length).toBeGreaterThan(1);
+
+      const base = steps1.find((s) => typeof s?.minutesPlanned === "number" && s.minutesPlanned > 0) ?? steps1[0];
+      const baseId = base.id as string;
+
+      // Force another step to reference base as a relative anchor.
+      const other = steps1.find((s) => s.id !== baseId) ?? steps1[1];
+      const otherId = other.id as string;
+
+      const payload = steps1.map((s: any, idx: number) => ({
+        id: s.id,
+        sectionId: s.sectionId,
+        sectionName: s.sectionName,
+        name: s.name,
+        isDisabled: !!s.isDisabled,
+        minutesPlanned: s.minutesPlanned,
+        relativeToStepId: s.id === otherId ? baseId : s.relativeToStepId,
+        offsetMinutesFromEnd: s.id === otherId ? -1 : s.offsetMinutesFromEnd,
+        customTimerEnabled: !!s.customTimerEnabled,
+      }));
+
+      const save1 = await app.inject({
+        method: "PATCH",
+        url: `/brew-sessions/${id2}/steps`,
+        headers: { cookie },
+        payload: { steps: payload },
+      });
+      expect(save1.statusCode).toBe(200);
+
+      const removedPayload = payload.filter((s: any) => s.id !== baseId);
+      const save2 = await app.inject({
+        method: "PATCH",
+        url: `/brew-sessions/${id2}/steps`,
+        headers: { cookie },
+        payload: { steps: removedPayload },
+      });
+      expect(save2.statusCode).toBe(200);
+      const stepsOut = (save2.json() as any).steps as any[];
+      expect(stepsOut.some((s) => s.id === baseId)).toBe(false);
+      const otherOut = stepsOut.find((s) => s.id === otherId);
+      expect(otherOut).toBeTruthy();
+      // Reference must be cleared when the base step is removed.
+      expect(otherOut.relativeToStepId).toBe(null);
+      expect(otherOut.offsetMinutesFromEnd).toBe(null);
+    } finally {
+      await app.prisma.brewSessionLog.deleteMany({ where: { brewSessionId: id2 } });
+      await app.prisma.brewSessionStep.deleteMany({ where: { brewSessionId: id2 } });
+      await app.prisma.brewSession.deleteMany({ where: { id: id2, workspaceId } });
+    }
+  });
+
   it("allows deleting a stopped session", async () => {
     // Create another session, stop it, then delete.
     const created = await app.inject({

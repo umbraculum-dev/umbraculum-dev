@@ -82,6 +82,7 @@ enum BrewSessionStatus {
 
 enum BrewSessionStepStatus {
   pending
+  in_progress
   done
   skipped
   not_applicable

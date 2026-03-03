@@ -45,7 +45,7 @@ type BrewSessionStep = {
   minutesPlanned: number | null;
   relativeToStepId: string | null;
   offsetMinutesFromEnd: number | null;
-  status: "pending" | "done" | "skipped" | "not_applicable";
+  status: "pending" | "in_progress" | "done" | "skipped" | "not_applicable";
   note: string | null;
   timerState: "idle" | "running" | "paused" | "stopped";
   timerStartedAt: string | null;
@@ -114,6 +114,10 @@ function formatDateTime(locale: string, iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(d);
+}
+
+function hasPresetStepTimer(st: { sectionId: string; minutesPlanned: number | null }): boolean {
+  return st.sectionId === "mash" && st.minutesPlanned != null && st.minutesPlanned > 0;
 }
 
 export default function BrewSessionDetailPage() {
@@ -202,7 +206,9 @@ export default function BrewSessionDetailPage() {
   const sectionHasRunningTimer = useMemo(() => {
     const running = new Set<string>();
     for (const st of steps) {
-      if (st.customTimerEnabled === true && st.timerState === "running") {
+      const hasCustom = st.customTimerEnabled === true && st.timerState === "running";
+      const hasPreset = hasPresetStepTimer(st) && st.timerState === "running";
+      if (hasCustom || hasPreset) {
         running.add(st.sectionId);
       }
     }
@@ -263,7 +269,9 @@ export default function BrewSessionDetailPage() {
         const nextOpen: Record<string, boolean> = {};
         for (const id of sectionIds) nextOpen[id] = prev[id] ?? false;
         for (const st of incomingSteps) {
-          if (st.customTimerEnabled === true && st.timerState === "running") {
+          const hasCustom = st.customTimerEnabled === true && st.timerState === "running";
+          const hasPreset = hasPresetStepTimer(st) && st.timerState === "running";
+          if (hasCustom || hasPreset) {
             nextOpen[st.sectionId] = true;
           }
         }
@@ -380,6 +388,29 @@ export default function BrewSessionDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canCall, brewSessionId, session?.status, session?.startedAt, allSectionsDone]);
 
+  useEffect(() => {
+    if (!canCall || !brewSessionId) return;
+    const isStepCompleteForSection = (s: BrewSessionStep) => {
+      if (s.isDisabled) return true;
+      return s.status === "done" || s.status === "not_applicable" || s.status === "skipped";
+    };
+    for (const g of grouped) {
+      const sectionDone = g.steps.length > 0 && g.steps.every(isStepCompleteForSection);
+      if (!sectionDone) continue;
+      const anchorStep =
+        g.sectionId === "mash"
+          ? g.steps.find((s) => s.name === "Start mash") ?? g.steps[0]
+          : g.sectionId === "boil"
+            ? g.steps.find((s) => s.name === "Start boil") ?? g.steps[0]
+            : null;
+      if (!anchorStep) continue;
+      if (anchorStep.timerState === "running" || anchorStep.timerState === "paused") {
+        void onStepTimer(anchorStep.id, "stop");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canCall, brewSessionId, grouped, steps]);
+
   const sectionOptions = useMemo(() => {
     const opts = [
       ...PRESET_SECTION_ORDER.map((k) => ({
@@ -456,7 +487,7 @@ export default function BrewSessionDetailPage() {
       // Persist log-relevant edits (status/note/name/isDisabled) too, so "Save brewing session"
       // matches user expectations during brewing.
       for (const st of dirtyForLogs) {
-        const derivedStatus = st.isDisabled ? "skipped" : st.status ?? "pending";
+      const derivedStatus = st.isDisabled ? "skipped" : st.status ?? "pending";
         const r = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${st.id}/log`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -917,7 +948,7 @@ export default function BrewSessionDetailPage() {
       const shouldKeep =
         !!st &&
         !st.isDisabled &&
-        st.status === "pending" &&
+        (st.status === "pending" || st.status === "in_progress") &&
         !!st.relativeToStepId &&
         st.offsetMinutesFromEnd != null;
       if (!shouldKeep) {
@@ -930,7 +961,7 @@ export default function BrewSessionDetailPage() {
 
     for (const st of steps) {
       if (st.isDisabled) continue;
-      if (st.status !== "pending") continue;
+      if (st.status !== "pending" && st.status !== "in_progress") continue;
       if (!st.relativeToStepId) continue;
       if (st.offsetMinutesFromEnd == null) continue;
       const base = steps.find((s) => s.id === st.relativeToStepId);
@@ -1607,7 +1638,22 @@ export default function BrewSessionDetailPage() {
         >
           <YStack gap="$2">
             {showMashSectionTimer && mashAnchorStep ? (
-              <YStack gap="$1" p="$2" bg="var(--surface-2)" rounded="$2" borderWidth={1} borderColor="var(--border)">
+              <YStack
+                gap="$1"
+                p="$2"
+                bg={
+                  mashAnchorStep.timerState === "running"
+                    ? "color-mix(in srgb, var(--warning) 18%, var(--surface))"
+                    : "var(--surface-2)"
+                }
+                rounded="$2"
+                borderWidth={1}
+                borderColor={
+                  mashAnchorStep.timerState === "running"
+                    ? "color-mix(in srgb, var(--warning) 40%, var(--border))"
+                    : "var(--border)"
+                }
+              >
                 <XStack gap="$2" items="center" flexWrap="wrap">
                   <SizableText size="$3" fontFamily="$body" color="var(--text)">
                     {t("startMashTimerMin", { minutes: mashMinutes != null ? `${mashMinutes} min` : "—" })}
@@ -1678,7 +1724,22 @@ export default function BrewSessionDetailPage() {
             ) : null}
 
             {showBoilSectionTimer && boilAnchorStep ? (
-              <YStack gap="$1" p="$2" bg="var(--surface-2)" rounded="$2" borderWidth={1} borderColor="var(--border)">
+              <YStack
+                gap="$1"
+                p="$2"
+                bg={
+                  boilAnchorStep.timerState === "running"
+                    ? "color-mix(in srgb, var(--warning) 18%, var(--surface))"
+                    : "var(--surface-2)"
+                }
+                rounded="$2"
+                borderWidth={1}
+                borderColor={
+                  boilAnchorStep.timerState === "running"
+                    ? "color-mix(in srgb, var(--warning) 40%, var(--border))"
+                    : "var(--border)"
+                }
+              >
                 <XStack gap="$2" items="center" flexWrap="wrap">
                   <SizableText size="$3" fontFamily="$body" color="var(--text)">
                     {t("startBoilTimerMin", { minutes: boilMinutes != null ? `${boilMinutes} min` : "—" })}
@@ -1756,7 +1817,8 @@ export default function BrewSessionDetailPage() {
               const relativeCountdownSecondsRaw = computeRelativeCountdownSeconds(st);
               const relativeCountdownSecondsDisplay =
                 relativeCountdownSecondsRaw == null ? null : Math.max(0, relativeCountdownSecondsRaw);
-              const isRelativeCountdownRelevant = !st.isDisabled && st.status === "pending";
+              const isRelativeCountdownRelevant =
+                !st.isDisabled && (st.status === "pending" || st.status === "in_progress");
               const showRelativeCountdown =
                 isRelativeCountdownRelevant && relativeCountdownSecondsRaw != null && !!relativeBase?.timerStartedAt;
               const showOldestDueWarning =
@@ -1830,38 +1892,67 @@ export default function BrewSessionDetailPage() {
                             <BrewSelect
                               id={`step-status-${st.id}`}
                               value={st.status}
-                              onValueChange={(v) =>
+                              onValueChange={(v) => {
+                                const newStatus = v as BrewSessionStep["status"];
+                                const prevStatus = st.status;
                                 setSteps((prev) =>
                                   prev.map((s) =>
-                                    s.id === st.id
-                                      ? { ...s, status: v as BrewSessionStep["status"] }
-                                      : s
+                                    s.id === st.id ? { ...s, status: newStatus } : s
                                   )
-                                )
-                              }
+                                );
+                                if (hasPresetStepTimer(st)) {
+                                  if (newStatus === "in_progress") {
+                                    void onStepTimer(st.id, "start");
+                                  } else if (
+                                    prevStatus === "in_progress" &&
+                                    (newStatus === "done" || newStatus === "skipped" || newStatus === "pending")
+                                  ) {
+                                    void onStepTimer(st.id, "stop");
+                                  }
+                                }
+                              }}
                               options={[
                                 { value: "pending", label: t("statusPending") },
+                                { value: "in_progress", label: t("statusInProgress") },
                                 { value: "done", label: t("statusDone") },
-                                { value: "not_applicable", label: t("statusNotApplicable") },
+                                { value: "skipped", label: t("statusSkipped") },
                               ]}
                               width="full"
                               aria-label={t("stepStatusLabel")}
-                              tone={st.status === "done" ? "success" : "default"}
+                              tone={
+                                st.status === "done"
+                                  ? "success"
+                                  : st.status === "in_progress"
+                                    ? "warning"
+                                    : st.status === "skipped"
+                                      ? "info"
+                                      : "default"
+                              }
                             />
                           ) : (
                             <RecipeEditReadOnlyValue>
                               <SizableText
                                 size="$2"
                                 fontFamily="$body"
-                                color={st.status === "done" ? "var(--success)" : "var(--text-muted)"}
+                                color={
+                                  st.status === "done"
+                                    ? "var(--success)"
+                                    : st.status === "in_progress"
+                                      ? "var(--warning)"
+                                      : st.status === "skipped" || st.status === "not_applicable"
+                                        ? "var(--info)"
+                                        : "var(--text-muted)"
+                                }
                               >
                                 {st.isDisabled
                                   ? t("statusSkipped")
-                                  : st.status === "done"
-                                    ? t("statusDone")
-                                    : st.status === "not_applicable"
-                                      ? t("statusNotApplicable")
-                                      : t("statusPending")}
+                                  : st.status === "in_progress"
+                                    ? t("statusInProgress")
+                                    : st.status === "done"
+                                      ? t("statusDone")
+                                      : st.status === "skipped" || st.status === "not_applicable"
+                                        ? t("statusSkipped")
+                                        : t("statusPending")}
                               </SizableText>
                             </RecipeEditReadOnlyValue>
                           )}
@@ -1917,30 +2008,38 @@ export default function BrewSessionDetailPage() {
 
                       <XStack gap="$2" items="center" flexWrap="wrap" justifyContent="space-between" width="100%">
                         <XStack gap="$2" items="center" flexShrink={0}>
-                          <Checkbox
-                            id={`step-custom-timer-${st.id}`}
-                            checked={st.customTimerEnabled ?? false}
-                            onCheckedChange={(checked) => void onToggleCustomTimerEnabled(st.id, checked === true)}
-                            aria-label={t("activateCustomTimerLabel")}
-                            size="$4"
-                            bg="var(--surface-2)"
-                            borderWidth={2}
-                            borderColor="var(--border)"
-                            activeStyle={{
-                              backgroundColor: "var(--info)",
-                              borderColor: "var(--info)",
-                            }}
-                          >
-                            <Checkbox.Indicator
-                              backgroundColor="var(--text)"
-                              width={8}
-                              height={8}
-                              borderRadius={1}
-                            />
-                          </Checkbox>
-                          <RecipeEditFieldLabel htmlFor={`step-custom-timer-${st.id}`}>
-                            {t("activateCustomTimerLabel")}
-                          </RecipeEditFieldLabel>
+                          {hasPresetStepTimer(st) ? (
+                            <RecipeEditFieldLabel>
+                              {t("stepDurationTimerLabel")} — {t("stepDurationTimerHelp")}
+                            </RecipeEditFieldLabel>
+                          ) : (
+                            <>
+                              <Checkbox
+                                id={`step-custom-timer-${st.id}`}
+                                checked={st.customTimerEnabled ?? false}
+                                onCheckedChange={(checked) => void onToggleCustomTimerEnabled(st.id, checked === true)}
+                                aria-label={t("activateCustomTimerLabel")}
+                                size="$4"
+                                bg="var(--surface-2)"
+                                borderWidth={2}
+                                borderColor="var(--border)"
+                                activeStyle={{
+                                  backgroundColor: "var(--info)",
+                                  borderColor: "var(--info)",
+                                }}
+                              >
+                                <Checkbox.Indicator
+                                  backgroundColor="var(--text)"
+                                  width={8}
+                                  height={8}
+                                  borderRadius={1}
+                                />
+                              </Checkbox>
+                              <RecipeEditFieldLabel htmlFor={`step-custom-timer-${st.id}`}>
+                                {t("activateCustomTimerLabel")}
+                              </RecipeEditFieldLabel>
+                            </>
+                          )}
                         </XStack>
                         <XStack gap="$2" items="center" flexShrink={0}>
                           <Button
@@ -1955,19 +2054,21 @@ export default function BrewSessionDetailPage() {
                           >
                             {t("saveLogButton")}
                           </Button>
-                          <Button
-                            onPress={() => void onRemoveStep(st.id)}
-                            disabled={!canCall || removeStepWorking != null}
-                            size="$3"
-                            bg="var(--surface-2)"
-                            borderWidth={1}
-                            borderColor="var(--border)"
-                            color="var(--text)"
-                            fontFamily="$body"
-                            aria-label={t("removeStepButton")}
-                          >
-                            {removeStepWorking === st.id ? t("removeStepRemoving") : t("removeStepButton")}
-                          </Button>
+                          {!session?.startedAt ? (
+                            <Button
+                              onPress={() => void onRemoveStep(st.id)}
+                              disabled={!canCall || removeStepWorking != null}
+                              size="$3"
+                              bg="var(--surface-2)"
+                              borderWidth={1}
+                              borderColor="var(--border)"
+                              color="var(--text)"
+                              fontFamily="$body"
+                              aria-label={t("removeStepButton")}
+                            >
+                              {removeStepWorking === st.id ? t("removeStepRemoving") : t("removeStepButton")}
+                            </Button>
+                          ) : null}
                         </XStack>
                       </XStack>
                       {(() => {
@@ -1997,7 +2098,75 @@ export default function BrewSessionDetailPage() {
                         );
                       })()}
 
-                      {(st.customTimerEnabled ?? false) ? (
+                      {hasPresetStepTimer(st) ? (
+                        <YStack gap="$1">
+                          {st.status === "in_progress" ? (
+                            <>
+                              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                                {st.timerState === "stopped"
+                                  ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) } as any)
+                                  : t("timerLine", {
+                                      elapsed: formatElapsedSeconds(elapsed),
+                                      planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
+                                    })}
+                                {st.timerState !== "stopped" && remainingSeconds != null ? (
+                                  <SizableText as="span" size="$2" color="var(--text-muted)" fontFamily="$body">
+                                    {" "}· {t("countdownLine", { remaining: formatElapsedSeconds(remainingSeconds) })}
+                                  </SizableText>
+                                ) : null}
+                              </SizableText>
+                              <XStack gap="$2" items="center" flexWrap="wrap" width="100%">
+                                {st.timerState === "idle" || st.timerState === "paused" ? (
+                                  <Button
+                                    onPress={() => void onStepTimer(st.id, "start")}
+                                    disabled={!canCall || !session?.startedAt}
+                                    size="$3"
+                                    bg="var(--surface-2)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    color="var(--text)"
+                                    fontFamily="$body"
+                                  >
+                                    {t("timerStart")}
+                                  </Button>
+                                ) : null}
+                                {st.timerState === "running" ? (
+                                  <Button
+                                    onPress={() => void onStepTimer(st.id, "pause")}
+                                    disabled={!canCall || !session?.startedAt}
+                                    size="$3"
+                                    bg="var(--surface-2)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    color="var(--text)"
+                                    fontFamily="$body"
+                                  >
+                                    {t("timerPause")}
+                                  </Button>
+                                ) : null}
+                                {st.timerState !== "stopped" ? (
+                                  <Button
+                                    onPress={() => void onStepTimer(st.id, "stop")}
+                                    disabled={!canCall || !session?.startedAt}
+                                    size="$3"
+                                    bg="var(--surface-2)"
+                                    borderWidth={1}
+                                    borderColor="var(--border)"
+                                    color="var(--text)"
+                                    fontFamily="$body"
+                                  >
+                                    {t("timerStop")}
+                                  </Button>
+                                ) : null}
+                              </XStack>
+                            </>
+                          ) : (
+                            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                              {t("stepDurationTimerIdle")}
+                            </SizableText>
+                          )}
+                        </YStack>
+                      ) : (st.customTimerEnabled ?? false) ? (
                         <>
                           <XStack gap="$2" items="flex-end" flexWrap="wrap">
                             <View minW={240} flex={1}>

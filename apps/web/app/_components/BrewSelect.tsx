@@ -40,7 +40,7 @@ export function BrewSelect({
         }
       : tone === "warning"
         ? {
-            backgroundColor: "color-mix(in srgb, var(--warning) 14%, var(--surface))",
+            backgroundColor: "color-mix(in srgb, var(--warning) 18%, var(--surface))",
             borderColor: "color-mix(in srgb, var(--warning) 40%, var(--border))",
           }
         : tone === "info"

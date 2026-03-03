@@ -537,7 +537,7 @@ export class BrewSessionsService {
     });
     if (!existing) throw new NotFoundError("brew_session_not_found", "Brew session not found");
 
-    const normalized = steps
+    const normalizedBase = steps
       .filter((s) => s && typeof s === "object")
       .map((s, idx) => {
         const id = typeof s.id === "string" && s.id.trim() ? s.id.trim() : crypto.randomUUID();
@@ -576,7 +576,19 @@ export class BrewSessionsService {
       })
       .filter((s) => s.name.length > 0);
 
-    const keepIds = new Set(normalized.map((s) => s.id));
+    const keepIds = new Set(normalizedBase.map((s) => s.id));
+    const normalized = normalizedBase.map((s) => {
+      // If a step is deleted, any references to it must be cleared to avoid FK violations.
+      // Also prevent self-referencing relative links.
+      if (!s.relativeToStepId) return s;
+      if (s.relativeToStepId === s.id) {
+        return { ...s, relativeToStepId: null, offsetMinutesFromEnd: null };
+      }
+      if (!keepIds.has(s.relativeToStepId)) {
+        return { ...s, relativeToStepId: null, offsetMinutesFromEnd: null };
+      }
+      return s;
+    });
     const now = new Date();
 
     const result = await this.prisma.$transaction(async (tx) => {

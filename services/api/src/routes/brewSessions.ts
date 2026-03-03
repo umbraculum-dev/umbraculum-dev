@@ -117,7 +117,7 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     const stepId = typeof params.stepId === "string" ? params.stepId : "";
     const body = (req.body ?? {}) as { status?: unknown; note?: unknown; name?: unknown; isDisabled?: unknown };
     const status = typeof body.status === "string" ? body.status : "";
-    if (!["pending", "done", "skipped", "not_applicable"].includes(status)) {
+    if (!["pending", "in_progress", "done", "skipped", "not_applicable"].includes(status)) {
       throw new BadRequestError("invalid_step_status", "Body.status is invalid");
     }
     const note = body.note === null ? null : typeof body.note === "string" ? body.note : null;
