@@ -690,7 +690,7 @@ function parseMashFromBeerJson(r0: any): EditorMash {
 
   const stepsRaw = Array.isArray(mash.mash_steps) ? mash.mash_steps : [];
   const steps: EditorMashStep[] = stepsRaw
-    .map((s: any) => {
+    .map((s: any, idx: number) => {
       const stepName = typeof s?.name === "string" ? s.name.trim() : "";
       const typeRaw = typeof s?.type === "string" ? s.type : "";
       const type: EditorMashStepType = VALID_MASH_STEP_TYPES.includes(typeRaw as EditorMashStepType) ? (typeRaw as EditorMashStepType) : "infusion";
@@ -731,7 +731,7 @@ function parseMashFromBeerJson(r0: any): EditorMash {
       const description = typeof s?.description === "string" ? s.description.trim() || null : null;
 
       return {
-        id: typeof s?.id === "string" ? s.id : `${Date.now()}-${Math.random()}`,
+        id: typeof s?.id === "string" ? s.id : `mash-step-${idx}`,
         name: stepName,
         type,
         stepTemperatureC: stepTemp,
@@ -758,14 +758,21 @@ function parseMashFromBeerJson(r0: any): EditorMash {
 export function mergeMashDeduceFromExt(mash: EditorMash | null, recipeExtJson: unknown): EditorMash | null {
   if (!mash || !mash.steps.length) return mash;
   const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? (recipeExtJson as Record<string, unknown>) : null;
-  const map = ext?.mashStepDeduceFromMashIn && typeof ext.mashStepDeduceFromMashIn === "object" && !Array.isArray(ext.mashStepDeduceFromMashIn)
-    ? (ext.mashStepDeduceFromMashIn as Record<string, boolean>)
-    : null;
+  const map =
+    ext?.mashStepDeduceFromMashIn && typeof ext.mashStepDeduceFromMashIn === "object" && !Array.isArray(ext.mashStepDeduceFromMashIn)
+      ? (ext.mashStepDeduceFromMashIn as Record<string, boolean>)
+      : null;
+
   if (!map) return mash;
-  const steps = mash.steps.map((s) => ({
-    ...s,
-    deduceFromMashIn: map[s.id] === true,
-  }));
+
+  const steps = mash.steps.map((s, idx) => {
+    const deduceByIndex = map[String(idx)] === true;
+    const deduceById = map[s.id] === true;
+    return {
+      ...s,
+      deduceFromMashIn: deduceByIndex || deduceById,
+    };
+  });
   return { ...mash, steps };
 }
 

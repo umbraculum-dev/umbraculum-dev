@@ -406,7 +406,7 @@ function parseMashFromBeerJson(r0) {
   const grainTemp = mash.grain_temperature?.unit === "C" && typeof mash.grain_temperature?.value === "number" && Number.isFinite(mash.grain_temperature.value) ? mash.grain_temperature.value : mash.grain_temperature?.unit === "F" ? (mash.grain_temperature.value - 32) * 5 / 9 : null;
   if (!name || grainTemp == null) return null;
   const stepsRaw = Array.isArray(mash.mash_steps) ? mash.mash_steps : [];
-  const steps = stepsRaw.map((s) => {
+  const steps = stepsRaw.map((s, idx) => {
     const stepName = typeof s?.name === "string" ? s.name.trim() : "";
     const typeRaw = typeof s?.type === "string" ? s.type : "";
     const type = VALID_MASH_STEP_TYPES.includes(typeRaw) ? typeRaw : "infusion";
@@ -419,7 +419,7 @@ function parseMashFromBeerJson(r0) {
     const infuseTemp = s?.infuse_temperature?.unit === "C" && typeof s?.infuse_temperature?.value === "number" && Number.isFinite(s.infuse_temperature.value) ? s.infuse_temperature.value : s?.infuse_temperature?.unit === "F" && typeof s?.infuse_temperature?.value === "number" ? (s.infuse_temperature.value - 32) * 5 / 9 : null;
     const description = typeof s?.description === "string" ? s.description.trim() || null : null;
     return {
-      id: typeof s?.id === "string" ? s.id : `${Date.now()}-${Math.random()}`,
+      id: typeof s?.id === "string" ? s.id : `mash-step-${idx}`,
       name: stepName,
       type,
       stepTemperatureC: stepTemp,
@@ -444,10 +444,14 @@ function mergeMashDeduceFromExt(mash, recipeExtJson) {
   const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? recipeExtJson : null;
   const map = ext?.mashStepDeduceFromMashIn && typeof ext.mashStepDeduceFromMashIn === "object" && !Array.isArray(ext.mashStepDeduceFromMashIn) ? ext.mashStepDeduceFromMashIn : null;
   if (!map) return mash;
-  const steps = mash.steps.map((s) => ({
-    ...s,
-    deduceFromMashIn: map[s.id] === true
-  }));
+  const steps = mash.steps.map((s, idx) => {
+    const deduceByIndex = map[String(idx)] === true;
+    const deduceById = map[s.id] === true;
+    return {
+      ...s,
+      deduceFromMashIn: deduceByIndex || deduceById
+    };
+  });
   return { ...mash, steps };
 }
 function editorStateFromBeerJson(doc) {

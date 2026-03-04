@@ -24,9 +24,10 @@
 
   /* Field semantics (color is supportive; badges/text still required). */
   --field-input-bg: var(--surface);
-  --field-readonly-bg: color-mix(in srgb, var(--info) 8%, var(--surface));
+  /* Shared with native via @brewery/ui nativeReadonlyTokens. Must stay in sync. */
+  --field-readonly-bg: #232934;
   --field-computed-bg: color-mix(in srgb, var(--success) 7%, var(--surface));
-  --field-readonly-border: color-mix(in srgb, var(--info) 30%, var(--border));
+  --field-readonly-border: #3a4558;
   --field-computed-border: color-mix(in srgb, var(--success) 30%, var(--border));
 }
 

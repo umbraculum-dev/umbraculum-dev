@@ -1,10 +1,10 @@
 import React from "react";
-import { Checkbox, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 
 import type { EditorMashStep, EditorMashStepType } from "@brewery/beerjson";
 import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@brewery/beerjson";
 
-import { Button, Card, Input, ReadOnlyField, ReadOnlyFieldRow, SelectField, Text } from "@brewery/ui";
+import { BrewCheckbox, Button, Card, Input, ReadOnlyField, ReadOnlyFieldRow, SelectField, Text } from "@brewery/ui";
 
 export type WaterVolumes = { mashLiters: number; spargeLiters: number };
 
@@ -17,8 +17,13 @@ export interface MashStepsEditorProps {
   hideSpargeFromTypeOptions?: boolean;
   readOnly?: boolean;
   recipeId?: string;
+  /** Override card background (e.g. native: SURFACE_CARD for contrast with field values). */
+  cardBackgroundColor?: string;
+  /** Override card border color. */
+  cardBorderColor?: string;
   onUpdateProcedure?: (patch: { name?: string; grainTemperatureC?: number }) => void;
   onUpdateStep?: (id: string, patch: Partial<EditorMashStep>) => void;
+  onMoveStep?: (id: string, direction: "up" | "down") => void;
   onAddStep?: () => void;
   onDeleteStep?: (id: string) => void;
   onAddFromTemplate?: (templateId: string) => void;
@@ -46,8 +51,11 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
     firstStepAmountComputed = null,
     hideSpargeFromTypeOptions = false,
     readOnly = false,
+    cardBackgroundColor,
+    cardBorderColor,
     onUpdateProcedure,
     onUpdateStep,
+    onMoveStep,
     onAddStep,
     onDeleteStep,
     onAddFromTemplate,
@@ -60,6 +68,14 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
     locale,
     formatFixed,
   } = props;
+
+  const isSpargeRow = (r: EditorMashStep) => r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+  const movableIndices = mashRows
+    .map((r, idx) => ({ r, idx }))
+    .filter(({ r, idx }) => idx > 0 && !isSpargeRow(r))
+    .map(({ idx }) => idx);
+  const firstMovableIdx = movableIndices.length ? movableIndices[0] : null;
+  const lastMovableIdx = movableIndices.length ? movableIndices[movableIndices.length - 1] : null;
 
   if (readOnly) {
     return (
@@ -84,12 +100,12 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
               <Card
                 key={r.id}
                 data-mash-step-card
-                theme="surface2"
+                theme={cardBackgroundColor ?? cardBorderColor ? undefined : "surface2"}
                 gap="$2"
                 padding="$3"
-                backgroundColor="$background"
+                backgroundColor={cardBackgroundColor ?? "$background"}
                 borderWidth={1}
-                borderColor="$borderColor"
+                borderColor={cardBorderColor ?? "$borderColor"}
               >
                 <Text fontSize={12} fontWeight="700">
                   {idx + 1}. {r.name}
@@ -172,12 +188,18 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
       ) : null}
 
       {mashRows.map((r, idx) => {
-        const isSpargeStep = r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+        const isSpargeStep = isSpargeRow(r);
         const disableName = isSpargeStep || (idx === 0 && firstStepAmountComputed != null);
         const disableType = isSpargeStep;
-        const disableAmount = isSpargeStep || (idx === 0 && firstStepAmountComputed != null) || (idx > 0 && r.deduceFromMashIn === true);
+        const disableAmount =
+          isSpargeStep ||
+          (idx === 0 && firstStepAmountComputed != null) ||
+          (idx > 0 && r.deduceFromMashIn !== true);
         const typeOptions = stepTypeOptions(hideSpargeFromTypeOptions);
         const typeValue: EditorMashStepType = r.type;
+        const canReorder = Boolean(onMoveStep) && idx > 0 && !isSpargeStep;
+        const disableMoveUp = !canReorder || firstMovableIdx == null || idx === firstMovableIdx;
+        const disableMoveDown = !canReorder || lastMovableIdx == null || idx === lastMovableIdx;
 
         return (
           <Card key={r.id} gap="$2" padding="$3" background="$background" borderWidth={1} borderColor="$borderColor">
@@ -185,11 +207,36 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
               <Text fontSize={14} fontWeight="700">
                 {idx + 1}. {r.name || t("mashingStepName")}
               </Text>
-              {idx > 0 && onDeleteStep ? (
-                <Button size="$2" chromeless onPress={() => onDeleteStep(r.id)}>
-                  <Text fontSize={12}>{t("mashingDeleteStep")}</Text>
-                </Button>
-              ) : null}
+              <XStack gap="$2" alignItems="center">
+                {canReorder ? (
+                  <>
+                    <Button
+                      size="$2"
+                      chromeless
+                      disabled={disableMoveUp}
+                      onPress={() => onMoveStep?.(r.id, "up")}
+                      accessibilityLabel={t("moveUp")}
+                    >
+                      <Text fontSize={12}>{t("moveUp")}</Text>
+                    </Button>
+                    <Button
+                      size="$2"
+                      chromeless
+                      disabled={disableMoveDown}
+                      onPress={() => onMoveStep?.(r.id, "down")}
+                      accessibilityLabel={t("moveDown")}
+                    >
+                      <Text fontSize={12}>{t("moveDown")}</Text>
+                    </Button>
+                  </>
+                ) : null}
+
+                {idx > 0 && onDeleteStep ? (
+                  <Button size="$2" chromeless onPress={() => onDeleteStep(r.id)}>
+                    <Text fontSize={12}>{t("mashingDeleteStep")}</Text>
+                  </Button>
+                ) : null}
+              </XStack>
             </XStack>
 
             <YStack gap="$2">
@@ -264,7 +311,7 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
 
               <YStack gap="$1">
                 <Text fontSize={11} opacity={0.8}>
-                  {t("mashingStepAmount", { unit: "L" })} ({tUnits("L")})
+                  {t("mashingStepAmount", { unit: tUnits("L") })}
                 </Text>
                 {isSpargeStep ? (
                   <Text fontSize={12} opacity={0.85}>
@@ -293,21 +340,18 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
 
               {idx > 0 ? (
                 <XStack gap="$2" alignItems="center">
-                  <Checkbox
+                  <BrewCheckbox
                     id={`mash-step-deduce-${r.id}`}
                     checked={r.deduceFromMashIn === true}
                     onCheckedChange={(checked) =>
                       onUpdateStep?.(r.id, {
                         deduceFromMashIn: checked === true,
-                        ...(checked === true ? {} : { amountL: 0 }),
                       })
                     }
-                    aria-label={t("mashingDeduceFromMashIn")}
                     size="$2"
-                    native
-                  >
-                    <Checkbox.Indicator />
-                  </Checkbox>
+                    accessibilityLabel={t("mashingDeduceFromMashIn")}
+                    accessibilityRole="checkbox"
+                  />
                   <Text fontSize={12} opacity={0.85}>
                     {t("mashingDeduceFromMashIn")}
                   </Text>

@@ -976,27 +976,77 @@ export default function MashWaterPage() {
 
   const updateMashStep = (id: string, patch: Partial<EditorMashStep>) => {
     setMashStepsDirty(true);
-    if ("amountL" in patch && patch.amountL != null) {
-      const idx = mashRows.findIndex((r) => r.id === id);
-      const row = mashRows[idx];
-      if (idx > 0) {
-        if (row?.deduceFromMashIn !== true) {
-          patch = { ...patch, amountL: 0 };
-        } else {
-          const otherSum = mashRows
-            .filter((r, i) => i !== idx && i !== 0)
+    setMashRows((prev) => {
+      const idx = prev.findIndex((r) => r.id === id);
+      const row = idx >= 0 ? prev[idx] : null;
+      if (!row) return prev;
+
+      let nextPatch = patch;
+
+      // When turning off deduce, always zero the amount to avoid hidden water.
+      if ("deduceFromMashIn" in nextPatch && idx > 0) {
+        if (nextPatch.deduceFromMashIn !== true) {
+          nextPatch = { ...nextPatch, amountL: 0 };
+        } else if (row.amountL != null) {
+          // When turning on deduce, clamp existing amount to remaining budget.
+          const otherSum = prev
+            .filter((r, i) => i !== idx && i !== 0 && r.deduceFromMashIn === true)
             .reduce((s, r) => s + (r.amountL ?? 0), 0);
           const available = Math.max(0, derivedMashWaterVolumeLiters - otherSum);
-          patch = { ...patch, amountL: Math.min(patch.amountL as number, available) };
+          nextPatch = { ...nextPatch, amountL: Math.min(row.amountL, available) };
         }
       }
-    }
-    setMashRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+
+      if ("amountL" in nextPatch && nextPatch.amountL != null && idx > 0) {
+        // Only deduced steps can carry a non-zero Amount in the budget model.
+        if ((row.deduceFromMashIn ?? false) !== true) {
+          nextPatch = { ...nextPatch, amountL: 0 };
+        } else {
+          const otherSum = prev
+            .filter((r, i) => i !== idx && i !== 0 && r.deduceFromMashIn === true)
+            .reduce((s, r) => s + (r.amountL ?? 0), 0);
+          const available = Math.max(0, derivedMashWaterVolumeLiters - otherSum);
+          nextPatch = { ...nextPatch, amountL: Math.min(nextPatch.amountL as number, available) };
+        }
+      }
+
+      return prev.map((r) => (r.id === id ? { ...r, ...nextPatch } : r));
+    });
   };
 
   const deleteMashStep = (id: string) => {
     setMashStepsDirty(true);
     setMashRows((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const moveMashStep = (id: string, direction: "up" | "down") => {
+    setMashStepsDirty(true);
+    setMashRows((prev) => {
+      const idx = prev.findIndex((r) => r.id === id);
+      const row = idx >= 0 ? prev[idx] : null;
+      if (!row) return prev;
+
+      const isSpargeRow = (r: EditorMashStep) => r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+      if (idx <= 0 || isSpargeRow(row)) return prev;
+
+      const movable = prev
+        .map((r, i) => ({ r, i }))
+        .filter(({ r, i }) => i > 0 && !isSpargeRow(r))
+        .map(({ i }) => i);
+      if (!movable.length) return prev;
+
+      const targetIdx =
+        direction === "up"
+          ? [...movable].reverse().find((i) => i < idx) ?? null
+          : movable.find((i) => i > idx) ?? null;
+      if (targetIdx == null) return prev;
+
+      const next = prev.slice();
+      const tmp = next[idx];
+      next[idx] = next[targetIdx];
+      next[targetIdx] = tmp;
+      return next;
+    });
   };
 
   const addMashFromTemplate = (templateId: string) => {
@@ -1035,6 +1085,9 @@ export default function MashWaterPage() {
         if (idx === 0 && r.type === "infusion" && derivedMashWaterVolumeLiters > 0) {
           return { ...r, amountL: computeFirstStepAmountL };
         }
+        if (idx > 0 && r.deduceFromMashIn !== true) {
+          return { ...r, amountL: 0 };
+        }
         return r;
       });
       const mash =
@@ -1058,8 +1111,8 @@ export default function MashWaterPage() {
         : { version: 1 };
       const mashStepDeduceFromMashIn = Object.fromEntries(
         mashRows
-          .filter((r, i) => i > 0 && r.deduceFromMashIn === true)
-          .map((r) => [r.id, true] as const),
+          .map((r, idx) => [String(idx), r.deduceFromMashIn === true] as const)
+          .filter(([k, v]) => k !== "0" && v === true),
       );
       const recipeExtJson = { ...extBase, mashStepDeduceFromMashIn };
       const patchRes = await apiFetch(`/api/recipes/${recipeId}`, {
@@ -1138,12 +1191,14 @@ export default function MashWaterPage() {
 
   return (
     <>
-      <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine
-        recipeId={recipeId}
-        enabled={authState.status === "ready"}
-        loadRecipeMeta={loadRecipeMeta}
-      />
+      <YStack gap="$1" mb="$2">
+        <H1 mb={0}>{t("title")}</H1>
+        <RecipeMetaLine
+          recipeId={recipeId}
+          enabled={authState.status === "ready"}
+          loadRecipeMeta={loadRecipeMeta}
+        />
+      </YStack>
       <SurfaceMathToggleRow
         left={
           <SizableText size="$2" fontFamily="$body" mt={0}>
@@ -1568,7 +1623,7 @@ export default function MashWaterPage() {
               ) : null}
             </XStack>
 
-            <YStack gap="$2" mt="$3">
+            <YStack gap="$2" mt="$3" mb="$3">
               <XStack gap="$3" alignItems="center" flexWrap="wrap">
                 <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveMashInputs()} disabled={!canCall || savingMash}>
                   {savingMash ? "Saving…" : "Save mash draft"}
@@ -1792,7 +1847,7 @@ export default function MashWaterPage() {
           ) : null}
 
           {saltsResult ? (
-            <details className="brew-field-block brew-field-block--computed" mt="$3">
+            <details className="brew-field-block brew-field-block--computed brew-mt3">
               <summary className="brew-field-block-header brew-details-summary">
                 <strong>Resulting ions (after salts only)</strong>
                 {surfaceMath ? (() => {
@@ -1897,8 +1952,8 @@ body={buildWaterMathBody({
           ) : null}
 
           {overallResult ? (
-            <View className="brew-field-block brew-field-block--computed brew-mt3">
-              <View className="brew-field-block-header">
+            <details className="brew-field-block brew-field-block--computed brew-mt3" open>
+              <summary className="brew-field-block-header brew-details-summary">
                 <strong>Overall mash snapshot</strong>
                 {surfaceMath ? (() => {
                   const ex = mathExplain["mash.overallSnapshot"];
@@ -1927,7 +1982,7 @@ body={buildWaterMathBody({
                 })() : null}
                 <FieldBadge>Computed</FieldBadge>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
-              </View>
+              </summary>
               <ul>
                 <li>
                   pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
@@ -1992,7 +2047,7 @@ body={buildWaterMathBody({
                   </tbody>
                 </table>
               </View>
-            </View>
+            </details>
           ) : null}
         </View>
 
@@ -2018,19 +2073,30 @@ body={buildWaterMathBody({
             readOnly={false}
             onUpdateProcedure={updateMashProcedure}
             onUpdateStep={updateMashStep}
+            onMoveStep={moveMashStep}
             onAddStep={addMashStep}
             onDeleteStep={deleteMashStep}
             onAddFromTemplate={addMashFromTemplate}
             onSave={saveMashSteps}
             canSave={canCall && !!recipe?.beerJsonRecipeJson}
             saving={mashStepsSaving}
-            saveStatus={mashStepsSaveStatus}
-            onDismissSaveStatus={() => setMashStepsSaveStatus(null)}
             t={tEdit}
             tUnits={tUnits}
             locale={locale}
             formatFixed={formatFixed}
           />
+          {mashStepsSaveStatus ? (
+            <MessageBox
+              variant="success"
+              role="status"
+              aria-live="polite"
+              dismissAfter={5000}
+              onDismiss={() => setMashStepsSaveStatus(null)}
+              mt="$3"
+            >
+              {mashStepsSaveStatus}
+            </MessageBox>
+          ) : null}
         </View>
 
         {savingError ? (

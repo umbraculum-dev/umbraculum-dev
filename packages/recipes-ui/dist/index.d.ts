@@ -54,11 +54,16 @@ interface MashStepsEditorProps {
     hideSpargeFromTypeOptions?: boolean;
     readOnly?: boolean;
     recipeId?: string;
+    /** Override card background (e.g. native: SURFACE_CARD for contrast with field values). */
+    cardBackgroundColor?: string;
+    /** Override card border color. */
+    cardBorderColor?: string;
     onUpdateProcedure?: (patch: {
         name?: string;
         grainTemperatureC?: number;
     }) => void;
     onUpdateStep?: (id: string, patch: Partial<EditorMashStep>) => void;
+    onMoveStep?: (id: string, direction: "up" | "down") => void;
     onAddStep?: () => void;
     onDeleteStep?: (id: string) => void;
     onAddFromTemplate?: (templateId: string) => void;
@@ -83,6 +88,10 @@ interface SpargeStepReadOnlyRowProps {
     timeDisplay: string;
     amountDisplay: string;
     rampDisplay: string;
+    /** Override card background (e.g. native: SURFACE_CARD for contrast with field values). */
+    cardBackgroundColor?: string;
+    /** Override card border color. */
+    cardBorderColor?: string;
     labels: {
         name: string;
         type: string;

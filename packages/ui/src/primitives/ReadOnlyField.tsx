@@ -3,6 +3,7 @@ import React from "react";
 import { Platform } from "react-native";
 import { XStack, YStack } from "tamagui";
 
+import { FIELD_READONLY_BG, FIELD_READONLY_BORDER } from "../theme/nativeReadonlyTokens";
 import { Text } from "./Text";
 
 export interface ReadOnlyFieldLabelProps {
@@ -27,10 +28,10 @@ export function ReadOnlyFieldValue({ children }: ReadOnlyFieldValueProps) {
     <YStack
       data-readonly-field-value
       padding="$2"
-      backgroundColor={isWeb ? "var(--field-readonly-bg)" : "$gray3"}
+      backgroundColor={isWeb ? "var(--field-readonly-bg)" : FIELD_READONLY_BG}
       borderRadius="$2"
       borderWidth={1}
-      borderColor={isWeb ? "var(--field-readonly-border)" : "$gray4"}
+      borderColor={isWeb ? "var(--field-readonly-border)" : FIELD_READONLY_BORDER}
       userSelect="none"
       tabIndex={isWeb ? -1 : undefined}
     >

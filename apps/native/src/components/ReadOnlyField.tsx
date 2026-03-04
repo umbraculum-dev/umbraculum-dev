@@ -3,6 +3,8 @@ import { View } from "react-native";
 
 import { Text } from "@brewery/ui";
 
+import { FIELD_READONLY_BG, FIELD_READONLY_BORDER } from "../theme/colors";
+
 export interface ReadOnlyFieldProps {
   value: string;
   placeholder?: string;
@@ -19,10 +21,10 @@ export function ReadOnlyField({ value, placeholder = "—", textAlign }: ReadOnl
     <View
       style={{
         padding: 8,
-        backgroundColor: "#1a1f2e",
+        backgroundColor: FIELD_READONLY_BG,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: "#2a2f3a",
+        borderColor: FIELD_READONLY_BORDER,
       }}
     >
       <Text

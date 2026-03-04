@@ -21,9 +21,12 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   AdSlotCard: () => AdSlotCard,
+  BrewCheckbox: () => BrewCheckbox,
   Button: () => Button,
   Card: () => Card,
   Collapsible: () => Collapsible,
+  FIELD_READONLY_BG: () => FIELD_READONLY_BG,
+  FIELD_READONLY_BORDER: () => FIELD_READONLY_BORDER,
   Heading: () => Heading,
   Input: () => Input,
   ModeFieldset: () => ModeFieldset,
@@ -34,9 +37,29 @@ __export(index_exports, {
   Screen: () => Screen,
   SelectField: () => SelectField,
   Spinner: () => Spinner,
-  Text: () => Text
+  Text: () => Text,
+  ThemeVarsInjector: () => ThemeVarsInjector
 });
 module.exports = __toCommonJS(index_exports);
+
+// src/theme/nativeReadonlyTokens.ts
+var FIELD_READONLY_BG = "#232934";
+var FIELD_READONLY_BORDER = "#3a4558";
+
+// src/theme/ThemeVarsInjector.tsx
+var import_react = require("react");
+function ThemeVarsInjector() {
+  (0, import_react.useEffect)(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--field-readonly-bg", FIELD_READONLY_BG);
+    root.style.setProperty("--field-readonly-border", FIELD_READONLY_BORDER);
+    return () => {
+      root.style.removeProperty("--field-readonly-bg");
+      root.style.removeProperty("--field-readonly-border");
+    };
+  }, []);
+  return null;
+}
 
 // src/primitives/AdSlotCard.tsx
 var import_react_native = require("react-native");
@@ -120,7 +143,7 @@ function Button(props) {
   );
 }
 
-// src/primitives/Collapsible.tsx
+// src/primitives/BrewCheckbox.tsx
 var import_react_native3 = require("react-native");
 var import_tamagui5 = require("tamagui");
 
@@ -142,13 +165,43 @@ function Heading({ size, fontWeight, ...props }) {
   );
 }
 
-// src/primitives/Collapsible.tsx
+// src/primitives/BrewCheckbox.tsx
 var import_jsx_runtime5 = require("react/jsx-runtime");
+function BrewCheckbox(props) {
+  const { accessibilityLabel, accessibilityRole, checked, disabled, size, ...rest } = props;
+  const isChecked = checked === true;
+  const sharedProps = {
+    // Keep this custom-rendered so we control contrast/indicator on web.
+    native: import_react_native3.Platform.OS === "web" ? false : void 0,
+    size: size ?? "$2",
+    disabled,
+    checked,
+    unstyled: true,
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: isChecked ? "$color8" : "$borderColor",
+    backgroundColor: isChecked ? "$color8" : "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+    ...rest
+  };
+  if (import_react_native3.Platform.OS === "web") {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_tamagui5.Checkbox, { "aria-label": accessibilityLabel, ...sharedProps, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_tamagui5.Checkbox.Indicator, { unstyled: true, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "$color1", children: "\u2713" }) }) });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_tamagui5.Checkbox, { accessibilityLabel, accessibilityRole, ...sharedProps, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_tamagui5.Checkbox.Indicator, { unstyled: true, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { fontSize: 12, lineHeight: 12, fontWeight: "700", color: "$color1", children: "\u2713" }) }) });
+}
+
+// src/primitives/Collapsible.tsx
+var import_react_native4 = require("react-native");
+var import_tamagui6 = require("tamagui");
+var import_jsx_runtime6 = require("react/jsx-runtime");
 function Collapsible(props) {
   const { title, summary, children, expanded, onExpandedChange, accessibilityLabel } = props;
-  if (import_react_native3.Platform.OS === "web") {
-    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("details", { open: expanded, onToggle: (e) => onExpandedChange(e.target.open), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+  if (import_react_native4.Platform.OS === "web") {
+    return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("details", { open: expanded, onToggle: (e) => onExpandedChange(e.target.open), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
         "summary",
         {
           className: "brew-details-summary",
@@ -160,8 +213,8 @@ function Collapsible(props) {
       children
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_tamagui5.YStack, { gap: "$2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_tamagui6.YStack, { gap: "$2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       Button,
       {
         onPress: () => onExpandedChange(!expanded),
@@ -170,7 +223,7 @@ function Collapsible(props) {
         accessibilityRole: "button",
         accessibilityLabel: accessibilityLabel ?? title,
         accessibilityState: { expanded },
-        children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { fontSize: 16, fontWeight: "700", children: title })
+        children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text, { fontSize: 16, fontWeight: "700", children: title })
       }
     ),
     expanded ? children : null
@@ -178,14 +231,14 @@ function Collapsible(props) {
 }
 
 // src/primitives/Input.tsx
-var import_react_native4 = require("react-native");
-var import_tamagui6 = require("tamagui");
-var import_jsx_runtime6 = require("react/jsx-runtime");
+var import_react_native5 = require("react-native");
+var import_tamagui7 = require("tamagui");
+var import_jsx_runtime7 = require("react/jsx-runtime");
 function Input(props) {
   const { accessibilityLabel, accessibilityRole, ...rest } = props;
-  if (import_react_native4.Platform.OS === "web") {
-    return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-      import_tamagui6.Input,
+  if (import_react_native5.Platform.OS === "web") {
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      import_tamagui7.Input,
       {
         fontFamily: props.fontFamily ?? "$body",
         "aria-label": accessibilityLabel,
@@ -193,8 +246,8 @@ function Input(props) {
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-    import_tamagui6.Input,
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    import_tamagui7.Input,
     {
       fontFamily: props.fontFamily ?? "$body",
       accessibilityLabel,
@@ -205,11 +258,13 @@ function Input(props) {
 }
 
 // src/primitives/ModeFieldset.tsx
-var import_tamagui7 = require("tamagui");
-var import_jsx_runtime7 = require("react/jsx-runtime");
+var import_react_native6 = require("react-native");
+var import_tamagui8 = require("tamagui");
+var import_jsx_runtime8 = require("react/jsx-runtime");
 function ModeFieldset(props) {
   const { legend, name, value, onChange, options } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+  const isWeb = import_react_native6.Platform.OS === "web";
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
     Card,
     {
       borderWidth: 1,
@@ -219,19 +274,30 @@ function ModeFieldset(props) {
       marginBottom: "$3",
       gap: "$2",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { fontSize: 12, opacity: 0.8, marginBottom: "$1", children: legend }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-          import_tamagui7.RadioGroup,
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { fontSize: 12, opacity: 0.8, marginBottom: "$1", children: legend }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          import_tamagui8.RadioGroup,
           {
+            native: isWeb,
             name,
             value,
             onValueChange: (v) => onChange(v),
             "aria-label": legend,
-            children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_tamagui7.YStack, { gap: "$2", children: options.map((o) => {
+            children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_tamagui8.YStack, { gap: "$2", children: options.map((o) => {
               const id = `${name}-${o.value}`;
-              return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_tamagui7.XStack, { gap: "$2", alignItems: "center", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_tamagui7.RadioGroup.Item, { id, value: o.value, size: "$3", borderColor: "$borderColor", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_tamagui7.RadioGroup.Indicator, {}) }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_tamagui7.Label, { htmlFor: id, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { fontSize: 12, children: o.label }) })
+              const checked = value === o.value;
+              return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_tamagui8.XStack, { gap: "$2", alignItems: "center", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+                  import_tamagui8.RadioGroup.Item,
+                  {
+                    id,
+                    value: o.value,
+                    size: "$3",
+                    borderColor: "$borderColor",
+                    children: !isWeb ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_tamagui8.RadioGroup.Indicator, { unstyled: true, width: 10, height: 10, borderRadius: 9999, backgroundColor: "$color8" }) : null
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_tamagui8.Label, { htmlFor: id, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { fontSize: 12, children: o.label }) })
               ] }, o.value);
             }) })
           }
@@ -242,47 +308,47 @@ function ModeFieldset(props) {
 }
 
 // src/primitives/ReadOnlyField.tsx
-var import_react_native5 = require("react-native");
-var import_tamagui8 = require("tamagui");
-var import_jsx_runtime8 = require("react/jsx-runtime");
+var import_react_native7 = require("react-native");
+var import_tamagui9 = require("tamagui");
+var import_jsx_runtime9 = require("react/jsx-runtime");
 function ReadOnlyFieldLabel({ children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { fontSize: 11, opacity: 0.8, children });
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { fontSize: 11, opacity: 0.8, children });
 }
 function ReadOnlyFieldValue({ children }) {
-  const isWeb = import_react_native5.Platform.OS === "web";
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-    import_tamagui8.YStack,
+  const isWeb = import_react_native7.Platform.OS === "web";
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    import_tamagui9.YStack,
     {
       "data-readonly-field-value": true,
       padding: "$2",
-      backgroundColor: isWeb ? "var(--field-readonly-bg)" : "$gray3",
+      backgroundColor: isWeb ? "var(--field-readonly-bg)" : FIELD_READONLY_BG,
       borderRadius: "$2",
       borderWidth: 1,
-      borderColor: isWeb ? "var(--field-readonly-border)" : "$gray4",
+      borderColor: isWeb ? "var(--field-readonly-border)" : FIELD_READONLY_BORDER,
       userSelect: "none",
       tabIndex: isWeb ? -1 : void 0,
-      children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { fontSize: 12, opacity: 0.9, children })
+      children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { fontSize: 12, opacity: 0.9, children })
     }
   );
 }
 function ReadOnlyField({ label, value, minWidth, flex }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_tamagui8.YStack, { gap: "$1", minWidth, flex, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(ReadOnlyFieldLabel, { children: label }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(ReadOnlyFieldValue, { children: value })
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_tamagui9.YStack, { gap: "$1", minWidth, flex, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ReadOnlyFieldLabel, { children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ReadOnlyFieldValue, { children: value })
   ] });
 }
 function ReadOnlyFieldRow({ children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_tamagui8.XStack, { gap: "$3", flexWrap: "wrap", alignItems: "flex-end", children });
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_tamagui9.XStack, { gap: "$3", flexWrap: "wrap", alignItems: "flex-end", children });
 }
 
 // src/primitives/Screen.tsx
-var import_react_native6 = require("react-native");
-var import_tamagui9 = require("tamagui");
-var import_jsx_runtime9 = require("react/jsx-runtime");
+var import_react_native8 = require("react-native");
+var import_tamagui10 = require("tamagui");
+var import_jsx_runtime10 = require("react/jsx-runtime");
 function Screen({ flex, style, ...props }) {
-  const topInset = import_react_native6.Platform.OS === "web" ? 0 : Math.floor((import_react_native6.StatusBar.currentHeight ?? 0) / 2);
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
-    import_tamagui9.YStack,
+  const topInset = import_react_native8.Platform.OS === "web" ? 0 : Math.floor((import_react_native8.StatusBar.currentHeight ?? 0) / 2);
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    import_tamagui10.YStack,
     {
       flex: flex ?? 1,
       backgroundColor: props.backgroundColor ?? "$background",
@@ -301,9 +367,9 @@ function Screen({ flex, style, ...props }) {
 }
 
 // src/primitives/SelectField.tsx
-var import_react = require("react");
-var import_react_native7 = require("react-native");
-var import_jsx_runtime10 = require("react/jsx-runtime");
+var import_react2 = require("react");
+var import_react_native9 = require("react-native");
+var import_jsx_runtime11 = require("react/jsx-runtime");
 function SelectField({
   value,
   onValueChange,
@@ -318,11 +384,11 @@ function SelectField({
   closeLabel
 }) {
   const findLabel = (v) => options.find((opt) => opt.value === v)?.label ?? v;
-  const isWeb = import_react_native7.Platform.OS === "web";
-  const [open, setOpen] = (0, import_react.useState)(false);
-  const selectedLabel = (0, import_react.useMemo)(() => findLabel(value), [value, options]);
+  const isWeb = import_react_native9.Platform.OS === "web";
+  const [open, setOpen] = (0, import_react2.useState)(false);
+  const selectedLabel = (0, import_react2.useMemo)(() => findLabel(value), [value, options]);
   if (isWeb) {
-    return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
       "select",
       {
         id,
@@ -342,15 +408,15 @@ function SelectField({
           fontFamily: "var(--font-body, system-ui, -apple-system, Segoe UI, Roboto, sans-serif)"
         },
         children: [
-          placeholder ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("option", { value: "", disabled: true, children: placeholder }) : null,
-          options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("option", { value: opt.value, children: opt.label }, opt.value))
+          placeholder ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("option", { value: "", disabled: true, children: placeholder }) : null,
+          options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("option", { value: opt.value, children: opt.label }, opt.value))
         ]
       }
     );
   }
   {
-    return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_react_native7.View, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_react_native9.View, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
         Button,
         {
           onPress: () => setOpen(true),
@@ -360,17 +426,17 @@ function SelectField({
           borderColor: "$borderColor",
           disabled,
           accessibilityLabel: ariaLabel,
-          children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { fontSize: 12, children: (renderValue ? String(renderValue(value)) : selectedLabel) || placeholder || "\u2014" })
+          children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { fontSize: 12, children: (renderValue ? String(renderValue(value)) : selectedLabel) || placeholder || "\u2014" })
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_react_native7.Modal, { visible: open, transparent: true, animationType: "fade", onRequestClose: () => setOpen(false), children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-        import_react_native7.Pressable,
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_react_native9.Modal, { visible: open, transparent: true, animationType: "fade", onRequestClose: () => setOpen(false), children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+        import_react_native9.Pressable,
         {
           style: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "center", padding: 16 },
           onPress: () => setOpen(false),
-          children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_react_native7.Pressable, { onPress: () => null, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Card, { gap: "$2", background: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", children: [
-            ariaLabel ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { fontSize: 16, fontWeight: "700", children: ariaLabel }) : null,
-            /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_react_native7.ScrollView, { style: { maxHeight: 320 }, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_react_native7.View, { style: { gap: 8 }, children: options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+          children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_react_native9.Pressable, { onPress: () => null, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(Card, { gap: "$2", background: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", children: [
+            ariaLabel ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { fontSize: 16, fontWeight: "700", children: ariaLabel }) : null,
+            /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_react_native9.ScrollView, { style: { maxHeight: 320 }, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_react_native9.View, { style: { gap: 8 }, children: options.map((opt) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
               Button,
               {
                 onPress: () => {
@@ -381,11 +447,11 @@ function SelectField({
                 background: opt.value === value ? "$color4" : "$background",
                 borderWidth: 1,
                 borderColor: "$borderColor",
-                children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { fontSize: 12, children: opt.label })
+                children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { fontSize: 12, children: opt.label })
               },
               opt.value
             )) }) }),
-            closeLabel ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Button, { onPress: () => setOpen(false), size: "$3", chromeless: true, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: closeLabel }) }) : null
+            closeLabel ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Button, { onPress: () => setOpen(false), size: "$3", chromeless: true, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: closeLabel }) }) : null
           ] }) })
         }
       ) })
@@ -394,17 +460,20 @@ function SelectField({
 }
 
 // src/primitives/Spinner.tsx
-var import_tamagui10 = require("tamagui");
-var import_jsx_runtime11 = require("react/jsx-runtime");
+var import_tamagui11 = require("tamagui");
+var import_jsx_runtime12 = require("react/jsx-runtime");
 function Spinner(props) {
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_tamagui10.Spinner, { ...props });
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_tamagui11.Spinner, { ...props });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AdSlotCard,
+  BrewCheckbox,
   Button,
   Card,
   Collapsible,
+  FIELD_READONLY_BG,
+  FIELD_READONLY_BORDER,
   Heading,
   Input,
   ModeFieldset,
@@ -415,5 +484,6 @@ function Spinner(props) {
   Screen,
   SelectField,
   Spinner,
-  Text
+  Text,
+  ThemeVarsInjector
 });

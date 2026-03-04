@@ -21,7 +21,14 @@ import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 
 import { AdSlot } from "../components/AdSlot";
 import { Input } from "../components/AppInput";
-import { FIELD_COMPUTED_BG, FIELD_COMPUTED_BORDER, SURFACE_BACKGROUND, SURFACE_BORDER, SURFACE_CARD } from "../theme/colors";
+import {
+  FIELD_COMPUTED_BG,
+  FIELD_COMPUTED_BORDER,
+  FIELD_READONLY_BG,
+  FIELD_READONLY_BORDER,
+  SURFACE_BACKGROUND,
+  SURFACE_BORDER,
+} from "../theme/colors";
 import { MashStepsEditor, SpargeStepReadOnlyRow, type WaterVolumes } from "@brewery/recipes-ui";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { useAuth } from "../auth/AuthProvider";
@@ -269,6 +276,7 @@ export function RecipeEditScreen() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
+  const [mashProcedure, setMashProcedure] = useState<{ name: string; grainTemperatureC: number } | null>(null);
   const [mashRows, setMashRows] = useState<EditorMashStep[]>([]);
   const [waterSettings, setWaterSettings] = useState<{
     spargeStepTemperatureC?: number | null;
@@ -368,6 +376,7 @@ export function RecipeEditScreen() {
         setGristRows([]);
         setHopsRows([]);
         setYeastRows([]);
+        setMashProcedure(null);
         setMashRows([]);
         return;
       }
@@ -375,7 +384,16 @@ export function RecipeEditScreen() {
       setGristRows(s.gristRows);
       setHopsRows(s.hopsRows);
       const mashMerged = mergeMashDeduceFromExt(s.mash, ext);
-      setMashRows(mashMerged?.steps ?? []);
+      if (mashMerged) {
+        setMashProcedure({
+          name: mashMerged.name || "Mash",
+          grainTemperatureC: mashMerged.grainTemperatureC,
+        });
+        setMashRows(mashMerged.steps);
+      } else {
+        setMashProcedure(null);
+        setMashRows([]);
+      }
       const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
       const mappedYeastRows: EditorYeastRow[] = baseYeast.map((row) => {
         const fermentationTempC =
@@ -1794,11 +1812,17 @@ export function RecipeEditScreen() {
                       {t("mashingWaterVolumesUnavailable")}
                     </Text>
                   )}
-                  <View style={{ marginBottom: 12, padding: 12, borderWidth: 1, borderColor: SURFACE_BORDER, borderRadius: 8, backgroundColor: SURFACE_CARD }}>
+                  <View style={{ marginBottom: 12 }}>
+                    <Text fontSize={12} opacity={0.8} mb="$2">
+                      {t("mashStepsFromWaterPage")}
+                    </Text>
                     <MashStepsEditor
                       mashRows={mashRowsFiltered}
+                      mashProcedure={mashProcedure}
                       waterVolumes={waterVolumes}
                       readOnly
+                      cardBackgroundColor={FIELD_READONLY_BG}
+                      cardBorderColor={FIELD_READONLY_BORDER}
                       t={t}
                       tUnits={tUnits}
                       locale={locale}
@@ -1806,7 +1830,7 @@ export function RecipeEditScreen() {
                     />
                   </View>
                   {(spargeRows.length > 0 || (spargeConfigured && waterVolumes)) ? (
-                    <View style={{ marginBottom: 12, padding: 12, borderWidth: 1, borderColor: SURFACE_BORDER, borderRadius: 8, backgroundColor: SURFACE_CARD }}>
+                    <View style={{ marginBottom: 12 }}>
                       <Text fontSize={12} opacity={0.8} mb="$2">
                         {t("spargeStepFromWaterPage")}
                       </Text>
@@ -1844,6 +1868,8 @@ export function RecipeEditScreen() {
                                   timeDisplay={timeDisplay}
                                   amountDisplay={amountDisplay}
                                   rampDisplay={rampDisplay}
+                                  cardBackgroundColor={FIELD_READONLY_BG}
+                                  cardBorderColor={FIELD_READONLY_BORDER}
                                   labels={{
                                     name: t("mashingStepName"),
                                     type: t("mashingStepType"),
@@ -1876,6 +1902,8 @@ export function RecipeEditScreen() {
                                 timeDisplay={String(waterSettings?.spargeStepTimeMin ?? 60)}
                                 amountDisplay={`${waterVolumes ? formatFixed(locale, waterVolumes.spargeLiters, 2) : "—"} ${tUnits("L")}`}
                                 rampDisplay={String(waterSettings?.spargeStepRampMin ?? 0)}
+                                cardBackgroundColor={FIELD_READONLY_BG}
+                                cardBorderColor={FIELD_READONLY_BORDER}
                                 labels={{
                                   name: t("mashingStepName"),
                                   type: t("mashingStepType"),

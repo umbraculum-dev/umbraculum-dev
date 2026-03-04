@@ -182,9 +182,9 @@ function SaltAdditionsEditor(props) {
 }
 
 // src/mash/MashStepsEditor.tsx
-import { Checkbox, XStack as XStack2, YStack as YStack3 } from "tamagui";
+import { XStack as XStack2, YStack as YStack3 } from "tamagui";
 import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@brewery/beerjson";
-import { Button as Button2, Card as Card3, Input as Input2, ReadOnlyField, ReadOnlyFieldRow, SelectField as SelectField2, Text as Text4 } from "@brewery/ui";
+import { BrewCheckbox, Button as Button2, Card as Card3, Input as Input2, ReadOnlyField, ReadOnlyFieldRow, SelectField as SelectField2, Text as Text4 } from "@brewery/ui";
 import { Fragment, jsx as jsx3, jsxs as jsxs4 } from "react/jsx-runtime";
 function stepTypeOptions(hideSparge) {
   return hideSparge ? MASH_STEP_TYPE_OPTIONS.filter((o) => o.value !== "sparge") : MASH_STEP_TYPE_OPTIONS;
@@ -198,8 +198,11 @@ function MashStepsEditor(props) {
     firstStepAmountComputed = null,
     hideSpargeFromTypeOptions = false,
     readOnly = false,
+    cardBackgroundColor,
+    cardBorderColor,
     onUpdateProcedure,
     onUpdateStep,
+    onMoveStep,
     onAddStep,
     onDeleteStep,
     onAddFromTemplate,
@@ -212,6 +215,10 @@ function MashStepsEditor(props) {
     locale,
     formatFixed
   } = props;
+  const isSpargeRow = (r) => r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+  const movableIndices = mashRows.map((r, idx) => ({ r, idx })).filter(({ r, idx }) => idx > 0 && !isSpargeRow(r)).map(({ idx }) => idx);
+  const firstMovableIdx = movableIndices.length ? movableIndices[0] : null;
+  const lastMovableIdx = movableIndices.length ? movableIndices[movableIndices.length - 1] : null;
   if (readOnly) {
     return /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
       mashProcedure ? /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, opacity: 0.8, children: [
@@ -230,12 +237,12 @@ function MashStepsEditor(props) {
           Card3,
           {
             "data-mash-step-card": true,
-            theme: "surface2",
+            theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
             gap: "$2",
             padding: "$3",
-            backgroundColor: "$background",
+            backgroundColor: cardBackgroundColor ?? "$background",
             borderWidth: 1,
-            borderColor: "$borderColor",
+            borderColor: cardBorderColor ?? "$borderColor",
             children: [
               /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, fontWeight: "700", children: [
                 idx + 1,
@@ -313,12 +320,15 @@ function MashStepsEditor(props) {
       )
     ] }) : null,
     mashRows.map((r, idx) => {
-      const isSpargeStep = r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+      const isSpargeStep = isSpargeRow(r);
       const disableName = isSpargeStep || idx === 0 && firstStepAmountComputed != null;
       const disableType = isSpargeStep;
-      const disableAmount = isSpargeStep || idx === 0 && firstStepAmountComputed != null || idx > 0 && r.deduceFromMashIn === true;
+      const disableAmount = isSpargeStep || idx === 0 && firstStepAmountComputed != null || idx > 0 && r.deduceFromMashIn !== true;
       const typeOptions = stepTypeOptions(hideSpargeFromTypeOptions);
       const typeValue = r.type;
+      const canReorder = Boolean(onMoveStep) && idx > 0 && !isSpargeStep;
+      const disableMoveUp = !canReorder || firstMovableIdx == null || idx === firstMovableIdx;
+      const disableMoveDown = !canReorder || lastMovableIdx == null || idx === lastMovableIdx;
       return /* @__PURE__ */ jsxs4(Card3, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
         /* @__PURE__ */ jsxs4(XStack2, { justifyContent: "space-between", alignItems: "center", children: [
           /* @__PURE__ */ jsxs4(Text4, { fontSize: 14, fontWeight: "700", children: [
@@ -326,7 +336,33 @@ function MashStepsEditor(props) {
             ". ",
             r.name || t("mashingStepName")
           ] }),
-          idx > 0 && onDeleteStep ? /* @__PURE__ */ jsx3(Button2, { size: "$2", chromeless: true, onPress: () => onDeleteStep(r.id), children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+          /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", alignItems: "center", children: [
+            canReorder ? /* @__PURE__ */ jsxs4(Fragment, { children: [
+              /* @__PURE__ */ jsx3(
+                Button2,
+                {
+                  size: "$2",
+                  chromeless: true,
+                  disabled: disableMoveUp,
+                  onPress: () => onMoveStep?.(r.id, "up"),
+                  accessibilityLabel: t("moveUp"),
+                  children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("moveUp") })
+                }
+              ),
+              /* @__PURE__ */ jsx3(
+                Button2,
+                {
+                  size: "$2",
+                  chromeless: true,
+                  disabled: disableMoveDown,
+                  onPress: () => onMoveStep?.(r.id, "down"),
+                  accessibilityLabel: t("moveDown"),
+                  children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("moveDown") })
+                }
+              )
+            ] }) : null,
+            idx > 0 && onDeleteStep ? /* @__PURE__ */ jsx3(Button2, { size: "$2", chromeless: true, onPress: () => onDeleteStep(r.id), children: /* @__PURE__ */ jsx3(Text4, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+          ] })
         ] }),
         /* @__PURE__ */ jsxs4(YStack3, { gap: "$2", children: [
           /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", children: [
@@ -389,12 +425,7 @@ function MashStepsEditor(props) {
             ] })
           ] }),
           /* @__PURE__ */ jsxs4(YStack3, { gap: "$1", children: [
-            /* @__PURE__ */ jsxs4(Text4, { fontSize: 11, opacity: 0.8, children: [
-              t("mashingStepAmount", { unit: "L" }),
-              " (",
-              tUnits("L"),
-              ")"
-            ] }),
+            /* @__PURE__ */ jsx3(Text4, { fontSize: 11, opacity: 0.8, children: t("mashingStepAmount", { unit: tUnits("L") }) }),
             isSpargeStep ? /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.85, children: waterVolumes ? `${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}` : "\u2014" }) : idx === 0 && firstStepAmountComputed != null ? /* @__PURE__ */ jsxs4(Text4, { fontSize: 12, opacity: 0.85, children: [
               formatFixed(locale, firstStepAmountComputed, 2),
               " ",
@@ -416,18 +447,16 @@ function MashStepsEditor(props) {
           ] }),
           idx > 0 ? /* @__PURE__ */ jsxs4(XStack2, { gap: "$2", alignItems: "center", children: [
             /* @__PURE__ */ jsx3(
-              Checkbox,
+              BrewCheckbox,
               {
                 id: `mash-step-deduce-${r.id}`,
                 checked: r.deduceFromMashIn === true,
                 onCheckedChange: (checked) => onUpdateStep?.(r.id, {
-                  deduceFromMashIn: checked === true,
-                  ...checked === true ? {} : { amountL: 0 }
+                  deduceFromMashIn: checked === true
                 }),
-                "aria-label": t("mashingDeduceFromMashIn"),
                 size: "$2",
-                native: true,
-                children: /* @__PURE__ */ jsx3(Checkbox.Indicator, {})
+                accessibilityLabel: t("mashingDeduceFromMashIn"),
+                accessibilityRole: "checkbox"
               }
             ),
             /* @__PURE__ */ jsx3(Text4, { fontSize: 12, opacity: 0.85, children: t("mashingDeduceFromMashIn") })
@@ -457,21 +486,34 @@ import { YStack as YStack4 } from "tamagui";
 import { Card as Card4, ReadOnlyField as ReadOnlyField2, ReadOnlyFieldRow as ReadOnlyFieldRow2, Text as Text5 } from "@brewery/ui";
 import { jsx as jsx4, jsxs as jsxs5 } from "react/jsx-runtime";
 function SpargeStepReadOnlyRow(props) {
-  return /* @__PURE__ */ jsxs5(Card4, { "data-mash-step-card": true, theme: "surface2", backgroundColor: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", gap: "$2", children: [
-    /* @__PURE__ */ jsxs5(Text5, { fontSize: 12, fontWeight: "700", children: [
-      props.stepNumber,
-      ". ",
-      props.title
-    ] }),
-    /* @__PURE__ */ jsx4(YStack4, { gap: "$2", children: /* @__PURE__ */ jsxs5(ReadOnlyFieldRow2, { children: [
-      /* @__PURE__ */ jsx4(ReadOnlyField2, { label: props.labels.name, value: props.name, minWidth: 90 }),
-      /* @__PURE__ */ jsx4(ReadOnlyField2, { label: props.labels.type, value: props.typeLabel, minWidth: 110 }),
-      /* @__PURE__ */ jsx4(ReadOnlyField2, { label: props.labels.temp, value: props.tempDisplay, minWidth: 90 }),
-      /* @__PURE__ */ jsx4(ReadOnlyField2, { label: props.labels.time, value: props.timeDisplay, minWidth: 90 }),
-      /* @__PURE__ */ jsx4(ReadOnlyField2, { label: props.labels.amount, value: props.amountDisplay, minWidth: 120 }),
-      /* @__PURE__ */ jsx4(ReadOnlyField2, { label: props.labels.ramp, value: props.rampDisplay, minWidth: 90 })
-    ] }) })
-  ] });
+  const { cardBackgroundColor, cardBorderColor, labels, ...rest } = props;
+  return /* @__PURE__ */ jsxs5(
+    Card4,
+    {
+      "data-mash-step-card": true,
+      theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
+      backgroundColor: cardBackgroundColor ?? "$background",
+      borderWidth: 1,
+      borderColor: cardBorderColor ?? "$borderColor",
+      padding: "$3",
+      gap: "$2",
+      children: [
+        /* @__PURE__ */ jsxs5(Text5, { fontSize: 12, fontWeight: "700", children: [
+          rest.stepNumber,
+          ". ",
+          rest.title
+        ] }),
+        /* @__PURE__ */ jsx4(YStack4, { gap: "$2", children: /* @__PURE__ */ jsxs5(ReadOnlyFieldRow2, { children: [
+          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.name, value: rest.name, minWidth: 90 }),
+          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.type, value: rest.typeLabel, minWidth: 110 }),
+          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.temp, value: rest.tempDisplay, minWidth: 90 }),
+          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.time, value: rest.timeDisplay, minWidth: 90 }),
+          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.amount, value: rest.amountDisplay, minWidth: 120 }),
+          /* @__PURE__ */ jsx4(ReadOnlyField2, { label: labels.ramp, value: rest.rampDisplay, minWidth: 90 })
+        ] }) })
+      ]
+    }
+  );
 }
 export {
   ManualCellCountHelpBox,

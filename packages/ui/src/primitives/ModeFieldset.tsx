@@ -1,4 +1,5 @@
 import React from "react";
+import { Platform } from "react-native";
 import { Label, RadioGroup, XStack, YStack } from "tamagui";
 
 import { Card } from "./Card";
@@ -14,6 +15,7 @@ export function ModeFieldset<T extends string>(props: {
   options: ModeOption<T>[];
 }) {
   const { legend, name, value, onChange, options } = props;
+  const isWeb = Platform.OS === "web";
 
   return (
     <Card
@@ -29,6 +31,7 @@ export function ModeFieldset<T extends string>(props: {
       </Text>
 
       <RadioGroup
+        native={isWeb}
         name={name}
         value={value}
         onValueChange={(v) => onChange(v as T)}
@@ -37,10 +40,18 @@ export function ModeFieldset<T extends string>(props: {
         <YStack gap="$2">
           {options.map((o) => {
             const id = `${name}-${o.value}`;
+            const checked = value === o.value;
             return (
               <XStack key={o.value} gap="$2" alignItems="center">
-                <RadioGroup.Item id={id} value={o.value} size="$3" borderColor="$borderColor">
-                  <RadioGroup.Indicator />
+                <RadioGroup.Item
+                  id={id}
+                  value={o.value}
+                  size="$3"
+                  borderColor="$borderColor"
+                >
+                  {!isWeb ? (
+                    <RadioGroup.Indicator unstyled width={10} height={10} borderRadius={9999} backgroundColor="$color8" />
+                  ) : null}
                 </RadioGroup.Item>
                 <Label htmlFor={id}>
                   <Text fontSize={12}>{o.label}</Text>

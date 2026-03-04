@@ -1,6 +1,20 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import React, { ReactNode, ComponentProps } from 'react';
-import { Button as Button$1, YStack, Input as Input$1, Spinner as Spinner$1, SizableText } from 'tamagui';
+import { Button as Button$1, YStack, Checkbox, Input as Input$1, Spinner as Spinner$1, SizableText } from 'tamagui';
+
+/**
+ * Centralized read-only field tokens.
+ * Single source of truth for web and native. Matches web default theme
+ * color-mix(in srgb, var(--info) 8%, var(--surface)) ≈ #232934.
+ */
+declare const FIELD_READONLY_BG = "#232934";
+declare const FIELD_READONLY_BORDER = "#3a4558";
+
+/**
+ * Injects shared readonly field tokens into document root so web and native
+ * use the same colors. Must run client-side.
+ */
+declare function ThemeVarsInjector(): null;
 
 interface AdSlotCardProps {
     ariaLabel: string;
@@ -18,6 +32,10 @@ type CardProps = Omit<ComponentProps<typeof YStack>, "children"> & {
     children: ReactNode;
 };
 declare function Card(props: CardProps): react_jsx_runtime.JSX.Element;
+
+interface BrewCheckboxProps extends Omit<ComponentProps<typeof Checkbox>, "children" | "native" | "unstyled"> {
+}
+declare function BrewCheckbox(props: BrewCheckboxProps): react_jsx_runtime.JSX.Element;
 
 interface CollapsibleProps {
     title: string;
@@ -98,4 +116,4 @@ type HeadingProps = Omit<TextProps, "size"> & {
 };
 declare function Heading({ size, fontWeight, ...props }: HeadingProps): react_jsx_runtime.JSX.Element;
 
-export { AdSlotCard, type AdSlotCardProps, Button, type ButtonProps, Card, type CardProps, Collapsible, type CollapsibleProps, Heading, type HeadingProps, Input, type InputProps, ModeFieldset, type ModeOption, ReadOnlyField, ReadOnlyFieldLabel, type ReadOnlyFieldLabelProps, type ReadOnlyFieldProps, ReadOnlyFieldRow, type ReadOnlyFieldRowProps, ReadOnlyFieldValue, type ReadOnlyFieldValueProps, Screen, type ScreenProps, SelectField, type SelectFieldProps, type SelectOption, Spinner, type SpinnerProps, Text, type TextProps };
+export { AdSlotCard, type AdSlotCardProps, BrewCheckbox, type BrewCheckboxProps, Button, type ButtonProps, Card, type CardProps, Collapsible, type CollapsibleProps, FIELD_READONLY_BG, FIELD_READONLY_BORDER, Heading, type HeadingProps, Input, type InputProps, ModeFieldset, type ModeOption, ReadOnlyField, ReadOnlyFieldLabel, type ReadOnlyFieldLabelProps, type ReadOnlyFieldProps, ReadOnlyFieldRow, type ReadOnlyFieldRowProps, ReadOnlyFieldValue, type ReadOnlyFieldValueProps, Screen, type ScreenProps, SelectField, type SelectFieldProps, type SelectOption, Spinner, type SpinnerProps, Text, type TextProps, ThemeVarsInjector };

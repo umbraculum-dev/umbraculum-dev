@@ -621,6 +621,36 @@ export function WaterMashScreen() {
     setMashRows((prev) => prev.filter((r) => r.id !== id));
   };
 
+  const moveMashStep = (id: string, direction: "up" | "down") => {
+    setMashStepsDirty(true);
+    setMashRows((prev) => {
+      const idx = prev.findIndex((r) => r.id === id);
+      const row = idx >= 0 ? prev[idx] : null;
+      if (!row) return prev;
+
+      const isSpargeRow = (r: EditorMashStep) => r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+      if (idx <= 0 || isSpargeRow(row)) return prev;
+
+      const movable = prev
+        .map((r, i) => ({ r, i }))
+        .filter(({ r, i }) => i > 0 && !isSpargeRow(r))
+        .map(({ i }) => i);
+      if (!movable.length) return prev;
+
+      const targetIdx =
+        direction === "up"
+          ? [...movable].reverse().find((i) => i < idx) ?? null
+          : movable.find((i) => i > idx) ?? null;
+      if (targetIdx == null) return prev;
+
+      const next = prev.slice();
+      const tmp = next[idx];
+      next[idx] = next[targetIdx];
+      next[targetIdx] = tmp;
+      return next;
+    });
+  };
+
   const addMashFromTemplate = (templateId: string) => {
     const tpl = MASH_TEMPLATES.find((x) => x.id === templateId);
     if (!tpl) return;
@@ -686,8 +716,8 @@ export function WaterMashScreen() {
         recipe.recipeExtJson && typeof recipe.recipeExtJson === "object" ? recipe.recipeExtJson : ({ version: 1 } as Record<string, unknown>);
       const mashStepDeduceFromMashIn = Object.fromEntries(
         mashRows
-          .filter((r, i) => i > 0 && r.deduceFromMashIn === true)
-          .map((r) => [r.id, true] as const)
+          .map((r, idx) => [String(idx), r.deduceFromMashIn === true] as const)
+          .filter(([k, v]) => k !== "0" && v === true)
       );
       const recipeExtJson = { ...(extBase as Record<string, unknown>), mashStepDeduceFromMashIn };
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
@@ -1154,6 +1184,7 @@ export function WaterMashScreen() {
                   firstStepAmountComputed={derivedMashWaterVolumeLiters > 0 ? computeFirstStepAmountL : null}
                   readOnly={false}
                   onUpdateStep={updateMashStep}
+                  onMoveStep={moveMashStep}
                   onAddStep={addMashStep}
                   onDeleteStep={deleteMashStep}
                   onAddFromTemplate={addMashFromTemplate}

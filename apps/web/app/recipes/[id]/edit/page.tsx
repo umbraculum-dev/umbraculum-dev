@@ -434,6 +434,12 @@ export default function RecipeEditPage() {
   }, []);
 
   useEffect(() => {
+    if (mashRows.length > 0 && !openSections.mashing) {
+      setSectionOpen("mashing", true);
+    }
+  }, [mashRows.length, openSections.mashing]);
+
+  useEffect(() => {
     if (typeof document === "undefined") return;
     const handler = () => {
       if (document.visibilityState === "visible") {
@@ -975,8 +981,8 @@ export default function RecipeEditPage() {
 
       extBaseForSave.mashStepDeduceFromMashIn = Object.fromEntries(
         mashRows
-          .filter((r, i) => i > 0 && r.deduceFromMashIn === true)
-          .map((r) => [r.id, true] as const),
+          .map((r, idx) => [String(idx), r.deduceFromMashIn === true] as const)
+          .filter(([k, v]) => k !== "0" && v === true),
       );
 
       const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
@@ -2572,6 +2578,9 @@ export default function RecipeEditPage() {
               </SizableText>
             )}
 
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2">
+                  {t("mashStepsFromWaterPage")}
+                </SizableText>
                 <View mt="$3">
                   <MashStepsEditor
                     mashRows={mashRowsFiltered}

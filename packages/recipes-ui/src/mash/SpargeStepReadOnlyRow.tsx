@@ -12,6 +12,10 @@ export interface SpargeStepReadOnlyRowProps {
   timeDisplay: string;
   amountDisplay: string;
   rampDisplay: string;
+  /** Override card background (e.g. native: SURFACE_CARD for contrast with field values). */
+  cardBackgroundColor?: string;
+  /** Override card border color. */
+  cardBorderColor?: string;
   labels: {
     name: string;
     type: string;
@@ -23,19 +27,28 @@ export interface SpargeStepReadOnlyRowProps {
 }
 
 export function SpargeStepReadOnlyRow(props: SpargeStepReadOnlyRowProps) {
+  const { cardBackgroundColor, cardBorderColor, labels, ...rest } = props;
   return (
-    <Card data-mash-step-card theme="surface2" backgroundColor="$background" borderWidth={1} borderColor="$borderColor" padding="$3" gap="$2">
+    <Card
+      data-mash-step-card
+      theme={cardBackgroundColor ?? cardBorderColor ? undefined : "surface2"}
+      backgroundColor={cardBackgroundColor ?? "$background"}
+      borderWidth={1}
+      borderColor={cardBorderColor ?? "$borderColor"}
+      padding="$3"
+      gap="$2"
+    >
       <Text fontSize={12} fontWeight="700">
-        {props.stepNumber}. {props.title}
+        {rest.stepNumber}. {rest.title}
       </Text>
       <YStack gap="$2">
         <ReadOnlyFieldRow>
-          <ReadOnlyField label={props.labels.name} value={props.name} minWidth={90} />
-          <ReadOnlyField label={props.labels.type} value={props.typeLabel} minWidth={110} />
-          <ReadOnlyField label={props.labels.temp} value={props.tempDisplay} minWidth={90} />
-          <ReadOnlyField label={props.labels.time} value={props.timeDisplay} minWidth={90} />
-          <ReadOnlyField label={props.labels.amount} value={props.amountDisplay} minWidth={120} />
-          <ReadOnlyField label={props.labels.ramp} value={props.rampDisplay} minWidth={90} />
+          <ReadOnlyField label={labels.name} value={rest.name} minWidth={90} />
+          <ReadOnlyField label={labels.type} value={rest.typeLabel} minWidth={110} />
+          <ReadOnlyField label={labels.temp} value={rest.tempDisplay} minWidth={90} />
+          <ReadOnlyField label={labels.time} value={rest.timeDisplay} minWidth={90} />
+          <ReadOnlyField label={labels.amount} value={rest.amountDisplay} minWidth={120} />
+          <ReadOnlyField label={labels.ramp} value={rest.rampDisplay} minWidth={90} />
         </ReadOnlyFieldRow>
       </YStack>
     </Card>

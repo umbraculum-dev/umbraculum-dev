@@ -825,6 +825,8 @@
       "mashingStepAmount": "Quantità ({unit})",
       "mashingStepRamp": "Rampa ({unit})",
       "mashingDeleteStep": "Elimina step",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
       "mashingDeduceFromMashIn": "Deduci da Mash in",
       "mashingSave": "Salva (inclusa mash)",
       "mashingSaveMashSteps": "Salva",

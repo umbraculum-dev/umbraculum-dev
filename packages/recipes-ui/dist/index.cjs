@@ -229,8 +229,11 @@ function MashStepsEditor(props) {
     firstStepAmountComputed = null,
     hideSpargeFromTypeOptions = false,
     readOnly = false,
+    cardBackgroundColor,
+    cardBorderColor,
     onUpdateProcedure,
     onUpdateStep,
+    onMoveStep,
     onAddStep,
     onDeleteStep,
     onAddFromTemplate,
@@ -243,6 +246,10 @@ function MashStepsEditor(props) {
     locale,
     formatFixed
   } = props;
+  const isSpargeRow = (r) => r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+  const movableIndices = mashRows.map((r, idx) => ({ r, idx })).filter(({ r, idx }) => idx > 0 && !isSpargeRow(r)).map(({ idx }) => idx);
+  const firstMovableIdx = movableIndices.length ? movableIndices[0] : null;
+  const lastMovableIdx = movableIndices.length ? movableIndices[movableIndices.length - 1] : null;
   if (readOnly) {
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.YStack, { gap: "$2", children: [
       mashProcedure ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_ui4.Text, { fontSize: 12, opacity: 0.8, children: [
@@ -261,12 +268,12 @@ function MashStepsEditor(props) {
           import_ui4.Card,
           {
             "data-mash-step-card": true,
-            theme: "surface2",
+            theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
             gap: "$2",
             padding: "$3",
-            backgroundColor: "$background",
+            backgroundColor: cardBackgroundColor ?? "$background",
             borderWidth: 1,
-            borderColor: "$borderColor",
+            borderColor: cardBorderColor ?? "$borderColor",
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_ui4.Text, { fontSize: 12, fontWeight: "700", children: [
                 idx + 1,
@@ -344,12 +351,15 @@ function MashStepsEditor(props) {
       )
     ] }) : null,
     mashRows.map((r, idx) => {
-      const isSpargeStep = r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
+      const isSpargeStep = isSpargeRow(r);
       const disableName = isSpargeStep || idx === 0 && firstStepAmountComputed != null;
       const disableType = isSpargeStep;
-      const disableAmount = isSpargeStep || idx === 0 && firstStepAmountComputed != null || idx > 0 && r.deduceFromMashIn === true;
+      const disableAmount = isSpargeStep || idx === 0 && firstStepAmountComputed != null || idx > 0 && r.deduceFromMashIn !== true;
       const typeOptions = stepTypeOptions(hideSpargeFromTypeOptions);
       const typeValue = r.type;
+      const canReorder = Boolean(onMoveStep) && idx > 0 && !isSpargeStep;
+      const disableMoveUp = !canReorder || firstMovableIdx == null || idx === firstMovableIdx;
+      const disableMoveDown = !canReorder || lastMovableIdx == null || idx === lastMovableIdx;
       return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_ui4.Card, { gap: "$2", padding: "$3", background: "$background", borderWidth: 1, borderColor: "$borderColor", children: [
         /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.XStack, { justifyContent: "space-between", alignItems: "center", children: [
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_ui4.Text, { fontSize: 14, fontWeight: "700", children: [
@@ -357,7 +367,33 @@ function MashStepsEditor(props) {
             ". ",
             r.name || t("mashingStepName")
           ] }),
-          idx > 0 && onDeleteStep ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Button, { size: "$2", chromeless: true, onPress: () => onDeleteStep(r.id), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.XStack, { gap: "$2", alignItems: "center", children: [
+            canReorder ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                import_ui4.Button,
+                {
+                  size: "$2",
+                  chromeless: true,
+                  disabled: disableMoveUp,
+                  onPress: () => onMoveStep?.(r.id, "up"),
+                  accessibilityLabel: t("moveUp"),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, children: t("moveUp") })
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                import_ui4.Button,
+                {
+                  size: "$2",
+                  chromeless: true,
+                  disabled: disableMoveDown,
+                  onPress: () => onMoveStep?.(r.id, "down"),
+                  accessibilityLabel: t("moveDown"),
+                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, children: t("moveDown") })
+                }
+              )
+            ] }) : null,
+            idx > 0 && onDeleteStep ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Button, { size: "$2", chromeless: true, onPress: () => onDeleteStep(r.id), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, children: t("mashingDeleteStep") }) }) : null
+          ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.YStack, { gap: "$2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.YStack, { gap: "$1", children: [
@@ -420,12 +456,7 @@ function MashStepsEditor(props) {
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.YStack, { gap: "$1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_ui4.Text, { fontSize: 11, opacity: 0.8, children: [
-              t("mashingStepAmount", { unit: "L" }),
-              " (",
-              tUnits("L"),
-              ")"
-            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 11, opacity: 0.8, children: t("mashingStepAmount", { unit: tUnits("L") }) }),
             isSpargeStep ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, opacity: 0.85, children: waterVolumes ? `${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}` : "\u2014" }) : idx === 0 && firstStepAmountComputed != null ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_ui4.Text, { fontSize: 12, opacity: 0.85, children: [
               formatFixed(locale, firstStepAmountComputed, 2),
               " ",
@@ -447,18 +478,16 @@ function MashStepsEditor(props) {
           ] }),
           idx > 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.XStack, { gap: "$2", alignItems: "center", children: [
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-              import_tamagui3.Checkbox,
+              import_ui4.BrewCheckbox,
               {
                 id: `mash-step-deduce-${r.id}`,
                 checked: r.deduceFromMashIn === true,
                 onCheckedChange: (checked) => onUpdateStep?.(r.id, {
-                  deduceFromMashIn: checked === true,
-                  ...checked === true ? {} : { amountL: 0 }
+                  deduceFromMashIn: checked === true
                 }),
-                "aria-label": t("mashingDeduceFromMashIn"),
                 size: "$2",
-                native: true,
-                children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_tamagui3.Checkbox.Indicator, {})
+                accessibilityLabel: t("mashingDeduceFromMashIn"),
+                accessibilityRole: "checkbox"
               }
             ),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, opacity: 0.85, children: t("mashingDeduceFromMashIn") })
@@ -488,21 +517,34 @@ var import_tamagui4 = require("tamagui");
 var import_ui5 = require("@brewery/ui");
 var import_jsx_runtime5 = require("react/jsx-runtime");
 function SpargeStepReadOnlyRow(props) {
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.Card, { "data-mash-step-card": true, theme: "surface2", backgroundColor: "$background", borderWidth: 1, borderColor: "$borderColor", padding: "$3", gap: "$2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.Text, { fontSize: 12, fontWeight: "700", children: [
-      props.stepNumber,
-      ". ",
-      props.title
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_tamagui4.YStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.ReadOnlyFieldRow, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: props.labels.name, value: props.name, minWidth: 90 }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: props.labels.type, value: props.typeLabel, minWidth: 110 }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: props.labels.temp, value: props.tempDisplay, minWidth: 90 }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: props.labels.time, value: props.timeDisplay, minWidth: 90 }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: props.labels.amount, value: props.amountDisplay, minWidth: 120 }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: props.labels.ramp, value: props.rampDisplay, minWidth: 90 })
-    ] }) })
-  ] });
+  const { cardBackgroundColor, cardBorderColor, labels, ...rest } = props;
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+    import_ui5.Card,
+    {
+      "data-mash-step-card": true,
+      theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
+      backgroundColor: cardBackgroundColor ?? "$background",
+      borderWidth: 1,
+      borderColor: cardBorderColor ?? "$borderColor",
+      padding: "$3",
+      gap: "$2",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.Text, { fontSize: 12, fontWeight: "700", children: [
+          rest.stepNumber,
+          ". ",
+          rest.title
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_tamagui4.YStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_ui5.ReadOnlyFieldRow, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: labels.name, value: rest.name, minWidth: 90 }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: labels.type, value: rest.typeLabel, minWidth: 110 }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: labels.temp, value: rest.tempDisplay, minWidth: 90 }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: labels.time, value: rest.timeDisplay, minWidth: 90 }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: labels.amount, value: rest.amountDisplay, minWidth: 120 }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(import_ui5.ReadOnlyField, { label: labels.ramp, value: rest.rampDisplay, minWidth: 90 })
+        ] }) })
+      ]
+    }
+  );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
