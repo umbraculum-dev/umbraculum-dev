@@ -18,6 +18,7 @@
   /* Global UI sizing knobs. */
   --panel-padding: 12px;
   --app-shell-padding: 16px;
+  --brew-section-gap: 16px;
   --control-padding: 8px;
   --button-padding-y: 8px;
   --button-padding-x: 10px;
@@ -67,6 +68,7 @@ html[data-brand="forest"] {
 html[data-density="compact"] {
   --panel-padding: 10px;
   --app-shell-padding: 12px;
+  --brew-section-gap: 12px;
   --control-padding: 6px;
   --button-padding-y: 6px;
   --button-padding-x: 8px;

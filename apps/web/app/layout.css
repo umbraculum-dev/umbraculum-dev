@@ -124,6 +124,10 @@ code {
   padding: var(--panel-padding);
 }
 
+.brew-section {
+  margin-top: var(--brew-section-gap);
+}
+
 .brew-code-block {
   background: var(--surface-2);
   border: 1px solid var(--border);

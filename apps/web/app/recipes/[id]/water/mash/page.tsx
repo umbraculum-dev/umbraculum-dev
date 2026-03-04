@@ -26,7 +26,7 @@ import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesRes
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { ModeFieldset } from "@brewery/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
-import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
   bicarbonatePpmToAlkalinityPpmCaCO3,
@@ -199,6 +199,7 @@ export default function MashWaterPage() {
   const canCall = authState.status === "ready";
 
   const [surfaceMath, setSurfaceMath] = useState(false);
+  const [openMashSections, setOpenMashSections] = useState<string[]>(["adjustment"]);
   useEffect(() => {
     try {
       const v = sessionStorage.getItem("brewery:surfaceMath:mash");
@@ -1217,223 +1218,283 @@ export default function MashWaterPage() {
       ) : null}
 
       <YStack gap="$4">
-        <View className="brew-panel" aria-labelledby="adjustment-heading">
-          <H2 id="adjustment-heading" mt={0}>
-            {t("adjustmentHeading")}
-          </H2>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-            Choose source/target/dilution profiles and volumes to compute a mixed starting water profile.
-            Manage profiles on <Link href="/water-profiles">Water profiles</Link>.
-          </SizableText>
+        <Accordion type="multiple" value={openMashSections} onValueChange={(next) => setOpenMashSections(Array.isArray(next) ? next : next ? [next] : [])}>
+          <Accordion.Item value="adjustment">
+            <View className="brew-panel" aria-labelledby="adjustment-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="adjustment-heading" mt={0}>
+                      {t("adjustmentHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openMashSections.includes("adjustment") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  Choose source/target/dilution profiles and volumes to compute a mixed starting water profile. Manage profiles on{" "}
+                  <Link href="/water-profiles">Water profiles</Link>.
+                </SizableText>
 
-          <XStack gap="$3" flexWrap="wrap" ai="flex-end">
-            <View flex={1} minWidth={200}>
-              <YStack gap="$1.5">
-                <RecipeEditFieldLabel htmlFor="source-profile">
-                Source water profile (starting water)
-              </RecipeEditFieldLabel>
-              <BrewSelect
-                id="source-profile"
-                value={sourceProfileId}
-                onValueChange={setSourceProfileId}
-                options={waterProfiles.map((p) => ({
-                  value: p.id,
-                  label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
-                }))}
-                width="full"
-              />
-              </YStack>
+                <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="source-profile">
+                        Source water profile (starting water)
+                      </RecipeEditFieldLabel>
+                      <BrewSelect
+                        id="source-profile"
+                        value={sourceProfileId}
+                        onValueChange={setSourceProfileId}
+                        options={waterProfiles.map((p) => ({
+                          value: p.id,
+                          label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                        }))}
+                        width="full"
+                      />
+                    </YStack>
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="target-profile">Target water profile</RecipeEditFieldLabel>
+                      <BrewSelect
+                        id="target-profile"
+                        value={targetProfileId}
+                        onValueChange={setTargetProfileId}
+                        options={waterProfiles.map((p) => ({
+                          value: p.id,
+                          label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                        }))}
+                        width="full"
+                      />
+                    </YStack>
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="dilution-profile">Dilution water profile</RecipeEditFieldLabel>
+                      <BrewSelect
+                        id="dilution-profile"
+                        value={dilutionProfileId}
+                        onValueChange={setDilutionProfileId}
+                        options={dilutionProfiles.map((p) => ({
+                          value: p.id,
+                          label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
+                        }))}
+                        width="full"
+                      />
+                    </YStack>
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="tap-volume">
+                        {t("sourceVolumeLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="tap-volume"
+                        keyboardType="decimal-pad"
+                        value={String(tapVolumeLiters)}
+                        onChangeText={(text) => setTapVolumeLiters(Number(text) || 0)}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                  </View>
+                  <View flex={1} minWidth={200}>
+                    <YStack gap="$1.5">
+                      <RecipeEditFieldLabel htmlFor="dilution-volume">
+                        {t("dilutionVolumeLabel", { unit: tUnits("L") })}
+                      </RecipeEditFieldLabel>
+                      <Input
+                        id="dilution-volume"
+                        keyboardType="decimal-pad"
+                        value={String(dilutionVolumeLiters)}
+                        onChangeText={(text) => setDilutionVolumeLiters(Number(text) || 0)}
+                        size="$3"
+                        w="100%"
+                        bg="var(--surface)"
+                        borderWidth={1}
+                        borderColor="var(--border)"
+                        rounded="$2"
+                        fontFamily="$body"
+                      />
+                    </YStack>
+                  </View>
+                </XStack>
+
+                <YStack gap="$2" mt="$3">
+                  <XStack gap="$3" alignItems="center" flexWrap="wrap">
+                    <Button
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      onPress={() => void refreshProfiles()}
+                      disabled={!canCall || loadingProfiles}
+                    >
+                      {loadingProfiles ? "Reloading…" : "Reload water profiles"}
+                    </Button>
+                    <Button
+                      size="$3"
+                      bg="var(--surface-2)"
+                      borderWidth={1}
+                      borderColor="var(--border)"
+                      color="var(--text)"
+                      onPress={() => void onSaveAdjustment()}
+                      disabled={!canCall || savingAdjustment}
+                    >
+                      {savingAdjustment ? "Saving…" : "Save profile and volumes"}
+                    </Button>
+                  </XStack>
+                  {adjustmentSaveStatus ? (
+                    <MessageBox
+                      variant="success"
+                      role="status"
+                      aria-live="polite"
+                      dismissAfter={5000}
+                      onDismiss={() => setAdjustmentSaveStatus(null)}
+                    >
+                      {adjustmentSaveStatus}
+                    </MessageBox>
+                  ) : null}
+                </YStack>
+
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
+                  {t("adjustmentHint")}
+                </SizableText>
+
+                {mixedSourceProfile ? (
+                  <details className="brew-field-block brew-field-block--readonly brew-mt3">
+                    <summary className="brew-field-block-header brew-details-summary">
+                      <strong>Mixed water ions</strong>
+                      <FieldBadge>Read-only</FieldBadge>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+                        Computed from profiles + volumes
+                      </SizableText>
+                    </summary>
+                    <View className="brew-table-wrap">
+                      <table className="brew-table">
+                        <thead>
+                          <tr>
+                            <th align="left">Ion</th>
+                            <th align="right">Mixed (ppm)</th>
+                            <th align="right">Target (ppm)</th>
+                            <th align="right">Δ (mixed - target)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(
+                            [
+                              ["Ca", mixedSourceProfile.calcium, selectedTarget?.calcium ?? null],
+                              ["Mg", mixedSourceProfile.magnesium, selectedTarget?.magnesium ?? null],
+                              ["Na", mixedSourceProfile.sodium, selectedTarget?.sodium ?? null],
+                              ["SO4", mixedSourceProfile.sulfate, selectedTarget?.sulfate ?? null],
+                              ["Cl", mixedSourceProfile.chloride, selectedTarget?.chloride ?? null],
+                              ["HCO3", mixedSourceProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                            ] as const
+                          ).map(([label, mixed, target]) => {
+                            const delta = target === null ? null : mixed - target;
+                            return (
+                              <tr key={label}>
+                                <td>{label}</td>
+                                <td align="right">{fmt("ppm", mixed, 0)}</td>
+                                <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
+                                <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </View>
+                  </details>
+                ) : null}
+
+                {profilesError ? <ErrorBox mt="$3">{profilesError}</ErrorBox> : null}
+              </Accordion.Content>
             </View>
-            <View flex={1} minWidth={200}>
-              <YStack gap="$1.5">
-                <RecipeEditFieldLabel htmlFor="target-profile">
-                Target water profile
-              </RecipeEditFieldLabel>
-              <BrewSelect
-                id="target-profile"
-                value={targetProfileId}
-                onValueChange={setTargetProfileId}
-                options={waterProfiles.map((p) => ({
-                  value: p.id,
-                  label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
-                }))}
-                width="full"
-              />
-              </YStack>
+          </Accordion.Item>
+
+          <Accordion.Item value="grist">
+            <View className="brew-panel brew-section" aria-labelledby="grist-summary-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="grist-summary-heading" mt={0}>
+                      {t("gristSummaryHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openMashSections.includes("grist") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  {t("gristSummaryHelp")}
+                </SizableText>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
+                  {t("lateExtractExcludedNote")}
+                </SizableText>
+                <ul className="brew-list-mt0">
+                  <li>
+                    Rows: <code>{gristImportedRows.length}</code> · Total: <code>{fmt("kg", gristTotalKg, 2)}</code>{" "}
+                    {tUnits("kg")}
+                  </li>
+                  <li>
+                    Snapshot imported at: <code>{gristImportedAt ?? "—"}</code>
+                  </li>
+                  <li>
+                    Source recipe updated at: <code>{gristSourceRecipeUpdatedAt ?? "—"}</code>
+                  </li>
+                </ul>
+                <XStack gap="$3" alignItems="center">
+                  <Button
+                    size="$3"
+                    bg="var(--surface-2)"
+                    borderWidth={1}
+                    borderColor="var(--border)"
+                    color="var(--text)"
+                    onPress={() => void onImportGristFromRecipe()}
+                    disabled={!canCall || importingGrist}
+                  >
+                    {importingGrist ? "Importing…" : "Import/update grist snapshot"}
+                  </Button>
+                  <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
+                  {gristImportStatus ? (
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {gristImportStatus}
+                    </SizableText>
+                  ) : null}
+                </XStack>
+                {gristImportError ? <ErrorBox mt="$3">{gristImportError}</ErrorBox> : null}
+              </Accordion.Content>
             </View>
-            <View flex={1} minWidth={200}>
-              <YStack gap="$1.5">
-                <RecipeEditFieldLabel htmlFor="dilution-profile">
-                Dilution water profile
-              </RecipeEditFieldLabel>
-              <BrewSelect
-                id="dilution-profile"
-                value={dilutionProfileId}
-                onValueChange={setDilutionProfileId}
-                options={dilutionProfiles.map((p) => ({
-                  value: p.id,
-                  label: `${p.name} [${p.scope}/${p.verificationStatus}]`,
-                }))}
-                width="full"
-              />
-              </YStack>
-            </View>
-            <View flex={1} minWidth={200}>
-              <YStack gap="$1.5">
-                <RecipeEditFieldLabel htmlFor="tap-volume">
-                {t("sourceVolumeLabel", { unit: tUnits("L") })}
-              </RecipeEditFieldLabel>
-              <Input
-                id="tap-volume"
-                keyboardType="decimal-pad"
-                value={String(tapVolumeLiters)}
-                onChangeText={(text) => setTapVolumeLiters(Number(text) || 0)}
-                size="$3"
-                w="100%"
-                bg="var(--surface)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                rounded="$2"
-                fontFamily="$body"
-              />
-              </YStack>
-            </View>
-            <View flex={1} minWidth={200}>
-              <YStack gap="$1.5">
-                <RecipeEditFieldLabel htmlFor="dilution-volume">
-                {t("dilutionVolumeLabel", { unit: tUnits("L") })}
-              </RecipeEditFieldLabel>
-              <Input
-                id="dilution-volume"
-                keyboardType="decimal-pad"
-                value={String(dilutionVolumeLiters)}
-                onChangeText={(text) => setDilutionVolumeLiters(Number(text) || 0)}
-                size="$3"
-                w="100%"
-                bg="var(--surface)"
-                borderWidth={1}
-                borderColor="var(--border)"
-                rounded="$2"
-                fontFamily="$body"
-              />
-              </YStack>
-            </View>
-          </XStack>
+          </Accordion.Item>
 
-          <YStack gap="$2" mt="$3">
-            <XStack gap="$3" alignItems="center" flexWrap="wrap">
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void refreshProfiles()} disabled={!canCall || loadingProfiles}>
-                {loadingProfiles ? "Reloading…" : "Reload water profiles"}
-              </Button>
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveAdjustment()} disabled={!canCall || savingAdjustment}>
-                {savingAdjustment ? "Saving…" : "Save profile and volumes"}
-              </Button>
-            </XStack>
-            {adjustmentSaveStatus ? (
-              <MessageBox
-                variant="success"
-                role="status"
-                aria-live="polite"
-                dismissAfter={5000}
-                onDismiss={() => setAdjustmentSaveStatus(null)}
-              >
-                {adjustmentSaveStatus}
-              </MessageBox>
-            ) : null}
-          </YStack>
-
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$3" mb={0}>
-            {t("adjustmentHint")}
-          </SizableText>
-
-          {mixedSourceProfile ? (
-            <details className="brew-field-block brew-field-block--readonly brew-mt3">
-              <summary className="brew-field-block-header brew-details-summary">
-                <strong>Mixed water ions</strong>
-                <FieldBadge>Read-only</FieldBadge>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Computed from profiles + volumes</SizableText>
-              </summary>
-              <View className="brew-table-wrap">
-                <table className="brew-table">
-                  <thead>
-                    <tr>
-                      <th align="left">Ion</th>
-                      <th align="right">Mixed (ppm)</th>
-                      <th align="right">Target (ppm)</th>
-                      <th align="right">Δ (mixed - target)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(
-                      [
-                        ["Ca", mixedSourceProfile.calcium, selectedTarget?.calcium ?? null],
-                        ["Mg", mixedSourceProfile.magnesium, selectedTarget?.magnesium ?? null],
-                        ["Na", mixedSourceProfile.sodium, selectedTarget?.sodium ?? null],
-                        ["SO4", mixedSourceProfile.sulfate, selectedTarget?.sulfate ?? null],
-                        ["Cl", mixedSourceProfile.chloride, selectedTarget?.chloride ?? null],
-                        ["HCO3", mixedSourceProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
-                      ] as const
-                    ).map(([label, mixed, target]) => {
-                      const delta = target === null ? null : mixed - target;
-                      return (
-                        <tr key={label}>
-                          <td>{label}</td>
-                          <td align="right">{fmt("ppm", mixed, 0)}</td>
-                          <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
-                          <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </View>
-            </details>
-          ) : null}
-
-          {profilesError ? (
-            <ErrorBox mt="$3">{profilesError}</ErrorBox>
-          ) : null}
-        </View>
-
-        <View className="brew-panel" aria-labelledby="grist-summary-heading">
-          <H2 id="grist-summary-heading" mt={0}>
-            {t("gristSummaryHeading")}
-          </H2>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-            {t("gristSummaryHelp")}
-          </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
-            {t("lateExtractExcludedNote")}
-          </SizableText>
-          <ul className="brew-list-mt0">
-            <li>
-              Rows: <code>{gristImportedRows.length}</code> · Total: <code>{fmt("kg", gristTotalKg, 2)}</code> {tUnits("kg")}
-            </li>
-            <li>
-              Snapshot imported at: <code>{gristImportedAt ?? "—"}</code>
-            </li>
-            <li>
-              Source recipe updated at: <code>{gristSourceRecipeUpdatedAt ?? "—"}</code>
-            </li>
-          </ul>
-          <XStack gap="$3" alignItems="center">
-            <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onImportGristFromRecipe()} disabled={!canCall || importingGrist}>
-              {importingGrist ? "Importing…" : "Import/update grist snapshot"}
-            </Button>
-            <Link href={`/recipes/${recipeId}/edit#fermentables`}>View/edit grist in recipe</Link>
-            {gristImportStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{gristImportStatus}</SizableText> : null}
-          </XStack>
-          {gristImportError ? (
-            <ErrorBox mt="$3">{gristImportError}</ErrorBox>
-          ) : null}
-        </View>
-
-        <View className="brew-panel" aria-labelledby="mash-heading">
-          <H2 id="mash-heading" mt={0}>
-            {t("acidificationHeading")}
-          </H2>
-
-          <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
+          <Accordion.Item value="acidification">
+            <View className="brew-panel brew-section" aria-labelledby="mash-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="mash-heading" mt={0}>
+                      {t("acidificationHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openMashSections.includes("acidification") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
             <ModeFieldset
               legend="Mode"
               name="mash-acid-mode"
@@ -1801,303 +1862,339 @@ export default function MashWaterPage() {
               </ul>
             </details>
           ) : null}
+              </Accordion.Content>
+            </View>
+          </Accordion.Item>
 
-          <View height={1} bg="var(--border)" my="$4" />
-
-          <H3 mt={0}>{t("saltAdditionsManualV0")}</H3>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-            Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
-          </SizableText>
-
-          <SaltAdditionsEditor
-            rows={saltAdditions}
-            onChange={setSaltAdditions}
-            idPrefix="mash"
-            disabled={!canCall}
-          />
-
-          <YStack gap="$2" mt="$3">
-            <XStack gap="$3" alignItems="center" flexWrap="wrap">
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
-                {savingSalts ? "Saving…" : "Save salts draft"}
-              </Button>
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
-                {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-              </Button>
-              {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
-            </XStack>
-            {(saltsSaveStatus || saltsCalcSaveStatus) ? (
-              <MessageBox
-                variant="success"
-                role="status"
-                aria-live="polite"
-                dismissAfter={5000}
-                onDismiss={() => {
-                  setSaltsSaveStatus(null);
-                  setSaltsCalcSaveStatus(null);
-                }}
-              >
-                {saltsSaveStatus ?? saltsCalcSaveStatus}
-              </MessageBox>
-            ) : null}
-          </YStack>
-
-          {saltsError ? (
-            <ErrorBox mt="$3">{saltsError}</ErrorBox>
-          ) : null}
-
-          {saltsResult ? (
-            <details className="brew-field-block brew-field-block--computed brew-mt3">
-              <summary className="brew-field-block-header brew-details-summary">
-                <strong>Resulting ions (after salts only)</strong>
-                {surfaceMath ? (() => {
-                  const ex = mathExplain["mash.ionsAfterSalts"];
-                  const title = tMath(ex.titleKey);
-                  return (
-                    <MathHelpPopover
-                      title={title}
-body={buildWaterMathBody({
-                      key: "mash.ionsAfterSalts",
-                      tMath,
-                      locale,
-                      ctx: {
-                        saltDerivation: saltDerivationForMath,
-                      },
-                      units: {
-                        L: tUnits("L"),
-                        ppmAsCaCO3: tUnits("ppmAsCaCO3"),
-                        ppm: tUnits("ppm"),
-                        g: tUnits("g"),
-                        LPerKg: tUnits("LPerKg"),
-                      },
-                    })}
-                      ariaLabel={tMath("fxLabel", { topic: title })}
-                    />
-                  );
-                })() : null}
-                <FieldBadge>Computed</FieldBadge>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
-                  Does not consider acid; see &quot;Overall mash water result&quot; for combined output
+          <Accordion.Item value="salts">
+            <View className="brew-panel brew-section" aria-labelledby="salts-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="salts-heading" mt={0}>
+                      {t("saltAdditionsManualV0")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openMashSections.includes("salts") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
                 </SizableText>
-              </summary>
-              <View className="brew-table-wrap">
-                <table className="brew-table">
-                  <thead>
-                    <tr>
-                      <th align="left">Ion</th>
-                      <th align="right">After salts (ppm)</th>
-                      <th align="right">Target (ppm)</th>
-                      <th align="right">Δ (after - target)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(
-                      [
-                        ["Ca", saltsResult.resultingProfile.calcium, selectedTarget?.calcium ?? null],
-                        ["Mg", saltsResult.resultingProfile.magnesium, selectedTarget?.magnesium ?? null],
-                        ["Na", saltsResult.resultingProfile.sodium, selectedTarget?.sodium ?? null],
-                        ["SO4", saltsResult.resultingProfile.sulfate, selectedTarget?.sulfate ?? null],
-                        ["Cl", saltsResult.resultingProfile.chloride, selectedTarget?.chloride ?? null],
-                        ["HCO3", saltsResult.resultingProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
-                      ] as const
-                    ).map(([label, after, target]) => {
-                      const delta = target === null ? null : after - target;
-                      return (
-                        <tr key={label}>
-                          <td>{label}</td>
-                          <td align="right">{fmt("ppm", after, 0)}</td>
-                          <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
-                          <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </View>
-            </details>
-          ) : null}
 
-          <View height={1} bg="var(--border)" my="$4" />
+                <SaltAdditionsEditor rows={saltAdditions} onChange={setSaltAdditions} idPrefix="mash" disabled={!canCall} />
 
-<H3 id="overall-mash-water-result" mt={0}>
-                {t("overallResultHeading")}
-              </H3>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-            Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
-          </SizableText>
-          <YStack gap="$2" mt="$3">
-            <XStack gap="$3" alignItems="center" flexWrap="wrap">
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
-                {savingOverall ? "Calculating…" : "Preview overall"}
-              </Button>
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
-                {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
-              </Button>
-              {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
-            </XStack>
-            {overallSaveStatus ? (
-              <MessageBox
-                variant="success"
-                role="status"
-                aria-live="polite"
-                dismissAfter={5000}
-                onDismiss={() => setOverallSaveStatus(null)}
-              >
-                {overallSaveStatus}
-              </MessageBox>
-            ) : null}
-          </YStack>
-          {overallError ? (
-            <ErrorBox mt="$3">{overallError}</ErrorBox>
-          ) : null}
+                <YStack gap="$2" mt="$3">
+                  <XStack gap="$3" alignItems="center" flexWrap="wrap">
+                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSaltAdditions()} disabled={!canCall || savingSalts}>
+                      {savingSalts ? "Saving…" : "Save salts draft"}
+                    </Button>
+                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalcSalts()} disabled={!canCall || saltsSubmitting}>
+                      {saltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
+                    </Button>
+                    {saltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{saltsStatus}</SizableText> : null}
+                  </XStack>
+                  {(saltsSaveStatus || saltsCalcSaveStatus) ? (
+                    <MessageBox
+                      variant="success"
+                      role="status"
+                      aria-live="polite"
+                      dismissAfter={5000}
+                      onDismiss={() => {
+                        setSaltsSaveStatus(null);
+                        setSaltsCalcSaveStatus(null);
+                      }}
+                    >
+                      {saltsSaveStatus ?? saltsCalcSaveStatus}
+                    </MessageBox>
+                  ) : null}
+                </YStack>
 
-          {overallResult ? (
-            <details className="brew-field-block brew-field-block--computed brew-mt3" open>
-              <summary className="brew-field-block-header brew-details-summary">
-                <strong>Overall mash snapshot</strong>
-                {surfaceMath ? (() => {
-                  const ex = mathExplain["mash.overallSnapshot"];
-                  const title = tMath(ex.titleKey);
-                  return (
-                    <MathHelpPopover
-                      title={title}
-                      body={buildWaterMathBody({
-                        key: "mash.overallSnapshot",
-                        tMath,
-                        locale,
-                        ctx: {
-                          overallDerivation,
-                        },
-                        units: {
-                          L: tUnits("L"),
-                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
-                          ppm: tUnits("ppm"),
-                          g: tUnits("g"),
-                          LPerKg: tUnits("LPerKg"),
-                        },
-                      })}
-                      ariaLabel={tMath("fxLabel", { topic: title })}
-                    />
-                  );
-                })() : null}
-                <FieldBadge>Computed</FieldBadge>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
-              </summary>
-              <ul>
-                <li>
-                  pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
-                </li>
-                <li>
-                  Mash water volume: <code>{fmt("L", derivedMashWaterVolumeLiters, 2)}</code> {tUnits("L")}
-                </li>
-                <li>
-                  Final alkalinity{" "}
-                  {surfaceMath ? (() => {
-                    const ex = mathExplain["mash.finalAlkalinity"];
-                    const title = tMath(ex.titleKey);
-                    return (
-                      <MathHelpPopover
-                        title={title}
-                        body={buildWaterMathBody({
-                          key: "mash.finalAlkalinity",
-                          tMath,
-                          locale,
-                          ctx: {
-                            overallDerivation,
-                            acidDerivation,
-                          },
-                          units: {
-                            L: tUnits("L"),
-                            ppmAsCaCO3: tUnits("ppmAsCaCO3"),
-                            ppm: tUnits("ppm"),
-                            LPerKg: tUnits("LPerKg"),
-                          },
-                        })}
-                        ariaLabel={tMath("fxLabel", { topic: title })}
-                      />
-                    );
-                  })() : null}
-                  : <code>{fmt("ppm_as_CaCO3", overallResult.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
-                </li>
-              </ul>
-              <View className="brew-table-wrap-mt">
-                <table className="brew-table">
-                  <thead>
-                    <tr>
-                      <th align="left">Ion</th>
-                      <th align="right">Overall (ppm)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(
-                      [
-                        ["Ca", overallResult.ionsPpm.calcium],
-                        ["Mg", overallResult.ionsPpm.magnesium],
-                        ["Na", overallResult.ionsPpm.sodium],
-                        ["SO4", overallResult.ionsPpm.sulfate],
-                        ["Cl", overallResult.ionsPpm.chloride],
-                        ["HCO3", overallResult.ionsPpm.bicarbonate],
-                      ] as const
-                    ).map(([label, v]) => (
-                      <tr key={label}>
-                        <td>{label}</td>
-                        <td align="right">{fmt("ppm", v, 0)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </View>
-            </details>
-          ) : null}
-        </View>
+                {saltsError ? (
+                  <ErrorBox mt="$3">{saltsError}</ErrorBox>
+                ) : null}
 
-        <View id="mash-steps" className="brew-panel" aria-labelledby="mash-steps-heading">
-          <H2 id="mash-steps-heading" mt={0}>
-            {t("mashStepsHeading")}
-          </H2>
-          {mashStepsSaveError ? (
-            <ErrorBox mb="$3">{mashStepsSaveError}</ErrorBox>
-          ) : null}
-          <MashStepsEditor
-            mashRows={mashRows}
-            mashProcedure={mashProcedure}
-            waterVolumes={waterVolumes}
-            mashWaterBudgetLiters={derivedMashWaterVolumeLiters > 0 ? derivedMashWaterVolumeLiters : null}
-            firstStepAmountComputed={
-              derivedMashWaterVolumeLiters > 0 && mashRows[0]?.type === "infusion"
-                ? computeFirstStepAmountL
-                : null
-            }
-            hideSpargeFromTypeOptions
-            recipeId={recipeId}
-            readOnly={false}
-            onUpdateProcedure={updateMashProcedure}
-            onUpdateStep={updateMashStep}
-            onMoveStep={moveMashStep}
-            onAddStep={addMashStep}
-            onDeleteStep={deleteMashStep}
-            onAddFromTemplate={addMashFromTemplate}
-            onSave={saveMashSteps}
-            canSave={canCall && !!recipe?.beerJsonRecipeJson}
-            saving={mashStepsSaving}
-            t={tEdit}
-            tUnits={tUnits}
-            locale={locale}
-            formatFixed={formatFixed}
-          />
-          {mashStepsSaveStatus ? (
-            <MessageBox
-              variant="success"
-              role="status"
-              aria-live="polite"
-              dismissAfter={5000}
-              onDismiss={() => setMashStepsSaveStatus(null)}
-              mt="$3"
-            >
-              {mashStepsSaveStatus}
-            </MessageBox>
-          ) : null}
-        </View>
+                {saltsResult ? (
+                  <details className="brew-field-block brew-field-block--computed brew-mt3">
+                    <summary className="brew-field-block-header brew-details-summary">
+                      <strong>Resulting ions (after salts only)</strong>
+                      {surfaceMath ? (() => {
+                        const ex = mathExplain["mash.ionsAfterSalts"];
+                        const title = tMath(ex.titleKey);
+                        return (
+                          <MathHelpPopover
+                            title={title}
+                            body={buildWaterMathBody({
+                              key: "mash.ionsAfterSalts",
+                              tMath,
+                              locale,
+                              ctx: {
+                                saltDerivation: saltDerivationForMath,
+                              },
+                              units: {
+                                L: tUnits("L"),
+                                ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                ppm: tUnits("ppm"),
+                                g: tUnits("g"),
+                                LPerKg: tUnits("LPerKg"),
+                              },
+                            })}
+                            ariaLabel={tMath("fxLabel", { topic: title })}
+                          />
+                        );
+                      })() : null}
+                      <FieldBadge>Computed</FieldBadge>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+                        Does not consider acid; see &quot;Overall mash water result&quot; for combined output
+                      </SizableText>
+                    </summary>
+                    <View className="brew-table-wrap">
+                      <table className="brew-table">
+                        <thead>
+                          <tr>
+                            <th align="left">Ion</th>
+                            <th align="right">After salts (ppm)</th>
+                            <th align="right">Target (ppm)</th>
+                            <th align="right">Δ (after - target)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(
+                            [
+                              ["Ca", saltsResult.resultingProfile.calcium, selectedTarget?.calcium ?? null],
+                              ["Mg", saltsResult.resultingProfile.magnesium, selectedTarget?.magnesium ?? null],
+                              ["Na", saltsResult.resultingProfile.sodium, selectedTarget?.sodium ?? null],
+                              ["SO4", saltsResult.resultingProfile.sulfate, selectedTarget?.sulfate ?? null],
+                              ["Cl", saltsResult.resultingProfile.chloride, selectedTarget?.chloride ?? null],
+                              ["HCO3", saltsResult.resultingProfile.bicarbonate, selectedTarget?.bicarbonate ?? null],
+                            ] as const
+                          ).map(([label, after, target]) => {
+                            const delta = target === null ? null : after - target;
+                            return (
+                              <tr key={label}>
+                                <td>{label}</td>
+                                <td align="right">{fmt("ppm", after, 0)}</td>
+                                <td align="right">{target === null ? "—" : fmt("ppm", target, 0)}</td>
+                                <td align="right">{delta === null ? "—" : fmt("ppm", delta, 0)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </View>
+                  </details>
+                ) : null}
+              </Accordion.Content>
+            </View>
+          </Accordion.Item>
+
+          <Accordion.Item value="overall">
+            <View className="brew-panel brew-section" aria-labelledby="overall-mash-water-result">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="overall-mash-water-result" mt={0}>
+                      {t("overallResultHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openMashSections.includes("overall") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
+                </SizableText>
+                <YStack gap="$2" mt="$3">
+                  <XStack gap="$3" alignItems="center" flexWrap="wrap">
+                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(false)} disabled={!canCall || savingOverall}>
+                      {savingOverall ? "Calculating…" : "Preview overall"}
+                    </Button>
+                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateOverall(true)} disabled={!canCall || savingOverall}>
+                      {savingOverall ? "Calculating…" : "Calculate & save overall snapshot"}
+                    </Button>
+                    {overallStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">{overallStatus}</SizableText> : null}
+                  </XStack>
+                  {overallSaveStatus ? (
+                    <MessageBox
+                      variant="success"
+                      role="status"
+                      aria-live="polite"
+                      dismissAfter={5000}
+                      onDismiss={() => setOverallSaveStatus(null)}
+                    >
+                      {overallSaveStatus}
+                    </MessageBox>
+                  ) : null}
+                </YStack>
+                {overallError ? (
+                  <ErrorBox mt="$3">{overallError}</ErrorBox>
+                ) : null}
+
+                {overallResult ? (
+                  <details className="brew-field-block brew-field-block--computed brew-mt3" open>
+                    <summary className="brew-field-block-header brew-details-summary">
+                      <strong>Overall mash snapshot</strong>
+                      {surfaceMath ? (() => {
+                        const ex = mathExplain["mash.overallSnapshot"];
+                        const title = tMath(ex.titleKey);
+                        return (
+                          <MathHelpPopover
+                            title={title}
+                            body={buildWaterMathBody({
+                              key: "mash.overallSnapshot",
+                              tMath,
+                              locale,
+                              ctx: {
+                                overallDerivation,
+                              },
+                              units: {
+                                L: tUnits("L"),
+                                ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                ppm: tUnits("ppm"),
+                                g: tUnits("g"),
+                                LPerKg: tUnits("LPerKg"),
+                              },
+                            })}
+                            ariaLabel={tMath("fxLabel", { topic: title })}
+                          />
+                        );
+                      })() : null}
+                      <FieldBadge>Computed</FieldBadge>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">Uses latest inputs; persist a snapshot to debug</SizableText>
+                    </summary>
+                    <ul>
+                      <li>
+                        pH: {overallResult.ph.kind} <code>{fmt("pH", overallResult.ph.value, 2)}</code>
+                      </li>
+                      <li>
+                        Mash water volume: <code>{fmt("L", derivedMashWaterVolumeLiters, 2)}</code> {tUnits("L")}
+                      </li>
+                      <li>
+                        Final alkalinity{" "}
+                        {surfaceMath ? (() => {
+                          const ex = mathExplain["mash.finalAlkalinity"];
+                          const title = tMath(ex.titleKey);
+                          return (
+                            <MathHelpPopover
+                              title={title}
+                              body={buildWaterMathBody({
+                                key: "mash.finalAlkalinity",
+                                tMath,
+                                locale,
+                                ctx: {
+                                  overallDerivation,
+                                  acidDerivation,
+                                },
+                                units: {
+                                  L: tUnits("L"),
+                                  ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                  ppm: tUnits("ppm"),
+                                  LPerKg: tUnits("LPerKg"),
+                                },
+                              })}
+                              ariaLabel={tMath("fxLabel", { topic: title })}
+                            />
+                          );
+                        })() : null}
+                        : <code>{fmt("ppm_as_CaCO3", overallResult.finalAlkalinityPpmCaCO3, 0)}</code> {tUnits("ppmAsCaCO3")}
+                      </li>
+                    </ul>
+                    <View className="brew-table-wrap-mt">
+                      <table className="brew-table">
+                        <thead>
+                          <tr>
+                            <th align="left">Ion</th>
+                            <th align="right">Overall (ppm)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(
+                            [
+                              ["Ca", overallResult.ionsPpm.calcium],
+                              ["Mg", overallResult.ionsPpm.magnesium],
+                              ["Na", overallResult.ionsPpm.sodium],
+                              ["SO4", overallResult.ionsPpm.sulfate],
+                              ["Cl", overallResult.ionsPpm.chloride],
+                              ["HCO3", overallResult.ionsPpm.bicarbonate],
+                            ] as const
+                          ).map(([label, v]) => (
+                            <tr key={label}>
+                              <td>{label}</td>
+                              <td align="right">{fmt("ppm", v, 0)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </View>
+                  </details>
+                ) : null}
+              </Accordion.Content>
+            </View>
+          </Accordion.Item>
+          <Accordion.Item value="mashSteps">
+            <View id="mash-steps" className="brew-panel brew-section" aria-labelledby="mash-steps-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="mash-steps-heading" mt={0}>
+                      {t("mashStepsHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openMashSections.includes("mashSteps") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                {mashStepsSaveError ? <ErrorBox mb="$3">{mashStepsSaveError}</ErrorBox> : null}
+                <MashStepsEditor
+                  mashRows={mashRows}
+                  mashProcedure={mashProcedure}
+                  waterVolumes={waterVolumes}
+                  mashWaterBudgetLiters={derivedMashWaterVolumeLiters > 0 ? derivedMashWaterVolumeLiters : null}
+                  firstStepAmountComputed={
+                    derivedMashWaterVolumeLiters > 0 && mashRows[0]?.type === "infusion"
+                      ? computeFirstStepAmountL
+                      : null
+                  }
+                  hideSpargeFromTypeOptions
+                  recipeId={recipeId}
+                  readOnly={false}
+                  onUpdateProcedure={updateMashProcedure}
+                  onUpdateStep={updateMashStep}
+                  onMoveStep={moveMashStep}
+                  onAddStep={addMashStep}
+                  onDeleteStep={deleteMashStep}
+                  onAddFromTemplate={addMashFromTemplate}
+                  onSave={saveMashSteps}
+                  canSave={canCall && !!recipe?.beerJsonRecipeJson}
+                  saving={mashStepsSaving}
+                  t={tEdit}
+                  tUnits={tUnits}
+                  locale={locale}
+                  formatFixed={formatFixed}
+                />
+                {mashStepsSaveStatus ? (
+                  <MessageBox
+                    variant="success"
+                    role="status"
+                    aria-live="polite"
+                    dismissAfter={5000}
+                    onDismiss={() => setMashStepsSaveStatus(null)}
+                    mt="$3"
+                  >
+                    {mashStepsSaveStatus}
+                  </MessageBox>
+                ) : null}
+              </Accordion.Content>
+            </View>
+          </Accordion.Item>
+        </Accordion>
 
         {savingError ? (
           <ErrorBox mt="$3">{savingError}</ErrorBox>

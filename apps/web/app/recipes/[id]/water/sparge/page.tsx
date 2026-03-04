@@ -12,7 +12,7 @@ import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleR
 import { parseWaterProfilesResponse } from "@brewery/contracts";
 import { ModeFieldset } from "@brewery/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
-import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 
@@ -133,6 +133,7 @@ export default function SpargeWaterPage() {
     formatWithHint(locale, value, formatHints, unitKey, fallback);
 
   const [surfaceMath, setSurfaceMath] = useState(false);
+  const [openSpargeSections, setOpenSpargeSections] = useState<string[]>(["spargeConfig"]);
   useEffect(() => {
     try {
       const v = sessionStorage.getItem("brewery:surfaceMath:sparge");
@@ -682,11 +683,27 @@ export default function SpargeWaterPage() {
       ) : null}
 
       <YStack gap="$4">
-        <View className="brew-panel" aria-labelledby="sparge-config-heading">
-          <H2 id="sparge-config-heading" mt={0}>
-            {t("spargeConfigurationHeading")}
-          </H2>
-          <XStack gap="$3" flexWrap="wrap" ai="flex-end">
+        <Accordion
+          type="multiple"
+          value={openSpargeSections}
+          onValueChange={(next) => setOpenSpargeSections(Array.isArray(next) ? next : next ? [next] : [])}
+        >
+          <Accordion.Item value="spargeConfig">
+            <View className="brew-panel" aria-labelledby="sparge-config-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="sparge-config-heading" mt={0}>
+                      {t("spargeConfigurationHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openSpargeSections.includes("spargeConfig") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <XStack gap="$3" flexWrap="wrap" ai="flex-end">
             <View flex={1} minWidth={120}>
               <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="sparge-step-time">
@@ -794,19 +811,31 @@ export default function SpargeWaterPage() {
               </MessageBox>
             ) : null}
           </YStack>
-        </View>
+              </Accordion.Content>
+            </View>
+          </Accordion.Item>
 
-        <View className="brew-panel" aria-labelledby="sparge-heading">
-          <H2 id="sparge-heading" mt={0}>
-            {t("acidificationHeading")}
-          </H2>
-
-          <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
+          <Accordion.Item value="acidification">
+            <View className="brew-panel brew-section" aria-labelledby="sparge-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="sparge-heading" mt={0}>
+                      {t("acidificationHeading")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openSpargeSections.includes("acidification") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
             <XStack gap="$3" flexWrap="wrap" ai="flex-end">
               <View width="100%" flexBasis="100%">
                 <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="sparge-profile">
-                  Sparge water profile
+                  {t("spargeSourceWaterProfileLabel")}
                 </RecipeEditFieldLabel>
                 <BrewSelect
                   id="sparge-profile"
@@ -1209,205 +1238,223 @@ export default function SpargeWaterPage() {
               ) : null}
             </details>
           ) : null}
-
-          <View height={1} bg="var(--border)" my="$4" />
-
-          <H3 mt={0}>{t("saltAdditionsManualV0")}</H3>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-            {t("saltAdditionsHelp")}
-          </SizableText>
-
-          <SaltAdditionsEditor
-            rows={spargeSaltAdditions}
-            onChange={setSpargeSaltAdditions}
-            idPrefix="sparge"
-            disabled={!canCall}
-          />
-
-          <YStack mt="$3" gap="$2">
-            <XStack gap="$3" alignItems="center" flexWrap="wrap">
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
-                {savingSpargeSalts ? "Saving…" : "Save salts draft"}
-              </Button>
-              <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
-                {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
-              </Button>
-              {spargeSaltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsStatus}</SizableText> : null}
-            </XStack>
-            {(spargeSaltsSaveStatus || spargeSaltsCalcSaveStatus) ? (
-              <MessageBox
-                variant="success"
-                role="status"
-                aria-live="polite"
-                dismissAfter={5000}
-                onDismiss={() => {
-                  setSpargeSaltsSaveStatus(null);
-                  setSpargeSaltsCalcSaveStatus(null);
-                }}
-              >
-                {spargeSaltsSaveStatus ?? spargeSaltsCalcSaveStatus}
-              </MessageBox>
-            ) : null}
-          </YStack>
-
-          {spargeSaltsError ? <ErrorBox mt="$3">{spargeSaltsError}</ErrorBox> : null}
-
-          {spargeSaltsResult ? (
-            <details className="brew-field-block brew-field-block--computed brew-mt3">
-              <summary className="brew-field-block-header brew-details-summary">
-                <strong>Resulting ions (after sparge salts only)</strong>
-                {surfaceMath ? (() => {
-                  const ex = mathExplain["sparge.ionsAfterSalts"];
-                  const title = tMath(ex.titleKey);
-                  return (
-                    <MathHelpPopover
-                      title={title}
-                      body={buildWaterMathBody({
-                        key: "sparge.ionsAfterSalts",
-                        tMath,
-                        locale,
-                        ctx: {
-                          saltDerivation,
-                        },
-                        units: {
-                          L: tUnits("L"),
-                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
-                          ppm: tUnits("ppm"),
-                          g: tUnits("g"),
-                          LPerKg: tUnits("LPerKg"),
-                        },
-                      })}
-                      ariaLabel={tMath("fxLabel", { topic: title })}
-                    />
-                  );
-                })() : null}
-                <FieldBadge>Computed</FieldBadge>
-              </summary>
-              <div className="brew-table-wrap">
-                <table className="brew-table">
-                  <thead>
-                    <tr>
-                      <th align="left">Ion</th>
-                      <th align="left">After salts (ppm)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(
-                      [
-                        ["Ca", spargeSaltsResult.resultingProfile.calcium],
-                        ["Mg", spargeSaltsResult.resultingProfile.magnesium],
-                        ["Na", spargeSaltsResult.resultingProfile.sodium],
-                        ["SO4", spargeSaltsResult.resultingProfile.sulfate],
-                        ["Cl", spargeSaltsResult.resultingProfile.chloride],
-                        ["HCO3", spargeSaltsResult.resultingProfile.bicarbonate],
-                      ] as const
-                    ).map(([label, after]) => (
-                      <tr key={label}>
-                        <td>{label}</td>
-                        <td align="left">{fmt("ppm", after, 0)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </details>
-          ) : null}
-
-          {spargeSaltsResult && spargeResult ? (
-            <View className="brew-field-block brew-field-block--computed brew-mt3">
-              <View className="brew-field-block-header">
-                <strong>Resulting ions (after sparge salts + acid, HCO3 derived from alkalinity)</strong>
-                {surfaceMath ? (() => {
-                  const ex = mathExplain["sparge.ionsAfterSaltsAndAcid"];
-                  const title = tMath(ex.titleKey);
-                  return (
-                    <MathHelpPopover
-                      title={title}
-                      body={buildWaterMathBody({
-                        key: "sparge.ionsAfterSaltsAndAcid",
-                        tMath,
-                        locale,
-                        ctx: {
-                          overallDerivation: spargeOverall?.derivation ?? null,
-                        },
-                        units: {
-                          L: tUnits("L"),
-                          ppmAsCaCO3: tUnits("ppmAsCaCO3"),
-                          ppm: tUnits("ppm"),
-                          g: tUnits("g"),
-                          LPerKg: tUnits("LPerKg"),
-                        },
-                      })}
-                      ariaLabel={tMath("fxLabel", { topic: title })}
-                    />
-                  );
-                })() : null}
-                <FieldBadge>Computed</FieldBadge>
-                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
-                  Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
-                  {surfaceMath ? (() => {
-                    const ex = mathExplain["sparge.alkalinityHeuristic"];
-                    const title = tMath(ex.titleKey);
-                    return (
-                      <View as="span" display="inline" ml="$1">
-                        <MathHelpPopover
-                          title={title}
-                          body={buildWaterMathBody({
-                            key: "sparge.alkalinityHeuristic",
-                            tMath,
-                            locale,
-                            ctx: { acidDerivation },
-                            units: {
-                              L: tUnits("L"),
-                              ppmAsCaCO3: tUnits("ppmAsCaCO3"),
-                              ppm: tUnits("ppm"),
-                              g: tUnits("g"),
-                              LPerKg: tUnits("LPerKg"),
-                            },
-                          })}
-                          ariaLabel={tMath("fxLabel", { topic: title })}
-                        />
-                      </View>
-                    );
-                  })() : null}
-                </SizableText>
-              </View>
-              <View className="brew-table-wrap">
-                <table className="brew-table">
-                  <thead>
-                    <tr>
-                      <th align="left">Ion</th>
-                      <th align="left">After salts + acid (ppm)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(() => {
-                      const combined =
-                        (spargeOverall?.result?.ionsPpm as any) ??
-                        combineAfterSaltsAndAcid({
-                          afterSalts: spargeSaltsResult.resultingProfile,
-                          acidResult: spargeResult,
-                        });
-                      return ([
-                        ["Ca", combined.calcium],
-                        ["Mg", combined.magnesium],
-                        ["Na", combined.sodium],
-                        ["SO4", combined.sulfate],
-                        ["Cl", combined.chloride],
-                        ["HCO3", combined.bicarbonate],
-                      ] as const).map(([label, v]) => (
-                        <tr key={label}>
-                          <td>{label}</td>
-                          <td align="left">{fmt("ppm", v, 0)}</td>
-                        </tr>
-                      ));
-                    })()}
-                  </tbody>
-                </table>
-              </View>
+                </Accordion.Content>
             </View>
-          ) : null}
-        </View>
+          </Accordion.Item>
+
+          <Accordion.Item value="salts">
+            <View className="brew-panel brew-section" aria-labelledby="sparge-salts-heading">
+              <Accordion.Header>
+                <Accordion.Trigger unstyled width="100%">
+                  <XStack justifyContent="space-between" alignItems="center">
+                    <H2 id="sparge-salts-heading" mt={0}>
+                      {t("saltAdditionsManualV0")}
+                    </H2>
+                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                      {openSpargeSections.includes("salts") ? "▾" : "▸"}
+                    </SizableText>
+                  </XStack>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+                  {t("saltAdditionsHelp")}
+                </SizableText>
+
+                <SaltAdditionsEditor
+                  rows={spargeSaltAdditions}
+                  onChange={setSpargeSaltAdditions}
+                  idPrefix="sparge"
+                  disabled={!canCall}
+                />
+
+                <YStack mt="$3" gap="$2">
+                  <XStack gap="$3" alignItems="center" flexWrap="wrap">
+                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onSaveSpargeSaltsInputs()} disabled={!canCall || savingSpargeSalts}>
+                      {savingSpargeSalts ? "Saving…" : "Save salts draft"}
+                    </Button>
+                    <Button size="$3" bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" color="var(--text)" onPress={() => void onCalculateSpargeSalts()} disabled={!canCall || spargeSaltsSubmitting || !selectedSpargeProfile}>
+                      {spargeSaltsSubmitting ? "Calculating…" : "Calculate & save salts snapshot"}
+                    </Button>
+                    {spargeSaltsStatus ? <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" role="status" aria-live="polite">{spargeSaltsStatus}</SizableText> : null}
+                  </XStack>
+                  {(spargeSaltsSaveStatus || spargeSaltsCalcSaveStatus) ? (
+                    <MessageBox
+                      variant="success"
+                      role="status"
+                      aria-live="polite"
+                      dismissAfter={5000}
+                      onDismiss={() => {
+                        setSpargeSaltsSaveStatus(null);
+                        setSpargeSaltsCalcSaveStatus(null);
+                      }}
+                    >
+                      {spargeSaltsSaveStatus ?? spargeSaltsCalcSaveStatus}
+                    </MessageBox>
+                  ) : null}
+                </YStack>
+
+                {spargeSaltsError ? <ErrorBox mt="$3">{spargeSaltsError}</ErrorBox> : null}
+
+                {spargeSaltsResult ? (
+                  <details className="brew-field-block brew-field-block--computed brew-mt3">
+                    <summary className="brew-field-block-header brew-details-summary">
+                      <strong>Resulting ions (after sparge salts only)</strong>
+                      {surfaceMath ? (() => {
+                        const ex = mathExplain["sparge.ionsAfterSalts"];
+                        const title = tMath(ex.titleKey);
+                        return (
+                          <MathHelpPopover
+                            title={title}
+                            body={buildWaterMathBody({
+                              key: "sparge.ionsAfterSalts",
+                              tMath,
+                              locale,
+                              ctx: {
+                                saltDerivation,
+                              },
+                              units: {
+                                L: tUnits("L"),
+                                ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                ppm: tUnits("ppm"),
+                                g: tUnits("g"),
+                                LPerKg: tUnits("LPerKg"),
+                              },
+                            })}
+                            ariaLabel={tMath("fxLabel", { topic: title })}
+                          />
+                        );
+                      })() : null}
+                      <FieldBadge>Computed</FieldBadge>
+                    </summary>
+                    <div className="brew-table-wrap">
+                      <table className="brew-table">
+                        <thead>
+                          <tr>
+                            <th align="left">Ion</th>
+                            <th align="left">After salts (ppm)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(
+                            [
+                              ["Ca", spargeSaltsResult.resultingProfile.calcium],
+                              ["Mg", spargeSaltsResult.resultingProfile.magnesium],
+                              ["Na", spargeSaltsResult.resultingProfile.sodium],
+                              ["SO4", spargeSaltsResult.resultingProfile.sulfate],
+                              ["Cl", spargeSaltsResult.resultingProfile.chloride],
+                              ["HCO3", spargeSaltsResult.resultingProfile.bicarbonate],
+                            ] as const
+                          ).map(([label, after]) => (
+                            <tr key={label}>
+                              <td>{label}</td>
+                              <td align="left">{fmt("ppm", after, 0)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                ) : null}
+
+                {spargeSaltsResult && spargeResult ? (
+                  <View className="brew-field-block brew-field-block--computed brew-mt3">
+                    <View className="brew-field-block-header">
+                      <strong>Resulting ions (after sparge salts + acid, HCO3 derived from alkalinity)</strong>
+                      {surfaceMath ? (() => {
+                        const ex = mathExplain["sparge.ionsAfterSaltsAndAcid"];
+                        const title = tMath(ex.titleKey);
+                        return (
+                          <MathHelpPopover
+                            title={title}
+                            body={buildWaterMathBody({
+                              key: "sparge.ionsAfterSaltsAndAcid",
+                              tMath,
+                              locale,
+                              ctx: {
+                                overallDerivation: spargeOverall?.derivation ?? null,
+                              },
+                              units: {
+                                L: tUnits("L"),
+                                ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                ppm: tUnits("ppm"),
+                                g: tUnits("g"),
+                                LPerKg: tUnits("LPerKg"),
+                              },
+                            })}
+                            ariaLabel={tMath("fxLabel", { topic: title })}
+                          />
+                        );
+                      })() : null}
+                      <FieldBadge>Computed</FieldBadge>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" display="inline">
+                        Heuristic: Ca/Mg from salts reduce effective alkalinity, so salts can modestly change acid required.
+                        {surfaceMath ? (() => {
+                          const ex = mathExplain["sparge.alkalinityHeuristic"];
+                          const title = tMath(ex.titleKey);
+                          return (
+                            <View as="span" display="inline" ml="$1">
+                              <MathHelpPopover
+                                title={title}
+                                body={buildWaterMathBody({
+                                  key: "sparge.alkalinityHeuristic",
+                                  tMath,
+                                  locale,
+                                  ctx: { acidDerivation },
+                                  units: {
+                                    L: tUnits("L"),
+                                    ppmAsCaCO3: tUnits("ppmAsCaCO3"),
+                                    ppm: tUnits("ppm"),
+                                    g: tUnits("g"),
+                                    LPerKg: tUnits("LPerKg"),
+                                  },
+                                })}
+                                ariaLabel={tMath("fxLabel", { topic: title })}
+                              />
+                            </View>
+                          );
+                        })() : null}
+                      </SizableText>
+                    </View>
+                    <View className="brew-table-wrap">
+                      <table className="brew-table">
+                        <thead>
+                          <tr>
+                            <th align="left">Ion</th>
+                            <th align="left">After salts + acid (ppm)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const combined =
+                              (spargeOverall?.result?.ionsPpm as any) ??
+                              combineAfterSaltsAndAcid({
+                                afterSalts: spargeSaltsResult.resultingProfile,
+                                acidResult: spargeResult,
+                              });
+                            return ([
+                              ["Ca", combined.calcium],
+                              ["Mg", combined.magnesium],
+                              ["Na", combined.sodium],
+                              ["SO4", combined.sulfate],
+                              ["Cl", combined.chloride],
+                              ["HCO3", combined.bicarbonate],
+                            ] as const).map(([label, v]) => (
+                              <tr key={label}>
+                                <td>{label}</td>
+                                <td align="left">{fmt("ppm", v, 0)}</td>
+                              </tr>
+                            ));
+                          })()}
+                        </tbody>
+                      </table>
+                    </View>
+                  </View>
+                ) : null}
+              </Accordion.Content>
+            </View>
+          </Accordion.Item>
+        </Accordion>
 
         {profilesError ? <ErrorBox>{profilesError}</ErrorBox> : null}
         {settingsError ? <ErrorBox>{settingsError}</ErrorBox> : null}
