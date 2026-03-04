@@ -81,8 +81,9 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Local dev entrypoint**: `docker compose up --build`
 - **Shared packages build (native-ready)**:
   - Packages consumed by native apps ship runtime JS + `.d.ts` under `dist/` and we commit those build outputs.
-  - When you change anything under `packages/i18n`, `packages/contracts`, `packages/api-client`, or `packages/ui`, rebuild the shared packages from repo root:
-    - `npm run build:packages`
+  - When you change anything under `packages/i18n`, `packages/contracts`, `packages/api-client`, `packages/ui`, or `packages/recipes-ui`, rebuild the shared packages from repo root:
+    - `./scripts/build-packages-in-docker.sh`
+    - (Equivalent inside a Node container: `npm run build:packages`)
   - Reminder: do not run npm on the host in this repo. Run the build via Docker if needed.
   - Native baseline: start `apps/native` on the latest stable Expo SDK (React 19) and keep React aligned between web and native.
 - **Monorepo workspace deps in Docker (important)**:

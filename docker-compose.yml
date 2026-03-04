@@ -26,8 +26,10 @@ services:
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
       - ./packages/i18n:/packages/i18n:ro
+      - ./packages/i18n-react:/packages/i18n-react:ro
       - ./packages/media:/packages/media:ro
       - ./packages/navigation:/packages/navigation:ro
+      - ./packages/recipes-ui:/packages/recipes-ui:ro
       - ./packages/ui:/packages/ui:ro
 
   api:

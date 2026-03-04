@@ -3,16 +3,16 @@
 import { Link } from "../../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ModeFieldset } from "../_components/ModeFieldset";
-import { RecipeMetaLine } from "../_components/RecipeMetaLine";
-import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
+import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewery/recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
+import { ModeFieldset } from "@brewery/ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
@@ -77,6 +77,12 @@ export default function BoilWaterPage() {
   const tMath = useTranslations("math");
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, []);
 
   const [authChecked, setAuthChecked] = useState(false);
   const [authed, setAuthed] = useState(false);
@@ -732,7 +738,7 @@ export default function BoilWaterPage() {
   return (
     <>
       <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine recipeId={recipeId} enabled={authed} />
+      <RecipeMetaLine recipeId={recipeId} enabled={authed} loadRecipeMeta={loadRecipeMeta} />
       <SurfaceMathToggleRow
         left={
           <SizableText size="$2" fontFamily="$body" mt={0}>

@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { Image, SizableText, View, YStack } from "tamagui";
+import { Image } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
+import { AdSlotCard, Text } from "@brewery/ui";
 
 export type AdPlacementV1 =
   | "global_top"
@@ -57,53 +58,35 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   if (disabled) return null;
 
   return (
-    <YStack my="$3" gap="$1.5">
-      <View
-        as="aside"
-        aria-label={t("ariaLabel")}
-        bg="color-mix(in srgb, var(--surface-2) 45%, var(--surface))"
-        borderWidth={1}
-        borderColor="var(--border)"
-        rounded="$2"
-        p="$2.5"
-      >
-        <YStack gap="$1.5">
-          <View
-            h={mediaHeightPx}
-            w="100%"
-            maxW="100%"
-            overflow="hidden"
-            rounded="$2"
-            bg="var(--surface)"
+    <AdSlotCard
+      ariaLabel={t("ariaLabel")}
+      mediaHeightPx={mediaHeightPx}
+      media={
+        ad ? (
+          <a
+            href={ad.linkUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="brew-block"
+            style={{ height: "100%" }}
           >
-            {ad ? (
-              <a
-                href={ad.linkUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="brew-block"
-                style={{ height: "100%" }}
-              >
-                <Image
-                  src={ad.imageUrl}
-                  alt={ad.altText}
-                  loading="lazy"
-                  w="100%"
-                  h="100%"
-                  style={{ objectFit: "cover" }}
-                />
-              </a>
-            ) : null}
-          </View>
-
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
-            <Link href="/contact">{t("contactLine")}</Link>
-          </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" m={0}>
-            {t("upgradeLine")}
-          </SizableText>
-        </YStack>
-      </View>
-    </YStack>
+            <Image
+              src={ad.imageUrl}
+              alt={ad.altText}
+              loading="lazy"
+              w="100%"
+              h="100%"
+              style={{ objectFit: "cover" }}
+            />
+          </a>
+        ) : null
+      }
+      contactLine={
+        <Text fontSize={12} opacity={0.8}>
+          <Link href="/contact">{t("contactLine")}</Link>
+        </Text>
+      }
+      upgradeLine={<Text fontSize={12} opacity={0.8}>{t("upgradeLine")}</Text>}
+    />
   );
 }

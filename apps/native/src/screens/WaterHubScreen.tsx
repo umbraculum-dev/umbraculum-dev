@@ -6,9 +6,9 @@ import type { IonProfilePpm, RecipeWaterHubSummaryResponse } from "@brewery/cont
 import { parseRecipeWaterHubSummaryResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";
 
-import { RecipeMetaLine } from "../components/RecipeMetaLine";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
@@ -71,6 +71,14 @@ export function WaterHubScreen() {
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    if (!baseUrl || !token) return null;
+    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    const res = await api.get(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, [baseUrl, token]);
 
   const { t } = useT("waterHub");
   const { t: tUnits } = useT("units");
@@ -164,7 +172,7 @@ export function WaterHubScreen() {
         <Heading fontSize={22} mb="$2">
           {t("title")}
         </Heading>
-        <RecipeMetaLine recipeId={recipeId} enabled={canCall} />
+        <RecipeMetaLine recipeId={recipeId} enabled={canCall} loadRecipeMeta={loadRecipeMeta} />
         <Button
           chromeless
           size="$3"

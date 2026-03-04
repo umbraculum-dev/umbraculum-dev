@@ -27,6 +27,8 @@ config.resolver.extraNodeModules = {
   "react/jsx-dev-runtime": path.join(rootNodeModules, "react", "jsx-dev-runtime.js"),
   scheduler: path.join(rootNodeModules, "scheduler"),
   "react-native": path.join(appNodeModules, "react-native"),
+  // Explicitly resolve workspace packages that may not be hoisted to root node_modules.
+  "@brewery/recipes-ui": path.join(workspaceRoot, "packages", "recipes-ui"),
 };
 
 module.exports = config;

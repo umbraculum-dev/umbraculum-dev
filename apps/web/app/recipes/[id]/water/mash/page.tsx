@@ -3,7 +3,7 @@
 import { Link } from "../../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { parseGristJson, type GristRow } from "../../../../_lib/grist";
@@ -16,16 +16,16 @@ import {
   newMashRowId,
   type EditorMashStep,
 } from "../../../_lib/beerjsonRecipe";
-import { MashStepsEditor } from "../../../_components/MashStepsEditor";
+import { MashStepsEditor } from "@brewery/recipes-ui";
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
-import { ModeFieldset } from "../_components/ModeFieldset";
-import { RecipeMetaLine } from "../_components/RecipeMetaLine";
-import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "../_components/SaltAdditionsEditor";
+import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewery/recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
+import { ModeFieldset } from "@brewery/ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
@@ -108,6 +108,12 @@ export default function MashWaterPage() {
   const authState = useRequireAuth({ requireActiveWorkspace: true });
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, []);
 
   const [me, setMe] = useState<AuthMeResponse | null>(null);
 
@@ -1133,7 +1139,11 @@ export default function MashWaterPage() {
   return (
     <>
       <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
+      <RecipeMetaLine
+        recipeId={recipeId}
+        enabled={authState.status === "ready"}
+        loadRecipeMeta={loadRecipeMeta}
+      />
       <SurfaceMathToggleRow
         left={
           <SizableText size="$2" fontFamily="$body" mt={0}>

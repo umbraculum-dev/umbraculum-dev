@@ -1,3 +1,5 @@
+"use client";
+
 // src/index.tsx
 import { createContext, useContext, useMemo } from "react";
 import { IntlMessageFormat } from "intl-messageformat";

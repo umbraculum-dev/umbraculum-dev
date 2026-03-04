@@ -855,6 +855,7 @@ var en_default = {
       mashingEditInMashPage: "Edit mash schedule in Mash water & Mash steps",
       spargeStepFromWaterPage: "Sparge step (from Sparge water page)",
       spargeStepConfigureLink: "Configure sparge water",
+      mashStepConfigureLink: "Configure mash water",
       mashingWaterVolumesTitle: "Water volumes (mash + sparge)",
       mashingWaterVolumesSource: "From water calculator",
       mashingWaterVolumesUnavailable: "Set up water volumes in the Water calculator to see mash and sparge volumes here.",
@@ -1364,6 +1365,8 @@ var en_default = {
   ui: {
     addSalt: "Add salt",
     amountLabel: "Amount ({unit})",
+    salt: "Salt",
+    noSaltsAddedYet: "No salts added yet.",
     fx: "fx"
   },
   salts: {
@@ -2339,6 +2342,7 @@ var it_default = {
       mashingEditInMashPage: "Modifica programma mash in Acqua mash e Step mash",
       spargeStepFromWaterPage: "Step sparge (da pagina Acqua sparge)",
       spargeStepConfigureLink: "Configura acqua sparge",
+      mashStepConfigureLink: "Configura acqua mash",
       mashingWaterVolumesTitle: "Volumi acqua (mash + sparge)",
       mashingWaterVolumesSource: "Dal calcolatore acqua",
       mashingWaterVolumesUnavailable: "Configura i volumi acqua nel Calcolatore acqua per vedere i volumi mash e sparge qui.",
@@ -2848,6 +2852,8 @@ var it_default = {
   ui: {
     addSalt: "Aggiungi sale",
     amountLabel: "Quantit\xE0 ({unit})",
+    salt: "Sale",
+    noSaltsAddedYet: "Nessun sale aggiunto.",
     fx: "fx"
   },
   salts: {

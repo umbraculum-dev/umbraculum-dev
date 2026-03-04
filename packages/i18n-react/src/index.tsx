@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import React, { createContext, useContext, useMemo } from "react";
 import { IntlMessageFormat } from "intl-messageformat";

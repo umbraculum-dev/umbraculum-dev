@@ -831,6 +831,7 @@
       "mashingEditInMashPage": "Modifica programma mash in Acqua mash e Step mash",
       "spargeStepFromWaterPage": "Step sparge (da pagina Acqua sparge)",
       "spargeStepConfigureLink": "Configura acqua sparge",
+      "mashStepConfigureLink": "Configura acqua mash",
       "mashingWaterVolumesTitle": "Volumi acqua (mash + sparge)",
       "mashingWaterVolumesSource": "Dal calcolatore acqua",
       "mashingWaterVolumesUnavailable": "Configura i volumi acqua nel Calcolatore acqua per vedere i volumi mash e sparge qui.",
@@ -1340,6 +1341,8 @@
   "ui": {
     "addSalt": "Aggiungi sale",
     "amountLabel": "Quantità ({unit})",
+    "salt": "Sale",
+    "noSaltsAddedYet": "Nessun sale aggiunto.",
     "fx": "fx"
   },
   "salts": {

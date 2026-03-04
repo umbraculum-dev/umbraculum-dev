@@ -3,7 +3,7 @@
 import { Link } from "../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { H1, H2, SizableText, View, YStack } from "tamagui";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
@@ -22,10 +22,11 @@ import {
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 import { formatFixed } from "../../../../src/i18n/format";
-import { ManualCellCountHelpBox } from "../../_components/ManualCellCountHelpBox";
+import { getMediaPublicPath } from "@brewery/media";
+import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 
 type Recipe = {
   id: string;
@@ -54,6 +55,12 @@ export default function YeastPage() {
   const recipeId = params?.id ?? "";
 
   const authState = useRequireAuth({ requireActiveWorkspace: true });
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, []);
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
@@ -540,7 +547,11 @@ export default function YeastPage() {
   return (
     <>
       <H1 mb="$2">{t("yeastPageTitle")}</H1>
-      <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
+      <RecipeMetaLine
+        recipeId={recipeId}
+        enabled={authState.status === "ready"}
+        loadRecipeMeta={loadRecipeMeta}
+      />
       <SurfaceMathToggleRow
         left={
           <SizableText size="$2" fontFamily="$body" mt={0}>
@@ -601,7 +612,16 @@ export default function YeastPage() {
             formatFixed={formatFixed}
             lowViabilityWarning={lowViabilityWarning}
           />
-          <ManualCellCountHelpBox t={t} />
+          <ManualCellCountHelpBox
+            renderImage={({ assetKey, alt, width, height }) => (
+              <img
+                src={getMediaPublicPath(assetKey)}
+                alt={alt}
+                loading="lazy"
+                style={{ maxWidth: width, width: "100%", height: "auto" }}
+              />
+            )}
+          />
           {saveError ? (
             <ErrorBox mt="$3">{saveError}</ErrorBox>
           ) : null}

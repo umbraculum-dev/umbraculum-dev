@@ -23,15 +23,16 @@ import {
 } from "@brewery/beerjson";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";
 
-import { ManualCellCountHelpBox } from "../components/ManualCellCountHelpBox";
+import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
 import { ReadOnlyField } from "../components/ReadOnlyField";
-import { RecipeMetaLine } from "../components/RecipeMetaLine";
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
+import { RemoteImage } from "../media/RemoteImage";
 
 function formatFixed(locale: string, value: number, fractionDigits: number): string {
   return new Intl.NumberFormat(locale, {
@@ -150,6 +151,14 @@ export function YeastScreen() {
   const auth = useAuth();
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    if (!baseUrl || !token) return null;
+    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    const res = await api.get(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, [baseUrl, token]);
 
   const { t } = useT("recipes.edit");
   const { t: tAnalysis } = useT("recipes.analysis");
@@ -496,7 +505,7 @@ export function YeastScreen() {
           <Heading fontSize={28} mb="$2">
             {t("yeastPageTitle")}
           </Heading>
-          <RecipeMetaLine recipeId={recipeId} enabled={!!recipeId} />
+          <RecipeMetaLine recipeId={recipeId} enabled={!!recipeId} loadRecipeMeta={loadRecipeMeta} />
 
           {loadError ? (
             <Text fontSize={12} color="$red10">{loadError}</Text>
@@ -886,7 +895,17 @@ export function YeastScreen() {
             </Card>
           ) : null}
 
-          <ManualCellCountHelpBox />
+          <ManualCellCountHelpBox
+            renderImage={({ assetKey, alt, width, height }) => (
+              <RemoteImage
+                assetKey={assetKey}
+                accessibilityLabel={alt}
+                unavailableText={alt}
+                width={width}
+                height={height}
+              />
+            )}
+          />
         </View>
       </ScrollView>
     </Screen>

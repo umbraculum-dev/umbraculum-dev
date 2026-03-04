@@ -18,6 +18,7 @@ Current buildable packages (native-consumed):
 - `packages/contracts` (`@brewery/contracts`)
 - `packages/api-client` (`@brewery/api-client`)
 - `packages/ui` (`@brewery/ui`)
+- `packages/recipes-ui` (`@brewery/recipes-ui`)
 
 Build workflow:
 - When you change any of the packages above, rebuild `dist/` and commit the updated `dist/` outputs.
@@ -38,6 +39,15 @@ Why we commit `dist/`:
 - Import Tamagui configs via explicit subpaths:
   - Web: `@brewery/ui/tamagui-config-web` (uses `@tamagui/animations-css`)
   - Native: `@brewery/ui/tamagui-config-native` (native-safe)
+
+#### UI layering (mandatory for scalability)
+
+- **Generic primitives** (buttons, inputs, selects, cards, collapsibles): `@brewery/ui`
+- **Domain feature UI** (recipe editors, water/yeast widgets): `@brewery/recipes-ui`
+- **Adapters** (Next.js routing, cookie-session fetch, native bearer auth, media rendering): stay in `apps/web/**` and `apps/native/**`
+
+Rule of thumb:
+- If a component needs Next.js, `next-intl`, React Navigation, Expo, or app-specific auth, it is **not** shared UI; keep it as an app-level adapter and pass callbacks/props into the shared component instead.
 
 #### `@brewery/i18n-react` import rules (web vs native)
 - Shared/native: import `useT` from `@brewery/i18n-react`.

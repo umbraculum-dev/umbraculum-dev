@@ -6,11 +6,11 @@ import { parseSpargeComputeAndSaveResponse, parseWaterProfilesResponse } from "@
 import type { WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";
 
-import { ModeFieldset } from "../components/ModeFieldset";
-import { RecipeMetaLine } from "../components/RecipeMetaLine";
-import { SaltAdditionsEditor, type SaltAdditionRow } from "../components/SaltAdditionsEditor";
+import { ModeFieldset } from "@brewery/ui";
+import { SaltAdditionsEditor, type SaltAdditionRow } from "@brewery/recipes-ui";
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
@@ -105,6 +105,14 @@ export function WaterSpargeScreen() {
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    if (!baseUrl || !token) return null;
+    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    const res = await api.get(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, [baseUrl, token]);
 
   const { t } = useT("recipes.water.sparge");
   const { t: tEdit } = useT("recipes.edit");
@@ -439,7 +447,7 @@ export function WaterSpargeScreen() {
         <Heading fontSize={22} mb="$2">
           {t("title")}
         </Heading>
-        <RecipeMetaLine recipeId={recipeId} enabled={canCall} />
+        <RecipeMetaLine recipeId={recipeId} enabled={canCall} loadRecipeMeta={loadRecipeMeta} />
         <Button chromeless size="$3" mt="$2" mb="$3" onPress={() => navigation.navigate("WaterHub", { recipeId })}>
           <Text fontSize={12}>{tWaterCommon("backToHub")}</Text>
         </Button>

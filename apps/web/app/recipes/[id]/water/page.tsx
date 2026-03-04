@@ -2,7 +2,7 @@
 
 import { Link } from "../../../../src/i18n/navigation";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import type { IonProfilePpm } from "@brewery/contracts";
@@ -19,7 +19,7 @@ import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow"
 import { mathExplain } from "./_lib/mathExplain";
 import { buildWaterMathBody } from "./_lib/mathBodies";
 import { ErrorBox, FieldBadge } from "../../../_components/recipe-edit";
-import { RecipeMetaLine } from "./_components/RecipeMetaLine";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 
 type DisplayStream = {
   key: "mash" | "sparge" | "boil";
@@ -43,6 +43,12 @@ export default function WaterHubPage() {
   const recipeId = params?.id ?? "";
 
   const authState = useRequireAuth({ requireActiveWorkspace: true });
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, []);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
   const [summaryRes, setSummaryRes] = useState<RecipeWaterHubSummaryResponse | null>(null);
@@ -168,7 +174,11 @@ export default function WaterHubPage() {
     <>
       <YStack width="100%" gap="$1" mb="$2">
         <H1 mt={0} mb={0}>{t("title")}</H1>
-        <RecipeMetaLine recipeId={recipeId} enabled={authState.status === "ready"} />
+        <RecipeMetaLine
+          recipeId={recipeId}
+          enabled={authState.status === "ready"}
+          loadRecipeMeta={loadRecipeMeta}
+        />
         <SizableText size="$2" fontFamily="$body" mt={0} mb={0} display="block">
           <Link href={`/recipes/${recipeId}/edit`}>{t("backToRecipeEditor")}</Link>
         </SizableText>

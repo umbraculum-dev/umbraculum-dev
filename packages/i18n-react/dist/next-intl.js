@@ -1,3 +1,5 @@
+"use client";
+
 // src/next-intl.ts
 import { useTranslations } from "next-intl";
 function useT(namespace) {

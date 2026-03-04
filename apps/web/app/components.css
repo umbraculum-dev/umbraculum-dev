@@ -37,6 +37,11 @@
   text-align: left !important;
 }
 
+[data-mash-step-card] {
+  background-color: var(--field-readonly-bg) !important;
+  border-color: var(--field-readonly-border) !important;
+}
+
 .brew-field-block {
   border: 1px solid var(--border);
   border-radius: var(--radius);

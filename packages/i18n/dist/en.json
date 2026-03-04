@@ -824,6 +824,7 @@
       "mashingEditInMashPage": "Edit mash schedule in Mash water & Mash steps",
       "spargeStepFromWaterPage": "Sparge step (from Sparge water page)",
       "spargeStepConfigureLink": "Configure sparge water",
+      "mashStepConfigureLink": "Configure mash water",
       "mashingWaterVolumesTitle": "Water volumes (mash + sparge)",
       "mashingWaterVolumesSource": "From water calculator",
       "mashingWaterVolumesUnavailable": "Set up water volumes in the Water calculator to see mash and sparge volumes here.",
@@ -1333,6 +1334,8 @@
   "ui": {
     "addSalt": "Add salt",
     "amountLabel": "Amount ({unit})",
+    "salt": "Salt",
+    "noSaltsAddedYet": "No salts added yet.",
     "fx": "fx"
   },
   "salts": {

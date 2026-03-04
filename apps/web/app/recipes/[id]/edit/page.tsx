@@ -3,7 +3,7 @@
 import { Link, useRouter } from "../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
@@ -42,10 +42,10 @@ import {
   type EditorMiscRow,
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
-import { MashStepsEditor } from "../../_components/MashStepsEditor";
+import { MashStepsEditor, SpargeStepReadOnlyRow } from "@brewery/recipes-ui";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { RecipeEditSectionsNav } from "../../_components/RecipeEditSectionsNav";
-import { RecipeMetaLine } from "../water/_components/RecipeMetaLine";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -143,6 +143,13 @@ export default function RecipeEditPage() {
   const params = useParams<{ id: string }>();
   const recipeId = params?.id ?? "";
   const authState = useRequireAuth({ requireActiveWorkspace: true });
+
+  const loadRecipeMeta = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/recipes/${id}`);
+    if (!res.ok) return null;
+    return parseRecipeMetaFromGetRecipeResponse(res.data);
+  }, []);
+
   const [layoutMetrics, setLayoutMetrics] = useState<{
     leftGutterPx: number | null;
     railTopPx: number | null;
@@ -1385,7 +1392,7 @@ export default function RecipeEditPage() {
   return (
     <>
       <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine recipeId={recipeId} />
+      <RecipeMetaLine recipeId={recipeId} loadRecipeMeta={loadRecipeMeta} />
 
       <SurfaceMathToggleRow
         left={null}
@@ -2579,52 +2586,33 @@ export default function RecipeEditPage() {
                   />
                 </View>
 
+                <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$2" mb={0}>
+                  <Link href={`/recipes/${recipeId}/water/mash`}>{t("mashStepConfigureLink")}</Link>
+                </SizableText>
+
                 {spargeConfigured ? (
                   <View mt="$4">
                     <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb="$2">
                       {t("spargeStepFromWaterPage")}
                     </SizableText>
-                    <RecipeEditIngredientCard>
-                      <XStack gap="$3" flexWrap="wrap" items="flex-end">
-                        <View alignSelf="center">
-                          <SizableText size="$2" fontWeight="bold" fontFamily="$body" color="var(--text)">
-                            {mashRowsFiltered.length + 1}
-                          </SizableText>
-                        </View>
-                        <YStack gap="$1" minW={80}>
-                          <RecipeEditFieldLabel>{t("mashingStepName")}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>Sparge</RecipeEditReadOnlyValue>
-                        </YStack>
-                        <YStack gap="$1" minW={80}>
-                          <RecipeEditFieldLabel>{t("mashingStepType")}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>{spargeMethodLabel}</RecipeEditReadOnlyValue>
-                        </YStack>
-                        <YStack gap="$1" minW={60}>
-                          <RecipeEditFieldLabel>{t("mashingStepTemp", { unit: "°C" })}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>
-                            {formatFixed(locale, spargeStepTempDisplay, 1)}
-                          </RecipeEditReadOnlyValue>
-                        </YStack>
-                        <YStack gap="$1" minW={50}>
-                          <RecipeEditFieldLabel>{t("mashingStepTime", { unit: "min" })}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>
-                            {waterSettings?.spargeStepTimeMin ?? 60}
-                          </RecipeEditReadOnlyValue>
-                        </YStack>
-                        <YStack gap="$1" minW={80}>
-                          <RecipeEditFieldLabel>{t("mashingStepAmount", { unit: "L" })}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>
-                            <CodeInline>{formatFixed(locale, waterVolumes.spargeLiters, 2)}</CodeInline> {tUnits("L")}
-                          </RecipeEditReadOnlyValue>
-                        </YStack>
-                        <YStack gap="$1" minW={50}>
-                          <RecipeEditFieldLabel>{t("mashingStepRamp", { unit: "min" })}</RecipeEditFieldLabel>
-                          <RecipeEditReadOnlyValue>
-                            {waterSettings?.spargeStepRampMin ?? 0}
-                          </RecipeEditReadOnlyValue>
-                        </YStack>
-                      </XStack>
-                    </RecipeEditIngredientCard>
+                    <SpargeStepReadOnlyRow
+                      stepNumber={mashRowsFiltered.length + 1}
+                      title="Sparge"
+                      name="Sparge"
+                      typeLabel={spargeMethodLabel}
+                      tempDisplay={formatFixed(locale, spargeStepTempDisplay, 1)}
+                      timeDisplay={String(waterSettings?.spargeStepTimeMin ?? 60)}
+                      amountDisplay={`${formatFixed(locale, waterVolumes.spargeLiters, 2)} ${tUnits("L")}`}
+                      rampDisplay={String(waterSettings?.spargeStepRampMin ?? 0)}
+                      labels={{
+                        name: t("mashingStepName"),
+                        type: t("mashingStepType"),
+                        temp: t("mashingStepTemp", { unit: "°C" }),
+                        time: t("mashingStepTime", { unit: "min" }),
+                        amount: t("mashingStepAmount", { unit: "L" }),
+                        ramp: t("mashingStepRamp", { unit: "min" }),
+                      }}
+                    />
                     <SizableText size="$2" fontFamily="$body" color="var(--text)" mt="$2" mb={0}>
                       <Link href={`/recipes/${recipeId}/water/sparge`}>
                         {t("spargeStepConfigureLink")}
