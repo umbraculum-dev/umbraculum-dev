@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { Accordion, H2, View, XStack } from "tamagui";
+import { Accordion, H2, SizableText, View, XStack } from "tamagui";
 
 export interface RecipeEditSectionProps {
   id: string;
@@ -10,6 +10,8 @@ export interface RecipeEditSectionProps {
   label: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  spaced?: boolean;
+  className?: string;
   rightSlot?: ReactNode;
   children: ReactNode;
 }
@@ -20,18 +22,20 @@ export function RecipeEditSection({
   label,
   open,
   onOpenChange,
+  spaced,
+  className,
   rightSlot,
   children,
 }: RecipeEditSectionProps) {
+  const classes = ["brew-panel", spaced ? "brew-section" : null, className ?? null]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <View
       as="section"
       id={id}
-      bg="var(--surface)"
-      borderWidth={1}
-      borderColor="var(--border)"
-      rounded="$3"
-      p="$3"
+      className={classes}
     >
       <Accordion
         type="single"
@@ -41,12 +45,17 @@ export function RecipeEditSection({
       >
         <Accordion.Item value={id}>
           <Accordion.Header>
-            <Accordion.Trigger unstyled cursor="pointer">
+            <Accordion.Trigger unstyled width="100%">
               <XStack items="center" justifyContent="space-between" gap="$2" width="100%">
                 <H2 id={headingId} m={0} size="$5" fontFamily="$heading" color="var(--text)">
                   {label}
                 </H2>
-                {rightSlot ? <View>{rightSlot}</View> : null}
+                <XStack items="center" gap="$2">
+                  {rightSlot ? <View>{rightSlot}</View> : null}
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    {open ? "▾" : "▸"}
+                  </SizableText>
+                </XStack>
               </XStack>
             </Accordion.Trigger>
           </Accordion.Header>

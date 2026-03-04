@@ -45,7 +45,8 @@ import {
 import { MashStepsEditor, SpargeStepReadOnlyRow } from "@brewery/recipes-ui";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { RecipeEditSectionsNav } from "../../_components/RecipeEditSectionsNav";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeTitleWithMeta } from "../../../_components/RecipeTitleWithMeta";
 import {
   fetchRecipeWaterSettings,
   saveRecipeWaterSettings,
@@ -219,11 +220,12 @@ export default function RecipeEditPage() {
     { id: "water", label: t("sections.water") },
   ] as const;
 
-  const collapsibleSectionIds = ["basics", "analysis", "brewingHistory", "brew", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes"] as const;
+  const collapsibleSectionIds = ["basics", "analysis", "brewingHistory", "brew", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes", "water"] as const;
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     for (const id of collapsibleSectionIds) init[id] = false;
+    init.water = true;
     return init;
   });
 
@@ -428,16 +430,11 @@ export default function RecipeEditPage() {
       setSectionOpen(id, true);
     };
 
-    applyHashOpen();
     window.addEventListener("hashchange", applyHashOpen);
     return () => window.removeEventListener("hashchange", applyHashOpen);
   }, []);
 
-  useEffect(() => {
-    if (mashRows.length > 0 && !openSections.mashing) {
-      setSectionOpen("mashing", true);
-    }
-  }, [mashRows.length, openSections.mashing]);
+  // Do not auto-open sections based on data presence; only open via hash navigation.
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -1397,8 +1394,12 @@ export default function RecipeEditPage() {
 
   return (
     <>
-      <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine recipeId={recipeId} loadRecipeMeta={loadRecipeMeta} />
+      <RecipeTitleWithMeta
+        title={t("title")}
+        recipeId={recipeId}
+        enabled={authState.status === "ready"}
+        loadRecipeMeta={loadRecipeMeta}
+      />
 
       <SurfaceMathToggleRow
         left={null}
@@ -1480,7 +1481,7 @@ export default function RecipeEditPage() {
         flex={1}
         minW={0}
       >
-        <YStack gap="$4" flex={1} minW={0}>
+        <YStack gap="$0" flex={1} minW={0}>
           {!useDesktopRail ? (
             <View mb="$3">
               <RecipeEditSectionsNav sections={sections} recipeId={recipeId} layoutMode="sheet" />
@@ -1631,6 +1632,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="analysis"
             headingId="analysis-heading"
             label={t("sections.analysis")}
@@ -2353,6 +2355,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="brewingHistory"
             headingId="brewing-history-heading"
             label={t("sections.brewingHistory")}
@@ -2451,6 +2454,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="brew"
             headingId="brew-heading"
             label={t("sections.brew")}
@@ -2478,6 +2482,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="equipment"
             headingId="equipment-heading"
             label={t("sections.equipment")}
@@ -2544,6 +2549,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="mashing"
             headingId="mashing-heading"
             label={t("sections.mashing")}
@@ -2632,6 +2638,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="fermentables"
             headingId="fermentables-heading"
             label={t("sections.fermentables")}
@@ -3113,9 +3120,12 @@ export default function RecipeEditPage() {
                 </SizableText>
           </RecipeEditSection>
 
-          <AdSlot placement="recipe_edit_after_fermentables" />
+          <View className="brew-section">
+            <AdSlot placement="recipe_edit_after_fermentables" />
+          </View>
 
           <RecipeEditSection
+            spaced
             id="hops"
             headingId="hops-heading"
             label={t("sections.hops")}
@@ -3403,9 +3413,12 @@ export default function RecipeEditPage() {
                 </SizableText>
           </RecipeEditSection>
 
-          <AdSlot placement="recipe_edit_after_hops" />
+          <View className="brew-section">
+            <AdSlot placement="recipe_edit_after_hops" />
+          </View>
 
           <RecipeEditSection
+            spaced
             id="yeast"
             headingId="yeast-heading"
             label={t("sections.yeast")}
@@ -3431,9 +3444,12 @@ export default function RecipeEditPage() {
             </SizableText>
           </RecipeEditSection>
 
-          <AdSlot placement="recipe_edit_after_yeast" />
+          <View className="brew-section">
+            <AdSlot placement="recipe_edit_after_yeast" />
+          </View>
 
           <RecipeEditSection
+            spaced
             id="other"
             headingId="other-heading"
             label={t("sections.other")}
@@ -3664,6 +3680,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="boil"
             headingId="boil-heading"
             label={t("sections.boil")}
@@ -3706,6 +3723,7 @@ export default function RecipeEditPage() {
           </RecipeEditSection>
 
           <RecipeEditSection
+            spaced
             id="notes"
             headingId="notes-heading"
             label={t("sections.notes")}
@@ -3729,19 +3747,14 @@ export default function RecipeEditPage() {
             </RecipeEditField>
           </RecipeEditSection>
 
-          <View
-            as="section"
+          <RecipeEditSection
+            spaced
             id="water"
-            aria-labelledby="water-heading"
-            bg="var(--surface)"
-            borderWidth={1}
-            borderColor="var(--border)"
-            rounded="$3"
-            p="$3"
+            headingId="water-heading"
+            label={t("sections.water")}
+            open={openSections.water}
+            onOpenChange={(open) => setSectionOpen("water", open)}
           >
-            <H2 id="water-heading" m={0} size="$5" fontFamily="$heading" color="var(--text)">
-              {t("sections.water")}
-            </H2>
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
               {t("waterHelp")}
             </SizableText>
@@ -3765,7 +3778,7 @@ export default function RecipeEditPage() {
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
               {t("waterProfilesManageText")} <Link href="/water-profiles">{tNav("waterProfiles")}</Link>.
             </SizableText>
-          </View>
+          </RecipeEditSection>
         </YStack>
       </XStack>
     </>

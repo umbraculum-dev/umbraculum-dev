@@ -25,7 +25,8 @@ import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleR
 import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { ModeFieldset } from "@brewery/ui";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
@@ -1192,14 +1193,12 @@ export default function MashWaterPage() {
 
   return (
     <>
-      <YStack gap="$1" mb="$2">
-        <H1 mb={0}>{t("title")}</H1>
-        <RecipeMetaLine
-          recipeId={recipeId}
-          enabled={authState.status === "ready"}
-          loadRecipeMeta={loadRecipeMeta}
-        />
-      </YStack>
+      <RecipeTitleWithMeta
+        title={t("title")}
+        recipeId={recipeId}
+        enabled={authState.status === "ready"}
+        loadRecipeMeta={loadRecipeMeta}
+      />
       <SurfaceMathToggleRow
         left={
           <SizableText size="$2" fontFamily="$body" mt={0}>

@@ -11,10 +11,11 @@ import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
 import { ModeFieldset } from "@brewery/ui";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
+import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -660,8 +661,12 @@ export default function SpargeWaterPage() {
 
   return (
     <>
-      <H1 mb="$2">{t("title")}</H1>
-      <RecipeMetaLine recipeId={recipeId} enabled={authed} loadRecipeMeta={loadRecipeMeta} />
+      <RecipeTitleWithMeta
+        title={t("title")}
+        recipeId={recipeId}
+        enabled={authed}
+        loadRecipeMeta={loadRecipeMeta}
+      />
       <SurfaceMathToggleRow
         left={
           <SizableText size="$2" fontFamily="$body" mt={0}>
