@@ -16,6 +16,7 @@ import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack
 
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
+import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -695,18 +696,11 @@ export default function SpargeWaterPage() {
         >
           <Accordion.Item value="spargeConfig">
             <View className="brew-panel" aria-labelledby="sparge-config-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="sparge-config-heading" mt={0}>
-                      {t("spargeConfigurationHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openSpargeSections.includes("spargeConfig") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="sparge-config-heading"
+                title={t("spargeConfigurationHeading")}
+                open={openSpargeSections.includes("spargeConfig")}
+              />
               <Accordion.Content>
                 <XStack gap="$3" flexWrap="wrap" ai="flex-end">
             <View flex={1} minWidth={120}>
@@ -822,18 +816,11 @@ export default function SpargeWaterPage() {
 
           <Accordion.Item value="acidification">
             <View className="brew-panel brew-section" aria-labelledby="sparge-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="sparge-heading" mt={0}>
-                      {t("acidificationHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openSpargeSections.includes("acidification") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="sparge-heading"
+                title={t("acidificationHeading")}
+                open={openSpargeSections.includes("acidification")}
+              />
               <Accordion.Content>
                 <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
             <XStack gap="$3" flexWrap="wrap" ai="flex-end">
@@ -1249,18 +1236,11 @@ export default function SpargeWaterPage() {
 
           <Accordion.Item value="salts">
             <View className="brew-panel brew-section" aria-labelledby="sparge-salts-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="sparge-salts-heading" mt={0}>
-                      {t("saltAdditionsManualV0")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openSpargeSections.includes("salts") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="sparge-salts-heading"
+                title={t("saltAdditionsManualV0")}
+                open={openSpargeSections.includes("salts")}
+              />
               <Accordion.Content>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("saltAdditionsHelp")}

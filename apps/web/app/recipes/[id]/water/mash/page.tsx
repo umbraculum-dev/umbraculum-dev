@@ -27,6 +27,7 @@ import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contra
 import { ModeFieldset } from "@brewery/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
+import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";
 import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
@@ -1220,18 +1221,11 @@ export default function MashWaterPage() {
         <Accordion type="multiple" value={openMashSections} onValueChange={(next) => setOpenMashSections(Array.isArray(next) ? next : next ? [next] : [])}>
           <Accordion.Item value="adjustment">
             <View className="brew-panel" aria-labelledby="adjustment-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="adjustment-heading" mt={0}>
-                      {t("adjustmentHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openMashSections.includes("adjustment") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="adjustment-heading"
+                title={t("adjustmentHeading")}
+                open={openMashSections.includes("adjustment")}
+              />
               <Accordion.Content>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   Choose source/target/dilution profiles and volumes to compute a mixed starting water profile. Manage profiles on{" "}
@@ -1423,18 +1417,11 @@ export default function MashWaterPage() {
 
           <Accordion.Item value="grist">
             <View className="brew-panel brew-section" aria-labelledby="grist-summary-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="grist-summary-heading" mt={0}>
-                      {t("gristSummaryHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openMashSections.includes("grist") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="grist-summary-heading"
+                title={t("gristSummaryHeading")}
+                open={openMashSections.includes("grist")}
+              />
               <Accordion.Content>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   {t("gristSummaryHelp")}
@@ -1480,18 +1467,11 @@ export default function MashWaterPage() {
 
           <Accordion.Item value="acidification">
             <View className="brew-panel brew-section" aria-labelledby="mash-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="mash-heading" mt={0}>
-                      {t("acidificationHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openMashSections.includes("acidification") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="mash-heading"
+                title={t("acidificationHeading")}
+                open={openMashSections.includes("acidification")}
+              />
               <Accordion.Content>
                 <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
             <ModeFieldset
@@ -1867,18 +1847,11 @@ export default function MashWaterPage() {
 
           <Accordion.Item value="salts">
             <View className="brew-panel brew-section" aria-labelledby="salts-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="salts-heading" mt={0}>
-                      {t("saltAdditionsManualV0")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openMashSections.includes("salts") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="salts-heading"
+                title={t("saltAdditionsManualV0")}
+                open={openMashSections.includes("salts")}
+              />
               <Accordion.Content>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   Base profile is the mixed source water above. Add salts in grams; we compute resulting ions (ppm).
@@ -1992,18 +1965,11 @@ export default function MashWaterPage() {
 
           <Accordion.Item value="overall">
             <View className="brew-panel brew-section" aria-labelledby="overall-mash-water-result">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="overall-mash-water-result" mt={0}>
-                      {t("overallResultHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openMashSections.includes("overall") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="overall-mash-water-result"
+                title={t("overallResultHeading")}
+                open={openMashSections.includes("overall")}
+              />
               <Accordion.Content>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                   Click <strong>Preview overall</strong> to preview, or <strong>Calculate &amp; save overall snapshot</strong> to persist a snapshot.
@@ -2137,18 +2103,11 @@ export default function MashWaterPage() {
           </Accordion.Item>
           <Accordion.Item value="mashSteps">
             <View id="mash-steps" className="brew-panel brew-section" aria-labelledby="mash-steps-heading">
-              <Accordion.Header>
-                <Accordion.Trigger unstyled width="100%">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <H2 id="mash-steps-heading" mt={0}>
-                      {t("mashStepsHeading")}
-                    </H2>
-                    <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {openMashSections.includes("mashSteps") ? "▾" : "▸"}
-                    </SizableText>
-                  </XStack>
-                </Accordion.Trigger>
-              </Accordion.Header>
+              <BrewAccordionHeader
+                headingId="mash-steps-heading"
+                title={t("mashStepsHeading")}
+                open={openMashSections.includes("mashSteps")}
+              />
               <Accordion.Content>
                 {mashStepsSaveError ? <ErrorBox mb="$3">{mashStepsSaveError}</ErrorBox> : null}
                 <MashStepsEditor

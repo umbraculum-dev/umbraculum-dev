@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { H2, H3, SizableText, View, YStack } from "tamagui";
+import { SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../src/i18n/navigation";
 import { CodeInline } from "./_components/CodeInline";
@@ -15,10 +15,9 @@ type HealthState =
   | { status: "ok"; data: unknown }
   | { status: "error"; error: string };
 
-export function HealthPanel() {
+export function HealthStatusContent() {
   const t = useTranslations("health");
   const [state, setState] = useState<HealthState>({ status: "idle" });
-  const [meState, setMeState] = useState<HealthState>({ status: "idle" });
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
   useEffect(() => {
@@ -38,6 +37,27 @@ export function HealthPanel() {
       cancelled = true;
     };
   }, [apiBase]);
+
+  return (
+    <>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        {t("subtitle", { url: `${apiBase}/health` })}
+      </SizableText>
+      <YStack gap="$3" mt="$3">
+        <View bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" overflow="auto">
+          <SizableText size="$2" fontFamily={MONO_FONT} whiteSpace="pre-wrap">
+            {JSON.stringify(state, null, 2)}
+          </SizableText>
+        </View>
+      </YStack>
+    </>
+  );
+}
+
+export function AppPermissionsContent() {
+  const t = useTranslations("health");
+  const [meState, setMeState] = useState<HealthState>({ status: "idle" });
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
   useEffect(() => {
     let cancelled = false;
@@ -78,53 +98,27 @@ export function HealthPanel() {
   })();
 
   return (
-    <YStack gap="$3">
-      <View bg="var(--surface)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3">
-        <H2 mt="$4">{t("title")}</H2>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-          {t("subtitle", { url: `${apiBase}/health` })}
+    <>
+      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
+        {t("appPermissions.subtitle")}
+      </SizableText>
+
+      <YStack gap="$1.5" mt="$2.5">
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("appPermissions.userLabel")}: <CodeInline>{meSummary?.userEmail ?? "—"}</CodeInline>
         </SizableText>
-        <YStack gap="$3" mt="$3">
-          <View bg="var(--surface-2)" borderWidth={1} borderColor="var(--border)" rounded="$2" p="$3" overflow="auto">
-            <SizableText size="$2" fontFamily={MONO_FONT} whiteSpace="pre-wrap">
-              {JSON.stringify(state, null, 2)}
-            </SizableText>
-          </View>
-        </YStack>
-      </View>
-
-      <View
-        bg="var(--surface)"
-        borderWidth={1}
-        borderColor="var(--border)"
-        rounded="$2"
-        p="$3"
-        aria-labelledby="app-permissions-heading"
-      >
-        <H2 id="app-permissions-heading" mt="$4">
-          {t("appPermissions.title")}
-        </H2>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
-          {t("appPermissions.subtitle")}
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("appPermissions.activeWorkspaceLabel")}: <CodeInline>{meSummary?.activeWorkspaceId ?? "—"}</CodeInline>
         </SizableText>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+          {t("appPermissions.roleLabel")}: <CodeInline>{meSummary?.role ?? t("appPermissions.roleUnknown")}</CodeInline>
+        </SizableText>
+      </YStack>
 
-        <YStack gap="$1.5" mt="$2.5">
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-            {t("appPermissions.userLabel")}: <CodeInline>{meSummary?.userEmail ?? "—"}</CodeInline>
-          </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-            {t("appPermissions.activeWorkspaceLabel")}: <CodeInline>{meSummary?.activeWorkspaceId ?? "—"}</CodeInline>
-          </SizableText>
-          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-            {t("appPermissions.roleLabel")}: <CodeInline>{meSummary?.role ?? t("appPermissions.roleUnknown")}</CodeInline>
-          </SizableText>
-        </YStack>
-
-        <View mt="$2.5">
-          <Link href="/select-workspace">{t("appPermissions.selectWorkspaceCta")}</Link>
-        </View>
+      <View mt="$2.5">
+        <Link href="/select-workspace">{t("appPermissions.selectWorkspaceCta")}</Link>
       </View>
-    </YStack>
+    </>
   );
 }
 

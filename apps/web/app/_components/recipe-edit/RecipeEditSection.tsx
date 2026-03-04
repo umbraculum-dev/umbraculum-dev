@@ -2,7 +2,9 @@
 
 import type { ReactNode } from "react";
 
-import { Accordion, H2, SizableText, View, XStack } from "tamagui";
+import { Accordion, SizableText, View } from "tamagui";
+
+import { BrewAccordionHeader } from "../BrewAccordionHeader";
 
 export interface RecipeEditSectionProps {
   id: string;
@@ -44,21 +46,16 @@ export function RecipeEditSection({
         onValueChange={(v) => onOpenChange(v === id)}
       >
         <Accordion.Item value={id}>
-          <Accordion.Header>
-            <Accordion.Trigger unstyled width="100%">
-              <XStack items="center" justifyContent="space-between" gap="$2" width="100%">
-                <H2 id={headingId} m={0} size="$5" fontFamily="$heading" color="var(--text)">
-                  {label}
-                </H2>
-                <XStack items="center" gap="$2">
-                  {rightSlot ? <View>{rightSlot}</View> : null}
-                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                    {open ? "▾" : "▸"}
-                  </SizableText>
-                </XStack>
-              </XStack>
-            </Accordion.Trigger>
-          </Accordion.Header>
+          <BrewAccordionHeader
+            headingId={headingId}
+            title={
+              <SizableText m={0} size="$5" fontFamily="$heading" color="var(--text)">
+                {label}
+              </SizableText>
+            }
+            open={open}
+            rightSlot={rightSlot}
+          />
           <Accordion.Content>
             <View mt="$3">{children}</View>
           </Accordion.Content>
