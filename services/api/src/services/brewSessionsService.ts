@@ -27,6 +27,7 @@ type RecipeDrivenStepSeed = {
   minutesPlanned?: number | null;
   relativeToStepId?: string | null;
   offsetMinutesFromEnd?: number | null;
+  breweryAppStepKind?: "fermentable_early" | "fermentable_late" | null;
 };
 
 export class BrewSessionsService {
@@ -97,6 +98,7 @@ export class BrewSessionsService {
         : 60;
     const boilBaseStepId = crypto.randomUUID();
 
+    const fermentables = Array.isArray(ing?.fermentable_additions) ? ing.fermentable_additions : [];
     const hops = Array.isArray(ing?.hop_additions) ? ing.hop_additions : [];
     const cultures = Array.isArray(ing?.culture_additions) ? ing.culture_additions : [];
     const misc = Array.isArray(ing?.miscellaneous_additions) ? ing.miscellaneous_additions : [];
@@ -116,6 +118,26 @@ export class BrewSessionsService {
       }
       return null;
     };
+
+    for (const f of fermentables) {
+      const name = typeof f?.name === "string" ? f.name.trim() : "";
+      if (!name) continue;
+      const amountKg =
+        f?.amount?.unit === "kg"
+          ? toFiniteNumber(f?.amount?.value)
+          : f?.amount?.unit === "g"
+            ? ((toFiniteNumber(f?.amount?.value) ?? 0) / 1000)
+            : null;
+      const amountSuffix =
+        amountKg != null && Number.isFinite(amountKg) && amountKg > 0 ? ` (${Math.round(amountKg * 1000) / 1000} kg)` : "";
+      const lateAddition = f?.brewery_app_late_addition === true;
+      steps.push({
+        sectionId: "mash",
+        sectionName: null,
+        name: `Add fermentable: ${name}${amountSuffix}`,
+        breweryAppStepKind: lateAddition ? "fermentable_late" : "fermentable_early",
+      });
+    }
 
     const extractMashStepMinutes = (s: any): number => {
       const rawStepTime = s?.step_time;
@@ -439,7 +461,16 @@ export class BrewSessionsService {
     const allSections = new Set([...seedBySection.keys(), ...recipeBySection.keys()]);
     const sortedSections = [...allSections].sort((a, b) => sectionRank(a) - sectionRank(b));
 
-    const merged: Array<{ sectionId: string; sectionName: string | null; name: string; minutesPlanned: number | null; id?: string; relativeToStepId?: string | null; offsetMinutesFromEnd?: number | null }> = [];
+    const merged: Array<{
+      sectionId: string;
+      sectionName: string | null;
+      name: string;
+      minutesPlanned: number | null;
+      id?: string;
+      relativeToStepId?: string | null;
+      offsetMinutesFromEnd?: number | null;
+      breweryAppStepKind?: RecipeDrivenStepSeed["breweryAppStepKind"];
+    }> = [];
     for (const sid of sortedSections) {
       const seedList = seedBySection.get(sid) ?? [];
       const recipeList = recipeBySection.get(sid) ?? [];
@@ -460,8 +491,52 @@ export class BrewSessionsService {
           id: s.id,
           relativeToStepId: s.relativeToStepId ?? null,
           offsetMinutesFromEnd: s.offsetMinutesFromEnd ?? null,
+          breweryAppStepKind: s.breweryAppStepKind ?? null,
         });
       }
+    }
+
+    const mashInNameMatch = (name: string) => name.toLowerCase().includes("mash in");
+    const vorlaufNameMatch = (name: string) => {
+      const n = name.toLowerCase();
+      return n.includes("vorlauf") || n.includes("volauf");
+    };
+    const isMash = (s: (typeof merged)[number]) => s.sectionId === "mash";
+    const isEarlyFermentable = (s: (typeof merged)[number]) => s.breweryAppStepKind === "fermentable_early";
+    const isLateFermentable = (s: (typeof merged)[number]) => s.breweryAppStepKind === "fermentable_late";
+
+    const mashSteps = merged.filter(isMash);
+    const earlyFermentables = mashSteps.filter(isEarlyFermentable);
+    const lateFermentables = mashSteps.filter(isLateFermentable);
+    const mashWithoutFermentables = mashSteps.filter((s) => !isEarlyFermentable(s) && !isLateFermentable(s));
+
+    if (earlyFermentables.length > 0 || lateFermentables.length > 0) {
+      const mashInIdx = mashWithoutFermentables.findIndex((s) => mashInNameMatch(s.name));
+      const earlyInsertAt = mashInIdx >= 0 ? mashInIdx + 1 : mashWithoutFermentables.length > 0 ? 1 : 0;
+
+      const withEarly = [...mashWithoutFermentables];
+      withEarly.splice(earlyInsertAt, 0, ...earlyFermentables);
+
+      const vorlaufIdx = withEarly.findIndex((s) => vorlaufNameMatch(s.name));
+      const lateInsertAt = vorlaufIdx >= 0 ? vorlaufIdx : withEarly.length;
+      withEarly.splice(lateInsertAt, 0, ...lateFermentables);
+
+      const nextMerged: typeof merged = [];
+      let insertedMash = false;
+      for (const s of merged) {
+        if (s.sectionId !== "mash") {
+          nextMerged.push(s);
+          continue;
+        }
+        if (insertedMash) continue;
+        nextMerged.push(...withEarly);
+        insertedMash = true;
+      }
+
+      if (!insertedMash) nextMerged.push(...withEarly);
+
+      merged.length = 0;
+      merged.push(...nextMerged);
     }
 
     const prefix = `BREW-${recipeId.slice(0, 6).toUpperCase()}`;

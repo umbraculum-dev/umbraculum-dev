@@ -413,7 +413,9 @@ export function WaterMashScreen() {
       if (!r?.beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
       const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
       const mashOnlyRows = (s.gristRows as Record<string, unknown>[]).filter(
-        (row) => (row.timingUse as string ?? "add_to_mash") === "add_to_mash",
+        (row) =>
+          (row.timingUse as string ?? "add_to_mash") === "add_to_mash" &&
+          (row as any).lateAddition !== true,
       );
       const nowIso = new Date().toISOString();
       await saveSettings({
@@ -429,6 +431,22 @@ export function WaterMashScreen() {
       setImportingGrist(false);
     }
   };
+
+  const lateAdditionsTotalKg = useMemo(() => {
+    try {
+      const doc = recipe?.beerJsonRecipeJson;
+      if (!doc) return 0;
+      const s = editorStateFromBeerJson(doc);
+      return (s.gristRows as any[]).reduce((sum, r) => {
+        if ((r?.timingUse ?? "add_to_mash") !== "add_to_mash") return sum;
+        if (r?.lateAddition !== true) return sum;
+        const amountKg = typeof r?.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0;
+        return sum + amountKg;
+      }, 0);
+    } catch {
+      return 0;
+    }
+  }, [recipe]);
 
   const onSaveMashDraft = async () => {
     if (!canCall) return;
@@ -878,6 +896,9 @@ export function WaterMashScreen() {
               </Accordion.Header>
               <Accordion.Content>
                 <View style={{ gap: 8 }}>
+                  <Text fontSize={12} opacity={0.75}>
+                    {t("lateFermentablesExcludedNote", { kg: formatFixed(locale, lateAdditionsTotalKg, 2) })}
+                  </Text>
                   <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
                     <Button
                       size="$3"

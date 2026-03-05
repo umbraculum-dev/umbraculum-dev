@@ -593,6 +593,7 @@ export function RecipeEditScreen() {
         potential: null,
         maltClass: "base",
         timingUse: "add_to_mash",
+        lateAddition: false,
       } as EditorGristRow,
     ]);
   }, []);
@@ -616,6 +617,7 @@ export function RecipeEditScreen() {
         potential,
         maltClass,
         timingUse: "add_to_mash",
+        lateAddition: false,
       } as EditorGristRow,
     ]);
   }, []);
@@ -1204,6 +1206,17 @@ export function RecipeEditScreen() {
                           }
                           closeLabel={tCommon("close")}
                           accessibilityLabel={t("fermentableTimingLabel")}
+                        />
+                        <PickerField
+                          label={t("fermentableLateAdditionLabel")}
+                          value={r.lateAddition === true ? "yes" : "no"}
+                          options={[
+                            { value: "no", label: t("fermentableLateAdditionNo") },
+                            { value: "yes", label: t("fermentableLateAdditionYes") },
+                          ]}
+                          onChange={(v) => updateGristRow(r.id, { lateAddition: v === "yes" })}
+                          closeLabel={tCommon("close")}
+                          accessibilityLabel={t("fermentableLateAdditionLabel")}
                         />
                         {(r.group ?? "") ? (
                           <View>

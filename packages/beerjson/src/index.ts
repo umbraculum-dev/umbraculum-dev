@@ -32,6 +32,7 @@ export type EditorGristRow = {
   potential: GristPotential;
   maltClass: "base" | "crystal" | "roast" | "acid";
   timingUse?: "add_to_mash" | "add_to_boil";
+  lateAddition?: boolean;
 };
 
 export type EditorHopRow = {
@@ -379,6 +380,7 @@ function buildFermentableAddition(row: EditorGristRow) {
     ...(colorLovibond === null ? {} : { color: { unit: "Lovi", value: colorLovibond } }),
     amount: { unit: "kg", value: row.amountKg },
     timing: { use: timingUse },
+    ...(row.lateAddition === true ? { brewery_app_late_addition: true } : {}),
   };
 }
 
@@ -821,6 +823,8 @@ export function editorStateFromBeerJson(doc: unknown): {
           ? "add_to_boil"
           : "add_to_mash";
 
+      const lateAddition = f?.brewery_app_late_addition === true;
+
       return {
         id,
         ingredientId: null,
@@ -835,6 +839,7 @@ export function editorStateFromBeerJson(doc: unknown): {
         potential,
         maltClass,
         timingUse,
+        lateAddition,
       } as EditorGristRow;
     })
     .filter(Boolean) as EditorGristRow[];

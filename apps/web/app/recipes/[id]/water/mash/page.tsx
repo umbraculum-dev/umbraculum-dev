@@ -1155,7 +1155,7 @@ export default function MashWaterPage() {
       }
       const s = editorStateFromBeerJson((data.recipe as any).beerJsonRecipeJson);
       const mashOnlyRows = (s.gristRows as any[]).filter(
-        (r) => (r.timingUse ?? "add_to_mash") === "add_to_mash",
+        (r) => (r.timingUse ?? "add_to_mash") === "add_to_mash" && r.lateAddition !== true,
       );
       rows = mashOnlyRows.map((r) => {
         const m = r.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[r.id] : null;
@@ -1191,6 +1191,21 @@ export default function MashWaterPage() {
     () => gristImportedRows.reduce((sum, r) => sum + (Number.isFinite(r.amountKg) ? r.amountKg : 0), 0),
     [gristImportedRows],
   );
+  const lateAdditionsTotalKg = useMemo(() => {
+    try {
+      const doc = (recipe as any)?.beerJsonRecipeJson;
+      if (!doc) return 0;
+      const s = editorStateFromBeerJson(doc);
+      return (s.gristRows as any[]).reduce((sum, r) => {
+        if ((r?.timingUse ?? "add_to_mash") !== "add_to_mash") return sum;
+        if (r?.lateAddition !== true) return sum;
+        const amountKg = typeof r?.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0;
+        return sum + amountKg;
+      }, 0);
+    } catch {
+      return 0;
+    }
+  }, [recipe]);
 
   return (
     <>
@@ -1427,7 +1442,7 @@ export default function MashWaterPage() {
                   {t("gristSummaryHelp")}
                 </SizableText>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1" mb={0}>
-                  {t("lateExtractExcludedNote")}
+                  {t("lateFermentablesExcludedNote", { kg: fmt("kg", lateAdditionsTotalKg, 2) })}
                 </SizableText>
                 <ul className="brew-list-mt0">
                   <li>

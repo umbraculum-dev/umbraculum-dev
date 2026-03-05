@@ -43,6 +43,15 @@ describe("brew sessions (account scoped)", () => {
                   color: { unit: "Lovi", value: 2.0 },
                   amount: { unit: "kg", value: 4.5 },
                 },
+                {
+                  id: "row-2",
+                  name: "Roasted barley",
+                  type: "grain",
+                  yield: { potential: { unit: "sg", value: 1.025 } },
+                  color: { unit: "Lovi", value: 300 },
+                  amount: { unit: "kg", value: 0.3 },
+                  brewery_app_late_addition: true,
+                },
               ],
               hop_additions: [],
               culture_additions: [],
@@ -105,6 +114,23 @@ describe("brew sessions (account scoped)", () => {
     expect(mashOut.relativeToStepId).toBe(startMash.id);
     expect(mashIn.offsetMinutesFromEnd).toBe(-70);
     expect(mashOut.offsetMinutesFromEnd).toBe(-10);
+
+    const mashSteps = (body.steps as any[]).filter((s) => s?.sectionId === "mash");
+    const mashInIdx = mashSteps.findIndex((s) => s?.name === "Mash in");
+    expect(mashInIdx).toBeGreaterThanOrEqual(0);
+
+    const addPaleIdx = mashSteps.findIndex((s) => String(s?.name ?? "").includes("Add fermentable: Pale malt"));
+    const addRoastIdx = mashSteps.findIndex((s) => String(s?.name ?? "").includes("Add fermentable: Roasted barley"));
+    expect(addPaleIdx).toBeGreaterThanOrEqual(0);
+    expect(addRoastIdx).toBeGreaterThanOrEqual(0);
+    expect(addPaleIdx).toBeGreaterThan(mashInIdx);
+
+    const vorlaufIdx = mashSteps.findIndex((s) => {
+      const n = String(s?.name ?? "").toLowerCase();
+      return n.includes("vorlauf") || n.includes("volauf");
+    });
+    expect(vorlaufIdx).toBeGreaterThanOrEqual(0);
+    expect(addRoastIdx).toBeLessThan(vorlaufIdx);
 
     brewSessionId = body.brewSession.id;
   });

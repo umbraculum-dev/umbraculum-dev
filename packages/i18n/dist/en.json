@@ -1005,7 +1005,10 @@
       "gristAvgColor": "Avg color: {value} {unit}",
       "fermentableTimingLabel": "Add to",
       "fermentableTimingMash": "Mash",
-      "fermentableTimingKettle": "Kettle (late extract)"
+      "fermentableTimingKettle": "Kettle (late extract)",
+      "fermentableLateAdditionLabel": "Late addition",
+      "fermentableLateAdditionNo": "No",
+      "fermentableLateAdditionYes": "Yes"
     },
     "analysis": {
       "help": "Derived estimates. If required inputs are missing, values show as “Insufficient data”.",
@@ -1067,7 +1070,7 @@
         "adjustmentHint": "Select a source + dilution profile and set volumes to see mixed ions.",
         "gristSummaryHeading": "Grist (import & summary)",
         "gristSummaryHelp": "We avoid duplicating the full grist table here. Use the recipe editor for details; this page only keeps a snapshot for calculations.",
-        "lateExtractExcludedNote": "Late extract (kettle) additions are excluded from mash grist for water chemistry.",
+        "lateFermentablesExcludedNote": "Late addition fermentables total {kg} kg and are excluded from mash grist for water chemistry.",
         "acidificationHeading": "Mash water acidification",
         "resultLastCalculated": "Result (last calculated)",
         "overallResultHeading": "Overall mash water result (HCO3 derived from alkalinity)",

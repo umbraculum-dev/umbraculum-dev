@@ -1010,7 +1010,10 @@
       "gristAvgColor": "Colore medio: {value} {unit}",
       "fermentableTimingLabel": "Aggiungi a",
       "fermentableTimingMash": "Mash",
-      "fermentableTimingKettle": "Kettle (estratto a fine bollitura)"
+      "fermentableTimingKettle": "Kettle (estratto a fine bollitura)",
+      "fermentableLateAdditionLabel": "Aggiunta tardiva",
+      "fermentableLateAdditionNo": "No",
+      "fermentableLateAdditionYes": "Sì"
     },
     "analysis": {
       "help": "Stime derivate. Se mancano input necessari, i valori mostrano “Dati insufficienti”.",
@@ -1072,7 +1075,7 @@
         "adjustmentHint": "Seleziona un profilo sorgente + diluizione e imposta i volumi per vedere gli ioni miscelati.",
         "gristSummaryHeading": "Grist (importa e riepilogo)",
         "gristSummaryHelp": "Evitiamo di duplicare qui la tabella completa del grist. Usa l’editor ricetta per i dettagli; questa pagina mantiene solo uno snapshot per i calcoli.",
-        "lateExtractExcludedNote": "Gli aggiunti di estratto a fine bollitura (kettle) sono esclusi dal grist mash per la chimica dell'acqua.",
+        "lateFermentablesExcludedNote": "I fermentabili a aggiunta tardiva totalizzano {kg} kg e sono esclusi dal grist mash per la chimica dell'acqua.",
         "acidificationHeading": "Acidificazione acqua mash",
         "resultLastCalculated": "Risultato (ultimo calcolo)",
         "overallResultHeading": "Risultato complessivo acqua mash (HCO3 derivato dall’alcalinità)",

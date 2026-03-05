@@ -1119,6 +1119,7 @@ export default function RecipeEditPage() {
         potential: null,
         maltClass: "base",
         timingUse: "add_to_mash",
+        lateAddition: false,
       },
     ]);
   };
@@ -1171,6 +1172,7 @@ export default function RecipeEditPage() {
         potential,
         maltClass,
         timingUse: "add_to_mash",
+        lateAddition: false,
       },
     ]);
     const msg = t("fermentableAddedSaveHint");
@@ -2913,6 +2915,23 @@ export default function RecipeEditPage() {
                                     options={[
                                       { value: "add_to_mash", label: t("fermentableTimingMash") },
                                       { value: "add_to_boil", label: t("fermentableTimingKettle") },
+                                    ]}
+                                  />
+                                </YStack>
+
+                                <YStack gap="$1" minW={140}>
+                                  <RecipeEditFieldLabel htmlFor={`grist-late-${r.id}`}>
+                                    {t("fermentableLateAdditionLabel")}
+                                  </RecipeEditFieldLabel>
+                                  <BrewSelect
+                                    id={`grist-late-${r.id}`}
+                                    value={r.lateAddition === true ? "yes" : "no"}
+                                    onValueChange={(v) =>
+                                      updateGristRow(r.id, { lateAddition: v === "yes" })
+                                    }
+                                    options={[
+                                      { value: "no", label: t("fermentableLateAdditionNo") },
+                                      { value: "yes", label: t("fermentableLateAdditionYes") },
                                     ]}
                                   />
                                 </YStack>

@@ -16,11 +16,12 @@ function cloneJson<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
 }
 
-function stripIdOnAdditions(arr: any[] | undefined) {
+function stripInternalFieldsOnAdditions(arr: any[] | undefined) {
   if (!Array.isArray(arr)) return;
   for (const item of arr) {
     if (!item || typeof item !== "object") continue;
     if ("id" in item) delete (item as any).id;
+    if ("brewery_app_late_addition" in item) delete (item as any).brewery_app_late_addition;
   }
 }
 
@@ -35,10 +36,10 @@ export function strictBeerJsonExport(doc: unknown): unknown {
   const r0 = out?.beerjson?.recipes?.[0];
   const ing = r0?.ingredients;
 
-  stripIdOnAdditions(ing?.fermentable_additions);
-  stripIdOnAdditions(ing?.hop_additions);
-  stripIdOnAdditions(ing?.culture_additions);
-  stripIdOnAdditions(ing?.miscellaneous_additions);
+  stripInternalFieldsOnAdditions(ing?.fermentable_additions);
+  stripInternalFieldsOnAdditions(ing?.hop_additions);
+  stripInternalFieldsOnAdditions(ing?.culture_additions);
+  stripInternalFieldsOnAdditions(ing?.miscellaneous_additions);
 
   return out as unknown;
 }

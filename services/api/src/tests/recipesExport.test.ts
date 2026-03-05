@@ -49,6 +49,7 @@ describe("recipes export (BeerJSON strict)", () => {
                       yield: { potential: { unit: "sg", value: 1.037 } },
                       color: { unit: "Lovi", value: 2.0 },
                       amount: { unit: "kg", value: 4.5 },
+                      brewery_app_late_addition: true,
                     },
                   ],
                   hop_additions: [
@@ -103,6 +104,7 @@ describe("recipes export (BeerJSON strict)", () => {
     const doc = exp.json() as any;
     const ing = doc?.beerjson?.recipes?.[0]?.ingredients ?? null;
     expect(ing?.fermentable_additions?.[0]?.id).toBeUndefined();
+    expect(ing?.fermentable_additions?.[0]?.brewery_app_late_addition).toBeUndefined();
     expect(ing?.hop_additions?.[0]?.id).toBeUndefined();
     expect(ing?.culture_additions?.[0]?.id).toBeUndefined();
     expect(ing?.miscellaneous_additions?.[0]?.id).toBeUndefined();

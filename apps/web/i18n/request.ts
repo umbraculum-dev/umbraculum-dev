@@ -14,6 +14,17 @@ export default getRequestConfig(async ({ requestLocale }) => {
   messages.recipes.edit.saving = messages.recipes.edit.saving ?? "Saving…";
   messages.recipes.edit.mashStepsFromWaterPage =
     messages.recipes.edit.mashStepsFromWaterPage ?? "Mash steps (from Mash water page)";
+  messages.recipes.edit.fermentableLateAdditionLabel =
+    messages.recipes.edit.fermentableLateAdditionLabel ?? "Late addition";
+  messages.recipes.edit.fermentableLateAdditionNo =
+    messages.recipes.edit.fermentableLateAdditionNo ?? "No";
+  messages.recipes.edit.fermentableLateAdditionYes =
+    messages.recipes.edit.fermentableLateAdditionYes ?? "Yes";
+  messages.recipes.water = messages.recipes.water ?? {};
+  messages.recipes.water.mash = messages.recipes.water.mash ?? {};
+  messages.recipes.water.mash.lateFermentablesExcludedNote =
+    messages.recipes.water.mash.lateFermentablesExcludedNote ??
+    "Late addition fermentables total {kg} kg and are excluded from mash grist for water chemistry.";
 
   return {
     locale,

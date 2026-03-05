@@ -1005,7 +1005,10 @@ var en_default = {
       gristAvgColor: "Avg color: {value} {unit}",
       fermentableTimingLabel: "Add to",
       fermentableTimingMash: "Mash",
-      fermentableTimingKettle: "Kettle (late extract)"
+      fermentableTimingKettle: "Kettle (late extract)",
+      fermentableLateAdditionLabel: "Late addition",
+      fermentableLateAdditionNo: "No",
+      fermentableLateAdditionYes: "Yes"
     },
     analysis: {
       help: "Derived estimates. If required inputs are missing, values show as \u201CInsufficient data\u201D.",
@@ -1067,7 +1070,7 @@ var en_default = {
         adjustmentHint: "Select a source + dilution profile and set volumes to see mixed ions.",
         gristSummaryHeading: "Grist (import & summary)",
         gristSummaryHelp: "We avoid duplicating the full grist table here. Use the recipe editor for details; this page only keeps a snapshot for calculations.",
-        lateExtractExcludedNote: "Late extract (kettle) additions are excluded from mash grist for water chemistry.",
+        lateFermentablesExcludedNote: "Late addition fermentables total {kg} kg and are excluded from mash grist for water chemistry.",
         acidificationHeading: "Mash water acidification",
         resultLastCalculated: "Result (last calculated)",
         overallResultHeading: "Overall mash water result (HCO3 derived from alkalinity)",
@@ -1212,7 +1215,7 @@ var en_default = {
       backToDashboard: "Back to dashboard",
       sections: {
         integration: {
-          title: "Integration",
+          title: "Integrations",
           empty: "No integrations yet."
         }
       }
@@ -2495,7 +2498,10 @@ var it_default = {
       gristAvgColor: "Colore medio: {value} {unit}",
       fermentableTimingLabel: "Aggiungi a",
       fermentableTimingMash: "Mash",
-      fermentableTimingKettle: "Kettle (estratto a fine bollitura)"
+      fermentableTimingKettle: "Kettle (estratto a fine bollitura)",
+      fermentableLateAdditionLabel: "Aggiunta tardiva",
+      fermentableLateAdditionNo: "No",
+      fermentableLateAdditionYes: "S\xEC"
     },
     analysis: {
       help: "Stime derivate. Se mancano input necessari, i valori mostrano \u201CDati insufficienti\u201D.",
@@ -2557,7 +2563,7 @@ var it_default = {
         adjustmentHint: "Seleziona un profilo sorgente + diluizione e imposta i volumi per vedere gli ioni miscelati.",
         gristSummaryHeading: "Grist (importa e riepilogo)",
         gristSummaryHelp: "Evitiamo di duplicare qui la tabella completa del grist. Usa l\u2019editor ricetta per i dettagli; questa pagina mantiene solo uno snapshot per i calcoli.",
-        lateExtractExcludedNote: "Gli aggiunti di estratto a fine bollitura (kettle) sono esclusi dal grist mash per la chimica dell'acqua.",
+        lateFermentablesExcludedNote: "I fermentabili a aggiunta tardiva totalizzano {kg} kg e sono esclusi dal grist mash per la chimica dell'acqua.",
         acidificationHeading: "Acidificazione acqua mash",
         resultLastCalculated: "Risultato (ultimo calcolo)",
         overallResultHeading: "Risultato complessivo acqua mash (HCO3 derivato dall\u2019alcalinit\xE0)",
@@ -2702,7 +2708,7 @@ var it_default = {
       backToDashboard: "Torna alla dashboard",
       sections: {
         integration: {
-          title: "Integrazione",
+          title: "Integrazioni",
           empty: "Nessuna integrazione per ora."
         }
       }
