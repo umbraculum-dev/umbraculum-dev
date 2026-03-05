@@ -1212,7 +1212,7 @@
       "backToDashboard": "Back to dashboard",
       "sections": {
         "integration": {
-          "title": "Integration",
+          "title": "Integrations",
           "empty": "No integrations yet."
         }
       }

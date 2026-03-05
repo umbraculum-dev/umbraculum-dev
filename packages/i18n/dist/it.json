@@ -1217,7 +1217,7 @@
       "backToDashboard": "Torna alla dashboard",
       "sections": {
         "integration": {
-          "title": "Integrazione",
+          "title": "Integrazioni",
           "empty": "Nessuna integrazione per ora."
         }
       }

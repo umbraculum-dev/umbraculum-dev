@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { H1, H2, SizableText, View, YStack } from "tamagui";
+import { Accordion, H1, SizableText, YStack } from "tamagui";
 
 import { DashboardClient } from "../../DashboardClient";
 import { Link } from "../../../src/i18n/navigation";
+import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 
 export default function FermDataIntegrationPage() {
   const t = useTranslations("dashboard.fermDataIntegration");
+  const [openSections, setOpenSections] = useState<string[]>([]);
 
   return (
     <YStack gap="$3">
@@ -22,21 +25,24 @@ export default function FermDataIntegrationPage() {
         <Link href="/">{t("backToDashboard")}</Link>
       </SizableText>
 
-      <View
-        bg="var(--surface)"
-        borderWidth={1}
-        borderColor="var(--border)"
-        rounded="$2"
-        p="$3"
-        aria-labelledby="integration-heading"
-      >
-        <H2 id="integration-heading" mt={0}>
-          {t("sections.integration.title")}
-        </H2>
-        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0}>
-          {t("sections.integration.empty")}
-        </SizableText>
-      </View>
+      <YStack gap="$0">
+        <Accordion
+          type="multiple"
+          value={openSections}
+          onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : next ? [next] : [])}
+        >
+          <BrewAccordionSection
+            value="integrations"
+            headingId="integrations-heading"
+            title={t("sections.integration.title")}
+            open={openSections.includes("integrations")}
+          >
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mb={0} mt="$3">
+              {t("sections.integration.empty")}
+            </SizableText>
+          </BrewAccordionSection>
+        </Accordion>
+      </YStack>
     </YStack>
   );
 }

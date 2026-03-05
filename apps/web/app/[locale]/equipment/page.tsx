@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
 import type { AuthMeResponse } from "@brewery/contracts";
 import { parseAuthMeResponse } from "@brewery/contracts";
 
+import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { apiFetch } from "../../_lib/apiClient";
 
@@ -68,6 +69,8 @@ export default function EquipmentPage() {
   const [editDraft, setEditDraft] = useState<Record<string, string>>({});
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+
+  const [openSections, setOpenSections] = useState<string[]>([]);
 
   const canWrite = auth != null;
 
@@ -312,68 +315,83 @@ export default function EquipmentPage() {
       ) : null}
 
       <View mt="$3">
-        <details className="brew-panel">
-          <summary className="brew-details-summary">
-            <H2 id="equipment-list" mt={0} display="inline">
-              {t("listTitle")}
-            </H2>
-          </summary>
-          <YStack mt="$3">
-            {profiles.length ? (
-              <View className="brew-table-wrap">
-                <table className="brew-table">
-                  <thead>
-                    <tr>
-                      <th align="left">{t("colName")}</th>
-                      <th align="left">{t("colKettleVol", { unit: tUnits("L") })}</th>
-                      <th align="left">{t("colMashEff")}</th>
-                      {canWrite ? <th align="left">{t("colActions")}</th> : null}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {profiles.map((p) => (
-                      <tr key={p.id}>
-                        <td>{p.name}</td>
-                        <td>{p.equipment?.kettle?.kettleVolumeLiters == null ? "—" : p.equipment.kettle.kettleVolumeLiters}</td>
-                        <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
-                        {canWrite ? (
-                          <td>
-                            <XStack gap="$2" display="inline-flex">
-                              <Button
-                                size="$3"
-                                onPress={() => beginEdit(p)}
-                                bg="var(--surface-2)"
-                                borderWidth={1}
-                                borderColor="var(--border)"
-                                color="var(--text)"
-                              >
-                                {t("edit")}
-                              </Button>
-                              <Button
-                                size="$3"
-                                onPress={() => void onDelete(p.id)}
-                                bg="var(--surface-2)"
-                                borderWidth={1}
-                                borderColor="var(--border)"
-                                color="var(--text)"
-                              >
-                                {t("delete")}
-                              </Button>
-                            </XStack>
-                          </td>
-                        ) : null}
+        <Accordion
+          type="single"
+          collapsible
+          value={openSections.includes("list") ? "list" : ""}
+          onValueChange={(v) =>
+            setOpenSections((prev) =>
+              v === "list"
+                ? prev.includes("list")
+                  ? prev
+                  : [...prev, "list"]
+                : prev.filter((x) => x !== "list")
+            )
+          }
+        >
+          <BrewAccordionSection
+            value="list"
+            headingId="equipment-list-heading"
+            title={t("listTitle")}
+            open={openSections.includes("list")}
+          >
+            <View mt="$3">
+              {profiles.length ? (
+                <View className="brew-table-wrap">
+                  <table className="brew-table">
+                    <thead>
+                      <tr>
+                        <th align="left">{t("colName")}</th>
+                        <th align="left">{t("colKettleVol", { unit: tUnits("L") })}</th>
+                        <th align="left">{t("colMashEff")}</th>
+                        {canWrite ? <th align="left">{t("colActions")}</th> : null}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </View>
-            ) : (
-              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
-                {t("noProfiles")}
-              </SizableText>
-            )}
-          </YStack>
-        </details>
+                    </thead>
+                    <tbody>
+                      {profiles.map((p) => (
+                        <tr key={p.id}>
+                          <td>{p.name}</td>
+                          <td>{p.equipment?.kettle?.kettleVolumeLiters == null ? "—" : p.equipment.kettle.kettleVolumeLiters}</td>
+                          <td>{p.equipment?.mash?.mashEfficiencyPercent == null ? "—" : p.equipment.mash.mashEfficiencyPercent}</td>
+                          {canWrite ? (
+                            <td>
+                              <XStack gap="$2" display="inline-flex">
+                                <Button
+                                  size="$3"
+                                  onPress={() => beginEdit(p)}
+                                  bg="var(--surface-2)"
+                                  borderWidth={1}
+                                  borderColor="var(--border)"
+                                  color="var(--text)"
+                                >
+                                  {t("edit")}
+                                </Button>
+                                <Button
+                                  size="$3"
+                                  onPress={() => void onDelete(p.id)}
+                                  bg="var(--surface-2)"
+                                  borderWidth={1}
+                                  borderColor="var(--border)"
+                                  color="var(--text)"
+                                >
+                                  {t("delete")}
+                                </Button>
+                              </XStack>
+                            </td>
+                          ) : null}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </View>
+              ) : (
+                <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$2" mb={0}>
+                  {t("noProfiles")}
+                </SizableText>
+              )}
+            </View>
+          </BrewAccordionSection>
+        </Accordion>
       </View>
 
       {canWrite && editingId ? (
@@ -707,14 +725,29 @@ export default function EquipmentPage() {
 
       {canWrite ? (
         <View mt="$3">
-          <details className="brew-panel">
-            <summary className="brew-details-summary">
-              <H2 id="equipment-create" mt={0} display="inline">
-                {t("createTitle")}
-              </H2>
-            </summary>
-            <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined}>
-              <YStack mt="$3" gap="$3">
+          <Accordion
+            type="single"
+            collapsible
+            value={openSections.includes("create") ? "create" : ""}
+            onValueChange={(v) =>
+              setOpenSections((prev) =>
+                v === "create"
+                  ? prev.includes("create")
+                    ? prev
+                    : [...prev, "create"]
+                  : prev.filter((x) => x !== "create")
+              )
+            }
+          >
+            <BrewAccordionSection
+              value="create"
+              headingId="equipment-create-heading"
+              title={t("createTitle")}
+              open={openSections.includes("create")}
+            >
+              <View mt="$3">
+                <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined}>
+                  <YStack gap="$3">
                 <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="equip-name">{t("nameLabel")}</RecipeEditFieldLabel>
                   <Input
@@ -1009,8 +1042,10 @@ export default function EquipmentPage() {
               {createError ? (
                 <ErrorBox id="equipment-create-error" mt="$3">{createError}</ErrorBox>
               ) : null}
-            </form>
-          </details>
+                </form>
+              </View>
+            </BrewAccordionSection>
+          </Accordion>
         </View>
       ) : null}
     </YStack>
