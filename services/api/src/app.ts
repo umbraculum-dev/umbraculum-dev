@@ -27,6 +27,9 @@ import { brewdaySettingsRoutes } from "./routes/brewdaySettings.js";
 import { brewSessionsRoutes } from "./routes/brewSessions.js";
 import { inventoryRoutes } from "./routes/inventory.js";
 import { billingRoutes } from "./routes/billing.js";
+import { integrationsTiltIngestRoutes } from "./routes/integrationsTiltIngest.js";
+import { integrationsTiltRoutes } from "./routes/integrationsTilt.js";
+import { integrationsRevealRoutes } from "./routes/integrationsReveal.js";
 import { webhooksStripeRoutes } from "./routes/webhooksStripe.js";
 import { webhooksRevenuecatRoutes } from "./routes/webhooksRevenuecat.js";
 
@@ -79,6 +82,9 @@ export function buildApp() {
   app.register(brewSessionsRoutes);
   app.register(inventoryRoutes);
   app.register(billingRoutes);
+  app.register(integrationsTiltIngestRoutes);
+  app.register(integrationsTiltRoutes);
+  app.register(integrationsRevealRoutes);
   app.register(webhooksStripeRoutes);
   app.register(webhooksRevenuecatRoutes);
 

@@ -113,6 +113,12 @@ enum BrewSessionLogKind {
   @@map("brew_session_log_kind")
 }
 
+enum IntegrationKind {
+  tilt
+
+  @@map("integration_kind")
+}
+
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
@@ -168,6 +174,7 @@ model Workspace {
   billingPurchaseIntents BillingPurchaseIntent[]
   billingWorkspaceBindings BillingUserWorkspaceBinding[]
   billingEvents BillingEvent[]
+  integrations Integration[]
 
   @@map("workspaces")
 }
@@ -210,12 +217,94 @@ model BrewSession {
   recipe    Recipe           @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   steps     BrewSessionStep[]
   logs      BrewSessionLog[]
+  integrationDeviceAttachments IntegrationDeviceAttachment[]
+  integrationReadings IntegrationReading[]
 
   @@index([workspaceId])
   @@index([recipeId])
   @@index([workspaceId, recipeId])
   @@unique([workspaceId, code])
   @@map("brew_sessions")
+}
+
+model Integration {
+  id          String          @id @default(uuid())
+  workspaceId String          @map("workspace_id")
+  kind        IntegrationKind
+  /** Token version for deterministic token derivation. */
+  tokenVersion Int           @default(1) @map("token_version")
+  /** Hash of the integration token (store hash only). */
+  tokenHash   String          @unique @map("token_hash")
+  revokedAt   DateTime?       @map("revoked_at")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  devices   IntegrationDevice[]
+
+  @@index([workspaceId])
+  @@index([kind])
+  @@map("integrations")
+}
+
+model IntegrationDevice {
+  id            String   @id @default(uuid())
+  integrationId String   @map("integration_id")
+  /** Stable identity string (e.g. uuid:..., mac:..., color:...). */
+  deviceKey     String   @map("device_key")
+  /** UI display name (e.g. color). */
+  displayName   String?  @map("display_name")
+  /** Raw identity metadata for forward compatibility. */
+  metadataJson  Json?    @map("metadata_json")
+  lastSeenAt    DateTime? @map("last_seen_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  attachments IntegrationDeviceAttachment[]
+  readings    IntegrationReading[]
+
+  @@unique([integrationId, deviceKey])
+  @@index([integrationId])
+  @@index([lastSeenAt])
+  @@map("integration_devices")
+}
+
+model IntegrationDeviceAttachment {
+  id           String   @id @default(uuid())
+  deviceId     String   @map("device_id")
+  brewSessionId String  @map("brew_session_id")
+  attachedAt   DateTime @default(now()) @map("attached_at")
+  detachedAt   DateTime? @map("detached_at")
+
+  device      IntegrationDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  brewSession BrewSession       @relation(fields: [brewSessionId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId])
+  @@index([brewSessionId])
+  @@index([deviceId, detachedAt])
+  @@map("integration_device_attachments")
+}
+
+model IntegrationReading {
+  id           String   @id @default(uuid())
+  deviceId     String   @map("device_id")
+  brewSessionId String? @map("brew_session_id")
+  /** Timestamp reported by the device/gateway (optional). */
+  recordedAt   DateTime? @map("recorded_at")
+  /** Timestamp when the API received the reading. */
+  receivedAt   DateTime @default(now()) @map("received_at")
+  temperatureC Float?   @map("temperature_c")
+  gravitySg    Float?   @map("gravity_sg")
+  rawJson      Json     @map("raw_json")
+
+  device      IntegrationDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  brewSession BrewSession?      @relation(fields: [brewSessionId], references: [id], onDelete: SetNull)
+
+  @@index([deviceId])
+  @@index([brewSessionId])
+  @@index([receivedAt])
+  @@map("integration_readings")
 }
 
 model Ad {
