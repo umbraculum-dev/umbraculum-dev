@@ -9,9 +9,14 @@ import { Link } from "../../../src/i18n/navigation";
 import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import { BrewSelect } from "../../_components/BrewSelect";
 import { CodeInline } from "../../_components/CodeInline";
+import { HydrometerChart } from "../../_components/HydrometerChart";
 import { MessageBox } from "../../_components/recipe-edit/MessageBox";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
+
+type IntegrationKind = "tilt" | "ispindel" | "rapt";
+
+const INTEGRATION_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
 
 export default function FermDataIntegrationPage() {
   const t = useTranslations("dashboard.fermDataIntegration");
@@ -24,22 +29,31 @@ export default function FermDataIntegrationPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [integration, setIntegration] = useState<any | null>(null);
-  const [devices, setDevices] = useState<any[]>([]);
+  const createKindRecord = <T,>(value: T): Record<IntegrationKind, T> => ({
+    tilt: value,
+    ispindel: value,
+    rapt: value,
+  });
+
+  const [integrations, setIntegrations] = useState<Record<IntegrationKind, any | null>>(createKindRecord(null));
+  const [devicesByKind, setDevicesByKind] = useState<Record<IntegrationKind, any[]>>(createKindRecord([]));
   const [recentBrewSessions, setRecentBrewSessions] = useState<any[]>([]);
 
-  const [newToken, setNewToken] = useState<string | null>(null);
-  const [newPublicPath, setNewPublicPath] = useState<string | null>(null);
-  const [copied, setCopied] = useState<null | "url" | "token">(null);
+  const [newTokens, setNewTokens] = useState<Record<IntegrationKind, string | null>>(createKindRecord(null));
+  const [newPublicPaths, setNewPublicPaths] = useState<Record<IntegrationKind, string | null>>(createKindRecord(null));
+  const [copied, setCopied] = useState<null | { kind: IntegrationKind; field: "url" | "token" }>(null);
 
   const [attachSessionByDeviceId, setAttachSessionByDeviceId] = useState<Record<string, string>>({});
   const [deviceWorkingId, setDeviceWorkingId] = useState<string | null>(null);
-  const [integrationWorking, setIntegrationWorking] = useState<null | "create" | "rotate" | "revoke">(null);
+  const [integrationWorking, setIntegrationWorking] = useState<null | { kind: IntegrationKind; action: "create" | "rotate" | "revoke" | "reveal" }>(
+    null
+  );
 
-  const fullPublicUrl = useMemo(() => {
-    if (!newPublicPath || typeof window === "undefined") return null;
-    return `${window.location.origin}${newPublicPath}`;
-  }, [newPublicPath]);
+  const getFullPublicUrl = (kind: IntegrationKind) => {
+    const path = newPublicPaths[kind];
+    if (!path || typeof window === "undefined") return null;
+    return `${window.location.origin}${path}`;
+  };
 
   const brewSessionOptions = useMemo(() => {
     return (recentBrewSessions ?? []).map((s: any) => ({
@@ -48,23 +62,47 @@ export default function FermDataIntegrationPage() {
     }));
   }, [recentBrewSessions]);
 
+  const tiltIntegration = integrations.tilt;
+  const tiltDevices = devicesByKind.tilt;
+  const ispindelIntegration = integrations.ispindel;
+  const raptIntegration = integrations.rapt;
+
   const refresh = async () => {
     if (!canCall) return;
     setError(null);
     setLoading(true);
     try {
-      const [iRes, dRes, sRes] = await Promise.all([
-        apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt`),
-        apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/devices`),
+      const integrationRequests = INTEGRATION_KINDS.map((kind) =>
+        apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}`)
+      );
+      const deviceRequests = INTEGRATION_KINDS.map((kind) =>
+        apiFetch(
+          `/api/workspaces/${workspaceId}/integrations/${kind}/devices?includeReadings=1&readingsLimit=50`
+        )
+      );
+      const [integrationResponses, deviceResponses, sRes] = await Promise.all([
+        Promise.all(integrationRequests),
+        Promise.all(deviceRequests),
         apiFetch(`/api/workspaces/${workspaceId}/brew-sessions/recent?limit=25`),
       ]);
 
-      if (!iRes.ok) throw new Error(String((iRes.data as any)?.message ?? iRes.status));
-      if (!dRes.ok) throw new Error(String((dRes.data as any)?.message ?? dRes.status));
+      integrationResponses.forEach((res) => {
+        if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      });
+      deviceResponses.forEach((res) => {
+        if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      });
       if (!sRes.ok) throw new Error(String((sRes.data as any)?.message ?? sRes.status));
 
-      setIntegration((iRes.data as any).integration ?? null);
-      setDevices((dRes.data as any).devices ?? []);
+      const nextIntegrations = createKindRecord<any | null>(null);
+      const nextDevices = createKindRecord<any[]>([]);
+      INTEGRATION_KINDS.forEach((kind, idx) => {
+        nextIntegrations[kind] = (integrationResponses[idx].data as any).integration ?? null;
+        nextDevices[kind] = (deviceResponses[idx].data as any).devices ?? [];
+      });
+
+      setIntegrations(nextIntegrations);
+      setDevicesByKind(nextDevices);
       setRecentBrewSessions((sRes.data as any).brewSessions ?? []);
     } catch (e) {
       setError(String(e));
@@ -78,7 +116,7 @@ export default function FermDataIntegrationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canCall, workspaceId]);
 
-  const copyToClipboard = async (kind: "url" | "token", value: string) => {
+  const copyToClipboard = async (kind: IntegrationKind, field: "url" | "token", value: string) => {
     setCopied(null);
     try {
       if (navigator?.clipboard?.writeText) {
@@ -86,24 +124,28 @@ export default function FermDataIntegrationPage() {
       } else {
         // Fallback: select/copy from an input (we keep value visible anyway).
       }
-      setCopied(kind);
+      setCopied({ kind, field });
       window.setTimeout(() => setCopied(null), 1500);
     } catch {
       setCopied(null);
     }
   };
 
-  const reveal = async () => {
+  const updateKindTokens = (kind: IntegrationKind, token: string, publicPath: string) => {
+    setNewTokens((prev) => ({ ...prev, [kind]: token || null }));
+    setNewPublicPaths((prev) => ({ ...prev, [kind]: publicPath || null }));
+  };
+
+  const reveal = async (kind: IntegrationKind) => {
     if (!canCall) return;
-    setIntegrationWorking("create");
+    setIntegrationWorking({ kind, action: "reveal" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/reveal`);
+      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/reveal`);
       if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
       const token = String((res.data as any)?.token ?? "");
       const publicPath = String((res.data as any)?.publicPath ?? "");
-      setNewToken(token || null);
-      setNewPublicPath(publicPath || null);
+      updateKindTokens(kind, token, publicPath);
     } catch (e) {
       setError(String(e));
     } finally {
@@ -111,17 +153,16 @@ export default function FermDataIntegrationPage() {
     }
   };
 
-  const createOrRotate = async () => {
+  const createOrRotate = async (kind: IntegrationKind) => {
     if (!canCall) return;
-    setIntegrationWorking("create");
+    setIntegrationWorking({ kind, action: "create" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt`, { method: "POST" });
+      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}`, { method: "POST" });
       if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
       const token = String((res.data as any)?.token ?? "");
       const publicPath = String((res.data as any)?.publicPath ?? "");
-      setNewToken(token || null);
-      setNewPublicPath(publicPath || null);
+      updateKindTokens(kind, token, publicPath);
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -130,17 +171,16 @@ export default function FermDataIntegrationPage() {
     }
   };
 
-  const rotateToken = async () => {
+  const rotateToken = async (kind: IntegrationKind) => {
     if (!canCall) return;
-    setIntegrationWorking("rotate");
+    setIntegrationWorking({ kind, action: "rotate" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/rotate-token`, { method: "POST" });
+      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/rotate-token`, { method: "POST" });
       if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
       const token = String((res.data as any)?.token ?? "");
       const publicPath = String((res.data as any)?.publicPath ?? "");
-      setNewToken(token || null);
-      setNewPublicPath(publicPath || null);
+      updateKindTokens(kind, token, publicPath);
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -149,15 +189,14 @@ export default function FermDataIntegrationPage() {
     }
   };
 
-  const revoke = async () => {
+  const revoke = async (kind: IntegrationKind) => {
     if (!canCall) return;
-    setIntegrationWorking("revoke");
+    setIntegrationWorking({ kind, action: "revoke" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/revoke`, { method: "POST" });
+      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/revoke`, { method: "POST" });
       if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
-      setNewToken(null);
-      setNewPublicPath(null);
+      updateKindTokens(kind, "", "");
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -203,6 +242,9 @@ export default function FermDataIntegrationPage() {
       setDeviceWorkingId(null);
     }
   };
+
+  const isKindWorking = (kind: IntegrationKind) => integrationWorking?.kind === kind;
+  const isAnyWorking = integrationWorking !== null;
 
   return (
     <YStack gap="$3">
@@ -264,65 +306,80 @@ export default function FermDataIntegrationPage() {
 
               <XStack gap="$2" flexWrap="wrap" alignItems="center">
                 <Button
-                  onPress={createOrRotate}
-                  disabled={!canCall || loading || integrationWorking !== null}
+                  onPress={() => void createOrRotate("tilt")}
+                  disabled={!canCall || loading || isAnyWorking}
                   aria-label={t("sections.integration.actions.createAria")}
                 >
-                  {integration ? t("sections.integration.actions.createAgain") : t("sections.integration.actions.create")}
+                  {tiltIntegration ? t("sections.integration.actions.createAgain") : t("sections.integration.actions.create")}
                 </Button>
-                <Button onPress={reveal} disabled={!integration || loading || integrationWorking !== null}>
+                <Button onPress={() => void reveal("tilt")} disabled={!tiltIntegration || loading || isAnyWorking}>
                   {t("sections.integration.actions.reveal")}
                 </Button>
                 <Button
-                  onPress={rotateToken}
-                  disabled={!integration || loading || integrationWorking !== null}
+                  onPress={() => void rotateToken("tilt")}
+                  disabled={!tiltIntegration || loading || isAnyWorking}
                   aria-label={t("sections.integration.actions.rotateAria")}
                 >
                   {t("sections.integration.actions.rotate")}
                 </Button>
                 <Button
-                  onPress={revoke}
-                  disabled={!integration || loading || integrationWorking !== null}
+                  onPress={() => void revoke("tilt")}
+                  disabled={!tiltIntegration || loading || isAnyWorking}
                   aria-label={t("sections.integration.actions.revokeAria")}
                 >
                   {t("sections.integration.actions.revoke")}
                 </Button>
 
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                  {loading || integrationWorking ? t("sections.integration.working") : integration ? t("sections.integration.configured") : t("sections.integration.notConfigured")}
+                  {loading || isAnyWorking
+                    ? t("sections.integration.working")
+                    : tiltIntegration
+                      ? t("sections.integration.configured")
+                      : t("sections.integration.notConfigured")}
                 </SizableText>
               </XStack>
 
-              {newPublicPath ? (
+              {newPublicPaths.tilt ? (
                 <YStack gap="$2" mt="$2">
                   <SizableText size="$2" fontFamily="$body">
                     {t("sections.integration.cloudUrlLabel")}
                   </SizableText>
-                  <Input value={fullPublicUrl ?? newPublicPath} readOnly aria-label={t("sections.integration.cloudUrlAria")} />
+                  <Input
+                    value={getFullPublicUrl("tilt") ?? newPublicPaths.tilt}
+                    readOnly
+                      aria-label={t("sections.integration.cloudUrlAriaTilt")}
+                  />
                   <XStack gap="$2" flexWrap="wrap" alignItems="center">
                     <Button
-                      onPress={() => copyToClipboard("url", fullPublicUrl ?? newPublicPath)}
-                      disabled={!fullPublicUrl && !newPublicPath}
+                      onPress={() => copyToClipboard("tilt", "url", getFullPublicUrl("tilt") ?? newPublicPaths.tilt ?? "")}
+                      disabled={!getFullPublicUrl("tilt") && !newPublicPaths.tilt}
                       aria-label={t("sections.integration.copyUrlAria")}
                     >
-                      {copied === "url" ? t("sections.integration.copied") : t("sections.integration.copy")}
+                      {copied?.kind === "tilt" && copied.field === "url"
+                        ? t("sections.integration.copied")
+                        : t("sections.integration.copy")}
                     </Button>
                     <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
-                      {t("sections.integration.cloudUrlHelp")}
+                      {t("sections.integration.cloudUrlHelpTilt")}
                     </SizableText>
                   </XStack>
                 </YStack>
               ) : null}
 
-              {newToken ? (
+              {newTokens.tilt ? (
                 <YStack gap="$2" mt="$2">
                   <SizableText size="$2" fontFamily="$body">
                     {t("sections.integration.tokenLabel")}
                   </SizableText>
-                  <Input value={newToken} readOnly aria-label={t("sections.integration.tokenAria")} />
+                  <Input value={newTokens.tilt} readOnly aria-label={t("sections.integration.tokenAria")} />
                   <XStack gap="$2" flexWrap="wrap" alignItems="center">
-                    <Button onPress={() => copyToClipboard("token", newToken)} aria-label={t("sections.integration.copyTokenAria")}>
-                      {copied === "token" ? t("sections.integration.copied") : t("sections.integration.copy")}
+                    <Button
+                      onPress={() => copyToClipboard("tilt", "token", newTokens.tilt ?? "")}
+                      aria-label={t("sections.integration.copyTokenAria")}
+                    >
+                      {copied?.kind === "tilt" && copied.field === "token"
+                        ? t("sections.integration.copied")
+                        : t("sections.integration.copy")}
                     </Button>
                     <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
                       {t("sections.integration.tokenHelp")}
@@ -336,18 +393,19 @@ export default function FermDataIntegrationPage() {
                   {t("sections.integration.devicesTitle")}
                 </SizableText>
 
-                {!devices.length ? (
+                {!tiltDevices.length ? (
                   <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
                     {t("sections.integration.noDevices")}
                   </SizableText>
                 ) : (
                   <YStack gap="$2">
-                    {devices.map((d: any) => {
+                    {tiltDevices.map((d: any) => {
                       const attachId = `attach-${d.id}`;
                       const selectedSessionId = attachSessionByDeviceId[d.id] ?? "";
                       const working = deviceWorkingId === d.id;
                       const active = d.activeAttachment?.brewSession ?? null;
                       const last = d.lastReading ?? null;
+                      const recentReadings = Array.isArray(d.recentReadings) ? d.recentReadings : [];
 
                       return (
                         <YStack
@@ -381,6 +439,20 @@ export default function FermDataIntegrationPage() {
                               {t("sections.integration.noReadingsYet")}
                             </SizableText>
                           )}
+
+                          {recentReadings.length ? (
+                            <HydrometerChart
+                              points={recentReadings.map((r: any) => ({
+                                at: String(r.recordedAt ?? r.receivedAt ?? ""),
+                                gravitySg: typeof r.gravitySg === "number" ? r.gravitySg : null,
+                                temperatureC: typeof r.temperatureC === "number" ? r.temperatureC : null,
+                              }))}
+                              compact
+                              title={t("sections.integration.deviceChartTitle")}
+                              gravityLabel={t("sections.integration.chartGravity")}
+                              temperatureLabel={t("sections.integration.chartTemperature")}
+                            />
+                          ) : null}
 
                           <YStack gap="$1">
                             <SizableText size="$2" fontFamily="$body">
@@ -431,17 +503,92 @@ export default function FermDataIntegrationPage() {
                   {t("sections.integration.ispindelSubtitle")}
                 </SizableText>
                 <XStack gap="$2" flexWrap="wrap" alignItems="center">
-                  <Button disabled aria-label={t("sections.integration.actions.createAria")}>
-                    {t("sections.integration.actions.create")}
+                  <Button
+                    onPress={() => void createOrRotate("ispindel")}
+                    disabled={!canCall || loading || isAnyWorking}
+                    aria-label={t("sections.integration.actions.createAriaGeneric")}
+                  >
+                    {ispindelIntegration
+                      ? t("sections.integration.actions.createAgain")
+                      : t("sections.integration.actions.create")}
                   </Button>
-                  <Button disabled>{t("sections.integration.actions.reveal")}</Button>
-                  <Button disabled aria-label={t("sections.integration.actions.rotateAria")}>
+                  <Button onPress={() => void reveal("ispindel")} disabled={!ispindelIntegration || loading || isAnyWorking}>
+                    {t("sections.integration.actions.reveal")}
+                  </Button>
+                  <Button
+                    onPress={() => void rotateToken("ispindel")}
+                    disabled={!ispindelIntegration || loading || isAnyWorking}
+                    aria-label={t("sections.integration.actions.rotateAriaGeneric")}
+                  >
                     {t("sections.integration.actions.rotate")}
                   </Button>
-                  <Button disabled aria-label={t("sections.integration.actions.revokeAria")}>
+                  <Button
+                    onPress={() => void revoke("ispindel")}
+                    disabled={!ispindelIntegration || loading || isAnyWorking}
+                    aria-label={t("sections.integration.actions.revokeAriaGeneric")}
+                  >
                     {t("sections.integration.actions.revoke")}
                   </Button>
+
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    {loading || isAnyWorking
+                      ? t("sections.integration.working")
+                      : ispindelIntegration
+                        ? t("sections.integration.configured")
+                        : t("sections.integration.notConfigured")}
+                  </SizableText>
                 </XStack>
+
+                {newPublicPaths.ispindel ? (
+                  <YStack gap="$2" mt="$2">
+                    <SizableText size="$2" fontFamily="$body">
+                      {t("sections.integration.cloudUrlLabel")}
+                    </SizableText>
+                    <Input
+                      value={getFullPublicUrl("ispindel") ?? newPublicPaths.ispindel}
+                      readOnly
+                      aria-label={t("sections.integration.cloudUrlAriaGeneric")}
+                    />
+                    <XStack gap="$2" flexWrap="wrap" alignItems="center">
+                      <Button
+                        onPress={() =>
+                          copyToClipboard("ispindel", "url", getFullPublicUrl("ispindel") ?? newPublicPaths.ispindel ?? "")
+                        }
+                        disabled={!getFullPublicUrl("ispindel") && !newPublicPaths.ispindel}
+                        aria-label={t("sections.integration.copyUrlAria")}
+                      >
+                        {copied?.kind === "ispindel" && copied.field === "url"
+                          ? t("sections.integration.copied")
+                          : t("sections.integration.copy")}
+                      </Button>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {t("sections.integration.cloudUrlHelpGeneric")}
+                      </SizableText>
+                    </XStack>
+                  </YStack>
+                ) : null}
+
+                {newTokens.ispindel ? (
+                  <YStack gap="$2" mt="$2">
+                    <SizableText size="$2" fontFamily="$body">
+                      {t("sections.integration.tokenLabel")}
+                    </SizableText>
+                    <Input value={newTokens.ispindel} readOnly aria-label={t("sections.integration.tokenAria")} />
+                    <XStack gap="$2" flexWrap="wrap" alignItems="center">
+                      <Button
+                        onPress={() => copyToClipboard("ispindel", "token", newTokens.ispindel ?? "")}
+                        aria-label={t("sections.integration.copyTokenAria")}
+                      >
+                        {copied?.kind === "ispindel" && copied.field === "token"
+                          ? t("sections.integration.copied")
+                          : t("sections.integration.copy")}
+                      </Button>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {t("sections.integration.tokenHelp")}
+                      </SizableText>
+                    </XStack>
+                  </YStack>
+                ) : null}
               </YStack>
 
               <YStack borderBottomWidth={1} borderColor="var(--border)" my="$3" />
@@ -455,17 +602,88 @@ export default function FermDataIntegrationPage() {
                   {t("sections.integration.raptSubtitle")}
                 </SizableText>
                 <XStack gap="$2" flexWrap="wrap" alignItems="center">
-                  <Button disabled aria-label={t("sections.integration.actions.createAria")}>
-                    {t("sections.integration.actions.create")}
+                  <Button
+                    onPress={() => void createOrRotate("rapt")}
+                    disabled={!canCall || loading || isAnyWorking}
+                    aria-label={t("sections.integration.actions.createAriaGeneric")}
+                  >
+                    {raptIntegration ? t("sections.integration.actions.createAgain") : t("sections.integration.actions.create")}
                   </Button>
-                  <Button disabled>{t("sections.integration.actions.reveal")}</Button>
-                  <Button disabled aria-label={t("sections.integration.actions.rotateAria")}>
+                  <Button onPress={() => void reveal("rapt")} disabled={!raptIntegration || loading || isAnyWorking}>
+                    {t("sections.integration.actions.reveal")}
+                  </Button>
+                  <Button
+                    onPress={() => void rotateToken("rapt")}
+                    disabled={!raptIntegration || loading || isAnyWorking}
+                    aria-label={t("sections.integration.actions.rotateAriaGeneric")}
+                  >
                     {t("sections.integration.actions.rotate")}
                   </Button>
-                  <Button disabled aria-label={t("sections.integration.actions.revokeAria")}>
+                  <Button
+                    onPress={() => void revoke("rapt")}
+                    disabled={!raptIntegration || loading || isAnyWorking}
+                    aria-label={t("sections.integration.actions.revokeAriaGeneric")}
+                  >
                     {t("sections.integration.actions.revoke")}
                   </Button>
+
+                  <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                    {loading || isAnyWorking
+                      ? t("sections.integration.working")
+                      : raptIntegration
+                        ? t("sections.integration.configured")
+                        : t("sections.integration.notConfigured")}
+                  </SizableText>
                 </XStack>
+
+                {newPublicPaths.rapt ? (
+                  <YStack gap="$2" mt="$2">
+                    <SizableText size="$2" fontFamily="$body">
+                      {t("sections.integration.cloudUrlLabel")}
+                    </SizableText>
+                    <Input
+                      value={getFullPublicUrl("rapt") ?? newPublicPaths.rapt}
+                      readOnly
+                      aria-label={t("sections.integration.cloudUrlAriaGeneric")}
+                    />
+                    <XStack gap="$2" flexWrap="wrap" alignItems="center">
+                      <Button
+                        onPress={() => copyToClipboard("rapt", "url", getFullPublicUrl("rapt") ?? newPublicPaths.rapt ?? "")}
+                        disabled={!getFullPublicUrl("rapt") && !newPublicPaths.rapt}
+                        aria-label={t("sections.integration.copyUrlAria")}
+                      >
+                        {copied?.kind === "rapt" && copied.field === "url"
+                          ? t("sections.integration.copied")
+                          : t("sections.integration.copy")}
+                      </Button>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {t("sections.integration.cloudUrlHelpGeneric")}
+                      </SizableText>
+                    </XStack>
+                  </YStack>
+                ) : null}
+
+                {newTokens.rapt ? (
+                  <YStack gap="$2" mt="$2">
+                    <SizableText size="$2" fontFamily="$body">
+                      {t("sections.integration.tokenLabel")}
+                    </SizableText>
+                    <Input value={newTokens.rapt} readOnly aria-label={t("sections.integration.tokenAria")} />
+                    <XStack gap="$2" flexWrap="wrap" alignItems="center">
+                      <Button
+                        onPress={() => copyToClipboard("rapt", "token", newTokens.rapt ?? "")}
+                        aria-label={t("sections.integration.copyTokenAria")}
+                      >
+                        {copied?.kind === "rapt" && copied.field === "token"
+                          ? t("sections.integration.copied")
+                          : t("sections.integration.copy")}
+                      </Button>
+                      <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                        {t("sections.integration.tokenHelp")}
+                      </SizableText>
+                    </XStack>
+                  </YStack>
+                ) : null}
               </YStack>
             </YStack>
           </BrewAccordionSection>

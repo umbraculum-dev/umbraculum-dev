@@ -13,6 +13,27 @@ describe("tilt integrations (device attach)", () => {
   let deviceId = "";
   let integrationToken = "";
 
+  const ensureIntegrationAndDevice = async () => {
+    if (integrationId && integrationToken && deviceId) return;
+    const createIntegration = await app.inject({
+      method: "POST",
+      url: `/workspaces/${workspaceId}/integrations/tilt`,
+      headers: { cookie },
+    });
+    expect(createIntegration.statusCode).toBe(200);
+    const ci = createIntegration.json() as any;
+    integrationId = ci.integrationId as string;
+    integrationToken = ci.token as string;
+
+    const first = await app.inject({
+      method: "POST",
+      url: `/integrations/tilt/${encodeURIComponent(integrationToken)}`,
+      payload: { Temp: "68.0", SG: "1.050", Color: "ORANGE", Beer: "test", Comment: "" },
+    });
+    expect(first.statusCode).toBe(200);
+    deviceId = (first.json() as any).deviceId as string;
+  };
+
   beforeAll(async () => {
     await app.ready();
     const sess = await createSessionForTestUser(app, { activeWorkspace: true });
@@ -203,6 +224,37 @@ describe("tilt integrations (device attach)", () => {
     const thirdBody = third.json() as any;
     expect(thirdBody.ok).toBe(true);
     expect(thirdBody.brewSessionId).toBe(brewSessionId2);
+  });
+
+  it("attaches from the brew session and exposes readings by session", async () => {
+    await ensureIntegrationAndDevice();
+
+    const attach = await app.inject({
+      method: "POST",
+      url: `/brew-sessions/${brewSessionId1}/integrations/attach`,
+      headers: { cookie },
+      payload: { kind: "tilt", deviceId },
+    });
+    expect(attach.statusCode).toBe(200);
+    expect((attach.json() as any).ok).toBe(true);
+
+    const ingest = await app.inject({
+      method: "POST",
+      url: `/integrations/tilt/${encodeURIComponent(integrationToken)}`,
+      payload: { Temp: 66, SG: 1.052, Color: "ORANGE" },
+    });
+    expect(ingest.statusCode).toBe(200);
+
+    const readings = await app.inject({
+      method: "GET",
+      url: `/brew-sessions/${brewSessionId1}/integrations/readings?kind=tilt&limit=10`,
+      headers: { cookie },
+    });
+    expect(readings.statusCode).toBe(200);
+    const body = readings.json() as any;
+    expect(body.ok).toBe(true);
+    expect(Array.isArray(body.readings)).toBe(true);
+    expect(body.readings.length).toBeGreaterThan(0);
   });
 
   it("rotates token and rejects the old token", async () => {

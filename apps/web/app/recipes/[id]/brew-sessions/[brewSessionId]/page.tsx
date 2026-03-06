@@ -9,6 +9,7 @@ import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, Y
 
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { PageWideActionBar } from "../../../../_components/PageWideActionBar";
+import { HydrometerChart } from "../../../../_components/HydrometerChart";
 import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { CodeInline } from "../../../../_components/CodeInline";
@@ -67,6 +68,31 @@ type BrewSessionLog = {
   stepId: string | null;
 };
 
+type IntegrationKind = "tilt" | "ispindel" | "rapt";
+
+type HydrometerDevice = {
+  id: string;
+  deviceKey: string;
+  displayName: string | null;
+  lastSeenAt: string | null;
+  metadataJson: unknown | null;
+};
+
+type HydrometerAttachment = {
+  id: string;
+  attachedAt: string;
+  device: HydrometerDevice & { integrationId: string; kind: IntegrationKind };
+};
+
+type HydrometerReading = {
+  id: string;
+  deviceId: string;
+  recordedAt: string | null;
+  receivedAt: string;
+  temperatureC: number | null;
+  gravitySg: number | null;
+};
+
 type BrewSessionDetailResponse = {
   brewSession: BrewSession & {
     recipe: { id: string; name: string; version: number };
@@ -74,6 +100,7 @@ type BrewSessionDetailResponse = {
     logs: BrewSessionLog[];
   };
 };
+
 
 const PRESET_SECTION_ORDER = [
   "preparation",
@@ -126,6 +153,7 @@ export default function BrewSessionDetailPage() {
   const locale = useLocale();
   const authState = useRequireAuth({ requireActiveWorkspace: true });
   const canCall = authState.status === "ready" && !!authState.me.activeWorkspaceId;
+  const workspaceId = authState.status === "ready" ? authState.me.activeWorkspaceId ?? "" : "";
 
   const router = useRouter();
   const params = useParams() as { id?: string; brewSessionId?: string };
@@ -139,6 +167,14 @@ export default function BrewSessionDetailPage() {
   const [logs, setLogs] = useState<BrewSessionLog[]>([]);
   const LOGS_PAGE_SIZE = 25;
   const [logsPage, setLogsPage] = useState(1);
+
+  const [hydrometerKind, setHydrometerKind] = useState<IntegrationKind>("tilt");
+  const [hydrometerDevices, setHydrometerDevices] = useState<HydrometerDevice[]>([]);
+  const [hydrometerAttachments, setHydrometerAttachments] = useState<HydrometerAttachment[]>([]);
+  const [hydrometerReadings, setHydrometerReadings] = useState<HydrometerReading[]>([]);
+  const [hydrometerSelectedDeviceId, setHydrometerSelectedDeviceId] = useState<string>("");
+  const [hydrometerWorking, setHydrometerWorking] = useState<null | "refresh" | "attach" | "detach">(null);
+  const [hydrometerError, setHydrometerError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -284,10 +320,93 @@ export default function BrewSessionDetailPage() {
     }
   };
 
+  const refreshHydrometers = async (kind: IntegrationKind = hydrometerKind, resetSelection = false) => {
+    if (!canCall || !brewSessionId || !workspaceId) return;
+    setHydrometerError(null);
+    setHydrometerWorking("refresh");
+    try {
+      const [devicesRes, attachmentsRes, readingsRes] = await Promise.all([
+        apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/devices`),
+        apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/attachments`),
+        apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/readings?kind=${kind}&limit=200`),
+      ]);
+      if (!devicesRes.ok) throw new Error(String((devicesRes.data as any)?.message ?? devicesRes.status));
+      if (!attachmentsRes.ok) throw new Error(String((attachmentsRes.data as any)?.message ?? attachmentsRes.status));
+      if (!readingsRes.ok) throw new Error(String((readingsRes.data as any)?.message ?? readingsRes.status));
+
+      const devices = (devicesRes.data as any).devices ?? [];
+      const attachments = (attachmentsRes.data as any).attachments ?? [];
+      const readings = (readingsRes.data as any).readings ?? [];
+      setHydrometerDevices(devices);
+      setHydrometerAttachments(attachments);
+      setHydrometerReadings(readings);
+
+      if (resetSelection || !hydrometerSelectedDeviceId) {
+        const attachedForKind = attachments.find((a: any) => a.device?.kind === kind);
+        if (attachedForKind?.device?.id) {
+          setHydrometerSelectedDeviceId(attachedForKind.device.id);
+        } else if (devices[0]?.id) {
+          setHydrometerSelectedDeviceId(devices[0].id);
+        }
+      }
+    } catch (err) {
+      setHydrometerError(String(err));
+    } finally {
+      setHydrometerWorking(null);
+    }
+  };
+
   useEffect(() => {
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canCall, brewSessionId]);
+
+  useEffect(() => {
+    void refreshHydrometers(hydrometerKind, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canCall, brewSessionId, hydrometerKind, workspaceId]);
+
+
+  const attachHydrometer = async () => {
+    if (!canCall || !brewSessionId) return;
+    if (!hydrometerSelectedDeviceId) return;
+    setHydrometerError(null);
+    setHydrometerWorking("attach");
+    try {
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/attach`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: hydrometerKind, deviceId: hydrometerSelectedDeviceId }),
+      });
+      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      await refreshHydrometers(hydrometerKind);
+    } catch (err) {
+      setHydrometerError(String(err));
+    } finally {
+      setHydrometerWorking(null);
+    }
+  };
+
+  const detachHydrometer = async () => {
+    if (!canCall || !brewSessionId) return;
+    const attached = hydrometerAttachments.find((a) => a.device.kind === hydrometerKind);
+    if (!attached) return;
+    setHydrometerError(null);
+    setHydrometerWorking("detach");
+    try {
+      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/detach`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deviceId: attached.device.id }),
+      });
+      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      await refreshHydrometers(hydrometerKind);
+    } catch (err) {
+      setHydrometerError(String(err));
+    } finally {
+      setHydrometerWorking(null);
+    }
+  };
 
   useEffect(() => {
     autoStopTriggeredRef.current = false;
@@ -309,6 +428,45 @@ export default function BrewSessionDetailPage() {
     const start = (logsPage - 1) * LOGS_PAGE_SIZE;
     return logs.slice(start, start + LOGS_PAGE_SIZE);
   }, [logs, logsPage]);
+
+  const hydrometerKindOptions = useMemo(
+    () => [
+      { value: "tilt", label: t("hydrometerKindTilt") },
+      { value: "ispindel", label: t("hydrometerKindIspindel") },
+      { value: "rapt", label: t("hydrometerKindRapt") },
+    ],
+    [t]
+  );
+
+  const hydrometerDeviceOptions = useMemo(() => {
+    return hydrometerDevices.map((d) => ({
+      value: d.id,
+      label: d.displayName ? `${d.displayName} (${d.deviceKey})` : d.deviceKey,
+    }));
+  }, [hydrometerDevices]);
+
+  const attachedHydrometer = useMemo(() => {
+    return hydrometerAttachments.find((a) => a.device.kind === hydrometerKind) ?? null;
+  }, [hydrometerAttachments, hydrometerKind]);
+
+  const hydrometerChartPoints = useMemo(() => {
+    return [...hydrometerReadings]
+      .sort((a, b) => {
+        const aTime = new Date(a.recordedAt ?? a.receivedAt).getTime();
+        const bTime = new Date(b.recordedAt ?? b.receivedAt).getTime();
+        return aTime - bTime;
+      })
+      .map((r) => ({
+        at: r.recordedAt ?? r.receivedAt,
+        gravitySg: typeof r.gravitySg === "number" ? r.gravitySg : null,
+        temperatureC: typeof r.temperatureC === "number" ? r.temperatureC : null,
+      }));
+  }, [hydrometerReadings]);
+
+  const hydrometerLastReading = useMemo(() => {
+    if (!hydrometerReadings.length) return null;
+    return hydrometerReadings[0] ?? null;
+  }, [hydrometerReadings]);
 
   useEffect(() => {
     const anyRunning = steps.some((s) => s.timerState === "running");
@@ -1432,6 +1590,124 @@ export default function BrewSessionDetailPage() {
           </YStack>
         </View>
       ) : null}
+
+      <View
+        bg="var(--surface)"
+        borderWidth={1}
+        borderColor="var(--border)"
+        rounded="$3"
+        p="$3"
+      >
+        <H2 mt={0}>{t("hydrometerSectionTitle")}</H2>
+        <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt="$1">
+          {t("hydrometerSectionSubtitle")}
+        </SizableText>
+
+        {hydrometerError ? <ErrorBox mt="$2">{hydrometerError}</ErrorBox> : null}
+
+        <YStack gap="$2" mt="$2">
+          <View minW={200}>
+            <RecipeEditFieldLabel htmlFor="hydrometer-kind">
+              {t("hydrometerKindLabel")}
+            </RecipeEditFieldLabel>
+            <BrewSelect
+              id="hydrometer-kind"
+              value={hydrometerKind}
+              onValueChange={(v) => setHydrometerKind(v as IntegrationKind)}
+              options={hydrometerKindOptions}
+              width="full"
+              aria-label={t("hydrometerKindLabel")}
+            />
+          </View>
+
+          {hydrometerKind !== "tilt" ? (
+            <MessageBox variant="warning">{t("hydrometerNotSupportedYet")}</MessageBox>
+          ) : null}
+
+          <View minW={260}>
+            <RecipeEditFieldLabel htmlFor="hydrometer-device">
+              {t("hydrometerDeviceLabel")}
+            </RecipeEditFieldLabel>
+            <BrewSelect
+              id="hydrometer-device"
+              value={hydrometerSelectedDeviceId}
+              onValueChange={(v) => setHydrometerSelectedDeviceId(v)}
+              options={hydrometerDeviceOptions}
+              width="full"
+              placeholder={t("hydrometerDevicePlaceholder")}
+              aria-label={t("hydrometerDeviceLabel")}
+              disabled={!hydrometerDevices.length}
+            />
+          </View>
+
+          {!hydrometerDevices.length ? (
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {t("hydrometerNoDevices")}
+            </SizableText>
+          ) : null}
+
+          <XStack gap="$2" flexWrap="wrap" alignItems="center">
+            <Button
+              onPress={() => void attachHydrometer()}
+              disabled={!canCall || hydrometerWorking !== null || !hydrometerSelectedDeviceId}
+              size="$3"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              fontFamily="$body"
+            >
+              {hydrometerWorking === "attach" ? t("working") : t("hydrometerAttach")}
+            </Button>
+            <Button
+              onPress={() => void detachHydrometer()}
+              disabled={!canCall || hydrometerWorking !== null || !attachedHydrometer}
+              size="$3"
+              bg="var(--surface-2)"
+              borderWidth={1}
+              borderColor="var(--border)"
+              color="var(--text)"
+              fontFamily="$body"
+            >
+              {hydrometerWorking === "detach" ? t("working") : t("hydrometerDetach")}
+            </Button>
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {attachedHydrometer
+                ? t("hydrometerAttachedTo", {
+                    device: attachedHydrometer.device.displayName ?? attachedHydrometer.device.deviceKey,
+                  })
+                : t("hydrometerNotAttached")}
+            </SizableText>
+          </XStack>
+
+          {hydrometerLastReading ? (
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {t("hydrometerLastReading")}:{" "}
+              <CodeInline>
+                {typeof hydrometerLastReading.temperatureC === "number"
+                  ? `${hydrometerLastReading.temperatureC.toFixed(2)} °C`
+                  : "—"},{" "}
+                {typeof hydrometerLastReading.gravitySg === "number"
+                  ? `SG ${hydrometerLastReading.gravitySg.toFixed(3)}`
+                  : "—"}
+              </CodeInline>
+            </SizableText>
+          ) : (
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {t("hydrometerNoReadings")}
+            </SizableText>
+          )}
+
+          {hydrometerChartPoints.length ? (
+            <HydrometerChart
+              points={hydrometerChartPoints}
+              title={t("hydrometerChartTitle")}
+              gravityLabel={t("hydrometerChartGravity")}
+              temperatureLabel={t("hydrometerChartTemperature")}
+            />
+          ) : null}
+        </YStack>
+      </View>
 
       <View
         bg="var(--surface)"

@@ -115,6 +115,8 @@ enum BrewSessionLogKind {
 
 enum IntegrationKind {
   tilt
+  ispindel
+  rapt
 
   @@map("integration_kind")
 }

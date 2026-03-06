@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import type { IntegrationKind } from "@prisma/client";
 
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
@@ -11,10 +12,15 @@ function assertWorkspaceId(v: unknown): string {
   return s;
 }
 
-function assertKind(v: unknown): "tilt" {
-  const s = typeof v === "string" ? v.trim() : "";
-  if (s === "tilt") return "tilt";
-  throw new BadRequestError("invalid_integration_kind", "Params.kind is invalid");
+const SUPPORTED_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
+
+function assertKind(v: unknown): IntegrationKind {
+  const s = typeof v === "string" ? v.trim().toLowerCase() : "";
+  if (!s) throw new BadRequestError("invalid_integration_kind", "Params.kind is invalid");
+  if (!SUPPORTED_KINDS.includes(s as IntegrationKind)) {
+    throw new BadRequestError("invalid_integration_kind", "Params.kind is invalid");
+  }
+  return s as IntegrationKind;
 }
 
 function integrationPublicPath(kind: string, token: string): string {
