@@ -2,6 +2,10 @@
 
 This document describes how Tilt Hydrometer logging is integrated into Brewery App.
 
+For the full end-to-end integration overview (tokens + attach + readings + charts), see:
+
+- `docs/integrations/FLOATING-HYDROMETERS.md`
+
 ### How data reaches our API
 
 Tilt Hydrometers broadcast readings via BLE. They cannot call our API directly. A gateway must be used, typically:

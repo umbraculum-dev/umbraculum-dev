@@ -2,6 +2,10 @@
 
 This repo uses deterministic integration tokens so users can always re-visualize the “Cloud URL” from any browser/device, without storing plaintext tokens in the database.
 
+For the full end-to-end integration overview (tokens + attach + readings + charts), see:
+
+- `docs/integrations/FLOATING-HYDROMETERS.md`
+
 ### Key idea
 
 - DB stores `token_hash` (SHA-256), not the token itself.
