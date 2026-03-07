@@ -13,6 +13,8 @@ import { Spinner } from "@brewery/ui";
 import { useAuth } from "../auth/AuthProvider";
 import { AboutScreen } from "../screens/AboutScreen";
 import { BrewdayStepsSettingsScreen } from "../screens/BrewdayStepsSettingsScreen";
+import { BrewSessionDetailScreen } from "../screens/BrewSessionDetailScreen";
+import { BrewSessionsListScreen } from "../screens/BrewSessionsListScreen";
 import { ContributingScreen } from "../screens/ContributingScreen";
 import { DashboardScreen } from "../screens/DashboardScreen";
 import { EquipmentScreen } from "../screens/EquipmentScreen";
@@ -43,6 +45,8 @@ type RootStackParamList = {
   Tabs: undefined;
   SelectWorkspace: undefined;
   RecipeEdit: { recipeId: string };
+  BrewSessionsList: { recipeId: string };
+  BrewSessionDetail: { recipeId: string; brewSessionId: string };
   RecipeYeast: { recipeId: string };
   WaterHub: { recipeId: string };
   WaterMash: { recipeId: string };
@@ -134,6 +138,28 @@ export function AppNavigator() {
         <RootStack.Screen
           name="RecipeEdit"
           component={RecipeEditScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="BrewSessionsList"
+          component={BrewSessionsListScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="BrewSessionDetail"
+          component={BrewSessionDetailScreen}
           options={{
             headerShown: true,
             headerTitle: "",

@@ -213,6 +213,7 @@ export function RecipeEditScreen() {
   const navigation = useNavigation();
   const recipeId = (route.params as { recipeId?: string })?.recipeId ?? "";
   const { t } = useT("recipes.edit");
+  const { t: tBrewSessions } = useT("recipes.brewSessions");
   const { t: tSparge } = useT("recipes.water.sparge");
   const { t: tRecipes } = useT("recipes");
   const { t: tCommon } = useT("common");
@@ -951,6 +952,16 @@ export function RecipeEditScreen() {
             {saveError ? <Text fontSize={14} color="$red10">{saveError}</Text> : null}
           </Card>
         ) : null}
+
+        <Card gap="$2" mb="$3">
+          <Heading fontSize={16}>{tBrewSessions("listTitle")}</Heading>
+          <Button
+            onPress={() => navigation.navigate("BrewSessionsList" as never, { recipeId } as never)}
+            accessibilityLabel={tBrewSessions("listTitle")}
+          >
+            <Text>{tBrewSessions("listTitle")}</Text>
+          </Button>
+        </Card>
 
         <Accordion
           type="multiple"

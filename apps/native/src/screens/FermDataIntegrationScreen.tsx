@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Input, Screen, Spinner, Text } from "@brewery/ui";
+import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
@@ -32,6 +33,12 @@ type IntegrationDevice = {
     temperatureC: number | null;
     gravitySg: number | null;
   } | null;
+  recentReadings?: Array<{
+    recordedAt: string | null;
+    receivedAt: string;
+    temperatureC: number | null;
+    gravitySg: number | null;
+  }> | null;
 };
 
 type IntegrationTokenState = {
@@ -101,7 +108,9 @@ export function FermDataIntegrationScreen() {
         INTEGRATION_KINDS.map((kind) => api.get(`/api/workspaces/${workspaceId}/integrations/${kind}`)),
       );
       const devicesRes = await Promise.all(
-        INTEGRATION_KINDS.map((kind) => api.get(`/api/workspaces/${workspaceId}/integrations/${kind}/devices`)),
+        INTEGRATION_KINDS.map((kind) =>
+          api.get(`/api/workspaces/${workspaceId}/integrations/${kind}/devices?includeReadings=true&readingsLimit=200`)
+        )
       );
 
       integrationsRes.forEach((res) => {
@@ -395,6 +404,22 @@ export function FermDataIntegrationScreen() {
                                     {t("sections.integration.noReadingsYet")}
                                   </Text>
                                 )}
+                              {d.recentReadings?.length ? (
+                                <HydrometerChart
+                                  points={d.recentReadings.map((r) => ({
+                                    at: String(r.recordedAt ?? r.receivedAt ?? ""),
+                                    gravitySg: typeof r.gravitySg === "number" ? r.gravitySg : null,
+                                    temperatureC: typeof r.temperatureC === "number" ? r.temperatureC : null,
+                                  }))}
+                                  compact
+                                  title={t("sections.integration.deviceChartTitle")}
+                                  gravityLabel={t("sections.integration.chartGravity")}
+                                  temperatureLabel={t("sections.integration.chartTemperature")}
+                                  xAxisLabel={t("sections.integration.chartXAxis")}
+                                  gravityAxisLabel={t("sections.integration.chartGravityAxis")}
+                                  temperatureAxisLabel={t("sections.integration.chartTemperatureAxis")}
+                                />
+                              ) : null}
                               </Card>
                             ))
                           )}

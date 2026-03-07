@@ -9,7 +9,7 @@ import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, Y
 
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { PageWideActionBar } from "../../../../_components/PageWideActionBar";
-import { HydrometerChart } from "../../../../_components/HydrometerChart";
+import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
 import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { CodeInline } from "../../../../_components/CodeInline";
@@ -1704,6 +1704,9 @@ export default function BrewSessionDetailPage() {
               title={t("hydrometerChartTitle")}
               gravityLabel={t("hydrometerChartGravity")}
               temperatureLabel={t("hydrometerChartTemperature")}
+              xAxisLabel={t("hydrometerChartXAxis")}
+              gravityAxisLabel={t("hydrometerChartGravityAxis")}
+              temperatureAxisLabel={t("hydrometerChartTemperatureAxis")}
             />
           ) : null}
         </YStack>

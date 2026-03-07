@@ -9,7 +9,7 @@ import { Link } from "../../../src/i18n/navigation";
 import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import { BrewSelect } from "../../_components/BrewSelect";
 import { CodeInline } from "../../_components/CodeInline";
-import { HydrometerChart } from "../../_components/HydrometerChart";
+import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
 import { MessageBox } from "../../_components/recipe-edit/MessageBox";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";
@@ -451,6 +451,9 @@ export default function FermDataIntegrationPage() {
                               title={t("sections.integration.deviceChartTitle")}
                               gravityLabel={t("sections.integration.chartGravity")}
                               temperatureLabel={t("sections.integration.chartTemperature")}
+                              xAxisLabel={t("sections.integration.chartXAxis")}
+                              gravityAxisLabel={t("sections.integration.chartGravityAxis")}
+                              temperatureAxisLabel={t("sections.integration.chartTemperatureAxis")}
                             />
                           ) : null}
 
@@ -680,7 +683,7 @@ export default function FermDataIntegrationPage() {
                       </Button>
                       <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
                         {t("sections.integration.tokenHelp")}
-                      </SizableText>
+            </SizableText>
                     </XStack>
                   </YStack>
                 ) : null}

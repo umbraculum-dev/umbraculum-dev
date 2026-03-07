@@ -1,0 +1,134 @@
+import React, { useCallback, useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+
+import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { useT } from "@brewery/i18n-react";
+import { Button, Card, Heading, Screen, Text } from "@brewery/ui";
+
+import { useAuth } from "../auth/AuthProvider";
+import { getApiBaseUrl } from "../auth/apiBaseUrl";
+
+type BrewSessionListItem = {
+  id: string;
+  code: string;
+  status: string;
+  createdAt: string;
+  startedAt: string | null;
+  stoppedAt: string | null;
+};
+
+export function BrewSessionsListScreen() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { t } = useT("recipes.brewSessions");
+  const { state } = useAuth();
+
+  const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
+  const canCall = state.status === "logged_in";
+
+  const [sessions, setSessions] = useState<BrewSessionListItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!canCall || !recipeId) return;
+    setError(null);
+    setLoading(true);
+    try {
+      const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
+      const res = await api.get(`/api/recipes/${recipeId}/brew-sessions`);
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const list = (res.data as any)?.brewSessions;
+      setSessions(Array.isArray(list) ? (list as BrewSessionListItem[]) : []);
+    } catch (err) {
+      setSessions([]);
+      setError(String(err));
+    } finally {
+      setLoading(false);
+    }
+  }, [canCall, recipeId, state]);
+
+  const createSession = useCallback(async () => {
+    if (!canCall || !recipeId) return;
+    setCreateError(null);
+    setCreating(true);
+    try {
+      const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
+      const res = await api.post(`/api/recipes/${recipeId}/brew-sessions`, {});
+      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const id = (res.data as any)?.brewSession?.id;
+      if (typeof id !== "string" || !id) throw new Error("Create brew session response is missing brewSession.id");
+      navigation.navigate("BrewSessionDetail" as never, { recipeId, brewSessionId: id } as never);
+    } catch (err) {
+      setCreateError(String(err));
+    } finally {
+      setCreating(false);
+    }
+  }, [canCall, recipeId, state, navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void refresh();
+    }, [refresh])
+  );
+
+  const empty = useMemo(() => !loading && !error && sessions.length === 0, [loading, error, sessions.length]);
+
+  return (
+    <Screen>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+        <Heading fontSize={20} mb="$3">
+          {t("listTitle")}
+        </Heading>
+
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+          <Button onPress={createSession} disabled={!canCall || creating || !recipeId}>
+            <Text>{creating ? t("creating") : t("createButton")}</Text>
+          </Button>
+          <Button onPress={() => void refresh()} disabled={!canCall || loading || !recipeId} background="$background" borderWidth={1}>
+            <Text>{loading ? t("loading") : t("refresh")}</Text>
+          </Button>
+        </View>
+
+        {createError ? (
+          <Text fontSize={12} color="$red10" mb="$2">
+            {createError}
+          </Text>
+        ) : null}
+        {error ? (
+          <Text fontSize={12} color="$red10" mb="$2">
+            {error}
+          </Text>
+        ) : null}
+        {empty ? (
+          <Card borderWidth={1} borderColor="$borderColor" mb="$2">
+            <Text fontSize={12}>{t("empty")}</Text>
+          </Card>
+        ) : null}
+
+        <View style={{ gap: 12 }}>
+          {sessions.map((session) => (
+            <Card key={session.id} gap="$2">
+              <Heading fontSize={16}>{session.code}</Heading>
+              <Text fontSize={12} opacity={0.8}>
+                {t("statusLine", { status: session.status })}
+              </Text>
+              <Button
+                onPress={() => navigation.navigate("BrewSessionDetail" as never, { recipeId, brewSessionId: session.id } as never)}
+                size="$3"
+                background="$background"
+                borderWidth={1}
+                borderColor="$borderColor"
+              >
+                <Text>{t("detailTitle")}</Text>
+              </Button>
+            </Card>
+          ))}
+        </View>
+      </ScrollView>
+    </Screen>
+  );
+}
