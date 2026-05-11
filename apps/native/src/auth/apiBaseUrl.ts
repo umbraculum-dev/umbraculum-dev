@@ -17,11 +17,17 @@ function maybeRewriteForAndroidEmulator(baseUrl: string): string {
   try {
     const u = new URL(baseUrl);
     if (!u.hostname) return baseUrl;
-    if (u.hostname === "localhost" || u.hostname === "127.0.0.1" || u.hostname === "0.0.0.0") {
-      u.hostname = ANDROID_EMULATOR_HOST;
-      return u.toString().replace(/\/+$/, "");
+    if (u.hostname !== "localhost" && u.hostname !== "127.0.0.1" && u.hostname !== "0.0.0.0") {
+      return baseUrl;
     }
-    return baseUrl;
+    // WHATWG URL.hostname is writable at runtime, but its TypeScript type can
+    // resolve to a read-only declaration when lib.dom is not included and
+    // @types/node's URL is in scope (which is the case in this app: tsconfig
+    // lib is ES2022 only). Rebuild the URL string from the parsed parts so the
+    // typecheck is environment-independent.
+    const port = u.port ? `:${u.port}` : "";
+    const path = u.pathname === "/" ? "" : u.pathname;
+    return `${u.protocol}//${ANDROID_EMULATOR_HOST}${port}${path}${u.search}${u.hash}`.replace(/\/+$/, "");
   } catch {
     return baseUrl;
   }

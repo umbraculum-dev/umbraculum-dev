@@ -315,6 +315,24 @@ Then commit the regenerated `packages/beerjson/dist/*` (and any other dist that 
 
 See `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" for the drift-reproduction recipe and CI guard details.
 
+### `npm run typecheck` passes locally but the `native-deps` GitHub Action fails on the same commit
+
+Symptom: you ran the CI-equivalent docker command locally (`npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck`), it returned exit 0, you pushed, and the workflow turned red on a TypeScript error that the local run never reported.
+
+Root cause: a bind-mounted `apps/native/node_modules` (or hoisted root `node_modules`) from a prior install can resolve a *different* `@types/*` version than a clean CI install does. The most common offender is `URL` typings — local `@types/node` may declare `URL.hostname` as writable, while a fresh CI install resolves a strict version where it's read-only. Other `lib.dom`-shaped APIs can drift the same way.
+
+Fix when triaging:
+
+```bash
+# Reproduce CI's clean install locally — this exposes the same @types resolution CI sees.
+docker run --rm \
+  -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
+  -w /repo/apps/native node:20-slim \
+  bash -lc "rm -rf node_modules && npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+```
+
+If this reproduces, fix the code so it doesn't depend on the lenient typing (e.g., for `URL`: rebuild the URL string from `u.protocol` + `u.hostname` + `u.port` + `u.pathname` + `u.search` + `u.hash` instead of assigning to `u.hostname = ...`). See `apps/native/src/auth/apiBaseUrl.ts` for the canonical example committed for exactly this reason. If it doesn't reproduce, the divergence is probably elsewhere (Node minor version, lockfile drift) — check the workflow logs for the exact npm version and tsc version.
+
 ### `error: unable to unlink old 'packages/.../dist/...': Permission denied` after running the build script
 
 This should no longer happen on a current checkout: `scripts/build-packages-in-docker.sh` now appends a `chown -R $HOST_UID:$HOST_GID /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json` step (host uid/gid passed in as env vars; runs unconditionally so a failed build never leaves a partial root-owned tree).
