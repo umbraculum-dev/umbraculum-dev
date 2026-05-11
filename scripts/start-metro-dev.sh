@@ -37,9 +37,24 @@ case "${LAN_IP}" in
   127.* | 169.254.*) echo "ERROR: detected non-LAN IP '${LAN_IP}'. Provide LAN_IP=... explicitly." >&2; exit 1 ;;
 esac
 
-# 2. Clean up any prior brewery-metro container — covers both "Exited (255)"
-#    leftovers and "container name already in use" races.
+# 2. Clean up any prior brewery-metro container, then wait for Docker to
+#    actually release the name. Without the wait we hit a race when the
+#    previous container was started with `--rm`: `docker stop` triggers an
+#    async cleanup, and a fast follow-up `docker run` lands inside that
+#    window and fails with `Conflict. The container name "/brewery-metro"
+#    is already in use`. Poll until `docker inspect` says the name is gone.
 docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+for _ in $(seq 1 50); do
+  if ! docker inspect "${CONTAINER_NAME}" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.2
+done
+if docker inspect "${CONTAINER_NAME}" >/dev/null 2>&1; then
+  echo "ERROR: container '${CONTAINER_NAME}' is still present after 10s of waiting." >&2
+  echo "       Inspect with: docker ps -a --filter name=${CONTAINER_NAME}" >&2
+  exit 1
+fi
 
 # 3. Start Metro. --rm so the container auto-cleans on stop. The inline
 #    `npm install` keeps node_modules aligned with package.json before
