@@ -170,10 +170,59 @@ Platform-specific notes:
 
 ## Device testing (Expo Go)
 
-- Android emulator: use Android Studio emulator, open Expo Go, connect to `exp://<LAN_IP>:8081`.
-- Android device: install Expo Go from Play Store, ensure it is on the same Wi-Fi/LAN as `REACT_NATIVE_PACKAGER_HOSTNAME`, then scan the QR.
-- iOS device: install Expo Go, same Wi-Fi/LAN, then scan the QR from `expo start --lan`.
-- iOS simulator: requires macOS + Xcode (cannot run the iOS Simulator on Linux).
+This is the validated end-to-end smoke flow once `./scripts/start-metro-dev.sh` is up. Each step is a quick gate; if a step fails, fix it before moving on (the cause is almost always upstream of the next step).
+
+### 1. Pre-flight from the phone's browser (catches network problems before Expo Go)
+
+The helper script printed a `LAN IP:` line and a `Metro web preview:` URL. On the phone's browser (same Wi-Fi as the laptop), open:
+
+```
+http://<LAN_IP>:8081/
+```
+
+Expect Metro's "React Native" preview page. If this fails, no Expo Go change will help — fix the network first. Most common causes:
+
+- Phone is on a different SSID or VLAN than the laptop.
+- Wi-Fi access point has **client isolation** enabled (typical on guest networks; switch to your main network or use a hotspot).
+- Laptop firewall is blocking inbound on `:8081` — on Linux check `sudo ufw status` / `firewalld`.
+- Wrong interface detected. Restart the helper with `LAN_IP=<other>` (e.g. swap Ethernet ↔ Wi-Fi).
+
+### 2. Connect Expo Go (three options, in order of speed)
+
+Metro is running **detached** (no TTY) by default, so its logs do not print a QR. Pick one of these to connect:
+
+- **Manual URL (easiest, no QR needed):**
+  - Open Expo Go.
+  - Tap **"Enter URL manually"** on the Expo Go home screen (below the projects list).
+  - Enter: `exp://<LAN_IP>:8081`.
+  - Tap **Connect**.
+- **Recently in development:** if you've connected to this project from this Expo Go before, it appears on the Expo Go home screen — tap it.
+- **QR code:** restart Metro in interactive mode (`docker run --rm -it … expo start --lan -c`, see §4.2 "Run Metro manually") and Metro will print the QR in the terminal.
+
+### 3. First-load expectations
+
+- **Bundling progress bar** in Expo Go for ~30–90s on cold cache; faster on subsequent loads.
+- **No red error overlay** and **no blue/black "Incompatible React versions" screen** — that would mean the React / `react-native-renderer` ABI is out of sync (see Troubleshooting → "Incompatible React versions").
+- **No "Failed to download remote update"** blue screen — that would mean Step 1 actually didn't pass (phone can't reach the laptop).
+- **App opens to its initial screen** (login page for unauthenticated users).
+- The app's API base URL is auto-derived to `http://<LAN_IP>:18080` from Metro's hostUri — no `app.json` edit was needed. See `docs/NATIVE-STRATEGY-AND-CI.md` §5.1.
+
+### 4. Watch Metro / device logs in a second terminal
+
+```bash
+docker logs -f brewery-metro
+```
+
+Every bundle request, fast-refresh event, and runtime `console.*` call from the device shows here. **Keep this open while testing** — if something misbehaves on the device, the cause is almost always visible here in real time.
+
+For deeper device-side debugging, shake the phone (or Cmd-D / Cmd-M on emulators) for Expo Go's dev menu (toggle dev menu, reload, debug remote JS, performance monitor).
+
+### 5. Platform variants
+
+- **Android device (covered above):** Expo Go from Play Store, same Wi-Fi, Step 2 URL or QR.
+- **Android emulator (Android Studio):** open Expo Go inside the emulator, use Step 2 URL or QR. The helper sets `REACT_NATIVE_PACKAGER_HOSTNAME` to the LAN IP; the emulator can reach it because it shares the host network.
+- **iOS device:** Expo Go from App Store, same Wi-Fi, Step 2 URL or QR.
+- **iOS simulator:** requires macOS + Xcode (cannot run the iOS Simulator on Linux). Not part of the Mac-free flow — see `docs/NATIVE-STRATEGY-AND-CI.md`.
 
 ## Quick validation checklist
 
