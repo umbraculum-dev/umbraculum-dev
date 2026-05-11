@@ -101,6 +101,33 @@ Optional enhancements (nice-to-have, not required for solo honesty):
 
 ---
 
+## 5.1 Dev host autodetection (why auto-derive over DHCP / Tailscale / static IP)
+
+**Problem.** The laptop's LAN IP drifts (DHCP renewal, switching WiFi↔Ethernet, network change). With a hardcoded `EXPO_PUBLIC_API_BASE_URL` in `apps/native/app.json` and a hardcoded `REACT_NATIVE_PACKAGER_HOSTNAME` in the Metro command, every drift required two manual edits and a Metro restart. This is the LAN-IP pre-flight item from §5, made automatic.
+
+**Options considered.**
+
+| Option | What it does | Why not as primary |
+|---|---|---|
+| **A. Auto-derive from Metro `hostUri`** *(chosen)* | `apps/native/src/auth/apiBaseUrl.ts` reads `Constants.expoConfig.hostUri` at runtime and derives `http://<host>:18080` when no explicit URL is set. A `scripts/start-metro-dev.sh` helper detects the laptop's outbound LAN IP and passes it as `REACT_NATIVE_PACKAGER_HOSTNAME`. | — |
+| B. DHCP reservation on the router | Bind a fixed IP to the laptop's MAC in router admin; `app.json` stays pinned forever. | Only works on the home LAN. Useless on café/coworking WiFi or mobile hotspot. Assumes router admin access, which we cannot assume for all future contributors or future homes. |
+| C. Tailscale | Laptop + phone on a Tailscale tailnet; use a stable `100.x.x.x` or `<hostname>.tailnet.ts.net`. | Solves a bigger problem (works across any network, even when laptop & phone are not on the same LAN) at the cost of an always-on daemon and ~30–80ms latency per request. Sensible **secondary** option if we ever dev away from the home LAN regularly. |
+| D. Static IP on the laptop interface | Configure `wlo1`/`enp3s0` with a fixed IP outside the DHCP pool. | Fragile (collides with the router's DHCP pool when networks change) and same network-bound limitation as B. |
+
+**Decision criteria that selected A.**
+
+1. **Zero per-restart manual work** — the only criterion the user actually surfaced as a pain point.
+2. **No new daemons, no router config** — we own only the code; the solution must live there too.
+3. **Network-agnostic** — works on any network the laptop joins (LAN, café WiFi, hotspot) as long as the phone is on the same network as the laptop (which Expo Go already requires).
+4. **Reversible / overridable** — if `extra.EXPO_PUBLIC_API_BASE_URL` (in `app.json`) or `process.env.EXPO_PUBLIC_API_BASE_URL` is present, those still win. EAS staging/production builds and tunnel-mode dev keep working unchanged.
+5. **No commit per IP change** — `apps/native/app.json` stops carrying a personal LAN IP, which has been a source of merge noise in this repo (multiple commits across sessions just to swap `192.168.1.124` → `.115` → `.117`).
+
+**When to revisit A.** If we adopt `expo start --tunnel` regularly, `hostUri` becomes the ngrok tunnel URL and auto-derive would point at the tunnel rather than the laptop's API. At that point layer **C (Tailscale)** in as the dev-host-resolution mechanism for tunnel flows, keeping A for LAN flows. Until then, A is sufficient.
+
+**Bound on the change.** This is a `apps/native/**` + one new helper script + three doc updates. It does **not** touch CI, `docker-compose.yml`, the API, the web app, or any shared package.
+
+---
+
 ## 6. GitHub Actions (or similar): what is actually being suggested?
 
 ### 6.1 CI is not required for “professionalism”

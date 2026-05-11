@@ -78,76 +78,68 @@ docker run --rm -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" -w /repo/apps/
 
 ## 4) Start Expo (containerized)
 
-### 4.0) MANDATORY pre-flight: pick your current LAN IP
+### 4.0) Start Metro (recommended: helper script)
 
-Your host's LAN IP **changes over time** (DHCP lease, switching Wi-Fi vs Ethernet, VPN). Hard-coding an old IP is the #1 cause of Expo Go failing with `java.io.IOException: Failed to download remote update`. Re-check every session:
-
-```bash
-ip -4 addr show | awk '/inet /{print $NF, $2}' | grep -v '127.0.0.1'
-```
-
-Pick the interface on the same subnet as your phone (usually Wi-Fi, e.g. `wlo1 → 192.168.1.115/24`). That value is your **`<LAN_IP>`** for the rest of this section.
-
-Then update **both** places that hard-code an IP, replacing any stale value with your current `<LAN_IP>`:
-
-- `apps/native/app.json` → `extra.EXPO_PUBLIC_API_BASE_URL` and `extra.EXPO_PUBLIC_MEDIA_BASE_URL` (must be `http://<LAN_IP>:<NGINX_HTTP_PORT>`).
-- The `REACT_NATIVE_PACKAGER_HOSTNAME` env var passed to `expo start` (used by Metro and embedded into the QR/`exp://` URL).
-- (Optional, fallback only) `apps/native/src/auth/apiBaseUrl.ts` → `DEFAULT_API_BASE_URL`. This is only used when `app.json` `extra` is empty.
-
-Verify the IP responds from the host **before scanning the QR**:
-
-```bash
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" "http://<LAN_IP>:8081/"   # expect 200 once Metro is up
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" "http://<LAN_IP>:${NGINX_HTTP_PORT:-18080}/en/login"  # expect 200
-```
-
-If `curl` returns `No route to host` or `connection refused` from the host itself, the IP is wrong (or the port isn't bound) — do **not** start Expo until this passes.
-
-### 4.1) Run Metro (interactive — recommended)
-
-Foreground + TTY: keeps the QR visible in the terminal and gives you the interactive keys (`r` reload, `m` menu, etc.). Use this for normal dev work.
+Use `./scripts/start-metro-dev.sh`. It auto-detects the laptop's outbound LAN IP, removes any stale `brewery-metro` container, and starts Metro in Docker with the right `REACT_NATIVE_PACKAGER_HOSTNAME`. The app then auto-derives its API base URL from Metro's bundle host at runtime — so you no longer edit `apps/native/app.json` when your IP drifts. See `docs/NATIVE-STRATEGY-AND-CI.md` §5.1 for the rationale.
 
 ```bash
 cd /home/rf/dkprojects/rfapps/brewery-app
-docker run --rm -it \
-  -p 19000:19000 -p 19001:19001 -p 19002:19002 \
-  -p 8081:8081 \
-  -e REACT_NATIVE_PACKAGER_HOSTNAME=<LAN_IP> \
-  -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
-  -w /repo/apps/native \
-  node:20-slim \
-  bash -lc "./node_modules/.bin/expo start --lan -c"
+./scripts/start-metro-dev.sh
+docker logs -f brewery-metro    # follow Metro; Ctrl+C detaches the log tail (container keeps running)
 ```
 
-`--rm` auto-cleans the container on exit. `Ctrl+C` stops Metro and removes the container in one step.
+The script prints the detected IP, the `exp://<LAN_IP>:8081` URL for manual entry in Expo Go, and the local Metro web preview at `http://localhost:8081/`. Stop it with `docker stop brewery-metro` (`--rm` removes the container automatically).
 
-Notes:
+Override the auto-detection when needed (e.g. force Ethernet over WiFi, or pin a Tailscale IP):
 
-- If `./node_modules/.bin/expo` is missing, run `npm install` in the same container workdir first.
-- Web preview is available at `http://<LAN_IP>:8081/` (useful to inspect browser console errors while iterating).
-- After changing `app.json` or `<LAN_IP>`, always restart Metro with `-c` (cache clear) and **rescan the QR** on the device (do not reload an old session — it has the stale URL cached).
+```bash
+LAN_IP=192.168.1.116 ./scripts/start-metro-dev.sh
+```
 
-### 4.2) Run Metro detached (background, no TTY)
+### 4.1) Verify the API is reachable on the detected IP (optional, fast)
 
-When you don't need the QR (e.g. agent-driven workflow, CI smoke checks) or want to keep your terminal free:
+```bash
+curl -sS "http://$(ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit}'):${NGINX_HTTP_PORT:-18080}/api/health"
+# Expect: {"ok":true}
+```
+
+If this fails, fix the stack (`docker compose up -d`) before scanning the QR — see `DEVELOPMENT-LOCAL.md` → "Troubleshooting: 502 Bad Gateway on login / API calls".
+
+### 4.2) Run Metro manually (without the helper)
+
+Only needed if you can't run the helper script (different OS, Docker socket issue, etc.). Use this as the explicit form of what the helper does:
 
 ```bash
 cd /home/rf/dkprojects/rfapps/brewery-app
-docker rm -f brewery-metro 2>/dev/null
+LAN_IP="$(ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit}')"
+docker rm -f brewery-metro 2>/dev/null || true
 docker run -d --rm --name brewery-metro \
-  -p 19000:19000 -p 19001:19001 -p 19002:19002 \
-  -p 8081:8081 \
-  -e REACT_NATIVE_PACKAGER_HOSTNAME=<LAN_IP> \
+  -p 19000:19000 -p 19001:19001 -p 19002:19002 -p 8081:8081 \
+  -e REACT_NATIVE_PACKAGER_HOSTNAME="${LAN_IP}" \
   -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
   -w /repo/apps/native \
   node:20-slim \
-  bash -lc "./node_modules/.bin/expo start --lan -c"
+  bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo start --lan -c"
 ```
 
-- `--rm` removes the container as soon as it stops, so `docker stop brewery-metro` is all you need (no leftover container blocking the name on the next run).
-- Without `--rm`, `docker stop` leaves an `Exited` container holding the `brewery-metro` name; a follow-up `docker run --name brewery-metro` will fail with `Conflict. The container name "/brewery-metro" is already in use`. Recover with `docker rm brewery-metro` first.
-- No QR is printed to logs in detached mode. Enter the URL `exp://<LAN_IP>:8081` manually in Expo Go (Settings → "Enter URL manually"), or just tap your previous project in Expo Go's recents.
-- Tail logs with `docker logs -f brewery-metro`.
+- `--rm` removes the container on stop, so `docker stop brewery-metro` is all you need; otherwise `docker run --name brewery-metro` next time will fail with `Conflict. The container name "/brewery-metro" is already in use`. Recover with `docker rm brewery-metro`.
+- No QR is printed to logs in detached mode. Enter `exp://${LAN_IP}:8081` manually in Expo Go (Settings → "Enter URL manually"), or tap your previous project in Expo Go's recents.
+
+### 4.3) Pinning a specific URL (override the auto-derive)
+
+The auto-derive in `apps/native/src/auth/apiBaseUrl.ts` is bypassed when **any** of these is set, in this priority order:
+
+1. `apps/native/app.json` → `expo.extra.EXPO_PUBLIC_API_BASE_URL` (per-config pin; checked in to the repo for EAS staging/production builds via `app.config.ts` / `eas.json`).
+2. `process.env.EXPO_PUBLIC_API_BASE_URL` (per-session env override; used for tunnel mode, integration tests, ad-hoc pinning).
+3. Auto-derive from Metro `hostUri` (the new default; works on any LAN).
+4. `DEFAULT_API_BASE_URL` in `apiBaseUrl.ts` (last resort; only hit by real builds without Metro and no override).
+
+The same logic applies to `EXPO_PUBLIC_MEDIA_BASE_URL` via `apps/native/src/media/mediaBaseUrl.ts`, which delegates to `getApiBaseUrl()` when no explicit media URL is set.
+
+**When to use overrides:**
+
+- **Tunnel mode** (`expo start --tunnel`): `hostUri` becomes the ngrok URL, which won't route to your laptop's API. Set `EXPO_PUBLIC_API_BASE_URL=http://<LAN_IP>:18080` (or a public URL) in your shell before starting Metro.
+- **EAS builds**: configure `EXPO_PUBLIC_API_BASE_URL` in `eas.json` per profile (staging/preview/production) so released binaries point at the right backend.
 
 ### Environment variables (native)
 
@@ -156,16 +148,13 @@ docker run -d --rm --name brewery-metro \
 - `EXPO_PUBLIC_API_BASE_URL` (used by native auth + API calls; see `apps/native/src/auth/apiBaseUrl.ts`)
 - `EXPO_PUBLIC_MEDIA_BASE_URL` (used by `RemoteImage`; see `apps/native/src/media/mediaBaseUrl.ts`)
 
-Recommended values depend on where the app runs:
+For local dev on Expo Go you typically **leave both unset** — `apiBaseUrl.ts` auto-derives the host from Metro's `hostUri` (set by the helper script via `REACT_NATIVE_PACKAGER_HOSTNAME`), and `mediaBaseUrl.ts` delegates to it. See §4.3 for when to override.
 
-- Android emulator often needs `http://10.0.2.2:<NGINX_HTTP_PORT>`
-- iOS simulator can usually use `http://localhost:<NGINX_HTTP_PORT>`
-- Physical device should use your current LAN IP (same network as the dev server): `http://<LAN_IP>:<NGINX_HTTP_PORT>`. Find `<LAN_IP>` with `ip -4 addr show` (see §4.0). Do not hard-code a stale IP — the previous one is the #1 cause of `Failed to download remote update`.
+Platform-specific notes:
 
-Notes:
-
-- On Android **emulators**, `apps/native/src/auth/apiBaseUrl.ts` rewrites `localhost` / `127.0.0.1` / `0.0.0.0` to `10.0.2.2` automatically, but it cannot guess your LAN IP for real devices.
-- `apps/native/src/media/mediaBaseUrl.ts` falls back to `EXPO_PUBLIC_API_BASE_URL` if `EXPO_PUBLIC_MEDIA_BASE_URL` is unset.
+- **Android emulator** without overrides: `apiBaseUrl.ts` rewrites `localhost` / `127.0.0.1` / `0.0.0.0` to `10.0.2.2` automatically (see `maybeRewriteForAndroidEmulator` in that file).
+- **iOS simulator**: auto-derive produces `http://localhost:18080` from Metro's hostUri — usually correct without overrides.
+- **Physical device**: auto-derive produces `http://<your-laptop-LAN-IP>:18080` from Metro's hostUri — also correct as long as the helper detected the right interface. Override with `LAN_IP=...` on the helper if it picked the wrong one.
 
 ## Go-live checklist (native)
 
@@ -201,15 +190,14 @@ These are recurring traps. Walk through them in order.
 
 ### `java.io.IOException: Failed to download remote update` (Android Expo Go)
 
-Cause: Expo Go is fetching the JS bundle from a host it cannot reach (almost always a stale `REACT_NATIVE_PACKAGER_HOSTNAME` and/or stale IP in `apps/native/app.json`).
+Cause: Expo Go is fetching the JS bundle from a host it cannot reach (almost always a stale `REACT_NATIVE_PACKAGER_HOSTNAME` — typically because the laptop joined a new network after Metro was started, or the helper script picked an interface the phone can't reach).
 
 Fix:
 
-1. Find the current LAN IP (see §4.0 above): `ip -4 addr show | grep 'inet '` and pick the interface on the same subnet as your phone.
-2. Update `apps/native/app.json` (`extra.EXPO_PUBLIC_API_BASE_URL`, `extra.EXPO_PUBLIC_MEDIA_BASE_URL`) and, optionally, `apps/native/src/auth/apiBaseUrl.ts` (`DEFAULT_API_BASE_URL`).
-3. Stop Metro, restart it with `REACT_NATIVE_PACKAGER_HOSTNAME=<LAN_IP>` and `expo start --lan -c`.
-4. **Rescan the QR** in Expo Go (do not reload the previous session).
-5. Sanity check from the **phone's browser**: `http://<LAN_IP>:8081/` should load Metro's web preview. If it doesn't, the issue is network (Wi-Fi mismatch, client/AP isolation, firewall). Try `expo start --tunnel` as a fallback while you diagnose.
+1. Stop Metro: `docker stop brewery-metro`.
+2. Restart with the helper, which re-detects the current LAN IP: `./scripts/start-metro-dev.sh`. If the auto-detected IP is on the wrong interface for your phone, override it: `LAN_IP=192.168.x.y ./scripts/start-metro-dev.sh`.
+3. **Rescan the QR** in Expo Go (do not reload the previous session — it has the stale bundle URL cached).
+4. Sanity check from the **phone's browser**: `http://<LAN_IP>:8081/` should load Metro's web preview. If it doesn't, the issue is network-level (Wi-Fi mismatch, client/AP isolation, firewall). Try `expo start --tunnel` as a fallback while you diagnose, but remember to also set `EXPO_PUBLIC_API_BASE_URL` to a reachable URL — the auto-derive intentionally skips tunnel `hostUri`s (see §4.3).
 
 ### `Incompatible React versions: react 19.x.x vs react-native-renderer 19.y.y` (Expo Go black/blank screen after bundle loads)
 
@@ -353,8 +341,8 @@ See also `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" → "
 Walk through these in this exact order before deep-diving:
 
 1. **API up?** `curl -sS http://localhost:${NGINX_HTTP_PORT:-18080}/api/health` → `{"ok":true}`. If 502, see esbuild/502 section above. Many native crashes are downstream of a dead API.
-2. **LAN IP fresh?** `ip -4 addr show | grep 'inet '` — does the IP in `apps/native/app.json` and your last `REACT_NATIVE_PACKAGER_HOSTNAME` still match?
-3. **Phone reaches host?** From the **phone's browser**, open `http://<LAN_IP>:8081/`. If that fails, no Expo Go change will help — fix the network first.
+2. **Metro running on the right IP?** `docker ps --filter name=brewery-metro` should show it Up. `docker logs --tail=20 brewery-metro` should mention the LAN IP. If the IP looks wrong for your current network, restart it: `docker stop brewery-metro && ./scripts/start-metro-dev.sh`.
+3. **Phone reaches host?** From the **phone's browser**, open `http://<LAN_IP>:8081/` (the IP printed by the helper script). If that fails, no Expo Go change will help — fix the network first (Wi-Fi mismatch, AP isolation, firewall).
 4. **Versions aligned?** Run `expo install --check`. If it complains, run `expo install --fix` and (if `react` moved) ensure `react-dom` was bumped to the same exact version.
 5. **Shared packages dist fresh?** If you (or someone) just edited `packages/beerjson/src/` (or any other shared package source) and `apps/native` typecheck fails on a property that exists in source, run `./scripts/build-packages-in-docker.sh` — see "beerjson dist drift" entry above.
 6. **Bundle cache?** Restart Metro with `-c` and rescan the QR (or re-enter `exp://<LAN_IP>:8081`).
@@ -378,8 +366,13 @@ Until one of those is done, treat the divergence as **known tech debt**:
 ## Appendix: operator quick reference
 
 ```bash
-# pick the current LAN IP
-ip -4 addr show | awk '/inet /{print $NF, $2}' | grep -v '127.0.0.1'
+# start Metro (auto-detects LAN IP; override with LAN_IP=... if needed)
+./scripts/start-metro-dev.sh
+docker logs -f brewery-metro
+docker stop brewery-metro     # --rm removes the container automatically
+
+# inspect current LAN IP (debug only — the helper already does this)
+ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit}'
 
 # verify versions in apps/native
 docker run --rm \
@@ -400,21 +393,5 @@ docker compose exec -T api npm install
 docker compose exec -T api npx prisma generate
 docker compose restart api
 curl -sS http://localhost:${NGINX_HTTP_PORT:-18080}/api/health
-
-# start Metro detached (replace LAN_IP)
-docker rm -f brewery-metro 2>/dev/null
-docker run -d --rm --name brewery-metro \
-  -p 19000:19000 -p 19001:19001 -p 19002:19002 \
-  -p 8081:8081 \
-  -e REACT_NATIVE_PACKAGER_HOSTNAME=<LAN_IP> \
-  -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
-  -w /repo/apps/native \
-  node:20-slim \
-  bash -lc "./node_modules/.bin/expo start --lan -c"
-
-# tail Metro logs / stop / restart
-docker logs -f brewery-metro
-docker stop brewery-metro
-# (after stop, with --rm the container is gone, no docker rm needed)
 ```
 
