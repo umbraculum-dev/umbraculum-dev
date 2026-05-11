@@ -2,6 +2,8 @@
 
 Repo root (canonical): `/home/rf/dkprojects/rfapps/brewery-app`
 
+For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`.
+
 ## Prerequisites
 
 - Docker / Docker Compose
