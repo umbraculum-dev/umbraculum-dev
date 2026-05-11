@@ -131,7 +131,7 @@ Expected:
 
 Because auth uses httpOnly cookies, the simplest check is via browser:
 
-- Log in via `http://localhost:${NGINX_HTTP_PORT:-8080}/en/login` (or your configured port)
+- Log in via `http://localhost:${NGINX_HTTP_PORT:-18080}/en/login` (or your configured port)
 - Confirm normal navigation works.
 
 Then run the degrade test (Section 6.2) while staying on a protected page:
@@ -147,9 +147,9 @@ COOKIE_JAR="$(mktemp)"
 # Login (replace placeholders)
 curl -sS -c "$COOKIE_JAR" -H "Content-Type: application/json" \
   -d '{"email":"<EMAIL>","password":"<PASSWORD>","preferredLocale":"en"}' \
-  "http://localhost:${NGINX_HTTP_PORT:-8080}/api/auth/login" >/dev/null
+  "http://localhost:${NGINX_HTTP_PORT:-18080}/api/auth/login" >/dev/null
 
 # Immediate read-after-write check
-curl -sS -b "$COOKIE_JAR" "http://localhost:${NGINX_HTTP_PORT:-8080}/api/auth/me" | head
+curl -sS -b "$COOKIE_JAR" "http://localhost:${NGINX_HTTP_PORT:-18080}/api/auth/me" | head
 ```
 

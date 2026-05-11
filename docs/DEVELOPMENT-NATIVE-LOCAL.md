@@ -37,7 +37,7 @@ docker compose up --build
 
 Default local entrypoint is nginx:
 
-- `http://localhost:${NGINX_HTTP_PORT:-8080}`
+- `http://localhost:${NGINX_HTTP_PORT:-18080}`
 
 ## 3) Ensure web media is synced (hashed filenames)
 

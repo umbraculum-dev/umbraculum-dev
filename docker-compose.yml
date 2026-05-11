@@ -1,8 +1,62 @@
+##
+## ============================================================================
+## NOT MIGRATED TO THE SHARED TRAEFIK PROXY — and intentionally so (2026-05-11)
+## ============================================================================
+## This stack is dev-only and does NOT need Traefik. It already runs concurrently
+## with any Traefik-migrated Magento stack, with pi-sidecar, and with host
+## OpenPLC, because there is zero port overlap (after the :18080 choice below).
+##
+## Host ports used by this stack:
+##   - nginx front-door  -> 18080:80   (see NGINX_HTTP_PORT below; deliberately
+##                                     :18080, NOT :8080, to avoid host-OpenPLC's
+##                                     :8080 which runs as a systemd service on
+##                                     this dev box)
+##   - web (Next.js)     -> 3000:3000
+##   - api (Fastify)     -> 4000:4000
+##   - postgres primary  -> 5432:5432
+##   - postgres replica  -> 5433:5432
+##   - pgpool            -> 5434:5432
+##   - redis             -> 6379:6379
+## Plus when running native dev (apps/native, outside this compose):
+##   - Expo Metro :8081  (CORS already whitelisted in services/api/src/app.ts)
+##   - Expo legacy :19000-19002
+##
+## Magento stacks own MariaDB :3306..:3322; Traefik owns :443/:80. None of
+## those overlap with the ports above.
+##
+## Tests run entirely inside the docker network (vitest in services/api hits
+## DATABASE_URL_TEST against the in-container postgres:5432/brewapp_test).
+## No host-port pressure during `npm test`. See services/api/package.json.
+##
+## Native (apps/native) paths:
+##   - iOS Simulator      -> http://localhost:18080 (loopback)
+##   - Android Emulator   -> http://10.0.2.2:18080 (auto-rewritten)
+##   - Physical device    -> http://<LAN_IP>:18080 (e.g. 192.168.1.124)
+## None of these benefit from Traefik (physical devices can't resolve *.docker
+## and don't trust the mkcert root CA without per-device installation).
+##
+## When you would actually want to Traefik-ify this stack (later, optional):
+##   - HTTPS-only browser features (Service Workers, Web Crypto subtle, Secure
+##     cookies) for Playwright/web tests
+##   - iOS Simulator using https://brewery.docker/ with a trusted dev cert
+## Migration cost would be ~30 minutes: add `proxy-net` external network +
+## Traefik labels on `nginx`, comment out the host port, append `brewery.docker`
+## (and any sub-hostnames) to /etc/hosts + _proxy/certs/devca.{crt,key} SANs,
+## verify nginx's X-Forwarded-Proto handling matches the Traefik pattern used
+## by yamamoto/cmp/etc. (see _proxy/README.md "Magento gotchas").
+##
+## Cross-references:
+##   - ~/dkprojects/_proxy/README.md     (Traefik architecture, hostname table)
+##   - ~/dkprojects/_proxy/ROADMAP.md    (migration status per stack)
+##   - DEVELOPMENT-LOCAL.md              (local-port + override notes)
+##   - docs/DEVELOPMENT-NATIVE-LOCAL.md  (native/Expo workflow)
+## ============================================================================
+##
 services:
   nginx:
     image: nginx:stable
     ports:
-      - "${NGINX_HTTP_PORT:-8080}:80"
+      - "${NGINX_HTTP_PORT:-18080}:80"
     volumes:
       - ./infra/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:

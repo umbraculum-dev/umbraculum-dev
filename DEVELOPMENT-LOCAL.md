@@ -96,8 +96,8 @@ Anything below this heading is **project-owned** and will not be overwritten by 
     - If API logs mention Prisma client not initialized, also run:
       - `docker compose exec -T api npx prisma generate`
     - `docker compose restart api`
-- **Local ports** (repo-local `.env`, not committed):
-  - `NGINX_HTTP_PORT=18080` (defaults to `8080` if unset)
+- **Local ports** (repo-local `.env`, not committed; see also `.env.sample` for the discovery doc):
+  - `NGINX_HTTP_PORT=18080` (defaults to `18080` if unset; chosen to avoid host-OpenPLC's `:8080` — see banner in docker-compose.yml)
 - **Next.js dev note**: Avoid running `docker compose exec web npm run build` while `next dev` is running. If you need typecheck/build again, either stop `web` first or be ready to wipe `.next` and restart `web`.
 - **Troubleshooting: web dev gets a corrupted `.next` (missing chunks / missing `routes-manifest.json`)**:
   - Symptoms:
