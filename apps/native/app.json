@@ -8,8 +8,8 @@
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": ["**/*"],
     "extra": {
-      "EXPO_PUBLIC_API_BASE_URL": "http://192.168.1.124:18080",
-      "EXPO_PUBLIC_MEDIA_BASE_URL": "http://192.168.1.124:18080"
+      "EXPO_PUBLIC_API_BASE_URL": "http://192.168.1.115:18080",
+      "EXPO_PUBLIC_MEDIA_BASE_URL": "http://192.168.1.115:18080"
     }
   }
 }
