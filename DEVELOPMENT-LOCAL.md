@@ -81,10 +81,29 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Local dev entrypoint**: `docker compose up --build`
 - **Shared packages build (native-ready)**:
   - Packages consumed by native apps ship runtime JS + `.d.ts` under `dist/` and we commit those build outputs.
-  - When you change anything under `packages/i18n`, `packages/contracts`, `packages/api-client`, `packages/ui`, or `packages/recipes-ui`, rebuild the shared packages from repo root:
+  - When you change anything under `packages/i18n`, `packages/i18n-react`, `packages/navigation`, `packages/contracts`, `packages/api-client`, `packages/ui`, `packages/beerjson`, `packages/recipes-ui`, or `packages/media`, rebuild the shared packages from repo root:
     - `./scripts/build-packages-in-docker.sh`
     - (Equivalent inside a Node container: `npm run build:packages`)
   - Reminder: do not run npm on the host in this repo. Run the build via Docker if needed.
+  - **Build order matters.** `package.json:11` runs the packages sequentially; `@brewery/beerjson` is built **before** `@brewery/recipes-ui` because recipes-ui imports types/values from beerjson at build time. Do not reorder casually — recipes-ui's `dist/` will silently encode whatever beerjson `dist/` was on disk at build time.
+  - **Drift detection (catches the original 2026-05 regression).** If you add or rename a field in `packages/beerjson/src/index.ts` and forget to rebuild, downstream consumers (`apps/native` first, because it has the only repo-wide `tsc --noEmit`; web won't notice locally) will fail typecheck against the stale `packages/beerjson/dist/*.d.ts`. Two ways to catch it:
+    1. **Automated, fast (preferred before pushing):** run `./scripts/check-packages-dist-up-to-date.sh` — it rebuilds all packages and `git diff --exit-code`s `packages/*/dist` and `packages/*/package.json`. Exit `0` = no drift; non-zero = `dist/` would have changed (rebuild it and commit). Note: this script only became effective for beerjson once `@brewery/beerjson` was added to `build:packages` in this commit.
+    2. **End-to-end reproduction (for understanding the symptom):**
+       ```bash
+       # Wipe beerjson dist to simulate "field added, dist forgot to be rebuilt"
+       docker run --rm -v "$PWD:/repo" node:20-slim bash -lc 'rm -rf /repo/packages/beerjson/dist'
+       ./scripts/build-packages-in-docker.sh
+       grep -c lateAddition packages/beerjson/dist/index.d.ts   # expect >=1 once that field exists
+       docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim \
+         bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+       # exit 0 means the chain is healthy end-to-end
+       ```
+  - **Container ownership (now self-resolving from the script).** Historically, `scripts/build-packages-in-docker.sh` ran Docker as root inside the `/repo` bind-mount, which left any file it (re)wrote — anything under `packages/*/dist/*`, sometimes `package-lock.json`, sometimes files inside `apps/*` and `services/*` — owned by `root:root` on the host. Git tracks content not ownership, so this was invisible until you asked git to *replace* one of those files (stash pop, branch switch, restore, rebase): non-root users can't unlink root-owned files, and git aborts with `error: unable to unlink old '...': Permission denied`. The build script now appends a `chown -R $HOST_UID:$HOST_GID /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json` step (uid/gid are resolved on the host and passed in via env vars; the chown runs unconditionally so a failed build never leaves a partial root-owned tree; `/repo/node_modules` is excluded on purpose because it's a docker named volume, not a host bind-mount). If you ever do hit `Permission denied` from git on those paths — e.g. because an older runner image or an out-of-band `docker run` wrote them as root — the manual recovery command is still:
+    ```bash
+    docker run --rm -v "$PWD:/repo" node:20-slim \
+      chown -R "$(id -u):$(id -g)" /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json
+    ```
+  - **CI guard.** `.github/workflows/native-deps.yml` runs the `apps/native` typecheck on every PR touching `apps/native/**`, `packages/**`, or the lockfiles. If `packages/beerjson/dist/*` is committed stale relative to `packages/beerjson/src/`, that workflow will go red — which is the desired signal. (A future, stricter CI step would invoke `./scripts/check-packages-dist-up-to-date.sh` directly to fail on *any* shared-package dist drift, not only the ones that happen to break `apps/native` typecheck.)
   - Native baseline: start `apps/native` on the latest stable Expo SDK (React 19) and keep React aligned between web and native.
   - **Native strategy + CI (prose)**: when deciding Expo Go vs custom dev clients, React drift vs web, and whether GitHub Actions are worth it, read `docs/NATIVE-STRATEGY-AND-CI.md`.
   - **Expo Go ABI exception (important)**: when developing on a physical device via Expo Go, `apps/native` MUST match the React / `react-dom` / `react-native-svg` / `expo` versions that Expo Go's installed binary ships with. If `apps/web` is on a newer React minor and Expo Go's React is older, `apps/native` follows **Expo Go**, not web — accept the temporary minor drift between web and native. Symptoms of ignoring this: blank/black screen on the device with `Incompatible React versions: react X.Y.Z vs react-native-renderer X.Y.W`, or a blank Metro web preview at `:8081/` with `Incompatible React versions: react X.Y.Z vs react-dom X.Y.W`. To re-align, run `expo install --fix` in `apps/native` and ensure `react-dom` is pinned to the same exact version as `react` (see `docs/DEVELOPMENT-NATIVE-LOCAL.md` → "Troubleshooting (native + Expo Go)" and "Native baseline"). Permanent alignment requires either bumping the Expo SDK to one that ships your target React, or moving native off Expo Go to a custom dev client.

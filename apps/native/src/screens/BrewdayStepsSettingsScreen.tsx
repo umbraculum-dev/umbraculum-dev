@@ -8,6 +8,27 @@ import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 import { TextArea } from "tamagui";
 
 import { Input } from "../components/AppInput";
+
+// Tamagui v2 RC's typed Button surface omits `chromeless` and a few layout
+// longhand props (`width`, `justifyContent`) even though they are valid at
+// runtime (see packages/ui/src/primitives/{Collapsible,SelectField}.tsx). We
+// cast locally to keep the existing collapsible-section-header pattern
+// without weakening shared typings.
+const SectionToggleButton = Button as unknown as React.ComponentType<
+  React.ComponentProps<typeof Button> & {
+    chromeless?: boolean;
+    width?: number | string;
+    justifyContent?: string;
+  }
+>;
+const NotesTextArea = TextArea as unknown as React.ComponentType<
+  React.ComponentProps<typeof TextArea> & {
+    value?: string;
+    onChangeText?: (text: string) => void;
+    placeholder?: string;
+    minHeight?: number | string;
+  }
+>;
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 
@@ -358,10 +379,10 @@ export function BrewdayStepsSettingsScreen() {
           ) : null}
 
           <Card gap="$2">
-            <Button chromeless size="$3" onPress={() => toggleOpen("recap")} width="100%" justifyContent="space-between">
+            <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("recap")} width="100%" justifyContent="space-between">
               <Heading fontSize={18}>{t("sections.brewdayStepsRecap.title")}</Heading>
               <Text opacity={0.7}>{openSections.includes("recap") ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
             {openSections.includes("recap") ? (
               recapLines.length > 0 ? (
                 <View style={{ gap: 6 }}>
@@ -380,10 +401,10 @@ export function BrewdayStepsSettingsScreen() {
           </Card>
 
           <Card gap="$2">
-            <Button chromeless size="$3" onPress={() => toggleOpen("brewingType")} width="100%" justifyContent="space-between">
+            <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("brewingType")} width="100%" justifyContent="space-between">
               <Heading fontSize={18}>{t("sections.brewingType.title")}</Heading>
               <Text opacity={0.7}>{openSections.includes("brewingType") ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
             {openSections.includes("brewingType") ? (
               <View style={{ gap: 12 }}>
                 <PickerField
@@ -419,10 +440,10 @@ export function BrewdayStepsSettingsScreen() {
           </Card>
 
           <Card gap="$2">
-            <Button chromeless size="$3" onPress={() => toggleOpen("sections")} width="100%" justifyContent="space-between">
+            <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("sections")} width="100%" justifyContent="space-between">
               <Heading fontSize={18}>{t("sections.brewdayStepsSections.title")}</Heading>
               <Text opacity={0.7}>{openSections.includes("sections") ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
             {openSections.includes("sections") ? (
               <View style={{ gap: 10 }}>
                 <Heading fontSize={16}>{t("presetSections.preparation")}</Heading>
@@ -494,10 +515,10 @@ export function BrewdayStepsSettingsScreen() {
           </Card>
 
           <Card gap="$2">
-            <Button chromeless size="$3" onPress={() => toggleOpen("defaultSteps")} width="100%" justifyContent="space-between">
+            <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("defaultSteps")} width="100%" justifyContent="space-between">
               <Heading fontSize={18}>{t("sections.brewdayStepsDefault.title")}</Heading>
               <Text opacity={0.7}>{openSections.includes("defaultSteps") ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
             {openSections.includes("defaultSteps") ? (
               <View style={{ gap: 10 }}>
                 <Text fontSize={12} opacity={0.85}>
@@ -548,10 +569,10 @@ export function BrewdayStepsSettingsScreen() {
           </Card>
 
           <Card gap="$2">
-            <Button chromeless size="$3" onPress={() => toggleOpen("customSteps")} width="100%" justifyContent="space-between">
+            <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("customSteps")} width="100%" justifyContent="space-between">
               <Heading fontSize={18}>{t("sections.brewdayStepsCustom.title")}</Heading>
               <Text opacity={0.7}>{openSections.includes("customSteps") ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
             {openSections.includes("customSteps") ? (
               <View style={{ gap: 10 }}>
                 <Text fontSize={12} opacity={0.85}>
@@ -625,13 +646,13 @@ export function BrewdayStepsSettingsScreen() {
           </Card>
 
           <Card gap="$2">
-            <Button chromeless size="$3" onPress={() => toggleOpen("notes")} width="100%" justifyContent="space-between">
+            <SectionToggleButton chromeless size="$3" onPress={() => toggleOpen("notes")} width="100%" justifyContent="space-between">
               <Heading fontSize={18}>{t("sections.brewdayNotes.title")}</Heading>
               <Text opacity={0.7}>{openSections.includes("notes") ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
             {openSections.includes("notes") ? (
               <View style={{ gap: 8 }}>
-                <TextArea
+                <NotesTextArea
                   value={brewdayNotes}
                   onChangeText={setBrewdayNotes}
                   placeholder={t("sections.brewdayNotes.title")}

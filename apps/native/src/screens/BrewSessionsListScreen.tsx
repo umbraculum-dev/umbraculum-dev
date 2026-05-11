@@ -19,7 +19,7 @@ type BrewSessionListItem = {
 };
 
 export function BrewSessionsListScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const route = useRoute();
   const { t } = useT("recipes.brewSessions");
   const { state } = useAuth();
@@ -61,7 +61,7 @@ export function BrewSessionsListScreen() {
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       const id = (res.data as any)?.brewSession?.id;
       if (typeof id !== "string" || !id) throw new Error("Create brew session response is missing brewSession.id");
-      navigation.navigate("BrewSessionDetail" as never, { recipeId, brewSessionId: id } as never);
+      navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: id });
     } catch (err) {
       setCreateError(String(err));
     } finally {
@@ -117,7 +117,7 @@ export function BrewSessionsListScreen() {
                 {t("statusLine", { status: session.status })}
               </Text>
               <Button
-                onPress={() => navigation.navigate("BrewSessionDetail" as never, { recipeId, brewSessionId: session.id } as never)}
+                onPress={() => navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: session.id })}
                 size="$3"
                 background="$background"
                 borderWidth={1}

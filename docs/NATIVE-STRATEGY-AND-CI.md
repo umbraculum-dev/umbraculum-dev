@@ -92,6 +92,8 @@ These are the **minimum** professional bar for the current stack:
 | API `/api/health` triage + esbuild recovery doc | Prevents false “native bugs” when API is 502 |
 | “Quick triage order” in native doc | Reduces random debugging |
 | Shared packages: avoid React internals / version-sensitive APIs | Reduces silent breakage across web vs native |
+| `@brewery/beerjson` is in `build:packages` (before `@brewery/recipes-ui`) | Prevents stale `packages/beerjson/dist/*` from silently breaking `apps/native` and `packages/recipes-ui` consumers (see `DEVELOPMENT-LOCAL.md` → "Shared packages build") |
+| `./scripts/check-packages-dist-up-to-date.sh` before pushing | Catches any `packages/*/dist` drift automatically. Now actually covers beerjson too (it didn't before this commit, because beerjson wasn't in the upstream `build:packages` chain). |
 
 Optional enhancements (nice-to-have, not required for solo honesty):
 
@@ -113,19 +115,30 @@ Goals:
 - **Fast:** one small job, cache npm where worthwhile.
 - **Skippable:** you can merge doc-only or emergency fixes without burning minutes.
 
-**Concrete minimal recipe (conceptual—not obligatory):**
+**Implemented as `.github/workflows/native-deps.yml`.** The file is intentionally small and matches the recipe below 1:1.
 
-1. **Trigger:** `pull_request` and/or `push` to `main`, with **`paths`** limited to `apps/native/**`, `packages/**`, and root lockfiles—so edits to unrelated folders do **not** run the job.
-2. **Job:** checkout → Docker run `node:20-slim` → `cd apps/native` → `./node_modules/.bin/expo install --check` (exit non-zero fails the workflow).
-3. **Optional second step:** `npm run typecheck` inside `apps/native` in the same container (still cheap, no emulator).
+1. **Triggers:**
+   - `pull_request` targeting `master` (path-filtered).
+   - `push` to `master` (path-filtered).
+   - `workflow_dispatch` (manual run from the Actions tab).
+2. **`paths` filter** (changes outside these do not trigger the job):
+   - `apps/native/**`
+   - `packages/**`
+   - root `package.json` / `package-lock.json`
+   - the workflow file itself (`.github/workflows/native-deps.yml`)
+3. **Job:** `actions/checkout@v4` → single Docker step that runs in `node:20-slim`, mounts the repo into `/repo`, cd's into `/repo/apps/native`, and chains: `npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck`.
+4. **Concurrency:** new runs on the same ref cancel in-flight runs (`concurrency.cancel-in-progress: true`) — keeps minutes lean on rapid pushes.
+5. **Timeout:** `timeout-minutes: 10`.
 
-**Manual skip patterns** (pick one or combine):
+**Manual skip patterns (all supported today):**
 
-- **Commit message:** conventional `[skip ci]` / `[ci skip]` in the subject or body—workflow uses `if` conditions to skip jobs when those tokens appear (document the exact phrase in the workflow comment).
-- **`workflow_dispatch` only:** workflow does not run on every push; you run it manually from the Actions tab when you want reassurance.
-- **`paths-ignore`:** e.g. ignore `docs/**`, `*.md` so documentation-only PRs never trigger native checks.
+- **Commit message tokens:** include `[skip ci]` or `[ci skip]` in the subject or body. The workflow's `if:` clause inspects `github.event.head_commit.message` and skips the job. Use this when you knowingly merge something that should not retrigger CI (e.g. a hotfix verified locally, a follow-up to a recently-green run).
+- **`paths` filter:** doc-only PRs (no files matching the `paths` list above) do not trigger the workflow at all — no minutes consumed, no checkmark appears.
+- **`workflow_dispatch`:** trigger the workflow manually from the GitHub Actions tab (e.g. before tagging a release, or as reassurance after a dependency bump you did locally).
 
-**Cost note:** Public repos on GitHub get free Actions minutes on standard runners; staying on Linux + short jobs keeps usage negligible. Private repos have minute quotas—same lean design applies.
+> **`[skip ci]` caveat:** GitHub itself **does not** auto-skip workflows based on commit messages; the skip only works because we explicitly check the message in the job's `if:`. If you ever copy this workflow to another repo or service, copy the `if:` clause too.
+
+**Cost note:** Public repos on GitHub get free Actions minutes on standard runners; staying on Linux + short jobs keeps usage negligible. Private repos have minute quotas — same lean design applies.
 
 ### 6.3 What this repo does **not** need by default
 
@@ -153,3 +166,4 @@ Document that one-liner next to your merge checklist. That is **professionally s
 
 - Native operations & troubleshooting: `docs/DEVELOPMENT-NATIVE-LOCAL.md`
 - Project-local rules (Expo Go ABI exception): `DEVELOPMENT-LOCAL.md`
+- CI workflow file: `.github/workflows/native-deps.yml`

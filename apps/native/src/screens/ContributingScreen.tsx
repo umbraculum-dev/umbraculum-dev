@@ -5,6 +5,17 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@brewery/ui";
 
+// See comment in BrewdayStepsSettingsScreen.tsx: Tamagui v2 RC omits a few
+// runtime-valid Button props from its TS surface. Local cast preserves the
+// existing collapsible-section-header pattern without weakening shared types.
+const SectionToggleButton = Button as unknown as React.ComponentType<
+  React.ComponentProps<typeof Button> & {
+    chromeless?: boolean;
+    width?: number | string;
+    justifyContent?: string;
+  }
+>;
+
 type Topic = "i18n" | "raw-materials" | null;
 
 function parseTopic(v: unknown): Topic {
@@ -67,7 +78,7 @@ export function ContributingScreen() {
           </Text>
 
           <Card gap="$2">
-            <Button
+            <SectionToggleButton
               chromeless
               size="$3"
               onPress={() => setOpenI18n((v) => !v)}
@@ -78,7 +89,7 @@ export function ContributingScreen() {
             >
               <Heading fontSize={18}>{t("sections.i18n.title")}</Heading>
               <Text opacity={0.7}>{openI18n ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
 
             {openI18n ? (
               <View style={{ gap: 10 }}>
@@ -128,7 +139,7 @@ export function ContributingScreen() {
           </Card>
 
           <Card gap="$2">
-            <Button
+            <SectionToggleButton
               chromeless
               size="$3"
               onPress={() => setOpenRawMaterials((v) => !v)}
@@ -139,7 +150,7 @@ export function ContributingScreen() {
             >
               <Heading fontSize={18}>{t("sections.rawMaterials.title")}</Heading>
               <Text opacity={0.7}>{openRawMaterials ? "▾" : "▸"}</Text>
-            </Button>
+            </SectionToggleButton>
 
             {openRawMaterials ? (
               <View style={{ gap: 10 }}>

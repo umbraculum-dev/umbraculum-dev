@@ -35,6 +35,7 @@ type EditorGristRow = {
     potential: GristPotential;
     maltClass: "base" | "crystal" | "roast" | "acid";
     timingUse?: "add_to_mash" | "add_to_boil";
+    lateAddition?: boolean;
 };
 type EditorHopRow = {
     id: string;

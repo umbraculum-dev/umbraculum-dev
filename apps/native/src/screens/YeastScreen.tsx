@@ -27,6 +27,7 @@ import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/r
 import { Accordion } from "tamagui";
 
 import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
+import { isMediaAssetKey } from "@brewery/media";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
@@ -896,15 +897,17 @@ export function YeastScreen() {
           ) : null}
 
           <ManualCellCountHelpBox
-            renderImage={({ assetKey, alt, width, height }) => (
-              <RemoteImage
-                assetKey={assetKey}
-                accessibilityLabel={alt}
-                unavailableText={alt}
-                width={width}
-                height={height}
-              />
-            )}
+            renderImage={({ assetKey, alt, width, height }) =>
+              isMediaAssetKey(assetKey) ? (
+                <RemoteImage
+                  assetKey={assetKey}
+                  accessibilityLabel={alt}
+                  unavailableText={alt}
+                  width={width}
+                  height={height}
+                />
+              ) : null
+            }
           />
         </View>
       </ScrollView>

@@ -171,7 +171,8 @@ function buildFermentableAddition(row) {
     yield: yieldObj,
     ...colorLovibond === null ? {} : { color: { unit: "Lovi", value: colorLovibond } },
     amount: { unit: "kg", value: row.amountKg },
-    timing: { use: timingUse }
+    timing: { use: timingUse },
+    ...row.lateAddition === true ? { brewery_app_late_addition: true } : {}
   };
 }
 function buildHopAddition(row) {
@@ -473,6 +474,7 @@ function editorStateFromBeerJson(doc) {
     const maltClass = grainGroup === "roasted" ? "roast" : grainGroup === "caramel" ? "crystal" : "base";
     const timingUseRaw = typeof f?.timing?.use === "string" ? f.timing.use : "";
     const timingUse = timingUseRaw === "add_to_boil" || timingUseRaw === "add_to_fermentation" || timingUseRaw === "add_to_package" ? "add_to_boil" : "add_to_mash";
+    const lateAddition = f?.brewery_app_late_addition === true;
     return {
       id,
       ingredientId: null,
@@ -486,7 +488,8 @@ function editorStateFromBeerJson(doc) {
       colorLovibond,
       potential,
       maltClass,
-      timingUse
+      timingUse,
+      lateAddition
     };
   }).filter(Boolean);
   const hopsRows = hops.map((h) => {

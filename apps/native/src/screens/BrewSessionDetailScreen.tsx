@@ -252,7 +252,7 @@ export function BrewSessionDetailScreen() {
           </View>
 
           {hydrometerKind !== "tilt" ? (
-            <Card borderWidth={1} borderColor="$yellow10" backgroundColor="rgba(234,179,8,0.18)">
+            <Card borderWidth={1} borderColor="$yellow10" bg="rgba(234,179,8,0.18)">
               <Text fontSize={12} color="$yellow10">
                 {t("hydrometerNotSupportedYet")}
               </Text>

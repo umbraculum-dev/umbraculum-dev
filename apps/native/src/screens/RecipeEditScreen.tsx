@@ -210,7 +210,7 @@ const YEAST_FORMAT_OPTIONS: { value: NonNullable<EditorYeastRow["format"]>; labe
 export function RecipeEditScreen() {
   const auth = useAuth();
   const route = useRoute();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const recipeId = (route.params as { recipeId?: string })?.recipeId ?? "";
   const { t } = useT("recipes.edit");
   const { t: tBrewSessions } = useT("recipes.brewSessions");
@@ -956,7 +956,7 @@ export function RecipeEditScreen() {
         <Card gap="$2" mb="$3">
           <Heading fontSize={16}>{tBrewSessions("listTitle")}</Heading>
           <Button
-            onPress={() => navigation.navigate("BrewSessionsList" as never, { recipeId } as never)}
+            onPress={() => navigation.navigate("BrewSessionsList", { recipeId })}
             accessibilityLabel={tBrewSessions("listTitle")}
           >
             <Text>{tBrewSessions("listTitle")}</Text>
@@ -969,7 +969,7 @@ export function RecipeEditScreen() {
           onValueChange={(next) => setOpenSections(Array.isArray(next) ? next : (next ? [next] : []))}
         >
           <Accordion.Item value="basics">
-            <Card gap="$2" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.basics")}>
+            <Card gap="$2" bg={SURFACE_BACKGROUND} aria-label={t("sections.basics")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1025,7 +1025,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="fermentables">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.fermentables")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.fermentables")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1117,7 +1117,7 @@ export function RecipeEditScreen() {
                   >
                     {gristRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`grist-${r.id}`}>
-                        <Card gap="$2" mb="$2" backgroundColor={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="$2" mb="$2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
                           <Accordion.Header>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                               <Accordion.Trigger
@@ -1298,7 +1298,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="hops">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.hops")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.hops")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1381,7 +1381,7 @@ export function RecipeEditScreen() {
                   >
                     {hopsRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`hop-${r.id}`}>
-                        <Card gap="$2" mb="$2" backgroundColor={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="$2" mb="$2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
                           <Accordion.Header>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                               <Accordion.Trigger
@@ -1509,7 +1509,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="yeast">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.yeast")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.yeast")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1534,7 +1534,7 @@ export function RecipeEditScreen() {
                   >
                     {yeastRows.map((r, idx) => (
                       <Accordion.Item key={r.id} value={`yeast-${r.id}`}>
-                        <Card gap="$2" mb="$2" backgroundColor={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
+                        <Card gap="$2" mb="$2" bg={SURFACE_BACKGROUND} borderWidth={1} borderColor="$borderColor" p="$3">
                           <Accordion.Header>
                             <Accordion.Trigger
                               width="100%"
@@ -1694,7 +1694,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="equipment">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.equipment")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.equipment")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1786,7 +1786,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="mashing">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.mashing")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.mashing")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1960,7 +1960,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="boil">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.boil")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.boil")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"
@@ -1999,7 +1999,7 @@ export function RecipeEditScreen() {
           </Accordion.Item>
 
           <Accordion.Item value="notes">
-            <Card gap="$2" mt="$3" backgroundColor={SURFACE_BACKGROUND} aria-label={t("sections.notes")}>
+            <Card gap="$2" mt="$3" bg={SURFACE_BACKGROUND} aria-label={t("sections.notes")}>
               <Accordion.Header>
                 <Accordion.Trigger
                   width="100%"

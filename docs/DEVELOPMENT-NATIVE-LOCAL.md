@@ -2,7 +2,7 @@
 
 Repo root (canonical): `/home/rf/dkprojects/rfapps/brewery-app`
 
-For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`.
+For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`. The same dependency check runs in CI: `.github/workflows/native-deps.yml`.
 
 ## Prerequisites
 
@@ -287,6 +287,49 @@ docker run --rm \
 
 A non-zero exit means at least one package will fail at runtime on Expo Go.
 
+### `apps/native` typecheck fails with `Property 'X' does not exist on type 'EditorGristRow'` (or similar `@brewery/beerjson` type)
+
+Symptom: a fresh `npm run typecheck` in `apps/native` (or a red `native-deps.yml` PR check) complaining about a property that **clearly exists** in `packages/beerjson/src/index.ts`. The dist on disk (and committed to git) is older than the source.
+
+Root cause: `packages/beerjson/dist/*` is consumed via the workspace symlink, and tsup builds happen only when the `build:packages` script runs. Until 2026-05, the script omitted `@brewery/beerjson`, so dist could drift silently. The script now (re)builds beerjson before `@brewery/recipes-ui` — but if someone bypasses the script, the dist still goes stale.
+
+Fix:
+
+```bash
+# Option A — fast check: rebuilds all packages and fails if any dist diffs
+./scripts/check-packages-dist-up-to-date.sh
+# If it errors, the diff IS your fix — `git status` will show packages/*/dist
+# changes you need to stage and commit.
+
+# Option B — explicit rebuild + apps/native re-typecheck (use when you want to
+# see the apps/native error go away yourself):
+./scripts/build-packages-in-docker.sh
+docker run --rm \
+  -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
+  -w /repo/apps/native node:20-slim \
+  bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
+# exit 0 means dist drift is gone
+```
+
+Then commit the regenerated `packages/beerjson/dist/*` (and any other dist that changed as a result of the rebuild) alongside the source change.
+
+See `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" for the drift-reproduction recipe and CI guard details.
+
+### `error: unable to unlink old 'packages/.../dist/...': Permission denied` after running the build script
+
+This should no longer happen on a current checkout: `scripts/build-packages-in-docker.sh` now appends a `chown -R $HOST_UID:$HOST_GID /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json` step (host uid/gid passed in as env vars; runs unconditionally so a failed build never leaves a partial root-owned tree).
+
+If you still hit it — typically because an older `docker run` (or an older copy of the script) wrote files as root before the fix landed — the symptom is that any of these git operations fail: `git stash pop`, `git checkout <branch>`, `git restore <file>`, `git rebase …`. The manual recovery is:
+
+```bash
+docker run --rm -v "$PWD:/repo" node:20-slim \
+  chown -R "$(id -u):$(id -g)" /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json
+```
+
+If `git stash pop` then complains `Your local changes to ... would be overwritten by merge` — that means the working tree has *also* modified the same dist files (e.g. a leftover from an interrupted rebuild). Decide whether the working-tree dist or the stash dist is correct, then either `git restore packages/*/dist/*` (to keep stash) or `git stash drop` (to keep working tree) and retry.
+
+See also `DEVELOPMENT-LOCAL.md` → "Shared packages build (native-ready)" → "Container ownership (now self-resolving from the script)".
+
 ### Quick triage order (when "something is wrong with native")
 
 Walk through these in this exact order before deep-diving:
@@ -295,8 +338,9 @@ Walk through these in this exact order before deep-diving:
 2. **LAN IP fresh?** `ip -4 addr show | grep 'inet '` — does the IP in `apps/native/app.json` and your last `REACT_NATIVE_PACKAGER_HOSTNAME` still match?
 3. **Phone reaches host?** From the **phone's browser**, open `http://<LAN_IP>:8081/`. If that fails, no Expo Go change will help — fix the network first.
 4. **Versions aligned?** Run `expo install --check`. If it complains, run `expo install --fix` and (if `react` moved) ensure `react-dom` was bumped to the same exact version.
-5. **Bundle cache?** Restart Metro with `-c` and rescan the QR (or re-enter `exp://<LAN_IP>:8081`).
-6. **Read the device error log.** On the blue "Something went wrong" screen, tap **View error log** — `java.io.IOException: Failed to download remote update` means step 2/3; `Incompatible React versions` means step 4.
+5. **Shared packages dist fresh?** If you (or someone) just edited `packages/beerjson/src/` (or any other shared package source) and `apps/native` typecheck fails on a property that exists in source, run `./scripts/build-packages-in-docker.sh` — see "beerjson dist drift" entry above.
+6. **Bundle cache?** Restart Metro with `-c` and rescan the QR (or re-enter `exp://<LAN_IP>:8081`).
+7. **Read the device error log.** On the blue "Something went wrong" screen, tap **View error log** — `java.io.IOException: Failed to download remote update` means step 2/3; `Incompatible React versions` means step 4.
 
 ## Long-term: aligning web + native React (planning, not yet executed)
 

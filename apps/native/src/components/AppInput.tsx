@@ -3,11 +3,14 @@ import { Platform } from "react-native";
 import { Input as TamaguiInput } from "tamagui";
 import type { InputProps } from "tamagui";
 
+// `includeFontPadding` is a React Native TextInput prop that Tamagui's
+// typings don't surface. Tamagui's Input forwards unknown props to the
+// underlying RN TextInput at runtime, so we apply it via a narrow cast.
+type IncludeFontPaddingProp = { includeFontPadding?: boolean };
+
 export function Input(props: InputProps) {
   const isAndroid = Platform.OS === "android";
 
-  // Android TextInput can render text slightly too high (cropped at top) depending on font metrics.
-  // We correct this by centering vertically and nudging padding a bit for single-line fields.
   const androidSingleLineFixStyle =
     isAndroid && !props.multiline
       ? ({
@@ -17,13 +20,14 @@ export function Input(props: InputProps) {
         } as const)
       : null;
 
+  const passthrough = props as InputProps & IncludeFontPaddingProp;
   const includeFontPadding =
-    props.includeFontPadding ?? (isAndroid ? false : undefined);
+    passthrough.includeFontPadding ?? (isAndroid ? false : undefined);
 
   return (
     <TamaguiInput
       {...props}
-      includeFontPadding={includeFontPadding}
+      {...({ includeFontPadding } as IncludeFontPaddingProp)}
       style={androidSingleLineFixStyle ? [androidSingleLineFixStyle, props.style] : props.style}
     />
   );
