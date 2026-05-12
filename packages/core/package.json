@@ -3,12 +3,18 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
     }
   },
-  "types": "./src/index.d.ts"
+  "types": "./src/index.d.ts",
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
 }
 
