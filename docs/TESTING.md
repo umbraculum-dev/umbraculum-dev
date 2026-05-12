@@ -28,12 +28,31 @@ Pure functions. No DB, no Fastify, no network. If you add or rename a field in:
 
 ...you MUST add a vitest case in the same package under `src/**/*.test.ts`.
 
-Run inside Docker (no host npm — see [.cursor/rules/00-shared-node-npm-container-only.mdc](../.cursor/rules/00-shared-node-npm-container-only.mdc)):
+Run inside Docker (no host npm — see [.cursor/rules/00-shared-node-npm-container-only.mdc](../.cursor/rules/00-shared-node-npm-container-only.mdc)).
+
+**Use scoped installs** for L1 (do **not** run a repo-wide
+`--workspaces` install from a one-shot `node:20-slim` container): the
+default `--workspaces` install reuses the root `package-lock.json` and
+will prune `services/api/node_modules` to its lockfile baseline, which
+breaks the long-running api container until you `docker compose exec
+api npm install` again. Install only the packages you actually want to
+test:
 
 ```bash
 docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
-  bash -lc "npm ci --workspaces --include-workspace-root --no-audit --no-fund && npm test -w @brewery/contracts && npm test -w @brewery/core"
+  bash -lc "npm install --no-audit --no-fund -w @brewery/contracts -w @brewery/core --include-workspace-root && \
+            npm test -w @brewery/contracts && npm test -w @brewery/core"
 ```
+
+Notes:
+- `-w @brewery/contracts -w @brewery/core` scopes installation to just
+  those two workspaces (plus their hoistable deps) and leaves
+  `services/api/node_modules` and `apps/web/node_modules` alone.
+- `--include-workspace-root` is required so the root devDependency
+  (vitest) is also installed for the workspaces to use.
+- If the api container's `node_modules` ever gets pruned anyway (e.g.
+  because someone else ran a `--workspaces` install), recover with
+  `docker compose exec api npm install --no-audit --no-fund`.
 
 ### L2 - API integration
 
