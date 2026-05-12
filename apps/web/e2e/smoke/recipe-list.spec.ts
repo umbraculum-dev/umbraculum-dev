@@ -10,6 +10,16 @@ test.describe("recipe list smoke (authenticated)", () => {
     await authenticatedPage.goto("/en/recipes");
     await expect(authenticatedPage).toHaveURL(/\/en\/recipes/);
 
+    // /en/recipes renders four collapsible disclosures (Create / Import /
+    // Your recipes / Export). The seeded recipe lives inside the
+    // "Your recipes" disclosure, which is collapsed by default. Mirror
+    // what a real user does: open the disclosure first, then assert.
+    const yourRecipesDisclosure = authenticatedPage.getByRole("button", {
+      name: /your recipes/i,
+    });
+    await expect(yourRecipesDisclosure).toBeVisible({ timeout: 15_000 });
+    await yourRecipesDisclosure.click();
+
     const recipeLink = authenticatedPage.getByText(/E2E Pale Ale/i).first();
     await expect(recipeLink).toBeVisible({ timeout: 15_000 });
   });
