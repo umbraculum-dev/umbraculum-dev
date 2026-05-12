@@ -1,0 +1,23 @@
+{
+  "activeWorkspaceId": "string",
+  "ok": "boolean",
+  "role": "string",
+  "user": {
+    "email": "string",
+    "id": "string",
+    "isPlatformAdmin": "boolean",
+    "preferredDensity": "string",
+    "preferredFontScale": "string",
+    "preferredLocale": "string",
+    "preferredTheme": "string"
+  },
+  "workspaces": {
+    "__array": {
+      "brandKey": "string",
+      "id": "string",
+      "name": "string",
+      "role": "string"
+    },
+    "__length": "non-empty"
+  }
+}

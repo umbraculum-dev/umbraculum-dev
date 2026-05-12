@@ -1,0 +1,130 @@
+name: api
+
+# Gates the existing @brewery/api vitest suite + shared-package unit tests on
+# every PR that could affect API behavior. Runs migrations against an ephemeral
+# postgres container, then runs vitest in a node:20-slim container so the
+# "no npm on host" policy is honored end-to-end (see
+# .cursor/rules/00-shared-node-npm-container-only.mdc and docs/TESTING.md).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "services/api/**"
+      - "packages/contracts/**"
+      - "packages/core/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/api.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "services/api/**"
+      - "packages/contracts/**"
+      - "packages/core/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/api.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shared-package-unit-tests:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run @brewery/contracts + @brewery/core unit tests
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            -w /repo \
+            node:20-slim \
+            bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run test:packages"
+
+  api-integration-tests:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: brewapp_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/brewapp_test
+      DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/brewapp_test
+      DATABASE_URL_DIRECT: postgresql://postgres:postgres@localhost:5432/brewapp_test
+      DATABASE_URL_RO: postgresql://postgres:postgres@localhost:5432/brewapp_test
+      REDIS_URL: redis://localhost:6379/0
+      STRIPE_WEBHOOK_SECRET: ci-only-not-real
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install workspace dependencies
+        run: npm install --no-audit --no-fund --workspaces --include-workspace-root
+
+      - name: Generate Prisma client
+        working-directory: services/api
+        run: npx prisma generate
+
+      - name: Wait for Postgres
+        run: |
+          for i in $(seq 1 30); do
+            if pg_isready -h localhost -p 5432 -U postgres > /dev/null 2>&1; then
+              echo "postgres ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "postgres never became ready" >&2
+          exit 1
+
+      - name: Run @brewery/api vitest suite
+        working-directory: services/api
+        run: npm test
+
+      - name: Upload vitest output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-vitest-output
+          path: |
+            services/api/coverage
+            services/api/.vitest-cache
+          if-no-files-found: ignore
+          retention-days: 7

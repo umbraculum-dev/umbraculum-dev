@@ -18,6 +18,8 @@
     "seed:e2e": "tsx src/cli/seedE2eFixture.ts",
     "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma migrate reset --force --skip-seed && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma db seed",
     "test": "npm run test:db:prepare && vitest run",
+    "contracts:check": "npm run test:db:prepare && vitest run src/tests/contracts",
+    "contracts:update": "npm run test:db:prepare && UPDATE_CONTRACTS=1 vitest run src/tests/contracts",
     "seed:import": "tsx src/cli/seed-import.ts",
     "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts",
     "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts"

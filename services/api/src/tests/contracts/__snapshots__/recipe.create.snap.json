@@ -1,0 +1,92 @@
+{
+  "ok": "boolean",
+  "recipe": {
+    "beerJsonRecipeJson": {
+      "beerjson": {
+        "recipes": {
+          "__array": {
+            "author": "string",
+            "batch_size": {
+              "unit": "string",
+              "value": "number"
+            },
+            "efficiency": {
+              "brewhouse": {
+                "unit": "string",
+                "value": "number"
+              }
+            },
+            "ingredients": {
+              "culture_additions": {
+                "__array": "undefined",
+                "__length": "empty"
+              },
+              "fermentable_additions": {
+                "__array": {
+                  "amount": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "color": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "id": "string",
+                  "name": "string",
+                  "type": "string",
+                  "yield": {
+                    "potential": {
+                      "unit": "string",
+                      "value": "number"
+                    }
+                  }
+                },
+                "__length": "non-empty"
+              },
+              "hop_additions": {
+                "__array": {
+                  "alpha_acid": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "amount": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "name": "string",
+                  "timing": {
+                    "duration": {
+                      "unit": "string",
+                      "value": "number"
+                    },
+                    "use": "string"
+                  }
+                },
+                "__length": "non-empty"
+              },
+              "miscellaneous_additions": {
+                "__array": "undefined",
+                "__length": "empty"
+              }
+            },
+            "name": "string",
+            "type": "string"
+          },
+          "__length": "non-empty"
+        },
+        "version": "number"
+      }
+    },
+    "createdAt": "string",
+    "id": "string",
+    "name": "string",
+    "notes": "null",
+    "recipeExtJson": "null",
+    "style": "string",
+    "styleKey": "string",
+    "updatedAt": "string",
+    "version": "number",
+    "versionGroupId": "string",
+    "workspaceId": "string"
+  }
+}
