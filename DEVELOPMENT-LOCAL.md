@@ -7,15 +7,11 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 - Keep this file short and high-signal.
 - Prefer pointing to runbooks under `.cursor/skills/` rather than duplicating long procedures here.
 
-## Project summary (read this first)
-
-- This is a **custom TypeScript project** (not Magento, not PHP).
-- Planned stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.
-- Canonical big-picture plan: `docs/architechture-Rev02.md`
-
 ## Announcements (from cursor-rules)
 
 - Shared runbooks (“skills”) are available under `.cursor/skills/`. Consider moving long procedures out of `.cursor/rules/*.mdc` and into skills, then link them from `DEVELOPMENT.md` / `DEVELOPMENT-LOCAL.md`.
+- v3+: Shared subagents (`.cursor/agents/*.md`) are now also synced. Cursor's main agent will automatically delegate to them based on their `description` field; you can also invoke explicitly with `/<name>`. See `DEVELOPMENT.md` for the inventory.
+- v3+: For local-model (Ollama) variants of the shipped subagents, see `DEVELOPMENT-LOCAL-OLLAMA.md`. Project-only `*.local.md` siblings are preserved by the sync.
 
 ## Canonical repo location (examples only)
 
@@ -52,11 +48,25 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 - `.cursor/skills/phpunit-unit-runbook.md`
 - `.cursor/skills/magento-integration-tests-runbook.md`
 - `.cursor/skills/magento-known-issues.md`
+
+## Quick links to subagents (`.cursor/agents/`, v3+)
+
+- `.cursor/agents/verifier.md` (`/verifier`) — validates URL fixes and unit-test claims.
+- `.cursor/agents/magento-debugger.md` (`/magento-debugger`) — triages PHP/Magento exceptions.
+- `.cursor/agents/e2e-smoke.md` (`/e2e-smoke`) — bounded agentic E2E, signal-only.
+- `.cursor/agents/phpunit-runner.md` (`/phpunit-runner`) — runs unit tests for changed modules.
+- `.cursor/agents/template-refactor-verifier.md` (`/template-refactor-verifier`) — post-template-refactor sanity.
 <!-- END managed-by-cursor-rules -->
 
 ## Project notes (unmanaged)
 
 Anything below this heading is **project-owned** and will not be overwritten by the sync tool.
+
+- **Project summary (project-owned; restored 2026-05-12 after `@rftsu/cursor-rules` 3.1.1 sync removed it from the managed block)**:
+  - This is a **custom TypeScript project** (not Magento, not PHP).
+  - Stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.
+  - Canonical big-picture plan: `docs/architechture-Rev02.md`
+  - Testing strategy: `docs/TESTING.md` (single source of truth) + `docs/ROLLOUT.md` (rollout plan) + `docs/agentic-jobs.md` (L6 agentic-browser job catalog).
 
 - **ACCESSIBILITY-FIRST (MANDATORY)**:
   - Before implementing or modifying ANY UI, read: `docs/DEVELOPMENT-ACCESSIBILITY.md` and follow it as a hard constraint.
