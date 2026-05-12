@@ -107,6 +107,18 @@ docker run --rm --network host \
   bash -lc "npm ci && npx playwright test"
 ```
 
+#### Known upstream a11y debt (Tamagui Accordion)
+
+`smoke/dashboard.spec.ts` skips the axe rule `aria-valid-attr-value` because `@tamagui/accordion@2.0.0-rc.17` ships an id-wiring bug: every `Accordion.Trigger` renders `aria-controls="<contentId>"` but the corresponding `Accordion.Content` DOM node never receives that id (the trigger and content sides each call `React.useId()` independently — see `node_modules/@tamagui/accordion/src/Accordion.tsx:407`). The interaction works for keyboard and screen readers (`aria-expanded`, `data-state` are correctly wired), but axe still flags the trigger as critical.
+
+When this rule is retired here:
+
+1. Confirm the bug is fixed in a newer `@tamagui/accordion` release (release notes or a manual repro).
+2. Remove the `skipFailures: ["aria-valid-attr-value"]` argument from `apps/web/e2e/smoke/dashboard.spec.ts`.
+3. If the violation reappears on a non-Tamagui-Accordion element (i.e. our own code introduces a malformed ARIA value), fix it there — do **not** re-introduce the skip.
+
+If the bug persists past, say, two Tamagui releases, file an upstream issue with the reproducer text already in the dashboard spec's leading comment.
+
 ### L6 - Agentic browser E2E
 
 Driven by the Cursor browser MCP, orchestrated through `@brewery/test-mcp`. Three named jobs:

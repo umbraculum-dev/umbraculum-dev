@@ -39,6 +39,7 @@ export function LanguageSwitcher() {
         lazyMount
       >
         <Select.Trigger
+          aria-label={t("language")}
           iconAfter={null}
           size="$2"
           width="auto"
