@@ -24,6 +24,25 @@ Plus the read-only convenience endpoint:
 
 - `GET /lastRunArtifacts?tool=<tool>` -> `{ runDir, verdict, logLines, files }` for the most recent run.
 
+### Response shape
+
+POST responses from any subprocess/fetch-based tool are enriched server-side with the run-dir summary, so a caller does not need a second round trip to know whether the run passed semantically:
+
+```json
+{
+  "ok": true,
+  "runDir": "/repo/var/test-runs/<ts>-smoke",
+  "exitCode": 0,
+  "stdoutTail": "...",
+  "stderrTail": "...",
+  "verdict": "pass",
+  "logLines": 2,
+  "files": ["verdict.txt", "log.jsonl", "stdout.log", "stderr.log", "summary.json"]
+}
+```
+
+`loginAs` does not produce a run-dir, so its response is unchanged (`{ ok, token, cookie, activeWorkspaceId }`). The CLI mode (`--cli <tool>`) emits the same enriched JSON to stdout.
+
 ## HTTP usage
 
 ```bash

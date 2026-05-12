@@ -18,6 +18,40 @@ import http from "node:http";
 import { TOOLS, type ToolName } from "./tools.js";
 import { latestRunDirFor, summarizeRunDir } from "./runDir.js";
 
+/**
+ * Tool results have one of two shapes:
+ *  - Subprocess/fetch tools (smokeStack, runApiTests, ...) -> ToolResult,
+ *    which carries `runDir` and per-stream tails. The HTTP/CLI response
+ *    is enriched from that run-dir so a caller gets verdict/logLines/files
+ *    without an extra round trip (mirrors what GET /lastRunArtifacts
+ *    returns).
+ *  - Lightweight tools (loginAs) -> their own JSON object with no
+ *    `runDir`. These pass through unchanged.
+ *
+ * Without this enrichment a caller would see `{ ok, runDir, exitCode,
+ * stdoutTail, stderrTail }` and still have to `cat <runDir>/verdict.txt`
+ * to know whether the run passed semantically.
+ */
+function enrichResultWithRunDir(result: unknown): unknown {
+  if (result === null || typeof result !== "object") return result;
+  const obj = result as Record<string, unknown>;
+  const runDir = obj.runDir;
+  if (typeof runDir !== "string" || runDir.length === 0) return result;
+  try {
+    const summary = summarizeRunDir(runDir);
+    // Server-side summary fields go LAST so a tool can never accidentally
+    // shadow them (e.g. a tool result already containing a stringly-
+    // shaped "files" field would otherwise be confusing). The tool's own
+    // fields stay authoritative for anything they explicitly set.
+    return { ...obj, verdict: summary.verdict, logLines: summary.logLines, files: summary.files };
+  } catch {
+    // Summarization is best-effort; never break the response over a
+    // missing/unreadable artifact (e.g. run-dir got rm-rf'd between
+    // tool return and HTTP response).
+    return result;
+  }
+}
+
 const PORT = Number(process.env.MCP_PORT ?? process.env.PORT ?? "8932");
 
 interface JsonRequest {
@@ -108,7 +142,7 @@ async function startServer() {
 
     try {
       const result = await dispatch(tool, body);
-      return json(res, 200, result);
+      return json(res, 200, enrichResultWithRunDir(result));
     } catch (err) {
       return json(res, 500, { ok: false, error: String((err as Error)?.message ?? err) });
     }
@@ -134,9 +168,10 @@ async function runCli() {
   const args = jsonIdx !== -1 ? (JSON.parse(argv[jsonIdx + 1] ?? "{}") as Record<string, unknown>) : {};
   try {
     const result = await dispatch(tool, args);
+    const enriched = enrichResultWithRunDir(result);
     // eslint-disable-next-line no-console
-    console.log(JSON.stringify(result, null, 2));
-    const ok = (result as { ok?: boolean } | undefined)?.ok !== false;
+    console.log(JSON.stringify(enriched, null, 2));
+    const ok = (enriched as { ok?: boolean } | undefined)?.ok !== false;
     process.exit(ok ? 0 : 1);
   } catch (err) {
     // eslint-disable-next-line no-console
