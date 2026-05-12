@@ -12,7 +12,7 @@ Small HTTP server exposing brewery-app testing tools as JSON endpoints. Modeled 
 
 | Tool | Args | What it does |
 |---|---|---|
-| `smokeStack` | `{ baseUrl? }` | Runs `scripts/smoke.sh` |
+| `smokeStack` | `{ baseUrl? }` | In-process port of `scripts/smoke.sh` (5 checks via `fetch()`). No `curl`/`jq` dependency, so it runs in any Node >=18 container (including `node:20-slim` and the api container). Writes the same `verdict.txt`/`log.jsonl` plus a per-check `summary.json`. The shell `scripts/smoke.sh` is retained for CI/ops; both implementations must stay semantically equivalent — if you add/remove a check in one, mirror it in the other. |
 | `seedE2eFixture` | `{ clean? }` | Runs `docker compose exec api npm run seed:e2e [-- --clean]` |
 | `runApiTests` | `{ filter? }` | Runs `docker compose exec api npm test` (vitest filter via `-t`) |
 | `runContractsCheck` | `{ update? }` | Runs `npm run contracts:check` (or `contracts:update`) in the api container |
@@ -85,10 +85,11 @@ Every subprocess-spawning tool writes to:
 
 ```
 var/test-runs/<ISO-timestamp>-<tool>/
-  verdict.txt    # "pass" or "fail: exit <code>"
-  log.jsonl      # structured per-step log
+  verdict.txt     # "pass" or "fail: <reason>"
+  log.jsonl       # structured per-step log
   stdout.log
   stderr.log
+  summary.json    # smokeStack only: per-check status and details
 ```
 
 This matches the run-dir layout documented in [.cursor/skills/agentic-browser-web-app.md](../../.cursor/skills/agentic-browser-web-app.md) (upstream skill), so artifacts from MCP-driven runs and agent-driven browser runs land in the same place. The brewery-specific job catalog lives in [docs/agentic-jobs.md](../../docs/agentic-jobs.md).
