@@ -15,6 +15,7 @@
     "db:backfill:recipe-styles": "tsx src/cli/backfillRecipeStyleKeys.ts",
     "db:backfill:recipe-beerjson": "tsx src/cli/backfillRecipeBeerJson.ts",
     "db:backfill:integration-tokens": "tsx src/cli/backfillIntegrationTokenHashes.ts",
+    "seed:e2e": "tsx src/cli/seedE2eFixture.ts",
     "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma migrate reset --force --skip-seed && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma db seed",
     "test": "npm run test:db:prepare && vitest run",
     "seed:import": "tsx src/cli/seed-import.ts",
