@@ -181,12 +181,10 @@ function Input(props) {
 }
 
 // src/primitives/ModeFieldset.tsx
-import { Platform as Platform6 } from "react-native";
 import { Label, RadioGroup, XStack, YStack as YStack3 } from "tamagui";
 import { jsx as jsx6, jsxs as jsxs3 } from "react/jsx-runtime";
 function ModeFieldset(props) {
   const { legend, name, value, onChange, options } = props;
-  const isWeb = Platform6.OS === "web";
   return /* @__PURE__ */ jsxs3(
     Card,
     {
@@ -201,14 +199,12 @@ function ModeFieldset(props) {
         /* @__PURE__ */ jsx6(
           RadioGroup,
           {
-            native: isWeb,
             name,
             value,
             onValueChange: (v) => onChange(v),
             "aria-label": legend,
             children: /* @__PURE__ */ jsx6(YStack3, { gap: "$2", children: options.map((o) => {
               const id = `${name}-${o.value}`;
-              const checked = value === o.value;
               return /* @__PURE__ */ jsxs3(XStack, { gap: "$2", alignItems: "center", children: [
                 /* @__PURE__ */ jsx6(
                   RadioGroup.Item,
@@ -217,7 +213,16 @@ function ModeFieldset(props) {
                     value: o.value,
                     size: "$3",
                     borderColor: "$borderColor",
-                    children: !isWeb ? /* @__PURE__ */ jsx6(RadioGroup.Indicator, { unstyled: true, width: 10, height: 10, borderRadius: 9999, backgroundColor: "$color8" }) : null
+                    children: /* @__PURE__ */ jsx6(
+                      RadioGroup.Indicator,
+                      {
+                        unstyled: true,
+                        width: 10,
+                        height: 10,
+                        borderRadius: 9999,
+                        backgroundColor: "$color8"
+                      }
+                    )
                   }
                 ),
                 /* @__PURE__ */ jsx6(Label, { htmlFor: id, children: /* @__PURE__ */ jsx6(Text, { fontSize: 12, children: o.label }) })
@@ -231,14 +236,14 @@ function ModeFieldset(props) {
 }
 
 // src/primitives/ReadOnlyField.tsx
-import { Platform as Platform7 } from "react-native";
+import { Platform as Platform6 } from "react-native";
 import { XStack as XStack2, YStack as YStack4 } from "tamagui";
 import { jsx as jsx7, jsxs as jsxs4 } from "react/jsx-runtime";
 function ReadOnlyFieldLabel({ children }) {
   return /* @__PURE__ */ jsx7(Text, { fontSize: 11, opacity: 0.8, children });
 }
 function ReadOnlyFieldValue({ children }) {
-  const isWeb = Platform7.OS === "web";
+  const isWeb = Platform6.OS === "web";
   return /* @__PURE__ */ jsx7(
     YStack4,
     {
@@ -265,11 +270,11 @@ function ReadOnlyFieldRow({ children }) {
 }
 
 // src/primitives/Screen.tsx
-import { Platform as Platform8, StatusBar } from "react-native";
+import { Platform as Platform7, StatusBar } from "react-native";
 import { YStack as YStack5 } from "tamagui";
 import { jsx as jsx8 } from "react/jsx-runtime";
 function Screen({ flex, style, ...props }) {
-  const topInset = Platform8.OS === "web" ? 0 : Math.floor((StatusBar.currentHeight ?? 0) / 2);
+  const topInset = Platform7.OS === "web" ? 0 : Math.floor((StatusBar.currentHeight ?? 0) / 2);
   return /* @__PURE__ */ jsx8(
     YStack5,
     {
@@ -291,7 +296,7 @@ function Screen({ flex, style, ...props }) {
 
 // src/primitives/SelectField.tsx
 import { useMemo, useState } from "react";
-import { Modal, Platform as Platform9, Pressable, ScrollView, View } from "react-native";
+import { Modal, Platform as Platform8, Pressable, ScrollView, View } from "react-native";
 import { jsx as jsx9, jsxs as jsxs5 } from "react/jsx-runtime";
 function SelectField({
   value,
@@ -307,7 +312,7 @@ function SelectField({
   closeLabel
 }) {
   const findLabel = (v) => options.find((opt) => opt.value === v)?.label ?? v;
-  const isWeb = Platform9.OS === "web";
+  const isWeb = Platform8.OS === "web";
   const [open, setOpen] = useState(false);
   const selectedLabel = useMemo(() => findLabel(value), [value, options]);
   if (isWeb) {
