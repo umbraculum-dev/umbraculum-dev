@@ -175,6 +175,34 @@ Anything below this heading is **project-owned** and will not be overwritten by 
     - `docker compose up -d --build api`
   - **Do NOT** use `docker compose down -v` unless you intentionally want to wipe local DB volumes.
 
+- **Reference-data recovery after a DB wipe / `migrate reset` (MANDATORY)**:
+  - The dev DB depends on **two independent seed paths** for reference data. A `prisma migrate reset` (or any equivalent wipe-and-rebuild) re-creates the tables but **does not** re-populate them. After any such event, both commands must be run, in order:
+    1. `docker compose exec -T api npm run db:seed`
+       - Populates `water_profiles` (`scope='system'`, ~70 rows incl. famous brewing waters like Dusseldorf, Pilsen, Burton), `beer_styles` (BJCP-2021), sample `ads`, the dev user (`00000000-…-0001`), dev workspace (`00000000-…-00a1`), and optionally a "Seeded Owner Brewery" workspace via `SEEDED_OWNER_EMAIL` + `SEEDED_OWNER_PASSWORD` env vars.
+       - Source: `services/api/prisma/seed.ts`. Idempotent (all upserts).
+    2. `docker compose exec -T api npm run seed:import -- --source beerproto`
+       - Populates `fermentables` (~870), `hops` (~315), `yeasts` (~445) by fetching the BeerProto CSV catalogs over the network. Records provenance into `ingredient_sources` / `ingredient_staging_rows` / `ingredient_source_maps` and writes a row to `ingredient_import_runs` per CSV (look for `status='ok'`).
+       - Source: `services/api/src/cli/seed-import.ts` → `services/api/src/seed/sources/beerproto/beerproto.ts`. Re-runnable; uses ETags unless `--force` is passed.
+  - Quick verification query (paste into `docker compose exec -T postgres psql -U postgres -d brewapp`):
+    ```sql
+    SELECT 'water_profiles_system' AS t, COUNT(*) FROM water_profiles WHERE scope='system'
+    UNION ALL SELECT 'beer_styles', COUNT(*) FROM beer_styles
+    UNION ALL SELECT 'fermentables', COUNT(*) FROM fermentables
+    UNION ALL SELECT 'hops', COUNT(*) FROM hops
+    UNION ALL SELECT 'yeasts', COUNT(*) FROM yeasts
+    ORDER BY 1;
+    ```
+    Expected: all counts > 0 (current floor: 70 / 111 / 871 / 315 / 446).
+  - **Tables NOT covered by either seed**:
+    - `equipment_profiles` — user-owned; recreate via the Equipment UI. If you lost a row that is still referenced by a recipe's `recipe_ext_json.equipmentSource.equipmentProfileId`, you can restore it from the recipe's embedded equipment snapshot (`recipe_ext_json.equipment.{mash,kettle,misc}`) with the one-off CLI:
+      ```bash
+      docker compose exec -T api npm run db:restore:equipment-profile -- \
+        --recipe-id <recipe-uuid> [--dry-run]
+      ```
+      Source: `services/api/src/cli/restoreEquipmentProfileFromRecipe.ts`.
+    - Workspace/user data (`recipes`, `recipe_water_settings`, `brew_sessions`, `inventory_items`, `workspace_members`, …) — not seedable; restore from a Postgres dump if needed.
+  - **Historical context**: on 2026-03-06 a wipe-and-restore-style event re-applied all migrations in one batch (`_prisma_migrations.finished_at` all within ~3 s) but only partially re-seeded the reference tables (`beer_styles` and `ads` got fresh `created_at`; `water_profiles`, `equipment_profiles`, `fermentables`, `hops`, `yeasts`, `ingredient_sources` were left empty). The downstream effect was "Insufficient data" on every recipe (no water profiles to pick → no `recipe_water_settings` row → null cascade in `gravityAnalysis.ts`). Always run both seed commands above to avoid recreating that gap.
+
 - **Database naming convention (Postgres + Prisma)**:
   - **DB identifiers**: use **lowercase `snake_case`** for **tables and columns** (no quoting needed in pgAdmin / raw SQL).
     - Example: `recipes`, `recipe_water_settings`, `style_key`, `created_at`
