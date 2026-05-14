@@ -23,3 +23,10 @@ export function roundTo(value: number, decimals: number): number;
 export function platoToSg(plato: number): number | null;
 export function sgToPlato(sg: number): number | null;
 
+/**
+ * Default target mash pH at room temperature (~20°C), used when neither the
+ * recipe nor the request body specifies one. Matches the Prisma column
+ * default on `recipe_water_settings.mash_target_ph`.
+ */
+export const DEFAULT_MASH_TARGET_PH: number;
+

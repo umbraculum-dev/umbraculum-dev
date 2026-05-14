@@ -38,6 +38,7 @@ import {
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@brewery/contracts";
+import { DEFAULT_MASH_TARGET_PH } from "@brewery/core";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
@@ -142,7 +143,7 @@ export default function MashWaterPage() {
   const [mashStartingAlk, setMashStartingAlk] = useState(0);
   const [mashStartingAlkTouched, setMashStartingAlkTouched] = useState(false);
   const [mashStartingPh, setMashStartingPh] = useState(7.0);
-  const [mashTargetPh, setMashTargetPh] = useState(5.4);
+  const [mashTargetPh, setMashTargetPh] = useState(DEFAULT_MASH_TARGET_PH);
   const [mashAcidType, setMashAcidType] = useState("lactic");
   const [mashStrengthKind, setMashStrengthKind] = useState<"percent" | "normality" | "molarity" | "solid">(
     "percent",
@@ -264,7 +265,7 @@ export default function MashWaterPage() {
         setMashStartingAlkTouched(false);
       }
       setMashStartingPh(s.mashStartingPh ?? 7.0);
-      setMashTargetPh(s.mashTargetPh ?? 5.4);
+      setMashTargetPh(s.mashTargetPh ?? DEFAULT_MASH_TARGET_PH);
       setMashAcidType(s.mashAcidType ?? "lactic");
 
       const savedKind = ((s.mashStrengthKind as any) ?? "percent") as

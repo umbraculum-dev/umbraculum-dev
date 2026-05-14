@@ -23,6 +23,7 @@ import {
 } from "../domain/waterCalc/overall.js";
 import { buildSaltAdditionsDerivation } from "../domain/waterCalc/derivation/saltAdditionsDerivation.js";
 import { buildAcidificationDerivation } from "../domain/waterCalc/derivation/acidificationDerivation.js";
+import { DEFAULT_MASH_TARGET_PH } from "@brewery/core";
 
 function colorLovibondToEbc(colorLovibond: number | null): number | null {
   if (colorLovibond === null) return null;
@@ -69,7 +70,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const startingAlkalinityPpmCaCO3 =
       typeof body.startingAlkalinityPpmCaCO3 === "number" ? body.startingAlkalinityPpmCaCO3 : 0;
     const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? body.targetPh : 5.6;
+    const targetPh = typeof body.targetPh === "number" ? body.targetPh : DEFAULT_MASH_TARGET_PH;
     const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
     const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
     const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
@@ -242,7 +243,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         ? (body.mashTargetPh as number)
         : typeof body.targetPh === "number"
           ? (body.targetPh as number)
-          : 5.6;
+          : DEFAULT_MASH_TARGET_PH;
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
         ? (body.mashWaterVolumeLiters as number)
@@ -731,7 +732,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         ? (body.mashTargetPh as number)
         : typeof body.targetPh === "number"
           ? (body.targetPh as number)
-          : 5.6;
+          : DEFAULT_MASH_TARGET_PH;
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
         ? (body.mashWaterVolumeLiters as number)
@@ -982,7 +983,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
           ? (body.spargeStartingAlkalinityPpmCaCO3 as number)
           : 0;
     const startingPh = typeof body.startingPh === "number" ? (body.startingPh as number) : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : 5.6;
+    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : DEFAULT_MASH_TARGET_PH;
     const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters as number) : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
@@ -1146,7 +1147,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
           ? (body.boilStartingAlkalinityPpmCaCO3 as number)
           : 0;
     const startingPh = typeof body.startingPh === "number" ? (body.startingPh as number) : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : 5.6;
+    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : DEFAULT_MASH_TARGET_PH;
     const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters as number) : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
