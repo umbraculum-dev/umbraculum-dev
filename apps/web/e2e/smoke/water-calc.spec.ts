@@ -35,4 +35,51 @@ test.describe("water calc smoke (authenticated)", () => {
       expect(body.summary.version).toBe(1);
     }
   });
+
+  // Regression: ModeFieldset (Tamagui RadioGroup) used to set native={true} on
+  // web, which moved the DOM `checked` attribute on click but never propagated
+  // through onValueChange. As a result, switching the acidification mode to
+  // "Manual" did nothing in React: the submit button kept saying
+  // "Calculate & save snapshot" and the "Acid added" input never appeared.
+  // See packages/ui/src/primitives/ModeFieldset.tsx.
+  test("mash acidification mode radio actually flips React state on web (ModeFieldset regression)", async ({
+    authenticatedPage,
+  }) => {
+    const fixture = getFixtureIdentities();
+    await authenticatedPage.goto(`/en/recipes/${fixture.recipeId}/water/mash`);
+
+    // Expand the "Mash water acidification" disclosure (collapsed by default).
+    const acidificationDisclosure = authenticatedPage.getByRole("button", {
+      name: /mash water acidification/i,
+    });
+    await expect(acidificationDisclosure).toBeVisible({ timeout: 15_000 });
+    await acidificationDisclosure.click();
+
+    // Baseline: mode should be targetPh. The submit button text is the
+    // canonical state-derived indicator (see mash/page.tsx ~L1690).
+    const submitButton = authenticatedPage.getByRole("button", {
+      name: /calculate & save snapshot/i,
+    });
+    await expect(submitButton).toBeVisible({ timeout: 10_000 });
+
+    // The "Acid added" input only renders when state === "manual". Assert it
+    // is absent before the click.
+    const acidAddedInput = authenticatedPage.locator("#mash-manual-acid-added");
+    await expect(acidAddedInput).toHaveCount(0);
+
+    // Switch to manual mode.
+    const manualRadio = authenticatedPage.getByRole("radio", {
+      name: /manual acid amount/i,
+    });
+    await expect(manualRadio).toBeVisible({ timeout: 10_000 });
+    await manualRadio.click();
+
+    // After the click, React state must have flipped. Both observable effects
+    // (button text + Acid added input visibility) must follow.
+    const estimateButton = authenticatedPage.getByRole("button", {
+      name: /estimate & save snapshot/i,
+    });
+    await expect(estimateButton).toBeVisible({ timeout: 5_000 });
+    await expect(acidAddedInput).toBeVisible({ timeout: 5_000 });
+  });
 });
