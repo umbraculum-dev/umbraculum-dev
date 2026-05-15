@@ -84,7 +84,7 @@ Use these guidelines to decide whether new content belongs in `internal/` or `do
 ## Current contents
 
 - [`MOAT-AND-COMPETITIVE-STRATEGY.md`](MOAT-AND-COMPETITIVE-STRATEGY.md) — per-workspace operational memory as the time-locked moat asset; compounding curve; anticipated competitor moves; strategic priorities that fall out.
-- [`BYOK-AND-RESOLD-CREDITS-STRATEGY.md`](BYOK-AND-RESOLD-CREDITS-STRATEGY.md) — the two-mode AI provider architecture, why BYOK ships first (technical + strategic + regulatory hedge), pricing power implications, transition path.
+- [`AI-MONETIZATION-STRATEGY.md`](AI-MONETIZATION-STRATEGY.md) — the three monetization modes (BYOK-only, BYOK + paid AI subscription, resold credits); the value-layer-subscription insight; the four-row risk-adjusted comparison; concierge onboarding (IT + EN) as differentiator; chargeback / AR / NET 30 risk analysis; transition path from v0 to optional managed-AI tier to enterprise. **Supersedes** the v1.0 "BYOK and resold-credits strategy" doc.
 
 Anticipated future additions (do not exist yet):
 
