@@ -84,10 +84,10 @@ export default function AiUsagePage() {
     try {
       const res = await apiFetch(`/api/workspaces/${workspaceId}/ai/usage`);
       if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+        const body = (res.data ?? {}) as { error?: { message?: string } };
         throw new Error(body.error?.message ?? `HTTP ${res.status}`);
       }
-      const body = (await res.json()) as UsageResponse;
+      const body = res.data as UsageResponse;
       setData(body);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -125,9 +125,8 @@ export default function AiUsagePage() {
   }
 
   return (
-    <DashboardClient>
-      <YStack gap="$4">
-        <H1 id="ai-usage-title">{tUsage("title")}</H1>
+    <YStack gap="$4">
+      <H1 id="ai-usage-title">{tUsage("title")}</H1>
         <SizableText theme="alt2">{tUsage("description")}</SizableText>
 
         {error ? (
@@ -232,8 +231,8 @@ export default function AiUsagePage() {
             </YStack>
           </>
         ) : null}
-      </YStack>
-    </DashboardClient>
+      <DashboardClient />
+    </YStack>
   );
 }
 

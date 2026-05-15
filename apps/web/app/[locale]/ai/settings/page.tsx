@@ -129,7 +129,7 @@ export default function AiSettingsPage() {
   }
 
   return (
-    <DashboardClient>
+    <>
       <main role="main" aria-labelledby="ai-settings-title">
         <YStack gap="$4">
           <YStack gap="$2">
@@ -351,6 +351,7 @@ export default function AiSettingsPage() {
           ) : null}
         </YStack>
       </main>
-    </DashboardClient>
+      <DashboardClient />
+    </>
   );
 }

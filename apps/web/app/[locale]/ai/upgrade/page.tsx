@@ -68,7 +68,7 @@ export default function AiUpgradePage() {
   }
 
   return (
-    <DashboardClient>
+    <>
       <main role="main" aria-labelledby="ai-upgrade-title">
         <YStack gap="$4">
           <H1 id="ai-upgrade-title">{t("title")}</H1>
@@ -142,6 +142,7 @@ export default function AiUpgradePage() {
           ) : null}
         </YStack>
       </main>
-    </DashboardClient>
+      <DashboardClient />
+    </>
   );
 }
