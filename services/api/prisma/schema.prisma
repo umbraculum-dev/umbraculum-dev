@@ -144,6 +144,7 @@ model User {
   billingPurchaseIntents  BillingPurchaseIntent[]
   billingWorkspaceBinding BillingUserWorkspaceBinding?
   billingEvents           BillingEvent[]
+  aiUsageLedger           AiUsageLedger[]
 
   @@index([email])
   @@map("users")
@@ -177,6 +178,9 @@ model Workspace {
   billingWorkspaceBindings BillingUserWorkspaceBinding[]
   billingEvents BillingEvent[]
   integrations Integration[]
+  aiSettings    WorkspaceAiSettings?
+  aiMemory      WorkspaceAiMemory?
+  aiUsageLedger AiUsageLedger[]
 
   @@map("workspaces")
 }
@@ -1150,4 +1154,104 @@ model BillingEvent {
   @@index([userId])
   @@index([workspaceId])
   @@map("billing_events")
+}
+
+enum AiProvider {
+  anthropic
+
+  @@map("ai_provider")
+}
+
+/**
+ * Per-workspace AI consultant configuration. One row per workspace.
+ *
+ * - `encryptedKey` stores a BYOK provider API key encrypted at rest via
+ *   AES-256-GCM (keyVault.ts). Never returned to clients.
+ * - `roleLimits` is `{ [WorkspaceRole]: number }` — per-role monthly token
+ *   cap (sum of tokensIn + tokensOut over trailing 30 days). 0 / missing
+ *   key = no role cap.
+ * - `perUserDailyCap` is the per-user daily token ceiling (tokensIn +
+ *   tokensOut today). Default 200_000 tokens/day ≈ $0.60/user/day at
+ *   current Claude Sonnet pricing.
+ * - Cancellation discipline (internal/MOAT-AND-COMPETITIVE-STRATEGY.md):
+ *   when a workspace downgrades back to `free`, this row is preserved so
+ *   the memory asset survives churn and can be re-activated on re-upgrade.
+ */
+model WorkspaceAiSettings {
+  workspaceId          String      @id @map("workspace_id")
+  provider             AiProvider  @default(anthropic)
+  encryptedKey         String?     @map("encrypted_key")
+  enabled              Boolean     @default(false)
+  roleLimits           Json        @default("{}") @map("role_limits")
+  perUserDailyCap      Int         @default(200000) @map("per_user_daily_cap")
+  dataEgressAccepted   Boolean     @default(false) @map("data_egress_accepted")
+  dataEgressAcceptedAt DateTime?   @map("data_egress_accepted_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_ai_settings")
+}
+
+/**
+ * Per-workspace operational memory — the moat.
+ *
+ * `memoryBlob` is the serialized {@link WorkspaceAiMemoryBlob} from
+ * `services/api/src/services/ai/promptComposer.ts` (facts + recurring
+ * issues + lastUpdated + schemaVersion). Defaults to an empty object so
+ * the very first chat turn does not need an explicit seed row.
+ *
+ * `version` is a monotonic row-level counter incremented by every
+ * successful writer run. It is *not* the JSON's internal `schemaVersion`.
+ * `lastWriterRunAt` records the most recent successful writer run; if a
+ * writer fails the row is left unchanged so the next turn retries.
+ *
+ * The memory blob is bounded to roughly ~2k tokens (~10k characters);
+ * the writer in `memoryWriter.ts` enforces the bound by pruning oldest
+ * entries first. See plan §6.5 + Sprint #2 acceptance criteria.
+ */
+model WorkspaceAiMemory {
+  workspaceId     String    @id @map("workspace_id")
+  memoryBlob      Json      @default("{}") @map("memory_blob")
+  version         Int       @default(0)
+  lastWriterRunAt DateTime? @map("last_writer_run_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_ai_memory")
+}
+
+/**
+ * Append-only ledger of AI chat turns. Used by:
+ *   - per-role + per-user rate-limit preflight (aggregated reads)
+ *   - workspace admin usage dashboard (Sprint #2)
+ *   - future credit-resale reconciliation (deferred to v1.5)
+ *
+ * `toolCalls` is the ordered list of tool invocations during the turn; see
+ * `packages/contracts/src/ai/aiUsage.ts` `AiToolCallRecord` for the shape.
+ */
+model AiUsageLedger {
+  id                String  @id @default(uuid())
+  workspaceId       String  @map("workspace_id")
+  userId            String  @map("user_id")
+  sessionId         String? @map("session_id")
+  model             String
+  tokensIn          Int     @default(0) @map("tokens_in")
+  tokensOut         Int     @default(0) @map("tokens_out")
+  costMicroUsd      BigInt  @default(0) @map("cost_micro_usd")
+  durationMs        Int     @default(0) @map("duration_ms")
+  providerRequestId String? @map("provider_request_id")
+  toolCalls         Json    @default("[]") @map("tool_calls")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ai_usage_ledger")
 }

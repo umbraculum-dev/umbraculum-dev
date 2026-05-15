@@ -1,37 +1,159 @@
-# Brewing SaaS (WIP)
+# `<PLATFORM_NAME>` — process-manufacturing platform, brewery-configured by default
 
-This repository is the start of a bfr-style product: a **desktop-first web app** plus **native mobile apps** focused on **brew-day reliability** and **offline-first logging**.
+> [!IMPORTANT]
+> This repository is **work in progress** and **not yet a public-facing
+> release**. The path to a public flip (working assumption: H1 2027,
+> seeded into a fresh public repo once `<PLATFORM_NAME>` is chosen) is
+> documented in
+> [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
 
-## Big picture (start here)
+## What this is
 
-- Architecture and implementation plan: `docs/architechture-Rev02.md`
+`<PLATFORM_NAME>` is a **process-manufacturing platform** built around a
+small set of operational primitives — recipes as bills-of-materials,
+equipment profiles as constrained resources, production runs as
+scheduled batches, and ingredient + utility inputs as process
+specifications.
 
-## Intended stack (early plan)
+The **brewery vertical** is the first vertical configuration shipping
+on this platform. It is a fully working product on its own — brew-day
+logging, water chemistry, recipe management, brew sessions — and
+simultaneously a reference implementation for how other vertical
+configurations (distillery, kombucha, food, cosmetics, fine chemicals,
+nutraceuticals, fragrance) plug in via seed data, prompts, and
+configuration rather than by re-implementing the core. See
+[`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1 +
+§2 for the full reasoning.
 
-- **Web**: Next.js + React + TypeScript
-- **API**: Node.js + Fastify + TypeScript
-- **DB/ORM**: PostgreSQL + Prisma
-- **Routing**: Nginx
-- **Local dev**: Docker Compose (nginx + web + api + postgres)
-- **Testing**: Vitest (unit), Playwright (web e2e)
-- **Mobile (later)**: React Native + Expo + TypeScript (+ SQLite on-device)
+This framing matters because **the same primitives that power a
+brewery are the primitives any batch process manufacturer needs.** MRP
+and CRP are not future "new modules" — they are a generalization of
+work the brewery vertical already does.
 
-## Native-ready shared packages (important)
+### What ships with the brewery vertical today
 
-This monorepo is intentionally structured so web and native can share code safely via `packages/**`.
+- Brew-day reliability tooling — mash / sparge / boil step pages, water
+  chemistry (mash + sparge + boil), recipe import/export (BeerJSON
+  canonical; BeerXML import-compatible), equipment profiles.
+- Workspace + membership + tier-based billing (free / premium / pro /
+  pro+) wired through Stripe.
+- An **AI consultant** integrated as a first-class operational surface
+  (chat, settings, usage dashboard, per-workspace operational memory)
+  using **BYOK** keys + a paid orchestration / memory subscription on
+  top — see [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
+  §6.
+- Web app + native (React Native + Expo) app sharing core logic via
+  cross-platform packages.
 
-- **Buildable packages ship committed outputs**: for native-consumed packages we commit `packages/*/dist/**` so Docker (read-only mounts) and Expo/Metro can run from a fresh checkout.
-- **Container-only build workflow (no host npm)** (from repo root):
-  - Build: `./scripts/build-packages-in-docker.sh`
-  - Verify outputs are up to date: `./scripts/check-packages-dist-up-to-date.sh`
-- **Tamagui config imports**:
-  - Web: `@brewery/ui/tamagui-config-web`
-  - Native: `@brewery/ui/tamagui-config-native`
+### What is intentionally not shipped yet
 
-## Internationalization (i18n)
+- A second vertical module (WMS / CRM / MRP / CRP). The platform is
+  shaped to host them, but only the brewery vertical is live today.
+- A chosen brand name. `<PLATFORM_NAME>` is a placeholder throughout
+  the codebase and docs; it will be resolved once a name is chosen
+  (working assumption: H1 2027).
+- A public release. The repository is currently developed privately;
+  the go-public criteria and plan are in
+  [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
 
-- The web app uses **locale-prefixed routing**: `/en/...` and `/it/...` (default: `en`).
-- User-facing UI text should be sourced from `packages/i18n/src/*.json` (no new hard-coded JSX strings).
+## Who this is for
 
-This README will be expanded as implementation lands.
+- **Process manufacturers** — anyone running batch production where the
+  primitives above are recognizable. Today the user-facing brewery
+  vertical is the entry point; the underlying platform aims to serve a
+  much wider audience as additional vertical configurations land.
+- **Operators / IT teams** — single-tenant self-host is a first-class
+  deployment target. Hosted SaaS will be offered alongside, not instead.
+- **Developers and integrators** — every public-facing surface is
+  contract-typed (`packages/contracts`), every module is registered
+  through the same horizontal platform layer, and the AI consultant
+  exposes a stable tool-protocol per
+  [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §6.
 
+## Repository layout
+
+```text
+apps/
+  web/         Next.js + React + Tamagui — desktop-first web UI
+  native/     React Native + Expo + Tamagui — mobile UI
+services/
+  api/         Fastify + Prisma — primary API service
+packages/
+  contracts/   Typed shared contracts (DTOs, AI tool types, etc.)
+  ui/          Cross-platform Tamagui primitives + shared components
+                 (e.g. AiChatPanel — used by both web and native)
+  i18n/        en + it translations
+  i18n-react/  React bindings for translations
+  api-client/  Typed API client (bearer-token aware; used by native)
+  navigation/  Cross-platform route IDs
+docs/          Public-facing docs (this is what ships to consumers)
+internal/      Internal-only strategy + business docs (excluded from
+                 the public mirror when the repo flips public)
+scripts/       One-shot maintenance + container build scripts
+.cursor/       AI agent rules + skills for in-repo coding workflows
+```
+
+## Stack
+
+- **Web:** Next.js + React + TypeScript + Tamagui.
+- **Native:** React Native + Expo + TypeScript + Tamagui.
+- **API:** Node.js + Fastify + TypeScript + Prisma.
+- **Database:** PostgreSQL (primary + replica) fronted by pgpool.
+- **Reverse proxy:** nginx.
+- **Local dev:** Docker Compose (one stack for everything, including
+  the read replica).
+- **Testing:** Vitest (unit / integration / contract) + Playwright
+  (web e2e, separate suite stack).
+- **AI:** Anthropic Claude via the official SDK, BYOK keys stored
+  AES-256-GCM-encrypted per workspace, orchestrator + tool registry +
+  per-workspace operational memory.
+
+## Docs
+
+The single source of truth lives under [`docs/`](docs/). High-signal
+entry points:
+
+- [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) —
+  vision, audit, target architecture, AI consultant blueprint,
+  trajectory.
+- [`docs/LICENSING.md`](docs/LICENSING.md) — licensing rationale (why
+  AGPLv3 for the core, why MIT for SDKs).
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — 12–30 month trajectory.
+- [`docs/TESTING.md`](docs/TESTING.md) — test layer map (unit /
+  integration / contract / E2E) and per-language conventions.
+- [`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) —
+  native app build + CI strategy.
+
+## License
+
+This project is licensed under the **GNU Affero General Public License
+v3.0 or later** (AGPLv3), with selected SDK / client packages released
+separately under the **MIT License** (look for `"license": "MIT"` in
+the relevant package's `package.json`). See [`LICENSE`](LICENSE) for
+the full AGPLv3 text and [`docs/LICENSING.md`](docs/LICENSING.md) for
+the rationale.
+
+Copyright (C) 2026 `<PLATFORM_NAME>` contributors.
+
+## Contributing
+
+We welcome contributions — bug fixes, features, documentation,
+translations, and security reports.
+
+- Start with [`CONTRIBUTING.md`](CONTRIBUTING.md) — DCO sign-off is
+  required on every commit.
+- The [`Code of Conduct`](CODE_OF_CONDUCT.md) is in force in all
+  project spaces.
+- For security issues, please follow [`SECURITY.md`](SECURITY.md)
+  rather than opening a public issue.
+
+## Status snapshot
+
+| Area                              | Status        |
+|-----------------------------------|---------------|
+| Brewery vertical — web            | Shipping (WIP)|
+| Brewery vertical — native (Expo)  | Shipping (WIP)|
+| AI consultant — orchestrator + tools + memory + admin dashboard | Shipping (Sprint #2 complete) |
+| Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
+| Brand name (`<PLATFORM_NAME>`)    | Not chosen (working assumption: H1 2027) |
+| Public release                    | Not flipped (working assumption: H1 2027 — see `docs/PLATFORM-ARCHITECTURE.md` §10.1) |

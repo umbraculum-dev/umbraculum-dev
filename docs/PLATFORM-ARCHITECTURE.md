@@ -699,3 +699,29 @@ Because `<PLATFORM_NAME>` is open source and intended to be public-facing, this 
 - **Brand and trademark separate from license.** As detailed in [`docs/LICENSING.md`](LICENSING.md) §8: the `<PLATFORM_NAME>` brand is not transferred by the source license. Forks, mirrors, and modified versions must use a different name. A formal trademark policy will be published before the first stable release.
 - **Foundation question is deferred, not denied.** Transferring the trademark and governance to a foundation (e.g. Linux Foundation, Software Freedom Conservancy, a dedicated `<PLATFORM_NAME>` Foundation) is a real option, with real benefits for community trust and project longevity. It is not the right move at the current stage (pre-revenue, pre-community), but the architectural decisions on this page — AGPLv3, public SDK, DCO sign-off rather than CLA, governance principles in §2.2 — are deliberately compatible with a future foundation transfer if the project reaches that scale.
 - **Audience-tier convention for documentation.** Each Markdown document in the repository carries an explicit `**Tier:**` marker on its first content line. Recognized values: `Public` (default for everything in [`docs/`](.) and the repo root — surfaceable on the public flip), and reserved values `Partner-restricted` and `Customer-restricted` for future authenticated audiences. Non-public business documentation (strategy notes, competitive analysis, pricing margins) is maintained separately and is not part of the public-mirror flip when it happens; documents that are not Tier: Public are intentionally not indexed from any public-tier doc to avoid one-way information leaks on the flip. Authors of new docs in [`docs/`](.) should add the marker and stick to the Tier: Public audience expectations.
+
+#### 10.1.1 Go-public path (decision)
+
+This subsection records the operational decision for *when and how* this repository becomes public.
+
+- **Current state.** The repository is **developed privately**. The Phase 3 launch-readiness artifacts ([`LICENSE`](../LICENSE), [`CONTRIBUTING.md`](../CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md), [`SECURITY.md`](../SECURITY.md), and the public-facing [`README.md`](../README.md)) are already in place, written as if the repository were already public, so that the history is clean when the flip happens.
+- **Decision.** Keep the repository private until `<PLATFORM_NAME>` is chosen — working assumption **H1 2027**. At the flip, **seed a fresh public repository from this one** rather than renaming this repository in place. The original repository remains as the private development history and is archived once the public seed catches up.
+- **Why a fresh public seed (not a rename in place).**
+  - **Avoids exposing the historical `@brewery/*` package naming, route IDs, and brewery-vertical-flavored class names on the public branch.** Those names are appropriate for the brewery vertical configuration but misleading on a public process-manufacturing platform.
+  - Gives a clean opportunity to apply the `<PLATFORM_NAME>` resolution as a single atomic change across the codebase, rather than leaving rename artifacts scattered across git history.
+  - Keeps the public commit history aligned with the public framing in [§1.1](#11-positioning--process-manufacturing-platform-brewery-configured-by-default), instead of having the public audience read backwards through brewery-only history.
+- **Conditions that would justify an earlier flip.**
+  - A community contributor or paying customer concretely needs public-source visibility to evaluate adoption — and waiting until H1 2027 would lose them.
+  - A security or governance reason requires public auditability sooner than planned.
+  - `<PLATFORM_NAME>` is chosen earlier than expected and the brand-rename work fits inside a single sprint.
+- **Conditions that would justify a later flip.**
+  - The brand is still not chosen by H1 2027 and the project is materially better served by another six months of focused, private iteration on the second vertical module.
+  - A foundation-transfer conversation (see §10.1, *Foundation question*) is in flight and the public flip is best done together with the transfer rather than separately.
+- **Pre-flip checklist** (kept here so the conditions are explicit, not folkloric):
+  1. `<PLATFORM_NAME>` resolved everywhere — repo metadata, docs, package names, route prefixes, AI prompts, billing UI copy.
+  2. `internal/**` audited and confirmed excluded from the public seed; cross-links from `docs/**` to `internal/**` removed.
+  3. Contact email placeholders in [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) and [`SECURITY.md`](../SECURITY.md) replaced with monitored, real addresses.
+  4. Copyright header in [`LICENSE`](../LICENSE) resolved to the final entity name.
+  5. Migration path documented for the few callers (if any) that depend on the `@brewery/*` package names.
+  6. A short public-launch blog post / `docs/`-hosted announcement explaining the project, the licensing posture, and how to contribute.
+- **Non-goals at the flip.** A coordinated marketing launch, a paid hosted service GA, or a v1.0 release are *not* required to flip the repo public. The flip is about source visibility and a contribution surface; commercial milestones can land on their own cadence afterwards.

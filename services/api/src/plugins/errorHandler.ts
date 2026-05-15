@@ -20,6 +20,7 @@ async function errorHandlerPluginImpl(app: FastifyInstance) {
     const isHttp = err instanceof HttpError;
     const statusCode = isHttp ? err.statusCode : 500;
     const code = isHttp ? err.code : "internal_error";
+    const details = isHttp ? err.details : undefined;
 
     req.log.error({ err: err as any }, "request failed");
 
@@ -35,6 +36,7 @@ async function errorHandlerPluginImpl(app: FastifyInstance) {
       error: {
         code,
         message,
+        ...(details ? { details } : {}),
       },
     });
   });

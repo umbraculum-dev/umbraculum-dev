@@ -12,6 +12,7 @@ import { Spinner } from "@brewery/ui";
 
 import { useAuth } from "../auth/AuthProvider";
 import { AboutScreen } from "../screens/AboutScreen";
+import { AiScreen } from "../screens/AiScreen";
 import { BrewdayStepsSettingsScreen } from "../screens/BrewdayStepsSettingsScreen";
 import { BrewSessionDetailScreen } from "../screens/BrewSessionDetailScreen";
 import { BrewSessionsListScreen } from "../screens/BrewSessionsListScreen";
@@ -53,6 +54,7 @@ type RootStackParamList = {
   WaterSparge: { recipeId: string };
   WaterBoil: { recipeId: string };
   About: undefined;
+  Ai: undefined;
   Contributing: { topic?: "i18n" | "raw-materials" } | undefined;
   Equipment: undefined;
   BrewdayStepsSettings: undefined;
@@ -163,6 +165,17 @@ export function AppNavigator() {
           options={{
             headerShown: true,
             headerTitle: "",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#141820" },
+            headerTintColor: "#e7eaf0",
+          }}
+        />
+        <RootStack.Screen
+          name="Ai"
+          component={AiScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "AI",
             headerBackTitle: "Back",
             headerStyle: { backgroundColor: "#141820" },
             headerTintColor: "#e7eaf0",

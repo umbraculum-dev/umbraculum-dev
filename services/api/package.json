@@ -26,6 +26,7 @@
     "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
     "@beerjson/beerjson": "^1.0.2",
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/core": "file:../../packages/core",

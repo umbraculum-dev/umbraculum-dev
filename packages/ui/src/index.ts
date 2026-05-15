@@ -22,3 +22,15 @@ export { SelectField, type SelectFieldProps, type SelectOption } from "./primiti
 export { Spinner, type SpinnerProps } from "./primitives/Spinner";
 export { Heading, Text, type HeadingProps, type TextProps } from "./primitives/Text";
 
+export {
+  useAiChatStream,
+  consumeSseStream,
+  AiChatPanel,
+  type AiChatMessage,
+  type AiChatTurn,
+  type AiToolCallView,
+  type AiChatPanelProps,
+  type AiChatTranslate,
+  type UseAiChatStreamInput,
+} from "./ai/index";
+

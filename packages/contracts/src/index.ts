@@ -11,4 +11,5 @@ export * from "./format/numberFormat";
 export * from "./format/formatHints";
 export * from "./analysis/gravityAnalysis";
 export * from "./analysis/parseGravityAnalysis";
+export * from "./ai/index";
 

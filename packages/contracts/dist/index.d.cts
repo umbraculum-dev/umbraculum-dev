@@ -430,4 +430,220 @@ interface GravityAnalysisResponseV1 {
 
 declare function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisResponseV1;
 
-export { type AuthMeResponse, type AuthMeResponseUser, type AuthMeResponseWorkspace, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type NumberFormatHintV1, type NumberFormatUnit, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };
+/**
+ * AI tool contract — the interface that every callable tool the AI consultant
+ * may invoke must satisfy. Matches docs/PLATFORM-ARCHITECTURE.md §6.2.
+ *
+ * Notes on stability:
+ * - This surface is intentionally minimal in v0 (Sprint #1). It will be
+ *   extracted to a standalone `@brewery/ai-tool-sdk` package in H1 2027 per
+ *   docs/ROADMAP.md; until then it lives here in `@brewery/contracts`.
+ * - Tool implementations live in `services/api/src/services/ai/tools/<module>/`
+ *   and are responsible for ACL inheritance via the same service injection
+ *   the rest of the API uses (no parallel access-control layer).
+ */
+/**
+ * Capability scope hint surfaced to admins when configuring role limits.
+ * Tools tagged `write` may mutate workspace state; v0 ships only `read` tools
+ * but the type is reserved for forward compatibility.
+ */
+type AiToolScope = "read" | "write";
+/**
+ * Per-invocation context passed to every tool's `handler`.
+ *
+ * - `workspaceId` and `userId` come from the authenticated session.
+ * - `requestId` is a per-AI-turn correlation id; tools should pass it through
+ *   to downstream services for end-to-end traceability.
+ * - `signal` is forwarded from the orchestrator so tools can honor request
+ *   cancellation (e.g. client disconnect on the SSE stream).
+ */
+interface AiToolContext {
+    workspaceId: string;
+    userId: string;
+    requestId: string;
+    signal?: AbortSignal;
+}
+/**
+ * Generic tool definition. `Input` is the JSON-serializable input shape the
+ * model produces when calling the tool; `Output` is the JSON-serializable
+ * result returned back to the model.
+ */
+interface AiTool<Input = unknown, Output = unknown> {
+    /** Unique, stable identifier (e.g. `brewery.recipeLookup`). */
+    name: string;
+    /** Short human-readable description; the model uses this to choose tools. */
+    description: string;
+    /** Capability scope; admins may restrict roles to read-only tools. */
+    scope: AiToolScope;
+    /**
+     * JSON Schema for the tool's input. Kept as `unknown` here because the
+     * actual schema shape depends on the provider (Anthropic uses JSON Schema
+     * draft-7 + minor extensions). The orchestrator is responsible for
+     * provider-specific marshalling.
+     */
+    inputSchema: unknown;
+    /** Implementation. Throws should be converted to error payloads upstream. */
+    handler: (input: Input, ctx: AiToolContext) => Promise<Output>;
+}
+/**
+ * Lightweight registry surface. v0 instantiates one registry at API boot;
+ * module-pluggable registration (per docs/PLATFORM-ARCHITECTURE.md §6.2) is
+ * Sprint #3+ work.
+ */
+interface AiToolRegistry {
+    /** Register a tool. Throws on duplicate `name`. */
+    register(tool: AiTool): void;
+    /** Resolve a tool by name. Returns `undefined` if not registered. */
+    resolve(name: string): AiTool | undefined;
+    /** List all registered tools, optionally filtered by scope. */
+    list(filter?: {
+        scope?: AiToolScope;
+    }): AiTool[];
+}
+/**
+ * Serializable tool descriptor — what the API may expose to clients (e.g. the
+ * workspace admin "which tools are available?" listing) without leaking the
+ * `handler` function reference.
+ */
+interface AiToolDefinition {
+    name: string;
+    description: string;
+    scope: AiToolScope;
+    inputSchema: unknown;
+}
+
+/**
+ * AI usage ledger entry — the audit/analytics record written by the
+ * orchestrator after every chat turn. Matches the schema in
+ * docs/PLATFORM-ARCHITECTURE.md §4.3 / §6.4.
+ *
+ * In v0 the ledger is informational-only: it drives the workspace usage
+ * dashboard (Sprint #2) and the per-user / per-role rate-limit checks; it
+ * does NOT drive any Stripe charge. The paid-AI subscription is flat-rate
+ * regardless of usage volume — see internal/AI-MONETIZATION-STRATEGY.md.
+ */
+/**
+ * One recorded entry per AI chat turn (success or partial failure). Costs
+ * are stored in micro-USD (1 USD = 1_000_000 micro-USD) to avoid floating
+ * point precision loss on small per-call amounts.
+ */
+interface AiUsageLedgerEntry {
+    id: string;
+    workspaceId: string;
+    userId: string;
+    /** Logical session/conversation identifier; nullable for one-shot calls. */
+    sessionId: string | null;
+    /** Provider-specific model identifier (e.g. `claude-sonnet-4-5`). */
+    model: string;
+    tokensIn: number;
+    tokensOut: number;
+    /** Provider-reported cost in micro-USD (1e-6 USD). 0 if not derivable. */
+    costMicroUsd: number;
+    /** Wall-clock duration of the chat turn in milliseconds. */
+    durationMs: number;
+    /** Provider request id for cross-system tracing (Anthropic `request_id`). */
+    providerRequestId: string | null;
+    /** Ordered list of tool calls the model made during this turn. */
+    toolCalls: AiToolCallRecord[];
+    /** ISO-8601 timestamp. */
+    createdAt: string;
+}
+/**
+ * One tool invocation inside a single chat turn. `argsJson` and `resultJson`
+ * are stored verbatim for debugging; orchestrators are encouraged to elide
+ * large blobs (e.g. truncate `resultJson` to 8 KB) before persistence.
+ */
+interface AiToolCallRecord {
+    name: string;
+    /** Stringified JSON input the model produced (or truncated thereof). */
+    argsJson: string;
+    /** Stringified JSON result returned to the model (or truncated thereof). */
+    resultJson: string;
+    /** Wall-clock duration of this tool call in milliseconds. */
+    durationMs: number;
+    /** `true` if the handler threw; the message is captured in `resultJson`. */
+    errored: boolean;
+}
+
+/**
+ * Workspace AI settings — wire shape for `GET/PUT /workspaces/:id/ai/settings`.
+ *
+ * Security invariant: the encrypted provider key MUST never be returned
+ * to clients. The DTO exposes only `hasKey: boolean` so the admin UI can
+ * render "Key configured: yes/no". `PUT` accepts a write-only `apiKey`
+ * field; the server encrypts and stores it without ever echoing it back.
+ */
+/**
+ * AI provider identifier. v0 ships Anthropic only; the union is reserved
+ * for future provider adapters (OpenAI / Google / local).
+ */
+type AiProvider = "anthropic";
+/**
+ * Per-role monthly token cap (sum of `tokensIn + tokensOut` over the trailing
+ * 30 days). The map is keyed by `WorkspaceRole`. A missing role key or a
+ * value of `0` means "no role-level cap".
+ *
+ * Example: `{ "brewery_admin": 0, "member": 500000, "viewer": 100000 }`.
+ */
+type AiRoleLimits = Record<string, number>;
+interface WorkspaceAiSettings {
+    workspaceId: string;
+    provider: AiProvider;
+    /** `true` when a workspace key is stored (encrypted at rest). */
+    hasKey: boolean;
+    /** Master AI feature toggle; the orchestrator gates on this. */
+    enabled: boolean;
+    /** Per-role monthly token caps. */
+    roleLimits: AiRoleLimits;
+    /** Per-user daily token cap (sum of `tokensIn + tokensOut` for today). */
+    perUserDailyCap: number;
+    /** Whether the workspace admin acknowledged the data-egress notice. */
+    dataEgressAccepted: boolean;
+    /** ISO-8601 timestamp of acceptance; `null` if never accepted. */
+    dataEgressAcceptedAt: string | null;
+    /** ISO-8601 timestamp. */
+    createdAt: string;
+    /** ISO-8601 timestamp. */
+    updatedAt: string;
+}
+/**
+ * `PUT /workspaces/:id/ai/settings` body. All fields are optional — the
+ * server applies a partial update. `apiKey` is write-only and never echoed
+ * back; pass an empty string to clear the stored key.
+ */
+interface UpdateWorkspaceAiSettingsRequest {
+    provider?: AiProvider;
+    apiKey?: string;
+    enabled?: boolean;
+    roleLimits?: AiRoleLimits;
+    perUserDailyCap?: number;
+    dataEgressAccepted?: boolean;
+}
+interface WorkspaceAiSettingsResponse {
+    ok: true;
+    settings: WorkspaceAiSettings;
+}
+/**
+ * Aggregated usage view used by the workspace admin dashboard (Sprint #2)
+ * and surfaced from `GET /workspaces/:id/ai/usage`.
+ */
+interface WorkspaceAiUsageResponse {
+    ok: true;
+    monthly: {
+        tokensIn: number;
+        tokensOut: number;
+        costMicroUsd: number;
+        callCount: number;
+    };
+    byUser: Array<{
+        userId: string;
+        tokensInToday: number;
+        tokensOutToday: number;
+        tokensInMonth: number;
+        tokensOutMonth: number;
+        costMicroUsdMonth: number;
+        callCountMonth: number;
+    }>;
+}
+
+export { type AiProvider, type AiRoleLimits, type AiTool, type AiToolCallRecord, type AiToolContext, type AiToolDefinition, type AiToolRegistry, type AiToolScope, type AiUsageLedgerEntry, type AuthMeResponse, type AuthMeResponseUser, type AuthMeResponseWorkspace, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type NumberFormatHintV1, type NumberFormatUnit, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };

@@ -123,6 +123,7 @@ export function DashboardScreen() {
         { key: "fermDataIntegration", label: t("links.fermDataIntegration"), route: { id: "fermDataIntegration", params: {} } as const },
         { key: "brewdayStepsSettings", label: t("links.brewdayStepsSettings"), route: { id: "brewdayStepsSettings", params: {} } as const },
         { key: "waterProfiles", label: t("links.waterProfiles"), route: { id: "waterProfiles", params: {} } as const },
+        { key: "ai", label: t("links.ai"), route: { id: "fermDataIntegration", params: {} } as const },
       ] satisfies readonly { key: string; label: string; route: RouteRef }[],
     [t],
   );
@@ -242,7 +243,9 @@ export function DashboardScreen() {
                         ? navigation.navigate("FermDataIntegration")
                         : l.key === "brewdayStepsSettings"
                           ? navigation.navigate("BrewdayStepsSettings")
-                          : void openWeb(l.route)
+                          : l.key === "ai"
+                            ? navigation.navigate("Ai")
+                            : void openWeb(l.route)
                   }
                   accessibilityRole="button"
                   accessibilityLabel={l.label}

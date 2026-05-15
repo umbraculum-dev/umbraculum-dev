@@ -1219,7 +1219,8 @@
       "waterProfiles": "Water profiles",
       "brewery": "Brewery",
       "equipment": "Equipment",
-      "inventory": "Inventory"
+      "inventory": "Inventory",
+      "ai": "AI consultant"
     },
     "importExport": {
       "title": "Import / Export",
@@ -1567,6 +1568,129 @@
     "rule2": "Keep meaning accurate; avoid overly literal translations if they read unnaturally.",
     "rule3": "Don’t translate technical identifiers like file paths, API paths, or code.",
     "backToLogin": "Back to sign in"
+  },
+  "ai": {
+    "title": "AI Consultant",
+    "subtitle": "Ask questions about your brewery’s recipes, water chemistry, equipment, sessions, and inventory.",
+    "composer": {
+      "placeholder": "Ask a question about your brewery…",
+      "send": "Send",
+      "sendAriaLabel": "Send message",
+      "thinking": "Thinking…",
+      "streamingAriaLabel": "Streaming assistant response"
+    },
+    "messages": {
+      "empty": "Start a conversation by asking a question below.",
+      "you": "You",
+      "assistant": "Consultant",
+      "toolCall": "Looking up: {tool}",
+      "toolError": "Tool error: {message}"
+    },
+    "errors": {
+      "subscriptionRequired": "AI consultant is available on paid tiers.",
+      "subscriptionRequiredCta": "Upgrade to unlock",
+      "notEnabled": "AI consultant is not enabled in this workspace. Ask an admin to enable it.",
+      "noKey": "No AI provider key configured. An admin must add one in the AI settings.",
+      "dataEgressNotAccepted": "An admin must accept the data-egress notice before AI calls can be made.",
+      "rateLimit": "AI usage limit reached. Try again later.",
+      "rateLimitRole": "Your role’s monthly AI usage limit has been reached.",
+      "rateLimitUserDaily": "Your daily AI usage limit has been reached.",
+      "internal": "Something went wrong. Please try again."
+    },
+    "settings": {
+      "title": "AI Settings",
+      "subtitle": "Configure the AI consultant for this workspace. Admin-only.",
+      "memberOnlyNotice": "Only workspace admins can change AI settings. You can still use the consultant once it has been enabled.",
+      "enableLabel": "Enable AI consultant",
+      "enableHint": "When enabled, members can use the AI consultant in this workspace.",
+      "providerLabel": "AI provider",
+      "providerHint": "Currently only Anthropic Claude is supported.",
+      "apiKeyLabel": "Anthropic API key",
+      "apiKeyHint": "Stored encrypted at rest. We never display the key back; clear by saving an empty value.",
+      "apiKeyConfigured": "A key is currently configured.",
+      "apiKeyMissing": "No key configured.",
+      "apiKeyPlaceholder": "sk-ant-…",
+      "apiKeyClearLabel": "Clear stored key",
+      "dataEgressLabel": "I understand that messages and tool results will be sent to Anthropic for processing.",
+      "dataEgressHint": "Required by EU + US privacy regimes. Tool results may include recipe, equipment, and inventory data from this workspace.",
+      "dataEgressAcceptedAt": "Accepted on {date}.",
+      "roleLimitsTitle": "Per-role monthly token caps",
+      "roleLimitsHint": "Sum of input + output tokens over the trailing 30 days. 0 = no cap.",
+      "perUserDailyCapLabel": "Per-user daily token cap",
+      "perUserDailyCapHint": "Sum of input + output tokens today (UTC). 0 = no cap.",
+      "saveButton": "Save changes",
+      "savingButton": "Saving…",
+      "savedMessage": "Settings saved.",
+      "saveError": "Could not save settings: {message}",
+      "concierge": {
+        "title": "Need help setting up?",
+        "body": "Book a 15-minute call with our team. Italian and English available.",
+        "cta": "Schedule a call"
+      },
+      "roles": {
+        "brewery_admin": "Admin",
+        "member": "Member",
+        "viewer": "Viewer"
+      }
+    },
+    "upgrade": {
+      "title": "Unlock the AI consultant",
+      "body": "The AI consultant is included with the paid plan. Upgrade your workspace to ask questions in plain language about your recipes, equipment, brew sessions, and inventory — answered using your workspace’s real data.",
+      "bullet1": "Read-only access to your workspace data",
+      "bullet2": "Configurable per-role and per-user limits",
+      "bullet3": "Encrypted-at-rest provider key (BYOK)",
+      "ctaButton": "Upgrade workspace",
+      "ctaLoading": "Preparing checkout…",
+      "ctaError": "Could not start checkout: {message}",
+      "concierge": {
+        "title": "Want help getting set up?",
+        "body": "Once your workspace is upgraded, book a 15-minute call with our team. Italian and English available.",
+        "cta": "Schedule a call"
+      }
+    },
+    "usage": {
+      "title": "AI usage",
+      "description": "Aggregated token spend, per-user activity, and role limits for this workspace.",
+      "monthlyTokensIn": "Tokens in (month-to-date)",
+      "monthlyTokensOut": "Tokens out (month-to-date)",
+      "monthlyCallCount": "Calls (month-to-date)",
+      "perUserTitle": "Per user (month-to-date)",
+      "userColumn": "User",
+      "todayColumn": "Today (in + out)",
+      "monthColumn": "Month (in + out)",
+      "monthCallsColumn": "Calls",
+      "empty": "No AI usage recorded yet.",
+      "monthly": {
+        "callCount": "Calls (MTD)",
+        "tokensIn": "Tokens in (MTD)",
+        "tokensOut": "Tokens out (MTD)",
+        "total": "Total tokens (MTD)"
+      },
+      "chart": {
+        "title": "Token spend — last 30 days",
+        "ariaLabel": "Bar chart of daily token spend over the last 30 days"
+      },
+      "table": {
+        "title": "Per-user breakdown",
+        "empty": "No AI usage recorded yet.",
+        "user": "User",
+        "role": "Role",
+        "today": "Today",
+        "month": "Month",
+        "roleLimit": "Role limit",
+        "rolePercent": "% of role limit"
+      },
+      "alerts": {
+        "heading": "Limits approaching",
+        "roleApproachingLimit": "Role '{role}' is at {percent} of its monthly cap ({used}/{limit}).",
+        "userApproachingDailyCap": "User '{user}' is at {percent} of today's cap ({used}/{cap})."
+      }
+    },
+    "actions": {
+      "openSettings": "AI settings",
+      "openUsage": "View usage",
+      "tryAgain": "Try again"
+    }
   }
 }
 

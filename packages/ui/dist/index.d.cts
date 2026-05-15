@@ -116,4 +116,140 @@ type HeadingProps = Omit<TextProps, "size"> & {
 };
 declare function Heading({ size, fontWeight, ...props }: HeadingProps): react_jsx_runtime.JSX.Element;
 
-export { AdSlotCard, type AdSlotCardProps, BrewCheckbox, type BrewCheckboxProps, Button, type ButtonProps, Card, type CardProps, Collapsible, type CollapsibleProps, FIELD_READONLY_BG, FIELD_READONLY_BORDER, Heading, type HeadingProps, Input, type InputProps, ModeFieldset, type ModeOption, ReadOnlyField, ReadOnlyFieldLabel, type ReadOnlyFieldLabelProps, type ReadOnlyFieldProps, ReadOnlyFieldRow, type ReadOnlyFieldRowProps, ReadOnlyFieldValue, type ReadOnlyFieldValueProps, Screen, type ScreenProps, SelectField, type SelectFieldProps, type SelectOption, Spinner, type SpinnerProps, Text, type TextProps, ThemeVarsInjector };
+/**
+ * Cross-platform AI chat stream hook.
+ *
+ * The hook owns the SSE wire-protocol decoding (event/data frames) and
+ * the in-flight turn accumulator, but it does NOT know how to talk to
+ * the API — the caller supplies a `chatFetch(message) => Promise<Response>`
+ * function so each platform can wire its own auth:
+ *
+ *   web → `fetch("/api/ai/chat", { credentials: "same-origin", ... })`
+ *   native → `fetch(`${baseUrl}/api/ai/chat`, { headers: { Authorization: "Bearer ..." } })`
+ *
+ * The response body must be a streaming SSE source. RN 0.72+ on Hermes
+ * supports `response.body.getReader()` over HTTPS, which is the path
+ * used by Expo SDK 50+. Older runtimes need a polyfill such as
+ * `react-native-sse`; the contract here is a Response-like object with
+ * either a `body.getReader()` ReadableStream or a `text()` fallback.
+ */
+interface AiToolCallView {
+    name: string;
+    argsJson: string;
+    resultJson: string | null;
+    durationMs: number | null;
+    errored: boolean;
+}
+interface AiChatTurn {
+    id: string;
+    status: "streaming" | "complete" | "error";
+    text: string;
+    toolCalls: AiToolCallView[];
+    usage: {
+        tokensIn: number;
+        tokensOut: number;
+        durationMs: number;
+        model: string;
+    } | null;
+    error: {
+        code: string;
+        message: string;
+    } | null;
+}
+interface AiChatMessage {
+    id: string;
+    role: "user" | "assistant";
+    text: string;
+    turn?: AiChatTurn;
+}
+/**
+ * The wire-event union, matching the server-side `AiSseEvent` exactly.
+ * Kept local so this hook can ship without depending on the API package.
+ */
+type IncomingEvent = {
+    type: "assistant_chunk";
+    text: string;
+} | {
+    type: "tool_call";
+    name: string;
+    argsJson: string;
+} | {
+    type: "tool_result";
+    name: string;
+    resultJson: string;
+    durationMs: number;
+    errored: boolean;
+} | {
+    type: "complete";
+    usage: AiChatTurn["usage"];
+} | {
+    type: "error";
+    code: string;
+    message: string;
+};
+interface UseAiChatStreamInput {
+    /**
+     * Caller-provided chat invocation. Receives the user's message and
+     * an `AbortSignal` (used by the hook's `reset()` to cancel in-flight
+     * requests). Must return a Response-like object whose body streams
+     * SSE frames or whose `text()` returns the full SSE payload.
+     */
+    chatFetch: (message: string, init: {
+        signal: AbortSignal;
+    }) => Promise<Response>;
+}
+/**
+ * Shared chat state machine. One in-flight turn at a time; `send()` while
+ * `pending` is true is a no-op.
+ */
+declare function useAiChatStream(input: UseAiChatStreamInput): {
+    messages: AiChatMessage[];
+    pending: boolean;
+    terminalError: {
+        code: string;
+        message: string;
+    } | null;
+    send: (text: string) => Promise<void>;
+    reset: () => void;
+};
+/**
+ * Consume an SSE response. Prefers the streaming `getReader()` path
+ * (works in browsers + Hermes RN 0.72+); falls back to `text()` when
+ * the runtime does not expose `body.getReader` (older RN, polyfilled
+ * fetch implementations).
+ *
+ * Exported so cross-platform parity tests can exercise the same code
+ * path the React hook uses.
+ */
+declare function consumeSseStream(res: Response, onEvent: (event: IncomingEvent) => void): Promise<void>;
+
+/**
+ * Translation lookup. The shared component is i18n-agnostic — the caller
+ * passes a typed translator so web (next-intl) and native (@brewery/i18n-react)
+ * can both supply their own implementation.
+ */
+type AiChatTranslate = (key: string, vars?: Record<string, string | number>) => string;
+interface AiChatPanelProps {
+    chat: ReturnType<typeof useAiChatStream>;
+    t: AiChatTranslate;
+    /**
+     * Optional callback for the "subscription required" upgrade CTA.
+     * If omitted, the CTA link is hidden.
+     */
+    onOpenUpgrade?: () => void;
+}
+/**
+ * Cross-platform AI chat panel — Tamagui primitives only. The wire-protocol
+ * + state machine live in `useAiChatStream`; this component is the visual
+ * shell over them and is identical on web and native.
+ *
+ * Accessibility:
+ *   - Outer container uses aria-labelledby pointing at the H2 title.
+ *   - The streaming turn is marked aria-live="polite" (Tamagui forwards
+ *     the prop to the underlying RN/DOM node).
+ *   - The composer Button has an explicit aria-label.
+ *   - Submit-on-Enter is wired via `onSubmitEditing` (cross-platform).
+ */
+declare function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps): react_jsx_runtime.JSX.Element;
+
+export { AdSlotCard, type AdSlotCardProps, type AiChatMessage, AiChatPanel, type AiChatPanelProps, type AiChatTranslate, type AiChatTurn, type AiToolCallView, BrewCheckbox, type BrewCheckboxProps, Button, type ButtonProps, Card, type CardProps, Collapsible, type CollapsibleProps, FIELD_READONLY_BG, FIELD_READONLY_BORDER, Heading, type HeadingProps, Input, type InputProps, ModeFieldset, type ModeOption, ReadOnlyField, ReadOnlyFieldLabel, type ReadOnlyFieldLabelProps, type ReadOnlyFieldProps, ReadOnlyFieldRow, type ReadOnlyFieldRowProps, ReadOnlyFieldValue, type ReadOnlyFieldValueProps, Screen, type ScreenProps, SelectField, type SelectFieldProps, type SelectOption, Spinner, type SpinnerProps, Text, type TextProps, ThemeVarsInjector, type UseAiChatStreamInput, consumeSseStream, useAiChatStream };

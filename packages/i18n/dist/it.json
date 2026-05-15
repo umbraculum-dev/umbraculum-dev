@@ -1224,7 +1224,8 @@
       "waterProfiles": "Profili acqua",
       "brewery": "Birrificio",
       "equipment": "Attrezzatura",
-      "inventory": "Inventario"
+      "inventory": "Inventario",
+      "ai": "Consulente AI"
     },
     "importExport": {
       "title": "Import / Export",
@@ -1572,5 +1573,128 @@
     "rule2": "Mantieni il significato; evita traduzioni troppo letterali se suonano innaturali.",
     "rule3": "Non tradurre identificatori tecnici come path di file, path API o codice.",
     "backToLogin": "Torna ad Accedi"
+  },
+  "ai": {
+    "title": "Consulente AI",
+    "subtitle": "Fai domande su ricette, chimica dell’acqua, attrezzature, sessioni di cotta e magazzino del tuo birrificio.",
+    "composer": {
+      "placeholder": "Fai una domanda sul tuo birrificio…",
+      "send": "Invia",
+      "sendAriaLabel": "Invia messaggio",
+      "thinking": "Sto pensando…",
+      "streamingAriaLabel": "Risposta dell’assistente in corso"
+    },
+    "messages": {
+      "empty": "Inizia una conversazione facendo una domanda qui sotto.",
+      "you": "Tu",
+      "assistant": "Consulente",
+      "toolCall": "Sto consultando: {tool}",
+      "toolError": "Errore strumento: {message}"
+    },
+    "errors": {
+      "subscriptionRequired": "Il consulente AI è disponibile sui piani a pagamento.",
+      "subscriptionRequiredCta": "Aggiorna per sbloccare",
+      "notEnabled": "Il consulente AI non è attivo in questo workspace. Chiedi a un amministratore di attivarlo.",
+      "noKey": "Nessuna chiave AI configurata. Un amministratore deve aggiungerla nelle impostazioni AI.",
+      "dataEgressNotAccepted": "Un amministratore deve accettare l’informativa sul trasferimento dati prima di poter usare l’AI.",
+      "rateLimit": "Limite di uso AI raggiunto. Riprova più tardi.",
+      "rateLimitRole": "Il limite mensile del tuo ruolo per l’uso dell’AI è stato raggiunto.",
+      "rateLimitUserDaily": "Il tuo limite giornaliero di uso dell’AI è stato raggiunto.",
+      "internal": "Qualcosa è andato storto. Riprova."
+    },
+    "settings": {
+      "title": "Impostazioni AI",
+      "subtitle": "Configura il consulente AI per questo workspace. Solo amministratori.",
+      "memberOnlyNotice": "Solo gli amministratori del workspace possono modificare le impostazioni AI. Puoi comunque usare il consulente una volta che è stato attivato.",
+      "enableLabel": "Attiva consulente AI",
+      "enableHint": "Quando attivo, i membri possono usare il consulente AI in questo workspace.",
+      "providerLabel": "Fornitore AI",
+      "providerHint": "Attualmente è supportato solo Anthropic Claude.",
+      "apiKeyLabel": "Chiave API Anthropic",
+      "apiKeyHint": "Memorizzata cifrata. Non mostriamo mai la chiave; salva un valore vuoto per rimuoverla.",
+      "apiKeyConfigured": "Una chiave è attualmente configurata.",
+      "apiKeyMissing": "Nessuna chiave configurata.",
+      "apiKeyPlaceholder": "sk-ant-…",
+      "apiKeyClearLabel": "Rimuovi chiave memorizzata",
+      "dataEgressLabel": "Capisco che i messaggi e i risultati degli strumenti saranno inviati ad Anthropic per l’elaborazione.",
+      "dataEgressHint": "Richiesto dalle normative privacy UE + USA. I risultati possono includere dati di ricette, attrezzature e magazzino di questo workspace.",
+      "dataEgressAcceptedAt": "Accettata il {date}.",
+      "roleLimitsTitle": "Limiti mensili token per ruolo",
+      "roleLimitsHint": "Somma dei token in entrata + uscita negli ultimi 30 giorni. 0 = nessun limite.",
+      "perUserDailyCapLabel": "Limite giornaliero token per utente",
+      "perUserDailyCapHint": "Somma dei token in entrata + uscita di oggi (UTC). 0 = nessun limite.",
+      "saveButton": "Salva modifiche",
+      "savingButton": "Salvataggio…",
+      "savedMessage": "Impostazioni salvate.",
+      "saveError": "Impossibile salvare le impostazioni: {message}",
+      "concierge": {
+        "title": "Hai bisogno di aiuto per la configurazione?",
+        "body": "Prenota una chiamata di 15 minuti con il nostro team. Disponibile in italiano e inglese.",
+        "cta": "Prenota una chiamata"
+      },
+      "roles": {
+        "brewery_admin": "Amministratore",
+        "member": "Membro",
+        "viewer": "Osservatore"
+      }
+    },
+    "upgrade": {
+      "title": "Sblocca il consulente AI",
+      "body": "Il consulente AI è incluso nel piano a pagamento. Aggiorna il workspace per fare domande in linguaggio naturale su ricette, attrezzature, sessioni di cotta e magazzino — con risposte basate sui dati reali del tuo workspace.",
+      "bullet1": "Accesso in sola lettura ai dati del workspace",
+      "bullet2": "Limiti configurabili per ruolo e per utente",
+      "bullet3": "Chiave fornitore cifrata (BYOK)",
+      "ctaButton": "Aggiorna workspace",
+      "ctaLoading": "Preparazione del checkout…",
+      "ctaError": "Impossibile avviare il checkout: {message}",
+      "concierge": {
+        "title": "Vuoi aiuto per iniziare?",
+        "body": "Dopo l’aggiornamento del workspace, prenota una chiamata di 15 minuti con il nostro team. Disponibile in italiano e inglese.",
+        "cta": "Prenota una chiamata"
+      }
+    },
+    "usage": {
+      "title": "Utilizzo AI",
+      "description": "Spesa di token aggregata, attività per utente e limiti di ruolo per questo workspace.",
+      "monthlyTokensIn": "Token in entrata (mese corrente)",
+      "monthlyTokensOut": "Token in uscita (mese corrente)",
+      "monthlyCallCount": "Chiamate (mese corrente)",
+      "perUserTitle": "Per utente (mese corrente)",
+      "userColumn": "Utente",
+      "todayColumn": "Oggi (in + out)",
+      "monthColumn": "Mese (in + out)",
+      "monthCallsColumn": "Chiamate",
+      "empty": "Nessun utilizzo AI registrato.",
+      "monthly": {
+        "callCount": "Chiamate (mese)",
+        "tokensIn": "Token in entrata (mese)",
+        "tokensOut": "Token in uscita (mese)",
+        "total": "Token totali (mese)"
+      },
+      "chart": {
+        "title": "Spesa di token — ultimi 30 giorni",
+        "ariaLabel": "Grafico a barre della spesa di token giornaliera negli ultimi 30 giorni"
+      },
+      "table": {
+        "title": "Dettaglio per utente",
+        "empty": "Nessun utilizzo AI registrato.",
+        "user": "Utente",
+        "role": "Ruolo",
+        "today": "Oggi",
+        "month": "Mese",
+        "roleLimit": "Limite ruolo",
+        "rolePercent": "% del limite ruolo"
+      },
+      "alerts": {
+        "heading": "Limiti in avvicinamento",
+        "roleApproachingLimit": "Il ruolo '{role}' è al {percent} del limite mensile ({used}/{limit}).",
+        "userApproachingDailyCap": "L'utente '{user}' è al {percent} del limite giornaliero ({used}/{cap})."
+      }
+    },
+    "actions": {
+      "openSettings": "Impostazioni AI",
+      "openUsage": "Vedi utilizzo",
+      "tryAgain": "Riprova"
+    }
   }
 }

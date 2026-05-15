@@ -33,6 +33,9 @@ import { integrationsGenericRoutes } from "./routes/integrationsGeneric.js";
 import { integrationsRevealRoutes } from "./routes/integrationsReveal.js";
 import { webhooksStripeRoutes } from "./routes/webhooksStripe.js";
 import { webhooksRevenuecatRoutes } from "./routes/webhooksRevenuecat.js";
+import { aiRoutes } from "./routes/ai.js";
+import { InMemoryAiToolRegistry } from "./services/ai/toolRegistry.js";
+import { registerBreweryTools } from "./services/ai/tools/brewery/index.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -89,6 +92,12 @@ export function buildApp() {
   app.register(integrationsRevealRoutes);
   app.register(webhooksStripeRoutes);
   app.register(webhooksRevenuecatRoutes);
+
+  app.register(async (instance) => {
+    const registry = new InMemoryAiToolRegistry();
+    registerBreweryTools(registry, instance.prisma);
+    await aiRoutes(registry)(instance);
+  });
 
   return app;
 }
