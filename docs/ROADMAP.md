@@ -4,7 +4,8 @@ This roadmap captures the agreed “direction of travel” for the product so im
 
 ## Big picture
 
-- Source of truth: `docs/architechture-Rev02.md`
+- Platform vision (horizontal-platform-with-vertical-modules + AI consultant + add-on pricing): `docs/PLATFORM-ARCHITECTURE.md`
+- Source of truth (brewery-vertical implementation log): `docs/architechture-Rev02.md`
 - Accessibility hard constraint: `docs/DEVELOPMENT-ACCESSIBILITY.md`
 - Seed data sources + licensing notes: `docs/RAW-MATERIALS-SEEDABLE-SOURCES.md`
 

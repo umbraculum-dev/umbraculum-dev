@@ -62,6 +62,8 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 
 Anything below this heading is **project-owned** and will not be overwritten by the sync tool.
 
+- **Platform vision**: see `docs/PLATFORM-ARCHITECTURE.md` — high-level entry point for the horizontal-platform-with-vertical-modules direction, AI consultant blueprint, and AI add-on pricing model. Read this before any product/architecture discussion.
+
 - **Project summary (project-owned; restored 2026-05-12 after `@rftsu/cursor-rules` 3.1.1 sync removed it from the managed block)**:
   - This is a **custom TypeScript project** (not Magento, not PHP).
   - Stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.

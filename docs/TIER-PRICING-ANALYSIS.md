@@ -3,6 +3,8 @@
 **Status:** Draft (pre-development)  
 **Purpose:** Base document for current and future analysis; to be discussed before implementation.
 
+> **Add-on tier model (AI credits):** for the per-credit AI add-on pricing model (Cursor-style hard cap + retail unlock, pricebook abstraction, COGS / margin glossary, `WorkspaceBillingAddon` shape), see [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §7. That section is the canonical source for pricing structure decisions; this document remains the analysis of the *base subscription tiers* (`free | premium | pro | pro_plus`).
+
 ---
 
 ## Current State

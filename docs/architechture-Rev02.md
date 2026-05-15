@@ -1,5 +1,8 @@
 # Brewing SaaS - Architecture & Implementation Plan (AI-first)
 
+> **See also:** [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) for the platform-level vision (horizontal-platform-with-vertical-modules pattern, AI consultant blueprint, AI add-on pricing model).
+> This document remains the implementation log of the **brewery vertical** and the cross-platform (web + native) boundary decisions.
+
 **Status:** v0.3 (living document)  
 **Primary goal:** ship a bfr-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2).  
 **Guiding principle:** keep the backend *boring* (monolith, predictable patterns), make offline reliable without early sync complexity, and keep decisions easy to review and evolve.
