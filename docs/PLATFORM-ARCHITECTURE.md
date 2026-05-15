@@ -17,6 +17,18 @@ How it relates to the existing architecture log:
 
 When the two disagree, this document wins for "where we are going" questions, and Rev02 wins for "what is already wired up" questions.
 
+### 1.1 Positioning — process-manufacturing platform, brewery-configured by default
+
+`<PLATFORM_NAME>` is a **process-manufacturing platform**. The brewery vertical is the **first vertical configuration** of that platform — it ships with brewery-specific data (BJCP styles, BeerJSON, hop bitterness math, water-chemistry models) and brewery-specific UI flows, but the *underlying primitives* — recipes-as-bills-of-materials, equipment profiles as constrained resources, brew sessions as scheduled production orders, ingredient-and-water inputs as process specifications — are the same primitives any batch process manufacturer needs.
+
+This framing matters for three reasons:
+
+1. **The market is much larger than "breweries".** Distilleries, kombucha producers, food manufacturers, cosmetics, supplement and nutraceutical producers, fine chemical batch operations, fragrance houses, and others all consume the same core primitives with different vertical configurations. Positioning the platform as "process-manufacturing, brewery-configured by default" rather than "a brewery app" expands the addressable market by roughly an order of magnitude **without changing the product** — the same code base, with vertical-specific seed data and prompts.
+2. **MRP and CRP are not new modules — they are a generalization of what the brewery vertical already does.** Promoting the brewery production-planning subsystem to first-class generic capability is dramatically cheaper than building MRP/CRP from scratch. The trajectory in [`docs/ROADMAP.md`](ROADMAP.md) reflects this.
+3. **The AI consultant story scales with this framing.** "An AI for breweries" sells one vertical. "An AI for your process-manufacturing operation, with brewery-domain knowledge included" sells the same product to a much larger pool of buyers, plus opens the door to community-contributed vertical configurations (cosmetics, food, distillery) without writing them ourselves.
+
+The brewery vertical remains a first-class showcase — both as a working customer-facing product and as a reference implementation for how other vertical configurations should be shaped. Subsequent vertical configurations are expected to plug in primarily through **seed data, prompts, and configuration**, not by re-implementing the core.
+
 ---
 
 ## 2. Vision — horizontal platform + vertical modules
@@ -52,6 +64,50 @@ flowchart TB
 ```
 
 Brewery is **shipped**; WMS / CRM / MRP / CRP are **open doors** — explicitly anticipated in the architecture but not yet implemented.
+
+### 2.1 Distribution & business model
+
+`<PLATFORM_NAME>` is **open source** by design — not as a marketing tactic, but as the structural foundation for long-term sustainability with a small team, trust with operational customers, and a defensible position against hyperscaler capture.
+
+**License posture** (rationale in [`docs/LICENSING.md`](LICENSING.md)):
+
+- **Core platform**: AGPLv3.
+- **SDK / contracts / public interface packages** (the surface third-party modules depend on): MIT.
+- **Commercial dual license** available for enterprises whose policies cannot accommodate AGPLv3 (same source, alternative terms).
+
+**Revenue lines** (target: bread-and-butter sustainability for a small team, not venture-scale exit):
+
+1. **Managed hosting** — `<PLATFORM_NAME>` operated as a service. The dominant revenue line; pairs with the AGPL stance because hyperscaler imitation is structurally deterred.
+2. **AI credits** — usage-metered AI consultant access for hosted customers (see §7).
+3. **Enterprise support contracts** — for self-hosters and hosted customers that need SLAs, dedicated infrastructure, or operator support.
+4. **Optional commercial license** (§6.3 of [`docs/LICENSING.md`](LICENSING.md)) — for enterprises whose legal teams cannot adopt AGPLv3.
+
+**Self-host posture (first-class, not an afterthought).** The platform must be installable on commodity Postgres + Node + a single VPS; no AWS-specific or other cloud-vendor-specific dependencies in the core. Every external service (AI providers, Stripe, RevenueCat, S3-compatible storage, error reporting) is configured via environment variables and can be swapped or omitted. Self-hosters bring their own keys.
+
+**AI provider integration — BYOK and resold credits both supported, from day one.** This is the explicit decision that resolves §8 open question 1: *both* paths exist in parallel. Hosted customers use resold credits as described in §7; self-hosters bring their own OpenAI / Anthropic / etc. keys. The orchestrator code is identical in both modes; only the billing wrapper differs.
+
+**What is *not* in the business model:**
+
+- No closed-source replacement of public modules.
+- No enterprise-only paywall on bug fixes or security patches.
+- No future-dated re-licensing of existing source code.
+
+These are explicit commitments documented in [`docs/LICENSING.md`](LICENSING.md) §9, changeable only via the public RFC process there.
+
+### 2.2 Governance & community
+
+The single biggest determinant of an open-source project's long-term health is **how welcome contributors feel** — not the license, not the technology, not the marketing. The Magento → Mage-OS history makes this concrete: Adobe inherited a permissive license and a thriving community, and lost the community by making contribution unwelcome.
+
+Governance principles, in priority order:
+
+1. **Public contribution from day one.** All meaningful changes go through public PRs with public review, including changes made by founders and core maintainers. The "private fork that occasionally pushes large drops" pattern is not used.
+2. **RFC process for breaking changes.** Public-comment RFCs (minimum 30 days) for any change that affects: license terms, governance, the module SDK's public surface, the AI tool contract, billing model, or anything else that downstream depends on. RFC process is the same one used for license changes ([`docs/LICENSING.md`](LICENSING.md) §10).
+3. **No CLA that grants unilateral re-licensing rights.** Contributors retain their copyright; the project signs commits via Developer Certificate of Origin (DCO). This is a deliberate constraint against the failure mode that enabled the HashiCorp / Elastic re-licensings.
+4. **Code of conduct from the first public release.** Modeled on Contributor Covenant.
+5. **Decision transparency.** Major decisions are recorded — in RFCs for changes, in this document for architectural direction, in [`ROADMAP.md`](ROADMAP.md) for trajectory. New contributors should be able to read why something is the way it is, not just *that* it is.
+6. **Trademark protection separate from license.** The platform name and logo remain commercial property of the founding entity (eventually possibly a foundation); the source license does not include trademark rights. This is the same separation used by WordPress, Linux Foundation projects, and Plausible.
+
+The aim is to be **honest about commercial realities** (this is a project that pays for groceries, not a foundation-only effort) while keeping community contribution genuinely first-class — the opposite of the open-core trap that fragmented the Magento ecosystem.
 
 ---
 
@@ -234,6 +290,13 @@ BASE                  ← "you are an ERP assistant for <PLATFORM_NAME>; never r
 
 **Write-action policy.** In v0 and v1, the model can **propose** changes (drafts) but cannot apply them without explicit user confirmation. This avoids the entire class of "AI deleted my BOM" disasters that have hit early adopters of agentic ERP features.
 
+**Provider access — BYOK and resold credits, both supported.** The orchestrator routes every model call through a provider adapter that accepts either:
+
+- A **`<PLATFORM_NAME>`-managed key** (hosted customers) — usage is metered, credits are debited from the workspace's add-on allowance, and overages are billed via Stripe top-ups per §7.
+- A **workspace-supplied key** (self-hosters, or hosted customers who prefer BYOK) — usage is unmetered by the platform; the provider bills the workspace directly.
+
+The two modes share the same orchestrator, the same tool registry, the same prompt composition, the same audit log, and the same write-action policy. Only the billing wrapper and the rate-limiter differ. This is the deliberate symmetry that lets hosted-customer and self-host paths share the same code surface — and the same security posture — without duplication.
+
 ### 4.4 Module registration pattern
 
 Sketch (TypeScript pseudocode — not a code spec, just shape):
@@ -266,6 +329,17 @@ registerModule({
 ```
 
 The same shape will eventually apply to the brewery vertical too — the migration from "flat brewery routes" to "brewery is just another module" is mechanical once the helper exists.
+
+**The module SDK is a first-class public artifact, not an internal convention.** A third-party developer — an indie consultancy, a vertical-specific software vendor, an in-house team at a customer — must be able to build a module **in their own repository**, depend on `<PLATFORM_NAME>`'s SDK as published npm packages, and ship the module independently of platform releases. The SDK packages are licensed under MIT (see [`docs/LICENSING.md`](LICENSING.md) §6.2) precisely so module developers can license their own module's source code however they want, including proprietary, without their choice being constrained by the platform's AGPL core.
+
+Concretely, the SDK surface includes:
+
+- `@<platform>/module-sdk` — the `registerModule()` contract, types, and helper utilities.
+- `@<platform>/ai-tool-sdk` — the `AiTool<I, O>` interface, scope types, and `AiToolContext` definitions.
+- `@<platform>/api-client` (public types subset) — DTO types and route-ID conventions third parties can pin to.
+- `@<platform>/i18n-keys` — namespace conventions for module-owned message keys.
+
+These names are illustrative; the actual scope and package boundaries land when the `@brewery/*` → platform scope rename happens. What matters today is that the *intent* is published as a stable public contract, not a private implementation detail.
 
 ### 4.5 Prisma schema strategy
 
@@ -565,7 +639,7 @@ These need explicit answers before any implementation PR is opened. Listed here 
 2. **Provider preference**: Anthropic only, OpenAI only, or both via an adapter? (Working assumption: both via an adapter — half-day extra, future-proof.)
 3. **v0 prompt scope**: water + recipe coach only, or include style guidance / fermentation troubleshooting from day one?
 4. **Default-on vs opt-in per workspace** for AI features (working assumption: opt-in, with a data-egress notice).
-5. **Per-user role gating**: should `WorkspaceAiSettings.allowedRoles[]` exist from v0?
+5. **Per-user role gating**: **(Resolved 2026-05-15.)** No role-gating in v0 — AI is available to *all* workspace members once the workspace admin has enabled AI for the workspace. Safety is enforced through three independent mechanisms instead of role-gated access: (a) per-role usage limits (admins can configure different monthly token / credit budgets per role), (b) per-user daily caps as a circuit breaker, (c) the workspace-level opt-in toggle. Rationale: `<PLATFORM_NAME>` is AI-first by design; gating AI behind a role contradicts the positioning. The combination of caps + audit ledger + workspace-level opt-in preserves operational safety without gatekeeping the feature.
 6. **Refund policy** for unused credits — non-refundable / pro-rata / case-by-case?
 7. **EU VAT handling** for resold credits — collect via Stripe Tax, or via a separate flow?
 8. **Postgres multi-schema timing** — adopt at second-module ship, or earlier as preparation?
@@ -611,3 +685,15 @@ These need explicit answers before any implementation PR is opened. Listed here 
   - Structural changes (sections 2, 3, 4, 7) should be reviewed before merging — they change shared assumptions.
   - Glossary additions and pricing-example numeric updates can land in normal PRs.
   - Open-questions checklist (§8) should be appended to as new questions arise; resolved questions move to the relevant section with a brief decision note.
+
+### 10.1 Open-source lifecycle
+
+Because `<PLATFORM_NAME>` is open source and intended to be public-facing, this document and its sibling docs have additional lifecycle obligations beyond ordinary internal documentation.
+
+- **Public-facing intent.** Treat every doc under [`docs/`](.) as potentially public-facing. The audience priority order set in [`docs/README.md`](README.md) applies: future maintainers and contributors first, self-hosting operators second, prospective module developers third. Avoid private-by-default tone, internal-only references, and unexplained jargon.
+- **Semver discipline at the SDK boundary.** The SDK packages described in §4.4 follow [semantic versioning](https://semver.org/). Breaking changes to the SDK go through an RFC, get a deprecation window, and ship in a major version bump. The platform core has more flexibility — but any change visible to downstream modules counts as SDK surface.
+- **License-change and governance-change RFCs.** Any change to the licensing posture in [`docs/LICENSING.md`](LICENSING.md) or the governance principles in §2.2 follows the RFC process documented in [`docs/LICENSING.md`](LICENSING.md) §10 — written RFC, minimum 30-day public comment, forward-only application.
+- **Deprecation policy.** Public-surface deprecations (SDK types, AI tool contracts, route IDs, prompt-overlay keys) are announced in the RFC repository, marked with a `@deprecated` tag in source, and removed no earlier than one major version after announcement. The cost of a noisy deprecation is much lower than the cost of a silent breaking change for a module developer running a small consultancy.
+- **No retroactive license changes.** Source code committed under AGPLv3 stays AGPLv3. Source code committed under MIT stays MIT. License-change RFCs apply only to code committed after the change date, preserving the terms downstream users relied on.
+- **Brand and trademark separate from license.** As detailed in [`docs/LICENSING.md`](LICENSING.md) §8: the `<PLATFORM_NAME>` brand is not transferred by the source license. Forks, mirrors, and modified versions must use a different name. A formal trademark policy will be published before the first stable release.
+- **Foundation question is deferred, not denied.** Transferring the trademark and governance to a foundation (e.g. Linux Foundation, Software Freedom Conservancy, a dedicated `<PLATFORM_NAME>` Foundation) is a real option, with real benefits for community trust and project longevity. It is not the right move at the current stage (pre-revenue, pre-community), but the architectural decisions on this page — AGPLv3, public SDK, DCO sign-off rather than CLA, governance principles in §2.2 — are deliberately compatible with a future foundation transfer if the project reaches that scale.

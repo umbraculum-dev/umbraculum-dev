@@ -5,9 +5,61 @@ This roadmap captures the agreed “direction of travel” for the product so im
 ## Big picture
 
 - Platform vision (horizontal-platform-with-vertical-modules + AI consultant + add-on pricing): `docs/PLATFORM-ARCHITECTURE.md`
+- Licensing posture and rationale (AGPLv3 core + MIT SDK + commercial dual license): `docs/LICENSING.md`
 - Source of truth (brewery-vertical implementation log): `docs/architechture-Rev02.md`
 - Accessibility hard constraint: `docs/DEVELOPMENT-ACCESSIBILITY.md`
 - Seed data sources + licensing notes: `docs/RAW-MATERIALS-SEEDABLE-SOURCES.md`
+- Full doc index: `docs/README.md`
+
+## Trajectory (12–30 months)
+
+This is the agreed direction of travel at the platform level. It is intentionally short on implementation detail and long on sequencing — implementation specifics land in domain docs and per-quarter planning. The trajectory exists to keep parallel work coherent and to make explicit which decisions need to happen *before* the second vertical lands.
+
+### H2 2026 — AI consultant as cross-module connective tissue
+
+Goal: ship the smallest AI consultant that demonstrably provides value across the brewery vertical, with the architecture intentionally platform-shaped from day one (not brewery-shaped with platform aspirations).
+
+- **Architecture**: AI platform skeleton per `docs/PLATFORM-ARCHITECTURE.md` §4.3 and §5.3 — orchestrator, tool registry, usage ledger, provider adapters, pricebook, BYOK + resold credits sharing the same code path.
+- **Tools layer first** (`Layer A`): roughly 80% of value, lowest risk. Read-only, ACL-aware, deterministic. Brewery tools are the v0 surface.
+- **Per-workspace operational memory store** stood up alongside the tool layer. This is the moat investment (`docs/PLATFORM-ARCHITECTURE.md` §4.3, §6.5) — the AI's recall of seasonal patterns, supplier quirks, and recurring failure modes compounds over time and is not transferable to a competitor.
+- **Write-action drafts with human-in-the-loop confirmation** from the first AI feature that touches mutable state. No autonomous writes in v0 or v1.
+- **License + governance** as a parallel track: publish `docs/LICENSING.md` publicly, adopt DCO sign-off on contributions, write the contributor README, and pick the AGPLv3 + MIT SDK split intentionally before the first community contribution arrives (much harder to retrofit after).
+
+Blocking decisions to close in this phase (from `docs/PLATFORM-ARCHITECTURE.md` §8): provider preference, AI feature default (opt-in vs default-on), per-user role gating for AI, v0 prompt scope.
+
+### H1 2027 — Brewery production planning is promoted to first-class MRP/CRP, and the platform is repositioned
+
+Goal: realize the §1.1 reframe in code and in market positioning. Same product, much larger addressable market.
+
+- Generalize the brewery production-planning subsystem (recipes-as-BOMs, equipment profiles as constrained resources, brew sessions as scheduled production orders) into platform-level MRP and CRP capabilities. The brewery vertical becomes a configuration of these capabilities rather than a private implementation.
+- AI consultant demonstrably reasons across recipe planning + production scheduling + capacity load.
+- Platform repositioned externally: "process-manufacturing platform, brewery-configured by default". Brand and copy reflect this on public surfaces (marketing site, documentation, App Store listings).
+- `@brewery/*` horizontal packages renamed to a neutral platform scope (`docs/PLATFORM-ARCHITECTURE.md` §3.3, §5.2). This is the one-way structural move that should not be deferred past this phase.
+- Module SDK published as a public artifact (`docs/PLATFORM-ARCHITECTURE.md` §4.4). Third-party module developers can build modules in their own repositories.
+- `WorkspaceBillingAddon` model + Stripe subscription-item flow + RevenueCat consumables shipped — the prerequisite for selling per-module entitlements and AI credits cleanly.
+
+### H2 2027 — WMS as second native-mandatory vertical; federation decision
+
+Goal: validate the "modules expand by config and SDK, not by core rewrite" promise, and decide native packaging strategy with evidence.
+
+- Spike Re.Pack module federation against the platform shell (expecting roughly 30 months of post-MF-release tooling hardening by this point). Decision gate: if the Expo + Re.Pack story is genuinely smooth, federate WMS as the second native module in the same shell; if not, ship WMS as web + PWA + a thin native scanner companion. Either way, the AI consultant sees both modules.
+- Brewery + WMS overlap on tooling, packaging, and AI tool registry — the strongest test of whether the platform shape genuinely supports multi-module operation or whether brewery still leaks across boundaries.
+- First third-party-built vertical configuration accepted (likely distillery or kombucha) — the proof that the SDK is a public contract, not a private convention.
+
+### 2028 and beyond — CRM, additional vertical configurations, foundation question
+
+- CRM module: native-shipped only if customer ICP demand justifies it; otherwise web-only with PWA on mobile. The decision depends on the segment we actually win, not on hopes.
+- Additional process-manufacturing vertical configurations onboarded primarily through **configuration and seed data**, not code (food, cosmetics, supplements, fragrance, fine chemical batch).
+- Ecommerce surfaces (if pursued) are explicitly **separate apps** — different audience (shopper vs operator), different ASO, different auth model. Not added to the workspace-member app shell. Out of scope for this roadmap.
+- Foundation transfer question (`docs/PLATFORM-ARCHITECTURE.md` §10.1) reopened with evidence: by this point the project either has a community large enough that foundation governance is a meaningful upgrade, or it does not, and the decision becomes much easier than speculating about it now.
+
+### Standing principles across the whole trajectory
+
+- **Web-first for the heavy desktop workflows.** Native apps exist only where workflows are intrinsically mobile (offline operation, BLE, scanning, push notifications, on-the-floor input).
+- **One audience per app.** Workspace-member modules share one shell. Shopper-facing surfaces (if any) are separate apps.
+- **AI consultant is the cross-module connective tissue.** The architectural and economic case for one shell over a "myriad of apps" rests on the AI seeing all modules in one workspace context.
+- **No retroactive license changes.** Anything committed under AGPLv3 stays AGPLv3 (`docs/LICENSING.md` §9–10).
+- **The tone of this roadmap is honest commitment, not aspiration.** If a phase moves, the doc moves. If the underlying assumptions change, the trajectory changes openly via the same RFC process used for governance changes (`docs/LICENSING.md` §10).
 
 ## UI pillars (from Figma)
 
