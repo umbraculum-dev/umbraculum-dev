@@ -1,10 +1,14 @@
 # `<PLATFORM_NAME>` documentation
 
+**Tier:** Public
+
 This folder is the canonical reference set for the `<PLATFORM_NAME>` platform. It is structured so that anyone — a new contributor, a self-hoster, a hosted-service customer, or a future maintainer — can find what they need without reading the whole repository.
 
 Documents are grouped by **purpose**, not by physical location. Files have not been moved into subfolders in order to keep cross-links inside the existing codebase stable; this index provides the navigation.
 
 > **Token convention.** The placeholder `<PLATFORM_NAME>` appears throughout these docs. It will be replaced with the chosen brand name once one is selected; until then, treat it as a search/replace token.
+
+> **Audience tier.** All documents in this folder are **Tier: Public** by default — written to be surfaceable when the repository flips public. The first content line of each doc carries an explicit `**Tier:** Public` marker for clarity. Other tier values reserved for future use: `Partner-restricted`, `Customer-restricted`. Documentation that is not public-tier lives outside this folder and outside any public-mirror flip; it is intentionally not indexed here.
 
 ---
 

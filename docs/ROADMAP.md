@@ -1,5 +1,7 @@
 # Roadmap (living)
 
+**Tier:** Public
+
 This roadmap captures the agreed “direction of travel” for the product so implementation stays coherent and we avoid rework.
 
 ## Big picture

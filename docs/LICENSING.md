@@ -1,5 +1,6 @@
 # `<PLATFORM_NAME>` — Licensing rationale
 
+**Tier:** Public
 **Status:** v1.0 (living document, public-facing intent)
 **Audience:** prospective contributors, self-hosters, hosted-service customers, enterprise legal teams, and anyone evaluating `<PLATFORM_NAME>` as a long-term operational dependency.
 **Token convention:** the placeholder `<PLATFORM_NAME>` is used everywhere the brand will appear; it will be replaced once a name is chosen.
