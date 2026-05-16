@@ -83,6 +83,7 @@ Day-to-day engineering conventions and runbooks.
 - [`CODING-STANDARDS.md`](CODING-STANDARDS.md) — Coding standards (TypeScript, conventions, file layout).
 - [`LINTING.md`](LINTING.md) — ESLint setup, scope tiers (HIGH-light → HIGH-staged → HIGH-full), value/cost analysis, and how to extend the strict gate.
 - [`TAMAGUI.md`](TAMAGUI.md) — Tamagui type-system caveats, our adaptation strategy, and what to watch upstream.
+- [`CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md) — Why `packages/contracts` uses hand-rolled validators today, candidate libraries (Zod, Valibot, TypeBox), trigger criteria for revisiting, and migration mechanics if we go.
 - [`TESTING.md`](TESTING.md) — Test layers, frameworks, conventions; see also the `Tests must follow code changes` rule in `.cursor/rules/`.
 - [`DEVELOPMENT-ACCESSIBILITY.md`](DEVELOPMENT-ACCESSIBILITY.md) — Accessibility constraints (hard requirements).
 - [`DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) — Local development for the native app.

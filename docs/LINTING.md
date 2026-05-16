@@ -4,7 +4,7 @@
 **Status:** v1.2 — HIGH-staged Phase 1 (`packages/contracts/**`) landed; Phase 2 (`packages/beerjson/**`) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
-**Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `eslint.config.mjs` (this file is also documentation — read the comment headers).
+**Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
 
 ---
 
@@ -129,6 +129,14 @@ Same patterns as Phase 4 but for the React Native side. May land easier or harde
 - [ ] Clean 86 `no-unused-vars` warnings (mostly unused imports — mechanical deletions)
 - [ ] Promote `no-unused-vars` from `warn` to `error`
 - [ ] Verify no remaining pre-existing warnings outside known carve-outs
+
+### Phase 7 (optional, separate decision) — runtime-validation library migration
+
+This is **not** an ESLint phase per se — it's an architectural decision adjacent to the type-discipline work. Phase 1 surfaced the question ("should `packages/contracts` use Zod / Valibot / TypeBox instead of hand-rolled validators?"). The current decision is **no**, but the question deserves to be tracked rather than forgotten.
+
+- [ ] Re-evaluate when one of the trigger criteria in `docs/CONTRACTS-VALIDATION-STRATEGY.md` is met (new complex contract, OpenAPI requirement, form-validation parity, drift bugs, bundle-size shift, independent route migration).
+
+See `docs/CONTRACTS-VALIDATION-STRATEGY.md` for the full pros/cons, candidate libraries (Zod, Valibot, Arktype, TypeBox), migration mechanics if/when we go, and the decision log.
 
 ---
 
