@@ -157,8 +157,11 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
    - Yes → caveat 3 pattern. Add the canonical `// eslint-disable-next-line ... -- Tamagui ... ; see docs/TAMAGUI.md` comment.
 
 3. **Is this from a HIGH-full type-aware rule (`no-unsafe-*`)?**
-   - HIGH-full hasn't landed yet, but when it does — these will likely fire heavily in Tamagui-adjacent code. We may need to globally disable a few `no-unsafe-*` rules for `apps/**` (the cost/benefit there is much worse than for `packages/**` because Tamagui surface is dense).
-   - Strategy: when HIGH-full is being scoped, evaluate per-rule whether to disable globally for apps or accept the noise.
+   - HIGH-full is now scoped — see [`docs/LINTING.md`](LINTING.md) for the 5-phase plan. The 2026-05-16 measurement run produced data that is much more granular than the original prediction:
+     - `apps/web` has **266 `no-unsafe-*` warnings** total — Tamagui-driven, mostly props leaked as `any`. This is the genuine "Tamagui wall" the doc warned about, and it is HIGH-full Phase 4 specifically.
+     - `apps/native` has **only 3 `no-unsafe-*` warnings** in total. Tamagui's React Native bindings type cleanly enough that the friction is essentially apps/web-only, not both-platforms as previously assumed.
+     - `services/api` has 665 `no-unsafe-*` warnings — but those are Prisma + Fastify + AI tool boundaries, not Tamagui (that is HIGH-full Phase 3, separate from this doc).
+   - Strategy: per-rule global disables in `apps/web` are evaluated as part of HIGH-full Phase 4, where the choice between (4a) per-site disables, (4b) Tamagui adapter improvements, and (4c) hybrid is made based on the unique-component-vs-unique-site count taken at phase start. **Do not pre-decide the disable strategy in this doc** — it belongs to the Phase 4 commit's reviewer context.
 
 4. **Is this something Tamagui upstream is actively fixing?**
    - Check the open issues at https://github.com/tamagui/tamagui (search for the specific error number and `types`).
@@ -182,7 +185,7 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 - A new Tamagui major version is released and changes the type ecosystem materially.
 - A new bug class appears that needs another wrapper primitive.
 - The `no-explicit-any` count concentrated in Tamagui-adjacent code crosses a threshold where the cost/benefit of a more aggressive wrapper layer changes (currently: ~590 in apps/web alone; if it grows to >1000 in a single app, reconsider).
-- HIGH-full lint upgrade is being scoped (`docs/LINTING.md`) — evaluate whether type-aware rules need per-glob carve-outs for Tamagui surface.
+- HIGH-full lint upgrade is now scoped as a 5-phase plan in [`docs/LINTING.md`](LINTING.md) (target H1 2027). The Tamagui-adjacent surface is concentrated in `apps/web` (266 `no-unsafe-*` warnings) and lands in HIGH-full Phase 4 specifically; `apps/native` is essentially unaffected (3 such warnings total). Re-evaluate Tamagui adapter strategy if the apps/web Phase 4 measurement shows >50% of warnings concentrated in <10 unique components (favors a 4b adapter-improvement approach over 4a per-site disables).
 
 ---
 

@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.2 — **HIGH-staged complete.** Phases 1–6c landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail (`ferm-data-integration`, `RecipeImportForm`, `HealthPanel`, `inventory`, `YeastEditor`, `PrimaryNav`, `mathBodies`, `(auth)/{login,signup}/page.tsx`, plus 13 smaller files), and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are now promoted to `error` repo-wide. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. Next: HIGH-full upgrade (`recommended-type-checked` + `--max-warnings 0` everywhere).
+**Status:** v2.3 — **HIGH-staged complete + HIGH-full scoped.** Phases 1–6c landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail (`ferm-data-integration`, `RecipeImportForm`, `HealthPanel`, `inventory`, `YeastEditor`, `PrimaryNav`, `mathBodies`, `(auth)/{login,signup}/page.tsx`, plus 13 smaller files), and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are now promoted to `error` repo-wide. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. A measurement run (2026-05-16) sized the HIGH-full surface at 1,671 type-aware warnings, ~411 of which auto-fix; the upgrade is now a 5-phase plan (see [HIGH-full upgrade](#high-full-upgrade)) targeting H1 2027 alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md).
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -59,18 +59,25 @@ Lint configuration has a fundamental value/cost trade-off: stricter rules catch 
 | **Medium** — full base preset (TS-recommended + React-Hooks + jsx-a11y) with per-glob overrides; `no-restricted-imports` on cross-platform UI; `react-hooks/exhaustive-deps` set to `warn`. | Medium (one config + ~5 plugins + light cleanup of pre-existing warnings). | High — catches a real class of React bugs TypeScript misses, formalizes a11y, prevents future drift. | ✅ Superseded by HIGH-light. |
 | **HIGH-light** — Medium + `exhaustive-deps` as **error** + `--max-warnings 0` on 9 clean packages + `allowInterfaces: "with-single-extends"` to keep Tamagui's module-augmentation pattern legal. | Medium-high (1 PR, ~3 hours focused work). | High — locks in the clean parts; gates against drift; gives an honest "where are we" picture. | ✅ **Landed.** |
 | **HIGH-staged** — HIGH-light + clean `any` warnings package-by-package, expanding `lint:packages-strict` glob with each cleanup. | Medium-high per phase (4–6 phases). | High — real type-safety wins where the money is (contracts, services, web pages). | 🚧 In progress — see [HIGH-staged roadmap](#high-staged-roadmap) below. |
-| **HIGH-full** — HIGH-staged + `@typescript-eslint/recommended-type-checked` (type-aware) + `no-explicit-any` as **error** + `--max-warnings 0` repo-wide. | High (CI gets slower; many pre-existing violations surface from type-aware rules). | Highest — production-grade hygiene; signals maturity to public contributors. | 🚧 **Target: Q4 2026 / Q1 2027**, aligned with the public AGPLv3 flip (`docs/ROADMAP.md`). |
+| **HIGH-full** — HIGH-staged + `@typescript-eslint/recommended-type-checked` (type-aware) + `--max-warnings 0` repo-wide (`no-explicit-any: error` already landed in Phase 6c). | Medium-high — measurement (2026-05-16) shows full-repo type-aware lint takes 44s wall (vs current 6s), ~1,671 warnings to triage of which ~411 auto-fix. Phased over 5 commits. | Highest — production-grade hygiene; signals maturity to public contributors. | 🚧 **Target: H1 2027** alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md), which lands ahead of the public AGPLv3 flip. Phase plan: see [HIGH-full upgrade](#high-full-upgrade). |
 
 ### Why we did not go HIGH-full in one shot
 
-Roughly 1,040 of 1,127 outstanding warnings are `@typescript-eslint/no-explicit-any`. Mechanically fixing them would take an estimated 20–60 hours. More importantly, `recommended-type-checked` makes ESLint significantly slower (likely 5–10× in our monorepo), and Tamagui's type ecosystem (`docs/TAMAGUI.md`) generates large amounts of friction with `no-unsafe-*` rules. Doing HIGH-full as one mega-PR would:
+HIGH-staged removed all `@typescript-eslint/no-explicit-any` warnings (Phases 1–6b) and all `@typescript-eslint/no-unused-vars` warnings (Phase 6c), and promoted both rules from `warn` to `error`. The repo is now warning-free under the current (non-type-aware) rule set. With that baseline established, a measurement run on 2026-05-16 enabled `@typescript-eslint/recommended-type-checked` against the post-Phase-6c tree (master `09c8b3c`) and surfaced **1,671 type-aware warnings** in 44s wall-clock — close to the prior estimate but distributed differently than the original framing assumed:
 
-1. Block other work for 1–2 weeks,
-2. Generate a diff so large that meaningful review is impossible,
-3. Conflate "real bug fixes" with "scope-creep refactors",
-4. Risk landing semantic regressions (e.g. `catch (err: any)` → `unknown` requires careful narrowing).
+- **`services/api` is 62% of the surface** (1,034 warnings, dominated by `no-unsafe-member-access` 507 and `no-unsafe-assignment` 158). Prisma raw queries, Fastify request bodies, AI tool I/O, BeerJSON normalisation — not Tamagui.
+- **`apps/web` is 27%** (452 warnings, of which 266 are the `no-unsafe-*` family — these are the genuine Tamagui-driven props-leaked-as-`any` cases the doc was always worried about).
+- **`apps/native` is only 5%** (78 warnings, of which only 3 are `no-unsafe-*`). Tamagui's React Native bindings type cleanly enough that the friction story is essentially apps/web-only, not both-platforms.
+- **~411 warnings (~25%) auto-fix** with `eslint --fix` — mostly `no-unnecessary-type-assertion` casts left over from the Phase 1–6c `any`-removal that became redundant once the surrounding code got typed.
 
-HIGH-staged converts that monolith into ~5 reviewable PRs spread over months, each delivering measurable value (one more package gated against drift).
+Doing HIGH-full as one mega-PR would still:
+
+1. Generate a diff too large to review meaningfully,
+2. Conflate the four distinct work tiers (auto-fix, real-bug Promise correctness, services/api boundary typing, apps/web Tamagui surface),
+3. Risk semantic regressions in the `no-unsafe-*` narrowing where the type guard chosen is wrong,
+4. Block other work for the duration.
+
+The remaining HIGH-full work is therefore phased into 5 commits with explicit per-phase scope, counts, and verification gates — see [HIGH-full upgrade](#high-full-upgrade) below.
 
 ---
 
@@ -438,16 +445,115 @@ See `docs/CONTRACTS-VALIDATION-STRATEGY.md` for the full pros/cons, candidate li
 
 ## HIGH-full upgrade
 
-When HIGH-staged is complete (target: Q4 2026 / Q1 2027), the final upgrade is:
+HIGH-staged is complete; HIGH-full is now scoped as 5 reviewable phases targeting H1 2027 (alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md), ahead of the public AGPLv3 flip).
 
-- [ ] Promote `@typescript-eslint/no-explicit-any` from `warn` to `error` (project-wide, with surgical per-file disables for the genuine "this is dynamic" cases).
-- [ ] Add `@typescript-eslint/recommended-type-checked` with per-glob `parserOptions.project`. This enables ~30 type-aware rules including `no-floating-promises`, `no-misused-promises`, `await-thenable`, `no-unsafe-*`.
-- [ ] Triage the new violations (expect 100s–1000s — many will be in Tamagui-adjacent code, see `docs/TAMAGUI.md`).
-- [ ] Change `npm run lint` to `npm run lint -- --max-warnings 0`.
-- [ ] Update `web-lint.yml` to drop the separate `lint:packages-strict` step (no longer needed — the main lint is strict everywhere).
-- [ ] Update this doc to mark HIGH-full as ✅ landed.
+### Measurement baseline (2026-05-16, master `09c8b3c`)
 
-The expected output of HIGH-full: 0 warnings repo-wide, every error is real, every PR catches type-safety regressions before merge.
+A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-checked` on top of the regular config (with `parserOptions.projectService: true`) was run against the post-Phase-6c tree. The raw per-workspace logs are kept under `var/tmp/cursor/raw/high-full-*.raw` (gitignored) for reproducibility. Headline numbers:
+
+- **Total warnings:** 1,671 (errors: 0, after the throwaway-config-only `js.configs.recommended` carve-outs are accounted for).
+- **Auto-fixable:** ~411 (~25%) via `eslint --fix`. Mostly `no-unnecessary-type-assertion`.
+- **Wall time, full repo:** 44s (vs ~6s for the current non-type-aware lint). The wall time is acceptable for CI (`web-lint.yml` has a 10-min timeout; the lint phase goes from ~10–15s to ~44s, total job goes from ~3–4 min to ~3.5–4.5 min). The bigger UX cost is editor inline lint — Cursor's per-file feedback goes from ~instant to several seconds, which is the main day-to-day friction.
+- **Per-workspace distribution:**
+
+  | Workspace | Warnings | Top rule (count) |
+  |---|---:|---|
+  | `services/api` | 1,034 | `no-unsafe-member-access` (507) |
+  | `apps/web` | 452 | `no-unsafe-member-access` (147) |
+  | `apps/native` | 78 | `no-unnecessary-type-assertion` (34) |
+  | `packages/contracts` | 59 | `no-unsafe-member-access` (42) |
+  | `packages/ui` | 21 | `no-unnecessary-type-assertion` (6) |
+  | `packages/test-mcp` | 9 | `no-unnecessary-type-assertion` (6) |
+  | `packages/i18n-react` | 3 | `no-unnecessary-type-assertion` (3) |
+  | `packages/beerjson` | 2 | `no-redundant-type-constituents` (2) |
+  | `packages/i18n` | 2 | `no-unnecessary-type-assertion` (2) |
+  | `packages/api-client` | 0 | — |
+  | `packages/media` | 0 | — |
+  | `packages/navigation` | 0 | — |
+  | `packages/recipes-ui` | 0 | — |
+
+- **Friction tiers** (where the warnings actually live):
+  - **Tier A — Real bug catches** (~135 warnings): `no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`. Each fix catches a real bug or near-bug. No Tamagui interaction.
+  - **Tier B — Mechanical cleanup** (~425 warnings, ~96% auto-fixable): `no-unnecessary-type-assertion`, `no-redundant-type-constituents`, `no-base-to-string`, `restrict-template-expressions`, `unbound-method`. Mostly stale casts left over from the Phase 1–6c `any`-removal.
+  - **Tier C-narrow — `services/api` `no-unsafe-*`** (~665 warnings): Prisma raw queries, Fastify request bodies, AI tool I/O, BeerJSON normalisation. Real type-discipline issues, no Tamagui involvement.
+  - **Tier C-wide — `apps/web` `no-unsafe-*`** (~266 warnings): Tamagui-driven props leaked as `any`. The genuine "Tamagui wall" — but bounded to apps/web only (apps/native has 3 such warnings total).
+
+### Phase plan
+
+#### Phase 1 — Auto-fix sweep
+
+- **Scope:** ~411 warnings, single commit, mechanical only.
+- **Rules enabled (auto-fix only):** `no-unnecessary-type-assertion`, `no-redundant-type-constituents`, the auto-fixable subset of `no-base-to-string`.
+- **Strategy:** run `eslint --fix` against a temporary type-aware config restricted to the auto-fixable rules. Manual review of the resulting diff (mostly stale `as Foo` removals + a few `String(x)` rewrites). No hand edits.
+- **Verification gate:**
+  - Per-workspace TS baselines hold: `apps/web` 590, `services/api` 19, all others 0.
+  - `npm run lint` and `npm run lint:packages-strict` still pass (this phase only touches code that the existing lint rules already accept, since auto-fix produces canonical replacements).
+  - The remeasurement baseline drops by ~411.
+- **Effort:** ~30 min.
+- **Risk:** very low (auto-fix is reversible; the rules in scope are the ones with the smallest semantic surface).
+- **Status:** [ ] not started.
+
+#### Phase 2 — Tier A: Promise correctness
+
+- **Scope:** ~135 warnings, distributed across `services/api` (47 `require-await`), `apps/web` (41 `no-misused-promises` + 13 `no-floating-promises` + 2 `require-await`), `apps/native` (24 `no-misused-promises` + 11 `no-base-to-string` + 4 `no-floating-promises` + 1 `require-await` + 1 `prefer-promise-reject-errors`), `packages/test-mcp` (1 `no-misused-promises` + 1 `require-await`).
+- **Rules promoted to `warn` (and required to be at zero before the phase closes):** `no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`.
+- **Strategy per rule:**
+  - `no-floating-promises`: add `await`, or `void` the expression with a comment explaining the deliberate fire-and-forget.
+  - `no-misused-promises`: convert async handlers passed to non-awaiting slots to wrappers (`(...args) => { void asyncHandler(...args); }`) — common in event handlers and `onPress`.
+  - `require-await`: drop the `async` keyword on functions that don't actually await anything (the surrounding callers must already handle non-Promise return — ESLint flagged this because TS doesn't).
+  - `await-thenable`: drop the `await` from non-Promise expressions.
+  - `prefer-promise-reject-errors` / `only-throw-error`: replace `throw "string"` and `Promise.reject("string")` with proper `Error` instances.
+- **Verification gate:** all 7 rules at zero warnings; per-workspace TS baselines hold; CI green.
+- **Effort:** 3–6 hours, one commit per workspace (~7 commits).
+- **Risk:** low (each fix is local; behavior change is "the bug stops happening").
+- **Status:** [ ] not started.
+
+#### Phase 3 — Tier C-narrow: `services/api` `no-unsafe-*`
+
+- **Scope:** ~665 warnings in `services/api/src/**` (`no-unsafe-member-access` 507, `no-unsafe-assignment` 158, `no-unsafe-call` 44, `no-unsafe-return` 10, `no-unsafe-argument` 6, plus tail). Phase-start re-measurement to identify the file families before splitting commits.
+- **Rules promoted (scoped to `services/api/**`):** `no-unsafe-assignment`, `no-unsafe-member-access`, `no-unsafe-call`, `no-unsafe-argument`, `no-unsafe-return`.
+- **Likely file families (to be confirmed at phase start):**
+  - Prisma raw queries (`$queryRaw`, `$executeRaw`).
+  - Fastify request handler bodies + headers (handlers that read `req.body` / `req.headers` without going through a typed Zod parser).
+  - AI tool I/O (`services/api/src/services/ai/tools/**` — input/output narrowing).
+  - BeerJSON normalisation (already partially typed in Phase 2 of HIGH-staged).
+- **Strategy:** type the boundary as `unknown`, narrow with type guards or a parser inside. Where a Zod/Valibot parser is the right answer, defer to the `Phase 7` migration in [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md) — Phase 3 of HIGH-full only types boundaries that don't need a runtime validator.
+- **Verification gate:** `services/api` warning surface at zero on the 5 `no-unsafe-*` rules; `services/api` TS baseline (currently 19 errors, all pre-existing) unchanged or reduced; integration tests still green; CI green.
+- **Effort:** 10–20 hours, split per file family (likely 4–6 commits).
+- **Risk:** medium (semantic regressions possible in narrowing — e.g. a wrong type guard letting unexpected shapes through). Mitigated by the existing integration test suite and per-route-family commit scope.
+- **Status:** [ ] not started.
+
+#### Phase 4 — Tier C-wide: `apps/web` `no-unsafe-*` (Tamagui surface)
+
+- **Scope:** ~266 warnings in `apps/web/app/**` (`no-unsafe-member-access` 147, `no-unsafe-assignment` 119, plus tail). Tamagui-driven; needs per-component triage.
+- **Phase-start measurement:** count unique components vs unique sites to choose between three sub-strategies:
+  - **4a — per-site disable.** Cheap (1 line per site) but noisy in source. Use when the warning is at a leaf consumer that has no architectural alternative.
+  - **4b — Tamagui adapter improvements.** Type the platform-forking primitives in `packages/ui/src/primitives/*` more strictly so consumers don't see the leaks. May require upstream Tamagui changes (see [`docs/TAMAGUI.md`](TAMAGUI.md) §"Do not fork Tamagui to fix types"). Higher effort, durable fix.
+  - **4c — hybrid.** 4b for hot paths (forms, navigation, primary CRUD screens), 4a for cold paths (admin tools, one-off settings panels).
+- **Decision trigger:** if >50% of warnings concentrate in <10 unique components, pick 4b. If >100 unique components are touched, pick 4a/4c. The phase-start measurement decides.
+- **Rules promoted (scoped to `apps/web/**`):** same 5 `no-unsafe-*` rules as Phase 3.
+- **Verification gate:** `apps/web` warning surface at zero on the 5 `no-unsafe-*` rules; `apps/web` TS baseline (currently 590) unchanged; Playwright smoke suite green; CI green.
+- **Effort:** 10–30 hours depending on the 4a/4b/4c split.
+- **Risk:** medium-high — Tamagui upstream type stability is variable. Disables (4a) are always a safety valve.
+- **Status:** [ ] not started.
+
+#### Phase 5 — Rule promotions + gate
+
+- **Scope:** trivial cleanup phase. All type-aware rules flipped from `warn` to `error`; `lint:packages-strict` script + the corresponding step in [`.github/workflows/web-lint.yml`](.github/workflows/web-lint.yml) dropped (now redundant since the main lint is strict everywhere); LINTING.md status banner updated to `v3.0` / "HIGH-full landed".
+- **Pre-conditions:** Phases 1–4 all at zero warnings on the type-aware rules they enabled.
+- **Changes:**
+  - `eslint.config.mjs`: promote each type-aware rule from `warn` to `error`.
+  - `package.json`: drop `lint:packages-strict` script.
+  - `.github/workflows/web-lint.yml`: drop the strict step; main `npm run lint` already gates everything.
+  - `docs/LINTING.md`: status banner update + tier table HIGH-full row marked landed.
+- **Verification gate:** `npm run lint` exits clean (errors only, zero warnings); CI green; this doc shows `v3.0`.
+- **Effort:** ~30 min.
+- **Risk:** trivial.
+- **Status:** [ ] not started.
+
+### Expected output of HIGH-full
+
+Zero warnings repo-wide under `npm run lint`, every error real, every PR catches type-safety regressions before merge. Editor inline lint feedback ~3–5× slower than today (per-file, type-aware rules need TS program loaded) — the only meaningful UX cost.
 
 ---
 
