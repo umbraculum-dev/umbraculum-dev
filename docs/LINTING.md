@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.9 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**` — recipe edit + water + yeast + brew-sessions pages), 5a (`apps/native/src/screens/RecipeEditScreen.tsx`), and **5b** (the rest of `apps/native/src/**` — YeastScreen + 14 other screens + bootstrap + auth + media + navigation + dom-shim) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, the entire `apps/web/app/recipes/**` surface (~11,400 lines) is `any`-free, and **the entire `apps/native/src/**` surface is `any`-free** with typed React Navigation across all screens. Only `apps/web` (outside `app/recipes/**`) and `services/api` test stragglers remain.
+**Status:** v2.0 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**`), 5a–5b (entire `apps/native/src/**`), and **6a** (`apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, all of `apps/web/app/recipes/**` (~11,400 lines) is `any`-free, the entire `apps/native/src/**` surface is `any`-free with typed React Navigation, and the two highest-leverage non-recipes web files are now `any`-free. Only the apps/web "long tail" (~58 `any` across 22 small files, mostly 1–13 each) and a 1-`any` services/api seed residual remain.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **187** (-99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -940 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **138** (-49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -989 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -309,11 +309,35 @@ Same patterns as Phase 4 but for the React Native side. May land easier or harde
 
 **Phase 5 cumulative impact:** 155 `any` removed across 22 files (Phase 5a's RecipeEditScreen + Phase 5b's 21 files). The whole React Native app surface is now `any`-free. Combined with Phases 1–4 (`packages/**`, `services/api/src/**`, `apps/web/app/recipes/**`), the only remaining `any` debt is the `apps/web` non-recipes pages (mostly under `apps/web/app/[locale]/**` and `apps/web/app/_components/**`, ~96 warnings) plus a small `services/api` test residue.
 
-### Phase 6 — Mop-up
+### Phase 6 — `apps/web` non-recipes any cleanup + mop-up
 
-- [ ] Clean 86 `no-unused-vars` warnings (mostly unused imports — mechanical deletions)
-- [ ] Promote `no-unused-vars` from `warn` to `error`
+The big-leverage `any` debt outside `apps/web/app/recipes/**` lives in two files (49 of the 107 post-5b warnings). Phase 6a clears those. Phase 6b sweeps the long tail. Phase 6c is the original mop-up scope (no-unused-vars promotion).
+
+- [x] Phase 6a: `apps/web/app/[locale]/ferm-data-integration/page.tsx` (26 `any`) + `apps/web/app/_components/RecipeImportForm.tsx` (23 `any`) — 49 `any` removed ✅ landed 2026-05-16
+- [ ] Phase 6b: Long tail — `apps/web/app/HealthPanel.tsx` (13), `apps/web/app/[locale]/inventory/page.tsx` (7), `apps/web/app/recipes/_components/YeastEditor.tsx` (6), `apps/web/app/_components/PrimaryNav.tsx` (5), and 18 smaller files (1–4 `any` each)
+- [ ] Phase 6c: Clean ~50 `no-unused-vars` warnings (mostly unused imports — mechanical deletions); promote `no-unused-vars` from `warn` to `error`
 - [ ] Verify no remaining pre-existing warnings outside known carve-outs
+
+#### Phase 6a — `apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx` ✅ landed 2026-05-16
+
+**Scope:** 2 files, 1,386 lines combined. 49 `no-explicit-any` warnings → 0. Both are big "container" files — the ferm-data integration page is the web counterpart of `apps/native/src/screens/FermDataIntegrationScreen.tsx` (Phase 5b), and `RecipeImportForm` is the shared single + bulk recipe import form used by `apps/web/app/[locale]/recipes/page.tsx` and the platform-admin recipes page.
+
+**Strategy used:** "tighten in place" — same toolkit as Phases 1–5b. Both files were dominated by two patterns: `(res.data as any)?.field` API response unpacks (~25 sites combined), and `xs.map((x: any) => …)` JSX iterators where the array element shape was known but unstated (~10 sites combined).
+
+**Per-file changes:**
+
+- **`ferm-data-integration/page.tsx` (26 → 0):** Defined 4 explicit row types — `IntegrationSummary`, `IntegrationDevice`, `HydrometerReadingPoint`, `RecentBrewSession` — at the top of the file, mirroring the same shapes used in the native counterpart (Phase 5b). Replaced the 3 `any`-typed `useState<...>` declarations (`integrations`, `devicesByKind`, `recentBrewSessions`) with the new types. Replaced the 6 method-level error-message extracts (`(res.data as any)?.message`) with `(res.data as { message?: unknown })?.message`. Replaced the 9 `(res.data as any)?.{token,publicPath,integration,devices,brewSessions}` response-unpacks with explicit shape-casts + `Array.isArray` for list responses. The 2 JSX `map((d: any) => …)` / `map((r: any) => …)` iterators dropped to typed callbacks (the array elements are `IntegrationDevice` and `HydrometerReadingPoint` respectively). Same Phase 4a/5b precedent.
+- **`RecipeImportForm.tsx` (23 → 0):** Defined 3 explicit shapes — `BulkPreviewItem`, `BulkCreatedItem`, `BulkFailedItem` — alongside the pre-existing `ImportWarning` type. Updated the `bulkPreviewItems` and `bulkResult` state declarations to use these types instead of `any[]` / `{ created: any[]; failed: any[] }`. Replaced the 5 `(res.data as any)?.{styles,preview,previewItems,recipe,created,failed}` response-unpacks with typed shape-casts. The preview-extraction block's 5 `(p as any).field` reads consolidated to a single `pRec = p as { name?: unknown; notes?: unknown; warnings?: unknown }` narrowing. The bulk-result `Array.isArray((res.data as any)?.created) ? ((res.data as any).created as any[]) : []` simplified to `Array.isArray(body?.created) ? (body.created as BulkCreatedItem[]) : []` after the body shape-cast. JSX iterators (`bulkPreviewItems.map`, `bulkResult.created.map`, `bulkResult.failed.map`, and the inner warnings loop) all dropped their `: any` annotations.
+
+**Verification:**
+
+- ESLint: both files at 0 `no-explicit-any` warnings (down from 26 + 23 = 49).
+- `apps/web` TypeScript: held at the pre-change baseline of 590 errors (`npx tsc --noEmit` from `apps/web` — all 590 are pre-existing Tamagui/Next.js type-system gaps unrelated to Phase 6a). The Phase 6a changes did not introduce a single new TS error.
+- Repo-wide `no-explicit-any`: 107 → 58 (drop of 49, exact match to scope).
+- Repo-wide all-warnings: 187 → 138 (same -49 delta, no other warning category affected).
+- No new unit tests added — Phase 6a is type-tightening, no behavioural change. Both files are exercised by the existing Playwright smoke suite.
+
+**Why these two files went together in Phase 6a:** they're the two largest single residuals after Phase 5b (26 + 23 = 49 of the remaining 107 `any` warnings, ≈46% of the post-5b debt), they share ~80% of their patterns with prior phases, and the ferm-data-integration page in particular was already half-typed by Phase 5b's native counterpart — porting the same type definitions back to web was mostly mechanical. Splitting them into two PRs would have been disproportionate review overhead given the pattern uniformity.
 
 ### Phase 7 (optional, separate decision) — runtime-validation library migration
 

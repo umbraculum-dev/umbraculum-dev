@@ -20,6 +20,26 @@ type StyleListItem = { key: string; name: string; code: string; sortOrder: numbe
 
 type ImportWarning = { code?: unknown; message?: unknown };
 
+type BulkPreviewItem = {
+  index?: number;
+  name?: string;
+  resolvedStyleCode?: string;
+  resolvedStyleName?: string;
+  warnings?: ImportWarning[];
+};
+
+type BulkCreatedItem = {
+  recipeId: string;
+  name?: string;
+  style?: string;
+};
+
+type BulkFailedItem = {
+  index?: number;
+  name?: string;
+  error?: string;
+};
+
 function apiErrorMessage(resData: unknown): string {
   const errData = resData as { error?: { code?: string; message?: string } } | undefined;
   return (
@@ -92,11 +112,11 @@ export function RecipeImportForm({
 
   const [bulkPreviewLoading, setBulkPreviewLoading] = useState(false);
   const [bulkPreviewError, setBulkPreviewError] = useState<string | null>(null);
-  const [bulkPreviewItems, setBulkPreviewItems] = useState<any[] | null>(null);
+  const [bulkPreviewItems, setBulkPreviewItems] = useState<BulkPreviewItem[] | null>(null);
 
   const [bulkImporting, setBulkImporting] = useState(false);
   const [bulkImportError, setBulkImportError] = useState<string | null>(null);
-  const [bulkResult, setBulkResult] = useState<{ created: any[]; failed: any[] } | null>(null);
+  const [bulkResult, setBulkResult] = useState<{ created: BulkCreatedItem[]; failed: BulkFailedItem[] } | null>(null);
 
   const [openSections, setOpenSections] = useState<string[]>([]);
 
@@ -109,7 +129,7 @@ export function RecipeImportForm({
       try {
         const res = await apiFetch("/api/styles");
         if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-        const items = (res.data as any)?.styles;
+        const items = (res.data as { styles?: unknown })?.styles;
         if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
       } catch (err) {
         if (!cancelled) {
@@ -196,12 +216,13 @@ export function RecipeImportForm({
         body: JSON.stringify(buildBody({ format, content })),
       });
       if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const p = (res.data as any)?.preview ?? null;
+      const p = (res.data as { preview?: unknown })?.preview ?? null;
       if (!p || typeof p !== "object") throw new Error(t("errors.previewMissing"));
-      const name = typeof (p as any).name === "string" ? ((p as any).name as string) : "";
-      const notesRaw = (p as any).notes;
+      const pRec = p as { name?: unknown; notes?: unknown; warnings?: unknown };
+      const name = typeof pRec.name === "string" ? pRec.name : "";
+      const notesRaw = pRec.notes;
       const notes = typeof notesRaw === "string" ? notesRaw : notesRaw === null ? null : null;
-      const warningsRaw = (p as any).warnings;
+      const warningsRaw = pRec.warnings;
       const warnings = Array.isArray(warningsRaw) ? (warningsRaw as ImportWarning[]) : [];
       setPreview({ name, notes, warnings });
     } catch (err) {
@@ -229,9 +250,9 @@ export function RecipeImportForm({
         body: JSON.stringify(buildBody({ format: bulkFormat, content: bulkContent })),
       });
       if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const items = (res.data as any)?.previewItems;
+      const items = (res.data as { previewItems?: unknown })?.previewItems;
       if (!Array.isArray(items)) throw new Error(t("errors.previewMissing"));
-      setBulkPreviewItems(items);
+      setBulkPreviewItems(items as BulkPreviewItem[]);
     } catch (err) {
       setBulkPreviewError(String(err));
     } finally {
@@ -255,8 +276,9 @@ export function RecipeImportForm({
         body: JSON.stringify(buildBody({ format, content, styleKey })),
       });
       if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const recipe = (res.data as any)?.recipe ?? null;
-      const id = recipe && typeof recipe === "object" && typeof (recipe as any).id === "string" ? ((recipe as any).id as string) : "";
+      const recipe = (res.data as { recipe?: unknown })?.recipe ?? null;
+      const recipeRec = recipe && typeof recipe === "object" ? (recipe as { id?: unknown }) : null;
+      const id = typeof recipeRec?.id === "string" ? recipeRec.id : "";
       if (!id) throw new Error(t("errors.importMissingId"));
       onSingleImportSuccess?.(id);
     } catch (err) {
@@ -281,8 +303,9 @@ export function RecipeImportForm({
         body: JSON.stringify(buildBody({ format: bulkFormat, content: bulkContent })),
       });
       if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const created = Array.isArray((res.data as any)?.created) ? ((res.data as any).created as any[]) : [];
-      const failed = Array.isArray((res.data as any)?.failed) ? ((res.data as any).failed as any[]) : [];
+      const body = res.data as { created?: unknown; failed?: unknown };
+      const created: BulkCreatedItem[] = Array.isArray(body?.created) ? (body.created as BulkCreatedItem[]) : [];
+      const failed: BulkFailedItem[] = Array.isArray(body?.failed) ? (body.failed as BulkFailedItem[]) : [];
       setBulkResult({ created, failed });
     } catch (err) {
       setBulkImportError(String(err));
@@ -603,7 +626,7 @@ export function RecipeImportForm({
           <View mt="$3">
             <H3 mb="$1.5">{t("bulkPreviewHeading")}</H3>
             <ul className="brew-recipe-edit-list-disc brew-list-mt0">
-              {bulkPreviewItems.map((it: any) => (
+              {bulkPreviewItems.map((it) => (
                 <li key={String(it?.index ?? Math.random())} className="brew-list-item-mb">
                   <SizableText size="$2" fontFamily="$body">
                     <SizableText fontWeight="bold">{String(it?.name ?? dash)}</SizableText>
@@ -615,7 +638,7 @@ export function RecipeImportForm({
                   </SizableText>
                   {Array.isArray(it?.warnings) && it.warnings.length ? (
                     <ul className="brew-recipe-edit-list-disc brew-list-mt1">
-                      {it.warnings.map((w: any, idx: number) => (
+                      {it.warnings.map((w: ImportWarning, idx: number) => (
                         <li key={`${String(w?.code ?? "warn")}-${idx}`}>
                           <SizableText size="$2" fontFamily="$body">
                             <code>{typeof w?.code === "string" ? w.code : t("unknownWarningCode")}</code>{" "}
@@ -644,7 +667,7 @@ export function RecipeImportForm({
               </View>
               {bulkResult.created.length ? (
                 <ul className="brew-recipe-edit-list-disc brew-list-mt0">
-                  {bulkResult.created.map((x: any) => (
+                  {bulkResult.created.map((x) => (
                     <li key={String(x?.recipeId ?? Math.random())}>
                       <SizableText size="$2" fontFamily="$body">
                         <Link href={`/recipes/${String(x.recipeId)}/edit`}>{String(x?.name ?? "") || dash}</Link>
@@ -663,7 +686,7 @@ export function RecipeImportForm({
             {bulkResult.failed.length ? (
               <ErrorBox>
                 {t("bulkFailedHeading")}{"\n"}
-                {bulkResult.failed.map((f: any) => `#${String(f?.index ?? "?")}: ${String(f?.name ?? "")} — ${String(f?.error ?? "")}`).join("\n")}
+                {bulkResult.failed.map((f) => `#${String(f?.index ?? "?")}: ${String(f?.name ?? "")} — ${String(f?.error ?? "")}`).join("\n")}
               </ErrorBox>
             ) : null}
           </YStack>

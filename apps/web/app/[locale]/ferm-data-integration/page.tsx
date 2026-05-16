@@ -18,6 +18,44 @@ type IntegrationKind = "tilt" | "ispindel" | "rapt";
 
 const INTEGRATION_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
 
+type IntegrationSummary = {
+  id: string;
+  workspaceId: string;
+  kind: IntegrationKind;
+  revokedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type HydrometerReadingPoint = {
+  recordedAt: string | null;
+  receivedAt: string;
+  temperatureC: number | null;
+  gravitySg: number | null;
+};
+
+type IntegrationDevice = {
+  id: string;
+  deviceKey: string;
+  displayName: string | null;
+  lastSeenAt: string | null;
+  activeAttachment?: {
+    brewSession?: {
+      id: string;
+      code: string;
+      recipe?: { id: string; name: string | null } | null;
+    } | null;
+  } | null;
+  lastReading?: HydrometerReadingPoint | null;
+  recentReadings?: HydrometerReadingPoint[] | null;
+};
+
+type RecentBrewSession = {
+  id: string;
+  code: string;
+  recipe?: { id: string; name: string | null } | null;
+};
+
 export default function FermDataIntegrationPage() {
   const t = useTranslations("dashboard.fermDataIntegration");
   const [openSections, setOpenSections] = useState<string[]>([]);
@@ -35,9 +73,13 @@ export default function FermDataIntegrationPage() {
     rapt: value,
   });
 
-  const [integrations, setIntegrations] = useState<Record<IntegrationKind, any | null>>(createKindRecord(null));
-  const [devicesByKind, setDevicesByKind] = useState<Record<IntegrationKind, any[]>>(createKindRecord([]));
-  const [recentBrewSessions, setRecentBrewSessions] = useState<any[]>([]);
+  const [integrations, setIntegrations] = useState<Record<IntegrationKind, IntegrationSummary | null>>(
+    createKindRecord<IntegrationSummary | null>(null),
+  );
+  const [devicesByKind, setDevicesByKind] = useState<Record<IntegrationKind, IntegrationDevice[]>>(
+    createKindRecord<IntegrationDevice[]>([]),
+  );
+  const [recentBrewSessions, setRecentBrewSessions] = useState<RecentBrewSession[]>([]);
 
   const [newTokens, setNewTokens] = useState<Record<IntegrationKind, string | null>>(createKindRecord(null));
   const [newPublicPaths, setNewPublicPaths] = useState<Record<IntegrationKind, string | null>>(createKindRecord(null));
@@ -56,7 +98,7 @@ export default function FermDataIntegrationPage() {
   };
 
   const brewSessionOptions = useMemo(() => {
-    return (recentBrewSessions ?? []).map((s: any) => ({
+    return (recentBrewSessions ?? []).map((s) => ({
       value: s.id,
       label: `${s.code} — ${s.recipe?.name ?? ""}`.trim(),
     }));
@@ -87,23 +129,26 @@ export default function FermDataIntegrationPage() {
       ]);
 
       integrationResponses.forEach((res) => {
-        if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+        if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       });
       deviceResponses.forEach((res) => {
-        if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+        if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       });
-      if (!sRes.ok) throw new Error(String((sRes.data as any)?.message ?? sRes.status));
+      if (!sRes.ok) throw new Error(String((sRes.data as { message?: unknown })?.message ?? sRes.status));
 
-      const nextIntegrations = createKindRecord<any | null>(null);
-      const nextDevices = createKindRecord<any[]>([]);
+      const nextIntegrations = createKindRecord<IntegrationSummary | null>(null);
+      const nextDevices = createKindRecord<IntegrationDevice[]>([]);
       INTEGRATION_KINDS.forEach((kind, idx) => {
-        nextIntegrations[kind] = (integrationResponses[idx].data as any).integration ?? null;
-        nextDevices[kind] = (deviceResponses[idx].data as any).devices ?? [];
+        const integration = (integrationResponses[idx].data as { integration?: unknown })?.integration;
+        nextIntegrations[kind] = (integration ?? null) as IntegrationSummary | null;
+        const devices = (deviceResponses[idx].data as { devices?: unknown })?.devices;
+        nextDevices[kind] = Array.isArray(devices) ? (devices as IntegrationDevice[]) : [];
       });
 
       setIntegrations(nextIntegrations);
       setDevicesByKind(nextDevices);
-      setRecentBrewSessions((sRes.data as any).brewSessions ?? []);
+      const sessions = (sRes.data as { brewSessions?: unknown })?.brewSessions;
+      setRecentBrewSessions(Array.isArray(sessions) ? (sessions as RecentBrewSession[]) : []);
     } catch (e) {
       setError(String(e));
     } finally {
@@ -142,10 +187,9 @@ export default function FermDataIntegrationPage() {
     setError(null);
     try {
       const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/reveal`);
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
-      const token = String((res.data as any)?.token ?? "");
-      const publicPath = String((res.data as any)?.publicPath ?? "");
-      updateKindTokens(kind, token, publicPath);
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
+      const body = res.data as { token?: unknown; publicPath?: unknown };
+      updateKindTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
     } catch (e) {
       setError(String(e));
     } finally {
@@ -159,10 +203,9 @@ export default function FermDataIntegrationPage() {
     setError(null);
     try {
       const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}`, { method: "POST" });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
-      const token = String((res.data as any)?.token ?? "");
-      const publicPath = String((res.data as any)?.publicPath ?? "");
-      updateKindTokens(kind, token, publicPath);
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
+      const body = res.data as { token?: unknown; publicPath?: unknown };
+      updateKindTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -177,10 +220,9 @@ export default function FermDataIntegrationPage() {
     setError(null);
     try {
       const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/rotate-token`, { method: "POST" });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
-      const token = String((res.data as any)?.token ?? "");
-      const publicPath = String((res.data as any)?.publicPath ?? "");
-      updateKindTokens(kind, token, publicPath);
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
+      const body = res.data as { token?: unknown; publicPath?: unknown };
+      updateKindTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -195,7 +237,7 @@ export default function FermDataIntegrationPage() {
     setError(null);
     try {
       const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/revoke`, { method: "POST" });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       updateKindTokens(kind, "", "");
       await refresh();
     } catch (e) {
@@ -217,7 +259,7 @@ export default function FermDataIntegrationPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brewSessionId }),
       });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -234,7 +276,7 @@ export default function FermDataIntegrationPage() {
       const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/devices/${deviceId}/detach`, {
         method: "POST",
       });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -399,7 +441,7 @@ export default function FermDataIntegrationPage() {
                   </SizableText>
                 ) : (
                   <YStack gap="$2">
-                    {tiltDevices.map((d: any) => {
+                    {tiltDevices.map((d) => {
                       const attachId = `attach-${d.id}`;
                       const selectedSessionId = attachSessionByDeviceId[d.id] ?? "";
                       const working = deviceWorkingId === d.id;
@@ -442,7 +484,7 @@ export default function FermDataIntegrationPage() {
 
                           {recentReadings.length ? (
                             <HydrometerChart
-                              points={recentReadings.map((r: any) => ({
+                              points={recentReadings.map((r: HydrometerReadingPoint) => ({
                                 at: String(r.recordedAt ?? r.receivedAt ?? ""),
                                 gravitySg: typeof r.gravitySg === "number" ? r.gravitySg : null,
                                 temperatureC: typeof r.temperatureC === "number" ? r.temperatureC : null,
