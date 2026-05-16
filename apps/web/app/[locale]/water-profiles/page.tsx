@@ -74,8 +74,8 @@ export default function WaterProfilesPage() {
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
     const pub = profiles?.public ?? [];
-    const acc = profiles?.account ?? [];
-    return [...sys, ...pub, ...acc];
+    const wsp = profiles?.workspace ?? [];
+    return [...sys, ...pub, ...wsp];
   }, [profiles]);
 
   const admin = isAdmin(me?.role ?? null);

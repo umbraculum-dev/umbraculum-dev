@@ -426,8 +426,8 @@ export default function MashWaterPage() {
   const allProfiles = useMemo(() => {
     const sys = profiles?.system ?? [];
     const pub = profiles?.public ?? [];
-    const acc = profiles?.account ?? [];
-    return [...sys, ...pub, ...acc];
+    const wsp = profiles?.workspace ?? [];
+    return [...sys, ...pub, ...wsp];
   }, [profiles]);
   const waterProfiles = useMemo(() => allProfiles.filter((p) => p.type === "water"), [allProfiles]);
   const dilutionProfiles = useMemo(() => allProfiles.filter((p) => p.type === "dilution"), [allProfiles]);
