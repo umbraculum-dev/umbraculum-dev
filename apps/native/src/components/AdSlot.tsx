@@ -72,7 +72,7 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
       media={
         ad ? (
           <Pressable
-            onPress={() => ad.linkUrl && Linking.openURL(ad.linkUrl)}
+            onPress={() => { if (ad.linkUrl) void Linking.openURL(ad.linkUrl); }}
             style={{ flex: 1 }}
             accessibilityRole="link"
             accessibilityLabel={ad.altText}
@@ -93,7 +93,7 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
         <Pressable
           onPress={() => {
             const base = baseUrl.replace(/\/+$/, "");
-            Linking.openURL(`${base}/contact`);
+            void Linking.openURL(`${base}/contact`);
           }}
           accessibilityRole="link"
           accessibilityLabel={t("contactLine")}

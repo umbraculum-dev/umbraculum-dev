@@ -70,7 +70,7 @@ export function LoginScreen() {
         </YStack>
 
         <Button
-          onPress={onSubmit}
+          onPress={() => { void onSubmit(); }}
           disabled={!canSubmit}
           accessibilityRole="button"
           accessibilityLabel={t("submitLogin")}

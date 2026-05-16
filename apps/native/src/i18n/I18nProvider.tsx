@@ -26,7 +26,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    void (async () => {
       const persisted = await readString(LOCALE_STORAGE_KEY);
       const resolved = persisted && isLocale(persisted) ? persisted : getDeviceLocale();
       if (!cancelled) setLocaleState(resolved);

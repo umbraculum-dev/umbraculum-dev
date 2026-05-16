@@ -202,7 +202,7 @@ export function WaterProfilesScreen() {
     await refresh();
   };
 
-  const onDeleteProfile = async (p: WaterProfile) => {
+  const onDeleteProfile = (p: WaterProfile) => {
     if (p.scope === "system" || !api) return;
     Alert.alert(
       tEquipment("delete"),
@@ -212,15 +212,17 @@ export function WaterProfilesScreen() {
         {
           text: tEquipment("delete"),
           style: "destructive",
-          onPress: async () => {
-            setError(null);
-            try {
-              const res = await api.delete(`/api/water-profiles/${p.id}`);
-              if (!res.ok) throw new Error(JSON.stringify(res.data));
-              await refresh();
-            } catch (err) {
-              setError(String(err));
-            }
+          onPress: () => {
+            void (async () => {
+              setError(null);
+              try {
+                const res = await api.delete(`/api/water-profiles/${p.id}`);
+                if (!res.ok) throw new Error(JSON.stringify(res.data));
+                await refresh();
+              } catch (err) {
+                setError(String(err));
+              }
+            })();
           },
         },
       ]

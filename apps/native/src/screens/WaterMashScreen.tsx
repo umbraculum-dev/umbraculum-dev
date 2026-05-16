@@ -851,7 +851,7 @@ export function WaterMashScreen() {
                       borderColor="$borderColor"
                     />
                   </View>
-                  <Button size="$3" onPress={onSaveAdjustment}>
+                  <Button size="$3" onPress={() => { void onSaveAdjustment(); }}>
                     <Text>Save</Text>
                   </Button>
                   {mixedSourceProfile ? (
@@ -912,7 +912,7 @@ export function WaterMashScreen() {
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
-                      onPress={onImportGristFromRecipe}
+                      onPress={() => { void onImportGristFromRecipe(); }}
                       disabled={!canCall || importingGrist}
                     >
                       <Text>{importingGrist ? "Importing…" : "Import/update grist snapshot"}</Text>
@@ -1069,7 +1069,7 @@ export function WaterMashScreen() {
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
-                      onPress={onSaveMashDraft}
+                      onPress={() => { void onSaveMashDraft(); }}
                       disabled={!canCall || savingMash}
                     >
                       <Text>{savingMash ? t("saving") : t("saveMashDraft")}</Text>
@@ -1079,7 +1079,7 @@ export function WaterMashScreen() {
                       background="$background"
                       borderWidth={1}
                       borderColor="$borderColor"
-                      onPress={onEstimateAndSaveSnapshot}
+                      onPress={() => { void onEstimateAndSaveSnapshot(); }}
                       disabled={!canCall || mashSubmitting}
                     >
                       <Text>
@@ -1174,7 +1174,7 @@ export function WaterMashScreen() {
                   <Button
                   size="$3"
                   mt="$2"
-                  onPress={() => saveSettings({ mashSaltAdditionsJson: saltAdditions })}
+                  onPress={() => { void saveSettings({ mashSaltAdditionsJson: saltAdditions }); }}
                   disabled={!canCall}
                 >
                   <Text>Save</Text>
@@ -1196,7 +1196,7 @@ export function WaterMashScreen() {
               <Accordion.Content>
                 <Button
                   size="$3"
-                  onPress={onComputeAndSave}
+                  onPress={() => { void onComputeAndSave(); }}
                   disabled={!canCall || savingOverall}
                 >
                   <Text>{savingOverall ? "Calculating…" : "Compute & save"}</Text>
@@ -1244,7 +1244,7 @@ export function WaterMashScreen() {
                   formatFixed={formatFixed}
                 />
                 {mashStepsDirty ? (
-                  <Button size="$3" mt="$2" onPress={saveMashSteps} disabled={mashStepsSaving}>
+                  <Button size="$3" mt="$2" onPress={() => { void saveMashSteps(); }} disabled={mashStepsSaving}>
                     <Text>{mashStepsSaving ? "Saving…" : "Save mash steps"}</Text>
                   </Button>
                 ) : null}

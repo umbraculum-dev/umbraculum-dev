@@ -619,7 +619,7 @@ export function WaterBoilScreen() {
                       borderColor="$borderColor"
                     />
                   </View>
-                  <Button size="$3" onPress={onSaveAdjustment} disabled={!canCall || saving}>
+                  <Button size="$3" onPress={() => { void onSaveAdjustment(); }} disabled={!canCall || saving}>
                     <Text>{saving ? "Saving…" : "Save adjustment"}</Text>
                   </Button>
                 </View>
@@ -759,7 +759,7 @@ export function WaterBoilScreen() {
                   <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
                     <Button
                       size="$3"
-                      onPress={onCalculateAndSave}
+                      onPress={() => { void onCalculateAndSave(); }}
                       disabled={!canCall || submitting}
                     >
                       <Text>
@@ -770,7 +770,7 @@ export function WaterBoilScreen() {
                             : "Calculate & save"}
                       </Text>
                     </Button>
-                    <Button size="$3" chromeless onPress={onSaveDraft} disabled={!canCall || saving}>
+                    <Button size="$3" chromeless onPress={() => { void onSaveDraft(); }} disabled={!canCall || saving}>
                       <Text>{saving ? "Saving…" : "Save draft"}</Text>
                     </Button>
                   </View>
@@ -839,7 +839,7 @@ export function WaterBoilScreen() {
                   idPrefix="boil"
                   disabled={!canCall}
                 />
-                <Button size="$3" mt="$2" chromeless onPress={onSaveSalts} disabled={!canCall || saving}>
+                <Button size="$3" mt="$2" chromeless onPress={() => { void onSaveSalts(); }} disabled={!canCall || saving}>
                   <Text>{saving ? "Saving…" : "Save salts"}</Text>
                 </Button>
               </Accordion.Content>

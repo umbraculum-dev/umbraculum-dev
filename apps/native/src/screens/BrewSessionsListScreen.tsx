@@ -86,7 +86,7 @@ export function BrewSessionsListScreen() {
         </Heading>
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-          <Button onPress={createSession} disabled={!canCall || creating || !recipeId}>
+          <Button onPress={() => { void createSession(); }} disabled={!canCall || creating || !recipeId}>
             <Text>{creating ? t("creating") : t("createButton")}</Text>
           </Button>
           <Button onPress={() => void refresh()} disabled={!canCall || loading || !recipeId} background="$background" borderWidth={1}>

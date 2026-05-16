@@ -52,7 +52,7 @@ export function BlockedRouteScreen({ routeId }: { routeId: RouteId }) {
 
       {canOpenOnWeb ? (
         <Button
-          onPress={onOpenWeb}
+          onPress={() => { void onOpenWeb(); }}
           disabled={opening || auth.state.status !== "logged_in"}
           accessibilityRole="button"
           accessibilityLabel={t("openOnWeb")}

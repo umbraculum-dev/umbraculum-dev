@@ -678,7 +678,7 @@ export function BrewdayStepsSettingsScreen() {
           </Card>
 
           <View style={{ gap: 8 }}>
-            <Button size="$4" onPress={onSave} disabled={!canCall || saving}>
+            <Button size="$4" onPress={() => { void onSave(); }} disabled={!canCall || saving}>
               <Text>{saving ? t("saving") : t("save")}</Text>
             </Button>
             {saveStatus ? (

@@ -550,7 +550,7 @@ export function WaterSpargeScreen() {
                   <Button
                     size="$3"
                     chromeless
-                    onPress={onSaveSpargeConfig}
+                    onPress={() => { void onSaveSpargeConfig(); }}
                     disabled={!canCall || savingSpargeConfig}
                   >
                     <Text>{savingSpargeConfig ? "Saving…" : "Save"}</Text>
@@ -722,7 +722,7 @@ export function WaterSpargeScreen() {
                   <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
                     <Button
                       size="$3"
-                      onPress={onCalculateAndSave}
+                      onPress={() => { void onCalculateAndSave(); }}
                       disabled={!canCall || submitting}
                     >
                       <Text>
@@ -733,7 +733,7 @@ export function WaterSpargeScreen() {
                             : "Calculate & save"}
                       </Text>
                     </Button>
-                    <Button size="$3" chromeless onPress={onSaveDraft} disabled={!canCall || saving}>
+                    <Button size="$3" chromeless onPress={() => { void onSaveDraft(); }} disabled={!canCall || saving}>
                       <Text>{saving ? "Saving…" : "Save draft"}</Text>
                     </Button>
                   </View>
@@ -814,7 +814,7 @@ export function WaterSpargeScreen() {
                   idPrefix="sparge"
                   disabled={!canCall}
                 />
-                <Button size="$3" mt="$2" chromeless onPress={onSaveSalts} disabled={!canCall || saving}>
+                <Button size="$3" mt="$2" chromeless onPress={() => { void onSaveSalts(); }} disabled={!canCall || saving}>
                   <Text>{saving ? "Saving…" : "Save salts"}</Text>
                 </Button>
               </Accordion.Content>

@@ -506,7 +506,7 @@ export function RecipeEditScreen() {
   useEffect(() => {
     if (!canCall || !recipeId || !api) return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       try {
         const res = await api.get(`/api/recipes/${recipeId}/water-settings`);
         if (cancelled) return;

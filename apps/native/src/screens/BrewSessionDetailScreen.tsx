@@ -282,10 +282,10 @@ export function BrewSessionDetailScreen() {
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-            <Button onPress={attachHydrometer} disabled={!selectedDeviceId || working !== null}>
+            <Button onPress={() => { void attachHydrometer(); }} disabled={!selectedDeviceId || working !== null}>
               <Text>{t("hydrometerAttach")}</Text>
             </Button>
-            <Button onPress={detachHydrometer} disabled={!attached || working !== null} background="$background" borderWidth={1}>
+            <Button onPress={() => { void detachHydrometer(); }} disabled={!attached || working !== null} background="$background" borderWidth={1}>
               <Text>{t("hydrometerDetach")}</Text>
             </Button>
           </View>

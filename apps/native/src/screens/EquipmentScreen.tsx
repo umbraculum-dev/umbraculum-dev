@@ -273,7 +273,8 @@ export function EquipmentScreen() {
         {
           text: t("delete"),
           style: "destructive",
-          onPress: async () => {
+          onPress: () => {
+            void (async () => {
             setError(null);
             try {
               const res = await api.delete(`/api/equipment-profiles/${p.id}`);
@@ -286,6 +287,7 @@ export function EquipmentScreen() {
             } catch (err) {
               setError(String(err));
             }
+            })();
           },
         },
       ]
