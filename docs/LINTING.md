@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.6 — **HIGH-staged complete + HIGH-full Phases 1–3 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: 64 files, 310 warnings eliminated. **HIGH-full Phase 2** (Tier A — Promise correctness) landed 2026-05-16: 7 type-aware rules promoted to `warn`; 136 sites hand-fixed across 5 commits. **HIGH-full Phase 3** (Tier C-narrow — `services/api` `no-unsafe-*`) landed 2026-05-16: 5 unsafe-* rules promoted to `warn` on `services/api/**`, with the same family relaxed in test files (matching the existing `no-explicit-any: off` test relaxation pattern). 777 raw warnings → 0 across 5 commits (3a config + tests-relax = -611, 3b `app.ts` -17, 3c `prisma/seed.ts` -31 + new prisma sub-tsconfig, 3d `beerproto.ts` -108 via single `PrismaLike = any` → `PrismaClient` change, 3e tail -10). `services/api` tsc baseline improved 19 → 17 as a side effect of typing the CORS origin callback. Repo-wide lint stays at ~39s wall. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. **HIGH-full Phases 4–5 outstanding** — Tier C-wide (`apps/web` `no-unsafe-*`, ~266 warnings, Tamagui surface) and the final rule promotion + gate. Detailed phase plan, scope counts, and decisions in [`HIGH-full upgrade`](#high-full-upgrade) below.
+**Status:** v2.7 — **HIGH-staged complete + HIGH-full Phases 1–4 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: 64 files, 310 warnings eliminated. **HIGH-full Phase 2** (Tier A — Promise correctness) landed 2026-05-16: 7 type-aware rules promoted to `warn`; 136 sites hand-fixed across 5 commits. **HIGH-full Phase 3** (Tier C-narrow — `services/api` `no-unsafe-*`) landed 2026-05-16: 777 raw warnings → 0 across 5 commits; `services/api` tsc baseline improved 19 → 17 as a side effect. **HIGH-full Phase 4** (Tier C-wide — `apps/web` `no-unsafe-*`) landed 2026-05-16: 5 unsafe-* rules promoted to `warn` on `apps/web/**` (test/e2e auto-relaxed via existing test glob). 304 raw warnings → 0 across 4 commits (4a config = -10 e2e relaxation, 4b `.account → .workspace` rename in 4 pages = -290 + restored a long-broken UI feature, 4c tail = -4, 4d docs). **The "Tamagui wall" was a phantom** — 95% of the surface traced to a stale-rename cascade, not Tamagui prop typing. apps/web tsc baseline improved 590 → 585 as a side effect. Repo-wide lint stays at ~42s wall. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. **HIGH-full Phase 5 outstanding** — promote all type-aware rules from `warn` to `error` and drop the now-redundant `lint:packages-strict` script. Detailed phase plan in [`HIGH-full upgrade`](#high-full-upgrade) below.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -592,19 +592,51 @@ A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-ch
   - **`Array.isArray` narrows `unknown` to `any[]`, not `unknown[]`.** This was Pattern A in 4 of the Phase 3e tail fixes plus the BJCP styles loop in 3c. The standard remedy is `const items: unknown[] = Array.isArray(x) ? x : []` (or assert `as unknown[]` immediately after the runtime check).
   - **Sub-projects work with `projectService`.** Adding a `services/api/prisma/tsconfig.json` cleared a class of "type that could not be resolved" warnings without touching `eslint.config.mjs` rules. Keep this pattern for Phase 4 if it surfaces.
 
-#### Phase 4 — Tier C-wide: `apps/web` `no-unsafe-*` (Tamagui surface)
+#### Phase 4 — Tier C-wide: `apps/web` `no-unsafe-*` ✅ landed 2026-05-16
 
-- **Scope:** ~266 warnings in `apps/web/app/**` (`no-unsafe-member-access` 147, `no-unsafe-assignment` 119, plus tail). Tamagui-driven; needs per-component triage.
-- **Phase-start measurement:** count unique components vs unique sites to choose between three sub-strategies:
-  - **4a — per-site disable.** Cheap (1 line per site) but noisy in source. Use when the warning is at a leaf consumer that has no architectural alternative.
-  - **4b — Tamagui adapter improvements.** Type the platform-forking primitives in `packages/ui/src/primitives/*` more strictly so consumers don't see the leaks. May require upstream Tamagui changes (see [`docs/TAMAGUI.md`](TAMAGUI.md) §"Do not fork Tamagui to fix types"). Higher effort, durable fix.
-  - **4c — hybrid.** 4b for hot paths (forms, navigation, primary CRUD screens), 4a for cold paths (admin tools, one-off settings panels).
-- **Decision trigger:** if >50% of warnings concentrate in <10 unique components, pick 4b. If >100 unique components are touched, pick 4a/4c. The phase-start measurement decides.
-- **Rules promoted (scoped to `apps/web/**`):** same 5 `no-unsafe-*` rules as Phase 3.
-- **Verification gate:** `apps/web` warning surface at zero on the 5 `no-unsafe-*` rules; `apps/web` TS baseline (currently 590) unchanged; Playwright smoke suite green; CI green.
-- **Effort:** 10–30 hours depending on the 4a/4b/4c split.
-- **Risk:** medium-high — Tamagui upstream type stability is variable. Disables (4a) are always a safety valve.
-- **Status:** [ ] not started.
+- **Actual scope (post-Phase-3 remeasurement):** **304 warnings** in `apps/web/**` under the 5 promoted rules (vs ~266 estimated, +14%). Distribution was, again, sharply different from the original plan:
+
+  | Slice                                                               | Count | %   |
+  |---------------------------------------------------------------------|------:|----:|
+  | 4 water-related pages w/ stale `profiles?.account` field            |   290 | 95% |
+  | Playwright e2e specs (auto-relaxed via `**/e2e/**` glob)            |    10 |  3% |
+  | Genuine tail (3 unrelated files; only 2 of 4 warnings Tamagui-ish)  |     4 |  1% |
+
+  Per-rule across the full surface: `no-unsafe-member-access` 153, `no-unsafe-assignment` 122, `no-unsafe-return` 16, `no-unsafe-argument` 10, `no-unsafe-call` 3.
+
+- **The plan called this "the Tamagui wall." It wasn't.**
+  The original plan (now archived above) framed Phase 4 as "Tamagui-driven props leaked as `any`" requiring an architectural decision between three sub-strategies (4a per-site disable / 4b adapter improvements / 4c hybrid). The phase-start measurement showed the actual distribution: **95% of the surface (290 warnings) traced to a single root cause unrelated to Tamagui** — four UI consumers reading `profiles?.account` after the [`87876d0`](https://github.com/romeof1980/brewing-app/commit/87876d0) `account → workspace` rename missed them. The Tamagui-adjacent surface was 2 warnings in `NavSheet.tsx` (5% of the tail). No 4a/4b/4c decision tree was needed.
+
+- **Significant collateral discovery — a long-broken UI feature returns:**
+  Because the four pages read `profiles?.account` (a field that no longer exists on the parsed `WaterProfilesResponse`), `acc` was always `[]`. The dropdowns silently dropped workspace-scoped water profiles. Fixing the type also fixes the runtime bug — workspace water profiles re-appear in:
+    - `apps/web/app/recipes/[id]/water/mash/page.tsx`
+    - `apps/web/app/recipes/[id]/water/sparge/page.tsx`
+    - `apps/web/app/recipes/[id]/water/boil/page.tsx`
+    - `apps/web/app/[locale]/water-profiles/page.tsx`
+  The Phase 4b commit message is prefixed `fix(web)` rather than `foundation` to make the user-visible behaviour change discoverable in `git log`.
+
+- **Rules promoted (scoped to `apps/web/**`, off in tests/e2e):** same 5 `no-unsafe-*` rules as Phase 3.
+- **Test relaxation:** the existing test-files block (`**/*.{test,spec}.{ts,tsx,js,jsx}`, `**/tests/**`, `**/e2e/**`) automatically covers `apps/web/e2e/**` Playwright specs. The 10 e2e warnings observed in the throwaway measurement evaporate to 0 under the production config — no extra glob needed.
+- **Strategy:** identical to Phase 3 — type the boundary as `unknown`, narrow with the existing hand-rolled `parseX()` helpers in `packages/contracts`. No Zod/Valibot. The `select-workspace/page.tsx` fix is exemplary: instead of inline `body as { workspaces?: unknown; accounts?: unknown }` cast + `Array.isArray` dance, delegate to `parseAuthMeResponse(res.data)` which already centralises the legacy-`accounts` fallback in the contract.
+- **Order of landing (4 commits, ~1 hour):**
+  1. **Phase 4a** (`eslint.config.mjs` only, +294 warnings): promote the 5 unsafe-* rules at `warn` on `apps/web/**`. Block positioned after the type-aware parser block and after Phase 3a's `services/api/**` block, but before the test-files relaxation block (later block wins; e2e auto-exempt).
+  2. **Phase 4b** (`fix(web)` — 4 files, -290 warnings + restores workspace water profiles dropdown): replace `profiles?.account ?? []` with `profiles?.workspace ?? []` and rename the local `acc` variable to `wsp` in all four pages. 8 lines total. apps/web tsc baseline drops 590 → 586 (4 latent type errors that were hidden behind the `error typed` propagation now resolved).
+  3. **Phase 4c** (3 files, -4 warnings):
+     - `apps/web/app/[locale]/(auth)/select-workspace/page.tsx` (1): replace inline `Array.isArray(body?.workspaces ?? body?.accounts) ? list : []` with `parseAuthMeResponse(res.data).workspaces`. Aliases the local `WorkspaceListItem = AuthMeResponseWorkspace`. apps/web tsc drops another 1 (586 → 585).
+     - `apps/web/app/_components/NavSheet.tsx` (2): only "Tamagui-adjacent" warning of the whole phase. The web-only `YStack onClickCapture` handler had `e: any` because Tamagui's DOM-vs-RN abstraction makes the inferred event type ambiguous. Annotate explicitly: `(e: MouseEvent<HTMLElement>) => { ... }`. The runtime `instanceof HTMLElement` check still narrows; the annotation just gives type-aware ESLint a non-`any` starting type.
+     - `apps/web/app/recipes/[id]/edit/page.tsx` (1): the unused-by-convention helper `_addYeastFromDb` calls a non-existent `addYeastRow` (the corresponding TS2552 lives in the apps/web pre-existing tsc baseline). Suppressed with a focused `eslint-disable-next-line @typescript-eslint/no-unsafe-call` and a block comment documenting the dead-code state. Deliberately did NOT use `@ts-expect-error` (would be brittle the moment `addYeastRow` is defined; doesn't change the lint outcome anyway).
+  4. **Phase 4d** (this docs update + delete `eslint.config.measure.mjs`).
+
+- **Verification:** `npm run lint` exits 0/0 (full monorepo). `npm run lint:packages-strict` clean. Per-workspace `tsc --noEmit` baselines: `apps/web` **585** (improved from 590, **no regression**), `services/api` 17 (unchanged from Phase 3), `apps/native` 0, `packages/{contracts,i18n,i18n-react,test-mcp,api-client,beerjson,media,navigation,recipes-ui}` 0, `packages/ui` 25. Wall-time impact: full-repo lint goes ~39s → ~42s (one more rule family on the same parser-served file set). Acceptable.
+
+- **Effort (actual):** ~1 hour (estimate was 10–30h). The gap is dominated by the same lesson as Phase 3: the surface dissolved into 2 commits because 95% of warnings traced to a single fixable root cause. There was no Tamagui adapter project to do.
+
+- **Lessons learned (carry into Phase 5):**
+  - **The "Tamagui wall" was a phantom.** Both Phase 3 and Phase 4 measurements showed the no-unsafe-* surface concentrated in a small number of files with file-specific root causes (escape hatches, stale renames), not in a broad Tamagui-adapter-shaped surface. The Tamagui type-system gap that motivated `docs/TAMAGUI.md` is real, but it is NOT what generates `no-unsafe-*` warnings at scale in this codebase. Don't over-design future phases around Tamagui hypotheses.
+  - **Lint promotion finds latent runtime bugs.** Phase 4b's `.account → .workspace` rename had been silently broken since `87876d0` and would have stayed silent indefinitely without the type-aware lint pass. The promotion paid for itself in user-visible bug fixes, not just static-discipline points. Treat each future lint-tightening phase as an opportunity to surface this kind of drift.
+  - **Stale-rename cascades behave like escape hatches.** A non-existent field access (e.g. `profiles?.account` after the rename) produces an `error typed` value that propagates through every downstream consumer, generating dozens or hundreds of warnings from a single source. When triaging a high-warning file, look for "type that cannot be resolved" / "error typed" early in the chain, not in the leaves.
+  - **Web-only Tamagui handlers can be cleanly typed with `react`'s event types.** When a Tamagui component is used inside `apps/web/**` (Next.js, web-only render), the runtime event is always a React DOM event. Annotating handlers with `MouseEvent<HTMLElement>` / `FormEvent<HTMLFormElement>` / etc. gives type-aware ESLint a non-`any` starting type without forking Tamagui or relaxing types. This is a third tool in the kit alongside Phase 3's `() => { void fn(); }` (no-arg JSX wrappers) and `(...a) => { void fn(...a as Parameters<typeof fn>); }` (event-consuming JSX wrappers).
+  - **Dead code with pre-existing tsc errors gets a focused eslint-disable, not a `@ts-expect-error`.** `@ts-expect-error` becomes its own error the moment the underlying issue is fixed (brittle), and doesn't change the lint outcome (the call expression stays "error typed" regardless of TS suppression). For unreachable code paths, a one-line disable directive with an inline `-- TS####` reference comment is the right tool.
 
 #### Phase 5 — Rule promotions + gate
 
