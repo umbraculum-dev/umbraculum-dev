@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.7 — **HIGH-staged complete + HIGH-full Phases 1–4 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: 64 files, 310 warnings eliminated. **HIGH-full Phase 2** (Tier A — Promise correctness) landed 2026-05-16: 7 type-aware rules promoted to `warn`; 136 sites hand-fixed across 5 commits. **HIGH-full Phase 3** (Tier C-narrow — `services/api` `no-unsafe-*`) landed 2026-05-16: 777 raw warnings → 0 across 5 commits; `services/api` tsc baseline improved 19 → 17 as a side effect. **HIGH-full Phase 4** (Tier C-wide — `apps/web` `no-unsafe-*`) landed 2026-05-16: 5 unsafe-* rules promoted to `warn` on `apps/web/**` (test/e2e auto-relaxed via existing test glob). 304 raw warnings → 0 across 4 commits (4a config = -10 e2e relaxation, 4b `.account → .workspace` rename in 4 pages = -290 + restored a long-broken UI feature, 4c tail = -4, 4d docs). **The "Tamagui wall" was a phantom** — 95% of the surface traced to a stale-rename cascade, not Tamagui prop typing. apps/web tsc baseline improved 590 → 585 as a side effect. Repo-wide lint stays at ~42s wall. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. **HIGH-full Phase 5 outstanding** — promote all type-aware rules from `warn` to `error` and drop the now-redundant `lint:packages-strict` script. Detailed phase plan in [`HIGH-full upgrade`](#high-full-upgrade) below.
+**Status:** v3.0 — **HIGH-full landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` promoted to `error` repo-wide. **HIGH-full Phases 1–5 landed 2026-05-16:** Phase 1 (auto-fix sweep, 64 files, 310 warnings); Phase 2 (Tier A — Promise correctness, 7 type-aware rules at `warn`, 136 sites fixed); Phase 3 (Tier C-narrow — `services/api` `no-unsafe-*`, 777 raw warnings → 0, tsc baseline 19 → 17); Phase 4 (Tier C-wide — `apps/web` `no-unsafe-*`, 304 raw warnings → 0, tsc baseline 590 → 585; the "Tamagui wall" was a phantom — 95% traced to a stale `.account → .workspace` rename in commit `87876d0` that also fixed a long-broken UI feature); **Phase 5 (rule promotions + IDE-config prereq, 2026-05-16): all 12 type-aware rules promoted from `warn` to `error`; the C+A+E+F mitigation stack landed (editor-only `eslint.config.editor.mjs` + `.vscode/settings.json.example` + upstream cursor rule `23a-eslint-fixall-discipline.mdc` + this doc's "Recommended editor configuration" section); `lint:packages-strict` script + workflow step dropped as redundant.** **`npm run lint` is now the single strict gate** — every type-aware regression fails CI as an error. Repo-wide lint stays at ~42s wall (CI) / ~7s wall (editor via the stripped editor config). **Zero warnings, zero errors across the whole monorepo.** Detailed phase log in [`HIGH-full upgrade`](#high-full-upgrade) below.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -14,11 +14,12 @@
 |---|---|
 | ESLint runs in CI | ✅ `web-lint` GitHub Action, path-gated |
 | Errors block CI | ✅ |
-| Warnings tolerated repo-wide | ⚠️ Yes (HIGH-staged work to remove them, see roadmap) |
-| Warnings forbidden in clean packages | ✅ `npm run lint:packages-strict` — **11 of 11 packages** at `--max-warnings 0` (every `packages/**` workspace is gated; only `apps/**` and `services/**` still have `any` debt) |
+| Warnings tolerated repo-wide | ❌ No — every type-aware rule is at `error` (HIGH-full Phase 5c, 2026-05-16). Only one warning-level rule remains: `no-empty-object-type` with the Tamagui-friendly `with-single-extends` allowance. |
+| Strict-gate workflow | ✅ `npm run lint` is the single gate. The previous `lint:packages-strict --max-warnings 0` script was dropped in HIGH-full Phase 5d as redundant — with rules at `error` repo-wide, any new violation fails the main lint step. |
+| Editor-only ESLint config | ✅ `eslint.config.editor.mjs` strips the 12 type-aware rules + `parserOptions.projectService` for editor-extension use. Saves ~6× wall time (~42s → ~7s) and mechanically defeats the auto-fix-overreach failure mode. Copy `.vscode/settings.json.example` to `.vscode/settings.json` to opt in. See [Recommended editor configuration](#recommended-editor-configuration). |
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
-| Type-aware lint enabled | 🟡 Partial — HIGH-full Phase 2 promoted 7 promise/throw rules to `warn`; HIGH-full Phase 3 added 5 `no-unsafe-*` rules at `warn` on `services/api/**`. `parserOptions.projectService` infrastructure is live. Full promotion to `error` is HIGH-full Phase 5. |
+| Type-aware lint enabled | ✅ **All 12 rules at `error`** — HIGH-full Phase 5c (2026-05-16). 7 promise-correctness rules (`**/*.{ts,tsx}`) + 5 `no-unsafe-*` rules (`services/api/**` + `apps/web/**`). Tests relaxed via the `**/{tests,e2e}/**` + `**/*.{test,spec}.*` glob block. `parserOptions.projectService` infrastructure live. |
 | Outstanding warnings | **0** (-80 from Phase 6c, -58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,127 cumulative; was 1,127 at HIGH-light landing). **`npm run lint` exits clean — zero warnings, zero errors.** |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
@@ -59,7 +60,7 @@ Lint configuration has a fundamental value/cost trade-off: stricter rules catch 
 | **Medium** — full base preset (TS-recommended + React-Hooks + jsx-a11y) with per-glob overrides; `no-restricted-imports` on cross-platform UI; `react-hooks/exhaustive-deps` set to `warn`. | Medium (one config + ~5 plugins + light cleanup of pre-existing warnings). | High — catches a real class of React bugs TypeScript misses, formalizes a11y, prevents future drift. | ✅ Superseded by HIGH-light. |
 | **HIGH-light** — Medium + `exhaustive-deps` as **error** + `--max-warnings 0` on 9 clean packages + `allowInterfaces: "with-single-extends"` to keep Tamagui's module-augmentation pattern legal. | Medium-high (1 PR, ~3 hours focused work). | High — locks in the clean parts; gates against drift; gives an honest "where are we" picture. | ✅ **Landed.** |
 | **HIGH-staged** — HIGH-light + clean `any` warnings package-by-package, expanding `lint:packages-strict` glob with each cleanup. | Medium-high per phase (4–6 phases). | High — real type-safety wins where the money is (contracts, services, web pages). | 🚧 In progress — see [HIGH-staged roadmap](#high-staged-roadmap) below. |
-| **HIGH-full** — HIGH-staged + `@typescript-eslint/recommended-type-checked` (type-aware) + `--max-warnings 0` repo-wide (`no-explicit-any: error` already landed in Phase 6c). | Medium-high — measurement (2026-05-16) shows full-repo type-aware lint takes 44s wall (vs current 6s), ~1,671 warnings to triage of which ~411 auto-fix. Phased over 5 commits. | Highest — production-grade hygiene; signals maturity to public contributors. | 🚧 **Target: H1 2027** alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md), which lands ahead of the public AGPLv3 flip. Phase plan: see [HIGH-full upgrade](#high-full-upgrade). |
+| **HIGH-full** — HIGH-staged + 12 type-aware rules at `error` (7 promise-correctness rules `**/*.{ts,tsx}` + 5 `no-unsafe-*` rules `services/api/**` and `apps/web/**`) + `no-explicit-any: error` + `no-unused-vars: error` repo-wide. Editor-only ESLint config split (`eslint.config.editor.mjs` + `.vscode/settings.json.example`) protects against IDE lag and `source.fixAll.eslint: true` auto-fix overreach. | Medium-high — measurement (2026-05-16) showed full-repo type-aware lint takes 44s wall (vs prior 6s), ~1,671 warnings to triage of which ~411 auto-fix. Landed in 5 phases / 23 commits over 2026-05-16. | Highest — production-grade hygiene; signals maturity to public contributors. | ✅ **Landed 2026-05-16** (originally targeted H1 2027). All five phases (auto-fix sweep, promise correctness, `services/api` `no-unsafe-*`, `apps/web` `no-unsafe-*`, rule promotions + IDE-config prereq) shipped in a single day, faster than estimated, with two latent bugs surfaced as side effects (the `.account → .workspace` UI regression in Phase 4 and 5 pre-existing `tsc` errors fixed across Phases 3-4). Phase log: see [HIGH-full upgrade](#high-full-upgrade). |
 
 ### Why we did not go HIGH-full in one shot
 
@@ -638,32 +639,35 @@ A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-ch
   - **Web-only Tamagui handlers can be cleanly typed with `react`'s event types.** When a Tamagui component is used inside `apps/web/**` (Next.js, web-only render), the runtime event is always a React DOM event. Annotating handlers with `MouseEvent<HTMLElement>` / `FormEvent<HTMLFormElement>` / etc. gives type-aware ESLint a non-`any` starting type without forking Tamagui or relaxing types. This is a third tool in the kit alongside Phase 3's `() => { void fn(); }` (no-arg JSX wrappers) and `(...a) => { void fn(...a as Parameters<typeof fn>); }` (event-consuming JSX wrappers).
   - **Dead code with pre-existing tsc errors gets a focused eslint-disable, not a `@ts-expect-error`.** `@ts-expect-error` becomes its own error the moment the underlying issue is fixed (brittle), and doesn't change the lint outcome (the call expression stays "error typed" regardless of TS suppression). For unreachable code paths, a one-line disable directive with an inline `-- TS####` reference comment is the right tool.
 
-#### Phase 5 — Rule promotions + gate
+#### Phase 5 — Rule promotions + IDE-config prerequisite ✅ landed 2026-05-16
 
-- **Scope:** trivial cleanup phase. All type-aware rules flipped from `warn` to `error`; `lint:packages-strict` script + the corresponding step in [`.github/workflows/web-lint.yml`](.github/workflows/web-lint.yml) dropped (now redundant since the main lint is strict everywhere); LINTING.md status banner updated to `v3.0` / "HIGH-full landed".
-- **Pre-conditions:** Phases 1–4 all at zero warnings on the type-aware rules they enabled.
-- **Changes:**
-  - `eslint.config.mjs`: promote each type-aware rule from `warn` to `error`.
-  - `package.json`: drop `lint:packages-strict` script.
-  - `.github/workflows/web-lint.yml`: drop the strict step; main `npm run lint` already gates everything.
-  - `docs/LINTING.md`: status banner update + tier table HIGH-full row marked landed.
-- **Verification gate:** `npm run lint` exits clean (errors only, zero warnings); CI green; this doc shows `v3.0`.
-- **Effort:** ~30 min.
-- **Risk:** trivial.
-- **Status:** [ ] not started.
+The closing phase of the HIGH-full upgrade. Two parts ran in parallel: a contributor-facing IDE-config prerequisite (mitigations C + A + E + F) and the actual rule promotion (`warn → error`). Both completed in a single day in 5 commits.
 
-##### Phase 5 prerequisite: editor / IDE config (tracked, not landed)
+##### Part 1 — IDE-config prerequisite (C + A + E + F)
 
-Before promoting type-aware rules to `error`, ship the contributor-facing safeguards that prevent the failure modes Phase 1 demonstrated (auto-fix overreach + stripped `eslint-disable` comments). Per the deep analysis logged in chat session [Phase 1 follow-up — IDE costs](1d038fd8-93bb-490e-8830-174603d169ff), the recommended mitigation stack is **C + A + E + F** (skip B, G; D opt-in only):
+Phases 1–4 shipped the rule changes; Phase 5 first had to ship the contributor-facing safeguards that prevent the failure modes Phase 1 demonstrated (auto-fix overreach + stripped `eslint-disable` comments + IDE lag). The mitigation stack landed:
 
-- **C — Editor-only thinner ESLint config (`eslint.config.editor.mjs`):** strict subset of the production config, excluding type-aware rules entirely. The Cursor/VS Code ESLint extension points at this file; CI keeps using `eslint.config.mjs`. **Highest ROI** — also cuts the IDE memory/lag costs documented in §"Cons of type-aware ESLint in the IDE" and is the only mitigation that mechanically defeats the adversarial scenario (junior contributor with `source.fixAll.eslint: true` imported from a previous job).
-- **A — `.vscode/settings.json.example`:** ships `editor.codeActionsOnSave: { "source.fixAll.eslint": "explicit" }` plus other recommended defaults (workspace folder mode, working directories, on-save not on-type). Contributors copy to `.vscode/settings.json` (gitignored) on their machine.
-- **E — Cursor rule (`.cursor/rules/<n>-eslint-fixall-discipline.mdc`):** small guardrail telling the AI to default to `"explicit"` (never `true`) for `source.fixAll.eslint` when configuring editor settings in this repo. Also points contributors to the example file. Insurance for the AI-mediated case.
-- **F — Doc cross-link in this file:** a "Recommended editor configuration" section listing the example file, the why, and the link to the IDE-cost discussion above.
+- **C — Editor-only thinner ESLint config (`eslint.config.editor.mjs`):** ✅ landed 5a. Derived from production via a transform (single `TYPE_AWARE_RULES` allowlist filters the 12 type-aware rule names + a `stripProjectService` step removes `parserOptions.projectService`). Saves ~6× wall time on editor inline lint (~7s vs ~42s) and mechanically defeats the auto-fix-overreach failure mode (the rules are simply not enabled in the editor; auto-fix has nothing to overreach into). A final `linterOptions.reportUnusedDisableDirectives: "off"` block prevents the editor from flagging (and `source.fixAll` from auto-stripping) `eslint-disable` directives that target rules the editor config has stripped.
+- **A — `.vscode/settings.json.example`:** ✅ landed 5a. Pins `eslint.options.overrideConfigFile: "eslint.config.editor.mjs"`, `eslint.run: "onSave"`, and `editor.codeActionsOnSave.source.fixAll.eslint: "explicit"`. `.gitignore` adjusted from `.vscode/` (full-directory) to `.vscode/*` + `!.vscode/settings.json.example` so the example file is tracked while the real `.vscode/settings.json` stays gitignored.
+- **E — Cursor rule (`23a-eslint-fixall-discipline.mdc`):** ✅ committed upstream 5b. The rule is package-owned (per `.cursor/rules/11-cursor-package-files-edit-in-source-repo.mdc` it must edit in the source repo, not the consumer); it landed in `rftsu/cursor-rules` (canonical) + `rf-node-react-cursor-assistant` plugin variant. Will arrive in this repo via the next package sync after the maintainer-authorized 3.1.11+ release. The Magento variant (`rf-magento-cursor-assistant`) does not get the rule (no ESLint surface).
+- **F — `docs/LINTING.md` "Recommended editor configuration" section:** ✅ landed 5b. Full how-to with three concrete troubleshooting entries for the failure modes contributors will actually hit, the C+A+E+F status table, and rationale for skipping B/D/G.
 
-**Why this is deferred to Phase 5 prep, not done earlier:** today there are no type-aware rules in `eslint.config.mjs`, so `source.fixAll.eslint: true` is mechanically safe. The thinner editor config (C) would either be empty or identical to production — shipping scaffolding-without-purpose. The work pays for itself only once the danger is real.
+##### Part 2 — Rule promotion (`warn → error`) + cleanup
 
-**Owner:** Phase 5. **Effort:** ~2 hours total for the C+A+E+F stack. **Status:** [ ] not started.
+- **5c — promote 12 type-aware rules to `error`:** ✅ landed. All 7 promise-correctness rules (Phase 2) on `**/*.{ts,tsx}` + all 5 `no-unsafe-*` rules (Phases 3–4) on `services/api/**` and `apps/web/**`. The test-files relaxation block (`**/{tests,e2e}/**`, `**/*.{test,spec}.*`) keeps these rules at `off`, unchanged. The block-header comments in `eslint.config.mjs` updated to reflect Phase 5 landing (previously: "Phase 5 promotes them to error"; now: "promoted from warn by Phase 5"). Verification: `npm run lint` exits 0/0 (~40s wall); editor config exits 0/0 (~7s wall).
+- **5d — drop `lint:packages-strict`:** ✅ landed. The script (`eslint packages/... --max-warnings 0`) and its corresponding `web-lint.yml` step were dropped as redundant. With rules at `error` repo-wide, any new violation fails the main `npm run lint` step; the dedicated package-level strict gate provides no additional signal. The one remaining warning-level rule is `no-empty-object-type` with `with-single-extends` (Tamagui-friendly) — a regression there is now a CI warning rather than the previous "fail in packages, warn elsewhere" asymmetry, considered acceptable.
+
+##### Effort and findings
+
+- **Estimated:** ~2.5 hours for the full Phase 5 (~2h prereq + ~30min promotion).
+- **Actual:** ~1.5 hours. The transform-from-production pattern for `eslint.config.editor.mjs` removed the need for a separate rule list to maintain, and the package-owned cursor rule landed cleanly in both source repos with no version-bump churn.
+- **Lessons learned:**
+  - **The "transform-don't-fork" pattern works for derivative ESLint configs.** Importing `baseConfig` and applying `stripTypeAwareRules` + `stripProjectService` is more maintainable than duplicating production rules into a parallel file. Future type-aware rule additions only need the rule name appended to `TYPE_AWARE_RULES`.
+  - **Package-owned cursor rules block locally; commit upstream first.** The `.cursor/rules/11-cursor-package-files-edit-in-source-repo.mdc` rule fired correctly when an attempted local-write of `23a-eslint-fixall-discipline.mdc` would have been silently overwritten by the next sync. Asking the developer for the source repo path (`~/dkprojects/thesiteup/cursor-rules`) and landing the rule in both `github-repo` and `cursor-plugins/rf-node-react-cursor-assistant` was the right escalation.
+  - **`lint:packages-strict` was a HIGH-light artifact.** It existed to gate clean packages while warnings still piled up elsewhere. Once the entire repo reaches zero warnings AND rules are at `error`, the dedicated gate has no purpose. The phase plan correctly identified this as redundancy to drop in 5d.
+  - **The `linterOptions.reportUnusedDisableDirectives: "off"` block is essential, not optional.** Without it, the editor config would flag every focused `// eslint-disable-next-line @typescript-eslint/no-unsafe-*` comment as "unused" (because the rule is stripped in the editor) — and `source.fixAll.eslint: "explicit"` won't save you if the contributor explicitly invokes "Fix all auto-fixable Problems". The block is the second line of defense after the editor-config split.
+
+**Closing state:** repo at zero warnings, zero errors. CI gate is `npm run lint` (single command, ~40s). Editor uses the stripped config (~7s, instant inline feedback). The IDE-config prereq stack (C+A+E+F) protects against the auto-fix-overreach failure mode mechanically. The HIGH-full upgrade is closed.
 
 ### Expected output of HIGH-full
 
@@ -683,14 +687,7 @@ docker run --rm \
   bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run lint"
 ```
 
-For the strict gate that runs in CI:
-
-```bash
-docker run --rm \
-  -v "$PWD:/repo" -w /repo \
-  node:20-slim \
-  bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run lint:packages-strict"
-```
+CI runs the same `npm run lint` step — there is no separate strict gate. With all type-aware rules at `error` (HIGH-full Phase 5c), any new violation fails CI as an error. The previous `npm run lint:packages-strict` (`--max-warnings 0` on `packages/**`) was dropped in Phase 5d as redundant.
 
 For a focused path (much faster iteration):
 
@@ -757,12 +754,11 @@ Mitigations B (an EditorConfig-only delta) and G (a forced `eslint.options.worki
 
 ## CI
 
-The `.github/workflows/web-lint.yml` workflow runs two ESLint invocations on every PR that touches `apps/web/**`, `apps/native/**`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`:
+The `.github/workflows/web-lint.yml` workflow runs a single ESLint invocation on every PR that touches `apps/web/**`, `apps/native/**`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`:
 
-1. **`npm run lint`** — full repo. Errors block CI; warnings reported but tolerated.
-2. **`npm run lint:packages-strict`** — gated packages (`packages/api-client`, `core`, `i18n`, `i18n-react`, `media`, `navigation`, `recipes-ui`, `test-mcp`, `ui`) with `--max-warnings 0`. Any new warning here blocks merge.
+- **`npm run lint`** — full repo. Errors block CI. Since HIGH-full Phase 5c (2026-05-16) all 12 type-aware rules + `no-explicit-any` + `no-unused-vars` are at `error`, so any new violation fails the build. The single remaining warning-level rule is `no-empty-object-type` with the Tamagui-friendly `with-single-extends` allowance.
 
-Both run inside a `node:20-slim` container to mirror the CI environment exactly. Adding a new package to the strict gate requires editing the `lint:packages-strict` script in the root `package.json` (see [HIGH-staged roadmap](#high-staged-roadmap) for the per-phase update).
+Runs inside a `node:20-slim` container to mirror the CI environment exactly. The historical `npm run lint:packages-strict` second step was dropped in Phase 5d (now redundant since the main `lint` is the strict gate).
 
 ---
 
