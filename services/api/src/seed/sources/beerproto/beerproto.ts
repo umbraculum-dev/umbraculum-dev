@@ -1,10 +1,17 @@
 import { parse } from "csv-parse/sync";
+import type { PrismaClient } from "@prisma/client";
 
-// Note: we intentionally avoid importing Prisma-generated enum/types here to keep editor/host
-// typechecking robust even when Prisma Client generation is out of sync.
-// Runtime correctness is ensured by our API's container build/typecheck.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentional escape hatch; see comment above.
-type PrismaLike = any;
+// Historical note: this file previously typed the prisma argument as
+// `any` ("PrismaLike = any") to keep editor/host typechecking robust
+// when Prisma Client generation was out of sync. That escape hatch
+// produced ~108 unsafe-* warnings, and every other file in
+// services/api imports `PrismaClient` directly without issue. We
+// switched to a typed reference so this importer participates in the
+// same type-safety guarantees as the rest of the codebase. If a
+// stale Prisma Client ever causes editor friction here, the fix is
+// to regenerate the client (`prisma generate`), not to escape-hatch
+// this one file.
+type PrismaLike = PrismaClient;
 
 type IngredientKind = "fermentable" | "hop" | "yeast";
 type ColorUnit = "ebc" | "srm" | "lovibond" | "unknown";
