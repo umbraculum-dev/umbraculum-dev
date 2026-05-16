@@ -12,7 +12,7 @@ function shouldCaptureRawBody(url: string): boolean {
   return url === "/webhooks/stripe" || url === "/webhooks/revenuecat";
 }
 
-export const webhookRawBodyPlugin = fp(async (app: FastifyInstance) => {
+export const webhookRawBodyPlugin = fp((app: FastifyInstance) => {
   app.addHook("preParsing", async (req, _reply, payload) => {
     if (!shouldCaptureRawBody(req.url)) return payload;
 

@@ -9,7 +9,7 @@ function fakeTool(name: string, scope: "read" | "write" = "read"): AiTool {
     description: `desc for ${name}`,
     scope,
     inputSchema: { type: "object" },
-    handler: async () => ({ ok: true }),
+    handler: () => Promise.resolve({ ok: true }),
   };
 }
 

@@ -29,7 +29,7 @@ function parseSections(body: unknown): BrewdaySectionConfig {
   return { presetExcludes, customSections, customBrewingMethods };
 }
 
-export async function brewdaySettingsRoutes(app: FastifyInstance) {
+export function brewdaySettingsRoutes(app: FastifyInstance) {
   const svc = new BrewdaySettingsService(app.prisma);
 
   app.get("/brewday-settings", async (req) => {

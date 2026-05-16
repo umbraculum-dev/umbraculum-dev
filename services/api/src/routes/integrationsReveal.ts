@@ -27,7 +27,7 @@ function integrationPublicPath(kind: string, token: string): string {
   return `/api/integrations/${encodeURIComponent(kind)}/${encodeURIComponent(token)}`;
 }
 
-export async function integrationsRevealRoutes(app: FastifyInstance) {
+export function integrationsRevealRoutes(app: FastifyInstance) {
   const integrations = new IntegrationsService(app.prisma);
   const workspaces = new WorkspacesService(app.prisma);
 

@@ -23,7 +23,7 @@ function assertLimit(v: unknown, fallback = 200, max = 500): number {
   return Math.max(1, Math.min(max, n));
 }
 
-export async function brewSessionsRoutes(app: FastifyInstance) {
+export function brewSessionsRoutes(app: FastifyInstance) {
   const svc = new BrewSessionsService(app.prisma);
 
   app.post("/recipes/:recipeId/brew-sessions", async (req) => {

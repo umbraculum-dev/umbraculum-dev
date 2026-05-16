@@ -16,7 +16,7 @@ function parseRecipeId(req: FastifyRequest): string {
   return recipeId;
 }
 
-export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
+export function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
   const svc = new RecipeWaterComputeAndSaveService(app.prisma);
 
   app.post("/recipes/:id/water-settings/mash/compute-and-save", async (req) => {

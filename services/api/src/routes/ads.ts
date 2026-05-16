@@ -24,7 +24,7 @@ function assertPlatform(v: unknown): AdPlatform {
   return "web";
 }
 
-export async function adsRoutes(app: FastifyInstance) {
+export function adsRoutes(app: FastifyInstance) {
   const ads = new AdsService(app.prisma);
 
   app.get("/ads/slot/:placement", async (req: FastifyRequest) => {

@@ -85,6 +85,40 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // Type-aware parser for TS files (HIGH-full Phase 2 onward).
+  //
+  // Enables the 7 promise-related rules below to read TypeScript types.
+  // Scoped to `.ts/.tsx` only so non-TS files (.cjs, .mjs, .js configs)
+  // stay on the cheap parser. Adds ~30s to a full-repo lint; the savings
+  // it unlocks (real promise-correctness bug catches) are worth the cost.
+  //
+  // `allowDefaultProject` is the escape hatch for TS files outside any
+  // tsconfig include (vitest configs, ad-hoc scripts).
+  // -------------------------------------------------------------------
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: [
+            "services/api/vitest.config.ts",
+            "apps/web/vitest.config.ts",
+            "apps/native/vitest.config.ts",
+            "packages/beerjson/vitest.config.ts",
+            "packages/contracts/vitest.config.ts",
+            "packages/core/vitest.config.ts",
+            "packages/core/src/index.d.ts",
+            "packages/recipes-ui/tsup.config.ts",
+            "packages/ui/tsup.config.ts",
+            "services/api/prisma/seed.ts",
+          ],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+
+  // -------------------------------------------------------------------
   // Project-wide rule tweaks. MUST come before any file-glob override
   // blocks below — flat-config later blocks override earlier ones, so
   // anything we want a per-glob override (e.g. "@typescript-eslint/
@@ -119,6 +153,37 @@ export default [
         "warn",
         { allowInterfaces: "with-single-extends" },
       ],
+    },
+  },
+
+  // -------------------------------------------------------------------
+  // HIGH-full Phase 2 — Tier A: Promise correctness (TS-only).
+  //
+  // All seven type-aware rules at `warn`. Required to be at zero
+  // before the phase closes; Phase 5 promotes them to `error`.
+  //
+  // Scoped to `.ts/.tsx` because the rules require the type-aware
+  // parser block above (which is also `.ts/.tsx`-scoped).
+  //
+  //  - no-floating-promises: orphan Promises that swallow rejections.
+  //  - no-misused-promises: async fn passed where void return expected
+  //    (event handlers, setTimeout callbacks, etc.).
+  //  - await-thenable: `await` on a non-Promise (no-op signaling bug).
+  //  - require-await: async fn with no `await` (return type mismatch).
+  //  - prefer-promise-reject-errors / only-throw-error: reject/throw
+  //    must be Error instances, not strings.
+  //  - no-implied-eval: setTimeout("string"), new Function(string).
+  // -------------------------------------------------------------------
+  {
+    files: ["**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-floating-promises": "warn",
+      "@typescript-eslint/no-misused-promises": "warn",
+      "@typescript-eslint/await-thenable": "warn",
+      "@typescript-eslint/require-await": "warn",
+      "@typescript-eslint/prefer-promise-reject-errors": "warn",
+      "@typescript-eslint/no-implied-eval": "warn",
+      "@typescript-eslint/only-throw-error": "warn",
     },
   },
 

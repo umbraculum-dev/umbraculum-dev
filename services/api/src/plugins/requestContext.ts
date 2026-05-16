@@ -32,10 +32,11 @@ export function requireActiveWorkspace(req: FastifyRequest): RequestContext & { 
   return { userId: s.userId, activeWorkspaceId: s.activeWorkspaceId };
 }
 
-export async function requestContextPlugin(app: FastifyInstance) {
-  app.addHook("onRequest", async (req) => {
+export function requestContextPlugin(app: FastifyInstance) {
+  app.addHook("onRequest", (req, _reply, done) => {
     const ctx = getOptionalContext(req);
     if (ctx) req.requestContext = ctx;
+    done();
   });
 }
 

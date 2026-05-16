@@ -27,7 +27,7 @@ function assertMode(v: unknown): BillingPurchaseIntentMode {
   return "purchase";
 }
 
-export async function billingRoutes(app: FastifyInstance) {
+export function billingRoutes(app: FastifyInstance) {
   const intents = new BillingIntentsService(app.prisma);
   const billing = new WorkspaceBillingService(app.prisma);
 

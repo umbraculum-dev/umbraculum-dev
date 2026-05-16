@@ -10,7 +10,7 @@ function assertBrandKey(v: unknown): BrandKey {
   return typeof v === "string" && (ALLOWED_BRAND_KEYS as readonly string[]).includes(v) ? (v as BrandKey) : "default";
 }
 
-export async function workspacesRoutes(app: FastifyInstance) {
+export function workspacesRoutes(app: FastifyInstance) {
   const workspaces = new WorkspacesService(app.prisma);
 
   app.get("/me", async (req) => {

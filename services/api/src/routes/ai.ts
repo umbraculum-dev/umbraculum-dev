@@ -27,7 +27,7 @@ function assertMessage(v: unknown): string {
  * it per request.
  */
 export function aiRoutes(toolRegistry: AiToolRegistry) {
-  return async function aiRoutesImpl(app: FastifyInstance) {
+  return function aiRoutesImpl(app: FastifyInstance) {
     const settings = new AiSettingsService(app.prisma);
 
     // ----- Chat (SSE) -----

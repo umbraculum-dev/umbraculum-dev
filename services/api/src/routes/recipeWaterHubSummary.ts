@@ -3,7 +3,7 @@ import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipeWaterHubSummaryService } from "../services/recipeWaterHubSummaryService.js";
 import { waterFormatHints } from "@brewery/contracts";
 
-export async function recipeWaterHubSummaryRoutes(app: FastifyInstance) {
+export function recipeWaterHubSummaryRoutes(app: FastifyInstance) {
   const svc = new RecipeWaterHubSummaryService(app.prisma);
 
   app.get("/recipes/:id/water-hub-summary", async (req) => {

@@ -13,7 +13,7 @@ function safeFilenamePart(v: string) {
     .replaceAll(/^-|-$/g, "");
 }
 
-export async function recipesExportRoutes(app: FastifyInstance) {
+export function recipesExportRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
   app.get("/recipes/:id/export/beerjson", async (req, reply) => {

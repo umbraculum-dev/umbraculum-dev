@@ -18,7 +18,7 @@ function toItemPayload(item: InventoryItem) {
   };
 }
 
-export async function inventoryRoutes(app: FastifyInstance) {
+export function inventoryRoutes(app: FastifyInstance) {
   const svc = new InventoryService(app.prisma);
 
   app.get("/inventory", async (req) => {

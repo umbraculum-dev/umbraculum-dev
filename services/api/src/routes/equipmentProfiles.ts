@@ -35,7 +35,7 @@ function toEquipmentPayload(p: EquipmentProfile) {
   };
 }
 
-export async function equipmentProfilesRoutes(app: FastifyInstance) {
+export function equipmentProfilesRoutes(app: FastifyInstance) {
   const svc = new EquipmentProfilesService(app.prisma);
 
   app.get("/equipment-profiles", async (req) => {

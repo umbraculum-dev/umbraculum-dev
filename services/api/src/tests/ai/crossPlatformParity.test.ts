@@ -85,12 +85,12 @@ async function consumeStreaming(payload: string): Promise<IncomingEvent[]> {
   let i = 0;
   // Synthetic ReadableStream that hands out 9-byte slices.
   const reader = {
-    async read(): Promise<{ done: boolean; value?: Uint8Array }> {
-      if (i >= bytes.length) return { done: true };
+    read(): Promise<{ done: boolean; value?: Uint8Array }> {
+      if (i >= bytes.length) return Promise.resolve({ done: true });
       const end = Math.min(i + 9, bytes.length);
       const value = bytes.slice(i, end);
       i = end;
-      return { done: false, value };
+      return Promise.resolve({ done: false, value });
     },
   };
   const decoder = new TextDecoder();

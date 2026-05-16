@@ -23,7 +23,7 @@ function integrationPublicPath(token: string): string {
   return `/api/integrations/tilt/${encodeURIComponent(token)}`;
 }
 
-export async function integrationsTiltRoutes(app: FastifyInstance) {
+export function integrationsTiltRoutes(app: FastifyInstance) {
   const integrations = new IntegrationsService(app.prisma);
   const workspaces = new WorkspacesService(app.prisma);
 

@@ -14,10 +14,10 @@ import { validateBeerJsonDoc } from "../beerjson/index.js";
 const RECIPES_IMPORT_SINGLE_MAX_BYTES = 1 * 1024 * 1024;
 const RECIPES_IMPORT_BULK_MAX_BYTES = 5 * 1024 * 1024;
 
-export async function recipesImportRoutes(app: FastifyInstance) {
+export function recipesImportRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
-  app.post("/recipes/import/preview", { bodyLimit: RECIPES_IMPORT_SINGLE_MAX_BYTES }, async (req) => {
+  app.post("/recipes/import/preview", { bodyLimit: RECIPES_IMPORT_SINGLE_MAX_BYTES }, (req) => {
     const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as { format?: unknown; content?: unknown };
     const format = (typeof body.format === "string" ? body.format : "") as ImportFormat;

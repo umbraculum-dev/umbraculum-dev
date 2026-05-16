@@ -27,7 +27,7 @@ function clampInt(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-export async function ingredientsRoutes(app: FastifyInstance) {
+export function ingredientsRoutes(app: FastifyInstance) {
   const workspaces = new WorkspacesService(app.prisma);
 
   app.get("/ingredients/fermentables", async (req) => {

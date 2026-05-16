@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipeWaterSettingsService } from "../services/recipeWaterSettingsService.js";
 
-export async function recipeWaterSettingsRoutes(app: FastifyInstance) {
+export function recipeWaterSettingsRoutes(app: FastifyInstance) {
   const svc = new RecipeWaterSettingsService(app.prisma);
 
   app.get("/recipes/:id/water-settings", async (req) => {

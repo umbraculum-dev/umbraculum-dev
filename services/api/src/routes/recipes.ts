@@ -3,7 +3,7 @@ import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipesService } from "../services/recipesService.js";
 import { computeRecipeGravityAnalysis } from "../domain/recipeAnalysis/gravityAnalysis.js";
 
-export async function recipesRoutes(app: FastifyInstance) {
+export function recipesRoutes(app: FastifyInstance) {
   const recipes = new RecipesService(app.prisma);
 
   app.get("/recipes", async (req) => {

@@ -166,7 +166,7 @@ function pickColorUnit(standard: string | null): ColorUnit {
   return "unknown";
 }
 
-async function upsertSourceMap(
+function upsertSourceMap(
   prisma: PrismaLike,
   input: { kind: IngredientKind; sourceKey: string; fermentableId?: string; hopId?: string; yeastId?: string },
 ) {

@@ -49,7 +49,7 @@ function verifyStripeSignature(input: { rawBody: Buffer; header: string; secret:
   }
 }
 
-export async function webhooksStripeRoutes(app: FastifyInstance) {
+export function webhooksStripeRoutes(app: FastifyInstance) {
   const svc = new StripeWebhookService(app.prisma);
 
   app.post("/webhooks/stripe", async (req) => {

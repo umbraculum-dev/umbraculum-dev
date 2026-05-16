@@ -40,8 +40,8 @@ function mashPhModelKeyFromMaltClass(maltClass: string) {
   return "base_pale";
 }
 
-export async function waterCalcRoutes(app: FastifyInstance) {
-  app.post("/water-calc/sparge-acidification", async (req) => {
+export function waterCalcRoutes(app: FastifyInstance) {
+  app.post("/water-calc/sparge-acidification", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -110,7 +110,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   // Sparge acidification manual-entry mode (Sheet 2, v0): user enters acid amount; we estimate achieved pH.
-  app.post("/water-calc/sparge-acidification-manual", async (req) => {
+  app.post("/water-calc/sparge-acidification-manual", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -199,7 +199,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   // Mash water acidification (Sheet 4, v0): same math as sparge acidification, but stored/displayed separately.
-  app.post("/water-calc/mash-acidification", async (req) => {
+  app.post("/water-calc/mash-acidification", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -278,7 +278,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   });
 
   // Mash water acidification manual-entry mode (Sheet 4, v0): user enters acid amount; we estimate achieved pH.
-  app.post("/water-calc/mash-acidification-manual", async (req) => {
+  app.post("/water-calc/mash-acidification-manual", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -368,7 +368,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     };
   });
 
-  app.post("/water-calc/mash-ph-estimate", async (req) => {
+  app.post("/water-calc/mash-ph-estimate", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -523,7 +523,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
   // v1 is now canonical: the unversioned endpoint handles both the new v1 per-row inputs and
   // the older maltClass/color inputs (it derives v1 defaults when needed).
 
-  app.post("/water-calc/mash-acidification-target-mash-ph", async (req) => {
+  app.post("/water-calc/mash-acidification-target-mash-ph", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -663,7 +663,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     return { ok: true, result };
   });
 
-  app.post("/water-calc/salt-additions", async (req) => {
+  app.post("/water-calc/salt-additions", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -710,7 +710,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     };
   });
 
-  app.post("/water-calc/mash-overall", async (req) => {
+  app.post("/water-calc/mash-overall", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -971,7 +971,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     };
   });
 
-  app.post("/water-calc/sparge-overall", async (req) => {
+  app.post("/water-calc/sparge-overall", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -1135,7 +1135,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     };
   });
 
-  app.post("/water-calc/boil-overall", async (req) => {
+  app.post("/water-calc/boil-overall", (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 

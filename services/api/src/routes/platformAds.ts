@@ -33,7 +33,7 @@ function parseDateOrNull(v: unknown): Date | null {
   return d;
 }
 
-export async function platformAdsRoutes(app: FastifyInstance) {
+export function platformAdsRoutes(app: FastifyInstance) {
   app.get("/platform/ads", async (req) => {
     const s = requireSession(req);
     await requirePlatformAdmin(app, s.userId);

@@ -8,7 +8,7 @@ declare module "fastify" {
   }
 }
 
-export const prismaPlugin = fp(async (app: FastifyInstance) => {
+export const prismaPlugin = fp((app: FastifyInstance) => {
   const prisma = new PrismaClient();
   app.decorate("prisma", prisma);
 

@@ -93,10 +93,11 @@ export function buildApp() {
   app.register(webhooksStripeRoutes);
   app.register(webhooksRevenuecatRoutes);
 
-  app.register(async (instance) => {
+  app.register((instance, _opts, done) => {
     const registry = new InMemoryAiToolRegistry();
     registerBreweryTools(registry, instance.prisma);
-    await aiRoutes(registry)(instance);
+    aiRoutes(registry)(instance);
+    done();
   });
 
   return app;

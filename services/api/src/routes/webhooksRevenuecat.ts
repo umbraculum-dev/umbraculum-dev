@@ -17,7 +17,7 @@ function requireRevenueCatAuth(req: FastifyRequest) {
   if (actual !== expected) throw new UnauthorizedError("invalid_revenuecat_auth", "Invalid RevenueCat webhook Authorization");
 }
 
-export async function webhooksRevenuecatRoutes(app: FastifyInstance) {
+export function webhooksRevenuecatRoutes(app: FastifyInstance) {
   const svc = new RevenueCatWebhookService(app.prisma);
 
   app.post("/webhooks/revenuecat", async (req) => {

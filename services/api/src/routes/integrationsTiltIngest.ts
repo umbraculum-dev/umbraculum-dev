@@ -32,7 +32,7 @@ function readNumber(o: Record<string, unknown>, keys: string[]): number | null {
   return null;
 }
 
-export async function integrationsTiltIngestRoutes(app: FastifyInstance) {
+export function integrationsTiltIngestRoutes(app: FastifyInstance) {
   const svc = new IntegrationsService(app.prisma);
 
   app.post("/integrations/tilt/:token", async (req) => {

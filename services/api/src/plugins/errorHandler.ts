@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { HttpError } from "../errors.js";
 
-async function errorHandlerPluginImpl(app: FastifyInstance) {
+function errorHandlerPluginImpl(app: FastifyInstance) {
   app.setErrorHandler((err, req, reply) => {
     const errCode = (err as NodeJS.ErrnoException).code;
     if (errCode === "FST_ERR_CTP_ENTITY_TOO_LARGE" || errCode === "FST_ERR_CTP_BODY_TOO_LARGE") {

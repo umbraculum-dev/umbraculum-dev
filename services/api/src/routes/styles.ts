@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { requireUser } from "../plugins/requestContext.js";
 
-export async function stylesRoutes(app: FastifyInstance) {
+export function stylesRoutes(app: FastifyInstance) {
   app.get("/styles", async (req) => {
     // Styles are system-scoped; require auth but not an active account.
     requireUser(req);
