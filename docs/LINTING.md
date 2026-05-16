@@ -686,6 +686,28 @@ This section describes what HIGH-full was originally projected to deliver vs. wh
 
 **Net summary:** HIGH-full delivered every projected benefit, avoided the projected UX cost via the editor-config split, and surfaced two latent bugs and a structural auto-fix-safety risk that wouldn't have been visible without the rule promotion. The original "main UX cost" framing turned out to be wrong — the cost was only paid if you naively pointed the editor extension at the production config, which the C+A+E+F stack now prevents by default.
 
+### Beyond HIGH-full — the wider foundation-hardening pass
+
+HIGH-full is a complete, closed slice. The roadmap-level **foundation-hardening pass** ahead of the public AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md) H1 2027 milestone) has three slices:
+
+| Slice | Status | Living doc |
+|---|---|---|
+| **ESLint hardening** (HIGH-light → HIGH-staged → HIGH-full + 5f housekeeping + 5g native parity) | ✅ **Landed** 2026-05-16 | this doc |
+| **TypeScript hardening** — drive per-workspace `tsc --noEmit` baselines toward 0 across `apps/web/**` (current baseline 585), `services/api/**` (current 17), `packages/ui` (current 25). The HIGH-full lint cleanup already moved each of these baselines downward as a side effect; remaining errors are mostly Tamagui shorthand-prop typing (apps/web), Prisma raw-query result typing (services/api), and the few intentional `as any` carve-outs in `packages/ui/src/primitives/*` that are documented in `docs/TAMAGUI.md`. | 🟡 **Not started.** No dedicated tracking doc yet — recommended creation: `docs/TYPECHECKING.md`, mirroring this doc's measurement-first / phase-gated structure. | — |
+| **Test-coverage hardening** — drive per-layer coverage gaps from the cheapest-test-layer mapping in [`docs/TESTING.md`](TESTING.md). HIGH-full surfaced two latent bugs that escaped existing tests (Phase 4b stale rename, Phase 5g render-prop typing); both indicate gaps in the L2 (integration) and L4 (contract-snapshot) layers respectively. | 🟡 **Not started.** Living doc exists (`docs/TESTING.md`) but the gap-audit phase plan is not written. | [`docs/TESTING.md`](TESTING.md) |
+| **Documentation hardening** — module READMEs (`packages/*/README.md`, `services/api/README.md`, `apps/{web,native}/README.md`) audited for public-flip quality; "describe" rather than "stub". Currently uneven (some packages have rich READMEs, others have stubs or none). | 🟡 **Not started.** No dedicated tracker. The `docs/README.md` index is up to date but module-local docs are not. | — |
+
+The "Phase 7" runtime-validation library question ([`docs/CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md)) is a separate architectural decision adjacent to all four slices — it has its own per-criterion audit cadence and is currently re-confirmed as deferred (audit log convention introduced 2026-05-16).
+
+When picking the next slice, the cheapest-bug-catching-per-hour ranking (informed by what HIGH-full's side effects revealed) is roughly:
+
+1. **Test-coverage hardening (L2 + L4 gaps).** HIGH-full demonstrated that the lint promotion caught 2 latent bugs that should have been caught by tests. Prefer adding the missing tests over relying on lint to surface future similar drift. Probably 1-2 weeks of focused work.
+2. **TypeScript hardening (Tamagui shorthand baselines).** ~610 cumulative `tsc` errors across the three first-party workspaces. Most are Tamagui-shorthand-related (per `docs/TAMAGUI.md` caveat 2) and would benefit from a coordinated Tamagui adapter prop-typing project — but that's larger scope. Bounded version: address the non-Tamagui `tsc` errors first (the Prisma raw-query and AI-tool-result typing in services/api), which are more straightforward type-discipline work.
+3. **Documentation hardening.** Highest variance in effort estimate (depends on how many module READMEs need to be written from scratch vs polished). Lowest urgency per-bug-catch but most visible to a public-flip first-impression reader.
+4. **Phase 7 (Zod migration).** Currently deferred per audit; only re-engages if a trigger criterion fires. See `docs/CONTRACTS-VALIDATION-STRATEGY.md` § Audit log.
+
+None of slices 1-3 are blocking. Pick based on the bottleneck you're feeling most acutely at the time.
+
 ---
 
 ## How to run locally

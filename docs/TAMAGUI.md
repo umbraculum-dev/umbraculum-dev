@@ -1,10 +1,10 @@
 # Tamagui: type-system situation + our adaptation strategy
 
 **Tier:** Public
-**Status:** v1.0 — descriptive (not prescriptive). Living document.
+**Status:** v1.1 — descriptive (not prescriptive). Living document. Updated 2026-05-16 post-HIGH-full landing — the "Tamagui wall" framing was materially over-stated (see triage block #3 below).
 **Audience:** maintainers, contributors authoring web/native UI code, anyone debugging Tamagui-related lint/TS noise.
 **Owners:** maintainers
-**Related:** `docs/LINTING.md` (especially the HIGH-staged + HIGH-full roadmap), `packages/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
+**Related:** `docs/LINTING.md` (the lint phase log, including the post-mortem revision of the Tamagui-wall framing), `packages/ui/README.md`, the `eslint.config.mjs` `no-restricted-imports` carve-out.
 
 ---
 
@@ -84,7 +84,7 @@ Property 'padding' does not exist on type 'IntrinsicAttributes & Omit<RNTamaguiV
 
 - Prefer shorthand props consistently (`p`, `bg`, `m`) — they're idiomatic Tamagui and most likely to be in the generated types.
 - If a component is `TS2322` only for shorthand reasons, leave the error; it does not affect runtime behavior.
-- Do not chase these errors with manual `as any` casts. They will resolve themselves either via Tamagui upstream fixes or via a project-wide shorthand audit (HIGH-full timeframe).
+- Do not chase these errors with manual `as any` casts. They will resolve themselves either via Tamagui upstream fixes or via a project-wide shorthand audit (currently unscheduled; not part of the landed HIGH-full ESLint phases — `tsc` shorthand-prop errors are a separate `tsc` baseline issue).
 
 ### Caveat 3: Component-as-element-tag (`as="aside"`) (TS2322)
 
@@ -157,11 +157,11 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
    - Yes → caveat 3 pattern. Add the canonical `// eslint-disable-next-line ... -- Tamagui ... ; see docs/TAMAGUI.md` comment.
 
 3. **Is this from a HIGH-full type-aware rule (`no-unsafe-*`)?**
-   - HIGH-full is now scoped — see [`docs/LINTING.md`](LINTING.md) for the 5-phase plan. The 2026-05-16 measurement run produced data that is much more granular than the original prediction:
-     - `apps/web` has **266 `no-unsafe-*` warnings** total — Tamagui-driven, mostly props leaked as `any`. This is the genuine "Tamagui wall" the doc warned about, and it is HIGH-full Phase 4 specifically.
-     - `apps/native` has **only 3 `no-unsafe-*` warnings** in total. Tamagui's React Native bindings type cleanly enough that the friction is essentially apps/web-only, not both-platforms as previously assumed.
-     - `services/api` has 665 `no-unsafe-*` warnings — but those are Prisma + Fastify + AI tool boundaries, not Tamagui (that is HIGH-full Phase 3, separate from this doc).
-   - Strategy: per-rule global disables in `apps/web` are evaluated as part of HIGH-full Phase 4, where the choice between (4a) per-site disables, (4b) Tamagui adapter improvements, and (4c) hybrid is made based on the unique-component-vs-unique-site count taken at phase start. **Do not pre-decide the disable strategy in this doc** — it belongs to the Phase 4 commit's reviewer context.
+   - HIGH-full landed 2026-05-16 — see [`docs/LINTING.md`](LINTING.md) for the full phase log. The post-mortem materially changes the picture this doc previously painted:
+     - **The "Tamagui wall" was a phantom.** The original 2026-05-16 measurement reported `apps/web` had 266 `no-unsafe-*` warnings and predicted Tamagui prop leakage as the root cause. Reality (post-investigation, Phase 4b commit `4d9ec1e`): of the actual 304 raw warnings in `apps/web`, **290 traced to a single stale rename** — `WaterProfilesResponse.account` was renamed to `.workspace` in commit `87876d0`, but four UI consumers (`apps/web/app/recipes/[id]/water/{mash,sparge,boil}/page.tsx` + `apps/web/app/[locale]/water-profiles/page.tsx`) kept reading `profiles?.account`, which evaluated to `undefined`, propagating "error typed" through every downstream `.find`, `.map`, and spread. Tamagui-related leakage was responsible for **~6 warnings, not 266** — well within the per-line `eslint-disable-next-line` budget rather than warranting an adapter project. Fixing the four consumers also restored a long-broken UI feature (workspace water profiles silently never appeared in dropdowns).
+     - **`apps/native` was effectively clean.** The measurement reported only 3 `no-unsafe-*` warnings, all clustered on a single inline `<RootStack.Screen>` render-prop in `apps/native/src/navigation/AppNavigator.tsx` line 113. Phase 5g (2026-05-16) extended the rules to `apps/native/**` and the fix was a single import + a single annotation (`NativeStackScreenProps<RootStackParamList, "SelectWorkspace">`).
+     - **`services/api` was real but Tamagui-irrelevant.** 665 `no-unsafe-*` warnings traced to Prisma raw queries, Fastify request bodies, AI tool I/O, and BeerJSON normalisation — all `unknown → typed` boundary discipline (Phase 3, commits `5a42572`–`83844e7`). No Tamagui involvement.
+   - **Lesson for future "Tamagui-adjacent surface looks scary" measurements:** before scoping a Tamagui adapter project, do a 30-min triage of the top warning files. The 95th-percentile warning is usually a stale rename, a missing parser narrowing, or a single mis-typed render-prop — not Tamagui-the-library. Tamagui itself ranks much lower on real "type leakage" cost than the original framing suggested.
 
 4. **Is this something Tamagui upstream is actively fixing?**
    - Check the open issues at https://github.com/tamagui/tamagui (search for the specific error number and `types`).
@@ -185,13 +185,13 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 - A new Tamagui major version is released and changes the type ecosystem materially.
 - A new bug class appears that needs another wrapper primitive.
 - The `no-explicit-any` count concentrated in Tamagui-adjacent code crosses a threshold where the cost/benefit of a more aggressive wrapper layer changes (currently: ~590 in apps/web alone; if it grows to >1000 in a single app, reconsider).
-- HIGH-full lint upgrade is now scoped as a 5-phase plan in [`docs/LINTING.md`](LINTING.md) (target H1 2027). The Tamagui-adjacent surface is concentrated in `apps/web` (266 `no-unsafe-*` warnings) and lands in HIGH-full Phase 4 specifically; `apps/native` is essentially unaffected (3 such warnings total). Re-evaluate Tamagui adapter strategy if the apps/web Phase 4 measurement shows >50% of warnings concentrated in <10 unique components (favors a 4b adapter-improvement approach over 4a per-site disables).
+- HIGH-full lint upgrade landed 2026-05-16 — see [`docs/LINTING.md`](LINTING.md) for the full phase log. Tamagui-adjacent type leakage turned out to be ~6 warnings, not the 266 originally predicted (95% of the apps/web `no-unsafe-*` surface was a stale `account → workspace` rename, not Tamagui — see triage block #3 above). The trigger to re-open the "should we build a Tamagui adapter wrapper layer?" question: a *new* surge of Tamagui-attributed `no-unsafe-*` errors in CI specifically (>50 in a single PR cycle, or >100 cumulative across two cycles) — that would suggest Tamagui upstream's typings have regressed and the cost/benefit of a project-local adapter has shifted. Until then, per-line `eslint-disable-next-line ... -- Tamagui ... ; see docs/TAMAGUI.md` is the right granularity.
 
 ---
 
 ## Related
 
-- `docs/LINTING.md` — the lint roadmap, especially HIGH-staged Phase 4 (`apps/web/app/recipes/**`) and Phase 5 (`apps/native/src/screens/**`) where Tamagui friction is highest.
+- `docs/LINTING.md` — the lint roadmap and full phase log; HIGH-full landed 2026-05-16 with the Tamagui-wall framing materially revised (see `docs/LINTING.md` "Realised output of HIGH-full" + the Phase 4b post-mortem for the stale-rename root-cause analysis).
 - `packages/ui/README.md` — `@brewery/ui` package overview, especially the platform-forking primitives in `src/primitives/*`.
 - `eslint.config.mjs` — the `no-restricted-imports` block for `packages/ui/src/{ai,charts}/**` that enforces "never import raw Tamagui Button/Input/Checkbox in cross-platform components".
 - `packages/ui/src/primitives/AdSlotCard.tsx` — canonical example of the caveat-3 (`as="aside"`) pattern.
