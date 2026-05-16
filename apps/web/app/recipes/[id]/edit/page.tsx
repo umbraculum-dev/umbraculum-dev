@@ -54,11 +54,12 @@ import {
 } from "../water/_lib/waterSettings";
 import { mathExplain } from "./_lib/mathExplain";
 import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
+import type { NumberFormatHintV1, WaterCalcDerivation } from "@brewery/contracts";
 import { renderDerivationBody } from "../water/_lib/mathBodies";
 import { formatSgWithPlato } from "../../../_lib/gravity";
 import { parseGristJson } from "../../../_lib/grist";
 
-type Recipe = {
+interface Recipe {
   id: string;
   accountId: string;
   name: string;
@@ -69,20 +70,28 @@ type Recipe = {
   notes: string | null;
   beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
+  /** Gravity analysis attached by `GET /recipes/:id` (see `GravityAnalysisResponseV1`). */
+  analysis?: unknown;
   createdAt: string;
   updatedAt: string;
-};
+}
 
-type RecipeVersionListItem = {
+interface RecipeVersionListItem {
   id: string;
   version: number;
   name: string;
   createdAt: string;
   updatedAt: string;
-};
+}
 
-type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
-type EquipmentProfile = {
+interface StyleListItem {
+  key: string;
+  name: string;
+  code: string;
+  sortOrder: number;
+}
+
+interface EquipmentProfile {
   id: string;
   name: string;
   equipment: {
@@ -90,7 +99,117 @@ type EquipmentProfile = {
     mash: Record<string, unknown>;
     misc: Record<string, unknown>;
   };
-};
+}
+
+/**
+ * Search-result DTOs for the `/api/ingredients/*` endpoints.
+ *
+ * The API returns Prisma rows plus a few derived fields. We declare them locally
+ * (instead of importing Prisma types into apps/web) so the contract is documented
+ * at the consumer side and the editor is `any`-free.
+ */
+interface FermentableSearchResult {
+  id: string;
+  name: string;
+  producer?: string | null;
+  group?: string | null;
+  type?: string | null;
+  notes?: string | null;
+  country?: string | null;
+  colorEbc?: number | null;
+  colorLovibond?: number | null;
+  yieldPercent?: number | null;
+  ppg?: number | null;
+  mashDiPh?: number | null;
+  mashTaToPh57_mEqPerKg?: number | null;
+}
+
+interface HopSearchResult {
+  id: string;
+  name: string;
+  country?: string | null;
+  type?: string | null;
+  alphaMin?: number | null;
+  alphaMax?: number | null;
+  betaMin?: number | null;
+  betaMax?: number | null;
+}
+
+interface YeastSearchResult {
+  id: string;
+  name: string;
+  lab?: string | null;
+  productId?: string | null;
+  attenuationMin?: number | null;
+  attenuationMax?: number | null;
+}
+
+/**
+ * Narrow helper: returns the input as a plain object record, or null otherwise.
+ * Mirrors `services/api/src/lib/typeGuards.ts::isObject` (kept local to avoid
+ * a cross-app import).
+ */
+function asRecord(v: unknown): Record<string, unknown> | null {
+  if (v == null || typeof v !== "object" || Array.isArray(v)) return null;
+  return v as Record<string, unknown>;
+}
+
+/**
+ * Compute the brewhouse efficiency to display in math bodies. Tries, in order:
+ *  1. `recipeExtJson.equipment.mash.mashEfficiencyPercent`
+ *  2. `recipeExtJson.brewhouseEfficiencyPercent`
+ *  3. `beerJsonRecipeJson.beerjson.recipes[0].efficiency.brewhouse` (when unit is %)
+ */
+function getRecipeEfficiencyPercent(recipe: Recipe | null): number | null {
+  if (!recipe) return null;
+  const ext = asRecord(recipe.recipeExtJson);
+  const equipment = ext ? asRecord(ext.equipment) : null;
+  const mash = equipment ? asRecord(equipment.mash) : null;
+  const mashEff =
+    mash && typeof mash.mashEfficiencyPercent === "number" && Number.isFinite(mash.mashEfficiencyPercent)
+      ? (mash.mashEfficiencyPercent as number)
+      : null;
+  if (mashEff != null) return mashEff;
+
+  const brewEff =
+    ext && typeof ext.brewhouseEfficiencyPercent === "number" && Number.isFinite(ext.brewhouseEfficiencyPercent)
+      ? (ext.brewhouseEfficiencyPercent as number)
+      : null;
+  if (brewEff != null) return brewEff;
+
+  const bj = asRecord(recipe.beerJsonRecipeJson);
+  const bjRoot = bj ? asRecord(bj.beerjson) : null;
+  const bjRecipes = bjRoot && Array.isArray(bjRoot.recipes) ? bjRoot.recipes : null;
+  const r0 = bjRecipes && bjRecipes.length > 0 ? asRecord(bjRecipes[0]) : null;
+  const efficiency = r0 ? asRecord(r0.efficiency) : null;
+  const brewhouse = efficiency ? asRecord(efficiency.brewhouse) : null;
+  if (brewhouse && brewhouse.unit === "%" && typeof brewhouse.value === "number" && Number.isFinite(brewhouse.value)) {
+    return brewhouse.value as number;
+  }
+  return null;
+}
+
+/**
+ * Read the BeerJSON `batch_size` for the first recipe (used as a volume fallback
+ * when the gravity analysis emits the `used_batch_size_volume` warning).
+ */
+function getBeerJsonBatchSize(recipe: Recipe | null): { unit: string; value: number | null } {
+  if (!recipe) return { unit: "", value: null };
+  const bj = asRecord(recipe.beerJsonRecipeJson);
+  const bjRoot = bj ? asRecord(bj.beerjson) : null;
+  const bjRecipes = bjRoot && Array.isArray(bjRoot.recipes) ? bjRoot.recipes : null;
+  const r0 = bjRecipes && bjRecipes.length > 0 ? asRecord(bjRecipes[0]) : null;
+  const batch = r0 ? asRecord(r0.batch_size) : null;
+  const unit = batch && typeof batch.unit === "string" ? batch.unit : "";
+  const value =
+    batch && typeof batch.value === "number" && Number.isFinite(batch.value) ? (batch.value as number) : null;
+  return { unit, value };
+}
+
+/** A `Record`-style alias for `formatHints` so we can index by an arbitrary string field name. */
+type FormatHintsRecord = Record<string, NumberFormatHintV1 | undefined>;
+/** Same trick for `derivations` keyed by an arbitrary derivation id. */
+type DerivationsRecord = Record<string, WaterCalcDerivation | undefined>;
 
 function newRowId() {
   try {
@@ -262,7 +381,7 @@ export default function RecipeEditPage() {
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [analysis, setAnalysis] = useState<any | null>(null);
+  const [analysis, setAnalysis] = useState<unknown>(null);
   const [versions, setVersions] = useState<RecipeVersionListItem[] | null>(null);
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [versionsError, setVersionsError] = useState<string | null>(null);
@@ -310,14 +429,14 @@ export default function RecipeEditPage() {
 
   // Ingredient DB searches (v0)
   const [fermentableQuery, setFermentableQuery] = useState("");
-  const [fermentableResults, setFermentableResults] = useState<any[]>([]);
+  const [fermentableResults, setFermentableResults] = useState<FermentableSearchResult[]>([]);
   const [fermentableSearching, setFermentableSearching] = useState(false);
   const [fermentableSearchError, setFermentableSearchError] = useState<string | null>(null);
   const [fermentableAddMessage, setFermentableAddMessage] = useState<string | null>(null);
   const fermentableAddMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [hopQuery, setHopQuery] = useState("");
-  const [hopResults, setHopResults] = useState<any[]>([]);
+  const [hopResults, setHopResults] = useState<HopSearchResult[]>([]);
   const [hopSearching, setHopSearching] = useState(false);
   const [hopSearchError, setHopSearchError] = useState<string | null>(null);
 
@@ -377,15 +496,18 @@ export default function RecipeEditPage() {
         const list = (res.data as { brewSessions?: unknown[] })?.brewSessions;
         const sessions = Array.isArray(list) ? list.slice(0, 20) : [];
         setBrewSessions(
-          sessions.map((s: any) => ({
-            id: s?.id ?? "",
-            code: s?.code ?? "",
-            status: s?.status ?? "",
-            createdAt: s?.createdAt ?? "",
-            startedAt: s?.startedAt ?? null,
-            stoppedAt: s?.stoppedAt ?? null,
-            scheduledDate: s?.scheduledDate ?? null,
-          })),
+          sessions.map((entry) => {
+            const s = asRecord(entry) ?? {};
+            return {
+              id: typeof s.id === "string" ? s.id : "",
+              code: typeof s.code === "string" ? s.code : "",
+              status: typeof s.status === "string" ? s.status : "",
+              createdAt: typeof s.createdAt === "string" ? s.createdAt : "",
+              startedAt: typeof s.startedAt === "string" ? s.startedAt : null,
+              stoppedAt: typeof s.stoppedAt === "string" ? s.stoppedAt : null,
+              scheduledDate: typeof s.scheduledDate === "string" ? s.scheduledDate : null,
+            };
+          }),
         );
       } catch {
         if (!cancelled) setBrewSessions([]);
@@ -426,7 +548,7 @@ export default function RecipeEditPage() {
       const raw = window.location.hash || "";
       const id = raw.startsWith("#") ? raw.slice(1) : raw;
       if (!id) return;
-      if (!COLLAPSIBLE_SECTION_IDS.includes(id as any)) return;
+      if (!(COLLAPSIBLE_SECTION_IDS as ReadonlyArray<string>).includes(id)) return;
       setSectionOpen(id, true);
     };
 
@@ -458,20 +580,24 @@ export default function RecipeEditPage() {
       try {
         const res = await apiFetch(`/api/recipes/${recipeId}`);
         if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const r = (res.data as any).recipe as Recipe;
+        const r = (res.data as { recipe: Recipe }).recipe;
         if (cancelled) return;
         setRecipe(r);
-        setAnalysis((r as any).analysis ?? null);
+        setAnalysis(r.analysis ?? null);
         setName(r.name ?? "");
-        setStyleKey((r as any).styleKey ?? "custom");
+        setStyleKey(r.styleKey ?? "custom");
         setNotes(r.notes ?? "");
-        const ext = (r as any).recipeExtJson;
-        const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
-        const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
-        const yeastOverridesRaw = ext && typeof ext === "object" ? (ext as any).yeastAttenuationOverridesPercent : null;
-        if (yeastOverridesRaw && typeof yeastOverridesRaw === "object") {
+        const ext = asRecord(r.recipeExtJson);
+        const links = ext ? asRecord(ext.ingredientLinks) : null;
+        const linksGrist = links ? asRecord(links.grist) : null;
+        const linksHops = links ? asRecord(links.hops) : null;
+        const linksYeast = links ? asRecord(links.yeast) : null;
+        const linksMisc = links ? asRecord(links.misc) : null;
+        const mashPhModel = ext ? asRecord(ext.mashPhModel) : null;
+        const yeastOverridesRaw = ext ? asRecord(ext.yeastAttenuationOverridesPercent) : null;
+        if (yeastOverridesRaw) {
           const out: Record<string, string> = {};
-          for (const [k, v] of Object.entries(yeastOverridesRaw as any)) {
+          for (const [k, v] of Object.entries(yeastOverridesRaw)) {
             if (typeof k !== "string") continue;
             if (typeof v !== "number" || !Number.isFinite(v)) continue;
             out[k] = String(v);
@@ -481,43 +607,34 @@ export default function RecipeEditPage() {
           setYeastAttenuationOverrides({});
         }
 
-        const yeastPitchRateRaw = ext && typeof ext === "object" ? (ext as any).yeastPitchRateOverrides : null;
-        const yeastFermentationTempRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastFermentationTempOverrides : null;
-        const yeastOxygenationRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastOxygenationOverrides : null;
-        const yeastDiacetylRestRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastDiacetylRestOverrides : null;
-        const yeastFormatRaw =
-          ext && typeof ext === "object"
-            ? (ext as any).yeastFormatOverrides ?? (ext as any).yeastTypeOverrides
-            : null;
-        const yeastSpeciesRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastSpeciesOverrides : null;
-        const yeastNeedsPropagationRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastNeedsPropagationOverrides : null;
-        const yeastCellsPerLRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastCellsPerLOverrides : null;
-        const yeastCellsPerKGRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastCellsPerKGOverrides : null;
-        const yeastCellsPerGRaw =
-          ext && typeof ext === "object" ? (ext as any).yeastCellsPerGOverrides : null;
+        const yeastPitchRateRaw = ext ? asRecord(ext.yeastPitchRateOverrides) : null;
+        const yeastFermentationTempRaw = ext ? asRecord(ext.yeastFermentationTempOverrides) : null;
+        const yeastOxygenationRaw = ext ? asRecord(ext.yeastOxygenationOverrides) : null;
+        const yeastDiacetylRestRaw = ext ? asRecord(ext.yeastDiacetylRestOverrides) : null;
+        const yeastFormatRaw = ext
+          ? asRecord(ext.yeastFormatOverrides) ?? asRecord(ext.yeastTypeOverrides)
+          : null;
+        const yeastSpeciesRaw = ext ? asRecord(ext.yeastSpeciesOverrides) : null;
+        const yeastNeedsPropagationRaw = ext ? asRecord(ext.yeastNeedsPropagationOverrides) : null;
+        const yeastCellsPerLRaw = ext ? asRecord(ext.yeastCellsPerLOverrides) : null;
+        const yeastCellsPerKGRaw = ext ? asRecord(ext.yeastCellsPerKGOverrides) : null;
+        const yeastCellsPerGRaw = ext ? asRecord(ext.yeastCellsPerGOverrides) : null;
 
-        const equipmentSource = ext && typeof ext === "object" ? (ext as any).equipmentSource : null;
+        const equipmentSource = ext ? asRecord(ext.equipmentSource) : null;
         const equipmentProfileId =
-          equipmentSource && typeof equipmentSource === "object" && typeof (equipmentSource as any).equipmentProfileId === "string"
-            ? ((equipmentSource as any).equipmentProfileId as string)
+          equipmentSource && typeof equipmentSource.equipmentProfileId === "string"
+            ? equipmentSource.equipmentProfileId
             : "";
         setSelectedEquipmentProfileId(equipmentProfileId);
 
-        if (!(r as any).beerJsonRecipeJson) {
+        if (!r.beerJsonRecipeJson) {
           throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
         }
-        const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
+        const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
 
         const boilTimeMinutesOverride =
-          ext && typeof ext === "object" && typeof (ext as any).boilTimeMinutesOverride === "number" && Number.isFinite((ext as any).boilTimeMinutesOverride)
-            ? (ext as any).boilTimeMinutesOverride
+          ext && typeof ext.boilTimeMinutesOverride === "number" && Number.isFinite(ext.boilTimeMinutesOverride)
+            ? (ext.boilTimeMinutesOverride as number)
             : null;
         if (boilTimeMinutesOverride != null && boilTimeMinutesOverride >= 0) {
           setBoilTimeMinutes(String(Math.round(boilTimeMinutesOverride)));
@@ -536,67 +653,63 @@ export default function RecipeEditPage() {
         }
 
         const grist = s.gristRows.map((row) => {
-          const ingredientId = typeof links?.grist?.[row.id] === "string" ? (links.grist[row.id] as string) : null;
-          const m = row.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[row.id] : null;
+          const ingredientId =
+            linksGrist && typeof linksGrist[row.id] === "string" ? (linksGrist[row.id] as string) : null;
+          const m = row.id && mashPhModel ? asRecord(mashPhModel[row.id]) : null;
           return {
             ...row,
             ingredientId,
             mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : row.mashDiPh ?? null,
             mashTaToPh57_mEqPerKg:
-              typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : row.mashTaToPh57_mEqPerKg ?? null,
+              typeof m?.mashTaToPh57_mEqPerKg === "number"
+                ? (m.mashTaToPh57_mEqPerKg as number)
+                : row.mashTaToPh57_mEqPerKg ?? null,
             mashRoastDehuskedOverride:
-              "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : row.mashRoastDehuskedOverride ?? null,
+              m && "roastDehuskedOverride" in m
+                ? (m.roastDehuskedOverride as boolean | null)
+                : row.mashRoastDehuskedOverride ?? null,
           } as EditorGristRow;
         });
-        const hopFormOverrides =
-          ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any).hopFormOverrides : null;
+        const hopFormOverrides = ext ? asRecord(ext.hopFormOverrides) : null;
         const hops = s.hopsRows.map((row) => {
-          const override =
-            hopFormOverrides &&
-            typeof hopFormOverrides === "object" &&
-            !Array.isArray(hopFormOverrides) &&
-            (hopFormOverrides[row.id] === "debittered_leaf" || hopFormOverrides[row.id] === "hop_extract")
+          const override = hopFormOverrides
+            ? hopFormOverrides[row.id] === "debittered_leaf" || hopFormOverrides[row.id] === "hop_extract"
               ? (hopFormOverrides[row.id] as "debittered_leaf" | "hop_extract")
-              : null;
+              : null
+            : null;
           return {
             ...row,
-            ingredientId: typeof links?.hops?.[row.id] === "string" ? (links.hops[row.id] as string) : null,
+            ingredientId:
+              linksHops && typeof linksHops[row.id] === "string" ? (linksHops[row.id] as string) : null,
             form: override ?? (row.form ?? "pellet"),
           };
         }) as EditorHopRow[];
         const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
         const yeast = baseYeast.map((row) => {
-          const pitchRate =
-            yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string"
-              ? (yeastPitchRateRaw[row.id] as string)
-              : null;
+          const pitchRateVal = yeastPitchRateRaw?.[row.id];
+          const pitchRate = typeof pitchRateVal === "string" ? pitchRateVal : null;
+
+          const fermentationTempVal = yeastFermentationTempRaw?.[row.id];
           const fermentationTempC =
-            yeastFermentationTempRaw &&
-            typeof yeastFermentationTempRaw === "object" &&
-            typeof yeastFermentationTempRaw[row.id] === "number" &&
-            Number.isFinite(yeastFermentationTempRaw[row.id])
-              ? (yeastFermentationTempRaw[row.id] as number)
+            typeof fermentationTempVal === "number" && Number.isFinite(fermentationTempVal)
+              ? fermentationTempVal
               : null;
+
+          const oxygenationVal = yeastOxygenationRaw?.[row.id];
           const oxygenation =
-            yeastOxygenationRaw &&
-            typeof yeastOxygenationRaw === "object" &&
-            (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no")
-              ? (yeastOxygenationRaw[row.id] as "yes" | "no")
-              : null;
+            oxygenationVal === "yes" || oxygenationVal === "no" ? (oxygenationVal as "yes" | "no") : null;
+
+          const diacetylRestVal = yeastDiacetylRestRaw?.[row.id];
           const diacetylRest =
-            yeastDiacetylRestRaw &&
-            typeof yeastDiacetylRestRaw === "object" &&
-            (yeastDiacetylRestRaw[row.id] === "yes" || yeastDiacetylRestRaw[row.id] === "no")
-              ? (yeastDiacetylRestRaw[row.id] as "yes" | "no")
-              : null;
+            diacetylRestVal === "yes" || diacetylRestVal === "no" ? (diacetylRestVal as "yes" | "no") : null;
+
+          const formatVal = yeastFormatRaw?.[row.id];
           const format =
-            yeastFormatRaw &&
-            typeof yeastFormatRaw === "object" &&
-            (yeastFormatRaw[row.id] === "dry" || yeastFormatRaw[row.id] === "liquid" || yeastFormatRaw[row.id] === "slurry")
-              ? (yeastFormatRaw[row.id] as "dry" | "liquid" | "slurry")
+            formatVal === "dry" || formatVal === "liquid" || formatVal === "slurry"
+              ? (formatVal as "dry" | "liquid" | "slurry")
               : null;
-          const speciesRaw =
-            yeastSpeciesRaw && typeof yeastSpeciesRaw === "object" ? yeastSpeciesRaw[row.id] : null;
+
+          const speciesRaw = yeastSpeciesRaw?.[row.id] ?? null;
           const validSpecies = [
             "saccharomyces_cerevisiae",
             "saccharomyces_pastorianus",
@@ -604,42 +717,42 @@ export default function RecipeEditPage() {
             "diastaticus",
             "other",
           ] as const;
+          type YeastSpecies = (typeof validSpecies)[number];
           const species =
-            typeof speciesRaw === "string" && validSpecies.includes(speciesRaw as any) ? speciesRaw : null;
+            typeof speciesRaw === "string" && (validSpecies as ReadonlyArray<string>).includes(speciesRaw)
+              ? (speciesRaw as YeastSpecies)
+              : null;
+
+          const needsPropagationVal = yeastNeedsPropagationRaw?.[row.id];
           const needsPropagation =
-            yeastNeedsPropagationRaw &&
-            typeof yeastNeedsPropagationRaw === "object" &&
-            (yeastNeedsPropagationRaw[row.id] === "yes" || yeastNeedsPropagationRaw[row.id] === "no")
-              ? (yeastNeedsPropagationRaw[row.id] as "yes" | "no")
+            needsPropagationVal === "yes" || needsPropagationVal === "no"
+              ? (needsPropagationVal as "yes" | "no")
               : null;
+
+          const cellsPerLVal = yeastCellsPerLRaw?.[row.id];
           const cellsPerLOverride =
-            yeastCellsPerLRaw &&
-            typeof yeastCellsPerLRaw === "object" &&
-            typeof yeastCellsPerLRaw[row.id] === "number" &&
-            Number.isFinite(yeastCellsPerLRaw[row.id]) &&
-            yeastCellsPerLRaw[row.id] > 0
-              ? (yeastCellsPerLRaw[row.id] as number)
+            typeof cellsPerLVal === "number" && Number.isFinite(cellsPerLVal) && cellsPerLVal > 0
+              ? cellsPerLVal
               : null;
+
+          const cellsPerKGVal = yeastCellsPerKGRaw?.[row.id];
           const cellsPerKGFromKG =
-            yeastCellsPerKGRaw &&
-            typeof yeastCellsPerKGRaw === "object" &&
-            typeof yeastCellsPerKGRaw[row.id] === "number" &&
-            Number.isFinite(yeastCellsPerKGRaw[row.id]) &&
-            yeastCellsPerKGRaw[row.id] > 0
-              ? (yeastCellsPerKGRaw[row.id] as number)
+            typeof cellsPerKGVal === "number" && Number.isFinite(cellsPerKGVal) && cellsPerKGVal > 0
+              ? cellsPerKGVal
               : null;
+
+          const cellsPerGVal = yeastCellsPerGRaw?.[row.id];
           const cellsPerKGFromG =
-            yeastCellsPerGRaw &&
-            typeof yeastCellsPerGRaw === "object" &&
-            typeof yeastCellsPerGRaw[row.id] === "number" &&
-            Number.isFinite(yeastCellsPerGRaw[row.id]) &&
-            yeastCellsPerGRaw[row.id] > 0
-              ? (yeastCellsPerGRaw[row.id] as number) * 1000
+            typeof cellsPerGVal === "number" && Number.isFinite(cellsPerGVal) && cellsPerGVal > 0
+              ? cellsPerGVal * 1000
               : null;
+
           const cellsPerKGOverride = cellsPerKGFromKG ?? cellsPerKGFromG ?? null;
+
           return {
             ...row,
-            ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+            ingredientId:
+              linksYeast && typeof linksYeast[row.id] === "string" ? (linksYeast[row.id] as string) : null,
             pitchRate: pitchRate ?? undefined,
             fermentationTempC: fermentationTempC ?? undefined,
             oxygenation: oxygenation ?? undefined,
@@ -653,7 +766,8 @@ export default function RecipeEditPage() {
         }) as EditorYeastRow[];
         const misc = s.miscRows.map((row) => ({
           ...row,
-          ingredientId: typeof links?.misc?.[row.id] === "string" ? (links.misc[row.id] as string) : null,
+          ingredientId:
+            linksMisc && typeof linksMisc[row.id] === "string" ? (linksMisc[row.id] as string) : null,
         })) as EditorMiscRow[];
 
         setGristRows(grist);
@@ -691,7 +805,7 @@ export default function RecipeEditPage() {
       try {
         const res = await apiFetch(`/api/recipes/${recipeId}/versions`);
         if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const items = (res.data as any)?.versions;
+        const items = (res.data as { versions?: unknown })?.versions;
         if (!cancelled) setVersions(Array.isArray(items) ? (items as RecipeVersionListItem[]) : []);
       } catch (err) {
         if (!cancelled) {
@@ -717,7 +831,7 @@ export default function RecipeEditPage() {
       try {
         const res = await apiFetch("/api/styles");
         if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const items = (res.data as any)?.styles;
+        const items = (res.data as { styles?: unknown })?.styles;
         if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
       } catch (err) {
         if (!cancelled) setStylesError(String(err));
@@ -739,7 +853,7 @@ export default function RecipeEditPage() {
       try {
         const res = await apiFetch("/api/equipment-profiles");
         if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const items = (res.data as any)?.profiles;
+        const items = (res.data as { profiles?: unknown })?.profiles;
         if (!cancelled) setEquipmentProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
       } catch (err) {
         if (!cancelled) setEquipmentProfilesError(String(err));
@@ -760,9 +874,8 @@ export default function RecipeEditPage() {
       const selected = equipmentProfiles.find((p) => p.id === selectedEquipmentProfileId) ?? null;
       if (!selected) throw new Error(tEquip("errors.selectFirst"));
 
-      const extBase = (recipe as any)?.recipeExtJson;
-      const base =
-        extBase && typeof extBase === "object" && !Array.isArray(extBase) ? ({ ...(extBase as any) } as any) : ({} as any);
+      const extBase = asRecord(recipe?.recipeExtJson);
+      const base: Record<string, unknown> = extBase ? { ...extBase } : {};
 
       base.version = 1;
       base.equipment = selected.equipment;
@@ -778,9 +891,9 @@ export default function RecipeEditPage() {
       // Re-fetch to refresh derived analysis.
       const reload = await apiFetch(`/api/recipes/${recipeId}`);
       if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as any).recipe as Recipe;
+      const r = (reload.data as { recipe: Recipe }).recipe;
       setRecipe(r);
-      setAnalysis((r as any).analysis ?? null);
+      setAnalysis(r.analysis ?? null);
       setSaveStatus(mode === "reload" ? t("status.equipmentReloaded") : t("status.equipmentApplied"));
     } catch (err) {
       setEquipmentApplyError(String(err));
@@ -795,9 +908,8 @@ export default function RecipeEditPage() {
     setSaveError(null);
     setSaveStatus(null);
     try {
-      const extBase = (recipe as any)?.recipeExtJson;
-      const extBaseForSave =
-        extBase && typeof extBase === "object" && !Array.isArray(extBase) ? ({ ...(extBase as any) } as any) : ({} as any);
+      const extBase = asRecord(recipe?.recipeExtJson);
+      const extBaseForSave: Record<string, unknown> = extBase ? { ...extBase } : {};
 
       const boilTimeMinutesVal = (() => {
         const trimmed = boilTimeMinutes.trim();
@@ -922,7 +1034,7 @@ export default function RecipeEditPage() {
       } else {
         delete extBaseForSave.yeastSpeciesOverrides;
       }
-      delete (extBaseForSave as any).yeastTypeOverrides;
+      delete extBaseForSave.yeastTypeOverrides;
       if (Object.keys(yeastNeedsPropagationOverrides).length) {
         extBaseForSave.yeastNeedsPropagationOverrides = yeastNeedsPropagationOverrides;
       } else {
@@ -938,7 +1050,7 @@ export default function RecipeEditPage() {
       } else {
         delete extBaseForSave.yeastCellsPerKGOverrides;
       }
-      delete (extBaseForSave as any).yeastCellsPerGOverrides;
+      delete extBaseForSave.yeastCellsPerGOverrides;
 
       const batchSizeLiters =
         typeof extBaseForSave.batchSizeLiters === "number" ? extBaseForSave.batchSizeLiters
@@ -985,20 +1097,20 @@ export default function RecipeEditPage() {
       const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
         name,
         notes: notes || null,
-        gristRows: gristRows as any,
-        hopsRows: hopsRows as unknown as EditorHopRow[],
-        yeastRows: yeastRows as unknown as EditorYeastRow[],
-        miscRows: miscRows as any,
+        gristRows,
+        hopsRows,
+        yeastRows,
+        miscRows,
         mash,
         batchSizeLiters,
         brewhouseEfficiencyPercent,
       });
 
       const recipeExtJson = buildRecipeExtJsonFromEditorState({
-        gristRows: gristRows as any,
-        hopsRows: hopsRows as unknown as EditorHopRow[],
-        yeastRows: yeastRows as unknown as EditorYeastRow[],
-        miscRows: miscRows as any,
+        gristRows,
+        hopsRows,
+        yeastRows,
+        miscRows,
         extBase: extBaseForSave,
       });
 
@@ -1018,10 +1130,10 @@ export default function RecipeEditPage() {
       // Re-fetch to refresh derived analysis (PATCH response does not include it).
       const reload = await apiFetch(`/api/recipes/${recipeId}`);
       if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as any).recipe as Recipe;
+      const r = (reload.data as { recipe: Recipe }).recipe;
       setRecipe(r);
-      setAnalysis((r as any).analysis ?? null);
-      setStyleKey((r as any).styleKey ?? styleKey);
+      setAnalysis(r.analysis ?? null);
+      setStyleKey(r.styleKey ?? styleKey);
       setSaveStatus(t("status.saved"));
     } catch (err) {
       setSaveError(String(err));
@@ -1041,7 +1153,7 @@ export default function RecipeEditPage() {
         headers: { "Content-Type": "application/json" },
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const newId = (res.data as any)?.recipe?.id;
+      const newId = (res.data as { recipe?: { id?: unknown } })?.recipe?.id;
       if (typeof newId !== "string" || !newId) {
         throw new Error("Version create response is missing recipe.id");
       }
@@ -1064,7 +1176,7 @@ export default function RecipeEditPage() {
         headers: { "Content-Type": "application/json" },
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const newId = (res.data as any)?.recipe?.id;
+      const newId = (res.data as { recipe?: { id?: unknown } })?.recipe?.id;
       if (typeof newId !== "string" || !newId) {
         throw new Error("Duplicate response is missing recipe.id");
       }
@@ -1088,7 +1200,7 @@ export default function RecipeEditPage() {
         body: JSON.stringify({}),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const id = (res.data as any)?.brewSession?.id;
+      const id = (res.data as { brewSession?: { id?: unknown } })?.brewSession?.id;
       if (typeof id !== "string" || !id) {
         throw new Error("Create brew session response is missing brewSession.id");
       }
@@ -1124,35 +1236,35 @@ export default function RecipeEditPage() {
     ]);
   };
 
-  const addFermentableFromDb = (item: any) => {
-    const id = typeof item?.id === "string" ? item.id : null;
-    const itemName = typeof item?.name === "string" ? item.name : "";
+  const addFermentableFromDb = (item: FermentableSearchResult) => {
+    const id = typeof item.id === "string" ? item.id : null;
+    const itemName = typeof item.name === "string" ? item.name : "";
     if (!id || !itemName) return;
-    const producer = typeof item?.producer === "string" ? item.producer : null;
-    const group = typeof item?.group === "string" ? item.group : null;
-    const mashDiPh = typeof item?.mashDiPh === "number" && Number.isFinite(item.mashDiPh) ? item.mashDiPh : null;
+    const producer = typeof item.producer === "string" ? item.producer : null;
+    const group = typeof item.group === "string" ? item.group : null;
+    const mashDiPh = typeof item.mashDiPh === "number" && Number.isFinite(item.mashDiPh) ? item.mashDiPh : null;
     const mashTaToPh57_mEqPerKg =
-      typeof item?.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(item.mashTaToPh57_mEqPerKg)
+      typeof item.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(item.mashTaToPh57_mEqPerKg)
         ? item.mashTaToPh57_mEqPerKg
         : null;
     const mashPhModelSource =
       mashDiPh !== null || mashTaToPh57_mEqPerKg !== null ? ("default" as const) : ("unknown" as const);
     const name = itemName;
     const colorLovibond =
-      typeof item?.colorLovibond === "number" && Number.isFinite(item.colorLovibond)
+      typeof item.colorLovibond === "number" && Number.isFinite(item.colorLovibond)
         ? roundTo(item.colorLovibond, 3)
         : null;
     const ppg =
-      typeof item?.ppg === "number" && Number.isFinite(item.ppg) ? roundTo(item.ppg, 3) : null;
+      typeof item.ppg === "number" && Number.isFinite(item.ppg) ? roundTo(item.ppg, 3) : null;
     const yieldPercent =
-      typeof item?.yieldPercent === "number" && Number.isFinite(item.yieldPercent)
+      typeof item.yieldPercent === "number" && Number.isFinite(item.yieldPercent)
         ? roundTo(item.yieldPercent, 3)
         : null;
 
     const potential: GristPotential =
       ppg !== null ? { kind: "ppg", value: ppg } : yieldPercent !== null ? { kind: "yieldPercent", value: yieldPercent } : null;
 
-    const maltClass = inferMaltClass(typeof item?.group === "string" ? item.group : null, itemName);
+    const maltClass = inferMaltClass(typeof item.group === "string" ? item.group : null, itemName);
 
     setGristRows((prev) => [
       ...prev,
@@ -1194,13 +1306,13 @@ export default function RecipeEditPage() {
     };
   }, []);
 
-  const addHopFromDb = (item: any) => {
-    const id = typeof item?.id === "string" ? item.id : null;
-    const name = typeof item?.name === "string" ? item.name : "";
+  const addHopFromDb = (item: HopSearchResult) => {
+    const id = typeof item.id === "string" ? item.id : null;
+    const name = typeof item.name === "string" ? item.name : "";
     if (!id || !name) return;
-    const country = typeof item?.country === "string" ? item.country : null;
-    const alphaMin = typeof item?.alphaMin === "number" && Number.isFinite(item.alphaMin) ? item.alphaMin : null;
-    const alphaMax = typeof item?.alphaMax === "number" && Number.isFinite(item.alphaMax) ? item.alphaMax : null;
+    const country = typeof item.country === "string" ? item.country : null;
+    const alphaMin = typeof item.alphaMin === "number" && Number.isFinite(item.alphaMin) ? item.alphaMin : null;
+    const alphaMax = typeof item.alphaMax === "number" && Number.isFinite(item.alphaMax) ? item.alphaMax : null;
     const alphaAcidPercent =
       alphaMin !== null && alphaMax !== null ? (alphaMin + alphaMax) / 2 : alphaMin !== null ? alphaMin : alphaMax;
     addHopRow({
@@ -1217,16 +1329,16 @@ export default function RecipeEditPage() {
     });
   };
 
-  const addYeastFromDb = (item: any) => {
-    const id = typeof item?.id === "string" ? item.id : null;
-    const nameRaw = typeof item?.name === "string" ? item.name : "";
+  const addYeastFromDb = (item: YeastSearchResult) => {
+    const id = typeof item.id === "string" ? item.id : null;
+    const nameRaw = typeof item.name === "string" ? item.name : "";
     if (!id || !nameRaw) return;
-    const lab = typeof item?.lab === "string" ? item.lab : null;
-    const productId = typeof item?.productId === "string" ? item.productId : null;
+    const lab = typeof item.lab === "string" ? item.lab : null;
+    const productId = typeof item.productId === "string" ? item.productId : null;
     const attenuationMin =
-      typeof item?.attenuationMin === "number" && Number.isFinite(item.attenuationMin) ? item.attenuationMin : null;
+      typeof item.attenuationMin === "number" && Number.isFinite(item.attenuationMin) ? item.attenuationMin : null;
     const attenuationMax =
-      typeof item?.attenuationMax === "number" && Number.isFinite(item.attenuationMax) ? item.attenuationMax : null;
+      typeof item.attenuationMax === "number" && Number.isFinite(item.attenuationMax) ? item.attenuationMax : null;
     addYeastRow({ ingredientId: id, name: nameRaw, lab, productId, attenuationMin, attenuationMax });
   };
   const removeGristRow = (id: string) => {
@@ -1321,8 +1433,8 @@ export default function RecipeEditPage() {
     try {
       const res = await apiFetch(`/api/ingredients/fermentables?query=${encodeURIComponent(fermentableQuery)}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as any)?.items;
-      setFermentableResults(Array.isArray(items) ? items : []);
+      const items = (res.data as { items?: unknown })?.items;
+      setFermentableResults(Array.isArray(items) ? (items as FermentableSearchResult[]) : []);
     } catch (err) {
       setFermentableSearchError(String(err));
       setFermentableResults([]);
@@ -1343,8 +1455,8 @@ export default function RecipeEditPage() {
     try {
       const res = await apiFetch(`/api/ingredients/hops?query=${encodeURIComponent(hopQuery)}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as any)?.items;
-      setHopResults(Array.isArray(items) ? items : []);
+      const items = (res.data as { items?: unknown })?.items;
+      setHopResults(Array.isArray(items) ? (items as HopSearchResult[]) : []);
     } catch (err) {
       setHopSearchError(String(err));
       setHopResults([]);
@@ -1527,8 +1639,8 @@ export default function RecipeEditPage() {
                         fontWeight="bold"
                         as="span"
                       >
-                        {typeof (recipe as any)?.version === "number"
-                          ? String((recipe as any).version).padStart(2, "0")
+                        {typeof recipe?.version === "number"
+                          ? String(recipe.version).padStart(2, "0")
                           : "—"}
                       </SizableText>
                     </SizableText>
@@ -1659,13 +1771,19 @@ export default function RecipeEditPage() {
                     typeof v === "number" && Number.isFinite(v) ? formatFixed(locale, v, decimals) : tAnalysis("na");
 
                   const fmtField = (field: string, v: unknown, fallbackDecimals: number) => {
-                    const hint = parsed?.formatHints ? (parsed.formatHints as any)[field] : null;
-                    const decimals = typeof hint?.decimals === "number" && Number.isFinite(hint.decimals) ? hint.decimals : fallbackDecimals;
+                    const hints = parsed?.formatHints as FormatHintsRecord | undefined;
+                    const hint = hints ? hints[field] : undefined;
+                    const decimals =
+                      hint && typeof hint.decimals === "number" && Number.isFinite(hint.decimals)
+                        ? hint.decimals
+                        : fallbackDecimals;
                     return fmt(v, decimals);
                   };
 
-                  const warnings = Array.isArray(a?.warnings) ? (a.warnings as any[]) : [];
-                  const warningCodes = new Set(warnings.map((w) => String(w?.code ?? "")));
+                  const warnings = Array.isArray(a?.warnings) ? a.warnings : [];
+                  const warningCodes = new Set(
+                    warnings.map((w) => String((asRecord(w)?.code ?? "") as string | number)),
+                  );
 
                   const renderMath = (key: keyof typeof mathExplain, body: string) => {
                     if (!surfaceMath) return null;
@@ -1682,7 +1800,8 @@ export default function RecipeEditPage() {
 
                   const renderDerivationMath = (derivationKey: string, fallback: string) => {
                     if (!surfaceMath) return null;
-                    const d = parsed?.derivations ? (parsed.derivations as any)[derivationKey] : null;
+                    const derivations = parsed?.derivations as DerivationsRecord | undefined;
+                    const d = derivations ? derivations[derivationKey] : undefined;
                     if (!d) return null;
                     try {
                       return renderDerivationBody({
@@ -1714,9 +1833,7 @@ export default function RecipeEditPage() {
                     const vol = a?.kettleVolumeLiters;
                     if (typeof vol === "number" && Number.isFinite(vol)) return { value: fmtField("kettleVolumeLiters", vol, 2), source: tMath("analysis.common.sources.kettleVolume") };
                     if (warningCodes.has("used_batch_size_volume")) {
-                      const r0 = (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0];
-                      const unit = typeof r0?.batch_size?.unit === "string" ? r0.batch_size.unit : "";
-                      const value = typeof r0?.batch_size?.value === "number" && Number.isFinite(r0.batch_size.value) ? r0.batch_size.value : null;
+                      const { unit, value } = getBeerJsonBatchSize(recipe);
                       const liters = value != null ? (unit === "l" ? value : unit === "ml" ? value / 1000 : null) : null;
                       return {
                         value: liters != null && liters > 0 ? fmt(liters, 2) : tAnalysis("na"),
@@ -1750,7 +1867,7 @@ export default function RecipeEditPage() {
                       out.push(
                         tMath("analysis.common.hopLine", {
                           name,
-                          use: tMath(`analysis.common.hopUse.${use}` as any),
+                          use: tMath(`analysis.common.hopUse.${use}` as Parameters<typeof tMath>[0]),
                           amountG: fmt(h.amountGrams, 1),
                           alpha: fmt(h.alphaAcidPercent, 1),
                           timeMin: String(Math.round(timeMin)),
@@ -1766,14 +1883,21 @@ export default function RecipeEditPage() {
 
                     const effective: Array<{ id: string; name: string; eff: number | null; source: "override" | "beerjson" | "missing" }> = [];
                     for (const y of rows) {
-                      const id = typeof (y as any)?.id === "string" ? (y as any).id : "";
-                      const name = typeof (y as any)?.name === "string" ? String((y as any).name).trim() : "";
+                      const id = typeof y.id === "string" ? y.id : "";
+                      const name = typeof y.name === "string" ? y.name.trim() : "";
                       if (!id || !name) continue;
-                      const ovRaw = typeof (overrides as any)[id] === "string" ? String((overrides as any)[id]).trim() : "";
+                      const ovRawVal = overrides[id];
+                      const ovRaw = typeof ovRawVal === "string" ? ovRawVal.trim() : "";
                       const ov = ovRaw ? Number(ovRaw) : null;
                       const overrideOk = ov != null && Number.isFinite(ov) ? Math.max(0, Math.min(100, ov)) : null;
-                      const min = typeof (y as any)?.attenuationMin === "number" && Number.isFinite((y as any).attenuationMin) ? (y as any).attenuationMin : null;
-                      const max = typeof (y as any)?.attenuationMax === "number" && Number.isFinite((y as any).attenuationMax) ? (y as any).attenuationMax : null;
+                      const min =
+                        typeof y.attenuationMin === "number" && Number.isFinite(y.attenuationMin)
+                          ? y.attenuationMin
+                          : null;
+                      const max =
+                        typeof y.attenuationMax === "number" && Number.isFinite(y.attenuationMax)
+                          ? y.attenuationMax
+                          : null;
                       const att =
                         min != null && max != null ? (min + max) / 2 : min != null ? min : max != null ? max : null;
                       const eff = overrideOk ?? (att != null ? Math.max(0, Math.min(100, att)) : null);
@@ -2085,21 +2209,7 @@ export default function RecipeEditPage() {
                                           og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
                                           volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                           efficiency: (() => {
-                                            const ext = (recipe as any)?.recipeExtJson;
-                                            const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                            const mashEff =
-                                              typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                                ? e.equipment.mash.mashEfficiencyPercent
-                                                : null;
-                                            const brewEff =
-                                              typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                                ? e.brewhouseEfficiencyPercent
-                                                : null;
-                                            const bjEff =
-                                              (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                                ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                                : null;
-                                            const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                            const eff = getRecipeEfficiencyPercent(recipe);
                                             return eff != null ? fmt(eff, 1) : tAnalysis("na");
                                           })(),
                                         }),
@@ -2107,21 +2217,7 @@ export default function RecipeEditPage() {
                                         og: fmtField("ogEstimatedSg", a?.ogEstimatedSg, 3),
                                         volume: fmtField("kettleVolumeLiters", a?.kettleVolumeLiters, 2),
                                         efficiency: (() => {
-                                          const ext = (recipe as any)?.recipeExtJson;
-                                          const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                          const mashEff =
-                                            typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                              ? e.equipment.mash.mashEfficiencyPercent
-                                              : null;
-                                          const brewEff =
-                                            typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                              ? e.brewhouseEfficiencyPercent
-                                              : null;
-                                          const bjEff =
-                                            (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                              ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                              : null;
-                                          const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                          const eff = getRecipeEfficiencyPercent(recipe);
                                           return eff != null ? fmt(eff, 1) : tAnalysis("na");
                                         })(),
                                       }),
@@ -2173,21 +2269,7 @@ export default function RecipeEditPage() {
                                           pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
                                           preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
                                           efficiency: (() => {
-                                            const ext = (recipe as any)?.recipeExtJson;
-                                            const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                            const mashEff =
-                                              typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                                ? e.equipment.mash.mashEfficiencyPercent
-                                                : null;
-                                            const brewEff =
-                                              typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                                ? e.equipment.mash.mashEfficiencyPercent
-                                                : null;
-                                            const bjEff =
-                                              (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                                ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                                : null;
-                                            const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                            const eff = getRecipeEfficiencyPercent(recipe);
                                             return eff != null ? fmt(eff, 1) : tAnalysis("na");
                                           })(),
                                         }),
@@ -2195,21 +2277,7 @@ export default function RecipeEditPage() {
                                         pbg: fmtField("pbgEstimatedSg", a?.pbgEstimatedSg, 3),
                                         preBoilVolume: fmtField("preBoilVolumeLiters", a?.preBoilVolumeLiters, 2),
                                         efficiency: (() => {
-                                          const ext = (recipe as any)?.recipeExtJson;
-                                          const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any) : null;
-                                          const mashEff =
-                                            typeof e?.equipment?.mash?.mashEfficiencyPercent === "number" && Number.isFinite(e.equipment.mash.mashEfficiencyPercent)
-                                              ? e.equipment.mash.mashEfficiencyPercent
-                                              : null;
-                                          const brewEff =
-                                            typeof e?.brewhouseEfficiencyPercent === "number" && Number.isFinite(e.brewhouseEfficiencyPercent)
-                                              ? e.equipment.mash.mashEfficiencyPercent
-                                              : null;
-                                          const bjEff =
-                                            (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.unit === "%"
-                                              ? (recipe as any)?.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.efficiency?.brewhouse?.value
-                                              : null;
-                                          const eff = mashEff ?? brewEff ?? (typeof bjEff === "number" && Number.isFinite(bjEff) ? bjEff : null);
+                                          const eff = getRecipeEfficiencyPercent(recipe);
                                           return eff != null ? fmt(eff, 1) : tAnalysis("na");
                                         })(),
                                       }),
@@ -2344,7 +2412,7 @@ export default function RecipeEditPage() {
                               >
                                 <CodeInline>{String(w?.code ?? "warning")}</CodeInline>{" "}
                                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
-                                  {tAnalysis(`warnings.${String(w?.code ?? "unknown")}` as any)}
+                                  {tAnalysis(`warnings.${String(w?.code ?? "unknown")}` as Parameters<typeof tAnalysis>[0])}
                                 </SizableText>
                               </SizableText>
                             ))}
@@ -2890,7 +2958,7 @@ export default function RecipeEditPage() {
                                   <BrewSelect
                                     id={`grist-class-${r.id}`}
                                     value={r.maltClass}
-                                    onValueChange={(v) => updateGristRow(r.id, { maltClass: v as any })}
+                                    onValueChange={(v) => updateGristRow(r.id, { maltClass: v as GristMaltClass })}
                                     options={[
                                       { value: "base", label: "Base" },
                                       { value: "crystal", label: "Crystal" },
@@ -3352,7 +3420,7 @@ export default function RecipeEditPage() {
                                     value={r.form ?? "pellet"}
                                     onValueChange={(v) =>
                                       updateHopRow(r.id, {
-                                        form: v as any,
+                                        form: v as NonNullable<HopRow["form"]>,
                                       })
                                     }
                                     options={[

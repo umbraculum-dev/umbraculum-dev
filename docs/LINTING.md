@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.4 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), and 3 (`services/api/src/**`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, and `services/api/src/**` now has zero `no-explicit-any` warnings. Phase 4 (`apps/web/app/recipes/**`) is next.
+**Status:** v1.5 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), and **4a** (`apps/web/app/recipes/[id]/edit/page.tsx`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, and the largest single `apps/web` page (3,800-line recipe editor) is now `any`-free. Phase 4b (water sub-pages) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **597** (-432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -530 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **493** (-104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -634 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -143,10 +143,35 @@ The separate "should we adopt Zod / Valibot / TypeBox here?" question is tracked
 
 The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui friction here — coordinate with `docs/TAMAGUI.md`.
 
-- [ ] Phase 4a: `apps/web/app/recipes/[id]/edit/page.tsx` (112 `any`)
+- [x] Phase 4a: `apps/web/app/recipes/[id]/edit/page.tsx` (104 `any` removed) ✅ landed 2026-05-16
 - [ ] Phase 4b: water sub-pages (mash/sparge/boil/page) (~115 `any`)
 - [ ] Phase 4c: yeast + brew-sessions pages
 - [ ] Add `lint:web-recipes-strict` script once clean
+
+#### Phase 4a — `apps/web/app/recipes/[id]/edit/page.tsx` ✅ landed 2026-05-16
+
+**Scope:** 1 file, 3,806 lines (the recipe editor — the largest single `apps/web` page). 104 `no-explicit-any` warnings → 0.
+
+**Strategy used:** "tighten in place" — same as Phases 1–3.
+
+- Replaced ad-hoc `(x as any).field` chains over `recipeExtJson` and `beerJsonRecipeJson` with a local `asRecord(v: unknown): Record<string, unknown> | null` narrower (mirrors the `services/api/src/lib/typeGuards.ts::isObject` helper we added in Phase 3 — declared locally instead of imported to avoid an apps/web → services cross-app dependency).
+- Added local DTO interfaces for the `/api/ingredients/*` search responses (`FermentableSearchResult`, `HopSearchResult`, `YeastSearchResult`). They mirror the Prisma row + select shape that the API actually returns; declared at the consumer side so apps/web does not depend on Prisma types.
+- Added `analysis?: unknown` to the `Recipe` type (the field is attached by `GET /recipes/:id`'s gravity-analysis enrichment but was never declared, which is why the page kept casting `(r as any).analysis`).
+- Imported `NumberFormatHintV1` and `WaterCalcDerivation` from `@brewery/contracts` and used `Record<string, NumberFormatHintV1 | undefined>` / `Record<string, WaterCalcDerivation | undefined>` aliases when indexing `parsed.formatHints[field]` / `parsed.derivations[derivationKey]` by an arbitrary string field name. This collapses two `as any` casts into honest, lossless type assertions.
+- Extracted `getRecipeEfficiencyPercent(recipe)` and `getBeerJsonBatchSize(recipe)` helpers. The efficiency helper replaces four duplicated 9-line IIFE blocks (32 `as any` casts) inside the OG / PBG math-body renderers. Bonus: it incidentally fixes a pre-existing copy-paste bug in the PBG block where `brewEff` was returning `e.equipment.mash.mashEfficiencyPercent` instead of `e.brewhouseEfficiencyPercent` (the intended fallback when no mash efficiency is set). User-visible effect: when mash efficiency is unset but brewhouse efficiency is, the PBG body's "efficiency" footnote now displays the brewhouse value (matching the OG body's behaviour) instead of falling through to the BeerJSON or `na`.
+- Replaced `tMath(\`...${dynamicKey}\` as any)` and `tAnalysis(\`warnings.${code}\` as any)` with `... as Parameters<typeof tMath>[0]` (and the same for `tAnalysis`). Honest cast that asserts "this dynamic string is a valid message key", no information loss.
+- Replaced narrow union casts in `BrewSelect.onValueChange` callbacks: `v as any` → `v as GristMaltClass` / `v as NonNullable<HopRow["form"]>`. The cast is still needed because `BrewSelect` types its callback as `(value: string) => void`, but the union assertion is now explicit and grep-able.
+- Dropped unconditionally-redundant casts: `(recipe as any).version` (already `?: number` on `Recipe`), `gristRows as any` / `miscRows as any` when calling `buildBeerJsonRecipeDocument` / `buildRecipeExtJsonFromEditorState` (state is already typed as `EditorGristRow[]` / `EditorMiscRow[]`), `(y as any)?.id` etc. when `y` is already an `EditorYeastRow`.
+- Replaced `delete (extBaseForSave as any).yeastTypeOverrides` with a direct `delete extBaseForSave.yeastTypeOverrides` after typing `extBaseForSave` as `Record<string, unknown>`.
+
+**Verification:**
+
+- ESLint: file went from 111 warnings (104 `no-explicit-any` + 7 pre-existing `no-unused-vars`) to 7 warnings (0 `no-explicit-any` + 7 pre-existing `no-unused-vars`).
+- `apps/web` TypeScript error count held exactly at the pre-change baseline: 1067 total errors repo-wide, 239 in `recipes/[id]/edit/page.tsx`. Both numbers unchanged. A normalized diff (line/col stripped) of the TS error logs shows zero new error categories or messages — only line-number shifts from the ~115 lines of types/helpers added at the top of the file. Histogram of error codes (`error TS####`) is byte-identical before vs after.
+- Repo-wide `no-explicit-any` count: 517 → 413 (drop of 104, exactly matches Phase 4a scope).
+- No new `apps/web` unit tests added (Phase 4 is type-tightening, no behavioural change). The one incidental PBG-efficiency bug fix described above will be picked up by existing Playwright recipe-flow specs the next time they run; if it surfaces a regression, the previous (buggy) behaviour is recoverable as a one-line revert in `getRecipeEfficiencyPercent`.
+
+**Why this file went first in Phase 4:** at 104 `any` warnings it was the highest-leverage single file in `apps/web`, the duplicated efficiency-from-ext block was a visible code-smell that the helper extraction obviously cleaned up, and the ingredient-search DTOs naturally consumed the sharper `services/api` types from Phase 3.
 
 ### Phase 5 — `apps/native/src/screens/**` (~162 `any` warnings)
 
