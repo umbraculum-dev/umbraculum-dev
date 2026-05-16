@@ -1075,7 +1075,7 @@ export default function BoilWaterPage() {
             {t("acidificationHeading")}
           </H2>
 
-          <form onSubmit={onSubmitAcid} aria-describedby={boilError ? "boil-error" : undefined}>
+          <form onSubmit={(...a) => { void onSubmitAcid(...(a as Parameters<typeof onSubmitAcid>)); }} aria-describedby={boilError ? "boil-error" : undefined}>
             <XStack gap="$3" flexWrap="wrap" ai="flex-end">
               <View width="100%" flexBasis="100%">
                 <ModeFieldset

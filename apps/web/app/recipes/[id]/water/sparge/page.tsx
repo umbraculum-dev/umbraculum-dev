@@ -840,7 +840,7 @@ export default function SpargeWaterPage() {
                 open={openSpargeSections.includes("acidification")}
               />
               <Accordion.Content>
-                <form onSubmit={onSubmitSparge} aria-describedby={spargeError ? "sparge-error" : undefined}>
+                <form onSubmit={(...a) => { void onSubmitSparge(...(a as Parameters<typeof onSubmitSparge>)); }} aria-describedby={spargeError ? "sparge-error" : undefined}>
             <XStack gap="$3" flexWrap="wrap" ai="flex-end">
               <View width="100%" flexBasis="100%">
                 <YStack gap="$1.5">

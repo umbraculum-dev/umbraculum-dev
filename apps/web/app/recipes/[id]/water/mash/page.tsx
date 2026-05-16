@@ -366,7 +366,7 @@ export default function MashWaterPage() {
   useEffect(() => {
     if (!canCall || !recipeId) return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       try {
         const res = await apiFetch(`/api/recipes/${recipeId}`);
         if (!res.ok) throw new Error(JSON.stringify(res.data));
@@ -1496,7 +1496,7 @@ export default function MashWaterPage() {
                 open={openMashSections.includes("acidification")}
               />
               <Accordion.Content>
-                <form onSubmit={onSubmitMash} aria-describedby={mashError ? "mash-error" : undefined}>
+                <form onSubmit={(...a) => { void onSubmitMash(...(a as Parameters<typeof onSubmitMash>)); }} aria-describedby={mashError ? "mash-error" : undefined}>
             <ModeFieldset
               legend="Mode"
               name="mash-acid-mode"
@@ -2152,7 +2152,7 @@ export default function MashWaterPage() {
                   onAddStep={addMashStep}
                   onDeleteStep={deleteMashStep}
                   onAddFromTemplate={addMashFromTemplate}
-                  onSave={saveMashSteps}
+                  onSave={() => { void saveMashSteps(); }}
                   canSave={canCall && !!recipe?.beerJsonRecipeJson}
                   saving={mashStepsSaving}
                   t={tEdit}

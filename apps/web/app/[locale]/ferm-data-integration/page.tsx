@@ -393,7 +393,7 @@ export default function FermDataIntegrationPage() {
                   />
                   <XStack gap="$2" flexWrap="wrap" alignItems="center">
                     <Button
-                      onPress={() => copyToClipboard("tilt", "url", getFullPublicUrl("tilt") ?? newPublicPaths.tilt ?? "")}
+                      onPress={() => { void copyToClipboard("tilt", "url", getFullPublicUrl("tilt") ?? newPublicPaths.tilt ?? ""); }}
                       disabled={!getFullPublicUrl("tilt") && !newPublicPaths.tilt}
                       aria-label={t("sections.integration.copyUrlAria")}
                     >
@@ -416,7 +416,7 @@ export default function FermDataIntegrationPage() {
                   <Input value={newTokens.tilt} readOnly aria-label={t("sections.integration.tokenAria")} />
                   <XStack gap="$2" flexWrap="wrap" alignItems="center">
                     <Button
-                      onPress={() => copyToClipboard("tilt", "token", newTokens.tilt ?? "")}
+                      onPress={() => { void copyToClipboard("tilt", "token", newTokens.tilt ?? ""); }}
                       aria-label={t("sections.integration.copyTokenAria")}
                     >
                       {copied?.kind === "tilt" && copied.field === "token"
@@ -522,10 +522,10 @@ export default function FermDataIntegrationPage() {
                                 disabled={working}
                                 width="full"
                               />
-                              <Button onPress={() => attachDevice(d.id)} disabled={working || !selectedSessionId}>
+                              <Button onPress={() => { void attachDevice(d.id); }} disabled={working || !selectedSessionId}>
                                 {t("sections.integration.attach")}
                               </Button>
-                              <Button onPress={() => detachDevice(d.id)} disabled={working || !active}>
+                              <Button onPress={() => { void detachDevice(d.id); }} disabled={working || !active}>
                                 {t("sections.integration.detach")}
                               </Button>
                             </XStack>
@@ -596,9 +596,9 @@ export default function FermDataIntegrationPage() {
                     />
                     <XStack gap="$2" flexWrap="wrap" alignItems="center">
                       <Button
-                        onPress={() =>
-                          copyToClipboard("ispindel", "url", getFullPublicUrl("ispindel") ?? newPublicPaths.ispindel ?? "")
-                        }
+                        onPress={() => {
+                          void copyToClipboard("ispindel", "url", getFullPublicUrl("ispindel") ?? newPublicPaths.ispindel ?? "");
+                        }}
                         disabled={!getFullPublicUrl("ispindel") && !newPublicPaths.ispindel}
                         aria-label={t("sections.integration.copyUrlAria")}
                       >
@@ -621,7 +621,7 @@ export default function FermDataIntegrationPage() {
                     <Input value={newTokens.ispindel} readOnly aria-label={t("sections.integration.tokenAria")} />
                     <XStack gap="$2" flexWrap="wrap" alignItems="center">
                       <Button
-                        onPress={() => copyToClipboard("ispindel", "token", newTokens.ispindel ?? "")}
+                        onPress={() => { void copyToClipboard("ispindel", "token", newTokens.ispindel ?? ""); }}
                         aria-label={t("sections.integration.copyTokenAria")}
                       >
                         {copied?.kind === "ispindel" && copied.field === "token"
@@ -693,7 +693,7 @@ export default function FermDataIntegrationPage() {
                     />
                     <XStack gap="$2" flexWrap="wrap" alignItems="center">
                       <Button
-                        onPress={() => copyToClipboard("rapt", "url", getFullPublicUrl("rapt") ?? newPublicPaths.rapt ?? "")}
+                        onPress={() => { void copyToClipboard("rapt", "url", getFullPublicUrl("rapt") ?? newPublicPaths.rapt ?? ""); }}
                         disabled={!getFullPublicUrl("rapt") && !newPublicPaths.rapt}
                         aria-label={t("sections.integration.copyUrlAria")}
                       >
@@ -716,7 +716,7 @@ export default function FermDataIntegrationPage() {
                     <Input value={newTokens.rapt} readOnly aria-label={t("sections.integration.tokenAria")} />
                     <XStack gap="$2" flexWrap="wrap" alignItems="center">
                       <Button
-                        onPress={() => copyToClipboard("rapt", "token", newTokens.rapt ?? "")}
+                        onPress={() => { void copyToClipboard("rapt", "token", newTokens.rapt ?? ""); }}
                         aria-label={t("sections.integration.copyTokenAria")}
                       >
                         {copied?.kind === "rapt" && copied.field === "token"

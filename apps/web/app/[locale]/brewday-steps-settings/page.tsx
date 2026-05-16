@@ -578,7 +578,7 @@ export default function BrewdayStepsSettingsPage() {
               borderColor="var(--border)"
               color="var(--text)"
               fontFamily="$body"
-              onPress={onSave}
+              onPress={() => { void onSave(); }}
               disabled={!canCallAccountScoped || saving}
             >
               {saving ? t("saving") : t("save")}
@@ -727,7 +727,7 @@ export default function BrewdayStepsSettingsPage() {
                   borderColor="var(--border)"
                   color="var(--text)"
                   fontFamily="$body"
-                  onPress={onSave}
+                  onPress={() => { void onSave(); }}
                   disabled={!canCallAccountScoped || saving}
                 >
                   {saving
@@ -891,7 +891,7 @@ export default function BrewdayStepsSettingsPage() {
                   borderColor="var(--border)"
                   color="var(--text)"
                   fontFamily="$body"
-                  onPress={onSave}
+                  onPress={() => { void onSave(); }}
                   disabled={!canCallAccountScoped || saving}
                 >
                   {saving
@@ -1127,7 +1127,7 @@ export default function BrewdayStepsSettingsPage() {
               borderColor="var(--border)"
               color="var(--text)"
               fontFamily="$body"
-              onPress={onSave}
+              onPress={() => { void onSave(); }}
               disabled={!canCallAccountScoped || saving}
             >
               {saving

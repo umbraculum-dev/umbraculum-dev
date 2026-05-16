@@ -1777,7 +1777,7 @@ export default function BrewSessionDetailPage() {
             />
           </View>
           <Button
-            onPress={addCustomStep}
+            onPress={() => { void addCustomStep(); }}
             disabled={!customStepName.trim()}
             size="$3"
             bg="var(--surface-2)"

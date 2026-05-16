@@ -463,7 +463,7 @@ function YeastEditorEditable({
 
   return (
     <View>
-      <form onSubmit={onSearchYeasts}>
+      <form onSubmit={(...a) => { void onSearchYeasts(...(a as Parameters<typeof onSearchYeasts>)); }}>
         <RecipeEditFieldLabel htmlFor="yeast-search">{t("yeastSearchLabel")}</RecipeEditFieldLabel>
         <XStack gap="$2" items="center" flexWrap="wrap" mt="$1">
           <Input

@@ -33,7 +33,7 @@ export default function PlatformRecipesPage() {
   useEffect(() => {
     if (!canLoad) return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setWorkspacesError(null);
       setWorkspacesLoading(true);
       try {
@@ -60,7 +60,7 @@ export default function PlatformRecipesPage() {
       return;
     }
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setRecipesLoading(true);
       try {
         const res = await apiFetch(`/api/platform/recipes/list?workspaceId=${encodeURIComponent(workspaceId)}`);

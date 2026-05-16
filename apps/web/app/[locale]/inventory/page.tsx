@@ -327,7 +327,7 @@ export default function InventoryPage() {
     }
   };
 
-  const onSearchFermentables = async (e: React.FormEvent) => {
+  const onSearchFermentables = (e: React.FormEvent) => {
     e.preventDefault();
     const q = fermentableQuery;
     setFermentableActiveQuery(q);
@@ -372,7 +372,7 @@ export default function InventoryPage() {
     [canCall]
   );
 
-  const onSearchHops = async (e: React.FormEvent) => {
+  const onSearchHops = (e: React.FormEvent) => {
     e.preventDefault();
     const q = hopQuery;
     setHopActiveQuery(q);
@@ -551,7 +551,7 @@ export default function InventoryPage() {
           >
             <YStack gap="$2">
               <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
-                <form onSubmit={onSearchFermentables}>
+                <form onSubmit={(...a) => { void onSearchFermentables(...(a as Parameters<typeof onSearchFermentables>)); }}>
                   <XStack gap="$2" alignItems="center">
                     <Input
                       value={fermentableQuery}
@@ -790,7 +790,7 @@ export default function InventoryPage() {
           >
             <YStack gap="$2">
               <XStack gap="$2" flexWrap="wrap" alignItems="flex-end">
-                <form onSubmit={onSearchHops}>
+                <form onSubmit={(...a) => { void onSearchHops(...(a as Parameters<typeof onSearchHops>)); }}>
                   <XStack gap="$2" alignItems="center">
                     <Input
                       value={hopQuery}

@@ -167,13 +167,13 @@ export default function AccessibilityPage() {
               <BrewSelect
                 id="ui-theme"
                 value={theme}
-                onValueChange={(v) =>
-                  applyAndPersist({
+                onValueChange={(v) => {
+                  void applyAndPersist({
                     theme: oneOf(v, allowedTheme, "default"),
                     fontScale,
                     density,
-                  })
-                }
+                  });
+                }}
                 options={[
                   { value: "default", label: t("theme.default") },
                   { value: "hc_dark", label: t("theme.hcDark") },
@@ -188,13 +188,13 @@ export default function AccessibilityPage() {
               <BrewSelect
                 id="ui-font-scale"
                 value={fontScale}
-                onValueChange={(v) =>
-                  applyAndPersist({
+                onValueChange={(v) => {
+                  void applyAndPersist({
                     theme,
                     fontScale: oneOf(v, allowedFont, "md"),
                     density,
-                  })
-                }
+                  });
+                }}
                 options={[
                   { value: "sm", label: t("font.sm") },
                   { value: "md", label: t("font.md") },
@@ -210,13 +210,13 @@ export default function AccessibilityPage() {
               <BrewSelect
                 id="ui-density"
                 value={density}
-                onValueChange={(v) =>
-                  applyAndPersist({
+                onValueChange={(v) => {
+                  void applyAndPersist({
                     theme,
                     fontScale,
                     density: oneOf(v, allowedDensity, "comfortable"),
-                  })
-                }
+                  });
+                }}
                 options={[
                   { value: "comfortable", label: t("densityOptions.comfortable") },
                   { value: "compact", label: t("densityOptions.compact") },

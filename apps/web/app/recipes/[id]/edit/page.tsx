@@ -461,7 +461,7 @@ export default function RecipeEditPage() {
   useEffect(() => {
     if (!canCallAccountScoped || !recipeId) return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       try {
         const data = await fetchRecipeWaterSettings(recipeId);
         if (cancelled) return;
@@ -479,7 +479,7 @@ export default function RecipeEditPage() {
     if (!canCallAccountScoped || !recipeId) return;
     let cancelled = false;
     setBrewSessionsLoading(true);
-    (async () => {
+    void (async () => {
       try {
         const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`);
         if (cancelled) return;
@@ -563,7 +563,7 @@ export default function RecipeEditPage() {
     if (!canCallAccountScoped) return;
     let cancelled = false;
 
-    (async () => {
+    void (async () => {
       setLoading(true);
       setLoadError(null);
       setSaveStatus(null);
@@ -789,7 +789,7 @@ export default function RecipeEditPage() {
     if (!canCallAccountScoped) return;
     let cancelled = false;
 
-    (async () => {
+    void (async () => {
       setVersionsLoading(true);
       setVersionsError(null);
       try {
@@ -815,7 +815,7 @@ export default function RecipeEditPage() {
   useEffect(() => {
     if (authState.status !== "ready") return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setStylesLoading(true);
       setStylesError(null);
       try {
@@ -837,7 +837,7 @@ export default function RecipeEditPage() {
   useEffect(() => {
     if (authState.status !== "ready") return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setEquipmentProfilesLoading(true);
       setEquipmentProfilesError(null);
       try {
@@ -1662,7 +1662,7 @@ export default function RecipeEditPage() {
             <YStack gap="$2" mt="$3">
               <XStack gap="$3" items="center" flexWrap="wrap">
                 <Button
-                  onPress={onSave}
+                  onPress={() => { void onSave(); }}
                   disabled={!canCallAccountScoped || saving}
                   size="$3"
                   bg="var(--surface-2)"
@@ -1686,7 +1686,7 @@ export default function RecipeEditPage() {
                 {t("versionCreateNote")}
               </SizableText>
               <Button
-                onPress={onCreateAnotherVersion}
+                onPress={() => { void onCreateAnotherVersion(); }}
                 disabled={
                   !canCallAccountScoped ||
                   creatingVersion ||
@@ -1718,7 +1718,7 @@ export default function RecipeEditPage() {
                 {t("duplicateRecipeNote")}
               </SizableText>
               <Button
-                onPress={onDuplicateRecipe}
+                onPress={() => { void onDuplicateRecipe(); }}
                 disabled={!canCallAccountScoped || duplicatingRecipe}
                 size="$3"
                 bg="var(--surface-2)"
@@ -2526,7 +2526,7 @@ export default function RecipeEditPage() {
                 {t("brewNote")}
               </SizableText>
               <Button
-                onPress={onBrewRecipe}
+                onPress={() => { void onBrewRecipe(); }}
                 disabled={!canCallAccountScoped || creatingBrewSession}
                 size="$3"
                 bg="var(--surface-2)"
@@ -2710,7 +2710,7 @@ export default function RecipeEditPage() {
             </SizableText>
 
             <View mt="$3">
-              <form onSubmit={onSearchFermentables}>
+              <form onSubmit={(...a) => { void onSearchFermentables(...(a as Parameters<typeof onSearchFermentables>)); }}>
                 <RecipeEditFieldLabel htmlFor="fermentable-search">
                 Search fermentables database
               </RecipeEditFieldLabel>
@@ -3184,7 +3184,7 @@ export default function RecipeEditPage() {
                     borderColor="var(--border)"
                     color="var(--text)"
                     fontFamily="$body"
-                    onPress={onSave}
+                    onPress={() => { void onSave(); }}
                     disabled={!canCallAccountScoped || saving}
                   >
                     {saving ? "Saving…" : "Save (including grist)"}
@@ -3214,7 +3214,7 @@ export default function RecipeEditPage() {
             </SizableText>
 
             <View mt="$3">
-              <form onSubmit={onSearchHops}>
+              <form onSubmit={(...a) => { void onSearchHops(...(a as Parameters<typeof onSearchHops>)); }}>
                 <RecipeEditFieldLabel htmlFor="hop-search">Search hops database</RecipeEditFieldLabel>
               <XStack gap="$2" items="center" flexWrap="wrap">
                 <Input
@@ -3477,7 +3477,7 @@ export default function RecipeEditPage() {
                     borderColor="var(--border)"
                     color="var(--text)"
                     fontFamily="$body"
-                    onPress={onSave}
+                    onPress={() => { void onSave(); }}
                     disabled={!canCallAccountScoped || saving}
                   >
                     {saving ? "Saving…" : "Save (including hops)"}
@@ -3743,7 +3743,7 @@ export default function RecipeEditPage() {
                     borderColor="var(--border)"
                     color="var(--text)"
                     fontFamily="$body"
-                    onPress={onSave}
+                    onPress={() => { void onSave(); }}
                     disabled={!canCallAccountScoped || saving}
                   >
                     {saving ? "Saving…" : "Save (including other ingredients)"}
@@ -3791,7 +3791,7 @@ export default function RecipeEditPage() {
                 borderColor="var(--border)"
                 color="var(--text)"
                 fontFamily="$body"
-                onPress={onSave}
+                onPress={() => { void onSave(); }}
                 disabled={!canCallAccountScoped || saving}
               >
                 {saving ? "Saving…" : t("boilSave")}

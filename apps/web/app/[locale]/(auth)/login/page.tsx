@@ -93,7 +93,7 @@ export default function LoginPage() {
     >
       <H1 mt={0}>{t("loginTitle")}</H1>
 
-      <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
+      <form onSubmit={(...a) => { void onSubmit(...(a as Parameters<typeof onSubmit>)); }} aria-describedby={error ? "login-error" : undefined}>
         <YStack gap="$3">
           <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="login-email">{t("emailLabel")}</RecipeEditFieldLabel>

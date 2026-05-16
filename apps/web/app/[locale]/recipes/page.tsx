@@ -170,7 +170,7 @@ export default function RecipesPage() {
             title={t("createTitle")}
             open={openSections.includes("create")}
           >
-            <form onSubmit={onCreate}>
+            <form onSubmit={(...a) => { void onCreate(...(a as Parameters<typeof onCreate>)); }}>
               <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                 <View flex={1} minWidth={200}>
                   <YStack gap="$1.5">

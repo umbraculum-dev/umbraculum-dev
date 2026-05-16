@@ -100,7 +100,7 @@ export default function YeastPage() {
   useEffect(() => {
     if (!canCallAccountScoped || !recipeId) return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setLoading(true);
       setLoadError(null);
       try {
@@ -580,7 +580,7 @@ export default function YeastPage() {
             onRemoveRow={removeYeastRow}
             onUpdateRow={updateYeastRow}
             onAttenuationOverrideChange={onAttenuationOverrideChange}
-            onSave={onSave}
+            onSave={() => { void onSave(); }}
             canSave={canCallAccountScoped}
             saving={saving}
             saveStatus={saveStatus}

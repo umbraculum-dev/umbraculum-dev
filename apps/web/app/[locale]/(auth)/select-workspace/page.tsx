@@ -40,7 +40,7 @@ export default function SelectWorkspacePage() {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    (async () => {
+    void (async () => {
       try {
         const res = await apiFetch("/api/auth/me");
         if (!res.ok) {

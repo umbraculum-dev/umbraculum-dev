@@ -29,7 +29,7 @@ export function useRequireAuth(options?: { requireActiveWorkspace?: boolean; req
   useEffect(() => {
     let cancelled = false;
     setState({ status: "loading" });
-    (async () => {
+    void (async () => {
       try {
         const res = await apiFetch("/api/auth/me");
         if (!res.ok) {

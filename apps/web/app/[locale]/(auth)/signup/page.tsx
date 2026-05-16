@@ -97,7 +97,7 @@ export default function SignupPage() {
     >
       <H1 mt={0}>{t("signupTitle")}</H1>
 
-      <form onSubmit={onSubmit} aria-describedby={error ? "signup-error" : undefined}>
+      <form onSubmit={(...a) => { void onSubmit(...(a as Parameters<typeof onSubmit>)); }} aria-describedby={error ? "signup-error" : undefined}>
         <YStack gap="$3">
           <YStack gap="$1.5">
             <RecipeEditFieldLabel htmlFor="signup-email">{t("emailLabel")}</RecipeEditFieldLabel>

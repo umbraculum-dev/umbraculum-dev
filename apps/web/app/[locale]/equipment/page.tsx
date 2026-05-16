@@ -407,7 +407,7 @@ export default function EquipmentPage() {
           <H2 id="equipment-edit" mt={0}>
             {t("editTitle")}
           </H2>
-          <form onSubmit={onSaveEdit} aria-describedby={editError ? "equipment-edit-error" : undefined}>
+          <form onSubmit={(...a) => { void onSaveEdit(...(a as Parameters<typeof onSaveEdit>)); }} aria-describedby={editError ? "equipment-edit-error" : undefined}>
             <YStack gap="$3">
               <YStack gap="$1.5">
                 <RecipeEditFieldLabel htmlFor="equip-edit-name">{t("nameLabel")}</RecipeEditFieldLabel>
@@ -746,7 +746,7 @@ export default function EquipmentPage() {
               open={openSections.includes("create")}
             >
               <View mt="$3">
-                <form onSubmit={onCreate} aria-describedby={createError ? "equipment-create-error" : undefined}>
+                <form onSubmit={(...a) => { void onCreate(...(a as Parameters<typeof onCreate>)); }} aria-describedby={createError ? "equipment-create-error" : undefined}>
                   <YStack gap="$3">
                 <YStack gap="$1.5">
                   <RecipeEditFieldLabel htmlFor="equip-name">{t("nameLabel")}</RecipeEditFieldLabel>

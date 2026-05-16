@@ -273,7 +273,7 @@ export default function WaterProfilesPage() {
               {t("createdProfilesStartUnverified")}
             </SizableText>
 
-            <form onSubmit={onCreateProfile} aria-describedby={createError ? "create-error" : undefined}>
+            <form onSubmit={(...a) => { void onCreateProfile(...(a as Parameters<typeof onCreateProfile>)); }} aria-describedby={createError ? "create-error" : undefined}>
               <XStack gap="$3" flexWrap="wrap" ai="flex-end">
                 <View width="100%" flexBasis="100%">
                   <YStack gap="$1.5">

@@ -90,7 +90,7 @@ export default function RecipeBrewSessionsPage() {
 
       <XStack gap="$3" items="center" flexWrap="wrap">
         <Button
-          onPress={onCreate}
+          onPress={() => { void onCreate(); }}
           disabled={!canCall || creating || !recipeId}
           size="$3"
           bg="var(--surface-2)"

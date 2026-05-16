@@ -123,7 +123,7 @@ export function RecipeImportForm({
   useEffect(() => {
     if (!canCall) return;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setStylesError(null);
       setStylesLoading(true);
       try {
