@@ -220,6 +220,38 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // HIGH-full Phase 4 — Tier C-wide: apps/web `no-unsafe-*`.
+  //
+  // Same five type-aware rules as Phase 3, scoped to `apps/web/**`.
+  // The original plan called this "the Tamagui wall" with an estimated
+  // 266 warnings split across 4a/4b/4c sub-strategies (per-site
+  // disable / Tamagui adapter improvements / hybrid).
+  //
+  // Reality (post-Phase-3 remeasurement): 304 raw warnings, 290 of
+  // which traced to a single root cause — four water-related pages
+  // reading `profiles?.account` after the `account → workspace`
+  // rename in commit `87876d0` missed those consumers. Tamagui prop
+  // typing was responsible for ~6 warnings, not 266. Phase 4 became
+  // a stale-rename cleanup (4b) plus a small tail (4c), not a
+  // Tamagui adapter project.
+  //
+  // Tests are exempted via the test-files relaxation block below
+  // (later block wins), matching Phase 3a. Playwright e2e specs in
+  // `apps/web/e2e/**` are covered by the `**/e2e/**` glob in that
+  // block.
+  // -------------------------------------------------------------------
+  {
+    files: ["apps/web/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-unsafe-assignment": "warn",
+      "@typescript-eslint/no-unsafe-member-access": "warn",
+      "@typescript-eslint/no-unsafe-call": "warn",
+      "@typescript-eslint/no-unsafe-argument": "warn",
+      "@typescript-eslint/no-unsafe-return": "warn",
+    },
+  },
+
+  // -------------------------------------------------------------------
   // React hook rules (manual; the plugin doesn't ship a flat preset).
   // -------------------------------------------------------------------
   {
