@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.5 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), and **4a** (`apps/web/app/recipes/[id]/edit/page.tsx`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, and the largest single `apps/web` page (3,800-line recipe editor) is now `any`-free. Phase 4b (water sub-pages) is next.
+**Status:** v1.6 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a (`apps/web/app/recipes/[id]/edit/page.tsx`), and **4b** (`apps/web/app/recipes/[id]/water/**` — mash + sparge + boil pages) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, and the entire recipe editor surface in `apps/web` (recipe edit page + all three water sub-pages, ~7,900 lines) is now `any`-free. Phase 4c (yeast + brew-sessions pages) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **493** (-104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -634 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **406** (-87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -721 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -144,7 +144,7 @@ The separate "should we adopt Zod / Valibot / TypeBox here?" question is tracked
 The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui friction here — coordinate with `docs/TAMAGUI.md`.
 
 - [x] Phase 4a: `apps/web/app/recipes/[id]/edit/page.tsx` (104 `any` removed) ✅ landed 2026-05-16
-- [ ] Phase 4b: water sub-pages (mash/sparge/boil/page) (~115 `any`)
+- [x] Phase 4b: water sub-pages (mash + sparge + boil — `water/page.tsx` was already clean) (87 `any` removed) ✅ landed 2026-05-16
 - [ ] Phase 4c: yeast + brew-sessions pages
 - [ ] Add `lint:web-recipes-strict` script once clean
 
@@ -172,6 +172,31 @@ The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui fr
 - No new `apps/web` unit tests added (Phase 4 is type-tightening, no behavioural change). The one incidental PBG-efficiency bug fix described above will be picked up by existing Playwright recipe-flow specs the next time they run; if it surfaces a regression, the previous (buggy) behaviour is recoverable as a one-line revert in `getRecipeEfficiencyPercent`.
 
 **Why this file went first in Phase 4:** at 104 `any` warnings it was the highest-leverage single file in `apps/web`, the duplicated efficiency-from-ext block was a visible code-smell that the helper extraction obviously cleaned up, and the ingredient-search DTOs naturally consumed the sharper `services/api` types from Phase 3.
+
+#### Phase 4b — `apps/web/app/recipes/[id]/water/{mash,sparge,boil}/page.tsx` ✅ landed 2026-05-16
+
+**Scope:** 3 sibling files (`mash/page.tsx`, `sparge/page.tsx`, `boil/page.tsx`), 5,085 lines combined. 87 `no-explicit-any` warnings → 0. (`water/page.tsx`, the index, was already `any`-free.) Initial estimate was ~115; the index page being clean reduced the actual workload.
+
+**Strategy used:** "tighten in place" — same as Phases 1–4a. The 3 files share an almost-identical shape (each owns an acidification calculator + salt additions + overall snapshot for its brewing stage), so the toolkit assembled in Phase 4a was applied uniformly across all three. Order: smallest first (sparge 19 → boil 24 → mash 44) to validate the toolkit on smaller surface area before tackling the largest file.
+
+- Extracted `apps/web/app/_lib/typeGuards.ts` exporting `asRecord(v: unknown): Record<string, unknown> | null` and imported it in mash/sparge/boil. This generalises the local `asRecord` helper introduced in Phase 4a so future apps/web pages can reuse it without re-declaring (the Phase 4a inline copy in `recipes/[id]/edit/page.tsx` is left in place — refactoring that file's helper into the shared one is mechanical and can ride along with Phase 4c if the consumer set grows).
+- Replaced `useState<any | null>(null)` for derivation states (`saltsDerivation`, `acidDerivation`, `overallDerivation`, `saltDerivation`) with `useState<WaterCalcDerivation | null>(null)` (the type is from `@brewery/contracts` and is exactly what the API returns post-`parseMashComputeAndSaveResponse` / `parseSpargeComputeAndSaveResponse` / `parseBoilComputeAndSaveResponse`). 8 derivation states tightened.
+- Replaced `useState<any | null>(null)` for sparge's `spargeOverall` with the shape `{ result: WaterOverallResult; derivation: WaterCalcDerivation } | null`.
+- Replaced `((s.xStrengthKind as any) ?? "percent") as "percent" | "normality" | "molarity" | "solid"` (3 sites — one per stage) with explicit safe narrowing: a 5-line ternary that checks each union member against the saved string before falling back to `"percent"`. No more "trust the saved value blindly through `as any`".
+- Dropped redundant `as any` casts on parser arguments: `parseGravityAnalysisResponseV1(analysis)` was being called with `(analysis as any)` even though the parser's signature is `(x: unknown) => GravityAnalysisResponseV1`. The cast hid the fact that the contract was already correct.
+- Replaced internal-API response unpacking patterns (`/api/water-calc/salt-additions`, `/api/water-calc/{mash,sparge,boil}-overall`) — these don't yet have contract parsers in `@brewery/contracts`, so we use `asRecord` to narrow `res.data` and then typed shape-casts to the local `SaltAdditionsResult` / `WaterOverallResult` / `WaterCalcDerivation`. Same defensive posture as Phase 4a's "internal monorepo API without a parser" treatment; if/when these endpoints get parsers in a future Phase 7 round, the casts will fall away.
+- Replaced `(s.gristRows as any[])` and `(r as any).{mashDiPh,mashTaToPh57_mEqPerKg,mashRoastDehuskedOverride,timingUse,lateAddition,amountKg}` accesses with direct field access on `EditorGristRow` (the type from `@brewery/beerjson` already declares all these fields — the casts were purely defensive and unnecessary).
+- Replaced `(recipe as any).recipeExtJson` / `(recipe as any).beerJsonRecipeJson` with direct access (`recipe?.recipeExtJson`, `recipe?.beerJsonRecipeJson`) — the local `RecipeResponse["recipe"]` type already declares these as `unknown`, so the `as any` was redundant. Then narrowed with `asRecord` for safe property access (`asRecord(extRec?.mashPhModel)` etc.).
+- Replaced post-`parseMashComputeAndSaveResponse` setter casts (`setSaltsResult(computed.salts.result as any)`, `setSaltsDerivation(computed.salts.derivation as any)`, etc. — about 28 sites combined across the 3 files) with typed shape-casts (`as unknown as SaltAdditionsResult` / `as unknown as MashOverallResult`) for state setters whose local types are structurally compatible but stricter than the contract types (e.g. local `breakdown[].saltKey: SaltKey` vs contract `breakdown[].saltKey: string`). Derivation state setters drop the cast entirely (the contract type matches the state type).
+
+**Verification:**
+
+- ESLint: all 4 files (`water/page.tsx`, `water/mash/page.tsx`, `water/sparge/page.tsx`, `water/boil/page.tsx`) at 0 `no-explicit-any` warnings.
+- `apps/web` TypeScript error count held exactly at the pre-change baseline: 1067 total errors repo-wide, identical per-file counts (29 sparge / 37 boil / 36 mash, all pre-existing Tamagui-adjacent). A normalized diff (line/col stripped) of the TS error logs shows zero new error categories or messages.
+- Repo-wide `no-explicit-any` count: 413 → 326 (drop of 87, exactly matches Phase 4b scope).
+- No new `apps/web` unit tests added (Phase 4b is type-tightening, no behavioural change). The water sub-pages are already covered by the Playwright recipe-flow specs that exercise mash/sparge/boil acidification through the storefront UI.
+
+**Why these files went together in Phase 4b:** they are siblings of the same brewing-stage-calculator pattern, share ~90% of their `any` patterns (derivation states, strength-kind narrowing, internal-API response unpacking, recipe-ext traversal), and benefit from a single shared `asRecord` import. Splitting them across multiple PRs would have triplicated the review surface for the same conceptual change.
 
 ### Phase 5 — `apps/native/src/screens/**` (~162 `any` warnings)
 

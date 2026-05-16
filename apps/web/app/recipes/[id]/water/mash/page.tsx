@@ -38,6 +38,8 @@ import {
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@brewery/contracts";
+import type { WaterCalcDerivation } from "@brewery/contracts";
+import { asRecord } from "../../../../_lib/typeGuards";
 import { DEFAULT_MASH_TARGET_PH } from "@brewery/core";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import {
@@ -162,9 +164,9 @@ export default function MashWaterPage() {
   const [savingSalts, setSavingSalts] = useState(false);
   const [saltAdditions, setSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
-  const [saltsDerivation, setSaltsDerivation] = useState<any | null>(null);
-  const [acidDerivation, setAcidDerivation] = useState<any | null>(null);
-  const [overallDerivation, setOverallDerivation] = useState<any | null>(null);
+  const [saltsDerivation, setSaltsDerivation] = useState<WaterCalcDerivation | null>(null);
+  const [acidDerivation, setAcidDerivation] = useState<WaterCalcDerivation | null>(null);
+  const [overallDerivation, setOverallDerivation] = useState<WaterCalcDerivation | null>(null);
 
   const [overallError, setOverallError] = useState<string | null>(null);
   const [overallStatus, setOverallStatus] = useState<string | null>(null);
@@ -268,11 +270,14 @@ export default function MashWaterPage() {
       setMashTargetPh(s.mashTargetPh ?? DEFAULT_MASH_TARGET_PH);
       setMashAcidType(s.mashAcidType ?? "lactic");
 
-      const savedKind = ((s.mashStrengthKind as any) ?? "percent") as
-        | "percent"
-        | "normality"
-        | "molarity"
-        | "solid";
+      const rawStrengthKind = s.mashStrengthKind;
+      const savedKind: "percent" | "normality" | "molarity" | "solid" =
+        rawStrengthKind === "percent" ||
+        rawStrengthKind === "normality" ||
+        rawStrengthKind === "molarity" ||
+        rawStrengthKind === "solid"
+          ? rawStrengthKind
+          : "percent";
       setMashStrengthKind(savedKind);
       setMashStrengthValue(s.mashStrengthValue ?? 88);
       setMashAcidificationMode(s.mashAcidificationMode === "manual" ? "manual" : "targetPh");
@@ -280,13 +285,16 @@ export default function MashWaterPage() {
         savedKind === "solid" ? (s.mashManualAcidAddedGrams ?? 0) : (s.mashManualAcidAddedMl ?? 0),
       );
 
-      if (Array.isArray(s.mashSaltAdditionsJson)) setSaltAdditions(s.mashSaltAdditionsJson as any);
-      if (s.mashSaltsLastResultJson && typeof s.mashSaltsLastResultJson === "object") {
-        const v: any = s.mashSaltsLastResultJson as any;
-        if (v?.result && typeof v.result === "object") {
-          setSaltsResult(v.result as SaltAdditionsResult);
-          if (typeof v.calculatedAt === "string") {
-            setSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
+      if (Array.isArray(s.mashSaltAdditionsJson)) {
+        setSaltAdditions(s.mashSaltAdditionsJson as SaltAdditionRow[]);
+      }
+      const lastResult = asRecord(s.mashSaltsLastResultJson);
+      if (lastResult) {
+        const innerResult = asRecord(lastResult.result);
+        if (innerResult) {
+          setSaltsResult(innerResult as unknown as SaltAdditionsResult);
+          if (typeof lastResult.calculatedAt === "string") {
+            setSaltsStatus(`Last calculated: ${new Date(lastResult.calculatedAt).toLocaleString()}`);
           }
         }
       }
@@ -385,7 +393,7 @@ export default function MashWaterPage() {
     const analysis = recipe?.analysis;
     if (!analysis) return null;
     try {
-      const parsed = parseGravityAnalysisResponseV1(analysis as any);
+      const parsed = parseGravityAnalysisResponseV1(analysis);
       const preBoil = parsed?.derivations?.["analysis.pre_boil_volume"];
       if (!preBoil?.inputs) return null;
       const mashIn = preBoil.inputs.find((i: { id: string }) => i.id === "mashWaterVolumeLiters")?.value;
@@ -520,7 +528,7 @@ export default function MashWaterPage() {
       return;
     }
     const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
-    const mashMerged = mergeMashDeduceFromExt(s.mash, (r as any).recipeExtJson);
+    const mashMerged = mergeMashDeduceFromExt(s.mash, r.recipeExtJson);
     if (mashMerged && mashMerged.steps.length > 0) {
       if (!mashStepsDirty) {
         setMashProcedure({ name: mashMerged.name, grainTemperatureC: mashMerged.grainTemperatureC });
@@ -670,9 +678,11 @@ export default function MashWaterPage() {
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const result = (res.data as any).result as SaltAdditionsResult;
+      const dataRec = asRecord(res.data) ?? {};
+      const result = dataRec.result as SaltAdditionsResult;
+      const derivationRec = asRecord(dataRec.derivation);
       setSaltsResult(result);
-      setSaltsDerivation((res.data as any).derivation ?? null);
+      setSaltsDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
 
       await saveSettings({
         tapWaterVolumeLiters: tapVolumeLiters,
@@ -781,8 +791,9 @@ export default function MashWaterPage() {
       }),
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const body = res.data as any;
-    return body.result?.estimatedMashPhRoomTemp as number;
+    const bodyRec = asRecord(res.data) ?? {};
+    const resultRec = asRecord(bodyRec.result);
+    return resultRec?.estimatedMashPhRoomTemp as number;
   };
 
   const computeOverallMash = async () => {
@@ -827,9 +838,10 @@ export default function MashWaterPage() {
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const body = res.data as any;
-    setOverallDerivation(body.derivation ?? null);
-    return body.result as MashOverallResult;
+    const bodyRec = asRecord(res.data) ?? {};
+    const derivationRec = asRecord(bodyRec.derivation);
+    setOverallDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
+    return bodyRec.result as MashOverallResult;
   };
 
   const computeAndSaveMashSnapshots = async () => {
@@ -881,21 +893,21 @@ export default function MashWaterPage() {
       if (saveAlso) {
         const computed = await computeAndSaveMashSnapshots();
         setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
-        setSaltsResult(computed.salts.result as any);
-        setSaltsDerivation(computed.salts.derivation as any);
-        setAcidDerivation(computed.acid.derivation as any);
-        setOverallDerivation(computed.overall.derivation as any);
-        setOverallResult(computed.overall.result as any);
+        setSaltsResult(computed.salts.result as unknown as SaltAdditionsResult);
+        setSaltsDerivation(computed.salts.derivation);
+        setAcidDerivation(computed.acid.derivation);
+        setOverallDerivation(computed.overall.derivation);
+        setOverallResult(computed.overall.result as unknown as MashOverallResult);
         setOverallStatus("Calculated.");
         if (computed.acid.kind === "mash_acidification_manual") {
-          setMashManualResult(computed.acid.result as any);
+          setMashManualResult(computed.acid.result);
           setMashManualStatus("Estimated (manual mode).");
-          setMashResult((computed.acid.result as any).predicted ?? null);
+          setMashResult(computed.acid.result.predicted ?? null);
           setMashCalcSaveStatus("Estimated & saved snapshot.");
         } else {
           setMashManualResult(null);
           setMashManualStatus(null);
-          setMashResult(computed.acid.result as any);
+          setMashResult(computed.acid.result);
           setMashStatus("Calculated.");
           setMashCalcSaveStatus("Calculated & saved snapshot.");
         }
@@ -927,22 +939,22 @@ export default function MashWaterPage() {
     try {
       const computed = await computeAndSaveMashSnapshots();
       setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
-      setSaltsResult(computed.salts.result as any);
-      setSaltsDerivation(computed.salts.derivation as any);
-      setAcidDerivation(computed.acid.derivation as any);
-      setOverallDerivation(computed.overall.derivation as any);
-      setOverallResult(computed.overall.result as any);
+      setSaltsResult(computed.salts.result as unknown as SaltAdditionsResult);
+      setSaltsDerivation(computed.salts.derivation);
+      setAcidDerivation(computed.acid.derivation);
+      setOverallDerivation(computed.overall.derivation);
+      setOverallResult(computed.overall.result as unknown as MashOverallResult);
       setOverallStatus("Calculated.");
 
       if (computed.acid.kind === "mash_acidification_manual") {
-        setMashManualResult(computed.acid.result as any);
+        setMashManualResult(computed.acid.result);
         setMashManualStatus("Estimated (manual mode).");
-        setMashResult((computed.acid.result as any).predicted ?? null);
+        setMashResult(computed.acid.result.predicted ?? null);
         setMashCalcSaveStatus("Estimated & saved snapshot.");
       } else {
         setMashManualResult(null);
         setMashManualStatus(null);
-        setMashResult(computed.acid.result as any);
+        setMashResult(computed.acid.result);
         setMashStatus("Calculated.");
         setMashCalcSaveStatus("Calculated & saved snapshot.");
       }
@@ -1110,9 +1122,7 @@ export default function MashWaterPage() {
         return;
       }
       const newDoc = replaceMashInBeerJsonDocument(recipe.beerJsonRecipeJson, mash);
-      const extBase = (recipe as any).recipeExtJson && typeof (recipe as any).recipeExtJson === "object"
-        ? (recipe as any).recipeExtJson
-        : { version: 1 };
+      const extBase = asRecord(recipe.recipeExtJson) ?? { version: 1 };
       const mashStepDeduceFromMashIn = Object.fromEntries(
         mashRows
           .map((r, idx) => [String(idx), r.deduceFromMashIn === true] as const)
@@ -1147,26 +1157,28 @@ export default function MashWaterPage() {
       const res = await apiFetch(`/api/recipes/${recipeId}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const data = res.data as RecipeResponse;
-      const ext = (data.recipe as any).recipeExtJson;
-      const mashPhModel = ext && typeof ext === "object" ? (ext as any).mashPhModel : null;
+      const extRec = asRecord(data.recipe.recipeExtJson);
+      const mashPhModelRec = asRecord(extRec?.mashPhModel);
 
       let rows: GristRow[] = [];
-      if (!(data.recipe as any).beerJsonRecipeJson) {
+      if (!data.recipe.beerJsonRecipeJson) {
         throw new Error("Recipe is missing BeerJSON (beerJsonRecipeJson)");
       }
-      const s = editorStateFromBeerJson((data.recipe as any).beerJsonRecipeJson);
-      const mashOnlyRows = (s.gristRows as any[]).filter(
+      const s = editorStateFromBeerJson(data.recipe.beerJsonRecipeJson);
+      const mashOnlyRows = s.gristRows.filter(
         (r) => (r.timingUse ?? "add_to_mash") === "add_to_mash" && r.lateAddition !== true,
       );
       rows = mashOnlyRows.map((r) => {
-        const m = r.id && mashPhModel && typeof mashPhModel === "object" ? (mashPhModel as any)[r.id] : null;
+        const m = r.id && mashPhModelRec ? asRecord(mashPhModelRec[r.id]) : null;
         return {
           ...r,
-          mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : (r as any).mashDiPh ?? null,
+          mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : r.mashDiPh ?? null,
           mashTaToPh57_mEqPerKg:
-            typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : (r as any).mashTaToPh57_mEqPerKg ?? null,
+            typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : r.mashTaToPh57_mEqPerKg ?? null,
           mashRoastDehuskedOverride:
-            "roastDehuskedOverride" in (m ?? {}) ? (m as any).roastDehuskedOverride : (r as any).mashRoastDehuskedOverride ?? null,
+            m && "roastDehuskedOverride" in m
+              ? (m.roastDehuskedOverride as boolean | null | undefined) ?? null
+              : r.mashRoastDehuskedOverride ?? null,
         } as GristRow;
       });
       const nowIso = new Date().toISOString();
@@ -1194,13 +1206,13 @@ export default function MashWaterPage() {
   );
   const lateAdditionsTotalKg = useMemo(() => {
     try {
-      const doc = (recipe as any)?.beerJsonRecipeJson;
+      const doc = recipe?.beerJsonRecipeJson;
       if (!doc) return 0;
       const s = editorStateFromBeerJson(doc);
-      return (s.gristRows as any[]).reduce((sum, r) => {
-        if ((r?.timingUse ?? "add_to_mash") !== "add_to_mash") return sum;
-        if (r?.lateAddition !== true) return sum;
-        const amountKg = typeof r?.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0;
+      return s.gristRows.reduce((sum, r) => {
+        if ((r.timingUse ?? "add_to_mash") !== "add_to_mash") return sum;
+        if (r.lateAddition !== true) return sum;
+        const amountKg = typeof r.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0;
         return sum + amountKg;
       }, 0);
     } catch {

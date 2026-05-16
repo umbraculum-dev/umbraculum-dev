@@ -21,6 +21,8 @@ import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonPro
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseBoilComputeAndSaveResponse } from "@brewery/contracts";
+import type { WaterCalcDerivation } from "@brewery/contracts";
+import { asRecord } from "../../../../_lib/typeGuards";
 import { formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
@@ -123,7 +125,7 @@ export default function BoilWaterPage() {
   const [savingInputs, setSavingInputs] = useState(false);
   const [acidResult, setAcidResult] = useState<BoilAcidResult | null>(null);
   const [manualResult, setManualResult] = useState<BoilManualCalcResult | null>(null);
-  const [acidDerivation, setAcidDerivation] = useState<any | null>(null);
+  const [acidDerivation, setAcidDerivation] = useState<WaterCalcDerivation | null>(null);
 
   // Salts
   const [saltsError, setSaltsError] = useState<string | null>(null);
@@ -134,7 +136,7 @@ export default function BoilWaterPage() {
   const [savingSalts, setSavingSalts] = useState(false);
   const [saltAdditions, setSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [saltsResult, setSaltsResult] = useState<SaltAdditionsResult | null>(null);
-  const [saltDerivation, setSaltDerivation] = useState<any | null>(null);
+  const [saltDerivation, setSaltDerivation] = useState<WaterCalcDerivation | null>(null);
 
   // Overall snapshot
   const [overallError, setOverallError] = useState<string | null>(null);
@@ -142,7 +144,7 @@ export default function BoilWaterPage() {
   const [overallSaveStatus, setOverallSaveStatus] = useState<string | null>(null);
   const [savingOverall, setSavingOverall] = useState(false);
   const [overallResult, setOverallResult] = useState<BoilOverallResultV0 | null>(null);
-  const [overallDerivation, setOverallDerivation] = useState<any | null>(null);
+  const [overallDerivation, setOverallDerivation] = useState<WaterCalcDerivation | null>(null);
   const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
 
   const fmt = (unitKey: string, value: unknown, fallback: number) =>
@@ -232,21 +234,31 @@ export default function BoilWaterPage() {
       setTargetPh(s.boilTargetPh ?? 5.6);
       setAcidType(s.boilAcidType ?? "phosphoric");
 
-      const savedKind = ((s.boilStrengthKind as any) ?? "percent") as "percent" | "normality" | "molarity" | "solid";
+      const rawStrengthKind = s.boilStrengthKind;
+      const savedKind: "percent" | "normality" | "molarity" | "solid" =
+        rawStrengthKind === "percent" ||
+        rawStrengthKind === "normality" ||
+        rawStrengthKind === "molarity" ||
+        rawStrengthKind === "solid"
+          ? rawStrengthKind
+          : "percent";
       setStrengthKind(savedKind);
-      setStrengthValue((s.boilStrengthValue as any) ?? 10);
+      setStrengthValue(s.boilStrengthValue ?? 10);
       setAcidificationMode(s.boilAcidificationMode === "manual" ? "manual" : "targetPh");
       setManualAcidAdded(
         savedKind === "solid" ? (s.boilManualAcidAddedGrams ?? 0) : (s.boilManualAcidAddedMl ?? 0),
       );
 
-      if (Array.isArray(s.boilSaltAdditionsJson)) setSaltAdditions(s.boilSaltAdditionsJson as any);
-      if (s.boilSaltsLastResultJson && typeof s.boilSaltsLastResultJson === "object") {
-        const v: any = s.boilSaltsLastResultJson as any;
-        if (v?.result && typeof v.result === "object") {
-          setSaltsResult(v.result as SaltAdditionsResult);
-          if (typeof v.calculatedAt === "string") {
-            setSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
+      if (Array.isArray(s.boilSaltAdditionsJson)) {
+        setSaltAdditions(s.boilSaltAdditionsJson as SaltAdditionRow[]);
+      }
+      const lastResult = asRecord(s.boilSaltsLastResultJson);
+      if (lastResult) {
+        const innerResult = asRecord(lastResult.result);
+        if (innerResult) {
+          setSaltsResult(innerResult as unknown as SaltAdditionsResult);
+          if (typeof lastResult.calculatedAt === "string") {
+            setSaltsStatus(`Last calculated: ${new Date(lastResult.calculatedAt).toLocaleString()}`);
           }
         }
       }
@@ -485,9 +497,11 @@ export default function BoilWaterPage() {
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const result = (res.data as any).result as SaltAdditionsResult;
+      const dataRec = asRecord(res.data) ?? {};
+      const result = dataRec.result as SaltAdditionsResult;
+      const derivationRec = asRecord(dataRec.derivation);
       setSaltsResult(result);
-      setSaltDerivation((res.data as any).derivation ?? null);
+      setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
 
       await saveSettings({
         boilSaltAdditionsJson: saltAdditions,
@@ -625,21 +639,21 @@ export default function BoilWaterPage() {
     try {
       const computed = await computeAndSaveBoilSnapshots();
       setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
-      setSaltsResult(computed.salts.result as any);
-      setSaltDerivation(computed.salts.derivation as any);
-      setAcidDerivation(computed.acid.derivation as any);
-      setOverallDerivation(computed.overall.derivation as any);
-      setOverallResult(computed.overall.result as any);
+      setSaltsResult(computed.salts.result as unknown as SaltAdditionsResult);
+      setSaltDerivation(computed.salts.derivation);
+      setAcidDerivation(computed.acid.derivation);
+      setOverallDerivation(computed.overall.derivation);
+      setOverallResult(computed.overall.result as unknown as BoilOverallResultV0);
       setOverallStatus("Calculated.");
 
       if (computed.acid.kind === "boil_acidification_manual") {
-        setManualResult(computed.acid.result as any);
-        setAcidResult((computed.acid.result as any).predicted ?? null);
+        setManualResult(computed.acid.result);
+        setAcidResult(computed.acid.result.predicted ?? null);
         setBoilStatus("Estimated (manual mode).");
         setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
         setManualResult(null);
-        setAcidResult(computed.acid.result as any);
+        setAcidResult(computed.acid.result);
         setBoilStatus("Calculated.");
         setCalcSaveStatus("Calculated & saved snapshot.");
       }
@@ -690,9 +704,10 @@ export default function BoilWaterPage() {
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const body = res.data as any;
-    setOverallDerivation(body.derivation ?? null);
-    return body.result as BoilOverallResultV0;
+    const bodyRec = asRecord(res.data) ?? {};
+    const derivationRec = asRecord(bodyRec.derivation);
+    setOverallDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
+    return bodyRec.result as BoilOverallResultV0;
   };
 
   const onCalculateOverall = async (saveAlso: boolean) => {
@@ -704,11 +719,11 @@ export default function BoilWaterPage() {
       if (saveAlso) {
         const computed = await computeAndSaveBoilSnapshots();
         setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
-        setSaltsResult(computed.salts.result as any);
-        setSaltDerivation(computed.salts.derivation as any);
-        setAcidDerivation(computed.acid.derivation as any);
-        setOverallDerivation(computed.overall.derivation as any);
-        setOverallResult(computed.overall.result as any);
+        setSaltsResult(computed.salts.result as unknown as SaltAdditionsResult);
+        setSaltDerivation(computed.salts.derivation);
+        setAcidDerivation(computed.acid.derivation);
+        setOverallDerivation(computed.overall.derivation);
+        setOverallResult(computed.overall.result as unknown as BoilOverallResultV0);
         setOverallStatus("Calculated.");
         setOverallSaveStatus("Calculated & saved overall snapshot.");
       } else {

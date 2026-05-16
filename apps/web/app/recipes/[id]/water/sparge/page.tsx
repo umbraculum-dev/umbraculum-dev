@@ -17,6 +17,7 @@ import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";
+import { asRecord } from "../../../../_lib/typeGuards";
 
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
@@ -24,6 +25,7 @@ import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "..
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseSpargeComputeAndSaveResponse } from "@brewery/contracts";
+import type { WaterCalcDerivation, WaterOverallResult } from "@brewery/contracts";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import {
   fetchRecipeWaterSettings,
@@ -88,7 +90,7 @@ export default function SpargeWaterPage() {
   const [spargeSaveStatus, setSpargeSaveStatus] = useState<string | null>(null);
   const [calcSaveStatus, setCalcSaveStatus] = useState<string | null>(null);
   const [spargeResult, setSpargeResult] = useState<SpargeResult | null>(null);
-  const [acidDerivation, setAcidDerivation] = useState<any | null>(null);
+  const [acidDerivation, setAcidDerivation] = useState<WaterCalcDerivation | null>(null);
   const [spargeManualResult, setSpargeManualResult] = useState<SpargeManualCalcResult | null>(null);
   const [spargeSubmitting, setSpargeSubmitting] = useState(false);
   const [savingSparge, setSavingSparge] = useState(false);
@@ -119,8 +121,11 @@ export default function SpargeWaterPage() {
   const [savingSpargeSalts, setSavingSpargeSalts] = useState(false);
   const [spargeSaltAdditions, setSpargeSaltAdditions] = useState<SaltAdditionRow[]>([]);
   const [spargeSaltsResult, setSpargeSaltsResult] = useState<SaltAdditionsResult | null>(null);
-  const [saltDerivation, setSaltDerivation] = useState<any | null>(null);
-  const [spargeOverall, setSpargeOverall] = useState<any | null>(null);
+  const [saltDerivation, setSaltDerivation] = useState<WaterCalcDerivation | null>(null);
+  const [spargeOverall, setSpargeOverall] = useState<{
+    result: WaterOverallResult;
+    derivation: WaterCalcDerivation;
+  } | null>(null);
   const [spargeSaltsInputsKey, setSpargeSaltsInputsKey] = useState<string | null>(null);
   const [formatHints, setFormatHints] = useState<Record<string, { decimals?: number }> | undefined>(undefined);
 
@@ -207,11 +212,14 @@ export default function SpargeWaterPage() {
       setTargetPh(s.spargeTargetPh ?? 5.6);
       setVolumeLiters(s.spargeVolumeLiters ?? 20);
       setAcidType(s.spargeAcidType ?? "phosphoric");
-      const savedStrengthKind = ((s.spargeStrengthKind as any) ?? "percent") as
-        | "percent"
-        | "normality"
-        | "molarity"
-        | "solid";
+      const rawStrengthKind = s.spargeStrengthKind;
+      const savedStrengthKind: "percent" | "normality" | "molarity" | "solid" =
+        rawStrengthKind === "percent" ||
+        rawStrengthKind === "normality" ||
+        rawStrengthKind === "molarity" ||
+        rawStrengthKind === "solid"
+          ? rawStrengthKind
+          : "percent";
       setStrengthKind(savedStrengthKind);
       setStrengthValue(s.spargeStrengthValue ?? 10);
       setSpargeWaterProfileId(s.spargeWaterProfileId ?? "");
@@ -223,11 +231,14 @@ export default function SpargeWaterPage() {
           : (s.spargeManualAcidAddedMl ?? 0),
       );
 
-      if (Array.isArray(s.spargeSaltAdditionsJson)) setSpargeSaltAdditions(s.spargeSaltAdditionsJson as any);
-      if (s.spargeSaltsLastResultJson && typeof s.spargeSaltsLastResultJson === "object") {
-        const v: any = s.spargeSaltsLastResultJson as any;
-        if (v?.result && typeof v.result === "object") {
-          setSpargeSaltsResult(v.result as SaltAdditionsResult);
+      if (Array.isArray(s.spargeSaltAdditionsJson)) {
+        setSpargeSaltAdditions(s.spargeSaltAdditionsJson as SaltAdditionRow[]);
+      }
+      const lastResult = asRecord(s.spargeSaltsLastResultJson);
+      if (lastResult) {
+        const innerResult = asRecord(lastResult.result);
+        if (innerResult) {
+          setSpargeSaltsResult(innerResult as unknown as SaltAdditionsResult);
           setSpargeSaltsInputsKey(
             JSON.stringify({
               spargeWaterProfileId: s.spargeWaterProfileId ?? "",
@@ -235,8 +246,8 @@ export default function SpargeWaterPage() {
               additions: Array.isArray(s.spargeSaltAdditionsJson) ? s.spargeSaltAdditionsJson : [],
             }),
           );
-          if (typeof v.calculatedAt === "string") {
-            setSpargeSaltsStatus(`Last calculated: ${new Date(v.calculatedAt).toLocaleString()}`);
+          if (typeof lastResult.calculatedAt === "string") {
+            setSpargeSaltsStatus(`Last calculated: ${new Date(lastResult.calculatedAt).toLocaleString()}`);
           }
         }
       }
@@ -417,19 +428,19 @@ export default function SpargeWaterPage() {
       const computed = parseSpargeComputeAndSaveResponse(res.data);
       setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
 
-      setSpargeSaltsResult(computed.salts.result as any);
-      setSaltDerivation(computed.salts.derivation as any);
+      setSpargeSaltsResult(computed.salts.result as unknown as SaltAdditionsResult);
+      setSaltDerivation(computed.salts.derivation);
       setSpargeSaltsInputsKey(buildSpargeSaltsInputsKey());
 
-      setAcidDerivation(computed.acid.derivation as any);
+      setAcidDerivation(computed.acid.derivation);
       if (computed.acid.kind === "sparge_acidification_manual") {
-        setSpargeManualResult(computed.acid.result as any);
-        setSpargeResult((computed.acid.result as any).predicted ?? null);
+        setSpargeManualResult(computed.acid.result);
+        setSpargeResult(computed.acid.result.predicted ?? null);
         setSpargeStatus("Estimated (manual mode).");
         setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
         setSpargeManualResult(null);
-        setSpargeResult(computed.acid.result as any);
+        setSpargeResult(computed.acid.result);
         setSpargeStatus("Calculated.");
         setCalcSaveStatus("Calculated & saved snapshot.");
       }
@@ -520,8 +531,10 @@ export default function SpargeWaterPage() {
       }),
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const result = (res.data as any).result as SaltAdditionsResult;
-    setSaltDerivation((res.data as any).derivation ?? null);
+    const dataRec = asRecord(res.data) ?? {};
+    const result = dataRec.result as SaltAdditionsResult;
+    const derivationRec = asRecord(dataRec.derivation);
+    setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
 
     const nowIso = new Date().toISOString();
     setSpargeSaltsResult(result);
@@ -562,9 +575,11 @@ export default function SpargeWaterPage() {
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const result = (res.data as any).result as SaltAdditionsResult;
+      const dataRec = asRecord(res.data) ?? {};
+      const result = dataRec.result as SaltAdditionsResult;
+      const derivationRec = asRecord(dataRec.derivation);
       setSpargeSaltsResult(result);
-      setSaltDerivation((res.data as any).derivation ?? null);
+      setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
       await refreshSpargeOverallIfPossible().catch(() => null);
 
       await saveSettings({
@@ -620,8 +635,15 @@ export default function SpargeWaterPage() {
       body: JSON.stringify(payload),
     });
     if (!res.ok) return;
-    const data = res.data as any;
-    setSpargeOverall({ result: data.result, derivation: data.derivation });
+    const dataRec = asRecord(res.data);
+    if (!dataRec) return;
+    const result = asRecord(dataRec.result);
+    const derivation = asRecord(dataRec.derivation);
+    if (!result || !derivation) return;
+    setSpargeOverall({
+      result: result as unknown as WaterOverallResult,
+      derivation: derivation as unknown as WaterCalcDerivation,
+    });
   };
 
   const selectedSpargeProfileInfo = selectedSpargeProfile ? (
@@ -1412,7 +1434,7 @@ export default function SpargeWaterPage() {
                         <tbody>
                           {(() => {
                             const combined =
-                              (spargeOverall?.result?.ionsPpm as any) ??
+                              spargeOverall?.result?.ionsPpm ??
                               combineAfterSaltsAndAcid({
                                 afterSalts: spargeSaltsResult.resultingProfile,
                                 acidResult: spargeResult,
