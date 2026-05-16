@@ -158,8 +158,8 @@ export default [
   // -------------------------------------------------------------------
   // HIGH-full Phase 2 — Tier A: Promise correctness (TS-only).
   //
-  // All seven type-aware rules at `warn`. Required to be at zero
-  // before the phase closes; Phase 5 promotes them to `error`.
+  // All seven type-aware rules at `error` (promoted from `warn` by
+  // Phase 5 after Phase 2 reached zero warnings repo-wide).
   //
   // Scoped to `.ts/.tsx` because the rules require the type-aware
   // parser block above (which is also `.ts/.tsx`-scoped).
@@ -176,22 +176,22 @@ export default [
   {
     files: ["**/*.{ts,tsx}"],
     rules: {
-      "@typescript-eslint/no-floating-promises": "warn",
-      "@typescript-eslint/no-misused-promises": "warn",
-      "@typescript-eslint/await-thenable": "warn",
-      "@typescript-eslint/require-await": "warn",
-      "@typescript-eslint/prefer-promise-reject-errors": "warn",
-      "@typescript-eslint/no-implied-eval": "warn",
-      "@typescript-eslint/only-throw-error": "warn",
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+      "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/require-await": "error",
+      "@typescript-eslint/prefer-promise-reject-errors": "error",
+      "@typescript-eslint/no-implied-eval": "error",
+      "@typescript-eslint/only-throw-error": "error",
     },
   },
 
   // -------------------------------------------------------------------
   // HIGH-full Phase 3 — Tier C-narrow: services/api `no-unsafe-*`.
   //
-  // All five type-aware unsafe-* rules at `warn` on `services/api/**`
-  // (covers both `src/**` and `prisma/seed.ts`). Required to be at
-  // zero before the phase closes; Phase 5 promotes to `error`.
+  // All five type-aware unsafe-* rules at `error` (promoted from `warn`
+  // by Phase 5 after Phase 3 reached zero warnings on `services/api/**`,
+  // covering both `src/**` and `prisma/seed.ts`).
   //
   // Tests are deliberately exempted via the test-files relaxation
   // block below (later block wins in flat config). Test code uses
@@ -211,18 +211,20 @@ export default [
   {
     files: ["services/api/**/*.{ts,tsx}"],
     rules: {
-      "@typescript-eslint/no-unsafe-assignment": "warn",
-      "@typescript-eslint/no-unsafe-member-access": "warn",
-      "@typescript-eslint/no-unsafe-call": "warn",
-      "@typescript-eslint/no-unsafe-argument": "warn",
-      "@typescript-eslint/no-unsafe-return": "warn",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
     },
   },
 
   // -------------------------------------------------------------------
   // HIGH-full Phase 4 — Tier C-wide: apps/web `no-unsafe-*`.
   //
-  // Same five type-aware rules as Phase 3, scoped to `apps/web/**`.
+  // Same five type-aware rules as Phase 3, scoped to `apps/web/**`,
+  // at `error` (promoted from `warn` by Phase 5).
+  //
   // The original plan called this "the Tamagui wall" with an estimated
   // 266 warnings split across 4a/4b/4c sub-strategies (per-site
   // disable / Tamagui adapter improvements / hybrid).
@@ -243,11 +245,11 @@ export default [
   {
     files: ["apps/web/**/*.{ts,tsx}"],
     rules: {
-      "@typescript-eslint/no-unsafe-assignment": "warn",
-      "@typescript-eslint/no-unsafe-member-access": "warn",
-      "@typescript-eslint/no-unsafe-call": "warn",
-      "@typescript-eslint/no-unsafe-argument": "warn",
-      "@typescript-eslint/no-unsafe-return": "warn",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
     },
   },
 
