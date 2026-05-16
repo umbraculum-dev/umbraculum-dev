@@ -2461,7 +2461,7 @@ export default function RecipeEditPage() {
                 </RecipeEditFieldBlock>
               ) : null}
               {programmedSessions.length > 0 ? (
-                <RecipeEditFieldBlock variant="computed" header={t("programmedSectionLabel")} mt={0} mb={0}>
+                <RecipeEditFieldBlock variant="programmed" header={t("programmedSectionLabel")} mt={0} mb={0}>
                   <RecipeEditList gap="$1" mt="$1" mb={0}>
                     {programmedSessions.map((s) => {
                       const displayDate = s.scheduledDate

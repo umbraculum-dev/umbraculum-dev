@@ -4,7 +4,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { SizableText, View } from "tamagui";
 
-export type MessageBoxVariant = "error" | "warning" | "success";
+export type MessageBoxVariant = "error" | "warning" | "success" | "notice";
 
 const VARIANT_STYLES: Record<
   MessageBoxVariant,
@@ -22,6 +22,10 @@ const VARIANT_STYLES: Record<
     bg: "color-mix(in srgb, var(--success) 18%, var(--surface))",
     borderColor: "color-mix(in srgb, var(--success) 40%, var(--border))",
   },
+  notice: {
+    bg: "color-mix(in srgb, var(--info) 10%, var(--surface))",
+    borderColor: "color-mix(in srgb, var(--info) 32%, var(--border))",
+  },
 };
 
 export interface MessageBoxProps {
@@ -32,7 +36,7 @@ export interface MessageBoxProps {
   id?: string;
   mt?: string | number;
   mb?: string | number;
-  /** Auto-dismiss after this many ms. Only for variant="success." Errors and warnings stay visible. */
+  /** Auto-dismiss after this many ms. Only for variant="success." Persistent messages stay visible. */
   dismissAfter?: number;
   /** Called when dismissAfter timer fires. Required when dismissAfter is set. */
   onDismiss?: () => void;

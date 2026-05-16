@@ -6,7 +6,7 @@ import { SizableText, View, XStack, YStack } from "tamagui";
 
 import { FieldBadge } from "./FieldBadge";
 
-export type RecipeEditFieldBlockVariant = "default" | "readonly" | "computed" | "inProgress";
+export type RecipeEditFieldBlockVariant = "default" | "readonly" | "computed" | "inProgress" | "programmed";
 
 export interface RecipeEditFieldBlockProps {
   variant?: RecipeEditFieldBlockVariant;
@@ -37,6 +37,10 @@ const variantStyles: Record<
   inProgress: {
     bg: "color-mix(in srgb, var(--warning) 18%, var(--surface))",
     borderColor: "color-mix(in srgb, var(--warning) 40%, var(--border))",
+  },
+  programmed: {
+    bg: "color-mix(in srgb, pink 16%, var(--surface))",
+    borderColor: "color-mix(in srgb, pink 38%, var(--border))",
   },
 };
 

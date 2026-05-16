@@ -1812,6 +1812,9 @@ export default function BrewSessionDetailPage() {
         </MessageBox>
       ) : null}
       {stepActionError ? <ErrorBox>{stepActionError}</ErrorBox> : null}
+      {session && !session.startedAt ? (
+        <MessageBox variant="notice">{t("stepsLockedUntilStartedNotice")}</MessageBox>
+      ) : null}
 
       {grouped.map((g) => {
         const isStepCompleteForSection = (s: BrewSessionStep) => {

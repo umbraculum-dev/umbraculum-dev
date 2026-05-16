@@ -771,6 +771,7 @@
       "stepDurationTimerHelp": "Parte automaticamente quando lo step è impostato su In corso",
       "stepDurationTimerIdle": "Parte quando lo step è impostato su In corso",
       "dateSectionTitle": "Data",
+      "stepsLockedUntilStartedNotice": "Avvia la sessione di brewing prima di cambiare lo stato degli step. Fino ad allora, gli step restano In attesa e in sola lettura.",
       "timersAndLogsHelpNote": "Alcuni timer partono automaticamente per certi step (ad es. per le aggiunte di luppolo dopo l'avvio del timer bollitura). Gli step mash con durata avviano automaticamente il countdown quando sono impostati su In corso. È anche possibile avviare timer personalizzati per singoli step per log personalizzati (di solito se vuoi misurare la durata di uno step specifico). IMPORTANTE: quando imposti manualmente uno step (o più step) su 'Fatto' o su un altro stato all'interno di una sezione, ricordati di cliccare su 'Salva log sezione' (o su 'Salva sessione brewing') altrimenti le modifiche non verranno salvate.",
       "datePickerLabel": "Data e ora programmate",
       "dateLabel": "Data",
