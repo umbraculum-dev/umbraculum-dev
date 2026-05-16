@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.2 — HIGH-staged Phase 1 (`packages/contracts/**`) landed; Phase 2 (`packages/beerjson/**`) is next.
+**Status:** v1.3 — HIGH-staged Phases 1 (`packages/contracts/**`) and 2 (`packages/beerjson/**`) landed; every `packages/**` workspace is now gated at `--max-warnings 0`. Phase 3 (`services/api/**`) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -15,11 +15,11 @@
 | ESLint runs in CI | ✅ `web-lint` GitHub Action, path-gated |
 | Errors block CI | ✅ |
 | Warnings tolerated repo-wide | ⚠️ Yes (HIGH-staged work to remove them, see roadmap) |
-| Warnings forbidden in clean packages | ✅ `npm run lint:packages-strict` — **10 of 11 packages** at `--max-warnings 0` (added `packages/contracts` in Phase 1) |
+| Warnings forbidden in clean packages | ✅ `npm run lint:packages-strict` — **11 of 11 packages** at `--max-warnings 0` (every `packages/**` workspace is gated; only `apps/**` and `services/**` still have `any` debt) |
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **1,050** (963 `no-explicit-any` + 86 `no-unused-vars` + ~1 misc) — was 1,127 before Phase 1 (-77 cleared in `packages/contracts`) |
+| Outstanding warnings | **1,029** (-21 from Phase 2, -77 from Phase 1, -98 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -92,18 +92,32 @@ Each phase below clears a slice of pre-existing `any` warnings, then expands the
 
 **Strategy used:** "tighten in place" — replaced `any` with `Record<string, unknown>` (after `isObject` narrowing), used proper return types on helper functions, used named union casts (`WaterCalcDerivationKind`, `NumberFormatUnit`, etc.) instead of `any` for unvalidated string-to-union narrowing. No Zod migration. See the commit (linked from this section after merge) and the discussion in the related session transcript for the full pros/cons of the Zod alternative.
 
-### Phase 2 — `packages/beerjson/**` (~21 `any` warnings)
+### Phase 2 — `packages/beerjson/**` (21 `any` warnings) ✅ landed 2026-05-16
 
-- [ ] Triage `packages/beerjson/src/index.ts`
-- [ ] Expand `lint:packages-strict` to include `packages/beerjson`
-- [ ] Update this doc's TL;DR table
+**Scope:** 1 file, 986 lines (`packages/beerjson/src/index.ts`). All 21 `any` removed.
+
+**Strategy used:** "tighten in place" — same as Phase 1.
+- Added local helpers `isObject`, `isFiniteNumber`, `parseValueWithUnit` (the BeerJSON shape uses `{ unit, value }` pairs everywhere — extracting this once collapses ~10 repeated guard chains into one helper call per access).
+- Output builders now type accumulators as `Record<string, unknown>` (pre-existing behaviour preserved; downstream consumers treat the BeerJSON document as opaque JSON-passed-to-API).
+- Input parsers now take `unknown` + `isObject` narrowing.
+- A `BeerJsonRecipe = Record<string, unknown>` alias replaces `any[]` in the document shape.
+- Two minor pre-existing semantic improvements landed alongside (both safer): in input parsers, missing-but-typed unit/value pairs (e.g. `unit === "F"` with no `value`) now return `null` instead of `NaN`; and unknown `type`/`form` strings on misc/hop ingredients fall back to a valid union member instead of being trusted unchecked.
+
+**Tests added (Option B):** `packages/beerjson/src/index.test.ts` — 4 round-trip tests (recipe-level grist+hops+yeast+misc, mash, replaceMashInBeerJsonDocument with null clearing, validateMashBeforeSave smoke). 4/4 passing. The package now has its own `vitest` dev dep + `test` script (mirrors `packages/contracts`).
+
+- [x] Add 4 round-trip unit tests
+- [x] Triage 21 `any` in `packages/beerjson/src/index.ts`
+- [x] Tests green: 4/4
+- [x] Downstream typecheck: zero new beerjson-related errors in `apps/web` / `apps/native`
+- [x] Expanded `lint:packages-strict` to include `packages/beerjson`
+- [x] Updated TL;DR table; **boundary milestone reached: 11 of 11 packages gated; only `apps/**` and `services/**` have outstanding `any` debt**
 
 ### Phase 3 — `services/api/src/routes/**` and `services/api/src/services/**` (~328 `any` warnings)
 
-This is the highest-leverage slice for runtime safety. API request/response shapes are exactly where Zod schemas should be the source of truth.
+This is the highest-leverage slice for runtime safety: API request/response validation. Within HIGH-staged scope, Phase 3 tightens hand-rolled validators in place (same strategy as Phases 1 and 2). The separate "should we adopt Zod / Valibot / TypeBox here?" question is tracked as Phase 7 (see `docs/CONTRACTS-VALIDATION-STRATEGY.md`); migrating to a schema library is *not* in HIGH-staged scope and should not be conflated with type-tightening.
 
 - [ ] Add a per-route audit checklist (each route's `any` triage)
-- [ ] Introduce typed Zod-derived inference helpers if missing
+- [ ] Lift hand-rolled validators into shared helpers under `services/api/src/lib/validation/` where the same shape is validated in 2+ routes (avoids drift)
 - [ ] Add a new strict gate script `lint:api-routes-strict` once clean
 - [ ] Update this doc's TL;DR table
 

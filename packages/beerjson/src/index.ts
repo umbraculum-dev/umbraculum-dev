@@ -2,12 +2,29 @@ import { platoToSg, sgToPlato } from "@brewery/core";
 
 export { sgToPlato };
 
+type BeerJsonRecipe = Record<string, unknown>;
+
 type BeerJsonDocument = {
   beerjson: {
     version: number;
-    recipes: any[];
+    recipes: BeerJsonRecipe[];
   };
 };
+
+function isObject(v: unknown): v is Record<string, unknown> {
+  return v != null && typeof v === "object" && !Array.isArray(v);
+}
+
+function isFiniteNumber(v: unknown): v is number {
+  return typeof v === "number" && Number.isFinite(v);
+}
+
+function parseValueWithUnit(v: unknown): { unit: string | null; value: number | null } {
+  if (!isObject(v)) return { unit: null, value: null };
+  const unit = typeof v.unit === "string" ? v.unit : null;
+  const value = isFiniteNumber(v.value) ? v.value : null;
+  return { unit, value };
+}
 
 type GristPotential =
   | { kind: "ppg"; value: number }
@@ -321,15 +338,15 @@ function maltClassToGrainGroup(maltClass: EditorGristRow["maltClass"]) {
   }
 }
 
-function hopUseToTiming(use: EditorHopRow["use"], timeMinutes: number | null) {
-  const timing: any = { use: use === "dryhop" ? "add_to_fermentation" : "add_to_boil" };
+function hopUseToTiming(use: EditorHopRow["use"], timeMinutes: number | null): Record<string, unknown> {
+  const timing: Record<string, unknown> = { use: use === "dryhop" ? "add_to_fermentation" : "add_to_boil" };
   if (typeof timeMinutes === "number" && Number.isFinite(timeMinutes)) {
     timing.duration = { unit: "min", value: Math.max(0, Math.round(timeMinutes)) };
   }
   return timing;
 }
 
-function miscUseToTiming(use: EditorMiscRow["use"], timeMinutes: number | null) {
+function miscUseToTiming(use: EditorMiscRow["use"], timeMinutes: number | null): Record<string, unknown> {
   const useMap: Record<EditorMiscRow["use"], string> = {
     mash: "add_to_mash",
     boil: "add_to_boil",
@@ -337,7 +354,7 @@ function miscUseToTiming(use: EditorMiscRow["use"], timeMinutes: number | null) 
     secondary: "add_to_fermentation",
     bottling: "add_to_package",
   };
-  const timing: any = { use: useMap[use] ?? "add_to_boil" };
+  const timing: Record<string, unknown> = { use: useMap[use] ?? "add_to_boil" };
   if (typeof timeMinutes === "number" && Number.isFinite(timeMinutes)) {
     timing.duration = { unit: "min", value: Math.max(0, Math.round(timeMinutes)) };
   }
@@ -424,7 +441,7 @@ function buildCultureAddition(row: EditorYeastRow) {
   } else {
     amount = { unit: "pkg", value: 1 };
   }
-  const out: any = {
+  const out: Record<string, unknown> = {
     id: row.id,
     name: row.name,
     type: "ale",
@@ -437,8 +454,8 @@ function buildCultureAddition(row: EditorYeastRow) {
   return out;
 }
 
-function buildMiscAddition(row: EditorMiscRow) {
-  const out: any = {
+function buildMiscAddition(row: EditorMiscRow): Record<string, unknown> {
+  const out: Record<string, unknown> = {
     id: row.id,
     name: row.name,
     type: miscTypeToBeerJsonType(row.type),
@@ -460,8 +477,8 @@ const VALID_MASH_STEP_TYPES: EditorMashStepType[] = [
   "sparge",
 ];
 
-function buildMashStep(step: EditorMashStep): any {
-  const out: any = {
+function buildMashStep(step: EditorMashStep): Record<string, unknown> {
+  const out: Record<string, unknown> = {
     name: step.name,
     type: step.type,
     step_temperature: { unit: "C" as const, value: step.stepTemperatureC },
@@ -485,7 +502,7 @@ function buildMashStep(step: EditorMashStep): any {
   return out;
 }
 
-function buildMashProcedure(mash: EditorMash): any {
+function buildMashProcedure(mash: EditorMash): Record<string, unknown> | null {
   if (!mash || !mash.steps.length) return null;
   return {
     name: mash.name,
@@ -538,11 +555,13 @@ export function validateMashBeforeSave(mash: EditorMash): { ok: true } | { ok: f
 export function replaceMashInBeerJsonDocument(
   doc: unknown,
   mash: EditorMash | null,
-): { beerjson: { version: number; recipes: any[] } } {
-  const cloned = JSON.parse(JSON.stringify(doc)) as { beerjson?: { version?: number; recipes?: any[] } };
+): BeerJsonDocument {
+  const cloned = JSON.parse(JSON.stringify(doc)) as {
+    beerjson?: { version?: number; recipes?: BeerJsonRecipe[] };
+  };
   const r0 = cloned?.beerjson?.recipes?.[0];
   if (!r0 || typeof r0 !== "object") {
-    return cloned as { beerjson: { version: number; recipes: any[] } };
+    return cloned as BeerJsonDocument;
   }
   const mashProc = buildMashProcedure(mash);
   if (mashProc) {
@@ -550,7 +569,7 @@ export function replaceMashInBeerJsonDocument(
   } else {
     delete r0.mash;
   }
-  return cloned as { beerjson: { version: number; recipes: any[] } };
+  return cloned as BeerJsonDocument;
 }
 
 export function buildBeerJsonRecipeDocument(args: {
@@ -567,7 +586,7 @@ export function buildBeerJsonRecipeDocument(args: {
   const batchSizeLiters = typeof args.batchSizeLiters === "number" && Number.isFinite(args.batchSizeLiters) ? args.batchSizeLiters : 20;
   const efficiency = typeof args.brewhouseEfficiencyPercent === "number" && Number.isFinite(args.brewhouseEfficiencyPercent) ? args.brewhouseEfficiencyPercent : 75;
 
-  const recipe: any = {
+  const recipe: Record<string, unknown> = {
     name: args.name,
     type: "all grain",
     author: "brewery-app",
@@ -678,62 +697,78 @@ export function buildRecipeExtJsonFromEditorState(args: {
   };
 }
 
-function parseMashFromBeerJson(r0: any): EditorMash {
-  const mash = r0?.mash;
-  if (!mash || typeof mash !== "object") return null;
+function parseMashFromBeerJson(r0: unknown): EditorMash {
+  if (!isObject(r0)) return null;
+  if (!isObject(r0.mash)) return null;
+  const mash = r0.mash;
+
   const name = typeof mash.name === "string" ? mash.name.trim() : "";
+
+  const gt = parseValueWithUnit(mash.grain_temperature);
   const grainTemp =
-    mash.grain_temperature?.unit === "C" && typeof mash.grain_temperature?.value === "number" && Number.isFinite(mash.grain_temperature.value)
-      ? mash.grain_temperature.value
-      : mash.grain_temperature?.unit === "F"
-        ? ((mash.grain_temperature.value - 32) * 5) / 9
+    gt.unit === "C" && gt.value != null
+      ? gt.value
+      : gt.unit === "F" && gt.value != null
+        ? ((gt.value - 32) * 5) / 9
         : null;
   if (!name || grainTemp == null) return null;
 
   const stepsRaw = Array.isArray(mash.mash_steps) ? mash.mash_steps : [];
   const steps: EditorMashStep[] = stepsRaw
-    .map((s: any, idx: number) => {
-      const stepName = typeof s?.name === "string" ? s.name.trim() : "";
-      const typeRaw = typeof s?.type === "string" ? s.type : "";
-      const type: EditorMashStepType = VALID_MASH_STEP_TYPES.includes(typeRaw as EditorMashStepType) ? (typeRaw as EditorMashStepType) : "infusion";
+    .map((sUnknown: unknown, idx: number): EditorMashStep | null => {
+      if (!isObject(sUnknown)) return null;
+      const s = sUnknown;
+
+      const stepName = typeof s.name === "string" ? s.name.trim() : "";
+      const typeRaw = typeof s.type === "string" ? s.type : "";
+      const type: EditorMashStepType = VALID_MASH_STEP_TYPES.includes(typeRaw as EditorMashStepType)
+        ? (typeRaw as EditorMashStepType)
+        : "infusion";
+
+      const stTemp = parseValueWithUnit(s.step_temperature);
       const stepTemp =
-        s?.step_temperature?.unit === "C" && typeof s?.step_temperature?.value === "number" && Number.isFinite(s.step_temperature.value)
-          ? s.step_temperature.value
-          : s?.step_temperature?.unit === "F" && typeof s?.step_temperature?.value === "number"
-            ? ((s.step_temperature.value - 32) * 5) / 9
+        stTemp.unit === "C" && stTemp.value != null
+          ? stTemp.value
+          : stTemp.unit === "F" && stTemp.value != null
+            ? ((stTemp.value - 32) * 5) / 9
             : null;
-      const stepTime =
-        s?.step_time?.unit === "min" && typeof s?.step_time?.value === "number" && Number.isFinite(s.step_time.value)
-          ? s.step_time.value
-          : null;
+
+      const stTime = parseValueWithUnit(s.step_time);
+      const stepTime = stTime.unit === "min" && stTime.value != null ? stTime.value : null;
+
       if (!stepName || stepTemp == null || stepTime == null) return null;
 
+      const amt = parseValueWithUnit(s.amount);
       const amountL =
-        s?.amount?.unit === "l" && typeof s?.amount?.value === "number" && Number.isFinite(s.amount.value)
-          ? s.amount.value
-          : s?.amount?.unit === "ml"
-            ? s.amount.value / 1000
+        amt.unit === "l" && amt.value != null
+          ? amt.value
+          : amt.unit === "ml" && amt.value != null
+            ? amt.value / 1000
             : null;
-      const rampTimeMin =
-        s?.ramp_time?.unit === "min" && typeof s?.ramp_time?.value === "number" && Number.isFinite(s.ramp_time.value) && s.ramp_time.value >= 0
-          ? s.ramp_time.value
-          : null;
+
+      const ramp = parseValueWithUnit(s.ramp_time);
+      const rampTimeMin = ramp.unit === "min" && ramp.value != null && ramp.value >= 0 ? ramp.value : null;
+
+      const endT = parseValueWithUnit(s.end_temperature);
       const endTemp =
-        s?.end_temperature?.unit === "C" && typeof s?.end_temperature?.value === "number" && Number.isFinite(s.end_temperature.value)
-          ? s.end_temperature.value
-          : s?.end_temperature?.unit === "F" && typeof s?.end_temperature?.value === "number"
-            ? ((s.end_temperature.value - 32) * 5) / 9
+        endT.unit === "C" && endT.value != null
+          ? endT.value
+          : endT.unit === "F" && endT.value != null
+            ? ((endT.value - 32) * 5) / 9
             : null;
+
+      const inf = parseValueWithUnit(s.infuse_temperature);
       const infuseTemp =
-        s?.infuse_temperature?.unit === "C" && typeof s?.infuse_temperature?.value === "number" && Number.isFinite(s.infuse_temperature.value)
-          ? s.infuse_temperature.value
-          : s?.infuse_temperature?.unit === "F" && typeof s?.infuse_temperature?.value === "number"
-            ? ((s.infuse_temperature.value - 32) * 5) / 9
+        inf.unit === "C" && inf.value != null
+          ? inf.value
+          : inf.unit === "F" && inf.value != null
+            ? ((inf.value - 32) * 5) / 9
             : null;
-      const description = typeof s?.description === "string" ? s.description.trim() || null : null;
+
+      const description = typeof s.description === "string" ? s.description.trim() || null : null;
 
       return {
-        id: typeof s?.id === "string" ? s.id : `mash-step-${idx}`,
+        id: typeof s.id === "string" ? s.id : `mash-step-${idx}`,
         name: stepName,
         type,
         stepTemperatureC: stepTemp,
@@ -743,9 +778,9 @@ function parseMashFromBeerJson(r0: any): EditorMash {
         endTemperatureC: endTemp ?? undefined,
         infuseTemperatureC: infuseTemp ?? undefined,
         description: description ?? undefined,
-      } as EditorMashStep;
+      };
     })
-    .filter(Boolean) as EditorMashStep[];
+    .filter((s): s is EditorMashStep => s !== null);
 
   if (steps.length === 0) return null;
 
@@ -785,51 +820,62 @@ export function editorStateFromBeerJson(doc: unknown): {
   miscRows: EditorMiscRow[];
   mash: EditorMash;
 } {
-  const d = (doc ?? {}) as any;
-  const r0 = d?.beerjson?.recipes?.[0];
-  const ing = r0?.ingredients ?? {};
+  const d = isObject(doc) ? doc : {};
+  const beerjson = isObject(d.beerjson) ? d.beerjson : {};
+  const recipesArr = Array.isArray(beerjson.recipes) ? beerjson.recipes : [];
+  const r0 = isObject(recipesArr[0]) ? recipesArr[0] : {};
+  const ing = isObject(r0.ingredients) ? r0.ingredients : {};
 
-  const fermentables = Array.isArray(ing?.fermentable_additions) ? ing.fermentable_additions : [];
-  const hops = Array.isArray(ing?.hop_additions) ? ing.hop_additions : [];
-  const cultures = Array.isArray(ing?.culture_additions) ? ing.culture_additions : [];
-  const misc = Array.isArray(ing?.miscellaneous_additions) ? ing.miscellaneous_additions : [];
+  const fermentables = Array.isArray(ing.fermentable_additions) ? ing.fermentable_additions : [];
+  const hops = Array.isArray(ing.hop_additions) ? ing.hop_additions : [];
+  const cultures = Array.isArray(ing.culture_additions) ? ing.culture_additions : [];
+  const misc = Array.isArray(ing.miscellaneous_additions) ? ing.miscellaneous_additions : [];
 
   const gristRows: EditorGristRow[] = fermentables
-    .map((f: any) => {
-      const id = typeof f?.id === "string" ? f.id : `${Date.now()}-${Math.random()}`;
-      const name = typeof f?.name === "string" ? f.name : "";
-      if (!name) return null;
-      const amountKg =
-        f?.amount?.unit === "kg" ? safeNum(f?.amount?.value, 0) : f?.amount?.unit === "g" ? safeNum(f?.amount?.value, 0) / 1000 : 0;
-      const colorLovibond =
-        f?.color?.unit === "Lovi" && typeof f?.color?.value === "number" && Number.isFinite(f.color.value) && f.color.value >= 0
-          ? safeNum(f.color.value, 0)
-          : null;
+    .map((fUnknown: unknown): EditorGristRow | null => {
+      if (!isObject(fUnknown)) return null;
+      const f = fUnknown;
 
+      const id = typeof f.id === "string" ? f.id : `${Date.now()}-${Math.random()}`;
+      const name = typeof f.name === "string" ? f.name : "";
+      if (!name) return null;
+
+      const amt = parseValueWithUnit(f.amount);
+      const amountKg =
+        amt.unit === "kg" ? safeNum(amt.value, 0) : amt.unit === "g" ? safeNum(amt.value, 0) / 1000 : 0;
+
+      const color = parseValueWithUnit(f.color);
+      const colorLovibond =
+        color.unit === "Lovi" && color.value != null && color.value >= 0 ? color.value : null;
+
+      const yieldObj = isObject(f.yield) ? f.yield : null;
+      const yieldPotential = parseValueWithUnit(yieldObj?.potential);
+      const yieldFineGrind = parseValueWithUnit(yieldObj?.fine_grind);
       const potential: GristPotential =
-        f?.yield?.potential?.unit === "sg" && typeof f?.yield?.potential?.value === "number"
-          ? { kind: "sg", value: f.yield.potential.value }
-          : f?.yield?.fine_grind?.unit === "%" && typeof f?.yield?.fine_grind?.value === "number"
-            ? { kind: "yieldPercent", value: f.yield.fine_grind.value }
+        yieldPotential.unit === "sg" && yieldPotential.value != null
+          ? { kind: "sg", value: yieldPotential.value }
+          : yieldFineGrind.unit === "%" && yieldFineGrind.value != null
+            ? { kind: "yieldPercent", value: yieldFineGrind.value }
             : null;
 
-      const grainGroup = typeof f?.grain_group === "string" ? f.grain_group : "";
+      const grainGroup = typeof f.grain_group === "string" ? f.grain_group : "";
       const maltClass: EditorGristRow["maltClass"] =
         grainGroup === "roasted" ? "roast" : grainGroup === "caramel" ? "crystal" : "base";
 
-      const timingUseRaw = typeof f?.timing?.use === "string" ? f.timing.use : "";
+      const timing = isObject(f.timing) ? f.timing : null;
+      const timingUseRaw = typeof timing?.use === "string" ? timing.use : "";
       const timingUse: EditorGristRow["timingUse"] =
         timingUseRaw === "add_to_boil" || timingUseRaw === "add_to_fermentation" || timingUseRaw === "add_to_package"
           ? "add_to_boil"
           : "add_to_mash";
 
-      const lateAddition = f?.brewery_app_late_addition === true;
+      const lateAddition = f.brewery_app_late_addition === true;
 
       return {
         id,
         ingredientId: null,
         name,
-        producer: typeof f?.producer === "string" ? f.producer : null,
+        producer: typeof f.producer === "string" ? f.producer : null,
         group: grainGroup || null,
         mashDiPh: null,
         mashTaToPh57_mEqPerKg: null,
@@ -840,58 +886,73 @@ export function editorStateFromBeerJson(doc: unknown): {
         maltClass,
         timingUse,
         lateAddition,
-      } as EditorGristRow;
+      };
     })
-    .filter(Boolean) as EditorGristRow[];
+    .filter((r): r is EditorGristRow => r !== null);
 
+  const VALID_HOP_FORMS = ["extract", "leaf", "leaf (wet)", "pellet", "powder", "plug"] as const;
   const hopsRows: EditorHopRow[] = hops
-    .map((h: any) => {
-      const id = typeof h?.id === "string" ? h.id : `${Date.now()}-${Math.random()}`;
-      const name = typeof h?.name === "string" ? h.name : "";
+    .map((hUnknown: unknown): EditorHopRow | null => {
+      if (!isObject(hUnknown)) return null;
+      const h = hUnknown;
+
+      const id = typeof h.id === "string" ? h.id : `${Date.now()}-${Math.random()}`;
+      const name = typeof h.name === "string" ? h.name : "";
       if (!name) return null;
-      const formRaw = typeof h?.form === "string" ? h.form : "";
-      const form: EditorHopRow["form"] =
-        formRaw === "extract" ||
-        formRaw === "leaf" ||
-        formRaw === "leaf (wet)" ||
-        formRaw === "pellet" ||
-        formRaw === "powder" ||
-        formRaw === "plug"
-          ? (formRaw as any)
-          : null;
+
+      const formRaw = typeof h.form === "string" ? h.form : "";
+      const form: EditorHopRow["form"] = (VALID_HOP_FORMS as readonly string[]).includes(formRaw)
+        ? (formRaw as EditorHopRow["form"])
+        : null;
+
+      const amt = parseValueWithUnit(h.amount);
       const amountGrams =
-        h?.amount?.unit === "g" ? safeNum(h?.amount?.value, 0) : h?.amount?.unit === "kg" ? safeNum(h?.amount?.value, 0) * 1000 : 0;
-      const alphaAcidPercent = h?.alpha_acid?.unit === "%" ? safeNum(h?.alpha_acid?.value, 0) : null;
-      const timingUse = typeof h?.timing?.use === "string" ? h.timing.use : "";
-      const savedUseRaw = typeof h?.brewery_app_use === "string" ? h.brewery_app_use : "";
+        amt.unit === "g" ? safeNum(amt.value, 0) : amt.unit === "kg" ? safeNum(amt.value, 0) * 1000 : 0;
+
+      const alpha = parseValueWithUnit(h.alpha_acid);
+      const alphaAcidPercent = alpha.unit === "%" ? safeNum(alpha.value, 0) : null;
+
+      const timing = isObject(h.timing) ? h.timing : null;
+      const timingUse = typeof timing?.use === "string" ? timing.use : "";
+      const savedUseRaw = typeof h.brewery_app_use === "string" ? h.brewery_app_use : "";
       const savedUse: EditorHopRow["use"] | null =
         savedUseRaw === "boil" || savedUseRaw === "whirlpool" || savedUseRaw === "dryhop" ? savedUseRaw : null;
 
       const use: EditorHopRow["use"] =
         timingUse === "add_to_fermentation" ? "dryhop" : savedUse != null ? savedUse : "boil";
-      const timeMinutes = h?.timing?.duration?.unit === "min" ? safeNum(h?.timing?.duration?.value, 0) : null;
+
+      const duration = parseValueWithUnit(timing?.duration);
+      const timeMinutes = duration.unit === "min" ? safeNum(duration.value, 0) : null;
+
       return {
         id,
         ingredientId: null,
         name,
-        country: typeof h?.origin === "string" ? h.origin : null,
+        country: typeof h.origin === "string" ? h.origin : null,
         form,
         amountGrams,
         alphaAcidPercent,
         use,
         timeMinutes,
-      } as EditorHopRow;
+      };
     })
-    .filter(Boolean) as EditorHopRow[];
+    .filter((r): r is EditorHopRow => r !== null);
 
   const yeastRows: EditorYeastRow[] = cultures
-    .map((c: any) => {
-      const id = typeof c?.id === "string" ? c.id : `${Date.now()}-${Math.random()}`;
-      const name = typeof c?.name === "string" ? c.name : "";
+    .map((cUnknown: unknown): EditorYeastRow | null => {
+      if (!isObject(cUnknown)) return null;
+      const c = cUnknown;
+
+      const id = typeof c.id === "string" ? c.id : `${Date.now()}-${Math.random()}`;
+      const name = typeof c.name === "string" ? c.name : "";
       if (!name) return null;
-      const att = c?.attenuation?.unit === "%" ? safeNum(c?.attenuation?.value, 0) : null;
-      const amtUnit = typeof c?.amount?.unit === "string" ? c.amount.unit : "";
-      const amtVal = typeof c?.amount?.value === "number" && Number.isFinite(c.amount.value) ? c.amount.value : null;
+
+      const attenuation = parseValueWithUnit(c.attenuation);
+      const att = attenuation.unit === "%" ? safeNum(attenuation.value, 0) : null;
+
+      const amt = parseValueWithUnit(c.amount);
+      const amtUnit = amt.unit ?? "";
+      const amtVal = amt.value;
       const amountL = amtUnit === "l" && amtVal != null && amtVal >= 0 ? amtVal : null;
       const amountKg =
         amtUnit === "kg" && amtVal != null && amtVal >= 0
@@ -899,29 +960,44 @@ export function editorStateFromBeerJson(doc: unknown): {
           : amtUnit === "g" && amtVal != null && amtVal >= 0
             ? amtVal / 1000
             : null;
+
       return {
         id,
         ingredientId: null,
         name,
-        lab: typeof c?.producer === "string" ? c.producer : null,
-        productId: typeof c?.product_id === "string" ? c.product_id : null,
+        lab: typeof c.producer === "string" ? c.producer : null,
+        productId: typeof c.product_id === "string" ? c.product_id : null,
         attenuationMin: att,
         attenuationMax: att,
         amountL: amountL != null ? amountL : null,
         amountKg: amountKg != null ? amountKg : null,
-      } as EditorYeastRow;
+      };
     })
-    .filter(Boolean) as EditorYeastRow[];
+    .filter((r): r is EditorYeastRow => r !== null);
 
+  const VALID_MISC_TYPES = ["spice", "fining", "water_agent", "herb", "flavor", "other"] as const;
   const miscRows: EditorMiscRow[] = misc
-    .map((m: any) => {
-      const id = typeof m?.id === "string" ? m.id : `${Date.now()}-${Math.random()}`;
-      const name = typeof m?.name === "string" ? m.name : "";
+    .map((mUnknown: unknown): EditorMiscRow | null => {
+      if (!isObject(mUnknown)) return null;
+      const m = mUnknown;
+
+      const id = typeof m.id === "string" ? m.id : `${Date.now()}-${Math.random()}`;
+      const name = typeof m.name === "string" ? m.name : "";
       if (!name) return null;
-      const amountIsWeight = m?.amount?.unit === "kg" || m?.amount?.unit === "g";
+
+      const amt = parseValueWithUnit(m.amount);
+      const amountIsWeight = amt.unit === "kg" || amt.unit === "g";
       const amount =
-        m?.amount?.unit === "kg" ? safeNum(m?.amount?.value, 0) : m?.amount?.unit === "g" ? safeNum(m?.amount?.value, 0) / 1000 : m?.amount?.unit === "l" ? safeNum(m?.amount?.value, 0) : 0;
-      const timingUse = typeof m?.timing?.use === "string" ? m.timing.use : "";
+        amt.unit === "kg"
+          ? safeNum(amt.value, 0)
+          : amt.unit === "g"
+            ? safeNum(amt.value, 0) / 1000
+            : amt.unit === "l"
+              ? safeNum(amt.value, 0)
+              : 0;
+
+      const timing = isObject(m.timing) ? m.timing : null;
+      const timingUse = typeof timing?.use === "string" ? timing.use : "";
       const use: EditorMiscRow["use"] =
         timingUse === "add_to_mash"
           ? "mash"
@@ -930,9 +1006,17 @@ export function editorStateFromBeerJson(doc: unknown): {
             : timingUse === "add_to_package"
               ? "bottling"
               : "boil";
-      const timeMinutes = m?.timing?.duration?.unit === "min" ? safeNum(m?.timing?.duration?.value, 0) : null;
-      const typeRaw = typeof m?.type === "string" ? m.type : "other";
-      const type: EditorMiscRow["type"] = typeRaw === "water agent" ? "water_agent" : typeRaw;
+
+      const duration = parseValueWithUnit(timing?.duration);
+      const timeMinutes = duration.unit === "min" ? safeNum(duration.value, 0) : null;
+
+      const typeRaw = typeof m.type === "string" ? m.type : "other";
+      const type: EditorMiscRow["type"] =
+        typeRaw === "water agent"
+          ? "water_agent"
+          : (VALID_MISC_TYPES as readonly string[]).includes(typeRaw)
+            ? (typeRaw as EditorMiscRow["type"])
+            : "other";
       return {
         id,
         ingredientId: null,
@@ -942,11 +1026,11 @@ export function editorStateFromBeerJson(doc: unknown): {
         timeMinutes,
         amount,
         amountIsWeight,
-        useFor: typeof m?.use_for === "string" ? m.use_for : null,
-        notes: typeof m?.notes === "string" ? m.notes : null,
-      } as EditorMiscRow;
+        useFor: typeof m.use_for === "string" ? m.use_for : null,
+        notes: typeof m.notes === "string" ? m.notes : null,
+      };
     })
-    .filter(Boolean) as EditorMiscRow[];
+    .filter((r): r is EditorMiscRow => r !== null);
 
   const mash = parseMashFromBeerJson(r0);
 
