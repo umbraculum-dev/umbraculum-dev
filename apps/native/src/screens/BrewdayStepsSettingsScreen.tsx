@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
+import type { RootStackParamList } from "../navigation/types";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
 import { TextArea } from "tamagui";
 
@@ -69,7 +70,8 @@ const BREWING_TYPE_OPTIONS = [
 
 function newId() {
   try {
-    return (globalThis as any).crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+    const g = globalThis as { crypto?: { randomUUID?: () => string } };
+    return g.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
   } catch {
     return `${Date.now()}-${Math.random()}`;
   }
@@ -195,7 +197,7 @@ function PickerField(props: {
 }
 
 export function BrewdayStepsSettingsScreen() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const auth = useAuth();
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
@@ -230,7 +232,10 @@ export function BrewdayStepsSettingsScreen() {
   const [openSections, setOpenSections] = useState<string[]>(["recap", "brewingType", "sections"]);
 
   const sectionOptions = useMemo(() => {
-    const preset = PRESET_KEYS.map((k) => ({ value: k, label: t(`presetSections.${k}` as any) }));
+    const preset = PRESET_KEYS.map((k) => ({
+      value: k,
+      label: t(`presetSections.${k}` as Parameters<typeof t>[0]),
+    }));
     const custom = (sections.customSections ?? []).map((s) => ({ value: s.id, label: s.name }));
     return [...preset, ...custom];
   }, [sections.customSections, t]);
@@ -249,17 +254,26 @@ export function BrewdayStepsSettingsScreen() {
       .then((res) => {
         if (cancelled) return;
         if (!res.ok) {
-          const err = (res.data as any)?.error;
-          const msg = typeof err === "string" ? err : err?.message ?? "Failed to load";
+          const errVal = (res.data as { error?: unknown })?.error;
+          const errObj = errVal && typeof errVal === "object" ? (errVal as { message?: unknown }) : null;
+          const msg = typeof errVal === "string" ? errVal : (typeof errObj?.message === "string" ? errObj.message : "Failed to load");
           setLoadError(msg);
           setLoading(false);
           return;
         }
-        const s = (res.data as any)?.settings;
+        const s = (res.data as {
+          settings?: {
+            brewingType?: unknown;
+            sections?: BrewdaySectionConfig;
+            defaultSteps?: unknown;
+            customSteps?: BrewdayStep[];
+            notes?: unknown;
+          } | null;
+        })?.settings;
         if (s) {
           if (s.brewingType != null) setBrewingType(String(s.brewingType));
           setSections(s.sections ?? { presetExcludes: {}, customSections: [], customBrewingMethods: [] });
-          const loadedDefault = Array.isArray(s.defaultSteps) ? s.defaultSteps : [];
+          const loadedDefault: BrewdayStep[] = Array.isArray(s.defaultSteps) ? (s.defaultSteps as BrewdayStep[]) : [];
           setDefaultSteps(loadedDefault.length > 0 ? loadedDefault : DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
           setCustomSteps(Array.isArray(s.customSteps) ? s.customSteps : []);
           setBrewdayNotes(typeof s.notes === "string" ? s.notes : "");
@@ -297,8 +311,9 @@ export function BrewdayStepsSettingsScreen() {
         notes: brewdayNotes || null,
       });
       if (!res.ok) {
-        const err = (res.data as any)?.error;
-        const msg = typeof err === "string" ? err : err?.message ?? "Save failed";
+        const errVal = (res.data as { error?: unknown })?.error;
+        const errObj = errVal && typeof errVal === "object" ? (errVal as { message?: unknown }) : null;
+        const msg = typeof errVal === "string" ? errVal : (typeof errObj?.message === "string" ? errObj.message : "Save failed");
         setSaveError(msg);
         return;
       }
@@ -412,7 +427,7 @@ export function BrewdayStepsSettingsScreen() {
                   value={brewingType}
                   options={[
                     { value: "", label: "—" },
-                    ...BREWING_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey as any) })),
+                    ...BREWING_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey as Parameters<typeof t>[0]) })),
                     ...(sections.customBrewingMethods ?? []).map((m) => ({ value: m, label: m })),
                   ]}
                   onChange={setBrewingType}
@@ -451,7 +466,7 @@ export function BrewdayStepsSettingsScreen() {
                   {PRESET_KEYS.map((k) => (
                     <CheckboxRow
                       key={k}
-                      label={`${t(`presetSections.${k}` as any)} · ${t("exclude")}`}
+                      label={`${t(`presetSections.${k}` as Parameters<typeof t>[0])} · ${t("exclude")}`}
                       checked={sections.presetExcludes?.[k] === true}
                       onChange={(next) =>
                         setSections((prev) => ({

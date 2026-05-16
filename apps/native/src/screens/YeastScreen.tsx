@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import {
@@ -33,6 +33,8 @@ import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
+import { asRecord } from "../lib/typeGuards";
+import type { RootStackParamList } from "../navigation/types";
 import { RemoteImage } from "../media/RemoteImage";
 
 function formatFixed(locale: string, value: number, fractionDigits: number): string {
@@ -145,9 +147,9 @@ type Recipe = {
 };
 
 export function YeastScreen() {
-  const route = useRoute<any>();
-  const navigation = useNavigation<any>();
-  const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
+  const route = useRoute<RouteProp<RootStackParamList, "RecipeYeast">>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const recipeId = route.params?.recipeId ?? "";
 
   const auth = useAuth();
   const baseUrl = getApiBaseUrl();
@@ -214,15 +216,16 @@ export function YeastScreen() {
     try {
       const res = await api.get(`/api/recipes/${recipeId}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const r = (res.data as any).recipe as Recipe;
+      const r = (res.data as { recipe: Recipe }).recipe;
       setRecipe(r);
 
-      const ext = (r as any).recipeExtJson;
-      const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
-      const yeastOverridesRaw = ext && typeof ext === "object" ? (ext as any).yeastAttenuationOverridesPercent : null;
-      if (yeastOverridesRaw && typeof yeastOverridesRaw === "object") {
+      const extRec = asRecord(r.recipeExtJson);
+      const linksRec = asRecord(extRec?.ingredientLinks);
+      const yeastLinks = asRecord(linksRec?.yeast);
+      const yeastOverridesRaw = asRecord(extRec?.yeastAttenuationOverridesPercent);
+      if (yeastOverridesRaw) {
         const out: Record<string, string> = {};
-        for (const [k, v] of Object.entries(yeastOverridesRaw as any)) {
+        for (const [k, v] of Object.entries(yeastOverridesRaw)) {
           if (typeof k === "string" && typeof v === "number" && Number.isFinite(v)) out[k] = String(v);
         }
         setYeastAttenuationOverrides(out);
@@ -230,35 +233,35 @@ export function YeastScreen() {
         setYeastAttenuationOverrides({});
       }
 
-      const yeastPitchRateRaw = ext && typeof ext === "object" ? (ext as any).yeastPitchRateOverrides : null;
-      const yeastFermentationTempRaw = ext && typeof ext === "object" ? (ext as any).yeastFermentationTempOverrides : null;
-      const yeastOxygenationRaw = ext && typeof ext === "object" ? (ext as any).yeastOxygenationOverrides : null;
-      const yeastDiacetylRestRaw = ext && typeof ext === "object" ? (ext as any).yeastDiacetylRestOverrides : null;
-      const yeastFormatRaw = ext && typeof ext === "object" ? (ext as any).yeastFormatOverrides ?? (ext as any).yeastTypeOverrides : null;
-      const yeastSpeciesRaw = ext && typeof ext === "object" ? (ext as any).yeastSpeciesOverrides : null;
-      const yeastNeedsPropagationRaw = ext && typeof ext === "object" ? (ext as any).yeastNeedsPropagationOverrides : null;
-      const yeastManualCellCountRaw = ext && typeof ext === "object" ? (ext as any).yeastManualCellCountOverrides : null;
+      const yeastPitchRateRaw = asRecord(extRec?.yeastPitchRateOverrides);
+      const yeastFermentationTempRaw = asRecord(extRec?.yeastFermentationTempOverrides);
+      const yeastOxygenationRaw = asRecord(extRec?.yeastOxygenationOverrides);
+      const yeastDiacetylRestRaw = asRecord(extRec?.yeastDiacetylRestOverrides);
+      const yeastFormatRaw = asRecord(extRec?.yeastFormatOverrides ?? extRec?.yeastTypeOverrides);
+      const yeastSpeciesRaw = asRecord(extRec?.yeastSpeciesOverrides);
+      const yeastNeedsPropagationRaw = asRecord(extRec?.yeastNeedsPropagationOverrides);
+      const yeastManualCellCountRaw = asRecord(extRec?.yeastManualCellCountOverrides);
 
-      if (!(r as any).beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
-      const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
+      if (!r.beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
+      const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
       setGristRows(s.gristRows);
       setHopsRows(s.hopsRows);
       setMiscRows(s.miscRows);
       setMash(s.mash);
 
-      const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
+      const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, r.recipeExtJson);
       setYeastRows(
         baseYeast.map((row) => {
-          const pitchRate = yeastPitchRateRaw && typeof yeastPitchRateRaw === "object" && typeof yeastPitchRateRaw[row.id] === "string" ? (yeastPitchRateRaw[row.id] as string) : null;
-          const fermentationTempC = yeastFermentationTempRaw && typeof yeastFermentationTempRaw === "object" && typeof yeastFermentationTempRaw[row.id] === "number" && Number.isFinite(yeastFermentationTempRaw[row.id]) ? (yeastFermentationTempRaw[row.id] as number) : null;
-          const oxygenation = yeastOxygenationRaw && typeof yeastOxygenationRaw === "object" && (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no") ? (yeastOxygenationRaw[row.id] as "yes" | "no") : null;
-          const diacetylRest = yeastDiacetylRestRaw && typeof yeastDiacetylRestRaw === "object" && (yeastDiacetylRestRaw[row.id] === "yes" || yeastDiacetylRestRaw[row.id] === "no") ? (yeastDiacetylRestRaw[row.id] as "yes" | "no") : null;
-          const format = yeastFormatRaw && typeof yeastFormatRaw === "object" && (yeastFormatRaw[row.id] === "dry" || yeastFormatRaw[row.id] === "liquid" || yeastFormatRaw[row.id] === "slurry") ? (yeastFormatRaw[row.id] as "dry" | "liquid" | "slurry") : null;
+          const pitchRate = yeastPitchRateRaw && typeof yeastPitchRateRaw[row.id] === "string" ? (yeastPitchRateRaw[row.id] as string) : null;
+          const fermentationTempC = yeastFermentationTempRaw && typeof yeastFermentationTempRaw[row.id] === "number" && Number.isFinite(yeastFermentationTempRaw[row.id] as number) ? (yeastFermentationTempRaw[row.id] as number) : null;
+          const oxygenation = yeastOxygenationRaw && (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no") ? (yeastOxygenationRaw[row.id] as "yes" | "no") : null;
+          const diacetylRest = yeastDiacetylRestRaw && (yeastDiacetylRestRaw[row.id] === "yes" || yeastDiacetylRestRaw[row.id] === "no") ? (yeastDiacetylRestRaw[row.id] as "yes" | "no") : null;
+          const format = yeastFormatRaw && (yeastFormatRaw[row.id] === "dry" || yeastFormatRaw[row.id] === "liquid" || yeastFormatRaw[row.id] === "slurry") ? (yeastFormatRaw[row.id] as "dry" | "liquid" | "slurry") : null;
           const validSpecies = ["saccharomyces_cerevisiae", "saccharomyces_pastorianus", "brettanomyces", "diastaticus", "other"] as const;
-          const speciesRaw = yeastSpeciesRaw && typeof yeastSpeciesRaw === "object" ? yeastSpeciesRaw[row.id] : null;
-          const species = typeof speciesRaw === "string" && validSpecies.includes(speciesRaw as any) ? speciesRaw : null;
-          const needsPropagation = yeastNeedsPropagationRaw && typeof yeastNeedsPropagationRaw === "object" && (yeastNeedsPropagationRaw[row.id] === "yes" || yeastNeedsPropagationRaw[row.id] === "no") ? (yeastNeedsPropagationRaw[row.id] as "yes" | "no") : null;
-          const manualRaw = yeastManualCellCountRaw && typeof yeastManualCellCountRaw === "object" && yeastManualCellCountRaw[row.id] && typeof yeastManualCellCountRaw[row.id] === "object" ? (yeastManualCellCountRaw[row.id] as { dilutionFactor?: number; aliveCells?: number; totalCells?: number }) : null;
+          const speciesRaw = yeastSpeciesRaw ? yeastSpeciesRaw[row.id] : null;
+          const species = typeof speciesRaw === "string" && (validSpecies as ReadonlyArray<string>).includes(speciesRaw) ? (speciesRaw as (typeof validSpecies)[number]) : null;
+          const needsPropagation = yeastNeedsPropagationRaw && (yeastNeedsPropagationRaw[row.id] === "yes" || yeastNeedsPropagationRaw[row.id] === "no") ? (yeastNeedsPropagationRaw[row.id] as "yes" | "no") : null;
+          const manualRaw = yeastManualCellCountRaw && asRecord(yeastManualCellCountRaw[row.id]) ? (yeastManualCellCountRaw[row.id] as { dilutionFactor?: number; aliveCells?: number; totalCells?: number }) : null;
           const dilutionFactor = manualRaw?.dilutionFactor === 200 || manualRaw?.dilutionFactor === 2000 ? (manualRaw.dilutionFactor as 200 | 2000) : undefined;
           const aliveCells = typeof manualRaw?.aliveCells === "number" && Number.isFinite(manualRaw.aliveCells) && manualRaw.aliveCells > 0 ? manualRaw.aliveCells : undefined;
           const totalCells = typeof manualRaw?.totalCells === "number" && Number.isFinite(manualRaw.totalCells) && manualRaw.totalCells > 0 ? manualRaw.totalCells : undefined;
@@ -266,7 +269,7 @@ export function YeastScreen() {
 
           return {
             ...row,
-            ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+            ingredientId: typeof yeastLinks?.[row.id] === "string" ? (yeastLinks[row.id] as string) : null,
             pitchRate: pitchRate ?? undefined,
             fermentationTempC: fermentationTempC ?? undefined,
             oxygenation: oxygenation ?? undefined,
@@ -296,7 +299,7 @@ export function YeastScreen() {
       const q = yeastQuery.trim() ? `?query=${encodeURIComponent(yeastQuery.trim())}` : "";
       const res = await api.get(`/api/ingredients/yeasts${q}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as any)?.items ?? [];
+      const items = (res.data as { items?: unknown })?.items;
       setYeastResults(Array.isArray(items) ? items : []);
     } catch {
       setYeastResults([]);
@@ -359,8 +362,8 @@ export function YeastScreen() {
     setSaveStatus(null);
     setLowViabilityWarning(null);
     try {
-      const extBase = (recipe as any)?.recipeExtJson;
-      const extBaseForSave = extBase && typeof extBase === "object" && !Array.isArray(extBase) ? { ...(extBase as any) } : ({} as any);
+      const baseRec = asRecord(recipe?.recipeExtJson);
+      const extBaseForSave: Record<string, unknown> = baseRec ? { ...baseRec } : {};
 
       const yeastAttenuationOverridesPercent = Object.fromEntries(
         Object.entries(yeastAttenuationOverrides)
@@ -404,20 +407,20 @@ export function YeastScreen() {
       const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
         name: recipe.name ?? "",
         notes: recipe.notes || null,
-        gristRows: gristRows as any,
-        hopsRows: hopsRows as any,
-        yeastRows: yeastRows as any,
-        miscRows: miscRows as any,
+        gristRows,
+        hopsRows,
+        yeastRows,
+        miscRows,
         mash: mash ?? undefined,
         batchSizeLiters,
         brewhouseEfficiencyPercent,
       });
 
       const recipeExtJson = buildRecipeExtJsonFromEditorState({
-        gristRows: gristRows as any,
-        hopsRows: hopsRows as any,
-        yeastRows: yeastRows as any,
-        miscRows: miscRows as any,
+        gristRows,
+        hopsRows,
+        yeastRows,
+        miscRows,
         extBase: extBaseForSave,
       });
 
@@ -432,7 +435,7 @@ export function YeastScreen() {
 
       const reload = await api.get(`/api/recipes/${recipeId}`);
       if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as any).recipe as Recipe;
+      const r = (reload.data as { recipe: Recipe }).recipe;
       setRecipe(r);
       setSaveStatus(t("status.saved"));
 
@@ -451,12 +454,9 @@ export function YeastScreen() {
     }
   };
 
-  const batchSizeForCells =
-    recipe?.recipeExtJson && typeof recipe.recipeExtJson === "object" && !Array.isArray(recipe.recipeExtJson)
-      ? (recipe.recipeExtJson as any).batchSizeLiters
-      : null;
-  const analysisKettleVolume = recipe?.analysis && typeof recipe.analysis === "object" ? (recipe.analysis as any).result?.kettleVolumeLiters : null;
-  const analysisOg = recipe?.analysis && typeof recipe.analysis === "object" ? (recipe.analysis as any).result?.ogEstimatedSg : null;
+  const batchSizeForCells = asRecord(recipe?.recipeExtJson)?.batchSizeLiters ?? null;
+  const analysisKettleVolume = recipe?.analysis?.result?.kettleVolumeLiters ?? null;
+  const analysisOg = recipe?.analysis?.result?.ogEstimatedSg ?? null;
   const batchSizeForCellsVal =
     typeof batchSizeForCells === "number" && Number.isFinite(batchSizeForCells) && batchSizeForCells > 0
       ? batchSizeForCells
@@ -877,7 +877,7 @@ export function YeastScreen() {
                             </View>
                           </View>
                         ) : null}
-                        <PickerField label={t("yeastSpeciesLabel")} value={r.species ?? ""} options={[{ value: "", label: "—" }, ...SPECIES_OPTIONS]} onChange={(v) => updateYeastRow(r.id, { species: v && ["saccharomyces_cerevisiae", "saccharomyces_pastorianus", "brettanomyces", "diastaticus", "other"].includes(v) ? v as any : null })} closeLabel={tCommon("close")} />
+                        <PickerField label={t("yeastSpeciesLabel")} value={r.species ?? ""} options={[{ value: "", label: "—" }, ...SPECIES_OPTIONS]} onChange={(v) => updateYeastRow(r.id, { species: v && ["saccharomyces_cerevisiae", "saccharomyces_pastorianus", "brettanomyces", "diastaticus", "other"].includes(v) ? (v as NonNullable<EditorYeastRow["species"]>) : null })} closeLabel={tCommon("close")} />
                         <PickerField label={t("yeastNeedsPropagationLabel")} value={r.needsPropagation ?? ""} options={[{ value: "", label: "—" }, ...YES_NO_OPTIONS.map((o) => ({ value: o.value, label: o.value === "yes" ? t("yeastNeedsPropagationYes") : t("yeastNeedsPropagationNo") }))]} onChange={(v) => updateYeastRow(r.id, { needsPropagation: v === "yes" || v === "no" ? v : null })} closeLabel={tCommon("close")} />
                           </View>
                         </Accordion.Content>

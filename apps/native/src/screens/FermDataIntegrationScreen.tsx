@@ -100,7 +100,7 @@ export function FermDataIntegrationScreen() {
 
       const meRes = await api.get("/api/auth/me");
       if (!meRes.ok) throw new Error(typeof meRes.data === "string" ? meRes.data : JSON.stringify(meRes.data));
-      const me = meRes.data as any;
+      const me = meRes.data as { activeWorkspaceId?: unknown } | undefined;
       const workspaceId = typeof me?.activeWorkspaceId === "string" ? me.activeWorkspaceId : null;
       if (!workspaceId) throw new Error("No active workspace selected");
 
@@ -126,8 +126,10 @@ export function FermDataIntegrationScreen() {
       >;
       const nextDevices = { tilt: [], ispindel: [], rapt: [] } as Record<IntegrationKind, IntegrationDevice[]>;
       INTEGRATION_KINDS.forEach((kind, idx) => {
-        nextIntegrations[kind] = (integrationsRes[idx].data as any).integration ?? null;
-        nextDevices[kind] = (devicesRes[idx].data as any).devices ?? [];
+        const integration = (integrationsRes[idx].data as { integration?: unknown })?.integration;
+        nextIntegrations[kind] = (integration ?? null) as IntegrationSummary | null;
+        const devices = (devicesRes[idx].data as { devices?: unknown })?.devices;
+        nextDevices[kind] = Array.isArray(devices) ? (devices as IntegrationDevice[]) : [];
       });
 
       setState((prev) => ({
@@ -171,7 +173,8 @@ export function FermDataIntegrationScreen() {
       setWorking(kind, "reveal");
       const res = await api.get(`/api/workspaces/${state.workspaceId}/integrations/${kind}/reveal`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      updateTokens(kind, String((res.data as any)?.token ?? ""), String((res.data as any)?.publicPath ?? ""));
+      const body = res.data as { token?: unknown; publicPath?: unknown } | undefined;
+      updateTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
     } catch (err) {
       Alert.alert(t("sections.integration.title"), String(err));
     } finally {
@@ -186,7 +189,8 @@ export function FermDataIntegrationScreen() {
       setWorking(kind, "create");
       const res = await api.post(`/api/workspaces/${state.workspaceId}/integrations/${kind}`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      updateTokens(kind, String((res.data as any)?.token ?? ""), String((res.data as any)?.publicPath ?? ""));
+      const body = res.data as { token?: unknown; publicPath?: unknown } | undefined;
+      updateTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
       await refresh();
     } catch (err) {
       Alert.alert(t("sections.integration.title"), String(err));
@@ -202,7 +206,8 @@ export function FermDataIntegrationScreen() {
       setWorking(kind, "rotate");
       const res = await api.post(`/api/workspaces/${state.workspaceId}/integrations/${kind}/rotate-token`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      updateTokens(kind, String((res.data as any)?.token ?? ""), String((res.data as any)?.publicPath ?? ""));
+      const body = res.data as { token?: unknown; publicPath?: unknown } | undefined;
+      updateTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
       await refresh();
     } catch (err) {
       Alert.alert(t("sections.integration.title"), String(err));

@@ -60,8 +60,8 @@ export function RemoteImage({
       accessibilityLabel={accessibilityLabel}
       onError={(e) => {
         try {
-          const msg =
-            e && typeof e === "object" && "error" in (e as any) ? String((e as any).error) : "image_load_failed";
+          const errRec = e && typeof e === "object" ? (e as { error?: unknown }) : null;
+          const msg = errRec && "error" in errRec ? String(errRec.error) : "image_load_failed";
           setErrorText(msg);
            
           console.warn("[RemoteImage] failed", { assetKey, baseUrl, uri, error: msg });

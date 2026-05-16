@@ -20,14 +20,13 @@ if (hasZeego) {
 // We only special-case this single property on `global` and otherwise preserve native behavior.
 try {
   const originalDefineProperty = Object.defineProperty.bind(Object);
-  Object.defineProperty = (obj: any, prop: any, descriptor: any) => {
+  Object.defineProperty = ((obj: object, prop: PropertyKey, descriptor: PropertyDescriptor) => {
     if (obj === globalThis && prop === "__FUSEBOX_REACT_DEVTOOLS_DISPATCHER__") {
       // Avoid defineProperty entirely: in some Expo Go / RN 0.81 environments this throws and
       // prevents React Native from booting (black screen).
       try {
         if (descriptor && "value" in descriptor) {
-           
-          (globalThis as any).__FUSEBOX_REACT_DEVTOOLS_DISPATCHER__ = descriptor.value;
+          (globalThis as Record<string, unknown>).__FUSEBOX_REACT_DEVTOOLS_DISPATCHER__ = descriptor.value;
         }
       } catch {
         // ignore
@@ -35,21 +34,26 @@ try {
       return obj;
     }
     return originalDefineProperty(obj, prop, descriptor);
-  };
+  }) as typeof Object.defineProperty;
 } catch {
   // ignore
 }
 
 // When the app crashes very early (black screen), RedBox may never render.
 // This prints a real stack trace to Metro logs so we can pinpoint the failing module.
+type GlobalErrorHandler = (error: unknown, isFatal: boolean) => void;
+type ErrorUtilsLike = {
+  setGlobalHandler?: (handler: GlobalErrorHandler) => void;
+  getGlobalHandler?: () => GlobalErrorHandler | null | undefined;
+};
 try {
-  const ErrorUtilsMaybe = (globalThis as any).ErrorUtils;
+  const ErrorUtilsMaybe = (globalThis as { ErrorUtils?: ErrorUtilsLike }).ErrorUtils;
   if (ErrorUtilsMaybe && typeof ErrorUtilsMaybe.setGlobalHandler === "function") {
     const previous =
       typeof ErrorUtilsMaybe.getGlobalHandler === "function" ? ErrorUtilsMaybe.getGlobalHandler() : null;
-    ErrorUtilsMaybe.setGlobalHandler((error: any, isFatal: boolean) => {
-       
-      console.error("[GlobalErrorHandler]", { isFatal, message: error?.message, stack: error?.stack });
+    ErrorUtilsMaybe.setGlobalHandler((error: unknown, isFatal: boolean) => {
+      const e = error as { message?: unknown; stack?: unknown } | null | undefined;
+      console.error("[GlobalErrorHandler]", { isFatal, message: e?.message, stack: e?.stack });
       if (previous) previous(error, isFatal);
     });
   }

@@ -15,7 +15,9 @@ import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
+
+import type { RootStackParamList } from "../navigation/types";
 
 function bicarbonatePpmToAlkalinityPpmCaCO3(bicarbPpm: number): number {
   return bicarbPpm * (50 / 61);
@@ -100,7 +102,7 @@ function profileOptions(profiles: WaterProfile[]) {
 export function WaterSpargeScreen() {
   const route = useRoute();
   const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const auth = useAuth();
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
@@ -348,7 +350,7 @@ export function WaterSpargeScreen() {
       setSpargeManualResult(null);
       setSpargeResult(null);
       if (computed.acid.kind === "sparge_acidification_manual") {
-        const r = computed.acid.result as any;
+        const r = computed.acid.result;
         setSpargeManualResult({
           achievedPh: r.achievedPh ?? 0,
           predicted: {
@@ -360,7 +362,7 @@ export function WaterSpargeScreen() {
         setSpargeResult(r.predicted ?? null);
         setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
-        const r = computed.acid.result as any;
+        const r = computed.acid.result;
         setSpargeResult({
           acidRequiredMl: r.acidRequiredMl ?? null,
           acidRequiredTsp: r.acidRequiredTsp ?? null,

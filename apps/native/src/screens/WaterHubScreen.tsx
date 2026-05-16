@@ -12,7 +12,9 @@ import { Accordion } from "tamagui";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
+
+import type { RootStackParamList } from "../navigation/types";
 
 function formatFixed(locale: string, value: number, fractionDigits: number): string {
   return new Intl.NumberFormat(locale, {
@@ -66,7 +68,7 @@ function formatSaltKeyLabel(saltKey: string, tsalts: (k: string) => string): str
 export function WaterHubScreen() {
   const route = useRoute();
   const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const auth = useAuth();
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();

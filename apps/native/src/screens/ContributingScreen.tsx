@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@brewery/ui";
+
+import type { RootStackParamList } from "../navigation/types";
 
 // See comment in BrewdayStepsSettingsScreen.tsx: Tamagui v2 RC omits a few
 // runtime-valid Button props from its TS surface. Local cast preserves the
@@ -40,13 +42,13 @@ function Bullet({ children }: { children: React.ReactNode }) {
 }
 
 export function ContributingScreen() {
-  const navigation = useNavigation<any>();
-  const route = useRoute();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "Contributing">>();
 
   const { t } = useT("contributing");
   const { t: tI18n } = useT("i18nContributing");
 
-  const topic = useMemo(() => parseTopic((route.params as any)?.topic), [route.params]);
+  const topic = useMemo(() => parseTopic(route.params?.topic), [route.params]);
   const [openI18n, setOpenI18n] = useState(false);
   const [openRawMaterials, setOpenRawMaterials] = useState(false);
 

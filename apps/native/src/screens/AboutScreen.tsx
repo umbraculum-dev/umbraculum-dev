@@ -1,15 +1,16 @@
 import React, { useEffect } from "react";
 import { Linking, Pressable, ScrollView, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { useT } from "@brewery/i18n-react";
 import { Heading, Screen, Text } from "@brewery/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
+import type { RootStackParamList } from "../navigation/types";
 
 export function AboutScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { t } = useT("about");
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export function AboutScreen() {
               {t("translationsRowPrefix")}{" "}
             </Text>
             <Pressable
-              onPress={() => (navigation as any).navigate("Contributing", { topic: "i18n" })}
+              onPress={() => navigation.navigate("Contributing", { topic: "i18n" })}
               accessibilityRole="button"
               accessibilityLabel={t("translationsRowLinkText")}
             >

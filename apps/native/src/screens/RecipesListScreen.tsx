@@ -4,11 +4,12 @@ import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import type { RootStackParamList } from "../navigation/types";
 
 type RecipeListItem = {
   id: string;
@@ -47,7 +48,7 @@ export function RecipesListScreen() {
   const auth = useAuth();
   const { t } = useT("recipes");
   const { t: tCommon } = useT("common");
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
@@ -81,7 +82,7 @@ export function RecipesListScreen() {
     try {
       const res = await api.get("/api/styles");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.styles;
+      const items = (res.data as { styles?: unknown })?.styles;
       setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
     } catch (err) {
       setStyles([]);
@@ -98,8 +99,8 @@ export function RecipesListScreen() {
     try {
       const res = await api.get("/api/recipes");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.recipes;
-      setRecipes(Array.isArray(items) ? items : []);
+      const items = (res.data as { recipes?: unknown })?.recipes;
+      setRecipes(Array.isArray(items) ? (items as RecipeListItem[]) : []);
       setDeleteConfirmId(null);
     } catch (err) {
       setError(String(err));

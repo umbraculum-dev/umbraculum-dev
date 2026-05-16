@@ -11,7 +11,8 @@ function normalizeBaseUrl(value: unknown): string {
 
 export function getMediaBaseUrl(): string {
   // Prefer Expo config extra (works in Expo Go).
-  const fromExtra = normalizeBaseUrl((Constants.expoConfig as any)?.extra?.EXPO_PUBLIC_MEDIA_BASE_URL);
+  const expoExtra = (Constants.expoConfig as { extra?: { EXPO_PUBLIC_MEDIA_BASE_URL?: unknown } } | null | undefined)?.extra;
+  const fromExtra = normalizeBaseUrl(expoExtra?.EXPO_PUBLIC_MEDIA_BASE_URL);
   if (fromExtra) return fromExtra;
 
   // Fall back to environment variable (works when set via .env or shell env).

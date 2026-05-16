@@ -15,7 +15,9 @@ import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
+
+import type { RootStackParamList } from "../navigation/types";
 
 type IonProfilePpm = {
   calcium: number;
@@ -123,7 +125,7 @@ function profileOptions(profiles: WaterProfile[]) {
 export function WaterBoilScreen() {
   const route = useRoute();
   const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const auth = useAuth();
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
@@ -452,7 +454,7 @@ export function WaterBoilScreen() {
       setManualResult(null);
       setAcidResult(null);
       if (computed.acid.kind === "boil_acidification_manual") {
-        const r = computed.acid.result as any;
+        const r = computed.acid.result;
         setManualResult({
           achievedPh: r.achievedPh ?? 0,
           predicted: {
@@ -464,7 +466,7 @@ export function WaterBoilScreen() {
         setAcidResult(r.predicted ?? null);
         setCalcSaveStatus("Estimated & saved snapshot.");
       } else {
-        const r = computed.acid.result as any;
+        const r = computed.acid.result;
         setAcidResult({
           acidRequiredMl: r.acidRequiredMl ?? null,
           acidRequiredTsp: r.acidRequiredTsp ?? null,

@@ -28,10 +28,17 @@ function normalizeBaseUrl(value: unknown): string {
 function getMetroDevHost(): string | null {
   // hostUri lives at slightly different paths across Expo SDKs / runtimes;
   // try the documented spot first, then the legacy manifest2 location.
+  // We treat each as `unknown` and narrow per-step rather than `as any`-ing
+  // the whole expression — the shape genuinely varies across SDK versions.
+  const expoConfig = Constants.expoConfig as { hostUri?: unknown } | null | undefined;
+  const constantsRec = Constants as unknown as {
+    manifest2?: { extra?: { expoClient?: { hostUri?: unknown } } };
+    manifest?: { hostUri?: unknown };
+  };
   const candidate =
-    (Constants.expoConfig as any)?.hostUri ??
-    (Constants as any)?.manifest2?.extra?.expoClient?.hostUri ??
-    (Constants as any)?.manifest?.hostUri ??
+    expoConfig?.hostUri ??
+    constantsRec.manifest2?.extra?.expoClient?.hostUri ??
+    constantsRec.manifest?.hostUri ??
     null;
   if (typeof candidate !== "string" || !candidate) return null;
 
@@ -47,7 +54,7 @@ function getMetroDevHost(): string | null {
 
 function maybeRewriteForAndroidEmulator(baseUrl: string): string {
   if (Platform.OS !== "android") return baseUrl;
-  if ((Constants as any).isDevice) return baseUrl;
+  if ((Constants as unknown as { isDevice?: boolean }).isDevice) return baseUrl;
   try {
     const u = new URL(baseUrl);
     if (!u.hostname) return baseUrl;
@@ -70,7 +77,8 @@ function maybeRewriteForAndroidEmulator(baseUrl: string): string {
 export function getApiBaseUrl(): string {
   // 1. Explicit override via Expo config `extra` — used by EAS staging/prod
   //    builds (eas.json) and anyone who wants to pin a specific URL in app.json.
-  const fromExtra = normalizeBaseUrl((Constants.expoConfig as any)?.extra?.EXPO_PUBLIC_API_BASE_URL);
+  const expoExtra = (Constants.expoConfig as { extra?: { EXPO_PUBLIC_API_BASE_URL?: unknown } } | null | undefined)?.extra;
+  const fromExtra = normalizeBaseUrl(expoExtra?.EXPO_PUBLIC_API_BASE_URL);
   if (fromExtra) return maybeRewriteForAndroidEmulator(fromExtra);
 
   // 2. Explicit override via env var — used by tunnel-mode dev (where

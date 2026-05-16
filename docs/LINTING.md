@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.8 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**` — recipe edit + water + yeast + brew-sessions pages), and **5a** (`apps/native/src/screens/RecipeEditScreen.tsx` + shared navigation/typeGuards extraction) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, the entire `apps/web/app/recipes/**` surface (~11,400 lines) is `any`-free, and the largest single `apps/native` screen (RecipeEditScreen, 2,117 lines) is `any`-free with typed React Navigation. Phase 5b (`apps/native/src/screens/YeastScreen.tsx` + remaining native screens) is next.
+**Status:** v1.9 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**` — recipe edit + water + yeast + brew-sessions pages), 5a (`apps/native/src/screens/RecipeEditScreen.tsx`), and **5b** (the rest of `apps/native/src/**` — YeastScreen + 14 other screens + bootstrap + auth + media + navigation + dom-shim) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, the entire `apps/web/app/recipes/**` surface (~11,400 lines) is `any`-free, and **the entire `apps/native/src/**` surface is `any`-free** with typed React Navigation across all screens. Only `apps/web` (outside `app/recipes/**`) and `services/api` test stragglers remain.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **286** (-56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -841 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **187** (-99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -940 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -220,13 +220,13 @@ The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui fr
 
 **Why these files went together in Phase 4c:** they share ~80% of their `any` patterns with Phase 4a/4b (`apiFetch` response unpacking, recipe-ext traversal, dynamic i18n keys), and the brew-sessions list page is so trivial (2 `any`) that splitting it into its own PR would have been disproportionate review overhead. Including the `asRecord` dedup ride-along in `edit/page.tsx` (~10 lines, no behavioural change) is a small but appropriate cleanup that grows the shared-helper consumer set from 3 to 4 files.
 
-### Phase 5 — `apps/native/src/screens/**` (~138 `any` warnings remaining)
+### Phase 5 — `apps/native/src/**` (155 `any` warnings — **all cleared**)
 
 Same patterns as Phase 4 but for the React Native side. May land easier or harder depending on how `docs/TAMAGUI.md` migration goes.
 
 - [x] Phase 5a: `RecipeEditScreen.tsx` (56 `any` removed) ✅ landed 2026-05-16 — also extracts shared `navigation/types.ts` and `lib/typeGuards.ts` for reuse by Phase 5b
-- [ ] Phase 5b: `YeastScreen.tsx` (36 `any`) + remaining screens (~46 `any` across 11 files)
-- [ ] Add `lint:native-screens-strict` script once clean
+- [x] Phase 5b: `YeastScreen.tsx` + remaining 14 native screens + 6 non-screen files (99 `any` removed) ✅ landed 2026-05-16
+- [ ] Add `lint:native-strict` script gating `apps/native/src/**` once a CI runner with native deps is in place (deferred to Phase 6 mop-up; behaviour-equivalent locally via `npx eslint apps/native --max-warnings 0`)
 
 #### Phase 5a — `apps/native/src/screens/RecipeEditScreen.tsx` ✅ landed 2026-05-16
 
@@ -259,6 +259,55 @@ Same patterns as Phase 4 but for the React Native side. May land easier or harde
 - No new `apps/native` unit tests added (Phase 5a is type-tightening, no behavioural change).
 
 **Why this file went first in Phase 5:** at 56 `any` it was the highest-leverage single file in `apps/native` (matches the doc's pre-flight estimate of 68 — actual count was 56), the patterns map 1:1 onto Phase 4a/4c so the toolkit transferred cleanly, and the navigation-type-extraction + typeGuards-extraction set up Phase 5b for cheap mechanical reuse across the remaining 11 native screens (where 12 of the 13 `useNavigation<any>` sites still live).
+
+#### Phase 5b — rest of `apps/native/src/**` ✅ landed 2026-05-16
+
+**Scope:** 21 files across `apps/native/src/screens/**` (15 files), `apps/native/src/auth/**` (2), `apps/native/src/media/**` (2), `apps/native/src/navigation/openWebFallback.ts`, `apps/native/src/types/dom-shim.d.ts`, and `apps/native/src/bootstrap.ts`. 99 `no-explicit-any` warnings → 0.
+
+**File-level breakdown:**
+
+| File | `any` removed | Notes |
+|---|---|---|
+| `screens/YeastScreen.tsx` | 36 | Mirror of Phase 4c web yeast page — same `recipeExtJson` + API patterns. |
+| `screens/FermDataIntegrationScreen.tsx` | 9 | Tilt/iSpindel/RAPT integration token + device unpacks. |
+| `screens/BrewdayStepsSettingsScreen.tsx` | 8 | `Constants.crypto?.randomUUID`, dynamic i18n keys, settings response shape. |
+| `bootstrap.ts` | 6 | `Object.defineProperty` polyfill; `ErrorUtils` typing. |
+| `screens/BrewSessionDetailScreen.tsx` | 5 | API response unpacks for hydrometer flow. |
+| `auth/apiBaseUrl.ts` | 5 | `Constants.expoConfig` / `Constants.manifest*` SDK-version-tolerant unpacks. |
+| `screens/DashboardScreen.tsx` | 4 | `healthState.me` shape-casts + tab-to-stack `CompositeNavigationProp`. |
+| `screens/Water{Sparge,Mash,Boil}Screen.tsx` | 3 each (9) | `useNavigation<any>` + per-screen idiomatic patterns. |
+| `screens/RecipesListScreen.tsx` | 3 | API response unpacks + typed nav. |
+| `screens/BrewSessionsListScreen.tsx` | 3 | API response unpacks + typed nav. |
+| `screens/ContributingScreen.tsx` | 2 | `route.params` cast + typed nav. |
+| `media/RemoteImage.tsx` | 2 | `expo-image` `onError` event narrowing. |
+| `screens/{WaterHub,SelectWorkspace,About}Screen.tsx` | 1 each (3) | Mostly `useNavigation<any>` + tiny shape-casts. |
+| `navigation/openWebFallback.ts` | 1 | `webview-exchange` response shape-cast. |
+| `media/mediaBaseUrl.ts` | 1 | `Constants.expoConfig.extra` unpack. |
+| `auth/AuthProvider.tsx` | 1 | `parseToken` shape-cast. |
+| `types/dom-shim.d.ts` | 1 | `declare const HTMLElement: any` → `new (...args: never[]) => unknown` (constructor-compatible — `unknown` would have broken `instanceof HTMLElement` checks in Tamagui). |
+
+**Strategy used:** "tighten in place" — same toolkit as Phases 1–5a. The bulk of the work was mechanical:
+
+- **`useNavigation<any>` → typed `NavigationProp<RootStackParamList>`** in 12 screens, importing the param list from the new `apps/native/src/navigation/types.ts` (Phase 5a extraction). One screen (`DashboardScreen`) needed a `CompositeNavigationProp<BottomTabNavigationProp<TabParamList, "Dashboard">, NativeStackNavigationProp<RootStackParamList>>` because it's a tab screen that navigates into the parent stack and into a sibling tab (`Recipes`). Two screens (`BrewSessionsListScreen`, `ContributingScreen`, `BrewSessionDetailScreen`, `YeastScreen`) additionally use `RouteProp<RootStackParamList, "RouteName">` for `useRoute()` typing.
+- **`(res.data as any)?.field` → `(res.data as { field?: unknown })?.field`** with `Array.isArray(...) ? (... as ItemType[]) : []` for list responses. ~25 sites across 9 files. Same Phase 4a/4c precedent.
+- **`(ext as any).field` recipeExtJson reads** in `YeastScreen.tsx` consolidated to `extRec = asRecord(r.recipeExtJson)` + per-field `asRecord(extRec?.field)`. Same Phase 4c yeast pattern; `asRecord` imported from `apps/native/src/lib/typeGuards.ts` (Phase 5a extraction).
+- **`(globalThis as any).crypto?.randomUUID`** → typed `globalThis as { crypto?: { randomUUID?: () => string } }` (one site in `BrewdayStepsSettingsScreen.tsx`). Same pattern already used in `YeastScreen.tsx`'s `newRowId` after Phase 5a.
+- **Dynamic i18n keys**: `t(\`presetSections.${k}\` as any)` → `t(... as Parameters<typeof t>[0])`. 3 sites in `BrewdayStepsSettingsScreen.tsx`. Same Phase 4a/4c precedent.
+- **`(Constants.expoConfig as any)?.extra.X` / `(Constants as any).manifest*`**: replaced with explicit per-step shape-casts (`{ extra?: { X?: unknown } }`, etc.). The casts are still present but each one is a precise, narrow shape rather than `any`. The variation across Expo SDK versions (`manifest` vs `manifest2` vs `expoConfig`) is genuine runtime drift, so per-step `unknown` is the honest type.
+- **`computed.acid.result as any`** in `WaterSpargeScreen.tsx` and `WaterBoilScreen.tsx`: removed — the discriminated-union narrowing on `computed.acid.kind === "*_manual"` already gives TS the correct `WaterAcidificationManualResult` vs `WaterAcidificationResult` type. The `as any` was unnecessary.
+- **`Object.defineProperty` polyfill** in `bootstrap.ts`: `(obj: any, prop: any, descriptor: any) => ...` → `((obj: object, prop: PropertyKey, descriptor: PropertyDescriptor) => ...) as typeof Object.defineProperty`. The outer cast is structural (matches the global `defineProperty` signature) rather than a parameter-level `any`.
+- **`HTMLElement` shim**: `declare const HTMLElement: any` → `declare const HTMLElement: new (...args: never[]) => unknown`. `unknown` alone broke `x instanceof HTMLElement` in `node_modules/@tamagui/element/src/getWebElement.ts` (the RHS of `instanceof` must be assignable to `Function`); the constructor-shaped type satisfies that constraint while keeping the shim's runtime intent ("we don't have DOM, just say it's a class").
+
+**Verification:**
+
+- ESLint: `apps/native` overall at **0 `no-explicit-any` warnings** (down from 99). The remaining 187 repo-wide warnings are all in `apps/web` (outside `app/recipes/**`) and `services/api` test stragglers.
+- `apps/native` TypeScript: 0 errors after Phase 5b (held at the pre-change baseline). The dom-shim change was the only place a TS error was introduced (`@tamagui/element/getWebElement.ts(19,28) TS2359`) and it was caught by `npm run typecheck --workspace=@brewery/native` and fixed before commit by switching from `unknown` to a constructor-shaped type. No new errors landed.
+- `@brewery/contracts` TypeScript: 0 errors (sanity-checked because Phase 5b's WaterSparge/Boil simplification reads through the discriminated-union narrowing that contracts owns).
+- Repo-wide `no-explicit-any` count: 206 → 107 (drop of 99, exactly matches Phase 5b scope).
+- Repo-wide all-warnings count: 286 → 187 (same -99 delta).
+- No new `apps/native` unit tests added (Phase 5b is type-tightening, no behavioural change).
+
+**Phase 5 cumulative impact:** 155 `any` removed across 22 files (Phase 5a's RecipeEditScreen + Phase 5b's 21 files). The whole React Native app surface is now `any`-free. Combined with Phases 1–4 (`packages/**`, `services/api/src/**`, `apps/web/app/recipes/**`), the only remaining `any` debt is the `apps/web` non-recipes pages (mostly under `apps/web/app/[locale]/**` and `apps/web/app/_components/**`, ~96 warnings) plus a small `services/api` test residue.
 
 ### Phase 6 — Mop-up
 

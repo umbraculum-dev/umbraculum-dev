@@ -27,7 +27,7 @@ export function useAuth(): AuthContextValue {
 }
 
 function parseToken(data: unknown): string | null {
-  const token = (data as any)?.token;
+  const token = (data as { token?: unknown } | null | undefined)?.token;
   if (typeof token === "string" && token.trim()) return token.trim();
   return null;
 }

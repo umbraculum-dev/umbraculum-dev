@@ -6,13 +6,21 @@ import type { RouteRef } from "@brewery/navigation";
 import { useT } from "@brewery/i18n-react";
 import { locales, type SupportedLocale } from "@brewery/i18n";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, type CompositeNavigationProp } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { AdSlot } from "../components/AdSlot";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
 import { openWebFallbackRoute } from "../navigation/openWebFallback";
+import type { RootStackParamList, TabParamList } from "../navigation/types";
+
+type DashboardNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<TabParamList, "Dashboard">,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 export function DashboardScreen() {
   const auth = useAuth();
@@ -64,7 +72,7 @@ export function DashboardScreen() {
     }
   }
 
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<DashboardNavigationProp>();
 
   const loadHealthAndMe = useCallback(() => {
     if (!token) return () => {};
@@ -189,13 +197,13 @@ export function DashboardScreen() {
             ) : healthState.status === "ok" ? (
               <View style={{ gap: 6 }}>
                 <Text fontSize={12} opacity={0.85}>
-                  {tHealth("appPermissions.userLabel")}: {(healthState.me as any)?.user?.email ?? "—"}
+                  {tHealth("appPermissions.userLabel")}: {(healthState.me as { user?: { email?: unknown } } | null | undefined)?.user?.email ?? "—"}
                 </Text>
                 <Text fontSize={12} opacity={0.85}>
-                  {tHealth("appPermissions.activeWorkspaceLabel")}: {(healthState.me as any)?.activeWorkspaceId ?? "—"}
+                  {tHealth("appPermissions.activeWorkspaceLabel")}: {(healthState.me as { activeWorkspaceId?: unknown } | null | undefined)?.activeWorkspaceId ?? "—"}
                 </Text>
                 <Text fontSize={12} opacity={0.85}>
-                  {tHealth("appPermissions.roleLabel")}: {(healthState.me as any)?.role ?? tHealth("appPermissions.roleUnknown")}
+                  {tHealth("appPermissions.roleLabel")}: {(healthState.me as { role?: unknown } | null | undefined)?.role ?? tHealth("appPermissions.roleUnknown")}
                 </Text>
                 <Button
                   onPress={() => navigation.navigate("SelectWorkspace")}

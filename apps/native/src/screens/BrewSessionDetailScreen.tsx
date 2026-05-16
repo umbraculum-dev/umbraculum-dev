@@ -74,10 +74,10 @@ export function BrewSessionDetailScreen() {
       const [meRes, sessionRes] = await Promise.all([api.get("/api/auth/me"), api.get(`/api/brew-sessions/${brewSessionId}`)]);
       if (!meRes.ok) throw new Error(typeof meRes.data === "string" ? meRes.data : JSON.stringify(meRes.data));
       if (!sessionRes.ok) throw new Error(typeof sessionRes.data === "string" ? sessionRes.data : JSON.stringify(sessionRes.data));
-      const workspace = (meRes.data as any)?.activeWorkspaceId ?? null;
-      const s = (sessionRes.data as any)?.brewSession ?? null;
+      const workspace = (meRes.data as { activeWorkspaceId?: unknown })?.activeWorkspaceId ?? null;
+      const s = (sessionRes.data as { brewSession?: BrewSessionDetail | null })?.brewSession ?? null;
       setWorkspaceId(typeof workspace === "string" ? workspace : null);
-      setSession(s as BrewSessionDetail);
+      setSession(s);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -101,15 +101,20 @@ export function BrewSessionDetailScreen() {
           throw new Error(typeof attachmentsRes.data === "string" ? attachmentsRes.data : JSON.stringify(attachmentsRes.data));
         if (!readingsRes.ok) throw new Error(typeof readingsRes.data === "string" ? readingsRes.data : JSON.stringify(readingsRes.data));
 
-        const nextDevices = (devicesRes.data as any)?.devices ?? [];
-        const nextAttachments = (attachmentsRes.data as any)?.attachments ?? [];
-        const nextReadings = (readingsRes.data as any)?.readings ?? [];
-        setDevices(Array.isArray(nextDevices) ? nextDevices : []);
-        setAttachments(Array.isArray(nextAttachments) ? nextAttachments : []);
-        setReadings(Array.isArray(nextReadings) ? nextReadings : []);
+        const rawDevices = (devicesRes.data as { devices?: unknown })?.devices;
+        const rawAttachments = (attachmentsRes.data as { attachments?: unknown })?.attachments;
+        const rawReadings = (readingsRes.data as { readings?: unknown })?.readings;
+        const nextDevices: HydrometerDevice[] = Array.isArray(rawDevices) ? (rawDevices as HydrometerDevice[]) : [];
+        const nextAttachments: HydrometerAttachment[] = Array.isArray(rawAttachments)
+          ? (rawAttachments as HydrometerAttachment[])
+          : [];
+        const nextReadings: HydrometerReading[] = Array.isArray(rawReadings) ? (rawReadings as HydrometerReading[]) : [];
+        setDevices(nextDevices);
+        setAttachments(nextAttachments);
+        setReadings(nextReadings);
 
         if (resetSelection || !selectedDeviceId) {
-          const attachedForKind = (nextAttachments as HydrometerAttachment[]).find((a) => a.device.kind === kind);
+          const attachedForKind = nextAttachments.find((a) => a.device.kind === kind);
           if (attachedForKind?.device?.id) {
             setSelectedDeviceId(attachedForKind.device.id);
           } else if (nextDevices[0]?.id) {

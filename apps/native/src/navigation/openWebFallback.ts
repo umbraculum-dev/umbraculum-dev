@@ -31,7 +31,7 @@ export async function openWebFallbackRoute(options: OpenWebFallbackOptions): Pro
     return { ok: false, error: `webview-exchange failed with status ${res.status}` };
   }
 
-  const bridgeUrl = (res.data as any)?.bridgeUrl;
+  const bridgeUrl = (res.data as { bridgeUrl?: unknown })?.bridgeUrl;
   if (typeof bridgeUrl !== "string" || !bridgeUrl.startsWith("/")) {
     return { ok: false, error: "webview-exchange returned invalid bridgeUrl" };
   }

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
@@ -8,6 +8,7 @@ import { Button, Card, Heading, Screen, Text } from "@brewery/ui";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import type { RootStackParamList } from "../navigation/types";
 
 type BrewSessionListItem = {
   id: string;
@@ -19,12 +20,12 @@ type BrewSessionListItem = {
 };
 
 export function BrewSessionsListScreen() {
-  const navigation = useNavigation<any>();
-  const route = useRoute();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, "BrewSessionsList">>();
   const { t } = useT("recipes.brewSessions");
   const { state } = useAuth();
 
-  const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
+  const recipeId = route.params?.recipeId ?? "";
   const canCall = state.status === "logged_in";
 
   const [sessions, setSessions] = useState<BrewSessionListItem[]>([]);
@@ -41,7 +42,7 @@ export function BrewSessionsListScreen() {
       const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
       const res = await api.get(`/api/recipes/${recipeId}/brew-sessions`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const list = (res.data as any)?.brewSessions;
+      const list = (res.data as { brewSessions?: unknown })?.brewSessions;
       setSessions(Array.isArray(list) ? (list as BrewSessionListItem[]) : []);
     } catch (err) {
       setSessions([]);
@@ -59,7 +60,7 @@ export function BrewSessionsListScreen() {
       const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
       const res = await api.post(`/api/recipes/${recipeId}/brew-sessions`, {});
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const id = (res.data as any)?.brewSession?.id;
+      const id = (res.data as { brewSession?: { id?: unknown } })?.brewSession?.id;
       if (typeof id !== "string" || !id) throw new Error("Create brew session response is missing brewSession.id");
       navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: id });
     } catch (err) {

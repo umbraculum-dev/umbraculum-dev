@@ -25,7 +25,9 @@ import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
+
+import type { RootStackParamList } from "../navigation/types";
 
 function formatFixed(locale: string, value: number, fractionDigits: number): string {
   return new Intl.NumberFormat(locale, {
@@ -129,7 +131,7 @@ function PickerField(props: {
 export function WaterMashScreen() {
   const route = useRoute();
   const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const auth = useAuth();
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
@@ -419,7 +421,7 @@ export function WaterMashScreen() {
       const mashOnlyRows = (s.gristRows as Record<string, unknown>[]).filter(
         (row) =>
           (row.timingUse as string ?? "add_to_mash") === "add_to_mash" &&
-          (row as any).lateAddition !== true,
+          (row as { lateAddition?: unknown }).lateAddition !== true,
       );
       const nowIso = new Date().toISOString();
       await saveSettings({
@@ -441,7 +443,8 @@ export function WaterMashScreen() {
       const doc = recipe?.beerJsonRecipeJson;
       if (!doc) return 0;
       const s = editorStateFromBeerJson(doc);
-      return (s.gristRows as any[]).reduce((sum, r) => {
+      type GristShape = { timingUse?: unknown; lateAddition?: unknown; amountKg?: unknown };
+      return (s.gristRows as GristShape[]).reduce((sum, r) => {
         if ((r?.timingUse ?? "add_to_mash") !== "add_to_mash") return sum;
         if (r?.lateAddition !== true) return sum;
         const amountKg = typeof r?.amountKg === "number" && Number.isFinite(r.amountKg) ? r.amountKg : 0;

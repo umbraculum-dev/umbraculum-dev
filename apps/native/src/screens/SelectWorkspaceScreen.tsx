@@ -38,10 +38,14 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
       const res = await api.get("/api/auth/me");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
 
-      const raw = res.data as any;
+      const raw = res.data as {
+        workspaces?: unknown;
+        accounts?: unknown;
+        activeWorkspaceId?: unknown;
+      } | null | undefined;
       const list = raw?.workspaces ?? raw?.accounts;
-      const workspaces: WorkspaceListItem[] = Array.isArray(list) ? list : [];
-      const activeWorkspaceId = typeof raw?.activeWorkspaceId === "string" ? (raw.activeWorkspaceId as string) : null;
+      const workspaces: WorkspaceListItem[] = Array.isArray(list) ? (list as WorkspaceListItem[]) : [];
+      const activeWorkspaceId = typeof raw?.activeWorkspaceId === "string" ? raw.activeWorkspaceId : null;
       setState({ status: "ready", workspaces, activeWorkspaceId });
     } catch (err) {
       setState({ status: "error", error: String(err) });
