@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.4 — **HIGH-staged complete + HIGH-full Phase 1 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: `eslint --fix` on the auto-fixable subset of type-aware rules, 64 files touched, 310 type-aware warnings eliminated (1,671 → 1,361). **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. The HIGH-full upgrade is now a 5-phase plan (see [HIGH-full upgrade](#high-full-upgrade)) targeting H1 2027 alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md).
+**Status:** v2.5 — **HIGH-staged complete + HIGH-full Phases 1–2 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: 64 files, 310 warnings eliminated. **HIGH-full Phase 2** (Tier A — Promise correctness) landed 2026-05-16: 7 type-aware rules promoted to `warn` (`no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`); type-aware parser infrastructure (`projectService` + `allowDefaultProject` allowlist) lands with it; 136 sites hand-fixed across 5 commits (2a `packages/{test-mcp,ui}` pre-fix, 2b `services/api` 47, 2c `apps/web` 56, 2d `apps/native` 30, 2e docs). Repo-wide lint goes from ~7s to ~39s wall. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. The HIGH-full upgrade is a 5-phase plan (see [HIGH-full upgrade](#high-full-upgrade)) targeting H1 2027 alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md).
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -500,20 +500,39 @@ A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-ch
 - **Risk:** very low after the safety reverts; remaining changes are auto-fix output that both ESLint and `tsc` accept.
 - **Status:** ✅ **landed** (commit pending push).
 
-#### Phase 2 — Tier A: Promise correctness
+#### Phase 2 — Tier A: Promise correctness ✅ landed 2026-05-16
 
-- **Scope:** ~135 warnings, distributed across `services/api` (47 `require-await`), `apps/web` (41 `no-misused-promises` + 13 `no-floating-promises` + 2 `require-await`), `apps/native` (24 `no-misused-promises` + 11 `no-base-to-string` + 4 `no-floating-promises` + 1 `require-await` + 1 `prefer-promise-reject-errors`), `packages/test-mcp` (1 `no-misused-promises` + 1 `require-await`).
-- **Rules promoted to `warn` (and required to be at zero before the phase closes):** `no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`.
-- **Strategy per rule:**
-  - `no-floating-promises`: add `await`, or `void` the expression with a comment explaining the deliberate fire-and-forget.
-  - `no-misused-promises`: convert async handlers passed to non-awaiting slots to wrappers (`(...args) => { void asyncHandler(...args); }`) — common in event handlers and `onPress`.
-  - `require-await`: drop the `async` keyword on functions that don't actually await anything (the surrounding callers must already handle non-Promise return — ESLint flagged this because TS doesn't).
-  - `await-thenable`: drop the `await` from non-Promise expressions.
-  - `prefer-promise-reject-errors` / `only-throw-error`: replace `throw "string"` and `Promise.reject("string")` with proper `Error` instances.
-- **Verification gate:** all 7 rules at zero warnings; per-workspace TS baselines hold; CI green.
-- **Effort:** 3–6 hours, one commit per workspace (~7 commits).
-- **Risk:** low (each fix is local; behavior change is "the bug stops happening").
-- **Status:** [ ] not started.
+- **Actual scope (post-Phase-1 remeasurement):** 133 warnings under the 7 promoted rules plus the 3 already-fixed strict-gated ones (136 total touched). Distribution:
+  - `services/api`: 47 `require-await`.
+  - `apps/web`: 41 `no-misused-promises` + 13 `no-floating-promises` + 2 `require-await` = 56.
+  - `apps/native`: 24 `no-misused-promises` + 4 `no-floating-promises` + 1 `require-await` + 1 `prefer-promise-reject-errors` = 30.
+  - `packages/test-mcp`: 1 `no-misused-promises` + 1 `require-await` = 2.
+  - `packages/ui`: 1 `no-base-to-string` (pre-fixed because strict-gated; `no-base-to-string` is not part of the 7 Phase 2 rules but was queued via the throwaway measurement and worth landing here).
+- **Rules promoted to `warn` in `eslint.config.mjs`:** `no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`. Scoped to `**/*.{ts,tsx}` (the 7 rules are type-aware and require the new TS-only `parserOptions.projectService` block).
+- **Type-aware infrastructure:** new TS-only language-options block enables `parserOptions.projectService: { allowDefaultProject: [...] }` with `tsconfigRootDir: import.meta.dirname`. The `allowDefaultProject` allowlist covers TS files outside any tsconfig include — vitest configs (`{services/api,apps/web,apps/native,packages/{beerjson,contracts,core}}/vitest.config.ts`), tsup configs (`packages/{recipes-ui,ui}/tsup.config.ts`), and `services/api/prisma/seed.ts`, `packages/core/src/index.d.ts`. `**`-globs are not allowed in `allowDefaultProject` — explicit relative paths only.
+- **Wall-time impact:** full-repo `npm run lint` went from ~7s to ~39s on a hot cache. Acceptable. Phase 5 will absorb this when the rules go to `error`; the cost is real but the value (catching async bug classes that TS itself cannot see) compounds.
+- **Strategy per rule (as actually applied):**
+  - `no-floating-promises` (17 sites total): the 13 in `apps/web` and 3 in `apps/native` were all `(async () => { … })();` IIFEs in `useEffect` bodies. Prefixed each with `void`. The 17th (`apps/native/AdSlot.tsx`) was a bare `Linking.openURL(...)` not awaited; same `void` fix.
+  - `no-misused-promises` (66 sites total): wrap the Promise-returning handler in a sync wrapper that satisfies the void-return contract.
+    - **Default (Tamagui `onPress` and similar):** `onPress={() => { void fn(); }}`. The bound handler usually doesn't consume the event, and Tamagui's `onPress` signature is `(e: GestureResponderEvent) => void` — passing the event via `Parameters<typeof fn>` trips TS2352 ("converting `[event: GestureResponderEvent]` to `[]`") whenever the handler is `() => Promise<…>`.
+    - **For `onSubmit` / `onChange` / `onValueChange` (web only):** the bound fn does consume the event (e.g. `e.preventDefault()`), so use `onSubmit={(...a) => { void fn(...(a as Parameters<typeof fn>)); }}`.
+    - **For Alert.alert button objects (`onPress: async () => { … }`)** and other multi-line property-style handlers: rewrote to `onPress: () => { void (async () => { … })(); }`.
+    - **Multi-line single-expression arrows** (e.g. `onValueChange={(v) => fn({...})}` across 3+ lines): hand-edited to `(v) => { void fn({...}); }`.
+  - `require-await` (51 sites total, mostly `services/api`): drop the `async` keyword. For Fastify plugin entry points (27 `routes/*.ts` files + 4 framework plugins) the function never awaits — Fastify accepts both sync and async signatures. For Fastify route handlers (`app.post('/foo', async (req) => …)` in `waterCalc.ts`, `health.ts`, `recipesImport.ts`) ditto. For methods/arrow shorthand returning a Promise from a single internal call (e.g. test mocks, seed `upsertSourceMap`): when the surrounding type required a Promise return, used `() => Promise.resolve(...)` or simply returned the inner Promise without awaiting. One `await-thenable` fallout in `app.ts:99` (an `await aiRoutes(registry)(instance)` call where `aiRoutes()` returned the now-sync inner) was refactored to the Fastify callback-form plugin signature.
+  - `prefer-promise-reject-errors` (1 site): `apps/native/DashboardScreen.tsx` `withTimeout()` helper. Tightened the `reject` callback's `err` argument type to `unknown` and wrapped non-Error values: `reject(err instanceof Error ? err : new Error(String(err)))`.
+  - `await-thenable` / `no-implied-eval` / `only-throw-error`: 0 standing violations.
+- **Order of landing (5 commits):**
+  1. **Phase 2a** (`packages/test-mcp` + `packages/ui`, 3 warnings): pre-fix the strict-gated packages so the rule promotion in 2b can land without breaking `lint:packages-strict`.
+  2. **Phase 2b** (`eslint.config.mjs` + `services/api`, 47 warnings): promote the 7 rules; add the type-aware parser block; fix all `services/api` violations.
+  3. **Phase 2c** (`apps/web`, 56 warnings): wrap handlers / void IIFEs.
+  4. **Phase 2d** (`apps/native`, 30 warnings): wrap handlers / void IIFEs / Error-ize one reject.
+  5. **Phase 2e** (this docs update + delete `eslint.config.measure.mjs`).
+- **Verification:** all 7 rules at zero warnings; `npm run lint` exits 0 with 0/0; `npm run lint:packages-strict` clean; per-workspace `tsc --noEmit` baselines unchanged (`apps/web` 590, `apps/native` 0, `services/api` 19, `packages/{contracts,i18n,i18n-react,test-mcp,api-client,beerjson,media,navigation,recipes-ui}` 0, `packages/ui` 25). `services/api` vitest pass/fail pattern unchanged from pre-Phase-2 (12 pass / 20 file-load fails / 3 test fails — all DB-env failures, not regressions).
+- **Lessons learned (carry into Phase 3+):**
+  - **Type-aware lint costs ~30s wall time** even with `projectService` and explicit `allowDefaultProject` paths. CI minute budget should account for this. Editor performance is a separate concern (see Phase 5 prerequisite).
+  - **`Parameters<typeof fn>` does not safely tunnel through Tamagui `onPress`.** When the bound handler takes 0 args but the JSX dispatcher hands you an event, TS2352 fires on the cast. Default to the no-arg `() => { void fn(); }` form for `onPress`/`onClick`; only use the Parameters form when the bound handler actually consumes the event (forms, value-changers).
+  - **Pre-fix the strict gate before the rule promotion.** The packages strict gate (`--max-warnings 0`) means promoting a rule mid-flight breaks CI for any package with even one violation. Always sweep packages first, then promote.
+  - **`allowDefaultProject` requires explicit relative paths**, not globs. `**/vitest.config.ts` is rejected with "glob too wide". Maintain the allowlist as new TS files outside tsconfig includes appear.
 
 #### Phase 3 — Tier C-narrow: `services/api` `no-unsafe-*`
 
