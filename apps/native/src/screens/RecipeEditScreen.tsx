@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import {
@@ -34,6 +35,10 @@ import { ReadOnlyField } from "../components/ReadOnlyField";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
+import { asRecord } from "../lib/typeGuards";
+import type { RootStackParamList } from "../navigation/types";
+
+type RecipeEditNavigationProp = NativeStackNavigationProp<RootStackParamList, "RecipeEdit">;
 
 function newRowId(): string {
   try {
@@ -210,7 +215,7 @@ const YEAST_FORMAT_OPTIONS: { value: NonNullable<EditorYeastRow["format"]>; labe
 export function RecipeEditScreen() {
   const auth = useAuth();
   const route = useRoute();
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<RecipeEditNavigationProp>();
   const recipeId = (route.params as { recipeId?: string })?.recipeId ?? "";
   const { t } = useT("recipes.edit");
   const { t: tBrewSessions } = useT("recipes.brewSessions");
@@ -330,19 +335,19 @@ export function RecipeEditScreen() {
     try {
       const res = await api.get(`/api/recipes/${recipeId}`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const r = (res.data as any)?.recipe;
+      const r = (res.data as { recipe?: Recipe })?.recipe;
       if (!r) throw new Error("Recipe not found");
       setRecipe(r);
       setName(typeof r.name === "string" ? r.name : "");
       setStyleKey(typeof r.styleKey === "string" ? r.styleKey : "custom");
       setNotes(typeof r.notes === "string" ? r.notes : "");
 
-      const ext = (r as any).recipeExtJson;
-      const links = ext && typeof ext === "object" ? (ext as any).ingredientLinks : null;
-      const yeastOverridesRaw = ext && typeof ext === "object" ? (ext as any).yeastAttenuationOverridesPercent : null;
-      if (yeastOverridesRaw && typeof yeastOverridesRaw === "object") {
+      const extRec = asRecord(r.recipeExtJson);
+      const linksRec = asRecord(extRec?.ingredientLinks);
+      const yeastOverridesRaw = asRecord(extRec?.yeastAttenuationOverridesPercent);
+      if (yeastOverridesRaw) {
         const out: Record<string, string> = {};
-        for (const [k, v] of Object.entries(yeastOverridesRaw as any)) {
+        for (const [k, v] of Object.entries(yeastOverridesRaw)) {
           if (typeof k === "string" && typeof v === "number" && Number.isFinite(v)) out[k] = String(v);
         }
         setYeastAttenuationOverrides(out);
@@ -350,22 +355,20 @@ export function RecipeEditScreen() {
         setYeastAttenuationOverrides({});
       }
 
-      const yeastFermentationTempRaw = ext && typeof ext === "object" ? (ext as any).yeastFermentationTempOverrides : null;
-      const yeastOxygenationRaw = ext && typeof ext === "object" ? (ext as any).yeastOxygenationOverrides : null;
-      const yeastDiacetylRestRaw = ext && typeof ext === "object" ? (ext as any).yeastDiacetylRestOverrides : null;
-      const yeastFormatRaw =
-        ext && typeof ext === "object" ? (ext as any).yeastFormatOverrides ?? (ext as any).yeastTypeOverrides : null;
+      const yeastFermentationTempRaw = asRecord(extRec?.yeastFermentationTempOverrides);
+      const yeastOxygenationRaw = asRecord(extRec?.yeastOxygenationOverrides);
+      const yeastDiacetylRestRaw = asRecord(extRec?.yeastDiacetylRestOverrides);
+      const yeastFormatRaw = asRecord(extRec?.yeastFormatOverrides ?? extRec?.yeastTypeOverrides);
 
-      const equipmentSource = ext && typeof ext === "object" ? (ext as any).equipmentSource : null;
+      const equipmentSource = asRecord(extRec?.equipmentSource);
       const equipmentProfileId =
-        equipmentSource && typeof equipmentSource === "object" && typeof (equipmentSource as any).equipmentProfileId === "string"
-          ? (equipmentSource as any).equipmentProfileId
-          : "";
+        typeof equipmentSource?.equipmentProfileId === "string" ? equipmentSource.equipmentProfileId : "";
       setSelectedEquipmentProfileId(equipmentProfileId);
 
+      const boilTimeMinutesOverrideRaw = extRec?.boilTimeMinutesOverride;
       const boilTimeMinutesOverride =
-        ext && typeof ext === "object" && typeof (ext as any).boilTimeMinutesOverride === "number" && Number.isFinite((ext as any).boilTimeMinutesOverride)
-          ? (ext as any).boilTimeMinutesOverride
+        typeof boilTimeMinutesOverrideRaw === "number" && Number.isFinite(boilTimeMinutesOverrideRaw)
+          ? boilTimeMinutesOverrideRaw
           : null;
       if (boilTimeMinutesOverride != null && boilTimeMinutesOverride >= 0) {
         setBoilTimeMinutes(String(Math.round(boilTimeMinutesOverride)));
@@ -373,7 +376,7 @@ export function RecipeEditScreen() {
         setBoilTimeMinutes("60");
       }
 
-      if (!(r as any).beerJsonRecipeJson) {
+      if (!r.beerJsonRecipeJson) {
         setGristRows([]);
         setHopsRows([]);
         setYeastRows([]);
@@ -381,10 +384,10 @@ export function RecipeEditScreen() {
         setMashRows([]);
         return;
       }
-      const s = editorStateFromBeerJson((r as any).beerJsonRecipeJson);
+      const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
       setGristRows(s.gristRows);
       setHopsRows(s.hopsRows);
-      const mashMerged = mergeMashDeduceFromExt(s.mash, ext);
+      const mashMerged = mergeMashDeduceFromExt(s.mash, r.recipeExtJson);
       if (mashMerged) {
         setMashProcedure({
           name: mashMerged.name || "Mash",
@@ -395,36 +398,31 @@ export function RecipeEditScreen() {
         setMashProcedure(null);
         setMashRows([]);
       }
-      const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, ext);
+      const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, r.recipeExtJson);
+      const yeastLinks = asRecord(linksRec?.yeast);
       const mappedYeastRows: EditorYeastRow[] = baseYeast.map((row) => {
         const fermentationTempC =
           yeastFermentationTempRaw &&
-          typeof yeastFermentationTempRaw === "object" &&
-          typeof (yeastFermentationTempRaw as any)[row.id] === "number" &&
-          Number.isFinite((yeastFermentationTempRaw as any)[row.id])
-            ? ((yeastFermentationTempRaw as any)[row.id] as number)
+          typeof yeastFermentationTempRaw[row.id] === "number" &&
+          Number.isFinite(yeastFermentationTempRaw[row.id] as number)
+            ? (yeastFermentationTempRaw[row.id] as number)
             : null;
         const oxygenation =
           yeastOxygenationRaw &&
-          typeof yeastOxygenationRaw === "object" &&
-          (((yeastOxygenationRaw as any)[row.id] as any) === "yes" ||
-            ((yeastOxygenationRaw as any)[row.id] as any) === "no")
-            ? ((yeastOxygenationRaw as any)[row.id] as "yes" | "no")
+          (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no")
+            ? (yeastOxygenationRaw[row.id] as "yes" | "no")
             : null;
         const diacetylRest =
           yeastDiacetylRestRaw &&
-          typeof yeastDiacetylRestRaw === "object" &&
-          (((yeastDiacetylRestRaw as any)[row.id] as any) === "yes" ||
-            ((yeastDiacetylRestRaw as any)[row.id] as any) === "no")
-            ? ((yeastDiacetylRestRaw as any)[row.id] as "yes" | "no")
+          (yeastDiacetylRestRaw[row.id] === "yes" || yeastDiacetylRestRaw[row.id] === "no")
+            ? (yeastDiacetylRestRaw[row.id] as "yes" | "no")
             : null;
         const formatOverride =
           yeastFormatRaw &&
-          typeof yeastFormatRaw === "object" &&
-          (((yeastFormatRaw as any)[row.id] as any) === "dry" ||
-            ((yeastFormatRaw as any)[row.id] as any) === "liquid" ||
-            ((yeastFormatRaw as any)[row.id] as any) === "slurry")
-            ? ((yeastFormatRaw as any)[row.id] as "dry" | "liquid" | "slurry")
+          (yeastFormatRaw[row.id] === "dry" ||
+            yeastFormatRaw[row.id] === "liquid" ||
+            yeastFormatRaw[row.id] === "slurry")
+            ? (yeastFormatRaw[row.id] as "dry" | "liquid" | "slurry")
             : null;
 
         const inferredFormat: NonNullable<EditorYeastRow["format"]> =
@@ -434,7 +432,7 @@ export function RecipeEditScreen() {
 
         return {
           ...row,
-          ingredientId: typeof links?.yeast?.[row.id] === "string" ? (links.yeast[row.id] as string) : null,
+          ingredientId: typeof yeastLinks?.[row.id] === "string" ? (yeastLinks[row.id] as string) : null,
           fermentationTempC: fermentationTempC ?? undefined,
           oxygenation: oxygenation ?? undefined,
           diacetylRest: diacetylRest ?? undefined,
@@ -471,8 +469,8 @@ export function RecipeEditScreen() {
     try {
       const res = await api.get("/api/styles");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.styles;
-      setStyles(Array.isArray(items) ? items : []);
+      const items = (res.data as { styles?: unknown })?.styles;
+      setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
     } catch {
       setStyles([]);
     } finally {
@@ -487,8 +485,8 @@ export function RecipeEditScreen() {
     try {
       const res = await api.get("/api/equipment-profiles");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.profiles;
-      setEquipmentProfiles(Array.isArray(items) ? items : []);
+      const items = (res.data as { profiles?: unknown })?.profiles;
+      setEquipmentProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
     } catch (err) {
       setEquipmentProfilesError(String(err));
       setEquipmentProfiles([]);
@@ -539,8 +537,8 @@ export function RecipeEditScreen() {
       const q = fermentableQuery.trim() ? `?query=${encodeURIComponent(fermentableQuery.trim())}&limit=20` : "?limit=20";
       const res = await api.get(`/api/ingredients/fermentables${q}`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.items ?? [];
-      setFermentableResults(Array.isArray(items) ? items : []);
+      const items = (res.data as { items?: unknown })?.items;
+      setFermentableResults(Array.isArray(items) ? (items as FermentableSearchItem[]) : []);
     } catch (err) {
       setFermentableSearchError(String(err));
       setFermentableResults([]);
@@ -557,8 +555,8 @@ export function RecipeEditScreen() {
       const q = hopQuery.trim() ? `?query=${encodeURIComponent(hopQuery.trim())}&limit=20` : "?limit=20";
       const res = await api.get(`/api/ingredients/hops${q}`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.items ?? [];
-      setHopResults(Array.isArray(items) ? items : []);
+      const items = (res.data as { items?: unknown })?.items;
+      setHopResults(Array.isArray(items) ? (items as HopSearchItem[]) : []);
     } catch (err) {
       setHopSearchError(String(err));
       setHopResults([]);
@@ -574,8 +572,8 @@ export function RecipeEditScreen() {
       const q = yeastQuery.trim() ? `?query=${encodeURIComponent(yeastQuery.trim())}` : "";
       const res = await api.get(`/api/ingredients/yeasts${q}`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.items ?? [];
-      setYeastResults(Array.isArray(items) ? items : []);
+      const items = (res.data as { items?: unknown })?.items;
+      setYeastResults(Array.isArray(items) ? (items as YeastSearchItem[]) : []);
     } catch {
       setYeastResults([]);
     } finally {
@@ -734,8 +732,8 @@ export function RecipeEditScreen() {
         const selected = equipmentProfiles.find((p) => p.id === selectedEquipmentProfileId) ?? null;
         if (!selected) throw new Error(t("equipmentSection.errors.selectFirst"));
 
-        const extBase = (recipe as any)?.recipeExtJson;
-        const base = extBase && typeof extBase === "object" && !Array.isArray(extBase) ? { ...(extBase as any) } : ({} as any);
+        const baseRec = asRecord(recipe?.recipeExtJson);
+        const base: Record<string, unknown> = baseRec ? { ...baseRec } : {};
         base.version = 1;
         base.equipment = selected.equipment;
         base.equipmentSource = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
@@ -776,8 +774,8 @@ export function RecipeEditScreen() {
     setSaveError(null);
     setSaveStatus(null);
     try {
-      const extBase = (recipe as any)?.recipeExtJson;
-      const extBaseForSave = extBase && typeof extBase === "object" && !Array.isArray(extBase) ? { ...(extBase as any) } : ({} as any);
+      const extBaseRec = asRecord(recipe?.recipeExtJson);
+      const extBaseForSave: Record<string, unknown> = extBaseRec ? { ...extBaseRec } : {};
 
       const boilTimeMinutesVal = (() => {
         const trimmed = boilTimeMinutes.trim();
@@ -1258,7 +1256,9 @@ export function RecipeEditScreen() {
                             onChange={(v) => {
                               const kind = v as "" | NonNullable<EditorGristRow["potential"]>["kind"];
                               if (!kind) return updateGristRow(r.id, { potential: null });
-                              updateGristRow(r.id, { potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) } as any });
+                              updateGristRow(r.id, {
+                                potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) } as NonNullable<EditorGristRow["potential"]>,
+                              });
                             }}
                             closeLabel={tCommon("close")}
                             accessibilityLabel={t("fermentables.potentialKindLabel")}
@@ -1274,7 +1274,9 @@ export function RecipeEditScreen() {
                               if (!r.potential) return;
                               const v = text === "" ? null : Number(text);
                               if (v === null) return updateGristRow(r.id, { potential: null });
-                              updateGristRow(r.id, { potential: { ...r.potential, value: roundTo(v, 3) } as any });
+                              updateGristRow(r.id, {
+                                potential: { ...r.potential, value: roundTo(v, 3) } as NonNullable<EditorGristRow["potential"]>,
+                              });
                             }}
                             placeholder="—"
                             keyboardType="decimal-pad"
@@ -1676,7 +1678,7 @@ export function RecipeEditScreen() {
                     ))}
                   </Accordion>
                   <Button
-                    onPress={() => (navigation as any).navigate("RecipeYeast", { recipeId })}
+                    onPress={() => navigation.navigate("RecipeYeast", { recipeId })}
                     size="$3"
                     mt="$2"
                     width="100%"
@@ -1776,7 +1778,7 @@ export function RecipeEditScreen() {
                   ) : null}
                   <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 4, marginTop: 8 }}>
                     <Text fontSize={12} opacity={0.8}>{t("equipmentSection.manageTemplatesText")}</Text>
-                    <Button chromeless size="$3" onPress={() => (navigation as any).navigate("Equipment")}>
+                    <Button chromeless size="$3" onPress={() => navigation.navigate("Equipment")}>
                       <Text fontSize={12} color="$blue10">{t("equipmentSection.manageTemplatesLinkText")}</Text>
                     </Button>
                   </View>
@@ -1942,7 +1944,7 @@ export function RecipeEditScreen() {
                     </View>
                   ) : null}
                   <Button
-                    onPress={() => (navigation as any).navigate("WaterHub", { recipeId })}
+                    onPress={() => navigation.navigate("WaterHub", { recipeId })}
                     size="$3"
                   >
                     <Text>{t("nav.openWaterCalculator")}</Text>
@@ -1950,7 +1952,7 @@ export function RecipeEditScreen() {
                   <Button
                     size="$3"
                     mt="$2"
-                    onPress={() => (navigation as any).navigate("WaterProfiles")}
+                    onPress={() => navigation.navigate("WaterProfiles")}
                   >
                     <Text>{t("waterProfilesManageText").replace(/\s+(on|su)$/i, "")}</Text>
                   </Button>

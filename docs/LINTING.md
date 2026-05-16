@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.7 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a (`apps/web/app/recipes/[id]/edit/page.tsx`), 4b (`apps/web/app/recipes/[id]/water/**` — mash + sparge + boil pages), and **4c** (`apps/web/app/recipes/[id]/yeast/page.tsx` + `brew-sessions/{,[brewSessionId]/}page.tsx`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, and the recipe editor surface in `apps/web` (recipe edit + water + yeast + brew-sessions pages, ~11,400 lines) is now `any`-free. Phase 5 (`apps/native/src/screens/**`) or Phase 6 (mop-up) is next.
+**Status:** v1.8 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**` — recipe edit + water + yeast + brew-sessions pages), and **5a** (`apps/native/src/screens/RecipeEditScreen.tsx` + shared navigation/typeGuards extraction) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, the entire `apps/web/app/recipes/**` surface (~11,400 lines) is `any`-free, and the largest single `apps/native` screen (RecipeEditScreen, 2,117 lines) is `any`-free with typed React Navigation. Phase 5b (`apps/native/src/screens/YeastScreen.tsx` + remaining native screens) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **342** (-64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -785 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **286** (-56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -841 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -220,13 +220,45 @@ The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui fr
 
 **Why these files went together in Phase 4c:** they share ~80% of their `any` patterns with Phase 4a/4b (`apiFetch` response unpacking, recipe-ext traversal, dynamic i18n keys), and the brew-sessions list page is so trivial (2 `any`) that splitting it into its own PR would have been disproportionate review overhead. Including the `asRecord` dedup ride-along in `edit/page.tsx` (~10 lines, no behavioural change) is a small but appropriate cleanup that grows the shared-helper consumer set from 3 to 4 files.
 
-### Phase 5 — `apps/native/src/screens/**` (~162 `any` warnings)
+### Phase 5 — `apps/native/src/screens/**` (~138 `any` warnings remaining)
 
 Same patterns as Phase 4 but for the React Native side. May land easier or harder depending on how `docs/TAMAGUI.md` migration goes.
 
-- [ ] Phase 5a: `RecipeEditScreen.tsx` (68 `any`)
-- [ ] Phase 5b: `YeastScreen.tsx` + remaining screens
+- [x] Phase 5a: `RecipeEditScreen.tsx` (56 `any` removed) ✅ landed 2026-05-16 — also extracts shared `navigation/types.ts` and `lib/typeGuards.ts` for reuse by Phase 5b
+- [ ] Phase 5b: `YeastScreen.tsx` (36 `any`) + remaining screens (~46 `any` across 11 files)
 - [ ] Add `lint:native-screens-strict` script once clean
+
+#### Phase 5a — `apps/native/src/screens/RecipeEditScreen.tsx` ✅ landed 2026-05-16
+
+**Scope:** 1 file, 2,117 lines (the largest single React Native screen — counterpart to `apps/web/app/recipes/[id]/edit/page.tsx`). 56 `no-explicit-any` warnings → 0. Plus 2 small infra files extracted for Phase 5b reuse.
+
+**Strategy used:** "tighten in place" — same toolkit as Phases 1–4c. The patterns mirror Phase 4a's web edit page and Phase 4c's web yeast page almost exactly (same JSON shapes coming from the same API).
+
+**Infrastructure additions (Phase 5b dividends):**
+
+- Extracted `apps/native/src/navigation/types.ts` exporting `RootStackParamList` and `TabParamList` (previously declared inline in `AppNavigator.tsx`). Avoids the circular-reference trap that would happen if a screen imported the param list from `AppNavigator.tsx` (which already imports all screens). All Phase 5b screens that currently use `useNavigation<any>()` (12 sites across 11 files) can now type their navigation properly.
+- Created `apps/native/src/lib/typeGuards.ts` mirroring `apps/web/app/_lib/typeGuards.ts` (Phase 4b extraction). Exports `asRecord(v: unknown): Record<string, unknown> | null`. Phase 5b screens can `import { asRecord } from "../lib/typeGuards"` instead of re-declaring the helper inline.
+
+**Per-pattern changes in `RecipeEditScreen.tsx`:**
+
+- Replaced `useNavigation<any>()` + 4 `(navigation as any).navigate(...)` sites with a typed `RecipeEditNavigationProp = NativeStackNavigationProp<RootStackParamList, "RecipeEdit">`. Each `navigate()` call now type-checks the route name + params at compile time (e.g. `navigation.navigate("RecipeYeast", { recipeId })` would fail TS if `recipeId` were missing).
+- Replaced the dense `(ext as any).field` cluster (12+ `recipeExtJson` field reads at the top of `loadRecipe`) with a single `extRec = asRecord(r.recipeExtJson)` extraction + per-field `asRecord(extRec?.fieldName)` for nested objects. Same Phase 4c yeast pattern.
+- Replaced the yeast-attenuation overrides loop's `Object.entries(yeastOverridesRaw as any)` with the typed `Object.entries(yeastOverridesRaw)` after `asRecord` narrowing.
+- Replaced the yeast-row map's `(yeastXxxRaw as any)[row.id]` indexing patterns (5 sites × ~3 expressions = ~15 casts) with direct indexing on the `Record<string, unknown> | null` typed Raws + lossless `as <literal>` casts on the final assignment. Behaviour preserved.
+- Replaced `(r as any).beerJsonRecipeJson` and `(r as any).recipeExtJson` with direct field access — the local `Recipe` type already declares both as `unknown`.
+- Replaced 6 `(res.data as any)?.{recipe,styles,profiles,items}` response-unpack casts with typed shape-casts (`as { recipe?: Recipe }` / `as { styles?: unknown }` etc.) plus `Array.isArray(...) ? (... as ItemType[]) : []` for the list responses. Same Phase 4a/4c precedent.
+- Replaced 2 `extBase` save blocks (`extBase && typeof extBase === "object" && !Array.isArray(extBase) ? { ...(extBase as any) } : ({} as any)`) — one in `applyEquipmentProfileToRecipe`, one in `save` — with `Record<string, unknown> = baseRec ? { ...baseRec } : {}`. Same Phase 4a/4c precedent.
+- Replaced 2 `as any` casts on `EditorGristRow["potential"]` field updates (potential picker + value input) with typed `as NonNullable<EditorGristRow["potential"]>` casts. The cast is still needed because TS can't fully infer the discriminated-union match from the narrowed `kind` variable, but the assertion is now structural rather than a type-system bypass.
+
+**Verification:**
+
+- ESLint: `RecipeEditScreen.tsx` at 0 `no-explicit-any` warnings (12 remaining warnings are all pre-existing `no-unused-vars` in dead-code yeast-row helpers — Phase 6 mop-up territory). Both new files (`navigation/types.ts`, `lib/typeGuards.ts`) at 0 warnings.
+- `apps/native` TypeScript error count held exactly at the pre-change baseline of 0 errors (`npm run typecheck --workspace=@brewery/native` clean). The Phase 5a changes did not introduce a single new TS error — typed navigation is fully assignable across the 4 `navigate()` call sites.
+- Repo-wide `no-explicit-any` count: 262 → 206 (drop of 56, exactly matches Phase 5a scope).
+- Repo-wide all-warnings count: 342 → 286 (same -56 delta, no other warning category affected).
+- No new `apps/native` unit tests added (Phase 5a is type-tightening, no behavioural change).
+
+**Why this file went first in Phase 5:** at 56 `any` it was the highest-leverage single file in `apps/native` (matches the doc's pre-flight estimate of 68 — actual count was 56), the patterns map 1:1 onto Phase 4a/4c so the toolkit transferred cleanly, and the navigation-type-extraction + typeGuards-extraction set up Phase 5b for cheap mechanical reuse across the remaining 11 native screens (where 12 of the 13 `useNavigation<any>` sites still live).
 
 ### Phase 6 — Mop-up
 

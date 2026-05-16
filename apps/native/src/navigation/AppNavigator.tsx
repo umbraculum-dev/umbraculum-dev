@@ -10,6 +10,7 @@ import type { RouteId } from "@brewery/navigation";
 
 import { Spinner } from "@brewery/ui";
 
+import type { RootStackParamList, TabParamList } from "./types";
 import { useAuth } from "../auth/AuthProvider";
 import { AboutScreen } from "../screens/AboutScreen";
 import { AiScreen } from "../screens/AiScreen";
@@ -34,33 +35,7 @@ import { SelectWorkspaceScreen } from "../screens/SelectWorkspaceScreen";
 
 enableScreens();
 
-type TabParamList = {
-  Dashboard: undefined;
-  Recipes: undefined;
-  Inventory: undefined;
-};
-
 const Tab = createBottomTabNavigator<TabParamList>();
-
-type RootStackParamList = {
-  Tabs: undefined;
-  SelectWorkspace: undefined;
-  RecipeEdit: { recipeId: string };
-  BrewSessionsList: { recipeId: string };
-  BrewSessionDetail: { recipeId: string; brewSessionId: string };
-  RecipeYeast: { recipeId: string };
-  WaterHub: { recipeId: string };
-  WaterMash: { recipeId: string };
-  WaterSparge: { recipeId: string };
-  WaterBoil: { recipeId: string };
-  About: undefined;
-  Ai: undefined;
-  Contributing: { topic?: "i18n" | "raw-materials" } | undefined;
-  Equipment: undefined;
-  BrewdayStepsSettings: undefined;
-  FermDataIntegration: undefined;
-  WaterProfiles: undefined;
-};
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
