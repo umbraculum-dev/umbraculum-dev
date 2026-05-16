@@ -714,7 +714,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             children: [
               /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { children: errorText }),
               isSubscriptionError && onOpenUpgrade ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.XStack, { marginTop: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                import_tamagui12.Button,
+                Button,
                 {
                   size: "$2",
                   onPress: onOpenUpgrade,
@@ -745,7 +745,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
         ),
         /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_tamagui12.XStack, { gap: "$2", alignItems: "center", children: [
           /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.View, { flex: 1, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-            import_tamagui12.Input,
+            Input,
             {
               value: draft,
               onChangeText: setDraft,
@@ -757,7 +757,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             }
           ) }),
           /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-            import_tamagui12.Button,
+            Button,
             {
               onPress: handleSend,
               disabled: pending || draft.trim().length === 0,

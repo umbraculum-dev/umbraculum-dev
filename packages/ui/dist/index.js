@@ -595,7 +595,7 @@ function applyEvent(setMessages, turnId, event) {
 
 // src/ai/AiChatPanel.tsx
 import { useState as useState3 } from "react";
-import { Button as Button2, H2, Input as Input2, SizableText, View as View2, XStack as XStack3, YStack as YStack6 } from "tamagui";
+import { H2, SizableText, View as View2, XStack as XStack3, YStack as YStack6 } from "tamagui";
 import { jsx as jsx11, jsxs as jsxs6 } from "react/jsx-runtime";
 function AiChatPanel({ chat, t, onOpenUpgrade }) {
   const { messages, pending, terminalError, send } = chat;
@@ -634,7 +634,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             children: [
               /* @__PURE__ */ jsx11(SizableText, { children: errorText }),
               isSubscriptionError && onOpenUpgrade ? /* @__PURE__ */ jsx11(XStack3, { marginTop: "$2", children: /* @__PURE__ */ jsx11(
-                Button2,
+                Button,
                 {
                   size: "$2",
                   onPress: onOpenUpgrade,
@@ -665,7 +665,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
         ),
         /* @__PURE__ */ jsxs6(XStack3, { gap: "$2", alignItems: "center", children: [
           /* @__PURE__ */ jsx11(View2, { flex: 1, children: /* @__PURE__ */ jsx11(
-            Input2,
+            Input,
             {
               value: draft,
               onChangeText: setDraft,
@@ -677,7 +677,7 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             }
           ) }),
           /* @__PURE__ */ jsx11(
-            Button2,
+            Button,
             {
               onPress: handleSend,
               disabled: pending || draft.trim().length === 0,

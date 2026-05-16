@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { H2, SizableText, View, XStack, YStack } from "tamagui";
+
+import { Button } from "../primitives/Button";
+import { Input } from "../primitives/Input";
 
 import type { useAiChatStream } from "./useAiChatStream";
 
