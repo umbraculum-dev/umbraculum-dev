@@ -713,6 +713,48 @@ docker run --rm \
 
 ---
 
+## Recommended editor configuration
+
+When working in this repo, copy `.vscode/settings.json.example` to `.vscode/settings.json` (gitignored — your local copy is yours to tweak). The example pins three settings that matter:
+
+1. **`eslint.options.overrideConfigFile: "eslint.config.editor.mjs"`** — points the Cursor / VS Code ESLint extension at the editor-only config (mitigation **C** of the Phase 5 prerequisite stack). The editor config derives from production but strips the 12 type-aware rules (the 7 promise rules + the 5 `no-unsafe-*` rules) and the `parserOptions.projectService` block that drives the cost. Full inline-feedback rules stay enabled (`no-explicit-any: error`, `no-unused-vars: error`, `react-hooks/exhaustive-deps: error`, `jsx-a11y/recommended`, the cross-platform UI primitives guardrail, etc.) — about ~95% of catch-on-save value, at ~7s wall instead of ~42s.
+
+2. **`eslint.run: "onSave"`** — lint on save, not on every keystroke. Drops typing latency to zero and matches CI's actual gate (lint runs once per commit).
+
+3. **`editor.codeActionsOnSave.source.fixAll.eslint: "explicit"`** — auto-fix runs only when you explicitly invoke it (command palette → "ESLint: Fix all auto-fixable Problems"), never silently on save. **`true` is forbidden by `.cursor/rules/23a-eslint-fixall-discipline.mdc`** (cursor rule mitigation **E**, ships in the next `@rftsu/cursor-rules` release after `3.1.10`).
+
+### Why this matters
+
+`eslint.config.mjs` enables 12 type-aware rules. Type-aware rules require ESLint to load the full TypeScript program for each lint pass:
+
+- **In CI:** ~42s wall. Acceptable; the `web-lint.yml` workflow has a 10-min budget and the lint phase fits comfortably inside it.
+- **In the editor (no override):** every save reloads the TS program. Inline lint feedback goes from instant to ~3-5s; ESLint-server RAM grows by several hundred MB; on large workspaces, contributors disable inline lint, and the production rule loses real-world enforcement.
+- **Worse:** `source.fixAll.eslint: true` (a default many contributors carry over from previous projects) lets the typescript-eslint auto-fixer **silently strip `eslint-disable` directives** that look "unused" against a transient rule state, and **rewrite type assertions** in ways that break `tsc --noEmit`. HIGH-full Phase 1 lost ~17 disable comments and 11 files to that pattern before we caught it. The risk is highest for AI-mediated edits where the auto-fixer runs implicitly between agent turns.
+
+The mitigation stack landed in HIGH-full Phase 5a/5b consists of four pieces:
+
+| ID | What | Where it lives | Status |
+|----|------|----------------|--------|
+| **C** | `eslint.config.editor.mjs` (editor-only ESLint config that strips type-aware rules and `projectService`) | This repo, root | ✅ landed Phase 5a |
+| **A** | `.vscode/settings.json.example` (recommended workspace settings) | This repo, `.vscode/` (gitignored carve-out) | ✅ landed Phase 5a |
+| **E** | `23a-eslint-fixall-discipline.mdc` cursor rule (forbids `source.fixAll.eslint: true`, requires the editor-config split when present) | Upstream `rftsu/cursor-rules` (canonical) + `rf-node-react-cursor-assistant` plugin variant; arrives in this repo via the next package sync after release | 🟡 landed upstream (uncommitted release; pulls in on next `npm install` after the `@rftsu/cursor-rules` 3.1.11+ tag) |
+| **F** | This section + the cross-link from the Phase 5 prerequisite section above | This repo, `docs/LINTING.md` | ✅ landed Phase 5b |
+
+Mitigations B (an EditorConfig-only delta) and G (a forced `eslint.options.workingDirectories` override) were considered and skipped — they don't add value beyond what C+A+E+F deliver. D (ESLint Daemon) is opt-in for contributors who want even faster inline feedback; it's not part of the recommended baseline.
+
+### Troubleshooting
+
+**Symptom:** ESLint inline feedback is slow / RAM usage is high in this repo.
+**Fix:** Confirm `.vscode/settings.json` exists locally and contains the `eslint.options.overrideConfigFile: "eslint.config.editor.mjs"` line from the example. Without it, the extension defaults to `eslint.config.mjs` and pays the full type-aware cost.
+
+**Symptom:** The editor flags an `eslint-disable-next-line @typescript-eslint/no-unsafe-*` directive as "Unused eslint-disable directive".
+**Fix:** Pull latest — the editor config has a `linterOptions.reportUnusedDisableDirectives: "off"` block that suppresses these (the rules are stripped in the editor config, so the directives look "unused" to it, but they ARE used in CI). If the warning persists after pull, check that the editor extension is actually using `eslint.config.editor.mjs` and not the production config.
+
+**Symptom:** I want to see all the type-aware warnings the editor would normally hide (e.g. before a PR).
+**Fix:** Run `npm run lint` in a terminal — that uses the production `eslint.config.mjs` and shows every rule. Do not flip `eslint.options.overrideConfigFile` in your settings to bypass — that re-introduces the auto-fix-overreach risk.
+
+---
+
 ## CI
 
 The `.github/workflows/web-lint.yml` workflow runs two ESLint invocations on every PR that touches `apps/web/**`, `apps/native/**`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`:
