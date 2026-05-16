@@ -526,7 +526,7 @@ export default function BrewSessionDetailPage() {
     };
     if (grouped.length === 0) return false;
     return grouped.every((g) => g.steps.length > 0 && g.steps.every(isStepCompleteForSection));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [grouped]);
 
   useEffect(() => {

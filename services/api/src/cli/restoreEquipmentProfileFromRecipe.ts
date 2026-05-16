@@ -92,7 +92,7 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 function printHelp(): void {
-  // eslint-disable-next-line no-console
+   
   console.log(
     [
       "restoreEquipmentProfileFromRecipe",
@@ -167,7 +167,7 @@ async function main(): Promise<void> {
     });
 
     if (!recipe) {
-      // eslint-disable-next-line no-console
+       
       console.error(`recipe not found: ${args.recipeId}`);
       process.exit(1);
     }
@@ -176,7 +176,7 @@ async function main(): Promise<void> {
     const equipment = asEquipmentSnapshot(ext.equipment);
 
     if (!equipment) {
-      // eslint-disable-next-line no-console
+       
       console.error(
         `recipe_ext_json.equipment is missing on ${recipe.id}; nothing to restore`,
       );
@@ -188,7 +188,7 @@ async function main(): Promise<void> {
       args.equipmentId ?? asString(equipmentSource.equipmentProfileId);
 
     if (!equipmentId) {
-      // eslint-disable-next-line no-console
+       
       console.error(
         "could not resolve equipment profile id; pass --equipment-id or set recipe_ext_json.equipmentSource.equipmentProfileId",
       );
@@ -229,7 +229,7 @@ async function main(): Promise<void> {
     };
 
     if (args.dryRun) {
-      // eslint-disable-next-line no-console
+       
       console.log(
         JSON.stringify({ dryRun: true, equipmentId, data }, null, 2),
       );
@@ -253,7 +253,7 @@ async function main(): Promise<void> {
       },
     });
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       JSON.stringify(
         { ok: true, action: existing ? "updated" : "created", profile: result },
@@ -267,7 +267,7 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

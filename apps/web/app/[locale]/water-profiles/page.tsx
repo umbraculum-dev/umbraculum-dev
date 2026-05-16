@@ -68,7 +68,7 @@ export default function WaterProfilesPage() {
 
   useEffect(() => {
     void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const allProfiles = useMemo(() => {

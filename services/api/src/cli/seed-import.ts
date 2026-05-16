@@ -40,7 +40,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 function printHelp() {
-  // eslint-disable-next-line no-console
+   
   console.log(
     [
       "seed-import",
@@ -73,7 +73,7 @@ async function main() {
   }
 
   if (args.path) {
-    // eslint-disable-next-line no-console
+     
     console.log("Note: --path is currently ignored; BeerProto imports fetch from upstream.");
   }
 
@@ -98,7 +98,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

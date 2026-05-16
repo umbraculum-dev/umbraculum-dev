@@ -129,6 +129,8 @@ const miscUseOptions: { value: MiscUse; label: string }[] = [
   { value: "bottling", label: "Bottling" },
 ];
 
+const COLLAPSIBLE_SECTION_IDS = ["basics", "analysis", "brewingHistory", "brew", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes", "water"] as const;
+
 export default function RecipeEditPage() {
   const t = useTranslations("recipes.edit");
   const tHops = useTranslations("recipes.edit.hops");
@@ -220,11 +222,9 @@ export default function RecipeEditPage() {
     { id: "water", label: t("sections.water") },
   ] as const;
 
-  const collapsibleSectionIds = ["basics", "analysis", "brewingHistory", "brew", "equipment", "mashing", "fermentables", "hops", "yeast", "other", "boil", "notes", "water"] as const;
-
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
-    for (const id of collapsibleSectionIds) init[id] = false;
+    for (const id of COLLAPSIBLE_SECTION_IDS) init[id] = false;
     init.water = true;
     return init;
   });
@@ -426,7 +426,7 @@ export default function RecipeEditPage() {
       const raw = window.location.hash || "";
       const id = raw.startsWith("#") ? raw.slice(1) : raw;
       if (!id) return;
-      if (!collapsibleSectionIds.includes(id as any)) return;
+      if (!COLLAPSIBLE_SECTION_IDS.includes(id as any)) return;
       setSectionOpen(id, true);
     };
 

@@ -39,6 +39,7 @@ Goal: realize the §1.1 reframe in code and in market positioning. Same product,
 - `@brewery/*` horizontal packages renamed to a neutral platform scope (`docs/PLATFORM-ARCHITECTURE.md` §3.3, §5.2). This is the one-way structural move that should not be deferred past this phase.
 - Module SDK published as a public artifact (`docs/PLATFORM-ARCHITECTURE.md` §4.4). Third-party module developers can build modules in their own repositories.
 - `WorkspaceBillingAddon` model + Stripe subscription-item flow + RevenueCat consumables shipped — the prerequisite for selling per-module entitlements and optional managed-AI credits cleanly.
+- **Foundation hardening pass (lint, types, tests) lands ahead of the public AGPLv3 flip.** Concretely: HIGH-staged ESLint slices complete by end of H2 2026; HIGH-full lint (type-aware + `no-explicit-any: error` + `--max-warnings 0` repo-wide) lands during this phase. See `docs/LINTING.md` for the staged roadmap and `docs/TAMAGUI.md` for the Tamagui-specific adaptation strategy. The intent is that a contributor reading the codebase for the first time sees a clean lint surface, descriptive docs about known type-system caveats, and CI gates that prevent regression.
 
 ### H2 2027 — WMS as second native-mandatory vertical; federation decision
 
@@ -61,6 +62,7 @@ Goal: validate the "modules expand by config and SDK, not by core rewrite" promi
 - **One audience per app.** Workspace-member modules share one shell. Shopper-facing surfaces (if any) are separate apps.
 - **AI consultant is the cross-module connective tissue.** The architectural and economic case for one shell over a "myriad of apps" rests on the AI seeing all modules in one workspace context.
 - **No retroactive license changes.** Anything committed under AGPLv3 stays AGPLv3 (`docs/LICENSING.md` §9–10).
+- **Invest in foundations alongside features, not at the end.** Lint, type safety, test coverage, and developer-facing documentation compound — every bit of foundation paid down now makes every future feature cheaper and safer. The opposite — accumulating debt until "later" — never goes well. Living foundation docs: `docs/LINTING.md`, `docs/TAMAGUI.md`, `docs/TESTING.md`, `docs/DEVELOPMENT-ACCESSIBILITY.md`.
 - **The tone of this roadmap is honest commitment, not aspiration.** If a phase moves, the doc moves. If the underlying assumptions change, the trajectory changes openly via the same RFC process used for governance changes (`docs/LICENSING.md` §10).
 
 ## UI pillars (from Figma)

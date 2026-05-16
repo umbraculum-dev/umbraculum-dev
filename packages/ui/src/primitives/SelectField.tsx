@@ -38,11 +38,12 @@ export function SelectField({
   renderValue,
   closeLabel,
 }: SelectFieldProps) {
-  const findLabel = (v: string) => options.find((opt) => opt.value === v)?.label ?? v;
-
   const isWeb = Platform.OS === "web";
   const [open, setOpen] = useState(false);
-  const selectedLabel = useMemo(() => findLabel(value), [value, options]);
+  const selectedLabel = useMemo(
+    () => options.find((opt) => opt.value === value)?.label ?? value,
+    [value, options],
+  );
 
   if (isWeb) {
     // Use a native <select> on web to avoid Tamagui Select type + DOM-prop issues.

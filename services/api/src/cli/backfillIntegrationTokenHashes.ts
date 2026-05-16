@@ -26,14 +26,14 @@ async function main() {
     updated += 1;
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`Backfilled integration tokens: ${updated}`);
 
   await prisma.$disconnect();
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

@@ -78,7 +78,7 @@ export default function PlatformAdsPage() {
   useEffect(() => {
     if (!canLoad) return;
     void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [canLoad]);
 
   const onCreate = async () => {

@@ -18,6 +18,7 @@ export function AdSlotCard(props: AdSlotCardProps) {
   return (
     <YStack marginVertical={12} gap="$1.5">
       <Card
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Tamagui Card supports `as="aside"` at runtime but does not expose it in its prop types. See docs/TAMAGUI.md (Tamagui type-system caveats).
         {...(isWeb ? ({ as: "aside", "aria-label": props.ariaLabel } as any) : { accessibilityLabel: props.ariaLabel })}
         backgroundColor="$background"
         borderWidth={1}

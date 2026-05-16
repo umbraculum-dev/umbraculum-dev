@@ -297,7 +297,7 @@ export default function BoilWaterPage() {
   useEffect(() => {
     if (!authed) return;
     void refreshProfiles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [authed]);
 
   useEffect(() => {

@@ -168,7 +168,7 @@ export default function WaterHubPage() {
     }));
 
     return streams;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [summary, formatHints, locale, t, tUnits, tsalts]);
 
   return (

@@ -35,8 +35,9 @@ export interface RecipeMetaLineProps {
 }
 
 export function RecipeMetaLine(props: RecipeMetaLineProps) {
+  const { recipeId, loadRecipeMeta, enabled: enabledProp } = props;
   const { t } = useT("waterHub");
-  const enabled = props.enabled !== false;
+  const enabled = enabledProp !== false;
 
   const [meta, setMeta] = useState<RecipeMeta>({ name: null, version: null });
 
@@ -45,10 +46,9 @@ export function RecipeMetaLine(props: RecipeMetaLineProps) {
     setMeta({ name: null, version: null });
 
     if (!enabled) return () => {};
-    if (!props.recipeId) return () => {};
+    if (!recipeId) return () => {};
 
-    void props
-      .loadRecipeMeta(props.recipeId)
+    void loadRecipeMeta(recipeId)
       .then((res) => {
         if (cancelled) return;
         if (!res) return;
@@ -59,11 +59,11 @@ export function RecipeMetaLine(props: RecipeMetaLineProps) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, props.recipeId, props.loadRecipeMeta]);
+  }, [enabled, recipeId, loadRecipeMeta]);
 
   return (
     <Text fontSize={12} opacity={0.8}>
-      {t("recipeId")}: {props.recipeId}
+      {t("recipeId")}: {recipeId}
       {meta.name ? ` - ${t("recipeName")}: ${meta.name}` : null}
       {meta.version !== null ? ` - ${t("recipeVersion")}: ${String(meta.version).padStart(2, "0")}` : null}
     </Text>

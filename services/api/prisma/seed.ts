@@ -349,10 +349,10 @@ async function main() {
         update: { role: "brewery_admin" },
       });
 
-      // eslint-disable-next-line no-console
+       
       console.log(`Seeded admin login: ${user.email} (workspace: ${SEEDED_OWNER_WORKSPACE_ID})`);
     } else {
-      // eslint-disable-next-line no-console
+       
       console.log("Skipping SEEDED_OWNER_*: invalid email or password too short.");
     }
   }
@@ -392,18 +392,18 @@ async function main() {
   await prisma.$disconnect();
 
   // Print stable IDs for convenience (safe, not secrets).
-  // eslint-disable-next-line no-console
+   
   console.log("Seeded dev identities:");
-  // eslint-disable-next-line no-console
+   
   console.log(`UserId: ${DEV_USER_ID}`);
-  // eslint-disable-next-line no-console
+   
   console.log(`WorkspaceId: ${DEV_WORKSPACE_ID}`);
-  // eslint-disable-next-line no-console
+   
   console.log("Auth is cookie-session-based (sid). Use /en/signup or /en/login in the web app.");
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

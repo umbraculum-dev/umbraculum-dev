@@ -378,7 +378,7 @@ export default function MashWaterPage() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [canCall, recipeId]);
 
   const waterVolumes = useMemo(() => {
@@ -545,7 +545,7 @@ export default function MashWaterPage() {
       setMashProcedure(null);
       setMashRows([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [recipe, derivedMashWaterVolumeLiters, mashRows.length, mashStepsDirty]);
 
   const saltDerivationForMath = useMemo(() => {

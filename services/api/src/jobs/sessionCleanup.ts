@@ -14,7 +14,7 @@ async function main() {
     const result = await prisma.session.deleteMany({
       where: { expiresAt: { lt: new Date() } },
     });
-    // eslint-disable-next-line no-console
+     
     console.log(`Deleted ${result.count} expired session(s)`);
   } finally {
     await prisma.$disconnect();
@@ -22,7 +22,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

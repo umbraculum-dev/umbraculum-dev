@@ -12,6 +12,7 @@
     "test:packages": "npm test -w @brewery/contracts && npm test -w @brewery/core",
     "test:all": "npm run test:packages",
     "lint": "eslint .",
+    "lint:packages-strict": "eslint packages/api-client packages/core packages/i18n packages/i18n-react packages/media packages/navigation packages/recipes-ui packages/test-mcp packages/ui --max-warnings 0",
     "smoke": "./scripts/smoke.sh",
     "seed:e2e": "docker compose exec -T api npm run seed:e2e",
     "dev": "docker compose up --build",

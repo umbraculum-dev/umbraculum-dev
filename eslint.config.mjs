@@ -85,6 +85,36 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // Project-wide rule tweaks. MUST come before any file-glob override
+  // blocks below — flat-config later blocks override earlier ones, so
+  // anything we want a per-glob override (e.g. "@typescript-eslint/
+  // no-explicit-any: off" for tests) to actually take effect must
+  // appear AFTER this block, not before.
+  // -------------------------------------------------------------------
+  {
+    rules: {
+      // TS already enforces this and the TS error message is clearer.
+      "no-unused-vars": "off",
+      // Allow underscore-prefixed unused (e.g. _unusedProps).
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      // `any` is sometimes the right escape hatch; warn rather than error.
+      "@typescript-eslint/no-explicit-any": "warn",
+      // Allow `interface X extends Y {}` (Tamagui's module augmentation
+      // pattern, `interface TamaguiCustomConfig extends AppConfig {}`, and
+      // similar "named type alias via interface" patterns). Still flag
+      // truly empty `interface X {}` and `type X = {}` because those
+      // accept any non-null value.
+      "@typescript-eslint/no-empty-object-type": [
+        "warn",
+        { allowInterfaces: "with-single-extends" },
+      ],
+    },
+  },
+
+  // -------------------------------------------------------------------
   // React hook rules (manual; the plugin doesn't ship a flat preset).
   // -------------------------------------------------------------------
   {
@@ -92,7 +122,12 @@ export default [
     plugins: { "react-hooks": reactHooks },
     rules: {
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
+      // Promoted from warn → error in HIGH-light. Catches stale-closure
+      // bugs that TS cannot see (e.g. an effect that reads `state` but
+      // omits it from its deps array). When a missing dep is intentional,
+      // use `// eslint-disable-next-line react-hooks/exhaustive-deps --
+      // <reason>`.
+      "react-hooks/exhaustive-deps": "error",
     },
   },
 
@@ -199,22 +234,4 @@ export default [
     },
   },
 
-  // -------------------------------------------------------------------
-  // Project-wide rule tweaks.
-  // -------------------------------------------------------------------
-  {
-    rules: {
-      // TS already enforces this and the TS error message is clearer.
-      "no-unused-vars": "off",
-      // Allow underscore-prefixed unused (e.g. _unusedProps).
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
-      ],
-      // `any` is sometimes the right escape hatch; warn rather than error.
-      "@typescript-eslint/no-explicit-any": "warn",
-      // We use empty interfaces for "open shape" / "marker type" patterns.
-      "@typescript-eslint/no-empty-object-type": "warn",
-    },
-  },
 ];

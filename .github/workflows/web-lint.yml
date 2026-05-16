@@ -6,12 +6,16 @@ name: web-lint
 # `.cursor/rules/00-shared-node-npm-container-only.mdc`,
 # `docs/TESTING.md`, and `docs/LINTING.md`).
 #
-# Scope is currently MEDIUM (per `docs/LINTING.md`):
-#   - errors only block CI; warnings are tolerated until the HIGH-scope
-#     upgrade (tracked in `docs/LINTING.md` "TODO: upgrade to HIGH").
-#   - the canonical guardrail is `no-restricted-imports` on cross-platform
+# Scope is currently HIGH-LIGHT (per `docs/LINTING.md`):
+#   - `npm run lint` (full repo): errors block CI, warnings tolerated.
+#     Used to surface ongoing drift to PR authors.
+#   - `npm run lint:packages-strict` (gated packages): runs with
+#     `--max-warnings 0` on 9 of 11 packages (excluding `beerjson` and
+#     `contracts`, which are HIGH-staged Phase 1 cleanup targets).
+#     Any new warning in these packages blocks merge.
+#   - The canonical guardrail is `no-restricted-imports` on cross-platform
 #     UI (`packages/ui/src/{ai,charts}/**`) to forbid raw `tamagui`
-#     Button/Input/Checkbox imports.
+#     Button/Input/Checkbox imports (see docs/LINTING.md, "Why Medium").
 
 on:
   push:
@@ -57,4 +61,11 @@ jobs:
             -v "${{ github.workspace }}:/repo" \
             -w /repo \
             node:20-slim \
-            bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run lint"
+            bash -lc "
+              set -e
+              npm install --no-audit --no-fund --workspaces --include-workspace-root
+              echo '--- full lint (errors block; warnings reported) ---'
+              npm run lint
+              echo '--- strict gate on packages/** (no warnings tolerated) ---'
+              npm run lint:packages-strict
+            "

@@ -63,7 +63,7 @@ export function RemoteImage({
           const msg =
             e && typeof e === "object" && "error" in (e as any) ? String((e as any).error) : "image_load_failed";
           setErrorText(msg);
-          // eslint-disable-next-line no-console
+           
           console.warn("[RemoteImage] failed", { assetKey, baseUrl, uri, error: msg });
         } catch {
           setErrorText("image_load_failed");

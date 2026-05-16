@@ -58,12 +58,12 @@ async function main() {
         updated += 1;
       } catch (err) {
         failed += 1;
-        // eslint-disable-next-line no-console
+         
         console.error(JSON.stringify({ recipeId: r.id, error: String(err) }));
       }
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log(JSON.stringify({ ok: true, dryRun, scanned: candidates.length, updated, failed }, null, 2));
   } finally {
     await prisma.$disconnect();
@@ -71,7 +71,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

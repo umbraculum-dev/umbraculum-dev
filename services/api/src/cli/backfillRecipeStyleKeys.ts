@@ -75,7 +75,7 @@ async function main() {
       });
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       JSON.stringify(
         { ok: true, scanned: candidates.length, matched, customed, note: "Recipes with existing styleKey were not touched." },
@@ -89,7 +89,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exit(1);
 });

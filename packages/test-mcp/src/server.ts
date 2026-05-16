@@ -54,11 +54,6 @@ function enrichResultWithRunDir(result: unknown): unknown {
 
 const PORT = Number(process.env.MCP_PORT ?? process.env.PORT ?? "8932");
 
-interface JsonRequest {
-  tool: ToolName;
-  args?: Record<string, unknown>;
-}
-
 async function dispatch(tool: ToolName, args: Record<string, unknown> = {}): Promise<unknown> {
   switch (tool) {
     case "smokeStack":
@@ -149,7 +144,6 @@ async function startServer() {
   });
 
   server.listen(PORT, () => {
-    // eslint-disable-next-line no-console
     console.log(`[@brewery/test-mcp] listening on http://localhost:${PORT}`);
   });
 }
@@ -160,7 +154,6 @@ async function runCli() {
   if (cliIdx === -1) return null;
   const tool = argv[cliIdx + 1] as ToolName | undefined;
   if (!tool || !(tool in TOOLS)) {
-    // eslint-disable-next-line no-console
     console.error(JSON.stringify({ ok: false, error: `unknown tool: ${tool}` }, null, 2));
     process.exit(2);
   }
@@ -169,12 +162,10 @@ async function runCli() {
   try {
     const result = await dispatch(tool, args);
     const enriched = enrichResultWithRunDir(result);
-    // eslint-disable-next-line no-console
     console.log(JSON.stringify(enriched, null, 2));
     const ok = (enriched as { ok?: boolean } | undefined)?.ok !== false;
     process.exit(ok ? 0 : 1);
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error(JSON.stringify({ ok: false, error: String((err as Error)?.message ?? err) }, null, 2));
     process.exit(1);
   }

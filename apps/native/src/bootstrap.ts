@@ -26,7 +26,7 @@ try {
       // prevents React Native from booting (black screen).
       try {
         if (descriptor && "value" in descriptor) {
-          // eslint-disable-next-line no-underscore-dangle
+           
           (globalThis as any).__FUSEBOX_REACT_DEVTOOLS_DISPATCHER__ = descriptor.value;
         }
       } catch {
@@ -48,7 +48,7 @@ try {
     const previous =
       typeof ErrorUtilsMaybe.getGlobalHandler === "function" ? ErrorUtilsMaybe.getGlobalHandler() : null;
     ErrorUtilsMaybe.setGlobalHandler((error: any, isFatal: boolean) => {
-      // eslint-disable-next-line no-console
+       
       console.error("[GlobalErrorHandler]", { isFatal, message: error?.message, stack: error?.stack });
       if (previous) previous(error, isFatal);
     });

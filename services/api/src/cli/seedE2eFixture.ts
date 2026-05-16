@@ -234,7 +234,7 @@ async function seed() {
       },
     });
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       JSON.stringify(
         {
@@ -268,7 +268,7 @@ async function clean() {
     await prisma.user.deleteMany({
       where: { id: { in: [E2E_USER_ADMIN_ID, E2E_USER_MEMBER_ID, E2E_USER_VIEWER_ID] } },
     });
-    // eslint-disable-next-line no-console
+     
     console.log(JSON.stringify({ ok: true, cleaned: true }, null, 2));
   } finally {
     await prisma.$disconnect();
@@ -277,7 +277,7 @@ async function clean() {
 
 const cmd = process.argv.includes("--clean") ? clean : seed;
 cmd().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(JSON.stringify({ ok: false, error: String(err?.message ?? err) }, null, 2));
   process.exit(1);
 });
