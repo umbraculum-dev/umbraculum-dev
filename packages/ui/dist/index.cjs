@@ -391,10 +391,12 @@ function SelectField({
   renderValue,
   closeLabel
 }) {
-  const findLabel = (v) => options.find((opt) => opt.value === v)?.label ?? v;
   const isWeb = import_react_native8.Platform.OS === "web";
   const [open, setOpen] = (0, import_react2.useState)(false);
-  const selectedLabel = (0, import_react2.useMemo)(() => findLabel(value), [value, options]);
+  const selectedLabel = (0, import_react2.useMemo)(
+    () => options.find((opt) => opt.value === value)?.label ?? value,
+    [value, options]
+  );
   if (isWeb) {
     return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(
       "select",

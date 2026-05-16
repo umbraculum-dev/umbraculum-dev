@@ -1,9 +1,10 @@
 export { sgToPlato } from '@brewery/core';
 
+type BeerJsonRecipe = Record<string, unknown>;
 type BeerJsonDocument = {
     beerjson: {
         version: number;
-        recipes: any[];
+        recipes: BeerJsonRecipe[];
     };
 };
 type GristPotential = {
@@ -142,12 +143,7 @@ declare function validateMashBeforeSave(mash: EditorMash): {
     ok: false;
     errors: string;
 };
-declare function replaceMashInBeerJsonDocument(doc: unknown, mash: EditorMash | null): {
-    beerjson: {
-        version: number;
-        recipes: any[];
-    };
-};
+declare function replaceMashInBeerJsonDocument(doc: unknown, mash: EditorMash | null): BeerJsonDocument;
 declare function buildBeerJsonRecipeDocument(args: {
     name: string;
     notes: string | null;

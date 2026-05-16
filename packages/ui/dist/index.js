@@ -311,10 +311,12 @@ function SelectField({
   renderValue,
   closeLabel
 }) {
-  const findLabel = (v) => options.find((opt) => opt.value === v)?.label ?? v;
   const isWeb = Platform8.OS === "web";
   const [open, setOpen] = useState(false);
-  const selectedLabel = useMemo(() => findLabel(value), [value, options]);
+  const selectedLabel = useMemo(
+    () => options.find((opt) => opt.value === value)?.label ?? value,
+    [value, options]
+  );
   if (isWeb) {
     return /* @__PURE__ */ jsxs5(
       "select",

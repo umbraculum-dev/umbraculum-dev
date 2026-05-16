@@ -274,117 +274,126 @@ function parseWaterProfilesResponse(payload) {
 function isFiniteNumber2(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
+function isObject3(v) {
+  return v != null && typeof v === "object" && !Array.isArray(v);
+}
 function parseIonProfilePpm2(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
   const keys = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
   for (const k of keys) {
-    if (!isFiniteNumber2(o[k])) throw new Error(`Invalid ${label}.${String(k)}`);
+    if (!isFiniteNumber2(v[k])) throw new Error(`Invalid ${label}.${String(k)}`);
   }
   return {
-    calcium: o.calcium,
-    magnesium: o.magnesium,
-    sodium: o.sodium,
-    sulfate: o.sulfate,
-    chloride: o.chloride,
-    bicarbonate: o.bicarbonate
+    calcium: v.calcium,
+    magnesium: v.magnesium,
+    sodium: v.sodium,
+    sulfate: v.sulfate,
+    chloride: v.chloride,
+    bicarbonate: v.bicarbonate
   };
 }
 function parseDerivationValue(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  if (o.kind === "number") {
-    if (!isFiniteNumber2(o.value)) throw new Error(`Invalid ${label}.value`);
-    const unit = typeof o.unit === "string" ? o.unit : void 0;
-    return unit ? { kind: "number", value: o.value, unit } : { kind: "number", value: o.value };
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (v.kind === "number") {
+    if (!isFiniteNumber2(v.value)) throw new Error(`Invalid ${label}.value`);
+    const unit = typeof v.unit === "string" ? v.unit : void 0;
+    return unit ? { kind: "number", value: v.value, unit } : { kind: "number", value: v.value };
   }
-  if (o.kind === "string") {
-    if (typeof o.value !== "string") throw new Error(`Invalid ${label}.value`);
-    return { kind: "string", value: o.value };
+  if (v.kind === "string") {
+    if (typeof v.value !== "string") throw new Error(`Invalid ${label}.value`);
+    return { kind: "string", value: v.value };
   }
-  if (o.kind === "boolean") {
-    if (typeof o.value !== "boolean") throw new Error(`Invalid ${label}.value`);
-    return { kind: "boolean", value: o.value };
+  if (v.kind === "boolean") {
+    if (typeof v.value !== "boolean") throw new Error(`Invalid ${label}.value`);
+    return { kind: "boolean", value: v.value };
   }
-  if (o.kind === "null") return { kind: "null" };
+  if (v.kind === "null") return { kind: "null" };
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseDerivationLine(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const id = typeof o.id === "string" ? o.id : "";
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const id = typeof v.id === "string" ? v.id : "";
   if (!id) throw new Error(`Invalid ${label}.id`);
-  return { id, value: parseDerivationValue(o.value, `${label}.value`) };
+  return { id, value: parseDerivationValue(v.value, `${label}.value`) };
 }
 function parseDerivation(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const kind = typeof o.kind === "string" ? o.kind : "";
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const kind = typeof v.kind === "string" ? v.kind : "";
   if (!kind) throw new Error(`Invalid ${label}.kind`);
-  if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
-  const formulaId = typeof o.formulaId === "string" ? o.formulaId : "";
+  if (v.version !== 1) throw new Error(`Invalid ${label}.version`);
+  const formulaId = typeof v.formulaId === "string" ? v.formulaId : "";
   if (!formulaId) throw new Error(`Invalid ${label}.formulaId`);
-  const inputs = Array.isArray(o.inputs) ? o.inputs.map((x, i) => parseDerivationLine(x, `${label}.inputs[${i}]`)) : [];
-  const intermediates = Array.isArray(o.intermediates) ? o.intermediates.map((x, i) => parseDerivationLine(x, `${label}.intermediates[${i}]`)) : [];
-  const breakdowns = Array.isArray(o.breakdowns) ? o.breakdowns.filter((b) => b && typeof b === "object" && typeof b.id === "string" && Array.isArray(b.rows)).map((b) => ({
+  const inputs = Array.isArray(v.inputs) ? v.inputs.map((x, i) => parseDerivationLine(x, `${label}.inputs[${i}]`)) : [];
+  const intermediates = Array.isArray(v.intermediates) ? v.intermediates.map((x, i) => parseDerivationLine(x, `${label}.intermediates[${i}]`)) : [];
+  const breakdowns = Array.isArray(v.breakdowns) ? v.breakdowns.filter(
+    (b) => isObject3(b) && typeof b.id === "string" && Array.isArray(b.rows)
+  ).map((b) => ({
     id: b.id,
-    rows: b.rows.filter((r) => r && typeof r === "object")
+    rows: b.rows.filter(
+      (r) => isObject3(r)
+    )
   })) : void 0;
-  const notes = Array.isArray(o.notes) ? o.notes.filter((n) => typeof n === "string") : void 0;
-  return { kind, version: 1, formulaId, inputs, intermediates, breakdowns, notes };
+  const notes = Array.isArray(v.notes) ? v.notes.filter((n) => typeof n === "string") : void 0;
+  return {
+    kind,
+    version: 1,
+    formulaId,
+    inputs,
+    intermediates,
+    breakdowns,
+    notes
+  };
 }
 function parseSettingsSavedRef(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const recipeId = typeof o.recipeId === "string" ? o.recipeId : "";
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const recipeId = typeof v.recipeId === "string" ? v.recipeId : "";
   if (!recipeId) throw new Error(`Invalid ${label}.recipeId`);
   return { recipeId };
 }
 function parseSaltAdditionsResult(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const baseProfile = parseIonProfilePpm2(o.baseProfile, `${label}.baseProfile`);
-  const resultingProfile = parseIonProfilePpm2(o.resultingProfile, `${label}.resultingProfile`);
-  const deltasPpm = parseIonProfilePpm2(o.deltasPpm, `${label}.deltasPpm`);
-  const breakdown = Array.isArray(o.breakdown) ? o.breakdown.filter((r) => r && typeof r === "object" && typeof r.saltKey === "string" && isFiniteNumber2(r.grams)).map((r) => ({
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const baseProfile = parseIonProfilePpm2(v.baseProfile, `${label}.baseProfile`);
+  const resultingProfile = parseIonProfilePpm2(v.resultingProfile, `${label}.resultingProfile`);
+  const deltasPpm = parseIonProfilePpm2(v.deltasPpm, `${label}.deltasPpm`);
+  const breakdown = Array.isArray(v.breakdown) ? v.breakdown.filter(
+    (r) => isObject3(r) && typeof r.saltKey === "string" && isFiniteNumber2(r.grams)
+  ).map((r) => ({
     saltKey: r.saltKey,
     grams: r.grams,
-    deltasPpm: r.deltasPpm && typeof r.deltasPpm === "object" ? r.deltasPpm : {}
+    deltasPpm: isObject3(r.deltasPpm) ? r.deltasPpm : {}
   })) : [];
   return { baseProfile, resultingProfile, deltasPpm, breakdown };
 }
 function parseAcidificationResult(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const finalAlkalinityPpmCaCO3 = isFiniteNumber2(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : NaN;
-  const sulfateAddedPpm = isFiniteNumber2(o.sulfateAddedPpm) ? o.sulfateAddedPpm : NaN;
-  const chlorideAddedPpm = isFiniteNumber2(o.chlorideAddedPpm) ? o.chlorideAddedPpm : NaN;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const finalAlkalinityPpmCaCO3 = isFiniteNumber2(v.finalAlkalinityPpmCaCO3) ? v.finalAlkalinityPpmCaCO3 : NaN;
+  const sulfateAddedPpm = isFiniteNumber2(v.sulfateAddedPpm) ? v.sulfateAddedPpm : NaN;
+  const chlorideAddedPpm = isFiniteNumber2(v.chlorideAddedPpm) ? v.chlorideAddedPpm : NaN;
   if (!Number.isFinite(finalAlkalinityPpmCaCO3)) throw new Error(`Invalid ${label}.finalAlkalinityPpmCaCO3`);
   if (!Number.isFinite(sulfateAddedPpm)) throw new Error(`Invalid ${label}.sulfateAddedPpm`);
   if (!Number.isFinite(chlorideAddedPpm)) throw new Error(`Invalid ${label}.chlorideAddedPpm`);
   return {
-    acidRequiredMl: o.acidRequiredMl === null ? null : isFiniteNumber2(o.acidRequiredMl) ? o.acidRequiredMl : null,
-    acidRequiredTsp: o.acidRequiredTsp === null ? null : isFiniteNumber2(o.acidRequiredTsp) ? o.acidRequiredTsp : null,
-    acidRequiredGrams: o.acidRequiredGrams === null ? null : isFiniteNumber2(o.acidRequiredGrams) ? o.acidRequiredGrams : null,
-    acidRequiredKg: o.acidRequiredKg === null ? null : isFiniteNumber2(o.acidRequiredKg) ? o.acidRequiredKg : null,
+    acidRequiredMl: v.acidRequiredMl === null ? null : isFiniteNumber2(v.acidRequiredMl) ? v.acidRequiredMl : null,
+    acidRequiredTsp: v.acidRequiredTsp === null ? null : isFiniteNumber2(v.acidRequiredTsp) ? v.acidRequiredTsp : null,
+    acidRequiredGrams: v.acidRequiredGrams === null ? null : isFiniteNumber2(v.acidRequiredGrams) ? v.acidRequiredGrams : null,
+    acidRequiredKg: v.acidRequiredKg === null ? null : isFiniteNumber2(v.acidRequiredKg) ? v.acidRequiredKg : null,
     finalAlkalinityPpmCaCO3,
     sulfateAddedPpm,
     chlorideAddedPpm,
-    debug: o.debug && typeof o.debug === "object" ? o.debug : void 0
+    debug: isObject3(v.debug) ? v.debug : void 0
   };
 }
 function parseAcidificationManualResult(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const achievedPh = isFiniteNumber2(o.achievedPh) ? o.achievedPh : NaN;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const achievedPh = isFiniteNumber2(v.achievedPh) ? v.achievedPh : NaN;
   if (!Number.isFinite(achievedPh)) throw new Error(`Invalid ${label}.achievedPh`);
-  const clamped = o.clamped === "none" || o.clamped === "low" || o.clamped === "high" ? o.clamped : "none";
-  const iterations = isFiniteNumber2(o.iterations) ? o.iterations : 0;
-  const targetAmount = isFiniteNumber2(o.targetAmount) ? o.targetAmount : NaN;
-  const predictedAmount = isFiniteNumber2(o.predictedAmount) ? o.predictedAmount : NaN;
+  const clamped = v.clamped === "none" || v.clamped === "low" || v.clamped === "high" ? v.clamped : "none";
+  const iterations = isFiniteNumber2(v.iterations) ? v.iterations : 0;
+  const targetAmount = isFiniteNumber2(v.targetAmount) ? v.targetAmount : NaN;
+  const predictedAmount = isFiniteNumber2(v.predictedAmount) ? v.predictedAmount : NaN;
   return {
     achievedPh,
-    predicted: parseAcidificationResult(o.predicted, `${label}.predicted`),
+    predicted: parseAcidificationResult(v.predicted, `${label}.predicted`),
     clamped,
     iterations,
     targetAmount,
@@ -393,20 +402,19 @@ function parseAcidificationManualResult(v, label) {
 }
 function parseMashTargetMashPhResult(v, label) {
   const base = parseAcidificationResult(v, label);
-  const o = v;
-  const estimatedMashPhRoomTemp = isFiniteNumber2(o.estimatedMashPhRoomTemp) ? o.estimatedMashPhRoomTemp : NaN;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const estimatedMashPhRoomTemp = isFiniteNumber2(v.estimatedMashPhRoomTemp) ? v.estimatedMashPhRoomTemp : NaN;
   if (!Number.isFinite(estimatedMashPhRoomTemp)) throw new Error(`Invalid ${label}.estimatedMashPhRoomTemp`);
   return { ...base, estimatedMashPhRoomTemp };
 }
 function parseOverallResult(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const calculatedAt = typeof o.calculatedAt === "string" ? o.calculatedAt : "";
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const calculatedAt = typeof v.calculatedAt === "string" ? v.calculatedAt : "";
   if (!calculatedAt) throw new Error(`Invalid ${label}.calculatedAt`);
-  const ionsPpm = parseIonProfilePpm2(o.ionsPpm, `${label}.ionsPpm`);
-  const finalAlkalinityPpmCaCO3 = isFiniteNumber2(o.finalAlkalinityPpmCaCO3) ? o.finalAlkalinityPpmCaCO3 : NaN;
+  const ionsPpm = parseIonProfilePpm2(v.ionsPpm, `${label}.ionsPpm`);
+  const finalAlkalinityPpmCaCO3 = isFiniteNumber2(v.finalAlkalinityPpmCaCO3) ? v.finalAlkalinityPpmCaCO3 : NaN;
   if (!Number.isFinite(finalAlkalinityPpmCaCO3)) throw new Error(`Invalid ${label}.finalAlkalinityPpmCaCO3`);
-  const ph = o.ph;
+  const ph = isObject3(v.ph) ? v.ph : null;
   const kind = ph?.kind === "target" || ph?.kind === "estimated" ? ph.kind : null;
   const value = isFiniteNumber2(ph?.value) ? ph.value : null;
   if (!kind || value === null) throw new Error(`Invalid ${label}.ph`);
@@ -415,105 +423,101 @@ function parseOverallResult(v, label) {
     ionsPpm,
     finalAlkalinityPpmCaCO3,
     ph: { kind, value },
-    debug: o.debug && typeof o.debug === "object" ? o.debug : void 0
+    debug: isObject3(v.debug) ? v.debug : void 0
   };
 }
 function parseMashAcidBlock(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const kind = o.kind;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const kind = v.kind;
   if (kind === "mash_acidification_manual") {
     return {
       kind,
       mode: "manual",
-      result: parseAcidificationManualResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseAcidificationManualResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   if (kind === "mash_acidification_target_mash_ph") {
     return {
       kind,
       mode: "targetPh",
-      result: parseMashTargetMashPhResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseMashTargetMashPhResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   if (kind === "mash_acidification") {
     return {
       kind,
       mode: "targetPh",
-      result: parseAcidificationResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseAcidificationResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseSpargeAcidBlock(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const kind = o.kind;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const kind = v.kind;
   if (kind === "sparge_acidification_manual") {
     return {
       kind,
       mode: "manual",
-      result: parseAcidificationManualResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseAcidificationManualResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   if (kind === "sparge_acidification") {
     return {
       kind,
       mode: "targetPh",
-      result: parseAcidificationResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseAcidificationResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseBoilAcidBlock(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  const kind = o.kind;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  const kind = v.kind;
   if (kind === "boil_acidification_manual") {
     return {
       kind,
       mode: "manual",
-      result: parseAcidificationManualResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseAcidificationManualResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   if (kind === "boil_acidification") {
     return {
       kind,
       mode: "targetPh",
-      result: parseAcidificationResult(o.result, `${label}.result`),
-      derivation: parseDerivation(o.derivation, `${label}.derivation`)
+      result: parseAcidificationResult(v.result, `${label}.result`),
+      derivation: parseDerivation(v.derivation, `${label}.derivation`)
     };
   }
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseNumberFormatHintV1(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
-  const style = o.style === "fixed" || o.style === "significant" ? o.style : null;
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (v.version !== 1) throw new Error(`Invalid ${label}.version`);
+  const style = v.style === "fixed" || v.style === "significant" ? v.style : null;
   if (!style) throw new Error(`Invalid ${label}.style`);
-  const decimals = isFiniteNumber2(o.decimals) ? o.decimals : NaN;
+  const decimals = isFiniteNumber2(v.decimals) ? v.decimals : NaN;
   if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
-  const unit = typeof o.unit === "string" ? o.unit : void 0;
-  const clamp = o.clamp && typeof o.clamp === "object" ? {
-    min: isFiniteNumber2(o.clamp.min) ? o.clamp.min : void 0,
-    max: isFiniteNumber2(o.clamp.max) ? o.clamp.max : void 0
+  const unitRaw = typeof v.unit === "string" ? v.unit : void 0;
+  const clamp = isObject3(v.clamp) ? {
+    min: isFiniteNumber2(v.clamp.min) ? v.clamp.min : void 0,
+    max: isFiniteNumber2(v.clamp.max) ? v.clamp.max : void 0
   } : void 0;
-  return { version: 1, style, decimals, unit, clamp };
+  return { version: 1, style, decimals, unit: unitRaw, clamp };
 }
 function parseFormatHints(root) {
   const hintsOut = {};
-  const h = root?.formatHints;
-  if (h && typeof h === "object") {
-    for (const [k, v] of Object.entries(h)) {
+  const h = root.formatHints;
+  if (isObject3(h)) {
+    for (const [k, val] of Object.entries(h)) {
       try {
-        hintsOut[k] = parseNumberFormatHintV1(v, `formatHints.${k}`);
+        hintsOut[k] = parseNumberFormatHintV1(val, `formatHints.${k}`);
       } catch {
       }
     }
@@ -521,71 +525,68 @@ function parseFormatHints(root) {
   return hintsOut;
 }
 function parseMashComputeAndSaveResponse(x) {
-  const root = x ?? {};
-  if (!root || typeof root !== "object") throw new Error("Invalid MashComputeAndSaveResponseV1");
-  if (root.ok !== true) throw new Error("Invalid MashComputeAndSaveResponseV1.ok");
-  if (root.version !== 1) throw new Error("Invalid MashComputeAndSaveResponseV1.version");
-  const salts = root.salts;
-  const acid = root.acid;
-  const overall = root.overall;
-  const formatHints = parseFormatHints(root);
+  if (!isObject3(x)) throw new Error("Invalid MashComputeAndSaveResponseV1");
+  if (x.ok !== true) throw new Error("Invalid MashComputeAndSaveResponseV1.ok");
+  if (x.version !== 1) throw new Error("Invalid MashComputeAndSaveResponseV1.version");
+  const salts = isObject3(x.salts) ? x.salts : {};
+  const acid = x.acid;
+  const overall = isObject3(x.overall) ? x.overall : {};
+  const formatHints = parseFormatHints(x);
   return {
     ok: true,
     version: 1,
-    settings: parseSettingsSavedRef(root.settings, "MashComputeAndSaveResponseV1.settings"),
+    settings: parseSettingsSavedRef(x.settings, "MashComputeAndSaveResponseV1.settings"),
     salts: {
-      result: parseSaltAdditionsResult(salts?.result, "MashComputeAndSaveResponseV1.salts.result"),
-      derivation: parseDerivation(salts?.derivation, "MashComputeAndSaveResponseV1.salts.derivation")
+      result: parseSaltAdditionsResult(salts.result, "MashComputeAndSaveResponseV1.salts.result"),
+      derivation: parseDerivation(salts.derivation, "MashComputeAndSaveResponseV1.salts.derivation")
     },
     acid: parseMashAcidBlock(acid, "MashComputeAndSaveResponseV1.acid"),
     overall: {
-      result: parseOverallResult(overall?.result, "MashComputeAndSaveResponseV1.overall.result"),
-      derivation: parseDerivation(overall?.derivation, "MashComputeAndSaveResponseV1.overall.derivation")
+      result: parseOverallResult(overall.result, "MashComputeAndSaveResponseV1.overall.result"),
+      derivation: parseDerivation(overall.derivation, "MashComputeAndSaveResponseV1.overall.derivation")
     },
     formatHints: Object.keys(formatHints).length > 0 ? formatHints : void 0
   };
 }
 function parseSpargeComputeAndSaveResponse(x) {
-  const root = x ?? {};
-  if (!root || typeof root !== "object") throw new Error("Invalid SpargeComputeAndSaveResponseV1");
-  if (root.ok !== true) throw new Error("Invalid SpargeComputeAndSaveResponseV1.ok");
-  if (root.version !== 1) throw new Error("Invalid SpargeComputeAndSaveResponseV1.version");
-  const salts = root.salts;
-  const acid = root.acid;
-  const formatHints = parseFormatHints(root);
+  if (!isObject3(x)) throw new Error("Invalid SpargeComputeAndSaveResponseV1");
+  if (x.ok !== true) throw new Error("Invalid SpargeComputeAndSaveResponseV1.ok");
+  if (x.version !== 1) throw new Error("Invalid SpargeComputeAndSaveResponseV1.version");
+  const salts = isObject3(x.salts) ? x.salts : {};
+  const acid = x.acid;
+  const formatHints = parseFormatHints(x);
   return {
     ok: true,
     version: 1,
-    settings: parseSettingsSavedRef(root.settings, "SpargeComputeAndSaveResponseV1.settings"),
+    settings: parseSettingsSavedRef(x.settings, "SpargeComputeAndSaveResponseV1.settings"),
     salts: {
-      result: parseSaltAdditionsResult(salts?.result, "SpargeComputeAndSaveResponseV1.salts.result"),
-      derivation: parseDerivation(salts?.derivation, "SpargeComputeAndSaveResponseV1.salts.derivation")
+      result: parseSaltAdditionsResult(salts.result, "SpargeComputeAndSaveResponseV1.salts.result"),
+      derivation: parseDerivation(salts.derivation, "SpargeComputeAndSaveResponseV1.salts.derivation")
     },
     acid: parseSpargeAcidBlock(acid, "SpargeComputeAndSaveResponseV1.acid"),
     formatHints: Object.keys(formatHints).length > 0 ? formatHints : void 0
   };
 }
 function parseBoilComputeAndSaveResponse(x) {
-  const root = x ?? {};
-  if (!root || typeof root !== "object") throw new Error("Invalid BoilComputeAndSaveResponseV1");
-  if (root.ok !== true) throw new Error("Invalid BoilComputeAndSaveResponseV1.ok");
-  if (root.version !== 1) throw new Error("Invalid BoilComputeAndSaveResponseV1.version");
-  const salts = root.salts;
-  const acid = root.acid;
-  const overall = root.overall;
-  const formatHints = parseFormatHints(root);
+  if (!isObject3(x)) throw new Error("Invalid BoilComputeAndSaveResponseV1");
+  if (x.ok !== true) throw new Error("Invalid BoilComputeAndSaveResponseV1.ok");
+  if (x.version !== 1) throw new Error("Invalid BoilComputeAndSaveResponseV1.version");
+  const salts = isObject3(x.salts) ? x.salts : {};
+  const acid = x.acid;
+  const overall = isObject3(x.overall) ? x.overall : {};
+  const formatHints = parseFormatHints(x);
   return {
     ok: true,
     version: 1,
-    settings: parseSettingsSavedRef(root.settings, "BoilComputeAndSaveResponseV1.settings"),
+    settings: parseSettingsSavedRef(x.settings, "BoilComputeAndSaveResponseV1.settings"),
     salts: {
-      result: parseSaltAdditionsResult(salts?.result, "BoilComputeAndSaveResponseV1.salts.result"),
-      derivation: parseDerivation(salts?.derivation, "BoilComputeAndSaveResponseV1.salts.derivation")
+      result: parseSaltAdditionsResult(salts.result, "BoilComputeAndSaveResponseV1.salts.result"),
+      derivation: parseDerivation(salts.derivation, "BoilComputeAndSaveResponseV1.salts.derivation")
     },
     acid: parseBoilAcidBlock(acid, "BoilComputeAndSaveResponseV1.acid"),
     overall: {
-      result: parseOverallResult(overall?.result, "BoilComputeAndSaveResponseV1.overall.result"),
-      derivation: parseDerivation(overall?.derivation, "BoilComputeAndSaveResponseV1.overall.derivation")
+      result: parseOverallResult(overall.result, "BoilComputeAndSaveResponseV1.overall.result"),
+      derivation: parseDerivation(overall.derivation, "BoilComputeAndSaveResponseV1.overall.derivation")
     },
     formatHints: Object.keys(formatHints).length > 0 ? formatHints : void 0
   };
@@ -624,113 +625,108 @@ var analysisFormatHints = {
 function isFiniteNumber3(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
+function isObject4(v) {
+  return v != null && typeof v === "object" && !Array.isArray(v);
+}
 function parseCanonicalModels(v) {
-  const o = v && typeof v === "object" ? v : null;
+  const o = isObject4(v) ? v : null;
   const ibu = o?.ibu === "tinseth" || o?.ibu === "rager" ? o.ibu : "tinseth";
   const srm = o?.srm === "morey" || o?.srm === "daniels" ? o.srm : "morey";
   return { ibu, srm };
 }
 function parseNumberFormatHintV12(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
-  const style = o.style === "fixed" || o.style === "significant" ? o.style : null;
+  if (!isObject4(v)) throw new Error(`Invalid ${label}`);
+  if (v.version !== 1) throw new Error(`Invalid ${label}.version`);
+  const style = v.style === "fixed" || v.style === "significant" ? v.style : null;
   if (!style) throw new Error(`Invalid ${label}.style`);
-  const decimals = isFiniteNumber3(o.decimals) ? o.decimals : NaN;
+  const decimals = isFiniteNumber3(v.decimals) ? v.decimals : NaN;
   if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
-  const unit = typeof o.unit === "string" ? o.unit : void 0;
-  const clamp = o.clamp && typeof o.clamp === "object" ? {
-    min: isFiniteNumber3(o.clamp.min) ? o.clamp.min : void 0,
-    max: isFiniteNumber3(o.clamp.max) ? o.clamp.max : void 0
+  const unit = typeof v.unit === "string" ? v.unit : void 0;
+  const clamp = isObject4(v.clamp) ? {
+    min: isFiniteNumber3(v.clamp.min) ? v.clamp.min : void 0,
+    max: isFiniteNumber3(v.clamp.max) ? v.clamp.max : void 0
   } : void 0;
   return { version: 1, style, decimals, unit, clamp };
 }
 function parseDerivationLineValue(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  if (o.kind === "number") {
-    if (!isFiniteNumber3(o.value)) throw new Error(`Invalid ${label}.value`);
-    const unit = typeof o.unit === "string" ? o.unit : void 0;
-    return unit ? { kind: "number", value: o.value, unit } : { kind: "number", value: o.value };
+  if (!isObject4(v)) throw new Error(`Invalid ${label}`);
+  if (v.kind === "number") {
+    if (!isFiniteNumber3(v.value)) throw new Error(`Invalid ${label}.value`);
+    const unit = typeof v.unit === "string" ? v.unit : void 0;
+    return unit ? { kind: "number", value: v.value, unit } : { kind: "number", value: v.value };
   }
-  if (o.kind === "string") {
-    if (typeof o.value !== "string") throw new Error(`Invalid ${label}.value`);
-    return { kind: "string", value: o.value };
+  if (v.kind === "string") {
+    if (typeof v.value !== "string") throw new Error(`Invalid ${label}.value`);
+    return { kind: "string", value: v.value };
   }
-  if (o.kind === "boolean") {
-    if (typeof o.value !== "boolean") throw new Error(`Invalid ${label}.value`);
-    return { kind: "boolean", value: o.value };
+  if (v.kind === "boolean") {
+    if (typeof v.value !== "boolean") throw new Error(`Invalid ${label}.value`);
+    return { kind: "boolean", value: v.value };
   }
-  if (o.kind === "null") return { kind: "null" };
+  if (v.kind === "null") return { kind: "null" };
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseDerivation2(v, label) {
-  if (!v || typeof v !== "object") throw new Error(`Invalid ${label}`);
-  const o = v;
-  if (typeof o.kind !== "string" || !o.kind) throw new Error(`Invalid ${label}.kind`);
-  if (o.version !== 1) throw new Error(`Invalid ${label}.version`);
-  if (typeof o.formulaId !== "string" || !o.formulaId) throw new Error(`Invalid ${label}.formulaId`);
+  if (!isObject4(v)) throw new Error(`Invalid ${label}`);
+  if (typeof v.kind !== "string" || !v.kind) throw new Error(`Invalid ${label}.kind`);
+  if (v.version !== 1) throw new Error(`Invalid ${label}.version`);
+  if (typeof v.formulaId !== "string" || !v.formulaId) throw new Error(`Invalid ${label}.formulaId`);
   const parseLine = (x, i, base) => {
-    if (!x || typeof x !== "object") throw new Error(`Invalid ${base}[${i}]`);
-    const l = x;
-    if (typeof l.id !== "string" || !l.id) throw new Error(`Invalid ${base}[${i}].id`);
-    return { id: l.id, value: parseDerivationLineValue(l.value, `${base}[${i}].value`) };
+    if (!isObject4(x)) throw new Error(`Invalid ${base}[${i}]`);
+    if (typeof x.id !== "string" || !x.id) throw new Error(`Invalid ${base}[${i}].id`);
+    return { id: x.id, value: parseDerivationLineValue(x.value, `${base}[${i}].value`) };
   };
-  const inputs = Array.isArray(o.inputs) ? o.inputs.map((x, i) => parseLine(x, i, `${label}.inputs`)) : [];
-  const intermediates = Array.isArray(o.intermediates) ? o.intermediates.map((x, i) => parseLine(x, i, `${label}.intermediates`)) : [];
+  const inputs = Array.isArray(v.inputs) ? v.inputs.map((x, i) => parseLine(x, i, `${label}.inputs`)) : [];
+  const intermediates = Array.isArray(v.intermediates) ? v.intermediates.map((x, i) => parseLine(x, i, `${label}.intermediates`)) : [];
   return {
-    kind: o.kind,
+    kind: v.kind,
     version: 1,
-    formulaId: o.formulaId,
+    formulaId: v.formulaId,
     inputs,
     intermediates,
-    breakdowns: Array.isArray(o.breakdowns) ? o.breakdowns : void 0,
-    notes: Array.isArray(o.notes) ? o.notes.filter((n) => typeof n === "string") : void 0
+    breakdowns: Array.isArray(v.breakdowns) ? v.breakdowns : void 0,
+    notes: Array.isArray(v.notes) ? v.notes.filter((n) => typeof n === "string") : void 0
   };
 }
 function parseGravityAnalysisResponseV1(x) {
-  if (!x || typeof x !== "object") throw new Error("Invalid GravityAnalysisResponseV1");
-  const root = x;
-  if (root.ok !== true) throw new Error("Invalid GravityAnalysisResponseV1.ok");
-  if (root.version !== 1) throw new Error("Invalid GravityAnalysisResponseV1.version");
-  const canonicalModels = parseCanonicalModels(root.canonicalModels);
-  const r = root.result;
-  if (!r || typeof r !== "object") throw new Error("Invalid GravityAnalysisResponseV1.result");
-  const rr = r;
-  const warningsRaw = Array.isArray(rr.warnings) ? rr.warnings : [];
-  const warnings = warningsRaw.map((w) => w && typeof w === "object" ? typeof w.code === "string" ? w.code : "" : "").filter((c) => Boolean(c)).map((code) => ({ code }));
+  if (!isObject4(x)) throw new Error("Invalid GravityAnalysisResponseV1");
+  if (x.ok !== true) throw new Error("Invalid GravityAnalysisResponseV1.ok");
+  if (x.version !== 1) throw new Error("Invalid GravityAnalysisResponseV1.version");
+  const canonicalModels = parseCanonicalModels(x.canonicalModels);
+  if (!isObject4(x.result)) throw new Error("Invalid GravityAnalysisResponseV1.result");
+  const r = x.result;
+  const warningsRaw = Array.isArray(r.warnings) ? r.warnings : [];
+  const warnings = warningsRaw.map((w) => isObject4(w) && typeof w.code === "string" ? w.code : "").filter((c) => Boolean(c)).map((code) => ({ code }));
   const result = {
-    boilTimeMinutes: rr.boilTimeMinutes === null ? null : isFiniteNumber3(rr.boilTimeMinutes) ? rr.boilTimeMinutes : null,
-    kettleVolumeLiters: rr.kettleVolumeLiters === null ? null : isFiniteNumber3(rr.kettleVolumeLiters) ? rr.kettleVolumeLiters : null,
-    preBoilVolumeLiters: rr.preBoilVolumeLiters === null ? null : isFiniteNumber3(rr.preBoilVolumeLiters) ? rr.preBoilVolumeLiters : null,
-    ogEstimatedSg: rr.ogEstimatedSg === null ? null : isFiniteNumber3(rr.ogEstimatedSg) ? rr.ogEstimatedSg : null,
-    pbgEstimatedSg: rr.pbgEstimatedSg === null ? null : isFiniteNumber3(rr.pbgEstimatedSg) ? rr.pbgEstimatedSg : null,
-    ibuTinsethEstimated: rr.ibuTinsethEstimated === null ? null : isFiniteNumber3(rr.ibuTinsethEstimated) ? rr.ibuTinsethEstimated : null,
-    ibuRagerEstimated: rr.ibuRagerEstimated === null ? null : isFiniteNumber3(rr.ibuRagerEstimated) ? rr.ibuRagerEstimated : null,
-    buGuRatio: rr.buGuRatio === null ? null : isFiniteNumber3(rr.buGuRatio) ? rr.buGuRatio : null,
-    colorSrmMoreyEstimated: rr.colorSrmMoreyEstimated === null ? null : isFiniteNumber3(rr.colorSrmMoreyEstimated) ? rr.colorSrmMoreyEstimated : null,
-    colorSrmDanielsEstimated: rr.colorSrmDanielsEstimated === null ? null : isFiniteNumber3(rr.colorSrmDanielsEstimated) ? rr.colorSrmDanielsEstimated : null,
-    fgEstimatedSg: rr.fgEstimatedSg === null ? null : isFiniteNumber3(rr.fgEstimatedSg) ? rr.fgEstimatedSg : null,
-    abvEstimatedPercent: rr.abvEstimatedPercent === null ? null : isFiniteNumber3(rr.abvEstimatedPercent) ? rr.abvEstimatedPercent : null,
-    attenuationEffectivePercent: rr.attenuationEffectivePercent === null ? null : isFiniteNumber3(rr.attenuationEffectivePercent) ? rr.attenuationEffectivePercent : null,
+    boilTimeMinutes: r.boilTimeMinutes === null ? null : isFiniteNumber3(r.boilTimeMinutes) ? r.boilTimeMinutes : null,
+    kettleVolumeLiters: r.kettleVolumeLiters === null ? null : isFiniteNumber3(r.kettleVolumeLiters) ? r.kettleVolumeLiters : null,
+    preBoilVolumeLiters: r.preBoilVolumeLiters === null ? null : isFiniteNumber3(r.preBoilVolumeLiters) ? r.preBoilVolumeLiters : null,
+    ogEstimatedSg: r.ogEstimatedSg === null ? null : isFiniteNumber3(r.ogEstimatedSg) ? r.ogEstimatedSg : null,
+    pbgEstimatedSg: r.pbgEstimatedSg === null ? null : isFiniteNumber3(r.pbgEstimatedSg) ? r.pbgEstimatedSg : null,
+    ibuTinsethEstimated: r.ibuTinsethEstimated === null ? null : isFiniteNumber3(r.ibuTinsethEstimated) ? r.ibuTinsethEstimated : null,
+    ibuRagerEstimated: r.ibuRagerEstimated === null ? null : isFiniteNumber3(r.ibuRagerEstimated) ? r.ibuRagerEstimated : null,
+    buGuRatio: r.buGuRatio === null ? null : isFiniteNumber3(r.buGuRatio) ? r.buGuRatio : null,
+    colorSrmMoreyEstimated: r.colorSrmMoreyEstimated === null ? null : isFiniteNumber3(r.colorSrmMoreyEstimated) ? r.colorSrmMoreyEstimated : null,
+    colorSrmDanielsEstimated: r.colorSrmDanielsEstimated === null ? null : isFiniteNumber3(r.colorSrmDanielsEstimated) ? r.colorSrmDanielsEstimated : null,
+    fgEstimatedSg: r.fgEstimatedSg === null ? null : isFiniteNumber3(r.fgEstimatedSg) ? r.fgEstimatedSg : null,
+    abvEstimatedPercent: r.abvEstimatedPercent === null ? null : isFiniteNumber3(r.abvEstimatedPercent) ? r.abvEstimatedPercent : null,
+    attenuationEffectivePercent: r.attenuationEffectivePercent === null ? null : isFiniteNumber3(r.attenuationEffectivePercent) ? r.attenuationEffectivePercent : null,
     warnings
   };
   const derivationsOut = {};
-  const d = root.derivations;
-  if (d && typeof d === "object") {
-    for (const [k, v] of Object.entries(d)) {
+  if (isObject4(x.derivations)) {
+    for (const [k, val] of Object.entries(x.derivations)) {
       try {
-        derivationsOut[k] = parseDerivation2(v, `GravityAnalysisResponseV1.derivations.${k}`);
+        derivationsOut[k] = parseDerivation2(val, `GravityAnalysisResponseV1.derivations.${k}`);
       } catch {
       }
     }
   }
   const hintsOut = {};
-  const h = root.formatHints;
-  if (h && typeof h === "object") {
-    for (const [k, v] of Object.entries(h)) {
+  if (isObject4(x.formatHints)) {
+    for (const [k, val] of Object.entries(x.formatHints)) {
       try {
-        hintsOut[k] = parseNumberFormatHintV12(v, `GravityAnalysisResponseV1.formatHints.${k}`);
+        hintsOut[k] = parseNumberFormatHintV12(val, `GravityAnalysisResponseV1.formatHints.${k}`);
       } catch {
       }
     }

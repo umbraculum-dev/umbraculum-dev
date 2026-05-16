@@ -29,7 +29,12 @@ function useT(namespace) {
   const t = (0, import_next_intl.useTranslations)(namespace);
   return {
     t: (key, values) => t(key, values),
-    rich: (key, values) => t.rich(key, values)
+    rich: (key, values) => (
+      // Cast through `unknown` because next-intl's RichTranslationValues is a
+      // narrower shape than ours (it requires React-specific tag functions).
+      // Our type is intentionally looser for cross-platform use.
+      t.rich(key, values)
+    )
   };
 }
 // Annotate the CommonJS export names for ESM import in node:

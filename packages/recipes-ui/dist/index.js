@@ -13,17 +13,18 @@ function parseRecipeMetaFromGetRecipeResponse(data) {
   return { name: name ? name : null, version };
 }
 function RecipeMetaLine(props) {
+  const { recipeId, loadRecipeMeta, enabled: enabledProp } = props;
   const { t } = useT("waterHub");
-  const enabled = props.enabled !== false;
+  const enabled = enabledProp !== false;
   const [meta, setMeta] = useState({ name: null, version: null });
   useEffect(() => {
     let cancelled = false;
     setMeta({ name: null, version: null });
     if (!enabled) return () => {
     };
-    if (!props.recipeId) return () => {
+    if (!recipeId) return () => {
     };
-    void props.loadRecipeMeta(props.recipeId).then((res) => {
+    void loadRecipeMeta(recipeId).then((res) => {
       if (cancelled) return;
       if (!res) return;
       setMeta(res);
@@ -32,11 +33,11 @@ function RecipeMetaLine(props) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, props.recipeId, props.loadRecipeMeta]);
+  }, [enabled, recipeId, loadRecipeMeta]);
   return /* @__PURE__ */ jsxs(Text, { fontSize: 12, opacity: 0.8, children: [
     t("recipeId"),
     ": ",
-    props.recipeId,
+    recipeId,
     meta.name ? ` - ${t("recipeName")}: ${meta.name}` : null,
     meta.version !== null ? ` - ${t("recipeVersion")}: ${String(meta.version).padStart(2, "0")}` : null
   ] });
