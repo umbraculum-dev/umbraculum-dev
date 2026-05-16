@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.1 — HIGH-light landed; HIGH-staged Phase 1 is next (see roadmap below).
+**Status:** v1.2 — HIGH-staged Phase 1 (`packages/contracts/**`) landed; Phase 2 (`packages/beerjson/**`) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -15,11 +15,11 @@
 | ESLint runs in CI | ✅ `web-lint` GitHub Action, path-gated |
 | Errors block CI | ✅ |
 | Warnings tolerated repo-wide | ⚠️ Yes (HIGH-staged work to remove them, see roadmap) |
-| Warnings forbidden in clean packages | ✅ `npm run lint:packages-strict` — 9 of 11 packages at `--max-warnings 0` |
+| Warnings forbidden in clean packages | ✅ `npm run lint:packages-strict` — **10 of 11 packages** at `--max-warnings 0` (added `packages/contracts` in Phase 1) |
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | 1,127 (1040 `no-explicit-any` + 86 `no-unused-vars` + ~1 misc) |
+| Outstanding warnings | **1,050** (963 `no-explicit-any` + 86 `no-unused-vars` + ~1 misc) — was 1,127 before Phase 1 (-77 cleared in `packages/contracts`) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -78,16 +78,19 @@ HIGH-staged converts that monolith into ~5 reviewable PRs spread over months, ea
 
 Each phase below clears a slice of pre-existing `any` warnings, then expands the strict gate to cover it. Phases can be done independently and in any order, but **`packages/contracts/**` should go first** because contracts types flow downstream into services + apps.
 
-### Phase 1 — `packages/contracts/**` (~77 `any` warnings)
+### Phase 1 — `packages/contracts/**` (~77 `any` warnings) — ✅ **Landed**
 
-- [ ] Triage `packages/contracts/src/water/parseComputeAndSave.ts` (32 `any`)
-- [ ] Triage `packages/contracts/src/analysis/parseGravityAnalysis.ts` (22 `any`)
-- [ ] Triage `packages/contracts/src/water/waterProfile.ts` (13 `any`)
-- [ ] Triage `packages/contracts/src/auth/meResponse.ts` (10 `any`)
-- [ ] Expand `lint:packages-strict` to include `packages/contracts`
-- [ ] Update this doc's TL;DR table
+- [x] Triage `packages/contracts/src/water/parseComputeAndSave.ts` (32 `any`) — done
+- [x] Triage `packages/contracts/src/analysis/parseGravityAnalysis.ts` (22 `any`) — done
+- [x] Triage `packages/contracts/src/water/waterProfile.ts` (13 `any`) — done
+- [x] Triage `packages/contracts/src/auth/meResponse.ts` (10 `any`) — done
+- [x] Expand `lint:packages-strict` to include `packages/contracts` — done
+- [x] Update this doc's TL;DR table — done
+- [x] Verify zero behavior change: 38/38 contracts unit tests pass; all downstream TS error counts (services/api, apps/web, apps/native, packages/ui) identical to pre-change baseline.
 
-**Why first:** contracts types are the source of truth for cross-process data (services → apps). Tightening them improves type safety in every downstream consumer.
+**Why this was first:** contracts types are the source of truth for cross-process data (services → apps). Tightening them improves type safety in every downstream consumer.
+
+**Strategy used:** "tighten in place" — replaced `any` with `Record<string, unknown>` (after `isObject` narrowing), used proper return types on helper functions, used named union casts (`WaterCalcDerivationKind`, `NumberFormatUnit`, etc.) instead of `any` for unvalidated string-to-union narrowing. No Zod migration. See the commit (linked from this section after merge) and the discussion in the related session transcript for the full pros/cons of the Zod alternative.
 
 ### Phase 2 — `packages/beerjson/**` (~21 `any` warnings)
 

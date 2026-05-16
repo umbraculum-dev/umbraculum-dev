@@ -74,10 +74,10 @@ export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
   if (!isObject(payload)) throw new Error("Invalid AuthMeResponse: expected object");
   if (payload.ok !== true) throw new Error("Invalid AuthMeResponse: ok must be true");
   const user = parseUser(payload.user);
-  const workspacesRaw = Array.isArray((payload as any).workspaces)
-    ? (payload as any).workspaces
-    : Array.isArray((payload as any).accounts)
-      ? (payload as any).accounts
+  const workspacesRaw = Array.isArray(payload.workspaces)
+    ? payload.workspaces
+    : Array.isArray(payload.accounts)
+      ? payload.accounts
       : null;
   if (!workspacesRaw) throw new Error("Invalid AuthMeResponse: workspaces must be array");
   const workspaces = workspacesRaw.map((a: unknown, i: number) => {
@@ -88,14 +88,14 @@ export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
     }
   });
   const activeWorkspaceId =
-    (payload as any).activeWorkspaceId === null
+    payload.activeWorkspaceId === null
       ? null
-      : isString((payload as any).activeWorkspaceId)
-        ? ((payload as any).activeWorkspaceId as string)
-        : (payload as any).activeAccountId === null
+      : isString(payload.activeWorkspaceId)
+        ? payload.activeWorkspaceId
+        : payload.activeAccountId === null
           ? null
-          : isString((payload as any).activeAccountId)
-            ? ((payload as any).activeAccountId as string)
+          : isString(payload.activeAccountId)
+            ? payload.activeAccountId
             : null;
   const role = payload.role === null ? null : isString(payload.role) ? payload.role : null;
   return { ok: true, user, workspaces, activeWorkspaceId, role };

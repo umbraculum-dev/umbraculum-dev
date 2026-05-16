@@ -54,17 +54,19 @@ function parseWaterProfile(v: unknown): WaterProfile {
   if (!isObject(v)) throw new Error("Invalid WaterProfile: expected object");
   const id = isString(v.id) ? v.id : "";
   const key = isString(v.key) ? v.key : "";
-  const scope = isString(v.scope) && SCOPES.includes(v.scope as any) ? (v.scope as WaterProfile["scope"]) : "system";
-  const type = isString(v.type) && TYPES.includes(v.type as any) ? (v.type as WaterProfile["type"]) : "water";
+  const scope =
+    isString(v.scope) && (SCOPES as readonly string[]).includes(v.scope) ? (v.scope as WaterProfile["scope"]) : "system";
+  const type =
+    isString(v.type) && (TYPES as readonly string[]).includes(v.type) ? (v.type as WaterProfile["type"]) : "water";
   const workspaceId =
-    (v as any).workspaceId === null
+    v.workspaceId === null
       ? null
-      : isString((v as any).workspaceId)
-        ? ((v as any).workspaceId as string)
-        : (v as any).accountId === null
+      : isString(v.workspaceId)
+        ? v.workspaceId
+        : v.accountId === null
           ? null
-          : isString((v as any).accountId)
-            ? ((v as any).accountId as string)
+          : isString(v.accountId)
+            ? v.accountId
             : null;
   const name = isString(v.name) ? v.name : "";
   const ph = v.ph === null || v.ph === undefined ? undefined : isNumber(v.ph) ? v.ph : undefined;
@@ -74,9 +76,10 @@ function parseWaterProfile(v: unknown): WaterProfile {
   const sulfate = isNumber(v.sulfate) ? v.sulfate : 0;
   const chloride = isNumber(v.chloride) ? v.chloride : 0;
   const bicarbonate = isNumber(v.bicarbonate) ? v.bicarbonate : 0;
-  const verificationStatus = isString(v.verificationStatus) && VERIFICATION_STATUSES.includes(v.verificationStatus as any)
-    ? (v.verificationStatus as WaterProfile["verificationStatus"])
-    : "unverified";
+  const verificationStatus =
+    isString(v.verificationStatus) && (VERIFICATION_STATUSES as readonly string[]).includes(v.verificationStatus)
+      ? (v.verificationStatus as WaterProfile["verificationStatus"])
+      : "unverified";
   const source = isString(v.source) ? v.source : "";
   if (!id || !key || !name) throw new Error("Invalid WaterProfile: id, key, name required");
   return {
@@ -124,10 +127,10 @@ export function parseWaterProfilesResponse(payload: unknown): WaterProfilesRespo
   if (payload.ok !== true) throw new Error("Invalid WaterProfilesResponse: ok must be true");
   const system = parseArray(payload.system, parseWaterProfile);
   const publicProfiles = parseArray(payload.public, parseWaterProfile);
-  const workspaceRaw = Array.isArray((payload as any).workspace)
-    ? (payload as any).workspace
-    : Array.isArray((payload as any).account)
-      ? (payload as any).account
+  const workspaceRaw = Array.isArray(payload.workspace)
+    ? payload.workspace
+    : Array.isArray(payload.account)
+      ? payload.account
       : null;
   if (!workspaceRaw) throw new Error("Invalid WaterProfilesResponse: workspace must be array");
   const workspace = parseArray(workspaceRaw, parseWaterProfile);
