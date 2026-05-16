@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.5 — **HIGH-staged complete + HIGH-full Phases 1–2 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: 64 files, 310 warnings eliminated. **HIGH-full Phase 2** (Tier A — Promise correctness) landed 2026-05-16: 7 type-aware rules promoted to `warn` (`no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`); type-aware parser infrastructure (`projectService` + `allowDefaultProject` allowlist) lands with it; 136 sites hand-fixed across 5 commits (2a `packages/{test-mcp,ui}` pre-fix, 2b `services/api` 47, 2c `apps/web` 56, 2d `apps/native` 30, 2e docs). Repo-wide lint goes from ~7s to ~39s wall. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. The HIGH-full upgrade is a 5-phase plan (see [HIGH-full upgrade](#high-full-upgrade)) targeting H1 2027 alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md).
+**Status:** v2.6 — **HIGH-staged complete + HIGH-full Phases 1–3 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: 64 files, 310 warnings eliminated. **HIGH-full Phase 2** (Tier A — Promise correctness) landed 2026-05-16: 7 type-aware rules promoted to `warn`; 136 sites hand-fixed across 5 commits. **HIGH-full Phase 3** (Tier C-narrow — `services/api` `no-unsafe-*`) landed 2026-05-16: 5 unsafe-* rules promoted to `warn` on `services/api/**`, with the same family relaxed in test files (matching the existing `no-explicit-any: off` test relaxation pattern). 777 raw warnings → 0 across 5 commits (3a config + tests-relax = -611, 3b `app.ts` -17, 3c `prisma/seed.ts` -31 + new prisma sub-tsconfig, 3d `beerproto.ts` -108 via single `PrismaLike = any` → `PrismaClient` change, 3e tail -10). `services/api` tsc baseline improved 19 → 17 as a side effect of typing the CORS origin callback. Repo-wide lint stays at ~39s wall. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. **HIGH-full Phases 4–5 outstanding** — Tier C-wide (`apps/web` `no-unsafe-*`, ~266 warnings, Tamagui surface) and the final rule promotion + gate. Detailed phase plan, scope counts, and decisions in [`HIGH-full upgrade`](#high-full-upgrade) below.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -18,7 +18,7 @@
 | Warnings forbidden in clean packages | ✅ `npm run lint:packages-strict` — **11 of 11 packages** at `--max-warnings 0` (every `packages/**` workspace is gated; only `apps/**` and `services/**` still have `any` debt) |
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
-| Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
+| Type-aware lint enabled | 🟡 Partial — HIGH-full Phase 2 promoted 7 promise/throw rules to `warn`; HIGH-full Phase 3 added 5 `no-unsafe-*` rules at `warn` on `services/api/**`. `parserOptions.projectService` infrastructure is live. Full promotion to `error` is HIGH-full Phase 5. |
 | Outstanding warnings | **0** (-80 from Phase 6c, -58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,127 cumulative; was 1,127 at HIGH-light landing). **`npm run lint` exits clean — zero warnings, zero errors.** |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
@@ -534,20 +534,63 @@ A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-ch
   - **Pre-fix the strict gate before the rule promotion.** The packages strict gate (`--max-warnings 0`) means promoting a rule mid-flight breaks CI for any package with even one violation. Always sweep packages first, then promote.
   - **`allowDefaultProject` requires explicit relative paths**, not globs. `**/vitest.config.ts` is rejected with "glob too wide". Maintain the allowlist as new TS files outside tsconfig includes appear.
 
-#### Phase 3 — Tier C-narrow: `services/api` `no-unsafe-*`
+#### Phase 3 — Tier C-narrow: `services/api` `no-unsafe-*` ✅ landed 2026-05-16
 
-- **Scope:** ~665 warnings in `services/api/src/**` (`no-unsafe-member-access` 507, `no-unsafe-assignment` 158, `no-unsafe-call` 44, `no-unsafe-return` 10, `no-unsafe-argument` 6, plus tail). Phase-start re-measurement to identify the file families before splitting commits.
-- **Rules promoted (scoped to `services/api/**`):** `no-unsafe-assignment`, `no-unsafe-member-access`, `no-unsafe-call`, `no-unsafe-argument`, `no-unsafe-return`.
-- **Likely file families (to be confirmed at phase start):**
-  - Prisma raw queries (`$queryRaw`, `$executeRaw`).
-  - Fastify request handler bodies + headers (handlers that read `req.body` / `req.headers` without going through a typed Zod parser).
-  - AI tool I/O (`services/api/src/services/ai/tools/**` — input/output narrowing).
-  - BeerJSON normalisation (already partially typed in Phase 2 of HIGH-staged).
-- **Strategy:** type the boundary as `unknown`, narrow with type guards or a parser inside. Where a Zod/Valibot parser is the right answer, defer to the `Phase 7` migration in [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md) — Phase 3 of HIGH-full only types boundaries that don't need a runtime validator.
-- **Verification gate:** `services/api` warning surface at zero on the 5 `no-unsafe-*` rules; `services/api` TS baseline (currently 19 errors, all pre-existing) unchanged or reduced; integration tests still green; CI green.
-- **Effort:** 10–20 hours, split per file family (likely 4–6 commits).
-- **Risk:** medium (semantic regressions possible in narrowing — e.g. a wrong type guard letting unexpected shapes through). Mitigated by the existing integration test suite and per-route-family commit scope.
-- **Status:** [ ] not started.
+- **Actual scope (post-Phase-2 remeasurement):** **777 warnings** in `services/api/**` (raw count under the 5 promoted rules). Distribution was sharply different from the original plan:
+
+  | Slice                                    | Count | %   |
+  |------------------------------------------|------:|----:|
+  | Test files (`**/tests/**`, `*.test.ts`)  |   611 | 79% |
+  | Source files                             |   166 | 21% |
+
+  Per-rule across the full surface: `no-unsafe-member-access` 528, `no-unsafe-assignment` 184, `no-unsafe-call` 49, `no-unsafe-return` 10, `no-unsafe-argument` 6.
+
+  Within source files, the 166 warnings concentrated almost entirely in two files:
+
+  | File                                                  | Count |
+  |-------------------------------------------------------|------:|
+  | `services/api/src/seed/sources/beerproto/beerproto.ts` |   108 |
+  | `services/api/prisma/seed.ts`                         |    31 |
+  | `services/api/src/app.ts`                             |    17 |
+  | `services/api/src/beerjson/beerjsonValidator.ts`      |     3 |
+  | 7 other files (1 each)                                |     7 |
+
+  The original plan estimated ~665 warnings split across "Prisma raw queries / Fastify request handlers / AI tool I/O / BeerJSON normalisation". In practice those file families were **already typed cleanly** by HIGH-staged Phases 2–4 (the `services/api/src/**` cleanup that landed before HIGH-full). The remaining concentration was in two seed/import files plus Fastify wiring.
+
+- **The big decision — relax `no-unsafe-*` in tests, not source:**
+  611 of 777 warnings (79%) came from the test-file convention `JSON.parse(res.body) as { foo: ... }` followed by `.field.subfield` chains. Re-typing every Fastify-inject test response would be ~600 mechanical fixes with very low bug-catching value: tests control both ends of the boundary, the type assertions are usually correct, and the expected shape is implicit in the test name.
+  Decision: relax the 5 `no-unsafe-*` rules in test files (matching the existing `no-explicit-any: off` and `no-unused-expressions: off` relaxations in the same `**/*.{test,spec}.{ts,tsx,js,jsx}` glob block). Industry standard — typescript-eslint's own docs recommend relaxing the unsafe family in tests. Source code keeps the strong guardrail.
+- **Rules promoted (scoped to `services/api/**`, off in tests):** `no-unsafe-assignment`, `no-unsafe-member-access`, `no-unsafe-call`, `no-unsafe-argument`, `no-unsafe-return`.
+- **Strategy:** per `docs/CONTRACTS-VALIDATION-STRATEGY.md`, this codebase stays on hand-rolled validators. Phase 3 typed each source boundary with `unknown` + type guards / `parseX()` helpers; **no Zod/Valibot was introduced**. The Zod migration remains a separate decision with its own trigger criteria.
+- **Order of landing (5 commits, ~3 hours):**
+  1. **Phase 3a** (`eslint.config.mjs` only, -611 warnings instantly): promote the 5 rules at `warn` on `services/api/**`; extend the test-files relaxation block to add the 5 unsafe-* at `off`. The throwaway `eslint.config.measure.mjs` is also deleted (production config now produces the same measurement).
+  2. **Phase 3b** (`services/api/src/app.ts`, 17 warnings): all 17 in the dev-only CORS origin callback. Imported `OriginFunction` from `@fastify/cors` and hoisted the inline arrow into a typed local `const corsOriginFn: OriginFunction = (origin, cb) => { ... }`. The single residual warning on the `app.register(cors, ...)` call itself is `@fastify/cors`'s `export = fastifyCors` namespace+function-merge confusing type-aware ESLint (TS itself accepts the call cleanly); suppressed with a focused `eslint-disable-next-line` and an explanatory comment block. **Side effect:** the typed callback exposed 2 latent type errors that were previously hidden behind the `any` parameter inference, so the `services/api` tsc baseline drops from 19 → 17 (improvement, not regression).
+  3. **Phase 3c** (`services/api/prisma/seed.ts` + `services/api/prisma/tsconfig.json`, 31 warnings): two unrelated root causes —
+     - **argon2 type resolution (7 warnings):** `import argon2 from "argon2"` works in `src/routes/auth.ts` but failed in `prisma/seed.ts` because `seed.ts` is outside the API tsconfig `include: ["src/**/*.ts"]` and was being resolved via flat-config's `allowDefaultProject` escape hatch. Fix: add a dedicated `services/api/prisma/tsconfig.json` (extends `../tsconfig.json`, `noEmit: true`, `include: ["seed.ts"]`). `projectService` finds it automatically; the `"services/api/prisma/seed.ts"` entry is removed from `allowDefaultProject`. Runtime unaffected (`prisma db seed` invokes `tsx`, not `tsc`).
+     - **BJCP styles parsing (24 warnings):** `Array.isArray(styles)` narrows `unknown` to `any[]`, so `for (const s of styles) { typeof s?.style_id === "string" ... }` had `s: any`. Added a local `function isRecord(v: unknown): v is Record<string, unknown>` guard, asserted `styles as unknown[]` after the runtime check, and narrowed each element with `if (!isRecord(s)) continue` before property access.
+  4. **Phase 3d** (`services/api/src/seed/sources/beerproto/beerproto.ts`, 108 warnings — the largest single file): all 108 traced to a single root cause — an explicit escape hatch typing the prisma argument as `any`:
+     ```ts
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     type PrismaLike = any;
+     ```
+     The comment said this was to keep editor/host typechecking robust when Prisma Client was out of sync, but every other `services/api/**` file imports `PrismaClient` directly without issue. Replaced `PrismaLike = any` with `import type { PrismaClient }` + `type PrismaLike = PrismaClient` — `tsc --noEmit` confirmed zero hidden errors had been masked by the `any`. Single-line fix cleared all 108 warnings.
+  5. **Phase 3e** (8 misc files, 10 warnings): tail of unrelated micro-causes —
+     - `Array.isArray` narrowing to `any[]` (in 3 sites: `gravityAnalysis.ts`, `platformRecipes.ts`, `recipesExport.ts`, `recipesImportService.ts`) → annotate locals as `: unknown[]`.
+     - Third-party `JSON.parse` / `parser.parse` / Ajv schema returns typed `any` (in `beerjsonValidator.ts` 3 sites, `beerxmlImporter.ts` 1 site) → cast to the appropriate shape (`AnySchema` for Ajv) or `: unknown` for narrow-on-use.
+     - Catch handler `(err) => err?.message` (in `seedE2eFixture.ts`) → tighten to `(err: unknown)` and `err instanceof Error ? err.message : String(err)`.
+     - Node 22 `Buffer<ArrayBufferLike>` regression vs `IncomingMessage` async-iter chunks typed as `any` (in `webhookRawBody.ts`) → cast iterable to `AsyncIterable<Buffer | Uint8Array | string>`.
+
+- **Verification:** `npm run lint` exits 0/0 (full monorepo). `npm run lint:packages-strict` unchanged (clean). Per-workspace `tsc --noEmit` baselines: `services/api` 17 (improved from 19, **no regression**), `apps/web` 590, `apps/native` 0, `packages/{contracts,i18n,i18n-react,test-mcp,api-client,beerjson,media,navigation,recipes-ui}` 0, `packages/ui` 25. Wall-time impact: full-repo lint stays at ~39s (the 5 new rules fire on the same file set the parser already serves).
+
+- **Effort (actual):** ~3 hours (estimate was 10–20 hours). The gap is entirely the test-relaxation decision (-611 warnings via config) plus the `PrismaLike = any` discovery (-108 via single import change) — together ~93% of the surface dissolved into 2 commits.
+
+- **Lessons learned (carry into Phase 4+):**
+  - **Always re-measure at phase start; don't trust the original estimate.** The Phase 3 plan listed file families that didn't exist (cleared by HIGH-staged). The dominant warnings were in two seed files that the plan didn't mention. A 30-minute remeasurement saved ~10+ hours of work targeting the wrong files.
+  - **Tests deserve different lint discipline than source.** The test-relaxation decision (-611) followed the existing `no-explicit-any: off` precedent and is the natural next step every time a type-aware rule lands. Phase 4 (`apps/web` `no-unsafe-*`) should consider the same relaxation — `apps/web/**/__tests__/**` and Playwright fixtures will have the same `JSON.parse → as Shape` pattern.
+  - **A single escape hatch can poison a whole file.** Beerproto's `type PrismaLike = any` was 108 of Phase 3's 166 source warnings. Before splitting a high-warning file into commits, scan for top-of-file `any` aliases or `as any` casts that fan out — one fix may collapse the entire surface.
+  - **Files outside `tsconfig.include` deserve their own sub-tsconfig, not `allowDefaultProject`.** The escape hatch is fine for trivial files (vitest configs, tsup configs, `.d.ts` shims) but breaks for files that import third-party CJS modules with `esModuleInterop` semantics (the `prisma/seed.ts` argon2 case). When a file develops real logic, give it a real tsconfig.
+  - **`Array.isArray` narrows `unknown` to `any[]`, not `unknown[]`.** This was Pattern A in 4 of the Phase 3e tail fixes plus the BJCP styles loop in 3c. The standard remedy is `const items: unknown[] = Array.isArray(x) ? x : []` (or assert `as unknown[]` immediately after the runtime check).
+  - **Sub-projects work with `projectService`.** Adding a `services/api/prisma/tsconfig.json` cleared a class of "type that could not be resolved" warnings without touching `eslint.config.mjs` rules. Keep this pattern for Phase 4 if it surfaces.
 
 #### Phase 4 — Tier C-wide: `apps/web` `no-unsafe-*` (Tamagui surface)
 
