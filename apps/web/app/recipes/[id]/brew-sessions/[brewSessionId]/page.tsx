@@ -12,6 +12,7 @@ import { PageWideActionBar } from "../../../../_components/PageWideActionBar";
 import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
 import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
+import { asRecord } from "../../../../_lib/typeGuards";
 import { CodeInline } from "../../../../_components/CodeInline";
 import {
   ErrorBox,
@@ -233,10 +234,9 @@ export default function BrewSessionDetailPage() {
 
   const stoppedBy = useMemo(() => {
     const stoppedLog = logs.find((l) => l.kind === "session_stopped");
-    const payload = stoppedLog?.payloadJson;
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return "manual";
-    const reason = (payload as any).reason;
-    return reason === "auto" ? "auto" : "manual";
+    const payloadRec = asRecord(stoppedLog?.payloadJson);
+    if (!payloadRec) return "manual";
+    return payloadRec.reason === "auto" ? "auto" : "manual";
   }, [logs]);
 
   const sectionHasRunningTimer = useMemo(() => {
@@ -259,7 +259,7 @@ export default function BrewSessionDetailPage() {
       const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       const data = res.data as unknown as BrewSessionDetailResponse;
-      const s = (data as any)?.brewSession;
+      const s = data?.brewSession;
       setSession(s ?? null);
       setRecipe(s?.recipe ?? null);
       const sd = s?.scheduledDate;
@@ -330,19 +330,22 @@ export default function BrewSessionDetailPage() {
         apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/attachments`),
         apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/readings?kind=${kind}&limit=200`),
       ]);
-      if (!devicesRes.ok) throw new Error(String((devicesRes.data as any)?.message ?? devicesRes.status));
-      if (!attachmentsRes.ok) throw new Error(String((attachmentsRes.data as any)?.message ?? attachmentsRes.status));
-      if (!readingsRes.ok) throw new Error(String((readingsRes.data as any)?.message ?? readingsRes.status));
+      if (!devicesRes.ok) throw new Error(String((devicesRes.data as { message?: unknown })?.message ?? devicesRes.status));
+      if (!attachmentsRes.ok) throw new Error(String((attachmentsRes.data as { message?: unknown })?.message ?? attachmentsRes.status));
+      if (!readingsRes.ok) throw new Error(String((readingsRes.data as { message?: unknown })?.message ?? readingsRes.status));
 
-      const devices = (devicesRes.data as any).devices ?? [];
-      const attachments = (attachmentsRes.data as any).attachments ?? [];
-      const readings = (readingsRes.data as any).readings ?? [];
+      const devicesRaw = (devicesRes.data as { devices?: unknown })?.devices;
+      const attachmentsRaw = (attachmentsRes.data as { attachments?: unknown })?.attachments;
+      const readingsRaw = (readingsRes.data as { readings?: unknown })?.readings;
+      const devices = (Array.isArray(devicesRaw) ? devicesRaw : []) as HydrometerDevice[];
+      const attachments = (Array.isArray(attachmentsRaw) ? attachmentsRaw : []) as HydrometerAttachment[];
+      const readings = (Array.isArray(readingsRaw) ? readingsRaw : []) as HydrometerReading[];
       setHydrometerDevices(devices);
       setHydrometerAttachments(attachments);
       setHydrometerReadings(readings);
 
       if (resetSelection || !hydrometerSelectedDeviceId) {
-        const attachedForKind = attachments.find((a: any) => a.device?.kind === kind);
+        const attachedForKind = attachments.find((a) => a.device?.kind === kind);
         if (attachedForKind?.device?.id) {
           setHydrometerSelectedDeviceId(attachedForKind.device.id);
         } else if (devices[0]?.id) {
@@ -378,7 +381,7 @@ export default function BrewSessionDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind: hydrometerKind, deviceId: hydrometerSelectedDeviceId }),
       });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       await refreshHydrometers(hydrometerKind);
     } catch (err) {
       setHydrometerError(String(err));
@@ -399,7 +402,7 @@ export default function BrewSessionDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ deviceId: attached.device.id }),
       });
-      if (!res.ok) throw new Error(String((res.data as any)?.message ?? res.status));
+      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       await refreshHydrometers(hydrometerKind);
     } catch (err) {
       setHydrometerError(String(err));
@@ -473,7 +476,7 @@ export default function BrewSessionDetailPage() {
     const sessionRunning = session?.status === "running";
     const shouldTick = anyRunning || sessionRunning;
     if (shouldTick && tickRef.current == null) {
-      tickRef.current = globalThis.setInterval(() => setTick((x) => x + 1), 1000) as any;
+      tickRef.current = globalThis.setInterval(() => setTick((x) => x + 1), 1000) as unknown as number;
     }
     if (!shouldTick && tickRef.current != null) {
       clearInterval(tickRef.current);
@@ -489,7 +492,7 @@ export default function BrewSessionDetailPage() {
 
   const getSectionLabel = (sectionId: string) => {
     if ((PRESET_SECTION_ORDER as readonly string[]).includes(sectionId)) {
-      return tPreset(`presetSections.${sectionId}` as any);
+      return tPreset(`presetSections.${sectionId}` as Parameters<typeof tPreset>[0]);
     }
     const first = steps.find((s) => s.sectionId === sectionId);
     return first?.sectionName ?? sectionId;
@@ -508,8 +511,9 @@ export default function BrewSessionDetailPage() {
     }
     const keys = [...map.keys()];
     keys.sort((a, b) => {
-      const ia = PRESET_SECTION_ORDER.indexOf(a as any);
-      const ib = PRESET_SECTION_ORDER.indexOf(b as any);
+      const presetOrder = PRESET_SECTION_ORDER as readonly string[];
+      const ia = presetOrder.indexOf(a);
+      const ib = presetOrder.indexOf(b);
       if (ia !== -1 || ib !== -1) {
         return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
       }
@@ -573,7 +577,7 @@ export default function BrewSessionDetailPage() {
     const opts = [
       ...PRESET_SECTION_ORDER.map((k) => ({
         value: k,
-        label: tPreset(`presetSections.${k}` as any),
+        label: tPreset(`presetSections.${k}` as Parameters<typeof tPreset>[0]),
       })),
     ];
     const custom = new Map<string, string>();
@@ -639,7 +643,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({ steps: payload }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const nextSteps = (res.data as any)?.steps;
+      const nextSteps = (res.data as { steps?: unknown })?.steps;
       setSteps(Array.isArray(nextSteps) ? (nextSteps as BrewSessionStep[]) : steps);
 
       // Persist log-relevant edits (status/note/name/isDisabled) too, so "Save brewing session"
@@ -679,7 +683,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({}),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as any)?.brewSession;
+      const next = (res.data as { brewSession?: unknown })?.brewSession;
       if (next) setSession(next as BrewSession);
       await refresh();
     } catch (err) {
@@ -700,7 +704,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({ reason }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as any)?.brewSession;
+      const next = (res.data as { brewSession?: unknown })?.brewSession;
       if (next) setSession(next as BrewSession);
       await refresh();
     } catch (err) {
@@ -794,7 +798,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({ customTimerEnabled: enabled }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const updated = (res.data as any)?.step as Partial<BrewSessionStep> | undefined;
+      const updated = (res.data as { step?: Partial<BrewSessionStep> })?.step;
       if (updated) {
         setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...updated } : s)));
       }
@@ -878,7 +882,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as any)?.brewSession;
+      const next = (res.data as { brewSession?: unknown })?.brewSession;
       if (next) setSession(next as BrewSession);
       setDateEditing(false);
     } catch (err) {
@@ -899,7 +903,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({ scheduledDate: null }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as any)?.brewSession;
+      const next = (res.data as { brewSession?: unknown })?.brewSession;
       if (next) setSession(next as BrewSession);
       setDateInputValue("");
       setTimeInputValue("");
@@ -921,7 +925,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({}),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const updated = (res.data as any)?.step as BrewSessionStep | undefined;
+      const updated = (res.data as { step?: BrewSessionStep })?.step;
       if (updated) {
         setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...updated } : s)));
       }
@@ -1000,7 +1004,7 @@ export default function BrewSessionDetailPage() {
         body: JSON.stringify({ steps: payload }),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const nextSaved = (res.data as any)?.steps;
+      const nextSaved = (res.data as { steps?: unknown })?.steps;
       if (Array.isArray(nextSaved)) {
         setSteps(nextSaved as BrewSessionStep[]);
       }
@@ -1177,7 +1181,7 @@ export default function BrewSessionDetailPage() {
       (document.getElementById(`step-status-${oldestDueStepId}`) as HTMLElement | null) ??
       (document.getElementById(`step-name-${oldestDueStepId}`) as HTMLElement | null);
     try {
-      focusEl?.focus({ preventScroll: true } as any);
+      focusEl?.focus({ preventScroll: true });
     } catch {
       focusEl?.focus();
     }
@@ -1194,7 +1198,8 @@ export default function BrewSessionDetailPage() {
     if (raw == null || raw > 0) return;
 
     try {
-      const Ctx = (window.AudioContext ?? (window as any).webkitAudioContext) as
+      const winRec = window as unknown as Record<string, unknown>;
+      const Ctx = (window.AudioContext ?? winRec.webkitAudioContext) as
         | (new () => AudioContext)
         | undefined;
       if (Ctx) {
@@ -2386,7 +2391,7 @@ export default function BrewSessionDetailPage() {
                             <>
                               <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                                 {st.timerState === "stopped"
-                                  ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) } as any)
+                                  ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) })
                                   : t("timerLine", {
                                       elapsed: formatElapsedSeconds(elapsed),
                                       planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
@@ -2501,7 +2506,7 @@ export default function BrewSessionDetailPage() {
                           <YStack gap="$1">
                             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
                               {st.timerState === "stopped"
-                                ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) } as any)
+                                ? t("timerLineStopped", { elapsed: formatElapsedSeconds(elapsed) })
                                 : t("timerLine", {
                                     elapsed: formatElapsedSeconds(elapsed),
                                     planned: st.minutesPlanned == null ? "—" : String(st.minutesPlanned),
@@ -2653,7 +2658,7 @@ export default function BrewSessionDetailPage() {
                   {t("logsPagination.next")}
                 </Button>
                 <SizableText size="$2" fontFamily="$body" color="var(--text-muted)" mt={0}>
-                  {t("logsPagination.status", { page: String(logsPage), pages: String(logsTotalPages) } as any)}
+                  {t("logsPagination.status", { page: String(logsPage), pages: String(logsTotalPages) })}
                 </SizableText>
               </XStack>
             ) : null}

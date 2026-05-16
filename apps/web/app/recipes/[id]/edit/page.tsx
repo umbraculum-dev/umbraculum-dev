@@ -9,6 +9,7 @@ import { Button, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } fr
 
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { asRecord } from "../../../_lib/typeGuards";
 import { formatFixed } from "../../../../src/i18n/format";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { AdSlot } from "../../../_components/AdSlot";
@@ -142,16 +143,6 @@ interface YeastSearchResult {
   productId?: string | null;
   attenuationMin?: number | null;
   attenuationMax?: number | null;
-}
-
-/**
- * Narrow helper: returns the input as a plain object record, or null otherwise.
- * Mirrors `services/api/src/lib/typeGuards.ts::isObject` (kept local to avoid
- * a cross-app import).
- */
-function asRecord(v: unknown): Record<string, unknown> | null {
-  if (v == null || typeof v !== "object" || Array.isArray(v)) return null;
-  return v as Record<string, unknown>;
 }
 
 /**

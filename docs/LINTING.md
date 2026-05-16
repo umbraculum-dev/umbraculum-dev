@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.6 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a (`apps/web/app/recipes/[id]/edit/page.tsx`), and **4b** (`apps/web/app/recipes/[id]/water/**` — mash + sparge + boil pages) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, and the entire recipe editor surface in `apps/web` (recipe edit page + all three water sub-pages, ~7,900 lines) is now `any`-free. Phase 4c (yeast + brew-sessions pages) is next.
+**Status:** v1.7 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a (`apps/web/app/recipes/[id]/edit/page.tsx`), 4b (`apps/web/app/recipes/[id]/water/**` — mash + sparge + boil pages), and **4c** (`apps/web/app/recipes/[id]/yeast/page.tsx` + `brew-sessions/{,[brewSessionId]/}page.tsx`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, and the recipe editor surface in `apps/web` (recipe edit + water + yeast + brew-sessions pages, ~11,400 lines) is now `any`-free. Phase 5 (`apps/native/src/screens/**`) or Phase 6 (mop-up) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **406** (-87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -721 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **342** (-64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -785 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -145,8 +145,8 @@ The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui fr
 
 - [x] Phase 4a: `apps/web/app/recipes/[id]/edit/page.tsx` (104 `any` removed) ✅ landed 2026-05-16
 - [x] Phase 4b: water sub-pages (mash + sparge + boil — `water/page.tsx` was already clean) (87 `any` removed) ✅ landed 2026-05-16
-- [ ] Phase 4c: yeast + brew-sessions pages
-- [ ] Add `lint:web-recipes-strict` script once clean
+- [x] Phase 4c: yeast + brew-sessions pages (64 `any` removed) ✅ landed 2026-05-16
+- [ ] Add `lint:web-recipes-strict` script once clean (still gated on `apps/web/app/recipes/**` being `any`-free; remaining surface is mostly the brew-sessions detail page's pre-existing Tamagui-adjacent TS errors, tracked separately)
 
 #### Phase 4a — `apps/web/app/recipes/[id]/edit/page.tsx` ✅ landed 2026-05-16
 
@@ -197,6 +197,28 @@ The recipe edit pages have the highest accumulated `any` debt. Expect Tamagui fr
 - No new `apps/web` unit tests added (Phase 4b is type-tightening, no behavioural change). The water sub-pages are already covered by the Playwright recipe-flow specs that exercise mash/sparge/boil acidification through the storefront UI.
 
 **Why these files went together in Phase 4b:** they are siblings of the same brewing-stage-calculator pattern, share ~90% of their `any` patterns (derivation states, strength-kind narrowing, internal-API response unpacking, recipe-ext traversal), and benefit from a single shared `asRecord` import. Splitting them across multiple PRs would have triplicated the review surface for the same conceptual change.
+
+#### Phase 4c — `apps/web/app/recipes/[id]/yeast/page.tsx` + `brew-sessions/{,[brewSessionId]/}page.tsx` ✅ landed 2026-05-16
+
+**Scope:** 3 files, 3,491 lines combined. 64 `no-explicit-any` warnings → 0 (yeast 33, brew-sessions list 2, brew-sessions detail 29).
+
+**Strategy used:** "tighten in place" — same toolkit as Phases 1–4b. Order: smallest first (brew-sessions list 2 → yeast 33 → brew-sessions detail 29) to validate the toolkit on the trivial case before the dense ones.
+
+- Re-used the shared `asRecord` helper from `apps/web/app/_lib/typeGuards.ts` (extracted in Phase 4b). Imported in all three files. Growing the consumer set justifies the helper extraction in retrospect.
+- **Ride-along cleanup:** refactored the local `asRecord` definition in `apps/web/app/recipes/[id]/edit/page.tsx` (Phase 4a's inline copy) to import from `_lib/typeGuards.ts` instead. Removes a near-duplicate function (~10 lines) so future changes to the narrower happen in one place. Mechanical, no behaviour change.
+- **`yeast/page.tsx` (33 `any`):** the load-effect at the top had a dense `(ext as any).field` cluster reading 12+ recipe-ext arrays (yeast pitch rate, fermentation temp, oxygenation, diacetyl rest, format/type, species, needs-propagation, cells-per-L/KG/G, manual cell count, attenuation overrides, ingredient links). Replaced with a single `extRec = asRecord(r.recipeExtJson)` extraction at the top, then `asRecord(extRec?.fieldName)` per array. The downstream `.map()` over `baseYeast` now indexes typed `Record<string, unknown> | null` arrays — collapsed three nested `XxxRaw && typeof XxxRaw === "object" && typeof XxxRaw[id] === "string"` checks into the simpler `XxxRaw && typeof XxxRaw[id] === "string"`. Replaced the `validSpecies.includes(speciesRaw as any)` cheat with the established `(validSpecies as ReadonlyArray<string>).includes(speciesRaw)` Phase 4a pattern. Replaced the `extBase` save block (`({ ...(extBase as any) } as any)`) with `Record<string, unknown>` typing, so `delete extBaseForSave.yeastTypeOverrides` etc. just work without casts. Dropped redundant `gristRows as any` / `miscRows as any` casts when calling `buildBeerJsonRecipeDocument` / `buildRecipeExtJsonFromEditorState` (the state is already typed as `EditorGristRow[]` / `EditorMiscRow[]`). Replaced `(recipe as any)?.{analysis,recipeExtJson}` JSX prop accesses with direct field access (the local `Recipe` type already declares both).
+- **`brew-sessions/page.tsx` (2 `any`):** trivial — both sites were `(res.data as any)?.field` response unpacking on `apiFetch` results. Replaced with `(res.data as { field?: shape })?.field` typed shape-casts. Same Phase 4a precedent.
+- **`brew-sessions/[brewSessionId]/page.tsx` (29 `any`):** mixed bag, all from existing patterns. Replaced ~10 `(res.data as any)?.{brewSession,step,steps,message}` response-unpack sites with typed shape-casts. Replaced `(payload as any).reason` after a typeof-guard with `asRecord(payload)?.reason`. Replaced `attachments.find((a: any) => ...)` (type cheat — the array is already `HydrometerAttachment[]`) with the proper element type via inferred narrowing on `Array.isArray(...) ? ... : []` plus an `as HydrometerDevice[]` / `HydrometerAttachment[]` / `HydrometerReading[]` cast on the parsed result. Replaced 3 dynamic-i18n-key `as any` casts with `as Parameters<typeof tPreset>[0]` (matches the established `apps/web/app/recipes/[id]/edit/page.tsx` Phase 4a precedent at lines 1870 and 2415). Removed 3 i18n-params `as any` casts entirely — `t("timerLineStopped", { elapsed: ... })` and `t("logsPagination.status", { page, pages })` typecheck correctly without the cast (the casts were defensive but unnecessary). Replaced `PRESET_SECTION_ORDER.indexOf(a as any)` with the same `as readonly string[]` pattern already used three lines above for `.includes(...)`. Replaced `tickRef.current = setInterval(...) as any` with `as unknown as number` (the ref is `useRef<number | null>` and `globalThis.setInterval` returns `number` in DOM lib but `NodeJS.Timeout` if `@types/node` lib types win — `as unknown as number` is the explicit "we want the DOM number here" assertion). Replaced `(window as any).webkitAudioContext` with a `winRec = window as unknown as Record<string, unknown>` extract for the legacy-Safari fallback. Dropped a now-unnecessary `focusEl?.focus({ preventScroll: true } as any)` cast (modern TS DOM types accept `FocusOptions` natively).
+
+**Verification:**
+
+- ESLint: all 3 files at 0 `no-explicit-any` warnings. The remaining warnings on these files are all pre-existing `no-unused-vars` (2 in yeast — `YStack` import, `height` callback arg).
+- `apps/web` TypeScript error count held exactly at the pre-change baseline: 1067 total errors repo-wide. Per-file TS counts also held: 7 yeast, 8 brew-sessions list, 120 brew-sessions detail (= 128 in the looser-grep baseline; the brew-sessions detail file naturally absorbs both, so the redistribution is bookkeeping not regression). Edit page held at 239 errors after the `asRecord` dedup ride-along. A normalized diff (line/col stripped) of the TS error logs shows zero new error categories or messages.
+- Repo-wide `no-explicit-any` count: 326 → 262 (drop of 64, exactly matches Phase 4c scope).
+- Repo-wide all-warnings count: 406 → 342 (same -64 delta, no other warning category affected).
+- No new `apps/web` unit tests added (Phase 4c is type-tightening, no behavioural change). The yeast and brew-sessions pages are already covered by the Playwright recipe-flow specs that exercise yeast pitching + brew session lifecycle.
+
+**Why these files went together in Phase 4c:** they share ~80% of their `any` patterns with Phase 4a/4b (`apiFetch` response unpacking, recipe-ext traversal, dynamic i18n keys), and the brew-sessions list page is so trivial (2 `any`) that splitting it into its own PR would have been disproportionate review overhead. Including the `asRecord` dedup ride-along in `edit/page.tsx` (~10 lines, no behavioural change) is a small but appropriate cleanup that grows the shared-helper consumer set from 3 to 4 files.
 
 ### Phase 5 — `apps/native/src/screens/**` (~162 `any` warnings)
 

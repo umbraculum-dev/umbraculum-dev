@@ -43,7 +43,7 @@ export default function RecipeBrewSessionsPage() {
     try {
       const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const list = (res.data as any)?.brewSessions;
+      const list = (res.data as { brewSessions?: unknown })?.brewSessions;
       setSessions(Array.isArray(list) ? (list as BrewSessionListItem[]) : []);
     } catch (err) {
       setSessions([]);
@@ -69,7 +69,7 @@ export default function RecipeBrewSessionsPage() {
         body: JSON.stringify({}),
       });
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const id = (res.data as any)?.brewSession?.id;
+      const id = (res.data as { brewSession?: { id?: unknown } })?.brewSession?.id;
       if (typeof id !== "string" || !id) throw new Error("Create brew session response is missing brewSession.id");
       router.push(`/recipes/${recipeId}/brew-sessions/${id}`);
     } catch (err) {
