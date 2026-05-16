@@ -9,8 +9,9 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
+import { parseAuthMeResponse, type AuthMeResponseWorkspace } from "@brewery/contracts";
 
-type WorkspaceListItem = { id: string; name: string; role: string; brandKey?: string | null };
+type WorkspaceListItem = AuthMeResponseWorkspace;
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 const BRAND_COOKIE = "UI_BRAND";
@@ -47,10 +48,10 @@ export default function SelectWorkspacePage() {
           setAuthExpired(true);
           return;
         }
-        const body = res.data as { workspaces?: unknown; accounts?: unknown } | null | undefined;
-        const list = body?.workspaces ?? body?.accounts;
-        const items: WorkspaceListItem[] = Array.isArray(list) ? list : [];
-        if (!cancelled) setWorkspaces(items);
+        // parseAuthMeResponse normalises the legacy `accounts` field
+        // to `workspaces`, so we don't need to handle both shapes here.
+        const parsed = parseAuthMeResponse(res.data);
+        if (!cancelled) setWorkspaces(parsed.workspaces);
       } catch (err) {
         if (!cancelled) setError(String(err));
       } finally {

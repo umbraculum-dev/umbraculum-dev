@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { useState } from "react";
 import { Button, Sheet, Text, useMedia, YStack } from "tamagui";
 
@@ -117,7 +117,7 @@ export function NavSheet({
           </Button>
           <YStack
             pt="$4"
-            onClickCapture={(e) => {
+            onClickCapture={(e: MouseEvent<HTMLElement>) => {
               if (!open) return;
               const target = e.target;
               if (!(target instanceof HTMLElement)) return;

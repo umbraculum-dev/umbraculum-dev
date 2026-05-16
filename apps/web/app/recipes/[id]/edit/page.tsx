@@ -1319,6 +1319,14 @@ export default function RecipeEditPage() {
     });
   };
 
+  // Dead-code helper. Underscore-prefixed because intentionally unused;
+  // the `addYeastRow` callee was never wired up. The corresponding
+  // `Cannot find name 'addYeastRow'` (TS2552) lives in the apps/web
+  // pre-existing tsc baseline. Kept here as a sketch of the future
+  // "add yeast from DB" feature so the YeastSearchResult → row
+  // mapping isn't lost. When this is wired up, define `addYeastRow`
+  // analogously to the inline grist/hop row creators and remove the
+  // disable directive below.
   const _addYeastFromDb = (item: YeastSearchResult) => {
     const id = typeof item.id === "string" ? item.id : null;
     const nameRaw = typeof item.name === "string" ? item.name : "";
@@ -1329,6 +1337,7 @@ export default function RecipeEditPage() {
       typeof item.attenuationMin === "number" && Number.isFinite(item.attenuationMin) ? item.attenuationMin : null;
     const attenuationMax =
       typeof item.attenuationMax === "number" && Number.isFinite(item.attenuationMax) ? item.attenuationMax : null;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- TS2552 (pre-existing); see block comment above.
     addYeastRow({ ingredientId: id, name: nameRaw, lab, productId, attenuationMin, attenuationMax });
   };
   const removeGristRow = (id: string) => {
