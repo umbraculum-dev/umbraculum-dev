@@ -3,6 +3,7 @@ import { parse } from "csv-parse/sync";
 // Note: we intentionally avoid importing Prisma-generated enum/types here to keep editor/host
 // typechecking robust even when Prisma Client generation is out of sync.
 // Runtime correctness is ensured by our API's container build/typecheck.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentional escape hatch; see comment above.
 type PrismaLike = any;
 
 type IngredientKind = "fermentable" | "hop" | "yeast";

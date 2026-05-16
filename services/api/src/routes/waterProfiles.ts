@@ -16,16 +16,16 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
-      scope: typeof body.scope === "string" ? (body.scope as any) : undefined,
-      type: (typeof body.type === "string" ? body.type : "water") as any,
+      scope: typeof body.scope === "string" ? body.scope : undefined,
+      type: typeof body.type === "string" ? body.type : "water",
       name: typeof body.name === "string" ? body.name : "",
-      ph: typeof body.ph === "number" ? (body.ph as any) : body.ph === null ? null : undefined,
-      calcium: body.calcium as any,
-      magnesium: body.magnesium as any,
-      sodium: body.sodium as any,
-      sulfate: body.sulfate as any,
-      chloride: body.chloride as any,
-      bicarbonate: body.bicarbonate as any,
+      ph: body.ph,
+      calcium: body.calcium,
+      magnesium: body.magnesium,
+      sodium: body.sodium,
+      sulfate: body.sulfate,
+      chloride: body.chloride,
+      bicarbonate: body.bicarbonate,
     });
 
     return { ok: true, profile: created };
@@ -38,18 +38,17 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
-      scope: typeof body.scope === "string" ? (body.scope as any) : undefined,
-      type: typeof body.type === "string" ? (body.type as any) : undefined,
+      scope: typeof body.scope === "string" ? body.scope : undefined,
+      type: typeof body.type === "string" ? body.type : undefined,
       name: typeof body.name === "string" ? body.name : undefined,
-      ph: typeof body.ph === "number" ? (body.ph as any) : body.ph === null ? null : undefined,
-      calcium: body.calcium as any,
-      magnesium: body.magnesium as any,
-      sodium: body.sodium as any,
-      sulfate: body.sulfate as any,
-      chloride: body.chloride as any,
-      bicarbonate: body.bicarbonate as any,
-      verificationStatus:
-        typeof body.verificationStatus === "string" ? (body.verificationStatus as any) : undefined,
+      ph: body.ph,
+      calcium: body.calcium,
+      magnesium: body.magnesium,
+      sodium: body.sodium,
+      sulfate: body.sulfate,
+      chloride: body.chloride,
+      bicarbonate: body.bicarbonate,
+      verificationStatus: typeof body.verificationStatus === "string" ? body.verificationStatus : undefined,
     });
 
     return { ok: true, profile: updated };
@@ -82,4 +81,3 @@ export async function waterProfilesRoutes(app: FastifyInstance) {
     return { ok: true };
   });
 }
-

@@ -52,7 +52,7 @@ async function main() {
         if (!dryRun) {
           await prisma.recipe.update({
             where: { id: r.id },
-            data: { recipeExtJson: nextRecipeExtJson as any },
+            data: { recipeExtJson: nextRecipeExtJson as Prisma.InputJsonValue },
           });
         }
         updated += 1;

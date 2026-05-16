@@ -30,7 +30,8 @@ export async function adsRoutes(app: FastifyInstance) {
   app.get("/ads/slot/:placement", async (req: FastifyRequest) => {
     const params = (req.params ?? {}) as { placement?: unknown };
     const placement = assertPlacement(params.placement);
-    const platform = assertPlatform((req.query as any)?.platform);
+    const query = (req.query ?? {}) as Record<string, unknown>;
+    const platform = assertPlatform(query.platform);
 
     const ctx = getOptionalContext(req);
     const activeWorkspaceId = ctx?.activeWorkspaceId ?? null;

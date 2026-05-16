@@ -2,17 +2,34 @@ import type { PrismaClient } from "@prisma/client";
 import { BadRequestError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
-import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
+import {
+  RecipeWaterSettingsService,
+  type UpsertRecipeWaterSettingsInput,
+} from "./recipeWaterSettingsService.js";
 import {
   applySaltAdditions,
   type IonProfilePpm,
   type SaltAddition,
   type SaltKey,
 } from "../domain/waterCalc/saltAdditions.js";
-import { spargeAcidification, type AcidStrength, type SpargeAcidType } from "../domain/waterCalc/spargeAcidification.js";
-import { spargeAcidificationManual } from "../domain/waterCalc/spargeAcidificationManual.js";
-import { mashAcidificationManual } from "../domain/waterCalc/mashAcidificationManual.js";
-import { mashAcidificationTargetMashPh } from "../domain/waterCalc/mashAcidificationTargetMashPh.js";
+import {
+  spargeAcidification,
+  type AcidStrength,
+  type SpargeAcidType,
+  type SpargeAcidificationResult,
+} from "../domain/waterCalc/spargeAcidification.js";
+import {
+  spargeAcidificationManual,
+  type SpargeAcidificationManualResult,
+} from "../domain/waterCalc/spargeAcidificationManual.js";
+import {
+  mashAcidificationManual,
+  type MashAcidificationManualResult,
+} from "../domain/waterCalc/mashAcidificationManual.js";
+import {
+  mashAcidificationTargetMashPh,
+  type MashAcidificationTargetMashPhResult,
+} from "../domain/waterCalc/mashAcidificationTargetMashPh.js";
 import { alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult, combineAfterSaltsAndAcid } from "../domain/waterCalc/overall.js";
 import { buildSaltAdditionsDerivation } from "../domain/waterCalc/derivation/saltAdditionsDerivation.js";
 import { buildAcidificationDerivation } from "../domain/waterCalc/derivation/acidificationDerivation.js";
@@ -42,13 +59,54 @@ function ensureFinite(n: unknown, field: string) {
   return n;
 }
 
+const STRENGTH_KINDS = ["percent", "normality", "molarity", "solid"] as const;
+const ACID_TYPES = [
+  "acetic",
+  "hydrochloric",
+  "lactic",
+  "phosphoric",
+  "sulfuric",
+  "citric",
+  "tartaric",
+  "malic",
+] as const;
+
+function parseStrengthKind(value: unknown, field: string): StrengthKind {
+  if (typeof value === "string" && (STRENGTH_KINDS as readonly string[]).includes(value)) {
+    return value as StrengthKind;
+  }
+  throw new BadRequestError(
+    "invalid_strength_kind",
+    `Body.${field} must be one of ${STRENGTH_KINDS.join(", ")}`,
+  );
+}
+
+function parseAcidType(value: unknown, field: string): SpargeAcidType {
+  if (typeof value === "string" && (ACID_TYPES as readonly string[]).includes(value)) {
+    return value as SpargeAcidType;
+  }
+  throw new BadRequestError(
+    "invalid_acid_type",
+    `Body.${field} must be one of ${ACID_TYPES.join(", ")}`,
+  );
+}
+
 function parseStrength(args: { strengthKind: StrengthKind; strengthValue?: number | null }): AcidStrength {
-  if (args.strengthKind === "solid") return { kind: "solid" };
+  const kind = args.strengthKind;
+  if (kind === "solid") return { kind: "solid" };
   const v = args.strengthValue;
   if (typeof v !== "number" || !Number.isFinite(v)) {
     throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a finite number");
   }
-  return { kind: args.strengthKind as any, value: v } as AcidStrength;
+  return { kind, value: v };
+}
+
+/**
+ * AcidStrength has a discriminated `kind`; only the non-"solid" variants carry
+ * a numeric `value`. This narrows safely so callers don't reach for `(strength as any).value`.
+ */
+function strengthValueOrNull(strength: AcidStrength): number | null {
+  return strength.kind === "solid" ? null : strength.value;
 }
 
 function mixIonProfilesByVolume(a: IonProfilePpm, aVolumeLiters: number, b: IonProfilePpm, bVolumeLiters: number): IonProfilePpm | null {
@@ -100,6 +158,15 @@ function parseSaltAdditions(value: unknown, field: string): SaltAddition[] {
   });
 }
 
+/**
+ * Compute-and-save inputs intentionally type the discriminator/enum fields
+ * (`acidType`, `strengthKind`, `acidificationMode`) as `string` rather than
+ * the narrow domain unions (`SpargeAcidType`, `StrengthKind`, `Mode`). The
+ * service validates each one at the entry point — promoting them to narrow
+ * types here would force routes to either re-introduce `as any` casts or
+ * duplicate the same coercion logic, which is exactly the noise we cleaned
+ * up in Phase 3 of `docs/LINTING.md`.
+ */
 export type MashComputeAndSaveInput = {
   sourceWaterProfileId: string;
   dilutionWaterProfileId: string | null;
@@ -109,10 +176,10 @@ export type MashComputeAndSaveInput = {
   mashStartingAlkalinityPpmCaCO3: number;
   mashStartingPh: number;
   mashTargetPh: number;
-  mashAcidType: SpargeAcidType;
-  mashStrengthKind: StrengthKind;
+  mashAcidType: string;
+  mashStrengthKind: string;
   mashStrengthValue: number | null;
-  mashAcidificationMode: Mode;
+  mashAcidificationMode: string;
   mashManualAcidAddedMl: number | null;
   mashManualAcidAddedGrams: number | null;
 
@@ -129,10 +196,10 @@ export type SpargeComputeAndSaveInput = {
   spargeStartingPh: number;
   spargeTargetPh: number;
   spargeVolumeLiters: number;
-  spargeAcidType: SpargeAcidType;
-  spargeStrengthKind: StrengthKind;
+  spargeAcidType: string;
+  spargeStrengthKind: string;
   spargeStrengthValue: number | null;
-  spargeAcidificationMode: Mode;
+  spargeAcidificationMode: string;
   spargeManualAcidAddedMl: number | null;
   spargeManualAcidAddedGrams: number | null;
 };
@@ -146,10 +213,10 @@ export type BoilComputeAndSaveInput = {
   boilStartingAlkalinityPpmCaCO3: number;
   boilStartingPh: number;
   boilTargetPh: number;
-  boilAcidType: SpargeAcidType;
-  boilStrengthKind: StrengthKind;
+  boilAcidType: string;
+  boilStrengthKind: string;
   boilStrengthValue: number | null;
-  boilAcidificationMode: Mode;
+  boilAcidificationMode: string;
   boilManualAcidAddedMl: number | null;
   boilManualAcidAddedGrams: number | null;
 
@@ -183,7 +250,17 @@ export class RecipeWaterComputeAndSaveService {
       },
     });
     if (!profile) throw new BadRequestError("invalid_profile_id", "Unknown water profile id");
-    return profile as any as WaterProfileLite;
+    return {
+      id: profile.id,
+      scope: profile.scope,
+      workspaceId: profile.workspaceId,
+      calcium: profile.calcium,
+      magnesium: profile.magnesium,
+      sodium: profile.sodium,
+      sulfate: profile.sulfate,
+      chloride: profile.chloride,
+      bicarbonate: profile.bicarbonate,
+    };
   }
 
   private async assertProfileAccessible(workspaceId: string, profileId: string) {
@@ -247,14 +324,12 @@ export class RecipeWaterComputeAndSaveService {
     const salts = applySaltAdditions(mixedBase, derivedVolumeLiters, additions);
     const saltsDerivation = buildSaltAdditionsDerivation({ volumeLiters: derivedVolumeLiters, baseProfile: mixedBase, result: salts });
 
-    const acidType = input.mashAcidType;
-    if (typeof acidType !== "string") throw new BadRequestError("invalid_acid_type", "Body.mashAcidType is required");
-
-    const strengthKind = input.mashStrengthKind;
+    const acidType = parseAcidType(input.mashAcidType, "mashAcidType");
+    const strengthKind = parseStrengthKind(input.mashStrengthKind, "mashStrengthKind");
     const strengthValue = input.mashStrengthValue;
     const strength = parseStrength({ strengthKind, strengthValue });
 
-    const mashMode = input.mashAcidificationMode === "manual" ? "manual" : "targetPh";
+    const mashMode: Mode = input.mashAcidificationMode === "manual" ? "manual" : "targetPh";
 
     const startingAlkalinityPpmCaCO3 = ensureFinite(input.mashStartingAlkalinityPpmCaCO3, "mashStartingAlkalinityPpmCaCO3");
     const startingPh = ensureFinite(input.mashStartingPh, "mashStartingPh");
@@ -264,7 +339,11 @@ export class RecipeWaterComputeAndSaveService {
 
     const nowIso = new Date().toISOString();
 
-    let acidResult: any;
+    type MashAcidResult =
+      | MashAcidificationManualResult
+      | MashAcidificationTargetMashPhResult
+      | SpargeAcidificationResult;
+    let acidResult: MashAcidResult | null = null;
     let acidDerivation: WaterCalcDerivation | null = null;
     let overallPh: { kind: "target" | "estimated"; value: number } = { kind: "target", value: targetPh };
 
@@ -289,7 +368,7 @@ export class RecipeWaterComputeAndSaveService {
         volumeLiters: derivedVolumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strengthValueOrNull(strength),
         result: manual.predicted,
       });
       if (hasGrist) {
@@ -304,7 +383,7 @@ export class RecipeWaterComputeAndSaveService {
           return { amountKg, mashDiPh, mashTaToPh57_mEqPerKg };
         });
 
-        const acidAdded_mEqPerL = (manual.predicted as any)?.debug?.acidRequired_mEqPerL as number | undefined;
+        const acidAdded_mEqPerL = manual.predicted.debug?.acidRequired_mEqPerL;
         const estimate = mashPhEstimate({
           volumeLiters: derivedVolumeLiters,
           alkalinityPpmCaCO3: startingAlkalinityPpmCaCO3,
@@ -360,12 +439,18 @@ export class RecipeWaterComputeAndSaveService {
         volumeLiters: derivedVolumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
-        result: hasGrist ? (acidResult as any).predicted ?? acidResult : acidResult,
+        strengthValue: strengthValueOrNull(strength),
+        // Target+grist returns MashAcidificationTargetMashPhResult, target+no-grist returns
+        // SpargeAcidificationResult. Both expose the fields the derivation builder reads
+        // (acidRequiredMl/Grams, finalAlkalinityPpmCaCO3, sulfate/chloride). The two
+        // `debug` shapes differ but the builder only inspects fields shared between them.
+        result: acidResult as SpargeAcidificationResult,
       });
     }
 
-    const acidPredicted = mashMode === "manual" ? (acidResult as any).predicted : acidResult;
+    if (!acidResult) throw new Error("acidResult was not set");
+    const acidPredicted: SpargeAcidificationResult | MashAcidificationTargetMashPhResult =
+      "predicted" in acidResult ? acidResult.predicted : acidResult;
     const ionsPpm = combineAfterSaltsAndAcid({ afterSalts: salts.resultingProfile, acidResult: acidPredicted });
     const alkalinityAfterSaltsPpmCaCO3 = alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult(salts);
 
@@ -441,20 +526,19 @@ export class RecipeWaterComputeAndSaveService {
       mashOverallLastCalculatedAt: nowIso,
     };
 
-    if (mashMode === "manual") {
-      const manual = acidResult as any;
-      patch.mashManualLastAchievedPh = manual.achievedPh;
-      patch.mashManualLastFinalAlkalinityPpmCaCO3 = manual.predicted.finalAlkalinityPpmCaCO3;
-      patch.mashManualLastSulfateAddedPpm = manual.predicted.sulfateAddedPpm;
-      patch.mashManualLastChlorideAddedPpm = manual.predicted.chlorideAddedPpm;
+    if (mashMode === "manual" && "predicted" in acidResult) {
+      patch.mashManualLastAchievedPh = acidResult.achievedPh;
+      patch.mashManualLastFinalAlkalinityPpmCaCO3 = acidResult.predicted.finalAlkalinityPpmCaCO3;
+      patch.mashManualLastSulfateAddedPpm = acidResult.predicted.sulfateAddedPpm;
+      patch.mashManualLastChlorideAddedPpm = acidResult.predicted.chlorideAddedPpm;
       patch.mashManualLastCalculatedAt = nowIso;
 
-      patch.mashLastFinalAlkalinityPpmCaCO3 = manual.predicted.finalAlkalinityPpmCaCO3;
-      patch.mashLastSulfateAddedPpm = manual.predicted.sulfateAddedPpm;
-      patch.mashLastChlorideAddedPpm = manual.predicted.chlorideAddedPpm;
+      patch.mashLastFinalAlkalinityPpmCaCO3 = acidResult.predicted.finalAlkalinityPpmCaCO3;
+      patch.mashLastSulfateAddedPpm = acidResult.predicted.sulfateAddedPpm;
+      patch.mashLastChlorideAddedPpm = acidResult.predicted.chlorideAddedPpm;
       patch.mashLastCalculatedAt = nowIso;
-    } else {
-      const r = acidResult as any;
+    } else if (mashMode !== "manual") {
+      const r = acidResult as MashAcidificationTargetMashPhResult | SpargeAcidificationResult;
       patch.mashLastAcidRequiredMl = r.acidRequiredMl ?? null;
       patch.mashLastAcidRequiredTsp = r.acidRequiredTsp ?? null;
       patch.mashLastAcidRequiredGrams = r.acidRequiredGrams ?? null;
@@ -465,7 +549,7 @@ export class RecipeWaterComputeAndSaveService {
       patch.mashLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, workspaceId, recipeId, patch as any);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch as UpsertRecipeWaterSettingsInput);
 
     return {
       settings: { recipeId },
@@ -506,9 +590,8 @@ export class RecipeWaterComputeAndSaveService {
     const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
     const saltsDerivation = buildSaltAdditionsDerivation({ volumeLiters, baseProfile, result: salts });
 
-    const acidType = input.spargeAcidType;
-    if (typeof acidType !== "string") throw new BadRequestError("invalid_acid_type", "Body.spargeAcidType is required");
-    const strengthKind = input.spargeStrengthKind;
+    const acidType = parseAcidType(input.spargeAcidType, "spargeAcidType");
+    const strengthKind = parseStrengthKind(input.spargeStrengthKind, "spargeStrengthKind");
     const strengthValue = input.spargeStrengthValue;
     const strength = parseStrength({ strengthKind, strengthValue });
 
@@ -517,9 +600,10 @@ export class RecipeWaterComputeAndSaveService {
     const targetPh = ensureFinite(input.spargeTargetPh, "spargeTargetPh");
 
     const nowIso = new Date().toISOString();
-    const mode = input.spargeAcidificationMode === "manual" ? "manual" : "targetPh";
+    const mode: Mode = input.spargeAcidificationMode === "manual" ? "manual" : "targetPh";
 
-    let acidResult: any;
+    type SpargeAcidResult = SpargeAcidificationManualResult | SpargeAcidificationResult;
+    let acidResult: SpargeAcidResult | null = null;
     let acidDerivation: WaterCalcDerivation | null = null;
 
     const calciumPpm = salts.resultingProfile.calcium;
@@ -548,7 +632,7 @@ export class RecipeWaterComputeAndSaveService {
         volumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strengthValueOrNull(strength),
         result: manual.predicted,
       });
     } else {
@@ -571,12 +655,14 @@ export class RecipeWaterComputeAndSaveService {
         volumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strengthValueOrNull(strength),
         result: r,
       });
     }
 
-    const acidPredicted = mode === "manual" ? (acidResult as any).predicted : acidResult;
+    if (!acidResult) throw new Error("acidResult was not set");
+    const acidPredicted: SpargeAcidificationResult =
+      "predicted" in acidResult ? acidResult.predicted : acidResult;
 
     const patch: Record<string, unknown> = {
       spargeWaterProfileId: input.spargeWaterProfileId,
@@ -595,33 +681,34 @@ export class RecipeWaterComputeAndSaveService {
       spargeManualAcidAddedGrams: strengthKind === "solid" ? input.spargeManualAcidAddedGrams : null,
     };
 
-    if (mode === "manual") {
-      patch.spargeLastAcidRequiredMl = (acidPredicted as any).acidRequiredMl ?? null;
-      patch.spargeLastAcidRequiredTsp = (acidPredicted as any).acidRequiredTsp ?? null;
-      patch.spargeLastAcidRequiredGrams = (acidPredicted as any).acidRequiredGrams ?? null;
-      patch.spargeLastAcidRequiredKg = (acidPredicted as any).acidRequiredKg ?? null;
+    if (mode === "manual" && "predicted" in acidResult) {
+      patch.spargeLastAcidRequiredMl = acidPredicted.acidRequiredMl ?? null;
+      patch.spargeLastAcidRequiredTsp = acidPredicted.acidRequiredTsp ?? null;
+      patch.spargeLastAcidRequiredGrams = acidPredicted.acidRequiredGrams ?? null;
+      patch.spargeLastAcidRequiredKg = acidPredicted.acidRequiredKg ?? null;
       patch.spargeLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
       patch.spargeLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
       patch.spargeLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
       patch.spargeLastCalculatedAt = nowIso;
 
-      patch.spargeManualLastAchievedPh = (acidResult as any).achievedPh;
+      patch.spargeManualLastAchievedPh = acidResult.achievedPh;
       patch.spargeManualLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
       patch.spargeManualLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
       patch.spargeManualLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
       patch.spargeManualLastCalculatedAt = nowIso;
-    } else {
-      patch.spargeLastAcidRequiredMl = (acidResult as any).acidRequiredMl ?? null;
-      patch.spargeLastAcidRequiredTsp = (acidResult as any).acidRequiredTsp ?? null;
-      patch.spargeLastAcidRequiredGrams = (acidResult as any).acidRequiredGrams ?? null;
-      patch.spargeLastAcidRequiredKg = (acidResult as any).acidRequiredKg ?? null;
-      patch.spargeLastFinalAlkalinityPpmCaCO3 = (acidResult as any).finalAlkalinityPpmCaCO3 ?? null;
-      patch.spargeLastSulfateAddedPpm = (acidResult as any).sulfateAddedPpm ?? null;
-      patch.spargeLastChlorideAddedPpm = (acidResult as any).chlorideAddedPpm ?? null;
+    } else if (mode !== "manual") {
+      const r = acidResult as SpargeAcidificationResult;
+      patch.spargeLastAcidRequiredMl = r.acidRequiredMl ?? null;
+      patch.spargeLastAcidRequiredTsp = r.acidRequiredTsp ?? null;
+      patch.spargeLastAcidRequiredGrams = r.acidRequiredGrams ?? null;
+      patch.spargeLastAcidRequiredKg = r.acidRequiredKg ?? null;
+      patch.spargeLastFinalAlkalinityPpmCaCO3 = r.finalAlkalinityPpmCaCO3 ?? null;
+      patch.spargeLastSulfateAddedPpm = r.sulfateAddedPpm ?? null;
+      patch.spargeLastChlorideAddedPpm = r.chlorideAddedPpm ?? null;
       patch.spargeLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, workspaceId, recipeId, patch as any);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch as UpsertRecipeWaterSettingsInput);
 
     return {
       settings: { recipeId },
@@ -685,9 +772,8 @@ export class RecipeWaterComputeAndSaveService {
     const salts = applySaltAdditions(mixedBase, derivedVolumeLiters, additions);
     const saltsDerivation = buildSaltAdditionsDerivation({ volumeLiters: derivedVolumeLiters, baseProfile: mixedBase, result: salts });
 
-    const acidType = input.boilAcidType;
-    if (typeof acidType !== "string") throw new BadRequestError("invalid_acid_type", "Body.boilAcidType is required");
-    const strengthKind = input.boilStrengthKind;
+    const acidType = parseAcidType(input.boilAcidType, "boilAcidType");
+    const strengthKind = parseStrengthKind(input.boilStrengthKind, "boilStrengthKind");
     const strengthValue = input.boilStrengthValue;
     const strength = parseStrength({ strengthKind, strengthValue });
 
@@ -696,9 +782,10 @@ export class RecipeWaterComputeAndSaveService {
     const targetPh = ensureFinite(input.boilTargetPh, "boilTargetPh");
 
     const nowIso = new Date().toISOString();
-    const mode = input.boilAcidificationMode === "manual" ? "manual" : "targetPh";
+    const mode: Mode = input.boilAcidificationMode === "manual" ? "manual" : "targetPh";
 
-    let acidResult: any;
+    type BoilAcidResult = SpargeAcidificationManualResult | SpargeAcidificationResult;
+    let acidResult: BoilAcidResult | null = null;
     let acidDerivation: WaterCalcDerivation | null = null;
     const calciumPpm = salts.resultingProfile.calcium;
     const magnesiumPpm = salts.resultingProfile.magnesium;
@@ -726,7 +813,7 @@ export class RecipeWaterComputeAndSaveService {
         volumeLiters: derivedVolumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strengthValueOrNull(strength),
         result: manual.predicted,
       });
     } else {
@@ -749,12 +836,16 @@ export class RecipeWaterComputeAndSaveService {
         volumeLiters: derivedVolumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strengthValueOrNull(strength),
         result: r,
       });
     }
 
-    const acidPredicted = mode === "manual" ? (acidResult as any).predicted : acidResult;
+    if (!acidResult) throw new Error("acidResult was not set");
+    const acidPredicted: SpargeAcidificationResult =
+      "predicted" in acidResult ? acidResult.predicted : acidResult;
+    const achievedPh: number | null =
+      "achievedPh" in acidResult ? acidResult.achievedPh : null;
     const ionsPpm = combineAfterSaltsAndAcid({ afterSalts: salts.resultingProfile, acidResult: acidPredicted });
     const alkalinityAfterSaltsPpmCaCO3 = alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult(salts);
 
@@ -762,7 +853,10 @@ export class RecipeWaterComputeAndSaveService {
       calculatedAt: nowIso,
       ionsPpm,
       finalAlkalinityPpmCaCO3: acidPredicted.finalAlkalinityPpmCaCO3,
-      ph: { kind: mode === "manual" ? "estimated" : "target", value: mode === "manual" ? (acidResult as any).achievedPh : targetPh },
+      ph: {
+        kind: mode === "manual" ? ("estimated" as const) : ("target" as const),
+        value: mode === "manual" && achievedPh !== null ? achievedPh : targetPh,
+      },
       debug: {
         startingAlkalinityPpmCaCO3,
         startingAlkalinityAfterSaltsPpmCaCO3: alkalinityAfterSaltsPpmCaCO3,
@@ -781,7 +875,7 @@ export class RecipeWaterComputeAndSaveService {
         { id: "volumeLiters", value: { kind: "number", value: derivedVolumeLiters, unit: "L" } },
         { id: "startingAlk", value: { kind: "number", value: startingAlkalinityPpmCaCO3, unit: "ppm_as_CaCO3" } },
         { id: "startingPh", value: { kind: "number", value: startingPh, unit: "pH" } },
-        { id: "targetPh", value: { kind: "number", value: mode === "manual" ? (acidResult as any).achievedPh : targetPh, unit: "pH" } },
+        { id: "targetPh", value: { kind: "number", value: mode === "manual" && achievedPh !== null ? achievedPh : targetPh, unit: "pH" } },
       ],
       intermediates: [
         { id: "alkAfterSalts", value: { kind: "number", value: alkalinityAfterSaltsPpmCaCO3, unit: "ppm_as_CaCO3" } },
@@ -830,33 +924,34 @@ export class RecipeWaterComputeAndSaveService {
       boilOverallLastCalculatedAt: nowIso,
     };
 
-    if (mode === "manual") {
-      patch.boilLastAcidRequiredMl = (acidPredicted as any).acidRequiredMl ?? null;
-      patch.boilLastAcidRequiredTsp = (acidPredicted as any).acidRequiredTsp ?? null;
-      patch.boilLastAcidRequiredGrams = (acidPredicted as any).acidRequiredGrams ?? null;
-      patch.boilLastAcidRequiredKg = (acidPredicted as any).acidRequiredKg ?? null;
+    if (mode === "manual" && "predicted" in acidResult) {
+      patch.boilLastAcidRequiredMl = acidPredicted.acidRequiredMl ?? null;
+      patch.boilLastAcidRequiredTsp = acidPredicted.acidRequiredTsp ?? null;
+      patch.boilLastAcidRequiredGrams = acidPredicted.acidRequiredGrams ?? null;
+      patch.boilLastAcidRequiredKg = acidPredicted.acidRequiredKg ?? null;
       patch.boilLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
       patch.boilLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
       patch.boilLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
       patch.boilLastCalculatedAt = nowIso;
 
-      patch.boilManualLastAchievedPh = (acidResult as any).achievedPh;
+      patch.boilManualLastAchievedPh = acidResult.achievedPh;
       patch.boilManualLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
       patch.boilManualLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
       patch.boilManualLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
       patch.boilManualLastCalculatedAt = nowIso;
-    } else {
-      patch.boilLastAcidRequiredMl = (acidResult as any).acidRequiredMl ?? null;
-      patch.boilLastAcidRequiredTsp = (acidResult as any).acidRequiredTsp ?? null;
-      patch.boilLastAcidRequiredGrams = (acidResult as any).acidRequiredGrams ?? null;
-      patch.boilLastAcidRequiredKg = (acidResult as any).acidRequiredKg ?? null;
-      patch.boilLastFinalAlkalinityPpmCaCO3 = (acidResult as any).finalAlkalinityPpmCaCO3 ?? null;
-      patch.boilLastSulfateAddedPpm = (acidResult as any).sulfateAddedPpm ?? null;
-      patch.boilLastChlorideAddedPpm = (acidResult as any).chlorideAddedPpm ?? null;
+    } else if (mode !== "manual") {
+      const r = acidResult as SpargeAcidificationResult;
+      patch.boilLastAcidRequiredMl = r.acidRequiredMl ?? null;
+      patch.boilLastAcidRequiredTsp = r.acidRequiredTsp ?? null;
+      patch.boilLastAcidRequiredGrams = r.acidRequiredGrams ?? null;
+      patch.boilLastAcidRequiredKg = r.acidRequiredKg ?? null;
+      patch.boilLastFinalAlkalinityPpmCaCO3 = r.finalAlkalinityPpmCaCO3 ?? null;
+      patch.boilLastSulfateAddedPpm = r.sulfateAddedPpm ?? null;
+      patch.boilLastChlorideAddedPpm = r.chlorideAddedPpm ?? null;
       patch.boilLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, workspaceId, recipeId, patch as any);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch as UpsertRecipeWaterSettingsInput);
 
     return {
       settings: { recipeId },

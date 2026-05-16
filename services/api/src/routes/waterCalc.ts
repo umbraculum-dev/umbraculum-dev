@@ -64,7 +64,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     const startingAlkalinityPpmCaCO3 =
@@ -103,7 +103,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         volumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strength.kind === "solid" ? null : strength.value,
         result,
       }),
     };
@@ -133,7 +133,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     const startingAlkalinityPpmCaCO3 =
@@ -192,7 +192,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         volumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strength.kind === "solid" ? null : strength.value,
         result: result.predicted,
       }),
     };
@@ -222,7 +222,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     // Accept mash-prefixed or generic field names.
@@ -271,7 +271,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         volumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strength.kind === "solid" ? null : strength.value,
         result,
       }),
     };
@@ -301,7 +301,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     // Accept mash-prefixed or generic field names.
@@ -362,7 +362,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
         volumeLiters,
         acidType,
         strengthKind,
-        strengthValue: strengthKind === "solid" ? null : (strength as any).value ?? null,
+        strengthValue: strength.kind === "solid" ? null : strength.value,
         result: result.predicted,
       }),
     };
@@ -546,7 +546,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     const startingAlkalinityPpmCaCO3 =
@@ -793,7 +793,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     let acid;
@@ -809,7 +809,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       mashDiPh?: number | null;
       mashTaToPh57_mEqPerKg?: number | null;
     }> | null = hasGrist
-      ? (gristRaw as any[]).map((row, idx) => {
+      ? (gristRaw as unknown[]).map((row, idx) => {
         const o = (row ?? {}) as Record<string, unknown>;
         const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
         if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
@@ -884,7 +884,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       acid = r.predicted;
       phKind = "estimated";
       if (mashPhEstimateGrist && mashPhEstimateGrist.length) {
-        const acidAdded_mEqPerL = (r.predicted as any)?.debug?.acidRequired_mEqPerL as number | undefined;
+        const acidAdded_mEqPerL = r.predicted.debug?.acidRequired_mEqPerL;
         const estimate = mashPhEstimate({
           volumeLiters,
           alkalinityPpmCaCO3: startingAlkalinityPpmCaCO3,
@@ -1039,7 +1039,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     let acid;
@@ -1203,7 +1203,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind as any, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
     }
 
     let acid;

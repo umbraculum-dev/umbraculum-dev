@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import type { Recipe } from "@prisma/client";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import { RecipesService } from "../services/recipesService.js";
@@ -30,7 +31,7 @@ export async function recipesImportRoutes(app: FastifyInstance) {
     }
 
     const mapped = parseSingleImportContent(format, content);
-    const v2 = validateBeerJsonDoc(mapped.beerJsonRecipeJson as any);
+    const v2 = validateBeerJsonDoc(mapped.beerJsonRecipeJson);
     if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v2.errors}`);
 
     return {
@@ -117,8 +118,18 @@ export async function recipesImportRoutes(app: FastifyInstance) {
     }
 
     const items = parseBulkImportContent(format, content);
-    const created: any[] = [];
-    const failed: any[] = [];
+    type ImportedItem = (typeof items)[number];
+    type CreatedRow = {
+      index: number;
+      recipeId: string;
+      name: string;
+      styleKey: string;
+      style: Recipe["style"] | null;
+      warnings: ImportedItem["warnings"];
+    };
+    type FailedRow = { index: number; name: string; error: string };
+    const created: CreatedRow[] = [];
+    const failed: FailedRow[] = [];
 
     for (const it of items) {
       try {
@@ -131,10 +142,10 @@ export async function recipesImportRoutes(app: FastifyInstance) {
         });
         created.push({
           index: it.index,
-          recipeId: (recipe as any).id,
-          name: (recipe as any).name,
-          styleKey: (recipe as any).styleKey ?? "custom",
-          style: (recipe as any).style ?? null,
+          recipeId: recipe.id,
+          name: recipe.name,
+          styleKey: recipe.styleKey ?? "custom",
+          style: recipe.style ?? null,
           warnings: [...(it.warnings ?? []), ...resolved.warnings],
         });
       } catch (err) {

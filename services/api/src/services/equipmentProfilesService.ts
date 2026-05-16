@@ -1,24 +1,33 @@
-import type { PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 
+/**
+ * Numeric fields are typed as `unknown` because they cross the trust boundary
+ * straight from request bodies; `toOptionalNumber` validates each one at the
+ * service entry point. Promoting them to `number | null` here would require
+ * the routes to either assert types via `as any` (re-introducing the warnings
+ * we're cleaning up) or to duplicate the same coercion logic. Centralized
+ * validation in the service keeps the rule "validate at the boundary" honest
+ * while keeping routes thin.
+ */
 export type CreateEquipmentProfileInput = {
   name: string;
 
-  kettleVolumeLiters?: number | null;
-  kettleLossesLiters?: number | null;
-  kettleBoilEvaporationRatePercentPerHour?: number | null;
-  kettleCoolingShrinkagePercent?: number | null;
-  kettleHopsAbsorptionLiters?: number | null;
+  kettleVolumeLiters?: unknown;
+  kettleLossesLiters?: unknown;
+  kettleBoilEvaporationRatePercentPerHour?: unknown;
+  kettleCoolingShrinkagePercent?: unknown;
+  kettleHopsAbsorptionLiters?: unknown;
 
-  mashVolumeLiters?: number | null;
-  mashEfficiencyPercent?: number | null;
-  mashLossesLiters?: number | null;
-  mashThicknessLPerKg?: number | null;
-  mashGrainAbsorptionLPerKg?: number | null;
-  mashWaterLeftoverLiters?: number | null;
+  mashVolumeLiters?: unknown;
+  mashEfficiencyPercent?: unknown;
+  mashLossesLiters?: unknown;
+  mashThicknessLPerKg?: unknown;
+  mashGrainAbsorptionLPerKg?: unknown;
+  mashWaterLeftoverLiters?: unknown;
 
-  otherLossesLiters?: number | null;
+  otherLossesLiters?: unknown;
 };
 
 export type UpdateEquipmentProfileInput = Partial<CreateEquipmentProfileInput>;
@@ -105,14 +114,18 @@ export class EquipmentProfilesService {
       "mashWaterLeftoverLiters",
       "otherLossesLiters",
     ] as const;
+    const inputRec = input as Record<string, unknown>;
     for (const f of numericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) data[f] = toOptionalNumber(v, f);
     }
 
     if (Object.keys(data).length === 0) throw new BadRequestError("no_updates", "No updatable fields provided");
 
-    return this.prisma.equipmentProfile.update({ where: { id }, data: data as any });
+    return this.prisma.equipmentProfile.update({
+      where: { id },
+      data: data as Prisma.EquipmentProfileUncheckedUpdateInput,
+    });
   }
 
   async deleteProfile(userId: string, workspaceId: string, id: string) {

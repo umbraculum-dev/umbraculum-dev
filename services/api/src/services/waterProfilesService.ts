@@ -1,23 +1,40 @@
-import type { PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 
+const SCOPE_VALUES = ["system", "account", "public"] as const;
+type WaterProfileScope = (typeof SCOPE_VALUES)[number];
+
+const TYPE_VALUES = ["water", "dilution"] as const;
+type WaterProfileType = (typeof TYPE_VALUES)[number];
+
+const VERIFICATION_STATUS_VALUES = ["unverified", "verified"] as const;
+type VerificationStatus = (typeof VERIFICATION_STATUS_VALUES)[number];
+
+/**
+ * Numeric and enum fields are typed as `unknown`/`string | undefined` because
+ * they cross the trust boundary directly from request bodies; the service
+ * validates each one (`toNumber`, `toScope`, …) at the entry point. Promoting
+ * them to their narrow types would force routes to either re-introduce `as
+ * any` casts or duplicate the same coercion logic. See also
+ * `equipmentProfilesService.ts` for the matching pattern.
+ */
 export type CreateWaterProfileInput = {
-  scope?: "system" | "account" | "public"; // defaults to "account"
-  type: "water" | "dilution";
+  scope?: string;
+  type?: string;
   name: string;
-  ph?: number | null;
-  calcium: number;
-  magnesium: number;
-  sodium: number;
-  sulfate: number;
-  chloride: number;
-  bicarbonate: number;
+  ph?: unknown;
+  calcium?: unknown;
+  magnesium?: unknown;
+  sodium?: unknown;
+  sulfate?: unknown;
+  chloride?: unknown;
+  bicarbonate?: unknown;
 };
 
 export type UpdateWaterProfileInput = Partial<CreateWaterProfileInput> & {
-  verificationStatus?: "unverified" | "verified";
+  verificationStatus?: string;
 };
 
 function isAdminRole(role: string) {
@@ -40,6 +57,33 @@ function toOptionalPh(val: unknown) {
     throw new BadRequestError("invalid_ph", "Body.ph must be between 0 and 14");
   }
   return n;
+}
+
+function toScope(val: unknown): WaterProfileScope | undefined {
+  if (val === undefined) return undefined;
+  if (typeof val === "string" && (SCOPE_VALUES as readonly string[]).includes(val)) {
+    return val as WaterProfileScope;
+  }
+  throw new BadRequestError("invalid_scope", `Body.scope must be one of ${SCOPE_VALUES.join(", ")}`);
+}
+
+function toType(val: unknown): WaterProfileType | undefined {
+  if (val === undefined) return undefined;
+  if (typeof val === "string" && (TYPE_VALUES as readonly string[]).includes(val)) {
+    return val as WaterProfileType;
+  }
+  throw new BadRequestError("invalid_type", `Body.type must be one of ${TYPE_VALUES.join(", ")}`);
+}
+
+function toVerificationStatus(val: unknown): VerificationStatus | undefined {
+  if (val === undefined) return undefined;
+  if (typeof val === "string" && (VERIFICATION_STATUS_VALUES as readonly string[]).includes(val)) {
+    return val as VerificationStatus;
+  }
+  throw new BadRequestError(
+    "invalid_verification_status",
+    `Body.verificationStatus must be one of ${VERIFICATION_STATUS_VALUES.join(", ")}`,
+  );
 }
 
 export class WaterProfilesService {
@@ -81,8 +125,9 @@ export class WaterProfilesService {
     const name = input.name.trim();
     if (!name) throw new BadRequestError("invalid_name", "Body.name is required");
 
-    const scope = input.scope ?? "account";
-    const type = input.type;
+    const scope: WaterProfileScope = toScope(input.scope) ?? "account";
+    const type = toType(input.type);
+    if (!type) throw new BadRequestError("invalid_type", "Body.type is required");
 
     return this.prisma.waterProfile.create({
       data: {
@@ -130,8 +175,8 @@ export class WaterProfilesService {
       if (!name) throw new BadRequestError("invalid_name", "Body.name must be a non-empty string");
       data.name = name;
     }
-    if (input.scope !== undefined) data.scope = input.scope;
-    if (input.type !== undefined) data.type = input.type;
+    if (input.scope !== undefined) data.scope = toScope(input.scope);
+    if (input.type !== undefined) data.type = toType(input.type);
 
     const numericFields = [
       "ph",
@@ -142,15 +187,16 @@ export class WaterProfilesService {
       "chloride",
       "bicarbonate",
     ] as const;
+    const inputRec = input as Record<string, unknown>;
     for (const f of numericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (f === "ph") data[f] = toOptionalPh(v);
         else data[f] = toNumber(v, f);
       }
     }
 
-    if (input.verificationStatus !== undefined) data.verificationStatus = input.verificationStatus;
+    if (input.verificationStatus !== undefined) data.verificationStatus = toVerificationStatus(input.verificationStatus);
 
     if (Object.keys(data).length === 0) {
       throw new BadRequestError("no_updates", "No updatable fields provided");
@@ -158,7 +204,7 @@ export class WaterProfilesService {
 
     return this.prisma.waterProfile.update({
       where: { id: profileId },
-      data,
+      data: data as Prisma.WaterProfileUncheckedUpdateInput,
     });
   }
 

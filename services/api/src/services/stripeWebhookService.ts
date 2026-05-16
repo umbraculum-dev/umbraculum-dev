@@ -4,10 +4,17 @@ import { BillingEventsService } from "./billingEventsService.js";
 import { BillingIntentsService } from "./billingIntentsService.js";
 import { WorkspaceBillingService } from "./workspaceBillingService.js";
 
+type StripeCheckoutSessionObject = {
+  id?: unknown;
+  client_reference_id?: unknown;
+  subscription?: unknown;
+  customer?: unknown;
+};
+
 type StripeCheckoutSessionCompletedEvent = {
   id?: unknown;
   type?: unknown;
-  data?: { object?: any } | null;
+  data?: { object?: StripeCheckoutSessionObject | null } | null;
 };
 
 function getString(v: unknown): string | null {
@@ -32,7 +39,7 @@ export class StripeWebhookService {
       throw new BadRequestError("unsupported_stripe_event", "Unsupported Stripe event type");
     }
 
-    const obj = (e.data as any)?.object;
+    const obj: StripeCheckoutSessionObject = e.data?.object ?? {};
     const billingIntentId = getString(obj?.client_reference_id);
     if (!billingIntentId) throw new BadRequestError("missing_client_reference_id", "Missing client_reference_id");
 

@@ -44,11 +44,11 @@ export async function recipesRoutes(app: FastifyInstance) {
 
     const recipe = await recipes.getRecipe(ctx.userId, ctx.activeWorkspaceId, id);
     const waterSettings = await app.prisma.recipeWaterSettings.findUnique({
-      where: { recipeId: (recipe as any).id },
+      where: { recipeId: recipe.id },
     });
     const analysis = computeRecipeGravityAnalysis({
-      beerJsonRecipeJson: (recipe as any).beerJsonRecipeJson,
-      recipeExtJson: (recipe as any).recipeExtJson,
+      beerJsonRecipeJson: recipe.beerJsonRecipeJson,
+      recipeExtJson: recipe.recipeExtJson,
       recipeWaterSettings: waterSettings,
     });
     return { ok: true, recipe: { ...recipe, analysis } };

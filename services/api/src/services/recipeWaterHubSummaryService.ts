@@ -4,6 +4,7 @@ import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
 import type { IonProfilePpm } from "../domain/waterCalc/saltAdditions.js";
 import { combineAfterSaltsAndAcid } from "../domain/waterCalc/overall.js";
+import { isObject, isFiniteNumber } from "../lib/typeGuards.js";
 
 type MashOverallLastResultJson = {
   ionsPpm: IonProfilePpm;
@@ -24,47 +25,47 @@ function calcResidualAlkalinityPpmCaCO3(args: {
   return args.alkalinityPpmCaCO3 - 0.713 * args.calciumPpm - 0.588 * args.magnesiumPpm;
 }
 
-function parseMashOverallLastResultJson(v: unknown): MashOverallLastResultJson | null {
-  if (!v || typeof v !== "object") return null;
-  const o = v as any;
-  const ph = o?.ph;
-  const ionsPpm = o?.ionsPpm;
-  if (!ph || typeof ph !== "object") return null;
-  if (!ionsPpm || typeof ionsPpm !== "object") return null;
-  if (typeof o?.finalAlkalinityPpmCaCO3 !== "number") return null;
-  if (typeof (ph as any).kind !== "string" || typeof (ph as any).value !== "number") return null;
-
-  const p = ionsPpm as any;
+function parseIonProfile(v: unknown): IonProfilePpm | null {
+  if (!isObject(v)) return null;
   const keys: Array<keyof IonProfilePpm> = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
-  for (const k of keys) if (typeof p[k] !== "number") return null;
+  const out: Partial<IonProfilePpm> = {};
+  for (const k of keys) {
+    const val = v[k];
+    if (!isFiniteNumber(val)) return null;
+    out[k] = val;
+  }
+  return out as IonProfilePpm;
+}
 
-  const kind = (ph as any).kind === "target" ? "target" : "estimated";
+function parseMashOverallLastResultJson(v: unknown): MashOverallLastResultJson | null {
+  if (!isObject(v)) return null;
+  const ph = v.ph;
+  if (!isObject(ph)) return null;
+  if (!isFiniteNumber(v.finalAlkalinityPpmCaCO3)) return null;
+  if (typeof ph.kind !== "string" || !isFiniteNumber(ph.value)) return null;
+
+  const ionsPpm = parseIonProfile(v.ionsPpm);
+  if (!ionsPpm) return null;
+
+  const kind = ph.kind === "target" ? "target" : "estimated";
   return {
-    ionsPpm: {
-      calcium: p.calcium,
-      magnesium: p.magnesium,
-      sodium: p.sodium,
-      sulfate: p.sulfate,
-      chloride: p.chloride,
-      bicarbonate: p.bicarbonate,
-    },
-    finalAlkalinityPpmCaCO3: o.finalAlkalinityPpmCaCO3,
-    ph: { kind, value: (ph as any).value },
+    ionsPpm,
+    finalAlkalinityPpmCaCO3: v.finalAlkalinityPpmCaCO3,
+    ph: { kind, value: ph.value },
   };
 }
 
 function parseSaltsBreakdown(v: unknown): Array<{ saltKey: string; grams: number }> | null {
-  if (!v || typeof v !== "object") return null;
-  const o = v as any;
-  const b = o?.result?.breakdown;
+  if (!isObject(v)) return null;
+  const result = isObject(v.result) ? v.result : null;
+  const b = result?.breakdown;
   if (!Array.isArray(b)) return null;
 
   const out: Array<{ saltKey: string; grams: number }> = [];
   for (const row of b) {
-    if (!row || typeof row !== "object") continue;
-    const r = row as any;
-    const saltKey = typeof r.saltKey === "string" ? r.saltKey : null;
-    const grams = typeof r.grams === "number" && Number.isFinite(r.grams) ? r.grams : null;
+    if (!isObject(row)) continue;
+    const saltKey = typeof row.saltKey === "string" ? row.saltKey : null;
+    const grams = isFiniteNumber(row.grams) ? row.grams : null;
     if (!saltKey || grams == null || !(grams > 0)) continue;
     out.push({ saltKey, grams });
   }
@@ -72,21 +73,9 @@ function parseSaltsBreakdown(v: unknown): Array<{ saltKey: string; grams: number
 }
 
 function parseSaltsResultingProfile(v: unknown): IonProfilePpm | null {
-  if (!v || typeof v !== "object") return null;
-  const o = v as any;
-  const r = o?.result?.resultingProfile;
-  if (!r || typeof r !== "object") return null;
-  const p = r as any;
-  const keys: Array<keyof IonProfilePpm> = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
-  for (const k of keys) if (typeof p[k] !== "number") return null;
-  return {
-    calcium: p.calcium,
-    magnesium: p.magnesium,
-    sodium: p.sodium,
-    sulfate: p.sulfate,
-    chloride: p.chloride,
-    bicarbonate: p.bicarbonate,
-  };
+  if (!isObject(v)) return null;
+  const result = isObject(v.result) ? v.result : null;
+  return parseIonProfile(result?.resultingProfile);
 }
 
 function inferExpectedRa(style: { name: string; category: string | null }): ExpectedRaRange | null {
@@ -145,7 +134,7 @@ export class RecipeWaterHubSummaryService {
 
     const settings = await this.prisma.recipeWaterSettings.findUnique({ where: { recipeId } });
 
-    const styleKey = (recipe as any)?.styleKey;
+    const styleKey = recipe.styleKey;
     const style =
       typeof styleKey === "string" && styleKey && styleKey !== "custom"
         ? await this.prisma.beerStyle.findUnique({ where: { key: styleKey } })
@@ -280,14 +269,17 @@ export class RecipeWaterHubSummaryService {
     const totalV = validForMerge.reduce((acc, s) => acc + (s.volumeLiters as number), 0);
     const mergedIons: IonProfilePpm | null =
       totalV > 0
-        ? (["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"] as const).reduce((acc, k) => {
-            const sum = validForMerge.reduce(
-              (a, s) => a + ((s.ionsPpm as IonProfilePpm)[k] * (s.volumeLiters as number)),
-              0,
-            );
-            (acc as any)[k] = sum / totalV;
-            return acc;
-          }, {} as any as IonProfilePpm)
+        ? (["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"] as const).reduce<IonProfilePpm>(
+            (acc, k) => {
+              const sum = validForMerge.reduce(
+                (a, s) => a + ((s.ionsPpm as IonProfilePpm)[k] * (s.volumeLiters as number)),
+                0,
+              );
+              acc[k] = sum / totalV;
+              return acc;
+            },
+            { calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0 },
+          )
         : null;
 
     const mergedFinalAlk =

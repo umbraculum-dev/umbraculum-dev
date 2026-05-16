@@ -4,18 +4,18 @@ import { BadRequestError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 
 export type CreateInventoryItemInput = {
-  category: InventoryCategory;
-  ingredientId?: string | null;
+  category: unknown;
+  ingredientId?: unknown;
   name: string;
-  quantity: number;
-  unit: InventoryUnit;
+  quantity: unknown;
+  unit: unknown;
   metadata?: unknown;
 };
 
 export type UpdateInventoryItemInput = {
   name?: string;
-  quantity?: number;
-  unit?: InventoryUnit;
+  quantity?: unknown;
+  unit?: unknown;
   metadata?: unknown;
 };
 
@@ -100,12 +100,16 @@ export class InventoryService {
     this.workspaces = new WorkspacesService(prisma);
   }
 
-  async listItems(userId: string, workspaceId: string, category?: InventoryCategory) {
+  async listItems(userId: string, workspaceId: string, category?: unknown) {
     await this.workspaces.assertMembership(userId, workspaceId);
+    const cat: InventoryCategory | undefined =
+      typeof category === "string" && VALID_CATEGORIES.includes(category as InventoryCategory)
+        ? (category as InventoryCategory)
+        : undefined;
     return this.prisma.inventoryItem.findMany({
       where: {
         workspaceId,
-        ...(category ? { category } : {}),
+        ...(cat ? { category: cat } : {}),
       },
       orderBy: [{ category: "asc" }, { name: "asc" }, { id: "asc" }],
     });

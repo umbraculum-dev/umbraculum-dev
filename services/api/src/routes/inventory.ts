@@ -1,8 +1,9 @@
 import type { FastifyInstance } from "fastify";
+import type { InventoryItem } from "@prisma/client";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { InventoryService } from "../services/inventoryService.js";
 
-function toItemPayload(item: any) {
+function toItemPayload(item: InventoryItem) {
   return {
     id: item.id,
     workspaceId: item.workspaceId,
@@ -24,7 +25,7 @@ export async function inventoryRoutes(app: FastifyInstance) {
     const ctx = requireActiveWorkspace(req);
     const query = (req.query ?? {}) as { category?: unknown };
     const category = typeof query.category === "string" && query.category.trim() ? query.category.trim() : undefined;
-    const items = await svc.listItems(ctx.userId, ctx.activeWorkspaceId, category as any);
+    const items = await svc.listItems(ctx.userId, ctx.activeWorkspaceId, category);
     return { ok: true, items: items.map(toItemPayload) };
   });
 
@@ -39,12 +40,12 @@ export async function inventoryRoutes(app: FastifyInstance) {
           ? parseFloat(q)
           : 0;
     const created = await svc.createItem(ctx.userId, ctx.activeWorkspaceId, {
-      category: body.category as any,
-      ingredientId: body.ingredientId as any,
+      category: body.category,
+      ingredientId: body.ingredientId,
       name: typeof body.name === "string" ? body.name : "",
       quantity: Number.isFinite(quantity) ? quantity : 0,
-      unit: (body.unit as any) ?? "kg",
-      metadata: (body as any).metadata,
+      unit: body.unit ?? "kg",
+      metadata: body.metadata,
     });
     return { ok: true, item: toItemPayload(created) };
   });
@@ -56,9 +57,9 @@ export async function inventoryRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
     const updated = await svc.updateItem(ctx.userId, ctx.activeWorkspaceId, id, {
       name: typeof body.name === "string" ? body.name : undefined,
-      quantity: body.quantity as any,
-      unit: body.unit as any,
-      metadata: (body as any).metadata,
+      quantity: body.quantity,
+      unit: body.unit,
+      metadata: body.metadata,
     });
     return { ok: true, item: toItemPayload(updated) };
   });

@@ -295,8 +295,8 @@ export async function authRoutes(app: FastifyInstance) {
   );
 
   app.post("/auth/logout", async (req, reply) => {
-    const sessionId =
-      (req.cookies as any)?.[SESSION_COOKIE_NAME] ?? readBearerToken(req);
+    const cookies = (req.cookies ?? {}) as Record<string, string | undefined>;
+    const sessionId = cookies[SESSION_COOKIE_NAME] ?? readBearerToken(req);
     if (typeof sessionId === "string" && sessionId) {
       if (app.redis) await deleteCachedSession(app.redis, sessionId);
       await app.prisma.session.delete({ where: { id: sessionId } }).catch(() => {});

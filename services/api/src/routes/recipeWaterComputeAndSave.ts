@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
 import { waterFormatHints } from "@brewery/contracts";
@@ -9,7 +9,7 @@ import {
   type SpargeComputeAndSaveInput,
 } from "../services/recipeWaterComputeAndSaveService.js";
 
-function parseRecipeId(req: any): string {
+function parseRecipeId(req: FastifyRequest): string {
   const params = (req.params ?? {}) as { id?: unknown };
   const recipeId = typeof params.id === "string" ? params.id : "";
   if (!recipeId) throw new BadRequestError("invalid_recipe_id", "Param :id is required");
@@ -39,11 +39,11 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
         typeof body.mashStartingAlkalinityPpmCaCO3 === "number" ? body.mashStartingAlkalinityPpmCaCO3 : NaN,
       mashStartingPh: typeof body.mashStartingPh === "number" ? body.mashStartingPh : NaN,
       mashTargetPh: typeof body.mashTargetPh === "number" ? body.mashTargetPh : NaN,
-      mashAcidType: typeof body.mashAcidType === "string" ? (body.mashAcidType as any) : ("" as any),
-      mashStrengthKind: (typeof body.mashStrengthKind === "string" ? body.mashStrengthKind : "percent") as any,
+      mashAcidType: typeof body.mashAcidType === "string" ? body.mashAcidType : "",
+      mashStrengthKind: typeof body.mashStrengthKind === "string" ? body.mashStrengthKind : "percent",
       mashStrengthValue:
         body.mashStrengthValue === null ? null : typeof body.mashStrengthValue === "number" ? body.mashStrengthValue : null,
-      mashAcidificationMode: (body.mashAcidificationMode === "manual" ? "manual" : "targetPh") as any,
+      mashAcidificationMode: body.mashAcidificationMode === "manual" ? "manual" : "targetPh",
       mashManualAcidAddedMl:
         body.mashManualAcidAddedMl === null ? null : typeof body.mashManualAcidAddedMl === "number" ? body.mashManualAcidAddedMl : null,
       mashManualAcidAddedGrams:
@@ -54,7 +54,9 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
             : null,
 
       mashSaltAdditionsJson: body.mashSaltAdditionsJson,
-      grist: Array.isArray(body.grist) ? (body.grist as any) : undefined,
+      grist: Array.isArray(body.grist)
+        ? (body.grist as MashComputeAndSaveInput["grist"])
+        : undefined,
     };
 
     const computed = await svc.computeAndSaveMash(ctx.userId, ctx.activeWorkspaceId, recipeId, input);
@@ -75,11 +77,11 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
       spargeStartingPh: typeof body.spargeStartingPh === "number" ? body.spargeStartingPh : NaN,
       spargeTargetPh: typeof body.spargeTargetPh === "number" ? body.spargeTargetPh : NaN,
       spargeVolumeLiters: typeof body.spargeVolumeLiters === "number" ? body.spargeVolumeLiters : NaN,
-      spargeAcidType: typeof body.spargeAcidType === "string" ? (body.spargeAcidType as any) : ("" as any),
-      spargeStrengthKind: (typeof body.spargeStrengthKind === "string" ? body.spargeStrengthKind : "percent") as any,
+      spargeAcidType: typeof body.spargeAcidType === "string" ? body.spargeAcidType : "",
+      spargeStrengthKind: typeof body.spargeStrengthKind === "string" ? body.spargeStrengthKind : "percent",
       spargeStrengthValue:
         body.spargeStrengthValue === null ? null : typeof body.spargeStrengthValue === "number" ? body.spargeStrengthValue : null,
-      spargeAcidificationMode: (body.spargeAcidificationMode === "manual" ? "manual" : "targetPh") as any,
+      spargeAcidificationMode: body.spargeAcidificationMode === "manual" ? "manual" : "targetPh",
       spargeManualAcidAddedMl:
         body.spargeManualAcidAddedMl === null ? null : typeof body.spargeManualAcidAddedMl === "number" ? body.spargeManualAcidAddedMl : null,
       spargeManualAcidAddedGrams:
@@ -115,11 +117,11 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
         typeof body.boilStartingAlkalinityPpmCaCO3 === "number" ? body.boilStartingAlkalinityPpmCaCO3 : NaN,
       boilStartingPh: typeof body.boilStartingPh === "number" ? body.boilStartingPh : NaN,
       boilTargetPh: typeof body.boilTargetPh === "number" ? body.boilTargetPh : NaN,
-      boilAcidType: typeof body.boilAcidType === "string" ? (body.boilAcidType as any) : ("" as any),
-      boilStrengthKind: (typeof body.boilStrengthKind === "string" ? body.boilStrengthKind : "percent") as any,
+      boilAcidType: typeof body.boilAcidType === "string" ? body.boilAcidType : "",
+      boilStrengthKind: typeof body.boilStrengthKind === "string" ? body.boilStrengthKind : "percent",
       boilStrengthValue:
         body.boilStrengthValue === null ? null : typeof body.boilStrengthValue === "number" ? body.boilStrengthValue : null,
-      boilAcidificationMode: (body.boilAcidificationMode === "manual" ? "manual" : "targetPh") as any,
+      boilAcidificationMode: body.boilAcidificationMode === "manual" ? "manual" : "targetPh",
       boilManualAcidAddedMl:
         body.boilManualAcidAddedMl === null ? null : typeof body.boilManualAcidAddedMl === "number" ? body.boilManualAcidAddedMl : null,
       boilManualAcidAddedGrams:
@@ -136,4 +138,3 @@ export async function recipeWaterComputeAndSaveRoutes(app: FastifyInstance) {
     return { ok: true, version: 1, ...computed, formatHints: waterFormatHints };
   });
 }
-

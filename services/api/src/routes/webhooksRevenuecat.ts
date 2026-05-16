@@ -1,13 +1,13 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { UnauthorizedError } from "../errors.js";
 import { RevenueCatWebhookService } from "../services/revenueCatWebhookService.js";
 
-function getAuthHeader(req: any): string | null {
+function getAuthHeader(req: FastifyRequest): string | null {
   const v = req.headers?.authorization;
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
-function requireRevenueCatAuth(req: any) {
+function requireRevenueCatAuth(req: FastifyRequest) {
   // RevenueCat webhook security uses a configurable Authorization header value (not an HMAC signature).
   const expected = (process.env.REVENUECAT_WEBHOOK_AUTH ?? process.env.REVENUECAT_WEBHOOK_SECRET ?? "").trim();
   if (!expected) return; // dev/stub mode

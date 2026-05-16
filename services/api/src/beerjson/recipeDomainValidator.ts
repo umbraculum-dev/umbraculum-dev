@@ -1,37 +1,40 @@
 import { BadRequestError } from "../errors.js";
+import { isObject, isFiniteNumber } from "../lib/typeGuards.js";
 
 type BeerJsonMassUnit = "kg" | "g";
 type BeerJsonVolumeUnit = "l" | "ml";
+
+type AmountNode = { unit?: unknown; value?: unknown };
 
 function asArray<T>(v: unknown): T[] {
   return Array.isArray(v) ? (v as T[]) : [];
 }
 
-function isFiniteNumber(v: unknown): v is number {
-  return typeof v === "number" && Number.isFinite(v);
+function readAmount(amount: unknown): AmountNode {
+  return isObject(amount) ? (amount as AmountNode) : {};
 }
 
-function readMassKg(amount: any): number | null {
-  const unit = amount?.unit;
-  const value = amount?.value;
+function readMassKg(amount: unknown): number | null {
+  const a = readAmount(amount);
+  const { unit, value } = a;
   if (!isFiniteNumber(value)) return null;
   if (unit === "kg") return value;
   if (unit === "g") return value / 1000;
   return null;
 }
 
-function readMassGrams(amount: any): number | null {
-  const unit = amount?.unit;
-  const value = amount?.value;
+function readMassGrams(amount: unknown): number | null {
+  const a = readAmount(amount);
+  const { unit, value } = a;
   if (!isFiniteNumber(value)) return null;
   if (unit === "g") return value;
   if (unit === "kg") return value * 1000;
   return null;
 }
 
-function readVolumeLiters(amount: any): number | null {
-  const unit = amount?.unit;
-  const value = amount?.value;
+function readVolumeLiters(amount: unknown): number | null {
+  const a = readAmount(amount);
+  const { unit, value } = a;
   if (!isFiniteNumber(value)) return null;
   if (unit === "l") return value;
   if (unit === "ml") return value / 1000;
@@ -45,15 +48,16 @@ function readVolumeLiters(amount: any): number | null {
  * but uses BeerJSON paths in messages so errors are not confusing.
  */
 export function validateBeerJsonRecipeDomain(doc: unknown): void {
-  const d = (doc ?? {}) as any;
-  const r0 = d?.beerjson?.recipes?.[0];
-  if (!r0 || typeof r0 !== "object") {
+  const beerjson = isObject(doc) && isObject(doc.beerjson) ? doc.beerjson : null;
+  const recipes = beerjson && Array.isArray(beerjson.recipes) ? beerjson.recipes : [];
+  const r0 = isObject(recipes[0]) ? recipes[0] : null;
+  if (!r0) {
     throw new BadRequestError("invalid_beerjson_recipe", "BeerJSON is missing beerjson.recipes[0]");
   }
 
-  const ing = r0.ingredients ?? {};
+  const ing = isObject(r0.ingredients) ? r0.ingredients : {};
 
-  const fermentables = asArray<any>(ing.fermentable_additions);
+  const fermentables = asArray<Record<string, unknown>>(ing.fermentable_additions);
   for (let idx = 0; idx < fermentables.length; idx += 1) {
     const f = fermentables[idx];
     const name = typeof f?.name === "string" ? f.name.trim() : "";
@@ -64,9 +68,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
+    const fAmount = readAmount(f?.amount);
     const amountKg = readMassKg(f?.amount);
     if (amountKg === null) {
-      const unit = typeof f?.amount?.unit === "string" ? f.amount.unit : null;
+      const unit = typeof fAmount.unit === "string" ? fAmount.unit : null;
       const allowed: BeerJsonMassUnit[] = ["kg", "g"];
       const unitNote = unit ? ` (unit=${unit})` : "";
       throw new BadRequestError(
@@ -81,10 +86,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
-    const color = f?.color;
-    if (color !== undefined && color !== null) {
-      const colorUnit = color?.unit;
-      const colorValue = color?.value;
+    const color = isObject(f?.color) ? f.color : null;
+    if (color !== null) {
+      const colorUnit = color.unit;
+      const colorValue = color.value;
       if (colorUnit === "Lovi" && isFiniteNumber(colorValue)) {
         if (!(colorValue >= 0)) {
           throw new BadRequestError(
@@ -96,7 +101,7 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
   }
 
-  const hops = asArray<any>(ing.hop_additions);
+  const hops = asArray<Record<string, unknown>>(ing.hop_additions);
   for (let idx = 0; idx < hops.length; idx += 1) {
     const h = hops[idx];
     const name = typeof h?.name === "string" ? h.name.trim() : "";
@@ -107,9 +112,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
+    const hAmount = readAmount(h?.amount);
     const amountGrams = readMassGrams(h?.amount);
     if (amountGrams === null) {
-      const unit = typeof h?.amount?.unit === "string" ? h.amount.unit : null;
+      const unit = typeof hAmount.unit === "string" ? hAmount.unit : null;
       const allowed: BeerJsonMassUnit[] = ["kg", "g"];
       const unitNote = unit ? ` (unit=${unit})` : "";
       throw new BadRequestError(
@@ -125,7 +131,7 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
   }
 
-  const cultures = asArray<any>(ing.culture_additions);
+  const cultures = asArray<Record<string, unknown>>(ing.culture_additions);
   for (let idx = 0; idx < cultures.length; idx += 1) {
     const c = cultures[idx];
     const name = typeof c?.name === "string" ? c.name.trim() : "";
@@ -137,7 +143,7 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
   }
 
-  const misc = asArray<any>(ing.miscellaneous_additions);
+  const misc = asArray<Record<string, unknown>>(ing.miscellaneous_additions);
   for (let idx = 0; idx < misc.length; idx += 1) {
     const m = misc[idx];
     const name = typeof m?.name === "string" ? m.name.trim() : "";
@@ -149,9 +155,8 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
 
     // Misc additions can be weight or volume. We only enforce positivity.
-    const amount = m?.amount;
-    const unit = amount?.unit;
-    const value = amount?.value;
+    const mAmount = readAmount(m?.amount);
+    const { unit, value } = mAmount;
     if (!isFiniteNumber(value) || typeof unit !== "string") {
       throw new BadRequestError(
         "invalid_misc_row_amount",
@@ -159,8 +164,8 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
-    const asLiters = readVolumeLiters(amount);
-    const asKg = readMassKg(amount);
+    const asLiters = readVolumeLiters(m?.amount);
+    const asKg = readMassKg(m?.amount);
     if (asLiters === null && asKg === null) {
       const allowed: Array<BeerJsonMassUnit | BeerJsonVolumeUnit> = ["kg", "g", "l", "ml"];
       throw new BadRequestError(

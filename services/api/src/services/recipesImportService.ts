@@ -2,6 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { BadRequestError } from "../errors.js";
 import { importBeerXmlToBeerJson, importBeerXmlToBeerJsonMany, type StyleCandidate } from "../importers/beerxmlImporter.js";
 import { normalizeBeerJsonRecipeUnits, validateBeerJsonDoc } from "../beerjson/index.js";
+import { isObject } from "../lib/typeGuards.js";
 
 export type ImportFormat = "beerjson" | "beerxml";
 
@@ -37,20 +38,29 @@ export function parseBeerJsonContent(content: string): unknown {
   }
 }
 
-export function extractRecipeMetaFromBeerJson(doc: any): { recipeName: string; notes: string | null } {
-  const r0 = doc?.beerjson?.recipes?.[0];
+function getFirstRecipe(doc: unknown): Record<string, unknown> | null {
+  if (!isObject(doc)) return null;
+  const beerjson = isObject(doc.beerjson) ? doc.beerjson : null;
+  const recipesArr = Array.isArray(beerjson?.recipes) ? beerjson.recipes : [];
+  const r0 = recipesArr[0];
+  return isObject(r0) ? r0 : null;
+}
+
+export function extractRecipeMetaFromBeerJson(doc: unknown): { recipeName: string; notes: string | null } {
+  const r0 = getFirstRecipe(doc);
   const recipeName = typeof r0?.name === "string" ? r0.name.trim() : "";
   if (!recipeName) throw new BadRequestError("invalid_beerjson", "BeerJSON recipe name is required");
   const notes = typeof r0?.notes === "string" ? r0.notes.trim() || null : null;
   return { recipeName, notes };
 }
 
-export function extractStyleCandidateFromBeerJsonRecipe(r0: any): StyleCandidate | null {
-  const style = r0?.style ?? null;
-  if (!style || typeof style !== "object") return null;
-  const name = typeof (style as any).name === "string" ? ((style as any).name as string).trim() : "";
-  const categoryNumberRaw = (style as any).category_number;
-  const styleLetter = typeof (style as any).style_letter === "string" ? ((style as any).style_letter as string).trim() : "";
+export function extractStyleCandidateFromBeerJsonRecipe(r0: unknown): StyleCandidate | null {
+  if (!isObject(r0)) return null;
+  const style = isObject(r0.style) ? r0.style : null;
+  if (!style) return null;
+  const name = typeof style.name === "string" ? style.name.trim() : "";
+  const categoryNumberRaw = style.category_number;
+  const styleLetter = typeof style.style_letter === "string" ? style.style_letter.trim() : "";
   const categoryNumber =
     typeof categoryNumberRaw === "number" && Number.isFinite(categoryNumberRaw) ? String(categoryNumberRaw)
       : typeof categoryNumberRaw === "string" ? categoryNumberRaw.trim()
@@ -72,7 +82,7 @@ export function parseSingleImportContent(format: ImportFormat, content: string):
     };
   }
 
-  const doc = parseBeerJsonContent(content) as any;
+  const doc = parseBeerJsonContent(content);
   const v = validateBeerJsonDoc(doc);
   if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
   const n = normalizeBeerJsonRecipeUnits(doc);
@@ -81,7 +91,7 @@ export function parseSingleImportContent(format: ImportFormat, content: string):
     if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v2.errors}`);
   }
   const meta = extractRecipeMetaFromBeerJson(doc);
-  const r0 = doc?.beerjson?.recipes?.[0] ?? null;
+  const r0 = getFirstRecipe(doc);
   return {
     recipeName: meta.recipeName,
     notes: meta.notes,
@@ -103,14 +113,15 @@ export function parseBulkImportContent(format: ImportFormat, content: string): B
     }));
   }
 
-  const doc = parseBeerJsonContent(content) as any;
+  const doc = parseBeerJsonContent(content);
   const v = validateBeerJsonDoc(doc);
   if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
-  const recipesArr = Array.isArray(doc?.beerjson?.recipes) ? (doc.beerjson.recipes as any[]) : [];
+  const beerjsonNode = isObject(doc) && isObject(doc.beerjson) ? doc.beerjson : null;
+  const recipesArr: unknown[] = beerjsonNode && Array.isArray(beerjsonNode.recipes) ? beerjsonNode.recipes : [];
   if (recipesArr.length === 0) throw new BadRequestError("invalid_beerjson", "BeerJSON must contain at least one recipe");
 
   return recipesArr.map((r, idx) => {
-    const singleDoc = { beerjson: { ...(doc.beerjson ?? {}), recipes: [r] } };
+    const singleDoc = { beerjson: { ...(beerjsonNode ?? {}), recipes: [r] } };
     const v2 = validateBeerJsonDoc(singleDoc);
     if (!v2.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON recipe[${idx}] is invalid: ${v2.errors}`);
     const n = normalizeBeerJsonRecipeUnits(singleDoc);

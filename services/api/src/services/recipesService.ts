@@ -3,6 +3,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 import { normalizeBeerJsonRecipeUnits, validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js";
 import { validateBeerJsonRecipeDomain } from "../beerjson/recipeDomainValidator.js";
+import { isObject } from "../lib/typeGuards.js";
 import { getTierLimits } from "./tierLimitsService.js";
 import {
   defaultMashDiPh,
@@ -108,7 +109,7 @@ export class RecipesService {
     await this.workspaces.assertMembership(userId, workspaceId);
 
     const recipe = await this.getRecipe(userId, workspaceId, recipeId);
-    const versionGroupId = (recipe as any).versionGroupId ?? (recipe as any).id ?? recipeId;
+    const versionGroupId = recipe.versionGroupId ?? recipe.id ?? recipeId;
 
     return this.prisma.recipe.findMany({
       where: { workspaceId, versionGroupId },
@@ -127,7 +128,7 @@ export class RecipesService {
     await this.workspaces.assertMembership(userId, workspaceId);
 
     const source = await this.getRecipe(userId, workspaceId, recipeId);
-    const versionGroupId = (source as any).versionGroupId ?? (source as any).id ?? recipeId;
+    const versionGroupId = source.versionGroupId ?? source.id ?? recipeId;
     const tier = await this.getWorkspaceTier(workspaceId);
     const limits = getTierLimits(tier);
 
@@ -157,34 +158,34 @@ export class RecipesService {
           workspaceId,
           versionGroupId,
           version: nextVersion,
-          name: (source as any).name,
-          style: (source as any).style,
-          styleKey: (source as any).styleKey,
-          notes: (source as any).notes,
-          beerJsonRecipeJson: (source as any).beerJsonRecipeJson,
-          recipeExtJson: (source as any).recipeExtJson,
+          name: source.name,
+          style: source.style,
+          styleKey: source.styleKey,
+          notes: source.notes,
+          beerJsonRecipeJson: source.beerJsonRecipeJson ?? Prisma.JsonNull,
+          recipeExtJson: source.recipeExtJson ?? Prisma.JsonNull,
         },
       });
 
       const sourceWater = await tx.recipeWaterSettings.findUnique({
-        where: { recipeId: (source as any).id },
+        where: { recipeId: source.id },
       });
 
       if (sourceWater) {
         const {
-          id,
+          id: _id,
           recipeId: _sourceRecipeId,
-          createdAt,
-          updatedAt,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
           ...rest
-        } = sourceWater as any;
+        } = sourceWater;
 
         await tx.recipeWaterSettings.create({
           data: {
             ...rest,
             recipeId: newRecipeId,
             workspaceId,
-          },
+          } as Prisma.RecipeWaterSettingsUncheckedCreateInput,
         });
       }
 
@@ -200,13 +201,15 @@ export class RecipesService {
 
     return this.prisma.$transaction(async (tx) => {
       const newRecipeId = crypto.randomUUID();
-      const newName = ((source as any).name ?? "").trim() + " - duplicated";
+      const newName = ((source.name ?? "") as string).trim() + " - duplicated";
 
-      const doc = (source as any).beerJsonRecipeJson;
-      const docCopy =
-        doc && typeof doc === "object" ? (JSON.parse(JSON.stringify(doc)) as any) : null;
-      if (docCopy?.beerjson?.recipes?.[0]) {
-        docCopy.beerjson.recipes[0].name = newName;
+      const doc = source.beerJsonRecipeJson;
+      const docCopy: Record<string, unknown> | null =
+        isObject(doc) ? (JSON.parse(JSON.stringify(doc)) as Record<string, unknown>) : null;
+      const docCopyBeerjson = isObject(docCopy?.beerjson) ? docCopy.beerjson : null;
+      const docCopyRecipes = Array.isArray(docCopyBeerjson?.recipes) ? docCopyBeerjson.recipes : null;
+      if (docCopyRecipes && isObject(docCopyRecipes[0])) {
+        (docCopyRecipes[0] as Record<string, unknown>).name = newName;
       }
 
       const created = await tx.recipe.create({
@@ -216,33 +219,36 @@ export class RecipesService {
           versionGroupId: newRecipeId,
           version: 0,
           name: newName,
-          style: (source as any).style,
-          styleKey: (source as any).styleKey,
-          notes: (source as any).notes,
-          beerJsonRecipeJson: docCopy ?? ((source as any).beerJsonRecipeJson as any),
-          recipeExtJson: (source as any).recipeExtJson,
+          style: source.style,
+          styleKey: source.styleKey,
+          notes: source.notes,
+          beerJsonRecipeJson:
+            (docCopy as Prisma.InputJsonValue | undefined) ??
+            (source.beerJsonRecipeJson as Prisma.InputJsonValue | null) ??
+            Prisma.JsonNull,
+          recipeExtJson: source.recipeExtJson ?? Prisma.JsonNull,
         },
       });
 
       const sourceWater = await tx.recipeWaterSettings.findUnique({
-        where: { recipeId: (source as any).id },
+        where: { recipeId: source.id },
       });
 
       if (sourceWater) {
         const {
-          id,
+          id: _id,
           recipeId: _sourceRecipeId,
-          createdAt,
-          updatedAt,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
           ...rest
-        } = sourceWater as any;
+        } = sourceWater;
 
         await tx.recipeWaterSettings.create({
           data: {
             ...rest,
             recipeId: newRecipeId,
             workspaceId,
-          },
+          } as Prisma.RecipeWaterSettingsUncheckedCreateInput,
         });
       }
 
@@ -270,7 +276,7 @@ export class RecipesService {
       throw new BadRequestError("invalid_recipe_payload", "Body.beerJsonRecipeJson is required");
     }
 
-    const doc = input.beerJsonRecipeJson as any;
+    const doc = input.beerJsonRecipeJson;
     const before = validateBeerJsonDoc(doc);
     if (!before.ok) {
       throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${before.errors}`);
@@ -278,8 +284,11 @@ export class RecipesService {
 
     // Normalize: keep DB columns `name`/`notes` in sync with BeerJSON.
     try {
-      const r0 = doc?.beerjson?.recipes?.[0];
-      if (!r0 || typeof r0 !== "object") {
+      const docObj = isObject(doc) ? doc : null;
+      const beerjson = isObject(docObj?.beerjson) ? docObj.beerjson : null;
+      const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
+      const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
+      if (!r0) {
         throw new Error("BeerJSON is missing beerjson.recipes[0]");
       }
       r0.name = name;
@@ -315,8 +324,9 @@ export class RecipesService {
         style,
         styleKey,
         notes,
-        beerJsonRecipeJson: doc as any,
-        recipeExtJson: recipeExtJson === undefined ? undefined : (recipeExtJson as any),
+        beerJsonRecipeJson: doc as Prisma.InputJsonValue,
+        recipeExtJson:
+          recipeExtJson === undefined ? undefined : (recipeExtJson as Prisma.InputJsonValue),
       },
     });
   }
@@ -354,7 +364,7 @@ export class RecipesService {
     // Ensure workspace scoping is enforced even if IDs collide across workspaces.
     const existing = await this.getRecipe(userId, workspaceId, recipeId);
 
-    const data: any = {};
+    const data: Prisma.RecipeUncheckedUpdateInput = {};
 
     const hasBeerJson = input.beerJsonRecipeJson !== undefined && input.beerJsonRecipeJson !== null;
 
@@ -375,17 +385,23 @@ export class RecipesService {
     if (input.notes !== undefined) data.notes = input.notes?.trim() || null;
 
     if (hasBeerJson) {
-      const nextName = (data.name as string | undefined) ?? existing.name;
-      const nextNotes = (data.notes as string | null | undefined) ?? existing.notes ?? null;
-      const doc = input.beerJsonRecipeJson as any;
+      const nextName = (typeof data.name === "string" ? data.name : null) ?? existing.name;
+      const nextNotes =
+        (typeof data.notes === "string" ? data.notes : data.notes === null ? null : undefined) ??
+        existing.notes ??
+        null;
+      const doc = input.beerJsonRecipeJson;
       const before = validateBeerJsonDoc(doc);
       if (!before.ok) {
         throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${before.errors}`);
       }
       // Normalize BeerJSON name/notes to match DB columns.
       try {
-        const r0 = doc?.beerjson?.recipes?.[0];
-        if (!r0 || typeof r0 !== "object") {
+        const docObj = isObject(doc) ? doc : null;
+        const beerjson = isObject(docObj?.beerjson) ? docObj.beerjson : null;
+        const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
+        const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
+        if (!r0) {
           throw new Error("BeerJSON is missing beerjson.recipes[0]");
         }
         r0.name = nextName;
@@ -408,7 +424,7 @@ export class RecipesService {
       // Enforce supported domain rules directly on BeerJSON (no legacy-row mapping).
       validateBeerJsonRecipeDomain(doc);
 
-      data.beerJsonRecipeJson = doc as any;
+      data.beerJsonRecipeJson = doc as Prisma.InputJsonValue;
     }
 
     if (input.recipeExtJson !== undefined) {
@@ -420,7 +436,7 @@ export class RecipesService {
           if (v === undefined) {
             // no-op
           } else {
-            data.recipeExtJson = v as any;
+            data.recipeExtJson = v as Prisma.InputJsonValue;
           }
         } catch (err) {
           throw new BadRequestError("invalid_recipe_ext_json", `Body.recipeExtJson is invalid: ${String(err)}`);
@@ -434,18 +450,23 @@ export class RecipesService {
 
     if (!hasBeerJson && (data.name !== undefined || data.notes !== undefined)) {
       // Keep BeerJSON in sync when only name/notes change.
-      const nextName = (data.name as string | undefined) ?? existing.name;
-      const nextNotes = (data.notes as string | null | undefined) ?? existing.notes ?? null;
+      const nextName = (typeof data.name === "string" ? data.name : null) ?? existing.name;
+      const nextNotes =
+        (typeof data.notes === "string" ? data.notes : data.notes === null ? null : undefined) ??
+        existing.notes ??
+        null;
 
-      const doc = (existing.beerJsonRecipeJson ?? null) as any;
-      if (doc && typeof doc === "object") {
+      const doc = existing.beerJsonRecipeJson;
+      if (isObject(doc)) {
         const before = validateBeerJsonDoc(doc);
         if (!before.ok) {
           throw new BadRequestError("invalid_beerjson_recipe", `Stored BeerJSON is invalid: ${before.errors}`);
         }
         try {
-          const r0 = doc?.beerjson?.recipes?.[0];
-          if (!r0 || typeof r0 !== "object") {
+          const beerjson = isObject(doc.beerjson) ? doc.beerjson : null;
+          const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
+          const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
+          if (!r0) {
             throw new Error("BeerJSON is missing beerjson.recipes[0]");
           }
           r0.name = nextName;
@@ -458,7 +479,7 @@ export class RecipesService {
         if (!after.ok) {
           throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
         }
-        data.beerJsonRecipeJson = doc;
+        data.beerJsonRecipeJson = doc as Prisma.InputJsonValue;
       } else {
         throw new BadRequestError("invalid_beerjson_recipe", "Stored BeerJSON is missing; cannot patch name/notes.");
       }
@@ -518,7 +539,7 @@ async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promis
       (typeof r.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(r.mashTaToPh57_mEqPerKg));
 
     const colorEbc = typeof f.colorEbc === "number" && Number.isFinite(f.colorEbc) ? f.colorEbc : null;
-    const canonicalName = (f as any).name ?? r.name;
+    const canonicalName = f.name ?? r.name;
 
     const inferredKey = inferMashPhModelKeyV1({
       name: canonicalName,
@@ -803,7 +824,7 @@ function validateGristJson(value: unknown): GristRow[] | null | undefined {
       );
     }
 
-    const out: any = {
+    const out: Record<string, unknown> = {
       id,
       name,
       amountKg,
@@ -943,7 +964,7 @@ function validateHopsJson(value: unknown): HopRow[] | null | undefined {
       );
     }
 
-    const out: any = {
+    const out: Record<string, unknown> = {
       id,
       ingredientId,
       name,
@@ -1062,7 +1083,7 @@ function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
       );
     }
 
-    const out: any = { id, name };
+    const out: Record<string, unknown> = { id, name };
     if (ingredientIdRaw !== undefined) out.ingredientId = ingredientId;
     if (lab) out.lab = lab;
     if (productIdRaw !== undefined) out.productId = productId;
@@ -1257,7 +1278,7 @@ function validateMiscJson(value: unknown): MiscRow[] | null | undefined {
               );
             })();
 
-    const out: any = {
+    const out: Record<string, unknown> = {
       id,
       name,
       type,

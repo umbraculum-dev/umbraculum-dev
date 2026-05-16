@@ -116,7 +116,7 @@ export function mashPhEstimateV1(input: MashPhEstimateV1Input): MashPhEstimateV1
 
     gristTotalKg += amountKg;
 
-    const diRaw = (r as any)?.mashDiPh;
+    const diRaw = r?.mashDiPh;
     const mashDiPh =
       diRaw === null || diRaw === undefined
         ? null
@@ -131,7 +131,7 @@ export function mashPhEstimateV1(input: MashPhEstimateV1Input): MashPhEstimateV1
     diMashPhWeightedSum += mashDiPhUsed * amountKg;
     diMashPhWeight += amountKg;
 
-    const taRaw = (r as any)?.mashTaToPh57_mEqPerKg;
+    const taRaw = r?.mashTaToPh57_mEqPerKg;
     const mashTa =
       taRaw === null || taRaw === undefined
         ? null

@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
@@ -27,7 +27,7 @@ export async function integrationsTiltRoutes(app: FastifyInstance) {
   const integrations = new IntegrationsService(app.prisma);
   const workspaces = new WorkspacesService(app.prisma);
 
-  async function requireActiveWorkspaceParam(req: any): Promise<{ userId: string; workspaceId: string }> {
+  async function requireActiveWorkspaceParam(req: FastifyRequest): Promise<{ userId: string; workspaceId: string }> {
     const ctx = requireActiveWorkspace(req);
     const params = (req.params ?? {}) as { workspaceId?: unknown };
     const workspaceId = assertWorkspaceId(params.workspaceId);
@@ -119,7 +119,7 @@ export async function integrationsTiltRoutes(app: FastifyInstance) {
     const { workspaceId } = await requireActiveWorkspaceParam(req);
     const integration = await findTiltIntegrationForWorkspace(workspaceId);
     if (!integration || integration.revokedAt) {
-      return { ok: true, devices: [] as any[] };
+      return { ok: true, devices: [] };
     }
 
     const devices = await app.prisma.integrationDevice.findMany({

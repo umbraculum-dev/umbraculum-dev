@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import { BadRequestError, ForbiddenError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
@@ -211,6 +211,11 @@ export class RecipeWaterSettingsService {
     const existing = await this.prisma.recipeWaterSettings.findUnique({ where: { recipeId } });
     const data: Record<string, unknown> = { workspaceId, recipeId };
 
+    // The dynamic-key field-loop pattern below iterates over `as const` arrays of field
+    // names defined on UpsertRecipeWaterSettingsInput; this alias avoids `(input as any)[f]`
+    // at every site while keeping `input` typed for direct named access.
+    const inputRec: Record<string, unknown> = input as unknown as Record<string, unknown>;
+
     if (input.sourceWaterProfileId !== undefined) data.sourceWaterProfileId = input.sourceWaterProfileId;
     if (input.targetWaterProfileId !== undefined) data.targetWaterProfileId = input.targetWaterProfileId;
     if (input.dilutionWaterProfileId !== undefined)
@@ -223,7 +228,7 @@ export class RecipeWaterSettingsService {
 
     const mixingNumericFields = ["tapWaterVolumeLiters", "dilutionWaterVolumeLiters"] as const;
     for (const f of mixingNumericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -266,7 +271,7 @@ export class RecipeWaterSettingsService {
       "mashTargetPh",
     ] as const;
     for (const f of mashNumericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) data[f] = ensureFinite(v, f);
     }
 
@@ -278,7 +283,7 @@ export class RecipeWaterSettingsService {
     // Boil add-on water mixing volumes + derived boilWaterVolumeLiters (single source of truth like mash).
     const boilMixingNumericFields = ["boilTapWaterVolumeLiters", "boilDilutionWaterVolumeLiters"] as const;
     for (const f of boilMixingNumericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -288,20 +293,20 @@ export class RecipeWaterSettingsService {
     const hasBoilMixingUpdate =
       input.boilTapWaterVolumeLiters !== undefined || input.boilDilutionWaterVolumeLiters !== undefined;
     const boilTap =
-      (input as any).boilTapWaterVolumeLiters === null
+      input.boilTapWaterVolumeLiters === null
         ? 0
-        : typeof (input as any).boilTapWaterVolumeLiters === "number"
-          ? (input as any).boilTapWaterVolumeLiters
-          : typeof (existing as any)?.boilTapWaterVolumeLiters === "number"
-            ? (existing as any).boilTapWaterVolumeLiters
+        : typeof input.boilTapWaterVolumeLiters === "number"
+          ? input.boilTapWaterVolumeLiters
+          : typeof existing?.boilTapWaterVolumeLiters === "number"
+            ? existing.boilTapWaterVolumeLiters
             : 0;
     const boilDil =
-      (input as any).boilDilutionWaterVolumeLiters === null
+      input.boilDilutionWaterVolumeLiters === null
         ? 0
-        : typeof (input as any).boilDilutionWaterVolumeLiters === "number"
-          ? (input as any).boilDilutionWaterVolumeLiters
-          : typeof (existing as any)?.boilDilutionWaterVolumeLiters === "number"
-            ? (existing as any).boilDilutionWaterVolumeLiters
+        : typeof input.boilDilutionWaterVolumeLiters === "number"
+          ? input.boilDilutionWaterVolumeLiters
+          : typeof existing?.boilDilutionWaterVolumeLiters === "number"
+            ? existing.boilDilutionWaterVolumeLiters
             : 0;
     const derivedBoilVolume = Math.max(0, boilTap) + Math.max(0, boilDil);
     if (derivedBoilVolume > 0 || hasBoilMixingUpdate) {
@@ -310,7 +315,7 @@ export class RecipeWaterSettingsService {
 
     const mashStringFields = ["mashAcidType", "mashStrengthKind"] as const;
     for (const f of mashStringFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (typeof v !== "string") throw new BadRequestError("invalid_string", `Body.${f} must be a string`);
         data[f] = v;
@@ -332,7 +337,7 @@ export class RecipeWaterSettingsService {
       "mashLastChlorideAddedPpm",
     ] as const;
     for (const f of mashSnapshotFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -358,7 +363,7 @@ export class RecipeWaterSettingsService {
 
     const mashManualInputFields = ["mashManualAcidAddedMl", "mashManualAcidAddedGrams"] as const;
     for (const f of mashManualInputFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -372,7 +377,7 @@ export class RecipeWaterSettingsService {
       "mashManualLastChlorideAddedPpm",
     ] as const;
     for (const f of mashManualSnapshotFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -384,22 +389,25 @@ export class RecipeWaterSettingsService {
 
     if (input.mashSaltAdditionsJson !== undefined) {
       // accept null to clear
-      data.mashSaltAdditionsJson = validateSaltAdditionsJson(input.mashSaltAdditionsJson, "mashSaltAdditionsJson") as any;
+      data.mashSaltAdditionsJson = validateSaltAdditionsJson(
+        input.mashSaltAdditionsJson,
+        "mashSaltAdditionsJson",
+      ) as Prisma.InputJsonValue;
     }
     if (input.mashSaltsLastResultJson !== undefined) {
-      data.mashSaltsLastResultJson = input.mashSaltsLastResultJson as any;
+      data.mashSaltsLastResultJson = input.mashSaltsLastResultJson as Prisma.InputJsonValue;
     }
 
     if (input.mashOverallLastResultJson !== undefined) {
       // accept null to clear; otherwise pass through (Json column)
-      data.mashOverallLastResultJson = input.mashOverallLastResultJson as any;
+      data.mashOverallLastResultJson = input.mashOverallLastResultJson as Prisma.InputJsonValue;
     }
     if (input.mashOverallLastCalculatedAt !== undefined) {
       data.mashOverallLastCalculatedAt = input.mashOverallLastCalculatedAt;
     }
 
     if (input.mashGristImportedJson !== undefined) {
-      data.mashGristImportedJson = input.mashGristImportedJson as any;
+      data.mashGristImportedJson = input.mashGristImportedJson as Prisma.InputJsonValue;
     }
     if (input.mashGristImportedAt !== undefined) {
       data.mashGristImportedAt = input.mashGristImportedAt;
@@ -415,13 +423,13 @@ export class RecipeWaterSettingsService {
       "spargeVolumeLiters",
     ] as const;
     for (const f of numericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) data[f] = ensureFinite(v, f);
     }
 
     const stringFields = ["spargeAcidType", "spargeStrengthKind"] as const;
     for (const f of stringFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (typeof v !== "string") throw new BadRequestError("invalid_string", `Body.${f} must be a string`);
         data[f] = v;
@@ -449,7 +457,7 @@ export class RecipeWaterSettingsService {
 
     const spargeManualInputFields = ["spargeManualAcidAddedMl", "spargeManualAcidAddedGrams"] as const;
     for (const f of spargeManualInputFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -463,7 +471,7 @@ export class RecipeWaterSettingsService {
       "spargeManualLastChlorideAddedPpm",
     ] as const;
     for (const f of spargeManualSnapshotFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -475,10 +483,13 @@ export class RecipeWaterSettingsService {
 
     if (input.spargeSaltAdditionsJson !== undefined) {
       // accept null to clear
-      data.spargeSaltAdditionsJson = validateSaltAdditionsJson(input.spargeSaltAdditionsJson, "spargeSaltAdditionsJson") as any;
+      data.spargeSaltAdditionsJson = validateSaltAdditionsJson(
+        input.spargeSaltAdditionsJson,
+        "spargeSaltAdditionsJson",
+      ) as Prisma.InputJsonValue;
     }
     if (input.spargeSaltsLastResultJson !== undefined) {
-      data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson as any;
+      data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson as Prisma.InputJsonValue;
     }
     if (input.spargeStepTemperatureC !== undefined) {
       if (input.spargeStepTemperatureC === null) data.spargeStepTemperatureC = null;
@@ -536,7 +547,7 @@ export class RecipeWaterSettingsService {
       "spargeLastChlorideAddedPpm",
     ] as const;
     for (const f of snapshotFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -549,7 +560,7 @@ export class RecipeWaterSettingsService {
     // Boil add-on water inputs/snapshots (mirrors sparge patterns; mixing mirrors mash).
     const boilNumericFields = ["boilStartingAlkalinityPpmCaCO3", "boilStartingPh", "boilTargetPh"] as const;
     for (const f of boilNumericFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) data[f] = ensureFinite(v, f);
     }
 
@@ -560,7 +571,7 @@ export class RecipeWaterSettingsService {
 
     const boilStringFields = ["boilAcidType", "boilStrengthKind"] as const;
     for (const f of boilStringFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (typeof v !== "string") throw new BadRequestError("invalid_string", `Body.${f} must be a string`);
         data[f] = v;
@@ -587,7 +598,7 @@ export class RecipeWaterSettingsService {
 
     const boilManualInputFields = ["boilManualAcidAddedMl", "boilManualAcidAddedGrams"] as const;
     for (const f of boilManualInputFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -601,7 +612,7 @@ export class RecipeWaterSettingsService {
       "boilManualLastChlorideAddedPpm",
     ] as const;
     for (const f of boilManualSnapshotFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -610,10 +621,13 @@ export class RecipeWaterSettingsService {
     if (input.boilManualLastCalculatedAt !== undefined) data.boilManualLastCalculatedAt = input.boilManualLastCalculatedAt;
 
     if (input.boilSaltAdditionsJson !== undefined) {
-      data.boilSaltAdditionsJson = validateSaltAdditionsJson(input.boilSaltAdditionsJson, "boilSaltAdditionsJson") as any;
+      data.boilSaltAdditionsJson = validateSaltAdditionsJson(
+        input.boilSaltAdditionsJson,
+        "boilSaltAdditionsJson",
+      ) as Prisma.InputJsonValue;
     }
     if (input.boilSaltsLastResultJson !== undefined) {
-      data.boilSaltsLastResultJson = input.boilSaltsLastResultJson as any;
+      data.boilSaltsLastResultJson = input.boilSaltsLastResultJson as Prisma.InputJsonValue;
     }
 
     const boilSnapshotFields = [
@@ -626,7 +640,7 @@ export class RecipeWaterSettingsService {
       "boilLastChlorideAddedPpm",
     ] as const;
     for (const f of boilSnapshotFields) {
-      const v = (input as any)[f];
+      const v = inputRec[f];
       if (v !== undefined) {
         if (v === null) data[f] = null;
         else data[f] = ensureFinite(v, f);
@@ -634,13 +648,15 @@ export class RecipeWaterSettingsService {
     }
     if (input.boilLastCalculatedAt !== undefined) data.boilLastCalculatedAt = input.boilLastCalculatedAt;
 
-    if (input.boilOverallLastResultJson !== undefined) data.boilOverallLastResultJson = input.boilOverallLastResultJson as any;
+    if (input.boilOverallLastResultJson !== undefined) {
+      data.boilOverallLastResultJson = input.boilOverallLastResultJson as Prisma.InputJsonValue;
+    }
     if (input.boilOverallLastCalculatedAt !== undefined) data.boilOverallLastCalculatedAt = input.boilOverallLastCalculatedAt;
 
     return this.prisma.recipeWaterSettings.upsert({
       where: { recipeId },
-      create: data as any,
-      update: data as any,
+      create: data as Prisma.RecipeWaterSettingsUncheckedCreateInput,
+      update: data as Prisma.RecipeWaterSettingsUncheckedUpdateInput,
     });
   }
 }

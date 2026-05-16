@@ -32,9 +32,10 @@ export async function ingredientsRoutes(app: FastifyInstance) {
 
   app.get("/ingredients/fermentables", async (req) => {
     const ctx = requireUser(req);
-    const q = getQueryString((req.query as any)?.query);
-    const offsetRaw = getQueryInt((req.query as any)?.offset);
-    const limitRaw = getQueryInt((req.query as any)?.limit);
+    const query = (req.query ?? {}) as Record<string, unknown>;
+    const q = getQueryString(query.query);
+    const offsetRaw = getQueryInt(query.offset);
+    const limitRaw = getQueryInt(query.limit);
     const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
     const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
@@ -103,9 +104,10 @@ export async function ingredientsRoutes(app: FastifyInstance) {
 
   app.get("/ingredients/hops", async (req) => {
     const ctx = requireUser(req);
-    const q = getQueryString((req.query as any)?.query);
-    const offsetRaw = getQueryInt((req.query as any)?.offset);
-    const limitRaw = getQueryInt((req.query as any)?.limit);
+    const query = (req.query ?? {}) as Record<string, unknown>;
+    const q = getQueryString(query.query);
+    const offsetRaw = getQueryInt(query.offset);
+    const limitRaw = getQueryInt(query.limit);
     const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
     const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
@@ -141,7 +143,8 @@ export async function ingredientsRoutes(app: FastifyInstance) {
 
   app.get("/ingredients/yeasts", async (req) => {
     const ctx = requireUser(req);
-    const q = getQueryString((req.query as any)?.query);
+    const query = (req.query ?? {}) as Record<string, unknown>;
+    const q = getQueryString(query.query);
 
     const items = await app.prisma.yeast.findMany({
       where: {

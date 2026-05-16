@@ -6,7 +6,7 @@ async function errorHandlerPluginImpl(app: FastifyInstance) {
   app.setErrorHandler((err, req, reply) => {
     const errCode = (err as NodeJS.ErrnoException).code;
     if (errCode === "FST_ERR_CTP_ENTITY_TOO_LARGE" || errCode === "FST_ERR_CTP_BODY_TOO_LARGE") {
-      req.log.warn({ err: err as any }, "request body exceeded size limit");
+      req.log.warn({ err }, "request body exceeded size limit");
       return reply.status(400).send({
         ok: false,
         error: {
@@ -22,7 +22,7 @@ async function errorHandlerPluginImpl(app: FastifyInstance) {
     const code = isHttp ? err.code : "internal_error";
     const details = isHttp ? err.details : undefined;
 
-    req.log.error({ err: err as any }, "request failed");
+    req.log.error({ err }, "request failed");
 
     const message =
       err instanceof Error

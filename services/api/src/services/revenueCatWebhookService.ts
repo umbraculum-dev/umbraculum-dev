@@ -1,14 +1,25 @@
 import type { BillingTier, PrismaClient } from "@prisma/client";
 import { BillingEventsService } from "./billingEventsService.js";
 import { WorkspaceBillingService } from "./workspaceBillingService.js";
+import { isObject } from "../lib/typeGuards.js";
+
+type RevenueCatPayload = {
+  id?: unknown;
+  app_user_id?: unknown;
+  entitlements?: unknown;
+  event?: { id?: unknown; entitlements?: unknown } | null;
+};
 
 function getString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
 function tierFromEntitlements(entitlements: unknown): BillingTier {
-  const e = entitlements as any;
-  const active = (key: string) => Boolean(e?.[key]?.is_active ?? e?.[key]?.isActive ?? e?.[key]?.active);
+  const e = isObject(entitlements) ? entitlements : {};
+  const active = (key: string) => {
+    const node = isObject(e[key]) ? e[key] : {};
+    return Boolean(node.is_active ?? node.isActive ?? node.active);
+  };
 
   if (active("tier_pro_plus")) return "pro_plus";
   if (active("tier_pro")) return "pro";
@@ -26,7 +37,7 @@ export class RevenueCatWebhookService {
   }
 
   async handleEvent(payload: unknown) {
-    const p = (payload ?? {}) as any;
+    const p: RevenueCatPayload = isObject(payload) ? (payload as RevenueCatPayload) : {};
     const userId = getString(p.app_user_id);
 
     // Always record an audit event even if we can't apply it.

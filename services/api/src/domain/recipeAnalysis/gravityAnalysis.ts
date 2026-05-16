@@ -1,6 +1,25 @@
-import type { GravityAnalysisResponseV1, GravityAnalysisWarningCode } from "@brewery/contracts";
+import type {
+  GravityAnalysisDerivationKind,
+  GravityAnalysisResponseV1,
+  GravityAnalysisWarningCode,
+  WaterCalcDerivation,
+} from "@brewery/contracts";
 import { analysisFormatHints } from "@brewery/contracts";
-import type { WaterCalcDerivation } from "../waterCalc/derivation/types.js";
+import { isFiniteNumber, isObject } from "../../lib/typeGuards.js";
+
+/**
+ * Phase 3 helper: walk the canonical `{ beerjson: { recipes: [recipe0, ...] } }`
+ * Prisma JSON shape and return the first recipe object (or null). Replaces
+ * ~7 repeated `(beerJsonRecipeJson as any)?.beerjson?.recipes?.[0]` accesses.
+ */
+function extractFirstRecipe(beerJsonRecipeJson: unknown): Record<string, unknown> | null {
+  if (!isObject(beerJsonRecipeJson)) return null;
+  if (!isObject(beerJsonRecipeJson.beerjson)) return null;
+  const recipes = beerJsonRecipeJson.beerjson.recipes;
+  if (!Array.isArray(recipes)) return null;
+  const first = recipes[0];
+  return isObject(first) ? first : null;
+}
 
 export interface GravityAnalysisWarning {
   code: GravityAnalysisWarningCode;
@@ -76,9 +95,10 @@ interface ExtractedFermentableForColor {
 }
 
 function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const unit = typeof r0?.batch_size?.unit === "string" ? r0.batch_size.unit : "";
-  const value = safeNum(r0?.batch_size?.value);
+  const r0 = extractFirstRecipe(beerJsonRecipeJson);
+  if (!r0 || !isObject(r0.batch_size)) return null;
+  const unit = typeof r0.batch_size.unit === "string" ? r0.batch_size.unit : "";
+  const value = safeNum(r0.batch_size.value);
   if (value == null || !(value > 0)) return null;
   if (unit === "l") return value;
   if (unit === "ml") return value / 1000;
@@ -86,24 +106,28 @@ function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
 }
 
 function extractFermentablesForColor(beerJsonRecipeJson: unknown): { rows: ExtractedFermentableForColor[]; hasMissingColor: boolean } {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const ferms = r0?.ingredients?.fermentable_additions;
+  const r0 = extractFirstRecipe(beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const ferms = ingredients?.fermentable_additions;
   const list = Array.isArray(ferms) ? ferms : [];
 
   const rows: ExtractedFermentableForColor[] = [];
   let hasMissingColor = false;
 
   for (const f of list) {
+    if (!isObject(f)) continue;
+    const amount = isObject(f.amount) ? f.amount : null;
     const amountKg =
-      f?.amount?.unit === "kg"
-        ? safeNum(f?.amount?.value)
-        : f?.amount?.unit === "g"
-          ? (safeNum(f?.amount?.value) ?? 0) / 1000
+      amount?.unit === "kg"
+        ? safeNum(amount.value)
+        : amount?.unit === "g"
+          ? (safeNum(amount.value) ?? 0) / 1000
           : null;
     if (amountKg == null || !(amountKg > 0)) continue;
 
+    const color = isObject(f.color) ? f.color : null;
     const colorLovibond =
-      f?.color?.unit === "Lovi" && typeof f?.color?.value === "number" && Number.isFinite(f.color.value) ? f.color.value : null;
+      color?.unit === "Lovi" && isFiniteNumber(color.value) ? color.value : null;
     if (colorLovibond == null) {
       hasMissingColor = true;
       continue;
@@ -146,11 +170,11 @@ const HOP_FORM_FACTOR: Record<HopForm, number> = {
 };
 
 function extractHopFormOverrides(recipeExtJson: unknown): Record<string, HopForm> | null {
-  const ext = recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson) ? (recipeExtJson as any) : null;
-  const raw = ext?.hopFormOverrides;
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  if (!isObject(recipeExtJson)) return null;
+  const raw = recipeExtJson.hopFormOverrides;
+  if (!isObject(raw)) return null;
   const out: Record<string, HopForm> = {};
-  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+  for (const [k, v] of Object.entries(raw)) {
     if (typeof k !== "string" || !k.trim()) continue;
     if (v === "debittered_leaf") out[k] = "debittered_leaf";
     if (v === "hop_extract") out[k] = "hop_extract";
@@ -159,25 +183,28 @@ function extractHopFormOverrides(recipeExtJson: unknown): Record<string, HopForm
 }
 
 function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown): ExtractedHopAddition[] {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const hops = r0?.ingredients?.hop_additions;
+  const r0 = extractFirstRecipe(beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const hops = ingredients?.hop_additions;
   const list = Array.isArray(hops) ? hops : [];
   const overrides = extractHopFormOverrides(recipeExtJson);
 
   const out: ExtractedHopAddition[] = [];
   for (const h of list) {
-    const id = typeof h?.id === "string" ? h.id : null;
-    const name = typeof h?.name === "string" ? h.name : null;
+    if (!isObject(h)) continue;
+    const id = typeof h.id === "string" ? h.id : null;
+    const name = typeof h.name === "string" ? h.name : null;
     const override = id && overrides ? overrides[id] : null;
-    const formRaw = typeof h?.form === "string" ? h.form : "";
+    const formRaw = typeof h.form === "string" ? h.form : "";
     const formFromBeerJson: HopForm | null =
       formRaw === "extract" || formRaw === "leaf" || formRaw === "leaf (wet)" || formRaw === "pellet" || formRaw === "powder" || formRaw === "plug"
         ? (formRaw as HopForm)
         : null;
     const form: HopForm | null = override ?? formFromBeerJson;
 
-    const timingUse = typeof h?.timing?.use === "string" ? h.timing.use : "";
-    const savedUseRaw = typeof h?.brewery_app_use === "string" ? h.brewery_app_use : "";
+    const timing = isObject(h.timing) ? h.timing : null;
+    const timingUse = typeof timing?.use === "string" ? timing.use : "";
+    const savedUseRaw = typeof h.brewery_app_use === "string" ? h.brewery_app_use : "";
     const savedUse: HopUse | null =
       savedUseRaw === "boil" || savedUseRaw === "whirlpool" || savedUseRaw === "dryhop" ? savedUseRaw : null;
     const use: HopUse =
@@ -187,10 +214,12 @@ function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown
           ? savedUse
           : "boil";
 
-    const timeMinutes = h?.timing?.duration?.unit === "min" ? safeNum(h?.timing?.duration?.value) : null;
+    const duration = isObject(timing?.duration) ? timing.duration : null;
+    const timeMinutes = duration?.unit === "min" ? safeNum(duration.value) : null;
 
-    const amountUnit = typeof h?.amount?.unit === "string" ? h.amount.unit : "";
-    const amountValue = safeNum(h?.amount?.value);
+    const amount = isObject(h.amount) ? h.amount : null;
+    const amountUnit = typeof amount?.unit === "string" ? amount.unit : "";
+    const amountValue = safeNum(amount?.value);
     const amountGrams =
       amountValue != null && amountValue >= 0
         ? amountUnit === "g"
@@ -200,7 +229,8 @@ function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown
             : null
         : null;
 
-    const alphaAcidPercent = h?.alpha_acid?.unit === "%" ? safeNum(h?.alpha_acid?.value) : null;
+    const alphaAcid = isObject(h.alpha_acid) ? h.alpha_acid : null;
+    const alphaAcidPercent = alphaAcid?.unit === "%" ? safeNum(alphaAcid.value) : null;
 
     out.push({
       id,
@@ -313,10 +343,10 @@ function computeIbuRager(args: {
 }
 
 function extractEquipment(ext: unknown): ExtractedEquipment {
-  const e = ext && typeof ext === "object" && !Array.isArray(ext) ? (ext as any).equipment : null;
-  const kettle = e && typeof e === "object" ? (e as any).kettle : null;
-  const mash = e && typeof e === "object" ? (e as any).mash : null;
-  const misc = e && typeof e === "object" ? (e as any).misc : null;
+  const e = isObject(ext) && isObject(ext.equipment) ? ext.equipment : null;
+  const kettle = e && isObject(e.kettle) ? e.kettle : null;
+  const mash = e && isObject(e.mash) ? e.mash : null;
+  const misc = e && isObject(e.misc) ? e.misc : null;
 
   const kettleCapacityLiters = safeNum(kettle?.kettleVolumeLiters);
   const kettleLossesLiters = safeNum(kettle?.kettleLossesLiters) ?? 0;
@@ -347,21 +377,22 @@ function extractEquipment(ext: unknown): ExtractedEquipment {
 }
 
 function extractBoilTimeHours(args: { beerJsonRecipeJson: unknown; recipeExtJson: unknown }): number {
-  const override =
-    args.recipeExtJson && typeof args.recipeExtJson === "object" && !Array.isArray(args.recipeExtJson)
-      ? (args.recipeExtJson as any).boilTimeMinutesOverride
-      : null;
+  const override = isObject(args.recipeExtJson) ? args.recipeExtJson.boilTimeMinutesOverride : null;
   if (typeof override === "number" && Number.isFinite(override) && override >= 0) {
     return override / 60;
   }
-  const r0 = (args.beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const hops = r0?.ingredients?.hop_additions;
+  const r0 = extractFirstRecipe(args.beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const hops = ingredients?.hop_additions;
   const list = Array.isArray(hops) ? hops : [];
   let maxMinutes = 0;
   for (const h of list) {
-    const use = typeof h?.timing?.use === "string" ? h.timing.use : "";
+    if (!isObject(h)) continue;
+    const timing = isObject(h.timing) ? h.timing : null;
+    const use = typeof timing?.use === "string" ? timing.use : "";
     if (use !== "add_to_boil") continue;
-    const minutes = h?.timing?.duration?.unit === "min" ? safeNum(h?.timing?.duration?.value) : null;
+    const duration = isObject(timing?.duration) ? timing.duration : null;
+    const minutes = duration?.unit === "min" ? safeNum(duration.value) : null;
     if (minutes != null && minutes > maxMinutes) maxMinutes = minutes;
   }
   const inferredMinutes = maxMinutes > 0 ? maxMinutes : 60;
@@ -369,15 +400,19 @@ function extractBoilTimeHours(args: { beerJsonRecipeJson: unknown; recipeExtJson
 }
 
 function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const hops = r0?.ingredients?.hop_additions;
+  const r0 = extractFirstRecipe(beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const hops = ingredients?.hop_additions;
   const list = Array.isArray(hops) ? hops : [];
   let totalGrams = 0;
   for (const h of list) {
-    const use = typeof h?.timing?.use === "string" ? h.timing.use : "";
+    if (!isObject(h)) continue;
+    const timing = isObject(h.timing) ? h.timing : null;
+    const use = typeof timing?.use === "string" ? timing.use : "";
     if (use !== "add_to_boil") continue;
-    const unit = typeof h?.amount?.unit === "string" ? h.amount.unit : "";
-    const value = safeNum(h?.amount?.value);
+    const amount = isObject(h.amount) ? h.amount : null;
+    const unit = typeof amount?.unit === "string" ? amount.unit : "";
+    const value = safeNum(amount?.value);
     if (value == null || !(value > 0)) continue;
     if (unit === "g") totalGrams += value;
     if (unit === "kg") totalGrams += value * 1000;
@@ -386,15 +421,18 @@ function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
 }
 
 function extractTotalGrainKg(beerJsonRecipeJson: unknown): number {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const ferms = r0?.ingredients?.fermentable_additions;
+  const r0 = extractFirstRecipe(beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const ferms = ingredients?.fermentable_additions;
   const list = Array.isArray(ferms) ? ferms : [];
   let totalKg = 0;
   for (const f of list) {
-    const type = typeof f?.type === "string" ? f.type.trim().toLowerCase() : "";
+    if (!isObject(f)) continue;
+    const type = typeof f.type === "string" ? f.type.trim().toLowerCase() : "";
     if (type !== "grain") continue;
-    const unit = typeof f?.amount?.unit === "string" ? f.amount.unit : "";
-    const value = safeNum(f?.amount?.value);
+    const amount = isObject(f.amount) ? f.amount : null;
+    const unit = typeof amount?.unit === "string" ? amount.unit : "";
+    const value = safeNum(amount?.value);
     if (value == null || !(value > 0)) continue;
     if (unit === "kg") totalKg += value;
     if (unit === "g") totalKg += value / 1000;
@@ -403,22 +441,28 @@ function extractTotalGrainKg(beerJsonRecipeJson: unknown): number {
 }
 
 function extractFermentablesPpgAndPounds(beerJsonRecipeJson: unknown): Array<{ ppg: number; pounds: number }> {
-  const r0 = (beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const ferms = r0?.ingredients?.fermentable_additions;
+  const r0 = extractFirstRecipe(beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const ferms = ingredients?.fermentable_additions;
   const list = Array.isArray(ferms) ? ferms : [];
   const out: Array<{ ppg: number; pounds: number }> = [];
 
   for (const f of list) {
+    if (!isObject(f)) continue;
+    const amount = isObject(f.amount) ? f.amount : null;
     const amountKg =
-      f?.amount?.unit === "kg"
-        ? safeNum(f?.amount?.value)
-        : f?.amount?.unit === "g"
-          ? (safeNum(f?.amount?.value) ?? 0) / 1000
+      amount?.unit === "kg"
+        ? safeNum(amount.value)
+        : amount?.unit === "g"
+          ? (safeNum(amount.value) ?? 0) / 1000
           : null;
     if (amountKg == null || !(amountKg > 0)) continue;
 
-    const potentialSg = f?.yield?.potential?.unit === "sg" ? safeNum(f?.yield?.potential?.value) : null;
-    const yieldPercent = f?.yield?.fine_grind?.unit === "%" ? safeNum(f?.yield?.fine_grind?.value) : null;
+    const yieldObj = isObject(f.yield) ? f.yield : null;
+    const potential = isObject(yieldObj?.potential) ? yieldObj.potential : null;
+    const fineGrind = isObject(yieldObj?.fine_grind) ? yieldObj.fine_grind : null;
+    const potentialSg = potential?.unit === "sg" ? safeNum(potential.value) : null;
+    const yieldPercent = fineGrind?.unit === "%" ? safeNum(fineGrind.value) : null;
 
     let ppg: number | null = null;
     if (potentialSg != null && potentialSg > 1) {
@@ -448,37 +492,30 @@ function estimateSgFromPpg(args: { fermentables: Array<{ ppg: number; pounds: nu
 }
 
 function extractYeastAttenuations(args: { beerJsonRecipeJson: unknown; recipeExtJson: unknown }): ExtractedYeastAttenuation[] {
-  const r0 = (args.beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-  const cultures = r0?.ingredients?.culture_additions;
+  const r0 = extractFirstRecipe(args.beerJsonRecipeJson);
+  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
+  const cultures = ingredients?.culture_additions;
   const list = Array.isArray(cultures) ? cultures : [];
 
-  const ext =
-    args.recipeExtJson && typeof args.recipeExtJson === "object" && !Array.isArray(args.recipeExtJson)
-      ? (args.recipeExtJson as Record<string, unknown>)
-      : null;
-  const overrides = ext?.yeastAttenuationOverridesPercent;
-  const rangeMap = ext?.yeastAttenuationRange;
+  const ext = isObject(args.recipeExtJson) ? args.recipeExtJson : null;
+  const overrides = isObject(ext?.yeastAttenuationOverridesPercent) ? ext.yeastAttenuationOverridesPercent : null;
+  const rangeMap = isObject(ext?.yeastAttenuationRange) ? ext.yeastAttenuationRange : null;
 
   const out: ExtractedYeastAttenuation[] = [];
   for (const c of list) {
-    const id = typeof c?.id === "string" ? c.id : "";
+    if (!isObject(c)) continue;
+    const id = typeof c.id === "string" ? c.id : "";
     if (!id) continue;
-    const beerJsonAtt = c?.attenuation?.unit === "%" ? safeNum(c?.attenuation?.value) : null;
-    const rangeEntry =
-      rangeMap && typeof rangeMap === "object" && !Array.isArray(rangeMap) ? (rangeMap as Record<string, unknown>)[id] : null;
-    const rangeMin =
-      rangeEntry && typeof rangeEntry === "object" && !Array.isArray(rangeEntry) && typeof (rangeEntry as any).min === "number" && Number.isFinite((rangeEntry as any).min)
-        ? (rangeEntry as any).min
-        : null;
-    const rangeMax =
-      rangeEntry && typeof rangeEntry === "object" && !Array.isArray(rangeEntry) && typeof (rangeEntry as any).max === "number" && Number.isFinite((rangeEntry as any).max)
-        ? (rangeEntry as any).max
-        : null;
+    const attenuation = isObject(c.attenuation) ? c.attenuation : null;
+    const beerJsonAtt = attenuation?.unit === "%" ? safeNum(attenuation.value) : null;
+    const rangeEntry = rangeMap && isObject(rangeMap[id]) ? rangeMap[id] : null;
+    const rangeMin = isFiniteNumber(rangeEntry?.min) ? rangeEntry.min : null;
+    const rangeMax = isFiniteNumber(rangeEntry?.max) ? rangeEntry.max : null;
     const rangeAvg =
       rangeMin != null && rangeMax != null ? (rangeMin + rangeMax) / 2 : null;
     const attenuationPercent =
       beerJsonAtt != null ? clamp(beerJsonAtt, 0, 100) : rangeAvg != null ? clamp(rangeAvg, 0, 100) : null;
-    const overrideRaw = overrides && typeof overrides === "object" ? safeNum((overrides as any)[id]) : null;
+    const overrideRaw = overrides ? safeNum(overrides[id]) : null;
     const overridePercent = overrideRaw != null ? clamp(overrideRaw, 0, 100) : null;
     out.push({
       id,
@@ -533,19 +570,11 @@ export function computeRecipeGravityAnalysis(args: {
     };
   }
 
-  const water = args.recipeWaterSettings && typeof args.recipeWaterSettings === "object" && !Array.isArray(args.recipeWaterSettings)
-    ? (args.recipeWaterSettings as any)
-    : null;
+  const water = isObject(args.recipeWaterSettings) ? args.recipeWaterSettings : null;
 
-  const mashWaterVolumeLiters = typeof water?.mashWaterVolumeLiters === "number" && Number.isFinite(water.mashWaterVolumeLiters)
-    ? water.mashWaterVolumeLiters
-    : null;
-  const spargeVolumeLiters = typeof water?.spargeVolumeLiters === "number" && Number.isFinite(water.spargeVolumeLiters)
-    ? water.spargeVolumeLiters
-    : null;
-  const boilWaterVolumeLiters = typeof water?.boilWaterVolumeLiters === "number" && Number.isFinite(water.boilWaterVolumeLiters)
-    ? water.boilWaterVolumeLiters
-    : 0;
+  const mashWaterVolumeLiters = isFiniteNumber(water?.mashWaterVolumeLiters) ? water.mashWaterVolumeLiters : null;
+  const spargeVolumeLiters = isFiniteNumber(water?.spargeVolumeLiters) ? water.spargeVolumeLiters : null;
+  const boilWaterVolumeLiters = isFiniteNumber(water?.boilWaterVolumeLiters) ? water.boilWaterVolumeLiters : 0;
 
   const boilTimeHours = extractBoilTimeHours({
     beerJsonRecipeJson: args.beerJsonRecipeJson,
@@ -615,13 +644,12 @@ export function computeRecipeGravityAnalysis(args: {
 
   const efficiencyPercent =
     equipment.mashEfficiencyPercent ??
-    (args.recipeExtJson && typeof args.recipeExtJson === "object" && !Array.isArray(args.recipeExtJson)
-      ? safeNum((args.recipeExtJson as any).brewhouseEfficiencyPercent)
-      : null) ??
+    (isObject(args.recipeExtJson) ? safeNum(args.recipeExtJson.brewhouseEfficiencyPercent) : null) ??
     (() => {
-      const r0 = (args.beerJsonRecipeJson as any)?.beerjson?.recipes?.[0];
-      const eff = r0?.efficiency?.brewhouse?.unit === "%" ? safeNum(r0?.efficiency?.brewhouse?.value) : null;
-      return eff;
+      const r0 = extractFirstRecipe(args.beerJsonRecipeJson);
+      const efficiency = r0 && isObject(r0.efficiency) ? r0.efficiency : null;
+      const brewhouse = isObject(efficiency?.brewhouse) ? efficiency.brewhouse : null;
+      return brewhouse?.unit === "%" ? safeNum(brewhouse.value) : null;
     })() ??
     0;
 
@@ -737,11 +765,11 @@ export function computeRecipeGravityAnalysis(args: {
     warnings,
   };
 
-  const derivations: Record<string, WaterCalcDerivation> = {};
+  const derivations: Partial<Record<GravityAnalysisDerivationKind, WaterCalcDerivation>> = {};
 
   if (preBoilVolumeLiters != null && mashWaterVolumeLiters != null && spargeVolumeLiters != null) {
     derivations["analysis.pre_boil_volume"] = {
-      kind: "analysis.pre_boil_volume" as any,
+      kind: "analysis.pre_boil_volume",
       version: 1,
       formulaId: "analysis.pre_boil_volume.v1",
       inputs: [
@@ -750,7 +778,7 @@ export function computeRecipeGravityAnalysis(args: {
         { id: "boilWaterVolumeLiters", value: { kind: "number", value: boilWaterVolumeLiters, unit: "L" } },
         { id: "mashLossesLiters", value: { kind: "number", value: equipment.mashLossesLiters, unit: "L" } },
         { id: "mashWaterLeftoverLiters", value: { kind: "number", value: equipment.mashWaterLeftoverLiters, unit: "L" } },
-        { id: "mashGrainAbsorptionLPerKg", value: { kind: "number", value: equipment.mashGrainAbsorptionLPerKg, unit: "L_per_kg" as any } },
+        { id: "mashGrainAbsorptionLPerKg", value: { kind: "number", value: equipment.mashGrainAbsorptionLPerKg, unit: "L_per_kg" } },
       ],
       intermediates: [{ id: "preBoilVolumeLiters", value: { kind: "number", value: preBoilVolumeLiters, unit: "L" } }],
     };
@@ -758,13 +786,13 @@ export function computeRecipeGravityAnalysis(args: {
 
   if (kettleVolumeLiters != null && preBoilVolumeLiters != null) {
     derivations["analysis.kettle_volume"] = {
-      kind: "analysis.kettle_volume" as any,
+      kind: "analysis.kettle_volume",
       version: 1,
       formulaId: "analysis.kettle_volume.v1",
       inputs: [
         { id: "preBoilVolumeLiters", value: { kind: "number", value: preBoilVolumeLiters, unit: "L" } },
-        { id: "boilTimeHours", value: { kind: "number", value: boilTimeHours, unit: "h" as any } },
-        { id: "evaporationRatePercentPerHour", value: { kind: "number", value: equipment.kettleBoilEvaporationRatePercentPerHour, unit: "percent_per_hour" as any } },
+        { id: "boilTimeHours", value: { kind: "number", value: boilTimeHours, unit: "h" } },
+        { id: "evaporationRatePercentPerHour", value: { kind: "number", value: equipment.kettleBoilEvaporationRatePercentPerHour, unit: "percent_per_hour" } },
         { id: "coolingShrinkagePercent", value: { kind: "number", value: equipment.kettleCoolingShrinkagePercent, unit: "percent" } },
         { id: "kettleLossesLiters", value: { kind: "number", value: equipment.kettleLossesLiters, unit: "L" } },
         { id: "otherLossesLiters", value: { kind: "number", value: equipment.otherLossesLiters, unit: "L" } },
@@ -776,33 +804,33 @@ export function computeRecipeGravityAnalysis(args: {
 
   if (ogEstimatedSg != null && kettleVolumeLiters != null) {
     derivations["analysis.og"] = {
-      kind: "analysis.og" as any,
+      kind: "analysis.og",
       version: 1,
       formulaId: "analysis.og.v1",
       inputs: [
         { id: "kettleVolumeLiters", value: { kind: "number", value: kettleVolumeLiters, unit: "L" } },
         { id: "efficiencyPercent", value: { kind: "number", value: efficiencyPercent, unit: "percent" } },
       ],
-      intermediates: [{ id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" as any } }],
+      intermediates: [{ id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" } }],
     };
   }
 
   if (pbgEstimatedSg != null && preBoilVolumeLiters != null) {
     derivations["analysis.pbg"] = {
-      kind: "analysis.pbg" as any,
+      kind: "analysis.pbg",
       version: 1,
       formulaId: "analysis.pbg.v1",
       inputs: [
         { id: "preBoilVolumeLiters", value: { kind: "number", value: preBoilVolumeLiters, unit: "L" } },
         { id: "efficiencyPercent", value: { kind: "number", value: efficiencyPercent, unit: "percent" } },
       ],
-      intermediates: [{ id: "pbgEstimatedSg", value: { kind: "number", value: pbgEstimatedSg, unit: "sg" as any } }],
+      intermediates: [{ id: "pbgEstimatedSg", value: { kind: "number", value: pbgEstimatedSg, unit: "sg" } }],
     };
   }
 
   if (attenuationEffectivePercent != null) {
     derivations["analysis.attenuation"] = {
-      kind: "analysis.attenuation" as any,
+      kind: "analysis.attenuation",
       version: 1,
       formulaId: "analysis.attenuation.v1",
       inputs: [],
@@ -812,25 +840,25 @@ export function computeRecipeGravityAnalysis(args: {
 
   if (fgEstimatedSg != null && ogEstimatedSg != null && attenuationEffectivePercent != null) {
     derivations["analysis.fg"] = {
-      kind: "analysis.fg" as any,
+      kind: "analysis.fg",
       version: 1,
       formulaId: "analysis.fg.v1",
       inputs: [
-        { id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" as any } },
+        { id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" } },
         { id: "attenuationEffectivePercent", value: { kind: "number", value: attenuationEffectivePercent, unit: "percent" } },
       ],
-      intermediates: [{ id: "fgEstimatedSg", value: { kind: "number", value: fgEstimatedSg, unit: "sg" as any } }],
+      intermediates: [{ id: "fgEstimatedSg", value: { kind: "number", value: fgEstimatedSg, unit: "sg" } }],
     };
   }
 
   if (abvEstimatedPercent != null && ogEstimatedSg != null && fgEstimatedSg != null) {
     derivations["analysis.abv"] = {
-      kind: "analysis.abv" as any,
+      kind: "analysis.abv",
       version: 1,
       formulaId: "analysis.abv.v1",
       inputs: [
-        { id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" as any } },
-        { id: "fgEstimatedSg", value: { kind: "number", value: fgEstimatedSg, unit: "sg" as any } },
+        { id: "ogEstimatedSg", value: { kind: "number", value: ogEstimatedSg, unit: "sg" } },
+        { id: "fgEstimatedSg", value: { kind: "number", value: fgEstimatedSg, unit: "sg" } },
       ],
       intermediates: [{ id: "abvEstimatedPercent", value: { kind: "number", value: abvEstimatedPercent, unit: "percent" } }],
     };
@@ -838,57 +866,57 @@ export function computeRecipeGravityAnalysis(args: {
 
   if (ibuTinsethEstimated != null && ibuVolumeLiters != null && ibuGravitySg != null) {
     derivations["analysis.ibu_tinseth"] = {
-      kind: "analysis.ibu_tinseth" as any,
+      kind: "analysis.ibu_tinseth",
       version: 1,
       formulaId: "analysis.ibu_tinseth.v1",
       inputs: [
         { id: "postBoilVolumeLiters", value: { kind: "number", value: ibuVolumeLiters, unit: "L" } },
-        { id: "boilGravitySg", value: { kind: "number", value: ibuGravitySg, unit: "sg" as any } },
+        { id: "boilGravitySg", value: { kind: "number", value: ibuGravitySg, unit: "sg" } },
       ],
-      intermediates: [{ id: "ibuTinsethEstimated", value: { kind: "number", value: ibuTinsethEstimated, unit: "ibu" as any } }],
+      intermediates: [{ id: "ibuTinsethEstimated", value: { kind: "number", value: ibuTinsethEstimated, unit: "ibu" } }],
     };
   }
 
   if (ibuRagerEstimated != null && ibuVolumeLiters != null && ibuGravitySg != null) {
     derivations["analysis.ibu_rager"] = {
-      kind: "analysis.ibu_rager" as any,
+      kind: "analysis.ibu_rager",
       version: 1,
       formulaId: "analysis.ibu_rager.v1",
       inputs: [
         { id: "postBoilVolumeLiters", value: { kind: "number", value: ibuVolumeLiters, unit: "L" } },
-        { id: "boilGravitySg", value: { kind: "number", value: ibuGravitySg, unit: "sg" as any } },
+        { id: "boilGravitySg", value: { kind: "number", value: ibuGravitySg, unit: "sg" } },
       ],
-      intermediates: [{ id: "ibuRagerEstimated", value: { kind: "number", value: ibuRagerEstimated, unit: "ibu" as any } }],
+      intermediates: [{ id: "ibuRagerEstimated", value: { kind: "number", value: ibuRagerEstimated, unit: "ibu" } }],
     };
   }
 
   if (colorMcuEstimated != null && kettleVolumeLiters != null) {
     derivations["analysis.mcu"] = {
-      kind: "analysis.mcu" as any,
+      kind: "analysis.mcu",
       version: 1,
       formulaId: "analysis.mcu.v1",
       inputs: [{ id: "postBoilVolumeLiters", value: { kind: "number", value: kettleVolumeLiters, unit: "L" } }],
-      intermediates: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" as any } }],
+      intermediates: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" } }],
     };
   }
 
   if (colorSrmMoreyEstimated != null && colorMcuEstimated != null) {
     derivations["analysis.srm_morey"] = {
-      kind: "analysis.srm_morey" as any,
+      kind: "analysis.srm_morey",
       version: 1,
       formulaId: "analysis.srm_morey.v1",
-      inputs: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" as any } }],
-      intermediates: [{ id: "colorSrmMoreyEstimated", value: { kind: "number", value: colorSrmMoreyEstimated, unit: "srm" as any } }],
+      inputs: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" } }],
+      intermediates: [{ id: "colorSrmMoreyEstimated", value: { kind: "number", value: colorSrmMoreyEstimated, unit: "srm" } }],
     };
   }
 
   if (colorSrmDanielsEstimated != null && colorMcuEstimated != null) {
     derivations["analysis.srm_daniels"] = {
-      kind: "analysis.srm_daniels" as any,
+      kind: "analysis.srm_daniels",
       version: 1,
       formulaId: "analysis.srm_daniels.v1",
-      inputs: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" as any } }],
-      intermediates: [{ id: "colorSrmDanielsEstimated", value: { kind: "number", value: colorSrmDanielsEstimated, unit: "srm" as any } }],
+      inputs: [{ id: "mcu", value: { kind: "number", value: colorMcuEstimated, unit: "mcu" } }],
+      intermediates: [{ id: "colorSrmDanielsEstimated", value: { kind: "number", value: colorSrmDanielsEstimated, unit: "srm" } }],
     };
   }
 
@@ -897,7 +925,7 @@ export function computeRecipeGravityAnalysis(args: {
     version: 1,
     canonicalModels: { ibu: "tinseth", srm: "morey" },
     result,
-    derivations: derivations as any,
+    derivations: derivations,
     formatHints: analysisFormatHints,
   };
 }

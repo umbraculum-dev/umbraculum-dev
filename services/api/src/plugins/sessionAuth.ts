@@ -20,7 +20,8 @@ declare module "fastify" {
 }
 
 function readCookieSessionId(req: FastifyRequest): string | null {
-  const val = (req.cookies as any)?.[SESSION_COOKIE_NAME];
+  const cookies = (req.cookies ?? {}) as Record<string, string | undefined>;
+  const val = cookies[SESSION_COOKIE_NAME];
   if (typeof val !== "string" || !val.trim()) return null;
   return val;
 }

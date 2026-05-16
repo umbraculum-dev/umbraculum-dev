@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { AdPlacement, AdPlatform } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
-import { BadRequestError, ForbiddenError } from "../errors.js";
+import { BadRequestError } from "../errors.js";
 import { requireSession } from "../plugins/sessionAuth.js";
 import { requirePlatformAdmin } from "../plugins/requirePlatformAdmin.js";
 
@@ -99,7 +100,7 @@ export async function platformAdsRoutes(app: FastifyInstance) {
 
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const data: any = {};
+    const data: Prisma.AdUncheckedUpdateInput = {};
     if (body.placement !== undefined) data.placement = assertPlacement(body.placement);
     if (body.platform !== undefined) data.platform = assertPlatform(body.platform);
     if (body.imageUrl !== undefined) data.imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";

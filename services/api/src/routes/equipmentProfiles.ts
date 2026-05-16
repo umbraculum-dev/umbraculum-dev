@@ -1,8 +1,9 @@
+import type { EquipmentProfile } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { EquipmentProfilesService } from "../services/equipmentProfilesService.js";
 
-function toEquipmentPayload(p: any) {
+function toEquipmentPayload(p: EquipmentProfile) {
   return {
     id: p.id,
     workspaceId: p.workspaceId,
@@ -48,18 +49,18 @@ export async function equipmentProfilesRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
     const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
       name: typeof body.name === "string" ? body.name : "",
-      kettleVolumeLiters: body.kettleVolumeLiters as any,
-      kettleLossesLiters: body.kettleLossesLiters as any,
-      kettleBoilEvaporationRatePercentPerHour: body.kettleBoilEvaporationRatePercentPerHour as any,
-      kettleCoolingShrinkagePercent: body.kettleCoolingShrinkagePercent as any,
-      kettleHopsAbsorptionLiters: body.kettleHopsAbsorptionLiters as any,
-      mashVolumeLiters: body.mashVolumeLiters as any,
-      mashEfficiencyPercent: body.mashEfficiencyPercent as any,
-      mashLossesLiters: body.mashLossesLiters as any,
-      mashThicknessLPerKg: body.mashThicknessLPerKg as any,
-      mashGrainAbsorptionLPerKg: body.mashGrainAbsorptionLPerKg as any,
-      mashWaterLeftoverLiters: body.mashWaterLeftoverLiters as any,
-      otherLossesLiters: body.otherLossesLiters as any,
+      kettleVolumeLiters: body.kettleVolumeLiters,
+      kettleLossesLiters: body.kettleLossesLiters,
+      kettleBoilEvaporationRatePercentPerHour: body.kettleBoilEvaporationRatePercentPerHour,
+      kettleCoolingShrinkagePercent: body.kettleCoolingShrinkagePercent,
+      kettleHopsAbsorptionLiters: body.kettleHopsAbsorptionLiters,
+      mashVolumeLiters: body.mashVolumeLiters,
+      mashEfficiencyPercent: body.mashEfficiencyPercent,
+      mashLossesLiters: body.mashLossesLiters,
+      mashThicknessLPerKg: body.mashThicknessLPerKg,
+      mashGrainAbsorptionLPerKg: body.mashGrainAbsorptionLPerKg,
+      mashWaterLeftoverLiters: body.mashWaterLeftoverLiters,
+      otherLossesLiters: body.otherLossesLiters,
     });
     return { ok: true, profile: toEquipmentPayload(created) };
   });
@@ -72,18 +73,18 @@ export async function equipmentProfilesRoutes(app: FastifyInstance) {
 
     const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
       name: typeof body.name === "string" ? body.name : undefined,
-      kettleVolumeLiters: body.kettleVolumeLiters as any,
-      kettleLossesLiters: body.kettleLossesLiters as any,
-      kettleBoilEvaporationRatePercentPerHour: body.kettleBoilEvaporationRatePercentPerHour as any,
-      kettleCoolingShrinkagePercent: body.kettleCoolingShrinkagePercent as any,
-      kettleHopsAbsorptionLiters: body.kettleHopsAbsorptionLiters as any,
-      mashVolumeLiters: body.mashVolumeLiters as any,
-      mashEfficiencyPercent: body.mashEfficiencyPercent as any,
-      mashLossesLiters: body.mashLossesLiters as any,
-      mashThicknessLPerKg: body.mashThicknessLPerKg as any,
-      mashGrainAbsorptionLPerKg: body.mashGrainAbsorptionLPerKg as any,
-      mashWaterLeftoverLiters: body.mashWaterLeftoverLiters as any,
-      otherLossesLiters: body.otherLossesLiters as any,
+      kettleVolumeLiters: body.kettleVolumeLiters,
+      kettleLossesLiters: body.kettleLossesLiters,
+      kettleBoilEvaporationRatePercentPerHour: body.kettleBoilEvaporationRatePercentPerHour,
+      kettleCoolingShrinkagePercent: body.kettleCoolingShrinkagePercent,
+      kettleHopsAbsorptionLiters: body.kettleHopsAbsorptionLiters,
+      mashVolumeLiters: body.mashVolumeLiters,
+      mashEfficiencyPercent: body.mashEfficiencyPercent,
+      mashLossesLiters: body.mashLossesLiters,
+      mashThicknessLPerKg: body.mashThicknessLPerKg,
+      mashGrainAbsorptionLPerKg: body.mashGrainAbsorptionLPerKg,
+      mashWaterLeftoverLiters: body.mashWaterLeftoverLiters,
+      otherLossesLiters: body.otherLossesLiters,
     });
     return { ok: true, profile: toEquipmentPayload(updated) };
   });

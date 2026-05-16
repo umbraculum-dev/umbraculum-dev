@@ -1,4 +1,5 @@
 import type { BillingEventProvider, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export class BillingEventsService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -11,6 +12,7 @@ export class BillingEventsService {
     payloadJson: unknown;
   }) {
     const externalEventId = input.externalEventId?.trim() ? input.externalEventId.trim() : null;
+    const payloadJson = input.payloadJson as Prisma.InputJsonValue;
 
     // If an externalEventId exists, make recording idempotent.
     if (externalEventId) {
@@ -21,13 +23,13 @@ export class BillingEventsService {
           externalEventId,
           userId: input.userId ?? null,
           workspaceId: input.workspaceId ?? null,
-          payloadJson: input.payloadJson as any,
+          payloadJson,
         },
         update: {
           provider: input.provider,
           userId: input.userId ?? null,
           workspaceId: input.workspaceId ?? null,
-          payloadJson: input.payloadJson as any,
+          payloadJson,
         },
         select: { id: true },
       });
@@ -40,7 +42,7 @@ export class BillingEventsService {
         externalEventId: null,
         userId: input.userId ?? null,
         workspaceId: input.workspaceId ?? null,
-        payloadJson: input.payloadJson as any,
+        payloadJson,
       },
       select: { id: true },
     });

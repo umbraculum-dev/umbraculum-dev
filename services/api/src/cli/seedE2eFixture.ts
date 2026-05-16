@@ -14,7 +14,7 @@
  * The fixture identities are documented as the single source of truth in
  * docs/TESTING.md "E2E fixture identities".
  */
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
 
 const E2E_USER_ADMIN_ID = "e2e00000-0000-0000-0000-000000000aaa";
@@ -204,7 +204,7 @@ async function seed() {
         style: "Custom",
         styleKey: "custom",
         notes: "Seeded recipe used by Playwright + browser-MCP E2E flows.",
-        beerJsonRecipeJson: buildE2EPaleAleBeerJson(recipeName) as any,
+        beerJsonRecipeJson: buildE2EPaleAleBeerJson(recipeName) as Prisma.InputJsonValue,
       },
       update: {
         workspaceId: E2E_WORKSPACE_ID,
@@ -214,7 +214,7 @@ async function seed() {
         style: "Custom",
         styleKey: "custom",
         notes: "Seeded recipe used by Playwright + browser-MCP E2E flows.",
-        beerJsonRecipeJson: buildE2EPaleAleBeerJson(recipeName) as any,
+        beerJsonRecipeJson: buildE2EPaleAleBeerJson(recipeName) as Prisma.InputJsonValue,
       },
     });
 

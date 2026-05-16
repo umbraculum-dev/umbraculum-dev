@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v1.3 — HIGH-staged Phases 1 (`packages/contracts/**`) and 2 (`packages/beerjson/**`) landed; every `packages/**` workspace is now gated at `--max-warnings 0`. Phase 3 (`services/api/**`) is next.
+**Status:** v1.4 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), and 3 (`services/api/src/**`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, and `services/api/src/**` now has zero `no-explicit-any` warnings. Phase 4 (`apps/web/app/recipes/**`) is next.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **1,029** (-21 from Phase 2, -77 from Phase 1, -98 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **597** (-432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -530 cumulative; was 1,127 at HIGH-light landing) |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -112,14 +112,32 @@ Each phase below clears a slice of pre-existing `any` warnings, then expands the
 - [x] Expanded `lint:packages-strict` to include `packages/beerjson`
 - [x] Updated TL;DR table; **boundary milestone reached: 11 of 11 packages gated; only `apps/**` and `services/**` have outstanding `any` debt**
 
-### Phase 3 — `services/api/src/routes/**` and `services/api/src/services/**` (~328 `any` warnings)
+### Phase 3 — `services/api/src/**` (444 → 0 `any` warnings) ✅ landed 2026-05-16
 
-This is the highest-leverage slice for runtime safety: API request/response validation. Within HIGH-staged scope, Phase 3 tightens hand-rolled validators in place (same strategy as Phases 1 and 2). The separate "should we adopt Zod / Valibot / TypeBox here?" question is tracked as Phase 7 (see `docs/CONTRACTS-VALIDATION-STRATEGY.md`); migrating to a schema library is *not* in HIGH-staged scope and should not be conflated with type-tightening.
+**Scope:** All of `services/api/src/**` (routes + services + domain + importers + beerjson). 444 `no-explicit-any` warnings → 0.
 
-- [ ] Add a per-route audit checklist (each route's `any` triage)
-- [ ] Lift hand-rolled validators into shared helpers under `services/api/src/lib/validation/` where the same shape is validated in 2+ routes (avoids drift)
-- [ ] Add a new strict gate script `lint:api-routes-strict` once clean
-- [ ] Update this doc's TL;DR table
+**Strategy used:** "tighten in place" — same as Phases 1 and 2.
+
+- Added `services/api/src/lib/typeGuards.ts` with shared `isObject`, `isFiniteNumber`, `isString` helpers (used across the codebase to narrow untyped JSON / request bodies).
+- Standardized pattern at trust boundaries: routes accept `Record<string, unknown>` request bodies and pass them to services; services widen their input types to `unknown` for validated fields and call typed parser helpers (e.g. `parseAcidType`, `parseStrengthKind`, `toScope`, `toType`, `toVerificationStatus`) that return narrow union types. This kept route handlers thin while pushing validation into services where it belongs (SRP).
+- Replaced `(x as any).field` chains with `isObject` guards and named type aliases (`BeerJsonDoc`, `XmlNode`, `BeerXmlRecipe`, `MashStepNode`, `WaterSettingsLoose`, etc.).
+- Replaced Prisma `as any` casts with proper Prisma utility types: `Prisma.InputJsonValue` for JSON columns, `Prisma.<Model>UncheckedUpdateInput` for partial updates, `Prisma.<Model>UncheckedCreateInput` for upsert create branches.
+- Replaced `(req.cookies as any)?.[KEY]` with `(req.cookies ?? {}) as Record<string, string | undefined>` and replaced `req: any` helpers with `FastifyRequest`.
+- One narrow escape hatch with explicit comment: `seed/sources/beerproto/beerproto.ts` keeps `type PrismaLike = any` because the file deliberately avoids importing Prisma-generated types to stay editable when client generation is out of sync.
+
+**Verification:** services/api unit + integration test suite green (149/149); apps/web TS error count unchanged (590 baseline, all pre-existing Tamagui-related); apps/native TS error count unchanged (0).
+
+The separate "should we adopt Zod / Valibot / TypeBox here?" question is tracked as Phase 7 (see `docs/CONTRACTS-VALIDATION-STRATEGY.md`); migrating to a schema library is *not* in HIGH-staged scope.
+
+- [x] Tighten top-5 files (gravityAnalysis, recipesService, recipeWaterComputeAndSave, recipeWaterSettings, brewSessions) — 47% reduction
+- [x] Tighten next-10 files — cumulative 72%
+- [x] Tighten remaining tail files — cumulative 100%
+- [x] Add `services/api/src/lib/typeGuards.ts`
+- [x] Tests green: 149/149
+- [x] Downstream typecheck: zero new API-related errors in `apps/web` / `apps/native`
+- [x] Update TL;DR table; **boundary milestone reached: 0 `no-explicit-any` warnings in `services/api/src/**`**
+
+> Note: a small number of dead-code and unused-var warnings remain in `services/api/src` (e.g. unused legacy validator stubs in `services/recipesService.ts`). These are tracked under Phase 6 (mop-up) since they are not `no-explicit-any` and removing them is a behavioural cleanup, not a type-tightening.
 
 ### Phase 4 — `apps/web/app/recipes/**` (~250 `any` warnings)
 

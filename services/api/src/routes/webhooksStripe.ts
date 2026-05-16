@@ -1,12 +1,13 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { BadRequestError, UnauthorizedError } from "../errors.js";
 import { StripeWebhookService } from "../services/stripeWebhookService.js";
 
 const STRIPE_TIMESTAMP_TOLERANCE_SECONDS = 5 * 60;
 
-function getHeader(req: any, name: string): string | null {
-  const v = req.headers?.[name] ?? req.headers?.[name.toLowerCase()];
+function getHeader(req: FastifyRequest, name: string): string | null {
+  const headers = req.headers as Record<string, unknown> | undefined;
+  const v = headers?.[name] ?? headers?.[name.toLowerCase()];
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
@@ -63,10 +64,10 @@ export async function webhooksStripeRoutes(app: FastifyInstance) {
     }
 
     // In strict mode, signature verification already happened. In dev mode, accept payload as-is.
-    const body = (req.body ?? {}) as any;
+    const body = (req.body ?? {}) as Record<string, unknown>;
 
     // Only handle checkout.session.completed for now; ignore others (still return 200).
-    if (body?.type === "checkout.session.completed") {
+    if (body.type === "checkout.session.completed") {
       await svc.handleCheckoutSessionCompleted(body);
     }
 

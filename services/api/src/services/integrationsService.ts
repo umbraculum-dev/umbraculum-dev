@@ -160,20 +160,27 @@ export class IntegrationsService {
     if (!key) throw new BadRequestError("invalid_device_key", "Device key is required");
     const now = new Date();
 
+    const metadataJson:
+      | Prisma.InputJsonValue
+      | typeof Prisma.JsonNull
+      | undefined =
+      input.metadataJson === undefined
+        ? undefined
+        : input.metadataJson === null
+          ? Prisma.JsonNull
+          : (input.metadataJson as Prisma.InputJsonValue);
     const device = await this.prisma.integrationDevice.upsert({
       where: { integrationId_deviceKey: { integrationId: input.integrationId, deviceKey: key } },
       create: {
         integrationId: input.integrationId,
         deviceKey: key,
         displayName: input.displayName ?? null,
-        metadataJson:
-          input.metadataJson === undefined ? undefined : input.metadataJson === null ? Prisma.JsonNull : (input.metadataJson as any),
+        metadataJson,
         lastSeenAt: now,
       },
       update: {
         displayName: input.displayName ?? undefined,
-        metadataJson:
-          input.metadataJson === undefined ? undefined : input.metadataJson === null ? Prisma.JsonNull : (input.metadataJson as any),
+        metadataJson,
         lastSeenAt: now,
       },
       select: {
@@ -206,7 +213,7 @@ export class IntegrationsService {
         recordedAt: input.recordedAt,
         temperatureC: input.temperatureC,
         gravitySg: input.gravitySg,
-        rawJson: input.rawJson as any,
+        rawJson: input.rawJson as Prisma.InputJsonValue,
       },
       select: {
         id: true,

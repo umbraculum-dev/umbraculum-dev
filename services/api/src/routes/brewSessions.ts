@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
-import type { IntegrationKind } from "@prisma/client";
+import type { BrewSessionStepStatus, IntegrationKind } from "@prisma/client";
 
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
-import { BrewSessionsService } from "../services/brewSessionsService.js";
+import { BrewSessionsService, type BrewSessionStepInput } from "../services/brewSessionsService.js";
 import { BadRequestError, NotFoundError } from "../errors.js";
 
 const SUPPORTED_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
@@ -237,7 +237,7 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     if (!Array.isArray(body.steps)) {
       throw new BadRequestError("invalid_steps_payload", "Body.steps must be an array");
     }
-    const res = await svc.saveSteps(ctx.userId, ctx.activeWorkspaceId, brewSessionId, body.steps as any);
+    const res = await svc.saveSteps(ctx.userId, ctx.activeWorkspaceId, brewSessionId, body.steps as BrewSessionStepInput[]);
     return { ok: true, steps: res.steps };
   });
 
@@ -297,7 +297,7 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     const isDisabled =
       body.isDisabled === true ? true : body.isDisabled === false ? false : null;
     const updated = await svc.saveStepLog(ctx.userId, ctx.activeWorkspaceId, brewSessionId, stepId, {
-      status: status as any,
+      status: status as BrewSessionStepStatus,
       note,
       name,
       isDisabled,

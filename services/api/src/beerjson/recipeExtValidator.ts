@@ -1,4 +1,4 @@
-import Ajv, { type ValidateFunction } from "ajv";
+import Ajv, { type ValidateFunction, type SchemaObject } from "ajv";
 import { BadRequestError } from "../errors.js";
 
 let validateRecipeExtCached: ValidateFunction | null = null;
@@ -266,7 +266,7 @@ export function validateRecipeExtJson(value: unknown): unknown {
       strictSchema: true,
       validateSchema: true,
     });
-    validateRecipeExtCached = ajv.compile(recipeExtSchemaV1 as any);
+    validateRecipeExtCached = ajv.compile(recipeExtSchemaV1 as SchemaObject);
   }
 
   const ok = validateRecipeExtCached(value);

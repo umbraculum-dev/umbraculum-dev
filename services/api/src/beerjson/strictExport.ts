@@ -2,10 +2,10 @@ type BeerJsonDocument = {
   beerjson?: {
     recipes?: Array<{
       ingredients?: {
-        fermentable_additions?: any[];
-        hop_additions?: any[];
-        culture_additions?: any[];
-        miscellaneous_additions?: any[];
+        fermentable_additions?: unknown[];
+        hop_additions?: unknown[];
+        culture_additions?: unknown[];
+        miscellaneous_additions?: unknown[];
       };
     }>;
   };
@@ -16,12 +16,13 @@ function cloneJson<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
 }
 
-function stripInternalFieldsOnAdditions(arr: any[] | undefined) {
+function stripInternalFieldsOnAdditions(arr: unknown[] | undefined) {
   if (!Array.isArray(arr)) return;
   for (const item of arr) {
     if (!item || typeof item !== "object") continue;
-    if ("id" in item) delete (item as any).id;
-    if ("brewery_app_late_addition" in item) delete (item as any).brewery_app_late_addition;
+    const rec = item as Record<string, unknown>;
+    if ("id" in rec) delete rec.id;
+    if ("brewery_app_late_addition" in rec) delete rec.brewery_app_late_addition;
   }
 }
 
@@ -32,7 +33,7 @@ function stripInternalFieldsOnAdditions(arr: any[] | undefined) {
  * For maximum interoperability, strict exports strip those `id` fields.
  */
 export function strictBeerJsonExport(doc: unknown): unknown {
-  const out = cloneJson(doc as any) as BeerJsonDocument;
+  const out = cloneJson(doc) as BeerJsonDocument;
   const r0 = out?.beerjson?.recipes?.[0];
   const ing = r0?.ingredients;
 
@@ -62,4 +63,3 @@ export function exportRecipeFull(recipe: RecipeForExport): { beerjson: unknown; 
     recipeExtJson: recipe.recipeExtJson,
   };
 }
-
