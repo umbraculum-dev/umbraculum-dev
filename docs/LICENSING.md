@@ -313,7 +313,7 @@ If you use the managed `<PLATFORM_NAME>` hosting:
 
 - You are using software hosted by us; you are a user, not a distributor. AGPL obligations do not apply to you as the customer.
 - The standard hosting contract governs your relationship with the operator.
-- AI usage is metered and billed via credits as described in [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §7.
+- AI is available through the paid workspace tiers using BYOK provider keys in the H2 2026 model; optional managed-AI credits are deferred and described in [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §7.
 
 ### 7.3 For module developers (the most important audience)
 

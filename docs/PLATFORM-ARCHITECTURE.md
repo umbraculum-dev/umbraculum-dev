@@ -13,8 +13,8 @@ This is the **high-level entry point** for any discussion about the shape of `<P
 
 How it relates to the existing architecture log:
 
-- [`docs/architechture-Rev02.md`](architechture-Rev02.md) remains the **implementation log of the brewery vertical** and the cross-platform (web + native) boundary decisions. It is still the source of truth for *what is implemented today* and the v0 phasing.
-- This document owns the **platform/vision narrative**: the horizontal-platform-with-vertical-modules pattern, the AI consultant blueprint, and the pricing model for AI add-ons.
+- [`docs/architechture-Rev02.md`](architechture-Rev02.md) remains the **implementation log of the brewery vertical** and the cross-platform (web + native) boundary decisions. It is still the source of truth for legacy context and detailed v0 phasing.
+- This document owns the **platform/vision narrative**: the horizontal-platform-with-vertical-modules pattern, the AI consultant blueprint, and the AI monetization path from BYOK + paid tier unlock to optional managed AI later.
 
 When the two disagree, this document wins for "where we are going" questions, and Rev02 wins for "what is already wired up" questions.
 
@@ -79,13 +79,14 @@ Brewery is **shipped**; WMS / CRM / MRP / CRP are **open doors** — explicitly 
 **Revenue lines** (target: bread-and-butter sustainability for a small team, not venture-scale exit):
 
 1. **Managed hosting** — `<PLATFORM_NAME>` operated as a service. The dominant revenue line; pairs with the AGPL stance because hyperscaler imitation is structurally deterred.
-2. **AI credits** — usage-metered AI consultant access for hosted customers (see §7).
+2. **AI value-layer subscription** — the AI consultant is unlocked through existing paid workspace tiers (`premium`, `pro`, `pro_plus`) while customers bring their own provider key for token spend (see §7).
 3. **Enterprise support contracts** — for self-hosters and hosted customers that need SLAs, dedicated infrastructure, or operator support.
-4. **Optional commercial license** (§6.3 of [`docs/LICENSING.md`](LICENSING.md)) — for enterprises whose legal teams cannot adopt AGPLv3.
+4. **Future managed-AI credits** — optional hosted convenience path, added only after BYOK + subscription proves demand.
+5. **Optional commercial license** (§6.3 of [`docs/LICENSING.md`](LICENSING.md)) — for enterprises whose legal teams cannot adopt AGPLv3.
 
 **Self-host posture (first-class, not an afterthought).** The platform must be installable on commodity Postgres + Node + a single VPS; no AWS-specific or other cloud-vendor-specific dependencies in the core. Every external service (AI providers, Stripe, RevenueCat, S3-compatible storage, error reporting) is configured via environment variables and can be swapped or omitted. Self-hosters bring their own keys.
 
-**AI provider integration — BYOK and resold credits both supported, from day one.** This is the explicit decision that resolves §8 open question 1: *both* paths exist in parallel. Hosted customers use resold credits as described in §7; self-hosters bring their own OpenAI / Anthropic / etc. keys. The orchestrator code is identical in both modes; only the billing wrapper differs.
+**AI provider integration — BYOK first, managed AI later.** The H2 2026 backbone ships the lowest-risk monetized path: workspace admins bring their own Anthropic key, and the platform sells the value layer around that call — orchestration, tools, memory, usage visibility, safety limits, and concierge onboarding — by unlocking AI on existing paid workspace tiers. A future managed-AI / resold-credit mode can reuse the same orchestrator and ledger, but it is deliberately not part of v0.
 
 **What is *not* in the business model:**
 
@@ -125,6 +126,7 @@ Honest inventory of what is already platform-shaped versus what is brewery-coupl
 - Workspace + membership: [`services/api/src/routes/workspaces.ts`](../services/api/src/routes/workspaces.ts).
 - Billing intents and workspace billing summary: [`services/api/src/routes/billing.ts`](../services/api/src/routes/billing.ts).
 - Stripe + RevenueCat webhook ingestion: `webhooksStripe.ts`, `webhooksRevenuecat.ts`.
+- AI routes and services: chat, settings, usage ledger, encrypted BYOK key storage, tool registry, prompt composition, and per-workspace memory.
 - Health: `health.ts`.
 
 **Brewery-vertical (fine for now, but flagged):**
@@ -138,7 +140,7 @@ Honest inventory of what is already platform-shaped versus what is brewery-coupl
 
 **Cross-cutting today, but brewery-shaped:**
 
-- [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts) defines limits as `{ maxRecipesPerWorkspace, maxVersionsPerRecipe }`. Correct shape for a brewery-only product, wrong shape for a multi-module suite (WMS will want `maxWarehouses`, CRM will want `maxContacts`, AI will want `monthlyCredits`).
+- [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts) defines brewery limits and the `aiEnabled` feature flag. That is correct for the completed H2 AI unlock, but the shape is still not module-aware (WMS will want `maxWarehouses`, CRM will want `maxContacts`, and future managed AI may want credit allowances).
 
 **Registration shape:**
 
@@ -181,17 +183,17 @@ The `@brewery/*` scope is a **historical artifact** of starting with the brewery
 
 ### 3.4 Prisma schema
 
-Single flat namespace at [`services/api/prisma/schema.prisma`](../services/api/prisma/schema.prisma) (33 models today). Loose taxonomy:
+Single flat namespace at [`services/api/prisma/schema.prisma`](../services/api/prisma/schema.prisma). Loose taxonomy:
 
 **Horizontal models:**
 
-`User`, `Workspace`, `WorkspaceMember`, `Session`, `WebviewExchangeCode`, `EmailVerificationToken`, `Ad`, `WorkspaceBilling`, `BillingPurchaseIntent`, `BillingUserWorkspaceBinding`, `BillingEvent`, `Integration*` (the framework — devices/attachments/readings).
+`User`, `Workspace`, `WorkspaceMember`, `Session`, `WebviewExchangeCode`, `EmailVerificationToken`, `Ad`, `WorkspaceBilling`, `BillingPurchaseIntent`, `BillingUserWorkspaceBinding`, `BillingEvent`, `WorkspaceAiSettings`, `WorkspaceAiMemory`, `AiUsageLedger`, `Integration*` (the framework — devices/attachments/readings).
 
 **Brewery-vertical models:**
 
 `Recipe`, `BrewSession`, `BrewSessionStep`, `BrewSessionLog`, `BrewdaySettings`, `BeerStyle`, `BeerStyleAlias`, `RecipeWaterSettings`, `WaterProfile`, `EquipmentProfile`, `Fermentable`, `Hop`, `Yeast`, `IngredientSource`, `IngredientImportRun`, `IngredientStagingRow`, `IngredientSourceMap`, `InventoryItem`.
 
-There is **no multi-schema split** today and **no naming convention** separating horizontal from vertical. This is fine at 33 models; it becomes painful around 80–100. Prisma supports `multiSchema` (preview but stable) when we want to draw the line.
+There is **no multi-schema split** today and **no naming convention** separating horizontal from vertical. This remains manageable while there is only one shipped vertical; it becomes painful around 80–100 models. Prisma supports `multiSchema` (preview but stable) when we want to draw the line.
 
 ### 3.5 Cross-platform boundaries
 
@@ -209,8 +211,9 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 ### 3.6 Billing + tier model
 
 - `WorkspaceBilling` + `BillingTier` (`free | premium | pro | pro_plus`) + `BillingPurchaseIntent` + `WorkspaceBillingService` is **workspace-scoped** — exactly the right shape for a multi-module suite, since each module's value applies to a workspace.
-- Tier limits live in [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts) but are brewery-shaped (see §3.1).
-- **Add-on shape is missing.** There is no `WorkspaceBillingAddon` model, so per-module entitlements (e.g. "this workspace has the WMS module installed") and usage-metered features (e.g. "AI credits") have no home today.
+- Tier limits live in [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts). The current shape includes recipe/version limits plus `aiEnabled`, where `free=false` and `premium | pro | pro_plus=true`.
+- The H2 AI backbone intentionally reuses existing `WorkspaceBilling` infrastructure. A free workspace upgrades through the existing billing-intent flow; after Stripe webhook processing moves the workspace to `premium` or above, AI is unlocked.
+- **Add-on shape is still missing.** There is no `WorkspaceBillingAddon` model, so future per-module entitlements (e.g. "this workspace has the WMS module installed") and optional managed-AI credits have no home today.
 
 ### 3.7 Verdict
 
@@ -230,10 +233,10 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 - Flat Prisma namespace will hurt around 80–100 models.
 - Brewery-shaped `tierLimitsService` needs a module-aware shape before any second module's limits can be expressed.
 - No module registry → modules can't currently declare "I contribute these routes / tools / prompts / limits / add-on codes" as a unit.
-- No AI platform layer → no orchestrator, no tool registry, no usage ledger, no provider adapters, no pricebook.
-- No `WorkspaceBillingAddon` → cannot sell AI credits or per-module entitlements.
+- AI platform v0 exists, but is still brewery-first: Anthropic-only BYOK, five brewery tools, no generic provider router, no module-pluggable registry contract, and no managed-AI pricebook.
+- No `WorkspaceBillingAddon` → cannot sell managed-AI credits or per-module entitlements.
 - No semantic / reporting DSL → AI cannot answer ad-hoc data questions safely.
-- No per-workspace operational memory → AI can't "remember the brewery" between sessions.
+- Per-workspace operational memory exists, but the full RAG layer over product docs + activity timelines + pgvector is still future work.
 
 ---
 
@@ -246,7 +249,7 @@ The horizontal layer owns everything that does not change when a new vertical is
 - **Identity & sessions**: auth, magic-link / email verification, webview bridge, role-based access at the workspace boundary.
 - **Tenancy**: Workspace + WorkspaceMember + role enforcement.
 - **Billing & entitlements**: tier subscription, **add-ons**, Stripe + RevenueCat adapters, source-of-truth in Postgres.
-- **AI platform**: orchestrator, tool registry, usage ledger, provider adapters (Anthropic / OpenAI / …), router, pricebook, RAG store.
+- **AI platform**: orchestrator, tool registry, usage ledger, encrypted BYOK settings, workspace memory, provider adapters (Anthropic / OpenAI / …), router, managed-AI pricebook, RAG store.
 - **Internationalization**: locales, messages, ICU formatting, locale-prefixed routing.
 - **Cross-platform UI primitives**: Tamagui tokens + components, route IDs, universal hooks.
 - **Observability**: structured logs, error reporting, usage metrics.
@@ -276,9 +279,9 @@ The AI consultant is not a feature of the brewery module — it is part of the h
 |---|---|---|---|---|
 | **A. Tools (function calling)** | Model acts on the user's actual data via your own endpoints | Read-only, ACL-aware functions. Model never sees the DB. | Low — every call goes through existing ACL. | v0 |
 | **B. Semantic layer + reporting DSL tool** | Answer ad-hoc data questions ("top 10 customers last quarter") | Typed query DSL on a curated set of reporting views. Never raw SQL. | Medium — needs row caps, statement timeouts, allowlists. | v1 |
-| **C. RAG over knowledge** | Answer "how does X work?" and "what is true about *this* workspace?" | pgvector store: product docs (global) + per-workspace operational memory + activity timeline summaries. | Medium — PII / cross-tenant isolation discipline required. | v1.5 |
+| **C. RAG over knowledge** | Answer "how does X work?" and "what is true about *this* workspace?" | v0 workspace memory now; later pgvector store for product docs (global) + per-workspace operational memory + activity timeline summaries. | Medium — PII / cross-tenant isolation discipline required. | memory v0, full RAG v1.5 |
 
-**Module-pluggable.** Each module registers its `{ tools, prompts, knowledgeSources, perRouteOverlays }` into the platform registry at boot. The orchestrator never imports module code directly — it iterates the registry.
+**Module-pluggable target.** Each module will register its `{ tools, prompts, knowledgeSources, perRouteOverlays }` into the platform registry at boot. The H2 2026 implementation proves the surface with brewery tools first; the second-module milestone is where the orchestrator stops knowing about brewery-specific tools directly and starts iterating a public module registry.
 
 **System prompt composition.** Every model call is prompted with:
 
@@ -291,12 +294,13 @@ BASE                  ← "you are an ERP assistant for <PLATFORM_NAME>; never r
 
 **Write-action policy.** In v0 and v1, the model can **propose** changes (drafts) but cannot apply them without explicit user confirmation. This avoids the entire class of "AI deleted my BOM" disasters that have hit early adopters of agentic ERP features.
 
-**Provider access — BYOK and resold credits, both supported.** The orchestrator routes every model call through a provider adapter that accepts either:
+**Provider access — shipped v0 and future managed mode.**
 
-- A **`<PLATFORM_NAME>`-managed key** (hosted customers) — usage is metered, credits are debited from the workspace's add-on allowance, and overages are billed via Stripe top-ups per §7.
-- A **workspace-supplied key** (self-hosters, or hosted customers who prefer BYOK) — usage is unmetered by the platform; the provider bills the workspace directly.
+- **Shipped v0: workspace-supplied Anthropic key.** The workspace admin enters an API key, accepts the data-egress notice, and enables AI. The key is encrypted at rest, decrypted only inside the API process, and never returned to web or native clients. Anthropic bills the workspace directly.
+- **Shipped v0 monetization: paid tier unlock.** The platform does not resell tokens in v0. Instead, AI is available only when the existing `WorkspaceBilling.tier` is `premium`, `pro`, or `pro_plus`; free workspaces get `402 ai_subscription_required` and use the existing Stripe Checkout billing-intent flow to upgrade.
+- **Future managed mode: `<PLATFORM_NAME>`-managed provider key + credits.** Hosted customers may later choose a one-bill managed-AI path. That mode can reuse the same orchestrator, tools, prompt composition, memory, audit log, and usage ledger; only key selection, credit balance checks, and post-call debit logic differ.
 
-The two modes share the same orchestrator, the same tool registry, the same prompt composition, the same audit log, and the same write-action policy. Only the billing wrapper and the rate-limiter differ. This is the deliberate symmetry that lets hosted-customer and self-host paths share the same code surface — and the same security posture — without duplication.
+This preserves the self-host path and avoids v0 chargeback / VAT / provider-cost risk, while still capturing margin from the value layer.
 
 ### 4.4 Module registration pattern
 
@@ -378,14 +382,14 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 ### 5.3 Net-new before 2nd module ships
 
-- `WorkspaceBillingAddon` Prisma model + service + Stripe subscription-item flow + RevenueCat consumable mapping.
 - `registerModule()` helper in the API and a parallel registry on the web side.
-- AI platform skeleton:
-  - `services/api/src/services/ai/{registry,orchestrator,ledger,router,providers,tools}.ts`.
-  - `packages/ai-platform-contracts` (Tool, ToolCall, Session, UsageRecord, Pricebook).
-  - `packages/ai-platform-ui` (Tamagui chat panel + composer + streaming hook).
-- `pricebook.json` convention with `creditValueMicroUsd` and per-model multipliers.
-- Per-workspace operational memory store (Postgres + pgvector when available).
+- Extract the H2 AI contracts into public SDK/package surfaces once the module boundary is stable:
+  - `packages/ai-platform-contracts` (Tool, ToolCall, Session, UsageRecord, provider mode).
+  - `packages/ai-platform-ui` (Tamagui chat panel + composer + streaming hook), if the shared UI package gets too broad.
+- Provider router / adapter layer beyond Anthropic-only BYOK.
+- Optional managed-AI credits: `WorkspaceBillingAddon` Prisma model + service + Stripe subscription-item / top-up flow + RevenueCat consumable mapping.
+- `pricebook.json` convention with `creditValueMicroUsd` and per-model multipliers for managed-AI mode only.
+- Full RAG store (pgvector when available) over product docs, workspace memory, and activity timeline summaries.
 - Reporting DSL + curated reporting views (Layer B).
 - One additional Postgres role (`ai_readonly`) with `SELECT`-only on the curated reporting views (only needed if/when we choose the SQL-tool variant of Layer B).
 
@@ -403,7 +407,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 | ACL | Inherits user session | Inherits role + curated view restrictions | Per-workspace index isolation |
 | Cost | Low (small JSON) | Low–medium (bounded result set) | Low (embeddings cached) |
 | Hallucination risk | Very low (deterministic numbers) | Low (typed query, deterministic execution) | Medium (model paraphrases retrieved text) |
-| Build order | v0 | v1 | v1.5 |
+| Build order | v0 | v1 | memory v0, full RAG v1.5 |
 
 ### 6.2 Module-pluggable tool registry (interface sketch)
 
@@ -440,7 +444,7 @@ sequenceDiagram
     Tools-->>Orch: small JSON result
   end
   Orch-->>UI: streamed answer (SSE)
-  Orch->>Ledger: tokens, cost, credits debited
+  Orch->>Ledger: tokens, cost, provider mode, tool calls
 ```
 
 ### 6.4 Worked example — WMS yeast question
@@ -482,9 +486,8 @@ User on the WMS "stock movements" page asks: *"Why are we constantly running out
 
 5. Ledger writes:
    AiUsageLedger { tokensIn: 4200, tokensOut: 380, model: "claude-haiku-4.5",
-                   costMicroUsd: 4760, creditsDebited: 5,
-                   workspaceId, userId, sessionId }
-   Redis INCRBY ai:workspace:<id>:credits:2026-05 5
+                   costMicroUsd: 4760, providerMode: "byok",
+                   workspaceId, userId, sessionId, toolCalls: [...] }
 ```
 
 **Notice what happened:**
@@ -492,7 +495,7 @@ User on the WMS "stock movements" page asks: *"Why are we constantly running out
 - The model never saw the `stock_movements` table (potentially millions of rows). It saw three small JSON results.
 - All numbers are deterministic — your Node code computed them, not the LLM.
 - Authorization was the user's. If the user couldn't see CRM, that tool wasn't in the registry for this call.
-- Cost was 5 credits ≈ €0.005 wholesale; the customer was charged ≈ €0.020 worth of allowance. Margin held.
+- Cost visibility exists in the ledger, but in BYOK mode there is no platform debit: the provider bills the workspace directly, while the platform monetizes the orchestration + memory + tool layer through the paid workspace tier.
 - The "draft a settings change" offer is a **future write tool** — those need a confirmation step (model proposes, user clicks "Apply"). The model never writes directly in v0/v1.
 
 ### 6.5 Safety
@@ -501,164 +504,124 @@ User on the WMS "stock movements" page asks: *"Why are we constantly running out
 - **Zero data retention provider settings** (OpenAI ZDR, Anthropic no-train) wired at the API call level, with an explicit per-workspace toggle banner before first use.
 - **PII redaction at the tool-result boundary**: tools may return scrubbed views of records (e.g. customer name without email/phone) when the AI scope doesn't require PII.
 - **Per-message `max_output_tokens`** (sane default; model can request more if the user asks for a long report).
-- **Per-user daily token cap** as a circuit breaker, separate from per-workspace credit budget.
+- **Per-user daily token cap** as a circuit breaker, separate from per-role monthly caps and any future managed-AI credit budget.
 - **Prompt-hash cache** (5–15 min TTL) for repeated identical prompts — saves money on common questions.
 - **Write-action human-in-the-loop**: the model proposes a JSON patch / config diff, the UI renders it, the user confirms.
 - **Audit trail**: every tool call is logged as `(workspaceId, userId, sessionId, toolName, argsHash, costMicroUsd, durationMs, providerRequestId)`. SOC2 / ISO friendly out of the box.
 
 ---
 
-## 7. Pricing model — AI add-on
+## 7. AI monetization model
 
-### 7.1 Glossary (defined precisely so future discussions don't drift)
+### 7.1 Shipped v0 — BYOK + paid tier unlock
 
-- **COGS (Cost of Goods Sold)** — the per-unit *variable* cost we pay to deliver one unit of the feature. For an AI request:
-  ```
-  COGS_per_request =
-      sum(provider_token_cost)            // input + output tokens × per-million-tokens price
-    + stripe_fee_share                    // pro-rata share of the Stripe processing fee on the SKU
-    + support_amortization                // expected support cost per request, amortized
-    + (optional) infra_marginal_cost      // bandwidth, observability, RAG retrieval — usually << provider cost
-  ```
-  COGS does **not** include fixed costs (servers, salaries, marketing). Those are subtracted separately to get net margin.
-- **Gross margin** — `(price − COGS) / price`, expressed as a percentage. Industry-typical for AI add-ons: 50–75%.
-- **ARPU (Average Revenue Per User)** — total revenue / number of paying entities (in our case, paying *workspaces*) per period.
-- **Soft cap** — usage limit that *warns* but allows continued use, billing the overage at retail.
-- **Hard cap** — usage limit that *blocks* further use until a top-up is purchased or the period rolls over.
-- **Retail overage** — buying more capacity *above* the included allowance, at a posted per-unit price (typically with volume discounts on larger packs).
+The H2 2026 AI backbone monetizes the value layer without reselling provider tokens:
 
-### 7.2 Why we sell credits, not tokens
+1. **Workspace brings the provider key.** The workspace admin enters an Anthropic API key in AI settings. The key is encrypted at rest, decrypted only in the API process, and never sent to web or native clients.
+2. **Workspace pays the provider directly.** Anthropic token spend is billed to the customer's Anthropic account. `<PLATFORM_NAME>` does not carry token COGS, reseller liability, provider credit risk, or token overage support in v0.
+3. **Workspace pays `<PLATFORM_NAME>` for the AI value layer.** AI is unlocked through existing workspace tiers: `free=false`, `premium | pro | pro_plus=true` via `tierLimitsService.aiEnabled`. Upgrades use the existing `BillingPurchaseIntent` / Stripe Checkout flow and existing webhook lifecycle handling.
+4. **Usage is visible, not billable.** `AiUsageLedger` records tokens, cost estimates, model, duration, provider request ID, and tool calls for analytics, admin visibility, caps, and future migration. It does **not** drive Stripe charges in v0.
+5. **Concierge onboarding is part of the value proposition.** The AI settings and post-checkout surfaces can link to human setup help, configured by environment variable.
 
-Selling "tokens" locks you to whichever provider's pricing the customer's mental model formed around. The day Anthropic drops prices 40% (it happens every 6–9 months) or you swap GPT-5 → GPT-5.3, customers either feel cheated or confused.
+This is intentionally different from a free-BYOK model. The customer pays their provider for raw model calls and pays `<PLATFORM_NAME>` for the operational layer that makes those calls useful: ACL-aware tools, prompt composition, per-workspace memory, limits, auditability, cross-platform UI, and support.
 
-What everyone successful does instead:
+### 7.2 Why v0 does not ship resold credits
 
-| Vendor | What they sell | What it actually maps to internally |
-|---|---|---|
-| Cursor | "fast requests / month" | A weighted pool that the backend converts to model + tokens |
-| Notion AI | "AI responses" | Same |
-| GitHub Copilot Business | "Active user / month" (flat) | Same (flat, no per-call metering) |
-| Vercel v0 | "messages" | Same |
+Resold credits are attractive for convenience, but they add real surface area: pricebook maintenance, top-ups, refunds, VAT and sales-tax handling on usage, chargeback exposure, App Store consumable mapping, dunning, provider price-change communication, and support for "why was I charged?" questions.
 
-`<PLATFORM_NAME>` will sell **AI Credits** (or a domain word — to be picked: "Consultations", "Queries", "Insights", …). Customers see "credits used / credits in plan"; internal accounting converts model + tokens → credits via a versioned pricebook.
+BYOK + paid tier unlock gets the hard architectural work into production first while avoiding that operational burden. It also keeps self-hosting straightforward: self-hosters always bring their own provider relationship, and the same BYOK code path works for them.
 
-### 7.3 Cursor-style hard-cap + retail unlock (chosen pattern)
+The future managed-AI path should be treated as an optional hosted convenience, not as the foundation of the AI architecture.
 
-Comparison of the three common patterns:
+### 7.3 Future managed-AI credits
 
-| Pattern | UX | Margin risk | Used by |
-|---|---|---|---|
-| Hard cap (block at 100%) | Predictable bill. Frustrating mid-task. | None. | GitHub Copilot Business |
-| **Hard cap + retail overage** | Predictable + escape hatch. One-click top-up. | None. | **Cursor, Vercel v0** ← `<PLATFORM_NAME>` chooses this |
-| Soft cap with overage | Smoothest UX. Bill shock risk. | Moderate. | OpenAI / Anthropic API |
+If hosted customers want one invoice and are willing to pay for convenience, `<PLATFORM_NAME>` can add a managed-AI mode later. In that mode:
 
-**Mechanism:**
+- The platform uses a `<PLATFORM_NAME>`-managed provider key.
+- Usage is debited against workspace AI credits.
+- Credits, not raw tokens, are the customer-facing unit.
+- A versioned `pricebook.json` maps model + token usage to credits.
+- Plan-included credits hard-cap at 100%; optional top-up packs provide a retail escape hatch.
+- Web top-ups use Stripe; native iOS can use RevenueCat consumables if top-ups are sold inside the app.
 
-- Plan-included credits hard-cap at 100% of the monthly allowance.
-- One-click top-up packs purchasable mid-session (e.g. €5 → 5,000 credits, €20 → 25,000 credits with ~25% volume discount).
-- Top-ups go through Stripe one-off products on the existing `BillingPurchaseIntent` flow (`mode = "credit_topup"`), with a new webhook handler that increments the credit balance.
-- Native iOS uses RevenueCat consumables for IAP compliance with App Store §3.1.1; web is preferred for top-ups.
+The core orchestrator does not change. The managed mode adds a preflight credit-balance check and a post-call debit, while reusing the same tools, prompts, memory, ledger, audit trail, and safety policy.
 
-### 7.4 Pricebook abstraction
+### 7.4 Future add-on model
 
-A versioned `pricebook.json` in the repo defines:
-
-```jsonc
-// 1 credit = a fixed economic value, NOT a fixed token count
-{
-  "version": "2026-05",
-  "creditValueMicroUsd": 1000,    // 1 credit = $0.001 of underlying provider cost (our COGS)
-  "models": {
-    "claude-sonnet-4.7":    { "inPerMTok": 3000000,  "outPerMTok": 15000000, "creditMultiplier": 1.0 },
-    "claude-haiku-4.5":     { "inPerMTok": 800000,   "outPerMTok": 4000000,  "creditMultiplier": 1.0 },
-    "gpt-5.3":              { "inPerMTok": 2500000,  "outPerMTok": 10000000, "creditMultiplier": 1.0 },
-    "gpt-5.5-mini":         { "inPerMTok": 200000,   "outPerMTok": 800000,   "creditMultiplier": 1.0 }
-  }
-}
-```
-
-Internal accounting per request:
-
-```
-creditsDebited = ceil(
-  (inputTokens  * model.inPerMTok / 1_000_000 + outputTokens * model.outPerMTok / 1_000_000)
-  / creditValueMicroUsd
-  * model.creditMultiplier
-)
-```
-
-The customer-facing SKU (e.g. "+€20 / month for 5,000 credits") never references token counts or model names. Provider/model swaps update `pricebook.json` without breaking the SKU.
-
-**Model basket assumption.** The bundled allowance is sized assuming a target mix (e.g. 70% Haiku, 30% Sonnet). If users hammer the expensive model, margin shrinks. **Mitigation: model auto-routing** (cheap model handles intent classification + simple Q&A; expensive model only when needed). Cursor does this aggressively.
-
-### 7.5 Worked margin example
-
-Take a +€20 / month add-on for 5,000 credits, with the pricebook above (1 credit = $0.001 ≈ €0.0009 wholesale):
-
-```
-Plan price (sell):       €20.00
-Token-cost budget:        €5.00   (5,000 credits × ~€0.001 of COGS each)
-Stripe fees (~3%):        €0.60
-Provider price buffer:    €1.00   (~20% of token cost — protects margin against price moves)
-Support / refund pool:    €0.50
-EU VAT handling cost:     €0.30   (admin overhead; the VAT itself is collected separately)
-                         ------
-COGS + frictions:         €7.40
-Gross margin:            ~63%
-```
-
-That's a healthy shape. **Explicit warning: do not target >80% gross margin on the AI line item.** You will either price yourself out, or be undercut the moment a competitor decides to subsidize AI from their seat revenue. Industry norm is 50–75%.
-
-### 7.6 Module-decoupled add-on model
-
-The pricing concept lives in one shared model and powers everything (AI credits, future per-module add-ons):
+Managed-AI credits and second-module entitlements both need the same missing primitive: a workspace-scoped add-on model.
 
 ```ts
 WorkspaceBillingAddon {
-  workspaceId            String
-  addonCode              String        // "ai_credits_5k", "ai_credits_25k", "wms_module", "crm_module"
-  status                 String        // "active" | "canceled" | "past_due"
-  periodStart, periodEnd DateTime
-  monthlyAllowance       Json          // { credits: 5000 } for AI; {} or { seats: 5 } for module add-ons
+  workspaceId              String
+  addonCode                String        // "managed_ai_credits_5k", "wms_module", "crm_module"
+  status                   String        // "active" | "canceled" | "past_due"
+  periodStart, periodEnd   DateTime
+  monthlyAllowance         Json          // { credits: 5000 } for managed AI; { seats: 5 } for modules if needed
   stripeSubscriptionItemId String?
 }
 ```
 
 Why decoupled:
 
-- Customers can buy AI **without upgrading the base tier** (lots of small breweries on Premium will want AI; some Pro customers won't).
-- The same shape will let us sell WMS / CRM as add-ons later — one Stripe subscription per workspace, multiple subscription items, one invoice.
-- RevenueCat supports the same via "entitlements".
+- Module entitlements should not require inventing a new base tier for every vertical.
+- Managed AI should remain optional for hosted customers and irrelevant to self-hosters.
+- One workspace can have one base subscription plus multiple subscription items on a single invoice.
+- RevenueCat can mirror the same concept through entitlements / consumables for native purchases.
+
+### 7.5 Margin discipline for managed AI
+
+If managed AI ships, margin must be priced against real COGS:
+
+```
+COGS_per_request =
+    sum(provider_token_cost)
+  + stripe_fee_share
+  + support_amortization
+  + provider_price_buffer
+  + optional infra_marginal_cost
+```
+
+Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin on the token line is brittle: a competitor can subsidize it, a provider can change prices, or a customer can shift the model mix. The strategic margin is in the operational layer — tools, memory, workflow integration, and support — not in pretending token resale is a moat.
 
 ---
 
-## 8. Open questions / decisions to confirm
+## 8. Decisions and open questions
 
-These need explicit answers before any implementation PR is opened. Listed here so they don't get forgotten between conversations.
+### 8.1 Resolved through the H2 2026 backbone
 
-1. **BYOK first, or resold credits first?** (Working assumption: BYOK first, resold credits in v1.)
-2. **Provider preference**: Anthropic only, OpenAI only, or both via an adapter? (Working assumption: both via an adapter — half-day extra, future-proof.)
-3. **v0 prompt scope**: water + recipe coach only, or include style guidance / fermentation troubleshooting from day one?
-4. **Default-on vs opt-in per workspace** for AI features (working assumption: opt-in, with a data-egress notice).
-5. **Per-user role gating**: **(Resolved 2026-05-15.)** No role-gating in v0 — AI is available to *all* workspace members once the workspace admin has enabled AI for the workspace. Safety is enforced through three independent mechanisms instead of role-gated access: (a) per-role usage limits (admins can configure different monthly token / credit budgets per role), (b) per-user daily caps as a circuit breaker, (c) the workspace-level opt-in toggle. Rationale: `<PLATFORM_NAME>` is AI-first by design; gating AI behind a role contradicts the positioning. The combination of caps + audit ledger + workspace-level opt-in preserves operational safety without gatekeeping the feature.
-6. **Refund policy** for unused credits — non-refundable / pro-rata / case-by-case?
-7. **EU VAT handling** for resold credits — collect via Stripe Tax, or via a separate flow?
-8. **Postgres multi-schema timing** — adopt at second-module ship, or earlier as preparation?
-9. **Naming**: real `<PLATFORM_NAME>` brand to choose; npm scope decision deferred to that point.
-10. **Model auto-routing policy** — heuristic (intent classifier → small model first) vs always-Sonnet vs user-choice?
+1. **v0 monetization model:** BYOK provider relationship + paid AI subscription through existing `WorkspaceBilling` / `BillingTier`. AI unlocks at `premium`, `pro`, and `pro_plus`; `free` is blocked with `402 ai_subscription_required`.
+2. **Stripe surface:** zero net-new Stripe code for v0 AI. The existing billing-intent checkout flow and webhook lifecycle handling are reused.
+3. **Subscription primitive:** no new `WorkspaceSubscription` model. Existing `WorkspaceBilling` remains the current subscription source of truth.
+4. **Provider for v0:** Anthropic only. Multi-provider adapters are deferred until a second provider is needed.
+5. **v0 prompt scope:** water + recipe coach. Style guidance, fermentation troubleshooting, and cross-module operations wait for later layers.
+6. **AI default:** opt-in per workspace. Admin enables AI, enters the key, and accepts the data-egress notice.
+7. **Per-user role gating:** no role gate. All workspace members can use AI once the workspace admin enables it; safety is enforced through per-role monthly caps, per-user daily caps, workspace opt-in, and the audit ledger.
+8. **Memory:** per-workspace operational memory is part of the H2 backbone. Full product-doc / timeline RAG remains future work.
+9. **Public-launch path:** launch artifacts exist, and §10.1.1 records the decision to seed a fresh public repository after `<PLATFORM_NAME>` is chosen.
+
+### 8.2 Still open / deferred
+
+1. **Managed-AI credits:** whether and when to add the optional hosted one-bill mode.
+2. **Refund policy for managed-AI credits:** non-refundable / pro-rata / case-by-case.
+3. **EU VAT / sales-tax handling for managed-AI credits:** Stripe Tax vs separate handling.
+4. **Postgres multi-schema timing:** adopt at second-module ship, or earlier as preparation.
+5. **Naming:** real `<PLATFORM_NAME>` brand and npm scope decision.
+6. **Model auto-routing policy:** heuristic router, always-Sonnet, or user-choice.
+7. **KMS-backed key storage:** when to replace the app-secret AES-GCM key vault with cloud KMS / Vault while preserving the encrypted-blob format.
 
 ---
 
 ## 9. Glossary
 
-- **Add-on** — a billable extension to a workspace (e.g. AI credits, a module entitlement) that is independent of the base tier.
+- **Add-on** — a billable extension to a workspace (e.g. a future managed-AI credit pack or module entitlement) that is independent of the base tier.
 - **ARPU (Average Revenue Per User)** — total revenue divided by paying entities per period.
-- **BYOK (Bring Your Own Key)** — workspace admin enters their own provider API key; the platform doesn't resell tokens.
-- **COGS (Cost of Goods Sold)** — variable per-unit cost of delivering one unit of the feature (see §7.1).
-- **Credit** — abstract internal unit for AI usage; converted from model + token usage via the pricebook.
+- **BYOK (Bring Your Own Key)** — workspace admin enters their own provider API key; the provider bills the workspace directly for tokens.
+- **COGS (Cost of Goods Sold)** — variable per-unit cost of delivering one unit of the feature; relevant to future managed-AI credits, not v0 BYOK token spend.
+- **Credit** — future managed-AI unit for usage; converted from model + token usage via a pricebook.
 - **Gross margin** — `(price − COGS) / price`.
 - **Hard cap** — usage limit that *blocks* further use until top-up or period rollover.
 - **Horizontal platform** — the layer of the system that does not change when a new vertical module is added.
+- **Managed AI** — future hosted mode where `<PLATFORM_NAME>` provides the model-provider key and bills usage through credits.
 - **Model basket** — assumed mix of model usage that pricing is sized against.
 - **Module** — a self-contained vertical (Brewery, WMS, CRM, MRP, CRP, …) that registers routes / services / models / AI tools / prompts / knowledge / limits / add-on codes into the platform.
 - **MRR (Monthly Recurring Revenue)** — sum of normalized monthly subscription revenue.

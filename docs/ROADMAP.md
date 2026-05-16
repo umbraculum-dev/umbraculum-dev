@@ -21,13 +21,13 @@ This is the agreed direction of travel at the platform level. It is intentionall
 
 Goal: ship the smallest AI consultant that demonstrably provides value across the brewery vertical, with the architecture intentionally platform-shaped from day one (not brewery-shaped with platform aspirations).
 
-- **Architecture**: AI platform skeleton per `docs/PLATFORM-ARCHITECTURE.md` §4.3 and §5.3 — orchestrator, tool registry, usage ledger, provider adapters, pricebook, BYOK + resold credits sharing the same code path.
+- **Architecture**: AI platform backbone per `docs/PLATFORM-ARCHITECTURE.md` §4.3 and §5.3 — orchestrator, brewery tool registry, usage ledger, encrypted BYOK settings, workspace memory, Anthropic-only v0 provider path, and future-ready seams for managed AI.
 - **Tools layer first** (`Layer A`): roughly 80% of value, lowest risk. Read-only, ACL-aware, deterministic. Brewery tools are the v0 surface.
 - **Per-workspace operational memory store** stood up alongside the tool layer. This is the moat investment (`docs/PLATFORM-ARCHITECTURE.md` §4.3, §6.5) — the AI's recall of seasonal patterns, supplier quirks, and recurring failure modes compounds over time and is not transferable to a competitor.
 - **Write-action drafts with human-in-the-loop confirmation** from the first AI feature that touches mutable state. No autonomous writes in v0 or v1.
 - **License + governance** as a parallel track: publish `docs/LICENSING.md` publicly, adopt DCO sign-off on contributions, write the contributor README, and pick the AGPLv3 + MIT SDK split intentionally before the first community contribution arrives (much harder to retrofit after).
 
-Blocking decisions to close in this phase (from `docs/PLATFORM-ARCHITECTURE.md` §8): provider preference, AI feature default (opt-in vs default-on), per-user role gating for AI, v0 prompt scope.
+Resolved in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8): BYOK + paid tier unlock, Anthropic-only v0, opt-in workspace enablement, no per-user role gate, water + recipe coach scope, per-workspace memory, and no net-new Stripe surface for v0 AI.
 
 ### H1 2027 — Brewery production planning is promoted to first-class MRP/CRP, and the platform is repositioned
 
@@ -38,7 +38,7 @@ Goal: realize the §1.1 reframe in code and in market positioning. Same product,
 - Platform repositioned externally: "process-manufacturing platform, brewery-configured by default". Brand and copy reflect this on public surfaces (marketing site, documentation, App Store listings).
 - `@brewery/*` horizontal packages renamed to a neutral platform scope (`docs/PLATFORM-ARCHITECTURE.md` §3.3, §5.2). This is the one-way structural move that should not be deferred past this phase.
 - Module SDK published as a public artifact (`docs/PLATFORM-ARCHITECTURE.md` §4.4). Third-party module developers can build modules in their own repositories.
-- `WorkspaceBillingAddon` model + Stripe subscription-item flow + RevenueCat consumables shipped — the prerequisite for selling per-module entitlements and AI credits cleanly.
+- `WorkspaceBillingAddon` model + Stripe subscription-item flow + RevenueCat consumables shipped — the prerequisite for selling per-module entitlements and optional managed-AI credits cleanly.
 
 ### H2 2027 — WMS as second native-mandatory vertical; federation decision
 

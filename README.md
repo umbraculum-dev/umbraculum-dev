@@ -39,9 +39,8 @@ work the brewery vertical already does.
   pro+) wired through Stripe.
 - An **AI consultant** integrated as a first-class operational surface
   (chat, settings, usage dashboard, per-workspace operational memory)
-  using **BYOK** keys + a paid orchestration / memory subscription on
-  top — see [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
-  §6.
+  using **BYOK** keys + paid workspace tier unlock — see
+  [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §6–§7.
 - Web app + native (React Native + Expo) app sharing core logic via
   cross-platform packages.
 

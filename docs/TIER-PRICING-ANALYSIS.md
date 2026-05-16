@@ -3,7 +3,7 @@
 **Status:** Draft (pre-development)  
 **Purpose:** Base document for current and future analysis; to be discussed before implementation.
 
-> **Add-on tier model (AI credits):** for the per-credit AI add-on pricing model (Cursor-style hard cap + retail unlock, pricebook abstraction, COGS / margin glossary, `WorkspaceBillingAddon` shape), see [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §7. That section is the canonical source for pricing structure decisions; this document remains the analysis of the *base subscription tiers* (`free | premium | pro | pro_plus`).
+> **AI monetization note:** the H2 AI backbone uses BYOK + existing paid workspace tier unlock (`premium | pro | pro_plus`) rather than AI credits. Future managed-AI credits and the `WorkspaceBillingAddon` shape are described in [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §7. This document remains the analysis of the *base subscription tiers* (`free | premium | pro | pro_plus`).
 
 ---
 

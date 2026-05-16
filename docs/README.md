@@ -16,7 +16,7 @@ Documents are grouped by **purpose**, not by physical location. Files have not b
 
 If you are new to the project, read these three documents in order:
 
-1. [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — the **vision and shape**: horizontal platform with vertical modules, AI consultant blueprint, AI-credit pricing.
+1. [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — the **vision and shape**: horizontal platform with vertical modules, AI consultant blueprint, BYOK + paid tier unlock, and the future managed-AI path.
 2. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
 3. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
 
@@ -31,7 +31,7 @@ The high-level direction, business model, and license posture.
 - [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — Platform vision, AI consultant, distribution model.
 - [`ROADMAP.md`](ROADMAP.md) — Living roadmap with 12–30 month trajectory.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
-- [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the AI add-on overlay is described in `PLATFORM-ARCHITECTURE.md` §7).
+- [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the current AI tier unlock and future managed-AI overlay are described in `PLATFORM-ARCHITECTURE.md` §7).
 
 ## Product
 
