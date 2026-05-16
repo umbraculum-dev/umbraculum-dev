@@ -80,7 +80,14 @@ logs/
 # ------------------------------------------------------------
 # IDE / OS
 # ------------------------------------------------------------
-.vscode/
+# Use `.vscode/*` (not `.vscode/`) so the file-level negation below works:
+# git ignores files inside `.vscode/` but still recurses into the dir,
+# allowing `!.vscode/settings.json.example` to re-include the example.
+.vscode/*
+# Track the recommended-settings example (HIGH-full Phase 5 prereq);
+# real `.vscode/settings.json` stays gitignored so contributors can
+# tweak locally.
+!.vscode/settings.json.example
 .idea/
 .DS_Store
 
