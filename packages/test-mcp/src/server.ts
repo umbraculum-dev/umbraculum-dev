@@ -106,46 +106,50 @@ function listTools() {
   };
 }
 
-async function startServer() {
-  const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
-
-    if (req.method === "GET" && url.pathname === "/") {
-      return json(res, 200, listTools());
-    }
-
-    if (req.method === "GET" && url.pathname === "/lastRunArtifacts") {
-      const tool = url.searchParams.get("tool") ?? undefined;
-      const dir = latestRunDirFor(tool);
-      if (!dir) return json(res, 404, { ok: false, error: "no runs found" });
-      return json(res, 200, { ok: true, ...summarizeRunDir(dir) });
-    }
-
-    if (req.method !== "POST") return json(res, 405, { ok: false, error: "method not allowed" });
-
-    // path-based dispatch: POST /<tool>
-    const tool = url.pathname.replace(/^\//, "") as ToolName;
-    if (!(tool in TOOLS)) return json(res, 404, { ok: false, error: `unknown tool: ${tool}` });
-
-    let body: Record<string, unknown> = {};
-    try {
-      const text = await readBody(req);
-      body = text ? (JSON.parse(text) as Record<string, unknown>) : {};
-    } catch (err) {
-      return json(res, 400, { ok: false, error: "invalid JSON body", detail: String(err) });
-    }
-
-    try {
-      const result = await dispatch(tool, body);
-      return json(res, 200, enrichResultWithRunDir(result));
-    } catch (err) {
-      return json(res, 500, { ok: false, error: String((err as Error)?.message ?? err) });
-    }
+function startServer() {
+  const server = http.createServer((req, res) => {
+    void handleRequest(req, res);
   });
 
   server.listen(PORT, () => {
     console.log(`[@brewery/test-mcp] listening on http://localhost:${PORT}`);
   });
+}
+
+async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
+  const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
+
+  if (req.method === "GET" && url.pathname === "/") {
+    return json(res, 200, listTools());
+  }
+
+  if (req.method === "GET" && url.pathname === "/lastRunArtifacts") {
+    const tool = url.searchParams.get("tool") ?? undefined;
+    const dir = latestRunDirFor(tool);
+    if (!dir) return json(res, 404, { ok: false, error: "no runs found" });
+    return json(res, 200, { ok: true, ...summarizeRunDir(dir) });
+  }
+
+  if (req.method !== "POST") return json(res, 405, { ok: false, error: "method not allowed" });
+
+  // path-based dispatch: POST /<tool>
+  const tool = url.pathname.replace(/^\//, "") as ToolName;
+  if (!(tool in TOOLS)) return json(res, 404, { ok: false, error: `unknown tool: ${tool}` });
+
+  let body: Record<string, unknown> = {};
+  try {
+    const text = await readBody(req);
+    body = text ? (JSON.parse(text) as Record<string, unknown>) : {};
+  } catch (err) {
+    return json(res, 400, { ok: false, error: "invalid JSON body", detail: String(err) });
+  }
+
+  try {
+    const result = await dispatch(tool, body);
+    return json(res, 200, enrichResultWithRunDir(result));
+  } catch (err) {
+    return json(res, 500, { ok: false, error: String((err as Error)?.message ?? err) });
+  }
 }
 
 async function runCli() {
@@ -173,5 +177,5 @@ async function runCli() {
 
 void (async () => {
   const cliRan = await runCli();
-  if (cliRan === null) await startServer();
+  if (cliRan === null) startServer();
 })();

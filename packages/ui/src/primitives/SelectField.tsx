@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, View } from "react-native";
 
@@ -21,7 +20,7 @@ export interface SelectFieldProps {
   width?: "auto" | "full";
   "aria-label"?: string;
   "aria-labelledby"?: string;
-  renderValue?: (value: string) => ReactNode;
+  renderValue?: (value: string) => string;
   closeLabel?: string;
 }
 
@@ -94,7 +93,7 @@ export function SelectField({
           disabled={disabled}
           accessibilityLabel={ariaLabel}
         >
-          <Text fontSize={12}>{(renderValue ? String(renderValue(value)) : selectedLabel) || placeholder || "—"}</Text>
+          <Text fontSize={12}>{(renderValue ? renderValue(value) : selectedLabel) || placeholder || "—"}</Text>
         </Button>
         <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
           <Pressable
