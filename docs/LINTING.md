@@ -558,6 +558,19 @@ A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-ch
 - **Risk:** trivial.
 - **Status:** [ ] not started.
 
+##### Phase 5 prerequisite: editor / IDE config (tracked, not landed)
+
+Before promoting type-aware rules to `error`, ship the contributor-facing safeguards that prevent the failure modes Phase 1 demonstrated (auto-fix overreach + stripped `eslint-disable` comments). Per the deep analysis logged in chat session [Phase 1 follow-up — IDE costs](1d038fd8-93bb-490e-8830-174603d169ff), the recommended mitigation stack is **C + A + E + F** (skip B, G; D opt-in only):
+
+- **C — Editor-only thinner ESLint config (`eslint.config.editor.mjs`):** strict subset of the production config, excluding type-aware rules entirely. The Cursor/VS Code ESLint extension points at this file; CI keeps using `eslint.config.mjs`. **Highest ROI** — also cuts the IDE memory/lag costs documented in §"Cons of type-aware ESLint in the IDE" and is the only mitigation that mechanically defeats the adversarial scenario (junior contributor with `source.fixAll.eslint: true` imported from a previous job).
+- **A — `.vscode/settings.json.example`:** ships `editor.codeActionsOnSave: { "source.fixAll.eslint": "explicit" }` plus other recommended defaults (workspace folder mode, working directories, on-save not on-type). Contributors copy to `.vscode/settings.json` (gitignored) on their machine.
+- **E — Cursor rule (`.cursor/rules/<n>-eslint-fixall-discipline.mdc`):** small guardrail telling the AI to default to `"explicit"` (never `true`) for `source.fixAll.eslint` when configuring editor settings in this repo. Also points contributors to the example file. Insurance for the AI-mediated case.
+- **F — Doc cross-link in this file:** a "Recommended editor configuration" section listing the example file, the why, and the link to the IDE-cost discussion above.
+
+**Why this is deferred to Phase 5 prep, not done earlier:** today there are no type-aware rules in `eslint.config.mjs`, so `source.fixAll.eslint: true` is mechanically safe. The thinner editor config (C) would either be empty or identical to production — shipping scaffolding-without-purpose. The work pays for itself only once the danger is real.
+
+**Owner:** Phase 5. **Effort:** ~2 hours total for the C+A+E+F stack. **Status:** [ ] not started.
+
 ### Expected output of HIGH-full
 
 Zero warnings repo-wide under `npm run lint`, every error real, every PR catches type-safety regressions before merge. Editor inline lint feedback ~3–5× slower than today (per-file, type-aware rules need TS program loaded) — the only meaningful UX cost.
