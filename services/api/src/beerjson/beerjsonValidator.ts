@@ -1,4 +1,4 @@
-import Ajv, { type ValidateFunction } from "ajv";
+import Ajv, { type AnySchema, type ValidateFunction } from "ajv";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -28,17 +28,20 @@ export function validateBeerJsonDoc(value: unknown): { ok: true } | { ok: false;
       validateSchema: true,
     });
 
-    // Add all BeerJSON schemas so relative $refs resolve.
+    // Add all BeerJSON schemas so relative $refs resolve. JSON.parse
+    // returns `any`; cast to `AnySchema` (Ajv's union of accepted
+    // schema shapes) since we trust the upstream @beerjson/beerjson
+    // package contents.
     for (const file of fs.readdirSync(schemaDir)) {
       if (!file.endsWith(".json")) continue;
       if (file === "beer.json") continue; // compiled as the root schema below
       const full = path.join(schemaDir, file);
-      const schema = JSON.parse(fs.readFileSync(full, "utf8"));
+      const schema = JSON.parse(fs.readFileSync(full, "utf8")) as AnySchema;
       // Ajv uses schema.$id as the primary key for ref resolution.
       ajv.addSchema(schema);
     }
 
-    const beerSchema = JSON.parse(fs.readFileSync(path.join(schemaDir, "beer.json"), "utf8"));
+    const beerSchema = JSON.parse(fs.readFileSync(path.join(schemaDir, "beer.json"), "utf8")) as AnySchema;
     validateBeerJsonDocCached = ajv.compile(beerSchema);
   }
 

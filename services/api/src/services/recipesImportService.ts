@@ -41,7 +41,7 @@ export function parseBeerJsonContent(content: string): unknown {
 function getFirstRecipe(doc: unknown): Record<string, unknown> | null {
   if (!isObject(doc)) return null;
   const beerjson = isObject(doc.beerjson) ? doc.beerjson : null;
-  const recipesArr = Array.isArray(beerjson?.recipes) ? beerjson.recipes : [];
+  const recipesArr: unknown[] = Array.isArray(beerjson?.recipes) ? beerjson.recipes : [];
   const r0 = recipesArr[0];
   return isObject(r0) ? r0 : null;
 }

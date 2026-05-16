@@ -276,8 +276,8 @@ async function clean() {
 }
 
 const cmd = process.argv.includes("--clean") ? clean : seed;
-cmd().catch((err) => {
-   
-  console.error(JSON.stringify({ ok: false, error: String(err?.message ?? err) }, null, 2));
+cmd().catch((err: unknown) => {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error(JSON.stringify({ ok: false, error: message }, null, 2));
   process.exit(1);
 });

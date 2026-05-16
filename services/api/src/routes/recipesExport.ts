@@ -40,7 +40,7 @@ export function recipesExportRoutes(app: FastifyInstance) {
     for (const r of list) {
       const strictDoc = exportRecipeStrict(r);
       const beerjson = isObject(strictDoc) && isObject(strictDoc.beerjson) ? strictDoc.beerjson : null;
-      const recipesArr = beerjson && Array.isArray(beerjson.recipes) ? beerjson.recipes : [];
+      const recipesArr: unknown[] = beerjson && Array.isArray(beerjson.recipes) ? beerjson.recipes : [];
       const r0 = recipesArr[0] ?? null;
       if (r0) outRecipes.push(r0);
     }

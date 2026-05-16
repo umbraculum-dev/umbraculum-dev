@@ -17,7 +17,13 @@ export const webhookRawBodyPlugin = fp((app: FastifyInstance) => {
     if (!shouldCaptureRawBody(req.url)) return payload;
 
     const chunks: Buffer[] = [];
-    for await (const chunk of payload) {
+    // The Fastify preParsing hook types `payload` as `IncomingMessage`,
+    // whose async-iteration chunks are `any` in @types/node. Narrow to
+    // the runtime values Node actually emits (Buffer/Uint8Array/string)
+    // so `Buffer.from(chunk)` is type-safe under the current
+    // Buffer<ArrayBufferLike> generic in @types/node v22+.
+    const chunkIter = payload as AsyncIterable<Buffer | Uint8Array | string>;
+    for await (const chunk of chunkIter) {
       chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     }
 

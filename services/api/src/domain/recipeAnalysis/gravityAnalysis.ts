@@ -17,7 +17,7 @@ function extractFirstRecipe(beerJsonRecipeJson: unknown): Record<string, unknown
   if (!isObject(beerJsonRecipeJson.beerjson)) return null;
   const recipes = beerJsonRecipeJson.beerjson.recipes;
   if (!Array.isArray(recipes)) return null;
-  const first = recipes[0];
+  const first: unknown = recipes[0];
   return isObject(first) ? first : null;
 }
 

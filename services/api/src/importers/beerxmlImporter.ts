@@ -187,7 +187,7 @@ function parseBeerXml(xml: string): XmlNode {
     parseTagValue: true,
   });
 
-  const parsed = parser.parse(xml);
+  const parsed: unknown = parser.parse(xml);
   return isObject(parsed) ? parsed : {};
 }
 
