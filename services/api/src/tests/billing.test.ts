@@ -1,6 +1,23 @@
+import { createHmac } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
 import { createSessionForTestUser } from "./helpers/session.js";
+
+/**
+ * Build a Stripe-formatted `Stripe-Signature` header for a given payload.
+ *
+ * Mirrors `verifyStripeSignature` in `services/api/src/routes/webhooksStripe.ts`:
+ * the signed payload is `${t}.${rawBody}`, HMAC-SHA256 with the webhook secret,
+ * and the v1 component is the lowercase hex digest. The CI env in `api.yml`
+ * sets `STRIPE_WEBHOOK_SECRET=ci-only-not-real`, which makes the handler run
+ * in strict mode — that's what we want to exercise here.
+ */
+function buildStripeSignature(rawBody: string, secret: string): string {
+  const t = Math.floor(Date.now() / 1000);
+  const signedPayload = `${t}.${rawBody}`;
+  const v1 = createHmac("sha256", secret).update(signedPayload).digest("hex");
+  return `t=${t},v1=${v1}`;
+}
 
 describe("billing (intents + webhooks + enforcement)", () => {
   const app = buildApp();
@@ -45,7 +62,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
     expect(body.clientReferenceId).toBe(body.billingIntentId);
   });
 
-  it("Stripe webhook (stub mode) fulfills intent + creates binding", async () => {
+  it("Stripe webhook (strict mode with valid signature) fulfills intent + creates binding", async () => {
     const intentRes = await app.inject({
       method: "POST",
       url: `/workspaces/${workspaceId}/billing/intent`,
@@ -56,21 +73,33 @@ describe("billing (intents + webhooks + enforcement)", () => {
     const intentBody = intentRes.json() as any;
     const billingIntentId = intentBody.billingIntentId as string;
 
+    // Send the payload as an explicit JSON string so we know the exact bytes
+    // that will be signed and stored on `req.rawBody` by webhookRawBodyPlugin.
+    // Falling back to "ci-only-not-real" mirrors api.yml's CI env so that the
+    // test passes both locally (when the env var is unset) and on CI.
+    const stripeSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim() || "ci-only-not-real";
+    const rawBody = JSON.stringify({
+      id: `evt_${Date.now()}`,
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          id: `cs_${Date.now()}`,
+          client_reference_id: billingIntentId,
+          subscription: "sub_test_123",
+          customer: "cus_test_123",
+        },
+      },
+    });
+    const signature = buildStripeSignature(rawBody, stripeSecret);
+
     const webhookRes = await app.inject({
       method: "POST",
       url: "/webhooks/stripe",
-      payload: {
-        id: `evt_${Date.now()}`,
-        type: "checkout.session.completed",
-        data: {
-          object: {
-            id: `cs_${Date.now()}`,
-            client_reference_id: billingIntentId,
-            subscription: "sub_test_123",
-            customer: "cus_test_123",
-          },
-        },
+      headers: {
+        "content-type": "application/json",
+        "stripe-signature": signature,
       },
+      payload: rawBody,
     });
     expect(webhookRes.statusCode).toBe(200);
     expect(webhookRes.json()).toEqual({ ok: true });
