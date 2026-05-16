@@ -169,9 +169,10 @@ export default function AiSettingsPage() {
 
           {/* Enable toggle */}
           <YStack gap="$1">
-            <label>
+            <label htmlFor="ai-enable" aria-label={tSettings("enableLabel")}>
               <XStack ai="center" gap="$2">
                 <input
+                  id="ai-enable"
                   type="checkbox"
                   checked={form.enabled}
                   disabled={!isAdmin || saving}
@@ -218,9 +219,10 @@ export default function AiSettingsPage() {
               {tSettings("apiKeyHint")}
             </SizableText>
             {settings.hasKey ? (
-              <label>
+              <label htmlFor="ai-clear-key" aria-label={tSettings("apiKeyClearLabel")}>
                 <XStack ai="center" gap="$2">
                   <input
+                    id="ai-clear-key"
                     type="checkbox"
                     checked={form.clearKey}
                     disabled={!isAdmin || saving}
@@ -236,9 +238,10 @@ export default function AiSettingsPage() {
 
           {/* Data egress */}
           <YStack gap="$1">
-            <label>
+            <label htmlFor="ai-data-egress" aria-label={tSettings("dataEgressLabel")}>
               <XStack ai="center" gap="$2">
                 <input
+                  id="ai-data-egress"
                   type="checkbox"
                   checked={form.dataEgressAccepted}
                   disabled={!isAdmin || saving}

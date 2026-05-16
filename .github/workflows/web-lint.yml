@@ -1,0 +1,60 @@
+name: web-lint
+
+# Gates ESLint on every PR that could affect web app, shared UI packages, or
+# the ESLint config itself. Runs in a node:20-slim container so the
+# "no npm on host" policy is honored end-to-end (see
+# `.cursor/rules/00-shared-node-npm-container-only.mdc`,
+# `docs/TESTING.md`, and `docs/LINTING.md`).
+#
+# Scope is currently MEDIUM (per `docs/LINTING.md`):
+#   - errors only block CI; warnings are tolerated until the HIGH-scope
+#     upgrade (tracked in `docs/LINTING.md` "TODO: upgrade to HIGH").
+#   - the canonical guardrail is `no-restricted-imports` on cross-platform
+#     UI (`packages/ui/src/{ai,charts}/**`) to forbid raw `tamagui`
+#     Button/Input/Checkbox imports.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "apps/web/**"
+      - "apps/native/**"
+      - "packages/**"
+      - "services/api/src/**"
+      - "eslint.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/web-lint.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "apps/web/**"
+      - "apps/native/**"
+      - "packages/**"
+      - "services/api/src/**"
+      - "eslint.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/web-lint.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: web-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run ESLint inside node:20-slim
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            -w /repo \
+            node:20-slim \
+            bash -lc "npm install --no-audit --no-fund --workspaces --include-workspace-root && npm run lint"

@@ -320,12 +320,16 @@ export function WaterMashScreen() {
           setDilutionProfileId((s.dilutionWaterProfileId as string) ?? "");
           setTapVolumeLiters(String(s.tapWaterVolumeLiters ?? 0));
           setDilutionVolumeLiters(String(s.dilutionWaterVolumeLiters ?? 0));
+          // eslint-disable-next-line no-constant-binary-expression -- pre-existing semantic bug: Number(x) ?? default never short-circuits (Number always returns a number, possibly NaN). Intended pattern is likely Number(x ?? default). Not fixed here because changing the precedence changes runtime behavior (NaN vs default). Tracked separately. See docs/LINTING.md.
           setMashStartingAlk(Number(s.mashStartingAlkalinityPpmCaCO3) ?? 0);
+          // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
           setMashStartingPh(Number(s.mashStartingPh) ?? 7);
+          // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
           setMashTargetPh(Number(s.mashTargetPh) ?? 5.4);
           setMashAcidType((s.mashAcidType as string) ?? "lactic");
           setMashAcidificationMode((s.mashAcidificationMode as string) === "manual" ? "manual" : "targetPh");
           setMashStrengthKind(((s.mashStrengthKind as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
+          // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
           setMashStrengthValue(Number(s.mashStrengthValue) ?? 88);
           setMashManualAcidAdded(Number(s.mashManualAcidAddedMl ?? s.mashManualAcidAddedGrams ?? 0));
           if (Array.isArray(s.mashSaltAdditionsJson)) setSaltAdditions(s.mashSaltAdditionsJson as SaltAdditionRow[]);

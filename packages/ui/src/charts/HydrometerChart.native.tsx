@@ -131,6 +131,7 @@ export function HydrometerChart({
   const [gMin, gMax] = gravityDomain;
   const [tMin, tMax] = temperatureDomain;
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- pre-existing: the early `return null` above this block (line 126) violates the Rules of Hooks. Fixing requires moving these useMemos above the early return; tracked separately to keep the ESLint Medium-scope landing tight. See docs/LINTING.md.
   const temperatureSeriesMapped = useMemo(() => {
     if (!temperatureSeries.length) return [];
     return temperatureSeries.map((p) => ({
@@ -140,6 +141,7 @@ export function HydrometerChart({
     }));
   }, [temperatureSeries, tMin, tMax, gMin, gMax]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- pre-existing: same root cause as the disable above. See docs/LINTING.md.
   const temperatureAxisTickValues = useMemo(() => {
     if (!temperatureSeries.length) return [];
     const temps = buildTickValues(tMin, tMax, 5);
