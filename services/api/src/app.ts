@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import cors from "@fastify/cors";
+import cors, { type OriginFunction } from "@fastify/cors";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { redisClientPlugin } from "./plugins/redisClient.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
@@ -45,19 +45,24 @@ export function buildApp() {
   // Dev-only CORS to allow Expo web preview (Metro) to call the API directly.
   // Native requests don't use browser CORS, but `expo start --web` does.
   if (process.env.NODE_ENV !== "production") {
+    const corsOriginFn: OriginFunction = (origin, cb) => {
+      if (!origin) return cb(null, true);
+
+      if (origin.startsWith("http://") && origin.endsWith(":8081")) return cb(null, true);
+      if (origin.startsWith("https://") && origin.endsWith(":8081")) return cb(null, true);
+
+      return cb(null, false);
+    };
+    // @fastify/cors v10 uses `export = fastifyCors` with a merged
+    // function+namespace declaration; type-aware ESLint can't fully
+    // narrow the resulting "function-or-namespace" type at the
+    // FastifyPluginCallback parameter slot, even though `tsc`
+    // accepts the call cleanly. Fastify itself, the cors plugin
+    // contract, and the inferred options object are all correct.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     app.register(cors, {
       credentials: true,
-      origin: (origin, cb) => {
-        // Allow non-browser tools (curl, server-to-server).
-        if (!origin) return cb(null, true);
-
-        // Allow the Expo/Metro dev server origin (typically :8081).
-        if (origin.startsWith("http://") && origin.endsWith(":8081")) return cb(null, true);
-        if (origin.startsWith("https://") && origin.endsWith(":8081")) return cb(null, true);
-
-        // Deny by default.
-        return cb(null, false);
-      },
+      origin: corsOriginFn,
     });
   }
   app.register(prismaPlugin);
