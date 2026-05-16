@@ -436,11 +436,11 @@ Both promotions are documented inline in `eslint.config.mjs` with a pointer back
 
 ### Phase 7 (optional, separate decision) — runtime-validation library migration
 
-This is **not** an ESLint phase per se — it's an architectural decision adjacent to the type-discipline work. Phase 1 surfaced the question ("should `packages/contracts` use Zod / Valibot / TypeBox instead of hand-rolled validators?"). The current decision is **no**, but the question deserves to be tracked rather than forgotten.
+This is **not** an ESLint phase per se — it's an architectural decision adjacent to the type-discipline work. Phase 1 surfaced the question ("should `packages/contracts` use Zod / Valibot / TypeBox instead of hand-rolled validators?"). The current decision is **no**, last re-confirmed 2026-05-16 (0/6 trigger criteria met — see [`docs/CONTRACTS-VALIDATION-STRATEGY.md` § Audit log](CONTRACTS-VALIDATION-STRATEGY.md#audit-log)). The question deserves to be tracked rather than forgotten.
 
 - [ ] Re-evaluate when one of the trigger criteria in `docs/CONTRACTS-VALIDATION-STRATEGY.md` is met (new complex contract, OpenAPI requirement, form-validation parity, drift bugs, bundle-size shift, independent route migration).
 
-See `docs/CONTRACTS-VALIDATION-STRATEGY.md` for the full pros/cons, candidate libraries (Zod, Valibot, Arktype, TypeBox), migration mechanics if/when we go, and the decision log.
+See `docs/CONTRACTS-VALIDATION-STRATEGY.md` for the full pros/cons, candidate libraries (Zod, Valibot, Arktype, TypeBox), migration mechanics if/when we go, the decision log, and the per-criterion audit log.
 
 ---
 

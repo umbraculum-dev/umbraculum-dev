@@ -1,7 +1,7 @@
 # Contracts validation strategy
 
 **Tier:** Public
-**Status:** v1.0 — descriptive (decision: stay on hand-rolled validators for now). Re-evaluate per the [trigger criteria](#when-to-revisit) below.
+**Status:** v1.1 — descriptive. Decision: stay on hand-rolled validators (re-confirmed 2026-05-16, 0/6 trigger criteria met — see [Audit log](#audit-log)). Re-evaluate per the [trigger criteria](#when-to-revisit) below.
 **Audience:** maintainers, future contributors, anyone considering a runtime-validation library migration
 **Owners:** maintainers
 **Related:** `docs/LINTING.md` (HIGH-staged Phase 7 references this doc), `docs/PLATFORM-ARCHITECTURE.md` §3.2 (cross-process boundaries), `packages/contracts/README.md` (if/when authored).
@@ -161,9 +161,27 @@ Sketch only — not a commitment.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-05-16 | Stay on hand-rolled (re-confirmed). | First post-decision audit. **0/6 trigger criteria met** against master `4cbf461` (HIGH-full ESLint upgrade landed same day). No new complex contracts; no OpenAPI requirement firmed up in `PLATFORM-ARCHITECTURE.md`; no per-field form-validation UI work; one drift bug landed (`4d9ec1e`, `account → workspace` stale-consumer drift in 4 UI files) — but it's a stale-CONSUMER drift, not parser/interface drift, so Zod would have had the same surface (counts as 1, not the 2+ required); Zod v4 Mini bundle is 3.94 KB gzipped (web-checked) vs the doc's ≤2 KB bar; `services/api` remains on hand-rolled `BadRequestError`-style Fastify validation. Side observation: HIGH-full Phase 5's editor-config split slightly lowers the IDE-cost objection that contributes to the "stay on hand-rolled" position, but doesn't flip the calculation. Per-criterion evidence in [Audit log](#audit-log) below. |
 | 2026-05-15 | Stay on hand-rolled. Track via this doc. | Phase 1 (commit `4fa663b`) showed the type-discipline gap was closeable without a library. The architectural question is real but separate. Public flip is not for ~12 months; the call can be made closer to that milestone with better data. |
 
 When a new decision is recorded, append a row above (most recent first), not below.
+
+---
+
+## Audit log
+
+Each scheduled audit walks the [trigger criteria](#when-to-revisit) and records per-criterion evidence. New audits append a column to the right (most recent rightmost). When the column count gets unwieldy, archive older columns into a separate `docs/CONTRACTS-VALIDATION-STRATEGY-AUDIT-ARCHIVE.md` and keep the 3 most recent here.
+
+| Criterion | 2026-05-16 audit |
+|---|---|
+| **(1) New complex contract** added since the last decision | ❌ Not met. Only `packages/contracts` commits since 2026-05-15 are type-tightening (`d029e41` Phase 1 auto-fix, `4fa663b` HIGH-staged Phase 1) and tracking docs. No new contract authored. |
+| **(2) OpenAPI requirement** firmed up for public flip / module SDK | ❌ Not met. `docs/PLATFORM-ARCHITECTURE.md` §4.4 mentions a future `packages/ai-platform-contracts` extraction but does NOT specify schema-first or auto-generated OpenAPI. §10.1 (go-public path) is about license/governance, not API spec generation. |
+| **(3) Form-validation parity** required by UI | ❌ Not met. No per-field error-message UI work landed since 2026-05-15. The `apps/web` form-touching commits in this window (`0c5425e` `ferm-data-integration`, `a5a7afa` Medium-scope landing) are lint cleanup, not new validation UX. |
+| **(4) Drift in practice** (2+ bugs where parser and interface diverged silently) | ❌ Not met (narrow miss, 1/2). Commit `4d9ec1e` ("restore workspace water profiles in 4 dropdowns, broken since `87876d0`") IS a drift case, but: (a) it's **stale-consumer drift** — UI code referenced `profiles?.account` after the `account → workspace` rename — not a parser/interface mismatch. (b) `parseWaterProfilesResponse()` was structurally correct: it accepts both `workspace` and `account` keys on the wire (for staged migration) and always normalises to `workspace` in output. (c) Zod schemas would have produced the same UI-consumer surface; the `WaterProfilesResponse` interface had the right shape, the consumers were stale. Lint promotion (HIGH-full Phase 4b) was the right detection tool. Counts as 1 instance; trigger requires 2+. |
+| **(5) Bundle-size shift** to ≤2 KB gzipped with full tree-shaking | ❌ Not met. Web check 2026-05-16 (zod.dev/v4 release notes + zod.dev/packages/mini): Zod v4 standard is ~5 KB gzipped (down 57% from v3); Zod v4 Mini is 3.94 KB gzipped with full tree-shaking. A simple `z.boolean().parse(true)` import lands at 2.12 KB with Mini, but realistic object schemas (the contracts surface in this app: water profiles, gravity analysis, mash/sparge/boil compute) are 4-13 KB territory. The doc's ≤2 KB bar still requires deeper compression than Zod v4 achieves for our shape complexity. |
+| **(6) Independent route migration** (services/api adopting a schema-validation framework) | ❌ Not met. The HIGH-full Phases 2-5 on `services/api` are lint promotions on the existing framework. No `fastify-type-provider-zod` / `fastify-type-provider-typebox` / equivalent adoption. Routes still use hand-rolled `BadRequestError`/`UnauthorizedError` validation. |
+
+Audit conclusion (2026-05-16): **0/6 met → no migration trigger fired → re-confirm "stay on hand-rolled."** Recommend next audit at the next architecture review (typically aligned with foundation-hardening pass milestones in [`docs/ROADMAP.md`](ROADMAP.md)), or sooner if any single criterion fires unambiguously between scheduled audits.
 
 ---
 
