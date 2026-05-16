@@ -147,7 +147,7 @@ export function parseGristJson(value: unknown): GristRow[] {
         colorLovibond,
         potential,
         maltClass,
-      } as GristRow;
+      };
     })
     .filter(Boolean);
 }

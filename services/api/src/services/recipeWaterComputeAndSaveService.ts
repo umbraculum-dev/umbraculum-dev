@@ -2,10 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { BadRequestError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
-import {
-  RecipeWaterSettingsService,
-  type UpsertRecipeWaterSettingsInput,
-} from "./recipeWaterSettingsService.js";
+import { RecipeWaterSettingsService } from "./recipeWaterSettingsService.js";
 import {
   applySaltAdditions,
   type IonProfilePpm,
@@ -266,7 +263,7 @@ export class RecipeWaterComputeAndSaveService {
   private async assertProfileAccessible(workspaceId: string, profileId: string) {
     const profile = await this.prisma.waterProfile.findUnique({ where: { id: profileId }, select: { id: true, scope: true, workspaceId: true } });
     if (!profile) throw new BadRequestError("invalid_profile_id", "Unknown water profile id");
-    const scope = profile.scope as "system" | "public" | "account";
+    const scope = profile.scope;
     if (scope === "system" || scope === "public") return;
     if (scope === "account" && profile.workspaceId === workspaceId) return;
     throw new BadRequestError("profile_not_accessible", "Water profile is not accessible to this workspace");
@@ -549,17 +546,17 @@ export class RecipeWaterComputeAndSaveService {
       patch.mashLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, workspaceId, recipeId, patch as UpsertRecipeWaterSettingsInput);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch);
 
     return {
       settings: { recipeId },
       salts: { result: salts, derivation: saltsDerivation },
       acid:
         mashMode === "manual"
-          ? { kind: "mash_acidification_manual", mode: "manual", result: acidResult, derivation: acidDerivation as WaterCalcDerivation }
+          ? { kind: "mash_acidification_manual", mode: "manual", result: acidResult, derivation: acidDerivation }
           : hasGrist
-            ? { kind: "mash_acidification_target_mash_ph", mode: "targetPh", result: acidResult, derivation: acidDerivation as WaterCalcDerivation }
-            : { kind: "mash_acidification", mode: "targetPh", result: acidResult, derivation: acidDerivation as WaterCalcDerivation },
+            ? { kind: "mash_acidification_target_mash_ph", mode: "targetPh", result: acidResult, derivation: acidDerivation }
+            : { kind: "mash_acidification", mode: "targetPh", result: acidResult, derivation: acidDerivation },
       overall: { result: overall, derivation: overallDerivation },
     };
   }
@@ -708,15 +705,15 @@ export class RecipeWaterComputeAndSaveService {
       patch.spargeLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, workspaceId, recipeId, patch as UpsertRecipeWaterSettingsInput);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch);
 
     return {
       settings: { recipeId },
       salts: { result: salts, derivation: saltsDerivation },
       acid:
         mode === "manual"
-          ? { kind: "sparge_acidification_manual", mode: "manual", result: acidResult, derivation: acidDerivation as WaterCalcDerivation }
-          : { kind: "sparge_acidification", mode: "targetPh", result: acidResult, derivation: acidDerivation as WaterCalcDerivation },
+          ? { kind: "sparge_acidification_manual", mode: "manual", result: acidResult, derivation: acidDerivation }
+          : { kind: "sparge_acidification", mode: "targetPh", result: acidResult, derivation: acidDerivation },
     };
   }
 
@@ -951,15 +948,15 @@ export class RecipeWaterComputeAndSaveService {
       patch.boilLastCalculatedAt = nowIso;
     }
 
-    await this.settings.upsert(userId, workspaceId, recipeId, patch as UpsertRecipeWaterSettingsInput);
+    await this.settings.upsert(userId, workspaceId, recipeId, patch);
 
     return {
       settings: { recipeId },
       salts: { result: salts, derivation: saltsDerivation },
       acid:
         mode === "manual"
-          ? { kind: "boil_acidification_manual", mode: "manual", result: acidResult, derivation: acidDerivation as WaterCalcDerivation }
-          : { kind: "boil_acidification", mode: "targetPh", result: acidResult, derivation: acidDerivation as WaterCalcDerivation },
+          ? { kind: "boil_acidification_manual", mode: "manual", result: acidResult, derivation: acidDerivation }
+          : { kind: "boil_acidification", mode: "targetPh", result: acidResult, derivation: acidDerivation },
       overall: { result: overall, derivation: overallDerivation },
     };
   }

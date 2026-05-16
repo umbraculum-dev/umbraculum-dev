@@ -148,7 +148,7 @@ export default function YeastPage() {
           s.hopsRows.map((row) => ({
             ...row,
             ingredientId: typeof hopsLinks?.[row.id] === "string" ? (hopsLinks[row.id] as string) : null,
-          })) as EditorHopRow[],
+          })),
         );
         const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, r.recipeExtJson);
         setYeastRows(
@@ -198,21 +198,21 @@ export default function YeastPage() {
             const cellsPerLOverride =
               yeastCellsPerLRaw &&
               typeof yeastCellsPerLRaw[row.id] === "number" &&
-              Number.isFinite(yeastCellsPerLRaw[row.id] as number) &&
+              Number.isFinite(yeastCellsPerLRaw[row.id]) &&
               (yeastCellsPerLRaw[row.id] as number) > 0
                 ? (yeastCellsPerLRaw[row.id] as number)
                 : null;
             const cellsPerKGFromKG =
               yeastCellsPerKGRaw &&
               typeof yeastCellsPerKGRaw[row.id] === "number" &&
-              Number.isFinite(yeastCellsPerKGRaw[row.id] as number) &&
+              Number.isFinite(yeastCellsPerKGRaw[row.id]) &&
               (yeastCellsPerKGRaw[row.id] as number) > 0
                 ? (yeastCellsPerKGRaw[row.id] as number)
                 : null;
             const cellsPerKGFromG =
               yeastCellsPerGRaw &&
               typeof yeastCellsPerGRaw[row.id] === "number" &&
-              Number.isFinite(yeastCellsPerGRaw[row.id] as number) &&
+              Number.isFinite(yeastCellsPerGRaw[row.id]) &&
               (yeastCellsPerGRaw[row.id] as number) > 0
                 ? (yeastCellsPerGRaw[row.id] as number) * 1000
                 : null;
@@ -224,7 +224,7 @@ export default function YeastPage() {
                 : null;
             const dilutionFactor =
               manualRaw?.dilutionFactor === 200 || manualRaw?.dilutionFactor === 2000
-                ? (manualRaw.dilutionFactor as 200 | 2000)
+                ? (manualRaw.dilutionFactor)
                 : undefined;
             const aliveCells =
               typeof manualRaw?.aliveCells === "number" && Number.isFinite(manualRaw.aliveCells) && manualRaw.aliveCells > 0

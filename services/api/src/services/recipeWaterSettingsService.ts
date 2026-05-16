@@ -188,7 +188,7 @@ export class RecipeWaterSettingsService {
     const profile = await this.prisma.waterProfile.findUnique({ where: { id: profileId } });
     if (!profile) throw new BadRequestError("invalid_profile_id", "Unknown water profile id");
 
-    const scope = profile.scope as "system" | "public" | "account";
+    const scope = profile.scope;
     if (scope === "system" || scope === "public") return;
     if (scope === "account" && profile.workspaceId === workspaceId) return;
 
@@ -214,7 +214,7 @@ export class RecipeWaterSettingsService {
     // The dynamic-key field-loop pattern below iterates over `as const` arrays of field
     // names defined on UpsertRecipeWaterSettingsInput; this alias avoids `(input as any)[f]`
     // at every site while keeping `input` typed for direct named access.
-    const inputRec: Record<string, unknown> = input as unknown as Record<string, unknown>;
+    const inputRec: Record<string, unknown> = input;
 
     if (input.sourceWaterProfileId !== undefined) data.sourceWaterProfileId = input.sourceWaterProfileId;
     if (input.targetWaterProfileId !== undefined) data.targetWaterProfileId = input.targetWaterProfileId;
@@ -392,22 +392,22 @@ export class RecipeWaterSettingsService {
       data.mashSaltAdditionsJson = validateSaltAdditionsJson(
         input.mashSaltAdditionsJson,
         "mashSaltAdditionsJson",
-      ) as Prisma.InputJsonValue;
+      );
     }
     if (input.mashSaltsLastResultJson !== undefined) {
-      data.mashSaltsLastResultJson = input.mashSaltsLastResultJson as Prisma.InputJsonValue;
+      data.mashSaltsLastResultJson = input.mashSaltsLastResultJson;
     }
 
     if (input.mashOverallLastResultJson !== undefined) {
       // accept null to clear; otherwise pass through (Json column)
-      data.mashOverallLastResultJson = input.mashOverallLastResultJson as Prisma.InputJsonValue;
+      data.mashOverallLastResultJson = input.mashOverallLastResultJson;
     }
     if (input.mashOverallLastCalculatedAt !== undefined) {
       data.mashOverallLastCalculatedAt = input.mashOverallLastCalculatedAt;
     }
 
     if (input.mashGristImportedJson !== undefined) {
-      data.mashGristImportedJson = input.mashGristImportedJson as Prisma.InputJsonValue;
+      data.mashGristImportedJson = input.mashGristImportedJson;
     }
     if (input.mashGristImportedAt !== undefined) {
       data.mashGristImportedAt = input.mashGristImportedAt;
@@ -486,10 +486,10 @@ export class RecipeWaterSettingsService {
       data.spargeSaltAdditionsJson = validateSaltAdditionsJson(
         input.spargeSaltAdditionsJson,
         "spargeSaltAdditionsJson",
-      ) as Prisma.InputJsonValue;
+      );
     }
     if (input.spargeSaltsLastResultJson !== undefined) {
-      data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson as Prisma.InputJsonValue;
+      data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson;
     }
     if (input.spargeStepTemperatureC !== undefined) {
       if (input.spargeStepTemperatureC === null) data.spargeStepTemperatureC = null;
@@ -624,10 +624,10 @@ export class RecipeWaterSettingsService {
       data.boilSaltAdditionsJson = validateSaltAdditionsJson(
         input.boilSaltAdditionsJson,
         "boilSaltAdditionsJson",
-      ) as Prisma.InputJsonValue;
+      );
     }
     if (input.boilSaltsLastResultJson !== undefined) {
-      data.boilSaltsLastResultJson = input.boilSaltsLastResultJson as Prisma.InputJsonValue;
+      data.boilSaltsLastResultJson = input.boilSaltsLastResultJson;
     }
 
     const boilSnapshotFields = [
@@ -649,14 +649,14 @@ export class RecipeWaterSettingsService {
     if (input.boilLastCalculatedAt !== undefined) data.boilLastCalculatedAt = input.boilLastCalculatedAt;
 
     if (input.boilOverallLastResultJson !== undefined) {
-      data.boilOverallLastResultJson = input.boilOverallLastResultJson as Prisma.InputJsonValue;
+      data.boilOverallLastResultJson = input.boilOverallLastResultJson;
     }
     if (input.boilOverallLastCalculatedAt !== undefined) data.boilOverallLastCalculatedAt = input.boilOverallLastCalculatedAt;
 
     return this.prisma.recipeWaterSettings.upsert({
       where: { recipeId },
       create: data as Prisma.RecipeWaterSettingsUncheckedCreateInput,
-      update: data as Prisma.RecipeWaterSettingsUncheckedUpdateInput,
+      update: data,
     });
   }
 }

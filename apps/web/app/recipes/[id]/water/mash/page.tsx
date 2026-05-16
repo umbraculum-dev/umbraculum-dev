@@ -41,11 +41,7 @@ import type { WaterCalcDerivation } from "@brewery/contracts";
 import { asRecord } from "../../../../_lib/typeGuards";
 import { DEFAULT_MASH_TARGET_PH } from "@brewery/core";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
-import {
-  fetchRecipeWaterSettings,
-  saveRecipeWaterSettings,
-  type RecipeWaterSettingsResponse,
-} from "../_lib/waterSettings";
+import { fetchRecipeWaterSettings, saveRecipeWaterSettings } from "../_lib/waterSettings";
 
 type MashResult = {
   acidRequiredMl: number | null;
@@ -242,7 +238,7 @@ export default function MashWaterPage() {
     if (authState.status !== "ready" || !recipeId) return;
     setSettingsError(null);
     try {
-      const data = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
+      const data = (await fetchRecipeWaterSettings(recipeId));
       const s = data.settings;
       if (!s) return;
 
@@ -1021,7 +1017,7 @@ export default function MashWaterPage() {
             .filter((r, i) => i !== idx && i !== 0 && r.deduceFromMashIn === true)
             .reduce((s, r) => s + (r.amountL ?? 0), 0);
           const available = Math.max(0, derivedMashWaterVolumeLiters - otherSum);
-          nextPatch = { ...nextPatch, amountL: Math.min(nextPatch.amountL as number, available) };
+          nextPatch = { ...nextPatch, amountL: Math.min(nextPatch.amountL, available) };
         }
       }
 
@@ -1178,7 +1174,7 @@ export default function MashWaterPage() {
             m && "roastDehuskedOverride" in m
               ? (m.roastDehuskedOverride as boolean | null | undefined) ?? null
               : r.mashRoastDehuskedOverride ?? null,
-        } as GristRow;
+        };
       });
       const nowIso = new Date().toISOString();
       await saveSettings({

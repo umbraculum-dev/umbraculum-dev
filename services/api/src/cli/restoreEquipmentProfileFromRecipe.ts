@@ -131,7 +131,7 @@ function asNumber(v: unknown): number | null {
 
 function asEquipmentSnapshot(raw: unknown): EquipmentSnapshot | null {
   if (!raw || typeof raw !== "object") return null;
-  return raw as EquipmentSnapshot;
+  return raw;
 }
 
 interface EquipmentUpsertData {

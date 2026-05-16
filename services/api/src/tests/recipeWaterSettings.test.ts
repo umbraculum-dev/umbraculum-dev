@@ -186,7 +186,7 @@ describe("recipe water-settings", () => {
       },
     });
     expect(put.statusCode).toBe(200);
-    const putBody = put.json() as any;
+    const putBody = put.json();
     expect(putBody.ok).toBe(true);
     expect(putBody.settings.recipeId).toBe(recipe.id);
     expect(putBody.settings.workspaceId).toBe(accountAId);
@@ -197,7 +197,7 @@ describe("recipe water-settings", () => {
       headers: { cookie: cookieA },
     });
     expect(get.statusCode).toBe(200);
-    const body = get.json() as any;
+    const body = get.json();
     expect(body.ok).toBe(true);
     expect(body.settings.tapWaterVolumeLiters).toBe(10);
     expect(body.settings.dilutionWaterVolumeLiters).toBe(5);

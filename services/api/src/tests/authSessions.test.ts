@@ -37,7 +37,7 @@ describe("auth (signup/login) + cookie sessions", () => {
       headers: { cookie: sidCookie as string },
     });
     expect(me.statusCode).toBe(200);
-    const body = me.json() as any;
+    const body = me.json();
     expect(body.ok).toBe(true);
     expect(body.user.email).toBe(email.toLowerCase());
     expect(body.user.preferredLocale).toBe("it");
@@ -86,7 +86,7 @@ describe("auth (signup/login) + cookie sessions", () => {
     const sidCookie2 = extractSidCookie(login.headers["set-cookie"]);
     expect(sidCookie2).toBeTruthy();
 
-    const loginBody = login.json() as any;
+    const loginBody = login.json();
     expect(loginBody.ok).toBe(true);
     expect(Array.isArray(loginBody.workspaces)).toBe(true);
     expect(loginBody.workspaces.length).toBe(2);
@@ -121,7 +121,7 @@ describe("auth (signup/login) + cookie sessions", () => {
       headers: { cookie: sidCookie2 as string },
     });
     expect(recipesOk.statusCode).toBe(200);
-    expect((recipesOk.json() as any).ok).toBe(true);
+    expect((recipesOk.json()).ok).toBe(true);
   });
 
   it("login/native returns token (no cookie); Bearer token works for /auth/me and logout", async () => {
@@ -143,7 +143,7 @@ describe("auth (signup/login) + cookie sessions", () => {
     expect(loginNative.statusCode).toBe(200);
     expect(loginNative.headers["set-cookie"]).toBeUndefined();
 
-    const body = loginNative.json() as any;
+    const body = loginNative.json();
     expect(body.ok).toBe(true);
     expect(typeof body.token).toBe("string");
     expect(body.token.length).toBeGreaterThan(0);
@@ -157,7 +157,7 @@ describe("auth (signup/login) + cookie sessions", () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     expect(me.statusCode).toBe(200);
-    expect((me.json() as any).user.email).toBe(email.toLowerCase());
+    expect((me.json()).user.email).toBe(email.toLowerCase());
 
     const logout = await app.inject({
       method: "POST",

@@ -138,7 +138,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
     expect(created.recipe.workspaceId).toBe(accountAId);
     expect(created.recipe.styleKey).toBe("custom");
@@ -157,7 +157,7 @@ describe("recipes (workspace scoped)", () => {
       headers: { cookie: cookieA },
     });
     expect(list.statusCode).toBe(200);
-    const body = list.json() as any;
+    const body = list.json();
     expect(body.ok).toBe(true);
     expect(body.recipes.some((r: any) => r.id === created.recipe.id)).toBe(true);
   });
@@ -211,7 +211,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
 
     const r0 = created.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0] ?? null;
@@ -258,7 +258,7 @@ describe("recipes (workspace scoped)", () => {
         },
       },
     });
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
 
     // List in B must not contain it
@@ -268,7 +268,7 @@ describe("recipes (workspace scoped)", () => {
       headers: { cookie: cookieB },
     });
     expect(listB.statusCode).toBe(200);
-    const bodyB = listB.json() as any;
+    const bodyB = listB.json();
     expect(bodyB.ok).toBe(true);
     expect(bodyB.recipes.some((r: any) => r.id === created.recipe.id)).toBe(false);
   });
@@ -306,7 +306,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
 
     const getA = await app.inject({
@@ -315,7 +315,7 @@ describe("recipes (workspace scoped)", () => {
       headers: { cookie: cookieA },
     });
     expect(getA.statusCode).toBe(200);
-    const gotA = getA.json() as any;
+    const gotA = getA.json();
     expect(gotA.ok).toBe(true);
     expect(gotA.recipe.workspaceId).toBe(accountAId);
     expect(gotA.recipe.notes).toBe("Initial notes");
@@ -327,7 +327,7 @@ describe("recipes (workspace scoped)", () => {
       payload: { name: "Renamed Recipe", styleKey: "custom", notes: "Updated notes" },
     });
     expect(patchA.statusCode).toBe(200);
-    const patched = patchA.json() as any;
+    const patched = patchA.json();
     expect(patched.ok).toBe(true);
     expect(patched.recipe.name).toBe("Renamed Recipe");
     expect(patched.recipe.styleKey).toBe("custom");
@@ -377,7 +377,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
 
     const del = await app.inject({
@@ -427,7 +427,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
 
     const delWrong = await app.inject({
@@ -453,7 +453,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(res.statusCode).toBe(400);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("invalid_recipe_payload");
   });
@@ -532,7 +532,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const body = create.json() as any;
+    const body = create.json();
     expect(body.ok).toBe(true);
     expect(body.recipe.beerJsonRecipeJson?.beerjson?.version).toBe(1);
     expect(body.recipe.recipeExtJson?.version).toBe(1);
@@ -583,7 +583,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const body = create.json() as any;
+    const body = create.json();
     expect(body.ok).toBe(true);
     expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.culture_additions?.[0]?.id).toBe("y-1");
     expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.culture_additions?.[0]?.product_id).toBe(
@@ -603,7 +603,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(res.statusCode).toBe(400);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("invalid_beerjson_recipe");
   });
@@ -657,7 +657,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const body = create.json() as any;
+    const body = create.json();
     expect(body.ok).toBe(true);
     expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.miscellaneous_additions?.length).toBe(2);
     expect(body.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.ingredients?.miscellaneous_additions?.[0]?.id).toBe("m-1");
@@ -703,7 +703,7 @@ describe("recipes (workspace scoped)", () => {
       },
     });
     expect(res.statusCode).toBe(400);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("invalid_misc_row_amount");
   });

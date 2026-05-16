@@ -79,7 +79,7 @@ describe("water-profiles", () => {
       headers: { cookie: cookieAdmin },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(Array.isArray(body.system)).toBe(true);
     expect(body.system.length).toBeGreaterThan(10);
@@ -130,7 +130,7 @@ describe("water-profiles", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
     expect(created.profile.scope).toBe("public");
     expect(created.profile.verificationStatus).toBe("unverified");
@@ -141,7 +141,7 @@ describe("water-profiles", () => {
       headers: { cookie: cookieAdmin },
     });
     expect(verify.statusCode).toBe(200);
-    const verified = verify.json() as any;
+    const verified = verify.json();
     expect(verified.ok).toBe(true);
     expect(verified.profile.verificationStatus).toBe("verified");
 
@@ -151,7 +151,7 @@ describe("water-profiles", () => {
       headers: { cookie: cookieAdmin },
     });
     expect(unverify.statusCode).toBe(200);
-    const unverified = unverify.json() as any;
+    const unverified = unverify.json();
     expect(unverified.ok).toBe(true);
     expect(unverified.profile.verificationStatus).toBe("unverified");
 
@@ -182,7 +182,7 @@ describe("water-profiles", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
 
     const del = await app.inject({

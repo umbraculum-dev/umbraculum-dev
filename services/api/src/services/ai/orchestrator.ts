@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 import type Anthropic from "@anthropic-ai/sdk";
-import type { AiTool, AiToolCallRecord, AiToolRegistry, AiRoleLimits } from "@brewery/contracts";
+import type { AiToolCallRecord, AiToolRegistry, AiRoleLimits } from "@brewery/contracts";
 
 import {
   BadRequestError,
@@ -207,7 +207,7 @@ export class AiOrchestrator {
         }> = [];
 
         for (const tu of toolUseBlocks) {
-          const tool = this.registry.resolve(tu.name) as AiTool | undefined;
+          const tool = this.registry.resolve(tu.name);
           const argsJson = truncate(JSON.stringify(tu.input ?? {}), 4096);
           yield { type: "tool_call", name: tu.name, argsJson };
           const toolStart = Date.now();

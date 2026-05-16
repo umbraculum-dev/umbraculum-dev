@@ -64,7 +64,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     const startingAlkalinityPpmCaCO3 =
@@ -72,8 +72,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
     const targetPh = typeof body.targetPh === "number" ? body.targetPh : DEFAULT_MASH_TARGET_PH;
     const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -133,15 +133,15 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     const startingAlkalinityPpmCaCO3 =
       typeof body.startingAlkalinityPpmCaCO3 === "number" ? body.startingAlkalinityPpmCaCO3 : 0;
     const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
     const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -222,33 +222,33 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     // Accept mash-prefixed or generic field names.
     const startingAlkalinityPpmCaCO3 =
       typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        ? (body.mashStartingAlkalinityPpmCaCO3)
         : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3 as number)
+          ? (body.startingAlkalinityPpmCaCO3)
           : 0;
     const startingPh =
       typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh as number)
+        ? (body.mashStartingPh)
         : typeof body.startingPh === "number"
-          ? (body.startingPh as number)
+          ? (body.startingPh)
           : 7.0;
     const targetPh =
       typeof body.mashTargetPh === "number"
-        ? (body.mashTargetPh as number)
+        ? (body.mashTargetPh)
         : typeof body.targetPh === "number"
-          ? (body.targetPh as number)
+          ? (body.targetPh)
           : DEFAULT_MASH_TARGET_PH;
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters as number)
+        ? (body.mashWaterVolumeLiters)
         : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters as number)
+          ? (body.volumeLiters)
           : 1.0;
 
     const result = spargeAcidification({
@@ -301,27 +301,27 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     // Accept mash-prefixed or generic field names.
     const startingAlkalinityPpmCaCO3 =
       typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        ? (body.mashStartingAlkalinityPpmCaCO3)
         : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3 as number)
+          ? (body.startingAlkalinityPpmCaCO3)
           : 0;
     const startingPh =
       typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh as number)
+        ? (body.mashStartingPh)
         : typeof body.startingPh === "number"
-          ? (body.startingPh as number)
+          ? (body.startingPh)
           : 7.0;
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters as number)
+        ? (body.mashWaterVolumeLiters)
         : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters as number)
+          ? (body.volumeLiters)
           : 1.0;
 
     const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
@@ -374,9 +374,9 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters as number)
+        ? (body.mashWaterVolumeLiters)
         : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters as number)
+          ? (body.volumeLiters)
           : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
@@ -384,11 +384,11 @@ export async function waterCalcRoutes(app: FastifyInstance) {
 
     const alkalinityPpmCaCO3 =
       typeof body.alkalinityPpmCaCO3 === "number"
-        ? (body.alkalinityPpmCaCO3 as number)
+        ? (body.alkalinityPpmCaCO3)
         : typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-          ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+          ? (body.mashStartingAlkalinityPpmCaCO3)
           : typeof body.startingAlkalinityPpmCaCO3 === "number"
-            ? (body.startingAlkalinityPpmCaCO3 as number)
+            ? (body.startingAlkalinityPpmCaCO3)
             : NaN;
     if (!Number.isFinite(alkalinityPpmCaCO3)) {
       throw new BadRequestError(
@@ -397,8 +397,8 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       );
     }
 
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -491,7 +491,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     }
 
     const acidAdded_mEqPerL =
-      typeof body.acidAdded_mEqPerL === "number" ? (body.acidAdded_mEqPerL as number) : undefined;
+      typeof body.acidAdded_mEqPerL === "number" ? (body.acidAdded_mEqPerL) : undefined;
     if (
       acidAdded_mEqPerL !== undefined &&
       (!Number.isFinite(acidAdded_mEqPerL) || acidAdded_mEqPerL < 0)
@@ -546,42 +546,42 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     const startingAlkalinityPpmCaCO3 =
       typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        ? (body.mashStartingAlkalinityPpmCaCO3)
         : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3 as number)
+          ? (body.startingAlkalinityPpmCaCO3)
           : 0;
     const startingPh =
       typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh as number)
+        ? (body.mashStartingPh)
         : typeof body.startingPh === "number"
-          ? (body.startingPh as number)
+          ? (body.startingPh)
           : 7.0;
     const targetMashPh =
       typeof body.targetMashPh === "number"
-        ? (body.targetMashPh as number)
+        ? (body.targetMashPh)
         : typeof body.mashTargetPh === "number"
-          ? (body.mashTargetPh as number)
+          ? (body.mashTargetPh)
           : NaN;
     if (!Number.isFinite(targetMashPh)) {
       throw new BadRequestError("invalid_target_mash_ph", "Body.targetMashPh (or mashTargetPh) is required");
     }
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters as number)
+        ? (body.mashWaterVolumeLiters)
         : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters as number)
+          ? (body.volumeLiters)
           : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
     }
 
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm as number) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm as number) : undefined;
+    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
+    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -717,27 +717,27 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const mashMode = body.mashMode === "manual" ? "manual" : "targetPh";
     const startingAlkalinityPpmCaCO3 =
       typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3 as number)
+        ? (body.mashStartingAlkalinityPpmCaCO3)
         : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3 as number)
+          ? (body.startingAlkalinityPpmCaCO3)
           : 0;
     const startingPh =
       typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh as number)
+        ? (body.mashStartingPh)
         : typeof body.startingPh === "number"
-          ? (body.startingPh as number)
+          ? (body.startingPh)
           : 7.0;
     const targetPh =
       typeof body.mashTargetPh === "number"
-        ? (body.mashTargetPh as number)
+        ? (body.mashTargetPh)
         : typeof body.targetPh === "number"
-          ? (body.targetPh as number)
+          ? (body.targetPh)
           : DEFAULT_MASH_TARGET_PH;
     const volumeLiters =
       typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters as number)
+        ? (body.mashWaterVolumeLiters)
         : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters as number)
+          ? (body.volumeLiters)
           : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
@@ -793,7 +793,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     let acid;
@@ -826,10 +826,10 @@ export async function waterCalcRoutes(app: FastifyInstance) {
           maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
             ? maltClassRaw
             : "base";
-        const mashDiPh = typeof o.mashDiPh === "number" ? (o.mashDiPh as number) : o.mashDiPh === null ? null : undefined;
+        const mashDiPh = typeof o.mashDiPh === "number" ? (o.mashDiPh) : o.mashDiPh === null ? null : undefined;
         const mashTaToPh57_mEqPerKg =
           typeof o.mashTaToPh57_mEqPerKg === "number"
-            ? (o.mashTaToPh57_mEqPerKg as number)
+            ? (o.mashTaToPh57_mEqPerKg)
             : o.mashTaToPh57_mEqPerKg === null
               ? null
               : undefined;
@@ -978,13 +978,13 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const spargeMode = body.spargeMode === "manual" ? "manual" : "targetPh";
     const startingAlkalinityPpmCaCO3 =
       typeof body.startingAlkalinityPpmCaCO3 === "number"
-        ? (body.startingAlkalinityPpmCaCO3 as number)
+        ? (body.startingAlkalinityPpmCaCO3)
         : typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
-          ? (body.spargeStartingAlkalinityPpmCaCO3 as number)
+          ? (body.spargeStartingAlkalinityPpmCaCO3)
           : 0;
-    const startingPh = typeof body.startingPh === "number" ? (body.startingPh as number) : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : DEFAULT_MASH_TARGET_PH;
-    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters as number) : NaN;
+    const startingPh = typeof body.startingPh === "number" ? (body.startingPh) : 7.0;
+    const targetPh = typeof body.targetPh === "number" ? (body.targetPh) : DEFAULT_MASH_TARGET_PH;
+    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters) : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
     }
@@ -1039,7 +1039,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     let acid;
@@ -1142,13 +1142,13 @@ export async function waterCalcRoutes(app: FastifyInstance) {
     const boilMode = body.boilMode === "manual" ? "manual" : "targetPh";
     const startingAlkalinityPpmCaCO3 =
       typeof body.startingAlkalinityPpmCaCO3 === "number"
-        ? (body.startingAlkalinityPpmCaCO3 as number)
+        ? (body.startingAlkalinityPpmCaCO3)
         : typeof body.boilStartingAlkalinityPpmCaCO3 === "number"
-          ? (body.boilStartingAlkalinityPpmCaCO3 as number)
+          ? (body.boilStartingAlkalinityPpmCaCO3)
           : 0;
-    const startingPh = typeof body.startingPh === "number" ? (body.startingPh as number) : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? (body.targetPh as number) : DEFAULT_MASH_TARGET_PH;
-    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters as number) : NaN;
+    const startingPh = typeof body.startingPh === "number" ? (body.startingPh) : 7.0;
+    const targetPh = typeof body.targetPh === "number" ? (body.targetPh) : DEFAULT_MASH_TARGET_PH;
+    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters) : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
     }
@@ -1203,7 +1203,7 @@ export async function waterCalcRoutes(app: FastifyInstance) {
       if (typeof strengthValue !== "number") {
         throw new BadRequestError("invalid_strength_value", "Body.strengthValue must be a number");
       }
-      strength = { kind: strengthKind, value: strengthValue } as AcidStrength;
+      strength = { kind: strengthKind, value: strengthValue };
     }
 
     let acid;

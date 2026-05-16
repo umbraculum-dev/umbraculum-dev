@@ -57,19 +57,19 @@ const PORT = Number(process.env.MCP_PORT ?? process.env.PORT ?? "8932");
 async function dispatch(tool: ToolName, args: Record<string, unknown> = {}): Promise<unknown> {
   switch (tool) {
     case "smokeStack":
-      return TOOLS.smokeStack(args as { baseUrl?: string });
+      return TOOLS.smokeStack(args);
     case "seedE2eFixture":
-      return TOOLS.seedE2eFixture(args as { clean?: boolean });
+      return TOOLS.seedE2eFixture(args);
     case "runApiTests":
-      return TOOLS.runApiTests(args as { filter?: string });
+      return TOOLS.runApiTests(args);
     case "runContractsCheck":
-      return TOOLS.runContractsCheck(args as { update?: boolean });
+      return TOOLS.runContractsCheck(args);
     case "runPlaywrightSmoke":
-      return TOOLS.runPlaywrightSmoke(args as { baseUrl?: string });
+      return TOOLS.runPlaywrightSmoke(args);
     case "runPlaywrightSpec":
       return TOOLS.runPlaywrightSpec(args as { spec: string; baseUrl?: string });
     case "loginAs":
-      return TOOLS.loginAs(args as { persona?: string; baseUrl?: string });
+      return TOOLS.loginAs(args);
     default:
       throw new Error(`unknown tool: ${tool}`);
   }

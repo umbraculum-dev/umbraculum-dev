@@ -110,7 +110,7 @@ export function mashPhEstimateV1(input: MashPhEstimateV1Input): MashPhEstimateV1
   const perRow: MashPhEstimateV1Result["debug"]["perRow"] = [];
 
   for (const r of input.grist) {
-    const amountKg = (r?.amountKg ?? NaN) as number;
+    const amountKg = (r?.amountKg ?? NaN);
     assertFinite(amountKg, "grist.amountKg");
     if (!(amountKg > 0)) continue;
 

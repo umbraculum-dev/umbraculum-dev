@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
@@ -204,7 +204,7 @@ export class WaterProfilesService {
 
     return this.prisma.waterProfile.update({
       where: { id: profileId },
-      data: data as Prisma.WaterProfileUncheckedUpdateInput,
+      data: data,
     });
   }
 

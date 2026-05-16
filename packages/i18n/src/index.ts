@@ -23,7 +23,7 @@ export function isLocale(value: string): value is SupportedLocale {
  * Returns the full message tree for next-intl (web) or i18next (native).
  */
 export function getSharedMessages(locale: SupportedLocale): Record<string, unknown> {
-  return locale === "it" ? (it as Record<string, unknown>) : (en as Record<string, unknown>);
+  return locale === "it" ? (it) : (en);
 }
 
 export { en, it };

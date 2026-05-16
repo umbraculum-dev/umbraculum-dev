@@ -201,7 +201,7 @@ export class RecipesService {
 
     return this.prisma.$transaction(async (tx) => {
       const newRecipeId = crypto.randomUUID();
-      const newName = ((source.name ?? "") as string).trim() + " - duplicated";
+      const newName = ((source.name ?? "")).trim() + " - duplicated";
 
       const doc = source.beerJsonRecipeJson;
       const docCopy: Record<string, unknown> | null =
@@ -209,7 +209,7 @@ export class RecipesService {
       const docCopyBeerjson = isObject(docCopy?.beerjson) ? docCopy.beerjson : null;
       const docCopyRecipes = Array.isArray(docCopyBeerjson?.recipes) ? docCopyBeerjson.recipes : null;
       if (docCopyRecipes && isObject(docCopyRecipes[0])) {
-        (docCopyRecipes[0] as Record<string, unknown>).name = newName;
+        (docCopyRecipes[0]).name = newName;
       }
 
       const created = await tx.recipe.create({
@@ -287,7 +287,7 @@ export class RecipesService {
       const docObj = isObject(doc) ? doc : null;
       const beerjson = isObject(docObj?.beerjson) ? docObj.beerjson : null;
       const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
-      const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
+      const r0 = recipes && isObject(recipes[0]) ? (recipes[0]) : null;
       if (!r0) {
         throw new Error("BeerJSON is missing beerjson.recipes[0]");
       }
@@ -324,7 +324,7 @@ export class RecipesService {
         style,
         styleKey,
         notes,
-        beerJsonRecipeJson: doc as Prisma.InputJsonValue,
+        beerJsonRecipeJson: doc,
         recipeExtJson:
           recipeExtJson === undefined ? undefined : (recipeExtJson as Prisma.InputJsonValue),
       },
@@ -400,7 +400,7 @@ export class RecipesService {
         const docObj = isObject(doc) ? doc : null;
         const beerjson = isObject(docObj?.beerjson) ? docObj.beerjson : null;
         const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
-        const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
+        const r0 = recipes && isObject(recipes[0]) ? (recipes[0]) : null;
         if (!r0) {
           throw new Error("BeerJSON is missing beerjson.recipes[0]");
         }
@@ -479,7 +479,7 @@ export class RecipesService {
         if (!after.ok) {
           throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${after.errors}`);
         }
-        data.beerJsonRecipeJson = doc as Prisma.InputJsonValue;
+        data.beerJsonRecipeJson = doc;
       } else {
         throw new BadRequestError("invalid_beerjson_recipe", "Stored BeerJSON is missing; cannot patch name/notes.");
       }
@@ -607,7 +607,7 @@ async function _snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promi
       mashPhModelSource,
       mashRoastDehuskedOverride,
       mashRoastDehuskedSource,
-    } as GristRow;
+    };
   });
 }
 
@@ -816,7 +816,7 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
           `Body.gristJson[${idx}].potential.value must be > 0`,
         );
       }
-      potential = { kind, value: pv } as GristPotential;
+      potential = { kind, value: pv };
     } else {
       throw new BadRequestError(
         "invalid_grist_row_potential",
@@ -1153,7 +1153,7 @@ async function _snapshotYeastRows(prisma: PrismaClient, rows: YeastRow[]): Promi
       productId: productId ?? null,
       attenuationMin: attenuationMin ?? null,
       attenuationMax: attenuationMax ?? null,
-    } as YeastRow;
+    };
   });
 }
 

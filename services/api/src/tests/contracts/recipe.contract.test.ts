@@ -74,7 +74,7 @@ describe("contract: recipe create + fetch", () => {
     if (create.statusCode !== 200) {
       throw new Error(`recipe create failed (${create.statusCode}): ${create.body}`);
     }
-    const body = create.json() as { recipe: { id: string } };
+    const body = create.json();
     recipeId = body.recipe.id;
   });
 
@@ -97,7 +97,7 @@ describe("contract: recipe create + fetch", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as { recipe: { id: string } };
+    const body = res.json();
     try {
       assertSnapshotShape("recipe.create", body);
     } finally {

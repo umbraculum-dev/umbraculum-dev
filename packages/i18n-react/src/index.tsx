@@ -69,7 +69,7 @@ export function useT(namespace: string): Translator {
     const cacheKey = `${locale}::${message}`;
     const fmt = formatCache.get(cacheKey) ?? new IntlMessageFormat(message, locale);
     if (!formatCache.has(cacheKey)) formatCache.set(cacheKey, fmt);
-    return fmt.format(values) as unknown;
+    return fmt.format(values);
   };
 
   return {
@@ -81,7 +81,7 @@ export function useT(namespace: string): Translator {
     },
     rich: (key, values) => {
       const message = getMessage(messages, namespace, key);
-      const out = format(message, values as Record<string, unknown> | undefined);
+      const out = format(message, values);
       return out as ReactNode;
     },
   };

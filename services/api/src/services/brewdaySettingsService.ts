@@ -1,5 +1,4 @@
 import type { PrismaClient } from "@prisma/client";
-import { Prisma } from "@prisma/client";
 import { WorkspacesService } from "./workspacesService.js";
 
 const PRESET_KEYS = [
@@ -427,7 +426,7 @@ export class BrewdaySettingsService {
     if (shouldUpgradeSeed) {
       await this.prisma.brewdaySettings.update({
         where: { workspaceId },
-        data: { defaultStepsJson: defaultSteps as unknown as Prisma.InputJsonValue },
+        data: { defaultStepsJson: defaultSteps },
       });
     }
 

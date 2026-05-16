@@ -26,7 +26,7 @@ export default function RecipeBrewSessionsPage() {
   const canCall = authState.status === "ready" && !!authState.me.activeWorkspaceId;
 
   const router = useRouter();
-  const params = useParams() as { id?: string };
+  const params = useParams();
   const recipeId = params?.id ?? "";
 
   const [sessions, setSessions] = useState<BrewSessionListItem[]>([]);

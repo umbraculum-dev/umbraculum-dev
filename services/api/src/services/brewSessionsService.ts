@@ -147,13 +147,13 @@ export class BrewSessionsService {
     const steps: RecipeDrivenStepSeed[] = [];
     // Single typed view-cast over otherwise-`unknown` JSON. Real validation is Phase 7.
     const d: BeerJsonDoc = isObject(args.beerJsonRecipeJson)
-      ? (args.beerJsonRecipeJson as BeerJsonDoc)
+      ? (args.beerJsonRecipeJson)
       : {};
     const recipesArr = Array.isArray(d.beerjson?.recipes) ? d.beerjson.recipes : [];
-    const r0: RecipeNode | null = isObject(recipesArr[0]) ? (recipesArr[0] as RecipeNode) : null;
+    const r0: RecipeNode | null = isObject(recipesArr[0]) ? (recipesArr[0]) : null;
     const ing = r0?.ingredients ?? {};
     const ext: RecipeExtLoose | null = isObject(args.recipeExtJson)
-      ? (args.recipeExtJson as RecipeExtLoose)
+      ? (args.recipeExtJson)
       : null;
 
     const boilTimeMinutes =
@@ -169,7 +169,7 @@ export class BrewSessionsService {
     const hops = filterObjects<HopNode>(ing.hop_additions);
     const cultures = filterObjects<CultureNode>(ing.culture_additions);
     const misc = filterObjects<MiscNode>(ing.miscellaneous_additions);
-    const mash: MashNode | null = isObject(r0?.mash) ? (r0.mash as MashNode) : null;
+    const mash: MashNode | null = isObject(r0?.mash) ? (r0.mash) : null;
     const mashStepsRaw: MashStepNode[] = mash
       ? filterObjects<MashStepNode>(mash.mash_steps).length > 0
         ? filterObjects<MashStepNode>(mash.mash_steps)
@@ -392,7 +392,7 @@ export class BrewSessionsService {
     }
 
     const ws: WaterSettingsLoose | null = isObject(args.waterSettings)
-      ? (args.waterSettings as WaterSettingsLoose)
+      ? (args.waterSettings)
       : null;
     if (ws) {
       const mashVol = ws.mashWaterVolumeLiters;

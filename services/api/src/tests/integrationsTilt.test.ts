@@ -21,7 +21,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(createIntegration.statusCode).toBe(200);
-    const ci = createIntegration.json() as any;
+    const ci = createIntegration.json();
     integrationId = ci.integrationId as string;
     integrationToken = ci.token as string;
 
@@ -31,7 +31,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { Temp: "68.0", SG: "1.050", Color: "ORANGE", Beer: "test", Comment: "" },
     });
     expect(first.statusCode).toBe(200);
-    deviceId = (first.json() as any).deviceId as string;
+    deviceId = (first.json()).deviceId as string;
   };
 
   beforeAll(async () => {
@@ -95,7 +95,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { name: "Tilt integration test recipe", styleKey: "custom", beerJsonRecipeJson },
     });
     expect(create.statusCode).toBe(200);
-    recipeId = (create.json() as any).recipe.id as string;
+    recipeId = (create.json()).recipe.id as string;
 
     const bs1 = await app.inject({
       method: "POST",
@@ -103,7 +103,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(bs1.statusCode).toBe(200);
-    brewSessionId1 = (bs1.json() as any).brewSession.id as string;
+    brewSessionId1 = (bs1.json()).brewSession.id as string;
 
     const bs2 = await app.inject({
       method: "POST",
@@ -111,7 +111,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(bs2.statusCode).toBe(200);
-    brewSessionId2 = (bs2.json() as any).brewSession.id as string;
+    brewSessionId2 = (bs2.json()).brewSession.id as string;
   });
 
   afterAll(async () => {
@@ -128,13 +128,13 @@ describe("tilt integrations (device attach)", () => {
 
     if (brewSessionId1 || brewSessionId2) {
       await app.prisma.brewSessionLog.deleteMany({
-        where: { brewSessionId: { in: [brewSessionId1, brewSessionId2].filter(Boolean) as string[] } },
+        where: { brewSessionId: { in: [brewSessionId1, brewSessionId2].filter(Boolean) } },
       });
       await app.prisma.brewSessionStep.deleteMany({
-        where: { brewSessionId: { in: [brewSessionId1, brewSessionId2].filter(Boolean) as string[] } },
+        where: { brewSessionId: { in: [brewSessionId1, brewSessionId2].filter(Boolean) } },
       });
       await app.prisma.brewSession.deleteMany({
-        where: { id: { in: [brewSessionId1, brewSessionId2].filter(Boolean) as string[] }, workspaceId },
+        where: { id: { in: [brewSessionId1, brewSessionId2].filter(Boolean) }, workspaceId },
       });
     }
 
@@ -152,7 +152,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(createIntegration.statusCode).toBe(200);
-    const ci = createIntegration.json() as any;
+    const ci = createIntegration.json();
     expect(ci.ok).toBe(true);
     expect(typeof ci.token).toBe("string");
     expect(typeof ci.integrationId).toBe("string");
@@ -166,7 +166,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { Temp: "68.0", SG: "1.050", Color: "ORANGE", Beer: "test", Comment: "" },
     });
     expect(first.statusCode).toBe(200);
-    const firstBody = first.json() as any;
+    const firstBody = first.json();
     expect(firstBody.ok).toBe(true);
     expect(typeof firstBody.deviceId).toBe("string");
     expect(firstBody.brewSessionId).toBeNull();
@@ -178,7 +178,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(devices1.statusCode).toBe(200);
-    const d1 = devices1.json() as any;
+    const d1 = devices1.json();
     expect(d1.ok).toBe(true);
     expect(d1.devices.length).toBe(1);
     expect(d1.devices[0].activeAttachment).toBeNull();
@@ -194,7 +194,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { brewSessionId: brewSessionId1 },
     });
     expect(attach1.statusCode).toBe(200);
-    expect((attach1.json() as any).ok).toBe(true);
+    expect((attach1.json()).ok).toBe(true);
 
     const second = await app.inject({
       method: "POST",
@@ -202,7 +202,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { Temp: 70, SG: 1.048, Color: "ORANGE" },
     });
     expect(second.statusCode).toBe(200);
-    const secondBody = second.json() as any;
+    const secondBody = second.json();
     expect(secondBody.ok).toBe(true);
     expect(secondBody.brewSessionId).toBe(brewSessionId1);
 
@@ -221,7 +221,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { Temp: 72, SG: 1.046, Color: "ORANGE" },
     });
     expect(third.statusCode).toBe(200);
-    const thirdBody = third.json() as any;
+    const thirdBody = third.json();
     expect(thirdBody.ok).toBe(true);
     expect(thirdBody.brewSessionId).toBe(brewSessionId2);
   });
@@ -236,7 +236,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { kind: "tilt", deviceId },
     });
     expect(attach.statusCode).toBe(200);
-    expect((attach.json() as any).ok).toBe(true);
+    expect((attach.json()).ok).toBe(true);
 
     const ingest = await app.inject({
       method: "POST",
@@ -251,7 +251,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(readings.statusCode).toBe(200);
-    const body = readings.json() as any;
+    const body = readings.json();
     expect(body.ok).toBe(true);
     expect(Array.isArray(body.readings)).toBe(true);
     expect(body.readings.length).toBeGreaterThan(0);
@@ -265,7 +265,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(reveal.statusCode).toBe(200);
-    const revealed = reveal.json() as any;
+    const revealed = reveal.json();
     expect(revealed.ok).toBe(true);
     expect(revealed.token).toBe(integrationToken);
 
@@ -275,7 +275,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(rotate.statusCode).toBe(200);
-    const rotated = rotate.json() as any;
+    const rotated = rotate.json();
     expect(rotated.ok).toBe(true);
     const newToken = rotated.token as string;
     expect(typeof newToken).toBe("string");
@@ -293,7 +293,7 @@ describe("tilt integrations (device attach)", () => {
       payload: { Temp: 70, SG: 1.048, Color: "ORANGE" },
     });
     expect(ok.statusCode).toBe(200);
-    expect((ok.json() as any).ok).toBe(true);
+    expect((ok.json()).ok).toBe(true);
 
     const reveal2 = await app.inject({
       method: "GET",
@@ -301,7 +301,7 @@ describe("tilt integrations (device attach)", () => {
       headers: { cookie },
     });
     expect(reveal2.statusCode).toBe(200);
-    const revealed2 = reveal2.json() as any;
+    const revealed2 = reveal2.json();
     expect(revealed2.ok).toBe(true);
     expect(revealed2.token).toBe(newToken);
   });

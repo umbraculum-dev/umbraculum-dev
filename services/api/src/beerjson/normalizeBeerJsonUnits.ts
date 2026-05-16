@@ -43,7 +43,7 @@ export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknow
   const warnings: UnitConversionWarningV1[] = [];
   const beerjson = isObject(doc) && isObject(doc.beerjson) ? doc.beerjson : null;
   const recipes = beerjson && Array.isArray(beerjson.recipes) ? beerjson.recipes : null;
-  const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
+  const r0 = recipes && isObject(recipes[0]) ? (recipes[0]) : null;
   if (!r0) return { normalized: doc, warnings };
 
   if (isObject(r0.batch_size)) {

@@ -87,7 +87,7 @@ describe("recipes export (BeerJSON strict)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
     createdRecipeId = created.recipe.id;
     expect(createdRecipeId).toBeTruthy();
@@ -101,7 +101,7 @@ describe("recipes export (BeerJSON strict)", () => {
     expect(String(exp.headers["content-type"] ?? "")).toContain("application/json");
     expect(String(exp.headers["content-disposition"] ?? "")).toContain("attachment");
 
-    const doc = exp.json() as any;
+    const doc = exp.json();
     const ing = doc?.beerjson?.recipes?.[0]?.ingredients ?? null;
     expect(ing?.fermentable_additions?.[0]?.id).toBeUndefined();
     expect(ing?.fermentable_additions?.[0]?.brewery_app_late_addition).toBeUndefined();

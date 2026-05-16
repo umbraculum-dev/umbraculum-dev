@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.3 — **HIGH-staged complete + HIGH-full scoped.** Phases 1–6c landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail (`ferm-data-integration`, `RecipeImportForm`, `HealthPanel`, `inventory`, `YeastEditor`, `PrimaryNav`, `mathBodies`, `(auth)/{login,signup}/page.tsx`, plus 13 smaller files), and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are now promoted to `error` repo-wide. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. A measurement run (2026-05-16) sized the HIGH-full surface at 1,671 type-aware warnings, ~411 of which auto-fix; the upgrade is now a 5-phase plan (see [HIGH-full upgrade](#high-full-upgrade)) targeting H1 2027 alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md).
+**Status:** v2.4 — **HIGH-staged complete + HIGH-full Phase 1 landed.** Phases 1–6c (HIGH-staged) landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail, and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error` repo-wide. **HIGH-full Phase 1** (auto-fix sweep) landed 2026-05-16: `eslint --fix` on the auto-fixable subset of type-aware rules, 64 files touched, 310 type-aware warnings eliminated (1,671 → 1,361). **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. The HIGH-full upgrade is now a 5-phase plan (see [HIGH-full upgrade](#high-full-upgrade)) targeting H1 2027 alongside the foundation hardening pass in [`docs/ROADMAP.md`](ROADMAP.md).
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -482,16 +482,23 @@ A throwaway ESLint flat config that adds `@typescript-eslint/recommended-type-ch
 
 #### Phase 1 — Auto-fix sweep
 
-- **Scope:** ~411 warnings, single commit, mechanical only.
+- **Scope (planned):** ~411 warnings, single commit, mechanical only.
+- **Scope (actual):** **310 warnings eliminated** (1,671 → 1,361). The shortfall versus the ~411 estimate is the cost of the safety reverts described under "Lessons learned" below — auto-fix produced 100 fixes that the TypeScript baseline rejected, and we restored the casts/comments rather than fix the underlying types in this phase.
 - **Rules enabled (auto-fix only):** `no-unnecessary-type-assertion`, `no-redundant-type-constituents`, the auto-fixable subset of `no-base-to-string`.
-- **Strategy:** run `eslint --fix` against a temporary type-aware config restricted to the auto-fixable rules. Manual review of the resulting diff (mostly stale `as Foo` removals + a few `String(x)` rewrites). No hand edits.
-- **Verification gate:**
-  - Per-workspace TS baselines hold: `apps/web` 590, `services/api` 19, all others 0.
-  - `npm run lint` and `npm run lint:packages-strict` still pass (this phase only touches code that the existing lint rules already accept, since auto-fix produces canonical replacements).
-  - The remeasurement baseline drops by ~411.
-- **Effort:** ~30 min.
-- **Risk:** very low (auto-fix is reversible; the rules in scope are the ones with the smallest semantic surface).
-- **Status:** [ ] not started.
+- **Strategy:** ran `eslint --fix` against a temporary type-aware config (`eslint.config.measure.mjs`, deleted after the run) with all type-aware rules at `warn`. Manual review of the resulting diff, then surgical reverts to keep per-workspace TS baselines green and the existing lint clean.
+- **Verification gate (achieved):**
+  - Per-workspace TS baselines hold: `apps/web` 590, `apps/native` 0, `services/api` 19, `packages/contracts` 0, `packages/i18n` 0, `packages/i18n-react` 0, `packages/test-mcp` 0, **`packages/ui` 25** (revised baseline; the original phase plan listed this as 0, which was wrong).
+  - `npm run lint` exits clean (0 errors, 0 warnings, ~7s wall).
+  - `npm run lint:packages-strict` exits clean (`--max-warnings 0` on all 11 strict packages).
+  - Remeasurement (post-fix) confirms type-aware warning surface dropped 310 (1,671 → 1,361, 43s wall).
+- **Files touched:** 64 — services/api 38 (mostly tests), apps/web 13, apps/native 8, packages/i18n-react 2, packages/i18n 1, packages/test-mcp 1, packages/contracts 1.
+- **Lessons learned (carry into Phase 2+):**
+  - **The throwaway config is not "safe by construction".** Setting an existing rule (e.g. `react-hooks/exhaustive-deps`) to `off` in the throwaway config makes ESLint's `--fix` treat all corresponding `// eslint-disable-next-line ...` comments as "unused", and a hidden secondary fixer (`eslint-comments` family, transitively enabled by `recommended-type-checked`) strips them. We lost ~17 disable comments to this; they were re-added surgically. **Mitigation for Phase 2+:** explicitly set the same severity in the throwaway config that production uses, never `off`. If a production rule must be silenced for measurement, use `// eslint-disable` *in the throwaway config* rather than rule-level off.
+  - **Auto-fix is not always type-safe even on `no-unnecessary-type-assertion`.** It removes assertions that the type checker can't verify *without* the assertion (e.g. `as Record<string, unknown>` casts that opened up dynamic indexing, or `as EditorYeastRow[]` that papered over a structural mismatch downstream). We reverted 11 files where the auto-fix broke `tsc --noEmit`. **Mitigation for Phase 2+:** always run `tsc --noEmit` per workspace after `--fix`, and `comm -13` against the pre-fix baseline; revert offenders before commit.
+  - **Per-workspace baselines must be measured directly, not trusted from prior summaries.** The HIGH-full plan claimed `packages/ui` at 0 TS errors; it's actually 25 (pre-existing Tamagui prop typing errors). Always re-measure.
+- **Effort (actual):** ~3 hours (estimate was 30 min — the gap is entirely revert/recovery work above).
+- **Risk:** very low after the safety reverts; remaining changes are auto-fix output that both ESLint and `tsc` accept.
+- **Status:** ✅ **landed** (commit pending push).
 
 #### Phase 2 — Tier A: Promise correctness
 

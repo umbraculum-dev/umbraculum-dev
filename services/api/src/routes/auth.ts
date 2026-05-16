@@ -189,7 +189,7 @@ export async function authRoutes(app: FastifyInstance) {
       const memberships = await workspaces.listWorkspacesForUser(user.id);
       const activeWorkspaceId =
         memberships.length === 1
-          ? memberships[0]!.id
+          ? memberships[0].id
           : null;
 
       const sessionId = makeOpaqueId();
@@ -260,7 +260,7 @@ export async function authRoutes(app: FastifyInstance) {
       const memberships = await workspaces.listWorkspacesForUser(user.id);
       const activeWorkspaceId =
         memberships.length === 1
-          ? memberships[0]!.id
+          ? memberships[0].id
           : null;
 
       const sessionId = makeOpaqueId();

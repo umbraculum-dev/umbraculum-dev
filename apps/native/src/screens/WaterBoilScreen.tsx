@@ -277,7 +277,7 @@ export function WaterBoilScreen() {
     setLoading(true);
     setError(null);
     try {
-      const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
       const [profRes, settingsRes] = await Promise.all([
         api.get("/api/water-profiles"),
         api.get(`/api/recipes/${recipeId}/water-settings`),
@@ -346,7 +346,7 @@ export function WaterBoilScreen() {
   const saveSettings = useCallback(
     async (patch: Record<string, unknown>) => {
       if (!canCall) return;
-      const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
       const res = await api.put(`/api/recipes/${recipeId}/water-settings`, patch);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const d = res.data as { settings?: Record<string, unknown> };
@@ -428,7 +428,7 @@ export function WaterBoilScreen() {
     setManualResult(null);
     setSubmitting(true);
     try {
-      const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
       const payload: Record<string, unknown> = {
         boilSourceWaterProfileId: sourceProfileId,
         boilDilutionWaterProfileId: dilutionProfileId || null,

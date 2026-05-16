@@ -168,7 +168,7 @@ export class IntegrationsService {
         ? undefined
         : input.metadataJson === null
           ? Prisma.JsonNull
-          : (input.metadataJson as Prisma.InputJsonValue);
+          : (input.metadataJson);
     const device = await this.prisma.integrationDevice.upsert({
       where: { integrationId_deviceKey: { integrationId: input.integrationId, deviceKey: key } },
       create: {

@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import { getSharedMessages } from "@brewery/i18n";
-import type { SupportedLocale } from "@brewery/i18n";
 import { LocaleProvider } from "@brewery/i18n-react";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
@@ -28,7 +27,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <LocaleProvider locale={locale as SupportedLocale} messages={messages}>
+      <LocaleProvider locale={locale} messages={messages}>
         <TamaguiProviderWrapper>
           <div className="brew-app-shell">
             <PrimaryNav />

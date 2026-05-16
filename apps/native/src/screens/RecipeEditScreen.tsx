@@ -404,7 +404,7 @@ export function RecipeEditScreen() {
         const fermentationTempC =
           yeastFermentationTempRaw &&
           typeof yeastFermentationTempRaw[row.id] === "number" &&
-          Number.isFinite(yeastFermentationTempRaw[row.id] as number)
+          Number.isFinite(yeastFermentationTempRaw[row.id])
             ? (yeastFermentationTempRaw[row.id] as number)
             : null;
         const oxygenation =
@@ -437,7 +437,7 @@ export function RecipeEditScreen() {
           oxygenation: oxygenation ?? undefined,
           diacetylRest: diacetylRest ?? undefined,
           format: inferredFormat,
-        } as EditorYeastRow;
+        };
       });
 
       setYeastRows(mappedYeastRows);
@@ -593,7 +593,7 @@ export function RecipeEditScreen() {
         maltClass: "base",
         timingUse: "add_to_mash",
         lateAddition: false,
-      } as EditorGristRow,
+      },
     ]);
   }, []);
 
@@ -617,7 +617,7 @@ export function RecipeEditScreen() {
         maltClass,
         timingUse: "add_to_mash",
         lateAddition: false,
-      } as EditorGristRow,
+      },
     ]);
   }, []);
 
@@ -641,7 +641,7 @@ export function RecipeEditScreen() {
         use: "boil",
         timeMinutes: 60,
         form: "pellet",
-      } as EditorHopRow,
+      },
     ]);
   }, []);
 
@@ -663,7 +663,7 @@ export function RecipeEditScreen() {
         use: "boil",
         timeMinutes: 60,
         form: "pellet",
-      } as EditorHopRow,
+      },
     ]);
   }, []);
 
@@ -685,7 +685,7 @@ export function RecipeEditScreen() {
         amountL: null,
         amountKg: null,
         format: "liquid",
-      } as EditorYeastRow,
+      },
     ]);
   }, []);
 
@@ -706,7 +706,7 @@ export function RecipeEditScreen() {
         amountL: null,
         amountKg: null,
         format: "liquid",
-      } as EditorYeastRow,
+      },
     ]);
   }, []);
 
@@ -1257,7 +1257,7 @@ export function RecipeEditScreen() {
                               const kind = v as "" | NonNullable<EditorGristRow["potential"]>["kind"];
                               if (!kind) return updateGristRow(r.id, { potential: null });
                               updateGristRow(r.id, {
-                                potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) } as NonNullable<EditorGristRow["potential"]>,
+                                potential: { kind, value: roundTo(r.potential?.value ?? 0, 3) },
                               });
                             }}
                             closeLabel={tCommon("close")}
@@ -1275,7 +1275,7 @@ export function RecipeEditScreen() {
                               const v = text === "" ? null : Number(text);
                               if (v === null) return updateGristRow(r.id, { potential: null });
                               updateGristRow(r.id, {
-                                potential: { ...r.potential, value: roundTo(v, 3) } as NonNullable<EditorGristRow["potential"]>,
+                                potential: { ...r.potential, value: roundTo(v, 3) },
                               });
                             }}
                             placeholder="—"

@@ -234,7 +234,7 @@ export function BrewdayStepsSettingsScreen() {
   const sectionOptions = useMemo(() => {
     const preset = PRESET_KEYS.map((k) => ({
       value: k,
-      label: t(`presetSections.${k}` as Parameters<typeof t>[0]),
+      label: t(`presetSections.${k}`),
     }));
     const custom = (sections.customSections ?? []).map((s) => ({ value: s.id, label: s.name }));
     return [...preset, ...custom];
@@ -248,7 +248,7 @@ export function BrewdayStepsSettingsScreen() {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+    const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
     api
       .get("/api/brewday-settings")
       .then((res) => {
@@ -302,7 +302,7 @@ export function BrewdayStepsSettingsScreen() {
     setSaveError(null);
     setSaveStatus(null);
     try {
-      const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
       const res = await api.patch("/api/brewday-settings", {
         brewingType,
         sections,
@@ -466,7 +466,7 @@ export function BrewdayStepsSettingsScreen() {
                   {PRESET_KEYS.map((k) => (
                     <CheckboxRow
                       key={k}
-                      label={`${t(`presetSections.${k}` as Parameters<typeof t>[0])} · ${t("exclude")}`}
+                      label={`${t(`presetSections.${k}`)} · ${t("exclude")}`}
                       checked={sections.presetExcludes?.[k] === true}
                       onChange={(next) =>
                         setSections((prev) => ({

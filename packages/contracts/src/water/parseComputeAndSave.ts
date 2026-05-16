@@ -132,7 +132,7 @@ function parseSaltAdditionsResult(v: unknown, label: string): WaterSaltAdditions
         .map((r) => ({
           saltKey: r.saltKey as string,
           grams: r.grams as number,
-          deltasPpm: (isObject(r.deltasPpm) ? r.deltasPpm : {}) as Partial<IonProfilePpm>,
+          deltasPpm: (isObject(r.deltasPpm) ? r.deltasPpm : {}),
         }))
     : [];
   return { baseProfile, resultingProfile, deltasPpm, breakdown };

@@ -74,7 +74,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerxml", content: xml },
     });
     expect(preview.statusCode).toBe(200);
-    const pj = preview.json() as any;
+    const pj = preview.json();
     expect(pj.ok).toBe(true);
     expect(pj.preview.name).toBe("Import Test IPA");
     expect(pj.preview.beerJsonRecipeJson?.beerjson?.version).toBe(1);
@@ -86,7 +86,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerxml", content: xml, styleKey: "custom" },
     });
     expect(imp.statusCode).toBe(200);
-    const ij = imp.json() as any;
+    const ij = imp.json();
     expect(ij.ok).toBe(true);
     expect(ij.recipe.name).toBe("Import Test IPA");
     expect(ij.recipe.beerJsonRecipeJson).toBeTruthy();
@@ -152,7 +152,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerxml", content: xml },
     });
     expect(preview.statusCode).toBe(200);
-    const pj = preview.json() as any;
+    const pj = preview.json();
     expect(pj.ok).toBe(true);
     expect(pj.preview.name).toBe("Mash Test Recipe");
     const mash = pj.preview.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.mash ?? null;
@@ -176,7 +176,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerxml", content: xml, styleKey: "custom" },
     });
     expect(imp.statusCode).toBe(200);
-    const ij = imp.json() as any;
+    const ij = imp.json();
     expect(ij.ok).toBe(true);
     createdRecipeIds.push(ij.recipe.id);
     const storedMash = ij.recipe.beerJsonRecipeJson?.beerjson?.recipes?.[0]?.mash ?? null;
@@ -228,7 +228,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerjson", content: JSON.stringify(doc) },
     });
     expect(preview.statusCode).toBe(200);
-    const pj = preview.json() as any;
+    const pj = preview.json();
     expect(pj.ok).toBe(true);
     expect(pj.preview.name).toBe("Imperial Units Recipe");
     expect(Array.isArray(pj.preview.warnings)).toBe(true);
@@ -242,7 +242,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerjson", content: JSON.stringify(doc), styleKey: "custom" },
     });
     expect(imp.statusCode).toBe(200);
-    const ij = imp.json() as any;
+    const ij = imp.json();
     expect(ij.ok).toBe(true);
     createdRecipeIds.push(ij.recipe.id);
 
@@ -329,7 +329,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerxml", content: xml },
     });
     expect(preview.statusCode).toBe(200);
-    const pj = preview.json() as any;
+    const pj = preview.json();
     expect(pj.ok).toBe(true);
     expect(Array.isArray(pj.previewItems)).toBe(true);
     expect(pj.previewItems.length).toBe(2);
@@ -352,7 +352,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerxml", content: xml },
     });
     expect(imp.statusCode).toBe(200);
-    const ij = imp.json() as any;
+    const ij = imp.json();
     expect(ij.ok).toBe(true);
     expect(Array.isArray(ij.created)).toBe(true);
     expect(Array.isArray(ij.failed)).toBe(true);
@@ -370,7 +370,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       headers: { cookie },
     });
     expect(expAll.statusCode).toBe(200);
-    const doc = expAll.json() as any;
+    const doc = expAll.json();
     expect(doc?.beerjson?.version).toBe(1);
     expect(Array.isArray(doc?.beerjson?.recipes)).toBe(true);
 
@@ -387,7 +387,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerjson", content: JSON.stringify(doc) },
     });
     expect(previewBeerJson.statusCode).toBe(200);
-    const bj = previewBeerJson.json() as any;
+    const bj = previewBeerJson.json();
     expect(bj.ok).toBe(true);
     expect(Array.isArray(bj.previewItems)).toBe(true);
     expect(bj.previewItems.length).toBe(doc.beerjson.recipes.length);
@@ -402,7 +402,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerjson", content: oversized },
     });
     expect(res.statusCode).toBe(400);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("file_too_large");
     expect(body.error?.message).toContain("1 MB");
@@ -417,7 +417,7 @@ describe("recipes import (BeerXML/BeerJSON)", () => {
       payload: { format: "beerjson", content: oversized },
     });
     expect(res.statusCode).toBe(400);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(false);
     expect(body.error?.code).toBe("file_too_large");
     expect(body.error?.message).toContain("5 MB");

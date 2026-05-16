@@ -53,7 +53,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
       payload: { planCode: "pro", provider: "stripe", mode: "purchase" },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(typeof body.billingIntentId).toBe("string");
     expect(body.workspaceId).toBe(workspaceId);
@@ -70,7 +70,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
       payload: { planCode: "pro_plus", provider: "stripe", mode: "purchase" },
     });
     expect(intentRes.statusCode).toBe(200);
-    const intentBody = intentRes.json() as any;
+    const intentBody = intentRes.json();
     const billingIntentId = intentBody.billingIntentId as string;
 
     // Send the payload as an explicit JSON string so we know the exact bytes
@@ -139,7 +139,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
       headers: { cookie },
     });
     expect(billing.statusCode).toBe(200);
-    const body = billing.json() as any;
+    const body = billing.json();
     expect(body.ok).toBe(true);
     expect(body.tier).toBe("pro_plus");
   });
@@ -195,7 +195,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
       payload: { name: "R5", styleKey: "custom", beerJsonRecipeJson },
     });
     expect(create6.statusCode).toBe(403);
-    expect((create6.json() as any).error?.code).toBe("plan_limit_recipes");
+    expect((create6.json()).error?.code).toBe("plan_limit_recipes");
   });
 
   it("Free tier enforces version limit (max 2 versions per recipe)", async () => {
@@ -233,7 +233,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
       payload: { name: "V0", styleKey: "custom", beerJsonRecipeJson },
     });
     expect(create.statusCode).toBe(200);
-    const recipeId = (create.json() as any).recipe.id as string;
+    const recipeId = (create.json()).recipe.id as string;
 
     const v1 = await app.inject({
       method: "POST",
@@ -248,7 +248,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
       headers: { cookie },
     });
     expect(v2.statusCode).toBe(403);
-    expect((v2.json() as any).error?.code).toBe("plan_limit_versions");
+    expect((v2.json()).error?.code).toBe("plan_limit_versions");
   });
 });
 

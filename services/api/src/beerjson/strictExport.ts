@@ -42,7 +42,7 @@ export function strictBeerJsonExport(doc: unknown): unknown {
   stripInternalFieldsOnAdditions(ing?.culture_additions);
   stripInternalFieldsOnAdditions(ing?.miscellaneous_additions);
 
-  return out as unknown;
+  return out;
 }
 
 export type RecipeForExport = { beerJsonRecipeJson: unknown; recipeExtJson?: unknown };

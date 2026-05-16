@@ -24,11 +24,7 @@ import { parseBoilComputeAndSaveResponse } from "@brewery/contracts";
 import type { WaterCalcDerivation } from "@brewery/contracts";
 import { asRecord } from "../../../../_lib/typeGuards";
 import { formatWithHint } from "../../../../../src/i18n/format";
-import {
-  fetchRecipeWaterSettings,
-  saveRecipeWaterSettings,
-  type RecipeWaterSettingsResponse,
-} from "../_lib/waterSettings";
+import { fetchRecipeWaterSettings, saveRecipeWaterSettings } from "../_lib/waterSettings";
 
 type BoilAcidResult = {
   acidRequiredMl: number | null;
@@ -212,7 +208,7 @@ export default function BoilWaterPage() {
     if (!recipeId) return;
     setSettingsError(null);
     try {
-      const data = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
+      const data = (await fetchRecipeWaterSettings(recipeId));
       const s = data.settings;
       if (!s) return;
 

@@ -11,7 +11,7 @@ function asArray<T>(v: unknown): T[] {
 }
 
 function readAmount(amount: unknown): AmountNode {
-  return isObject(amount) ? (amount as AmountNode) : {};
+  return isObject(amount) ? (amount) : {};
 }
 
 function readMassKg(amount: unknown): number | null {

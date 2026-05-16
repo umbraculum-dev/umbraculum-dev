@@ -28,7 +28,6 @@ import {
   PITCH_RATE_TO_MILLION_CELLS_PER_ML_P,
   YEAST_PITCH_RATE_OPTIONS,
   type EditorYeastRow,
-  type YeastPitchRateKey,
 } from "../_lib/beerjsonRecipe";
 import { mathExplain } from "../[id]/edit/_lib/mathExplain";
 
@@ -439,7 +438,7 @@ function YeastEditorEditable({
       const cellsB = computeEstimatedCellsB(
         batchSizeForCells,
         analysisOg,
-        r.pitchRate as YeastPitchRateKey,
+        r.pitchRate,
       );
       if (cellsB == null) continue;
       const cellsPerLOverride =
@@ -749,7 +748,7 @@ function YeastEditorEditable({
                                 ? computeEstimatedCellsB(
                                     batchSizeForCells,
                                     analysisOg,
-                                    r.pitchRate as YeastPitchRateKey,
+                                    r.pitchRate,
                                   )
                                 : null;
                             const cellsPerL =
@@ -953,7 +952,7 @@ function YeastEditorEditable({
                                 const cellsB = computeEstimatedCellsB(
                                   batchSizeForCells,
                                   analysisOg,
-                                  r.pitchRate as YeastPitchRateKey,
+                                  r.pitchRate,
                                 );
                                 return cellsB != null ? t("yeastEstimatedCellsValue", { value: Math.round(cellsB) }) : "—";
                               })()
@@ -1229,7 +1228,7 @@ function YeastEditorEditable({
                             r.manualCellCount.totalCells > 0 &&
                             Number.isFinite(r.manualCellCount.aliveCells) ? (() => {
                               const rawViability =
-                                (r.manualCellCount!.aliveCells / r.manualCellCount!.totalCells) * 100;
+                                (r.manualCellCount.aliveCells / r.manualCellCount.totalCells) * 100;
                               const displayViability = Math.min(100, rawViability);
                               const isInvalid = rawViability > 100;
                               return (

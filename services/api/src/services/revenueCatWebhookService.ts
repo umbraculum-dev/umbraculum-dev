@@ -37,7 +37,7 @@ export class RevenueCatWebhookService {
   }
 
   async handleEvent(payload: unknown) {
-    const p: RevenueCatPayload = isObject(payload) ? (payload as RevenueCatPayload) : {};
+    const p: RevenueCatPayload = isObject(payload) ? (payload) : {};
     const userId = getString(p.app_user_id);
 
     // Always record an audit event even if we can't apply it.

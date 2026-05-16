@@ -198,7 +198,7 @@ function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown
     const formRaw = typeof h.form === "string" ? h.form : "";
     const formFromBeerJson: HopForm | null =
       formRaw === "extract" || formRaw === "leaf" || formRaw === "leaf (wet)" || formRaw === "pellet" || formRaw === "powder" || formRaw === "plug"
-        ? (formRaw as HopForm)
+        ? (formRaw)
         : null;
     const form: HopForm | null = override ?? formFromBeerJson;
 

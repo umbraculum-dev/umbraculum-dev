@@ -41,7 +41,7 @@ describe("sessions + workspaces", () => {
     });
     expect(res.statusCode).toBe(200);
 
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(Array.isArray(body.workspaces)).toBe(true);
     expect(body.workspaces.some((w: any) => w.id === workspaceId)).toBe(true);

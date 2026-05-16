@@ -277,7 +277,7 @@ export async function brewSessionsRoutes(app: FastifyInstance) {
     const brewSessionId = typeof params.brewSessionId === "string" ? params.brewSessionId : "";
     const body = (req.body ?? {}) as { reason?: unknown };
     const reasonRaw = typeof body.reason === "string" ? body.reason : "";
-    const reason = reasonRaw === "auto" || reasonRaw === "manual" ? (reasonRaw as "auto" | "manual") : null;
+    const reason = reasonRaw === "auto" || reasonRaw === "manual" ? (reasonRaw) : null;
     const updated = await svc.stopSession(ctx.userId, ctx.activeWorkspaceId, brewSessionId, { reason });
     return { ok: true, brewSession: updated };
   });

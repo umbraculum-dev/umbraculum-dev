@@ -32,7 +32,7 @@ describe("ingredients: yeasts", () => {
       headers: { cookie },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(Array.isArray(body.items)).toBe(true);
     const hit = body.items.find((it: any) => it.id === created.id);
@@ -45,7 +45,7 @@ describe("ingredients: yeasts", () => {
       headers: { cookie },
     });
     expect(resByProduct.statusCode).toBe(200);
-    const bodyByProduct = resByProduct.json() as any;
+    const bodyByProduct = resByProduct.json();
     expect(bodyByProduct.ok).toBe(true);
     const hitByProduct = bodyByProduct.items.find((it: any) => it.id === created.id);
     expect(hitByProduct).toBeTruthy();

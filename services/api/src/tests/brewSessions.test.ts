@@ -73,7 +73,7 @@ describe("brew sessions (account scoped)", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    recipeId = (create.json() as any).recipe.id as string;
+    recipeId = (create.json()).recipe.id as string;
   });
 
   afterAll(async () => {
@@ -95,7 +95,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(typeof body.brewSession.id).toBe("string");
     expect(typeof body.brewSession.code).toBe("string");
@@ -142,7 +142,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(detail.statusCode).toBe(200);
-    const session = (detail.json() as any).brewSession;
+    const session = (detail.json()).brewSession;
     const steps = session.steps as any[];
     expect(steps.length).toBeGreaterThan(1);
 
@@ -162,7 +162,7 @@ describe("brew sessions (account scoped)", () => {
       payload: { steps: swapped },
     });
     expect(save.statusCode).toBe(200);
-    const saved = save.json() as any;
+    const saved = save.json();
     expect(saved.ok).toBe(true);
     expect(saved.steps[0].id).toBe(steps[1].id);
     expect(saved.steps[0].isDisabled).toBe(true);
@@ -175,7 +175,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(start.statusCode).toBe(200);
-    expect((start.json() as any).brewSession.status).toBe("running");
+    expect((start.json()).brewSession.status).toBe("running");
 
     const pause = await app.inject({
       method: "POST",
@@ -183,7 +183,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(pause.statusCode).toBe(200);
-    expect((pause.json() as any).brewSession.status).toBe("paused");
+    expect((pause.json()).brewSession.status).toBe("paused");
 
     const stop = await app.inject({
       method: "POST",
@@ -192,7 +192,7 @@ describe("brew sessions (account scoped)", () => {
       payload: { reason: "manual" },
     });
     expect(stop.statusCode).toBe(200);
-    expect((stop.json() as any).brewSession.status).toBe("stopped");
+    expect((stop.json()).brewSession.status).toBe("stopped");
 
     const detail = await app.inject({
       method: "GET",
@@ -200,7 +200,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(detail.statusCode).toBe(200);
-    const logs = ((detail.json() as any).brewSession.logs ?? []) as any[];
+    const logs = ((detail.json()).brewSession.logs ?? []) as any[];
     const stoppedLog = logs.find((l) => l?.kind === "session_stopped");
     expect(stoppedLog).toBeTruthy();
     expect(stoppedLog.payloadJson?.reason).toBe("manual");
@@ -213,7 +213,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     try {
       const stopAuto = await app.inject({
@@ -223,7 +223,7 @@ describe("brew sessions (account scoped)", () => {
         payload: { reason: "auto" },
       });
       expect(stopAuto.statusCode).toBe(200);
-      expect((stopAuto.json() as any).brewSession.status).toBe("stopped");
+      expect((stopAuto.json()).brewSession.status).toBe("stopped");
 
       const detail = await app.inject({
         method: "GET",
@@ -231,7 +231,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail.statusCode).toBe(200);
-      const logs = ((detail.json() as any).brewSession.logs ?? []) as any[];
+      const logs = ((detail.json()).brewSession.logs ?? []) as any[];
       const stoppedLog = logs.find((l) => l?.kind === "session_stopped");
       expect(stoppedLog).toBeTruthy();
       expect(stoppedLog.payloadJson?.reason).toBe("auto");
@@ -250,7 +250,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     try {
       const started = await app.inject({
@@ -266,7 +266,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail1.statusCode).toBe(200);
-      const steps1 = ((detail1.json() as any).brewSession.steps ?? []) as any[];
+      const steps1 = ((detail1.json()).brewSession.steps ?? []) as any[];
       expect(steps1.length).toBeGreaterThan(0);
       const stepId = steps1[0].id as string;
 
@@ -283,7 +283,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(paused.statusCode).toBe(200);
-      expect((paused.json() as any).brewSession.status).toBe("paused");
+      expect((paused.json()).brewSession.status).toBe("paused");
 
       const detail2 = await app.inject({
         method: "GET",
@@ -291,7 +291,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail2.statusCode).toBe(200);
-      const steps2 = ((detail2.json() as any).brewSession.steps ?? []) as any[];
+      const steps2 = ((detail2.json()).brewSession.steps ?? []) as any[];
       const updated2 = steps2.find((s) => s.id === stepId);
       expect(updated2).toBeTruthy();
       expect(updated2.timerState).toBe("paused");
@@ -304,7 +304,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(stopped.statusCode).toBe(200);
-      expect((stopped.json() as any).brewSession.status).toBe("stopped");
+      expect((stopped.json()).brewSession.status).toBe("stopped");
 
       const detail3 = await app.inject({
         method: "GET",
@@ -312,7 +312,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail3.statusCode).toBe(200);
-      const steps3 = ((detail3.json() as any).brewSession.steps ?? []) as any[];
+      const steps3 = ((detail3.json()).brewSession.steps ?? []) as any[];
       const updated3 = steps3.find((s) => s.id === stepId);
       expect(updated3).toBeTruthy();
       expect(updated3.timerState).toBe("stopped");
@@ -331,7 +331,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     try {
       const started = await app.inject({
@@ -347,7 +347,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail1.statusCode).toBe(200);
-      const steps1 = ((detail1.json() as any).brewSession.steps ?? []) as any[];
+      const steps1 = ((detail1.json()).brewSession.steps ?? []) as any[];
       const mashAnchor = steps1.find((s) => s?.name === "Start mash") ?? steps1[0];
       expect(mashAnchor?.id).toBeTruthy();
 
@@ -357,7 +357,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(timerStarted.statusCode).toBe(200);
-      expect((timerStarted.json() as any).step.timerState).toBe("running");
+      expect((timerStarted.json()).step.timerState).toBe("running");
 
       const paused = await app.inject({
         method: "POST",
@@ -365,7 +365,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(paused.statusCode).toBe(200);
-      expect((paused.json() as any).brewSession.status).toBe("paused");
+      expect((paused.json()).brewSession.status).toBe("paused");
 
       const resumed = await app.inject({
         method: "POST",
@@ -373,7 +373,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(resumed.statusCode).toBe(200);
-      expect((resumed.json() as any).brewSession.status).toBe("running");
+      expect((resumed.json()).brewSession.status).toBe("running");
 
       const detail2 = await app.inject({
         method: "GET",
@@ -381,7 +381,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail2.statusCode).toBe(200);
-      const steps2 = ((detail2.json() as any).brewSession.steps ?? []) as any[];
+      const steps2 = ((detail2.json()).brewSession.steps ?? []) as any[];
       const mash2 = steps2.find((s) => s.id === mashAnchor.id);
       expect(mash2).toBeTruthy();
       expect(mash2.timerState).toBe("running");
@@ -400,7 +400,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     try {
       const detail1 = await app.inject({
@@ -409,7 +409,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail1.statusCode).toBe(200);
-      const steps1 = ((detail1.json() as any).brewSession.steps ?? []) as any[];
+      const steps1 = ((detail1.json()).brewSession.steps ?? []) as any[];
       expect(steps1.length).toBeGreaterThan(0);
       const stepId = steps1[0].id as string;
 
@@ -420,8 +420,8 @@ describe("brew sessions (account scoped)", () => {
         payload: { customTimerEnabled: true },
       });
       expect(patch.statusCode).toBe(200);
-      expect((patch.json() as any)?.ok).toBe(true);
-      expect((patch.json() as any)?.step?.customTimerEnabled).toBe(true);
+      expect((patch.json())?.ok).toBe(true);
+      expect((patch.json())?.step?.customTimerEnabled).toBe(true);
 
       const timerStarted = await app.inject({
         method: "POST",
@@ -436,7 +436,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail2.statusCode).toBe(200);
-      const steps2 = ((detail2.json() as any).brewSession.steps ?? []) as any[];
+      const steps2 = ((detail2.json()).brewSession.steps ?? []) as any[];
       const updated = steps2.find((s) => s.id === stepId);
       expect(updated).toBeTruthy();
       expect(updated.customTimerEnabled).toBe(true);
@@ -454,7 +454,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     try {
       const detail1 = await app.inject({
@@ -463,7 +463,7 @@ describe("brew sessions (account scoped)", () => {
         headers: { cookie },
       });
       expect(detail1.statusCode).toBe(200);
-      const steps1 = ((detail1.json() as any).brewSession.steps ?? []) as any[];
+      const steps1 = ((detail1.json()).brewSession.steps ?? []) as any[];
       expect(steps1.length).toBeGreaterThan(1);
 
       const base = steps1.find((s) => typeof s?.minutesPlanned === "number" && s.minutesPlanned > 0) ?? steps1[0];
@@ -501,7 +501,7 @@ describe("brew sessions (account scoped)", () => {
         payload: { steps: removedPayload },
       });
       expect(save2.statusCode).toBe(200);
-      const stepsOut = (save2.json() as any).steps as any[];
+      const stepsOut = (save2.json()).steps as any[];
       expect(stepsOut.some((s) => s.id === baseId)).toBe(false);
       const otherOut = stepsOut.find((s) => s.id === otherId);
       expect(otherOut).toBeTruthy();
@@ -523,7 +523,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     const stop = await app.inject({
       method: "POST",
@@ -548,7 +548,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(created.statusCode).toBe(200);
-    const id2 = (created.json() as any).brewSession.id as string;
+    const id2 = (created.json()).brewSession.id as string;
 
     const start = await app.inject({
       method: "POST",
@@ -563,7 +563,7 @@ describe("brew sessions (account scoped)", () => {
       headers: { cookie },
     });
     expect(del.statusCode).toBe(400);
-    expect((del.json() as any)?.ok).toBe(false);
+    expect((del.json())?.ok).toBe(false);
   });
 });
 

@@ -22,7 +22,7 @@ export function formatWithHint(
 ): string {
   const decimals =
     formatHints?.[unitKey] && typeof formatHints[unitKey].decimals === "number" && Number.isFinite(formatHints[unitKey].decimals)
-      ? formatHints[unitKey].decimals!
+      ? formatHints[unitKey].decimals
       : fallbackDecimals;
   return typeof value === "number" && Number.isFinite(value) ? formatFixed(locale, value, decimals) : "—";
 }

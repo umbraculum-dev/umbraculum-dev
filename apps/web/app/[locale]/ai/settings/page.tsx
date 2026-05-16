@@ -4,14 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import type { WorkspaceAiSettings, AiRoleLimits } from "@brewery/contracts";
+import type { WorkspaceAiSettings } from "@brewery/contracts";
 
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 
 const ROLE_KEYS = ["brewery_admin", "member", "viewer"] as const;
-type RoleKey = (typeof ROLE_KEYS)[number];
+type _RoleKey = (typeof ROLE_KEYS)[number];
 
 interface FormState {
   enabled: boolean;
@@ -25,7 +25,7 @@ interface FormState {
 function settingsToForm(s: WorkspaceAiSettings): FormState {
   const limits: Record<string, number> = {};
   for (const k of ROLE_KEYS) {
-    const v = (s.roleLimits as AiRoleLimits)[k];
+    const v = (s.roleLimits)[k];
     limits[k] = typeof v === "number" ? v : 0;
   }
   return {
@@ -275,7 +275,7 @@ export default function AiSettingsPage() {
               {ROLE_KEYS.map((role) => (
                 <XStack key={role} ai="center" gap="$3">
                   <View width={150}>
-                    <SizableText>{tRoles(role as RoleKey)}</SizableText>
+                    <SizableText>{tRoles(role)}</SizableText>
                   </View>
                   <View flex={1}>
                     <Input
@@ -290,7 +290,7 @@ export default function AiSettingsPage() {
                       keyboardType="numeric"
                       inputMode="numeric"
                       disabled={!isAdmin || saving}
-                      aria-label={tRoles(role as RoleKey)}
+                      aria-label={tRoles(role)}
                     />
                   </View>
                 </XStack>

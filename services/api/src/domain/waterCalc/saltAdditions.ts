@@ -100,7 +100,7 @@ export function applySaltAdditions(baseProfile: IonProfilePpm, volumeLiters: num
   if (!(volumeLiters > 0)) throw new Error("volumeLiters must be > 0");
 
   for (const [k, v] of Object.entries(baseProfile)) {
-    assertFinite(v as number, `baseProfile.${k}`);
+    assertFinite(v, `baseProfile.${k}`);
   }
 
   const baseMgTotal: IonProfilePpm = {
@@ -124,7 +124,7 @@ export function applySaltAdditions(baseProfile: IonProfilePpm, volumeLiters: num
 
   for (const a of additions) {
     if (!a || typeof a.saltKey !== "string") throw new Error("Invalid salt addition");
-    const salt = SALTS[a.saltKey as SaltKey];
+    const salt = SALTS[a.saltKey];
     if (!salt) throw new Error(`Unknown saltKey: ${String(a.saltKey)}`);
     if (typeof a.grams !== "number" || !Number.isFinite(a.grams) || a.grams < 0) {
       throw new Error(`Invalid grams for ${salt.key}`);

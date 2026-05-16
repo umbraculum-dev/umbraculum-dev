@@ -78,7 +78,7 @@ function TabsNavigator({ tabLabels }: { tabLabels: { dashboard: string; recipes:
             accessibilityElementsHidden
             importantForAccessibility="no"
           >
-            {iconFor(route.name as keyof TabParamList)}
+            {iconFor(route.name)}
           </Text>
         ),
       })}

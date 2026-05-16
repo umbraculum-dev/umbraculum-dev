@@ -51,7 +51,7 @@ describe("water calc: mash acidification + salt additions", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result.achievedPh).toBeGreaterThan(3.0);
     expect(body.result.achievedPh).toBeLessThan(8.0);
@@ -69,7 +69,7 @@ describe("water calc: mash acidification + salt additions", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result.estimatedMashPhRoomTemp).toBeGreaterThan(0);
     expect(body.result.estimatedMashPhRoomTemp).toBeLessThan(14);
@@ -98,8 +98,8 @@ describe("water calc: mash acidification + salt additions", () => {
     });
     expect(resHigh.statusCode).toBe(200);
 
-    const low = (resLow.json() as any).result.estimatedMashPhRoomTemp as number;
-    const high = (resHigh.json() as any).result.estimatedMashPhRoomTemp as number;
+    const low = (resLow.json()).result.estimatedMashPhRoomTemp as number;
+    const high = (resHigh.json()).result.estimatedMashPhRoomTemp as number;
     expect(high).toBeLessThan(low);
   });
 
@@ -115,7 +115,7 @@ describe("water calc: mash acidification + salt additions", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result.estimatedMashPhRoomTemp).toBeGreaterThan(0);
     expect(body.result.estimatedMashPhRoomTemp).toBeLessThan(14);
@@ -138,7 +138,7 @@ describe("water calc: mash acidification + salt additions", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result.acidRequiredMl).toBeTypeOf("number");
     expect(body.result.acidRequiredMl).toBeGreaterThan(0);
@@ -176,8 +176,8 @@ describe("water calc: mash acidification + salt additions", () => {
     });
     expect(resHigh.statusCode).toBe(200);
 
-    const low = (resLow.json() as any).result.acidRequiredMl as number;
-    const high = (resHigh.json() as any).result.acidRequiredMl as number;
+    const low = (resLow.json()).result.acidRequiredMl as number;
+    const high = (resHigh.json()).result.acidRequiredMl as number;
     expect(high).toBeLessThan(low);
   });
 
@@ -200,7 +200,7 @@ describe("water calc: mash acidification + salt additions", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result.resultingProfile.calcium).toBeGreaterThan(0);
     expect(body.result.resultingProfile.sulfate).toBeGreaterThan(0);
@@ -259,8 +259,8 @@ describe("water calc: mash acidification + salt additions", () => {
     });
     expect(resWithGrist.statusCode).toBe(200);
 
-    const phNoGrist = ((resNoGrist.json() as any).result.ph.value ?? NaN) as number;
-    const phWithGrist = ((resWithGrist.json() as any).result.ph.value ?? NaN) as number;
+    const phNoGrist = ((resNoGrist.json()).result.ph.value ?? NaN) as number;
+    const phWithGrist = ((resWithGrist.json()).result.ph.value ?? NaN) as number;
 
     expect(Number.isFinite(phNoGrist)).toBe(true);
     expect(Number.isFinite(phWithGrist)).toBe(true);

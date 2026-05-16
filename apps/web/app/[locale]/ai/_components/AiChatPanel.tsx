@@ -24,5 +24,5 @@ export function AiChatPanel() {
     router.push("upgrade");
   }, [router]);
 
-  return <SharedAiChatPanel chat={chat} t={t as unknown as (key: string, vars?: Record<string, string | number>) => string} onOpenUpgrade={onOpenUpgrade} />;
+  return <SharedAiChatPanel chat={chat} t={t} onOpenUpgrade={onOpenUpgrade} />;
 }

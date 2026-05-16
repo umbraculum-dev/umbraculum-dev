@@ -47,7 +47,7 @@ describe("water-calc routes", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result).toBeTruthy();
     expect(body.result.acidRequiredMl).toBeCloseTo(0.361072950558936, 9);
@@ -70,7 +70,7 @@ describe("water-calc routes", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as any;
+    const body = res.json();
     expect(body.ok).toBe(true);
     expect(body.result).toBeTruthy();
     expect(body.result.achievedPh).toBeCloseTo(5.6, 2);

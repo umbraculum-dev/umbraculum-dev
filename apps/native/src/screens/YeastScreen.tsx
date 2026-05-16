@@ -253,7 +253,7 @@ export function YeastScreen() {
       setYeastRows(
         baseYeast.map((row) => {
           const pitchRate = yeastPitchRateRaw && typeof yeastPitchRateRaw[row.id] === "string" ? (yeastPitchRateRaw[row.id] as string) : null;
-          const fermentationTempC = yeastFermentationTempRaw && typeof yeastFermentationTempRaw[row.id] === "number" && Number.isFinite(yeastFermentationTempRaw[row.id] as number) ? (yeastFermentationTempRaw[row.id] as number) : null;
+          const fermentationTempC = yeastFermentationTempRaw && typeof yeastFermentationTempRaw[row.id] === "number" && Number.isFinite(yeastFermentationTempRaw[row.id]) ? (yeastFermentationTempRaw[row.id] as number) : null;
           const oxygenation = yeastOxygenationRaw && (yeastOxygenationRaw[row.id] === "yes" || yeastOxygenationRaw[row.id] === "no") ? (yeastOxygenationRaw[row.id] as "yes" | "no") : null;
           const diacetylRest = yeastDiacetylRestRaw && (yeastDiacetylRestRaw[row.id] === "yes" || yeastDiacetylRestRaw[row.id] === "no") ? (yeastDiacetylRestRaw[row.id] as "yes" | "no") : null;
           const format = yeastFormatRaw && (yeastFormatRaw[row.id] === "dry" || yeastFormatRaw[row.id] === "liquid" || yeastFormatRaw[row.id] === "slurry") ? (yeastFormatRaw[row.id] as "dry" | "liquid" | "slurry") : null;
@@ -262,7 +262,7 @@ export function YeastScreen() {
           const species = typeof speciesRaw === "string" && (validSpecies as ReadonlyArray<string>).includes(speciesRaw) ? (speciesRaw as (typeof validSpecies)[number]) : null;
           const needsPropagation = yeastNeedsPropagationRaw && (yeastNeedsPropagationRaw[row.id] === "yes" || yeastNeedsPropagationRaw[row.id] === "no") ? (yeastNeedsPropagationRaw[row.id] as "yes" | "no") : null;
           const manualRaw = yeastManualCellCountRaw && asRecord(yeastManualCellCountRaw[row.id]) ? (yeastManualCellCountRaw[row.id] as { dilutionFactor?: number; aliveCells?: number; totalCells?: number }) : null;
-          const dilutionFactor = manualRaw?.dilutionFactor === 200 || manualRaw?.dilutionFactor === 2000 ? (manualRaw.dilutionFactor as 200 | 2000) : undefined;
+          const dilutionFactor = manualRaw?.dilutionFactor === 200 || manualRaw?.dilutionFactor === 2000 ? (manualRaw.dilutionFactor) : undefined;
           const aliveCells = typeof manualRaw?.aliveCells === "number" && Number.isFinite(manualRaw.aliveCells) && manualRaw.aliveCells > 0 ? manualRaw.aliveCells : undefined;
           const totalCells = typeof manualRaw?.totalCells === "number" && Number.isFinite(manualRaw.totalCells) && manualRaw.totalCells > 0 ? manualRaw.totalCells : undefined;
           const manualCellCount = dilutionFactor != null && aliveCells != null && totalCells != null ? { dilutionFactor, aliveCells, totalCells } : undefined;
@@ -311,7 +311,7 @@ export function YeastScreen() {
   const addYeastRow = (row?: Partial<EditorYeastRow>) => {
     setYeastRows((prev) => [
       ...prev,
-      { id: newRowId(), ingredientId: null, name: "", lab: null, productId: null, attenuationMin: null, attenuationMax: null, ...row } as EditorYeastRow,
+      { id: newRowId(), ingredientId: null, name: "", lab: null, productId: null, attenuationMin: null, attenuationMax: null, ...row },
     ]);
   };
 
@@ -469,7 +469,7 @@ export function YeastScreen() {
       const format = r.format === "dry" || r.format === "liquid" || r.format === "slurry" ? r.format : null;
       const pitchRateValid = r.pitchRate && YEAST_PITCH_RATE_OPTIONS.some((o) => o.value === r.pitchRate);
       if (!format || !pitchRateValid || batchSizeForCellsVal == null || analysisOg == null) continue;
-      const cellsB = computeEstimatedCellsB(batchSizeForCellsVal, analysisOg, r.pitchRate!);
+      const cellsB = computeEstimatedCellsB(batchSizeForCellsVal, analysisOg, r.pitchRate);
       if (cellsB == null) continue;
       const cellsPerLOverride =
         format === "slurry" && r.manualCellCount
@@ -867,7 +867,7 @@ export function YeastScreen() {
                                   <ReadOnlyField
                                     value={
                                       (() => {
-                                        const raw = (r.manualCellCount!.aliveCells / r.manualCellCount!.totalCells) * 100;
+                                        const raw = (r.manualCellCount.aliveCells / r.manualCellCount.totalCells) * 100;
                                         return raw <= 100 ? `${Math.min(100, raw).toFixed(1)}%` : "";
                                       })()
                                     }

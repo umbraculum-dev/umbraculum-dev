@@ -71,7 +71,7 @@ describe("equipment-profiles", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
     expect(created.profile.name).toBe("Test Equipment Profile 1");
     expect(created.profile.equipment.kettle.kettleVolumeLiters).toBe(35);
@@ -87,7 +87,7 @@ describe("equipment-profiles", () => {
       },
     });
     expect(patch.statusCode).toBe(200);
-    const patched = patch.json() as any;
+    const patched = patch.json();
     expect(patched.ok).toBe(true);
     expect(patched.profile.name).toBe("Test Equipment Profile 1 (updated)");
     expect(patched.profile.equipment.kettle.kettleVolumeLiters).toBe(40);
@@ -98,7 +98,7 @@ describe("equipment-profiles", () => {
       headers: { cookie: cookieAdmin },
     });
     expect(list.statusCode).toBe(200);
-    const listed = list.json() as any;
+    const listed = list.json();
     expect(listed.ok).toBe(true);
     expect(Array.isArray(listed.profiles)).toBe(true);
     expect(listed.profiles.some((p: any) => p.id === created.profile.id)).toBe(true);
@@ -124,7 +124,7 @@ describe("equipment-profiles", () => {
       },
     });
     expect(create.statusCode).toBe(200);
-    const created = create.json() as any;
+    const created = create.json();
     expect(created.ok).toBe(true);
     expect(created.profile.name).toBe("Test Equipment Profile Viewer 1");
 
@@ -142,7 +142,7 @@ describe("equipment-profiles", () => {
       headers: { cookie: cookieViewer },
     });
     expect(list.statusCode).toBe(200);
-    const listed = list.json() as any;
+    const listed = list.json();
     expect(listed.ok).toBe(true);
     expect(listed.profiles.some((p: any) => p.id === created.profile.id)).toBe(true);
 

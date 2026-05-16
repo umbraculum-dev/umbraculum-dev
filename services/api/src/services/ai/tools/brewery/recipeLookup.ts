@@ -37,7 +37,7 @@ interface RecipeLookupOutput {
 function readNumeric(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (value && typeof value === "object" && "value" in value) {
-    const v = (value as { value: unknown }).value;
+    const v = (value).value;
     if (typeof v === "number" && Number.isFinite(v)) return v;
   }
   return null;

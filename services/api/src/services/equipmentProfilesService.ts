@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
 import { WorkspacesService } from "./workspacesService.js";
 
@@ -124,7 +124,7 @@ export class EquipmentProfilesService {
 
     return this.prisma.equipmentProfile.update({
       where: { id },
-      data: data as Prisma.EquipmentProfileUncheckedUpdateInput,
+      data: data,
     });
   }
 

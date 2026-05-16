@@ -78,7 +78,7 @@ describe("ai (chat + settings + gating)", () => {
       payload: { message: "hello" },
     });
     expect(res.statusCode).toBe(402);
-    const body = res.json() as { error?: { code?: string } };
+    const body = res.json();
     expect(body.error?.code).toBe("ai_subscription_required");
   });
 
@@ -102,7 +102,7 @@ describe("ai (chat + settings + gating)", () => {
       payload: { message: "hello" },
     });
     expect(res.statusCode).toBe(403);
-    const body = res.json() as { error?: { code?: string } };
+    const body = res.json();
     expect(body.error?.code).toBe("ai_not_enabled");
   });
 
@@ -131,7 +131,7 @@ describe("ai (chat + settings + gating)", () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as { settings: { hasKey?: boolean; enabled?: boolean } };
+    const body = res.json();
     expect(body.settings.hasKey).toBe(true);
     expect(body.settings.enabled).toBe(true);
     expect(JSON.stringify(body)).not.toContain("sk-ant-test-1");
@@ -225,7 +225,7 @@ describe("ai (chat + settings + gating)", () => {
       payload: { message: "another?" },
     });
     expect(res.statusCode).toBe(429);
-    const body = res.json() as { error?: { code?: string; details?: { scope?: string } } };
+    const body = res.json();
     expect(body.error?.code).toBe("ai_rate_limit");
     expect(body.error?.details?.scope).toBe("user_daily");
     // Restore for any subsequent tests.
@@ -244,10 +244,7 @@ describe("ai (chat + settings + gating)", () => {
       headers: { cookie: adminCookie },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json() as {
-      monthly: { tokensIn: number; tokensOut: number; callCount: number };
-      byUser: Array<{ userId: string }>;
-    };
+    const body = res.json();
     expect(body.monthly.callCount).toBeGreaterThanOrEqual(2);
     expect(body.byUser.length).toBeGreaterThanOrEqual(1);
   });
@@ -259,7 +256,7 @@ describe("ai (chat + settings + gating)", () => {
       headers: { cookie: memberCookie },
     });
     expect(res.statusCode).toBe(400);
-    const body = res.json() as { error?: { code?: string } };
+    const body = res.json();
     expect(body.error?.code).toBe("ai_admin_only");
   });
 });

@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
 import type { Translator, TranslationValues, RichTranslationValues } from "./index";
@@ -14,7 +13,7 @@ export function useT(namespace: string): Translator {
       // Cast through `unknown` because next-intl's RichTranslationValues is a
       // narrower shape than ours (it requires React-specific tag functions).
       // Our type is intentionally looser for cross-platform use.
-      t.rich(key, values as unknown as Parameters<typeof t.rich>[1]) as ReactNode,
+      t.rich(key, values as unknown as Parameters<typeof t.rich>[1]),
   };
 }
 

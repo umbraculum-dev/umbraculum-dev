@@ -32,7 +32,7 @@ function formatWithHint(
 ): string {
   const decimals =
     formatHints?.[unitKey]?.decimals != null && Number.isFinite(formatHints[unitKey].decimals)
-      ? formatHints[unitKey].decimals!
+      ? formatHints[unitKey].decimals
       : fallbackDecimals;
   return typeof value === "number" && Number.isFinite(value) ? formatFixed(locale, value, decimals) : "—";
 }

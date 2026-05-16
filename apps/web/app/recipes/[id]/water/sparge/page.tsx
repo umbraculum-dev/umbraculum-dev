@@ -27,11 +27,7 @@ import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseSpargeComputeAndSaveResponse } from "@brewery/contracts";
 import type { WaterCalcDerivation, WaterOverallResult } from "@brewery/contracts";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
-import {
-  fetchRecipeWaterSettings,
-  saveRecipeWaterSettings,
-  type RecipeWaterSettingsResponse,
-} from "../_lib/waterSettings";
+import { fetchRecipeWaterSettings, saveRecipeWaterSettings } from "../_lib/waterSettings";
 
 type SpargeResult = {
   acidRequiredMl: number | null;
@@ -195,7 +191,7 @@ export default function SpargeWaterPage() {
     if (!recipeId) return;
     setSettingsError(null);
     try {
-      const data = (await fetchRecipeWaterSettings(recipeId)) as RecipeWaterSettingsResponse;
+      const data = (await fetchRecipeWaterSettings(recipeId));
       const s = data.settings;
       if (!s) return;
 

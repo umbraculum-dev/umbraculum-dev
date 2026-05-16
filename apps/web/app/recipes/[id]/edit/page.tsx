@@ -157,13 +157,13 @@ function getRecipeEfficiencyPercent(recipe: Recipe | null): number | null {
   const mash = equipment ? asRecord(equipment.mash) : null;
   const mashEff =
     mash && typeof mash.mashEfficiencyPercent === "number" && Number.isFinite(mash.mashEfficiencyPercent)
-      ? (mash.mashEfficiencyPercent as number)
+      ? (mash.mashEfficiencyPercent)
       : null;
   if (mashEff != null) return mashEff;
 
   const brewEff =
     ext && typeof ext.brewhouseEfficiencyPercent === "number" && Number.isFinite(ext.brewhouseEfficiencyPercent)
-      ? (ext.brewhouseEfficiencyPercent as number)
+      ? (ext.brewhouseEfficiencyPercent)
       : null;
   if (brewEff != null) return brewEff;
 
@@ -174,7 +174,7 @@ function getRecipeEfficiencyPercent(recipe: Recipe | null): number | null {
   const efficiency = r0 ? asRecord(r0.efficiency) : null;
   const brewhouse = efficiency ? asRecord(efficiency.brewhouse) : null;
   if (brewhouse && brewhouse.unit === "%" && typeof brewhouse.value === "number" && Number.isFinite(brewhouse.value)) {
-    return brewhouse.value as number;
+    return brewhouse.value;
   }
   return null;
 }
@@ -192,7 +192,7 @@ function getBeerJsonBatchSize(recipe: Recipe | null): { unit: string; value: num
   const batch = r0 ? asRecord(r0.batch_size) : null;
   const unit = batch && typeof batch.unit === "string" ? batch.unit : "";
   const value =
-    batch && typeof batch.value === "number" && Number.isFinite(batch.value) ? (batch.value as number) : null;
+    batch && typeof batch.value === "number" && Number.isFinite(batch.value) ? (batch.value) : null;
   return { unit, value };
 }
 
@@ -624,7 +624,7 @@ export default function RecipeEditPage() {
 
         const boilTimeMinutesOverride =
           ext && typeof ext.boilTimeMinutesOverride === "number" && Number.isFinite(ext.boilTimeMinutesOverride)
-            ? (ext.boilTimeMinutesOverride as number)
+            ? (ext.boilTimeMinutesOverride)
             : null;
         if (boilTimeMinutesOverride != null && boilTimeMinutesOverride >= 0) {
           setBoilTimeMinutes(String(Math.round(boilTimeMinutesOverride)));
@@ -652,13 +652,13 @@ export default function RecipeEditPage() {
             mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : row.mashDiPh ?? null,
             mashTaToPh57_mEqPerKg:
               typeof m?.mashTaToPh57_mEqPerKg === "number"
-                ? (m.mashTaToPh57_mEqPerKg as number)
+                ? (m.mashTaToPh57_mEqPerKg)
                 : row.mashTaToPh57_mEqPerKg ?? null,
             mashRoastDehuskedOverride:
               m && "roastDehuskedOverride" in m
                 ? (m.roastDehuskedOverride as boolean | null)
                 : row.mashRoastDehuskedOverride ?? null,
-          } as EditorGristRow;
+          };
         });
         const hopFormOverrides = ext ? asRecord(ext.hopFormOverrides) : null;
         const hops = s.hopsRows.map((row) => {
@@ -687,16 +687,16 @@ export default function RecipeEditPage() {
 
           const oxygenationVal = yeastOxygenationRaw?.[row.id];
           const oxygenation =
-            oxygenationVal === "yes" || oxygenationVal === "no" ? (oxygenationVal as "yes" | "no") : null;
+            oxygenationVal === "yes" || oxygenationVal === "no" ? (oxygenationVal) : null;
 
           const diacetylRestVal = yeastDiacetylRestRaw?.[row.id];
           const diacetylRest =
-            diacetylRestVal === "yes" || diacetylRestVal === "no" ? (diacetylRestVal as "yes" | "no") : null;
+            diacetylRestVal === "yes" || diacetylRestVal === "no" ? (diacetylRestVal) : null;
 
           const formatVal = yeastFormatRaw?.[row.id];
           const format =
             formatVal === "dry" || formatVal === "liquid" || formatVal === "slurry"
-              ? (formatVal as "dry" | "liquid" | "slurry")
+              ? (formatVal)
               : null;
 
           const speciesRaw = yeastSpeciesRaw?.[row.id] ?? null;
@@ -716,7 +716,7 @@ export default function RecipeEditPage() {
           const needsPropagationVal = yeastNeedsPropagationRaw?.[row.id];
           const needsPropagation =
             needsPropagationVal === "yes" || needsPropagationVal === "no"
-              ? (needsPropagationVal as "yes" | "no")
+              ? (needsPropagationVal)
               : null;
 
           const cellsPerLVal = yeastCellsPerLRaw?.[row.id];
@@ -1857,7 +1857,7 @@ export default function RecipeEditPage() {
                       out.push(
                         tMath("analysis.common.hopLine", {
                           name,
-                          use: tMath(`analysis.common.hopUse.${use}` as Parameters<typeof tMath>[0]),
+                          use: tMath(`analysis.common.hopUse.${use}`),
                           amountG: fmt(h.amountGrams, 1),
                           alpha: fmt(h.alphaAcidPercent, 1),
                           timeMin: String(Math.round(timeMin)),
@@ -2402,7 +2402,7 @@ export default function RecipeEditPage() {
                               >
                                 <CodeInline>{String(w?.code ?? "warning")}</CodeInline>{" "}
                                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" as="span">
-                                  {tAnalysis(`warnings.${String(w?.code ?? "unknown")}` as Parameters<typeof tAnalysis>[0])}
+                                  {tAnalysis(`warnings.${String(w?.code ?? "unknown")}`)}
                                 </SizableText>
                               </SizableText>
                             ))}

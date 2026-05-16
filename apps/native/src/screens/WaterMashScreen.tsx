@@ -411,7 +411,7 @@ export function WaterMashScreen() {
     setGristImportStatus(null);
     setImportingGrist(true);
     try {
-      const api = createApiClient(baseUrl!, bearerTokenAuth(() => token!));
+      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
       const res = await api.get(`/api/recipes/${recipeId}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const data = res.data as { recipe?: { beerJsonRecipeJson?: unknown; recipeExtJson?: unknown; updatedAt?: string } };
@@ -525,7 +525,7 @@ export function WaterMashScreen() {
         setMashCalcSaveStatus(t("mashSnapshotCalculatedAndSaved"));
       }
 
-      setOverallResult(computed.overall.result as Record<string, unknown>);
+      setOverallResult(computed.overall.result);
       setOverallStatus(t("overallSnapshotSaved"));
     } catch (err) {
       setError(String(err));
@@ -569,7 +569,7 @@ export function WaterMashScreen() {
         setMashManualResult(null);
         setMashAcidResult(computed.acid.result);
       }
-      setOverallResult(computed.overall.result as Record<string, unknown>);
+      setOverallResult(computed.overall.result);
       setOverallStatus("Calculated & saved.");
     } catch (err) {
       setError(String(err));
@@ -731,7 +731,7 @@ export function WaterMashScreen() {
           : mashRows.length > 0
             ? { name: "Mash", grainTemperatureC: 20, steps: stepsForSave }
             : null;
-      const validation = validateMashBeforeSave(mash!);
+      const validation = validateMashBeforeSave(mash);
       if (!validation.ok) {
         setError(validation.errors);
         return;
@@ -1238,7 +1238,7 @@ export function WaterMashScreen() {
                   onAddStep={addMashStep}
                   onDeleteStep={deleteMashStep}
                   onAddFromTemplate={addMashFromTemplate}
-                  t={(k, v) => tEdit(k, v as Record<string, string | number>)}
+                  t={(k, v) => tEdit(k, v)}
                   tUnits={(k) => tUnits(k)}
                   locale={locale}
                   formatFixed={formatFixed}
