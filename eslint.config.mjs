@@ -188,6 +188,39 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // HIGH-full Phase 3 — Tier C-narrow: services/api `no-unsafe-*`.
+  //
+  // All five type-aware unsafe-* rules at `warn` on `services/api/**`
+  // (covers both `src/**` and `prisma/seed.ts`). Required to be at
+  // zero before the phase closes; Phase 5 promotes to `error`.
+  //
+  // Tests are deliberately exempted via the test-files relaxation
+  // block below (later block wins in flat config). Test code uses
+  // the `JSON.parse(res.body) as Shape` pattern by convention; type-
+  // narrowing every test response is high-volume mechanical work
+  // with low bug-catching value, and matches the existing test-file
+  // relaxation of `no-explicit-any`.
+  //
+  // The contracts/validation strategy
+  // (docs/CONTRACTS-VALIDATION-STRATEGY.md) explicitly says we stay
+  // on hand-rolled validators, so the fix pattern here is:
+  //   1. Type the boundary as `unknown` (or a narrow input type).
+  //   2. Narrow with type guards or hand-rolled `parseX()` helpers.
+  //   3. Do NOT introduce Zod/Valibot — that's a separate decision
+  //      with its own trigger criteria.
+  // -------------------------------------------------------------------
+  {
+    files: ["services/api/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-unsafe-assignment": "warn",
+      "@typescript-eslint/no-unsafe-member-access": "warn",
+      "@typescript-eslint/no-unsafe-call": "warn",
+      "@typescript-eslint/no-unsafe-argument": "warn",
+      "@typescript-eslint/no-unsafe-return": "warn",
+    },
+  },
+
+  // -------------------------------------------------------------------
   // React hook rules (manual; the plugin doesn't ship a flat preset).
   // -------------------------------------------------------------------
   {
@@ -268,6 +301,16 @@ export default [
 
   // -------------------------------------------------------------------
   // Test files: relax a few rules.
+  //
+  // `no-explicit-any` and `no-unused-expressions` were relaxed during
+  // HIGH-staged. The 5 `no-unsafe-*` rules are added here as part of
+  // HIGH-full Phase 3: test code uses the `JSON.parse(res.body) as
+  // Shape` pattern by convention, and re-typing every Fastify-inject
+  // test response yields ~600 mechanical fixes with low bug-catching
+  // value (the type assertions are usually correct because the test
+  // controls both ends). Source code in `services/api/**` keeps the
+  // strong guardrail; tests get the same relaxation pattern as
+  // `no-explicit-any`.
   // -------------------------------------------------------------------
   {
     files: [
@@ -278,6 +321,11 @@ export default [
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
     },
   },
 
