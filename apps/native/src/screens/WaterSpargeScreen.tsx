@@ -125,7 +125,7 @@ export function WaterSpargeScreen() {
   const canCall = auth.state.status === "logged_in" && Boolean(baseUrl) && Boolean(token);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [settings, setSettings] = useState<Record<string, unknown> | null>(null);
+  const [_settings, setSettings] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<string[]>(["spargeConfig", "acidification", "salts"]);

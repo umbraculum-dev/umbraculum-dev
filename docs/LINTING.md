@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.1 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**`), 5a–5b (entire `apps/native/src/**`), 6a (`apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx`), and **6b** (`apps/web` long tail across 17 files + `services/api/prisma/seed.ts`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` and `apps/web/**` and `apps/native/src/**` are all **`any`-free**. Only Phase 6c (`no-unused-vars` mop-up + promotion to `error`) and the HIGH-full upgrade (type-aware rules + `no-explicit-any: error`) remain.
+**Status:** v2.2 — **HIGH-staged complete.** Phases 1–6c landed: `packages/contracts/**`, `packages/beerjson/**`, `services/api/src/**`, all of `apps/web/app/recipes/**`, the entire `apps/native/src/**`, the `apps/web` non-recipes long tail (`ferm-data-integration`, `RecipeImportForm`, `HealthPanel`, `inventory`, `YeastEditor`, `PrimaryNav`, `mathBodies`, `(auth)/{login,signup}/page.tsx`, plus 13 smaller files), and the `no-unused-vars` mop-up. Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are now promoted to `error` repo-wide. **Zero warnings, zero errors across the whole monorepo** under `npm run lint`. Next: HIGH-full upgrade (`recommended-type-checked` + `--max-warnings 0` everywhere).
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **80** (-58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,047 cumulative; was 1,127 at HIGH-light landing). **Zero `no-explicit-any` warnings repo-wide.** Remaining 80 are all `no-unused-vars` (Phase 6c scope). |
+| Outstanding warnings | **0** (-80 from Phase 6c, -58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,127 cumulative; was 1,127 at HIGH-light landing). **`npm run lint` exits clean — zero warnings, zero errors.** |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -315,8 +315,8 @@ The big-leverage `any` debt outside `apps/web/app/recipes/**` lives in two files
 
 - [x] Phase 6a: `apps/web/app/[locale]/ferm-data-integration/page.tsx` (26 `any`) + `apps/web/app/_components/RecipeImportForm.tsx` (23 `any`) — 49 `any` removed ✅ landed 2026-05-16
 - [x] Phase 6b: Long tail — `apps/web/app/HealthPanel.tsx` (13), `apps/web/app/[locale]/inventory/page.tsx` (7), `apps/web/app/recipes/_components/YeastEditor.tsx` (6), `apps/web/app/_components/PrimaryNav.tsx` (5), `apps/web/app/recipes/[id]/water/_lib/mathBodies.ts` (4), `apps/web/app/[locale]/(auth)/{login,signup}/page.tsx` (4 each), and 9 smaller files (1–2 `any` each) + `services/api/prisma/seed.ts` (1 `any`) — 58 `any` removed ✅ landed 2026-05-16
-- [ ] Phase 6c: Clean ~80 `no-unused-vars` warnings (mostly unused imports — mechanical deletions); promote `no-unused-vars` from `warn` to `error`
-- [ ] Verify no remaining pre-existing warnings outside known carve-outs
+- [x] Phase 6c: 80 `no-unused-vars` warnings cleaned across `apps/native/src/screens/{AboutScreen,BrewSessionDetailScreen,BrewdayStepsSettingsScreen,RecipeEditScreen,RecipesListScreen,Water{Boil,Hub,Mash,Sparge}Screen}.tsx` + `apps/web/app/{[locale]/{brewday-steps-settings,equipment,ferm-data-integration,inventory,page,recipes/{import,page},water-profiles},recipes/[id]/{brew-sessions/[brewSessionId],edit,water/{_lib/mathBodies,boil,mash,page,sparge},yeast},recipes/_components/YeastEditor}.tsx` + `services/api/src/{domain/waterCalc/mashPhDefaultsV1,plugins/requestContext,seed/sources/beerproto/beerproto,services/recipesService,tests/{brewSessions,waterProfiles}.test}.ts` plus 1 `no-empty-object-type` carve-out (`services/api/src/services/ai/tools/brewery/currentBrewSessionStatus.ts`); both `@typescript-eslint/no-unused-vars` and `@typescript-eslint/no-explicit-any` promoted from `warn` to `error` ✅ landed 2026-05-16
+- [x] Verify no remaining pre-existing warnings outside known carve-outs ✅
 
 #### Phase 6a — `apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx` ✅ landed 2026-05-16
 
@@ -382,7 +382,49 @@ The big-leverage `any` debt outside `apps/web/app/recipes/**` lives in two files
 - Repo-wide all-warnings: 138 → 80 (-58, exactly Phase 6b scope).
 - No new unit tests added — Phase 6b is type-tightening, no behavioural change. All 18 files are exercised by the existing Playwright smoke suite + auth flow specs.
 
-**Phase 6 cumulative impact:** 107 `any` removed across 20 files (Phase 6a's 2 files + Phase 6b's 18). Combined with Phases 1–5, **the entire monorepo is now `no-explicit-any`-free.** This unblocks promoting `@typescript-eslint/no-explicit-any` from `warn` to `error` repo-wide, which is the gating step for HIGH-full. Phase 6c (`no-unused-vars` cleanup + promotion) is the only remaining HIGH-staged work before the HIGH-full upgrade can land.
+**Phase 6 cumulative impact:** 107 `any` removed across 20 files (Phase 6a's 2 files + Phase 6b's 18). Combined with Phases 1–5, **the entire monorepo is now `no-explicit-any`-free.** This unblocked promoting `@typescript-eslint/no-explicit-any` from `warn` to `error` repo-wide, which landed alongside Phase 6c.
+
+#### Phase 6c — `no-unused-vars` mop-up + rule promotions ✅ landed 2026-05-16
+
+**Scope:** 80 `no-unused-vars` warnings (the entire post-6b tail) + 1 `no-empty-object-type` carve-out → 0. Both `@typescript-eslint/no-unused-vars` and `@typescript-eslint/no-explicit-any` promoted from `warn` to `error`.
+
+**Strategy used:** for each warning the assistant chose between two equally valid mechanical fixes:
+
+1. **Delete** — when the unused symbol was a top-level import (e.g. `Linking`, `Heading`, `Spinner`, `useEffect`, `Fragment`, `H1`, `H2`, `View`, `WaterProfile`, `WaterCalcDerivationKind`, `combineAfterSaltsAndAcid`, `formatFixed`, `UnauthorizedError`, `FieldBadge`, `saveRecipeWaterSettings`). 21 imports removed across 13 files. The rule for "delete vs prefix": if the symbol was *imported* and the file no longer needed the import line at all, delete it; if the file still needs the line for other names, drop just the unused name from the destructuring.
+2. **Underscore-prefix** — when the unused symbol was a locally-defined constant, state setter pair, hook return, function parameter, or non-trivial declaration that future readers might still want for context (e.g. `_INTEGRATION_KINDS`, `_PresetKey`, `_recipeId`, `_locale`, `_settings`, `_loading`, `_canCall`, `_activeWorkspaceId`, `_yeastResults`, `_setYeastQuery`, `_yeastSearching`, `_yeastAmountTextById`, `_equipmentProfilesLoading`, `_versionsLoading`, `_acidDerivation`, `_loadingProfiles`, `_spargeCalciumPpm`, `_spargeMagnesiumPpm`, `_boilCalciumPpm`, `_boilMagnesiumPpm`, `_mashStatus`, `_mashManualStatus`, `_isKindWorking`, `_getSectionLabel`, `_calcMashEstimatedPh`, `_ensureSpargeSaltsSnapshotForAcidification`, `_searchYeasts`, `_addYeastRow`, `_addYeastFromDb`, `_updateYeastRow`, `_removeYeastRow`, `_newRowId`, `_canSave`, `_height`, `_idxInSection`, `_sectionPending`, `_contributingUrl`, `_notes`, `_idx`, `_cookieNoSession`, `_srmToEbc`, `_snapshotGristRows`, `_snapshotYeastRows`, `_validateGristJson`, `_validateHopsJson`, `_validateYeastJson`, `_validateMiscJson`, `_YEAST_FORMAT_OPTIONS`, `_YeastRow`, `_CATEGORIES`). 59 underscore-prefixings across 23 files. The `argsIgnorePattern: "^_"` / `varsIgnorePattern: "^_"` ESLint config (already in place from HIGH-light) makes `_`-prefixed names compliant without further configuration.
+
+**Why the `_`-prefix bias?** Several of these "unused" callbacks (`_searchYeasts`, `_addYeastRow`, `_addYeastFromDb`, `_updateYeastRow`, `_removeYeastRow` in `apps/native/src/screens/RecipeEditScreen.tsx`; `_calcMashEstimatedPh` in `apps/web/app/recipes/[id]/water/mash/page.tsx`; `_validateGristJson` / `_validateHopsJson` / `_validateYeastJson` / `_validateMiscJson` / `_snapshotGristRows` / `_snapshotYeastRows` in `services/api/src/services/recipesService.ts`) are dead-but-likely-revived: they were consciously written, they exercise infrastructure that's still in use elsewhere, and the safer call in non-interactive cleanup is to leave them in place behind a `_` prefix rather than delete them in a context where the reviewer can't easily flag a regression. A future cleanup pass can drop them once the surrounding screen/service flows stabilise.
+
+**One non-`no-unused-vars` carve-out:** `services/api/src/services/ai/tools/brewery/currentBrewSessionStatus.ts` had a `no-empty-object-type` warning on `interface CurrentBrewSessionStatusInput {}`. Replaced with `type CurrentBrewSessionStatusInput = Record<string, never>;` which is the canonical "I really do mean an empty object" expression and the one suggested by the `no-empty-object-type` rule itself.
+
+**Rule promotions — `eslint.config.mjs`:**
+
+```diff
+-      "@typescript-eslint/no-unused-vars": [
+-        "warn",
+-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+-      ],
+-      "@typescript-eslint/no-explicit-any": "warn",
++      "@typescript-eslint/no-unused-vars": [
++        "error",
++        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
++      ],
++      "@typescript-eslint/no-explicit-any": "error",
+```
+
+Both promotions are documented inline in `eslint.config.mjs` with a pointer back to this section.
+
+**Verification:**
+
+- `npm run lint` exits clean: **0 warnings, 0 errors** repo-wide.
+- `npm run lint:packages-strict` (the `--max-warnings 0` gate on every `packages/**` workspace) still passes.
+- `apps/web` TypeScript: held at the pre-change baseline of 590 errors (pre-existing Tamagui/Next.js gaps; Phase 6c added zero new TS errors).
+- `apps/native` TypeScript: 0 errors (held at baseline).
+- `@brewery/contracts` TypeScript: 0 errors.
+- `services/api` TypeScript: held at the pre-existing 19-error baseline (none of which are touched by the underscore-prefixings or the `Record<string, never>` change).
+- No new unit tests added — Phase 6c is mechanical naming, no behavioural change. The two `services/api` test files touched (`brewSessions.test.ts`, `waterProfiles.test.ts`) had unused locals only — runtime behaviour identical.
+
+**Phase HIGH-staged is now complete.** Both `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unused-vars` are promoted to `error`, the repo is warning-free, and the gating preconditions for HIGH-full (`recommended-type-checked` rule set + `--max-warnings 0` everywhere) are met. The HIGH-full upgrade is now a separate decision — see the section below.
 
 ### Phase 7 (optional, separate decision) — runtime-validation library migration
 

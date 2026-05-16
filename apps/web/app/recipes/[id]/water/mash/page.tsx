@@ -22,17 +22,16 @@ import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../..
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewery/recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
-import { apiFetch, type AuthMeResponse, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
+import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { ModeFieldset } from "@brewery/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";
-import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import {
   bicarbonatePpmToAlkalinityPpmCaCO3,
-  combineAfterSaltsAndAcid,
   mixIonProfilesByVolume,
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
@@ -133,8 +132,8 @@ export default function MashWaterPage() {
   const [savingAdjustment, setSavingAdjustment] = useState(false);
 
   const [mashError, setMashError] = useState<string | null>(null);
-  const [mashStatus, setMashStatus] = useState<string | null>(null);
-  const [mashManualStatus, setMashManualStatus] = useState<string | null>(null);
+  const [_mashStatus, setMashStatus] = useState<string | null>(null);
+  const [_mashManualStatus, setMashManualStatus] = useState<string | null>(null);
   const [mashSaveStatus, setMashSaveStatus] = useState<string | null>(null);
   const [mashCalcSaveStatus, setMashCalcSaveStatus] = useState<string | null>(null);
   const [mashSubmitting, setMashSubmitting] = useState(false);
@@ -757,7 +756,7 @@ export default function MashWaterPage() {
     });
   };
 
-  const calcMashEstimatedPh = async (args: {
+  const _calcMashEstimatedPh = async (args: {
     volumeLiters: number;
     alkalinityPpmCaCO3: number;
     calciumPpm?: number;

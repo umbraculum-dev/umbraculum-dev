@@ -12,7 +12,7 @@ import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleR
 import { parseWaterProfilesResponse } from "@brewery/contracts";
 import { ModeFieldset } from "@brewery/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
-import { Accordion, Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
@@ -79,7 +79,7 @@ export default function SpargeWaterPage() {
   const [authed, setAuthed] = useState(false);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [_loadingProfiles, setLoadingProfiles] = useState(false);
   const [profilesError, setProfilesError] = useState<string | null>(null);
 
   const [settingsError, setSettingsError] = useState<string | null>(null);
@@ -324,12 +324,12 @@ export default function SpargeWaterPage() {
     setStartingAlk(rounded);
   }, [derivedStartingAlkPpmCaCO3, startingAlkTouched]);
 
-  const spargeCalciumPpm = useMemo(() => {
+  const _spargeCalciumPpm = useMemo(() => {
     const v = spargeSaltsResult?.resultingProfile?.calcium ?? selectedSpargeProfile?.calcium;
     return typeof v === "number" && Number.isFinite(v) ? v : undefined;
   }, [spargeSaltsResult, selectedSpargeProfile]);
 
-  const spargeMagnesiumPpm = useMemo(() => {
+  const _spargeMagnesiumPpm = useMemo(() => {
     const v = spargeSaltsResult?.resultingProfile?.magnesium ?? selectedSpargeProfile?.magnesium;
     return typeof v === "number" && Number.isFinite(v) ? v : undefined;
   }, [spargeSaltsResult, selectedSpargeProfile]);
@@ -478,7 +478,7 @@ export default function SpargeWaterPage() {
     });
   };
 
-  const ensureSpargeSaltsSnapshotForAcidification = async (): Promise<SaltAdditionsResult> => {
+  const _ensureSpargeSaltsSnapshotForAcidification = async (): Promise<SaltAdditionsResult> => {
     if (!canCall) throw new Error("Not ready to call API.");
     if (!selectedSpargeProfile) {
       throw new Error("Select a sparge water profile first (base ion profile for recap).");

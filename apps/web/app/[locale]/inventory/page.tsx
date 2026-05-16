@@ -68,7 +68,7 @@ const ACID_SALT_OPTIONS: Array<{ value: string; label: string; unit: InventoryUn
   { value: "baking_soda", label: "Baking soda (NaHCO3)", unit: "g" },
 ];
 
-const CATEGORIES: InventoryCategory[] = [
+const _CATEGORIES: InventoryCategory[] = [
   "fermentable",
   "hop",
   "speciality",

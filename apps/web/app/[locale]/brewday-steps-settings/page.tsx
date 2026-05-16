@@ -377,7 +377,7 @@ export default function BrewdayStepsSettingsPage() {
     );
   };
 
-  const getSectionLabel = (sectionId: string) => {
+  const _getSectionLabel = (sectionId: string) => {
     if (PRESET_KEYS.includes(sectionId as PresetKey)) {
       return t(`presetSections.${sectionId}`);
     }

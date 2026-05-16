@@ -58,7 +58,7 @@ export function inferMashPhModelKeyV1(f: FermentableLike): MashPhModelKeyV1 {
   const g = lc(f.group);
   const t = lc(f.type);
   const n = lc(f.name);
-  const notes = lc(f.notes);
+  const _notes = lc(f.notes);
 
   if (inferIsDehuskedOrDebittered(f.name, f.notes)) return "roasted_dehusked";
 

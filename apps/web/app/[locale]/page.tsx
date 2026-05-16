@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Accordion, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, H1, SizableText, View, YStack } from "tamagui";
 import { AppPermissionsContent, HealthStatusContent } from "../HealthPanel";
 import { DashboardClient } from "../DashboardClient";
 import { ImportExportPanel } from "../_components/ImportExportPanel";

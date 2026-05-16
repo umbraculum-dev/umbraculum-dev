@@ -152,7 +152,7 @@ export function WaterMashScreen() {
   const { t: tWaterCommon } = useT("recipes.water.common");
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [settings, setSettings] = useState<Record<string, unknown> | null>(null);
+  const [_settings, setSettings] = useState<Record<string, unknown> | null>(null);
   const [recipe, setRecipe] = useState<{ beerJsonRecipeJson?: unknown; recipeExtJson?: unknown; analysis?: unknown } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

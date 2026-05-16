@@ -1833,7 +1833,7 @@ export default function BrewSessionDetailPage() {
           (s) => !!s.timerStartedAt || (s.timerAccumulatedSeconds ?? 0) > 0 || s.timerState !== "idle"
         );
         const sectionInProgress = !sectionDone && (sectionHasAnyDone || sectionHasAnyTimerStarted);
-        const sectionPending = !sectionDone && !sectionInProgress;
+        const _sectionPending = !sectionDone && !sectionInProgress;
         const sectionForcedFinished = session?.status === "stopped" && stoppedBy === "manual" && !sectionDone;
         const sectionStatus: "pending" | "in_progress" | "done" | "forced_finished" = sectionDone
           ? "done"
@@ -2095,7 +2095,7 @@ export default function BrewSessionDetailPage() {
                 ) : null}
               </YStack>
             ) : null}
-            {g.steps.map((st, idxInSection) => {
+            {g.steps.map((st, _idxInSection) => {
               const globalIdx = steps.findIndex((x) => x.id === st.id);
               const elapsed = computeElapsedSeconds(st);
               const remainingSeconds =

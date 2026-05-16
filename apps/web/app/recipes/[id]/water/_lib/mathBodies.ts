@@ -2,7 +2,7 @@
 
 import { formatFixed } from "../../../../../src/i18n/format";
 import type { MathExplainKey } from "./mathExplain";
-import type { WaterCalcDerivation, WaterCalcDerivationLine, WaterCalcDerivationValue, WaterCalcDerivationKind } from "@brewery/contracts";
+import type { WaterCalcDerivation, WaterCalcDerivationLine, WaterCalcDerivationValue } from "@brewery/contracts";
 
 type TValues = Record<string, string | number | Date>;
 type T = (key: string, values?: TValues) => string;

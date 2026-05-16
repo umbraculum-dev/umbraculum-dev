@@ -502,7 +502,7 @@ export class RecipesService {
   }
 }
 
-async function snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promise<GristRow[]> {
+async function _snapshotGristRows(prisma: PrismaClient, rows: GristRow[]): Promise<GristRow[]> {
   const ids = Array.from(
     new Set(
       rows
@@ -642,7 +642,7 @@ function ensureFinite(n: unknown, field: string) {
   return n;
 }
 
-function validateGristJson(value: unknown): GristRow[] | null | undefined {
+function _validateGristJson(value: unknown): GristRow[] | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (!Array.isArray(value)) {
@@ -858,7 +858,7 @@ type HopRow = {
   timeMinutes: number | null;
 };
 
-function validateHopsJson(value: unknown): HopRow[] | null | undefined {
+function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (!Array.isArray(value)) throw new BadRequestError("invalid_hops_json", "Body.hopsJson must be an array");
@@ -989,7 +989,7 @@ type YeastRow = {
   attenuationMax?: number | null;
 };
 
-function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
+function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (!Array.isArray(value)) throw new BadRequestError("invalid_yeast_json", "Body.yeastJson must be an array");
@@ -1093,7 +1093,7 @@ function validateYeastJson(value: unknown): YeastRow[] | null | undefined {
   });
 }
 
-async function snapshotYeastRows(prisma: PrismaClient, rows: YeastRow[]): Promise<YeastRow[]> {
+async function _snapshotYeastRows(prisma: PrismaClient, rows: YeastRow[]): Promise<YeastRow[]> {
   const ids = Array.from(
     new Set(
       rows
@@ -1174,7 +1174,7 @@ type MiscRow = {
   notes?: string | null;
 };
 
-function validateMiscJson(value: unknown): MiscRow[] | null | undefined {
+function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   if (!Array.isArray(value)) throw new BadRequestError("invalid_misc_json", "Body.miscJson must be an array");

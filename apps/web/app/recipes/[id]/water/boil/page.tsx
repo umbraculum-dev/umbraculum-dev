@@ -17,7 +17,7 @@ import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "ta
 
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
-import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid, mixIonProfilesByVolume } from "../_lib/waterChem";
+import { bicarbonatePpmToAlkalinityPpmCaCO3, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseBoilComputeAndSaveResponse } from "@brewery/contracts";
@@ -125,7 +125,7 @@ export default function BoilWaterPage() {
   const [savingInputs, setSavingInputs] = useState(false);
   const [acidResult, setAcidResult] = useState<BoilAcidResult | null>(null);
   const [manualResult, setManualResult] = useState<BoilManualCalcResult | null>(null);
-  const [acidDerivation, setAcidDerivation] = useState<WaterCalcDerivation | null>(null);
+  const [_acidDerivation, setAcidDerivation] = useState<WaterCalcDerivation | null>(null);
 
   // Salts
   const [saltsError, setSaltsError] = useState<string | null>(null);
@@ -570,11 +570,11 @@ export default function BoilWaterPage() {
     });
   };
 
-  const boilCalciumPpm = useMemo(() => {
+  const _boilCalciumPpm = useMemo(() => {
     const v = saltsResult?.resultingProfile?.calcium ?? mixedSourceProfile?.calcium;
     return typeof v === "number" && Number.isFinite(v) ? v : undefined;
   }, [saltsResult, mixedSourceProfile]);
-  const boilMagnesiumPpm = useMemo(() => {
+  const _boilMagnesiumPpm = useMemo(() => {
     const v = saltsResult?.resultingProfile?.magnesium ?? mixedSourceProfile?.magnesium;
     return typeof v === "number" && Number.isFinite(v) ? v : undefined;
   }, [saltsResult, mixedSourceProfile]);

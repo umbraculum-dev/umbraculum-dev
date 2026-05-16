@@ -8,11 +8,11 @@ import { useLocale, useTranslations } from "next-intl";
 import type { IonProfilePpm } from "@brewery/contracts";
 
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { Accordion, Button, H1, H2, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
+import { Accordion, Button, H1, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
-import { formatFixed, formatWithHint } from "../../../../src/i18n/format";
+import { formatWithHint } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { MathHelpPopover } from "../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";

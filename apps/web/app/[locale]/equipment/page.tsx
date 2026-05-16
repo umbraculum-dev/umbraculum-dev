@@ -44,7 +44,7 @@ export default function EquipmentPage() {
 
   const [auth, setAuth] = useState<AuthMeResponse | null>(null);
   const [profiles, setProfiles] = useState<EquipmentProfile[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [createName, setCreateName] = useState("");

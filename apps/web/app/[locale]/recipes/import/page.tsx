@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { H1, SizableText, View, YStack } from "tamagui";
+import { H1, SizableText, YStack } from "tamagui";
 
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";

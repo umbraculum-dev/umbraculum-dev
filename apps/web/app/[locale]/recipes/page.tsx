@@ -44,7 +44,7 @@ export default function RecipesPage() {
   const [openSections, setOpenSections] = useState<string[]>([]);
 
   const canCall = authState.status === "ready";
-  const activeWorkspaceId = authState.status === "ready" ? authState.me.activeWorkspaceId : null;
+  const _activeWorkspaceId = authState.status === "ready" ? authState.me.activeWorkspaceId : null;
 
   const [styles, setStyles] = useState<StyleListItem[]>([]);
   const [stylesLoading, setStylesLoading] = useState(false);

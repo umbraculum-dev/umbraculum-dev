@@ -11,7 +11,7 @@ describe("water-profiles", () => {
   const app = buildApp();
   let cookieAdmin = "";
   let cookieViewer = "";
-  let cookieNoSession = "";
+  let _cookieNoSession = "";
 
   beforeAll(async () => {
     await app.ready();
@@ -22,7 +22,7 @@ describe("water-profiles", () => {
     cookieViewer = viewer.cookie;
 
     // Used only to validate "not authenticated" behavior
-    cookieNoSession = "";
+    _cookieNoSession = "";
 
     await app.prisma.user.upsert({
       where: { id: TEST_ADMIN_USER_ID },

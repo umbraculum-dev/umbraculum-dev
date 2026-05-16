@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { Linking, Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { useT } from "@brewery/i18n-react";
-import { Heading, Screen, Text } from "@brewery/ui";
+import { Screen, Text } from "@brewery/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";
@@ -19,7 +19,7 @@ export function AboutScreen() {
   const { locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
 
-  const contributingUrl =
+  const _contributingUrl =
     baseUrl && locale
       ? `${baseUrl.replace(/\/+$/, "")}/${locale}/contributing?topic=i18n`
       : null;

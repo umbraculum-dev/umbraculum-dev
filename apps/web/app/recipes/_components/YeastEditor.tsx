@@ -11,7 +11,6 @@ import { MathHelpPopover } from "../../_components/MathHelpPopover";
 import { apiFetch } from "../../_lib/apiClient";
 import {
   ErrorBox,
-  FieldBadge,
   MessageBox,
   RecipeEditFieldLabel,
   RecipeEditIngredientCard,
@@ -79,7 +78,7 @@ type YeastEditorProps = {
   lowViabilityWarning?: number | null;
 };
 
-function newRowId(): string {
+function _newRowId(): string {
   try {
     return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
   } catch {
@@ -364,7 +363,7 @@ function YeastEditorEditable({
   onUpdateRow,
   onAttenuationOverrideChange,
   onSave,
-  canSave,
+  canSave: _canSave,
   saving,
   saveStatus,
   onDismissSaveStatus,

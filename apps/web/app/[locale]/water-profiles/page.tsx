@@ -23,7 +23,7 @@ export default function WaterProfilesPage() {
   const tUnits = useTranslations("units");
   const [me, setMe] = useState<AuthMeResponse | null>(null);
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [createName, setCreateName] = useState("");
@@ -42,7 +42,7 @@ export default function WaterProfilesPage() {
   const [createSubmitting, setCreateSubmitting] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>(["table"]);
 
-  const canCall = true;
+  const _canCall = true;
 
   const refresh = async () => {
     setError(null);

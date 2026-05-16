@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { H1, H2, SizableText, View, YStack } from "tamagui";
+import { H1, H2, SizableText, View } from "tamagui";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 
 import { apiFetch } from "../../../_lib/apiClient";
@@ -594,7 +594,7 @@ export default function YeastPage() {
             lowViabilityWarning={lowViabilityWarning}
           />
           <ManualCellCountHelpBox
-            renderImage={({ assetKey, alt, width, height }) => (
+            renderImage={({ assetKey, alt, width, height: _height }) => (
               <img
                 src={getMediaPublicPath(assetKey)}
                 alt={alt}

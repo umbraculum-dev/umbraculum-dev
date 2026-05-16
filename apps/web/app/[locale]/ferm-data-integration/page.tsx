@@ -285,7 +285,7 @@ export default function FermDataIntegrationPage() {
     }
   };
 
-  const isKindWorking = (kind: IntegrationKind) => integrationWorking?.kind === kind;
+  const _isKindWorking = (kind: IntegrationKind) => integrationWorking?.kind === kind;
   const isAnyWorking = integrationWorking !== null;
 
   return (

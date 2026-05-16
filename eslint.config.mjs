@@ -96,12 +96,20 @@ export default [
       // TS already enforces this and the TS error message is clearer.
       "no-unused-vars": "off",
       // Allow underscore-prefixed unused (e.g. _unusedProps).
+      // Promoted from warn → error in HIGH-staged Phase 6c (2026-05-16).
+      // Repo was swept warning-free across apps/native, apps/web,
+      // services/api, and packages/** before this promotion landed.
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
-      // `any` is sometimes the right escape hatch; warn rather than error.
-      "@typescript-eslint/no-explicit-any": "warn",
+      // Promoted from warn → error in HIGH-staged Phase 6c (2026-05-16).
+      // The repo is now `any`-free (the staged HIGH cleanup landed in
+      // Phases 1–6b). When a genuine "this is dynamic" escape hatch is
+      // needed, prefer typing as `unknown` and narrowing; if `any` is
+      // truly unavoidable, disable per-line with a `// eslint-disable-
+      // next-line @typescript-eslint/no-explicit-any -- <reason>`.
+      "@typescript-eslint/no-explicit-any": "error",
       // Allow `interface X extends Y {}` (Tamagui's module augmentation
       // pattern, `interface TamaguiCustomConfig extends AppConfig {}`, and
       // similar "named type alias via interface" patterns). Still flag

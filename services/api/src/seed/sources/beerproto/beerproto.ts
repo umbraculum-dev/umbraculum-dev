@@ -67,7 +67,7 @@ function ebcToSrm(ebc: number) {
   return ebc * 0.508;
 }
 
-function srmToEbc(srm: number) {
+function _srmToEbc(srm: number) {
   return srm * 1.97;
 }
 

@@ -127,7 +127,7 @@ export function WaterBoilScreen() {
   const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const auth = useAuth();
-  const { locale } = useLocaleController();
+  const { locale: _locale } = useLocaleController();
   const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
 
@@ -147,7 +147,7 @@ export function WaterBoilScreen() {
   const canCall = auth.state.status === "logged_in" && Boolean(baseUrl) && Boolean(token);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);
-  const [settings, setSettings] = useState<Record<string, unknown> | null>(null);
+  const [_settings, setSettings] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<string[]>(["adjustment", "acidification", "salts"]);

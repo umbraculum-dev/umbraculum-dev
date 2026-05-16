@@ -3,9 +3,9 @@
 import { Link, useRouter } from "../../../../src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Button, H1, H2, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
+import { Button, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -50,7 +50,6 @@ import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { RecipeTitleWithMeta } from "../../../_components/RecipeTitleWithMeta";
 import {
   fetchRecipeWaterSettings,
-  saveRecipeWaterSettings,
   type RecipeWaterSettingsResponse,
 } from "../water/_lib/waterSettings";
 import { mathExplain } from "./_lib/mathExplain";
@@ -215,7 +214,7 @@ type GristMaltClass = EditorGristRow["maltClass"];
 type GristPotential = EditorGristRow["potential"];
 type GristPotentialKind = NonNullable<GristPotential>["kind"];
 type HopRow = EditorHopRow;
-type YeastRow = EditorYeastRow;
+type _YeastRow = EditorYeastRow;
 type MiscRow = EditorMiscRow;
 
 type HopUse = "boil" | "whirlpool" | "dryhop";
@@ -374,7 +373,7 @@ export default function RecipeEditPage() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [analysis, setAnalysis] = useState<unknown>(null);
   const [versions, setVersions] = useState<RecipeVersionListItem[] | null>(null);
-  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [_versionsLoading, setVersionsLoading] = useState(false);
   const [versionsError, setVersionsError] = useState<string | null>(null);
   const [creatingVersion, setCreatingVersion] = useState(false);
   const [createVersionError, setCreateVersionError] = useState<string | null>(null);
@@ -1320,7 +1319,7 @@ export default function RecipeEditPage() {
     });
   };
 
-  const addYeastFromDb = (item: YeastSearchResult) => {
+  const _addYeastFromDb = (item: YeastSearchResult) => {
     const id = typeof item.id === "string" ? item.id : null;
     const nameRaw = typeof item.name === "string" ? item.name : "";
     if (!id || !nameRaw) return;

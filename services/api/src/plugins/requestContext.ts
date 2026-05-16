@@ -1,5 +1,4 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { UnauthorizedError } from "../errors.js";
 import { requireActiveWorkspaceInSession, requireSession } from "./sessionAuth.js";
 
 export type RequestContext = {

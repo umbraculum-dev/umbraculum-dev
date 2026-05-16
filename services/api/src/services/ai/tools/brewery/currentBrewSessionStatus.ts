@@ -3,9 +3,8 @@ import type { PrismaClient } from "@prisma/client";
 
 import { WorkspacesService } from "../../../workspacesService.js";
 
-interface CurrentBrewSessionStatusInput {
-  /** Empty input — the tool returns the workspace's most-recent session. */
-}
+/** Empty input — the tool returns the workspace's most-recent session. */
+type CurrentBrewSessionStatusInput = Record<string, never>;
 
 interface CurrentBrewSessionStatusOutput {
   sessionId: string | null;

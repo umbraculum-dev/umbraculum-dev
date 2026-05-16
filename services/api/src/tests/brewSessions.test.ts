@@ -473,7 +473,7 @@ describe("brew sessions (account scoped)", () => {
       const other = steps1.find((s) => s.id !== baseId) ?? steps1[1];
       const otherId = other.id as string;
 
-      const payload = steps1.map((s: any, idx: number) => ({
+      const payload = steps1.map((s: any, _idx: number) => ({
         id: s.id,
         sectionId: s.sectionId,
         sectionName: s.sectionName,

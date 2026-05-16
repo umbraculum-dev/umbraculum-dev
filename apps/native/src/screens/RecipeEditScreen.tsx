@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -206,7 +206,7 @@ const HOP_FORM_OPTIONS: { value: EditorHopRow["form"]; label: string }[] = [
   { value: "plug", label: "Plug" },
 ];
 
-const YEAST_FORMAT_OPTIONS: { value: NonNullable<EditorYeastRow["format"]>; label: string }[] = [
+const _YEAST_FORMAT_OPTIONS: { value: NonNullable<EditorYeastRow["format"]>; label: string }[] = [
   { value: "dry", label: "Dry" },
   { value: "liquid", label: "Liquid" },
   { value: "slurry", label: "Slurry" },
@@ -262,13 +262,13 @@ export function RecipeEditScreen() {
   const [hopSearching, setHopSearching] = useState(false);
   const [hopSearchError, setHopSearchError] = useState<string | null>(null);
 
-  const [yeastQuery, setYeastQuery] = useState("");
-  const [yeastResults, setYeastResults] = useState<YeastSearchItem[]>([]);
-  const [yeastSearching, setYeastSearching] = useState(false);
-  const [yeastAmountTextById, setYeastAmountTextById] = useState<Record<string, string>>({});
+  const [yeastQuery, _setYeastQuery] = useState("");
+  const [_yeastResults, setYeastResults] = useState<YeastSearchItem[]>([]);
+  const [_yeastSearching, setYeastSearching] = useState(false);
+  const [_yeastAmountTextById, setYeastAmountTextById] = useState<Record<string, string>>({});
 
   const [equipmentProfiles, setEquipmentProfiles] = useState<EquipmentProfile[]>([]);
-  const [equipmentProfilesLoading, setEquipmentProfilesLoading] = useState(false);
+  const [_equipmentProfilesLoading, setEquipmentProfilesLoading] = useState(false);
   const [equipmentProfilesError, setEquipmentProfilesError] = useState<string | null>(null);
   const [selectedEquipmentProfileId, setSelectedEquipmentProfileId] = useState("");
   const [equipmentApplying, setEquipmentApplying] = useState(false);
@@ -565,7 +565,7 @@ export function RecipeEditScreen() {
     }
   }, [api, hopQuery]);
 
-  const searchYeasts = useCallback(async () => {
+  const _searchYeasts = useCallback(async () => {
     if (!api) return;
     setYeastSearching(true);
     try {
@@ -675,7 +675,7 @@ export function RecipeEditScreen() {
     setHopsRows((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
-  const addYeastRow = useCallback(() => {
+  const _addYeastRow = useCallback(() => {
     setYeastRows((prev) => [
       ...prev,
       {
@@ -689,7 +689,7 @@ export function RecipeEditScreen() {
     ]);
   }, []);
 
-  const addYeastFromDb = useCallback((item: YeastSearchItem) => {
+  const _addYeastFromDb = useCallback((item: YeastSearchItem) => {
     const attenuationMin =
       typeof item.attenuationMin === "number" && Number.isFinite(item.attenuationMin) ? item.attenuationMin : null;
     const attenuationMax =
@@ -710,11 +710,11 @@ export function RecipeEditScreen() {
     ]);
   }, []);
 
-  const updateYeastRow = useCallback((id: string, patch: Partial<EditorYeastRow>) => {
+  const _updateYeastRow = useCallback((id: string, patch: Partial<EditorYeastRow>) => {
     setYeastRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
   }, []);
 
-  const removeYeastRow = useCallback((id: string) => {
+  const _removeYeastRow = useCallback((id: string) => {
     setYeastRows((prev) => prev.filter((r) => r.id !== id));
     setYeastAttenuationOverrides((prev) => {
       const next = { ...prev };

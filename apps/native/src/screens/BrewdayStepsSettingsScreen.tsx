@@ -47,7 +47,7 @@ const PRESET_KEYS = [
   "miscellaneous",
 ] as const;
 
-type PresetKey = (typeof PRESET_KEYS)[number];
+type _PresetKey = (typeof PRESET_KEYS)[number];
 
 type BrewdaySectionConfig = {
   presetExcludes: Record<string, boolean>;

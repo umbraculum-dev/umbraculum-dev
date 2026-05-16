@@ -11,7 +11,7 @@ import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 
 type IntegrationKind = "tilt" | "ispindel" | "rapt";
-const INTEGRATION_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
+const _INTEGRATION_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
 
 type BrewSessionDetail = {
   id: string;
@@ -44,7 +44,7 @@ export function BrewSessionDetailScreen() {
   const { t } = useT("recipes.brewSessions");
   const { state } = useAuth();
 
-  const recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
+  const _recipeId = (route.params as { recipeId?: string } | undefined)?.recipeId ?? "";
   const brewSessionId = (route.params as { brewSessionId?: string } | undefined)?.brewSessionId ?? "";
   const canCall = state.status === "logged_in";
 
