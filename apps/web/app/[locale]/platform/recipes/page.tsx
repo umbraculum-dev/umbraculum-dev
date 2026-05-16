@@ -39,8 +39,9 @@ export default function PlatformRecipesPage() {
       try {
         const res = await apiFetch("/api/platform/workspaces");
         if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-        const list = (res.data as any)?.workspaces ?? (res.data as any)?.accounts;
-        if (!cancelled) setWorkspaces(Array.isArray(list) ? list : []);
+        const body = res.data as { workspaces?: unknown; accounts?: unknown } | null | undefined;
+        const list = body?.workspaces ?? body?.accounts;
+        if (!cancelled) setWorkspaces(Array.isArray(list) ? (list as WorkspaceItem[]) : []);
       } catch (err) {
         if (!cancelled) setWorkspacesError(String(err));
       } finally {

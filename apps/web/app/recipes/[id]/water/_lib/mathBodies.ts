@@ -110,8 +110,9 @@ function renderBreakdowns(args: {
         ["Cl", "deltaChloridePpm", "chloridePpm"],
         ["HCO3", "deltaBicarbonatePpm", "bicarbonatePpm"],
       ] as const).forEach(([ion, k1, k2]) => {
-        const v = (r as any)[k1] ?? (r as any)[k2];
-        if (!v || v.kind !== "number") return;
+        const rRec = r as Record<string, { kind?: string; value?: number } | undefined>;
+        const v = rRec[k1] ?? rRec[k2];
+        if (!v || v.kind !== "number" || typeof v.value !== "number") return;
         if (Math.abs(v.value) < 1e-9) return;
         deltaEntries.push(
           args.tMath("derivation.common.ionDelta", {
@@ -240,7 +241,13 @@ export function buildWaterMathBody(args: {
     }
 
     case "waterHub.mergedWaterRecap": {
-      const streams = Array.isArray(ctx.streams) ? (ctx.streams as any[]) : [];
+      type StreamShape = {
+        label?: unknown;
+        volumeLiters?: unknown;
+        ph?: unknown;
+        finalAlkalinityPpmCaCO3?: unknown;
+      };
+      const streams: StreamShape[] = Array.isArray(ctx.streams) ? (ctx.streams as StreamShape[]) : [];
       const streamLines = streams.map((s) =>
         tMath("waterHub.mergedWaterRecap.streamLine", {
           ...(units ?? {}),
@@ -261,7 +268,7 @@ export function buildWaterMathBody(args: {
     }
 
     case "waterHub.mergedIons": {
-      const ions = (ctx.ions as any) ?? null;
+      const ions = (ctx.ions as Record<string, number | null | undefined>) ?? null;
       if (!ions) return tMath("waterHub.mergedIons.body");
       const ppmUnit = units?.ppm ?? "ppm";
       const ionL = [

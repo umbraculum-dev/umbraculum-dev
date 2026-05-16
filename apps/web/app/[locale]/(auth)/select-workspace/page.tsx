@@ -47,7 +47,8 @@ export default function SelectWorkspacePage() {
           setAuthExpired(true);
           return;
         }
-        const list = (res.data as any)?.workspaces ?? (res.data as any)?.accounts;
+        const body = res.data as { workspaces?: unknown; accounts?: unknown } | null | undefined;
+        const list = body?.workspaces ?? body?.accounts;
         const items: WorkspaceListItem[] = Array.isArray(list) ? list : [];
         if (!cancelled) setWorkspaces(items);
       } catch (err) {

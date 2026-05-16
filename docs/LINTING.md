@@ -1,7 +1,7 @@
 # Linting (ESLint)
 
 **Tier:** Public
-**Status:** v2.0 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**`), 5a–5b (entire `apps/native/src/**`), and **6a** (`apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` is `any`-free, all of `apps/web/app/recipes/**` (~11,400 lines) is `any`-free, the entire `apps/native/src/**` surface is `any`-free with typed React Navigation, and the two highest-leverage non-recipes web files are now `any`-free. Only the apps/web "long tail" (~58 `any` across 22 small files, mostly 1–13 each) and a 1-`any` services/api seed residual remain.
+**Status:** v2.1 — HIGH-staged Phases 1 (`packages/contracts/**`), 2 (`packages/beerjson/**`), 3 (`services/api/src/**`), 4a–4c (`apps/web/app/recipes/**`), 5a–5b (entire `apps/native/src/**`), 6a (`apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx`), and **6b** (`apps/web` long tail across 17 files + `services/api/prisma/seed.ts`) landed; every `packages/**` workspace is gated at `--max-warnings 0`, `services/api/src/**` and `apps/web/**` and `apps/native/src/**` are all **`any`-free**. Only Phase 6c (`no-unused-vars` mop-up + promotion to `error`) and the HIGH-full upgrade (type-aware rules + `no-explicit-any: error`) remain.
 **Audience:** maintainers, contributors, anyone authoring web/native UI code or services
 **Owners:** maintainers
 **Related:** `docs/TAMAGUI.md` (Tamagui type-system caveats), `docs/TESTING.md`, `docs/PLATFORM-ARCHITECTURE.md` §10.1.1 (go-public path), `docs/CONTRACTS-VALIDATION-STRATEGY.md` (Phase 7 — Zod/Valibot/TypeBox decision, separate from ESLint scope), `eslint.config.mjs` (this file is also documentation — read the comment headers).
@@ -19,7 +19,7 @@
 | Cross-platform UI primitives enforced | ✅ `no-restricted-imports` on `packages/ui/src/{ai,charts}/**` |
 | React hook bug class blocked | ✅ `react-hooks/exhaustive-deps` is `error` |
 | Type-aware lint enabled | ❌ Deferred to HIGH-full (alongside `no-explicit-any: error`) |
-| Outstanding warnings | **138** (-49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -989 cumulative; was 1,127 at HIGH-light landing) |
+| Outstanding warnings | **80** (-58 from Phase 6b, -49 from Phase 6a, -99 from Phase 5b, -56 from Phase 5a, -64 from Phase 4c, -87 from Phase 4b, -104 from Phase 4a, -432 from Phase 3, -21 from Phase 2, -77 from Phase 1, -1,047 cumulative; was 1,127 at HIGH-light landing). **Zero `no-explicit-any` warnings repo-wide.** Remaining 80 are all `no-unused-vars` (Phase 6c scope). |
 
 If you want to make a change touching `apps/web`, `apps/native`, `packages/**`, `services/api/src/**`, or `eslint.config.mjs`, the `web-lint` workflow will run automatically. Locally run lint with the commands in [How to run](#how-to-run-locally).
 
@@ -314,8 +314,8 @@ Same patterns as Phase 4 but for the React Native side. May land easier or harde
 The big-leverage `any` debt outside `apps/web/app/recipes/**` lives in two files (49 of the 107 post-5b warnings). Phase 6a clears those. Phase 6b sweeps the long tail. Phase 6c is the original mop-up scope (no-unused-vars promotion).
 
 - [x] Phase 6a: `apps/web/app/[locale]/ferm-data-integration/page.tsx` (26 `any`) + `apps/web/app/_components/RecipeImportForm.tsx` (23 `any`) — 49 `any` removed ✅ landed 2026-05-16
-- [ ] Phase 6b: Long tail — `apps/web/app/HealthPanel.tsx` (13), `apps/web/app/[locale]/inventory/page.tsx` (7), `apps/web/app/recipes/_components/YeastEditor.tsx` (6), `apps/web/app/_components/PrimaryNav.tsx` (5), and 18 smaller files (1–4 `any` each)
-- [ ] Phase 6c: Clean ~50 `no-unused-vars` warnings (mostly unused imports — mechanical deletions); promote `no-unused-vars` from `warn` to `error`
+- [x] Phase 6b: Long tail — `apps/web/app/HealthPanel.tsx` (13), `apps/web/app/[locale]/inventory/page.tsx` (7), `apps/web/app/recipes/_components/YeastEditor.tsx` (6), `apps/web/app/_components/PrimaryNav.tsx` (5), `apps/web/app/recipes/[id]/water/_lib/mathBodies.ts` (4), `apps/web/app/[locale]/(auth)/{login,signup}/page.tsx` (4 each), and 9 smaller files (1–2 `any` each) + `services/api/prisma/seed.ts` (1 `any`) — 58 `any` removed ✅ landed 2026-05-16
+- [ ] Phase 6c: Clean ~80 `no-unused-vars` warnings (mostly unused imports — mechanical deletions); promote `no-unused-vars` from `warn` to `error`
 - [ ] Verify no remaining pre-existing warnings outside known carve-outs
 
 #### Phase 6a — `apps/web/app/[locale]/ferm-data-integration/page.tsx` + `apps/web/app/_components/RecipeImportForm.tsx` ✅ landed 2026-05-16
@@ -338,6 +338,51 @@ The big-leverage `any` debt outside `apps/web/app/recipes/**` lives in two files
 - No new unit tests added — Phase 6a is type-tightening, no behavioural change. Both files are exercised by the existing Playwright smoke suite.
 
 **Why these two files went together in Phase 6a:** they're the two largest single residuals after Phase 5b (26 + 23 = 49 of the remaining 107 `any` warnings, ≈46% of the post-5b debt), they share ~80% of their patterns with prior phases, and the ferm-data-integration page in particular was already half-typed by Phase 5b's native counterpart — porting the same type definitions back to web was mostly mechanical. Splitting them into two PRs would have been disproportionate review overhead given the pattern uniformity.
+
+#### Phase 6b — `apps/web` long tail + `services/api/prisma/seed.ts` ✅ landed 2026-05-16
+
+**Scope:** 18 files. 58 `no-explicit-any` warnings → 0. **This phase eliminates the last `any` in the repo.**
+
+**File-level breakdown:**
+
+| File | `any` removed | Notes |
+|---|---|---|
+| `apps/web/app/HealthPanel.tsx` | 13 | `/api/auth/me` response narrowing — `raw` typed as `{ ok?: unknown; user?: { email?: unknown } | null; activeWorkspaceId?: unknown; activeAccountId?: unknown; role?: unknown }`. |
+| `apps/web/app/[locale]/inventory/page.tsx` | 7 | Defined `FermentableSearchItem` and `HopSearchItem` types; replaced `useState<any[]>` + `(item: any)` callback args with the typed shapes; `metadataJson` cast switched to `Record<string, unknown>`. |
+| `apps/web/app/recipes/_components/YeastEditor.tsx` | 6 | `recipeExtJson.batchSizeLiters` / `analysis.result.{ogEstimatedSg,kettleVolumeLiters}` shape-casts narrowed to `number` via `typeof === "number"` guard (preserves the existing `analysisOg: number \| null \| undefined` prop signature). Defined `YeastSearchItem` for `/api/ingredients/yeasts` response; replaced `useState<any[]>` + `(item: any)` callback args. |
+| `apps/web/app/_components/PrimaryNav.tsx` | 5 | `auth/me`-driven brand resolution; replaced `(next.workspaces as any[]).find((w) => (w as any).id === ...)` with `Array<unknown>` + `(w as { id?: unknown }).id` narrowing; `activeRec.brandKey` access via `{ brandKey?: unknown }` shape-cast. |
+| `apps/web/app/recipes/[id]/water/_lib/mathBodies.ts` | 4 | `(r as any)[k1]` indexing in the salt-delta forEach replaced with `Record<string, { kind?: string; value?: number } \| undefined>`; `ctx.streams` typed as `StreamShape[]`; `ctx.ions` cast to `Record<string, number \| null \| undefined>`. |
+| `apps/web/app/[locale]/(auth)/login/page.tsx` | 4 | `activeWorkspaceId` resolution from auth response — IIFE wrapping a typed body shape-cast (`{ activeWorkspaceId?: unknown; activeAccountId?: unknown }`) replacing the chained ternary `as any` casts. |
+| `apps/web/app/[locale]/(auth)/signup/page.tsx` | 4 | Same pattern as login. |
+| `apps/web/app/[locale]/recipes/page.tsx` | 2 | `(res.data as any)?.{styles,recipes}` → typed shape-casts; `Array.isArray` for list narrowing. |
+| `apps/web/app/[locale]/platform/recipes/page.tsx` | 2 | `(res.data as any)?.workspaces ?? .accounts` consolidated to a typed body shape-cast first. |
+| `apps/web/app/[locale]/platform/ads/page.tsx` | 2 | `(auth.me.user as any)?.isPlatformAdmin` → `{ isPlatformAdmin?: unknown }` shape-cast; `(res.data as any)?.ads` → typed shape-cast. |
+| `apps/web/app/[locale]/(auth)/select-workspace/page.tsx` | 2 | Same workspace/account body shape-cast as platform/recipes. |
+| `apps/web/i18n/request.ts` | 1 | `getSharedMessages(locale) as any` → `MessagesShape = Record<string, unknown> & { recipes?: { edit?: Record<string, string>; water?: { mash?: Record<string, string> } } }` so the existing runtime guardrails (`messages.recipes.edit.saving = ... ?? "Saving…"`) keep type-checking against the actual structure they manipulate. |
+| `apps/web/app/[locale]/recipes/[id]/versions/page.tsx` | 1 | `(res.data as any)?.versions` → typed shape-cast. |
+| `apps/web/app/[locale]/equipment/page.tsx` | 1 | `(listRes.data as any)?.profiles` → typed shape-cast. |
+| `apps/web/app/[locale]/accessibility/page.tsx` | 1 | `res.data as any` → `{ user?: Record<string, unknown> }`; `me?.user ?? {}` → `Record<string, unknown> = me?.user ?? {}`. |
+| `apps/web/app/_components/MathHelpPopover.tsx` | 1 | `removeEventListener("pointerdown", onPointerDown, { capture: true } as any)` → `EventListenerOptions` (the proper DOM type for the third arg). |
+| `apps/web/app/_components/AdSlot.tsx` | 1 | `res.data as any` → `Partial<SlotResponse>` (the local response type was already declared 30 lines above — the cast was just sloppy). |
+| `services/api/prisma/seed.ts` | 1 | BJCP styles fetch — `(await res.json()) as any` → `{ beerjson?: { styles?: unknown } }`. The downstream `Array.isArray(styles)` check + per-row `typeof === "string"` narrowing keep behaviour identical. |
+
+**Strategy used:** "tighten in place" — same toolkit as Phases 1–6a. Every change in this phase was mechanical, drawing on three patterns established earlier:
+
+1. **API response unpacks** (`(res.data as any)?.field` → `(res.data as { field?: unknown })?.field` + `Array.isArray` for lists) — most of the long tail.
+2. **State/callback typing** (`useState<any[]>` → `useState<TypedShape[]>` after defining the shape locally) — inventory, YeastEditor.
+3. **Auth/me body shape-casts** (`(meState.data as any).user.email` → `(meState.data as { data?: unknown }).data` then narrow `raw` to a typed `{ ok?: unknown; user?: { email?: unknown } | null; ... }`) — HealthPanel, PrimaryNav, login/signup, accessibility.
+
+**Verification:**
+
+- ESLint: **0 `no-explicit-any` warnings repo-wide** (down from 58). The remaining 80 warnings are all `no-unused-vars` (Phase 6c scope) and the 1-warning carve-outs already documented elsewhere.
+- `apps/web` TypeScript: held at the pre-change baseline of 590 errors (`npx tsc --noEmit` from `apps/web` — all 590 are pre-existing Tamagui/Next.js type-system gaps unrelated to Phase 6b). One transient TS error introduced during the rewrite (`HopSearchItem` missing `type` field, `YeastSearchItem` same) was caught by a normalized-diff TS-error log and fixed before commit. A second transient error in `i18n/request.ts` (initial overly-permissive `Record<string, ...>` shape broke `messages.recipes.water.mash.lateFermentablesExcludedNote = …`) was fixed by replacing the generic shape with the explicit `MessagesShape` interface that mirrors the actual mutations the file performs. A third transient error in `mathBodies.ts` (`v.value` could be `undefined` after the `Record<string, { kind?: string; value?: number }>` cast) was fixed by adding `typeof v.value === "number"` to the existing guard.
+- `apps/native` TypeScript: 0 errors (held at baseline; Phase 6b is web-only).
+- `@brewery/contracts` TypeScript: 0 errors.
+- Repo-wide `no-explicit-any`: 58 → 0. **Phase HIGH-staged is type-cast-cleanup-complete.**
+- Repo-wide all-warnings: 138 → 80 (-58, exactly Phase 6b scope).
+- No new unit tests added — Phase 6b is type-tightening, no behavioural change. All 18 files are exercised by the existing Playwright smoke suite + auth flow specs.
+
+**Phase 6 cumulative impact:** 107 `any` removed across 20 files (Phase 6a's 2 files + Phase 6b's 18). Combined with Phases 1–5, **the entire monorepo is now `no-explicit-any`-free.** This unblocks promoting `@typescript-eslint/no-explicit-any` from `warn` to `error` repo-wide, which is the gating step for HIGH-full. Phase 6c (`no-unused-vars` cleanup + promotion) is the only remaining HIGH-staged work before the HIGH-full upgrade can land.
 
 ### Phase 7 (optional, separate decision) — runtime-validation library migration
 

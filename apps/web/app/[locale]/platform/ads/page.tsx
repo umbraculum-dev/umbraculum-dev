@@ -45,7 +45,7 @@ export default function PlatformAdsPage() {
   const t = useTranslations("platformAds");
   const auth = useRequireAuth();
 
-  const isPlatformAdmin = auth.status === "ready" ? Boolean((auth.me.user as any)?.isPlatformAdmin) : false;
+  const isPlatformAdmin = auth.status === "ready" ? Boolean((auth.me.user as { isPlatformAdmin?: unknown } | null | undefined)?.isPlatformAdmin) : false;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,7 @@ export default function PlatformAdsPage() {
     try {
       const res = await apiFetch("/api/platform/ads");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const ads = (res.data as any)?.ads;
+      const ads = (res.data as { ads?: unknown })?.ads;
       setItems(Array.isArray(ads) ? (ads as PlatformAd[]) : []);
     } catch (err) {
       setError(String(err));

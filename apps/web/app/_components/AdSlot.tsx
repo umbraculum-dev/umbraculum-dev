@@ -39,7 +39,7 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
 
     (async () => {
       const res = await apiFetch(`/api/ads/slot/${placement}?platform=web`);
-      const data = res.ok && res.data && typeof res.data === "object" ? (res.data as any) : null;
+      const data = res.ok && res.data && typeof res.data === "object" ? (res.data as Partial<SlotResponse>) : null;
 
       const nextDisabled = Boolean(data?.disabled);
       const nextAd = data?.ad ?? null;

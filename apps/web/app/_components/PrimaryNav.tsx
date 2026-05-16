@@ -72,16 +72,17 @@ export function PrimaryNav() {
 
         const active =
           next && next.activeWorkspaceId
-            ? (next.workspaces as any[]).find(
+            ? (next.workspaces as Array<unknown>).find(
                 (w) =>
                   w &&
                   typeof w === "object" &&
-                  (w as any).id === next.activeWorkspaceId,
+                  (w as { id?: unknown }).id === next.activeWorkspaceId,
               ) ?? null
             : null;
+        const activeRec = active as { brandKey?: unknown } | null;
         const brandKey =
-          active && typeof (active as any).brandKey === "string" && (active as any).brandKey
-            ? ((active as any).brandKey as string)
+          activeRec && typeof activeRec.brandKey === "string" && activeRec.brandKey
+            ? activeRec.brandKey
             : "default";
 
         try {

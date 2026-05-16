@@ -42,7 +42,7 @@ export default function RecipeVersionsPage() {
     try {
       const res = await apiFetch(`/api/recipes/${recipeId}/versions`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as any)?.versions;
+      const items = (res.data as { versions?: unknown })?.versions;
       setVersions(Array.isArray(items) ? (items as VersionListItem[]) : []);
     } catch (err) {
       setVersions([]);

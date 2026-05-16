@@ -7,7 +7,13 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
   const locale = requested && isLocale(requested) ? requested : defaultLocale;
 
-  const messages = getSharedMessages(locale) as any;
+  type MessagesShape = Record<string, unknown> & {
+    recipes?: {
+      edit?: Record<string, string>;
+      water?: { mash?: Record<string, string> };
+    };
+  };
+  const messages = getSharedMessages(locale) as MessagesShape;
   // Runtime guardrail: ensure required keys exist even if dist JSON is stale.
   messages.recipes = messages.recipes ?? {};
   messages.recipes.edit = messages.recipes.edit ?? {};

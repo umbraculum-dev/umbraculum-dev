@@ -59,12 +59,16 @@ export default function LoginPage() {
 
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 
-      const activeWorkspaceId =
-        res.data && typeof res.data === "object" && "activeWorkspaceId" in (res.data as any)
-          ? ((res.data as any).activeWorkspaceId as string | null)
-          : res.data && typeof res.data === "object" && "activeAccountId" in (res.data as any)
-            ? ((res.data as any).activeAccountId as string | null)
-            : null;
+      const activeWorkspaceId = (() => {
+        const body = res.data as { activeWorkspaceId?: unknown; activeAccountId?: unknown } | null | undefined;
+        if (body && typeof body === "object" && "activeWorkspaceId" in body) {
+          return (body.activeWorkspaceId as string | null) ?? null;
+        }
+        if (body && typeof body === "object" && "activeAccountId" in body) {
+          return (body.activeAccountId as string | null) ?? null;
+        }
+        return null;
+      })();
 
       if (!activeWorkspaceId) {
         router.replace(`/${locale}/select-workspace`);

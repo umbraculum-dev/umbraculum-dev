@@ -79,21 +79,28 @@ export function AppPermissionsContent() {
 
   const meSummary = (() => {
     if (meState.status !== "ok") return null;
-    const raw = (meState.data as any)?.data;
-    if (!raw || typeof raw !== "object" || (raw as any).ok !== true) return null;
-    const userEmail = typeof (raw as any).user?.email === "string" ? (raw as any).user.email : null;
+    const raw = (meState.data as { data?: unknown })?.data;
+    if (!raw || typeof raw !== "object") return null;
+    const rawRec = raw as {
+      ok?: unknown;
+      user?: { email?: unknown } | null;
+      activeWorkspaceId?: unknown;
+      activeAccountId?: unknown;
+      role?: unknown;
+    };
+    if (rawRec.ok !== true) return null;
+    const userEmail = typeof rawRec.user?.email === "string" ? rawRec.user.email : null;
     const activeWorkspaceId =
-      (raw as any).activeWorkspaceId === null
+      rawRec.activeWorkspaceId === null
         ? null
-        : typeof (raw as any).activeWorkspaceId === "string"
-          ? ((raw as any).activeWorkspaceId as string)
-          : (raw as any).activeAccountId === null
+        : typeof rawRec.activeWorkspaceId === "string"
+          ? rawRec.activeWorkspaceId
+          : rawRec.activeAccountId === null
             ? null
-            : typeof (raw as any).activeAccountId === "string"
-              ? ((raw as any).activeAccountId as string)
+            : typeof rawRec.activeAccountId === "string"
+              ? rawRec.activeAccountId
               : null;
-    const role =
-      (raw as any).role === null ? null : typeof (raw as any).role === "string" ? ((raw as any).role as string) : null;
+    const role = rawRec.role === null ? null : typeof rawRec.role === "string" ? rawRec.role : null;
     return { userEmail, activeWorkspaceId, role };
   })();
 

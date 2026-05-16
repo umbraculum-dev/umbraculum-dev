@@ -79,8 +79,8 @@ export default function AccessibilityPage() {
           if (!cancelled) setLoaded(true);
           return;
         }
-        const me = res.data as any;
-        const u = me?.user ?? {};
+        const me = res.data as { user?: Record<string, unknown> } | null | undefined;
+        const u: Record<string, unknown> = me?.user ?? {};
         const pTheme = oneOf(u.preferredTheme, allowedTheme, cTheme);
         const pFont = oneOf(u.preferredFontScale, allowedFont, cFont);
         const pDensity = oneOf(u.preferredDensity, allowedDensity, cDensity);

@@ -38,6 +38,16 @@ function roundTo(n: number, decimals: number): number {
   return Math.round(n * factor) / factor;
 }
 
+type YeastSearchItem = {
+  id?: string;
+  name?: string;
+  type?: string | null;
+  lab?: string | null;
+  productId?: string | null;
+  attenuationMin?: number | null;
+  attenuationMax?: number | null;
+};
+
 type YeastEditorProps = {
   yeastRows: EditorYeastRow[];
   yeastAttenuationOverrides: Record<string, string>;
@@ -104,18 +114,21 @@ export function YeastEditor({
 }: YeastEditorProps) {
   const formatAmount = (value: number, decimals: number) =>
     formatFixedProp ? formatFixedProp(locale, value, decimals) : String(roundTo(value, decimals));
-  const batchSizeLiters =
+  const batchSizeLitersRaw =
     recipeExtJson && typeof recipeExtJson === "object" && !Array.isArray(recipeExtJson)
-      ? (recipeExtJson as any).batchSizeLiters
+      ? (recipeExtJson as { batchSizeLiters?: unknown }).batchSizeLiters
       : null;
-  const analysisOg =
+  const batchSizeLiters = typeof batchSizeLitersRaw === "number" ? batchSizeLitersRaw : null;
+  const analysisOgRaw =
     analysis && typeof analysis === "object" && !Array.isArray(analysis)
-      ? (analysis as any).result?.ogEstimatedSg
+      ? (analysis as { result?: { ogEstimatedSg?: unknown } }).result?.ogEstimatedSg
       : null;
-  const analysisKettleVolume =
+  const analysisOg = typeof analysisOgRaw === "number" ? analysisOgRaw : null;
+  const analysisKettleVolumeRaw =
     analysis && typeof analysis === "object" && !Array.isArray(analysis)
-      ? (analysis as any).result?.kettleVolumeLiters
+      ? (analysis as { result?: { kettleVolumeLiters?: unknown } }).result?.kettleVolumeLiters
       : null;
+  const analysisKettleVolume = typeof analysisKettleVolumeRaw === "number" ? analysisKettleVolumeRaw : null;
   const batchSizeForCells =
     typeof batchSizeLiters === "number" && Number.isFinite(batchSizeLiters) && batchSizeLiters > 0
       ? batchSizeLiters
@@ -373,7 +386,7 @@ function YeastEditorEditable({
       (r.manualCellCount.dilutionFactor === 200 || r.manualCellCount.dilutionFactor === 2000),
   );
   const [yeastQuery, setYeastQuery] = useState("");
-  const [yeastResults, setYeastResults] = useState<any[]>([]);
+  const [yeastResults, setYeastResults] = useState<YeastSearchItem[]>([]);
   const [yeastSearching, setYeastSearching] = useState(false);
   const [yeastSearchError, setYeastSearchError] = useState<string | null>(null);
 
@@ -384,8 +397,8 @@ function YeastEditorEditable({
     try {
       const res = await apiFetch(`/api/ingredients/yeasts?query=${encodeURIComponent(yeastQuery)}`);
       if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as any)?.items;
-      setYeastResults(Array.isArray(items) ? items : []);
+      const items = (res.data as { items?: unknown })?.items;
+      setYeastResults(Array.isArray(items) ? (items as YeastSearchItem[]) : []);
     } catch (err) {
       setYeastSearchError(String(err));
       setYeastResults([]);
@@ -399,7 +412,7 @@ function YeastEditorEditable({
     setYeastResults([]);
   };
 
-  const addYeastFromDb = (item: any) => {
+  const addYeastFromDb = (item: YeastSearchItem) => {
     const id = typeof item?.id === "string" ? item.id : null;
     const nameRaw = typeof item?.name === "string" ? item.name : "";
     if (!id || !nameRaw) return;

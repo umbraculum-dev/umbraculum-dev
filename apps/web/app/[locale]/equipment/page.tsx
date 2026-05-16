@@ -87,7 +87,7 @@ export default function EquipmentPage() {
 
       const listRes = await apiFetch("/api/equipment-profiles");
       if (!listRes.ok) throw new Error(JSON.stringify(listRes.data));
-      const items = (listRes.data as any)?.profiles;
+      const items = (listRes.data as { profiles?: unknown })?.profiles;
       setProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
     } catch (err) {
       setError(String(err));

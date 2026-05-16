@@ -56,7 +56,7 @@ async function seedBeerStyles(prisma: PrismaClient) {
     const text = await res.text();
     throw new Error(`BJCP styles fetch failed (${res.status}) from ${url}: ${text.slice(0, 500)}`);
   }
-  const json = (await res.json()) as any;
+  const json = (await res.json()) as { beerjson?: { styles?: unknown } };
   const styles = json?.beerjson?.styles;
   if (!Array.isArray(styles)) throw new Error("BJCP styles JSON: missing beerjson.styles[]");
 

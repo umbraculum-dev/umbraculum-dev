@@ -57,7 +57,7 @@ export default function RecipesPage() {
     try {
       const res = await apiFetch("/api/styles");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.styles;
+      const items = (res.data as { styles?: unknown })?.styles;
       setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
     } catch (err) {
       setStyles([]);
@@ -74,8 +74,8 @@ export default function RecipesPage() {
     try {
       const res = await apiFetch("/api/recipes");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as any)?.recipes;
-      setRecipes(Array.isArray(items) ? items : []);
+      const items = (res.data as { recipes?: unknown })?.recipes;
+      setRecipes(Array.isArray(items) ? (items as RecipeListItem[]) : []);
       setDeleteConfirmId(null);
     } catch (err) {
       setError(String(err));

@@ -38,7 +38,7 @@ export function MathHelpPopover(props: {
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
     return () => {
       window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("pointerdown", onPointerDown, { capture: true } as any);
+      window.removeEventListener("pointerdown", onPointerDown, { capture: true } as EventListenerOptions);
     };
   }, [open]);
 

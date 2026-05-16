@@ -40,6 +40,23 @@ type InventoryItem = {
   updatedAt: string;
 };
 
+type FermentableSearchItem = {
+  id: string;
+  name: string;
+  producer?: string | null;
+  colorLovibond?: number | null;
+  yieldPercent?: number | null;
+  ppg?: number | null;
+};
+
+type HopSearchItem = {
+  id: string;
+  name: string;
+  type?: string | null;
+  alphaMin?: number | null;
+  alphaMax?: number | null;
+};
+
 const ACID_SALT_OPTIONS: Array<{ value: string; label: string; unit: InventoryUnit }> = [
   { value: "lactic_acid", label: "Lactic acid", unit: "ml" },
   { value: "phosphoric_acid", label: "Phosphoric acid", unit: "ml" },
@@ -101,14 +118,14 @@ export default function InventoryPage() {
   const [qtyDraft, setQtyDraft] = useState<Record<string, string>>({});
   const [fermentableQuery, setFermentableQuery] = useState("");
   const [fermentableActiveQuery, setFermentableActiveQuery] = useState("");
-  const [fermentableResults, setFermentableResults] = useState<any[]>([]);
+  const [fermentableResults, setFermentableResults] = useState<FermentableSearchItem[]>([]);
   const [fermentableSearching, setFermentableSearching] = useState(false);
   const [fermentableSearched, setFermentableSearched] = useState(false);
   const [fermentablePage, setFermentablePage] = useState(0);
   const [fermentableTotal, setFermentableTotal] = useState<number | null>(null);
   const [hopQuery, setHopQuery] = useState("");
   const [hopActiveQuery, setHopActiveQuery] = useState("");
-  const [hopResults, setHopResults] = useState<any[]>([]);
+  const [hopResults, setHopResults] = useState<HopSearchItem[]>([]);
   const [hopSearching, setHopSearching] = useState(false);
   const [hopSearched, setHopSearched] = useState(false);
   const [hopPage, setHopPage] = useState(0);
@@ -201,7 +218,7 @@ export default function InventoryPage() {
     }
   };
 
-  const addFromFermentable = async (item: any) => {
+  const addFromFermentable = async (item: FermentableSearchItem) => {
     if (!canCall) return;
     try {
       const metadata = {
@@ -231,7 +248,7 @@ export default function InventoryPage() {
     }
   };
 
-  const addFromHop = async (item: any) => {
+  const addFromHop = async (item: HopSearchItem) => {
     if (!canCall) return;
     try {
       const metadata = {
@@ -338,8 +355,8 @@ export default function InventoryPage() {
           `/api/ingredients/fermentables?query=${encodeURIComponent(query)}&limit=${PUBLIC_DB_PAGE_SIZE}&offset=${offset}`
         );
         if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const data = res.data as { ok: boolean; items?: any[]; total?: number };
-        const items = Array.isArray(data.items) ? data.items : [];
+        const data = res.data as { ok: boolean; items?: unknown; total?: number };
+        const items: FermentableSearchItem[] = Array.isArray(data.items) ? (data.items as FermentableSearchItem[]) : [];
         setFermentableResults(items);
         setFermentableTotal(typeof data.total === "number" && Number.isFinite(data.total) ? data.total : null);
         setFermentablePage(safePage);
@@ -402,8 +419,8 @@ export default function InventoryPage() {
           `/api/ingredients/hops?query=${encodeURIComponent(query)}&limit=${PUBLIC_DB_PAGE_SIZE}&offset=${offset}`
         );
         if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const data = res.data as { ok: boolean; items?: any[]; total?: number };
-        const items = Array.isArray(data.items) ? data.items : [];
+        const data = res.data as { ok: boolean; items?: unknown; total?: number };
+        const items: HopSearchItem[] = Array.isArray(data.items) ? (data.items as HopSearchItem[]) : [];
         setHopResults(items);
         setHopTotal(typeof data.total === "number" && Number.isFinite(data.total) ? data.total : null);
         setHopPage(safePage);
@@ -426,7 +443,7 @@ export default function InventoryPage() {
     const displayQty = draft !== undefined ? draft : String(it.quantity);
     const meta =
       it.metadataJson && typeof it.metadataJson === "object" && !Array.isArray(it.metadataJson)
-        ? (it.metadataJson as any)
+        ? (it.metadataJson as Record<string, unknown>)
         : null;
     const producer = typeof meta?.producer === "string" ? meta.producer : null;
     const colorLovibond = typeof meta?.colorLovibond === "number" && Number.isFinite(meta.colorLovibond) ? meta.colorLovibond : null;
