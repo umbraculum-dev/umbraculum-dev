@@ -228,22 +228,40 @@ export default [
   },
 
   // -------------------------------------------------------------------
-  // HIGH-full Phase 4 — Tier C-wide: apps/web `no-unsafe-*`.
+  // HIGH-full Phase 4 + 5g — Tier C-wide: apps/web + apps/native
+  // `no-unsafe-*`.
   //
-  // Same five type-aware rules as Phase 3, scoped to `apps/web/**`,
-  // at `error` (promoted from `warn` by Phase 5).
+  // Same five type-aware rules as Phase 3, scoped to apps/web and
+  // apps/native, at `error`.
   //
+  // Phase 4 (apps/web, promoted to error by Phase 5c, 2026-05-16):
   // The original plan called this "the Tamagui wall" with an estimated
   // 266 warnings split across 4a/4b/4c sub-strategies (per-site
-  // disable / Tamagui adapter improvements / hybrid).
+  // disable / Tamagui adapter improvements / hybrid). Reality
+  // (post-Phase-3 remeasurement): 304 raw warnings, 290 of which
+  // traced to a single root cause — four water-related pages reading
+  // `profiles?.account` after the `account → workspace` rename in
+  // commit `87876d0` missed those consumers. Tamagui prop typing was
+  // responsible for ~6 warnings, not 266. Phase 4 became a stale-
+  // rename cleanup (4b) plus a small tail (4c), not a Tamagui
+  // adapter project.
   //
-  // Reality (post-Phase-3 remeasurement): 304 raw warnings, 290 of
-  // which traced to a single root cause — four water-related pages
-  // reading `profiles?.account` after the `account → workspace`
-  // rename in commit `87876d0` missed those consumers. Tamagui prop
-  // typing was responsible for ~6 warnings, not 266. Phase 4 became
-  // a stale-rename cleanup (4b) plus a small tail (4c), not a
-  // Tamagui adapter project.
+  // Phase 5g (apps/native, landed 2026-05-16): originally excluded
+  // from Phase 4 because the HIGH-full measurement reported only 3
+  // warnings in apps/native (smallest first-party workspace by an
+  // order of magnitude) and the IDE-cost objection at the time was
+  // a real concern. With the editor-config split landed in Phase 5a
+  // (which strips type-aware rules from editor lint regardless of
+  // file scope), the IDE-cost objection is gone. The 3 known
+  // warnings turned out to all be in `apps/native/src/navigation/
+  // AppNavigator.tsx` — a single inline `RootStack.Screen` render-
+  // prop where `({ navigation })` was untyped. Fixed by importing
+  // `NativeStackScreenProps<RootStackParamList, "SelectWorkspace">`
+  // and annotating the destructured argument; pattern matches
+  // `useNavigation<NavigationProp<RootStackParamList>>()` already
+  // used elsewhere in the workspace. Promoted directly to `error`
+  // in the same commit (no warn-staging needed for a 3-warning,
+  // single-file surface).
   //
   // Tests are exempted via the test-files relaxation block below
   // (later block wins), matching Phase 3a. Playwright e2e specs in
@@ -251,7 +269,7 @@ export default [
   // block.
   // -------------------------------------------------------------------
   {
-    files: ["apps/web/**/*.{ts,tsx}"],
+    files: ["apps/{web,native}/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "error",
       "@typescript-eslint/no-unsafe-member-access": "error",

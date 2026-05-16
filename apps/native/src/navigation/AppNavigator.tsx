@@ -3,7 +3,10 @@ import { Text } from "react-native";
 import { enableScreens } from "react-native-screens";
 import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+  createNativeStackNavigator,
+  type NativeStackScreenProps,
+} from "@react-navigation/native-stack";
 
 import { useT } from "@brewery/i18n-react";
 import type { RouteId } from "@brewery/navigation";
@@ -110,7 +113,11 @@ export function AppNavigator() {
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="Tabs">{() => <TabsNavigator tabLabels={tabLabels} />}</RootStack.Screen>
         <RootStack.Screen name="SelectWorkspace">
-          {({ navigation }) => <SelectWorkspaceScreen onDone={() => navigation.goBack()} />}
+          {({
+            navigation,
+          }: NativeStackScreenProps<RootStackParamList, "SelectWorkspace">) => (
+            <SelectWorkspaceScreen onDone={() => navigation.goBack()} />
+          )}
         </RootStack.Screen>
         <RootStack.Screen
           name="RecipeEdit"
