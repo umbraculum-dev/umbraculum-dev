@@ -110,7 +110,6 @@ export default [
             "packages/core/src/index.d.ts",
             "packages/recipes-ui/tsup.config.ts",
             "packages/ui/tsup.config.ts",
-            "services/api/prisma/seed.ts",
           ],
         },
         tsconfigRootDir: import.meta.dirname,
