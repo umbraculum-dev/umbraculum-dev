@@ -222,6 +222,17 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Cursor rules/skills upstream backlog**:
   - If you identify a reusable Cursor Rule/Skill improvement while working, add it to `CURSOR-RULES-SKILLS-TODO.md` (repo root) so it can be periodically upstreamed into the canonical rules/skills repo/plugin.
 
+- **Cursor rules/skills sync command (one-off, not in package files)**:
+  - This repo doesn't pin `@rftsu/cursor-rules` as a dev dependency — we're slated to switch to the Cursor plugin model soon. Until then, syncs run via a one-off `npx`. The friction-free path is **`git+ssh` over the `github-thesiteup` SSH alias** (set up in `~/.ssh/config`), which avoids the GitHub Packages PAT (`E401 unauthenticated`) failure mode entirely:
+    ```bash
+    # From repo root. Replace 3.1.11 with the current cursor-rules tag.
+    npx -y -p 'git+ssh://git@github-thesiteup:rftsu/cursor-rules.git#v3.1.11' cursor-rules-sync
+    ```
+  - Why this works: the upstream repo lives under the `rftsu/` GitHub org, which the `github-thesiteup` SSH key has access to. `npx -p git+ssh://...` clones the package via SSH (using the existing key + agent), bypassing npm registry authentication entirely. No `GITHUB_TOKEN`, no `.npmrc` `_authToken`, no PAT churn.
+  - Alternative path (only if the SSH alias isn't set up): authenticate to GitHub Packages with a PAT that has `read:packages` scope — `npm login --scope=@rftsu --registry=https://npm.pkg.github.com`. More setup, more places to leak, prefer the `git+ssh` path.
+  - After sync, verify with `cat .cursor/.cursor-rules-synced.json` — the `packageVersion` should match the tag you pulled, and the `files` array should reflect the latest rule/skill set.
+  - Source repo (canonical): `~/dkprojects/thesiteup/cursor-rules` on this developer's machine; `github.com/rftsu/cursor-rules` on the network.
+
 - **Coding standards (TypeScript/React)**
   - **Default**: use `interface` for object contracts (DTOs, component props, service inputs/outputs). Use `type` for unions/compositions.
   - **Styling**: avoid inline styles where you can; Tamagui props and components are the preferred replacement. Use `className` when Tamagui does not apply (e.g. native `<select>`, `<table>`).

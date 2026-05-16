@@ -148,8 +148,16 @@ export default [
       // similar "named type alias via interface" patterns). Still flag
       // truly empty `interface X {}` and `type X = {}` because those
       // accept any non-null value.
+      //
+      // Promoted from `warn` to `error` 2026-05-16 (HIGH-full housekeeping
+      // commit, post-Phase-5e). The repo has had zero violations of this
+      // rule since the HIGH-light landing — the warn level was a
+      // safety-net during the staged cleanup. Now that all type-aware
+      // rules are at `error`, having one lone warning-level rule was the
+      // last drift surface; promoting it removes the ambiguity (every
+      // rule now fails CI uniformly).
       "@typescript-eslint/no-empty-object-type": [
-        "warn",
+        "error",
         { allowInterfaces: "with-single-extends" },
       ],
     },
