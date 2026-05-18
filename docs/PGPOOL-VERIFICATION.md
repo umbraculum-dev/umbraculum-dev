@@ -10,12 +10,12 @@ This doc verifies the DB routing foundation:
 
 Repo root (canonical):
 
-- `cd /home/rf/dkprojects/rfapps/brewery-app`
+- `cd /home/rf/dkprojects/rfapps/umbraculum-dev`
 
 ## 1) Service health (compose)
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose ps postgres postgres-replica pgpool db-guard api nginx web
 ```
 
@@ -24,14 +24,14 @@ docker compose ps postgres postgres-replica pgpool db-guard api nginx web
 Replica is a hot standby:
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose exec -T postgres-replica psql -U postgres -d postgres -c "SELECT pg_is_in_recovery() AS is_replica;"
 ```
 
 Primary sees a streaming standby, and (when healthy) it should be `sync_state=sync`:
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose exec -T postgres psql -U postgres -d postgres -c "SELECT application_name, state, sync_state FROM pg_stat_replication;"
 ```
 
@@ -40,7 +40,7 @@ docker compose exec -T postgres psql -U postgres -d postgres -c "SELECT applicat
 Confirm the physical slot exists and is active:
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose exec -T postgres psql -U postgres -d postgres -c "SELECT slot_name, slot_type, active FROM pg_replication_slots;"
 ```
 
@@ -49,7 +49,7 @@ docker compose exec -T postgres psql -U postgres -d postgres -c "SELECT slot_nam
 Confirm WAL segments are being archived:
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose exec -T postgres sh -lc "ls -la /wal-archive | head"
 ```
 
@@ -63,7 +63,7 @@ Notes:
 From the primary container, query pgpool:
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose exec -T postgres sh -lc "PGPASSWORD=postgres psql -h pgpool -U postgres -d postgres -c \"show pool_nodes;\""
 ```
 
@@ -83,7 +83,7 @@ The guard toggles:
 ### 6.1 Confirm guard is running
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose logs --tail=120 db-guard
 ```
 
@@ -92,7 +92,7 @@ docker compose logs --tail=120 db-guard
 Stop replica and wait a few seconds (guard interval):
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose stop postgres-replica
 sleep 8
 docker compose exec -T postgres psql -U postgres -d postgres -c "SHOW synchronous_standby_names;"
@@ -113,7 +113,7 @@ Expected:
 Restart replica and wait:
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 docker compose up -d postgres-replica
 sleep 12
 docker compose exec -T postgres psql -U postgres -d postgres -c "SHOW synchronous_standby_names;"
@@ -141,7 +141,7 @@ Then run the degrade test (Section 6.2) while staying on a protected page:
 If you prefer curl (placeholders):
 
 ```bash
-cd /home/rf/dkprojects/rfapps/brewery-app
+cd /home/rf/dkprojects/rfapps/umbraculum-dev
 COOKIE_JAR="$(mktemp)"
 
 # Login (replace placeholders)

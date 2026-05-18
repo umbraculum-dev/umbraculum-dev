@@ -8,7 +8,7 @@
  *
  * Modeled after the agentic MCP server in
  * ~/dkprojects/thesiteup/e2e/e2e-app/playwright-suite/scripts/agentic/mcp-server.ts
- * but scoped to brewery-app concerns.
+ * but scoped to umbraculum-dev concerns.
  *
  * Output contract per .cursor/skills/agentic-browser-web-app.md (upstream skill) and docs/agentic-jobs.md (project-local job catalog):
  *   - tool runs that spawn subprocesses write artifacts under var/test-runs/<ts>-<tool>/

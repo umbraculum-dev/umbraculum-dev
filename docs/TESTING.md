@@ -1,4 +1,4 @@
-# Testing strategy (brewery-app)
+# Testing strategy (umbraculum-dev)
 
 This is the single source of truth for "what do I test, where, and how" in this monorepo. Read it before adding a new test or asking the agent to add one. Pair with [TESTING-DECISION.md](TESTING-DECISION.md) (decision tree) if you can't decide which layer applies.
 

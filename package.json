@@ -1,7 +1,16 @@
 {
-  "name": "brewery-app",
+  "name": "umbraculum-monorepo",
   "private": true,
   "version": "0.0.0",
+  "description": "AI-orchestrated open platform with composable vertical modules. Brewery seeded; MRP / WMS / CRM / CRP / automation next.",
+  "homepage": "https://umbraculum.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/romeof1980/umbraculum-dev.git"
+  },
+  "bugs": {
+    "url": "https://github.com/romeof1980/umbraculum-dev/issues"
+  },
   "workspaces": [
     "apps/*",
     "services/*",

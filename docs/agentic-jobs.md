@@ -1,6 +1,6 @@
-# Agentic browser jobs (brewery-app)
+# Agentic browser jobs (umbraculum-dev)
 
-Project-local catalog of jobs the agent can drive against the running brewery-app stack via Cursor's integrated browser. This file is the single source of truth for `<JOB>` values referenced by the generic upstream skill [`.cursor/skills/agentic-browser-web-app.md`](../.cursor/skills/agentic-browser-web-app.md).
+Project-local catalog of jobs the agent can drive against the running umbraculum-dev stack via Cursor's integrated browser. This file is the single source of truth for `<JOB>` values referenced by the generic upstream skill [`.cursor/skills/agentic-browser-web-app.md`](../.cursor/skills/agentic-browser-web-app.md).
 
 Use this file with:
 

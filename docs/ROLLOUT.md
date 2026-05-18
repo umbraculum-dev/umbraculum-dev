@@ -4,7 +4,7 @@ Companion to [docs/TESTING.md](TESTING.md). `TESTING.md` answers "what do I test
 
 This file has two independent scopes:
 1. **Brewery scaffolding** (vitest in shared packages, smoke + seeder, API CI workflow, Playwright suite, `@brewery/test-mcp`, agentic-browser jobs).
-2. **`@rftsu/cursor-rules` 3.1.1** publish + sync into brewery-app (the upstream codification of `20-tests-must-follow-changes.mdc` + the two new generic skills).
+2. **`@rftsu/cursor-rules` 3.1.1** publish + sync into umbraculum-dev (the upstream codification of `20-tests-must-follow-changes.mdc` + the two new generic skills).
 
 They're independent: brewery scaffolding works fine with cursor-rules at 3.1.0; 3.1.1 is the upstream version.
 
@@ -63,20 +63,20 @@ Add later as separate phases when they earn their cost.
 2. **Install the tarball** into brewery (the `postinstall` script runs the sync):
 
    ```bash
-   cd /home/rf/dkprojects/rfapps/brewery-app
+   cd /home/rf/dkprojects/rfapps/umbraculum-dev
    npm install --no-save /home/rf/dkprojects/thesiteup/cursor-rules/github-repo/rftsu-cursor-rules-3.1.1.tgz
    ```
 
 3. **Diff** brewery's `.cursor/` against the package contents (should be a no-op except possibly `.cursor-rules-synced.json`):
 
    ```bash
-   diff -r /home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/ /home/rf/dkprojects/rfapps/brewery-app/.cursor/ | head -40
+   diff -r /home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/ /home/rf/dkprojects/rfapps/umbraculum-dev/.cursor/ | head -40
    ```
 
 4. **Confirm sync state**:
 
    ```bash
-   cat /home/rf/dkprojects/rfapps/brewery-app/.cursor/.cursor-rules-synced.json | head -40
+   cat /home/rf/dkprojects/rfapps/umbraculum-dev/.cursor/.cursor-rules-synced.json | head -40
    ```
 
 5. Only then `npm publish` to GitHub Packages.

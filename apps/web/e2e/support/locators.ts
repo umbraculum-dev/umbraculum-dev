@@ -1,5 +1,5 @@
 /**
- * Central locator helpers for the brewery-app web E2E suite.
+ * Central locator helpers for the umbraculum-dev web E2E suite.
  *
  * Per docs/DEVELOPMENT-LOCAL.md "Accessibility-first":
  *   Prefer getByRole / getByLabel; reserve data-testid for workflow-critical

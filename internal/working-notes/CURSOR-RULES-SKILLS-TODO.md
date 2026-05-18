@@ -29,7 +29,7 @@ Purpose:
   - **Rule_or_Skill**: Rule
   - **Why (problem it prevents)**: Keep tests evolving with code in TS monorepos (apps/services/packages), not just Magento `app/code`. Drives the cheapest-test-layer choice via a small mapping table; defers project specifics to a per-project `docs/TESTING.md`.
   - **Scope**: reusable-across-repos
-  - **Status**: ✅ Upstreamed in `@rftsu/cursor-rules` **3.1.1** (2026-05-12). Pending the next `npm install` of v3.1.1+ to land via sync. brewery-app has been pre-aligned to the new text.
+  - **Status**: ✅ Upstreamed in `@rftsu/cursor-rules` **3.1.1** (2026-05-12). Pending the next `npm install` of v3.1.1+ to land via sync. umbraculum-dev has been pre-aligned to the new text.
   - **Notes/Links**:
     - Upstream file: `/home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/rules/20-tests-must-follow-changes.mdc`
     - Project-local single source of truth (brewery): [`docs/TESTING.md`](docs/TESTING.md)

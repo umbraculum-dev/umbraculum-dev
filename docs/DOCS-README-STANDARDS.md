@@ -79,7 +79,7 @@ The brand was resolved on 2026-05-18 (see [`RENAME-DILIGENCE.md`](RENAME-DILIGEN
 
 ### 3.1 The `@brewery/*` parking — explicit guidance
 
-The `@brewery/*` npm scope and the `<repo>/brewery-app` repository name are **deliberately retained** while sub-plan #9 is pending. Per [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) §10 sign-off:
+The `@brewery/*` npm scope is **deliberately retained** while sub-plan #9 is pending (the `<repo>/brewery-app` repository name was previously parked alongside it but resolved to `umbraculum-dev` on 2026-05-18 — folder, npm `name`, and GitHub repo all renamed; only the npm scope migration remains). Per [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) §10 sign-off:
 
 > "the `@brewery/*` actual package scopes — distinct from the `<PLATFORM_NAME>` placeholder — remain out of scope; their migration is tracked as the new follow-on sub-plan #9 in the umbrella plan's 'Sub-plans this plan is designed to spawn' list."
 

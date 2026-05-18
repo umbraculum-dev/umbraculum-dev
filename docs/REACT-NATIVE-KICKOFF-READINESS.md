@@ -1,6 +1,6 @@
 # React Native kickoff readiness (web + native shared stack)
 
-Repo root (canonical): `/home/rf/dkprojects/rfapps/brewery-app`
+Repo root (canonical): `/home/rf/dkprojects/rfapps/umbraculum-dev`
 
 ## Version baseline
 
@@ -10,7 +10,7 @@ Repo root (canonical): `/home/rf/dkprojects/rfapps/brewery-app`
 ## Shared packages build (native-ready dist)
 
 - [ ] After changes under `packages/**`, rebuild shared package outputs:
-  - `cd /home/rf/dkprojects/rfapps/brewery-app`
+  - `cd /home/rf/dkprojects/rfapps/umbraculum-dev`
   - `./scripts/build-packages-in-docker.sh`
 - [ ] Verify `packages/*/dist/**` reflects the latest source changes (these outputs are committed in this repo).
 

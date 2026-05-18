@@ -1,6 +1,6 @@
 # Native strategy, risk posture, and CI (prose)
 
-Canonical repo root (example): `/home/rf/dkprojects/rfapps/brewery-app`
+Canonical repo root (example): `/home/rf/dkprojects/rfapps/umbraculum-dev`
 
 This document captures **why** we accept certain trade-offs for native development today, **what** keeps that posture professionally safe for a small team or solo maintainer, and **whether** continuous integration (e.g. GitHub Actions) is recommended—and how to keep it lean.
 
@@ -179,7 +179,7 @@ Run the same checks **locally before push**:
 
 ```bash
 docker run --rm \
-  -v "/home/rf/dkprojects/rfapps/brewery-app:/repo" \
+  -v "/home/rf/dkprojects/rfapps/umbraculum-dev:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check && npm run typecheck"

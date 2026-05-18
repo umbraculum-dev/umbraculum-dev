@@ -212,7 +212,7 @@ Guardrails:
   - Web/native should consume `result` + `derivation` and render it, with runtime parsing of network payloads (`unknown` → `parseXxx()`).
 
 ### Shared contracts (`@brewery/contracts`) + versioning (MANDATORY for native-ready endpoints)
-We treat `@brewery/contracts` (`/home/rf/dkprojects/rfapps/brewery-app/packages/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
+We treat `@brewery/contracts` (`/home/rf/dkprojects/rfapps/umbraculum-dev/packages/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
 
 Standards:
 - **Type-only imports** for TS safety without runtime coupling:

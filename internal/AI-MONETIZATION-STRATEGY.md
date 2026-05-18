@@ -305,7 +305,7 @@ The pricing power grows because **older workspaces accrue moat asset (memory)** 
 
 Original v1.0 reasoning assumed free tier = BYOK active, accruing moat regardless of conversion. Under v0 model (subscription-gated AI), free tier looks different:
 
-**Option A — strict gate** (recommended): Free tier has no AI features at all. Free tier accrues only the brewery-app value. Memory doesn't compound for free workspaces.
+**Option A — strict gate** (recommended): Free tier has no AI features at all. Free tier accrues only the umbraculum-dev value. Memory doesn't compound for free workspaces.
 
 **Option B — limited free AI**: Free tier can use AI but with very low caps (e.g., 50 messages/month) and BYOK required. Memory still compounds.
 
