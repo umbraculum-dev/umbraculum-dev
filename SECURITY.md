@@ -5,17 +5,20 @@ how to responsibly disclose vulnerabilities, what is in scope, and what
 to expect from us in return.
 
 > [!NOTE]
-> The contact address below is a placeholder pending the choice of
-> `<PLATFORM_NAME>` and the project's public domain. It will be replaced
-> with a real, monitored mailbox before this repository is flipped to a
-> public-facing release (see `docs/PLATFORM-ARCHITECTURE.md` §10.1 for
-> the go-public path).
+> The contact address below is a placeholder pending the project's
+> public domain rollout. The brand was resolved on 2026-05-18 to
+> Umbraculum (primary domain `umbraculum.dev`); this contact will be
+> replaced with a real, monitored mailbox at that domain before this
+> repository is flipped to a public-facing release (see
+> `docs/PLATFORM-ARCHITECTURE.md` §10.1 for the go-public path and
+> [`docs/RENAME-DILIGENCE.md`](./docs/RENAME-DILIGENCE.md) for the
+> brand resolution).
 
 ## Reporting a vulnerability
 
 Please report security issues privately to:
 
-- **Email:** `security@<platform-domain>` *(placeholder)*
+- **Email:** `security@umbraculum.dev` *(placeholder mailbox; to be created before the public flip — see [`docs/PLATFORM-ARCHITECTURE.md`](./docs/PLATFORM-ARCHITECTURE.md) §10.1.1 pre-flip checklist)*
 
 If you prefer encrypted email, request our PGP key in your initial
 message and we will send it before any sensitive details are exchanged.

@@ -4,7 +4,7 @@
 
 ---
 
-# `<PLATFORM_NAME>` — moat and competitive strategy
+# Umbraculum — moat and competitive strategy
 
 ## Why this document is internal
 

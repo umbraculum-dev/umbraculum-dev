@@ -8,9 +8,11 @@ translations, and thoughtful issue triage.
 > This repository is **not yet a public-facing release**. The path to
 > the public flip is documented in
 > `docs/PLATFORM-ARCHITECTURE.md` §10.1 (working assumption: a fresh
-> public repo seeded from this one in H1 2027 once `<PLATFORM_NAME>`
-> is chosen). The conventions below are already in force so that the
-> existing history is clean when the flip happens.
+> public repo seeded from this one in H1 2027; the project brand was
+> resolved on 2026-05-18 to Umbraculum — see
+> [`docs/RENAME-DILIGENCE.md`](./docs/RENAME-DILIGENCE.md)). The
+> conventions below are already in force so that the existing history
+> is clean when the flip happens.
 
 ## Before you start
 

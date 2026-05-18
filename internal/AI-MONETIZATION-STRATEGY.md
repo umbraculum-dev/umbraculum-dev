@@ -4,7 +4,7 @@
 
 ---
 
-# `<PLATFORM_NAME>` — AI monetization strategy
+# Umbraculum — AI monetization strategy
 
 ## Why this document is internal
 
@@ -97,11 +97,11 @@ See the table above. Same order-of-magnitude margin, dramatically lower risk sur
 
 Small business owners are more often **risk-averse on usage-priced surprises** than they are friction-averse on setup. The brewery owner who's afraid of a €500 AI bill in a heavy month prefers:
 
-> "€25/month flat to <PLATFORM_NAME> + my own Anthropic bill (typically €5-15/month) which I can cap and monitor directly"
+> "€25/month flat to Umbraculum + my own Anthropic bill (typically €5-15/month) which I can cap and monitor directly"
 
 over:
 
-> "€60/month to <PLATFORM_NAME>, includes everything, trust us on the AI usage"
+> "€60/month to Umbraculum, includes everything, trust us on the AI usage"
 
 The Anthropic bill is the customer's **own safety mechanism**. They feel they control the cost ceiling because Anthropic shows them the bill in real time. This is the same psychology behind "I'd rather buy diesel myself than be on a rental that might surcharge me for fuel."
 
@@ -116,7 +116,7 @@ Under this model, our gross margin on the subscription is ~100% (minus Stripe fe
 
 ### 4. Self-host customers slot in for free
 
-Self-hosters running `<PLATFORM_NAME>` under AGPLv3 on their own infrastructure use BYOK by definition (they don't have access to our Stripe). Under our v0 model:
+Self-hosters running Umbraculum under AGPLv3 on their own infrastructure use BYOK by definition (they don't have access to our Stripe). Under our v0 model:
 
 - Self-host with BYOK = the free path. The community benefits; we get goodwill and contributions; no support burden on AI cost.
 - Hosted with BYOK + paid subscription = the paid path. Same orchestrator code; only the subscription gate differs.
@@ -136,7 +136,7 @@ This is functionally a credit check: only customers who've shown they can pay ge
 We have a human available — multilingual (Italian + English at minimum) — to help workspace admins set up:
 
 - Their Anthropic account (5 minutes guided walk-through)
-- The provider API key entry into `<PLATFORM_NAME>`
+- The provider API key entry into Umbraculum
 - The data-egress notice review
 - Role limits and per-user-daily-cap configuration
 - A first real chat session, showing the AI working
@@ -147,7 +147,7 @@ This is a strategic asset, not a soft footnote. Three reasons:
 
 The textbook objection to BYOK from a non-technical customer is: "I don't know what an Anthropic account is, I don't want to manage another API key, please just bill me." With a human available to walk them through it on a 15-minute call, this objection evaporates. The customer doesn't have to figure it out alone.
 
-Crucially, **this is cheap to deliver but hard to commoditize**. Most software vendors (especially horizontal infrastructure plays) don't offer human-led onboarding — they ship docs and a video. We offer the human. The brewery owner remembers the call, names the person, refers their brewery friends ("call X at <PLATFORM_NAME>, they walked me through it").
+Crucially, **this is cheap to deliver but hard to commoditize**. Most software vendors (especially horizontal infrastructure plays) don't offer human-led onboarding — they ship docs and a video. We offer the human. The brewery owner remembers the call, names the person, refers their brewery friends ("call X at Umbraculum, they walked me through it").
 
 ### Reason 2 — captures a market segment competitors can't
 

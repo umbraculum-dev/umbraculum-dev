@@ -4,7 +4,7 @@
 
 ---
 
-# `<PLATFORM_NAME>` — internal business documentation
+# Umbraculum — internal business documentation
 
 This folder is the home for documentation that is **not safe to publish**: business strategy, competitive analysis, margin math, customer notes, pricing-power reasoning, regulatory hedges, and any material whose value depends on competitors *not* reading it.
 

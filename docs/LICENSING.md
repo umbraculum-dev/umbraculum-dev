@@ -1,9 +1,9 @@
-# `<PLATFORM_NAME>` — Licensing rationale
+# Umbraculum — Licensing rationale
 
 **Tier:** Public
 **Status:** v1.0 (living document, public-facing intent)
-**Audience:** prospective contributors, self-hosters, hosted-service customers, enterprise legal teams, and anyone evaluating `<PLATFORM_NAME>` as a long-term operational dependency.
-**Token convention:** the placeholder `<PLATFORM_NAME>` is used everywhere the brand will appear; it will be replaced once a name is chosen.
+**Audience:** prospective contributors, self-hosters, hosted-service customers, enterprise legal teams, and anyone evaluating Umbraculum as a long-term operational dependency.
+**Brand resolution:** the project's brand was previously tracked via the `<PLATFORM_NAME>` placeholder convention, resolved on 2026-05-18 to **Umbraculum** (wordmark), `umbraculum` (namespace), `umbraculum.dev` (primary domain), and `umbraculum-dev` (GitHub org). See [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) for the full diligence record.
 
 > **Disclaimer.** This document explains the project's licensing **intent and reasoning**. It is not legal advice. If you are making a commercial or regulatory decision that depends on a precise interpretation of any license, please consult a qualified open-source licensing lawyer in your jurisdiction.
 
@@ -29,8 +29,8 @@ This document is intended to be **public**. Wording is aimed at a reader who is 
 
 - **Core platform**: **GNU Affero General Public License v3 (AGPLv3)**.
 - **SDK / contracts / public interface packages** (the surface third-party modules depend on): **MIT License**.
-- **Available alternative for enterprises that cannot adopt AGPLv3**: a **commercial dual license** of the same source code, sold by `<PLATFORM_NAME>`'s legal entity.
-- **Trademark**: the `<PLATFORM_NAME>` name and logo are **not** covered by the open-source license; they remain the project's commercial property and are protected separately.
+- **Available alternative for enterprises that cannot adopt AGPLv3**: a **commercial dual license** of the same source code, sold by Umbraculum's legal entity.
+- **Trademark**: the Umbraculum name and logo are **not** covered by the open-source license; they remain the project's commercial property and are protected separately.
 - **Commitments**: no closed-source replacement of public modules, no future-dated re-licensing of existing source, no enterprise-only paywall hiding bug fixes or security patches behind a commercial tier, and any future license change goes through a public RFC.
 
 The remainder of the document explains why.
@@ -39,12 +39,12 @@ The remainder of the document explains why.
 
 ## 3. What we are optimizing for
 
-A licensing decision only makes sense in the context of the goals it serves. `<PLATFORM_NAME>` is optimizing for, in order:
+A licensing decision only makes sense in the context of the goals it serves. Umbraculum is optimizing for, in order:
 
 1. **Long-term sustainability for a small team.** The project's economic target is a *bread-and-butter* income — sustainable for a small team over many years, not a venture-scale exit. This shapes everything else.
 2. **Survivability beyond any single maintainer.** The project is built to outlive its founders. If a maintainer steps back, retires, or hands off, the community continues. This is structurally only achievable with a real open-source license — not source-available.
 3. **Trust with operational customers.** Enterprise process-manufacturing buyers commit to 5–10 year operational dependencies. They will not commit to a project they cannot audit, fork if abandoned, or self-host if they need to.
-4. **A defensible position against hyperscalers.** If `<PLATFORM_NAME>` succeeds, large cloud providers (AWS, Azure, GCP) may be tempted to operate it as a managed service themselves, capturing the revenue without contributing back. The license must structurally deter this without alienating end users.
+4. **A defensible position against hyperscalers.** If Umbraculum succeeds, large cloud providers (AWS, Azure, GCP) may be tempted to operate it as a managed service themselves, capturing the revenue without contributing back. The license must structurally deter this without alienating end users.
 5. **A welcoming environment for module developers.** The platform's defensibility depends on a thriving ecosystem of third-party modules (verticals, integrations, themes). The license terms applicable to *those* modules must be permissive enough that an indie developer or a small consultancy is happy to ship one.
 6. **Compatibility with the AI add-on revenue line.** AI usage is metered and resold; the license should not undermine that model.
 
@@ -126,7 +126,7 @@ Definitions used throughout this section:
 
 **Strengths.**
 
-- Closes the GPL "SaaS loophole". A hyperscaler operating a modified version of `<PLATFORM_NAME>` as a managed service must release their modifications. This removes the easy "fork-and-host-quietly" attack vector.
+- Closes the GPL "SaaS loophole". A hyperscaler operating a modified version of Umbraculum as a managed service must release their modifications. This removes the easy "fork-and-host-quietly" attack vector.
 - Fully [OSI-approved](https://opensource.org/license/agpl-v3) and [FSF-recommended](https://www.gnu.org/licenses/why-affero-gpl.html). Counts as open source by every credible definition.
 - Has a large, growing track record in SaaS-shaped projects: Plausible (analytics), Cal.com (scheduling), Mautic (marketing), Nextcloud (file sync), Mastodon (social), Frappe Cloud's underlying products in some configurations.
 - Imposes obligations only on *modifications*. A self-hoster running the unmodified software has no obligation to publish anything.
@@ -136,7 +136,7 @@ Definitions used throughout this section:
 - Some enterprise legal teams have AGPLv3 on a "do not use" list, often inherited from policies drafted in the early 2010s when AGPL was unfamiliar. This concern is real and is addressed below in §6.3 (dual licensing) and §7.5.
 - The "modification + network interaction" trigger is broader than plain GPL's "distribute" trigger, which requires clear thinking about what counts as a modification (configuration vs source change) and what counts as "network interaction" (an internal back-office tool used by 50 employees is still network interaction).
 
-**Best fit.** Network-delivered software where the operator typically modifies the code (configuration extensions, integrations, custom workflows) and the maintainers want to ensure those modifications return to the commons. This is exactly `<PLATFORM_NAME>`'s situation.
+**Best fit.** Network-delivered software where the operator typically modifies the code (configuration extensions, integrations, custom workflows) and the maintainers want to ensure those modifications return to the commons. This is exactly Umbraculum's situation.
 
 ### 4.5 Source-available, *not* open source (BSL, SSPL, Elastic License)
 
@@ -177,7 +177,7 @@ Definitions used throughout this section:
 
 ## 5. What real OSS B2B projects chose, and what happened
 
-License choices are easier to reason about with the benefit of hindsight from projects similar in shape to `<PLATFORM_NAME>`.
+License choices are easier to reason about with the benefit of hindsight from projects similar in shape to Umbraculum.
 
 ### 5.1 Sustained successes
 
@@ -185,7 +185,7 @@ License choices are easier to reason about with the benefit of hindsight from pr
 |---|---|---|---|---|
 | **WordPress** | GPLv2 | Hosting (Automattic = WordPress.com), commercial themes/plugins, professional services | Foundation + Automattic large | A permissive *enough* copyleft that ecosystem flourished; brand and trademark held by the Foundation; community contribution > company control. |
 | **Drupal** | GPLv2+ | Hosting (Acquia), enterprise support, professional services | Foundation + Acquia | Similar shape to WordPress; commercial steward must continually re-earn community trust. |
-| **Plausible Analytics** | AGPLv3 | Hosting + self-host paid support | ≈4 people | **Bread-and-butter shape proven**: ~$3M ARR on AGPLv3 + cloud + no enterprise paywall on core. The clearest precedent for `<PLATFORM_NAME>`'s economic target. |
+| **Plausible Analytics** | AGPLv3 | Hosting + self-host paid support | ≈4 people | **Bread-and-butter shape proven**: ~$3M ARR on AGPLv3 + cloud + no enterprise paywall on core. The clearest precedent for Umbraculum's economic target. |
 | **Cal.com** | AGPLv3 | Hosting + enterprise tier | ≈40 people, started smaller | AGPL did not deter enterprise adoption; the enterprise tier provides features that genuinely require operator support (SAML, audit logs, dedicated infrastructure). |
 | **Mautic** | GPLv3 | Hosting (Acquia after acquisition), services | Foundation + Acquia | Community survived ownership change; GPLv3 + governance held the line. |
 | **Frappe / ERPNext** | GPLv3 core + permissive licenses for some libs | Frappe Cloud hosting, enterprise support | ≈30 people | Closest functional precedent: real ERP, modest team, profitable, AGPL-adjacent. Demonstrates that ERP-class software can sustain on copyleft + hosting. |
@@ -224,7 +224,7 @@ The platform monorepo — Fastify API, Next.js web app, React Native app, Prisma
 
 **Reasoning, in plain terms:**
 
-- **Hyperscaler defense**: if AWS / GCP / Azure ever operates a modified version of `<PLATFORM_NAME>` as a managed service, AGPLv3 §13 forces them to release the modifications. They keep the option to do it, but they cannot do it without contributing back to the commons. This is the deterrent that protects the hosting revenue line.
+- **Hyperscaler defense**: if AWS / GCP / Azure ever operates a modified version of Umbraculum as a managed service, AGPLv3 §13 forces them to release the modifications. They keep the option to do it, but they cannot do it without contributing back to the commons. This is the deterrent that protects the hosting revenue line.
 - **Real open source**: AGPLv3 is OSI-approved and FSF-recommended. Linux distributions accept it. Universities use it. There is no "is this actually open source?" question.
 - **Proven economic shape**: Plausible, Cal.com, and others demonstrate that AGPL + hosting + optional enterprise support is a sustainable model for small teams.
 - **Sufficient permissiveness for end users**: a brewery that self-hosts and tweaks the platform for its internal operations has no obligation to publish anything until they redistribute the modified version to others or operate a modified version *for other parties as a network service*.
@@ -255,11 +255,11 @@ A specific subset of packages — the ones third-party module developers must de
 - The same pattern is used by Frappe (GPL core, MIT for `frappejs`-style libraries), ERPNext (similar), and several other large copyleft-cored projects.
 - It does not weaken the core's protection: the *runtime* dependency from a module to the platform is mediated by network calls or by being loaded into an AGPL-licensed host process; the *source-level* dependency is via types and interfaces, which is the MIT scope.
 
-**Concrete example.** A brewery consultancy wants to ship a closed-source module that does specialized water-chemistry calculations for distillers. They depend on `<PLATFORM_NAME>`'s MIT-licensed SDK packages for the types and registration. Their module's own source code can be MIT, Apache 2.0, or fully proprietary. When the module runs inside a `<PLATFORM_NAME>` host, the *host* is AGPLv3 — the consultancy's source code is not.
+**Concrete example.** A brewery consultancy wants to ship a closed-source module that does specialized water-chemistry calculations for distillers. They depend on Umbraculum's MIT-licensed SDK packages for the types and registration. Their module's own source code can be MIT, Apache 2.0, or fully proprietary. When the module runs inside a Umbraculum host, the *host* is AGPLv3 — the consultancy's source code is not.
 
 ### 6.3 Available alternative: commercial dual license
 
-For enterprises whose policies cannot accommodate AGPLv3, `<PLATFORM_NAME>`'s legal entity offers a **commercial license** for the same source code. The commercial license:
+For enterprises whose policies cannot accommodate AGPLv3, Umbraculum's legal entity offers a **commercial license** for the same source code. The commercial license:
 
 - Removes AGPL §13's "share source with users" obligation, replacing it with a commercial contract.
 - Includes the same features and security patches as the AGPL version (no enterprise-only feature paywall — see §9 commitments).
@@ -305,11 +305,11 @@ You do not have to:
 
 - Publish modifications you do not network-serve to outside parties.
 - Pay license fees of any kind.
-- Have a commercial relationship with `<PLATFORM_NAME>`'s legal entity.
+- Have a commercial relationship with Umbraculum's legal entity.
 
 ### 7.2 For hosted-by-us customers
 
-If you use the managed `<PLATFORM_NAME>` hosting:
+If you use the managed Umbraculum hosting:
 
 - You are using software hosted by us; you are a user, not a distributor. AGPL obligations do not apply to you as the customer.
 - The standard hosting contract governs your relationship with the operator.
@@ -321,12 +321,12 @@ You can:
 
 - Build modules against the MIT-licensed SDK packages.
 - License your module's source code under any license you choose: MIT, Apache 2.0, BSD, GPL, AGPL, commercial — whatever fits your business.
-- Distribute your module via npm, GitHub, your own website, or a future `<PLATFORM_NAME>` module marketplace.
+- Distribute your module via npm, GitHub, your own website, or a future Umbraculum module marketplace.
 - Charge for your module, charge for support, or release it for free — your call.
 
 You must:
 
-- When your module is loaded into a `<PLATFORM_NAME>` host process, the host process as a whole is AGPLv3-licensed. This means: the *operator* of that host process (typically the end customer) has AGPL obligations toward *their* users. Your module's own source license is unaffected.
+- When your module is loaded into a Umbraculum host process, the host process as a whole is AGPLv3-licensed. This means: the *operator* of that host process (typically the end customer) has AGPL obligations toward *their* users. Your module's own source license is unaffected.
 - Comply with the SDK's API contracts and versioning conventions (these are technical, not legal, requirements).
 
 The practical effect: you can ship a closed-source vertical module without legal friction.
@@ -353,13 +353,13 @@ If your organization's open-source policy prohibits AGPLv3 adoption:
 
 ## 8. Trademark and brand
 
-The `<PLATFORM_NAME>` **name**, **logo**, and any future brand assets are **separate from** the source-code license. They are owned by the project's legal entity (currently a single-founder company; eventually possibly a foundation; see §10).
+The Umbraculum **name**, **logo**, and any future brand assets are **separate from** the source-code license. They are owned by the project's legal entity (currently a single-founder company; eventually possibly a foundation; see §10).
 
 What this means in practice:
 
-- You may build, distribute, and host a fork of the AGPL source code. You **may not** call your fork `<PLATFORM_NAME>` or use the logo. (This is the same protection WordPress.org applies to "WordPress" — derivative projects must use different names.)
+- You may build, distribute, and host a fork of the AGPL source code. You **may not** call your fork Umbraculum or use the logo. (This is the same protection WordPress.org applies to "WordPress" — derivative projects must use different names.)
 - A modified version intended for internal use does not need a different name; trademark obligations apply to **public** distribution and presentation.
-- Quotation, reference, attribution, and good-faith descriptions of the project ("we use `<PLATFORM_NAME>` internally", "this connector is for `<PLATFORM_NAME>`") are explicitly fine and welcomed.
+- Quotation, reference, attribution, and good-faith descriptions of the project ("we use Umbraculum internally", "this connector is for Umbraculum") are explicitly fine and welcomed.
 - A future trademark policy document will codify these rules in detail. The Mozilla, Linux Foundation, and Plausible trademark policies are the reference set.
 
 Trademark is the project's durable commercial asset. It is what makes "use our hosting" a coherent product offer in a world where anyone can fork the source.
@@ -410,7 +410,7 @@ This process mirrors the patterns adopted by Linux Foundation projects, Rust, an
 
 **Case studies and post-mortems:**
 
-- [Plausible Analytics: "Why we picked AGPL"](https://plausible.io/blog/open-source-licenses) — closest precedent for `<PLATFORM_NAME>`.
+- [Plausible Analytics: "Why we picked AGPL"](https://plausible.io/blog/open-source-licenses) — closest precedent for Umbraculum.
 - [Cal.com licensing discussion](https://github.com/calcom/cal.com/blob/main/LICENSE) and team blog posts.
 - [OpenTofu manifesto](https://opentofu.org/manifesto/) — the community response to Terraform's BSL move.
 - [Valkey announcement (Linux Foundation, 2024)](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community) — community response to Redis's relicense.
@@ -424,4 +424,4 @@ This process mirrors the patterns adopted by Linux Foundation projects, Rust, an
 
 ---
 
-*This document is part of the `<PLATFORM_NAME>` platform documentation set. See [`docs/README.md`](README.md) for the full doc index, and [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) for the platform vision this licensing serves.*
+*This document is part of the Umbraculum platform documentation set. See [`docs/README.md`](README.md) for the full doc index, and [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) for the platform vision this licensing serves.*

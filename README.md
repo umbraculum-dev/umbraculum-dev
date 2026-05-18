@@ -1,15 +1,19 @@
-# `<PLATFORM_NAME>` — process-manufacturing platform, brewery-configured by default
+# Umbraculum — process-manufacturing platform, brewery-configured by default
 
 > [!IMPORTANT]
 > This repository is **work in progress** and **not yet a public-facing
 > release**. The path to a public flip (working assumption: H1 2027,
-> seeded into a fresh public repo once `<PLATFORM_NAME>` is chosen) is
-> documented in
+> seeded into a fresh public repo) is documented in
 > [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
+> The project's brand was resolved on 2026-05-18 to **Umbraculum**
+> (primary domain `umbraculum.dev`; GitHub org `umbraculum-dev`;
+> mascot **Umbi** — [`docs/media/umbi.png`](docs/media/umbi.png));
+> see [`docs/RENAME-DILIGENCE.md`](docs/RENAME-DILIGENCE.md) for the
+> diligence record.
 
 ## What this is
 
-`<PLATFORM_NAME>` is a **process-manufacturing platform** built around a
+Umbraculum is a **process-manufacturing platform** built around a
 small set of operational primitives — recipes as bills-of-materials,
 equipment profiles as constrained resources, production runs as
 scheduled batches, and ingredient + utility inputs as process
@@ -48,9 +52,12 @@ work the brewery vertical already does.
 
 - A second vertical module (WMS / CRM / MRP / CRP). The platform is
   shaped to host them, but only the brewery vertical is live today.
-- A chosen brand name. `<PLATFORM_NAME>` is a placeholder throughout
-  the codebase and docs; it will be resolved once a name is chosen
-  (working assumption: H1 2027).
+- Brand resolution complete (2026-05-18: **Umbraculum** — wordmark,
+  `umbraculum` namespace, `umbraculum.dev` primary domain,
+  `umbraculum-dev` GitHub org). The placeholder substitution is
+  applied across the codebase and docs; see
+  [`docs/RENAME-DILIGENCE.md`](docs/RENAME-DILIGENCE.md) for the
+  diligence record.
 - A public release. The repository is currently developed privately;
   the go-public criteria and plan are in
   [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
@@ -132,7 +139,7 @@ the relevant package's `package.json`). See [`LICENSE`](LICENSE) for
 the full AGPLv3 text and [`docs/LICENSING.md`](docs/LICENSING.md) for
 the rationale.
 
-Copyright (C) 2026 `<PLATFORM_NAME>` contributors.
+Copyright (C) 2026 Umbraculum contributors.
 
 ## Contributing
 
@@ -154,5 +161,5 @@ translations, and security reports.
 | Brewery vertical — native (Expo)  | Shipping (WIP)|
 | AI consultant — orchestrator + tools + memory + admin dashboard | Shipping (Sprint #2 complete) |
 | Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
-| Brand name (`<PLATFORM_NAME>`)    | Not chosen (working assumption: H1 2027) |
+| Brand name                        | **Umbraculum** (resolved 2026-05-18; namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`); see [`docs/RENAME-DILIGENCE.md`](docs/RENAME-DILIGENCE.md) |
 | Public release                    | Not flipped (working assumption: H1 2027 — see `docs/PLATFORM-ARCHITECTURE.md` §10.1) |

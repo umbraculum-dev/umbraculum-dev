@@ -1,15 +1,15 @@
-# `<PLATFORM_NAME>` — Platform Architecture & Vision
+# Umbraculum — Platform Architecture & Vision
 
 **Tier:** Public
 **Status:** v1.0 (living document)
 **Audience:** product, engineering, and architecture conversations.
-**Token convention:** the placeholder `<PLATFORM_NAME>` is used everywhere the brand will appear. Search/replace it once a real brand is chosen — do not hand-edit individual occurrences.
+**Brand:** **Umbraculum** (resolved 2026-05-18 from the historical `<PLATFORM_NAME>` placeholder convention; see §10 of this document and [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md)).
 
 ---
 
 ## 1. Purpose and audience
 
-This is the **high-level entry point** for any discussion about the shape of `<PLATFORM_NAME>`: where the system is today, where it is going, and how to keep new work consistent with that direction. It is intentionally **vision-and-shape** focused — implementation specifics still live in domain documents.
+This is the **high-level entry point** for any discussion about the shape of Umbraculum: where the system is today, where it is going, and how to keep new work consistent with that direction. It is intentionally **vision-and-shape** focused — implementation specifics still live in domain documents.
 
 How it relates to the existing architecture log:
 
@@ -20,7 +20,7 @@ When the two disagree, this document wins for "where we are going" questions, an
 
 ### 1.1 Positioning — process-manufacturing platform, brewery-configured by default
 
-`<PLATFORM_NAME>` is a **process-manufacturing platform**. The brewery vertical is the **first vertical configuration** of that platform — it ships with brewery-specific data (BJCP styles, BeerJSON, hop bitterness math, water-chemistry models) and brewery-specific UI flows, but the *underlying primitives* — recipes-as-bills-of-materials, equipment profiles as constrained resources, brew sessions as scheduled production orders, ingredient-and-water inputs as process specifications — are the same primitives any batch process manufacturer needs.
+Umbraculum is a **process-manufacturing platform**. The brewery vertical is the **first vertical configuration** of that platform — it ships with brewery-specific data (BJCP styles, BeerJSON, hop bitterness math, water-chemistry models) and brewery-specific UI flows, but the *underlying primitives* — recipes-as-bills-of-materials, equipment profiles as constrained resources, brew sessions as scheduled production orders, ingredient-and-water inputs as process specifications — are the same primitives any batch process manufacturer needs.
 
 This framing matters for three reasons:
 
@@ -30,11 +30,26 @@ This framing matters for three reasons:
 
 The brewery vertical remains a first-class showcase — both as a working customer-facing product and as a reference implementation for how other vertical configurations should be shaped. Subsequent vertical configurations are expected to plug in primarily through **seed data, prompts, and configuration**, not by re-implementing the core.
 
+### 1.1.1 Canonical modules are peer domains, not nested under "manufacturing"
+
+The canonical-module set (today: `mrp`, `wms`, `crm`, `crp`, `automation`; future allocations via mini-RFC) is a **flat peer decomposition**, not a hierarchy with "manufacturing" as a top-level umbrella that contains MRP / automation / etc. as sub-modules.
+
+This is a deliberate choice. The peer-module shape (sometimes called "SAP-style") matches how Drupal, SAP S/4HANA, Salesforce/Force.com, and Odoo decompose their domain coverage. The reasoning:
+
+- Domain-level concerns don't naturally subordinate to a single umbrella. Production planning (`mrp`), inventory (`wms`), capacity (`crp`), customer relationships (`crm`), and automation (`automation`) are peer operational concerns. Forcing them under a "manufacturing" parent creates an arbitrary dependency on a higher-level construct that doesn't exist in practice.
+- Vertical configurations consume an arbitrary subset of canonical modules. A brewery vertical needs MRP + WMS + automation + (later) CRM. A cosmetics vertical needs MRP + WMS + (compliance — future). A distillery vertical needs MRP + WMS + automation + (regulatory). Each vertical configuration picks its set; the canonical layer doesn't pre-commit a hierarchy that a vertical might not need.
+- The AI consultant reasons across canonical modules at workspace scope (see §4.0). A flat peer decomposition gives the orchestrator one mental model — "what canonical modules are installed in this workspace" — instead of having to reason over both a hierarchy and a flat module-installation set.
+- The canonical Drupal lesson — "one module per functionality, no parallel modules competing for the same domain" — is structurally enforced by reserved-code allocation. Hierarchy is not needed for the discipline.
+
+**Brewery's relationship to the canonical set.** Brewery is a **tier-6 vertical configuration** consuming the canonical-module surface (and adding brewery-specific seed data: BJCP styles, BeerJSON, hop bitterness math, water chemistry, brewery-specific prompts and UI flows). Brewery is NOT a canonical module — that would be the same category mistake as building "a CRM for a hotel and calling it Hotel instead of CRM." The hotel is the vertical; the CRM is the canonical domain.
+
+This framing is formalized in RFC-0001 (modules, tiers, governance, and automation placement) once that RFC lands.
+
 ---
 
 ## 2. Vision — horizontal platform + vertical modules
 
-**Pattern.** `<PLATFORM_NAME>` is a **horizontal platform** (auth, workspace, billing, AI, i18n, navigation, observability, integrations) hosting one or more **vertical modules** (Brewery first; later WMS, CRM, MRP, CRP, …). A *module* is a self-contained vertical that owns its routes, services, Prisma models, AI tools, prompts, knowledge sources, UI screens, i18n strings, and tier-limit contributions, and registers all of those into the horizontal platform at boot.
+**Pattern.** Umbraculum is a **horizontal platform** (auth, workspace, billing, AI, i18n, navigation, observability, integrations) hosting one or more **vertical modules** (Brewery first; later WMS, CRM, MRP, CRP, …). A *module* is a self-contained vertical that owns its routes, services, Prisma models, AI tools, prompts, knowledge sources, UI screens, i18n strings, and tier-limit contributions, and registers all of those into the horizontal platform at boot.
 
 **Why this pattern.** Modern ERP buyers expect AI-native, multi-module suites; legacy ERPs (SAP, Oracle, NetSuite) are bolting AI onto crusty foundations. A greenfield horizontal-platform-with-vertical-modules shape lets us:
 
@@ -68,7 +83,7 @@ Brewery is **shipped**; WMS / CRM / MRP / CRP are **open doors** — explicitly 
 
 ### 2.1 Distribution & business model
 
-`<PLATFORM_NAME>` is **open source** by design — not as a marketing tactic, but as the structural foundation for long-term sustainability with a small team, trust with operational customers, and a defensible position against hyperscaler capture.
+Umbraculum is **open source** by design — not as a marketing tactic, but as the structural foundation for long-term sustainability with a small team, trust with operational customers, and a defensible position against hyperscaler capture.
 
 **License posture** (rationale in [`docs/LICENSING.md`](LICENSING.md)):
 
@@ -78,7 +93,7 @@ Brewery is **shipped**; WMS / CRM / MRP / CRP are **open doors** — explicitly 
 
 **Revenue lines** (target: bread-and-butter sustainability for a small team, not venture-scale exit):
 
-1. **Managed hosting** — `<PLATFORM_NAME>` operated as a service. The dominant revenue line; pairs with the AGPL stance because hyperscaler imitation is structurally deterred.
+1. **Managed hosting** — Umbraculum operated as a service. The dominant revenue line; pairs with the AGPL stance because hyperscaler imitation is structurally deterred.
 2. **AI value-layer subscription** — the AI consultant is unlocked through existing paid workspace tiers (`premium`, `pro`, `pro_plus`) while customers bring their own provider key for token spend (see §7).
 3. **Enterprise support contracts** — for self-hosters and hosted customers that need SLAs, dedicated infrastructure, or operator support.
 4. **Future managed-AI credits** — optional hosted convenience path, added only after BYOK + subscription proves demand.
@@ -179,7 +194,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 - `@brewery/recipes-ui` — domain UI for recipes, water, yeast.
 - `@brewery/beerjson` — BeerJSON schema layer.
 
-The `@brewery/*` scope is a **historical artifact** of starting with the brewery vertical. A neutral platform scope (e.g. `@<platform-name>/*`) is the right end-state, but renaming touches hundreds of import sites and several user-visible i18n strings — so it is deferred until the second module is on the table.
+The `@brewery/*` scope is a **historical artifact** of starting with the brewery vertical. A neutral platform scope — `@umbraculum/*` per the resolved brand (see §10) — is the right end-state, but renaming touches hundreds of import sites and several user-visible i18n strings, so it is deferred to the dedicated `@brewery/*` package scope migration sub-plan, sequenced after the second module is on the table.
 
 ### 3.4 Prisma schema
 
@@ -242,6 +257,25 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 
 ## 4. Target architecture
 
+### 4.0 AI-consultant context principle (cornerstone)
+
+Several decisions in §4 — the horizontal/module split (§§4.1–4.2), the AI sub-system shape (§4.3), the module SDK surface (§4.4), the Prisma multi-schema strategy (§4.5) — look like independent architectural choices but flow from a single principle that drives all of them. Stating it explicitly so the rest of §4 reads as one coherent shape rather than five accidentally-aligned ones.
+
+> **The AI consultant operates at workspace scope, not module scope.** For the consultant to give competent operational advice, it must see all installed canonical modules, all vertical configurations active in the workspace, all integration data, and all domain entities in **one coherent context**. A federated/microservice architecture where each module owned its own context — its own AI registry, its own auth, its own session, its own per-module orchestrator — would lose this story. The AI's quality is a function of how *coherent* its view of the workspace is.
+
+Concrete consequences (the principle drives all of these; none are independent decisions):
+
+- **Monorepo workspace** (over polyrepo per-module). All modules live in one workspace context the AI orchestrator can reason over end-to-end. Polyrepo would force RAG-via-cross-repo-fetch, latency penalties on tool registration, and a fragmented mental model.
+- **One native shell hosting federated modules** (ROADMAP standing principles, H2 2027 Re.Pack spike). The user does not interact with five disconnected apps; the AI does not interact with five disconnected per-app contexts.
+- **Single platform AI orchestrator** (§4.3). Every module's AI tools, prompts, and knowledge sources land in the *same* registry that the *same* orchestrator iterates. Per-module orchestrators would lose cross-module reasoning ("does my brewery have stock for tomorrow's brew?" crosses brewery + WMS + MRP + CRM).
+- **Horizontal-platform-services consumption contract** (umbrella plan §9; RFC-0001 Decision F). Identity, tenancy, ACL, billing, AI, observability, i18n, UI, secrets, integrations, HTTP, DB are platform-owned. Modules that fork these into per-module variants destroy the AI's coherent view at the cross-cutting level.
+- **Canonical-module discipline** ("one module per functionality"; umbrella plan §1; RFC-0001 Decision A). The AI must not be asked to reason over two competing CRMs, two competing auth flows, or two competing AI tool registries.
+- **Standard-shape vertical configurations** (§1.1, §1.1.1). Brewery as a tier-6 vertical configuration consumes the same canonical-module surface a future cosmetics or distillery vertical configuration will consume. The AI's mental model of "what a workspace is" doesn't fork per vertical.
+
+The cornerstone, in one line: **structural decisions in this document that look like independent architectural choices (monorepo, one shell, consumption contract, canonical discipline, peer-module decomposition, vertical-configuration tier) are all consequences of one principle — the AI consultant must see the workspace as one coherent thing.** Read the rest of §4 with that principle in mind; it's how the platform stops being a federation of disconnected products and becomes a coherent operational tool.
+
+A worked illustration: when a brewery operator's AI is asked *"do I have stock for tomorrow's brew?"*, the answer crosses **brewery** (recipe BoM derived from BeerJSON), **wms** (stock-on-hand for the BoM ingredients), **mrp** (planned consumption for in-flight production orders), **crm** (committed customer orders that affect inventory commitments), and possibly **automation** (current tank states — is the fermenter free?). A federated/microservice architecture where each module owned its own context would lose this story; cross-module questions would have to be re-asked per-module-AI and stitched together by the operator. Workspace-scope context with one orchestrator + one tool registry + one prompt-composition pipeline is what makes the answer competent.
+
 ### 4.1 Horizontal platform layer
 
 The horizontal layer owns everything that does not change when a new vertical is added:
@@ -271,7 +305,7 @@ A module owns end-to-end:
 
 ### 4.3 AI platform sub-system
 
-The AI consultant is not a feature of the brewery module — it is part of the horizontal platform, and modules feed it tools and knowledge.
+The AI consultant is not a feature of the brewery module — it is part of the horizontal platform, and modules feed it tools and knowledge. This is a direct consequence of the §4.0 context principle: workspace-scope reasoning requires one orchestrator, one tool registry, one prompt-composition pipeline, one usage ledger.
 
 **Three-layer model.** Build in this order; each layer multiplies the value of the previous one.
 
@@ -286,7 +320,7 @@ The AI consultant is not a feature of the brewery module — it is part of the h
 **System prompt composition.** Every model call is prompted with:
 
 ```
-BASE                  ← "you are an ERP assistant for <PLATFORM_NAME>; never reveal raw IDs unless asked; …"
+BASE                  ← "you are an ERP assistant for Umbraculum; never reveal raw IDs unless asked; …"
 + MODULE_OVERLAY      ← contributed by the active module ("WMS rules: never propose a stock write …")
 + ROUTE_OVERLAY       ← per-route hints ("user is on stock-movements; default tools to wms.lowStockItems")
 + WORKSPACE_MEMORY    ← distilled facts about this workspace ("brews lagers; weekly cadence; 2× 200L fermenters")
@@ -298,7 +332,7 @@ BASE                  ← "you are an ERP assistant for <PLATFORM_NAME>; never r
 
 - **Shipped v0: workspace-supplied Anthropic key.** The workspace admin enters an API key, accepts the data-egress notice, and enables AI. The key is encrypted at rest, decrypted only inside the API process, and never returned to web or native clients. Anthropic bills the workspace directly.
 - **Shipped v0 monetization: paid tier unlock.** The platform does not resell tokens in v0. Instead, AI is available only when the existing `WorkspaceBilling.tier` is `premium`, `pro`, or `pro_plus`; free workspaces get `402 ai_subscription_required` and use the existing Stripe Checkout billing-intent flow to upgrade.
-- **Future managed mode: `<PLATFORM_NAME>`-managed provider key + credits.** Hosted customers may later choose a one-bill managed-AI path. That mode can reuse the same orchestrator, tools, prompt composition, memory, audit log, and usage ledger; only key selection, credit balance checks, and post-call debit logic differ.
+- **Future managed mode: Umbraculum-managed provider key + credits.** Hosted customers may later choose a one-bill managed-AI path. That mode can reuse the same orchestrator, tools, prompt composition, memory, audit log, and usage ledger; only key selection, credit balance checks, and post-call debit logic differ.
 
 This preserves the self-host path and avoids v0 chargeback / VAT / provider-cost risk, while still capturing margin from the value layer.
 
@@ -335,16 +369,16 @@ registerModule({
 
 The same shape will eventually apply to the brewery vertical too — the migration from "flat brewery routes" to "brewery is just another module" is mechanical once the helper exists.
 
-**The module SDK is a first-class public artifact, not an internal convention.** A third-party developer — an indie consultancy, a vertical-specific software vendor, an in-house team at a customer — must be able to build a module **in their own repository**, depend on `<PLATFORM_NAME>`'s SDK as published npm packages, and ship the module independently of platform releases. The SDK packages are licensed under MIT (see [`docs/LICENSING.md`](LICENSING.md) §6.2) precisely so module developers can license their own module's source code however they want, including proprietary, without their choice being constrained by the platform's AGPL core.
+**The module SDK is a first-class public artifact, not an internal convention.** A third-party developer — an indie consultancy, a vertical-specific software vendor, an in-house team at a customer — must be able to build a module **in their own repository**, depend on Umbraculum's SDK as published npm packages, and ship the module independently of platform releases. The SDK packages are licensed under MIT (see [`docs/LICENSING.md`](LICENSING.md) §6.2) precisely so module developers can license their own module's source code however they want, including proprietary, without their choice being constrained by the platform's AGPL core.
 
 Concretely, the SDK surface includes:
 
-- `@<platform>/module-sdk` — the `registerModule()` contract, types, and helper utilities.
-- `@<platform>/ai-tool-sdk` — the `AiTool<I, O>` interface, scope types, and `AiToolContext` definitions.
-- `@<platform>/api-client` (public types subset) — DTO types and route-ID conventions third parties can pin to.
-- `@<platform>/i18n-keys` — namespace conventions for module-owned message keys.
+- `@umbraculum/module-sdk` — the `registerModule()` contract, types, and helper utilities.
+- `@umbraculum/ai-tool-sdk` — the `AiTool<I, O>` interface, scope types, and `AiToolContext` definitions.
+- `@umbraculum/api-client` (public types subset) — DTO types and route-ID conventions third parties can pin to.
+- `@umbraculum/i18n-keys` — namespace conventions for module-owned message keys.
 
-These names are illustrative; the actual scope and package boundaries land when the `@brewery/*` → platform scope rename happens. What matters today is that the *intent* is published as a stable public contract, not a private implementation detail.
+These names are the resolved end-state under the Umbraculum brand (see §10); the actual scope and package boundaries land when the `@brewery/*` → `@umbraculum/*` migration sub-plan executes (deferred until the second module is on the table). What matters today is that the *intent* is published as a stable public contract, not a private implementation detail.
 
 ### 4.5 Prisma schema strategy
 
@@ -374,7 +408,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 ### 5.2 Renamed / restructured when 2nd module ships
 
-- `@brewery/*` scope split: horizontal packages move to a neutral platform scope; brewery-vertical packages stay branded as the brewery module package set (or re-scope under `@<platform-name>/brewery-*`).
+- `@brewery/*` scope split: horizontal packages move to the neutral platform scope `@umbraculum/*`; brewery-vertical packages stay branded as the brewery module package set (or re-scope under `@umbraculum/brewery-*`).
 - Web routes wrapped in `(brewery)` Next.js route group (no URL change).
 - Brewery-vertical Postgres tables stay in place; new module gets its own Postgres schema via Prisma `multiSchema`.
 - `tierLimitsService` becomes module-aware: each module contributes a `tierLimits(tier)` slice; the platform composes them.
@@ -401,7 +435,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 | Aspect | Layer A: Tools | Layer B: Reporting DSL | Layer C: RAG |
 |---|---|---|---|
-| What it answers | "What's my mash pH?" | "Top 10 SKUs by movement last quarter" | "How does MRP work in `<PLATFORM_NAME>`?" |
+| What it answers | "What's my mash pH?" | "Top 10 SKUs by movement last quarter" | "How does MRP work in Umbraculum?" |
 | Mechanism | Function call → existing API endpoint | Typed DSL → curated views | Embedding search → context injection |
 | Where the data is | Wherever the API normally reads it | Reporting replica, curated views | pgvector, separate from operational tables |
 | ACL | Inherits user session | Inherits role + curated view restrictions | Per-workspace index isolation |
@@ -459,7 +493,7 @@ User on the WMS "stock movements" page asks: *"Why are we constantly running out
 
 2. Orchestrator:
    - Loads system prompt:
-       BASE("you are an ERP assistant for <PLATFORM_NAME> ...")
+       BASE("you are an ERP assistant for Umbraculum ...")
        + MODULE_OVERLAY("wms")
        + ROUTE_OVERLAY("wmsStockMovements")
        + WORKSPACE_MEMORY("they brew lagers; 2× 200L fermenters; weekly brew cadence")
@@ -518,12 +552,12 @@ User on the WMS "stock movements" page asks: *"Why are we constantly running out
 The H2 2026 AI backbone monetizes the value layer without reselling provider tokens:
 
 1. **Workspace brings the provider key.** The workspace admin enters an Anthropic API key in AI settings. The key is encrypted at rest, decrypted only in the API process, and never sent to web or native clients.
-2. **Workspace pays the provider directly.** Anthropic token spend is billed to the customer's Anthropic account. `<PLATFORM_NAME>` does not carry token COGS, reseller liability, provider credit risk, or token overage support in v0.
-3. **Workspace pays `<PLATFORM_NAME>` for the AI value layer.** AI is unlocked through existing workspace tiers: `free=false`, `premium | pro | pro_plus=true` via `tierLimitsService.aiEnabled`. Upgrades use the existing `BillingPurchaseIntent` / Stripe Checkout flow and existing webhook lifecycle handling.
+2. **Workspace pays the provider directly.** Anthropic token spend is billed to the customer's Anthropic account. Umbraculum does not carry token COGS, reseller liability, provider credit risk, or token overage support in v0.
+3. **Workspace pays Umbraculum for the AI value layer.** AI is unlocked through existing workspace tiers: `free=false`, `premium | pro | pro_plus=true` via `tierLimitsService.aiEnabled`. Upgrades use the existing `BillingPurchaseIntent` / Stripe Checkout flow and existing webhook lifecycle handling.
 4. **Usage is visible, not billable.** `AiUsageLedger` records tokens, cost estimates, model, duration, provider request ID, and tool calls for analytics, admin visibility, caps, and future migration. It does **not** drive Stripe charges in v0.
 5. **Concierge onboarding is part of the value proposition.** The AI settings and post-checkout surfaces can link to human setup help, configured by environment variable.
 
-This is intentionally different from a free-BYOK model. The customer pays their provider for raw model calls and pays `<PLATFORM_NAME>` for the operational layer that makes those calls useful: ACL-aware tools, prompt composition, per-workspace memory, limits, auditability, cross-platform UI, and support.
+This is intentionally different from a free-BYOK model. The customer pays their provider for raw model calls and pays Umbraculum for the operational layer that makes those calls useful: ACL-aware tools, prompt composition, per-workspace memory, limits, auditability, cross-platform UI, and support.
 
 ### 7.2 Why v0 does not ship resold credits
 
@@ -535,9 +569,9 @@ The future managed-AI path should be treated as an optional hosted convenience, 
 
 ### 7.3 Future managed-AI credits
 
-If hosted customers want one invoice and are willing to pay for convenience, `<PLATFORM_NAME>` can add a managed-AI mode later. In that mode:
+If hosted customers want one invoice and are willing to pay for convenience, Umbraculum can add a managed-AI mode later. In that mode:
 
-- The platform uses a `<PLATFORM_NAME>`-managed provider key.
+- The platform uses a Umbraculum-managed provider key.
 - Usage is debited against workspace AI credits.
 - Credits, not raw tokens, are the customer-facing unit.
 - A versioned `pricebook.json` maps model + token usage to credits.
@@ -597,7 +631,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 6. **AI default:** opt-in per workspace. Admin enables AI, enters the key, and accepts the data-egress notice.
 7. **Per-user role gating:** no role gate. All workspace members can use AI once the workspace admin enables it; safety is enforced through per-role monthly caps, per-user daily caps, workspace opt-in, and the audit ledger.
 8. **Memory:** per-workspace operational memory is part of the H2 backbone. Full product-doc / timeline RAG remains future work.
-9. **Public-launch path:** launch artifacts exist, and §10.1.1 records the decision to seed a fresh public repository after `<PLATFORM_NAME>` is chosen.
+9. **Public-launch path:** launch artifacts exist, and §10.1.1 records the decision to seed a fresh public repository after Umbraculum is chosen.
 
 ### 8.2 Still open / deferred
 
@@ -605,7 +639,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 2. **Refund policy for managed-AI credits:** non-refundable / pro-rata / case-by-case.
 3. **EU VAT / sales-tax handling for managed-AI credits:** Stripe Tax vs separate handling.
 4. **Postgres multi-schema timing:** adopt at second-module ship, or earlier as preparation.
-5. **Naming:** real `<PLATFORM_NAME>` brand and npm scope decision.
+5. **Naming:** real Umbraculum brand and npm scope decision.
 6. **Model auto-routing policy:** heuristic router, always-Sonnet, or user-choice.
 7. **KMS-backed key storage:** when to replace the app-secret AES-GCM key vault with cloud KMS / Vault while preserving the encrypted-blob format.
 
@@ -621,7 +655,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 - **Gross margin** — `(price − COGS) / price`.
 - **Hard cap** — usage limit that *blocks* further use until top-up or period rollover.
 - **Horizontal platform** — the layer of the system that does not change when a new vertical module is added.
-- **Managed AI** — future hosted mode where `<PLATFORM_NAME>` provides the model-provider key and bills usage through credits.
+- **Managed AI** — future hosted mode where Umbraculum provides the model-provider key and bills usage through credits.
 - **Model basket** — assumed mix of model usage that pricing is sized against.
 - **Module** — a self-contained vertical (Brewery, WMS, CRM, MRP, CRP, …) that registers routes / services / models / AI tools / prompts / knowledge / limits / add-on codes into the platform.
 - **MRR (Monthly Recurring Revenue)** — sum of normalized monthly subscription revenue.
@@ -643,7 +677,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 
 ## 10. Document conventions and lifecycle
 
-- **`<PLATFORM_NAME>` placeholder convention**: a single search/replaceable token used everywhere the brand will appear. Do not hand-edit individual occurrences.
+- **Brand resolution.** The project's brand was previously tracked via the `<PLATFORM_NAME>` placeholder convention, resolved on 2026-05-18 to **Umbraculum** (wordmark), `umbraculum` (namespace across npm / Composer / PyPI / crates.io / Docker Hub), `umbraculum.dev` (primary domain), and `umbraculum-dev` (GitHub org). See [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) for the full diligence record. The historical `<PLATFORM_NAME>` token convention is preserved in this paragraph as background for any future contributor who finds a stray reference; the substitution has been applied across docs and code.
 - **This is the entry point.** When in doubt, link here from new docs and discussions; module-implementation details belong in domain docs (e.g. [`docs/architecture-Rev02.md`](architecture-Rev02.md), [`docs/TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md), [`docs/Redis-architecture.md`](Redis-architecture.md), [`docs/org-billing-stripe-revenuecat-fastify.md`](org-billing-stripe-revenuecat-fastify.md)).
 - **Update protocol**:
   - Structural changes (sections 2, 3, 4, 7) should be reviewed before merging — they change shared assumptions.
@@ -652,39 +686,39 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 
 ### 10.1 Open-source lifecycle
 
-Because `<PLATFORM_NAME>` is open source and intended to be public-facing, this document and its sibling docs have additional lifecycle obligations beyond ordinary internal documentation.
+Because Umbraculum is open source and intended to be public-facing, this document and its sibling docs have additional lifecycle obligations beyond ordinary internal documentation.
 
 - **Public-facing intent.** Treat every doc under [`docs/`](.) as potentially public-facing. The audience priority order set in [`docs/README.md`](README.md) applies: future maintainers and contributors first, self-hosting operators second, prospective module developers third. Avoid private-by-default tone, internal-only references, and unexplained jargon.
 - **Semver discipline at the SDK boundary.** The SDK packages described in §4.4 follow [semantic versioning](https://semver.org/). Breaking changes to the SDK go through an RFC, get a deprecation window, and ship in a major version bump. The platform core has more flexibility — but any change visible to downstream modules counts as SDK surface.
 - **License-change and governance-change RFCs.** Any change to the licensing posture in [`docs/LICENSING.md`](LICENSING.md) or the governance principles in §2.2 follows the RFC process documented in [`docs/LICENSING.md`](LICENSING.md) §10 — written RFC, minimum 30-day public comment, forward-only application.
 - **Deprecation policy.** Public-surface deprecations (SDK types, AI tool contracts, route IDs, prompt-overlay keys) are announced in the RFC repository, marked with a `@deprecated` tag in source, and removed no earlier than one major version after announcement. The cost of a noisy deprecation is much lower than the cost of a silent breaking change for a module developer running a small consultancy.
 - **No retroactive license changes.** Source code committed under AGPLv3 stays AGPLv3. Source code committed under MIT stays MIT. License-change RFCs apply only to code committed after the change date, preserving the terms downstream users relied on.
-- **Brand and trademark separate from license.** As detailed in [`docs/LICENSING.md`](LICENSING.md) §8: the `<PLATFORM_NAME>` brand is not transferred by the source license. Forks, mirrors, and modified versions must use a different name. A formal trademark policy will be published before the first stable release.
-- **Foundation question is deferred, not denied.** Transferring the trademark and governance to a foundation (e.g. Linux Foundation, Software Freedom Conservancy, a dedicated `<PLATFORM_NAME>` Foundation) is a real option, with real benefits for community trust and project longevity. It is not the right move at the current stage (pre-revenue, pre-community), but the architectural decisions on this page — AGPLv3, public SDK, DCO sign-off rather than CLA, governance principles in §2.2 — are deliberately compatible with a future foundation transfer if the project reaches that scale.
+- **Brand and trademark separate from license.** As detailed in [`docs/LICENSING.md`](LICENSING.md) §8: the Umbraculum brand is not transferred by the source license. Forks, mirrors, and modified versions must use a different name. A formal trademark policy will be published before the first stable release.
+- **Foundation question is deferred, not denied.** Transferring the trademark and governance to a foundation (e.g. Linux Foundation, Software Freedom Conservancy, a dedicated Umbraculum Foundation) is a real option, with real benefits for community trust and project longevity. It is not the right move at the current stage (pre-revenue, pre-community), but the architectural decisions on this page — AGPLv3, public SDK, DCO sign-off rather than CLA, governance principles in §2.2 — are deliberately compatible with a future foundation transfer if the project reaches that scale.
 - **Audience-tier convention for documentation.** Each Markdown document in the repository carries an explicit `**Tier:**` marker on its first content line. Recognized values: `Public` (default for everything in [`docs/`](.) and the repo root — surfaceable on the public flip), and reserved values `Partner-restricted` and `Customer-restricted` for future authenticated audiences. Non-public business documentation (strategy notes, competitive analysis, pricing margins) is maintained separately and is not part of the public-mirror flip when it happens; documents that are not Tier: Public are intentionally not indexed from any public-tier doc to avoid one-way information leaks on the flip. Authors of new docs in [`docs/`](.) should add the marker and stick to the Tier: Public audience expectations.
 
 #### 10.1.1 Go-public path (decision)
 
 This subsection records the operational decision for *when and how* this repository becomes public.
 
-- **Current state.** The repository is **developed privately**. The Phase 3 launch-readiness artifacts ([`LICENSE`](../LICENSE), [`CONTRIBUTING.md`](../CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md), [`SECURITY.md`](../SECURITY.md), and the public-facing [`README.md`](../README.md)) are already in place, written as if the repository were already public, so that the history is clean when the flip happens.
-- **Decision.** Keep the repository private until `<PLATFORM_NAME>` is chosen — working assumption **H1 2027**. At the flip, **seed a fresh public repository from this one** rather than renaming this repository in place. The original repository remains as the private development history and is archived once the public seed catches up.
+- **Current state.** The repository is **developed privately**. The Phase 3 launch-readiness artifacts ([`LICENSE`](../LICENSE), [`CONTRIBUTING.md`](../CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md), [`SECURITY.md`](../SECURITY.md), and the public-facing [`README.md`](../README.md)) are already in place, written as if the repository were already public, so that the history is clean when the flip happens. The brand was resolved on 2026-05-18 to **Umbraculum** (see [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md)); the placeholder substitution from the prior `<PLATFORM_NAME>` convention has been applied to docs and code.
+- **Decision.** Keep the repository private through the working-assumption window of **H1 2027** for the public flip. The brand resolution does not unilaterally accelerate the flip; it removes one prerequisite (brand selection) but the other prerequisites — second-vertical-module shape, package-name migration of the actual `@brewery/*` scopes (separate sub-plan), and the pre-flip checklist below — still gate timing. At the flip, **seed a fresh public repository from this one under the `umbraculum-dev` GitHub org** rather than renaming this repository in place. The original repository remains as the private development history and is archived once the public seed catches up.
 - **Why a fresh public seed (not a rename in place).**
-  - **Avoids exposing the historical `@brewery/*` package naming, route IDs, and brewery-vertical-flavored class names on the public branch.** Those names are appropriate for the brewery vertical configuration but misleading on a public process-manufacturing platform.
-  - Gives a clean opportunity to apply the `<PLATFORM_NAME>` resolution as a single atomic change across the codebase, rather than leaving rename artifacts scattered across git history.
+  - **Avoids exposing the historical `@brewery/*` package naming, route IDs, and brewery-vertical-flavored class names on the public branch.** Those names are appropriate for the brewery vertical configuration but misleading on a public process-manufacturing platform; the `@brewery/*` → `@umbraculum/*` migration is a separate post-RFC-001 follow-on (see [`umbrella plan`](../../../home/rf/.cursor/plans/umbrella_ecosystem_architecture_443198a8.plan.md) §Sub-plans entry 9), and the public seed is the natural commit boundary to land it.
+  - Gives a clean opportunity to align the codebase with the resolved Umbraculum brand as a single atomic change, rather than leaving rename artifacts scattered across git history.
   - Keeps the public commit history aligned with the public framing in [§1.1](#11-positioning--process-manufacturing-platform-brewery-configured-by-default), instead of having the public audience read backwards through brewery-only history.
 - **Conditions that would justify an earlier flip.**
   - A community contributor or paying customer concretely needs public-source visibility to evaluate adoption — and waiting until H1 2027 would lose them.
   - A security or governance reason requires public auditability sooner than planned.
-  - `<PLATFORM_NAME>` is chosen earlier than expected and the brand-rename work fits inside a single sprint.
+  - The `@brewery/*` package scope migration lands materially earlier than expected and the rest of the pre-flip checklist fits inside a single sprint.
 - **Conditions that would justify a later flip.**
-  - The brand is still not chosen by H1 2027 and the project is materially better served by another six months of focused, private iteration on the second vertical module.
+  - The second-vertical-module shape is still not stable by H1 2027 and the project is materially better served by another six months of focused, private iteration before exposing the architecture to public review.
   - A foundation-transfer conversation (see §10.1, *Foundation question*) is in flight and the public flip is best done together with the transfer rather than separately.
 - **Pre-flip checklist** (kept here so the conditions are explicit, not folkloric):
-  1. `<PLATFORM_NAME>` resolved everywhere — repo metadata, docs, package names, route prefixes, AI prompts, billing UI copy.
+  1. **Brand resolved** ✅ (2026-05-18: Umbraculum across docs and code; see [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md)). The remaining brand-adjacent work — `@brewery/*` package scope migration, route-prefix audit, AI prompt audit, billing UI copy audit — is tracked under the post-RFC-001 follow-on sub-plans.
   2. `internal/**` audited and confirmed excluded from the public seed; cross-links from `docs/**` to `internal/**` removed.
-  3. Contact email placeholders in [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) and [`SECURITY.md`](../SECURITY.md) replaced with monitored, real addresses.
-  4. Copyright header in [`LICENSE`](../LICENSE) resolved to the final entity name.
-  5. Migration path documented for the few callers (if any) that depend on the `@brewery/*` package names.
+  3. Contact email placeholders in [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) and [`SECURITY.md`](../SECURITY.md) replaced with monitored, real addresses on the resolved `umbraculum.dev` domain.
+  4. Copyright header in [`LICENSE`](../LICENSE) resolved to the final entity name (placeholder substitution complete: `Copyright (C) 2026 Umbraculum contributors`; the eventual legal-entity name — single-founder company / future foundation — substitutes here at incorporation time).
+  5. Migration path documented for the few callers (if any) that depend on the `@brewery/*` package names — covered by the dedicated post-RFC-001 follow-on sub-plan.
   6. A short public-launch blog post / `docs/`-hosted announcement explaining the project, the licensing posture, and how to contribute.
 - **Non-goals at the flip.** A coordinated marketing launch, a paid hosted service GA, or a v1.0 release are *not* required to flip the repo public. The flip is about source visibility and a contribution surface; commercial milestones can land on their own cadence afterwards.

@@ -1,12 +1,12 @@
-# `<PLATFORM_NAME>` documentation
+# Umbraculum documentation
 
 **Tier:** Public
 
-This folder is the canonical reference set for the `<PLATFORM_NAME>` platform. It is structured so that anyone — a new contributor, a self-hoster, a hosted-service customer, or a future maintainer — can find what they need without reading the whole repository.
+This folder is the canonical reference set for the Umbraculum platform. It is structured so that anyone — a new contributor, a self-hoster, a hosted-service customer, or a future maintainer — can find what they need without reading the whole repository.
 
 Documents are grouped by **purpose**, not by physical location. Most files sit at the top level — they have not been moved into per-purpose subfolders in order to keep cross-links inside the existing codebase stable; this index provides the navigation. The exceptions are `integrations/`, `figma/`, `calculators/` (pre-existing per-asset folders), `archive/` (superseded revisions), and `help/` (end-user / operator help, currently empty placeholder).
 
-> **Token convention.** The placeholder `<PLATFORM_NAME>` appears throughout these docs. It will be replaced with the chosen brand name once one is selected; until then, treat it as a search/replace token.
+> **Brand resolution.** The project's brand was previously tracked via the `<PLATFORM_NAME>` placeholder convention, resolved on 2026-05-18 to **Umbraculum** (wordmark), `umbraculum` (namespace across npm / Composer / PyPI / crates.io / Docker Hub), `umbraculum.dev` (primary domain), and `umbraculum-dev` (GitHub org). See [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) for the full diligence record. Historical token references in this and sibling docs have been substituted in-place.
 
 > **Audience tier.** All documents in this folder are **Tier: Public** by default — written to be surfaceable when the repository flips public. The first content line of each doc carries an explicit `**Tier:** Public` marker for clarity. Other tier values reserved for future use: `Partner-restricted`, `Customer-restricted`. Documentation that is not public-tier lives outside this folder and outside any public-mirror flip; it is intentionally not indexed here.
 
@@ -149,7 +149,7 @@ Per-integration design notes.
 This documentation is written with three audiences in mind, in approximately this priority order:
 
 1. **Future maintainers and contributors** — the people who will keep this project alive across decades. The docs are the durable artifact; the chat history is not.
-2. **Self-hosting operators and platform evaluators** — technical decision-makers assessing `<PLATFORM_NAME>` as a long-term dependency.
+2. **Self-hosting operators and platform evaluators** — technical decision-makers assessing Umbraculum as a long-term dependency.
 3. **Prospective module developers** — partners building verticals or integrations on top of the platform.
 
 If a document does not serve at least one of these audiences clearly, it should be revised or moved out of the docs tree.
