@@ -8,7 +8,8 @@
     "test:smoke": "playwright test --project=smoke",
     "test:brewday": "playwright test --project=brewday",
     "trace": "playwright show-trace",
-    "install:browsers": "playwright install chromium"
+    "install:browsers": "playwright install chromium",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

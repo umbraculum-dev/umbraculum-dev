@@ -1,0 +1,130 @@
+name: typecheck
+
+# Gates `tsc --noEmit` across the 13 currently-clean TS workspaces on every PR
+# that could affect TypeScript sources. Runs inside a single node:20-slim
+# container that hoists /repo/node_modules — the same method used by
+# native-deps.yml (and documented in docs/TYPING.md as the canonical
+# measurement method).
+#
+# Scope (per docs/TYPING.md):
+#   - 13 workspaces are gated. apps/web is EXCLUDED by explicit decision
+#     (Phase 4 — its 585 errors are all in the Tamagui shorthand-prop /
+#     theme-token accepted-cost class per docs/TAMAGUI.md; gating them
+#     produces no signal and harms future Tamagui upgrades).
+#   - packages/ui is similarly excluded (25 errors in the same Tamagui class).
+#   - packages/core is JavaScript-only (no tsconfig.json); not in scope.
+#
+# Failure aggregation: each workspace's typecheck runs sequentially under
+# `set +e` so all 13 results are reported even if early workspaces fail.
+# The job exits non-zero if any single workspace produced errors.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "apps/native/**"
+      - "apps/web/e2e/**"
+      - "services/api/**"
+      - "packages/**"
+      - "**/tsconfig*.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/typecheck.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "apps/native/**"
+      - "apps/web/e2e/**"
+      - "services/api/**"
+      - "packages/**"
+      - "**/tsconfig*.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/typecheck.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: typecheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run tsc --noEmit across the 13 clean workspaces
+        # Single node:20-slim container hoists /repo/node_modules once
+        # (matches the canonical measurement method documented in
+        # docs/TYPING.md §Methodology). apps/web + packages/ui are
+        # excluded by explicit Phase 4 decision (Tamagui-accepted cost).
+        # services/api/prisma is not an npm workspace (only a tsconfig)
+        # so it gets a direct tsc invocation.
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            -w /repo \
+            node:20-slim \
+            bash -lc '
+              set -eu
+              npm install --no-audit --no-fund --workspaces --include-workspace-root
+
+              export PATH="/repo/node_modules/.bin:$PATH"
+
+              # Workspaces invoked via `npm run typecheck` from their dir.
+              # services/api/prisma is invoked via direct tsc because it
+              # has only a tsconfig, no package.json.
+              workspaces=(
+                "services/api"
+                "services/api/prisma|tsc"
+                "apps/native"
+                "apps/web/e2e"
+                "packages/api-client"
+                "packages/beerjson"
+                "packages/contracts"
+                "packages/i18n"
+                "packages/i18n-react"
+                "packages/media"
+                "packages/navigation"
+                "packages/recipes-ui"
+                "packages/test-mcp"
+              )
+
+              set +e
+              failed=()
+              for entry in "${workspaces[@]}"; do
+                ws="${entry%%|*}"
+                mode="${entry#*|}"
+                if [ "$mode" = "$entry" ]; then mode="npm"; fi
+                echo ""
+                echo "=== $ws ==="
+                cd "/repo/$ws"
+                if [ "$mode" = "tsc" ]; then
+                  /repo/node_modules/.bin/tsc -p tsconfig.json --noEmit
+                else
+                  npm run typecheck --silent
+                fi
+                rc=$?
+                if [ $rc -ne 0 ]; then
+                  echo "FAIL: $ws (exit $rc)"
+                  failed+=("$ws")
+                else
+                  echo "OK:   $ws"
+                fi
+                cd /repo
+              done
+
+              echo ""
+              echo "=== Summary ==="
+              if [ ${#failed[@]} -eq 0 ]; then
+                echo "All 13 workspaces typecheck clean."
+                exit 0
+              else
+                echo "Failed workspaces (${#failed[@]}):"
+                for ws in "${failed[@]}"; do echo "  - $ws"; done
+                exit 1
+              fi
+            '
