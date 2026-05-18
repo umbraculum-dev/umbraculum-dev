@@ -66,12 +66,12 @@ async function runCommand(
  * scripts/smoke.sh (and vice versa).
  */
 export async function smokeStack(args: { baseUrl?: string } = {}): Promise<ToolResult> {
-  const baseUrl = (args.baseUrl ?? process.env.E2E_BASE_URL ?? "http://localhost:18080").replace(
+  const baseUrl = (args.baseUrl ?? process.env['E2E_BASE_URL'] ?? "http://localhost:18080").replace(
     /\/+$/,
     "",
   );
-  const persona = process.env.E2E_ADMIN_EMAIL ?? "e2e-admin@brewery.local";
-  const password = process.env.E2E_ADMIN_PASSWORD ?? "e2e-admin-pw!";
+  const persona = process.env['E2E_ADMIN_EMAIL'] ?? "e2e-admin@brewery.local";
+  const password = process.env['E2E_ADMIN_PASSWORD'] ?? "e2e-admin-pw!";
 
   const runDir = createRunDir("smoke");
   appendLog(runDir, { event: "start", tool: "smoke", baseUrl, persona });
@@ -235,7 +235,7 @@ export async function runContractsCheck(args: { update?: boolean } = {}): Promis
 }
 
 export async function runPlaywrightSmoke(args: { baseUrl?: string } = {}): Promise<ToolResult> {
-  const baseUrl = args.baseUrl ?? process.env.E2E_BASE_URL ?? "http://localhost:18080";
+  const baseUrl = args.baseUrl ?? process.env['E2E_BASE_URL'] ?? "http://localhost:18080";
   return runCommand(
     "playwright-smoke",
     "docker",
@@ -256,7 +256,7 @@ export async function runPlaywrightSpec(args: { spec: string; baseUrl?: string }
   if (!args.spec || typeof args.spec !== "string") {
     throw new Error("runPlaywrightSpec: 'spec' is required (e.g. 'smoke/auth.spec.ts')");
   }
-  const baseUrl = args.baseUrl ?? process.env.E2E_BASE_URL ?? "http://localhost:18080";
+  const baseUrl = args.baseUrl ?? process.env['E2E_BASE_URL'] ?? "http://localhost:18080";
   return runCommand(
     "playwright-spec",
     "docker",
@@ -282,12 +282,12 @@ export interface LoginAsResult {
 }
 
 export async function loginAs(args: { persona?: string; baseUrl?: string } = {}): Promise<LoginAsResult> {
-  const baseUrl = args.baseUrl ?? process.env.E2E_BASE_URL ?? "http://localhost:18080";
+  const baseUrl = args.baseUrl ?? process.env['E2E_BASE_URL'] ?? "http://localhost:18080";
   const persona = args.persona ?? "e2e-admin";
   const passwords: Record<string, string> = {
-    "e2e-admin": process.env.E2E_ADMIN_PASSWORD ?? "e2e-admin-pw!",
-    "e2e-member": process.env.E2E_MEMBER_PASSWORD ?? "e2e-member-pw!",
-    "e2e-viewer": process.env.E2E_VIEWER_PASSWORD ?? "e2e-viewer-pw!",
+    "e2e-admin": process.env['E2E_ADMIN_PASSWORD'] ?? "e2e-admin-pw!",
+    "e2e-member": process.env['E2E_MEMBER_PASSWORD'] ?? "e2e-member-pw!",
+    "e2e-viewer": process.env['E2E_VIEWER_PASSWORD'] ?? "e2e-viewer-pw!",
   };
   const password = passwords[persona];
   if (!password) return { ok: false, error: `unknown persona: ${persona}` };

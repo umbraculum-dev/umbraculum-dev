@@ -97,7 +97,7 @@ export class EquipmentProfilesService {
     if (input.name !== undefined) {
       const name = (input.name ?? "").trim();
       if (!name) throw new BadRequestError("invalid_name", "Body.name must be a non-empty string");
-      data.name = name;
+      data['name'] = name;
     }
 
     const numericFields = [

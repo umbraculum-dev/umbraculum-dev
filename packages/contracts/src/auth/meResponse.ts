@@ -38,32 +38,32 @@ function isObject(v: unknown): v is Record<string, unknown> {
 
 function parseUser(v: unknown): AuthMeResponseUser {
   if (!isObject(v)) throw new Error("Invalid AuthMeResponse.user");
-  const id = isString(v.id) ? v.id : "";
-  const email = isString(v.email) ? v.email : "";
-  const preferredLocale = isString(v.preferredLocale) ? v.preferredLocale : "en";
+  const id = isString(v['id']) ? v['id'] : "";
+  const email = isString(v['email']) ? v['email'] : "";
+  const preferredLocale = isString(v['preferredLocale']) ? v['preferredLocale'] : "en";
   if (!id || !email) throw new Error("Invalid AuthMeResponse.user: id and email required");
   return {
     id,
     email,
     preferredLocale,
-    preferredTheme: v.preferredTheme === null ? null : isString(v.preferredTheme) ? v.preferredTheme : undefined,
-    preferredFontScale: v.preferredFontScale === null ? null : isString(v.preferredFontScale) ? v.preferredFontScale : undefined,
-    preferredDensity: v.preferredDensity === null ? null : isString(v.preferredDensity) ? v.preferredDensity : undefined,
-    isPlatformAdmin: typeof v.isPlatformAdmin === "boolean" ? v.isPlatformAdmin : undefined,
+    preferredTheme: v['preferredTheme'] === null ? null : isString(v['preferredTheme']) ? v['preferredTheme'] : undefined,
+    preferredFontScale: v['preferredFontScale'] === null ? null : isString(v['preferredFontScale']) ? v['preferredFontScale'] : undefined,
+    preferredDensity: v['preferredDensity'] === null ? null : isString(v['preferredDensity']) ? v['preferredDensity'] : undefined,
+    isPlatformAdmin: typeof v['isPlatformAdmin'] === "boolean" ? v['isPlatformAdmin'] : undefined,
   };
 }
 
 function parseWorkspace(v: unknown): AuthMeResponseWorkspace {
   if (!isObject(v)) throw new Error("Invalid AuthMeResponse.workspaces item");
-  const id = isString(v.id) ? v.id : "";
-  const name = isString(v.name) ? v.name : "";
-  const role = isString(v.role) ? v.role : "";
+  const id = isString(v['id']) ? v['id'] : "";
+  const name = isString(v['name']) ? v['name'] : "";
+  const role = isString(v['role']) ? v['role'] : "";
   if (!id || !name) throw new Error("Invalid AuthMeResponse.workspaces item: id and name required");
   return {
     id,
     name,
     role,
-    brandKey: v.brandKey === null ? null : isString(v.brandKey) ? v.brandKey : undefined,
+    brandKey: v['brandKey'] === null ? null : isString(v['brandKey']) ? v['brandKey'] : undefined,
   };
 }
 
@@ -72,12 +72,12 @@ function parseWorkspace(v: unknown): AuthMeResponseWorkspace {
  */
 export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
   if (!isObject(payload)) throw new Error("Invalid AuthMeResponse: expected object");
-  if (payload.ok !== true) throw new Error("Invalid AuthMeResponse: ok must be true");
-  const user = parseUser(payload.user);
-  const workspacesRaw = Array.isArray(payload.workspaces)
-    ? payload.workspaces
-    : Array.isArray(payload.accounts)
-      ? payload.accounts
+  if (payload['ok'] !== true) throw new Error("Invalid AuthMeResponse: ok must be true");
+  const user = parseUser(payload['user']);
+  const workspacesRaw = Array.isArray(payload['workspaces'])
+    ? payload['workspaces']
+    : Array.isArray(payload['accounts'])
+      ? payload['accounts']
       : null;
   if (!workspacesRaw) throw new Error("Invalid AuthMeResponse: workspaces must be array");
   const workspaces = workspacesRaw.map((a: unknown, i: number) => {
@@ -88,15 +88,15 @@ export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
     }
   });
   const activeWorkspaceId =
-    payload.activeWorkspaceId === null
+    payload['activeWorkspaceId'] === null
       ? null
-      : isString(payload.activeWorkspaceId)
-        ? payload.activeWorkspaceId
-        : payload.activeAccountId === null
+      : isString(payload['activeWorkspaceId'])
+        ? payload['activeWorkspaceId']
+        : payload['activeAccountId'] === null
           ? null
-          : isString(payload.activeAccountId)
-            ? payload.activeAccountId
+          : isString(payload['activeAccountId'])
+            ? payload['activeAccountId']
             : null;
-  const role = payload.role === null ? null : isString(payload.role) ? payload.role : null;
+  const role = payload['role'] === null ? null : isString(payload['role']) ? payload['role'] : null;
   return { ok: true, user, workspaces, activeWorkspaceId, role };
 }

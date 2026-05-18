@@ -31,7 +31,7 @@ export function adsRoutes(app: FastifyInstance) {
     const params = (req.params ?? {}) as { placement?: unknown };
     const placement = assertPlacement(params.placement);
     const query = (req.query ?? {}) as Record<string, unknown>;
-    const platform = assertPlatform(query.platform);
+    const platform = assertPlatform(query['platform']);
 
     const ctx = getOptionalContext(req);
     const activeWorkspaceId = ctx?.activeWorkspaceId ?? null;

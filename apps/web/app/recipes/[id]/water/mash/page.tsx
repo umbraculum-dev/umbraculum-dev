@@ -285,11 +285,11 @@ export default function MashWaterPage() {
       }
       const lastResult = asRecord(s.mashSaltsLastResultJson);
       if (lastResult) {
-        const innerResult = asRecord(lastResult.result);
+        const innerResult = asRecord(lastResult['result']);
         if (innerResult) {
           setSaltsResult(innerResult as unknown as SaltAdditionsResult);
-          if (typeof lastResult.calculatedAt === "string") {
-            setSaltsStatus(`Last calculated: ${new Date(lastResult.calculatedAt).toLocaleString()}`);
+          if (typeof lastResult['calculatedAt'] === "string") {
+            setSaltsStatus(`Last calculated: ${new Date(lastResult['calculatedAt']).toLocaleString()}`);
           }
         }
       }
@@ -674,8 +674,8 @@ export default function MashWaterPage() {
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const dataRec = asRecord(res.data) ?? {};
-      const result = dataRec.result as SaltAdditionsResult;
-      const derivationRec = asRecord(dataRec.derivation);
+      const result = dataRec['result'] as SaltAdditionsResult;
+      const derivationRec = asRecord(dataRec['derivation']);
       setSaltsResult(result);
       setSaltsDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
 
@@ -787,8 +787,8 @@ export default function MashWaterPage() {
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
     const bodyRec = asRecord(res.data) ?? {};
-    const resultRec = asRecord(bodyRec.result);
-    return resultRec?.estimatedMashPhRoomTemp as number;
+    const resultRec = asRecord(bodyRec['result']);
+    return resultRec?.['estimatedMashPhRoomTemp'] as number;
   };
 
   const computeOverallMash = async () => {
@@ -822,7 +822,7 @@ export default function MashWaterPage() {
       strengthKind: mashStrengthKind,
       ...(gristRows.length ? { grist: gristRows } : {}),
     };
-    if (mashStrengthKind !== "solid") payload.strengthValue = mashStrengthValue;
+    if (mashStrengthKind !== "solid") payload['strengthValue'] = mashStrengthValue;
     if (mashAcidificationMode === "manual") {
       Object.assign(payload, mashStrengthKind === "solid" ? { acidAddedGrams: mashManualAcidAdded } : { acidAddedMl: mashManualAcidAdded });
     }
@@ -834,9 +834,9 @@ export default function MashWaterPage() {
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
     const bodyRec = asRecord(res.data) ?? {};
-    const derivationRec = asRecord(bodyRec.derivation);
+    const derivationRec = asRecord(bodyRec['derivation']);
     setOverallDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
-    return bodyRec.result as MashOverallResult;
+    return bodyRec['result'] as MashOverallResult;
   };
 
   const computeAndSaveMashSnapshots = async () => {
@@ -1153,7 +1153,7 @@ export default function MashWaterPage() {
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const data = res.data as RecipeResponse;
       const extRec = asRecord(data.recipe.recipeExtJson);
-      const mashPhModelRec = asRecord(extRec?.mashPhModel);
+      const mashPhModelRec = asRecord(extRec?.['mashPhModel']);
 
       let rows: GristRow[] = [];
       if (!data.recipe.beerJsonRecipeJson) {
@@ -1167,12 +1167,12 @@ export default function MashWaterPage() {
         const m = r.id && mashPhModelRec ? asRecord(mashPhModelRec[r.id]) : null;
         return {
           ...r,
-          mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : r.mashDiPh ?? null,
+          mashDiPh: typeof m?.['mashDiPh'] === "number" ? m['mashDiPh'] : r.mashDiPh ?? null,
           mashTaToPh57_mEqPerKg:
-            typeof m?.mashTaToPh57_mEqPerKg === "number" ? m.mashTaToPh57_mEqPerKg : r.mashTaToPh57_mEqPerKg ?? null,
+            typeof m?.['mashTaToPh57_mEqPerKg'] === "number" ? m['mashTaToPh57_mEqPerKg'] : r.mashTaToPh57_mEqPerKg ?? null,
           mashRoastDehuskedOverride:
             m && "roastDehuskedOverride" in m
-              ? (m.roastDehuskedOverride as boolean | null | undefined) ?? null
+              ? (m['roastDehuskedOverride'] as boolean | null | undefined) ?? null
               : r.mashRoastDehuskedOverride ?? null,
         };
       });

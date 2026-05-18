@@ -13,7 +13,7 @@ async function main() {
   try {
     // In production this should typically run with ETag caching.
     // Set BEERPROTO_FORCE_SYNC=1 to backfill new mapped fields.
-    const force = process.env.BEERPROTO_FORCE_SYNC === "1";
+    const force = process.env['BEERPROTO_FORCE_SYNC'] === "1";
     await importBeerprotoAll(prisma, { dryRun: false, force });
   } finally {
     await prisma.$disconnect();

@@ -108,19 +108,19 @@ export function parsePatchSafe(raw: string): MemoryPatch {
   if (!parsed || typeof parsed !== "object") return {};
   const obj = parsed as Record<string, unknown>;
   const out: MemoryPatch = {};
-  if (Array.isArray(obj.addFacts)) {
-    out.addFacts = obj.addFacts.filter((f): f is string => typeof f === "string");
+  if (Array.isArray(obj['addFacts'])) {
+    out.addFacts = obj['addFacts'].filter((f): f is string => typeof f === "string");
   }
-  if (Array.isArray(obj.removeFacts)) {
-    out.removeFacts = obj.removeFacts.filter((f): f is string => typeof f === "string");
+  if (Array.isArray(obj['removeFacts'])) {
+    out.removeFacts = obj['removeFacts'].filter((f): f is string => typeof f === "string");
   }
-  if (Array.isArray(obj.addRecurringIssues)) {
-    out.addRecurringIssues = obj.addRecurringIssues.filter(
+  if (Array.isArray(obj['addRecurringIssues'])) {
+    out.addRecurringIssues = obj['addRecurringIssues'].filter(
       (f): f is string => typeof f === "string",
     );
   }
-  if (Array.isArray(obj.removeRecurringIssues)) {
-    out.removeRecurringIssues = obj.removeRecurringIssues.filter(
+  if (Array.isArray(obj['removeRecurringIssues'])) {
+    out.removeRecurringIssues = obj['removeRecurringIssues'].filter(
       (f): f is string => typeof f === "string",
     );
   }

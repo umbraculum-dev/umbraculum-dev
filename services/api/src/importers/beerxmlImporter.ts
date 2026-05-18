@@ -139,7 +139,7 @@ function toTiming(use: string, timeMinutes: number | null) {
 
   const timing: Record<string, unknown> = { use: useMap[use] ?? "add_to_boil" };
   if (typeof timeMinutes === "number" && Number.isFinite(timeMinutes)) {
-    timing.duration = { unit: "min", value: Math.max(0, Math.round(timeMinutes)) };
+    timing['duration'] = { unit: "min", value: Math.max(0, Math.round(timeMinutes)) };
   }
   return timing;
 }
@@ -192,8 +192,8 @@ function parseBeerXml(xml: string): XmlNode {
 }
 
 function extractBeerXmlRecipes(doc: XmlNode): BeerXmlRecipe[] {
-  const recipesNode = isObject(doc.RECIPES) ? doc.RECIPES : null;
-  const raw = recipesNode?.RECIPE ?? doc.RECIPE ?? null;
+  const recipesNode = isObject(doc['RECIPES']) ? doc['RECIPES'] : null;
+  const raw = recipesNode?.['RECIPE'] ?? doc['RECIPE'] ?? null;
   return asArray<unknown>(raw).filter((r): r is BeerXmlRecipe => isObject(r));
 }
 
@@ -207,26 +207,26 @@ function normMashStepType(typeRaw: string | null): "infusion" | "temperature" | 
 function parseBeerXmlMash(
   recipe: BeerXmlRecipe
 ): { name: string; grain_temperature: { unit: "C"; value: number }; mash_steps: Record<string, unknown>[] } | null {
-  const mash = isObject(recipe.MASH) ? recipe.MASH : null;
+  const mash = isObject(recipe['MASH']) ? recipe['MASH'] : null;
   if (!mash) return null;
 
-  const name = typeof mash.NAME === "string" ? mash.NAME.trim() : "Imported Mash";
-  const grainTempC = toNumber(mash.GRAIN_TEMP);
+  const name = typeof mash['NAME'] === "string" ? mash['NAME'].trim() : "Imported Mash";
+  const grainTempC = toNumber(mash['GRAIN_TEMP']);
   if (grainTempC == null || !Number.isFinite(grainTempC)) return null;
 
-  const mashStepsContainer = isObject(mash.MASH_STEPS) ? mash.MASH_STEPS : null;
-  const stepsRaw = mashStepsContainer?.MASH_STEP ?? null;
+  const mashStepsContainer = isObject(mash['MASH_STEPS']) ? mash['MASH_STEPS'] : null;
+  const stepsRaw = mashStepsContainer?.['MASH_STEP'] ?? null;
   const stepsArr = asArray<unknown>(stepsRaw).filter((s): s is XmlNode => isObject(s));
   if (stepsArr.length === 0) return null;
 
   const mashSteps = stepsArr
     .map((s) => {
-      const stepName = typeof s.NAME === "string" ? s.NAME.trim() : "";
-      const stepTempC = toNumber(s.STEP_TEMP);
-      const stepTimeMin = toNumber(s.STEP_TIME);
+      const stepName = typeof s['NAME'] === "string" ? s['NAME'].trim() : "";
+      const stepTempC = toNumber(s['STEP_TEMP']);
+      const stepTimeMin = toNumber(s['STEP_TIME']);
       if (!stepName || stepTempC == null || stepTimeMin == null) return null;
 
-      const type = normMashStepType(typeof s.TYPE === "string" ? s.TYPE : null);
+      const type = normMashStepType(typeof s['TYPE'] === "string" ? s['TYPE'] : null);
       const step: Record<string, unknown> = {
         name: stepName,
         type,
@@ -234,30 +234,30 @@ function parseBeerXmlMash(
         step_time: { unit: "min" as const, value: Math.max(0, stepTimeMin) },
       };
 
-      const rampTime = toNumber(s.RAMP_TIME);
+      const rampTime = toNumber(s['RAMP_TIME']);
       if (rampTime != null && rampTime >= 0) {
-        step.ramp_time = { unit: "min" as const, value: rampTime };
+        step['ramp_time'] = { unit: "min" as const, value: rampTime };
       }
 
-      const endTemp = toNumber(s.END_TEMP);
+      const endTemp = toNumber(s['END_TEMP']);
       if (endTemp != null && Number.isFinite(endTemp)) {
-        step.end_temperature = { unit: "C" as const, value: endTemp };
+        step['end_temperature'] = { unit: "C" as const, value: endTemp };
       }
 
       if (type === "infusion") {
-        const infuseAmount = toNumber(s.INFUSE_AMOUNT);
+        const infuseAmount = toNumber(s['INFUSE_AMOUNT']);
         if (infuseAmount != null && infuseAmount >= 0) {
-          step.amount = { unit: "l" as const, value: infuseAmount };
+          step['amount'] = { unit: "l" as const, value: infuseAmount };
         }
-        const infuseTemp = toNumber(s.INFUSE_TEMP);
+        const infuseTemp = toNumber(s['INFUSE_TEMP']);
         if (infuseTemp != null && Number.isFinite(infuseTemp)) {
-          step.infuse_temperature = { unit: "C" as const, value: infuseTemp };
+          step['infuse_temperature'] = { unit: "C" as const, value: infuseTemp };
         }
       }
 
-      const description = typeof s.DESCRIPTION === "string" ? s.DESCRIPTION.trim() : null;
+      const description = typeof s['DESCRIPTION'] === "string" ? s['DESCRIPTION'].trim() : null;
       if (description) {
-        step.description = description;
+        step['description'] = description;
       }
 
       return step;
@@ -274,19 +274,19 @@ function parseBeerXmlMash(
 }
 
 function extractStyleCandidateFromBeerXmlRecipe(recipe: BeerXmlRecipe): StyleCandidate | null {
-  const style = isObject(recipe.STYLE) ? recipe.STYLE : null;
+  const style = isObject(recipe['STYLE']) ? recipe['STYLE'] : null;
   if (!style) return null;
 
-  const nameRaw = typeof style.NAME === "string" ? style.NAME.trim() : "";
-  const category = typeof style.CATEGORY === "string" ? style.CATEGORY.trim() : "";
+  const nameRaw = typeof style['NAME'] === "string" ? style['NAME'].trim() : "";
+  const category = typeof style['CATEGORY'] === "string" ? style['CATEGORY'].trim() : "";
 
-  const categoryNumberRaw = style.CATEGORY_NUMBER;
+  const categoryNumberRaw = style['CATEGORY_NUMBER'];
   const categoryNumber =
     typeof categoryNumberRaw === "number" && Number.isFinite(categoryNumberRaw) ? String(categoryNumberRaw)
       : typeof categoryNumberRaw === "string" ? categoryNumberRaw.trim()
       : "";
 
-  const styleLetter = typeof style.STYLE_LETTER === "string" ? style.STYLE_LETTER.trim() : "";
+  const styleLetter = typeof style['STYLE_LETTER'] === "string" ? style['STYLE_LETTER'].trim() : "";
   const code = categoryNumber && styleLetter ? `${categoryNumber}${styleLetter}` : "";
 
   const name =
@@ -309,39 +309,39 @@ function importBeerXmlRecipeToLegacy(recipe: BeerXmlRecipe): {
 } {
   const warnings: ImportWarning[] = [];
 
-  const recipeName = typeof recipe.NAME === "string" ? recipe.NAME.trim() : "";
+  const recipeName = typeof recipe['NAME'] === "string" ? recipe['NAME'].trim() : "";
   if (!recipeName) throw new Error("BeerXML: recipe NAME is required");
-  const notes = typeof recipe.NOTES === "string" ? recipe.NOTES.trim() || null : null;
+  const notes = typeof recipe['NOTES'] === "string" ? recipe['NOTES'].trim() || null : null;
 
-  const batchSizeLitersRaw = toNumber(recipe.BATCH_SIZE);
+  const batchSizeLitersRaw = toNumber(recipe['BATCH_SIZE']);
   if (batchSizeLitersRaw == null || !(batchSizeLitersRaw > 0)) {
     throw new Error("BeerXML: recipe BATCH_SIZE is required and must be > 0 (liters)");
   }
   const batchSizeLiters = batchSizeLitersRaw;
 
-  const fermentablesContainer = isObject(recipe.FERMENTABLES) ? recipe.FERMENTABLES : null;
-  const hopsContainer = isObject(recipe.HOPS) ? recipe.HOPS : null;
-  const yeastsContainer = isObject(recipe.YEASTS) ? recipe.YEASTS : null;
-  const miscsContainer = isObject(recipe.MISCS) ? recipe.MISCS : null;
-  const fermentables = asArray<unknown>(fermentablesContainer?.FERMENTABLE).filter((f): f is XmlNode => isObject(f));
-  const hops = asArray<unknown>(hopsContainer?.HOP).filter((h): h is XmlNode => isObject(h));
-  const yeasts = asArray<unknown>(yeastsContainer?.YEAST).filter((y): y is XmlNode => isObject(y));
-  const miscs = asArray<unknown>(miscsContainer?.MISC).filter((m): m is XmlNode => isObject(m));
+  const fermentablesContainer = isObject(recipe['FERMENTABLES']) ? recipe['FERMENTABLES'] : null;
+  const hopsContainer = isObject(recipe['HOPS']) ? recipe['HOPS'] : null;
+  const yeastsContainer = isObject(recipe['YEASTS']) ? recipe['YEASTS'] : null;
+  const miscsContainer = isObject(recipe['MISCS']) ? recipe['MISCS'] : null;
+  const fermentables = asArray<unknown>(fermentablesContainer?.['FERMENTABLE']).filter((f): f is XmlNode => isObject(f));
+  const hops = asArray<unknown>(hopsContainer?.['HOP']).filter((h): h is XmlNode => isObject(h));
+  const yeasts = asArray<unknown>(yeastsContainer?.['YEAST']).filter((y): y is XmlNode => isObject(y));
+  const miscs = asArray<unknown>(miscsContainer?.['MISC']).filter((m): m is XmlNode => isObject(m));
 
   const gristJson: BeerXmlGristRow[] = fermentables
     .map((f) => {
-      const name = typeof f.NAME === "string" ? f.NAME.trim() : "";
-      const amountKg = toNumber(f.AMOUNT);
+      const name = typeof f['NAME'] === "string" ? f['NAME'].trim() : "";
+      const amountKg = toNumber(f['AMOUNT']);
       if (!name || amountKg == null) {
         warnings.push({ code: "fermentable_skipped", message: `Skipped fermentable missing NAME/AMOUNT: ${String(name)}` });
         return null;
       }
-      const colorLovibond = toNumber(f.COLOR);
-      const yieldPercent = toNumber(f.YIELD);
+      const colorLovibond = toNumber(f['COLOR']);
+      const yieldPercent = toNumber(f['YIELD']);
       const potential =
         yieldPercent != null ? ({ kind: "yieldPercent", value: yieldPercent } as const) : null;
-      const typeRaw = typeof f.TYPE === "string" ? f.TYPE : null;
-      const addAfterBoilRaw = typeof f.ADD_AFTER_BOIL === "string" ? f.ADD_AFTER_BOIL.trim().toUpperCase() : "";
+      const typeRaw = typeof f['TYPE'] === "string" ? f['TYPE'] : null;
+      const addAfterBoilRaw = typeof f['ADD_AFTER_BOIL'] === "string" ? f['ADD_AFTER_BOIL'].trim().toUpperCase() : "";
       const addAfterBoil = addAfterBoilRaw === "TRUE" || addAfterBoilRaw === "1" || addAfterBoilRaw === "YES";
       return {
         id: newId(),
@@ -357,15 +357,15 @@ function importBeerXmlRecipeToLegacy(recipe: BeerXmlRecipe): {
 
   const hopsJson: BeerXmlHopRow[] = hops
     .map((h) => {
-      const name = typeof h.NAME === "string" ? h.NAME.trim() : "";
-      const amountKg = toNumber(h.AMOUNT);
+      const name = typeof h['NAME'] === "string" ? h['NAME'].trim() : "";
+      const amountKg = toNumber(h['AMOUNT']);
       if (!name || amountKg == null) {
         warnings.push({ code: "hop_skipped", message: `Skipped hop missing NAME/AMOUNT: ${String(name)}` });
         return null;
       }
-      const alpha = toNumber(h.ALPHA);
-      const timeMinutes = toNumber(h.TIME);
-      const use = normUseHop(typeof h.USE === "string" ? h.USE : null);
+      const alpha = toNumber(h['ALPHA']);
+      const timeMinutes = toNumber(h['TIME']);
+      const use = normUseHop(typeof h['USE'] === "string" ? h['USE'] : null);
       return {
         id: newId(),
         name,
@@ -379,14 +379,14 @@ function importBeerXmlRecipeToLegacy(recipe: BeerXmlRecipe): {
 
   const yeastJson: BeerXmlYeastRow[] = yeasts
     .map((y) => {
-      const name = typeof y.NAME === "string" ? y.NAME.trim() : "";
+      const name = typeof y['NAME'] === "string" ? y['NAME'].trim() : "";
       if (!name) {
         warnings.push({ code: "yeast_skipped", message: "Skipped yeast missing NAME" });
         return null;
       }
-      const lab = typeof y.LABORATORY === "string" ? y.LABORATORY.trim() || null : null;
-      const productId = typeof y.PRODUCT_ID === "string" ? y.PRODUCT_ID.trim() || null : null;
-      const attenuation = toNumber(y.ATTENUATION);
+      const lab = typeof y['LABORATORY'] === "string" ? y['LABORATORY'].trim() || null : null;
+      const productId = typeof y['PRODUCT_ID'] === "string" ? y['PRODUCT_ID'].trim() || null : null;
+      const attenuation = toNumber(y['ATTENUATION']);
       return {
         id: newId(),
         name,
@@ -400,20 +400,20 @@ function importBeerXmlRecipeToLegacy(recipe: BeerXmlRecipe): {
 
   const miscJson: BeerXmlMiscRow[] = miscs
     .map((m) => {
-      const name = typeof m.NAME === "string" ? m.NAME.trim() : "";
-      const amount = toNumber(m.AMOUNT);
+      const name = typeof m['NAME'] === "string" ? m['NAME'].trim() : "";
+      const amount = toNumber(m['AMOUNT']);
       if (!name || amount == null) {
         warnings.push({ code: "misc_skipped", message: `Skipped misc missing NAME/AMOUNT: ${String(name)}` });
         return null;
       }
-      const type = normMiscType(typeof m.TYPE === "string" ? m.TYPE : null);
-      const use = normMiscUse(typeof m.USE === "string" ? m.USE : null);
-      const timeMinutes = toNumber(m.TIME);
-      const useFor = typeof m.USE_FOR === "string" ? m.USE_FOR.trim() || null : null;
-      const notes = typeof m.NOTES === "string" ? m.NOTES.trim() || null : null;
+      const type = normMiscType(typeof m['TYPE'] === "string" ? m['TYPE'] : null);
+      const use = normMiscUse(typeof m['USE'] === "string" ? m['USE'] : null);
+      const timeMinutes = toNumber(m['TIME']);
+      const useFor = typeof m['USE_FOR'] === "string" ? m['USE_FOR'].trim() || null : null;
+      const notes = typeof m['NOTES'] === "string" ? m['NOTES'].trim() || null : null;
       // BeerXML misc AMOUNT is usually in kg (weight), but can be volume depending on type.
       // For v1, assume weight unless AMOUNT_IS_WEIGHT is explicitly false.
-      const amountIsWeightRaw = typeof m.AMOUNT_IS_WEIGHT === "string" ? m.AMOUNT_IS_WEIGHT.trim().toLowerCase() : null;
+      const amountIsWeightRaw = typeof m['AMOUNT_IS_WEIGHT'] === "string" ? m['AMOUNT_IS_WEIGHT'].trim().toLowerCase() : null;
       const amountIsWeight = amountIsWeightRaw === "false" ? false : true;
 
       return {
@@ -470,7 +470,7 @@ export function importBeerXmlToBeerJson(xml: string): {
   const out: BeerJsonRecipeOut = legacyToBeerJsonRecipe(mapped);
 
   const mash = parseBeerXmlMash(recipe);
-  if (mash) out.mash = mash;
+  if (mash) out['mash'] = mash;
 
   return {
     recipeName: mapped.recipeName,
@@ -532,7 +532,7 @@ function legacyToBeerJsonRecipe(mapped: {
           product_id: y.productId ?? undefined,
           amount: { unit: "pkg", value: 1 },
         };
-        if (attenuation != null) out.attenuation = { unit: "%", value: attenuation };
+        if (attenuation != null) out['attenuation'] = { unit: "%", value: attenuation };
         return out;
       }),
       miscellaneous_additions: mapped.miscJson.map((m) => {
@@ -543,13 +543,13 @@ function legacyToBeerJsonRecipe(mapped: {
           timing: toTiming(m.use, m.timeMinutes),
           amount: m.amountIsWeight ? { unit: "kg", value: m.amount } : { unit: "l", value: m.amount },
         };
-        if (m.useFor) out.use_for = m.useFor;
-        if (m.notes) out.notes = m.notes;
+        if (m.useFor) out['use_for'] = m.useFor;
+        if (m.notes) out['notes'] = m.notes;
         return out;
       }),
     },
   };
-  if (mapped.notes) recipe.notes = mapped.notes;
+  if (mapped.notes) recipe['notes'] = mapped.notes;
   return recipe;
 }
 
@@ -569,7 +569,7 @@ export function importBeerXmlToBeerJsonMany(xml: string): Array<{
     const legacy = importBeerXmlRecipeToLegacy(r);
     const out: BeerJsonRecipeOut = legacyToBeerJsonRecipe(legacy);
     const mash = parseBeerXmlMash(r);
-    if (mash) out.mash = mash;
+    if (mash) out['mash'] = mash;
     return {
       recipeName: legacy.recipeName,
       notes: legacy.notes,

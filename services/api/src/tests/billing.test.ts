@@ -77,7 +77,7 @@ describe("billing (intents + webhooks + enforcement)", () => {
     // that will be signed and stored on `req.rawBody` by webhookRawBodyPlugin.
     // Falling back to "ci-only-not-real" mirrors api.yml's CI env so that the
     // test passes both locally (when the env var is unset) and on CI.
-    const stripeSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim() || "ci-only-not-real";
+    const stripeSecret = process.env['STRIPE_WEBHOOK_SECRET']?.trim() || "ci-only-not-real";
     const rawBody = JSON.stringify({
       id: `evt_${Date.now()}`,
       type: "checkout.session.completed",

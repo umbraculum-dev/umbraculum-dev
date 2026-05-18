@@ -148,7 +148,7 @@ export async function authRoutes(app: FastifyInstance) {
           sameSite: "lax",
           path: "/",
           // In production behind HTTPS, this must be true.
-          secure: process.env.NODE_ENV === "production",
+          secure: process.env['NODE_ENV'] === "production",
         })
         .send({
           ok: true,
@@ -218,7 +218,7 @@ export async function authRoutes(app: FastifyInstance) {
           httpOnly: true,
           sameSite: "lax",
           path: "/",
-          secure: process.env.NODE_ENV === "production",
+          secure: process.env['NODE_ENV'] === "production",
         })
         .send({
           ok: true,
@@ -405,7 +405,7 @@ export async function authRoutes(app: FastifyInstance) {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env['NODE_ENV'] === "production",
       })
       .redirect(next);
   });

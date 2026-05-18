@@ -173,7 +173,7 @@ async function main(): Promise<void> {
     }
 
     const ext = (recipe.recipeExtJson ?? {}) as Record<string, unknown>;
-    const equipment = asEquipmentSnapshot(ext.equipment);
+    const equipment = asEquipmentSnapshot(ext['equipment']);
 
     if (!equipment) {
        
@@ -183,9 +183,9 @@ async function main(): Promise<void> {
       process.exit(1);
     }
 
-    const equipmentSource = (ext.equipmentSource ?? {}) as Record<string, unknown>;
+    const equipmentSource = (ext['equipmentSource'] ?? {}) as Record<string, unknown>;
     const equipmentId =
-      args.equipmentId ?? asString(equipmentSource.equipmentProfileId);
+      args.equipmentId ?? asString(equipmentSource['equipmentProfileId']);
 
     if (!equipmentId) {
        

@@ -173,10 +173,10 @@ export class WaterProfilesService {
     if (input.name !== undefined) {
       const name = (input.name ?? "").trim();
       if (!name) throw new BadRequestError("invalid_name", "Body.name must be a non-empty string");
-      data.name = name;
+      data['name'] = name;
     }
-    if (input.scope !== undefined) data.scope = toScope(input.scope);
-    if (input.type !== undefined) data.type = toType(input.type);
+    if (input.scope !== undefined) data['scope'] = toScope(input.scope);
+    if (input.type !== undefined) data['type'] = toType(input.type);
 
     const numericFields = [
       "ph",
@@ -196,7 +196,7 @@ export class WaterProfilesService {
       }
     }
 
-    if (input.verificationStatus !== undefined) data.verificationStatus = toVerificationStatus(input.verificationStatus);
+    if (input.verificationStatus !== undefined) data['verificationStatus'] = toVerificationStatus(input.verificationStatus);
 
     if (Object.keys(data).length === 0) {
       throw new BadRequestError("no_updates", "No updatable fields provided");

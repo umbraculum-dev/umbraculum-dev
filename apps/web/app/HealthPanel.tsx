@@ -18,7 +18,7 @@ type HealthState =
 export function HealthStatusContent() {
   const t = useTranslations("health");
   const [state, setState] = useState<HealthState>({ status: "idle" });
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+  const apiBase = process.env['NEXT_PUBLIC_API_BASE_URL'] ?? "/api";
 
   useEffect(() => {
     let cancelled = false;
@@ -57,7 +57,7 @@ export function HealthStatusContent() {
 export function AppPermissionsContent() {
   const t = useTranslations("health");
   const [meState, setMeState] = useState<HealthState>({ status: "idle" });
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+  const apiBase = process.env['NEXT_PUBLIC_API_BASE_URL'] ?? "/api";
 
   useEffect(() => {
     let cancelled = false;

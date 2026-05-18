@@ -148,7 +148,7 @@ export function RecipeImportForm({
   const buildBody = (payload: Record<string, unknown>) => {
     const body = { ...payload };
     const effectiveWorkspaceId = workspaceId ?? accountId ?? null;
-    if (effectiveWorkspaceId) body.workspaceId = effectiveWorkspaceId;
+    if (effectiveWorkspaceId) body['workspaceId'] = effectiveWorkspaceId;
     return body;
   };
 

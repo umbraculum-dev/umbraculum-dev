@@ -21,4 +21,4 @@ export function createAnthropicClient(apiKey: string): AnthropicClient {
 }
 
 /** Default model. Override with `ANTHROPIC_MODEL` env var. */
-export const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5";
+export const DEFAULT_MODEL = process.env['ANTHROPIC_MODEL'] ?? "claude-sonnet-4-5";

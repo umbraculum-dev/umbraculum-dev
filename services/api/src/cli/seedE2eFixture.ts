@@ -32,10 +32,10 @@ const ADMIN_EMAIL = "e2e-admin@brewery.local";
 const MEMBER_EMAIL = "e2e-member@brewery.local";
 const VIEWER_EMAIL = "e2e-viewer@brewery.local";
 const MULTI_ADMIN_EMAIL = "e2e-multi-admin@brewery.local";
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? "e2e-admin-pw!";
-const MEMBER_PASSWORD = process.env.E2E_MEMBER_PASSWORD ?? "e2e-member-pw!";
-const VIEWER_PASSWORD = process.env.E2E_VIEWER_PASSWORD ?? "e2e-viewer-pw!";
-const MULTI_ADMIN_PASSWORD = process.env.E2E_MULTI_ADMIN_PASSWORD ?? "e2e-multi-admin-pw!";
+const ADMIN_PASSWORD = process.env['E2E_ADMIN_PASSWORD'] ?? "e2e-admin-pw!";
+const MEMBER_PASSWORD = process.env['E2E_MEMBER_PASSWORD'] ?? "e2e-member-pw!";
+const VIEWER_PASSWORD = process.env['E2E_VIEWER_PASSWORD'] ?? "e2e-viewer-pw!";
+const MULTI_ADMIN_PASSWORD = process.env['E2E_MULTI_ADMIN_PASSWORD'] ?? "e2e-multi-admin-pw!";
 
 interface Persona {
   id: string;

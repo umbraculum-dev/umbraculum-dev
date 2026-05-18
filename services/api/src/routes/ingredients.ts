@@ -34,9 +34,9 @@ export function ingredientsRoutes(app: FastifyInstance) {
   app.get("/ingredients/fermentables", async (req) => {
     const ctx = requireUser(req);
     const query = (req.query ?? {}) as Record<string, unknown>;
-    const q = getQueryString(query.query);
-    const offsetRaw = getQueryInt(query.offset);
-    const limitRaw = getQueryInt(query.limit);
+    const q = getQueryString(query['query']);
+    const offsetRaw = getQueryInt(query['offset']);
+    const limitRaw = getQueryInt(query['limit']);
     const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
     const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
@@ -111,9 +111,9 @@ export function ingredientsRoutes(app: FastifyInstance) {
   app.get("/ingredients/hops", async (req) => {
     const ctx = requireUser(req);
     const query = (req.query ?? {}) as Record<string, unknown>;
-    const q = getQueryString(query.query);
-    const offsetRaw = getQueryInt(query.offset);
-    const limitRaw = getQueryInt(query.limit);
+    const q = getQueryString(query['query']);
+    const offsetRaw = getQueryInt(query['offset']);
+    const limitRaw = getQueryInt(query['limit']);
     const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
     const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
@@ -157,7 +157,7 @@ export function ingredientsRoutes(app: FastifyInstance) {
   app.get("/ingredients/yeasts", async (req) => {
     const ctx = requireUser(req);
     const query = (req.query ?? {}) as Record<string, unknown>;
-    const q = getQueryString(query.query);
+    const q = getQueryString(query['query']);
 
     const filters: Prisma.YeastWhereInput[] = [
       ctx.activeWorkspaceId

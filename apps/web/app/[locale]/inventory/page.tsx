@@ -445,12 +445,12 @@ export default function InventoryPage() {
       it.metadataJson && typeof it.metadataJson === "object" && !Array.isArray(it.metadataJson)
         ? (it.metadataJson as Record<string, unknown>)
         : null;
-    const producer = typeof meta?.producer === "string" ? meta.producer : null;
-    const colorLovibond = typeof meta?.colorLovibond === "number" && Number.isFinite(meta.colorLovibond) ? meta.colorLovibond : null;
-    const yieldPercent = typeof meta?.yieldPercent === "number" && Number.isFinite(meta.yieldPercent) ? meta.yieldPercent : null;
-    const ppg = typeof meta?.ppg === "number" && Number.isFinite(meta.ppg) ? meta.ppg : null;
-    const alphaMin = typeof meta?.alphaMin === "number" && Number.isFinite(meta.alphaMin) ? meta.alphaMin : null;
-    const alphaMax = typeof meta?.alphaMax === "number" && Number.isFinite(meta.alphaMax) ? meta.alphaMax : null;
+    const producer = typeof meta?.['producer'] === "string" ? meta['producer'] : null;
+    const colorLovibond = typeof meta?.['colorLovibond'] === "number" && Number.isFinite(meta['colorLovibond']) ? meta['colorLovibond'] : null;
+    const yieldPercent = typeof meta?.['yieldPercent'] === "number" && Number.isFinite(meta['yieldPercent']) ? meta['yieldPercent'] : null;
+    const ppg = typeof meta?.['ppg'] === "number" && Number.isFinite(meta['ppg']) ? meta['ppg'] : null;
+    const alphaMin = typeof meta?.['alphaMin'] === "number" && Number.isFinite(meta['alphaMin']) ? meta['alphaMin'] : null;
+    const alphaMax = typeof meta?.['alphaMax'] === "number" && Number.isFinite(meta['alphaMax']) ? meta['alphaMax'] : null;
 
     return (
       <RecipeEditIngredientCard key={it.id}>
@@ -546,7 +546,7 @@ export default function InventoryPage() {
             id="fermentables"
             headingId="inv-fermentables"
             label={t("sections.fermentables")}
-            open={openSections.fermentables}
+            open={openSections['fermentables']}
             onOpenChange={(o) => setSectionOpen("fermentables", o)}
           >
             <YStack gap="$2">
@@ -680,7 +680,7 @@ export default function InventoryPage() {
                   <YStack minWidth={120} gap="$1">
                     <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                     <Input
-                      value={customName.fermentable ?? ""}
+                      value={customName['fermentable'] ?? ""}
                       onChangeText={(v) => setCustomName((p) => ({ ...p, fermentable: v }))}
                       placeholder={t("nameLabel")}
                       size="$3"
@@ -750,7 +750,7 @@ export default function InventoryPage() {
                   <YStack minWidth={80} gap="$1">
                     <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
                     <Input
-                      value={customQty.fermentable ?? ""}
+                      value={customQty['fermentable'] ?? ""}
                       onChangeText={(v) => setCustomQty((p) => ({ ...p, fermentable: v }))}
                       keyboardType="decimal-pad"
                       size="$3"
@@ -785,7 +785,7 @@ export default function InventoryPage() {
             id="hops"
             headingId="inv-hops"
             label={t("sections.hops")}
-            open={openSections.hops}
+            open={openSections['hops']}
             onOpenChange={(o) => setSectionOpen("hops", o)}
           >
             <YStack gap="$2">
@@ -914,7 +914,7 @@ export default function InventoryPage() {
                   <YStack minWidth={120} gap="$1">
                     <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                     <Input
-                      value={customName.hop ?? ""}
+                      value={customName['hop'] ?? ""}
                       onChangeText={(v) => setCustomName((p) => ({ ...p, hop: v }))}
                       placeholder={t("nameLabel")}
                       size="$3"
@@ -956,7 +956,7 @@ export default function InventoryPage() {
                   <YStack minWidth={80} gap="$1">
                     <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
                     <Input
-                      value={customQty.hop ?? ""}
+                      value={customQty['hop'] ?? ""}
                       onChangeText={(v) => setCustomQty((p) => ({ ...p, hop: v }))}
                       keyboardType="decimal-pad"
                       size="$3"
@@ -991,7 +991,7 @@ export default function InventoryPage() {
             id="specialities"
             headingId="inv-specialities"
             label={t("sections.specialities")}
-            open={openSections.specialities}
+            open={openSections['specialities']}
             onOpenChange={(o) => setSectionOpen("specialities", o)}
           >
             <YStack gap="$2">
@@ -999,7 +999,7 @@ export default function InventoryPage() {
                 <YStack minWidth={120} gap="$1">
                   <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                   <Input
-                    value={customName.speciality ?? ""}
+                    value={customName['speciality'] ?? ""}
                     onChangeText={(v) => setCustomName((p) => ({ ...p, speciality: v }))}
                     placeholder={t("nameLabel")}
                     size="$3"
@@ -1013,7 +1013,7 @@ export default function InventoryPage() {
                 <YStack minWidth={80} gap="$1">
                   <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("kg") })}</RecipeEditFieldLabel>
                   <Input
-                    value={customQty.speciality ?? ""}
+                    value={customQty['speciality'] ?? ""}
                     onChangeText={(v) => setCustomQty((p) => ({ ...p, speciality: v }))}
                     keyboardType="decimal-pad"
                     size="$3"
@@ -1040,7 +1040,7 @@ export default function InventoryPage() {
             id="acidSalts"
             headingId="inv-acid-salts"
             label={t("sections.acidSalts")}
-            open={openSections.acidSalts}
+            open={openSections['acidSalts']}
             onOpenChange={(o) => setSectionOpen("acidSalts", o)}
           >
             <YStack gap="$2">
@@ -1126,7 +1126,7 @@ export default function InventoryPage() {
                 <YStack minWidth={120} gap="$1">
                   <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                   <Input
-                    value={customName.acid_salt ?? ""}
+                    value={customName['acid_salt'] ?? ""}
                     onChangeText={(v) => setCustomName((p) => ({ ...p, acid_salt: v }))}
                     placeholder={t("nameLabel")}
                     size="$3"
@@ -1140,7 +1140,7 @@ export default function InventoryPage() {
                 <YStack minWidth={80} gap="$1">
                   <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("mL") })}</RecipeEditFieldLabel>
                   <Input
-                    value={customQty.acid_salt ?? ""}
+                    value={customQty['acid_salt'] ?? ""}
                     onChangeText={(v) => setCustomQty((p) => ({ ...p, acid_salt: v }))}
                     keyboardType="decimal-pad"
                     size="$3"
@@ -1167,7 +1167,7 @@ export default function InventoryPage() {
             id="detergentsSanitizers"
             headingId="inv-detergents"
             label={t("sections.detergentsSanitizers")}
-            open={openSections.detergentsSanitizers}
+            open={openSections['detergentsSanitizers']}
             onOpenChange={(o) => setSectionOpen("detergentsSanitizers", o)}
           >
             <YStack gap="$2">
@@ -1175,7 +1175,7 @@ export default function InventoryPage() {
                 <YStack minWidth={120} gap="$1">
                   <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                   <Input
-                    value={customName.detergent_sanitizer ?? ""}
+                    value={customName['detergent_sanitizer'] ?? ""}
                     onChangeText={(v) => setCustomName((p) => ({ ...p, detergent_sanitizer: v }))}
                     placeholder={t("nameLabel")}
                     size="$3"
@@ -1189,7 +1189,7 @@ export default function InventoryPage() {
                 <YStack minWidth={80} gap="$1">
                   <RecipeEditFieldLabel>{t("quantityLabel", { unit: tUnits("mL") })}</RecipeEditFieldLabel>
                   <Input
-                    value={customQty.detergent_sanitizer ?? ""}
+                    value={customQty['detergent_sanitizer'] ?? ""}
                     onChangeText={(v) => setCustomQty((p) => ({ ...p, detergent_sanitizer: v }))}
                     keyboardType="decimal-pad"
                     size="$3"
@@ -1216,7 +1216,7 @@ export default function InventoryPage() {
             id="kegging"
             headingId="inv-kegging"
             label={t("sections.kegging")}
-            open={openSections.kegging}
+            open={openSections['kegging']}
             onOpenChange={(o) => setSectionOpen("kegging", o)}
           >
             <YStack gap="$2">
@@ -1224,7 +1224,7 @@ export default function InventoryPage() {
                 <YStack minWidth={120} gap="$1">
                   <RecipeEditFieldLabel>{t("nameLabel")}</RecipeEditFieldLabel>
                   <Input
-                    value={customName.kegging ?? ""}
+                    value={customName['kegging'] ?? ""}
                     onChangeText={(v) => setCustomName((p) => ({ ...p, kegging: v }))}
                     placeholder={t("nameLabel")}
                     size="$3"
@@ -1238,7 +1238,7 @@ export default function InventoryPage() {
                 <YStack minWidth={80} gap="$1">
                   <RecipeEditFieldLabel>{t("quantityLabel", { unit: "count" })}</RecipeEditFieldLabel>
                   <Input
-                    value={customQty.kegging ?? ""}
+                    value={customQty['kegging'] ?? ""}
                     onChangeText={(v) => setCustomQty((p) => ({ ...p, kegging: v }))}
                     keyboardType="decimal-pad"
                     size="$3"

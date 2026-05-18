@@ -287,46 +287,46 @@ export function WaterBoilScreen() {
         const s = (settingsRes.data as { settings?: Record<string, unknown> })?.settings;
         if (s) {
           setSettings(s);
-          setSourceProfileId((s.boilSourceWaterProfileId as string) ?? "");
-          setTargetProfileId((s.boilTargetWaterProfileId as string) ?? "");
-          setDilutionProfileId((s.boilDilutionWaterProfileId as string) ?? "");
-          setTapVolumeLiters((s.boilTapWaterVolumeLiters as number) ?? 0);
-          setDilutionVolumeLiters((s.boilDilutionWaterVolumeLiters as number) ?? 0);
-          const savedAlk = s.boilStartingAlkalinityPpmCaCO3;
+          setSourceProfileId((s['boilSourceWaterProfileId'] as string) ?? "");
+          setTargetProfileId((s['boilTargetWaterProfileId'] as string) ?? "");
+          setDilutionProfileId((s['boilDilutionWaterProfileId'] as string) ?? "");
+          setTapVolumeLiters((s['boilTapWaterVolumeLiters'] as number) ?? 0);
+          setDilutionVolumeLiters((s['boilDilutionWaterVolumeLiters'] as number) ?? 0);
+          const savedAlk = s['boilStartingAlkalinityPpmCaCO3'];
           setStartingAlk(typeof savedAlk === "number" && Number.isFinite(savedAlk) ? savedAlk : 0);
           setStartingAlkTouched(
             typeof savedAlk === "number" && Number.isFinite(savedAlk) && savedAlk !== 0,
           );
-          setStartingPh(String(s.boilStartingPh ?? 7.0));
-          setTargetPh((s.boilTargetPh as number) ?? 5.6);
-          setAcidType((s.boilAcidType as string) ?? "phosphoric");
-          setStrengthKind(((s.boilStrengthKind as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
-          setStrengthValue((s.boilStrengthValue as number) ?? 10);
-          setAcidificationMode(s.boilAcidificationMode === "manual" ? "manual" : "targetPh");
+          setStartingPh(String(s['boilStartingPh'] ?? 7.0));
+          setTargetPh((s['boilTargetPh'] as number) ?? 5.6);
+          setAcidType((s['boilAcidType'] as string) ?? "phosphoric");
+          setStrengthKind(((s['boilStrengthKind'] as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
+          setStrengthValue((s['boilStrengthValue'] as number) ?? 10);
+          setAcidificationMode(s['boilAcidificationMode'] === "manual" ? "manual" : "targetPh");
           const savedManual =
-            (s.boilStrengthKind as string) === "solid"
-              ? (s.boilManualAcidAddedGrams as number) ?? 0
-              : (s.boilManualAcidAddedMl as number) ?? 0;
+            (s['boilStrengthKind'] as string) === "solid"
+              ? (s['boilManualAcidAddedGrams'] as number) ?? 0
+              : (s['boilManualAcidAddedMl'] as number) ?? 0;
           setManualAcidAdded(savedManual);
-          if (Array.isArray(s.boilSaltAdditionsJson)) setSaltAdditions(s.boilSaltAdditionsJson as SaltAdditionRow[]);
-          if (s.boilLastCalculatedAt) {
+          if (Array.isArray(s['boilSaltAdditionsJson'])) setSaltAdditions(s['boilSaltAdditionsJson'] as SaltAdditionRow[]);
+          if (s['boilLastCalculatedAt']) {
             setAcidResult({
-              acidRequiredMl: s.boilLastAcidRequiredMl as number | null,
-              acidRequiredTsp: s.boilLastAcidRequiredTsp as number | null,
-              acidRequiredGrams: s.boilLastAcidRequiredGrams as number | null,
-              acidRequiredKg: s.boilLastAcidRequiredKg as number | null,
-              finalAlkalinityPpmCaCO3: (s.boilLastFinalAlkalinityPpmCaCO3 as number) ?? 0,
-              sulfateAddedPpm: (s.boilLastSulfateAddedPpm as number) ?? 0,
-              chlorideAddedPpm: (s.boilLastChlorideAddedPpm as number) ?? 0,
+              acidRequiredMl: s['boilLastAcidRequiredMl'] as number | null,
+              acidRequiredTsp: s['boilLastAcidRequiredTsp'] as number | null,
+              acidRequiredGrams: s['boilLastAcidRequiredGrams'] as number | null,
+              acidRequiredKg: s['boilLastAcidRequiredKg'] as number | null,
+              finalAlkalinityPpmCaCO3: (s['boilLastFinalAlkalinityPpmCaCO3'] as number) ?? 0,
+              sulfateAddedPpm: (s['boilLastSulfateAddedPpm'] as number) ?? 0,
+              chlorideAddedPpm: (s['boilLastChlorideAddedPpm'] as number) ?? 0,
             });
           }
-          if (s.boilManualLastCalculatedAt) {
+          if (s['boilManualLastCalculatedAt']) {
             setManualResult({
-              achievedPh: (s.boilManualLastAchievedPh as number) ?? 0,
+              achievedPh: (s['boilManualLastAchievedPh'] as number) ?? 0,
               predicted: {
-                finalAlkalinityPpmCaCO3: (s.boilManualLastFinalAlkalinityPpmCaCO3 as number) ?? 0,
-                sulfateAddedPpm: (s.boilManualLastSulfateAddedPpm as number) ?? 0,
-                chlorideAddedPpm: (s.boilManualLastChlorideAddedPpm as number) ?? 0,
+                finalAlkalinityPpmCaCO3: (s['boilManualLastFinalAlkalinityPpmCaCO3'] as number) ?? 0,
+                sulfateAddedPpm: (s['boilManualLastSulfateAddedPpm'] as number) ?? 0,
+                chlorideAddedPpm: (s['boilManualLastChlorideAddedPpm'] as number) ?? 0,
               },
             });
           }

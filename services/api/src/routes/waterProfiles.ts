@@ -16,16 +16,16 @@ export function waterProfilesRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
-      scope: typeof body.scope === "string" ? body.scope : undefined,
-      type: typeof body.type === "string" ? body.type : "water",
-      name: typeof body.name === "string" ? body.name : "",
-      ph: body.ph,
-      calcium: body.calcium,
-      magnesium: body.magnesium,
-      sodium: body.sodium,
-      sulfate: body.sulfate,
-      chloride: body.chloride,
-      bicarbonate: body.bicarbonate,
+      scope: typeof body['scope'] === "string" ? body['scope'] : undefined,
+      type: typeof body['type'] === "string" ? body['type'] : "water",
+      name: typeof body['name'] === "string" ? body['name'] : "",
+      ph: body['ph'],
+      calcium: body['calcium'],
+      magnesium: body['magnesium'],
+      sodium: body['sodium'],
+      sulfate: body['sulfate'],
+      chloride: body['chloride'],
+      bicarbonate: body['bicarbonate'],
     });
 
     return { ok: true, profile: created };
@@ -38,17 +38,17 @@ export function waterProfilesRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
-      scope: typeof body.scope === "string" ? body.scope : undefined,
-      type: typeof body.type === "string" ? body.type : undefined,
-      name: typeof body.name === "string" ? body.name : undefined,
-      ph: body.ph,
-      calcium: body.calcium,
-      magnesium: body.magnesium,
-      sodium: body.sodium,
-      sulfate: body.sulfate,
-      chloride: body.chloride,
-      bicarbonate: body.bicarbonate,
-      verificationStatus: typeof body.verificationStatus === "string" ? body.verificationStatus : undefined,
+      scope: typeof body['scope'] === "string" ? body['scope'] : undefined,
+      type: typeof body['type'] === "string" ? body['type'] : undefined,
+      name: typeof body['name'] === "string" ? body['name'] : undefined,
+      ph: body['ph'],
+      calcium: body['calcium'],
+      magnesium: body['magnesium'],
+      sodium: body['sodium'],
+      sulfate: body['sulfate'],
+      chloride: body['chloride'],
+      bicarbonate: body['bicarbonate'],
+      verificationStatus: typeof body['verificationStatus'] === "string" ? body['verificationStatus'] : undefined,
     });
 
     return { ok: true, profile: updated };

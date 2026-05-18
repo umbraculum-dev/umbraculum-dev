@@ -45,17 +45,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
 
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -68,12 +68,12 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }
 
     const startingAlkalinityPpmCaCO3 =
-      typeof body.startingAlkalinityPpmCaCO3 === "number" ? body.startingAlkalinityPpmCaCO3 : 0;
-    const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? body.targetPh : DEFAULT_MASH_TARGET_PH;
-    const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
+      typeof body['startingAlkalinityPpmCaCO3'] === "number" ? body['startingAlkalinityPpmCaCO3'] : 0;
+    const startingPh = typeof body['startingPh'] === "number" ? body['startingPh'] : 7.0;
+    const targetPh = typeof body['targetPh'] === "number" ? body['targetPh'] : DEFAULT_MASH_TARGET_PH;
+    const volumeLiters = typeof body['volumeLiters'] === "number" ? body['volumeLiters'] : 1.0;
+    const calciumPpm = typeof body['calciumPpm'] === "number" ? (body['calciumPpm']) : undefined;
+    const magnesiumPpm = typeof body['magnesiumPpm'] === "number" ? (body['magnesiumPpm']) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -114,17 +114,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
 
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -137,11 +137,11 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }
 
     const startingAlkalinityPpmCaCO3 =
-      typeof body.startingAlkalinityPpmCaCO3 === "number" ? body.startingAlkalinityPpmCaCO3 : 0;
-    const startingPh = typeof body.startingPh === "number" ? body.startingPh : 7.0;
-    const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : 1.0;
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
+      typeof body['startingAlkalinityPpmCaCO3'] === "number" ? body['startingAlkalinityPpmCaCO3'] : 0;
+    const startingPh = typeof body['startingPh'] === "number" ? body['startingPh'] : 7.0;
+    const volumeLiters = typeof body['volumeLiters'] === "number" ? body['volumeLiters'] : 1.0;
+    const calciumPpm = typeof body['calciumPpm'] === "number" ? (body['calciumPpm']) : undefined;
+    const magnesiumPpm = typeof body['magnesiumPpm'] === "number" ? (body['magnesiumPpm']) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -149,8 +149,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
     }
 
-    const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
-    const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+    const acidAddedMl = typeof body['acidAddedMl'] === "number" ? body['acidAddedMl'] : undefined;
+    const acidAddedGrams = typeof body['acidAddedGrams'] === "number" ? body['acidAddedGrams'] : undefined;
     if (strength.kind === "solid") {
       if (typeof acidAddedGrams !== "number") {
         throw new BadRequestError("invalid_acid_added", "Body.acidAddedGrams is required for solid acids");
@@ -203,17 +203,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
 
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -227,28 +227,28 @@ export function waterCalcRoutes(app: FastifyInstance) {
 
     // Accept mash-prefixed or generic field names.
     const startingAlkalinityPpmCaCO3 =
-      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3)
-        : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3)
+      typeof body['mashStartingAlkalinityPpmCaCO3'] === "number"
+        ? (body['mashStartingAlkalinityPpmCaCO3'])
+        : typeof body['startingAlkalinityPpmCaCO3'] === "number"
+          ? (body['startingAlkalinityPpmCaCO3'])
           : 0;
     const startingPh =
-      typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh)
-        : typeof body.startingPh === "number"
-          ? (body.startingPh)
+      typeof body['mashStartingPh'] === "number"
+        ? (body['mashStartingPh'])
+        : typeof body['startingPh'] === "number"
+          ? (body['startingPh'])
           : 7.0;
     const targetPh =
-      typeof body.mashTargetPh === "number"
-        ? (body.mashTargetPh)
-        : typeof body.targetPh === "number"
-          ? (body.targetPh)
+      typeof body['mashTargetPh'] === "number"
+        ? (body['mashTargetPh'])
+        : typeof body['targetPh'] === "number"
+          ? (body['targetPh'])
           : DEFAULT_MASH_TARGET_PH;
     const volumeLiters =
-      typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters)
-        : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters)
+      typeof body['mashWaterVolumeLiters'] === "number"
+        ? (body['mashWaterVolumeLiters'])
+        : typeof body['volumeLiters'] === "number"
+          ? (body['volumeLiters'])
           : 1.0;
 
     const result = spargeAcidification({
@@ -282,17 +282,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
 
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -306,26 +306,26 @@ export function waterCalcRoutes(app: FastifyInstance) {
 
     // Accept mash-prefixed or generic field names.
     const startingAlkalinityPpmCaCO3 =
-      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3)
-        : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3)
+      typeof body['mashStartingAlkalinityPpmCaCO3'] === "number"
+        ? (body['mashStartingAlkalinityPpmCaCO3'])
+        : typeof body['startingAlkalinityPpmCaCO3'] === "number"
+          ? (body['startingAlkalinityPpmCaCO3'])
           : 0;
     const startingPh =
-      typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh)
-        : typeof body.startingPh === "number"
-          ? (body.startingPh)
+      typeof body['mashStartingPh'] === "number"
+        ? (body['mashStartingPh'])
+        : typeof body['startingPh'] === "number"
+          ? (body['startingPh'])
           : 7.0;
     const volumeLiters =
-      typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters)
-        : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters)
+      typeof body['mashWaterVolumeLiters'] === "number"
+        ? (body['mashWaterVolumeLiters'])
+        : typeof body['volumeLiters'] === "number"
+          ? (body['volumeLiters'])
           : 1.0;
 
-    const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
-    const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+    const acidAddedMl = typeof body['acidAddedMl'] === "number" ? body['acidAddedMl'] : undefined;
+    const acidAddedGrams = typeof body['acidAddedGrams'] === "number" ? body['acidAddedGrams'] : undefined;
     if (strength.kind === "solid") {
       if (typeof acidAddedGrams !== "number") {
         throw new BadRequestError("invalid_acid_added", "Body.acidAddedGrams is required for solid acids");
@@ -373,22 +373,22 @@ export function waterCalcRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const volumeLiters =
-      typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters)
-        : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters)
+      typeof body['mashWaterVolumeLiters'] === "number"
+        ? (body['mashWaterVolumeLiters'])
+        : typeof body['volumeLiters'] === "number"
+          ? (body['volumeLiters'])
           : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
     }
 
     const alkalinityPpmCaCO3 =
-      typeof body.alkalinityPpmCaCO3 === "number"
-        ? (body.alkalinityPpmCaCO3)
-        : typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-          ? (body.mashStartingAlkalinityPpmCaCO3)
-          : typeof body.startingAlkalinityPpmCaCO3 === "number"
-            ? (body.startingAlkalinityPpmCaCO3)
+      typeof body['alkalinityPpmCaCO3'] === "number"
+        ? (body['alkalinityPpmCaCO3'])
+        : typeof body['mashStartingAlkalinityPpmCaCO3'] === "number"
+          ? (body['mashStartingAlkalinityPpmCaCO3'])
+          : typeof body['startingAlkalinityPpmCaCO3'] === "number"
+            ? (body['startingAlkalinityPpmCaCO3'])
             : NaN;
     if (!Number.isFinite(alkalinityPpmCaCO3)) {
       throw new BadRequestError(
@@ -397,8 +397,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
       );
     }
 
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
+    const calciumPpm = typeof body['calciumPpm'] === "number" ? (body['calciumPpm']) : undefined;
+    const magnesiumPpm = typeof body['magnesiumPpm'] === "number" ? (body['magnesiumPpm']) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -406,13 +406,13 @@ export function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
     }
 
-    const gristRaw = body.grist;
+    const gristRaw = body['grist'];
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
     const grist: MashPhEstimateInput["grist"] = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
-      const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+      const amountKg = typeof o['amountKg'] === "number" ? o['amountKg'] : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
         throw new BadRequestError(
           "invalid_grist_row_amount",
@@ -421,7 +421,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       }
 
       // Preferred v1 inputs:
-      const diRaw = o.mashDiPh;
+      const diRaw = o['mashDiPh'];
       const mashDiPh =
         diRaw === null || diRaw === undefined ? null : typeof diRaw === "number" ? diRaw : NaN;
       if (typeof mashDiPh === "number" && (!Number.isFinite(mashDiPh) || mashDiPh < 0 || mashDiPh > 14)) {
@@ -431,7 +431,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         );
       }
 
-      const taRaw = o.mashTaToPh57_mEqPerKg;
+      const taRaw = o['mashTaToPh57_mEqPerKg'];
       const mashTaToPh57_mEqPerKg =
         taRaw === null || taRaw === undefined ? null : typeof taRaw === "number" ? taRaw : NaN;
       if (
@@ -445,7 +445,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       }
 
       // Back-compat: derive v1 defaults from v0-style fields when present.
-      const colorRaw = o.colorLovibond;
+      const colorRaw = o['colorLovibond'];
       const colorLovibond =
         colorRaw === null || colorRaw === undefined ? null : typeof colorRaw === "number" ? colorRaw : NaN;
       if (typeof colorLovibond === "number" && (!Number.isFinite(colorLovibond) || colorLovibond < 0)) {
@@ -455,7 +455,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         );
       }
 
-      const maltClassRaw = o.maltClass;
+      const maltClassRaw = o['maltClass'];
       const maltClass =
         maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
           ? maltClassRaw
@@ -477,8 +477,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
     });
 
     const waterToGristRatioQtPerLbOverride =
-      typeof body.waterToGristRatioQtPerLbOverride === "number"
-        ? body.waterToGristRatioQtPerLbOverride
+      typeof body['waterToGristRatioQtPerLbOverride'] === "number"
+        ? body['waterToGristRatioQtPerLbOverride']
         : undefined;
     if (
       waterToGristRatioQtPerLbOverride !== undefined &&
@@ -491,7 +491,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }
 
     const acidAdded_mEqPerL =
-      typeof body.acidAdded_mEqPerL === "number" ? (body.acidAdded_mEqPerL) : undefined;
+      typeof body['acidAdded_mEqPerL'] === "number" ? (body['acidAdded_mEqPerL']) : undefined;
     if (
       acidAdded_mEqPerL !== undefined &&
       (!Number.isFinite(acidAdded_mEqPerL) || acidAdded_mEqPerL < 0)
@@ -527,17 +527,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
 
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -550,38 +550,38 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }
 
     const startingAlkalinityPpmCaCO3 =
-      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3)
-        : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3)
+      typeof body['mashStartingAlkalinityPpmCaCO3'] === "number"
+        ? (body['mashStartingAlkalinityPpmCaCO3'])
+        : typeof body['startingAlkalinityPpmCaCO3'] === "number"
+          ? (body['startingAlkalinityPpmCaCO3'])
           : 0;
     const startingPh =
-      typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh)
-        : typeof body.startingPh === "number"
-          ? (body.startingPh)
+      typeof body['mashStartingPh'] === "number"
+        ? (body['mashStartingPh'])
+        : typeof body['startingPh'] === "number"
+          ? (body['startingPh'])
           : 7.0;
     const targetMashPh =
-      typeof body.targetMashPh === "number"
-        ? (body.targetMashPh)
-        : typeof body.mashTargetPh === "number"
-          ? (body.mashTargetPh)
+      typeof body['targetMashPh'] === "number"
+        ? (body['targetMashPh'])
+        : typeof body['mashTargetPh'] === "number"
+          ? (body['mashTargetPh'])
           : NaN;
     if (!Number.isFinite(targetMashPh)) {
       throw new BadRequestError("invalid_target_mash_ph", "Body.targetMashPh (or mashTargetPh) is required");
     }
     const volumeLiters =
-      typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters)
-        : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters)
+      typeof body['mashWaterVolumeLiters'] === "number"
+        ? (body['mashWaterVolumeLiters'])
+        : typeof body['volumeLiters'] === "number"
+          ? (body['volumeLiters'])
           : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
     }
 
-    const calciumPpm = typeof body.calciumPpm === "number" ? (body.calciumPpm) : undefined;
-    const magnesiumPpm = typeof body.magnesiumPpm === "number" ? (body.magnesiumPpm) : undefined;
+    const calciumPpm = typeof body['calciumPpm'] === "number" ? (body['calciumPpm']) : undefined;
+    const magnesiumPpm = typeof body['magnesiumPpm'] === "number" ? (body['magnesiumPpm']) : undefined;
     if (calciumPpm !== undefined && (!Number.isFinite(calciumPpm) || calciumPpm < 0)) {
       throw new BadRequestError("invalid_calcium_ppm", "Body.calciumPpm must be a finite number >= 0");
     }
@@ -589,20 +589,20 @@ export function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_magnesium_ppm", "Body.magnesiumPpm must be a finite number >= 0");
     }
 
-    const gristRaw = body.grist;
+    const gristRaw = body['grist'];
     if (!Array.isArray(gristRaw)) {
       throw new BadRequestError("invalid_grist", "Body.grist must be an array");
     }
     const grist: Array<{ amountKg: number; colorLovibond: number | null; maltClass: "base" | "crystal" | "roast" | "acid" }> = gristRaw.map((row, idx) => {
       const o = (row ?? {}) as Record<string, unknown>;
-      const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+      const amountKg = typeof o['amountKg'] === "number" ? o['amountKg'] : NaN;
       if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
         throw new BadRequestError(
           "invalid_grist_row_amount",
           `Body.grist[${idx}].amountKg must be a number > 0`,
         );
       }
-      const colorRaw = o.colorLovibond;
+      const colorRaw = o['colorLovibond'];
       const colorLovibond =
         colorRaw === null || colorRaw === undefined
           ? null
@@ -616,7 +616,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         );
       }
 
-      const maltClassRaw = o.maltClass;
+      const maltClassRaw = o['maltClass'];
       const maltClass =
         maltClassRaw === "base" ||
         maltClassRaw === "crystal" ||
@@ -629,8 +629,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
     });
 
     const waterToGristRatioQtPerLbOverride =
-      typeof body.waterToGristRatioQtPerLbOverride === "number"
-        ? body.waterToGristRatioQtPerLbOverride
+      typeof body['waterToGristRatioQtPerLbOverride'] === "number"
+        ? body['waterToGristRatioQtPerLbOverride']
         : undefined;
     if (
       waterToGristRatioQtPerLbOverride !== undefined &&
@@ -667,12 +667,12 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const volumeLiters = typeof body.volumeLiters === "number" ? body.volumeLiters : NaN;
+    const volumeLiters = typeof body['volumeLiters'] === "number" ? body['volumeLiters'] : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
     }
 
-    const base = body.baseProfile as Partial<IonProfilePpm>;
+    const base = body['baseProfile'] as Partial<IonProfilePpm>;
     if (!base || typeof base !== "object") {
       throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
     }
@@ -685,17 +685,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
       bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
     };
 
-    const additionsRaw = body.additions;
+    const additionsRaw = body['additions'];
     if (!Array.isArray(additionsRaw)) {
       throw new BadRequestError("invalid_additions", "Body.additions must be an array");
     }
     const additions: SaltAddition[] = additionsRaw.map((a) => {
       const o = (a ?? {}) as Record<string, unknown>;
-      const saltKey = o.saltKey as SaltKey;
+      const saltKey = o['saltKey'] as SaltKey;
       if (typeof saltKey !== "string") {
         throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
       }
-      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      const grams = typeof o['grams'] === "number" ? o['grams'] : NaN;
       if (!Number.isFinite(grams) || grams < 0) {
         throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
       }
@@ -714,36 +714,36 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const mashMode = body.mashMode === "manual" ? "manual" : "targetPh";
+    const mashMode = body['mashMode'] === "manual" ? "manual" : "targetPh";
     const startingAlkalinityPpmCaCO3 =
-      typeof body.mashStartingAlkalinityPpmCaCO3 === "number"
-        ? (body.mashStartingAlkalinityPpmCaCO3)
-        : typeof body.startingAlkalinityPpmCaCO3 === "number"
-          ? (body.startingAlkalinityPpmCaCO3)
+      typeof body['mashStartingAlkalinityPpmCaCO3'] === "number"
+        ? (body['mashStartingAlkalinityPpmCaCO3'])
+        : typeof body['startingAlkalinityPpmCaCO3'] === "number"
+          ? (body['startingAlkalinityPpmCaCO3'])
           : 0;
     const startingPh =
-      typeof body.mashStartingPh === "number"
-        ? (body.mashStartingPh)
-        : typeof body.startingPh === "number"
-          ? (body.startingPh)
+      typeof body['mashStartingPh'] === "number"
+        ? (body['mashStartingPh'])
+        : typeof body['startingPh'] === "number"
+          ? (body['startingPh'])
           : 7.0;
     const targetPh =
-      typeof body.mashTargetPh === "number"
-        ? (body.mashTargetPh)
-        : typeof body.targetPh === "number"
-          ? (body.targetPh)
+      typeof body['mashTargetPh'] === "number"
+        ? (body['mashTargetPh'])
+        : typeof body['targetPh'] === "number"
+          ? (body['targetPh'])
           : DEFAULT_MASH_TARGET_PH;
     const volumeLiters =
-      typeof body.mashWaterVolumeLiters === "number"
-        ? (body.mashWaterVolumeLiters)
-        : typeof body.volumeLiters === "number"
-          ? (body.volumeLiters)
+      typeof body['mashWaterVolumeLiters'] === "number"
+        ? (body['mashWaterVolumeLiters'])
+        : typeof body['volumeLiters'] === "number"
+          ? (body['volumeLiters'])
           : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.mashWaterVolumeLiters must be > 0");
     }
 
-    const base = body.baseProfile as Partial<IonProfilePpm>;
+    const base = body['baseProfile'] as Partial<IonProfilePpm>;
     if (!base || typeof base !== "object") {
       throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
     }
@@ -756,17 +756,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
       bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
     };
 
-    const additionsRaw = body.additions;
+    const additionsRaw = body['additions'];
     if (!Array.isArray(additionsRaw)) {
       throw new BadRequestError("invalid_additions", "Body.additions must be an array");
     }
     const additions: SaltAddition[] = additionsRaw.map((a) => {
       const o = (a ?? {}) as Record<string, unknown>;
-      const saltKey = o.saltKey as SaltKey;
+      const saltKey = o['saltKey'] as SaltKey;
       if (typeof saltKey !== "string") {
         throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
       }
-      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      const grams = typeof o['grams'] === "number" ? o['grams'] : NaN;
       if (!Number.isFinite(grams) || grams < 0) {
         throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
       }
@@ -775,16 +775,16 @@ export function waterCalcRoutes(app: FastifyInstance) {
 
     const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -800,7 +800,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
     let phKind: "target" | "estimated" = "target";
     let phValue = targetPh;
 
-    const gristRaw = body.grist;
+    const gristRaw = body['grist'];
     const hasGrist = Array.isArray(gristRaw) && gristRaw.length > 0;
     const grist: Array<{
       amountKg: number;
@@ -811,26 +811,26 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }> | null = hasGrist
       ? (gristRaw as unknown[]).map((row, idx) => {
         const o = (row ?? {}) as Record<string, unknown>;
-        const amountKg = typeof o.amountKg === "number" ? o.amountKg : NaN;
+        const amountKg = typeof o['amountKg'] === "number" ? o['amountKg'] : NaN;
         if (!Number.isFinite(amountKg) || !(amountKg > 0)) {
           throw new BadRequestError("invalid_grist_row_amount", `Body.grist[${idx}].amountKg must be a number > 0`);
         }
-        const colorRaw = o.colorLovibond;
+        const colorRaw = o['colorLovibond'];
         const colorLovibond =
           colorRaw === null || colorRaw === undefined ? null : typeof colorRaw === "number" ? colorRaw : NaN;
         if (typeof colorLovibond === "number" && (!Number.isFinite(colorLovibond) || colorLovibond < 0)) {
           throw new BadRequestError("invalid_grist_row_color", `Body.grist[${idx}].colorLovibond must be null or a number >= 0`);
         }
-        const maltClassRaw = o.maltClass;
+        const maltClassRaw = o['maltClass'];
         const maltClass =
           maltClassRaw === "base" || maltClassRaw === "crystal" || maltClassRaw === "roast" || maltClassRaw === "acid"
             ? maltClassRaw
             : "base";
-        const mashDiPh = typeof o.mashDiPh === "number" ? (o.mashDiPh) : o.mashDiPh === null ? null : undefined;
+        const mashDiPh = typeof o['mashDiPh'] === "number" ? (o['mashDiPh']) : o['mashDiPh'] === null ? null : undefined;
         const mashTaToPh57_mEqPerKg =
-          typeof o.mashTaToPh57_mEqPerKg === "number"
-            ? (o.mashTaToPh57_mEqPerKg)
-            : o.mashTaToPh57_mEqPerKg === null
+          typeof o['mashTaToPh57_mEqPerKg'] === "number"
+            ? (o['mashTaToPh57_mEqPerKg'])
+            : o['mashTaToPh57_mEqPerKg'] === null
               ? null
               : undefined;
         return { amountKg, colorLovibond, maltClass, mashDiPh, mashTaToPh57_mEqPerKg };
@@ -852,7 +852,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
     if (hasGrist && mashMode !== "manual") {
 
       const waterToGristRatioQtPerLbOverride =
-        typeof body.waterToGristRatioQtPerLbOverride === "number" ? body.waterToGristRatioQtPerLbOverride : undefined;
+        typeof body['waterToGristRatioQtPerLbOverride'] === "number" ? body['waterToGristRatioQtPerLbOverride'] : undefined;
 
       const r = mashAcidificationTargetMashPh({
         startingAlkalinityPpmCaCO3,
@@ -870,8 +870,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
       phKind = "estimated";
       phValue = r.estimatedMashPhRoomTemp;
     } else if (mashMode === "manual") {
-      const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
-      const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+      const acidAddedMl = typeof body['acidAddedMl'] === "number" ? body['acidAddedMl'] : undefined;
+      const acidAddedGrams = typeof body['acidAddedGrams'] === "number" ? body['acidAddedGrams'] : undefined;
       const r = mashAcidificationManual({
         startingAlkalinityPpmCaCO3,
         startingPh,
@@ -975,21 +975,21 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const spargeMode = body.spargeMode === "manual" ? "manual" : "targetPh";
+    const spargeMode = body['spargeMode'] === "manual" ? "manual" : "targetPh";
     const startingAlkalinityPpmCaCO3 =
-      typeof body.startingAlkalinityPpmCaCO3 === "number"
-        ? (body.startingAlkalinityPpmCaCO3)
-        : typeof body.spargeStartingAlkalinityPpmCaCO3 === "number"
-          ? (body.spargeStartingAlkalinityPpmCaCO3)
+      typeof body['startingAlkalinityPpmCaCO3'] === "number"
+        ? (body['startingAlkalinityPpmCaCO3'])
+        : typeof body['spargeStartingAlkalinityPpmCaCO3'] === "number"
+          ? (body['spargeStartingAlkalinityPpmCaCO3'])
           : 0;
-    const startingPh = typeof body.startingPh === "number" ? (body.startingPh) : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? (body.targetPh) : DEFAULT_MASH_TARGET_PH;
-    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters) : NaN;
+    const startingPh = typeof body['startingPh'] === "number" ? (body['startingPh']) : 7.0;
+    const targetPh = typeof body['targetPh'] === "number" ? (body['targetPh']) : DEFAULT_MASH_TARGET_PH;
+    const volumeLiters = typeof body['volumeLiters'] === "number" ? (body['volumeLiters']) : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
     }
 
-    const base = body.baseProfile as Partial<IonProfilePpm>;
+    const base = body['baseProfile'] as Partial<IonProfilePpm>;
     if (!base || typeof base !== "object") {
       throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
     }
@@ -1002,17 +1002,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
       bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
     };
 
-    const additionsRaw = body.additions;
+    const additionsRaw = body['additions'];
     if (!Array.isArray(additionsRaw)) {
       throw new BadRequestError("invalid_additions", "Body.additions must be an array");
     }
     const additions: SaltAddition[] = additionsRaw.map((a) => {
       const o = (a ?? {}) as Record<string, unknown>;
-      const saltKey = o.saltKey as SaltKey;
+      const saltKey = o['saltKey'] as SaltKey;
       if (typeof saltKey !== "string") {
         throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
       }
-      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      const grams = typeof o['grams'] === "number" ? o['grams'] : NaN;
       if (!Number.isFinite(grams) || grams < 0) {
         throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
       }
@@ -1021,16 +1021,16 @@ export function waterCalcRoutes(app: FastifyInstance) {
 
     const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -1047,8 +1047,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
     const magnesiumPpm = salts.resultingProfile.magnesium;
 
     if (spargeMode === "manual") {
-      const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
-      const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+      const acidAddedMl = typeof body['acidAddedMl'] === "number" ? body['acidAddedMl'] : undefined;
+      const acidAddedGrams = typeof body['acidAddedGrams'] === "number" ? body['acidAddedGrams'] : undefined;
       const r = spargeAcidificationManual({
         startingAlkalinityPpmCaCO3,
         startingPh,
@@ -1139,21 +1139,21 @@ export function waterCalcRoutes(app: FastifyInstance) {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
-    const boilMode = body.boilMode === "manual" ? "manual" : "targetPh";
+    const boilMode = body['boilMode'] === "manual" ? "manual" : "targetPh";
     const startingAlkalinityPpmCaCO3 =
-      typeof body.startingAlkalinityPpmCaCO3 === "number"
-        ? (body.startingAlkalinityPpmCaCO3)
-        : typeof body.boilStartingAlkalinityPpmCaCO3 === "number"
-          ? (body.boilStartingAlkalinityPpmCaCO3)
+      typeof body['startingAlkalinityPpmCaCO3'] === "number"
+        ? (body['startingAlkalinityPpmCaCO3'])
+        : typeof body['boilStartingAlkalinityPpmCaCO3'] === "number"
+          ? (body['boilStartingAlkalinityPpmCaCO3'])
           : 0;
-    const startingPh = typeof body.startingPh === "number" ? (body.startingPh) : 7.0;
-    const targetPh = typeof body.targetPh === "number" ? (body.targetPh) : DEFAULT_MASH_TARGET_PH;
-    const volumeLiters = typeof body.volumeLiters === "number" ? (body.volumeLiters) : NaN;
+    const startingPh = typeof body['startingPh'] === "number" ? (body['startingPh']) : 7.0;
+    const targetPh = typeof body['targetPh'] === "number" ? (body['targetPh']) : DEFAULT_MASH_TARGET_PH;
+    const volumeLiters = typeof body['volumeLiters'] === "number" ? (body['volumeLiters']) : NaN;
     if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) {
       throw new BadRequestError("invalid_volume_liters", "Body.volumeLiters must be > 0");
     }
 
-    const base = body.baseProfile as Partial<IonProfilePpm>;
+    const base = body['baseProfile'] as Partial<IonProfilePpm>;
     if (!base || typeof base !== "object") {
       throw new BadRequestError("invalid_base_profile", "Body.baseProfile is required");
     }
@@ -1166,17 +1166,17 @@ export function waterCalcRoutes(app: FastifyInstance) {
       bicarbonate: typeof base.bicarbonate === "number" ? base.bicarbonate : 0,
     };
 
-    const additionsRaw = body.additions;
+    const additionsRaw = body['additions'];
     if (!Array.isArray(additionsRaw)) {
       throw new BadRequestError("invalid_additions", "Body.additions must be an array");
     }
     const additions: SaltAddition[] = additionsRaw.map((a) => {
       const o = (a ?? {}) as Record<string, unknown>;
-      const saltKey = o.saltKey as SaltKey;
+      const saltKey = o['saltKey'] as SaltKey;
       if (typeof saltKey !== "string") {
         throw new BadRequestError("invalid_salt_key", "addition.saltKey must be a string");
       }
-      const grams = typeof o.grams === "number" ? o.grams : NaN;
+      const grams = typeof o['grams'] === "number" ? o['grams'] : NaN;
       if (!Number.isFinite(grams) || grams < 0) {
         throw new BadRequestError("invalid_grams", "addition.grams must be a number >= 0");
       }
@@ -1185,16 +1185,16 @@ export function waterCalcRoutes(app: FastifyInstance) {
 
     const salts = applySaltAdditions(baseProfile, volumeLiters, additions);
 
-    const acidType = body.acidType as SpargeAcidType;
+    const acidType = body['acidType'] as SpargeAcidType;
     if (typeof acidType !== "string") {
       throw new BadRequestError("invalid_acid_type", "Body.acidType is required");
     }
-    const strengthKind = (typeof body.strengthKind === "string" ? body.strengthKind : "percent") as
+    const strengthKind = (typeof body['strengthKind'] === "string" ? body['strengthKind'] : "percent") as
       | "percent"
       | "normality"
       | "molarity"
       | "solid";
-    const strengthValue = typeof body.strengthValue === "number" ? body.strengthValue : undefined;
+    const strengthValue = typeof body['strengthValue'] === "number" ? body['strengthValue'] : undefined;
 
     let strength: AcidStrength;
     if (strengthKind === "solid") {
@@ -1211,8 +1211,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
     const magnesiumPpm = salts.resultingProfile.magnesium;
 
     if (boilMode === "manual") {
-      const acidAddedMl = typeof body.acidAddedMl === "number" ? body.acidAddedMl : undefined;
-      const acidAddedGrams = typeof body.acidAddedGrams === "number" ? body.acidAddedGrams : undefined;
+      const acidAddedMl = typeof body['acidAddedMl'] === "number" ? body['acidAddedMl'] : undefined;
+      const acidAddedGrams = typeof body['acidAddedGrams'] === "number" ? body['acidAddedGrams'] : undefined;
       const r = spargeAcidificationManual({
         startingAlkalinityPpmCaCO3,
         startingPh,

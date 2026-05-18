@@ -44,7 +44,7 @@ export function buildApp() {
   app.register(webhookRawBodyPlugin);
   // Dev-only CORS to allow Expo web preview (Metro) to call the API directly.
   // Native requests don't use browser CORS, but `expo start --web` does.
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env['NODE_ENV'] !== "production") {
     const corsOriginFn: OriginFunction = (origin, cb) => {
       if (!origin) return cb(null, true);
 

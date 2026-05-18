@@ -236,13 +236,13 @@ export default function EquipmentPage() {
     setEditSubmitting(true);
     setEditError(null);
     try {
-      const name = (editDraft.name ?? "").trim();
+      const name = (editDraft['name'] ?? "").trim();
       if (!name) throw new Error(t("errors.nameRequired"));
 
-      const kettleVolumeLiters = parseNullableNumber(editDraft.kettleVolumeLiters ?? "");
+      const kettleVolumeLiters = parseNullableNumber(editDraft['kettleVolumeLiters'] ?? "");
       if (kettleVolumeLiters != null && kettleVolumeLiters <= 0) throw new Error(t("errors.kettleVolumeMustBePositive"));
 
-      const mashEfficiencyPercent = parseNullableNumber(editDraft.mashEfficiencyPercent ?? "");
+      const mashEfficiencyPercent = parseNullableNumber(editDraft['mashEfficiencyPercent'] ?? "");
       if (mashEfficiencyPercent != null && (mashEfficiencyPercent < 0 || mashEfficiencyPercent > 100)) {
         throw new Error(t("errors.mashEfficiencyRange"));
       }
@@ -253,17 +253,17 @@ export default function EquipmentPage() {
         body: JSON.stringify({
           name,
           kettleVolumeLiters,
-          kettleLossesLiters: parseNullableNumber(editDraft.kettleLossesLiters ?? ""),
-          kettleBoilEvaporationRatePercentPerHour: parseNullableNumber(editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""),
-          kettleCoolingShrinkagePercent: parseNullableNumber(editDraft.kettleCoolingShrinkagePercent ?? ""),
-          kettleHopsAbsorptionLiters: parseNullableNumber(editDraft.kettleHopsAbsorptionLiters ?? ""),
-          mashVolumeLiters: parseNullableNumber(editDraft.mashVolumeLiters ?? ""),
+          kettleLossesLiters: parseNullableNumber(editDraft['kettleLossesLiters'] ?? ""),
+          kettleBoilEvaporationRatePercentPerHour: parseNullableNumber(editDraft['kettleBoilEvaporationRatePercentPerHour'] ?? ""),
+          kettleCoolingShrinkagePercent: parseNullableNumber(editDraft['kettleCoolingShrinkagePercent'] ?? ""),
+          kettleHopsAbsorptionLiters: parseNullableNumber(editDraft['kettleHopsAbsorptionLiters'] ?? ""),
+          mashVolumeLiters: parseNullableNumber(editDraft['mashVolumeLiters'] ?? ""),
           mashEfficiencyPercent,
-          mashLossesLiters: parseNullableNumber(editDraft.mashLossesLiters ?? ""),
-          mashThicknessLPerKg: parseNullableNumber(editDraft.mashThicknessLPerKg ?? ""),
-          mashGrainAbsorptionLPerKg: parseNullableNumber(editDraft.mashGrainAbsorptionLPerKg ?? ""),
-          mashWaterLeftoverLiters: parseNullableNumber(editDraft.mashWaterLeftoverLiters ?? ""),
-          otherLossesLiters: parseNullableNumber(editDraft.otherLossesLiters ?? ""),
+          mashLossesLiters: parseNullableNumber(editDraft['mashLossesLiters'] ?? ""),
+          mashThicknessLPerKg: parseNullableNumber(editDraft['mashThicknessLPerKg'] ?? ""),
+          mashGrainAbsorptionLPerKg: parseNullableNumber(editDraft['mashGrainAbsorptionLPerKg'] ?? ""),
+          mashWaterLeftoverLiters: parseNullableNumber(editDraft['mashWaterLeftoverLiters'] ?? ""),
+          otherLossesLiters: parseNullableNumber(editDraft['otherLossesLiters'] ?? ""),
         }),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
@@ -413,7 +413,7 @@ export default function EquipmentPage() {
                 <RecipeEditFieldLabel htmlFor="equip-edit-name">{t("nameLabel")}</RecipeEditFieldLabel>
                 <Input
                   id="equip-edit-name"
-                  value={editDraft.name ?? ""}
+                  value={editDraft['name'] ?? ""}
                   onChangeText={(v) => setEditDraft((d) => ({ ...d, name: v }))}
                   size="$3"
                   w="100%"
@@ -437,7 +437,7 @@ export default function EquipmentPage() {
                       id="equip-edit-kettle-vol"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.kettleVolumeLiters ?? ""}
+                      value={editDraft['kettleVolumeLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: v }))}
                       size="$3"
                       w="100%"
@@ -458,7 +458,7 @@ export default function EquipmentPage() {
                       id="equip-edit-kettle-losses"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.kettleLossesLiters ?? ""}
+                      value={editDraft['kettleLossesLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleLossesLiters: v }))}
                       size="$3"
                       w="100%"
@@ -479,7 +479,7 @@ export default function EquipmentPage() {
                       id="equip-edit-evap"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""}
+                      value={editDraft['kettleBoilEvaporationRatePercentPerHour'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: v }))}
                       size="$3"
                       w="100%"
@@ -500,7 +500,7 @@ export default function EquipmentPage() {
                       id="equip-edit-shrink"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.kettleCoolingShrinkagePercent ?? ""}
+                      value={editDraft['kettleCoolingShrinkagePercent'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: v }))}
                       size="$3"
                       w="100%"
@@ -521,7 +521,7 @@ export default function EquipmentPage() {
                       id="equip-edit-hops-abs"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.kettleHopsAbsorptionLiters ?? ""}
+                      value={editDraft['kettleHopsAbsorptionLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: v }))}
                       size="$3"
                       w="100%"
@@ -548,7 +548,7 @@ export default function EquipmentPage() {
                       id="equip-edit-mash-vol"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.mashVolumeLiters ?? ""}
+                      value={editDraft['mashVolumeLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, mashVolumeLiters: v }))}
                       size="$3"
                       w="100%"
@@ -569,7 +569,7 @@ export default function EquipmentPage() {
                       id="equip-edit-mash-eff"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.mashEfficiencyPercent ?? ""}
+                      value={editDraft['mashEfficiencyPercent'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: v }))}
                       size="$3"
                       w="100%"
@@ -590,7 +590,7 @@ export default function EquipmentPage() {
                       id="equip-edit-mash-losses"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.mashLossesLiters ?? ""}
+                      value={editDraft['mashLossesLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, mashLossesLiters: v }))}
                       size="$3"
                       w="100%"
@@ -611,7 +611,7 @@ export default function EquipmentPage() {
                       id="equip-edit-thickness"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.mashThicknessLPerKg ?? ""}
+                      value={editDraft['mashThicknessLPerKg'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: v }))}
                       size="$3"
                       w="100%"
@@ -632,7 +632,7 @@ export default function EquipmentPage() {
                       id="equip-edit-grain-abs"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.mashGrainAbsorptionLPerKg ?? ""}
+                      value={editDraft['mashGrainAbsorptionLPerKg'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: v }))}
                       size="$3"
                       w="100%"
@@ -653,7 +653,7 @@ export default function EquipmentPage() {
                       id="equip-edit-water-leftover"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.mashWaterLeftoverLiters ?? ""}
+                      value={editDraft['mashWaterLeftoverLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: v }))}
                       size="$3"
                       w="100%"
@@ -680,7 +680,7 @@ export default function EquipmentPage() {
                       id="equip-edit-other-losses"
                       type="number"
                       inputMode="decimal"
-                      value={editDraft.otherLossesLiters ?? ""}
+                      value={editDraft['otherLossesLiters'] ?? ""}
                       onChangeText={(v) => setEditDraft((d) => ({ ...d, otherLossesLiters: v }))}
                       size="$3"
                       w="100%"

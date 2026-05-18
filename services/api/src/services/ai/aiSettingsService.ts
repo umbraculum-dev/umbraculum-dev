@@ -80,19 +80,19 @@ export class AiSettingsService {
     await this.getOrCreate(userId, workspaceId);
 
     const data: Record<string, unknown> = {};
-    if (input.provider !== undefined) data.provider = input.provider;
-    if (input.enabled !== undefined) data.enabled = input.enabled;
-    if (input.roleLimits !== undefined) data.roleLimits = input.roleLimits;
-    if (input.perUserDailyCap !== undefined) data.perUserDailyCap = input.perUserDailyCap;
+    if (input.provider !== undefined) data['provider'] = input.provider;
+    if (input.enabled !== undefined) data['enabled'] = input.enabled;
+    if (input.roleLimits !== undefined) data['roleLimits'] = input.roleLimits;
+    if (input.perUserDailyCap !== undefined) data['perUserDailyCap'] = input.perUserDailyCap;
     if (input.dataEgressAccepted !== undefined) {
-      data.dataEgressAccepted = input.dataEgressAccepted;
-      data.dataEgressAcceptedAt = input.dataEgressAccepted ? new Date() : null;
+      data['dataEgressAccepted'] = input.dataEgressAccepted;
+      data['dataEgressAcceptedAt'] = input.dataEgressAccepted ? new Date() : null;
     }
     if (input.apiKey !== undefined) {
       if (input.apiKey === "") {
-        data.encryptedKey = null;
+        data['encryptedKey'] = null;
       } else {
-        data.encryptedKey = this.keyVault.encrypt(input.apiKey);
+        data['encryptedKey'] = this.keyVault.encrypt(input.apiKey);
       }
     }
 

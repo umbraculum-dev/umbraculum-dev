@@ -8,7 +8,7 @@ import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 
-const CONCIERGE_URL = process.env.NEXT_PUBLIC_CONCIERGE_BOOKING_URL ?? "";
+const CONCIERGE_URL = process.env['NEXT_PUBLIC_CONCIERGE_BOOKING_URL'] ?? "";
 
 export default function AiUpgradePage() {
   const tCommon = useTranslations("common");

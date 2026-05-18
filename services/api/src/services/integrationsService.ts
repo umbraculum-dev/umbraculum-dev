@@ -61,9 +61,9 @@ export class IntegrationsService {
   constructor(private readonly prisma: PrismaClient) {}
 
   private getTokenSecret(): string {
-    const raw = (process.env.INTEGRATIONS_TOKEN_SECRET ?? "").trim();
+    const raw = (process.env['INTEGRATIONS_TOKEN_SECRET'] ?? "").trim();
     if (raw) return raw;
-    if (process.env.NODE_ENV === "production") {
+    if (process.env['NODE_ENV'] === "production") {
       throw new BadRequestError("missing_integrations_token_secret", "INTEGRATIONS_TOKEN_SECRET is not configured");
     }
     // Dev fallback to keep local environments working. Must be overridden in production.

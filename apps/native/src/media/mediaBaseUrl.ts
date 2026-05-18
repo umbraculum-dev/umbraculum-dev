@@ -16,7 +16,7 @@ export function getMediaBaseUrl(): string {
   if (fromExtra) return fromExtra;
 
   // Fall back to environment variable (works when set via .env or shell env).
-  const fromEnv = normalizeBaseUrl((process.env as Record<string, string | undefined>).EXPO_PUBLIC_MEDIA_BASE_URL);
+  const fromEnv = normalizeBaseUrl((process.env as Record<string, string | undefined>)['EXPO_PUBLIC_MEDIA_BASE_URL']);
   if (fromEnv) return fromEnv;
 
   // Safe fallback: media is served by nginx alongside API in local dev.

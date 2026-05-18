@@ -153,28 +153,28 @@ interface YeastSearchResult {
 function getRecipeEfficiencyPercent(recipe: Recipe | null): number | null {
   if (!recipe) return null;
   const ext = asRecord(recipe.recipeExtJson);
-  const equipment = ext ? asRecord(ext.equipment) : null;
-  const mash = equipment ? asRecord(equipment.mash) : null;
+  const equipment = ext ? asRecord(ext['equipment']) : null;
+  const mash = equipment ? asRecord(equipment['mash']) : null;
   const mashEff =
-    mash && typeof mash.mashEfficiencyPercent === "number" && Number.isFinite(mash.mashEfficiencyPercent)
-      ? (mash.mashEfficiencyPercent)
+    mash && typeof mash['mashEfficiencyPercent'] === "number" && Number.isFinite(mash['mashEfficiencyPercent'])
+      ? (mash['mashEfficiencyPercent'])
       : null;
   if (mashEff != null) return mashEff;
 
   const brewEff =
-    ext && typeof ext.brewhouseEfficiencyPercent === "number" && Number.isFinite(ext.brewhouseEfficiencyPercent)
-      ? (ext.brewhouseEfficiencyPercent)
+    ext && typeof ext['brewhouseEfficiencyPercent'] === "number" && Number.isFinite(ext['brewhouseEfficiencyPercent'])
+      ? (ext['brewhouseEfficiencyPercent'])
       : null;
   if (brewEff != null) return brewEff;
 
   const bj = asRecord(recipe.beerJsonRecipeJson);
-  const bjRoot = bj ? asRecord(bj.beerjson) : null;
-  const bjRecipes = bjRoot && Array.isArray(bjRoot.recipes) ? bjRoot.recipes : null;
+  const bjRoot = bj ? asRecord(bj['beerjson']) : null;
+  const bjRecipes = bjRoot && Array.isArray(bjRoot['recipes']) ? bjRoot['recipes'] : null;
   const r0 = bjRecipes && bjRecipes.length > 0 ? asRecord(bjRecipes[0]) : null;
-  const efficiency = r0 ? asRecord(r0.efficiency) : null;
-  const brewhouse = efficiency ? asRecord(efficiency.brewhouse) : null;
-  if (brewhouse && brewhouse.unit === "%" && typeof brewhouse.value === "number" && Number.isFinite(brewhouse.value)) {
-    return brewhouse.value;
+  const efficiency = r0 ? asRecord(r0['efficiency']) : null;
+  const brewhouse = efficiency ? asRecord(efficiency['brewhouse']) : null;
+  if (brewhouse && brewhouse['unit'] === "%" && typeof brewhouse['value'] === "number" && Number.isFinite(brewhouse['value'])) {
+    return brewhouse['value'];
   }
   return null;
 }
@@ -186,13 +186,13 @@ function getRecipeEfficiencyPercent(recipe: Recipe | null): number | null {
 function getBeerJsonBatchSize(recipe: Recipe | null): { unit: string; value: number | null } {
   if (!recipe) return { unit: "", value: null };
   const bj = asRecord(recipe.beerJsonRecipeJson);
-  const bjRoot = bj ? asRecord(bj.beerjson) : null;
-  const bjRecipes = bjRoot && Array.isArray(bjRoot.recipes) ? bjRoot.recipes : null;
+  const bjRoot = bj ? asRecord(bj['beerjson']) : null;
+  const bjRecipes = bjRoot && Array.isArray(bjRoot['recipes']) ? bjRoot['recipes'] : null;
   const r0 = bjRecipes && bjRecipes.length > 0 ? asRecord(bjRecipes[0]) : null;
-  const batch = r0 ? asRecord(r0.batch_size) : null;
-  const unit = batch && typeof batch.unit === "string" ? batch.unit : "";
+  const batch = r0 ? asRecord(r0['batch_size']) : null;
+  const unit = batch && typeof batch['unit'] === "string" ? batch['unit'] : "";
   const value =
-    batch && typeof batch.value === "number" && Number.isFinite(batch.value) ? (batch.value) : null;
+    batch && typeof batch['value'] === "number" && Number.isFinite(batch['value']) ? (batch['value']) : null;
   return { unit, value };
 }
 
@@ -334,7 +334,7 @@ export default function RecipeEditPage() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     for (const id of COLLAPSIBLE_SECTION_IDS) init[id] = false;
-    init.water = true;
+    init['water'] = true;
     return init;
   });
 
@@ -489,13 +489,13 @@ export default function RecipeEditPage() {
           sessions.map((entry) => {
             const s = asRecord(entry) ?? {};
             return {
-              id: typeof s.id === "string" ? s.id : "",
-              code: typeof s.code === "string" ? s.code : "",
-              status: typeof s.status === "string" ? s.status : "",
-              createdAt: typeof s.createdAt === "string" ? s.createdAt : "",
-              startedAt: typeof s.startedAt === "string" ? s.startedAt : null,
-              stoppedAt: typeof s.stoppedAt === "string" ? s.stoppedAt : null,
-              scheduledDate: typeof s.scheduledDate === "string" ? s.scheduledDate : null,
+              id: typeof s['id'] === "string" ? s['id'] : "",
+              code: typeof s['code'] === "string" ? s['code'] : "",
+              status: typeof s['status'] === "string" ? s['status'] : "",
+              createdAt: typeof s['createdAt'] === "string" ? s['createdAt'] : "",
+              startedAt: typeof s['startedAt'] === "string" ? s['startedAt'] : null,
+              stoppedAt: typeof s['stoppedAt'] === "string" ? s['stoppedAt'] : null,
+              scheduledDate: typeof s['scheduledDate'] === "string" ? s['scheduledDate'] : null,
             };
           }),
         );
@@ -578,13 +578,13 @@ export default function RecipeEditPage() {
         setStyleKey(r.styleKey ?? "custom");
         setNotes(r.notes ?? "");
         const ext = asRecord(r.recipeExtJson);
-        const links = ext ? asRecord(ext.ingredientLinks) : null;
-        const linksGrist = links ? asRecord(links.grist) : null;
-        const linksHops = links ? asRecord(links.hops) : null;
-        const linksYeast = links ? asRecord(links.yeast) : null;
-        const linksMisc = links ? asRecord(links.misc) : null;
-        const mashPhModel = ext ? asRecord(ext.mashPhModel) : null;
-        const yeastOverridesRaw = ext ? asRecord(ext.yeastAttenuationOverridesPercent) : null;
+        const links = ext ? asRecord(ext['ingredientLinks']) : null;
+        const linksGrist = links ? asRecord(links['grist']) : null;
+        const linksHops = links ? asRecord(links['hops']) : null;
+        const linksYeast = links ? asRecord(links['yeast']) : null;
+        const linksMisc = links ? asRecord(links['misc']) : null;
+        const mashPhModel = ext ? asRecord(ext['mashPhModel']) : null;
+        const yeastOverridesRaw = ext ? asRecord(ext['yeastAttenuationOverridesPercent']) : null;
         if (yeastOverridesRaw) {
           const out: Record<string, string> = {};
           for (const [k, v] of Object.entries(yeastOverridesRaw)) {
@@ -597,23 +597,23 @@ export default function RecipeEditPage() {
           setYeastAttenuationOverrides({});
         }
 
-        const yeastPitchRateRaw = ext ? asRecord(ext.yeastPitchRateOverrides) : null;
-        const yeastFermentationTempRaw = ext ? asRecord(ext.yeastFermentationTempOverrides) : null;
-        const yeastOxygenationRaw = ext ? asRecord(ext.yeastOxygenationOverrides) : null;
-        const yeastDiacetylRestRaw = ext ? asRecord(ext.yeastDiacetylRestOverrides) : null;
+        const yeastPitchRateRaw = ext ? asRecord(ext['yeastPitchRateOverrides']) : null;
+        const yeastFermentationTempRaw = ext ? asRecord(ext['yeastFermentationTempOverrides']) : null;
+        const yeastOxygenationRaw = ext ? asRecord(ext['yeastOxygenationOverrides']) : null;
+        const yeastDiacetylRestRaw = ext ? asRecord(ext['yeastDiacetylRestOverrides']) : null;
         const yeastFormatRaw = ext
-          ? asRecord(ext.yeastFormatOverrides) ?? asRecord(ext.yeastTypeOverrides)
+          ? asRecord(ext['yeastFormatOverrides']) ?? asRecord(ext['yeastTypeOverrides'])
           : null;
-        const yeastSpeciesRaw = ext ? asRecord(ext.yeastSpeciesOverrides) : null;
-        const yeastNeedsPropagationRaw = ext ? asRecord(ext.yeastNeedsPropagationOverrides) : null;
-        const yeastCellsPerLRaw = ext ? asRecord(ext.yeastCellsPerLOverrides) : null;
-        const yeastCellsPerKGRaw = ext ? asRecord(ext.yeastCellsPerKGOverrides) : null;
-        const yeastCellsPerGRaw = ext ? asRecord(ext.yeastCellsPerGOverrides) : null;
+        const yeastSpeciesRaw = ext ? asRecord(ext['yeastSpeciesOverrides']) : null;
+        const yeastNeedsPropagationRaw = ext ? asRecord(ext['yeastNeedsPropagationOverrides']) : null;
+        const yeastCellsPerLRaw = ext ? asRecord(ext['yeastCellsPerLOverrides']) : null;
+        const yeastCellsPerKGRaw = ext ? asRecord(ext['yeastCellsPerKGOverrides']) : null;
+        const yeastCellsPerGRaw = ext ? asRecord(ext['yeastCellsPerGOverrides']) : null;
 
-        const equipmentSource = ext ? asRecord(ext.equipmentSource) : null;
+        const equipmentSource = ext ? asRecord(ext['equipmentSource']) : null;
         const equipmentProfileId =
-          equipmentSource && typeof equipmentSource.equipmentProfileId === "string"
-            ? equipmentSource.equipmentProfileId
+          equipmentSource && typeof equipmentSource['equipmentProfileId'] === "string"
+            ? equipmentSource['equipmentProfileId']
             : "";
         setSelectedEquipmentProfileId(equipmentProfileId);
 
@@ -623,8 +623,8 @@ export default function RecipeEditPage() {
         const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
 
         const boilTimeMinutesOverride =
-          ext && typeof ext.boilTimeMinutesOverride === "number" && Number.isFinite(ext.boilTimeMinutesOverride)
-            ? (ext.boilTimeMinutesOverride)
+          ext && typeof ext['boilTimeMinutesOverride'] === "number" && Number.isFinite(ext['boilTimeMinutesOverride'])
+            ? (ext['boilTimeMinutesOverride'])
             : null;
         if (boilTimeMinutesOverride != null && boilTimeMinutesOverride >= 0) {
           setBoilTimeMinutes(String(Math.round(boilTimeMinutesOverride)));
@@ -649,18 +649,18 @@ export default function RecipeEditPage() {
           return {
             ...row,
             ingredientId,
-            mashDiPh: typeof m?.mashDiPh === "number" ? m.mashDiPh : row.mashDiPh ?? null,
+            mashDiPh: typeof m?.['mashDiPh'] === "number" ? m['mashDiPh'] : row.mashDiPh ?? null,
             mashTaToPh57_mEqPerKg:
-              typeof m?.mashTaToPh57_mEqPerKg === "number"
-                ? (m.mashTaToPh57_mEqPerKg)
+              typeof m?.['mashTaToPh57_mEqPerKg'] === "number"
+                ? (m['mashTaToPh57_mEqPerKg'])
                 : row.mashTaToPh57_mEqPerKg ?? null,
             mashRoastDehuskedOverride:
               m && "roastDehuskedOverride" in m
-                ? (m.roastDehuskedOverride as boolean | null)
+                ? (m['roastDehuskedOverride'] as boolean | null)
                 : row.mashRoastDehuskedOverride ?? null,
           };
         });
-        const hopFormOverrides = ext ? asRecord(ext.hopFormOverrides) : null;
+        const hopFormOverrides = ext ? asRecord(ext['hopFormOverrides']) : null;
         const hops = s.hopsRows.map((row) => {
           const override = hopFormOverrides
             ? hopFormOverrides[row.id] === "debittered_leaf" || hopFormOverrides[row.id] === "hop_extract"
@@ -867,9 +867,9 @@ export default function RecipeEditPage() {
       const extBase = asRecord(recipe?.recipeExtJson);
       const base: Record<string, unknown> = extBase ? { ...extBase } : {};
 
-      base.version = 1;
-      base.equipment = selected.equipment;
-      base.equipmentSource = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
+      base['version'] = 1;
+      base['equipment'] = selected.equipment;
+      base['equipmentSource'] = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
 
       const patchRes = await apiFetch(`/api/recipes/${recipeId}`, {
         method: "PATCH",
@@ -909,9 +909,9 @@ export default function RecipeEditPage() {
         return Math.round(n);
       })();
       if (boilTimeMinutesVal != null) {
-        extBaseForSave.boilTimeMinutesOverride = boilTimeMinutesVal;
+        extBaseForSave['boilTimeMinutesOverride'] = boilTimeMinutesVal;
       } else {
-        delete extBaseForSave.boilTimeMinutesOverride;
+        delete extBaseForSave['boilTimeMinutesOverride'];
       }
 
       const yeastAttenuationOverridesPercent = Object.fromEntries(
@@ -926,9 +926,9 @@ export default function RecipeEditPage() {
           .filter(Boolean) as Array<readonly [string, number]>,
       );
       if (Object.keys(yeastAttenuationOverridesPercent).length) {
-        extBaseForSave.yeastAttenuationOverridesPercent = yeastAttenuationOverridesPercent;
+        extBaseForSave['yeastAttenuationOverridesPercent'] = yeastAttenuationOverridesPercent;
       } else {
-        delete extBaseForSave.yeastAttenuationOverridesPercent;
+        delete extBaseForSave['yeastAttenuationOverridesPercent'];
       }
       const yeastPitchRateOverrides = Object.fromEntries(
         yeastRows
@@ -995,58 +995,58 @@ export default function RecipeEditPage() {
           .map((r) => [r.id, r.cellsPerKGOverride as number]),
       );
       if (Object.keys(yeastPitchRateOverrides).length) {
-        extBaseForSave.yeastPitchRateOverrides = yeastPitchRateOverrides;
+        extBaseForSave['yeastPitchRateOverrides'] = yeastPitchRateOverrides;
       } else {
-        delete extBaseForSave.yeastPitchRateOverrides;
+        delete extBaseForSave['yeastPitchRateOverrides'];
       }
       if (Object.keys(yeastFermentationTempOverrides).length) {
-        extBaseForSave.yeastFermentationTempOverrides = yeastFermentationTempOverrides;
+        extBaseForSave['yeastFermentationTempOverrides'] = yeastFermentationTempOverrides;
       } else {
-        delete extBaseForSave.yeastFermentationTempOverrides;
+        delete extBaseForSave['yeastFermentationTempOverrides'];
       }
       if (Object.keys(yeastOxygenationOverrides).length) {
-        extBaseForSave.yeastOxygenationOverrides = yeastOxygenationOverrides;
+        extBaseForSave['yeastOxygenationOverrides'] = yeastOxygenationOverrides;
       } else {
-        delete extBaseForSave.yeastOxygenationOverrides;
+        delete extBaseForSave['yeastOxygenationOverrides'];
       }
       if (Object.keys(yeastDiacetylRestOverrides).length) {
-        extBaseForSave.yeastDiacetylRestOverrides = yeastDiacetylRestOverrides;
+        extBaseForSave['yeastDiacetylRestOverrides'] = yeastDiacetylRestOverrides;
       } else {
-        delete extBaseForSave.yeastDiacetylRestOverrides;
+        delete extBaseForSave['yeastDiacetylRestOverrides'];
       }
       if (Object.keys(yeastFormatOverrides).length) {
-        extBaseForSave.yeastFormatOverrides = yeastFormatOverrides;
+        extBaseForSave['yeastFormatOverrides'] = yeastFormatOverrides;
       } else {
-        delete extBaseForSave.yeastFormatOverrides;
+        delete extBaseForSave['yeastFormatOverrides'];
       }
       if (Object.keys(yeastSpeciesOverrides).length) {
-        extBaseForSave.yeastSpeciesOverrides = yeastSpeciesOverrides;
+        extBaseForSave['yeastSpeciesOverrides'] = yeastSpeciesOverrides;
       } else {
-        delete extBaseForSave.yeastSpeciesOverrides;
+        delete extBaseForSave['yeastSpeciesOverrides'];
       }
-      delete extBaseForSave.yeastTypeOverrides;
+      delete extBaseForSave['yeastTypeOverrides'];
       if (Object.keys(yeastNeedsPropagationOverrides).length) {
-        extBaseForSave.yeastNeedsPropagationOverrides = yeastNeedsPropagationOverrides;
+        extBaseForSave['yeastNeedsPropagationOverrides'] = yeastNeedsPropagationOverrides;
       } else {
-        delete extBaseForSave.yeastNeedsPropagationOverrides;
+        delete extBaseForSave['yeastNeedsPropagationOverrides'];
       }
       if (Object.keys(yeastCellsPerLOverrides).length) {
-        extBaseForSave.yeastCellsPerLOverrides = yeastCellsPerLOverrides;
+        extBaseForSave['yeastCellsPerLOverrides'] = yeastCellsPerLOverrides;
       } else {
-        delete extBaseForSave.yeastCellsPerLOverrides;
+        delete extBaseForSave['yeastCellsPerLOverrides'];
       }
       if (Object.keys(yeastCellsPerKGOverrides).length) {
-        extBaseForSave.yeastCellsPerKGOverrides = yeastCellsPerKGOverrides;
+        extBaseForSave['yeastCellsPerKGOverrides'] = yeastCellsPerKGOverrides;
       } else {
-        delete extBaseForSave.yeastCellsPerKGOverrides;
+        delete extBaseForSave['yeastCellsPerKGOverrides'];
       }
-      delete extBaseForSave.yeastCellsPerGOverrides;
+      delete extBaseForSave['yeastCellsPerGOverrides'];
 
       const batchSizeLiters =
-        typeof extBaseForSave.batchSizeLiters === "number" ? extBaseForSave.batchSizeLiters
+        typeof extBaseForSave['batchSizeLiters'] === "number" ? extBaseForSave['batchSizeLiters']
           : null;
       const brewhouseEfficiencyPercent =
-        typeof extBaseForSave.brewhouseEfficiencyPercent === "number" ? extBaseForSave.brewhouseEfficiencyPercent
+        typeof extBaseForSave['brewhouseEfficiencyPercent'] === "number" ? extBaseForSave['brewhouseEfficiencyPercent']
           : null;
 
       const stepsForSave = mashRows.map((r) => {
@@ -1078,7 +1078,7 @@ export default function RecipeEditPage() {
         return;
       }
 
-      extBaseForSave.mashStepDeduceFromMashIn = Object.fromEntries(
+      extBaseForSave['mashStepDeduceFromMashIn'] = Object.fromEntries(
         mashRows
           .map((r, idx) => [String(idx), r.deduceFromMashIn === true] as const)
           .filter(([k, v]) => k !== "0" && v === true),
@@ -1604,7 +1604,7 @@ export default function RecipeEditPage() {
             id="basics"
             headingId="basics-heading"
             label={t("sections.basics")}
-            open={openSections.basics}
+            open={openSections['basics']}
             onOpenChange={(open) => setSectionOpen("basics", open)}
           >
             <XStack
@@ -1749,7 +1749,7 @@ export default function RecipeEditPage() {
             id="analysis"
             headingId="analysis-heading"
             label={t("sections.analysis")}
-            open={openSections.analysis}
+            open={openSections['analysis']}
             onOpenChange={(open) => setSectionOpen("analysis", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -1781,7 +1781,7 @@ export default function RecipeEditPage() {
 
                   const warnings = Array.isArray(a?.warnings) ? a.warnings : [];
                   const warningCodes = new Set(
-                    warnings.map((w) => String((asRecord(w)?.code ?? "") as string | number)),
+                    warnings.map((w) => String((asRecord(w)?.['code'] ?? "") as string | number)),
                   );
 
                   const renderMath = (key: keyof typeof mathExplain, body: string) => {
@@ -2428,7 +2428,7 @@ export default function RecipeEditPage() {
             id="brewingHistory"
             headingId="brewing-history-heading"
             label={t("sections.brewingHistory")}
-            open={openSections.brewingHistory}
+            open={openSections['brewingHistory']}
             onOpenChange={(open) => setSectionOpen("brewingHistory", open)}
           >
             <YStack gap="$2" mt="$2">
@@ -2527,7 +2527,7 @@ export default function RecipeEditPage() {
             id="brew"
             headingId="brew-heading"
             label={t("sections.brew")}
-            open={openSections.brew}
+            open={openSections['brew']}
             onOpenChange={(open) => setSectionOpen("brew", open)}
           >
             <YStack gap="$2" mt="$2">
@@ -2555,7 +2555,7 @@ export default function RecipeEditPage() {
             id="equipment"
             headingId="equipment-heading"
             label={t("sections.equipment")}
-            open={openSections.equipment}
+            open={openSections['equipment']}
             onOpenChange={(open) => setSectionOpen("equipment", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -2622,7 +2622,7 @@ export default function RecipeEditPage() {
             id="mashing"
             headingId="mashing-heading"
             label={t("sections.mashing")}
-            open={openSections.mashing}
+            open={openSections['mashing']}
             onOpenChange={(open) => setSectionOpen("mashing", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -2711,7 +2711,7 @@ export default function RecipeEditPage() {
             id="fermentables"
             headingId="fermentables-heading"
             label={t("sections.fermentables")}
-            open={openSections.fermentables}
+            open={openSections['fermentables']}
             onOpenChange={(open) => setSectionOpen("fermentables", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -3215,7 +3215,7 @@ export default function RecipeEditPage() {
             id="hops"
             headingId="hops-heading"
             label={t("sections.hops")}
-            open={openSections.hops}
+            open={openSections['hops']}
             onOpenChange={(open) => setSectionOpen("hops", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -3508,7 +3508,7 @@ export default function RecipeEditPage() {
             id="yeast"
             headingId="yeast-heading"
             label={t("sections.yeast")}
-            open={openSections.yeast}
+            open={openSections['yeast']}
             onOpenChange={(open) => setSectionOpen("yeast", open)}
           >
             <View mt="$3">
@@ -3539,7 +3539,7 @@ export default function RecipeEditPage() {
             id="other"
             headingId="other-heading"
             label={t("sections.other")}
-            open={openSections.other}
+            open={openSections['other']}
             onOpenChange={(open) => setSectionOpen("other", open)}
           >
             <XStack jc="space-between" gap="$3" flexWrap="wrap">
@@ -3770,7 +3770,7 @@ export default function RecipeEditPage() {
             id="boil"
             headingId="boil-heading"
             label={t("sections.boil")}
-            open={openSections.boil}
+            open={openSections['boil']}
             onOpenChange={(open) => setSectionOpen("boil", open)}
           >
             <RecipeEditField id="recipe-boil-time" label={t("sections.boil")}>
@@ -3813,7 +3813,7 @@ export default function RecipeEditPage() {
             id="notes"
             headingId="notes-heading"
             label={t("sections.notes")}
-            open={openSections.notes}
+            open={openSections['notes']}
             onOpenChange={(open) => setSectionOpen("notes", open)}
           >
             <RecipeEditField id="recipe-notes" label={t("sections.notes")}>
@@ -3838,7 +3838,7 @@ export default function RecipeEditPage() {
             id="water"
             headingId="water-heading"
             label={t("sections.water")}
-            open={openSections.water}
+            open={openSections['water']}
             onOpenChange={(open) => setSectionOpen("water", open)}
           >
             <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>

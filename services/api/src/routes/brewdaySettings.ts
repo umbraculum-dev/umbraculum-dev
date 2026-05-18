@@ -17,14 +17,14 @@ function parseSections(body: unknown): BrewdaySectionConfig {
   }
   const obj = body as Record<string, unknown>;
   const presetExcludes =
-    obj.presetExcludes && typeof obj.presetExcludes === "object"
-      ? (obj.presetExcludes as Record<string, boolean>)
+    obj['presetExcludes'] && typeof obj['presetExcludes'] === "object"
+      ? (obj['presetExcludes'] as Record<string, boolean>)
       : {};
-  const customSections = Array.isArray(obj.customSections)
-    ? (obj.customSections as BrewdaySectionConfig["customSections"])
+  const customSections = Array.isArray(obj['customSections'])
+    ? (obj['customSections'] as BrewdaySectionConfig["customSections"])
     : [];
-  const customBrewingMethods = Array.isArray(obj.customBrewingMethods)
-    ? (obj.customBrewingMethods as string[]).filter((x) => typeof x === "string")
+  const customBrewingMethods = Array.isArray(obj['customBrewingMethods'])
+    ? (obj['customBrewingMethods'] as string[]).filter((x) => typeof x === "string")
     : [];
   return { presetExcludes, customSections, customBrewingMethods };
 }
@@ -41,12 +41,12 @@ export function brewdaySettingsRoutes(app: FastifyInstance) {
   app.patch("/brewday-settings", async (req) => {
     const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
-    const brewingType = typeof body.brewingType === "string" ? body.brewingType : "";
-    const sections = parseSections(body.sections);
-    const defaultSteps = Array.isArray(body.defaultSteps) ? (body.defaultSteps as BrewdayDefaultStep[]) : [];
-    const customSteps = Array.isArray(body.customSteps) ? (body.customSteps as BrewdayCustomStep[]) : [];
+    const brewingType = typeof body['brewingType'] === "string" ? body['brewingType'] : "";
+    const sections = parseSections(body['sections']);
+    const defaultSteps = Array.isArray(body['defaultSteps']) ? (body['defaultSteps'] as BrewdayDefaultStep[]) : [];
+    const customSteps = Array.isArray(body['customSteps']) ? (body['customSteps'] as BrewdayCustomStep[]) : [];
     const notes =
-      body.notes === null ? null : typeof body.notes === "string" ? body.notes : undefined;
+      body['notes'] === null ? null : typeof body['notes'] === "string" ? body['notes'] : undefined;
 
     const updated = await svc.upsertSettings(ctx.userId, ctx.activeWorkspaceId, {
       brewingType,

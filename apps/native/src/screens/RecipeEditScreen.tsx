@@ -343,8 +343,8 @@ export function RecipeEditScreen() {
       setNotes(typeof r.notes === "string" ? r.notes : "");
 
       const extRec = asRecord(r.recipeExtJson);
-      const linksRec = asRecord(extRec?.ingredientLinks);
-      const yeastOverridesRaw = asRecord(extRec?.yeastAttenuationOverridesPercent);
+      const linksRec = asRecord(extRec?.['ingredientLinks']);
+      const yeastOverridesRaw = asRecord(extRec?.['yeastAttenuationOverridesPercent']);
       if (yeastOverridesRaw) {
         const out: Record<string, string> = {};
         for (const [k, v] of Object.entries(yeastOverridesRaw)) {
@@ -355,17 +355,17 @@ export function RecipeEditScreen() {
         setYeastAttenuationOverrides({});
       }
 
-      const yeastFermentationTempRaw = asRecord(extRec?.yeastFermentationTempOverrides);
-      const yeastOxygenationRaw = asRecord(extRec?.yeastOxygenationOverrides);
-      const yeastDiacetylRestRaw = asRecord(extRec?.yeastDiacetylRestOverrides);
-      const yeastFormatRaw = asRecord(extRec?.yeastFormatOverrides ?? extRec?.yeastTypeOverrides);
+      const yeastFermentationTempRaw = asRecord(extRec?.['yeastFermentationTempOverrides']);
+      const yeastOxygenationRaw = asRecord(extRec?.['yeastOxygenationOverrides']);
+      const yeastDiacetylRestRaw = asRecord(extRec?.['yeastDiacetylRestOverrides']);
+      const yeastFormatRaw = asRecord(extRec?.['yeastFormatOverrides'] ?? extRec?.['yeastTypeOverrides']);
 
-      const equipmentSource = asRecord(extRec?.equipmentSource);
+      const equipmentSource = asRecord(extRec?.['equipmentSource']);
       const equipmentProfileId =
-        typeof equipmentSource?.equipmentProfileId === "string" ? equipmentSource.equipmentProfileId : "";
+        typeof equipmentSource?.['equipmentProfileId'] === "string" ? equipmentSource['equipmentProfileId'] : "";
       setSelectedEquipmentProfileId(equipmentProfileId);
 
-      const boilTimeMinutesOverrideRaw = extRec?.boilTimeMinutesOverride;
+      const boilTimeMinutesOverrideRaw = extRec?.['boilTimeMinutesOverride'];
       const boilTimeMinutesOverride =
         typeof boilTimeMinutesOverrideRaw === "number" && Number.isFinite(boilTimeMinutesOverrideRaw)
           ? boilTimeMinutesOverrideRaw
@@ -399,7 +399,7 @@ export function RecipeEditScreen() {
         setMashRows([]);
       }
       const baseYeast = mergeYeastAttenuationRangeFromExt(s.yeastRows, r.recipeExtJson);
-      const yeastLinks = asRecord(linksRec?.yeast);
+      const yeastLinks = asRecord(linksRec?.['yeast']);
       const mappedYeastRows: EditorYeastRow[] = baseYeast.map((row) => {
         const fermentationTempC =
           yeastFermentationTempRaw &&
@@ -734,9 +734,9 @@ export function RecipeEditScreen() {
 
         const baseRec = asRecord(recipe?.recipeExtJson);
         const base: Record<string, unknown> = baseRec ? { ...baseRec } : {};
-        base.version = 1;
-        base.equipment = selected.equipment;
-        base.equipmentSource = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
+        base['version'] = 1;
+        base['equipment'] = selected.equipment;
+        base['equipmentSource'] = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
 
         const res = await api.patch(`/api/recipes/${recipeId}`, { recipeExtJson: base });
         if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
@@ -785,9 +785,9 @@ export function RecipeEditScreen() {
         return Math.round(n);
       })();
       if (boilTimeMinutesVal != null) {
-        extBaseForSave.boilTimeMinutesOverride = boilTimeMinutesVal;
+        extBaseForSave['boilTimeMinutesOverride'] = boilTimeMinutesVal;
       } else {
-        delete extBaseForSave.boilTimeMinutesOverride;
+        delete extBaseForSave['boilTimeMinutesOverride'];
       }
 
       const yeastAttenuationOverridesPercent = Object.fromEntries(
@@ -802,7 +802,7 @@ export function RecipeEditScreen() {
           .filter(Boolean) as Array<readonly [string, number]>,
       );
       if (Object.keys(yeastAttenuationOverridesPercent).length) {
-        extBaseForSave.yeastAttenuationOverridesPercent = yeastAttenuationOverridesPercent;
+        extBaseForSave['yeastAttenuationOverridesPercent'] = yeastAttenuationOverridesPercent;
       }
 
       const yeastFermentationTempOverrides = Object.fromEntries(
@@ -826,19 +826,19 @@ export function RecipeEditScreen() {
         yeastRows.filter((r) => r.format === "dry" || r.format === "liquid" || r.format === "slurry").map((r) => [r.id, r.format as "dry" | "liquid" | "slurry"]),
       );
 
-      if (Object.keys(yeastFermentationTempOverrides).length) extBaseForSave.yeastFermentationTempOverrides = yeastFermentationTempOverrides;
-      else delete extBaseForSave.yeastFermentationTempOverrides;
+      if (Object.keys(yeastFermentationTempOverrides).length) extBaseForSave['yeastFermentationTempOverrides'] = yeastFermentationTempOverrides;
+      else delete extBaseForSave['yeastFermentationTempOverrides'];
 
-      if (Object.keys(yeastOxygenationOverrides).length) extBaseForSave.yeastOxygenationOverrides = yeastOxygenationOverrides;
-      else delete extBaseForSave.yeastOxygenationOverrides;
+      if (Object.keys(yeastOxygenationOverrides).length) extBaseForSave['yeastOxygenationOverrides'] = yeastOxygenationOverrides;
+      else delete extBaseForSave['yeastOxygenationOverrides'];
 
-      if (Object.keys(yeastDiacetylRestOverrides).length) extBaseForSave.yeastDiacetylRestOverrides = yeastDiacetylRestOverrides;
-      else delete extBaseForSave.yeastDiacetylRestOverrides;
+      if (Object.keys(yeastDiacetylRestOverrides).length) extBaseForSave['yeastDiacetylRestOverrides'] = yeastDiacetylRestOverrides;
+      else delete extBaseForSave['yeastDiacetylRestOverrides'];
 
-      if (Object.keys(yeastFormatOverrides).length) extBaseForSave.yeastFormatOverrides = yeastFormatOverrides;
-      else delete extBaseForSave.yeastFormatOverrides;
+      if (Object.keys(yeastFormatOverrides).length) extBaseForSave['yeastFormatOverrides'] = yeastFormatOverrides;
+      else delete extBaseForSave['yeastFormatOverrides'];
 
-      delete extBaseForSave.yeastTypeOverrides;
+      delete extBaseForSave['yeastTypeOverrides'];
 
       const beerJsonDoc = buildBeerJsonRecipeDocument({
         name: name.trim() || recipe.name,

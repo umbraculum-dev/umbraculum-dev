@@ -232,7 +232,7 @@ export default function SpargeWaterPage() {
       }
       const lastResult = asRecord(s.spargeSaltsLastResultJson);
       if (lastResult) {
-        const innerResult = asRecord(lastResult.result);
+        const innerResult = asRecord(lastResult['result']);
         if (innerResult) {
           setSpargeSaltsResult(innerResult as unknown as SaltAdditionsResult);
           setSpargeSaltsInputsKey(
@@ -242,8 +242,8 @@ export default function SpargeWaterPage() {
               additions: Array.isArray(s.spargeSaltAdditionsJson) ? s.spargeSaltAdditionsJson : [],
             }),
           );
-          if (typeof lastResult.calculatedAt === "string") {
-            setSpargeSaltsStatus(`Last calculated: ${new Date(lastResult.calculatedAt).toLocaleString()}`);
+          if (typeof lastResult['calculatedAt'] === "string") {
+            setSpargeSaltsStatus(`Last calculated: ${new Date(lastResult['calculatedAt']).toLocaleString()}`);
           }
         }
       }
@@ -528,8 +528,8 @@ export default function SpargeWaterPage() {
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
     const dataRec = asRecord(res.data) ?? {};
-    const result = dataRec.result as SaltAdditionsResult;
-    const derivationRec = asRecord(dataRec.derivation);
+    const result = dataRec['result'] as SaltAdditionsResult;
+    const derivationRec = asRecord(dataRec['derivation']);
     setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
 
     const nowIso = new Date().toISOString();
@@ -572,8 +572,8 @@ export default function SpargeWaterPage() {
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const dataRec = asRecord(res.data) ?? {};
-      const result = dataRec.result as SaltAdditionsResult;
-      const derivationRec = asRecord(dataRec.derivation);
+      const result = dataRec['result'] as SaltAdditionsResult;
+      const derivationRec = asRecord(dataRec['derivation']);
       setSpargeSaltsResult(result);
       setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
       await refreshSpargeOverallIfPossible().catch(() => null);
@@ -617,7 +617,7 @@ export default function SpargeWaterPage() {
       acidType,
       strengthKind,
     };
-    if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+    if (strengthKind !== "solid") payload['strengthValue'] = strengthValue;
     if (spargeAcidificationMode === "manual") {
       Object.assign(
         payload,
@@ -633,8 +633,8 @@ export default function SpargeWaterPage() {
     if (!res.ok) return;
     const dataRec = asRecord(res.data);
     if (!dataRec) return;
-    const result = asRecord(dataRec.result);
-    const derivation = asRecord(dataRec.derivation);
+    const result = asRecord(dataRec['result']);
+    const derivation = asRecord(dataRec['derivation']);
     if (!result || !derivation) return;
     setSpargeOverall({
       result: result as unknown as WaterOverallResult,

@@ -208,8 +208,8 @@ export class BrewSessionsService {
     const extractMashStepMinutes = (s: MashStepNode): number => {
       const rawStepTime = s.step_time;
       if (isObject(rawStepTime)) {
-        const unit = typeof rawStepTime.unit === "string" ? rawStepTime.unit.trim().toLowerCase() : "";
-        const value = toFiniteNumber(rawStepTime.value);
+        const unit = typeof rawStepTime['unit'] === "string" ? rawStepTime['unit'].trim().toLowerCase() : "";
+        const value = toFiniteNumber(rawStepTime['value']);
         if (value == null) return 0;
         if (!unit || unit.startsWith("min")) return Math.max(0, Math.round(value));
         if (unit.startsWith("h")) return Math.max(0, Math.round(value * 60));
@@ -221,8 +221,8 @@ export class BrewSessionsService {
 
       const rawDuration = s.duration;
       if (isObject(rawDuration)) {
-        const unit = typeof rawDuration.unit === "string" ? rawDuration.unit.trim().toLowerCase() : "";
-        const value = toFiniteNumber(rawDuration.value);
+        const unit = typeof rawDuration['unit'] === "string" ? rawDuration['unit'].trim().toLowerCase() : "";
+        const value = toFiniteNumber(rawDuration['value']);
         if (value == null) return 0;
         if (!unit || unit.startsWith("min")) return Math.max(0, Math.round(value));
         if (unit.startsWith("h")) return Math.max(0, Math.round(value * 60));
@@ -404,8 +404,8 @@ export class BrewSessionsService {
         const parts = mashSalts
           .filter((a): a is Record<string, unknown> => isObject(a))
           .map((a) => {
-            const saltKey = typeof a.saltKey === "string" ? a.saltKey : "";
-            const grams = typeof a.grams === "number" && Number.isFinite(a.grams) ? a.grams : null;
+            const saltKey = typeof a['saltKey'] === "string" ? a['saltKey'] : "";
+            const grams = typeof a['grams'] === "number" && Number.isFinite(a['grams']) ? a['grams'] : null;
             if (!saltKey || grams == null) return null;
             const saltLabel = saltKey.replaceAll("_", " ");
             const gramsLabel = Math.round(grams * 10) / 10;

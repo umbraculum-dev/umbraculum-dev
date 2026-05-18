@@ -352,20 +352,20 @@ function parseSectionsJson(val: unknown): BrewdaySectionConfig {
   const obj = val as Record<string, unknown>;
   const presetExcludes: Record<string, boolean> = {};
   for (const k of PRESET_KEYS) {
-    presetExcludes[k] = obj.presetExcludes && typeof obj.presetExcludes === "object"
-      ? (obj.presetExcludes as Record<string, unknown>)[k] === true
+    presetExcludes[k] = obj['presetExcludes'] && typeof obj['presetExcludes'] === "object"
+      ? (obj['presetExcludes'] as Record<string, unknown>)[k] === true
       : false;
   }
-  const customRaw = Array.isArray(obj.customSections) ? obj.customSections : [];
+  const customRaw = Array.isArray(obj['customSections']) ? obj['customSections'] : [];
   const customSections = customRaw
     .filter((item): item is Record<string, unknown> => item != null && typeof item === "object")
     .map((item) => ({
-      id: typeof item.id === "string" ? item.id : crypto.randomUUID(),
-      name: typeof item.name === "string" ? item.name : "",
-      exclude: item.exclude === true,
+      id: typeof item['id'] === "string" ? item['id'] : crypto.randomUUID(),
+      name: typeof item['name'] === "string" ? item['name'] : "",
+      exclude: item['exclude'] === true,
     }));
-  const customBrewingMethods = Array.isArray(obj.customBrewingMethods)
-    ? (obj.customBrewingMethods as string[]).filter((x) => typeof x === "string")
+  const customBrewingMethods = Array.isArray(obj['customBrewingMethods'])
+    ? (obj['customBrewingMethods'] as string[]).filter((x) => typeof x === "string")
     : [];
   return { presetExcludes, customSections, customBrewingMethods };
 }
@@ -381,18 +381,18 @@ function parseStepArray(
     .filter((item): item is Record<string, unknown> => item != null && typeof item === "object")
     .map((item) => {
       const sectionId =
-        typeof item.sectionId === "string" && item.sectionId
-          ? item.sectionId
+        typeof item['sectionId'] === "string" && item['sectionId']
+          ? item['sectionId']
           : PRESET_KEYS[0];
       return {
-        id: typeof item.id === "string" ? item.id : crypto.randomUUID(),
-        name: typeof item.name === "string" ? item.name : "",
+        id: typeof item['id'] === "string" ? item['id'] : crypto.randomUUID(),
+        name: typeof item['name'] === "string" ? item['name'] : "",
         sectionId,
-        exclude: item.exclude === true,
+        exclude: item['exclude'] === true,
         minutes:
-          typeof item.minutes === "number" && Number.isInteger(item.minutes)
-            ? item.minutes
-            : item.minutes === null || item.minutes === undefined
+          typeof item['minutes'] === "number" && Number.isInteger(item['minutes'])
+            ? item['minutes']
+            : item['minutes'] === null || item['minutes'] === undefined
               ? null
               : null,
       };

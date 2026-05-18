@@ -52,35 +52,35 @@ const VERIFICATION_STATUSES = ["verified", "unverified"] as const;
 
 function parseWaterProfile(v: unknown): WaterProfile {
   if (!isObject(v)) throw new Error("Invalid WaterProfile: expected object");
-  const id = isString(v.id) ? v.id : "";
-  const key = isString(v.key) ? v.key : "";
+  const id = isString(v['id']) ? v['id'] : "";
+  const key = isString(v['key']) ? v['key'] : "";
   const scope =
-    isString(v.scope) && (SCOPES as readonly string[]).includes(v.scope) ? (v.scope as WaterProfile["scope"]) : "system";
+    isString(v['scope']) && (SCOPES as readonly string[]).includes(v['scope']) ? (v['scope'] as WaterProfile["scope"]) : "system";
   const type =
-    isString(v.type) && (TYPES as readonly string[]).includes(v.type) ? (v.type as WaterProfile["type"]) : "water";
+    isString(v['type']) && (TYPES as readonly string[]).includes(v['type']) ? (v['type'] as WaterProfile["type"]) : "water";
   const workspaceId =
-    v.workspaceId === null
+    v['workspaceId'] === null
       ? null
-      : isString(v.workspaceId)
-        ? v.workspaceId
-        : v.accountId === null
+      : isString(v['workspaceId'])
+        ? v['workspaceId']
+        : v['accountId'] === null
           ? null
-          : isString(v.accountId)
-            ? v.accountId
+          : isString(v['accountId'])
+            ? v['accountId']
             : null;
-  const name = isString(v.name) ? v.name : "";
-  const ph = v.ph === null || v.ph === undefined ? undefined : isNumber(v.ph) ? v.ph : undefined;
-  const calcium = isNumber(v.calcium) ? v.calcium : 0;
-  const magnesium = isNumber(v.magnesium) ? v.magnesium : 0;
-  const sodium = isNumber(v.sodium) ? v.sodium : 0;
-  const sulfate = isNumber(v.sulfate) ? v.sulfate : 0;
-  const chloride = isNumber(v.chloride) ? v.chloride : 0;
-  const bicarbonate = isNumber(v.bicarbonate) ? v.bicarbonate : 0;
+  const name = isString(v['name']) ? v['name'] : "";
+  const ph = v['ph'] === null || v['ph'] === undefined ? undefined : isNumber(v['ph']) ? v['ph'] : undefined;
+  const calcium = isNumber(v['calcium']) ? v['calcium'] : 0;
+  const magnesium = isNumber(v['magnesium']) ? v['magnesium'] : 0;
+  const sodium = isNumber(v['sodium']) ? v['sodium'] : 0;
+  const sulfate = isNumber(v['sulfate']) ? v['sulfate'] : 0;
+  const chloride = isNumber(v['chloride']) ? v['chloride'] : 0;
+  const bicarbonate = isNumber(v['bicarbonate']) ? v['bicarbonate'] : 0;
   const verificationStatus =
-    isString(v.verificationStatus) && (VERIFICATION_STATUSES as readonly string[]).includes(v.verificationStatus)
-      ? (v.verificationStatus as WaterProfile["verificationStatus"])
+    isString(v['verificationStatus']) && (VERIFICATION_STATUSES as readonly string[]).includes(v['verificationStatus'])
+      ? (v['verificationStatus'] as WaterProfile["verificationStatus"])
       : "unverified";
-  const source = isString(v.source) ? v.source : "";
+  const source = isString(v['source']) ? v['source'] : "";
   if (!id || !key || !name) throw new Error("Invalid WaterProfile: id, key, name required");
   return {
     id,
@@ -124,13 +124,13 @@ function parseArray<T>(v: unknown, parse: (x: unknown) => T): T[] {
  */
 export function parseWaterProfilesResponse(payload: unknown): WaterProfilesResponse {
   if (!isObject(payload)) throw new Error("Invalid WaterProfilesResponse: expected object");
-  if (payload.ok !== true) throw new Error("Invalid WaterProfilesResponse: ok must be true");
-  const system = parseArray(payload.system, parseWaterProfile);
-  const publicProfiles = parseArray(payload.public, parseWaterProfile);
-  const workspaceRaw = Array.isArray(payload.workspace)
-    ? payload.workspace
-    : Array.isArray(payload.account)
-      ? payload.account
+  if (payload['ok'] !== true) throw new Error("Invalid WaterProfilesResponse: ok must be true");
+  const system = parseArray(payload['system'], parseWaterProfile);
+  const publicProfiles = parseArray(payload['public'], parseWaterProfile);
+  const workspaceRaw = Array.isArray(payload['workspace'])
+    ? payload['workspace']
+    : Array.isArray(payload['account'])
+      ? payload['account']
       : null;
   if (!workspaceRaw) throw new Error("Invalid WaterProfilesResponse: workspace must be array");
   const workspace = parseArray(workspaceRaw, parseWaterProfile);

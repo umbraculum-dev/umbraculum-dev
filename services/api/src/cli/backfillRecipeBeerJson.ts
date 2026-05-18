@@ -15,7 +15,7 @@ import { validateBeerJsonDoc, validateRecipeExtJson } from "../beerjson/index.js
 
 async function main() {
   const prisma = new PrismaClient();
-  const dryRun = process.env.DRY_RUN === "1";
+  const dryRun = process.env['DRY_RUN'] === "1";
   try {
     const candidates = await prisma.recipe.findMany({
       where: {

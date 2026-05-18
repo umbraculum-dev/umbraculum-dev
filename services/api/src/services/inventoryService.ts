@@ -43,10 +43,10 @@ function parseMetadata(category: InventoryCategory, raw: unknown): Record<string
   const o = raw as Record<string, unknown>;
 
   if (category === "fermentable") {
-    const producer = toOptionalString(o.producer);
-    const colorLovibond = toOptionalNumber(o.colorLovibond, "metadata.colorLovibond");
-    const yieldPercent = toOptionalNumber(o.yieldPercent, "metadata.yieldPercent");
-    const ppg = toOptionalNumber(o.ppg, "metadata.ppg");
+    const producer = toOptionalString(o['producer']);
+    const colorLovibond = toOptionalNumber(o['colorLovibond'], "metadata.colorLovibond");
+    const yieldPercent = toOptionalNumber(o['yieldPercent'], "metadata.yieldPercent");
+    const ppg = toOptionalNumber(o['ppg'], "metadata.ppg");
     const out: Record<string, unknown> = {
       ...(producer ? { producer } : {}),
       ...(colorLovibond !== undefined ? { colorLovibond: Math.max(0, colorLovibond) } : {}),
@@ -57,8 +57,8 @@ function parseMetadata(category: InventoryCategory, raw: unknown): Record<string
   }
 
   if (category === "hop") {
-    const alphaMin = toOptionalNumber(o.alphaMin, "metadata.alphaMin");
-    const alphaMax = toOptionalNumber(o.alphaMax, "metadata.alphaMax");
+    const alphaMin = toOptionalNumber(o['alphaMin'], "metadata.alphaMin");
+    const alphaMax = toOptionalNumber(o['alphaMax'], "metadata.alphaMax");
     const out: Record<string, unknown> = {
       ...(alphaMin !== undefined ? { alphaMin: Math.max(0, alphaMin) } : {}),
       ...(alphaMax !== undefined ? { alphaMax: Math.max(0, alphaMax) } : {}),

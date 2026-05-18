@@ -73,11 +73,11 @@ export function createRecipeLookupTool(prisma: PrismaClient): AiTool<RecipeLooku
           name: r.name,
           styleKey: r.styleKey,
           version: r.version,
-          og: readNumeric(stats.original_gravity ?? stats.og),
-          fg: readNumeric(stats.final_gravity ?? stats.fg),
-          abv: readNumeric(stats.alcohol_by_volume ?? stats.abv),
-          srm: readNumeric(stats.color_estimate ?? stats.srm),
-          ibu: readNumeric(stats.ibu_estimate ?? stats.ibu),
+          og: readNumeric(stats['original_gravity'] ?? stats['og']),
+          fg: readNumeric(stats['final_gravity'] ?? stats['fg']),
+          abv: readNumeric(stats['alcohol_by_volume'] ?? stats['abv']),
+          srm: readNumeric(stats['color_estimate'] ?? stats['srm']),
+          ibu: readNumeric(stats['ibu_estimate'] ?? stats['ibu']),
         };
       });
       return { matched, totalCount: filtered.length };

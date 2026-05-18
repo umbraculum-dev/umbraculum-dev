@@ -41,13 +41,13 @@ function warnUnsupported(warnings: UnitConversionWarningV1[], args: { path: stri
  */
 export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknown; warnings: UnitConversionWarningV1[] } {
   const warnings: UnitConversionWarningV1[] = [];
-  const beerjson = isObject(doc) && isObject(doc.beerjson) ? doc.beerjson : null;
-  const recipes = beerjson && Array.isArray(beerjson.recipes) ? beerjson.recipes : null;
+  const beerjson = isObject(doc) && isObject(doc['beerjson']) ? doc['beerjson'] : null;
+  const recipes = beerjson && Array.isArray(beerjson['recipes']) ? beerjson['recipes'] : null;
   const r0 = recipes && isObject(recipes[0]) ? (recipes[0]) : null;
   if (!r0) return { normalized: doc, warnings };
 
-  if (isObject(r0.batch_size)) {
-    const batch = r0.batch_size as AmountNode & Record<string, unknown>;
+  if (isObject(r0['batch_size'])) {
+    const batch = r0['batch_size'] as AmountNode & Record<string, unknown>;
     const unit = typeof batch.unit === "string" ? batch.unit : "";
     const value = safeNum(batch.value);
     if (value != null && isVolumeUnitV1(unit)) {
@@ -62,13 +62,13 @@ export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknow
     }
   }
 
-  const ing: Record<string, unknown> = isObject(r0.ingredients) ? r0.ingredients : {};
+  const ing: Record<string, unknown> = isObject(r0['ingredients']) ? r0['ingredients'] : {};
 
-  const ferms = asArray<Record<string, unknown>>(ing.fermentable_additions);
+  const ferms = asArray<Record<string, unknown>>(ing['fermentable_additions']);
   for (let idx = 0; idx < ferms.length; idx += 1) {
     const f = ferms[idx];
-    if (!isObject(f?.amount)) continue;
-    const amount = f.amount as AmountNode & Record<string, unknown>;
+    if (!isObject(f?.['amount'])) continue;
+    const amount = f['amount'] as AmountNode & Record<string, unknown>;
     const unit = typeof amount.unit === "string" ? amount.unit : "";
     const value = safeNum(amount.value);
     if (value == null || !unit) continue;
@@ -88,11 +88,11 @@ export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknow
     }
   }
 
-  const hops = asArray<Record<string, unknown>>(ing.hop_additions);
+  const hops = asArray<Record<string, unknown>>(ing['hop_additions']);
   for (let idx = 0; idx < hops.length; idx += 1) {
     const h = hops[idx];
-    if (!isObject(h?.amount)) continue;
-    const amount = h.amount as AmountNode & Record<string, unknown>;
+    if (!isObject(h?.['amount'])) continue;
+    const amount = h['amount'] as AmountNode & Record<string, unknown>;
     const unit = typeof amount.unit === "string" ? amount.unit : "";
     const value = safeNum(amount.value);
     if (value == null || !unit) continue;
@@ -112,11 +112,11 @@ export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknow
     }
   }
 
-  const misc = asArray<Record<string, unknown>>(ing.miscellaneous_additions);
+  const misc = asArray<Record<string, unknown>>(ing['miscellaneous_additions']);
   for (let idx = 0; idx < misc.length; idx += 1) {
     const m = misc[idx];
-    if (!isObject(m?.amount)) continue;
-    const amount = m.amount as AmountNode & Record<string, unknown>;
+    if (!isObject(m?.['amount'])) continue;
+    const amount = m['amount'] as AmountNode & Record<string, unknown>;
     const unit = typeof amount.unit === "string" ? amount.unit : "";
     const value = safeNum(amount.value);
     if (value == null || !unit) continue;
@@ -147,11 +147,11 @@ export function normalizeBeerJsonRecipeUnits(doc: unknown): { normalized: unknow
     });
   }
 
-  const cultures = asArray<Record<string, unknown>>(ing.culture_additions);
+  const cultures = asArray<Record<string, unknown>>(ing['culture_additions']);
   for (let idx = 0; idx < cultures.length; idx += 1) {
     const c = cultures[idx];
-    if (!isObject(c?.amount)) continue;
-    const amount = c.amount as AmountNode & Record<string, unknown>;
+    if (!isObject(c?.['amount'])) continue;
+    const amount = c['amount'] as AmountNode & Record<string, unknown>;
     const unit = typeof amount.unit === "string" ? amount.unit : "";
     const value = safeNum(amount.value);
     if (value == null || !unit) continue;

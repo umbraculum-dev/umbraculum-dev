@@ -48,19 +48,19 @@ export function equipmentProfilesRoutes(app: FastifyInstance) {
     const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
     const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
-      name: typeof body.name === "string" ? body.name : "",
-      kettleVolumeLiters: body.kettleVolumeLiters,
-      kettleLossesLiters: body.kettleLossesLiters,
-      kettleBoilEvaporationRatePercentPerHour: body.kettleBoilEvaporationRatePercentPerHour,
-      kettleCoolingShrinkagePercent: body.kettleCoolingShrinkagePercent,
-      kettleHopsAbsorptionLiters: body.kettleHopsAbsorptionLiters,
-      mashVolumeLiters: body.mashVolumeLiters,
-      mashEfficiencyPercent: body.mashEfficiencyPercent,
-      mashLossesLiters: body.mashLossesLiters,
-      mashThicknessLPerKg: body.mashThicknessLPerKg,
-      mashGrainAbsorptionLPerKg: body.mashGrainAbsorptionLPerKg,
-      mashWaterLeftoverLiters: body.mashWaterLeftoverLiters,
-      otherLossesLiters: body.otherLossesLiters,
+      name: typeof body['name'] === "string" ? body['name'] : "",
+      kettleVolumeLiters: body['kettleVolumeLiters'],
+      kettleLossesLiters: body['kettleLossesLiters'],
+      kettleBoilEvaporationRatePercentPerHour: body['kettleBoilEvaporationRatePercentPerHour'],
+      kettleCoolingShrinkagePercent: body['kettleCoolingShrinkagePercent'],
+      kettleHopsAbsorptionLiters: body['kettleHopsAbsorptionLiters'],
+      mashVolumeLiters: body['mashVolumeLiters'],
+      mashEfficiencyPercent: body['mashEfficiencyPercent'],
+      mashLossesLiters: body['mashLossesLiters'],
+      mashThicknessLPerKg: body['mashThicknessLPerKg'],
+      mashGrainAbsorptionLPerKg: body['mashGrainAbsorptionLPerKg'],
+      mashWaterLeftoverLiters: body['mashWaterLeftoverLiters'],
+      otherLossesLiters: body['otherLossesLiters'],
     });
     return { ok: true, profile: toEquipmentPayload(created) };
   });
@@ -72,19 +72,19 @@ export function equipmentProfilesRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
-      name: typeof body.name === "string" ? body.name : undefined,
-      kettleVolumeLiters: body.kettleVolumeLiters,
-      kettleLossesLiters: body.kettleLossesLiters,
-      kettleBoilEvaporationRatePercentPerHour: body.kettleBoilEvaporationRatePercentPerHour,
-      kettleCoolingShrinkagePercent: body.kettleCoolingShrinkagePercent,
-      kettleHopsAbsorptionLiters: body.kettleHopsAbsorptionLiters,
-      mashVolumeLiters: body.mashVolumeLiters,
-      mashEfficiencyPercent: body.mashEfficiencyPercent,
-      mashLossesLiters: body.mashLossesLiters,
-      mashThicknessLPerKg: body.mashThicknessLPerKg,
-      mashGrainAbsorptionLPerKg: body.mashGrainAbsorptionLPerKg,
-      mashWaterLeftoverLiters: body.mashWaterLeftoverLiters,
-      otherLossesLiters: body.otherLossesLiters,
+      name: typeof body['name'] === "string" ? body['name'] : undefined,
+      kettleVolumeLiters: body['kettleVolumeLiters'],
+      kettleLossesLiters: body['kettleLossesLiters'],
+      kettleBoilEvaporationRatePercentPerHour: body['kettleBoilEvaporationRatePercentPerHour'],
+      kettleCoolingShrinkagePercent: body['kettleCoolingShrinkagePercent'],
+      kettleHopsAbsorptionLiters: body['kettleHopsAbsorptionLiters'],
+      mashVolumeLiters: body['mashVolumeLiters'],
+      mashEfficiencyPercent: body['mashEfficiencyPercent'],
+      mashLossesLiters: body['mashLossesLiters'],
+      mashThicknessLPerKg: body['mashThicknessLPerKg'],
+      mashGrainAbsorptionLPerKg: body['mashGrainAbsorptionLPerKg'],
+      mashWaterLeftoverLiters: body['mashWaterLeftoverLiters'],
+      otherLossesLiters: body['otherLossesLiters'],
     });
     return { ok: true, profile: toEquipmentPayload(updated) };
   });

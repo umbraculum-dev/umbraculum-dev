@@ -317,27 +317,27 @@ export function WaterMashScreen() {
         if (d?.settings) {
           setSettings(d.settings);
           const s = d.settings;
-          setSourceProfileId((s.sourceWaterProfileId as string) ?? "");
-          setTargetProfileId((s.targetWaterProfileId as string) ?? s.sourceWaterProfileId ?? "");
-          setDilutionProfileId((s.dilutionWaterProfileId as string) ?? "");
-          setTapVolumeLiters(String(s.tapWaterVolumeLiters ?? 0));
-          setDilutionVolumeLiters(String(s.dilutionWaterVolumeLiters ?? 0));
+          setSourceProfileId((s['sourceWaterProfileId'] as string) ?? "");
+          setTargetProfileId((s['targetWaterProfileId'] as string) ?? s['sourceWaterProfileId'] ?? "");
+          setDilutionProfileId((s['dilutionWaterProfileId'] as string) ?? "");
+          setTapVolumeLiters(String(s['tapWaterVolumeLiters'] ?? 0));
+          setDilutionVolumeLiters(String(s['dilutionWaterVolumeLiters'] ?? 0));
           // eslint-disable-next-line no-constant-binary-expression -- pre-existing semantic bug: Number(x) ?? default never short-circuits (Number always returns a number, possibly NaN). Intended pattern is likely Number(x ?? default). Not fixed here because changing the precedence changes runtime behavior (NaN vs default). Tracked separately. See docs/LINTING.md.
-          setMashStartingAlk(Number(s.mashStartingAlkalinityPpmCaCO3) ?? 0);
+          setMashStartingAlk(Number(s['mashStartingAlkalinityPpmCaCO3']) ?? 0);
           // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
-          setMashStartingPh(Number(s.mashStartingPh) ?? 7);
+          setMashStartingPh(Number(s['mashStartingPh']) ?? 7);
           // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
-          setMashTargetPh(Number(s.mashTargetPh) ?? 5.4);
-          setMashAcidType((s.mashAcidType as string) ?? "lactic");
-          setMashAcidificationMode((s.mashAcidificationMode as string) === "manual" ? "manual" : "targetPh");
-          setMashStrengthKind(((s.mashStrengthKind as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
+          setMashTargetPh(Number(s['mashTargetPh']) ?? 5.4);
+          setMashAcidType((s['mashAcidType'] as string) ?? "lactic");
+          setMashAcidificationMode((s['mashAcidificationMode'] as string) === "manual" ? "manual" : "targetPh");
+          setMashStrengthKind(((s['mashStrengthKind'] as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
           // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
-          setMashStrengthValue(Number(s.mashStrengthValue) ?? 88);
-          setMashManualAcidAdded(Number(s.mashManualAcidAddedMl ?? s.mashManualAcidAddedGrams ?? 0));
-          if (Array.isArray(s.mashSaltAdditionsJson)) setSaltAdditions(s.mashSaltAdditionsJson as SaltAdditionRow[]);
-          if (Array.isArray(s.mashGristImportedJson)) setGristImportedRows(s.mashGristImportedJson as Record<string, unknown>[]);
-          if (s.mashOverallLastResultJson && typeof s.mashOverallLastResultJson === "object") {
-            setOverallResult(s.mashOverallLastResultJson as Record<string, unknown>);
+          setMashStrengthValue(Number(s['mashStrengthValue']) ?? 88);
+          setMashManualAcidAdded(Number(s['mashManualAcidAddedMl'] ?? s['mashManualAcidAddedGrams'] ?? 0));
+          if (Array.isArray(s['mashSaltAdditionsJson'])) setSaltAdditions(s['mashSaltAdditionsJson'] as SaltAdditionRow[]);
+          if (Array.isArray(s['mashGristImportedJson'])) setGristImportedRows(s['mashGristImportedJson'] as Record<string, unknown>[]);
+          if (s['mashOverallLastResultJson'] && typeof s['mashOverallLastResultJson'] === "object") {
+            setOverallResult(s['mashOverallLastResultJson'] as Record<string, unknown>);
           }
         }
       }
@@ -420,7 +420,7 @@ export function WaterMashScreen() {
       const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
       const mashOnlyRows = (s.gristRows as Record<string, unknown>[]).filter(
         (row) =>
-          (row.timingUse as string ?? "add_to_mash") === "add_to_mash" &&
+          (row['timingUse'] as string ?? "add_to_mash") === "add_to_mash" &&
           (row as { lateAddition?: unknown }).lateAddition !== true,
       );
       const nowIso = new Date().toISOString();
@@ -929,7 +929,7 @@ export function WaterMashScreen() {
                       {formatFixed(
                         locale,
                         gristImportedRows.reduce(
-                          (sum, r) => sum + (Number.isFinite(r.amountKg as number) ? (r.amountKg as number) : 0),
+                          (sum, r) => sum + (Number.isFinite(r['amountKg'] as number) ? (r['amountKg'] as number) : 0),
                           0,
                         ),
                         2,
@@ -1208,10 +1208,10 @@ export function WaterMashScreen() {
                 {overallResult ? (
                   <View style={{ marginTop: 12, gap: 4 }}>
                     <Text fontSize={12}>
-                      pH: {formatFixed(locale, (overallResult.ph as { value?: number })?.value ?? 0, 2)}
+                      pH: {formatFixed(locale, (overallResult['ph'] as { value?: number })?.value ?? 0, 2)}
                     </Text>
                     <Text fontSize={12}>
-                      Final alkalinity: {formatFixed(locale, (overallResult.finalAlkalinityPpmCaCO3 as number) ?? 0, 0)} ppm
+                      Final alkalinity: {formatFixed(locale, (overallResult['finalAlkalinityPpmCaCO3'] as number) ?? 0, 0)} ppm
                     </Text>
                   </View>
                 ) : null}

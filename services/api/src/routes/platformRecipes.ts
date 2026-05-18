@@ -103,8 +103,8 @@ export function platformRecipesRoutes(app: FastifyInstance) {
     for (const r of list) {
       const full = exportRecipeFull(r);
       const beerjsonContainer = isObject(full.beerjson) ? full.beerjson : null;
-      const innerBeerjson = isObject(beerjsonContainer?.beerjson) ? beerjsonContainer.beerjson : null;
-      const recipesArr: unknown[] = Array.isArray(innerBeerjson?.recipes) ? innerBeerjson.recipes : [];
+      const innerBeerjson = isObject(beerjsonContainer?.['beerjson']) ? beerjsonContainer['beerjson'] : null;
+      const recipesArr: unknown[] = Array.isArray(innerBeerjson?.['recipes']) ? innerBeerjson['recipes'] : [];
       const r0 = recipesArr[0] ?? null;
       if (r0) outRecipes.push(r0);
     }

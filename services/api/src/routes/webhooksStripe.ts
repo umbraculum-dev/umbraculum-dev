@@ -53,7 +53,7 @@ export function webhooksStripeRoutes(app: FastifyInstance) {
   const svc = new StripeWebhookService(app.prisma);
 
   app.post("/webhooks/stripe", async (req) => {
-    const secretRaw = process.env.STRIPE_WEBHOOK_SECRET?.trim() ?? "";
+    const secretRaw = process.env['STRIPE_WEBHOOK_SECRET']?.trim() ?? "";
     const secret = secretRaw && secretRaw !== "..." ? secretRaw : "";
 
     if (secret) {
@@ -67,7 +67,7 @@ export function webhooksStripeRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     // Only handle checkout.session.completed for now; ignore others (still return 200).
-    if (body.type === "checkout.session.completed") {
+    if (body['type'] === "checkout.session.completed") {
       await svc.handleCheckoutSessionCompleted(body);
     }
 

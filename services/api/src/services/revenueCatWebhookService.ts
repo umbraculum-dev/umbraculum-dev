@@ -18,7 +18,7 @@ function tierFromEntitlements(entitlements: unknown): BillingTier {
   const e = isObject(entitlements) ? entitlements : {};
   const active = (key: string) => {
     const node = isObject(e[key]) ? e[key] : {};
-    return Boolean(node.is_active ?? node.isActive ?? node.active);
+    return Boolean(node['is_active'] ?? node['isActive'] ?? node['active']);
   };
 
   if (active("tier_pro_plus")) return "pro_plus";

@@ -250,11 +250,11 @@ export default function BoilWaterPage() {
       }
       const lastResult = asRecord(s.boilSaltsLastResultJson);
       if (lastResult) {
-        const innerResult = asRecord(lastResult.result);
+        const innerResult = asRecord(lastResult['result']);
         if (innerResult) {
           setSaltsResult(innerResult as unknown as SaltAdditionsResult);
-          if (typeof lastResult.calculatedAt === "string") {
-            setSaltsStatus(`Last calculated: ${new Date(lastResult.calculatedAt).toLocaleString()}`);
+          if (typeof lastResult['calculatedAt'] === "string") {
+            setSaltsStatus(`Last calculated: ${new Date(lastResult['calculatedAt']).toLocaleString()}`);
           }
         }
       }
@@ -494,8 +494,8 @@ export default function BoilWaterPage() {
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       const dataRec = asRecord(res.data) ?? {};
-      const result = dataRec.result as SaltAdditionsResult;
-      const derivationRec = asRecord(dataRec.derivation);
+      const result = dataRec['result'] as SaltAdditionsResult;
+      const derivationRec = asRecord(dataRec['derivation']);
       setSaltsResult(result);
       setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
 
@@ -686,7 +686,7 @@ export default function BoilWaterPage() {
       acidType,
       strengthKind,
     };
-    if (strengthKind !== "solid") payload.strengthValue = strengthValue;
+    if (strengthKind !== "solid") payload['strengthValue'] = strengthValue;
     if (acidificationMode === "manual") {
       Object.assign(
         payload,
@@ -701,9 +701,9 @@ export default function BoilWaterPage() {
     });
     if (!res.ok) throw new Error(JSON.stringify(res.data));
     const bodyRec = asRecord(res.data) ?? {};
-    const derivationRec = asRecord(bodyRec.derivation);
+    const derivationRec = asRecord(bodyRec['derivation']);
     setOverallDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
-    return bodyRec.result as BoilOverallResultV0;
+    return bodyRec['result'] as BoilOverallResultV0;
   };
 
   const onCalculateOverall = async (saveAlso: boolean) => {

@@ -58,7 +58,7 @@ export function assertSnapshotShape(name: string, value: unknown) {
   const actual = shapeOf(value);
   const actualText = JSON.stringify(actual, null, 2) + "\n";
 
-  if (process.env.UPDATE_CONTRACTS === "1" || !existsSync(file)) {
+  if (process.env['UPDATE_CONTRACTS'] === "1" || !existsSync(file)) {
     writeFileSync(file, actualText);
     return;
   }

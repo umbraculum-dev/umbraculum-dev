@@ -81,9 +81,9 @@ export default function AccessibilityPage() {
         }
         const me = res.data as { user?: Record<string, unknown> } | null | undefined;
         const u: Record<string, unknown> = me?.user ?? {};
-        const pTheme = oneOf(u.preferredTheme, allowedTheme, cTheme);
-        const pFont = oneOf(u.preferredFontScale, allowedFont, cFont);
-        const pDensity = oneOf(u.preferredDensity, allowedDensity, cDensity);
+        const pTheme = oneOf(u['preferredTheme'], allowedTheme, cTheme);
+        const pFont = oneOf(u['preferredFontScale'], allowedFont, cFont);
+        const pDensity = oneOf(u['preferredDensity'], allowedDensity, cDensity);
 
         // If cookies differ, prefer profile and sync cookies + DOM.
         if (pTheme !== cTheme || pFont !== cFont || pDensity !== cDensity) {

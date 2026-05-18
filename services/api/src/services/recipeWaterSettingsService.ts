@@ -148,8 +148,8 @@ function validateSaltAdditionsJson(value: unknown, field: string) {
 
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
-    const saltKey = o.saltKey;
-    const grams = o.grams;
+    const saltKey = o['saltKey'];
+    const grams = o['grams'];
     if (typeof saltKey !== "string" || !ALLOWED_MASH_SALT_KEYS.has(saltKey)) {
       throw new BadRequestError(
         "invalid_salt_key",
@@ -216,15 +216,15 @@ export class RecipeWaterSettingsService {
     // at every site while keeping `input` typed for direct named access.
     const inputRec: Record<string, unknown> = input;
 
-    if (input.sourceWaterProfileId !== undefined) data.sourceWaterProfileId = input.sourceWaterProfileId;
-    if (input.targetWaterProfileId !== undefined) data.targetWaterProfileId = input.targetWaterProfileId;
+    if (input.sourceWaterProfileId !== undefined) data['sourceWaterProfileId'] = input.sourceWaterProfileId;
+    if (input.targetWaterProfileId !== undefined) data['targetWaterProfileId'] = input.targetWaterProfileId;
     if (input.dilutionWaterProfileId !== undefined)
-      data.dilutionWaterProfileId = input.dilutionWaterProfileId;
-    if (input.spargeWaterProfileId !== undefined) data.spargeWaterProfileId = input.spargeWaterProfileId;
-    if (input.boilSourceWaterProfileId !== undefined) data.boilSourceWaterProfileId = input.boilSourceWaterProfileId;
-    if (input.boilTargetWaterProfileId !== undefined) data.boilTargetWaterProfileId = input.boilTargetWaterProfileId;
+      data['dilutionWaterProfileId'] = input.dilutionWaterProfileId;
+    if (input.spargeWaterProfileId !== undefined) data['spargeWaterProfileId'] = input.spargeWaterProfileId;
+    if (input.boilSourceWaterProfileId !== undefined) data['boilSourceWaterProfileId'] = input.boilSourceWaterProfileId;
+    if (input.boilTargetWaterProfileId !== undefined) data['boilTargetWaterProfileId'] = input.boilTargetWaterProfileId;
     if (input.boilDilutionWaterProfileId !== undefined)
-      data.boilDilutionWaterProfileId = input.boilDilutionWaterProfileId;
+      data['boilDilutionWaterProfileId'] = input.boilDilutionWaterProfileId;
 
     const mixingNumericFields = ["tapWaterVolumeLiters", "dilutionWaterVolumeLiters"] as const;
     for (const f of mixingNumericFields) {
@@ -262,7 +262,7 @@ export class RecipeWaterSettingsService {
     const derivedMashVolume = Math.max(0, tap) + Math.max(0, dil);
     if (derivedMashVolume > 0 || hasMixingUpdate) {
       // If caller explicitly updates mixing volumes to 0, derivedMashVolume will be 0; keep DB consistent anyway.
-      data.mashWaterVolumeLiters = ensureFinite(derivedMashVolume, "mashWaterVolumeLiters");
+      data['mashWaterVolumeLiters'] = ensureFinite(derivedMashVolume, "mashWaterVolumeLiters");
     }
 
     const mashNumericFields = [
@@ -277,7 +277,7 @@ export class RecipeWaterSettingsService {
 
     // Legacy-only: allow setting mashWaterVolumeLiters when mixing is not in use.
     if (derivedMashVolume <= 0 && !hasMixingUpdate && input.mashWaterVolumeLiters !== undefined) {
-      data.mashWaterVolumeLiters = ensureFinite(input.mashWaterVolumeLiters, "mashWaterVolumeLiters");
+      data['mashWaterVolumeLiters'] = ensureFinite(input.mashWaterVolumeLiters, "mashWaterVolumeLiters");
     }
 
     // Boil add-on water mixing volumes + derived boilWaterVolumeLiters (single source of truth like mash).
@@ -310,7 +310,7 @@ export class RecipeWaterSettingsService {
             : 0;
     const derivedBoilVolume = Math.max(0, boilTap) + Math.max(0, boilDil);
     if (derivedBoilVolume > 0 || hasBoilMixingUpdate) {
-      data.boilWaterVolumeLiters = ensureFinite(derivedBoilVolume, "boilWaterVolumeLiters");
+      data['boilWaterVolumeLiters'] = ensureFinite(derivedBoilVolume, "boilWaterVolumeLiters");
     }
 
     const mashStringFields = ["mashAcidType", "mashStrengthKind"] as const;
@@ -323,8 +323,8 @@ export class RecipeWaterSettingsService {
     }
 
     if (input.mashStrengthValue !== undefined) {
-      if (input.mashStrengthValue === null) data.mashStrengthValue = null;
-      else data.mashStrengthValue = ensureFinite(input.mashStrengthValue, "mashStrengthValue");
+      if (input.mashStrengthValue === null) data['mashStrengthValue'] = null;
+      else data['mashStrengthValue'] = ensureFinite(input.mashStrengthValue, "mashStrengthValue");
     }
 
     const mashSnapshotFields = [
@@ -344,7 +344,7 @@ export class RecipeWaterSettingsService {
       }
     }
     if (input.mashLastCalculatedAt !== undefined) {
-      data.mashLastCalculatedAt = input.mashLastCalculatedAt;
+      data['mashLastCalculatedAt'] = input.mashLastCalculatedAt;
     }
 
     if (input.mashAcidificationMode !== undefined) {
@@ -358,7 +358,7 @@ export class RecipeWaterSettingsService {
           'Body.mashAcidificationMode must be "targetPh" or "manual"',
         );
       }
-      data.mashAcidificationMode = v;
+      data['mashAcidificationMode'] = v;
     }
 
     const mashManualInputFields = ["mashManualAcidAddedMl", "mashManualAcidAddedGrams"] as const;
@@ -384,36 +384,36 @@ export class RecipeWaterSettingsService {
       }
     }
     if (input.mashManualLastCalculatedAt !== undefined) {
-      data.mashManualLastCalculatedAt = input.mashManualLastCalculatedAt;
+      data['mashManualLastCalculatedAt'] = input.mashManualLastCalculatedAt;
     }
 
     if (input.mashSaltAdditionsJson !== undefined) {
       // accept null to clear
-      data.mashSaltAdditionsJson = validateSaltAdditionsJson(
+      data['mashSaltAdditionsJson'] = validateSaltAdditionsJson(
         input.mashSaltAdditionsJson,
         "mashSaltAdditionsJson",
       );
     }
     if (input.mashSaltsLastResultJson !== undefined) {
-      data.mashSaltsLastResultJson = input.mashSaltsLastResultJson;
+      data['mashSaltsLastResultJson'] = input.mashSaltsLastResultJson;
     }
 
     if (input.mashOverallLastResultJson !== undefined) {
       // accept null to clear; otherwise pass through (Json column)
-      data.mashOverallLastResultJson = input.mashOverallLastResultJson;
+      data['mashOverallLastResultJson'] = input.mashOverallLastResultJson;
     }
     if (input.mashOverallLastCalculatedAt !== undefined) {
-      data.mashOverallLastCalculatedAt = input.mashOverallLastCalculatedAt;
+      data['mashOverallLastCalculatedAt'] = input.mashOverallLastCalculatedAt;
     }
 
     if (input.mashGristImportedJson !== undefined) {
-      data.mashGristImportedJson = input.mashGristImportedJson;
+      data['mashGristImportedJson'] = input.mashGristImportedJson;
     }
     if (input.mashGristImportedAt !== undefined) {
-      data.mashGristImportedAt = input.mashGristImportedAt;
+      data['mashGristImportedAt'] = input.mashGristImportedAt;
     }
     if (input.mashGristSourceRecipeUpdatedAt !== undefined) {
-      data.mashGristSourceRecipeUpdatedAt = input.mashGristSourceRecipeUpdatedAt;
+      data['mashGristSourceRecipeUpdatedAt'] = input.mashGristSourceRecipeUpdatedAt;
     }
 
     const numericFields = [
@@ -437,8 +437,8 @@ export class RecipeWaterSettingsService {
     }
 
     if (input.spargeStrengthValue !== undefined) {
-      if (input.spargeStrengthValue === null) data.spargeStrengthValue = null;
-      else data.spargeStrengthValue = ensureFinite(input.spargeStrengthValue, "spargeStrengthValue");
+      if (input.spargeStrengthValue === null) data['spargeStrengthValue'] = null;
+      else data['spargeStrengthValue'] = ensureFinite(input.spargeStrengthValue, "spargeStrengthValue");
     }
 
     if (input.spargeAcidificationMode !== undefined) {
@@ -452,7 +452,7 @@ export class RecipeWaterSettingsService {
           'Body.spargeAcidificationMode must be "targetPh" or "manual"',
         );
       }
-      data.spargeAcidificationMode = v;
+      data['spargeAcidificationMode'] = v;
     }
 
     const spargeManualInputFields = ["spargeManualAcidAddedMl", "spargeManualAcidAddedGrams"] as const;
@@ -478,53 +478,53 @@ export class RecipeWaterSettingsService {
       }
     }
     if (input.spargeManualLastCalculatedAt !== undefined) {
-      data.spargeManualLastCalculatedAt = input.spargeManualLastCalculatedAt;
+      data['spargeManualLastCalculatedAt'] = input.spargeManualLastCalculatedAt;
     }
 
     if (input.spargeSaltAdditionsJson !== undefined) {
       // accept null to clear
-      data.spargeSaltAdditionsJson = validateSaltAdditionsJson(
+      data['spargeSaltAdditionsJson'] = validateSaltAdditionsJson(
         input.spargeSaltAdditionsJson,
         "spargeSaltAdditionsJson",
       );
     }
     if (input.spargeSaltsLastResultJson !== undefined) {
-      data.spargeSaltsLastResultJson = input.spargeSaltsLastResultJson;
+      data['spargeSaltsLastResultJson'] = input.spargeSaltsLastResultJson;
     }
     if (input.spargeStepTemperatureC !== undefined) {
-      if (input.spargeStepTemperatureC === null) data.spargeStepTemperatureC = null;
+      if (input.spargeStepTemperatureC === null) data['spargeStepTemperatureC'] = null;
       else {
         const v = input.spargeStepTemperatureC;
         if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100) {
           throw new BadRequestError("invalid_sparge_step_temperature", "Body.spargeStepTemperatureC must be 0–100");
         }
-        data.spargeStepTemperatureC = v;
+        data['spargeStepTemperatureC'] = v;
       }
     }
 
     const SPARGE_METHOD_ALLOWLIST = new Set(["fly_sparge", "batch_sparge"]);
     if (input.spargeStepTimeMin !== undefined) {
-      if (input.spargeStepTimeMin === null) data.spargeStepTimeMin = null;
+      if (input.spargeStepTimeMin === null) data['spargeStepTimeMin'] = null;
       else {
         const v = input.spargeStepTimeMin;
         if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 600) {
           throw new BadRequestError("invalid_sparge_step_time", "Body.spargeStepTimeMin must be 0–600");
         }
-        data.spargeStepTimeMin = v;
+        data['spargeStepTimeMin'] = v;
       }
     }
     if (input.spargeStepRampMin !== undefined) {
-      if (input.spargeStepRampMin === null) data.spargeStepRampMin = null;
+      if (input.spargeStepRampMin === null) data['spargeStepRampMin'] = null;
       else {
         const v = input.spargeStepRampMin;
         if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 120) {
           throw new BadRequestError("invalid_sparge_step_ramp", "Body.spargeStepRampMin must be 0–120");
         }
-        data.spargeStepRampMin = v;
+        data['spargeStepRampMin'] = v;
       }
     }
     if (input.spargeMethodType !== undefined) {
-      if (input.spargeMethodType === null) data.spargeMethodType = null;
+      if (input.spargeMethodType === null) data['spargeMethodType'] = null;
       else {
         const v = input.spargeMethodType;
         if (typeof v !== "string" || !SPARGE_METHOD_ALLOWLIST.has(v)) {
@@ -533,7 +533,7 @@ export class RecipeWaterSettingsService {
             'Body.spargeMethodType must be "fly_sparge" or "batch_sparge"',
           );
         }
-        data.spargeMethodType = v;
+        data['spargeMethodType'] = v;
       }
     }
 
@@ -554,7 +554,7 @@ export class RecipeWaterSettingsService {
       }
     }
     if (input.spargeLastCalculatedAt !== undefined) {
-      data.spargeLastCalculatedAt = input.spargeLastCalculatedAt;
+      data['spargeLastCalculatedAt'] = input.spargeLastCalculatedAt;
     }
 
     // Boil add-on water inputs/snapshots (mirrors sparge patterns; mixing mirrors mash).
@@ -566,7 +566,7 @@ export class RecipeWaterSettingsService {
 
     // Allow client-provided boilWaterVolumeLiters only if mixing volumes are not being updated.
     if (!hasBoilMixingUpdate && input.boilWaterVolumeLiters !== undefined) {
-      data.boilWaterVolumeLiters = ensureFinite(input.boilWaterVolumeLiters, "boilWaterVolumeLiters");
+      data['boilWaterVolumeLiters'] = ensureFinite(input.boilWaterVolumeLiters, "boilWaterVolumeLiters");
     }
 
     const boilStringFields = ["boilAcidType", "boilStrengthKind"] as const;
@@ -578,8 +578,8 @@ export class RecipeWaterSettingsService {
       }
     }
     if (input.boilStrengthValue !== undefined) {
-      if (input.boilStrengthValue === null) data.boilStrengthValue = null;
-      else data.boilStrengthValue = ensureFinite(input.boilStrengthValue, "boilStrengthValue");
+      if (input.boilStrengthValue === null) data['boilStrengthValue'] = null;
+      else data['boilStrengthValue'] = ensureFinite(input.boilStrengthValue, "boilStrengthValue");
     }
 
     if (input.boilAcidificationMode !== undefined) {
@@ -593,7 +593,7 @@ export class RecipeWaterSettingsService {
           'Body.boilAcidificationMode must be "targetPh" or "manual"',
         );
       }
-      data.boilAcidificationMode = v;
+      data['boilAcidificationMode'] = v;
     }
 
     const boilManualInputFields = ["boilManualAcidAddedMl", "boilManualAcidAddedGrams"] as const;
@@ -618,16 +618,16 @@ export class RecipeWaterSettingsService {
         else data[f] = ensureFinite(v, f);
       }
     }
-    if (input.boilManualLastCalculatedAt !== undefined) data.boilManualLastCalculatedAt = input.boilManualLastCalculatedAt;
+    if (input.boilManualLastCalculatedAt !== undefined) data['boilManualLastCalculatedAt'] = input.boilManualLastCalculatedAt;
 
     if (input.boilSaltAdditionsJson !== undefined) {
-      data.boilSaltAdditionsJson = validateSaltAdditionsJson(
+      data['boilSaltAdditionsJson'] = validateSaltAdditionsJson(
         input.boilSaltAdditionsJson,
         "boilSaltAdditionsJson",
       );
     }
     if (input.boilSaltsLastResultJson !== undefined) {
-      data.boilSaltsLastResultJson = input.boilSaltsLastResultJson;
+      data['boilSaltsLastResultJson'] = input.boilSaltsLastResultJson;
     }
 
     const boilSnapshotFields = [
@@ -646,12 +646,12 @@ export class RecipeWaterSettingsService {
         else data[f] = ensureFinite(v, f);
       }
     }
-    if (input.boilLastCalculatedAt !== undefined) data.boilLastCalculatedAt = input.boilLastCalculatedAt;
+    if (input.boilLastCalculatedAt !== undefined) data['boilLastCalculatedAt'] = input.boilLastCalculatedAt;
 
     if (input.boilOverallLastResultJson !== undefined) {
-      data.boilOverallLastResultJson = input.boilOverallLastResultJson;
+      data['boilOverallLastResultJson'] = input.boilOverallLastResultJson;
     }
-    if (input.boilOverallLastCalculatedAt !== undefined) data.boilOverallLastCalculatedAt = input.boilOverallLastCalculatedAt;
+    if (input.boilOverallLastCalculatedAt !== undefined) data['boilOverallLastCalculatedAt'] = input.boilOverallLastCalculatedAt;
 
     return this.prisma.recipeWaterSettings.upsert({
       where: { recipeId },

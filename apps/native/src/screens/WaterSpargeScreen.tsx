@@ -209,49 +209,49 @@ export function WaterSpargeScreen() {
         const s = (settingsRes.data as { settings?: Record<string, unknown> })?.settings;
         if (s) {
           setSettings(s);
-          setSpargeWaterProfileId((s.spargeWaterProfileId as string) ?? "");
-          const savedAlk = s.spargeStartingAlkalinityPpmCaCO3;
+          setSpargeWaterProfileId((s['spargeWaterProfileId'] as string) ?? "");
+          const savedAlk = s['spargeStartingAlkalinityPpmCaCO3'];
           setStartingAlk(typeof savedAlk === "number" && Number.isFinite(savedAlk) ? savedAlk : 0);
           setStartingAlkTouched(
             typeof savedAlk === "number" && Number.isFinite(savedAlk) && savedAlk !== 0,
           );
-          setStartingPh(String(s.spargeStartingPh ?? 7.0));
-          setTargetPh((s.spargeTargetPh as number) ?? 5.6);
-          setVolumeLiters((s.spargeVolumeLiters as number) ?? 20);
-          setAcidType((s.spargeAcidType as string) ?? "phosphoric");
-          setStrengthKind(((s.spargeStrengthKind as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
-          setStrengthValue((s.spargeStrengthValue as number) ?? 10);
-          setAcidificationMode(s.spargeAcidificationMode === "manual" ? "manual" : "targetPh");
-          setSpargeStepTimeMin((s.spargeStepTimeMin as number) ?? 60);
-          setSpargeStepRampMin((s.spargeStepRampMin as number) ?? 0);
+          setStartingPh(String(s['spargeStartingPh'] ?? 7.0));
+          setTargetPh((s['spargeTargetPh'] as number) ?? 5.6);
+          setVolumeLiters((s['spargeVolumeLiters'] as number) ?? 20);
+          setAcidType((s['spargeAcidType'] as string) ?? "phosphoric");
+          setStrengthKind(((s['spargeStrengthKind'] as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
+          setStrengthValue((s['spargeStrengthValue'] as number) ?? 10);
+          setAcidificationMode(s['spargeAcidificationMode'] === "manual" ? "manual" : "targetPh");
+          setSpargeStepTimeMin((s['spargeStepTimeMin'] as number) ?? 60);
+          setSpargeStepRampMin((s['spargeStepRampMin'] as number) ?? 0);
           setSpargeMethodType(
-            (s.spargeMethodType as string) === "batch_sparge" ? "batch_sparge" : "fly_sparge",
+            (s['spargeMethodType'] as string) === "batch_sparge" ? "batch_sparge" : "fly_sparge",
           );
-          setSpargeStepTemp((s.spargeStepTemperatureC as number) ?? 75);
+          setSpargeStepTemp((s['spargeStepTemperatureC'] as number) ?? 75);
           const savedManual =
-            (s.spargeStrengthKind as string) === "solid"
-              ? (s.spargeManualAcidAddedGrams as number) ?? 0
-              : (s.spargeManualAcidAddedMl as number) ?? 0;
+            (s['spargeStrengthKind'] as string) === "solid"
+              ? (s['spargeManualAcidAddedGrams'] as number) ?? 0
+              : (s['spargeManualAcidAddedMl'] as number) ?? 0;
           setManualAcidAdded(savedManual);
-          if (Array.isArray(s.spargeSaltAdditionsJson)) setSaltAdditions(s.spargeSaltAdditionsJson as SaltAdditionRow[]);
-          if (s.spargeLastCalculatedAt) {
+          if (Array.isArray(s['spargeSaltAdditionsJson'])) setSaltAdditions(s['spargeSaltAdditionsJson'] as SaltAdditionRow[]);
+          if (s['spargeLastCalculatedAt']) {
             setSpargeResult({
-              acidRequiredMl: s.spargeLastAcidRequiredMl as number | null,
-              acidRequiredTsp: s.spargeLastAcidRequiredTsp as number | null,
-              acidRequiredGrams: s.spargeLastAcidRequiredGrams as number | null,
-              acidRequiredKg: s.spargeLastAcidRequiredKg as number | null,
-              finalAlkalinityPpmCaCO3: (s.spargeLastFinalAlkalinityPpmCaCO3 as number) ?? 0,
-              sulfateAddedPpm: (s.spargeLastSulfateAddedPpm as number) ?? 0,
-              chlorideAddedPpm: (s.spargeLastChlorideAddedPpm as number) ?? 0,
+              acidRequiredMl: s['spargeLastAcidRequiredMl'] as number | null,
+              acidRequiredTsp: s['spargeLastAcidRequiredTsp'] as number | null,
+              acidRequiredGrams: s['spargeLastAcidRequiredGrams'] as number | null,
+              acidRequiredKg: s['spargeLastAcidRequiredKg'] as number | null,
+              finalAlkalinityPpmCaCO3: (s['spargeLastFinalAlkalinityPpmCaCO3'] as number) ?? 0,
+              sulfateAddedPpm: (s['spargeLastSulfateAddedPpm'] as number) ?? 0,
+              chlorideAddedPpm: (s['spargeLastChlorideAddedPpm'] as number) ?? 0,
             });
           }
-          if (s.spargeManualLastCalculatedAt) {
+          if (s['spargeManualLastCalculatedAt']) {
             setSpargeManualResult({
-              achievedPh: (s.spargeManualLastAchievedPh as number) ?? 0,
+              achievedPh: (s['spargeManualLastAchievedPh'] as number) ?? 0,
               predicted: {
-                finalAlkalinityPpmCaCO3: (s.spargeManualLastFinalAlkalinityPpmCaCO3 as number) ?? 0,
-                sulfateAddedPpm: (s.spargeManualLastSulfateAddedPpm as number) ?? 0,
-                chlorideAddedPpm: (s.spargeManualLastChlorideAddedPpm as number) ?? 0,
+                finalAlkalinityPpmCaCO3: (s['spargeManualLastFinalAlkalinityPpmCaCO3'] as number) ?? 0,
+                sulfateAddedPpm: (s['spargeManualLastSulfateAddedPpm'] as number) ?? 0,
+                chlorideAddedPpm: (s['spargeManualLastChlorideAddedPpm'] as number) ?? 0,
               },
             });
           }

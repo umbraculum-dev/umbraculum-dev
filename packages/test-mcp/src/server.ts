@@ -35,7 +35,7 @@ import { latestRunDirFor, summarizeRunDir } from "./runDir.js";
 function enrichResultWithRunDir(result: unknown): unknown {
   if (result === null || typeof result !== "object") return result;
   const obj = result as Record<string, unknown>;
-  const runDir = obj.runDir;
+  const runDir = obj['runDir'];
   if (typeof runDir !== "string" || runDir.length === 0) return result;
   try {
     const summary = summarizeRunDir(runDir);
@@ -52,7 +52,7 @@ function enrichResultWithRunDir(result: unknown): unknown {
   }
 }
 
-const PORT = Number(process.env.MCP_PORT ?? process.env.PORT ?? "8932");
+const PORT = Number(process.env['MCP_PORT'] ?? process.env['PORT'] ?? "8932");
 
 async function dispatch(tool: ToolName, args: Record<string, unknown> = {}): Promise<unknown> {
   switch (tool) {

@@ -21,8 +21,8 @@ function stripInternalFieldsOnAdditions(arr: unknown[] | undefined) {
   for (const item of arr) {
     if (!item || typeof item !== "object") continue;
     const rec = item as Record<string, unknown>;
-    if ("id" in rec) delete rec.id;
-    if ("brewery_app_late_addition" in rec) delete rec.brewery_app_late_addition;
+    if ("id" in rec) delete rec['id'];
+    if ("brewery_app_late_addition" in rec) delete rec['brewery_app_late_addition'];
   }
 }
 

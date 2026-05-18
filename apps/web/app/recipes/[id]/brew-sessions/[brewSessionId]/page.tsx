@@ -236,7 +236,7 @@ export default function BrewSessionDetailPage() {
     const stoppedLog = logs.find((l) => l.kind === "session_stopped");
     const payloadRec = asRecord(stoppedLog?.payloadJson);
     if (!payloadRec) return "manual";
-    return payloadRec.reason === "auto" ? "auto" : "manual";
+    return payloadRec['reason'] === "auto" ? "auto" : "manual";
   }, [logs]);
 
   const sectionHasRunningTimer = useMemo(() => {
@@ -1199,7 +1199,7 @@ export default function BrewSessionDetailPage() {
 
     try {
       const winRec = window as unknown as Record<string, unknown>;
-      const Ctx = (window.AudioContext ?? winRec.webkitAudioContext) as
+      const Ctx = (window.AudioContext ?? winRec['webkitAudioContext']) as
         | (new () => AudioContext)
         | undefined;
       if (Ctx) {

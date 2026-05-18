@@ -206,10 +206,10 @@ export class RecipesService {
       const doc = source.beerJsonRecipeJson;
       const docCopy: Record<string, unknown> | null =
         isObject(doc) ? (JSON.parse(JSON.stringify(doc)) as Record<string, unknown>) : null;
-      const docCopyBeerjson = isObject(docCopy?.beerjson) ? docCopy.beerjson : null;
-      const docCopyRecipes = Array.isArray(docCopyBeerjson?.recipes) ? docCopyBeerjson.recipes : null;
+      const docCopyBeerjson = isObject(docCopy?.['beerjson']) ? docCopy['beerjson'] : null;
+      const docCopyRecipes = Array.isArray(docCopyBeerjson?.['recipes']) ? docCopyBeerjson['recipes'] : null;
       if (docCopyRecipes && isObject(docCopyRecipes[0])) {
-        (docCopyRecipes[0]).name = newName;
+        (docCopyRecipes[0])['name'] = newName;
       }
 
       const created = await tx.recipe.create({
@@ -285,15 +285,15 @@ export class RecipesService {
     // Normalize: keep DB columns `name`/`notes` in sync with BeerJSON.
     try {
       const docObj = isObject(doc) ? doc : null;
-      const beerjson = isObject(docObj?.beerjson) ? docObj.beerjson : null;
-      const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
+      const beerjson = isObject(docObj?.['beerjson']) ? docObj['beerjson'] : null;
+      const recipes = Array.isArray(beerjson?.['recipes']) ? beerjson['recipes'] : null;
       const r0 = recipes && isObject(recipes[0]) ? (recipes[0]) : null;
       if (!r0) {
         throw new Error("BeerJSON is missing beerjson.recipes[0]");
       }
-      r0.name = name;
-      if (notes) r0.notes = notes;
-      else delete r0.notes;
+      r0['name'] = name;
+      if (notes) r0['notes'] = notes;
+      else delete r0['notes'];
     } catch (err) {
       throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${String(err)}`);
     }
@@ -398,15 +398,15 @@ export class RecipesService {
       // Normalize BeerJSON name/notes to match DB columns.
       try {
         const docObj = isObject(doc) ? doc : null;
-        const beerjson = isObject(docObj?.beerjson) ? docObj.beerjson : null;
-        const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
+        const beerjson = isObject(docObj?.['beerjson']) ? docObj['beerjson'] : null;
+        const recipes = Array.isArray(beerjson?.['recipes']) ? beerjson['recipes'] : null;
         const r0 = recipes && isObject(recipes[0]) ? (recipes[0]) : null;
         if (!r0) {
           throw new Error("BeerJSON is missing beerjson.recipes[0]");
         }
-        r0.name = nextName;
-        if (nextNotes) r0.notes = nextNotes;
-        else delete r0.notes;
+        r0['name'] = nextName;
+        if (nextNotes) r0['notes'] = nextNotes;
+        else delete r0['notes'];
       } catch (err) {
         throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${String(err)}`);
       }
@@ -463,15 +463,15 @@ export class RecipesService {
           throw new BadRequestError("invalid_beerjson_recipe", `Stored BeerJSON is invalid: ${before.errors}`);
         }
         try {
-          const beerjson = isObject(doc.beerjson) ? doc.beerjson : null;
-          const recipes = Array.isArray(beerjson?.recipes) ? beerjson.recipes : null;
+          const beerjson = isObject(doc['beerjson']) ? doc['beerjson'] : null;
+          const recipes = Array.isArray(beerjson?.['recipes']) ? beerjson['recipes'] : null;
           const r0 = recipes && isObject(recipes[0]) ? (recipes[0] as Record<string, unknown>) : null;
           if (!r0) {
             throw new Error("BeerJSON is missing beerjson.recipes[0]");
           }
-          r0.name = nextName;
-          if (nextNotes) r0.notes = nextNotes;
-          else delete r0.notes;
+          r0['name'] = nextName;
+          if (nextNotes) r0['notes'] = nextNotes;
+          else delete r0['notes'];
         } catch (err) {
           throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${String(err)}`);
         }
@@ -651,8 +651,8 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
 
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
-    const id = typeof o.id === "string" ? o.id.trim() : "";
-    const ingredientIdRaw = o.ingredientId;
+    const id = typeof o['id'] === "string" ? o['id'].trim() : "";
+    const ingredientIdRaw = o['ingredientId'];
     const ingredientId =
       ingredientIdRaw === null || ingredientIdRaw === undefined
         ? null
@@ -664,8 +664,8 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
                 `Body.gristJson[${idx}].ingredientId must be a string or null`,
               );
             })();
-    const name = typeof o.name === "string" ? o.name.trim() : "";
-    const producerRaw = o.producer;
+    const name = typeof o['name'] === "string" ? o['name'].trim() : "";
+    const producerRaw = o['producer'];
     const producer =
       producerRaw === null || producerRaw === undefined
         ? null
@@ -678,7 +678,7 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
               );
             })();
 
-    const groupRaw = o.group;
+    const groupRaw = o['group'];
     const group =
       groupRaw === null || groupRaw === undefined
         ? null
@@ -691,7 +691,7 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
               );
             })();
 
-    const mashDiPhRaw = o.mashDiPh;
+    const mashDiPhRaw = o['mashDiPh'];
     const mashDiPh =
       mashDiPhRaw === null || mashDiPhRaw === undefined
         ? null
@@ -705,7 +705,7 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
       );
     }
 
-    const mashTaRaw = o.mashTaToPh57_mEqPerKg;
+    const mashTaRaw = o['mashTaToPh57_mEqPerKg'];
     const mashTaToPh57_mEqPerKg =
       mashTaRaw === null || mashTaRaw === undefined
         ? null
@@ -722,13 +722,13 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
       );
     }
 
-    const mashPhModelSourceRaw = o.mashPhModelSource;
+    const mashPhModelSourceRaw = o['mashPhModelSource'];
     const mashPhModelSource: GristRow["mashPhModelSource"] =
       mashPhModelSourceRaw === "default" || mashPhModelSourceRaw === "override" || mashPhModelSourceRaw === "unknown"
         ? mashPhModelSourceRaw
         : undefined;
 
-    const mashRoastDehuskedOverrideRaw = o.mashRoastDehuskedOverride;
+    const mashRoastDehuskedOverrideRaw = o['mashRoastDehuskedOverride'];
     const mashRoastDehuskedOverride =
       mashRoastDehuskedOverrideRaw === null || mashRoastDehuskedOverrideRaw === undefined
         ? null
@@ -741,7 +741,7 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
               );
             })();
 
-    const mashRoastDehuskedSourceRaw = o.mashRoastDehuskedSource;
+    const mashRoastDehuskedSourceRaw = o['mashRoastDehuskedSource'];
     const mashRoastDehuskedSource: GristRow["mashRoastDehuskedSource"] =
       mashRoastDehuskedSourceRaw === null || mashRoastDehuskedSourceRaw === undefined
         ? undefined
@@ -755,8 +755,8 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
                 `Body.gristJson[${idx}].mashRoastDehuskedSource must be "inferred", "override", "unknown" or null`,
               );
             })();
-    const amountKg = ensureFinite(o.amountKg, `gristJson[${idx}].amountKg`);
-    const colorLovibondRaw = o.colorLovibond;
+    const amountKg = ensureFinite(o['amountKg'], `gristJson[${idx}].amountKg`);
+    const colorLovibondRaw = o['colorLovibond'];
     const colorLovibond =
       colorLovibondRaw === null
         ? null
@@ -783,7 +783,7 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
       );
     }
 
-    const maltClassRaw = o.maltClass;
+    const maltClassRaw = o['maltClass'];
     const maltClass: GristMaltClass =
       maltClassRaw === undefined || maltClassRaw === null
         ? "base"
@@ -796,14 +796,14 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
               );
             })();
 
-    const potentialRaw = o.potential;
+    const potentialRaw = o['potential'];
     let potential: GristPotential | null = null;
     if (potentialRaw === null || potentialRaw === undefined) {
       potential = null;
     } else if (typeof potentialRaw === "object") {
       const p = potentialRaw as Record<string, unknown>;
-      const kind = p.kind;
-      const pv = ensureFinite(p.value, `gristJson[${idx}].potential.value`);
+      const kind = p['kind'];
+      const pv = ensureFinite(p['value'], `gristJson[${idx}].potential.value`);
       if (kind !== "ppg" && kind !== "yieldPercent" && kind !== "sg") {
         throw new BadRequestError(
           "invalid_grist_row_potential_kind",
@@ -832,14 +832,14 @@ function _validateGristJson(value: unknown): GristRow[] | null | undefined {
       potential,
       maltClass,
     };
-    if (ingredientId) out.ingredientId = ingredientId;
-    if (producer) out.producer = producer;
-    if (group) out.group = group;
-    if (mashDiPh !== null) out.mashDiPh = mashDiPh;
-    if (mashTaToPh57_mEqPerKg !== null) out.mashTaToPh57_mEqPerKg = mashTaToPh57_mEqPerKg;
-    if (mashPhModelSource) out.mashPhModelSource = mashPhModelSource;
-    if (mashRoastDehuskedOverride !== null) out.mashRoastDehuskedOverride = mashRoastDehuskedOverride;
-    if (mashRoastDehuskedSource) out.mashRoastDehuskedSource = mashRoastDehuskedSource;
+    if (ingredientId) out['ingredientId'] = ingredientId;
+    if (producer) out['producer'] = producer;
+    if (group) out['group'] = group;
+    if (mashDiPh !== null) out['mashDiPh'] = mashDiPh;
+    if (mashTaToPh57_mEqPerKg !== null) out['mashTaToPh57_mEqPerKg'] = mashTaToPh57_mEqPerKg;
+    if (mashPhModelSource) out['mashPhModelSource'] = mashPhModelSource;
+    if (mashRoastDehuskedOverride !== null) out['mashRoastDehuskedOverride'] = mashRoastDehuskedOverride;
+    if (mashRoastDehuskedSource) out['mashRoastDehuskedSource'] = mashRoastDehuskedSource;
     return out as GristRow;
   });
 }
@@ -865,10 +865,10 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
 
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
-    const id = typeof o.id === "string" ? o.id.trim() : "";
+    const id = typeof o['id'] === "string" ? o['id'].trim() : "";
     if (!id) throw new BadRequestError("invalid_hop_row_id", `Body.hopsJson[${idx}].id is required`);
 
-    const ingredientIdRaw = o.ingredientId;
+    const ingredientIdRaw = o['ingredientId'];
     const ingredientId =
       ingredientIdRaw === null || ingredientIdRaw === undefined
         ? null
@@ -881,10 +881,10 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
               );
             })();
 
-    const name = typeof o.name === "string" ? o.name.trim() : "";
+    const name = typeof o['name'] === "string" ? o['name'].trim() : "";
     if (!name) throw new BadRequestError("invalid_hop_row_name", `Body.hopsJson[${idx}].name is required`);
 
-    const countryRaw = o.country;
+    const countryRaw = o['country'];
     const country =
       countryRaw === null || countryRaw === undefined
         ? null
@@ -897,7 +897,7 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
               );
             })();
 
-    const formRaw = o.form;
+    const formRaw = o['form'];
     const form =
       formRaw === null || formRaw === undefined
         ? null
@@ -924,12 +924,12 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
               );
             })();
 
-    const amountGrams = ensureFinite(o.amountGrams, `hopsJson[${idx}].amountGrams`);
+    const amountGrams = ensureFinite(o['amountGrams'], `hopsJson[${idx}].amountGrams`);
     if (!(amountGrams >= 0)) {
       throw new BadRequestError("invalid_hop_row_amount", `Body.hopsJson[${idx}].amountGrams must be >= 0`);
     }
 
-    const alphaRaw = o.alphaAcidPercent;
+    const alphaRaw = o['alphaAcidPercent'];
     const alphaAcidPercent =
       alphaRaw === null || alphaRaw === undefined
         ? null
@@ -943,7 +943,7 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
       );
     }
 
-    const useRaw = o.use;
+    const useRaw = o['use'];
     const use: HopUse =
       useRaw === "boil" || useRaw === "whirlpool" || useRaw === "dryhop"
         ? useRaw
@@ -954,7 +954,7 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
             );
           })();
 
-    const timeRaw = o.timeMinutes;
+    const timeRaw = o['timeMinutes'];
     const timeMinutes =
       timeRaw === null || timeRaw === undefined ? null : typeof timeRaw === "number" ? timeRaw : NaN;
     if (typeof timeMinutes === "number" && (!Number.isFinite(timeMinutes) || timeMinutes < 0)) {
@@ -973,8 +973,8 @@ function _validateHopsJson(value: unknown): HopRow[] | null | undefined {
       use,
       timeMinutes,
     };
-    if (country) out.country = country;
-    if (form) out.form = form;
+    if (country) out['country'] = country;
+    if (form) out['form'] = form;
     return out as HopRow;
   });
 }
@@ -996,10 +996,10 @@ function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
 
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
-    const id = typeof o.id === "string" ? o.id.trim() : "";
+    const id = typeof o['id'] === "string" ? o['id'].trim() : "";
     if (!id) throw new BadRequestError("invalid_yeast_row_id", `Body.yeastJson[${idx}].id is required`);
 
-    const ingredientIdRaw = o.ingredientId;
+    const ingredientIdRaw = o['ingredientId'];
     const ingredientId =
       ingredientIdRaw === undefined
         ? undefined
@@ -1014,10 +1014,10 @@ function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
                 );
               })();
 
-    const name = typeof o.name === "string" ? o.name.trim() : "";
+    const name = typeof o['name'] === "string" ? o['name'].trim() : "";
     if (!name) throw new BadRequestError("invalid_yeast_row_name", `Body.yeastJson[${idx}].name is required`);
 
-    const labRaw = o.lab;
+    const labRaw = o['lab'];
     const lab =
       labRaw === null || labRaw === undefined
         ? null
@@ -1030,7 +1030,7 @@ function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
               );
             })();
 
-    const productIdRaw = o.productId;
+    const productIdRaw = o['productId'];
     const productId =
       productIdRaw === undefined
         ? undefined
@@ -1045,7 +1045,7 @@ function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
                 );
               })();
 
-    const attenuationMinRaw = o.attenuationMin;
+    const attenuationMinRaw = o['attenuationMin'];
     const attenuationMin =
       attenuationMinRaw === undefined
         ? undefined
@@ -1064,7 +1064,7 @@ function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
       );
     }
 
-    const attenuationMaxRaw = o.attenuationMax;
+    const attenuationMaxRaw = o['attenuationMax'];
     const attenuationMax =
       attenuationMaxRaw === undefined
         ? undefined
@@ -1084,11 +1084,11 @@ function _validateYeastJson(value: unknown): YeastRow[] | null | undefined {
     }
 
     const out: Record<string, unknown> = { id, name };
-    if (ingredientIdRaw !== undefined) out.ingredientId = ingredientId;
-    if (lab) out.lab = lab;
-    if (productIdRaw !== undefined) out.productId = productId;
-    if (attenuationMinRaw !== undefined) out.attenuationMin = attenuationMin;
-    if (attenuationMaxRaw !== undefined) out.attenuationMax = attenuationMax;
+    if (ingredientIdRaw !== undefined) out['ingredientId'] = ingredientId;
+    if (lab) out['lab'] = lab;
+    if (productIdRaw !== undefined) out['productId'] = productId;
+    if (attenuationMinRaw !== undefined) out['attenuationMin'] = attenuationMin;
+    if (attenuationMaxRaw !== undefined) out['attenuationMax'] = attenuationMax;
     return out as YeastRow;
   });
 }
@@ -1181,10 +1181,10 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
 
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
-    const id = typeof o.id === "string" ? o.id.trim() : "";
+    const id = typeof o['id'] === "string" ? o['id'].trim() : "";
     if (!id) throw new BadRequestError("invalid_misc_row_id", `Body.miscJson[${idx}].id is required`);
 
-    const ingredientIdRaw = o.ingredientId;
+    const ingredientIdRaw = o['ingredientId'];
     const ingredientId =
       ingredientIdRaw === undefined
         ? undefined
@@ -1199,10 +1199,10 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
                 );
               })();
 
-    const name = typeof o.name === "string" ? o.name.trim() : "";
+    const name = typeof o['name'] === "string" ? o['name'].trim() : "";
     if (!name) throw new BadRequestError("invalid_misc_row_name", `Body.miscJson[${idx}].name is required`);
 
-    const typeRaw = o.type;
+    const typeRaw = o['type'];
     const type: MiscType =
       typeRaw === "spice" ||
       typeRaw === "fining" ||
@@ -1218,7 +1218,7 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
             );
           })();
 
-    const useRaw = o.use;
+    const useRaw = o['use'];
     const use: MiscUse =
       useRaw === "boil" || useRaw === "mash" || useRaw === "primary" || useRaw === "secondary" || useRaw === "bottling"
         ? useRaw
@@ -1229,7 +1229,7 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
             );
           })();
 
-    const timeRaw = o.timeMinutes;
+    const timeRaw = o['timeMinutes'];
     const timeMinutes = timeRaw === null || timeRaw === undefined ? null : typeof timeRaw === "number" ? timeRaw : NaN;
     if (typeof timeMinutes === "number" && (!Number.isFinite(timeMinutes) || timeMinutes < 0)) {
       throw new BadRequestError(
@@ -1238,12 +1238,12 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
       );
     }
 
-    const amount = ensureFinite(o.amount, `miscJson[${idx}].amount`);
+    const amount = ensureFinite(o['amount'], `miscJson[${idx}].amount`);
     if (!(amount > 0)) {
       throw new BadRequestError("invalid_misc_row_amount", `Body.miscJson[${idx}].amount must be > 0`);
     }
 
-    const amountIsWeightRaw = o.amountIsWeight;
+    const amountIsWeightRaw = o['amountIsWeight'];
     if (typeof amountIsWeightRaw !== "boolean") {
       throw new BadRequestError(
         "invalid_misc_row_amount_is_weight",
@@ -1252,7 +1252,7 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
     }
     const amountIsWeight = amountIsWeightRaw;
 
-    const useForRaw = o.useFor;
+    const useForRaw = o['useFor'];
     const useFor =
       useForRaw === null || useForRaw === undefined
         ? null
@@ -1265,7 +1265,7 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
               );
             })();
 
-    const notesRaw = o.notes;
+    const notesRaw = o['notes'];
     const notes =
       notesRaw === null || notesRaw === undefined
         ? null
@@ -1287,9 +1287,9 @@ function _validateMiscJson(value: unknown): MiscRow[] | null | undefined {
       amount,
       amountIsWeight,
     };
-    if (ingredientIdRaw !== undefined) out.ingredientId = ingredientId;
-    if (useFor) out.useFor = useFor;
-    if (notes) out.notes = notes;
+    if (ingredientIdRaw !== undefined) out['ingredientId'] = ingredientId;
+    if (useFor) out['useFor'] = useFor;
+    if (notes) out['notes'] = notes;
     return out as MiscRow;
   });
 }

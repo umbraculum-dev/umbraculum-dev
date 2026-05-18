@@ -83,7 +83,7 @@ export function getApiBaseUrl(): string {
 
   // 2. Explicit override via env var — used by tunnel-mode dev (where
   //    hostUri points at ngrok) and by integration test scripts.
-  const fromEnv = normalizeBaseUrl((process.env as Record<string, string | undefined>).EXPO_PUBLIC_API_BASE_URL);
+  const fromEnv = normalizeBaseUrl((process.env as Record<string, string | undefined>)['EXPO_PUBLIC_API_BASE_URL']);
   if (fromEnv) return maybeRewriteForAndroidEmulator(fromEnv);
 
   // 3. Dev auto-derive: in Expo Go on LAN/local Metro, derive the API host

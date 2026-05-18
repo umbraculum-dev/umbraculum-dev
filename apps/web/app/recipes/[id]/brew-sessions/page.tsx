@@ -27,7 +27,7 @@ export default function RecipeBrewSessionsPage() {
 
   const router = useRouter();
   const params = useParams();
-  const recipeId = params?.id ?? "";
+  const recipeId = params?.['id'] ?? "";
 
   const [sessions, setSessions] = useState<BrewSessionListItem[]>([]);
   const [loading, setLoading] = useState(false);

@@ -463,7 +463,7 @@ export default function BrewdayStepsSettingsPage() {
           id="brewday-steps-recap"
           headingId="brewday-steps-recap-heading"
           label={t("sections.brewdayStepsRecap.title")}
-          open={openSections.brewdayStepsRecap}
+          open={openSections['brewdayStepsRecap']}
           onOpenChange={(open) => setSectionOpen("brewdayStepsRecap", open)}
         >
           <SizableText size="$2" color="var(--text-muted)" fontFamily="$body" mt={0}>
@@ -475,7 +475,7 @@ export default function BrewdayStepsSettingsPage() {
           id="brewing-type"
           headingId="brewing-type-heading"
           label={t("sections.brewingType.title")}
-          open={openSections.brewingType}
+          open={openSections['brewingType']}
           onOpenChange={(open) => setSectionOpen("brewingType", open)}
         >
           <XStack gap="$2" items="flex-end" flexWrap="wrap">
@@ -590,7 +590,7 @@ export default function BrewdayStepsSettingsPage() {
           id="brewday-steps-sections"
           headingId="brewday-steps-sections-heading"
           label={t("sections.brewdayStepsSections.title")}
-          open={openSections.brewdayStepsSections}
+          open={openSections['brewdayStepsSections']}
           onOpenChange={(open) => setSectionOpen("brewdayStepsSections", open)}
         >
           {loading ? (
@@ -743,7 +743,7 @@ export default function BrewdayStepsSettingsPage() {
           id="brewday-steps-default"
           headingId="brewday-steps-default-heading"
           label={t("sections.brewdayStepsDefault.title")}
-          open={openSections.brewdayStepsDefault}
+          open={openSections['brewdayStepsDefault']}
           onOpenChange={(open) => setSectionOpen("brewdayStepsDefault", open)}
         >
           <SizableText
@@ -907,7 +907,7 @@ export default function BrewdayStepsSettingsPage() {
           id="brewday-steps-custom"
           headingId="brewday-steps-custom-heading"
           label={t("sections.brewdayStepsCustom.title")}
-          open={openSections.brewdayStepsCustom}
+          open={openSections['brewdayStepsCustom']}
           onOpenChange={(open) => setSectionOpen("brewdayStepsCustom", open)}
         >
           <SizableText
@@ -1141,7 +1141,7 @@ export default function BrewdayStepsSettingsPage() {
           id="brewday-notes"
           headingId="brewday-notes-heading"
           label={t("sections.brewdayNotes.title")}
-          open={openSections.brewdayNotes}
+          open={openSections['brewdayNotes']}
           onOpenChange={(open) => setSectionOpen("brewdayNotes", open)}
         >
           <RecipeEditField id="brewday-notes" label={t("sections.brewdayNotes.title")}>

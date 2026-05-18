@@ -39,33 +39,33 @@ function parseIonProfile(v: unknown): IonProfilePpm | null {
 
 function parseMashOverallLastResultJson(v: unknown): MashOverallLastResultJson | null {
   if (!isObject(v)) return null;
-  const ph = v.ph;
+  const ph = v['ph'];
   if (!isObject(ph)) return null;
-  if (!isFiniteNumber(v.finalAlkalinityPpmCaCO3)) return null;
-  if (typeof ph.kind !== "string" || !isFiniteNumber(ph.value)) return null;
+  if (!isFiniteNumber(v['finalAlkalinityPpmCaCO3'])) return null;
+  if (typeof ph['kind'] !== "string" || !isFiniteNumber(ph['value'])) return null;
 
-  const ionsPpm = parseIonProfile(v.ionsPpm);
+  const ionsPpm = parseIonProfile(v['ionsPpm']);
   if (!ionsPpm) return null;
 
-  const kind = ph.kind === "target" ? "target" : "estimated";
+  const kind = ph['kind'] === "target" ? "target" : "estimated";
   return {
     ionsPpm,
-    finalAlkalinityPpmCaCO3: v.finalAlkalinityPpmCaCO3,
-    ph: { kind, value: ph.value },
+    finalAlkalinityPpmCaCO3: v['finalAlkalinityPpmCaCO3'],
+    ph: { kind, value: ph['value'] },
   };
 }
 
 function parseSaltsBreakdown(v: unknown): Array<{ saltKey: string; grams: number }> | null {
   if (!isObject(v)) return null;
-  const result = isObject(v.result) ? v.result : null;
-  const b = result?.breakdown;
+  const result = isObject(v['result']) ? v['result'] : null;
+  const b = result?.['breakdown'];
   if (!Array.isArray(b)) return null;
 
   const out: Array<{ saltKey: string; grams: number }> = [];
   for (const row of b) {
     if (!isObject(row)) continue;
-    const saltKey = typeof row.saltKey === "string" ? row.saltKey : null;
-    const grams = isFiniteNumber(row.grams) ? row.grams : null;
+    const saltKey = typeof row['saltKey'] === "string" ? row['saltKey'] : null;
+    const grams = isFiniteNumber(row['grams']) ? row['grams'] : null;
     if (!saltKey || grams == null || !(grams > 0)) continue;
     out.push({ saltKey, grams });
   }
@@ -74,8 +74,8 @@ function parseSaltsBreakdown(v: unknown): Array<{ saltKey: string; grams: number
 
 function parseSaltsResultingProfile(v: unknown): IonProfilePpm | null {
   if (!isObject(v)) return null;
-  const result = isObject(v.result) ? v.result : null;
-  return parseIonProfile(result?.resultingProfile);
+  const result = isObject(v['result']) ? v['result'] : null;
+  return parseIonProfile(result?.['resultingProfile']);
 }
 
 function inferExpectedRa(style: { name: string; category: string | null }): ExpectedRaRange | null {

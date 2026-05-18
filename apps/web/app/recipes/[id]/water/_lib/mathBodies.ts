@@ -92,14 +92,14 @@ function renderBreakdowns(args: {
   const blocks = args.derivation.breakdowns ?? [];
   if (!blocks.length) return "";
 
-  const ppmUnit = units?.ppm ?? "ppm";
-  const gUnit = units?.g ?? "g";
+  const ppmUnit = units?.['ppm'] ?? "ppm";
+  const gUnit = units?.['g'] ?? "g";
 
   const blockTexts = blocks.map((b) => {
     const title = args.tMath(`derivation.breakdowns.${args.derivation.kind}.${b.id}.title`);
     const rows = b.rows.map((r) => {
-      const saltKey = r.saltKey?.kind === "string" ? r.saltKey.value : null;
-      const grams = r.grams?.kind === "number" ? r.grams.value : null;
+      const saltKey = r['saltKey']?.kind === "string" ? r['saltKey'].value : null;
+      const grams = r['grams']?.kind === "number" ? r['grams'].value : null;
 
       const deltaEntries: string[] = [];
       ([
@@ -208,35 +208,35 @@ export function buildWaterMathBody(args: {
       // Prefer overall derivation when available (it can carry mash-estimated pH in manual+grist mode),
       // but fall back to the acid derivation for snapshot-only sections.
       const d =
-        (ctx.overallDerivation as WaterCalcDerivation | undefined) ??
-        (ctx.acidDerivation as WaterCalcDerivation | undefined);
+        (ctx['overallDerivation'] as WaterCalcDerivation | undefined) ??
+        (ctx['acidDerivation'] as WaterCalcDerivation | undefined);
       return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "mash.ionsAfterSalts":
     case "sparge.ionsAfterSalts":
     case "boil.ionsAfterSalts": {
-      const d = ctx.saltDerivation as WaterCalcDerivation | undefined;
+      const d = ctx['saltDerivation'] as WaterCalcDerivation | undefined;
       return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "mash.overallSnapshot": {
-      const d = ctx.overallDerivation as WaterCalcDerivation | undefined;
+      const d = ctx['overallDerivation'] as WaterCalcDerivation | undefined;
       return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "sparge.ionsAfterSaltsAndAcid": {
-      const d = ctx.overallDerivation as WaterCalcDerivation | undefined;
+      const d = ctx['overallDerivation'] as WaterCalcDerivation | undefined;
       return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "boil.overallSnapshot": {
-      const d = ctx.overallDerivation as WaterCalcDerivation | undefined;
+      const d = ctx['overallDerivation'] as WaterCalcDerivation | undefined;
       return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("derivation.common.missing");
     }
 
     case "sparge.alkalinityHeuristic": {
-      const d = ctx.acidDerivation as WaterCalcDerivation | undefined;
+      const d = ctx['acidDerivation'] as WaterCalcDerivation | undefined;
       return d ? renderDerivationBody({ locale, tMath, derivation: d, units }) : tMath("sparge.alkalinityHeuristic.body");
     }
 
@@ -247,7 +247,7 @@ export function buildWaterMathBody(args: {
         ph?: unknown;
         finalAlkalinityPpmCaCO3?: unknown;
       };
-      const streams: StreamShape[] = Array.isArray(ctx.streams) ? (ctx.streams as StreamShape[]) : [];
+      const streams: StreamShape[] = Array.isArray(ctx['streams']) ? (ctx['streams'] as StreamShape[]) : [];
       const streamLines = streams.map((s) =>
         tMath("waterHub.mergedWaterRecap.streamLine", {
           ...(units ?? {}),
@@ -260,24 +260,24 @@ export function buildWaterMathBody(args: {
       const capped = capLines({ lines: streamLines, max: 6, tMath });
       return tMath("waterHub.mergedWaterRecap.bodyWithValues", {
         ...(units ?? {}),
-        totalVolumeL: fmt(locale, ctx.totalVolumeLiters, 2),
-        mergedPh: fmt(locale, ctx.mergedPh, 2),
-        mergedFinalAlk: fmt(locale, ctx.mergedFinalAlk, 2),
+        totalVolumeL: fmt(locale, ctx['totalVolumeLiters'], 2),
+        mergedPh: fmt(locale, ctx['mergedPh'], 2),
+        mergedFinalAlk: fmt(locale, ctx['mergedFinalAlk'], 2),
         streamLines: capped.join("\n"),
       });
     }
 
     case "waterHub.mergedIons": {
-      const ions = (ctx.ions as Record<string, number | null | undefined>) ?? null;
+      const ions = (ctx['ions'] as Record<string, number | null | undefined>) ?? null;
       if (!ions) return tMath("waterHub.mergedIons.body");
-      const ppmUnit = units?.ppm ?? "ppm";
+      const ppmUnit = units?.['ppm'] ?? "ppm";
       const ionL = [
-        tMath("common.ionLine", { ion: "Ca", ppm: fmt(locale, ions.calcium, 2), ppmUnit }),
-        tMath("common.ionLine", { ion: "Mg", ppm: fmt(locale, ions.magnesium, 2), ppmUnit }),
-        tMath("common.ionLine", { ion: "Na", ppm: fmt(locale, ions.sodium, 2), ppmUnit }),
-        tMath("common.ionLine", { ion: "SO4", ppm: fmt(locale, ions.sulfate, 2), ppmUnit }),
-        tMath("common.ionLine", { ion: "Cl", ppm: fmt(locale, ions.chloride, 2), ppmUnit }),
-        tMath("common.ionLine", { ion: "HCO3", ppm: fmt(locale, ions.bicarbonate, 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Ca", ppm: fmt(locale, ions['calcium'], 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Mg", ppm: fmt(locale, ions['magnesium'], 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Na", ppm: fmt(locale, ions['sodium'], 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "SO4", ppm: fmt(locale, ions['sulfate'], 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "Cl", ppm: fmt(locale, ions['chloride'], 2), ppmUnit }),
+        tMath("common.ionLine", { ion: "HCO3", ppm: fmt(locale, ions['bicarbonate'], 2), ppmUnit }),
       ];
       return tMath("waterHub.mergedIons.bodyWithValues", {
         ...(units ?? {}),

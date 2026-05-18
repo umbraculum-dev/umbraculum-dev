@@ -55,8 +55,8 @@ export function billingRoutes(app: FastifyInstance) {
       expiresAt: created.expiresAt.toISOString(),
       clientReferenceId: created.id,
       // Optional: wire these when Stripe is configured.
-      stripePricingTableId: process.env.STRIPE_PRICING_TABLE_ID ?? null,
-      stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? null,
+      stripePricingTableId: process.env['STRIPE_PRICING_TABLE_ID'] ?? null,
+      stripePublishableKey: process.env['STRIPE_PUBLISHABLE_KEY'] ?? null,
     };
   });
 

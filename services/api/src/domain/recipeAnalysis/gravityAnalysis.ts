@@ -14,8 +14,8 @@ import { isFiniteNumber, isObject } from "../../lib/typeGuards.js";
  */
 function extractFirstRecipe(beerJsonRecipeJson: unknown): Record<string, unknown> | null {
   if (!isObject(beerJsonRecipeJson)) return null;
-  if (!isObject(beerJsonRecipeJson.beerjson)) return null;
-  const recipes = beerJsonRecipeJson.beerjson.recipes;
+  if (!isObject(beerJsonRecipeJson['beerjson'])) return null;
+  const recipes = beerJsonRecipeJson['beerjson']['recipes'];
   if (!Array.isArray(recipes)) return null;
   const first: unknown = recipes[0];
   return isObject(first) ? first : null;
@@ -96,9 +96,9 @@ interface ExtractedFermentableForColor {
 
 function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  if (!r0 || !isObject(r0.batch_size)) return null;
-  const unit = typeof r0.batch_size.unit === "string" ? r0.batch_size.unit : "";
-  const value = safeNum(r0.batch_size.value);
+  if (!r0 || !isObject(r0['batch_size'])) return null;
+  const unit = typeof r0['batch_size']['unit'] === "string" ? r0['batch_size']['unit'] : "";
+  const value = safeNum(r0['batch_size']['value']);
   if (value == null || !(value > 0)) return null;
   if (unit === "l") return value;
   if (unit === "ml") return value / 1000;
@@ -107,8 +107,8 @@ function extractBatchSizeLiters(beerJsonRecipeJson: unknown): number | null {
 
 function extractFermentablesForColor(beerJsonRecipeJson: unknown): { rows: ExtractedFermentableForColor[]; hasMissingColor: boolean } {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const ferms = ingredients?.fermentable_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const ferms = ingredients?.['fermentable_additions'];
   const list = Array.isArray(ferms) ? ferms : [];
 
   const rows: ExtractedFermentableForColor[] = [];
@@ -116,18 +116,18 @@ function extractFermentablesForColor(beerJsonRecipeJson: unknown): { rows: Extra
 
   for (const f of list) {
     if (!isObject(f)) continue;
-    const amount = isObject(f.amount) ? f.amount : null;
+    const amount = isObject(f['amount']) ? f['amount'] : null;
     const amountKg =
-      amount?.unit === "kg"
-        ? safeNum(amount.value)
-        : amount?.unit === "g"
-          ? (safeNum(amount.value) ?? 0) / 1000
+      amount?.['unit'] === "kg"
+        ? safeNum(amount['value'])
+        : amount?.['unit'] === "g"
+          ? (safeNum(amount['value']) ?? 0) / 1000
           : null;
     if (amountKg == null || !(amountKg > 0)) continue;
 
-    const color = isObject(f.color) ? f.color : null;
+    const color = isObject(f['color']) ? f['color'] : null;
     const colorLovibond =
-      color?.unit === "Lovi" && isFiniteNumber(color.value) ? color.value : null;
+      color?.['unit'] === "Lovi" && isFiniteNumber(color['value']) ? color['value'] : null;
     if (colorLovibond == null) {
       hasMissingColor = true;
       continue;
@@ -171,7 +171,7 @@ const HOP_FORM_FACTOR: Record<HopForm, number> = {
 
 function extractHopFormOverrides(recipeExtJson: unknown): Record<string, HopForm> | null {
   if (!isObject(recipeExtJson)) return null;
-  const raw = recipeExtJson.hopFormOverrides;
+  const raw = recipeExtJson['hopFormOverrides'];
   if (!isObject(raw)) return null;
   const out: Record<string, HopForm> = {};
   for (const [k, v] of Object.entries(raw)) {
@@ -184,27 +184,27 @@ function extractHopFormOverrides(recipeExtJson: unknown): Record<string, HopForm
 
 function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown): ExtractedHopAddition[] {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const hops = ingredients?.hop_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const hops = ingredients?.['hop_additions'];
   const list = Array.isArray(hops) ? hops : [];
   const overrides = extractHopFormOverrides(recipeExtJson);
 
   const out: ExtractedHopAddition[] = [];
   for (const h of list) {
     if (!isObject(h)) continue;
-    const id = typeof h.id === "string" ? h.id : null;
-    const name = typeof h.name === "string" ? h.name : null;
+    const id = typeof h['id'] === "string" ? h['id'] : null;
+    const name = typeof h['name'] === "string" ? h['name'] : null;
     const override = id && overrides ? overrides[id] : null;
-    const formRaw = typeof h.form === "string" ? h.form : "";
+    const formRaw = typeof h['form'] === "string" ? h['form'] : "";
     const formFromBeerJson: HopForm | null =
       formRaw === "extract" || formRaw === "leaf" || formRaw === "leaf (wet)" || formRaw === "pellet" || formRaw === "powder" || formRaw === "plug"
         ? (formRaw)
         : null;
     const form: HopForm | null = override ?? formFromBeerJson;
 
-    const timing = isObject(h.timing) ? h.timing : null;
-    const timingUse = typeof timing?.use === "string" ? timing.use : "";
-    const savedUseRaw = typeof h.brewery_app_use === "string" ? h.brewery_app_use : "";
+    const timing = isObject(h['timing']) ? h['timing'] : null;
+    const timingUse = typeof timing?.['use'] === "string" ? timing['use'] : "";
+    const savedUseRaw = typeof h['brewery_app_use'] === "string" ? h['brewery_app_use'] : "";
     const savedUse: HopUse | null =
       savedUseRaw === "boil" || savedUseRaw === "whirlpool" || savedUseRaw === "dryhop" ? savedUseRaw : null;
     const use: HopUse =
@@ -214,12 +214,12 @@ function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown
           ? savedUse
           : "boil";
 
-    const duration = isObject(timing?.duration) ? timing.duration : null;
-    const timeMinutes = duration?.unit === "min" ? safeNum(duration.value) : null;
+    const duration = isObject(timing?.['duration']) ? timing['duration'] : null;
+    const timeMinutes = duration?.['unit'] === "min" ? safeNum(duration['value']) : null;
 
-    const amount = isObject(h.amount) ? h.amount : null;
-    const amountUnit = typeof amount?.unit === "string" ? amount.unit : "";
-    const amountValue = safeNum(amount?.value);
+    const amount = isObject(h['amount']) ? h['amount'] : null;
+    const amountUnit = typeof amount?.['unit'] === "string" ? amount['unit'] : "";
+    const amountValue = safeNum(amount?.['value']);
     const amountGrams =
       amountValue != null && amountValue >= 0
         ? amountUnit === "g"
@@ -229,8 +229,8 @@ function extractHopAdditions(beerJsonRecipeJson: unknown, recipeExtJson: unknown
             : null
         : null;
 
-    const alphaAcid = isObject(h.alpha_acid) ? h.alpha_acid : null;
-    const alphaAcidPercent = alphaAcid?.unit === "%" ? safeNum(alphaAcid.value) : null;
+    const alphaAcid = isObject(h['alpha_acid']) ? h['alpha_acid'] : null;
+    const alphaAcidPercent = alphaAcid?.['unit'] === "%" ? safeNum(alphaAcid['value']) : null;
 
     out.push({
       id,
@@ -343,21 +343,21 @@ function computeIbuRager(args: {
 }
 
 function extractEquipment(ext: unknown): ExtractedEquipment {
-  const e = isObject(ext) && isObject(ext.equipment) ? ext.equipment : null;
-  const kettle = e && isObject(e.kettle) ? e.kettle : null;
-  const mash = e && isObject(e.mash) ? e.mash : null;
-  const misc = e && isObject(e.misc) ? e.misc : null;
+  const e = isObject(ext) && isObject(ext['equipment']) ? ext['equipment'] : null;
+  const kettle = e && isObject(e['kettle']) ? e['kettle'] : null;
+  const mash = e && isObject(e['mash']) ? e['mash'] : null;
+  const misc = e && isObject(e['misc']) ? e['misc'] : null;
 
-  const kettleCapacityLiters = safeNum(kettle?.kettleVolumeLiters);
-  const kettleLossesLiters = safeNum(kettle?.kettleLossesLiters) ?? 0;
-  const kettleBoilEvaporationRatePercentPerHour = safeNum(kettle?.kettleBoilEvaporationRatePercentPerHour) ?? 0;
-  const kettleCoolingShrinkagePercent = safeNum(kettle?.kettleCoolingShrinkagePercent) ?? 0;
-  const kettleHopsAbsorptionLitersPerGram = safeNum(kettle?.kettleHopsAbsorptionLiters) ?? 0;
-  const mashLossesLiters = safeNum(mash?.mashLossesLiters) ?? 0;
-  const mashGrainAbsorptionLPerKg = safeNum(mash?.mashGrainAbsorptionLPerKg) ?? 0;
-  const mashWaterLeftoverLiters = safeNum(mash?.mashWaterLeftoverLiters) ?? 0;
-  const mashEfficiencyPercent = safeNum(mash?.mashEfficiencyPercent);
-  const otherLossesLiters = safeNum(misc?.otherLossesLiters) ?? 0;
+  const kettleCapacityLiters = safeNum(kettle?.['kettleVolumeLiters']);
+  const kettleLossesLiters = safeNum(kettle?.['kettleLossesLiters']) ?? 0;
+  const kettleBoilEvaporationRatePercentPerHour = safeNum(kettle?.['kettleBoilEvaporationRatePercentPerHour']) ?? 0;
+  const kettleCoolingShrinkagePercent = safeNum(kettle?.['kettleCoolingShrinkagePercent']) ?? 0;
+  const kettleHopsAbsorptionLitersPerGram = safeNum(kettle?.['kettleHopsAbsorptionLiters']) ?? 0;
+  const mashLossesLiters = safeNum(mash?.['mashLossesLiters']) ?? 0;
+  const mashGrainAbsorptionLPerKg = safeNum(mash?.['mashGrainAbsorptionLPerKg']) ?? 0;
+  const mashWaterLeftoverLiters = safeNum(mash?.['mashWaterLeftoverLiters']) ?? 0;
+  const mashEfficiencyPercent = safeNum(mash?.['mashEfficiencyPercent']);
+  const otherLossesLiters = safeNum(misc?.['otherLossesLiters']) ?? 0;
 
   return {
     kettleCapacityLiters: kettleCapacityLiters != null && kettleCapacityLiters > 0 ? kettleCapacityLiters : null,
@@ -377,22 +377,22 @@ function extractEquipment(ext: unknown): ExtractedEquipment {
 }
 
 function extractBoilTimeHours(args: { beerJsonRecipeJson: unknown; recipeExtJson: unknown }): number {
-  const override = isObject(args.recipeExtJson) ? args.recipeExtJson.boilTimeMinutesOverride : null;
+  const override = isObject(args.recipeExtJson) ? args.recipeExtJson['boilTimeMinutesOverride'] : null;
   if (typeof override === "number" && Number.isFinite(override) && override >= 0) {
     return override / 60;
   }
   const r0 = extractFirstRecipe(args.beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const hops = ingredients?.hop_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const hops = ingredients?.['hop_additions'];
   const list = Array.isArray(hops) ? hops : [];
   let maxMinutes = 0;
   for (const h of list) {
     if (!isObject(h)) continue;
-    const timing = isObject(h.timing) ? h.timing : null;
-    const use = typeof timing?.use === "string" ? timing.use : "";
+    const timing = isObject(h['timing']) ? h['timing'] : null;
+    const use = typeof timing?.['use'] === "string" ? timing['use'] : "";
     if (use !== "add_to_boil") continue;
-    const duration = isObject(timing?.duration) ? timing.duration : null;
-    const minutes = duration?.unit === "min" ? safeNum(duration.value) : null;
+    const duration = isObject(timing?.['duration']) ? timing['duration'] : null;
+    const minutes = duration?.['unit'] === "min" ? safeNum(duration['value']) : null;
     if (minutes != null && minutes > maxMinutes) maxMinutes = minutes;
   }
   const inferredMinutes = maxMinutes > 0 ? maxMinutes : 60;
@@ -401,18 +401,18 @@ function extractBoilTimeHours(args: { beerJsonRecipeJson: unknown; recipeExtJson
 
 function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const hops = ingredients?.hop_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const hops = ingredients?.['hop_additions'];
   const list = Array.isArray(hops) ? hops : [];
   let totalGrams = 0;
   for (const h of list) {
     if (!isObject(h)) continue;
-    const timing = isObject(h.timing) ? h.timing : null;
-    const use = typeof timing?.use === "string" ? timing.use : "";
+    const timing = isObject(h['timing']) ? h['timing'] : null;
+    const use = typeof timing?.['use'] === "string" ? timing['use'] : "";
     if (use !== "add_to_boil") continue;
-    const amount = isObject(h.amount) ? h.amount : null;
-    const unit = typeof amount?.unit === "string" ? amount.unit : "";
-    const value = safeNum(amount?.value);
+    const amount = isObject(h['amount']) ? h['amount'] : null;
+    const unit = typeof amount?.['unit'] === "string" ? amount['unit'] : "";
+    const value = safeNum(amount?.['value']);
     if (value == null || !(value > 0)) continue;
     if (unit === "g") totalGrams += value;
     if (unit === "kg") totalGrams += value * 1000;
@@ -422,17 +422,17 @@ function extractKettleHopMassGrams(beerJsonRecipeJson: unknown): number {
 
 function extractTotalGrainKg(beerJsonRecipeJson: unknown): number {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const ferms = ingredients?.fermentable_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const ferms = ingredients?.['fermentable_additions'];
   const list = Array.isArray(ferms) ? ferms : [];
   let totalKg = 0;
   for (const f of list) {
     if (!isObject(f)) continue;
-    const type = typeof f.type === "string" ? f.type.trim().toLowerCase() : "";
+    const type = typeof f['type'] === "string" ? f['type'].trim().toLowerCase() : "";
     if (type !== "grain") continue;
-    const amount = isObject(f.amount) ? f.amount : null;
-    const unit = typeof amount?.unit === "string" ? amount.unit : "";
-    const value = safeNum(amount?.value);
+    const amount = isObject(f['amount']) ? f['amount'] : null;
+    const unit = typeof amount?.['unit'] === "string" ? amount['unit'] : "";
+    const value = safeNum(amount?.['value']);
     if (value == null || !(value > 0)) continue;
     if (unit === "kg") totalKg += value;
     if (unit === "g") totalKg += value / 1000;
@@ -442,27 +442,27 @@ function extractTotalGrainKg(beerJsonRecipeJson: unknown): number {
 
 function extractFermentablesPpgAndPounds(beerJsonRecipeJson: unknown): Array<{ ppg: number; pounds: number }> {
   const r0 = extractFirstRecipe(beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const ferms = ingredients?.fermentable_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const ferms = ingredients?.['fermentable_additions'];
   const list = Array.isArray(ferms) ? ferms : [];
   const out: Array<{ ppg: number; pounds: number }> = [];
 
   for (const f of list) {
     if (!isObject(f)) continue;
-    const amount = isObject(f.amount) ? f.amount : null;
+    const amount = isObject(f['amount']) ? f['amount'] : null;
     const amountKg =
-      amount?.unit === "kg"
-        ? safeNum(amount.value)
-        : amount?.unit === "g"
-          ? (safeNum(amount.value) ?? 0) / 1000
+      amount?.['unit'] === "kg"
+        ? safeNum(amount['value'])
+        : amount?.['unit'] === "g"
+          ? (safeNum(amount['value']) ?? 0) / 1000
           : null;
     if (amountKg == null || !(amountKg > 0)) continue;
 
-    const yieldObj = isObject(f.yield) ? f.yield : null;
-    const potential = isObject(yieldObj?.potential) ? yieldObj.potential : null;
-    const fineGrind = isObject(yieldObj?.fine_grind) ? yieldObj.fine_grind : null;
-    const potentialSg = potential?.unit === "sg" ? safeNum(potential.value) : null;
-    const yieldPercent = fineGrind?.unit === "%" ? safeNum(fineGrind.value) : null;
+    const yieldObj = isObject(f['yield']) ? f['yield'] : null;
+    const potential = isObject(yieldObj?.['potential']) ? yieldObj['potential'] : null;
+    const fineGrind = isObject(yieldObj?.['fine_grind']) ? yieldObj['fine_grind'] : null;
+    const potentialSg = potential?.['unit'] === "sg" ? safeNum(potential['value']) : null;
+    const yieldPercent = fineGrind?.['unit'] === "%" ? safeNum(fineGrind['value']) : null;
 
     let ppg: number | null = null;
     if (potentialSg != null && potentialSg > 1) {
@@ -493,24 +493,24 @@ function estimateSgFromPpg(args: { fermentables: Array<{ ppg: number; pounds: nu
 
 function extractYeastAttenuations(args: { beerJsonRecipeJson: unknown; recipeExtJson: unknown }): ExtractedYeastAttenuation[] {
   const r0 = extractFirstRecipe(args.beerJsonRecipeJson);
-  const ingredients = r0 && isObject(r0.ingredients) ? r0.ingredients : null;
-  const cultures = ingredients?.culture_additions;
+  const ingredients = r0 && isObject(r0['ingredients']) ? r0['ingredients'] : null;
+  const cultures = ingredients?.['culture_additions'];
   const list = Array.isArray(cultures) ? cultures : [];
 
   const ext = isObject(args.recipeExtJson) ? args.recipeExtJson : null;
-  const overrides = isObject(ext?.yeastAttenuationOverridesPercent) ? ext.yeastAttenuationOverridesPercent : null;
-  const rangeMap = isObject(ext?.yeastAttenuationRange) ? ext.yeastAttenuationRange : null;
+  const overrides = isObject(ext?.['yeastAttenuationOverridesPercent']) ? ext['yeastAttenuationOverridesPercent'] : null;
+  const rangeMap = isObject(ext?.['yeastAttenuationRange']) ? ext['yeastAttenuationRange'] : null;
 
   const out: ExtractedYeastAttenuation[] = [];
   for (const c of list) {
     if (!isObject(c)) continue;
-    const id = typeof c.id === "string" ? c.id : "";
+    const id = typeof c['id'] === "string" ? c['id'] : "";
     if (!id) continue;
-    const attenuation = isObject(c.attenuation) ? c.attenuation : null;
-    const beerJsonAtt = attenuation?.unit === "%" ? safeNum(attenuation.value) : null;
+    const attenuation = isObject(c['attenuation']) ? c['attenuation'] : null;
+    const beerJsonAtt = attenuation?.['unit'] === "%" ? safeNum(attenuation['value']) : null;
     const rangeEntry = rangeMap && isObject(rangeMap[id]) ? rangeMap[id] : null;
-    const rangeMin = isFiniteNumber(rangeEntry?.min) ? rangeEntry.min : null;
-    const rangeMax = isFiniteNumber(rangeEntry?.max) ? rangeEntry.max : null;
+    const rangeMin = isFiniteNumber(rangeEntry?.['min']) ? rangeEntry['min'] : null;
+    const rangeMax = isFiniteNumber(rangeEntry?.['max']) ? rangeEntry['max'] : null;
     const rangeAvg =
       rangeMin != null && rangeMax != null ? (rangeMin + rangeMax) / 2 : null;
     const attenuationPercent =
@@ -573,9 +573,9 @@ export function computeRecipeGravityAnalysis(args: {
 
   const water = isObject(args.recipeWaterSettings) ? args.recipeWaterSettings : null;
 
-  const mashWaterVolumeLiters = isFiniteNumber(water?.mashWaterVolumeLiters) ? water.mashWaterVolumeLiters : null;
-  const spargeVolumeLiters = isFiniteNumber(water?.spargeVolumeLiters) ? water.spargeVolumeLiters : null;
-  const boilWaterVolumeLiters = isFiniteNumber(water?.boilWaterVolumeLiters) ? water.boilWaterVolumeLiters : 0;
+  const mashWaterVolumeLiters = isFiniteNumber(water?.['mashWaterVolumeLiters']) ? water['mashWaterVolumeLiters'] : null;
+  const spargeVolumeLiters = isFiniteNumber(water?.['spargeVolumeLiters']) ? water['spargeVolumeLiters'] : null;
+  const boilWaterVolumeLiters = isFiniteNumber(water?.['boilWaterVolumeLiters']) ? water['boilWaterVolumeLiters'] : 0;
 
   const boilTimeHours = extractBoilTimeHours({
     beerJsonRecipeJson: args.beerJsonRecipeJson,
@@ -645,12 +645,12 @@ export function computeRecipeGravityAnalysis(args: {
 
   const efficiencyPercent =
     equipment.mashEfficiencyPercent ??
-    (isObject(args.recipeExtJson) ? safeNum(args.recipeExtJson.brewhouseEfficiencyPercent) : null) ??
+    (isObject(args.recipeExtJson) ? safeNum(args.recipeExtJson['brewhouseEfficiencyPercent']) : null) ??
     (() => {
       const r0 = extractFirstRecipe(args.beerJsonRecipeJson);
-      const efficiency = r0 && isObject(r0.efficiency) ? r0.efficiency : null;
-      const brewhouse = isObject(efficiency?.brewhouse) ? efficiency.brewhouse : null;
-      return brewhouse?.unit === "%" ? safeNum(brewhouse.value) : null;
+      const efficiency = r0 && isObject(r0['efficiency']) ? r0['efficiency'] : null;
+      const brewhouse = isObject(efficiency?.['brewhouse']) ? efficiency['brewhouse'] : null;
+      return brewhouse?.['unit'] === "%" ? safeNum(brewhouse['value']) : null;
     })() ??
     0;
 

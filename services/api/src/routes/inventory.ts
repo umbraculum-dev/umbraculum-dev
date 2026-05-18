@@ -32,7 +32,7 @@ export function inventoryRoutes(app: FastifyInstance) {
   app.post("/inventory", async (req) => {
     const ctx = requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
-    const q = body.quantity;
+    const q = body['quantity'];
     const quantity =
       typeof q === "number" && Number.isFinite(q)
         ? q
@@ -40,12 +40,12 @@ export function inventoryRoutes(app: FastifyInstance) {
           ? parseFloat(q)
           : 0;
     const created = await svc.createItem(ctx.userId, ctx.activeWorkspaceId, {
-      category: body.category,
-      ingredientId: body.ingredientId,
-      name: typeof body.name === "string" ? body.name : "",
+      category: body['category'],
+      ingredientId: body['ingredientId'],
+      name: typeof body['name'] === "string" ? body['name'] : "",
       quantity: Number.isFinite(quantity) ? quantity : 0,
-      unit: body.unit ?? "kg",
-      metadata: body.metadata,
+      unit: body['unit'] ?? "kg",
+      metadata: body['metadata'],
     });
     return { ok: true, item: toItemPayload(created) };
   });
@@ -56,10 +56,10 @@ export function inventoryRoutes(app: FastifyInstance) {
     const id = typeof params.id === "string" ? params.id : "";
     const body = (req.body ?? {}) as Record<string, unknown>;
     const updated = await svc.updateItem(ctx.userId, ctx.activeWorkspaceId, id, {
-      name: typeof body.name === "string" ? body.name : undefined,
-      quantity: body.quantity,
-      unit: body.unit,
-      metadata: body.metadata,
+      name: typeof body['name'] === "string" ? body['name'] : undefined,
+      quantity: body['quantity'],
+      unit: body['unit'],
+      metadata: body['metadata'],
     });
     return { ok: true, item: toItemPayload(updated) };
   });

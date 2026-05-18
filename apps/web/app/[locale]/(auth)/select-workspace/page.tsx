@@ -23,7 +23,7 @@ function writeCookie(name: string, value: string) {
 
 function setBrand(brandKey: string) {
   writeCookie(BRAND_COOKIE, brandKey);
-  document.documentElement.dataset.brand = brandKey;
+  document.documentElement.dataset['brand'] = brandKey;
 }
 
 export default function SelectWorkspacePage() {

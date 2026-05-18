@@ -68,11 +68,11 @@ async function seedBeerStyles(prisma: PrismaClient) {
   let sortOrder = 0;
   for (const s of styles as unknown[]) {
     if (!isRecord(s)) continue;
-    const styleId = typeof s.style_id === "string" ? s.style_id.trim() : "";
-    const name = typeof s.name === "string" ? s.name.trim() : "";
+    const styleId = typeof s['style_id'] === "string" ? s['style_id'].trim() : "";
+    const name = typeof s['name'] === "string" ? s['name'].trim() : "";
     if (!styleId || !name) continue;
-    const category = typeof s.category === "string" ? s.category.trim() : null;
-    const categoryId = typeof s.category_id === "string" ? s.category_id.trim() : null;
+    const category = typeof s['category'] === "string" ? s['category'].trim() : null;
+    const categoryId = typeof s['category_id'] === "string" ? s['category_id'].trim() : null;
     const key = `bjcp-2021:${styleId}`;
     seenKeys.push(key);
     await prisma.beerStyle.upsert({
@@ -312,8 +312,8 @@ async function main() {
   // Usage:
   //   SEEDED_OWNER_EMAIL="..." SEEDED_OWNER_PASSWORD="..." docker compose exec -T api npm run db:seed
   //
-  const seededOwnerEmailRaw = process.env.SEEDED_OWNER_EMAIL;
-  const seededOwnerPassword = process.env.SEEDED_OWNER_PASSWORD;
+  const seededOwnerEmailRaw = process.env['SEEDED_OWNER_EMAIL'];
+  const seededOwnerPassword = process.env['SEEDED_OWNER_PASSWORD'];
   if (typeof seededOwnerEmailRaw === "string" && typeof seededOwnerPassword === "string") {
     const seededOwnerEmail = normalizeEmail(seededOwnerEmailRaw);
     if (seededOwnerEmail && seededOwnerEmail.includes("@") && seededOwnerPassword.length >= 8) {

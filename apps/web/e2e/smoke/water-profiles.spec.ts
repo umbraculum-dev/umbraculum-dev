@@ -69,7 +69,7 @@ test.describe("water profiles list (Phase 4b L5 regression-pin)", () => {
     // on the wire. If a future PR re-introduces it (intentionally or
     // not), this fires so we explicitly notice.
     expect(
-      (body as Record<string, unknown>).account,
+      (body as Record<string, unknown>)['account'],
       "Legacy `body.account` key should not exist on the wire (Phase 4b regression)",
     ).toBeUndefined();
   });

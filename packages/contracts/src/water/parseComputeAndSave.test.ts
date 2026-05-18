@@ -102,7 +102,7 @@ describe("parseMashComputeAndSaveResponse", () => {
       expect(parsed.acid.result.estimatedMashPhRoomTemp).toBeCloseTo(5.42, 2);
     }
     expect(parsed.overall.result.ph).toEqual({ kind: "estimated", value: 5.42 });
-    expect(parsed.formatHints?.ph).toEqual({ version: 1, style: "fixed", decimals: 2 });
+    expect(parsed.formatHints?.['ph']).toEqual({ version: 1, style: "fixed", decimals: 2 });
   });
 
   it("rejects when ok is false", () => {

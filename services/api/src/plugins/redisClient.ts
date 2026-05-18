@@ -9,7 +9,7 @@ declare module "fastify" {
 }
 
 export const redisClientPlugin = fp(async (app: FastifyInstance) => {
-  const url = process.env.REDIS_URL;
+  const url = process.env['REDIS_URL'];
   if (typeof url !== "string" || !url.trim()) return;
 
   const client: RedisClientType = createClient({ url });

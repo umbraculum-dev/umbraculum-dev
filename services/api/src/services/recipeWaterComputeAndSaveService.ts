@@ -143,11 +143,11 @@ function parseSaltAdditions(value: unknown, field: string): SaltAddition[] {
   }
   return value.map((row, idx) => {
     const o = (row ?? {}) as Record<string, unknown>;
-    const saltKey = o.saltKey as SaltKey;
+    const saltKey = o['saltKey'] as SaltKey;
     if (typeof saltKey !== "string") {
       throw new BadRequestError("invalid_salt_key", `Body.${field}[${idx}].saltKey must be a string`);
     }
-    const grams = typeof o.grams === "number" ? o.grams : NaN;
+    const grams = typeof o['grams'] === "number" ? o['grams'] : NaN;
     if (!Number.isFinite(grams) || grams < 0) {
       throw new BadRequestError("invalid_salt_grams", `Body.${field}[${idx}].grams must be a number >= 0`);
     }
@@ -524,26 +524,26 @@ export class RecipeWaterComputeAndSaveService {
     };
 
     if (mashMode === "manual" && "predicted" in acidResult) {
-      patch.mashManualLastAchievedPh = acidResult.achievedPh;
-      patch.mashManualLastFinalAlkalinityPpmCaCO3 = acidResult.predicted.finalAlkalinityPpmCaCO3;
-      patch.mashManualLastSulfateAddedPpm = acidResult.predicted.sulfateAddedPpm;
-      patch.mashManualLastChlorideAddedPpm = acidResult.predicted.chlorideAddedPpm;
-      patch.mashManualLastCalculatedAt = nowIso;
+      patch['mashManualLastAchievedPh'] = acidResult.achievedPh;
+      patch['mashManualLastFinalAlkalinityPpmCaCO3'] = acidResult.predicted.finalAlkalinityPpmCaCO3;
+      patch['mashManualLastSulfateAddedPpm'] = acidResult.predicted.sulfateAddedPpm;
+      patch['mashManualLastChlorideAddedPpm'] = acidResult.predicted.chlorideAddedPpm;
+      patch['mashManualLastCalculatedAt'] = nowIso;
 
-      patch.mashLastFinalAlkalinityPpmCaCO3 = acidResult.predicted.finalAlkalinityPpmCaCO3;
-      patch.mashLastSulfateAddedPpm = acidResult.predicted.sulfateAddedPpm;
-      patch.mashLastChlorideAddedPpm = acidResult.predicted.chlorideAddedPpm;
-      patch.mashLastCalculatedAt = nowIso;
+      patch['mashLastFinalAlkalinityPpmCaCO3'] = acidResult.predicted.finalAlkalinityPpmCaCO3;
+      patch['mashLastSulfateAddedPpm'] = acidResult.predicted.sulfateAddedPpm;
+      patch['mashLastChlorideAddedPpm'] = acidResult.predicted.chlorideAddedPpm;
+      patch['mashLastCalculatedAt'] = nowIso;
     } else if (mashMode !== "manual") {
       const r = acidResult as MashAcidificationTargetMashPhResult | SpargeAcidificationResult;
-      patch.mashLastAcidRequiredMl = r.acidRequiredMl ?? null;
-      patch.mashLastAcidRequiredTsp = r.acidRequiredTsp ?? null;
-      patch.mashLastAcidRequiredGrams = r.acidRequiredGrams ?? null;
-      patch.mashLastAcidRequiredKg = r.acidRequiredKg ?? null;
-      patch.mashLastFinalAlkalinityPpmCaCO3 = r.finalAlkalinityPpmCaCO3 ?? null;
-      patch.mashLastSulfateAddedPpm = r.sulfateAddedPpm ?? null;
-      patch.mashLastChlorideAddedPpm = r.chlorideAddedPpm ?? null;
-      patch.mashLastCalculatedAt = nowIso;
+      patch['mashLastAcidRequiredMl'] = r.acidRequiredMl ?? null;
+      patch['mashLastAcidRequiredTsp'] = r.acidRequiredTsp ?? null;
+      patch['mashLastAcidRequiredGrams'] = r.acidRequiredGrams ?? null;
+      patch['mashLastAcidRequiredKg'] = r.acidRequiredKg ?? null;
+      patch['mashLastFinalAlkalinityPpmCaCO3'] = r.finalAlkalinityPpmCaCO3 ?? null;
+      patch['mashLastSulfateAddedPpm'] = r.sulfateAddedPpm ?? null;
+      patch['mashLastChlorideAddedPpm'] = r.chlorideAddedPpm ?? null;
+      patch['mashLastCalculatedAt'] = nowIso;
     }
 
     await this.settings.upsert(userId, workspaceId, recipeId, patch);
@@ -679,30 +679,30 @@ export class RecipeWaterComputeAndSaveService {
     };
 
     if (mode === "manual" && "predicted" in acidResult) {
-      patch.spargeLastAcidRequiredMl = acidPredicted.acidRequiredMl ?? null;
-      patch.spargeLastAcidRequiredTsp = acidPredicted.acidRequiredTsp ?? null;
-      patch.spargeLastAcidRequiredGrams = acidPredicted.acidRequiredGrams ?? null;
-      patch.spargeLastAcidRequiredKg = acidPredicted.acidRequiredKg ?? null;
-      patch.spargeLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
-      patch.spargeLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
-      patch.spargeLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
-      patch.spargeLastCalculatedAt = nowIso;
+      patch['spargeLastAcidRequiredMl'] = acidPredicted.acidRequiredMl ?? null;
+      patch['spargeLastAcidRequiredTsp'] = acidPredicted.acidRequiredTsp ?? null;
+      patch['spargeLastAcidRequiredGrams'] = acidPredicted.acidRequiredGrams ?? null;
+      patch['spargeLastAcidRequiredKg'] = acidPredicted.acidRequiredKg ?? null;
+      patch['spargeLastFinalAlkalinityPpmCaCO3'] = acidPredicted.finalAlkalinityPpmCaCO3;
+      patch['spargeLastSulfateAddedPpm'] = acidPredicted.sulfateAddedPpm;
+      patch['spargeLastChlorideAddedPpm'] = acidPredicted.chlorideAddedPpm;
+      patch['spargeLastCalculatedAt'] = nowIso;
 
-      patch.spargeManualLastAchievedPh = acidResult.achievedPh;
-      patch.spargeManualLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
-      patch.spargeManualLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
-      patch.spargeManualLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
-      patch.spargeManualLastCalculatedAt = nowIso;
+      patch['spargeManualLastAchievedPh'] = acidResult.achievedPh;
+      patch['spargeManualLastFinalAlkalinityPpmCaCO3'] = acidPredicted.finalAlkalinityPpmCaCO3;
+      patch['spargeManualLastSulfateAddedPpm'] = acidPredicted.sulfateAddedPpm;
+      patch['spargeManualLastChlorideAddedPpm'] = acidPredicted.chlorideAddedPpm;
+      patch['spargeManualLastCalculatedAt'] = nowIso;
     } else if (mode !== "manual") {
       const r = acidResult as SpargeAcidificationResult;
-      patch.spargeLastAcidRequiredMl = r.acidRequiredMl ?? null;
-      patch.spargeLastAcidRequiredTsp = r.acidRequiredTsp ?? null;
-      patch.spargeLastAcidRequiredGrams = r.acidRequiredGrams ?? null;
-      patch.spargeLastAcidRequiredKg = r.acidRequiredKg ?? null;
-      patch.spargeLastFinalAlkalinityPpmCaCO3 = r.finalAlkalinityPpmCaCO3 ?? null;
-      patch.spargeLastSulfateAddedPpm = r.sulfateAddedPpm ?? null;
-      patch.spargeLastChlorideAddedPpm = r.chlorideAddedPpm ?? null;
-      patch.spargeLastCalculatedAt = nowIso;
+      patch['spargeLastAcidRequiredMl'] = r.acidRequiredMl ?? null;
+      patch['spargeLastAcidRequiredTsp'] = r.acidRequiredTsp ?? null;
+      patch['spargeLastAcidRequiredGrams'] = r.acidRequiredGrams ?? null;
+      patch['spargeLastAcidRequiredKg'] = r.acidRequiredKg ?? null;
+      patch['spargeLastFinalAlkalinityPpmCaCO3'] = r.finalAlkalinityPpmCaCO3 ?? null;
+      patch['spargeLastSulfateAddedPpm'] = r.sulfateAddedPpm ?? null;
+      patch['spargeLastChlorideAddedPpm'] = r.chlorideAddedPpm ?? null;
+      patch['spargeLastCalculatedAt'] = nowIso;
     }
 
     await this.settings.upsert(userId, workspaceId, recipeId, patch);
@@ -922,30 +922,30 @@ export class RecipeWaterComputeAndSaveService {
     };
 
     if (mode === "manual" && "predicted" in acidResult) {
-      patch.boilLastAcidRequiredMl = acidPredicted.acidRequiredMl ?? null;
-      patch.boilLastAcidRequiredTsp = acidPredicted.acidRequiredTsp ?? null;
-      patch.boilLastAcidRequiredGrams = acidPredicted.acidRequiredGrams ?? null;
-      patch.boilLastAcidRequiredKg = acidPredicted.acidRequiredKg ?? null;
-      patch.boilLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
-      patch.boilLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
-      patch.boilLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
-      patch.boilLastCalculatedAt = nowIso;
+      patch['boilLastAcidRequiredMl'] = acidPredicted.acidRequiredMl ?? null;
+      patch['boilLastAcidRequiredTsp'] = acidPredicted.acidRequiredTsp ?? null;
+      patch['boilLastAcidRequiredGrams'] = acidPredicted.acidRequiredGrams ?? null;
+      patch['boilLastAcidRequiredKg'] = acidPredicted.acidRequiredKg ?? null;
+      patch['boilLastFinalAlkalinityPpmCaCO3'] = acidPredicted.finalAlkalinityPpmCaCO3;
+      patch['boilLastSulfateAddedPpm'] = acidPredicted.sulfateAddedPpm;
+      patch['boilLastChlorideAddedPpm'] = acidPredicted.chlorideAddedPpm;
+      patch['boilLastCalculatedAt'] = nowIso;
 
-      patch.boilManualLastAchievedPh = acidResult.achievedPh;
-      patch.boilManualLastFinalAlkalinityPpmCaCO3 = acidPredicted.finalAlkalinityPpmCaCO3;
-      patch.boilManualLastSulfateAddedPpm = acidPredicted.sulfateAddedPpm;
-      patch.boilManualLastChlorideAddedPpm = acidPredicted.chlorideAddedPpm;
-      patch.boilManualLastCalculatedAt = nowIso;
+      patch['boilManualLastAchievedPh'] = acidResult.achievedPh;
+      patch['boilManualLastFinalAlkalinityPpmCaCO3'] = acidPredicted.finalAlkalinityPpmCaCO3;
+      patch['boilManualLastSulfateAddedPpm'] = acidPredicted.sulfateAddedPpm;
+      patch['boilManualLastChlorideAddedPpm'] = acidPredicted.chlorideAddedPpm;
+      patch['boilManualLastCalculatedAt'] = nowIso;
     } else if (mode !== "manual") {
       const r = acidResult as SpargeAcidificationResult;
-      patch.boilLastAcidRequiredMl = r.acidRequiredMl ?? null;
-      patch.boilLastAcidRequiredTsp = r.acidRequiredTsp ?? null;
-      patch.boilLastAcidRequiredGrams = r.acidRequiredGrams ?? null;
-      patch.boilLastAcidRequiredKg = r.acidRequiredKg ?? null;
-      patch.boilLastFinalAlkalinityPpmCaCO3 = r.finalAlkalinityPpmCaCO3 ?? null;
-      patch.boilLastSulfateAddedPpm = r.sulfateAddedPpm ?? null;
-      patch.boilLastChlorideAddedPpm = r.chlorideAddedPpm ?? null;
-      patch.boilLastCalculatedAt = nowIso;
+      patch['boilLastAcidRequiredMl'] = r.acidRequiredMl ?? null;
+      patch['boilLastAcidRequiredTsp'] = r.acidRequiredTsp ?? null;
+      patch['boilLastAcidRequiredGrams'] = r.acidRequiredGrams ?? null;
+      patch['boilLastAcidRequiredKg'] = r.acidRequiredKg ?? null;
+      patch['boilLastFinalAlkalinityPpmCaCO3'] = r.finalAlkalinityPpmCaCO3 ?? null;
+      patch['boilLastSulfateAddedPpm'] = r.sulfateAddedPpm ?? null;
+      patch['boilLastChlorideAddedPpm'] = r.chlorideAddedPpm ?? null;
+      patch['boilLastCalculatedAt'] = nowIso;
     }
 
     await this.settings.upsert(userId, workspaceId, recipeId, patch);

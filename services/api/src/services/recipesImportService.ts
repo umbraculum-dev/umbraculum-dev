@@ -40,27 +40,27 @@ export function parseBeerJsonContent(content: string): unknown {
 
 function getFirstRecipe(doc: unknown): Record<string, unknown> | null {
   if (!isObject(doc)) return null;
-  const beerjson = isObject(doc.beerjson) ? doc.beerjson : null;
-  const recipesArr: unknown[] = Array.isArray(beerjson?.recipes) ? beerjson.recipes : [];
+  const beerjson = isObject(doc['beerjson']) ? doc['beerjson'] : null;
+  const recipesArr: unknown[] = Array.isArray(beerjson?.['recipes']) ? beerjson['recipes'] : [];
   const r0 = recipesArr[0];
   return isObject(r0) ? r0 : null;
 }
 
 export function extractRecipeMetaFromBeerJson(doc: unknown): { recipeName: string; notes: string | null } {
   const r0 = getFirstRecipe(doc);
-  const recipeName = typeof r0?.name === "string" ? r0.name.trim() : "";
+  const recipeName = typeof r0?.['name'] === "string" ? r0['name'].trim() : "";
   if (!recipeName) throw new BadRequestError("invalid_beerjson", "BeerJSON recipe name is required");
-  const notes = typeof r0?.notes === "string" ? r0.notes.trim() || null : null;
+  const notes = typeof r0?.['notes'] === "string" ? r0['notes'].trim() || null : null;
   return { recipeName, notes };
 }
 
 export function extractStyleCandidateFromBeerJsonRecipe(r0: unknown): StyleCandidate | null {
   if (!isObject(r0)) return null;
-  const style = isObject(r0.style) ? r0.style : null;
+  const style = isObject(r0['style']) ? r0['style'] : null;
   if (!style) return null;
-  const name = typeof style.name === "string" ? style.name.trim() : "";
-  const categoryNumberRaw = style.category_number;
-  const styleLetter = typeof style.style_letter === "string" ? style.style_letter.trim() : "";
+  const name = typeof style['name'] === "string" ? style['name'].trim() : "";
+  const categoryNumberRaw = style['category_number'];
+  const styleLetter = typeof style['style_letter'] === "string" ? style['style_letter'].trim() : "";
   const categoryNumber =
     typeof categoryNumberRaw === "number" && Number.isFinite(categoryNumberRaw) ? String(categoryNumberRaw)
       : typeof categoryNumberRaw === "string" ? categoryNumberRaw.trim()
@@ -119,8 +119,8 @@ export function parseBulkImportContent(format: ImportFormat, content: string): B
   const doc = parseBeerJsonContent(content);
   const v = validateBeerJsonDoc(doc);
   if (!v.ok) throw new BadRequestError("invalid_beerjson_recipe", `BeerJSON is invalid: ${v.errors}`);
-  const beerjsonNode = isObject(doc) && isObject(doc.beerjson) ? doc.beerjson : null;
-  const recipesArr: unknown[] = beerjsonNode && Array.isArray(beerjsonNode.recipes) ? beerjsonNode.recipes : [];
+  const beerjsonNode = isObject(doc) && isObject(doc['beerjson']) ? doc['beerjson'] : null;
+  const recipesArr: unknown[] = beerjsonNode && Array.isArray(beerjsonNode['recipes']) ? beerjsonNode['recipes'] : [];
   if (recipesArr.length === 0) throw new BadRequestError("invalid_beerjson", "BeerJSON must contain at least one recipe");
 
   return recipesArr.map((r, idx) => {

@@ -38,7 +38,7 @@ function settingsToForm(s: WorkspaceAiSettings): FormState {
   };
 }
 
-const CONCIERGE_URL = process.env.NEXT_PUBLIC_CONCIERGE_BOOKING_URL ?? "";
+const CONCIERGE_URL = process.env['NEXT_PUBLIC_CONCIERGE_BOOKING_URL'] ?? "";
 
 export default function AiSettingsPage() {
   const tCommon = useTranslations("common");
@@ -84,9 +84,9 @@ export default function AiSettingsPage() {
       dataEgressAccepted: form.dataEgressAccepted,
     };
     if (form.clearKey) {
-      body.apiKey = "";
+      body['apiKey'] = "";
     } else if (form.apiKey.length > 0) {
-      body.apiKey = form.apiKey;
+      body['apiKey'] = form.apiKey;
     }
     const res = await apiFetch(`/api/workspaces/${workspaceId}/ai/settings`, {
       method: "PUT",

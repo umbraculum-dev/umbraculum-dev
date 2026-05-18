@@ -9,7 +9,7 @@ function getAuthHeader(req: FastifyRequest): string | null {
 
 function requireRevenueCatAuth(req: FastifyRequest) {
   // RevenueCat webhook security uses a configurable Authorization header value (not an HMAC signature).
-  const expected = (process.env.REVENUECAT_WEBHOOK_AUTH ?? process.env.REVENUECAT_WEBHOOK_SECRET ?? "").trim();
+  const expected = (process.env['REVENUECAT_WEBHOOK_AUTH'] ?? process.env['REVENUECAT_WEBHOOK_SECRET'] ?? "").trim();
   if (!expected) return; // dev/stub mode
 
   const actual = getAuthHeader(req);

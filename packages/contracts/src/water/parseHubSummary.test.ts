@@ -80,7 +80,7 @@ describe("parseRecipeWaterHubSummaryResponse", () => {
       max: 0,
       rationaleKey: "styleExpectedRaPale",
     });
-    expect(parsed.formatHints?.pH).toEqual({ version: 1, style: "fixed", decimals: 2 });
+    expect(parsed.formatHints?.['pH']).toEqual({ version: 1, style: "fixed", decimals: 2 });
   });
 
   it("rejects when ok is not true", () => {

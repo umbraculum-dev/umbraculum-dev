@@ -70,50 +70,50 @@ export function parseGristJson(value: unknown): GristRow[] {
   return value
     .map((row) => {
       const o = (row ?? {}) as Record<string, unknown>;
-      const id = typeof o.id === "string" ? o.id : newRowId();
-      const ingredientIdRaw = o.ingredientId;
+      const id = typeof o['id'] === "string" ? o['id'] : newRowId();
+      const ingredientIdRaw = o['ingredientId'];
       const ingredientId =
         ingredientIdRaw === null || ingredientIdRaw === undefined
           ? null
           : typeof ingredientIdRaw === "string"
             ? ingredientIdRaw
             : null;
-      const name = typeof o.name === "string" ? o.name : "";
-      const producer = typeof o.producer === "string" ? o.producer : null;
-      const group = typeof o.group === "string" ? o.group : null;
-      const mashDiPh = typeof o.mashDiPh === "number" && Number.isFinite(o.mashDiPh) ? o.mashDiPh : null;
+      const name = typeof o['name'] === "string" ? o['name'] : "";
+      const producer = typeof o['producer'] === "string" ? o['producer'] : null;
+      const group = typeof o['group'] === "string" ? o['group'] : null;
+      const mashDiPh = typeof o['mashDiPh'] === "number" && Number.isFinite(o['mashDiPh']) ? o['mashDiPh'] : null;
       const mashTaToPh57_mEqPerKg =
-        typeof o.mashTaToPh57_mEqPerKg === "number" && Number.isFinite(o.mashTaToPh57_mEqPerKg)
-          ? o.mashTaToPh57_mEqPerKg
+        typeof o['mashTaToPh57_mEqPerKg'] === "number" && Number.isFinite(o['mashTaToPh57_mEqPerKg'])
+          ? o['mashTaToPh57_mEqPerKg']
           : null;
       const mashRoastDehuskedOverride =
-        typeof o.mashRoastDehuskedOverride === "boolean" ? o.mashRoastDehuskedOverride : null;
-      const mashRoastDehuskedSourceRaw = o.mashRoastDehuskedSource;
+        typeof o['mashRoastDehuskedOverride'] === "boolean" ? o['mashRoastDehuskedOverride'] : null;
+      const mashRoastDehuskedSourceRaw = o['mashRoastDehuskedSource'];
       const mashRoastDehuskedSource: GristRow["mashRoastDehuskedSource"] =
         mashRoastDehuskedSourceRaw === "inferred" ||
         mashRoastDehuskedSourceRaw === "override" ||
         mashRoastDehuskedSourceRaw === "unknown"
           ? mashRoastDehuskedSourceRaw
           : "unknown";
-      const mashPhModelSourceRaw = o.mashPhModelSource;
+      const mashPhModelSourceRaw = o['mashPhModelSource'];
       const mashPhModelSource: GristRow["mashPhModelSource"] =
         mashPhModelSourceRaw === "default" || mashPhModelSourceRaw === "override" || mashPhModelSourceRaw === "unknown"
           ? mashPhModelSourceRaw
           : "unknown";
-      const amountKg = typeof o.amountKg === "number" && Number.isFinite(o.amountKg) ? o.amountKg : 0;
+      const amountKg = typeof o['amountKg'] === "number" && Number.isFinite(o['amountKg']) ? o['amountKg'] : 0;
       const colorLovibond =
-        o.colorLovibond === null
+        o['colorLovibond'] === null
           ? null
-          : typeof o.colorLovibond === "number" && Number.isFinite(o.colorLovibond)
-            ? o.colorLovibond
+          : typeof o['colorLovibond'] === "number" && Number.isFinite(o['colorLovibond'])
+            ? o['colorLovibond']
             : null;
 
-      const potentialRaw = o.potential;
+      const potentialRaw = o['potential'];
       let potential: GristPotential = null;
       if (potentialRaw && typeof potentialRaw === "object") {
         const p = potentialRaw as Record<string, unknown>;
-        const kind = p.kind;
-        const v = p.value;
+        const kind = p['kind'];
+        const v = p['value'];
         if (
           (kind === "ppg" || kind === "yieldPercent" || kind === "sg" || kind === "plato") &&
           typeof v === "number" &&
@@ -123,7 +123,7 @@ export function parseGristJson(value: unknown): GristRow[] {
         }
       }
 
-      const maltClassRaw = o.maltClass;
+      const maltClassRaw = o['maltClass'];
       const maltClass: GristMaltClass =
         maltClassRaw === "base" ||
         maltClassRaw === "crystal" ||

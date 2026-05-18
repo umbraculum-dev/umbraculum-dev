@@ -26,7 +26,7 @@ try {
       // prevents React Native from booting (black screen).
       try {
         if (descriptor && "value" in descriptor) {
-          (globalThis as Record<string, unknown>).__FUSEBOX_REACT_DEVTOOLS_DISPATCHER__ = descriptor.value;
+          (globalThis as Record<string, unknown>)['__FUSEBOX_REACT_DEVTOOLS_DISPATCHER__'] = descriptor.value;
         }
       } catch {
         // ignore

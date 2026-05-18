@@ -25,18 +25,18 @@ export function normalizeMemoryBlob(raw: unknown): WorkspaceAiMemoryBlob {
   const out = emptyMemoryBlob();
   if (!raw || typeof raw !== "object") return out;
   const obj = raw as Record<string, unknown>;
-  if (Array.isArray(obj.facts)) {
-    out.facts = obj.facts
+  if (Array.isArray(obj['facts'])) {
+    out.facts = obj['facts']
       .filter((f): f is string => typeof f === "string" && f.trim().length > 0)
       .map((f) => f.trim());
   }
-  if (Array.isArray(obj.recurringIssues)) {
-    out.recurringIssues = obj.recurringIssues
+  if (Array.isArray(obj['recurringIssues'])) {
+    out.recurringIssues = obj['recurringIssues']
       .filter((r): r is string => typeof r === "string" && r.trim().length > 0)
       .map((r) => r.trim());
   }
-  if (typeof obj.lastUpdated === "string") {
-    out.lastUpdated = obj.lastUpdated;
+  if (typeof obj['lastUpdated'] === "string") {
+    out.lastUpdated = obj['lastUpdated'];
   }
   return enforceBounds(out);
 }

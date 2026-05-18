@@ -48,19 +48,19 @@ function readVolumeLiters(amount: unknown): number | null {
  * but uses BeerJSON paths in messages so errors are not confusing.
  */
 export function validateBeerJsonRecipeDomain(doc: unknown): void {
-  const beerjson = isObject(doc) && isObject(doc.beerjson) ? doc.beerjson : null;
-  const recipes = beerjson && Array.isArray(beerjson.recipes) ? beerjson.recipes : [];
+  const beerjson = isObject(doc) && isObject(doc['beerjson']) ? doc['beerjson'] : null;
+  const recipes = beerjson && Array.isArray(beerjson['recipes']) ? beerjson['recipes'] : [];
   const r0 = isObject(recipes[0]) ? recipes[0] : null;
   if (!r0) {
     throw new BadRequestError("invalid_beerjson_recipe", "BeerJSON is missing beerjson.recipes[0]");
   }
 
-  const ing = isObject(r0.ingredients) ? r0.ingredients : {};
+  const ing = isObject(r0['ingredients']) ? r0['ingredients'] : {};
 
-  const fermentables = asArray<Record<string, unknown>>(ing.fermentable_additions);
+  const fermentables = asArray<Record<string, unknown>>(ing['fermentable_additions']);
   for (let idx = 0; idx < fermentables.length; idx += 1) {
     const f = fermentables[idx];
-    const name = typeof f?.name === "string" ? f.name.trim() : "";
+    const name = typeof f?.['name'] === "string" ? f['name'].trim() : "";
     if (!name) {
       throw new BadRequestError(
         "invalid_grist_row_name",
@@ -68,8 +68,8 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
-    const fAmount = readAmount(f?.amount);
-    const amountKg = readMassKg(f?.amount);
+    const fAmount = readAmount(f?.['amount']);
+    const amountKg = readMassKg(f?.['amount']);
     if (amountKg === null) {
       const unit = typeof fAmount.unit === "string" ? fAmount.unit : null;
       const allowed: BeerJsonMassUnit[] = ["kg", "g"];
@@ -86,10 +86,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
-    const color = isObject(f?.color) ? f.color : null;
+    const color = isObject(f?.['color']) ? f['color'] : null;
     if (color !== null) {
-      const colorUnit = color.unit;
-      const colorValue = color.value;
+      const colorUnit = color['unit'];
+      const colorValue = color['value'];
       if (colorUnit === "Lovi" && isFiniteNumber(colorValue)) {
         if (!(colorValue >= 0)) {
           throw new BadRequestError(
@@ -101,10 +101,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
   }
 
-  const hops = asArray<Record<string, unknown>>(ing.hop_additions);
+  const hops = asArray<Record<string, unknown>>(ing['hop_additions']);
   for (let idx = 0; idx < hops.length; idx += 1) {
     const h = hops[idx];
-    const name = typeof h?.name === "string" ? h.name.trim() : "";
+    const name = typeof h?.['name'] === "string" ? h['name'].trim() : "";
     if (!name) {
       throw new BadRequestError(
         "invalid_hop_row_name",
@@ -112,8 +112,8 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
-    const hAmount = readAmount(h?.amount);
-    const amountGrams = readMassGrams(h?.amount);
+    const hAmount = readAmount(h?.['amount']);
+    const amountGrams = readMassGrams(h?.['amount']);
     if (amountGrams === null) {
       const unit = typeof hAmount.unit === "string" ? hAmount.unit : null;
       const allowed: BeerJsonMassUnit[] = ["kg", "g"];
@@ -131,10 +131,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
   }
 
-  const cultures = asArray<Record<string, unknown>>(ing.culture_additions);
+  const cultures = asArray<Record<string, unknown>>(ing['culture_additions']);
   for (let idx = 0; idx < cultures.length; idx += 1) {
     const c = cultures[idx];
-    const name = typeof c?.name === "string" ? c.name.trim() : "";
+    const name = typeof c?.['name'] === "string" ? c['name'].trim() : "";
     if (!name) {
       throw new BadRequestError(
         "invalid_yeast_row_name",
@@ -143,10 +143,10 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
   }
 
-  const misc = asArray<Record<string, unknown>>(ing.miscellaneous_additions);
+  const misc = asArray<Record<string, unknown>>(ing['miscellaneous_additions']);
   for (let idx = 0; idx < misc.length; idx += 1) {
     const m = misc[idx];
-    const name = typeof m?.name === "string" ? m.name.trim() : "";
+    const name = typeof m?.['name'] === "string" ? m['name'].trim() : "";
     if (!name) {
       throw new BadRequestError(
         "invalid_misc_row_name",
@@ -155,7 +155,7 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
     }
 
     // Misc additions can be weight or volume. We only enforce positivity.
-    const mAmount = readAmount(m?.amount);
+    const mAmount = readAmount(m?.['amount']);
     const { unit, value } = mAmount;
     if (!isFiniteNumber(value) || typeof unit !== "string") {
       throw new BadRequestError(
@@ -164,8 +164,8 @@ export function validateBeerJsonRecipeDomain(doc: unknown): void {
       );
     }
 
-    const asLiters = readVolumeLiters(m?.amount);
-    const asKg = readMassKg(m?.amount);
+    const asLiters = readVolumeLiters(m?.['amount']);
+    const asKg = readMassKg(m?.['amount']);
     if (asLiters === null && asKg === null) {
       const allowed: Array<BeerJsonMassUnit | BeerJsonVolumeUnit> = ["kg", "g", "l", "ml"];
       throw new BadRequestError(

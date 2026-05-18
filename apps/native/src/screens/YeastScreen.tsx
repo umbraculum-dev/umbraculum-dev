@@ -220,9 +220,9 @@ export function YeastScreen() {
       setRecipe(r);
 
       const extRec = asRecord(r.recipeExtJson);
-      const linksRec = asRecord(extRec?.ingredientLinks);
-      const yeastLinks = asRecord(linksRec?.yeast);
-      const yeastOverridesRaw = asRecord(extRec?.yeastAttenuationOverridesPercent);
+      const linksRec = asRecord(extRec?.['ingredientLinks']);
+      const yeastLinks = asRecord(linksRec?.['yeast']);
+      const yeastOverridesRaw = asRecord(extRec?.['yeastAttenuationOverridesPercent']);
       if (yeastOverridesRaw) {
         const out: Record<string, string> = {};
         for (const [k, v] of Object.entries(yeastOverridesRaw)) {
@@ -233,14 +233,14 @@ export function YeastScreen() {
         setYeastAttenuationOverrides({});
       }
 
-      const yeastPitchRateRaw = asRecord(extRec?.yeastPitchRateOverrides);
-      const yeastFermentationTempRaw = asRecord(extRec?.yeastFermentationTempOverrides);
-      const yeastOxygenationRaw = asRecord(extRec?.yeastOxygenationOverrides);
-      const yeastDiacetylRestRaw = asRecord(extRec?.yeastDiacetylRestOverrides);
-      const yeastFormatRaw = asRecord(extRec?.yeastFormatOverrides ?? extRec?.yeastTypeOverrides);
-      const yeastSpeciesRaw = asRecord(extRec?.yeastSpeciesOverrides);
-      const yeastNeedsPropagationRaw = asRecord(extRec?.yeastNeedsPropagationOverrides);
-      const yeastManualCellCountRaw = asRecord(extRec?.yeastManualCellCountOverrides);
+      const yeastPitchRateRaw = asRecord(extRec?.['yeastPitchRateOverrides']);
+      const yeastFermentationTempRaw = asRecord(extRec?.['yeastFermentationTempOverrides']);
+      const yeastOxygenationRaw = asRecord(extRec?.['yeastOxygenationOverrides']);
+      const yeastDiacetylRestRaw = asRecord(extRec?.['yeastDiacetylRestOverrides']);
+      const yeastFormatRaw = asRecord(extRec?.['yeastFormatOverrides'] ?? extRec?.['yeastTypeOverrides']);
+      const yeastSpeciesRaw = asRecord(extRec?.['yeastSpeciesOverrides']);
+      const yeastNeedsPropagationRaw = asRecord(extRec?.['yeastNeedsPropagationOverrides']);
+      const yeastManualCellCountRaw = asRecord(extRec?.['yeastManualCellCountOverrides']);
 
       if (!r.beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
       const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
@@ -376,33 +376,33 @@ export function YeastScreen() {
           })
           .filter(Boolean) as Array<readonly [string, number]>,
       );
-      if (Object.keys(yeastAttenuationOverridesPercent).length) extBaseForSave.yeastAttenuationOverridesPercent = yeastAttenuationOverridesPercent;
-      else delete extBaseForSave.yeastAttenuationOverridesPercent;
-      if (Object.keys(yeastPitchRateOverrides).length) extBaseForSave.yeastPitchRateOverrides = yeastPitchRateOverrides;
-      else delete extBaseForSave.yeastPitchRateOverrides;
-      if (Object.keys(yeastFermentationTempOverrides).length) extBaseForSave.yeastFermentationTempOverrides = yeastFermentationTempOverrides;
-      else delete extBaseForSave.yeastFermentationTempOverrides;
-      if (Object.keys(yeastOxygenationOverrides).length) extBaseForSave.yeastOxygenationOverrides = yeastOxygenationOverrides;
-      else delete extBaseForSave.yeastOxygenationOverrides;
-      if (Object.keys(yeastDiacetylRestOverrides).length) extBaseForSave.yeastDiacetylRestOverrides = yeastDiacetylRestOverrides;
-      else delete extBaseForSave.yeastDiacetylRestOverrides;
-      if (Object.keys(yeastFormatOverrides).length) extBaseForSave.yeastFormatOverrides = yeastFormatOverrides;
-      else delete extBaseForSave.yeastFormatOverrides;
-      delete extBaseForSave.yeastTypeOverrides;
-      if (Object.keys(yeastSpeciesOverrides).length) extBaseForSave.yeastSpeciesOverrides = yeastSpeciesOverrides;
-      else delete extBaseForSave.yeastSpeciesOverrides;
-      if (Object.keys(yeastNeedsPropagationOverrides).length) extBaseForSave.yeastNeedsPropagationOverrides = yeastNeedsPropagationOverrides;
-      else delete extBaseForSave.yeastNeedsPropagationOverrides;
-      if (Object.keys(yeastCellsPerLOverrides).length) extBaseForSave.yeastCellsPerLOverrides = yeastCellsPerLOverrides;
-      else delete extBaseForSave.yeastCellsPerLOverrides;
-      if (Object.keys(yeastCellsPerKGOverrides).length) extBaseForSave.yeastCellsPerKGOverrides = yeastCellsPerKGOverrides;
-      else delete extBaseForSave.yeastCellsPerKGOverrides;
-      if (Object.keys(yeastManualCellCountOverrides).length) extBaseForSave.yeastManualCellCountOverrides = yeastManualCellCountOverrides;
-      else delete extBaseForSave.yeastManualCellCountOverrides;
-      delete extBaseForSave.yeastCellsPerGOverrides;
+      if (Object.keys(yeastAttenuationOverridesPercent).length) extBaseForSave['yeastAttenuationOverridesPercent'] = yeastAttenuationOverridesPercent;
+      else delete extBaseForSave['yeastAttenuationOverridesPercent'];
+      if (Object.keys(yeastPitchRateOverrides).length) extBaseForSave['yeastPitchRateOverrides'] = yeastPitchRateOverrides;
+      else delete extBaseForSave['yeastPitchRateOverrides'];
+      if (Object.keys(yeastFermentationTempOverrides).length) extBaseForSave['yeastFermentationTempOverrides'] = yeastFermentationTempOverrides;
+      else delete extBaseForSave['yeastFermentationTempOverrides'];
+      if (Object.keys(yeastOxygenationOverrides).length) extBaseForSave['yeastOxygenationOverrides'] = yeastOxygenationOverrides;
+      else delete extBaseForSave['yeastOxygenationOverrides'];
+      if (Object.keys(yeastDiacetylRestOverrides).length) extBaseForSave['yeastDiacetylRestOverrides'] = yeastDiacetylRestOverrides;
+      else delete extBaseForSave['yeastDiacetylRestOverrides'];
+      if (Object.keys(yeastFormatOverrides).length) extBaseForSave['yeastFormatOverrides'] = yeastFormatOverrides;
+      else delete extBaseForSave['yeastFormatOverrides'];
+      delete extBaseForSave['yeastTypeOverrides'];
+      if (Object.keys(yeastSpeciesOverrides).length) extBaseForSave['yeastSpeciesOverrides'] = yeastSpeciesOverrides;
+      else delete extBaseForSave['yeastSpeciesOverrides'];
+      if (Object.keys(yeastNeedsPropagationOverrides).length) extBaseForSave['yeastNeedsPropagationOverrides'] = yeastNeedsPropagationOverrides;
+      else delete extBaseForSave['yeastNeedsPropagationOverrides'];
+      if (Object.keys(yeastCellsPerLOverrides).length) extBaseForSave['yeastCellsPerLOverrides'] = yeastCellsPerLOverrides;
+      else delete extBaseForSave['yeastCellsPerLOverrides'];
+      if (Object.keys(yeastCellsPerKGOverrides).length) extBaseForSave['yeastCellsPerKGOverrides'] = yeastCellsPerKGOverrides;
+      else delete extBaseForSave['yeastCellsPerKGOverrides'];
+      if (Object.keys(yeastManualCellCountOverrides).length) extBaseForSave['yeastManualCellCountOverrides'] = yeastManualCellCountOverrides;
+      else delete extBaseForSave['yeastManualCellCountOverrides'];
+      delete extBaseForSave['yeastCellsPerGOverrides'];
 
-      const batchSizeLiters = typeof extBaseForSave.batchSizeLiters === "number" ? extBaseForSave.batchSizeLiters : null;
-      const brewhouseEfficiencyPercent = typeof extBaseForSave.brewhouseEfficiencyPercent === "number" ? extBaseForSave.brewhouseEfficiencyPercent : null;
+      const batchSizeLiters = typeof extBaseForSave['batchSizeLiters'] === "number" ? extBaseForSave['batchSizeLiters'] : null;
+      const brewhouseEfficiencyPercent = typeof extBaseForSave['brewhouseEfficiencyPercent'] === "number" ? extBaseForSave['brewhouseEfficiencyPercent'] : null;
 
       const beerJsonRecipeJson = buildBeerJsonRecipeDocument({
         name: recipe.name ?? "",
@@ -454,7 +454,7 @@ export function YeastScreen() {
     }
   };
 
-  const batchSizeForCells = asRecord(recipe?.recipeExtJson)?.batchSizeLiters ?? null;
+  const batchSizeForCells = asRecord(recipe?.recipeExtJson)?.['batchSizeLiters'] ?? null;
   const analysisKettleVolume = recipe?.analysis?.result?.kettleVolumeLiters ?? null;
   const analysisOg = recipe?.analysis?.result?.ogEstimatedSg ?? null;
   const batchSizeForCellsVal =

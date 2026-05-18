@@ -225,7 +225,7 @@ export function EquipmentScreen() {
 
   const onSaveEdit = async () => {
     if (!api || !editingId) return;
-    const name = (editDraft.name ?? "").trim();
+    const name = (editDraft['name'] ?? "").trim();
     if (!name) {
       setEditError(t("errors.nameRequired"));
       return;
@@ -233,24 +233,24 @@ export function EquipmentScreen() {
     setEditError(null);
     setEditSubmitting(true);
     try {
-      const mashEfficiencyPercent = parseNullableNumber(editDraft.mashEfficiencyPercent ?? "");
+      const mashEfficiencyPercent = parseNullableNumber(editDraft['mashEfficiencyPercent'] ?? "");
       if (mashEfficiencyPercent != null && (mashEfficiencyPercent < 0 || mashEfficiencyPercent > 100)) {
         throw new Error(t("errors.mashEfficiencyRange"));
       }
       const res = await api.patch(`/api/equipment-profiles/${editingId}`, {
         name,
-        kettleVolumeLiters: parseNullableNumber(editDraft.kettleVolumeLiters ?? ""),
-        kettleLossesLiters: parseNullableNumber(editDraft.kettleLossesLiters ?? ""),
-        kettleBoilEvaporationRatePercentPerHour: parseNullableNumber(editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""),
-        kettleCoolingShrinkagePercent: parseNullableNumber(editDraft.kettleCoolingShrinkagePercent ?? ""),
-        kettleHopsAbsorptionLiters: parseNullableNumber(editDraft.kettleHopsAbsorptionLiters ?? ""),
-        mashVolumeLiters: parseNullableNumber(editDraft.mashVolumeLiters ?? ""),
+        kettleVolumeLiters: parseNullableNumber(editDraft['kettleVolumeLiters'] ?? ""),
+        kettleLossesLiters: parseNullableNumber(editDraft['kettleLossesLiters'] ?? ""),
+        kettleBoilEvaporationRatePercentPerHour: parseNullableNumber(editDraft['kettleBoilEvaporationRatePercentPerHour'] ?? ""),
+        kettleCoolingShrinkagePercent: parseNullableNumber(editDraft['kettleCoolingShrinkagePercent'] ?? ""),
+        kettleHopsAbsorptionLiters: parseNullableNumber(editDraft['kettleHopsAbsorptionLiters'] ?? ""),
+        mashVolumeLiters: parseNullableNumber(editDraft['mashVolumeLiters'] ?? ""),
         mashEfficiencyPercent,
-        mashLossesLiters: parseNullableNumber(editDraft.mashLossesLiters ?? ""),
-        mashThicknessLPerKg: parseNullableNumber(editDraft.mashThicknessLPerKg ?? ""),
-        mashGrainAbsorptionLPerKg: parseNullableNumber(editDraft.mashGrainAbsorptionLPerKg ?? ""),
-        mashWaterLeftoverLiters: parseNullableNumber(editDraft.mashWaterLeftoverLiters ?? ""),
-        otherLossesLiters: parseNullableNumber(editDraft.otherLossesLiters ?? ""),
+        mashLossesLiters: parseNullableNumber(editDraft['mashLossesLiters'] ?? ""),
+        mashThicknessLPerKg: parseNullableNumber(editDraft['mashThicknessLPerKg'] ?? ""),
+        mashGrainAbsorptionLPerKg: parseNullableNumber(editDraft['mashGrainAbsorptionLPerKg'] ?? ""),
+        mashWaterLeftoverLiters: parseNullableNumber(editDraft['mashWaterLeftoverLiters'] ?? ""),
+        otherLossesLiters: parseNullableNumber(editDraft['otherLossesLiters'] ?? ""),
       });
       if (!res.ok) throw new Error(JSON.stringify(res.data));
       setEditingId(null);
@@ -443,70 +443,70 @@ export function EquipmentScreen() {
                     <View style={{ gap: 12, marginTop: 12 }}>
                       <NumInput
                         label={t("nameLabel")}
-                        value={editDraft.name ?? ""}
+                        value={editDraft['name'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, name: v }))}
                       />
                       <Text fontSize={12} fontWeight="600">{t("sectionTitles.kettle")}</Text>
                       <NumInput
                         label={t("kettleVolumeLitersLabel", { unit: tUnits("L") })}
-                        value={editDraft.kettleVolumeLiters ?? ""}
+                        value={editDraft['kettleVolumeLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, kettleVolumeLiters: v }))}
                       />
                       <NumInput
                         label={t("kettleLossesLitersLabel", { unit: tUnits("L") })}
-                        value={editDraft.kettleLossesLiters ?? ""}
+                        value={editDraft['kettleLossesLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, kettleLossesLiters: v }))}
                       />
                       <NumInput
                         label={t("kettleBoilEvaporationRatePercentPerHourLabel")}
-                        value={editDraft.kettleBoilEvaporationRatePercentPerHour ?? ""}
+                        value={editDraft['kettleBoilEvaporationRatePercentPerHour'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, kettleBoilEvaporationRatePercentPerHour: v }))}
                       />
                       <NumInput
                         label={t("kettleCoolingShrinkagePercentLabel")}
-                        value={editDraft.kettleCoolingShrinkagePercent ?? ""}
+                        value={editDraft['kettleCoolingShrinkagePercent'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, kettleCoolingShrinkagePercent: v }))}
                       />
                       <NumInput
                         label={t("kettleHopsAbsorptionLitersLabel", { unit: tUnits("LPerG") })}
-                        value={editDraft.kettleHopsAbsorptionLiters ?? ""}
+                        value={editDraft['kettleHopsAbsorptionLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, kettleHopsAbsorptionLiters: v }))}
                       />
                       <Text fontSize={12} fontWeight="600">{t("sectionTitles.mash")}</Text>
                       <NumInput
                         label={t("mashVolumeLitersLabel", { unit: tUnits("L") })}
-                        value={editDraft.mashVolumeLiters ?? ""}
+                        value={editDraft['mashVolumeLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, mashVolumeLiters: v }))}
                       />
                       <NumInput
                         label={t("mashEfficiencyPercentLabel")}
-                        value={editDraft.mashEfficiencyPercent ?? ""}
+                        value={editDraft['mashEfficiencyPercent'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, mashEfficiencyPercent: v }))}
                       />
                       <NumInput
                         label={t("mashLossesLitersLabel", { unit: tUnits("L") })}
-                        value={editDraft.mashLossesLiters ?? ""}
+                        value={editDraft['mashLossesLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, mashLossesLiters: v }))}
                       />
                       <NumInput
                         label={t("mashThicknessLPerKgLabel", { unit: tUnits("LPerKg") })}
-                        value={editDraft.mashThicknessLPerKg ?? ""}
+                        value={editDraft['mashThicknessLPerKg'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, mashThicknessLPerKg: v }))}
                       />
                       <NumInput
                         label={t("mashGrainAbsorptionLPerKgLabel", { unit: tUnits("LPerKg") })}
-                        value={editDraft.mashGrainAbsorptionLPerKg ?? ""}
+                        value={editDraft['mashGrainAbsorptionLPerKg'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, mashGrainAbsorptionLPerKg: v }))}
                       />
                       <NumInput
                         label={t("mashWaterLeftoverLitersLabel", { unit: tUnits("L") })}
-                        value={editDraft.mashWaterLeftoverLiters ?? ""}
+                        value={editDraft['mashWaterLeftoverLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, mashWaterLeftoverLiters: v }))}
                       />
                       <Text fontSize={12} fontWeight="600">{t("sectionTitles.misc")}</Text>
                       <NumInput
                         label={t("otherLossesLitersLabel", { unit: tUnits("L") })}
-                        value={editDraft.otherLossesLiters ?? ""}
+                        value={editDraft['otherLossesLiters'] ?? ""}
                         onChange={(v) => setEditDraft((d) => ({ ...d, otherLossesLiters: v }))}
                       />
                       <View style={{ flexDirection: "row", gap: 12, marginTop: 8 }}>

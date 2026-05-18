@@ -66,21 +66,21 @@ export function platformAdsRoutes(app: FastifyInstance) {
     await requirePlatformAdmin(app, s.userId);
 
     const body = (req.body ?? {}) as Record<string, unknown>;
-    const placement = assertPlacement(body.placement);
-    const platform = assertPlatform(body.platform);
-    const imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";
-    const linkUrl = typeof body.linkUrl === "string" ? body.linkUrl.trim() : "";
-    const altText = typeof body.altText === "string" ? body.altText.trim() : "";
+    const placement = assertPlacement(body['placement']);
+    const platform = assertPlatform(body['platform']);
+    const imageUrl = typeof body['imageUrl'] === "string" ? body['imageUrl'].trim() : "";
+    const linkUrl = typeof body['linkUrl'] === "string" ? body['linkUrl'].trim() : "";
+    const altText = typeof body['altText'] === "string" ? body['altText'].trim() : "";
 
     if (!imageUrl) throw new BadRequestError("invalid_image_url", "Body.imageUrl is required");
     if (!linkUrl) throw new BadRequestError("invalid_link_url", "Body.linkUrl is required");
     if (!altText) throw new BadRequestError("invalid_alt_text", "Body.altText is required");
 
-    const startsAt = parseDateOrNull(body.startsAt);
-    const endsAt = parseDateOrNull(body.endsAt);
-    const isActive = typeof body.isActive === "boolean" ? body.isActive : true;
-    const priority = typeof body.priority === "number" && Number.isFinite(body.priority) ? Math.trunc(body.priority) : 0;
-    const weight = typeof body.weight === "number" && Number.isFinite(body.weight) ? Math.trunc(body.weight) : 1;
+    const startsAt = parseDateOrNull(body['startsAt']);
+    const endsAt = parseDateOrNull(body['endsAt']);
+    const isActive = typeof body['isActive'] === "boolean" ? body['isActive'] : true;
+    const priority = typeof body['priority'] === "number" && Number.isFinite(body['priority']) ? Math.trunc(body['priority']) : 0;
+    const weight = typeof body['weight'] === "number" && Number.isFinite(body['weight']) ? Math.trunc(body['weight']) : 1;
 
     const created = await app.prisma.ad.create({
       data: { placement, platform, imageUrl, linkUrl, altText, isActive, startsAt, endsAt, priority, weight },
@@ -101,16 +101,16 @@ export function platformAdsRoutes(app: FastifyInstance) {
     const body = (req.body ?? {}) as Record<string, unknown>;
 
     const data: Prisma.AdUncheckedUpdateInput = {};
-    if (body.placement !== undefined) data.placement = assertPlacement(body.placement);
-    if (body.platform !== undefined) data.platform = assertPlatform(body.platform);
-    if (body.imageUrl !== undefined) data.imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";
-    if (body.linkUrl !== undefined) data.linkUrl = typeof body.linkUrl === "string" ? body.linkUrl.trim() : "";
-    if (body.altText !== undefined) data.altText = typeof body.altText === "string" ? body.altText.trim() : "";
-    if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
-    if (body.startsAt !== undefined) data.startsAt = parseDateOrNull(body.startsAt);
-    if (body.endsAt !== undefined) data.endsAt = parseDateOrNull(body.endsAt);
-    if (body.priority !== undefined && typeof body.priority === "number" && Number.isFinite(body.priority)) data.priority = Math.trunc(body.priority);
-    if (body.weight !== undefined && typeof body.weight === "number" && Number.isFinite(body.weight)) data.weight = Math.trunc(body.weight);
+    if (body['placement'] !== undefined) data.placement = assertPlacement(body['placement']);
+    if (body['platform'] !== undefined) data.platform = assertPlatform(body['platform']);
+    if (body['imageUrl'] !== undefined) data.imageUrl = typeof body['imageUrl'] === "string" ? body['imageUrl'].trim() : "";
+    if (body['linkUrl'] !== undefined) data.linkUrl = typeof body['linkUrl'] === "string" ? body['linkUrl'].trim() : "";
+    if (body['altText'] !== undefined) data.altText = typeof body['altText'] === "string" ? body['altText'].trim() : "";
+    if (body['isActive'] !== undefined) data.isActive = Boolean(body['isActive']);
+    if (body['startsAt'] !== undefined) data.startsAt = parseDateOrNull(body['startsAt']);
+    if (body['endsAt'] !== undefined) data.endsAt = parseDateOrNull(body['endsAt']);
+    if (body['priority'] !== undefined && typeof body['priority'] === "number" && Number.isFinite(body['priority'])) data.priority = Math.trunc(body['priority']);
+    if (body['weight'] !== undefined && typeof body['weight'] === "number" && Number.isFinite(body['weight'])) data.weight = Math.trunc(body['weight']);
 
     await app.prisma.ad.update({ where: { id }, data, select: { id: true } });
     return { ok: true };

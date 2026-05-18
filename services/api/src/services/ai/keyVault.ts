@@ -90,11 +90,11 @@ export function createKeyVault(masterKeyHex: string): KeyVault {
  * protects nothing real; do NOT reuse it in production).
  */
 export function getKeyVaultFromEnv(): KeyVault {
-  const fromEnv = process.env.APP_AI_KEY_SECRET;
+  const fromEnv = process.env['APP_AI_KEY_SECRET'];
   if (fromEnv && fromEnv.length > 0) {
     return createKeyVault(fromEnv);
   }
-  if (process.env.NODE_ENV === "production") {
+  if (process.env['NODE_ENV'] === "production") {
     throw new Error(
       "APP_AI_KEY_SECRET is required in production (32-byte hex). Generate one with `openssl rand -hex 32`.",
     );

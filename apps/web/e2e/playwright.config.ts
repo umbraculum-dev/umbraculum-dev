@@ -1,17 +1,17 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:18080";
+const BASE_URL = process.env['E2E_BASE_URL'] ?? "http://localhost:18080";
 
 export default defineConfig({
   testDir: ".",
   testMatch: /.*\.spec\.ts/,
   fullyParallel: false,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : 2,
+  forbidOnly: !!process.env['CI'],
+  retries: process.env['CI'] ? 1 : 0,
+  workers: process.env['CI'] ? 1 : 2,
   timeout: 60_000,
   expect: { timeout: 10_000 },
-  reporter: process.env.CI
+  reporter: process.env['CI']
     ? [["list"], ["junit", { outputFile: "test-results/junit.xml" }], ["html", { open: "never" }]]
     : [["list"], ["html", { open: "never" }]],
   outputDir: "test-results",
