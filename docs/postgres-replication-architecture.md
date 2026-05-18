@@ -1,6 +1,6 @@
 # Postgres primary/replica + pgpool routing architecture
 
-Repo root (canonical): `/home/rf/dkprojects/rfapps/umbraculum-dev`
+Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
 
 This doc describes the **production-like** DB foundation implemented in Docker Compose:
 
@@ -20,7 +20,7 @@ This doc describes the **production-like** DB foundation implemented in Docker C
 - `pgpool` (DB proxy; clients connect here)
 - `db-guard` (health/lag guard; toggles routing + sync requirement)
 
-See `/home/rf/dkprojects/rfapps/umbraculum-dev/docker-compose.yml`.
+See `~/dkprojects/rfapps/umbraculum-dev/docker-compose.yml`.
 
 ### pgpool image source (why not Docker Hub `bitnami/pgpool`)
 

@@ -35,7 +35,7 @@ The decision to use **Umbraculum** as the wordmark was reached after the origina
 
 ## 2. Background — why this report exists
 
-The umbrella plan ([`/home/rf/.cursor/plans/umbrella_ecosystem_architecture_443198a8.plan.md`](#) §10) tentatively resolved the wordmark to **`RedUmbrella`** with the `red-umbrella` namespace, listing trademark / namespace / domain availability verification as the rename sub-plan's responsibility. The umbrella plan §10 explicitly anticipated that the rename sub-plan "returns to revisit only if a hard blocker surfaces during diligence — trademark conflict, namespace already taken by an active project of substance, etc."
+The umbrella plan ([`~/.cursor/plans/umbrella_ecosystem_architecture_443198a8.plan.md`](#) §10) tentatively resolved the wordmark to **`RedUmbrella`** with the `red-umbrella` namespace, listing trademark / namespace / domain availability verification as the rename sub-plan's responsibility. The umbrella plan §10 explicitly anticipated that the rename sub-plan "returns to revisit only if a hard blocker surfaces during diligence — trademark conflict, namespace already taken by an active project of substance, etc."
 
 This report records:
 

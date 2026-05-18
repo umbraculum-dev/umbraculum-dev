@@ -142,12 +142,12 @@ Anything below this heading is **project-owned** and will not be overwritten by 
     - `Cannot find module './5611.js'` (or other missing `.next/server/*.js` chunk)
     - `/en/*` routes return 500
   - Fast reset (safe: move aside, don’t delete). Run from repo root:
-    - `cd /home/rf/dkprojects/rfapps/umbraculum-dev`
+    - `cd ~/dkprojects/rfapps/umbraculum-dev`
     - `docker compose stop web`
     - `mv apps/web/.next "apps/web/.next.bak-$(date +%s)"` (skip if missing)
     - `docker compose up -d web`
   - Full rebuild/redeploy (if fast reset didn’t help):
-    - `cd /home/rf/dkprojects/rfapps/umbraculum-dev`
+    - `cd ~/dkprojects/rfapps/umbraculum-dev`
     - `docker compose up -d --build web`
   - Quick verification:
     - `curl -i "http://localhost:3000/en/login" | head -n 5`

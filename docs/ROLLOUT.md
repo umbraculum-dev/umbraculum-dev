@@ -56,27 +56,27 @@ Add later as separate phases when they earn their cost.
 1. **Local-pack** in the upstream repo:
 
    ```bash
-   cd /home/rf/dkprojects/thesiteup/cursor-rules/github-repo
+   cd ~/dkprojects/thesiteup/cursor-rules/github-repo
    npm pack    # produces rftsu-cursor-rules-3.1.1.tgz
    ```
 
 2. **Install the tarball** into brewery (the `postinstall` script runs the sync):
 
    ```bash
-   cd /home/rf/dkprojects/rfapps/umbraculum-dev
-   npm install --no-save /home/rf/dkprojects/thesiteup/cursor-rules/github-repo/rftsu-cursor-rules-3.1.1.tgz
+   cd ~/dkprojects/rfapps/umbraculum-dev
+   npm install --no-save ~/dkprojects/thesiteup/cursor-rules/github-repo/rftsu-cursor-rules-3.1.1.tgz
    ```
 
 3. **Diff** brewery's `.cursor/` against the package contents (should be a no-op except possibly `.cursor-rules-synced.json`):
 
    ```bash
-   diff -r /home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/ /home/rf/dkprojects/rfapps/umbraculum-dev/.cursor/ | head -40
+   diff -r ~/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/ ~/dkprojects/rfapps/umbraculum-dev/.cursor/ | head -40
    ```
 
 4. **Confirm sync state**:
 
    ```bash
-   cat /home/rf/dkprojects/rfapps/umbraculum-dev/.cursor/.cursor-rules-synced.json | head -40
+   cat ~/dkprojects/rfapps/umbraculum-dev/.cursor/.cursor-rules-synced.json | head -40
    ```
 
 5. Only then `npm publish` to GitHub Packages.

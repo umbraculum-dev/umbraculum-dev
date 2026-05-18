@@ -31,7 +31,7 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Status**: ✅ Upstreamed in `@rftsu/cursor-rules` **3.1.1** (2026-05-12). Pending the next `npm install` of v3.1.1+ to land via sync. umbraculum-dev has been pre-aligned to the new text.
   - **Notes/Links**:
-    - Upstream file: `/home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/rules/20-tests-must-follow-changes.mdc`
+    - Upstream file: `~/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/rules/20-tests-must-follow-changes.mdc`
     - Project-local single source of truth (brewery): [`docs/TESTING.md`](docs/TESTING.md)
     - Companion rule consulted by the new section: `.cursor/skills/node-npm-container-only.md`
 
@@ -41,7 +41,7 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Status**: ✅ Upstreamed in `@rftsu/cursor-rules` **3.1.1** (2026-05-12). Pending `npm install` sync.
   - **Notes/Links**:
-    - Upstream file: `/home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/skills/agentic-browser-web-app.md`
+    - Upstream file: `~/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/skills/agentic-browser-web-app.md`
     - Brewery job catalog (where the upstream skill defers to): [`docs/agentic-jobs.md`](docs/agentic-jobs.md)
     - Brewery test-MCP package (provides `loginAs`, etc.): [`packages/test-mcp`](packages/test-mcp)
   - **Inputs_required (do_not_assume)**: `<APP_BASE_URL>`, `<PERSONA_EMAIL>`, `<PERSONA_PASSWORD>`, `<FIXTURE_FILE>`, `<JOB>`, optional `<RUN_DIR_ROOT>`, `<MCP_BASE_URL>`
@@ -54,7 +54,7 @@ Purpose:
   - **Scope**: reusable-across-repos
   - **Status**: ✅ Upstreamed in `@rftsu/cursor-rules` **3.1.1** (2026-05-12). Pending `npm install` sync.
   - **Notes/Links**:
-    - Upstream file: `/home/rf/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/skills/test-mcp-server.md`
+    - Upstream file: `~/dkprojects/thesiteup/cursor-rules/github-repo/.cursor/skills/test-mcp-server.md`
     - Brewery implementation (reference subset): [`packages/test-mcp`](packages/test-mcp), [`packages/test-mcp/README.md`](packages/test-mcp/README.md)
   - **Inputs_required (do_not_assume)**: `<TEST_MCP_BASE_URL>`, `<TOOL>`, `<ARGS>`, optional `<RUN_DIR_ROOT>`, `<APP_BASE_URL>`
   - **Commands**: max 5 (discover → smoke → optional seed → invoke tool → read run-dir)

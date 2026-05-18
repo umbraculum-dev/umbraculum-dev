@@ -349,7 +349,7 @@ Post-public-flip, if the core team chooses to run a retroactive 30-day public-co
 
 ## 14. Touched docs (sweep summary)
 
-This RFC's documentation cross-reference sweep. Full sweep table in the sub-plan progress notes ([`/home/rf/.cursor/plans/draft_rfc-001_cluster_a_054a4ef7.plan.md`](#) — private discussion artifact). Public-readable summary:
+This RFC's documentation cross-reference sweep. Full sweep table in the sub-plan progress notes ([`~/.cursor/plans/draft_rfc-001_cluster_a_054a4ef7.plan.md`](#) — private discussion artifact). Public-readable summary:
 
 - **NEW**: `docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md` (this file).
 - **Substantive cross-ref**: [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.4 — one-line pointer to RFC-0001 added in companion edit.

@@ -101,7 +101,7 @@ Add this entry to your Cursor MCP user config (typically `~/.cursor/mcp.json` or
     "brewery-test-mcp": {
       "command": "tsx",
       "args": [
-        "/home/rf/dkprojects/rfapps/umbraculum-dev/packages/test-mcp/src/server.ts"
+        "/path/to/your/umbraculum-dev/packages/test-mcp/src/server.ts"
       ]
     }
   }

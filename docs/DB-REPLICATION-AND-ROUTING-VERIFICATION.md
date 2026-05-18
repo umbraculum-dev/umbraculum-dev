@@ -1,11 +1,11 @@
 # DB replication + pgpool routing verification (runbook)
 
-Repo root (canonical): `/home/rf/dkprojects/rfapps/umbraculum-dev`
+Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
 
 ## Prerequisites
 
 - Stack is up:
-  - `cd /home/rf/dkprojects/rfapps/umbraculum-dev`
+  - `cd ~/dkprojects/rfapps/umbraculum-dev`
   - `docker compose ps`
 - Services expected: `postgres`, `postgres-replica`, `pgpool`, `db-guard`, `api`
 
