@@ -132,7 +132,7 @@ describe("parseMashComputeAndSaveResponse", () => {
   it("filters out malformed salt breakdown rows", () => {
     const parsed = parseMashComputeAndSaveResponse(validMashResponse());
     expect(parsed.salts.result.breakdown.length).toBe(1);
-    expect(parsed.salts.result.breakdown[0].saltKey).toBe("gypsum");
+    expect(parsed.salts.result.breakdown[0]!.saltKey).toBe("gypsum");
   });
 
   it("accepts mash_acidification_manual variant", () => {

@@ -29,8 +29,8 @@ describe("keyVault (AES-256-GCM)", () => {
     const parts = ct.split(":");
     expect(parts).toHaveLength(3);
     // 12-byte nonce → 16 base64 chars; 16-byte auth tag → 24 base64 chars (with padding).
-    expect(Buffer.from(parts[0], "base64")).toHaveLength(12);
-    expect(Buffer.from(parts[2], "base64")).toHaveLength(16);
+    expect(Buffer.from(parts[0]!, "base64")).toHaveLength(12);
+    expect(Buffer.from(parts[2]!, "base64")).toHaveLength(16);
   });
 
   it("rejects keys of the wrong length", () => {
@@ -51,8 +51,8 @@ describe("keyVault (AES-256-GCM)", () => {
     const ct = v.encrypt("secret");
     const parts = ct.split(":");
     // Flip the last bit of the ciphertext.
-    const buf = Buffer.from(parts[1], "base64");
-    buf[0] = buf[0] ^ 0x01;
+    const buf = Buffer.from(parts[1]!, "base64");
+    buf[0] = buf[0]! ^ 0x01;
     parts[1] = buf.toString("base64");
     expect(() => v.decrypt(parts.join(":"))).toThrow();
   });

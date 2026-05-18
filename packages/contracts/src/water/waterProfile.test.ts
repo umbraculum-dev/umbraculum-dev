@@ -136,7 +136,7 @@ describe("parseWaterProfilesResponse", () => {
     const parsed = parseWaterProfilesResponse(validProfilesResponse());
     expect(parsed.ok).toBe(true);
     expect(parsed.system).toHaveLength(1);
-    expect(parsed.system[0].key).toBe("dusseldorf");
+    expect(parsed.system[0]!.key).toBe("dusseldorf");
     expect(parsed.public).toHaveLength(0);
     expect(parsed.workspace).toHaveLength(0);
   });
@@ -215,8 +215,8 @@ describe("parseWaterProfilesResponse", () => {
     r.account = [ws];
     const parsed = parseWaterProfilesResponse(r);
     expect(parsed.workspace).toHaveLength(1);
-    expect(parsed.workspace[0].id).toBe("p-ws-1");
-    expect(parsed.workspace[0].key).toBe("ws-profile-1");
+    expect(parsed.workspace[0]!.id).toBe("p-ws-1");
+    expect(parsed.workspace[0]!.key).toBe("ws-profile-1");
   });
 
   it("includes the offending array index in the error message", () => {

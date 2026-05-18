@@ -172,7 +172,8 @@ export async function resolveBjcp2021Style(prisma: PrismaClient, candidate: Styl
       take: 2,
     });
     if (found.length === 1) {
-      return { styleKey: found[0].key, styleName: found[0].name, styleCode: found[0].code, warnings };
+      const m = found[0]!;
+      return { styleKey: m.key, styleName: m.name, styleCode: m.code, warnings };
     }
     if (found.length > 1) {
       warnings.push({ code: "style_ambiguous", message: `Multiple BJCP 2021 styles match name "${name}". Using Custom.` });
@@ -187,7 +188,8 @@ export async function resolveBjcp2021Style(prisma: PrismaClient, candidate: Styl
       take: 2,
     });
     if (found.length === 1) {
-      return { styleKey: found[0].key, styleName: found[0].name, styleCode: found[0].code, warnings };
+      const m = found[0]!;
+      return { styleKey: m.key, styleName: m.name, styleCode: m.code, warnings };
     }
     if (found.length > 1) {
       warnings.push({ code: "style_ambiguous", message: `Multiple BJCP 2021 styles match code "${code}". Using Custom.` });

@@ -44,10 +44,10 @@ describe("parseAuthMeResponse", () => {
     expect(parsed.user.preferredDensity).toBe("compact");
     expect(parsed.user.isPlatformAdmin).toBe(false);
     expect(parsed.workspaces).toHaveLength(1);
-    expect(parsed.workspaces[0].id).toBe("ws-1");
-    expect(parsed.workspaces[0].name).toBe("Acme Brewery");
-    expect(parsed.workspaces[0].role).toBe("brewery_admin");
-    expect(parsed.workspaces[0].brandKey).toBe("acme");
+    expect(parsed.workspaces[0]!.id).toBe("ws-1");
+    expect(parsed.workspaces[0]!.name).toBe("Acme Brewery");
+    expect(parsed.workspaces[0]!.role).toBe("brewery_admin");
+    expect(parsed.workspaces[0]!.brandKey).toBe("acme");
     expect(parsed.activeWorkspaceId).toBe("ws-1");
     expect(parsed.role).toBe("brewery_admin");
   });
@@ -102,7 +102,7 @@ describe("parseAuthMeResponse", () => {
     delete r.workspaces;
     const parsed = parseAuthMeResponse(r);
     expect(parsed.workspaces).toHaveLength(1);
-    expect(parsed.workspaces[0].id).toBe("ws-1");
+    expect(parsed.workspaces[0]!.id).toBe("ws-1");
   });
 
   it("accepts the legacy `activeAccountId` key (staged rename backward-compat)", () => {
@@ -154,10 +154,10 @@ describe("parseAuthMeResponse", () => {
   it("preserves brandKey null vs undefined on workspace items", () => {
     const r = validResponse();
     (r.workspaces[0] as { brandKey: unknown }).brandKey = null;
-    expect(parseAuthMeResponse(r).workspaces[0].brandKey).toBeNull();
+    expect(parseAuthMeResponse(r).workspaces[0]!.brandKey).toBeNull();
 
     const r2 = validResponse();
     (r2.workspaces[0] as { brandKey: unknown }).brandKey = 42;
-    expect(parseAuthMeResponse(r2).workspaces[0].brandKey).toBeUndefined();
+    expect(parseAuthMeResponse(r2).workspaces[0]!.brandKey).toBeUndefined();
   });
 });

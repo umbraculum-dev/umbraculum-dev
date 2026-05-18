@@ -165,9 +165,9 @@ describe("ai (chat + settings + gating)", () => {
       take: 1,
     });
     expect(rows[0]).toBeDefined();
-    expect(rows[0].tokensIn).toBe(10);
-    expect(rows[0].tokensOut).toBe(5);
-    expect(rows[0].model).toBeTruthy();
+    expect(rows[0]!.tokensIn).toBe(10);
+    expect(rows[0]!.tokensOut).toBe(5);
+    expect(rows[0]!.model).toBeTruthy();
   });
 
   it("tool-use loop: model calls a tool, gets a result, then finishes", async () => {
@@ -206,8 +206,8 @@ describe("ai (chat + settings + gating)", () => {
       orderBy: { createdAt: "desc" },
       take: 1,
     });
-    expect(rows[0].tokensIn).toBe(50);
-    expect(rows[0].tokensOut).toBe(25);
+    expect(rows[0]!.tokensIn).toBe(50);
+    expect(rows[0]!.tokensOut).toBe(25);
   });
 
   // ----- Per-user daily cap -----

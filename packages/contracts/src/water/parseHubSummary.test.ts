@@ -72,7 +72,7 @@ describe("parseRecipeWaterHubSummaryResponse", () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.summary.version).toBe(1);
     expect(parsed.summary.streams.length).toBe(1);
-    expect(parsed.summary.streams[0].key).toBe("mash");
+    expect(parsed.summary.streams[0]!.key).toBe("mash");
     expect(parsed.summary.merged.totalVolumeLiters).toBe(22);
     expect(parsed.summary.finalRecap.predictedMashPh).toEqual({ kind: "estimated", value: 5.4 });
     expect(parsed.summary.finalRecap.styleExpectedRa).toEqual({
@@ -117,7 +117,7 @@ describe("parseRecipeWaterHubSummaryResponse", () => {
     (r as any).summary.streams = [{ ...validMashStream(), key: "carbonation" }, validMashStream()];
     const parsed = parseRecipeWaterHubSummaryResponse(r);
     expect(parsed.summary.streams.length).toBe(1);
-    expect(parsed.summary.streams[0].key).toBe("mash");
+    expect(parsed.summary.streams[0]!.key).toBe("mash");
   });
 
   it("returns null ionsPpm when one ion is missing", () => {
@@ -126,7 +126,7 @@ describe("parseRecipeWaterHubSummaryResponse", () => {
     (broken as any).ionsPpm = { ...validIons(), bicarbonate: undefined };
     (r as any).summary.streams = [broken];
     const parsed = parseRecipeWaterHubSummaryResponse(r);
-    expect(parsed.summary.streams[0].ionsPpm).toBeNull();
+    expect(parsed.summary.streams[0]!.ionsPpm).toBeNull();
   });
 
   it("drops salt breakdown rows lacking saltKey or grams", () => {
@@ -139,7 +139,7 @@ describe("parseRecipeWaterHubSummaryResponse", () => {
     ];
     (r as any).summary.streams = [stream];
     const parsed = parseRecipeWaterHubSummaryResponse(r);
-    expect(parsed.summary.streams[0].saltsBreakdown).toEqual([{ saltKey: "gypsum", grams: 1 }]);
+    expect(parsed.summary.streams[0]!.saltsBreakdown).toEqual([{ saltKey: "gypsum", grams: 1 }]);
   });
 
   it("returns null saltsBreakdown when no valid rows remain", () => {
@@ -148,7 +148,7 @@ describe("parseRecipeWaterHubSummaryResponse", () => {
     (stream as any).saltsBreakdown = [{ saltKey: "", grams: 1 }];
     (r as any).summary.streams = [stream];
     const parsed = parseRecipeWaterHubSummaryResponse(r);
-    expect(parsed.summary.streams[0].saltsBreakdown).toBeNull();
+    expect(parsed.summary.streams[0]!.saltsBreakdown).toBeNull();
   });
 
   it("normalises invalid mashOverallSnapshot to null", () => {

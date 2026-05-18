@@ -64,7 +64,7 @@ export function createKeyVault(masterKeyHex: string): KeyVault {
       if (parts.length !== 3) {
         throw new Error("keyVault.decrypt: expected 3 colon-separated parts");
       }
-      const [nonceB64, ctB64, tagB64] = parts;
+      const [nonceB64, ctB64, tagB64] = parts as [string, string, string];
       const nonce = Buffer.from(nonceB64, "base64");
       const ciphertext = Buffer.from(ctB64, "base64");
       const authTag = Buffer.from(tagB64, "base64");
