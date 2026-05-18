@@ -7,7 +7,7 @@ Shared i18n message tree for web and native apps. Single source of truth.
 
 ## What this is
 
-The platform-wide message catalog. The web app (Next.js + next-intl) and the native app (React Native / Expo) both consume from this package, so a translation change in `packages/i18n/src/<locale>.json` propagates to every surface without per-app duplication. Locales currently shipped: English (`en`), Italian (`it`). Coverage and conventions are tracked in [`docs/I18N-AUDIT.md`](../../docs/I18N-AUDIT.md). React-binding helpers (hooks, context providers) live in the sibling `@brewery/i18n-react` package (under `packages/i18n-react/`; its README lands in Phase 3 of the docs slice) — this package is **runtime-and-framework-neutral** so it can be consumed by Node services and tests too.
+The platform-wide message catalog. The web app (Next.js + next-intl) and the native app (React Native / Expo) both consume from this package, so a translation change in `packages/i18n/src/<locale>.json` propagates to every surface without per-app duplication. Locales currently shipped: English (`en`), Italian (`it`). Coverage and conventions are tracked in [`docs/I18N-AUDIT.md`](../../docs/I18N-AUDIT.md). React-binding helpers (hooks, context providers) live in the sibling [`@brewery/i18n-react`](../i18n-react/README.md) package — this package is **runtime-and-framework-neutral** so it can be consumed by Node services and tests too.
 
 ## Scope
 
@@ -70,4 +70,4 @@ Stable. Adding a locale is a runtime concern (drop a new `<locale>.json`, regist
 - [`docs/I18N-AUDIT.md`](../../docs/I18N-AUDIT.md) — internationalization audit and guardrails
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
-- `@brewery/i18n-react` (sibling package at `packages/i18n-react/`) — React bindings for translations; its README lands in Phase 3 of the docs slice
+- [`@brewery/i18n-react`](../i18n-react/README.md) — React bindings for translations
