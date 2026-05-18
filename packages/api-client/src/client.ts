@@ -81,19 +81,19 @@ export function createApiClient(
     post(path: string, body?: unknown) {
       return request(path, {
         method: "POST",
-        body: body != null ? JSON.stringify(body) : undefined,
+        ...(body != null ? { body: JSON.stringify(body) } : {}),
       });
     },
     put(path: string, body?: unknown) {
       return request(path, {
         method: "PUT",
-        body: body != null ? JSON.stringify(body) : undefined,
+        ...(body != null ? { body: JSON.stringify(body) } : {}),
       });
     },
     patch(path: string, body?: unknown) {
       return request(path, {
         method: "PATCH",
-        body: body != null ? JSON.stringify(body) : undefined,
+        ...(body != null ? { body: JSON.stringify(body) } : {}),
       });
     },
     delete(path: string) {

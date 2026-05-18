@@ -306,8 +306,7 @@ export async function loginAs(args: { persona?: string; baseUrl?: string } = {})
   const body = (await res.json()) as { ok: boolean; token?: string; activeWorkspaceId?: string | null };
   return {
     ok: body.ok === true,
-    token: body.token,
-    cookie: body.token ? `sid=${body.token}` : undefined,
+    ...(body.token !== undefined ? { token: body.token, cookie: `sid=${body.token}` } : {}),
     activeWorkspaceId: body.activeWorkspaceId ?? null,
   };
 }

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "noEmit": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["seed.ts"]
 }
