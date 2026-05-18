@@ -5,6 +5,8 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
     "noEmit": true,
     "skipLibCheck": true
   },
