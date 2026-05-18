@@ -1,27 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { computeRecipeGravityAnalysis } from "./gravityAnalysis.js";
 
+type TestHopInput = {
+  id?: string;
+  name?: string;
+  form?: "extract" | "leaf" | "leaf (wet)" | "pellet" | "powder" | "plug";
+  amountGrams: number;
+  alphaAcidPercent: number;
+  timeMinutes?: number | null;
+  use?: "boil" | "whirlpool" | "dryhop";
+};
+
 function beerJsonDoc(args: {
   fermentables: Array<{ amountKg: number; yieldPercent: number }>;
   yeasts?: Array<{ id: string; attenuationPercent?: number }>;
   boilMinutes?: number;
-  hops?: Array<{
-    id?: string;
-    name?: string;
-    form?: "extract" | "leaf" | "leaf (wet)" | "pellet" | "powder" | "plug";
-    amountGrams: number;
-    alphaAcidPercent: number;
-    timeMinutes?: number | null;
-    use?: "boil" | "whirlpool" | "dryhop";
-  }>;
+  hops?: TestHopInput[];
 }) {
-  const defaultHop = {
+  const defaultHop: TestHopInput = {
     id: "h-1",
     name: "Hop",
     amountGrams: 10,
     alphaAcidPercent: 10,
     timeMinutes: args.boilMinutes ?? 60,
-    use: "boil" as const,
+    use: "boil",
   };
   const hops = (args.hops ?? [defaultHop]).map((h, idx) => {
     const use = h.use ?? "boil";

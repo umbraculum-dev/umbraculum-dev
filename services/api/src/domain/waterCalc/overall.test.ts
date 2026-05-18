@@ -195,6 +195,14 @@ describe("alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult (Phase 5b-5)", () 
   // bridge between the saltAdditions step and the acid step.
   it("converts saltAdditions.resultingProfile.bicarbonate → alkalinity via 50/61 factor", () => {
     const fakeSalts: SaltAdditionsResult = {
+      baseProfile: {
+        calcium: 80,
+        magnesium: 20,
+        sodium: 15,
+        sulfate: 100,
+        chloride: 60,
+        bicarbonate: 122,
+      },
       resultingProfile: {
         calcium: 80,
         magnesium: 20,
@@ -211,6 +219,9 @@ describe("alkalinityAfterSaltsPpmCaCO3FromSaltAdditionsResult (Phase 5b-5)", () 
 
   it("zero bicarbonate → zero alkalinity", () => {
     const fakeSalts: SaltAdditionsResult = {
+      baseProfile: {
+        calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0,
+      },
       resultingProfile: {
         calcium: 0, magnesium: 0, sodium: 0, sulfate: 0, chloride: 0, bicarbonate: 0,
       },

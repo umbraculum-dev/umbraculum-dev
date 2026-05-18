@@ -553,6 +553,7 @@ export function computeRecipeGravityAnalysis(args: {
       pbgEstimatedSg: null,
       ibuTinsethEstimated: null,
       ibuRagerEstimated: null,
+      buGuRatio: null,
       colorSrmMoreyEstimated: null,
       colorSrmDanielsEstimated: null,
       fgEstimatedSg: null,
