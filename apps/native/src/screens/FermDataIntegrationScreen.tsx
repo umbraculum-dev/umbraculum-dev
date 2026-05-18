@@ -126,9 +126,12 @@ export function FermDataIntegrationScreen() {
       >;
       const nextDevices = { tilt: [], ispindel: [], rapt: [] } as Record<IntegrationKind, IntegrationDevice[]>;
       INTEGRATION_KINDS.forEach((kind, idx) => {
-        const integration = (integrationsRes[idx].data as { integration?: unknown })?.integration;
+        const intRes = integrationsRes[idx];
+        const devRes = devicesRes[idx];
+        if (!intRes || !devRes) return;
+        const integration = (intRes.data as { integration?: unknown })?.integration;
         nextIntegrations[kind] = (integration ?? null) as IntegrationSummary | null;
-        const devices = (devicesRes[idx].data as { devices?: unknown })?.devices;
+        const devices = (devRes.data as { devices?: unknown })?.devices;
         nextDevices[kind] = Array.isArray(devices) ? (devices as IntegrationDevice[]) : [];
       });
 

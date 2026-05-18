@@ -54,7 +54,9 @@ export function latestRunDirFor(tool?: string): string | null {
   const filtered = tool ? entries.filter((e) => e.endsWith("-" + tool)) : entries;
   if (filtered.length === 0) return null;
   filtered.sort();
-  return path.join(base, filtered[filtered.length - 1]);
+  const last = filtered[filtered.length - 1];
+  if (!last) return null;
+  return path.join(base, last);
 }
 
 export function summarizeRunDir(dir: string): {

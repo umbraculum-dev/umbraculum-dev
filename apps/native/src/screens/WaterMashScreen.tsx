@@ -613,6 +613,7 @@ export function WaterMashScreen() {
       if (idx < 0) return prev;
 
       const row = prev[idx];
+      if (!row) return prev;
       let nextPatch = { ...patch };
 
       if (idx > 0 && "deduceFromMashIn" in nextPatch) {
@@ -670,7 +671,9 @@ export function WaterMashScreen() {
 
       const next = prev.slice();
       const tmp = next[idx];
-      next[idx] = next[targetIdx];
+      const target = next[targetIdx];
+      if (!tmp || !target) return prev;
+      next[idx] = target;
       next[targetIdx] = tmp;
       return next;
     });
