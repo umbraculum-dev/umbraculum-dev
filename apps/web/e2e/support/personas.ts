@@ -4,7 +4,7 @@ import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export type PersonaKey = "e2e-admin" | "e2e-member" | "e2e-viewer";
+export type PersonaKey = "e2e-admin" | "e2e-member" | "e2e-viewer" | "e2e-multi-admin";
 
 export interface Persona {
   key: PersonaKey;
@@ -15,6 +15,10 @@ export interface Persona {
 
 export interface FixtureIdentities {
   workspaceId: string;
+  // Secondary workspace seeded only as a SelectWorkspace fixture for the
+  // multi-admin persona. Single-workspace personas (admin/member/viewer)
+  // never see this workspace.
+  secondaryWorkspaceId: string;
   recipeId: string;
   waterProfileId: string;
   brewSessionId: string;

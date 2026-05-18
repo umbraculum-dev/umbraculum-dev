@@ -20,10 +20,18 @@
       "passwordEnv": "E2E_VIEWER_PASSWORD",
       "defaultPassword": "e2e-viewer-pw!",
       "role": "viewer"
+    },
+    {
+      "key": "e2e-multi-admin",
+      "email": "e2e-multi-admin@brewery.local",
+      "passwordEnv": "E2E_MULTI_ADMIN_PASSWORD",
+      "defaultPassword": "e2e-multi-admin-pw!",
+      "role": "brewery_admin"
     }
   ],
   "fixture": {
     "workspaceId": "e2e00000-0000-0000-0000-0000000000aa",
+    "secondaryWorkspaceId": "e2e00000-0000-0000-0000-0000000000bb",
     "recipeId": "e2e00000-0000-0000-0000-000000000abc",
     "waterProfileId": "e2e00000-0000-0000-0000-000000000fff",
     "brewSessionId": "e2e00000-0000-0000-0000-000000000bbe"

@@ -2,7 +2,7 @@
 
 This is the single source of truth for "what do I test, where, and how" in this monorepo. Read it before adding a new test or asking the agent to add one. Pair with [TESTING-DECISION.md](TESTING-DECISION.md) (decision tree) if you can't decide which layer applies.
 
-**Status:** v1.2 (test-coverage hardening pass — Phase 1 + Phase 2 + Phase 3a landed 2026-05-17/18; see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟢 in progress (Phase 4b regression-pin trio L1+L4+L5 complete)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
+**Status:** v1.3 (test-coverage hardening pass — Phase 1 + Phase 2 + Phase 3 landed 2026-05-17/18; see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟢 in progress (Phase 4b regression-pin trio L1+L4+L5 complete; Phase 5g L5 web pin complete)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
 
 ## Layers (cheapest to most expensive)
 
@@ -151,18 +151,19 @@ Skill + job catalog split:
 
 These are the personas every E2E layer (L3, L5, L6) shares. Seeded by [services/api/src/cli/seedE2eFixture.ts](../services/api/src/cli/seedE2eFixture.ts) (idempotent — re-run anytime):
 
-| Persona | Email | Password | Role | Workspace |
+| Persona | Email | Password | Role | Workspace(s) |
 |---|---|---|---|---|
 | e2e-admin | `e2e-admin@brewery.local` | `e2e-admin-pw!` | brewery_admin | E2E Brewery |
 | e2e-member | `e2e-member@brewery.local` | `e2e-member-pw!` | member | E2E Brewery |
 | e2e-viewer | `e2e-viewer@brewery.local` | `e2e-viewer-pw!` | viewer | E2E Brewery |
+| e2e-multi-admin | `e2e-multi-admin@brewery.local` | `e2e-multi-admin-pw!` | brewery_admin | **E2E Brewery + E2E Side Brewery** (added 2026-05-18 as the SelectWorkspace flow fixture — Phase 3b L5 regression-pin) |
 
 Stable IDs (so tests can hardcode):
 
-- User UUIDs: `e2e0000-0000-0000-0000-00000000aaaa/bbbb/cccc`
-- Workspace UUID: `e2e0000-0000-0000-0000-0000000000ws`
-- Recipe ("E2E Pale Ale") UUID: `e2e0000-0000-0000-0000-000000000abc`
-- Water profile UUID: `e2e0000-0000-0000-0000-000000000fff`
+- User UUIDs: `e2e00000-0000-0000-0000-000000000aaa/bbb/ccc/ddd` (admin / member / viewer / multi-admin)
+- Workspace UUIDs: `e2e00000-0000-0000-0000-0000000000aa` (primary) + `e2e00000-0000-0000-0000-0000000000bb` (secondary, multi-admin only)
+- Recipe ("E2E Pale Ale") UUID: `e2e00000-0000-0000-0000-000000000abc`
+- Water profile UUID: `e2e00000-0000-0000-0000-000000000fff`
 
 Seed:
 
@@ -226,7 +227,7 @@ Headline numbers measured against master `00025dc` (just after the post-HIGH-ful
 | **L1 Unit** — `packages/core` (math + unit conversion) | `packages/core/src/**/*.test.ts` | TBD (existing suite, not re-measured in this audit) | 🟡 **Audit-deferred** — TESTING.md L1 section explicitly mentions `packages/core/src/gravity.js` + `packages/core/src/units`, but a parser-by-function coverage audit was not done in this round. Recommended next round. | — |
 | **L2 API integration** | `services/api/src/tests/*.test.ts` (excluding `contracts/**`) | 26 spec files (~20+ specs per the original kickoff note) | 🟡 **No formal gap audit done yet** — all the major routes (recipes, water-profiles, brewSessions, ai, billing, etc.) have suites, but per-route route-coverage was not measured. The `waterProfiles.test.ts` suite *did* exercise the renamed `body.workspace` field (line 87-88) post-Phase-4b, so L2 was actually aligned with the rename — the bug was strictly UI-consumer drift. | Phase 4b NOT an L2 gap. |
 | **L4 BeerJSON contract snapshots** | `services/api/src/tests/contracts/*.test.ts` | **15 of ~15 native-consumed endpoints covered (was 2 pre-audit; Phase 2 complete 2026-05-18)**: `recipe.contract.test.ts` (POST /recipes + GET /recipes/:id), `auth.contract.test.ts` (GET /auth/me), `waterProfiles.contract.test.ts` (Phase 4b L4 regression-pin), `recipeWater.contract.test.ts` (GET /water-settings + GET /water-hub-summary), `recipeWaterCompute.contract.test.ts` (POST mash + sparge + boil compute-and-save), `brewSessions.contract.test.ts` (POST create + GET list + GET detail), `inventoryEndpoints.contract.test.ts` (GET equipment-profiles + GET ingredients/{fermentables,hops,yeasts}). | ✅ **Phase 2 complete (2026-05-18)** — full L4 coverage of the native-consumed surface; 7 contract test suites, 16 tests. | Phase 4b pinned at L4; entire water-calc surface has L1+L4 alignment; all primary native screens have snapshot coverage of their consumed endpoints. |
-| **L5 Web E2E** | `apps/web/e2e/**/*.spec.ts` | **8 specs** (auth, dashboard, water-calc, **water-profiles** ←Phase 3a 2026-05-18, recipe-list, ai-pages, recipe-create, brew-session) | 🟢 **Improving — Phase 3a landed 2026-05-18** — the Phase 4b production-rendering symptom is now pinned at L5 (`smoke/water-profiles.spec.ts` asserts the seeded "E2E Tap Water" workspace profile appears in the `/en/water-profiles` table + verifies the `/api/water-profiles` response carries `body.workspace`). Combined with the L1 dual-key parser test + L4 contract snapshot, Phase 4b now has full L1+L4+L5 regression-pin coverage. SelectWorkspace flow (Phase 5g context) remains uncovered → Phase 3b. | Phase 4b ✅ pinned L1+L4+L5; Phase 5g still un-pinned (next: Phase 3b). |
+| **L5 Web E2E** | `apps/web/e2e/**/*.spec.ts` | **9 specs** (auth, dashboard, water-calc, **water-profiles** ←Phase 3a 2026-05-18, **select-workspace** ←Phase 3b 2026-05-18, recipe-list, ai-pages, recipe-create, brew-session) | 🟢 **Improving — Phase 3a + Phase 3b landed 2026-05-18** — Phase 4b production-rendering symptom pinned at L5 (`smoke/water-profiles.spec.ts`, 2 tests). Phase 5g SelectWorkspace flow pinned at L5 (`smoke/select-workspace.spec.ts`, 3 tests covering the multi-workspace login redirect, the picker UI, and the `POST /api/auth/active-workspace` handoff + session mutation). Required a new fixture persona `e2e-multi-admin` and a second seed workspace `E2E Side Brewery` to make the SelectWorkspace route reachable from E2E (previously a dead branch since all personas were single-workspace). | Phase 4b ✅ pinned L1+L4+L5; Phase 5g ✅ pinned L5 (apps/web side; native side deferred until apps/native testing infra). |
 | **L6 Agentic browser E2E** | `var/test-runs/<timestamp>/` from on-demand runs; named jobs in `docs/agentic-jobs.md` | 3 named jobs | ⚪ **By design on-demand only** — not part of CI; not a closeable gap (per kickoff non-goals). | — |
 
 ### Phase plan (hardening pass)
@@ -237,11 +238,11 @@ This audit is **Phase 1 of the test-coverage hardening slice**. Subsequent phase
 |---|---|---|:-:|---|
 | **Phase 1 — L1 contract parser coverage** | Bring the contract-parser test count from 5/8 to 8/8 by adding `parseAuthMeResponse`, `parseWaterProfileItem`, `parseWaterProfilesResponse` test files. Pin the `account → workspace` dual-key parser behavior (the same dual-key that allowed Phase 4b to be invisible at the wire level) so a future "remove legacy key" PR has an explicit test impact. | ~30 min | ✅ **Landed 2026-05-17** | This doc § above; commit landing the gap fix. |
 | **Phase 2 — L4 contract snapshots for the uncovered native-consumed endpoints** | Audit `apps/native/src/**` for `api.{get,post,patch,put,delete}` call sites; cross-reference against existing `*.contract.test.ts` files; author the missing snapshot tests. Split into sub-phases for bounded commits. | ~2-4 hours total | ✅ **Complete (2026-05-18)** — 13 new snapshots across 5 new contract test suites covering all primary native-consumed endpoints. L4 coverage 2/15 → 15/15. See [Phase 2b backlog](#phase-2b-backlog-l4-snapshots-still-missing) below for the per-endpoint closure log. |
-| **Phase 3 — L5 Playwright regression pins for Phase 4b + Phase 5g** | Split into 3a + 3b. **Phase 3a (Phase 4b L5 pin)**: assert workspace water profile appears in the `/en/water-profiles` table + asserts `/api/water-profiles` response carries `body.workspace`. **Phase 3b (Phase 5g SelectWorkspace flow)**: add a spec covering the SelectWorkspace flow (visible to apps/web users with multiple workspaces). | ~2-3 hours total | 🟢 **Phase 3a landed 2026-05-18** (`apps/web/e2e/smoke/water-profiles.spec.ts`; 2 tests, both green). Phase 3b not started. | Phase 4b regression-pin trio now complete (L1+L4+L5). |
+| **Phase 3 — L5 Playwright regression pins for Phase 4b + Phase 5g** | Split into 3a + 3b. **Phase 3a (Phase 4b L5 pin)**: assert workspace water profile appears in the `/en/water-profiles` table + asserts `/api/water-profiles` response carries `body.workspace`. **Phase 3b (Phase 5g SelectWorkspace flow)**: add a spec covering the SelectWorkspace flow (visible to apps/web users with multiple workspaces). | ~2-3 hours total | ✅ **Complete 2026-05-18.** Phase 3a (`apps/web/e2e/smoke/water-profiles.spec.ts`; 2 tests). Phase 3b (`apps/web/e2e/smoke/select-workspace.spec.ts`; 3 tests; required `e2e-multi-admin` persona + `secondaryWorkspaceId` seed extension). Full smoke suite: 15 → 18 tests, all green. | Phase 4b regression-pin trio complete (L1+L4+L5); Phase 5g L5 web pin complete. |
 | **Phase 4 — L2 integration coverage gap audit** | Per-route audit of `services/api/src/tests/*.test.ts`. Identify routes with thin coverage; add specs for ACL/scope edge cases. | Larger; needs route inventory first. | 🟡 Not started | TBD |
 | **Phase 5 (optional) — `packages/core` math/units L1 gap audit** | Inventory `packages/core/src/{gravity.js,units}` exported functions; cross-reference with existing tests; fill gaps. | Smaller; bounded chunk. | 🟡 Not started | TBD |
 
-**Recommended order:** Phase 2 first (L4 snapshots) ✅ done — the cheapest-bug-catching layer given Phase 4b was a "the wire format changed and we never noticed" failure. Phase 3a (Phase 4b L5 pin) ✅ done — closes the regression-pin trio for the original cleanest-signal bug across L1+L4+L5. Phase 3b next (SelectWorkspace L5 — uncovered flow pin for Phase 5g). Phase 4-5 last (they're "no known bug yet" coverage extensions rather than regression pins).
+**Recommended order:** Phase 2 (L4 snapshots) ✅ done — the cheapest-bug-catching layer given Phase 4b was a "the wire format changed and we never noticed" failure. Phase 3a (Phase 4b L5 pin) ✅ done — closes the regression-pin trio for the original cleanest-signal bug across L1+L4+L5. Phase 3b (SelectWorkspace L5 web pin for Phase 5g) ✅ done — pins the multi-workspace handoff on apps/web; native-side equivalent deferred until apps/native gets a test runner. Phase 4-5 next (they're "no known bug yet" coverage extensions rather than regression pins — pick based on prevailing risk model).
 
 #### Phase 2b backlog (closure log)
 

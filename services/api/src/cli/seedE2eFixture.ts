@@ -20,7 +20,9 @@ import argon2 from "argon2";
 const E2E_USER_ADMIN_ID = "e2e00000-0000-0000-0000-000000000aaa";
 const E2E_USER_MEMBER_ID = "e2e00000-0000-0000-0000-000000000bbb";
 const E2E_USER_VIEWER_ID = "e2e00000-0000-0000-0000-000000000ccc";
+const E2E_USER_MULTI_ADMIN_ID = "e2e00000-0000-0000-0000-000000000ddd";
 const E2E_WORKSPACE_ID = "e2e00000-0000-0000-0000-0000000000aa";
+const E2E_WORKSPACE_2_ID = "e2e00000-0000-0000-0000-0000000000bb";
 const E2E_RECIPE_ID = "e2e00000-0000-0000-0000-000000000abc";
 const E2E_RECIPE_VERSION_GROUP_ID = E2E_RECIPE_ID;
 const E2E_WATER_PROFILE_ID = "e2e00000-0000-0000-0000-000000000fff";
@@ -29,9 +31,11 @@ const E2E_BREW_SESSION_ID = "e2e00000-0000-0000-0000-000000000bbe";
 const ADMIN_EMAIL = "e2e-admin@brewery.local";
 const MEMBER_EMAIL = "e2e-member@brewery.local";
 const VIEWER_EMAIL = "e2e-viewer@brewery.local";
+const MULTI_ADMIN_EMAIL = "e2e-multi-admin@brewery.local";
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? "e2e-admin-pw!";
 const MEMBER_PASSWORD = process.env.E2E_MEMBER_PASSWORD ?? "e2e-member-pw!";
 const VIEWER_PASSWORD = process.env.E2E_VIEWER_PASSWORD ?? "e2e-viewer-pw!";
+const MULTI_ADMIN_PASSWORD = process.env.E2E_MULTI_ADMIN_PASSWORD ?? "e2e-multi-admin-pw!";
 
 interface Persona {
   id: string;
@@ -44,6 +48,12 @@ const PERSONAS: Persona[] = [
   { id: E2E_USER_ADMIN_ID, email: ADMIN_EMAIL, password: ADMIN_PASSWORD, role: "brewery_admin" },
   { id: E2E_USER_MEMBER_ID, email: MEMBER_EMAIL, password: MEMBER_PASSWORD, role: "member" },
   { id: E2E_USER_VIEWER_ID, email: VIEWER_EMAIL, password: VIEWER_PASSWORD, role: "viewer" },
+  {
+    id: E2E_USER_MULTI_ADMIN_ID,
+    email: MULTI_ADMIN_EMAIL,
+    password: MULTI_ADMIN_PASSWORD,
+    role: "brewery_admin",
+  },
 ];
 
 function buildE2EPaleAleBeerJson(name: string) {
@@ -155,7 +165,32 @@ async function seed() {
       },
     });
 
-    for (const p of PERSONAS) await ensureMembership(prisma, E2E_WORKSPACE_ID, p.id, p.role);
+    // Second workspace for the SelectWorkspace flow regression-pin
+    // (Phase 5g / Phase 3b L5 fixture). Owned by `e2e-multi-admin` who
+    // is also a member of E2E_WORKSPACE_ID, so logging in lands on
+    // /en/select-workspace instead of auto-selecting a single workspace.
+    await prisma.workspace.upsert({
+      where: { id: E2E_WORKSPACE_2_ID },
+      create: {
+        id: E2E_WORKSPACE_2_ID,
+        name: "E2E Side Brewery",
+        adsDisabled: true,
+      },
+      update: {
+        name: "E2E Side Brewery",
+        adsDisabled: true,
+      },
+    });
+
+    // Single-workspace personas (admin, member, viewer) keep their
+    // existing behavior (membership only in the primary workspace).
+    // The multi-admin persona is a member of BOTH workspaces.
+    for (const p of PERSONAS) {
+      if (p.id === E2E_USER_MULTI_ADMIN_ID) continue;
+      await ensureMembership(prisma, E2E_WORKSPACE_ID, p.id, p.role);
+    }
+    await ensureMembership(prisma, E2E_WORKSPACE_ID, E2E_USER_MULTI_ADMIN_ID, "brewery_admin");
+    await ensureMembership(prisma, E2E_WORKSPACE_2_ID, E2E_USER_MULTI_ADMIN_ID, "brewery_admin");
 
     await prisma.waterProfile.upsert({
       where: { id: E2E_WATER_PROFILE_ID },
@@ -241,6 +276,7 @@ async function seed() {
           ok: true,
           fixture: {
             workspaceId: E2E_WORKSPACE_ID,
+            secondaryWorkspaceId: E2E_WORKSPACE_2_ID,
             users: PERSONAS.map((p) => ({ id: p.id, email: p.email, role: p.role })),
             recipeId: E2E_RECIPE_ID,
             waterProfileId: E2E_WATER_PROFILE_ID,
@@ -263,10 +299,23 @@ async function clean() {
     await prisma.recipeWaterSettings.deleteMany({ where: { recipeId: E2E_RECIPE_ID } });
     await prisma.recipe.deleteMany({ where: { id: E2E_RECIPE_ID } });
     await prisma.waterProfile.deleteMany({ where: { id: E2E_WATER_PROFILE_ID } });
-    await prisma.workspaceMember.deleteMany({ where: { workspaceId: E2E_WORKSPACE_ID } });
-    await prisma.workspace.deleteMany({ where: { id: E2E_WORKSPACE_ID } });
+    await prisma.workspaceMember.deleteMany({
+      where: { workspaceId: { in: [E2E_WORKSPACE_ID, E2E_WORKSPACE_2_ID] } },
+    });
+    await prisma.workspace.deleteMany({
+      where: { id: { in: [E2E_WORKSPACE_ID, E2E_WORKSPACE_2_ID] } },
+    });
     await prisma.user.deleteMany({
-      where: { id: { in: [E2E_USER_ADMIN_ID, E2E_USER_MEMBER_ID, E2E_USER_VIEWER_ID] } },
+      where: {
+        id: {
+          in: [
+            E2E_USER_ADMIN_ID,
+            E2E_USER_MEMBER_ID,
+            E2E_USER_VIEWER_ID,
+            E2E_USER_MULTI_ADMIN_ID,
+          ],
+        },
+      },
     });
      
     console.log(JSON.stringify({ ok: true, cleaned: true }, null, 2));
