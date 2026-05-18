@@ -1,0 +1,42 @@
+{
+  "brewSession": {
+    "code": "string",
+    "createdAt": "string",
+    "id": "string",
+    "pausedAt": "null",
+    "recipeId": "string",
+    "scheduledDate": "null",
+    "startedAt": "null",
+    "status": "string",
+    "stoppedAt": "null",
+    "updatedAt": "string",
+    "workspaceId": "string"
+  },
+  "ok": "boolean",
+  "steps": {
+    "__array": {
+      "brewSessionId": "string",
+      "createdAt": "string",
+      "customTimerEnabled": "boolean",
+      "id": "string",
+      "isDisabled": "boolean",
+      "minutesPlanned": "null",
+      "name": "string",
+      "note": "null",
+      "offsetMinutesFromEnd": "null",
+      "relativeToStepId": "null",
+      "sectionId": "string",
+      "sectionName": "null",
+      "sortOrder": "number",
+      "status": "string",
+      "timerAccumulatedSeconds": "number",
+      "timerLastStartedAt": "null",
+      "timerPausedAt": "null",
+      "timerStartedAt": "null",
+      "timerState": "string",
+      "timerStoppedAt": "null",
+      "updatedAt": "string"
+    },
+    "__length": "non-empty"
+  }
+}

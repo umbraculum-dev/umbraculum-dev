@@ -1,0 +1,62 @@
+{
+  "brewSession": {
+    "code": "string",
+    "createdAt": "string",
+    "id": "string",
+    "logs": {
+      "__array": {
+        "brewSessionId": "string",
+        "createdAt": "string",
+        "id": "string",
+        "kind": "string",
+        "message": "string",
+        "payloadJson": {
+          "code": "string",
+          "recipeId": "string"
+        },
+        "stepId": "null"
+      },
+      "__length": "non-empty"
+    },
+    "pausedAt": "null",
+    "recipe": {
+      "id": "string",
+      "name": "string",
+      "version": "number"
+    },
+    "recipeId": "string",
+    "scheduledDate": "null",
+    "startedAt": "null",
+    "status": "string",
+    "steps": {
+      "__array": {
+        "brewSessionId": "string",
+        "createdAt": "string",
+        "customTimerEnabled": "boolean",
+        "id": "string",
+        "isDisabled": "boolean",
+        "minutesPlanned": "null",
+        "name": "string",
+        "note": "null",
+        "offsetMinutesFromEnd": "null",
+        "relativeToStepId": "null",
+        "sectionId": "string",
+        "sectionName": "null",
+        "sortOrder": "number",
+        "status": "string",
+        "timerAccumulatedSeconds": "number",
+        "timerLastStartedAt": "null",
+        "timerPausedAt": "null",
+        "timerStartedAt": "null",
+        "timerState": "string",
+        "timerStoppedAt": "null",
+        "updatedAt": "string"
+      },
+      "__length": "non-empty"
+    },
+    "stoppedAt": "null",
+    "updatedAt": "string",
+    "workspaceId": "string"
+  },
+  "ok": "boolean"
+}

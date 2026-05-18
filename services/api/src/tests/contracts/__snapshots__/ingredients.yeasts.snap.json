@@ -1,0 +1,19 @@
+{
+  "items": {
+    "__array": {
+      "attenuationMax": "number",
+      "attenuationMin": "number",
+      "form": "string",
+      "id": "string",
+      "lab": "string",
+      "name": "string",
+      "productId": "string",
+      "tempMaxC": "null",
+      "tempMinC": "null",
+      "type": "string",
+      "workspaceId": "null"
+    },
+    "__length": "non-empty"
+  },
+  "ok": "boolean"
+}
