@@ -2,6 +2,8 @@
 
 This is the single source of truth for "what do I test, where, and how" in this monorepo. Read it before adding a new test or asking the agent to add one. Pair with [TESTING-DECISION.md](TESTING-DECISION.md) (decision tree) if you can't decide which layer applies.
 
+**Status:** v1.1 (test-coverage hardening pass kicked off 2026-05-17 — see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟡 in progress (this slice)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
+
 ## Layers (cheapest to most expensive)
 
 | Layer | Tool | Where | When it runs | What it catches |
@@ -204,3 +206,48 @@ docker compose exec api npm run seed:e2e -- --clean
 - No load/performance testing yet.
 - No changes to `docker-compose.yml` to host Playwright (we use one-shot `docker run`).
 - No new test framework introduced — vitest + Playwright only.
+
+---
+
+## Coverage audit + hardening pass (2026-05-17)
+
+The ESLint HIGH-full slice (landed 2026-05-16) surfaced **two latent UI bugs** that escaped existing tests, which is the cleanest possible signal for which test layers have gaps:
+
+- **Phase 4b — `account → workspace` stale-consumer drift** (commit `4d9ec1e`): four UI consumers in `apps/web` (`apps/web/app/recipes/[id]/water/{mash,sparge,boil}/page.tsx` + `apps/web/app/[locale]/water-profiles/page.tsx`) kept reading `profiles?.account` after the `WaterProfilesResponse.account` → `.workspace` rename in commit `87876d0`. Workspace water profiles silently never appeared in any of the four dropdowns. Should have been caught by **L4 contract snapshot** (would have shown the rename as snapshot drift in the rename PR) and/or **L5 Playwright** (would have caught the UI symptom directly).
+- **Phase 5g — untyped render-prop in apps/native** (commit `6445476`): the inline `<RootStack.Screen name="SelectWorkspace">{({ navigation }) => ...}</RootStack.Screen>` render-prop fell back to `any`. Caused no runtime bug (the SelectWorkspace flow works), but the lack of static typing meant a class of regressions in that callback would have shipped silently. Should have been caught by **L1/L5 SelectWorkspace flow** coverage.
+
+### Layer-by-layer coverage at 2026-05-17
+
+Headline numbers measured against master `00025dc` (just after the post-HIGH-full doc consistency pass):
+
+| Layer | What | Count | Coverage assessment | Gap signal |
+|---|---|---:|---|---|
+| **L1 Unit** — contract parsers | `packages/contracts/src/**/*.test.ts` covering the 8 `parseX(unknown): X` parsers in `packages/contracts` | 8/8 parsers covered (was 5/8 pre-audit) | ✅ **Complete (2026-05-17)** — `parseAuthMeResponse` + `parseWaterProfileItem` + `parseWaterProfilesResponse` added as part of this audit. Total contracts vitest count: 70 tests across 5 suites (was 38 across 3 suites). | — |
+| **L1 Unit** — `packages/core` (math + unit conversion) | `packages/core/src/**/*.test.ts` | TBD (existing suite, not re-measured in this audit) | 🟡 **Audit-deferred** — TESTING.md L1 section explicitly mentions `packages/core/src/gravity.js` + `packages/core/src/units`, but a parser-by-function coverage audit was not done in this round. Recommended next round. | — |
+| **L2 API integration** | `services/api/src/tests/*.test.ts` (excluding `contracts/**`) | 26 spec files (~20+ specs per the original kickoff note) | 🟡 **No formal gap audit done yet** — all the major routes (recipes, water-profiles, brewSessions, ai, billing, etc.) have suites, but per-route route-coverage was not measured. The `waterProfiles.test.ts` suite *did* exercise the renamed `body.workspace` field (line 87-88) post-Phase-4b, so L2 was actually aligned with the rename — the bug was strictly UI-consumer drift. | Phase 4b NOT an L2 gap. |
+| **L4 BeerJSON contract snapshots** | `services/api/src/tests/contracts/*.test.ts` | 2 of ~12 native-consumed endpoints covered: `recipe.contract.test.ts` (recipes), `auth.contract.test.ts` (`/auth/me`) | 🔴 **Significant gap** — TESTING.md L4 § specifies "Each native-consumed endpoint has a `.snap.test.ts`", but currently only 2 of the ~12 endpoints `apps/native/` consumes have one. Notably, **`/water-profiles` is uncovered** — if it had been, the Phase 4b `account → workspace` rename would have appeared as snapshot drift in the rename PR's diff. | Phase 4b WOULD have been caught here. |
+| **L5 Web E2E** | `apps/web/e2e/**/*.spec.ts` | 7 specs (auth, dashboard, water-calc, recipe-list, ai-pages, recipe-create, brew-session) | 🟡 **Surface-level coverage; gap audit not done** — the spec set covers the major flows, but `water-calc.spec.ts` does not currently assert that workspace water profiles appear in the dropdowns. A regression-pin spec for the Phase 4b symptom (workspace profile appears in mash/sparge/boil dropdown) would be a high-value addition. SelectWorkspace flow (Phase 5g context) is also not covered. | Phase 4b + Phase 5g WOULD have been caught here. |
+| **L6 Agentic browser E2E** | `var/test-runs/<timestamp>/` from on-demand runs; named jobs in `docs/agentic-jobs.md` | 3 named jobs | ⚪ **By design on-demand only** — not part of CI; not a closeable gap (per kickoff non-goals). | — |
+
+### Phase plan (hardening pass)
+
+This audit is **Phase 1 of the test-coverage hardening slice**. Subsequent phases are scoped but not yet landed:
+
+| Phase | Scope | Effort estimate | Status | Tracking |
+|---|---|---|:-:|---|
+| **Phase 1 — L1 contract parser coverage** | Bring the contract-parser test count from 5/8 to 8/8 by adding `parseAuthMeResponse`, `parseWaterProfileItem`, `parseWaterProfilesResponse` test files. Pin the `account → workspace` dual-key parser behavior (the same dual-key that allowed Phase 4b to be invisible at the wire level) so a future "remove legacy key" PR has an explicit test impact. | ~30 min | ✅ **Landed 2026-05-17** | This doc § above; commit landing the gap fix. |
+| **Phase 2 — L4 contract snapshots for the 10 uncovered native-consumed endpoints** | Audit `apps/native/src/**` for `api.{get,post,patch,put,delete}` call sites; cross-reference against the 2 existing `*.contract.test.ts` files; author the missing snapshot tests. `/water-profiles` is the highest-priority snapshot (Phase 4b would have been caught). | ~2-4 hours (10 snapshots × ~15-30 min each, plus fixtures + the contracts:check `--update` flow) | 🟡 Not started | TBD — phase 2 audit + commits |
+| **Phase 3 — L5 Playwright regression pins for Phase 4b + Phase 5g** | Add a `water-calc.spec.ts` assertion: workspace water profile appears in the mash water-profile dropdown when a workspace member creates one. Add a `select-workspace.spec.ts` spec covering the SelectWorkspace flow (visible to apps/web users with multiple workspaces). | ~2-3 hours | 🟡 Not started | TBD |
+| **Phase 4 — L2 integration coverage gap audit** | Per-route audit of `services/api/src/tests/*.test.ts`. Identify routes with thin coverage; add specs for ACL/scope edge cases. | Larger; needs route inventory first. | 🟡 Not started | TBD |
+| **Phase 5 (optional) — `packages/core` math/units L1 gap audit** | Inventory `packages/core/src/{gravity.js,units}` exported functions; cross-reference with existing tests; fill gaps. | Smaller; bounded chunk. | 🟡 Not started | TBD |
+
+**Recommended order:** Phase 2 first (L4 snapshots) — the cheapest-bug-catching layer given Phase 4b was a "the wire format changed and we never noticed" failure. Phase 3 second (the L5 spec for Phase 4b is a small concrete addition; SelectWorkspace L5 is a separate larger addition). Phase 4-5 last (they're "no known bug yet" coverage extensions rather than regression pins).
+
+### What this audit deliberately does NOT change
+
+- The **layer-mapping framework** (L1-L6) and the per-layer "what goes in" guidance. That section is solid and pre-dates this audit.
+- The **`Anti-laziness defaults`** (`.cursor/rules/20-tests-must-follow-changes.mdc`) — the workflow gate is unchanged.
+- The **E2E fixture identities** — still the same personas/IDs.
+- The **per-layer run commands** — still the same Docker invocations.
+
+The audit is additive: it documents the gap state at a point in time and lays out the work needed to close it.
