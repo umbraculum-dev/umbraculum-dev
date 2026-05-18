@@ -1,6 +1,6 @@
 # Brewing SaaS - Architecture & Implementation Plan (AI-first)
 
-**NOTE:** This revision has been superseded by `docs/architechture-Rev02.md` (new source of truth). Keep Rev01 as historical context; apply new decisions in Rev02.
+**NOTE:** This revision has been superseded by [`../architecture-Rev02.md`](../architecture-Rev02.md) (new source of truth). Keep Rev01 as historical context; apply new decisions in Rev02.
 
 **Status:** v0.2 (living document)  
 **Primary goal:** ship a bfr-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2-codex).  
@@ -289,7 +289,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 
 ### Phase 0 - Repository and standards
 - Create monorepo structure (`apps/`, `services/`, `packages/`, `infra/`, `docs/`)
-- Add `docs/architechture-Rev02.md` as source of truth for Cursor
+- Add `docs/architecture-Rev02.md` as source of truth for Cursor
 - Native-ready packages (Metro-safe boundaries):
   - Shared packages imported by native apps ship `dist/**/*.js` + `dist/**/*.d.ts`
   - Do not export raw TS at the runtime boundary for native-consumed packages

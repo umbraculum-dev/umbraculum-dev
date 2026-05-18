@@ -67,7 +67,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
 - **Project summary (project-owned; restored 2026-05-12 after `@rftsu/cursor-rules` 3.1.1 sync removed it from the managed block)**:
   - This is a **custom TypeScript project** (not Magento, not PHP).
   - Stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.
-  - Canonical big-picture plan: `docs/architechture-Rev02.md`
+  - Canonical big-picture plan: `docs/architecture-Rev02.md`
   - Testing strategy: `docs/TESTING.md` (single source of truth) + `docs/ROLLOUT.md` (rollout plan) + `docs/agentic-jobs.md` (L6 agentic-browser job catalog).
 
 - **ACCESSIBILITY-FIRST (MANDATORY)**:
@@ -87,9 +87,9 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - If accessibility requirements conflict with design, propose an accessible alternative—do not ship inaccessible UI.
 
 - **CSS structure**: See `docs/CODING-STANDARDS.md` → "CSS structure" for file layout and naming.
-- **Big picture**: `docs/architechture-Rev02.md`
+- **Big picture**: `docs/architecture-Rev02.md`
 - **Roadmap**: `docs/ROADMAP.md`
-- **Work tracker**: `TODOs.md`
+- **Work tracker**: `internal/working-notes/TODOs.md`
 - **Local dev entrypoint**: `docker compose up --build`
 - **Shared packages build (native-ready)**:
   - Packages consumed by native apps ship runtime JS + `.d.ts` under `dist/` and we commit those build outputs.
@@ -220,7 +220,7 @@ Anything below this heading is **project-owned** and will not be overwritten by 
   - Treat `node_modules/` as **generated artifacts**: never edit them directly; always change dependencies via `package.json` and run installs.
   - If Docker creates the folder with unexpected ownership, prefer reinstalling from the host or adjusting ownership rather than manually editing contents.
 - **Cursor rules/skills upstream backlog**:
-  - If you identify a reusable Cursor Rule/Skill improvement while working, add it to `CURSOR-RULES-SKILLS-TODO.md` (repo root) so it can be periodically upstreamed into the canonical rules/skills repo/plugin.
+  - If you identify a reusable Cursor Rule/Skill improvement while working, add it to `internal/working-notes/CURSOR-RULES-SKILLS-TODO.md` so it can be periodically upstreamed into the canonical rules/skills repo/plugin.
 
 - **Cursor rules/skills sync command (one-off, not in package files)**:
   - This repo doesn't pin `@rftsu/cursor-rules` as a dev dependency — we're slated to switch to the Cursor plugin model soon. Until then, syncs run via a one-off `npx`. The friction-free path is **`git+ssh` over the `github-thesiteup` SSH alias** (set up in `~/.ssh/config`), which avoids the GitHub Packages PAT (`E401 unauthenticated`) failure mode entirely:

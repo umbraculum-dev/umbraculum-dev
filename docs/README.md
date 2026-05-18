@@ -4,7 +4,7 @@
 
 This folder is the canonical reference set for the `<PLATFORM_NAME>` platform. It is structured so that anyone — a new contributor, a self-hoster, a hosted-service customer, or a future maintainer — can find what they need without reading the whole repository.
 
-Documents are grouped by **purpose**, not by physical location. Files have not been moved into subfolders in order to keep cross-links inside the existing codebase stable; this index provides the navigation.
+Documents are grouped by **purpose**, not by physical location. Most files sit at the top level — they have not been moved into per-purpose subfolders in order to keep cross-links inside the existing codebase stable; this index provides the navigation. The exceptions are `integrations/`, `figma/`, `calculators/` (pre-existing per-asset folders), `archive/` (superseded revisions), and `help/` (end-user / operator help, currently empty placeholder).
 
 > **Token convention.** The placeholder `<PLATFORM_NAME>` appears throughout these docs. It will be replaced with the chosen brand name once one is selected; until then, treat it as a search/replace token.
 
@@ -20,11 +20,13 @@ If you are new to the project, read these three documents in order:
 2. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
 3. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
 
-The brewery-vertical implementation log lives in [`architechture-Rev02.md`](architechture-Rev02.md) — that is the source of truth for *what is wired up today* in the brewery vertical, and complements the platform-wide perspective above.
+The brewery-vertical implementation log lives in [`architecture-Rev02.md`](architecture-Rev02.md) — that is the source of truth for *what is wired up today* in the brewery vertical, and complements the platform-wide perspective above.
 
 ---
 
 ## Vision & strategy
+
+*Audience: technical decision-makers, platform evaluators, future module developers.*
 
 The high-level direction, business model, and license posture.
 
@@ -35,6 +37,8 @@ The high-level direction, business model, and license posture.
 
 ## Product
 
+*Audience: product readers, evaluators, hosted-service operators.*
+
 User-facing product surfaces and operational concerns at the product level.
 
 - [`ROLLOUT.md`](ROLLOUT.md) — Rollout plan and staged-launch notes.
@@ -43,13 +47,17 @@ User-facing product surfaces and operational concerns at the product level.
 
 ## Architecture — platform-wide
 
+*Audience: contributors, self-hosting operators, module developers.*
+
 Cross-cutting architectural decisions that apply to every module.
 
-- [`architechture-Rev02.md`](architechture-Rev02.md) — Brewery-vertical implementation log and cross-platform (web + native) boundary decisions. The current source of truth for "what is wired up". (Historical versions: [`architechture-Rev00.md`](architechture-Rev00.md), [`architechture-Rev01.md`](architechture-Rev01.md).)
+- [`architecture-Rev02.md`](architecture-Rev02.md) — Brewery-vertical implementation log and cross-platform (web + native) boundary decisions. The current source of truth for "what is wired up". (Historical versions: [`archive/architecture-Rev00.md`](archive/architecture-Rev00.md), [`archive/architecture-Rev01.md`](archive/architecture-Rev01.md).)
 - [`NATIVE-STRATEGY-AND-CI.md`](NATIVE-STRATEGY-AND-CI.md) — Native strategy and CI pipeline notes.
 - [`REACT-NATIVE-KICKOFF-READINESS.md`](REACT-NATIVE-KICKOFF-READINESS.md) — Readiness criteria for the React Native kickoff.
 
 ## Architecture — auth & security
+
+*Audience: contributors, self-hosting operators, module developers.*
 
 - [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) — Authentication strategy (cookie web + bearer native + webview bridge).
 - [`AUTH-HARDENING-ASSESSMENT.md`](AUTH-HARDENING-ASSESSMENT.md) — Hardening review and findings.
@@ -57,18 +65,24 @@ Cross-cutting architectural decisions that apply to every module.
 
 ## Architecture — data & infrastructure
 
-- [`Posgres-master-slave-replicas-architechture.md`](Posgres-master-slave-replicas-architechture.md) — Postgres primary + replica architecture.
+*Audience: contributors, self-hosting operators, module developers.*
+
+- [`postgres-replication-architecture.md`](postgres-replication-architecture.md) — Postgres primary + replica architecture.
 - [`DB-REPLICATION-AND-ROUTING-VERIFICATION.md`](DB-REPLICATION-AND-ROUTING-VERIFICATION.md) — Replication and read-routing verification.
 - [`PGPOOL-VERIFICATION.md`](PGPOOL-VERIFICATION.md) — pgpool-II verification steps.
 - [`Redis-architecture.md`](Redis-architecture.md) — Redis usage, key namespaces, caching pattern.
 
 ## Architecture — billing
 
+*Audience: contributors, hosted-service operators.*
+
 - [`org-billing-stripe-revenuecat-fastify.md`](org-billing-stripe-revenuecat-fastify.md) — Stripe + RevenueCat + Fastify billing source-of-truth design.
 
 ## Domain — brewery vertical
 
-Brewery-specific modeling, data formats, and analytical models. These will move into a `brewery/` module documentation set once the platform reframe lands; until then they live here.
+*Audience: brewery-vertical contributors and operators. These will move into a `brewery/` module documentation set at the H1 2027 platform reframe per [`ROADMAP.md`](ROADMAP.md); until then they live here.*
+
+Brewery-specific modeling, data formats, and analytical models.
 
 - [`BEERJSON-FIRST.md`](BEERJSON-FIRST.md) — BeerJSON-first data model and strict export discipline.
 - [`EQUIPMENT-AND-GRAVITY-ANALYSIS.md`](EQUIPMENT-AND-GRAVITY-ANALYSIS.md) — Equipment + gravity analysis (efficiency, losses, yields).
@@ -77,6 +91,8 @@ Brewery-specific modeling, data formats, and analytical models. These will move 
 - [`RAW-MATERIALS-SEEDABLE-SOURCES.md`](RAW-MATERIALS-SEEDABLE-SOURCES.md) — Seed data sources and licensing notes for raw materials.
 
 ## Engineering — development
+
+*Audience: contributors only.*
 
 Day-to-day engineering conventions and runbooks.
 
@@ -89,7 +105,15 @@ Day-to-day engineering conventions and runbooks.
 - [`DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) — Local development for the native app.
 - [`I18N-AUDIT.md`](I18N-AUDIT.md) — Internationalization audit and guardrails.
 
+## Help & guides (operator-facing)
+
+*Audience: workspace members and admins using the app's UI to perform operational work, regardless of whether their workspace is on free, paid, or self-hosted infrastructure.*
+
+- [`help/`](help/) — End-user / operator help documentation. Currently empty placeholder; content lands here as the brewery vertical UI matures and as additional vertical configurations land.
+
 ## Integrations
+
+*Audience: integration developers, hardware vendors, module developers.*
 
 Per-integration design notes.
 
@@ -99,12 +123,16 @@ Per-integration design notes.
 
 ## Design assets
 
+*Audience: contributors, designers.*
+
 - [`figma/`](figma/) — Figma exports for the three UI pillars (dashboard, edit-recipe, water-calculator).
 
 ## Reference
 
+*Audience: contributors, archaeology readers.*
+
 - [`calculators/`](calculators/) — Calculator references and source materials (e.g. BrunWater spreadsheet, mash-pH paper).
-- PDF copies of architecture revisions (kept for historical reference): [`architecture.pdf`](architecture.pdf), [`architecture-Rev02.pdf`](architecture-Rev02.pdf), [`brewing-app-architecture-and-plan.pdf`](brewing-app-architecture-and-plan.pdf).
+- [`archive/`](archive/) — Superseded architecture revisions (Rev00, Rev01) and the canonical architecture-revision PDF (`archive/architecture-Rev02.pdf`). Kept for historical reference; not load-bearing for current decisions.
 
 ---
 

@@ -68,7 +68,7 @@ Allowed in `apps/web/**`:
 ### Cursor rules/skills upstream backlog (process)
 When we discover a reusable Cursor Rule/Skill improvement while evolving this repo (for example, a buildable-packages runbook or a Metro monorepo pitfall), capture it in:
 
-- `CURSOR-RULES-SKILLS-TODO.md` (repo root)
+- `internal/working-notes/CURSOR-RULES-SKILLS-TODO.md`
 
 This file is intentionally “upstream-ready” so it can be periodically ported into the canonical rules/skills repo (outside this project) or a Cursor plugin.
 

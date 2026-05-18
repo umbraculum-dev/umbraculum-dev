@@ -185,3 +185,9 @@ If any step is red, [`docs/TESTING.md`](TESTING.md) § "What to do when a test f
 3. If chain steps 1-7 all green: slice into **S1+S2+S3** commit, then **S4** separately, then **S5+S6** separately. Three reviewable units, none coupled to the others.
 4. For cursor-rules: do the local-pack (option 1, steps 1-4) in parallel with the chain. Publishing 3.1.1 can wait until you're confident the upstream skills behave correctly.
 5. Hold off on agentic L6 until you actually need it — it's there, but it's the most expensive layer to operate.
+
+---
+
+## Note: file relocations after this rollout
+
+The S1 row above (and a few §S1-related references elsewhere) names `CURSOR-RULES-SKILLS-TODO.md` at the repo root, which is where it lived at the time of the S1 slice. As of the 2026-05-18 docs hygiene pass, that file (and the other repo-root TODO scratchpads) moved to `internal/working-notes/CURSOR-RULES-SKILLS-TODO.md`. The historical S1 narrative is intentionally preserved as-written; cite the new path when working with the file today.

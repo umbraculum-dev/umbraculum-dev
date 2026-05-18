@@ -72,7 +72,9 @@ Use these guidelines to decide whether new content belongs in `internal/` or `do
 | Pricing analysis at the SKU/margin level (actual numbers, breakeven points, strategic loss-leaders) | `internal/` |
 | Roadmap at the "trajectory" level (12-30 month phases, milestones) | `docs/` |
 | Roadmap at the "specific commitments and customer-tied dates" level | `internal/` |
-| Customer-facing operational mechanics | `docs/` (eventually `docs/customers/` when restricted) |
+| End-user / operator help (UI-driven, role-defined, public) | `docs/help/` (Public) |
+| Customer-account-gated operational mechanics (paying-only ops content) | `docs/customers/` (Customer-restricted, reserved — not yet created) |
+| Partner / module-developer-restricted material | `docs/partners/` (Partner-restricted, reserved — not yet created) |
 | Customer-specific notes, conversations, sales objections | `internal/CUSTOMER-NOTES/` (when populated) |
 | Public-product-positioning copy | `docs/` |
 | Investor / partner pitch material, fundraising notes (if/when relevant) | `internal/` |
@@ -85,6 +87,7 @@ Use these guidelines to decide whether new content belongs in `internal/` or `do
 
 - [`MOAT-AND-COMPETITIVE-STRATEGY.md`](MOAT-AND-COMPETITIVE-STRATEGY.md) — per-workspace operational memory as the time-locked moat asset; compounding curve; anticipated competitor moves; strategic priorities that fall out.
 - [`AI-MONETIZATION-STRATEGY.md`](AI-MONETIZATION-STRATEGY.md) — the three monetization modes (BYOK-only, BYOK + paid AI subscription, resold credits); the value-layer-subscription insight; the four-row risk-adjusted comparison; concierge onboarding (IT + EN) as differentiator; chargeback / AR / NET 30 risk analysis; transition path from v0 to optional managed-AI tier to enterprise. **Supersedes** the v1.0 "BYOK and resold-credits strategy" doc.
+- [`working-notes/`](working-notes/) — active TODO scratchpads and feature-debt working notebooks moved out of repo root in the 2026-05-18 docs hygiene pass: `TODOs.md`, `TODOs-TAMAGUI.md`, `RECIPES-IMPORT-TODO.md`, `CURSOR-RULES-SKILLS-TODO.md`. Internal-tier by folder convention; not surfaceable at the public flip.
 
 Anticipated future additions (do not exist yet):
 

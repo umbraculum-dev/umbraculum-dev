@@ -17,7 +17,7 @@
  * screen-reader interaction itself works.
  *
  * This is tracked as upstream tech debt in
- * `CURSOR-RULES-SKILLS-TODO.md` ("Tamagui Accordion aria-controls
+ * `internal/working-notes/CURSOR-RULES-SKILLS-TODO.md` ("Tamagui Accordion aria-controls
  * mismatch"); file the issue against Tamagui when this fails on a
  * non-dashboard route too. Until then, skipping the rule on this one
  * route (not in the shared `axe.ts` helper) keeps the scope minimal

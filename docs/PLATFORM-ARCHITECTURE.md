@@ -13,7 +13,7 @@ This is the **high-level entry point** for any discussion about the shape of `<P
 
 How it relates to the existing architecture log:
 
-- [`docs/architechture-Rev02.md`](architechture-Rev02.md) remains the **implementation log of the brewery vertical** and the cross-platform (web + native) boundary decisions. It is still the source of truth for legacy context and detailed v0 phasing.
+- [`docs/architecture-Rev02.md`](architecture-Rev02.md) remains the **implementation log of the brewery vertical** and the cross-platform (web + native) boundary decisions. It is still the source of truth for legacy context and detailed v0 phasing.
 - This document owns the **platform/vision narrative**: the horizontal-platform-with-vertical-modules pattern, the AI consultant blueprint, and the AI monetization path from BYOK + paid tier unlock to optional managed AI later.
 
 When the two disagree, this document wins for "where we are going" questions, and Rev02 wins for "what is already wired up" questions.
@@ -197,7 +197,7 @@ There is **no multi-schema split** today and **no naming convention** separating
 
 ### 3.5 Cross-platform boundaries
 
-This is the strongest part of the current architecture and the part that makes the multi-module vision realistic without a rewrite. See [`docs/architechture-Rev02.md`](architechture-Rev02.md) §0.1–0.7 for full detail. Summary:
+This is the strongest part of the current architecture and the part that makes the multi-module vision realistic without a rewrite. See [`docs/architecture-Rev02.md`](architecture-Rev02.md) §0.1–0.7 for full detail. Summary:
 
 - **Locale-prefixed routing** is enforced by middleware; default locale `en`.
 - **Route IDs + typed params** in `@brewery/navigation` (no Next.js / Expo Router leakage into shared screens).
@@ -354,7 +354,7 @@ Three options, ranked by readiness vs cost. Adopt them in order:
 2. **When second module ships**: enable Prisma `multiSchema` preview, move the new module's tables to its own Postgres schema (`wms.*`). Legacy brewery tables stay in `public` until painful.
 3. **Long-term**: full schema split — `platform.*` (auth, workspace, billing, …) / `brewery.*` / `wms.*` / `ai.*` — with Prisma multi-file split if/when one schema file becomes unreadable.
 
-Note for replication: pgpool-II + streaming replication (already in the stack — see [`docs/Posgres-master-slave-replicas-architechture.md`](Posgres-master-slave-replicas-architechture.md)) is schema-agnostic, so the multi-schema move does not affect routing.
+Note for replication: pgpool-II + streaming replication (already in the stack — see [`docs/postgres-replication-architecture.md`](postgres-replication-architecture.md)) is schema-agnostic, so the multi-schema move does not affect routing.
 
 ---
 
@@ -644,7 +644,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 ## 10. Document conventions and lifecycle
 
 - **`<PLATFORM_NAME>` placeholder convention**: a single search/replaceable token used everywhere the brand will appear. Do not hand-edit individual occurrences.
-- **This is the entry point.** When in doubt, link here from new docs and discussions; module-implementation details belong in domain docs (e.g. [`docs/architechture-Rev02.md`](architechture-Rev02.md), [`docs/TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md), [`docs/Redis-architecture.md`](Redis-architecture.md), [`docs/org-billing-stripe-revenuecat-fastify.md`](org-billing-stripe-revenuecat-fastify.md)).
+- **This is the entry point.** When in doubt, link here from new docs and discussions; module-implementation details belong in domain docs (e.g. [`docs/architecture-Rev02.md`](architecture-Rev02.md), [`docs/TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md), [`docs/Redis-architecture.md`](Redis-architecture.md), [`docs/org-billing-stripe-revenuecat-fastify.md`](org-billing-stripe-revenuecat-fastify.md)).
 - **Update protocol**:
   - Structural changes (sections 2, 3, 4, 7) should be reviewed before merging — they change shared assumptions.
   - Glossary additions and pricing-example numeric updates can land in normal PRs.

@@ -97,7 +97,7 @@ These are the **minimum** professional bar for the current stack:
 
 Optional enhancements (nice-to-have, not required for solo honesty):
 
-- A **pre-push checklist** in `TODOs.md` or a short `scripts/check-native-deps.sh` that runs `expo install --check` in Docker (mirrors CI below).
+- A **pre-push checklist** in `internal/working-notes/TODOs.md` or a short `scripts/check-native-deps.sh` that runs `expo install --check` in Docker (mirrors CI below).
 
 ---
 

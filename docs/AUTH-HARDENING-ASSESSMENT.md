@@ -1,6 +1,6 @@
 # Web auth hardening assessment
 
-Assessment of cookie-based web auth before adding token-based native auth. Gate: Native login (TODOs.md).
+Assessment of cookie-based web auth before adding token-based native auth. Gate: Native login (`internal/working-notes/TODOs.md`).
 
 ## Summary
 

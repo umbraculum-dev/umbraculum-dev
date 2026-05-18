@@ -130,7 +130,7 @@ Implemented pieces:
 
 Docs:
 
-- `docs/Posgres-master-slave-replicas-architechture.md`
+- `docs/postgres-replication-architecture.md`
 - `docs/PGPOOL-VERIFICATION.md`
 
 ---
@@ -473,7 +473,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 
 ### Phase 0 - Repository and standards
 - Create monorepo structure (`apps/`, `services/`, `packages/`, `infra/`, `docs/`)
-- Use `docs/architechture-Rev02.md` as the source-of-truth for Cursor + humans
+- Use `docs/architecture-Rev02.md` as the source-of-truth for Cursor + humans
 - Native-ready packages (Metro-safe boundaries):
   - Shared packages imported by native apps ship `dist/**/*.js` + `dist/**/*.d.ts`
   - Do not export raw TS at the runtime boundary for native-consumed packages
