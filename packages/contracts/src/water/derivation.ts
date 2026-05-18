@@ -36,7 +36,7 @@ export type WaterCalcUnit =
   | "mmol_per_L";
 
 export type WaterCalcDerivationValue =
-  | { kind: "number"; value: number; unit?: WaterCalcUnit }
+  | { kind: "number"; value: number; unit?: WaterCalcUnit | undefined }
   | { kind: "string"; value: string }
   | { kind: "boolean"; value: boolean }
   | { kind: "null" };
@@ -57,7 +57,7 @@ export interface WaterCalcDerivation {
   breakdowns?: Array<{
     id: string;
     rows: Array<Record<string, WaterCalcDerivationValue>>;
-  }>;
-  notes?: WaterCalcNoteCode[];
+  }> | undefined;
+  notes?: WaterCalcNoteCode[] | undefined;
 }
 

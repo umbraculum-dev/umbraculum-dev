@@ -14,7 +14,7 @@ export type CreateInventoryItemInput = {
 };
 
 export type UpdateInventoryItemInput = {
-  name?: string;
+  name?: string | undefined;
   quantity?: unknown;
   unit?: unknown;
   metadata?: unknown;

@@ -65,16 +65,16 @@ export interface WaterCalcDerivation {
   breakdowns?: Array<{
     id: string;
     rows: Array<Record<string, WaterCalcDerivationValue>>;
-  }>;
+  }> | undefined;
   /**
    * Optional short notes (non-localized, machine-readable).
    * Clients can map note codes to localized copy.
    */
-  notes?: string[];
+  notes?: string[] | undefined;
 }
 
 export function derivationNumber(value: number, unit?: WaterCalcUnit): WaterCalcDerivationValue {
-  return { kind: "number", value, unit };
+  return unit === undefined ? { kind: "number", value } : { kind: "number", value, unit };
 }
 
 export function derivationString(value: string): WaterCalcDerivationValue {

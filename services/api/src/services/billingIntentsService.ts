@@ -90,8 +90,8 @@ export class BillingIntentsService {
       data: {
         status: "fulfilled",
         fulfilledAt: new Date(),
-        stripeCheckoutSessionId: input.stripeCheckoutSessionId ?? undefined,
-        stripeSubscriptionId: input.stripeSubscriptionId ?? undefined,
+        ...(input.stripeCheckoutSessionId != null ? { stripeCheckoutSessionId: input.stripeCheckoutSessionId } : {}),
+        ...(input.stripeSubscriptionId != null ? { stripeSubscriptionId: input.stripeSubscriptionId } : {}),
       },
       select: {
         id: true,

@@ -6,16 +6,16 @@ interface AuthMeResponseUser {
     id: string;
     email: string;
     preferredLocale: string;
-    preferredTheme?: string | null;
-    preferredFontScale?: string | null;
-    preferredDensity?: string | null;
-    isPlatformAdmin?: boolean;
+    preferredTheme?: string | null | undefined;
+    preferredFontScale?: string | null | undefined;
+    preferredDensity?: string | null | undefined;
+    isPlatformAdmin?: boolean | undefined;
 }
 interface AuthMeResponseWorkspace {
     id: string;
     name: string;
     role: string;
-    brandKey?: string | null;
+    brandKey?: string | null | undefined;
 }
 interface AuthMeResponse {
     ok: true;
@@ -34,7 +34,7 @@ type WaterCalcUnit = "L" | "g" | "mL" | "ppm" | "ppm_as_CaCO3" | "pH" | "percent
 type WaterCalcDerivationValue = {
     kind: "number";
     value: number;
-    unit?: WaterCalcUnit;
+    unit?: WaterCalcUnit | undefined;
 } | {
     kind: "string";
     value: string;
@@ -58,8 +58,8 @@ interface WaterCalcDerivation {
     breakdowns?: Array<{
         id: string;
         rows: Array<Record<string, WaterCalcDerivationValue>>;
-    }>;
-    notes?: WaterCalcNoteCode[];
+    }> | undefined;
+    notes?: WaterCalcNoteCode[] | undefined;
 }
 
 interface IonProfilePpm {
@@ -76,11 +76,11 @@ interface NumberFormatHintV1 {
     version: 1;
     style: "fixed" | "significant";
     decimals: number;
-    unit?: NumberFormatUnit;
+    unit?: NumberFormatUnit | undefined;
     clamp?: {
-        min?: number;
-        max?: number;
-    };
+        min?: number | undefined;
+        max?: number | undefined;
+    } | undefined;
 }
 
 type WaterHubFormatHintKeys = "L" | "pH" | "ppm_as_CaCO3" | "g" | "mL";
@@ -143,7 +143,7 @@ interface RecipeWaterHubSummary {
 interface RecipeWaterHubSummaryResponse {
     ok: true;
     summary: RecipeWaterHubSummary;
-    formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+    formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 
 declare function parseRecipeWaterHubSummaryResponse(x: unknown): RecipeWaterHubSummaryResponse;
@@ -159,7 +159,7 @@ interface WaterProfile {
     workspaceId: string | null;
     name: string;
     /** Optional: may be missing/unknown for some sources. Range 0–14. */
-    ph?: number | null;
+    ph?: number | null | undefined;
     /** ppm */
     calcium: number;
     /** ppm */
@@ -211,7 +211,7 @@ type WaterAcidificationResult = {
     finalAlkalinityPpmCaCO3: number;
     sulfateAddedPpm: number;
     chlorideAddedPpm: number;
-    debug?: Record<string, unknown>;
+    debug?: Record<string, unknown> | undefined;
 };
 type WaterAcidificationManualResult = {
     achievedPh: number;
@@ -232,7 +232,7 @@ type WaterOverallResult = {
         kind: "target" | "estimated";
         value: number;
     };
-    debug?: Record<string, unknown>;
+    debug?: Record<string, unknown> | undefined;
 };
 type MashAcidComputeBlock = {
     kind: "mash_acidification_manual";
@@ -336,7 +336,7 @@ interface MashComputeAndSaveResponseV1 {
         result: WaterOverallResult;
         derivation: WaterCalcDerivation;
     };
-    formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+    formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 interface SpargeComputeAndSaveResponseV1 {
     ok: true;
@@ -347,7 +347,7 @@ interface SpargeComputeAndSaveResponseV1 {
         derivation: WaterCalcDerivation;
     };
     acid: SpargeAcidComputeBlock;
-    formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+    formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 interface BoilComputeAndSaveResponseV1 {
     ok: true;
@@ -362,7 +362,7 @@ interface BoilComputeAndSaveResponseV1 {
         result: WaterOverallResult;
         derivation: WaterCalcDerivation;
     };
-    formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+    formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 
 declare function parseMashComputeAndSaveResponse(x: unknown): MashComputeAndSaveResponseV1;

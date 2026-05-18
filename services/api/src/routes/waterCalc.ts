@@ -806,8 +806,8 @@ export function waterCalcRoutes(app: FastifyInstance) {
       amountKg: number;
       colorLovibond: number | null;
       maltClass: "base" | "crystal" | "roast" | "acid";
-      mashDiPh?: number | null;
-      mashTaToPh57_mEqPerKg?: number | null;
+      mashDiPh?: number | null | undefined;
+      mashTaToPh57_mEqPerKg?: number | null | undefined;
     }> | null = hasGrist
       ? (gristRaw as unknown[]).map((row, idx) => {
         const o = (row ?? {}) as Record<string, unknown>;

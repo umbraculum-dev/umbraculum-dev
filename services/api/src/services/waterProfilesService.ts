@@ -21,8 +21,8 @@ type VerificationStatus = (typeof VERIFICATION_STATUS_VALUES)[number];
  * `equipmentProfilesService.ts` for the matching pattern.
  */
 export type CreateWaterProfileInput = {
-  scope?: string;
-  type?: string;
+  scope?: string | undefined;
+  type?: string | undefined;
   name: string;
   ph?: unknown;
   calcium?: unknown;
@@ -33,8 +33,18 @@ export type CreateWaterProfileInput = {
   bicarbonate?: unknown;
 };
 
-export type UpdateWaterProfileInput = Partial<CreateWaterProfileInput> & {
-  verificationStatus?: string;
+export type UpdateWaterProfileInput = {
+  scope?: string | undefined;
+  type?: string | undefined;
+  name?: string | undefined;
+  ph?: unknown;
+  calcium?: unknown;
+  magnesium?: unknown;
+  sodium?: unknown;
+  sulfate?: unknown;
+  chloride?: unknown;
+  bicarbonate?: unknown;
+  verificationStatus?: string | undefined;
 };
 
 function isAdminRole(role: string) {
@@ -129,6 +139,7 @@ export class WaterProfilesService {
     const type = toType(input.type);
     if (!type) throw new BadRequestError("invalid_type", "Body.type is required");
 
+    const phValue = toOptionalPh(input.ph);
     return this.prisma.waterProfile.create({
       data: {
         key: `user:${randomUUID()}`,
@@ -136,7 +147,7 @@ export class WaterProfilesService {
         type,
         workspaceId, // keep audit trail even if scope is "public"
         name,
-        ph: toOptionalPh(input.ph),
+        ...(phValue !== undefined ? { ph: phValue } : {}),
         calcium: toNumber(input.calcium, "calcium"),
         magnesium: toNumber(input.magnesium, "magnesium"),
         sodium: toNumber(input.sodium, "sodium"),

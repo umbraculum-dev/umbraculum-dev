@@ -30,7 +30,24 @@ export type CreateEquipmentProfileInput = {
   otherLossesLiters?: unknown;
 };
 
-export type UpdateEquipmentProfileInput = Partial<CreateEquipmentProfileInput>;
+export type UpdateEquipmentProfileInput = {
+  name?: string | undefined;
+
+  kettleVolumeLiters?: unknown;
+  kettleLossesLiters?: unknown;
+  kettleBoilEvaporationRatePercentPerHour?: unknown;
+  kettleCoolingShrinkagePercent?: unknown;
+  kettleHopsAbsorptionLiters?: unknown;
+
+  mashVolumeLiters?: unknown;
+  mashEfficiencyPercent?: unknown;
+  mashLossesLiters?: unknown;
+  mashThicknessLPerKg?: unknown;
+  mashGrainAbsorptionLPerKg?: unknown;
+  mashWaterLeftoverLiters?: unknown;
+
+  otherLossesLiters?: unknown;
+};
 
 function toOptionalNumber(val: unknown, field: string) {
   if (val === undefined) return undefined;

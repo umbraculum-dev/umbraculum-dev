@@ -7,17 +7,17 @@ export interface AuthMeResponseUser {
   id: string;
   email: string;
   preferredLocale: string;
-  preferredTheme?: string | null;
-  preferredFontScale?: string | null;
-  preferredDensity?: string | null;
-  isPlatformAdmin?: boolean;
+  preferredTheme?: string | null | undefined;
+  preferredFontScale?: string | null | undefined;
+  preferredDensity?: string | null | undefined;
+  isPlatformAdmin?: boolean | undefined;
 }
 
 export interface AuthMeResponseWorkspace {
   id: string;
   name: string;
   role: string;
-  brandKey?: string | null;
+  brandKey?: string | null | undefined;
 }
 
 export interface AuthMeResponse {

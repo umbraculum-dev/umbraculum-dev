@@ -21,7 +21,7 @@ export type WaterAcidificationResult = {
   finalAlkalinityPpmCaCO3: number;
   sulfateAddedPpm: number;
   chlorideAddedPpm: number;
-  debug?: Record<string, unknown>;
+  debug?: Record<string, unknown> | undefined;
 };
 
 export type WaterAcidificationManualResult = {
@@ -42,7 +42,7 @@ export type WaterOverallResult = {
   ionsPpm: IonProfilePpm;
   finalAlkalinityPpmCaCO3: number;
   ph: { kind: "target" | "estimated"; value: number };
-  debug?: Record<string, unknown>;
+  debug?: Record<string, unknown> | undefined;
 };
 
 export type MashAcidComputeBlock =
@@ -154,7 +154,7 @@ export interface MashComputeAndSaveResponseV1 {
   salts: { result: WaterSaltAdditionsResult; derivation: WaterCalcDerivation };
   acid: MashAcidComputeBlock;
   overall: { result: WaterOverallResult; derivation: WaterCalcDerivation };
-  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+  formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 
 export interface SpargeComputeAndSaveResponseV1 {
@@ -163,7 +163,7 @@ export interface SpargeComputeAndSaveResponseV1 {
   settings: RecipeWaterSettingsSavedRef;
   salts: { result: WaterSaltAdditionsResult; derivation: WaterCalcDerivation };
   acid: SpargeAcidComputeBlock;
-  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+  formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 
 export interface BoilComputeAndSaveResponseV1 {
@@ -173,6 +173,6 @@ export interface BoilComputeAndSaveResponseV1 {
   salts: { result: WaterSaltAdditionsResult; derivation: WaterCalcDerivation };
   acid: BoilAcidComputeBlock;
   overall: { result: WaterOverallResult; derivation: WaterCalcDerivation };
-  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+  formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 

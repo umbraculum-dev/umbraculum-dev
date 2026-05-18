@@ -533,10 +533,10 @@ export class BrewSessionsService {
       sectionName: string | null;
       name: string;
       minutesPlanned: number | null;
-      id?: string;
-      relativeToStepId?: string | null;
-      offsetMinutesFromEnd?: number | null;
-      breweryAppStepKind?: RecipeDrivenStepSeed["breweryAppStepKind"];
+      id?: string | undefined;
+      relativeToStepId?: string | null | undefined;
+      offsetMinutesFromEnd?: number | null | undefined;
+      breweryAppStepKind?: RecipeDrivenStepSeed["breweryAppStepKind"] | undefined;
     }> = [];
     for (const sid of sortedSections) {
       const seedList = seedBySection.get(sid) ?? [];

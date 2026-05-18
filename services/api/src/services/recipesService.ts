@@ -15,15 +15,15 @@ import {
 export type CreateRecipeInput = {
   name: string;
   styleKey: string;
-  notes?: string | null;
+  notes?: string | null | undefined;
   beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
 };
 
 export type UpdateRecipeInput = {
-  name?: string | null;
-  styleKey?: string | null;
-  notes?: string | null;
+  name?: string | null | undefined;
+  styleKey?: string | null | undefined;
+  notes?: string | null | undefined;
   beerJsonRecipeJson?: unknown;
   recipeExtJson?: unknown;
 };
@@ -325,8 +325,9 @@ export class RecipesService {
         styleKey,
         notes,
         beerJsonRecipeJson: doc,
-        recipeExtJson:
-          recipeExtJson === undefined ? undefined : (recipeExtJson as Prisma.InputJsonValue),
+        ...(recipeExtJson !== undefined
+          ? { recipeExtJson: recipeExtJson as Prisma.InputJsonValue }
+          : {}),
       },
     });
   }

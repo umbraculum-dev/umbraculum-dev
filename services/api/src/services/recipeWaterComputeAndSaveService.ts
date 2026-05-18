@@ -182,7 +182,7 @@ export type MashComputeAndSaveInput = {
 
   mashSaltAdditionsJson: unknown;
 
-  grist?: Array<{ amountKg: number; colorLovibond: number | null; maltClass: "base" | "crystal" | "roast" | "acid" }>;
+  grist?: Array<{ amountKg: number; colorLovibond: number | null; maltClass: "base" | "crystal" | "roast" | "acid"; mashDiPh?: number | null | undefined; mashTaToPh57_mEqPerKg?: number | null | undefined }> | undefined | null;
 };
 
 export type SpargeComputeAndSaveInput = {

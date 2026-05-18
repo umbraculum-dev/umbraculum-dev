@@ -100,7 +100,7 @@ export function MashStepsEditor(props: MashStepsEditorProps) {
               <Card
                 key={r.id}
                 data-mash-step-card
-                theme={cardBackgroundColor ?? cardBorderColor ? undefined : "surface2"}
+                {...((cardBackgroundColor ?? cardBorderColor) ? {} : { theme: "surface2" as const })}
                 gap="$2"
                 padding="$3"
                 backgroundColor={cardBackgroundColor ?? "$background"}

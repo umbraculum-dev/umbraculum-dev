@@ -46,11 +46,11 @@ export class WorkspaceBillingService {
       create: {
         userId,
         workspaceId,
-        provider: input.provider ?? undefined,
+        ...(input.provider != null ? { provider: input.provider } : {}),
       },
       update: {
         workspaceId,
-        provider: input.provider ?? undefined,
+        ...(input.provider != null ? { provider: input.provider } : {}),
       },
       select: { userId: true },
     });

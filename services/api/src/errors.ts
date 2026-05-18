@@ -1,7 +1,7 @@
 export class HttpError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
-  public readonly details?: Record<string, unknown>;
+  public readonly details?: Record<string, unknown> | undefined;
 
   constructor(statusCode: number, code: string, message: string, details?: Record<string, unknown>) {
     super(message);

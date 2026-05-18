@@ -11,8 +11,8 @@ export type MashAcidificationManualInput = {
   volumeLiters: number;
   acidType: SpargeAcidType;
   strength: AcidStrength;
-  acidAddedMl?: number;
-  acidAddedGrams?: number;
+  acidAddedMl?: number | undefined;
+  acidAddedGrams?: number | undefined;
 };
 
 export type MashAcidificationManualResult = {

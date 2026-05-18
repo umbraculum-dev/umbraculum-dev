@@ -48,7 +48,7 @@ export function SaltAdditionsEditor(props: {
                   value={row.saltKey}
                   onValueChange={(v) => updateRow(idx, { saltKey: v as SaltKey })}
                   options={SALT_OPTIONS}
-                  disabled={disabled}
+                  {...(disabled !== undefined ? { disabled } : {})}
                   width="full"
                   aria-label={t("salt")}
                   closeLabel={tCommon("close")}

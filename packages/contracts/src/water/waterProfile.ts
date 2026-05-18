@@ -10,7 +10,7 @@ export interface WaterProfile {
   workspaceId: string | null;
   name: string;
   /** Optional: may be missing/unknown for some sources. Range 0–14. */
-  ph?: number | null;
+  ph?: number | null | undefined;
   /** ppm */
   calcium: number;
   /** ppm */

@@ -35,28 +35,28 @@ type GristPotential =
 
 export type EditorGristRow = {
   id: string;
-  ingredientId?: string | null;
+  ingredientId?: string | null | undefined;
   name: string;
-  producer?: string | null;
-  group?: string | null;
-  mashDiPh?: number | null;
-  mashTaToPh57_mEqPerKg?: number | null;
-  mashRoastDehuskedOverride?: boolean | null;
-  mashRoastDehuskedSource?: "unknown" | "inferred" | "override";
-  mashPhModelSource?: "unknown" | "default" | "override";
+  producer?: string | null | undefined;
+  group?: string | null | undefined;
+  mashDiPh?: number | null | undefined;
+  mashTaToPh57_mEqPerKg?: number | null | undefined;
+  mashRoastDehuskedOverride?: boolean | null | undefined;
+  mashRoastDehuskedSource?: "unknown" | "inferred" | "override" | undefined;
+  mashPhModelSource?: "unknown" | "default" | "override" | undefined;
   amountKg: number;
   colorLovibond: number | null;
   potential: GristPotential;
   maltClass: "base" | "crystal" | "roast" | "acid";
-  timingUse?: "add_to_mash" | "add_to_boil";
-  lateAddition?: boolean;
+  timingUse?: "add_to_mash" | "add_to_boil" | undefined;
+  lateAddition?: boolean | undefined;
 };
 
 export type EditorHopRow = {
   id: string;
   ingredientId: string | null;
   name: string;
-  country?: string | null;
+  country?: string | null | undefined;
   form?:
     | "extract"
     | "leaf"
@@ -66,7 +66,8 @@ export type EditorHopRow = {
     | "plug"
     | "debittered_leaf"
     | "hop_extract"
-    | null;
+    | null
+    | undefined;
   amountGrams: number;
   alphaAcidPercent: number | null;
   use: "boil" | "whirlpool" | "dryhop";
@@ -109,28 +110,29 @@ export type EditorYeastRow = {
   id: string;
   ingredientId: string | null;
   name: string;
-  lab?: string | null;
-  productId?: string | null;
-  attenuationMin?: number | null;
-  attenuationMax?: number | null;
-  amountL?: number | null;
-  amountKg?: number | null;
-  pitchRate?: YeastPitchRateKey | string | null;
-  fermentationTempC?: number | null;
-  oxygenation?: "yes" | "no" | null;
-  diacetylRest?: "yes" | "no" | null;
-  format?: "dry" | "liquid" | "slurry" | null;
+  lab?: string | null | undefined;
+  productId?: string | null | undefined;
+  attenuationMin?: number | null | undefined;
+  attenuationMax?: number | null | undefined;
+  amountL?: number | null | undefined;
+  amountKg?: number | null | undefined;
+  pitchRate?: YeastPitchRateKey | string | null | undefined;
+  fermentationTempC?: number | null | undefined;
+  oxygenation?: "yes" | "no" | null | undefined;
+  diacetylRest?: "yes" | "no" | null | undefined;
+  format?: "dry" | "liquid" | "slurry" | null | undefined;
   species?:
     | "saccharomyces_cerevisiae"
     | "saccharomyces_pastorianus"
     | "brettanomyces"
     | "diastaticus"
     | "other"
-    | null;
-  needsPropagation?: "yes" | "no" | null;
-  cellsPerLOverride?: number | null;
-  cellsPerKGOverride?: number | null;
-  manualCellCount?: { dilutionFactor: 200 | 2000; aliveCells: number; totalCells: number } | null;
+    | null
+    | undefined;
+  needsPropagation?: "yes" | "no" | null | undefined;
+  cellsPerLOverride?: number | null | undefined;
+  cellsPerKGOverride?: number | null | undefined;
+  manualCellCount?: { dilutionFactor: 200 | 2000; aliveCells: number; totalCells: number } | null | undefined;
 };
 
 export type YeastSpeciesKey = EditorYeastRow["species"] extends infer S
@@ -219,15 +221,15 @@ export function computeAmountFromCellsB(
 
 export type EditorMiscRow = {
   id: string;
-  ingredientId?: string | null;
+  ingredientId?: string | null | undefined;
   name: string;
   type: "spice" | "fining" | "water_agent" | "herb" | "flavor" | "other";
   use: "boil" | "mash" | "primary" | "secondary" | "bottling";
   timeMinutes: number | null;
   amount: number;
   amountIsWeight: boolean;
-  useFor?: string | null;
-  notes?: string | null;
+  useFor?: string | null | undefined;
+  notes?: string | null | undefined;
 };
 
 export type EditorMashStepType =
@@ -300,19 +302,19 @@ export type EditorMashStep = {
   type: EditorMashStepType;
   stepTemperatureC: number;
   stepTimeMin: number;
-  amountL?: number | null;
-  deduceFromMashIn?: boolean;
-  rampTimeMin?: number | null;
-  endTemperatureC?: number | null;
-  infuseTemperatureC?: number | null;
-  description?: string | null;
+  amountL?: number | null | undefined;
+  deduceFromMashIn?: boolean | undefined;
+  rampTimeMin?: number | null | undefined;
+  endTemperatureC?: number | null | undefined;
+  infuseTemperatureC?: number | null | undefined;
+  description?: string | null | undefined;
 };
 
 export type EditorMash = {
   name: string;
   grainTemperatureC: number;
   steps: EditorMashStep[];
-  notes?: string | null;
+  notes?: string | null | undefined;
 } | null;
 
 function safeNum(v: unknown, fallback: number) {
@@ -579,9 +581,9 @@ export function buildBeerJsonRecipeDocument(args: {
   hopsRows: EditorHopRow[];
   yeastRows: EditorYeastRow[];
   miscRows: EditorMiscRow[];
-  mash?: EditorMash | null;
-  batchSizeLiters?: number | null;
-  brewhouseEfficiencyPercent?: number | null;
+  mash?: EditorMash | null | undefined;
+  batchSizeLiters?: number | null | undefined;
+  brewhouseEfficiencyPercent?: number | null | undefined;
 }): BeerJsonDocument {
   const batchSizeLiters = typeof args.batchSizeLiters === "number" && Number.isFinite(args.batchSizeLiters) ? args.batchSizeLiters : 20;
   const efficiency = typeof args.brewhouseEfficiencyPercent === "number" && Number.isFinite(args.brewhouseEfficiencyPercent) ? args.brewhouseEfficiencyPercent : 75;

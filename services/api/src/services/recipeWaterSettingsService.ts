@@ -4,124 +4,124 @@ import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
 
 export type UpsertRecipeWaterSettingsInput = {
-  sourceWaterProfileId?: string | null;
-  targetWaterProfileId?: string | null;
-  dilutionWaterProfileId?: string | null;
+  sourceWaterProfileId?: string | null | undefined;
+  targetWaterProfileId?: string | null | undefined;
+  dilutionWaterProfileId?: string | null | undefined;
 
-  tapWaterVolumeLiters?: number | null;
-  dilutionWaterVolumeLiters?: number | null;
+  tapWaterVolumeLiters?: number | null | undefined;
+  dilutionWaterVolumeLiters?: number | null | undefined;
 
-  mashStartingAlkalinityPpmCaCO3?: number;
-  mashStartingPh?: number;
-  mashTargetPh?: number;
-  mashWaterVolumeLiters?: number;
-  mashAcidType?: string;
-  mashStrengthKind?: string;
-  mashStrengthValue?: number | null;
+  mashStartingAlkalinityPpmCaCO3?: number | undefined;
+  mashStartingPh?: number | undefined;
+  mashTargetPh?: number | undefined;
+  mashWaterVolumeLiters?: number | undefined;
+  mashAcidType?: string | undefined;
+  mashStrengthKind?: string | undefined;
+  mashStrengthValue?: number | null | undefined;
 
-  mashLastAcidRequiredMl?: number | null;
-  mashLastAcidRequiredTsp?: number | null;
-  mashLastAcidRequiredGrams?: number | null;
-  mashLastAcidRequiredKg?: number | null;
-  mashLastFinalAlkalinityPpmCaCO3?: number | null;
-  mashLastSulfateAddedPpm?: number | null;
-  mashLastChlorideAddedPpm?: number | null;
-  mashLastCalculatedAt?: Date | null;
+  mashLastAcidRequiredMl?: number | null | undefined;
+  mashLastAcidRequiredTsp?: number | null | undefined;
+  mashLastAcidRequiredGrams?: number | null | undefined;
+  mashLastAcidRequiredKg?: number | null | undefined;
+  mashLastFinalAlkalinityPpmCaCO3?: number | null | undefined;
+  mashLastSulfateAddedPpm?: number | null | undefined;
+  mashLastChlorideAddedPpm?: number | null | undefined;
+  mashLastCalculatedAt?: Date | null | undefined;
 
-  mashAcidificationMode?: string;
-  mashManualAcidAddedMl?: number | null;
-  mashManualAcidAddedGrams?: number | null;
-  mashManualLastAchievedPh?: number | null;
-  mashManualLastFinalAlkalinityPpmCaCO3?: number | null;
-  mashManualLastSulfateAddedPpm?: number | null;
-  mashManualLastChlorideAddedPpm?: number | null;
-  mashManualLastCalculatedAt?: Date | null;
+  mashAcidificationMode?: string | undefined;
+  mashManualAcidAddedMl?: number | null | undefined;
+  mashManualAcidAddedGrams?: number | null | undefined;
+  mashManualLastAchievedPh?: number | null | undefined;
+  mashManualLastFinalAlkalinityPpmCaCO3?: number | null | undefined;
+  mashManualLastSulfateAddedPpm?: number | null | undefined;
+  mashManualLastChlorideAddedPpm?: number | null | undefined;
+  mashManualLastCalculatedAt?: Date | null | undefined;
 
-  mashSaltAdditionsJson?: unknown;
-  mashSaltsLastResultJson?: unknown;
+  mashSaltAdditionsJson?: unknown | undefined;
+  mashSaltsLastResultJson?: unknown | undefined;
 
-  mashOverallLastResultJson?: unknown;
-  mashOverallLastCalculatedAt?: Date | null;
+  mashOverallLastResultJson?: unknown | undefined;
+  mashOverallLastCalculatedAt?: Date | null | undefined;
 
-  mashGristImportedJson?: unknown;
-  mashGristImportedAt?: Date | null;
-  mashGristSourceRecipeUpdatedAt?: Date | null;
+  mashGristImportedJson?: unknown | undefined;
+  mashGristImportedAt?: Date | null | undefined;
+  mashGristSourceRecipeUpdatedAt?: Date | null | undefined;
 
-  spargeWaterProfileId?: string | null;
-  spargeStartingAlkalinityPpmCaCO3?: number;
-  spargeStartingPh?: number;
-  spargeTargetPh?: number;
-  spargeVolumeLiters?: number;
-  spargeAcidType?: string;
-  spargeStrengthKind?: string;
-  spargeStrengthValue?: number | null;
+  spargeWaterProfileId?: string | null | undefined;
+  spargeStartingAlkalinityPpmCaCO3?: number | undefined;
+  spargeStartingPh?: number | undefined;
+  spargeTargetPh?: number | undefined;
+  spargeVolumeLiters?: number | undefined;
+  spargeAcidType?: string | undefined;
+  spargeStrengthKind?: string | undefined;
+  spargeStrengthValue?: number | null | undefined;
 
-  spargeLastAcidRequiredMl?: number | null;
-  spargeLastAcidRequiredTsp?: number | null;
-  spargeLastAcidRequiredGrams?: number | null;
-  spargeLastAcidRequiredKg?: number | null;
-  spargeLastFinalAlkalinityPpmCaCO3?: number | null;
-  spargeLastSulfateAddedPpm?: number | null;
-  spargeLastChlorideAddedPpm?: number | null;
-  spargeLastCalculatedAt?: Date | null;
+  spargeLastAcidRequiredMl?: number | null | undefined;
+  spargeLastAcidRequiredTsp?: number | null | undefined;
+  spargeLastAcidRequiredGrams?: number | null | undefined;
+  spargeLastAcidRequiredKg?: number | null | undefined;
+  spargeLastFinalAlkalinityPpmCaCO3?: number | null | undefined;
+  spargeLastSulfateAddedPpm?: number | null | undefined;
+  spargeLastChlorideAddedPpm?: number | null | undefined;
+  spargeLastCalculatedAt?: Date | null | undefined;
 
-  spargeAcidificationMode?: string;
-  spargeManualAcidAddedMl?: number | null;
-  spargeManualAcidAddedGrams?: number | null;
-  spargeManualLastAchievedPh?: number | null;
-  spargeManualLastFinalAlkalinityPpmCaCO3?: number | null;
-  spargeManualLastSulfateAddedPpm?: number | null;
-  spargeManualLastChlorideAddedPpm?: number | null;
-  spargeManualLastCalculatedAt?: Date | null;
+  spargeAcidificationMode?: string | undefined;
+  spargeManualAcidAddedMl?: number | null | undefined;
+  spargeManualAcidAddedGrams?: number | null | undefined;
+  spargeManualLastAchievedPh?: number | null | undefined;
+  spargeManualLastFinalAlkalinityPpmCaCO3?: number | null | undefined;
+  spargeManualLastSulfateAddedPpm?: number | null | undefined;
+  spargeManualLastChlorideAddedPpm?: number | null | undefined;
+  spargeManualLastCalculatedAt?: Date | null | undefined;
 
-  spargeSaltAdditionsJson?: unknown;
-  spargeSaltsLastResultJson?: unknown;
+  spargeSaltAdditionsJson?: unknown | undefined;
+  spargeSaltsLastResultJson?: unknown | undefined;
 
-  spargeStepTemperatureC?: number | null;
+  spargeStepTemperatureC?: number | null | undefined;
 
-  spargeStepTimeMin?: number | null;
-  spargeStepRampMin?: number | null;
-  spargeMethodType?: string | null;
+  spargeStepTimeMin?: number | null | undefined;
+  spargeStepRampMin?: number | null | undefined;
+  spargeMethodType?: string | null | undefined;
 
   // Boil/kettle add-on water (v0)
-  boilSourceWaterProfileId?: string | null;
-  boilTargetWaterProfileId?: string | null;
-  boilDilutionWaterProfileId?: string | null;
+  boilSourceWaterProfileId?: string | null | undefined;
+  boilTargetWaterProfileId?: string | null | undefined;
+  boilDilutionWaterProfileId?: string | null | undefined;
 
-  boilTapWaterVolumeLiters?: number | null;
-  boilDilutionWaterVolumeLiters?: number | null;
+  boilTapWaterVolumeLiters?: number | null | undefined;
+  boilDilutionWaterVolumeLiters?: number | null | undefined;
 
-  boilStartingAlkalinityPpmCaCO3?: number;
-  boilStartingPh?: number;
-  boilTargetPh?: number;
-  boilWaterVolumeLiters?: number;
-  boilAcidType?: string;
-  boilStrengthKind?: string;
-  boilStrengthValue?: number | null;
+  boilStartingAlkalinityPpmCaCO3?: number | undefined;
+  boilStartingPh?: number | undefined;
+  boilTargetPh?: number | undefined;
+  boilWaterVolumeLiters?: number | undefined;
+  boilAcidType?: string | undefined;
+  boilStrengthKind?: string | undefined;
+  boilStrengthValue?: number | null | undefined;
 
-  boilLastAcidRequiredMl?: number | null;
-  boilLastAcidRequiredTsp?: number | null;
-  boilLastAcidRequiredGrams?: number | null;
-  boilLastAcidRequiredKg?: number | null;
-  boilLastFinalAlkalinityPpmCaCO3?: number | null;
-  boilLastSulfateAddedPpm?: number | null;
-  boilLastChlorideAddedPpm?: number | null;
-  boilLastCalculatedAt?: Date | null;
+  boilLastAcidRequiredMl?: number | null | undefined;
+  boilLastAcidRequiredTsp?: number | null | undefined;
+  boilLastAcidRequiredGrams?: number | null | undefined;
+  boilLastAcidRequiredKg?: number | null | undefined;
+  boilLastFinalAlkalinityPpmCaCO3?: number | null | undefined;
+  boilLastSulfateAddedPpm?: number | null | undefined;
+  boilLastChlorideAddedPpm?: number | null | undefined;
+  boilLastCalculatedAt?: Date | null | undefined;
 
-  boilAcidificationMode?: string;
-  boilManualAcidAddedMl?: number | null;
-  boilManualAcidAddedGrams?: number | null;
-  boilManualLastAchievedPh?: number | null;
-  boilManualLastFinalAlkalinityPpmCaCO3?: number | null;
-  boilManualLastSulfateAddedPpm?: number | null;
-  boilManualLastChlorideAddedPpm?: number | null;
-  boilManualLastCalculatedAt?: Date | null;
+  boilAcidificationMode?: string | undefined;
+  boilManualAcidAddedMl?: number | null | undefined;
+  boilManualAcidAddedGrams?: number | null | undefined;
+  boilManualLastAchievedPh?: number | null | undefined;
+  boilManualLastFinalAlkalinityPpmCaCO3?: number | null | undefined;
+  boilManualLastSulfateAddedPpm?: number | null | undefined;
+  boilManualLastChlorideAddedPpm?: number | null | undefined;
+  boilManualLastCalculatedAt?: Date | null | undefined;
 
-  boilSaltAdditionsJson?: unknown;
-  boilSaltsLastResultJson?: unknown;
+  boilSaltAdditionsJson?: unknown | undefined;
+  boilSaltsLastResultJson?: unknown | undefined;
 
-  boilOverallLastResultJson?: unknown;
-  boilOverallLastCalculatedAt?: Date | null;
+  boilOverallLastResultJson?: unknown | undefined;
+  boilOverallLastCalculatedAt?: Date | null | undefined;
 };
 
 function ensureFinite(n: unknown, field: string) {

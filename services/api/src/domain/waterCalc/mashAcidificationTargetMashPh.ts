@@ -9,8 +9,8 @@ export type MashAcidificationTargetMashPhGristRow = {
   colorLovibond: number | null;
   maltClass: "base" | "crystal" | "roast" | "acid";
   // Optional explicit v1 overrides:
-  mashDiPh?: number | null;
-  mashTaToPh57_mEqPerKg?: number | null;
+  mashDiPh?: number | null | undefined;
+  mashTaToPh57_mEqPerKg?: number | null | undefined;
 };
 
 export type MashAcidificationTargetMashPhInput = {
@@ -19,13 +19,13 @@ export type MashAcidificationTargetMashPhInput = {
   volumeLiters: number;
   targetMashPh: number;
   /** Optional Ca (mg/L) for RA-like effective alkalinity adjustment in the mash pH estimator. */
-  calciumPpm?: number;
+  calciumPpm?: number | undefined;
   /** Optional Mg (mg/L) for RA-like effective alkalinity adjustment in the mash pH estimator. */
-  magnesiumPpm?: number;
+  magnesiumPpm?: number | undefined;
   acidType: SpargeAcidType;
   strength: AcidStrength;
   grist: MashAcidificationTargetMashPhGristRow[];
-  waterToGristRatioQtPerLbOverride?: number;
+  waterToGristRatioQtPerLbOverride?: number | undefined;
 };
 
 export type MashAcidificationTargetMashPhResult = {
@@ -95,8 +95,8 @@ function estimateMashPh(args: {
   calciumPpm: number;
   magnesiumPpm: number;
   grist: MashAcidificationTargetMashPhGristRow[];
-  waterToGristRatioQtPerLbOverride?: number;
-  acidAdded_mEqPerL?: number;
+  waterToGristRatioQtPerLbOverride?: number | undefined;
+  acidAdded_mEqPerL?: number | undefined;
 }) {
   return mashPhEstimate({
     volumeLiters: args.volumeLiters,

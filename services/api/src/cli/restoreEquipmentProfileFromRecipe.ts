@@ -79,9 +79,9 @@ function parseArgs(argv: string[]): CliArgs {
   const args: CliArgs = { dryRun: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--recipe-id") args.recipeId = argv[++i];
-    else if (a === "--equipment-id") args.equipmentId = argv[++i];
-    else if (a === "--name") args.name = argv[++i];
+    if (a === "--recipe-id") args.recipeId = argv[++i]!;
+    else if (a === "--equipment-id") args.equipmentId = argv[++i]!;
+    else if (a === "--name") args.name = argv[++i]!;
     else if (a === "--dry-run") args.dryRun = true;
     else if (a === "--help" || a === "-h") {
       printHelp();

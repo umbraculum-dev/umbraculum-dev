@@ -31,7 +31,7 @@ export function SpargeStepReadOnlyRow(props: SpargeStepReadOnlyRowProps) {
   return (
     <Card
       data-mash-step-card
-      theme={cardBackgroundColor ?? cardBorderColor ? undefined : "surface2"}
+      {...((cardBackgroundColor ?? cardBorderColor) ? {} : { theme: "surface2" as const })}
       backgroundColor={cardBackgroundColor ?? "$background"}
       borderWidth={1}
       borderColor={cardBorderColor ?? "$borderColor"}

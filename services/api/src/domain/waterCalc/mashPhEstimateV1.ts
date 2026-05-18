@@ -18,12 +18,12 @@ export type MashPhEstimateV1Input = {
   volumeLiters: number;
   alkalinityPpmCaCO3: number;
   /** Optional Ca (mg/L) for RA-like effective alkalinity adjustment. */
-  calciumPpm?: number;
+  calciumPpm?: number | undefined;
   /** Optional Mg (mg/L) for RA-like effective alkalinity adjustment. */
-  magnesiumPpm?: number;
+  magnesiumPpm?: number | undefined;
   grist: MashPhEstimateGristRowV1[];
-  waterToGristRatioQtPerLbOverride?: number;
-  acidAdded_mEqPerL?: number;
+  waterToGristRatioQtPerLbOverride?: number | undefined;
+  acidAdded_mEqPerL?: number | undefined;
 };
 
 export type MashPhEstimateV1Result = {

@@ -112,7 +112,7 @@ export class AiOrchestrator {
   private readonly workspaces: WorkspacesService;
   private readonly settings: AiSettingsService;
   private readonly memory: WorkspaceAiMemoryService;
-  private readonly memoryWriterFactory?: (client: Anthropic) => MemoryWriter;
+  private readonly memoryWriterFactory?: ((client: Anthropic) => MemoryWriter) | undefined;
 
   constructor(
     private readonly prisma: PrismaClient,
@@ -131,7 +131,7 @@ export class AiOrchestrator {
     if (options?.createClient) this.createClientOverride = options.createClient;
   }
 
-  private readonly createClientOverride?: (apiKey: string) => Anthropic;
+  private readonly createClientOverride?: ((apiKey: string) => Anthropic) | undefined;
 
   /**
    * Stream a single chat turn end-to-end. The route layer iterates the

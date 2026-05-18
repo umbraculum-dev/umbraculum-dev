@@ -27,9 +27,9 @@ function parseArgs(argv: string[]): Args {
     const a = argv[i];
     if (a === "--dry-run") args.dryRun = true;
     else if (a === "--force") args.force = true;
-    else if (a === "--source") args.source = argv[++i];
-    else if (a === "--path") args.path = argv[++i];
-    else if (a === "--resource") args.resource = argv[++i];
+    else if (a === "--source") args.source = argv[++i]!;
+    else if (a === "--path") args.path = argv[++i]!;
+    else if (a === "--resource") args.resource = argv[++i]!;
     else if (a === "--help" || a === "-h") {
       printHelp();
       process.exit(0);

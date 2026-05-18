@@ -22,7 +22,7 @@ export interface NumberFormatHintV1 {
   version: 1;
   style: "fixed" | "significant";
   decimals: number;
-  unit?: NumberFormatUnit;
-  clamp?: { min?: number; max?: number };
+  unit?: NumberFormatUnit | undefined;
+  clamp?: { min?: number | undefined; max?: number | undefined } | undefined;
 }
 

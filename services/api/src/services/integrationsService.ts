@@ -175,12 +175,12 @@ export class IntegrationsService {
         integrationId: input.integrationId,
         deviceKey: key,
         displayName: input.displayName ?? null,
-        metadataJson,
+        ...(metadataJson !== undefined ? { metadataJson } : {}),
         lastSeenAt: now,
       },
       update: {
-        displayName: input.displayName ?? undefined,
-        metadataJson,
+        ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
+        ...(metadataJson !== undefined ? { metadataJson } : {}),
         lastSeenAt: now,
       },
       select: {

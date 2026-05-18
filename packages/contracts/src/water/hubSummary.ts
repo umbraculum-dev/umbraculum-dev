@@ -56,6 +56,6 @@ export interface RecipeWaterHubSummary {
 export interface RecipeWaterHubSummaryResponse {
   ok: true;
   summary: RecipeWaterHubSummary;
-  formatHints?: Partial<Record<string, NumberFormatHintV1>>;
+  formatHints?: Partial<Record<string, NumberFormatHintV1>> | undefined;
 }
 

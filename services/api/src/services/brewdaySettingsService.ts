@@ -472,7 +472,7 @@ export class BrewdaySettingsService {
         sectionsJson,
         customSectionsJson,
         defaultStepsJson,
-        notes: notes !== undefined ? notes : undefined,
+        ...(notes !== undefined ? { notes } : {}),
       },
     });
 

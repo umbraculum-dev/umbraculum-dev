@@ -56,12 +56,12 @@ export function FermDataIntegrationScreen() {
 
   const [state, setState] = useState<{
     status: "loading" | "ready" | "error";
-    error?: string;
-    workspaceId?: string | null;
+    error?: string | undefined;
+    workspaceId?: string | null | undefined;
     integrations: Record<IntegrationKind, IntegrationSummary | null>;
     devices: Record<IntegrationKind, IntegrationDevice[]>;
     tokens: Record<IntegrationKind, IntegrationTokenState>;
-    working?: { kind: IntegrationKind; action: "create" | "reveal" | "rotate" | "revoke" } | null;
+    working?: { kind: IntegrationKind; action: "create" | "reveal" | "rotate" | "revoke" } | null | undefined;
   }>({
     status: "loading",
     integrations: { tilt: null, ispindel: null, rapt: null },
