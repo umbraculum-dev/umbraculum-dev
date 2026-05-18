@@ -16,6 +16,12 @@ translations, and thoughtful issue triage.
 
 ## Before you start
 
+- Read [`MANIFESTO.md`](./MANIFESTO.md) — the project's stated values and
+  the AI-orchestrated-code distinction. The §1.2 contract (rules + skills
+  + agents apparatus = the default authoring path; drive-by Copilot paste
+  = explicitly outside what the project endorses; manual writing welcomed
+  for *learning*, discouraged for *committing*) is what the contribution
+  surface assumes you have internalized.
 - Read the [Code of Conduct](./CODE_OF_CONDUCT.md). It is in force in
   every project space, including pull requests, issues, and commits.
 - Read [`docs/LICENSING.md`](./docs/LICENSING.md). Contributions are

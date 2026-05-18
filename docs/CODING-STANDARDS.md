@@ -2,6 +2,8 @@
 
 This repo is **TypeScript-first**. The goal is clarity + safe refactors (including AI-assisted code changes).
 
+**Why these standards exist.** The standards in this document are the code-level expression of the Total Quality lineage stated in [`MANIFESTO.md`](../MANIFESTO.md) §1.1 (Galgano / Deming / Toyota / Kaizen). They are the *poka-yoke* — mistake-proofing applied to TypeScript/React — that the manifesto names as the project's process-level defect-prevention apparatus. Read alongside [`LINTING.md`](LINTING.md), [`TESTING.md`](TESTING.md), [`TYPING.md`](TYPING.md) (the foundation-docs trio) and the [`.cursor/rules/`](../.cursor/rules/) guardrails, the apparatus is what makes "we care about quality" land in code.
+
 ### Native-ready packages: buildable workspaces (MANDATORY)
 We are intentionally building toward **React Native (Expo)**. Metro is much less forgiving than Next.js about consuming raw TypeScript from monorepo workspaces.
 

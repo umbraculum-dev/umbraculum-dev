@@ -1,6 +1,8 @@
 
 # Contributor Covenant Code of Conduct
 
+> **Relationship to [`MANIFESTO.md`](./MANIFESTO.md).** This Code of Conduct is the *behavioral rules* document; the manifesto is the *values* document. They reinforce each other: the manifesto's §3 commitments to empathy as a structural commitment, family-friendly schedules, welcomed unionism, and explicit inclusivity are why the rules below exist; the rules below are how those commitments are enforced. A contributor who has read both knows the project's posture in full.
+
 ## Our Pledge
 
 We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.

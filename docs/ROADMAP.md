@@ -58,6 +58,7 @@ Goal: validate the "modules expand by config and SDK, not by core rewrite" promi
 
 ### Standing principles across the whole trajectory
 
+- **Project values are versioned alongside the architecture.** [`MANIFESTO.md`](../MANIFESTO.md) carries the explicit commitments — Total Quality with capital Q (§1.1), AI-orchestrated code as discipline (§1.2), sustainability for the *whole ecosystem* (§2.1), horizontal accessibility (§2.2), and the §3 human-values commitments (empathy, family-friendly schedules, welcomed unionism, explicit inclusivity). The roadmap milestones below are how those commitments land in calendar time; the manifesto is why the milestones are shaped the way they are. The public flip (§10.1.1) is the manifesto's first public-launch occasion.
 - **Web-first for the heavy desktop workflows.** Native apps exist only where workflows are intrinsically mobile (offline operation, BLE, scanning, push notifications, on-the-floor input).
 - **One audience per app.** Workspace-member modules share one shell. Shopper-facing surfaces (if any) are separate apps.
 - **AI consultant is the cross-module connective tissue.** The architectural and economic case for one shell over a "myriad of apps" rests on the AI seeing all modules in one workspace context.

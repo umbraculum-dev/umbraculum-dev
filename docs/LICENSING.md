@@ -23,6 +23,8 @@ We are writing this document **before** we make the license decision public so t
 
 This document is intended to be **public**. Wording is aimed at a reader who is technically literate but not necessarily an open-source-licensing specialist. Where a term has a precise meaning, it is defined the first time it is used.
 
+**Relationship to [`MANIFESTO.md`](../MANIFESTO.md).** The license is not a stand-alone artifact; it is the **mechanism** of the project's stated ethics. The manifesto says what Umbraculum commits to (sustainability for the whole ecosystem, no closed-source replacement of public modules, no retroactive license changes, no CLA granting unilateral re-licensing); the structural answer to "how do we know you mean it?" is the license. The two documents are designed to be read together: this one for the *what* and the *why* of the legal mechanism, the manifesto for the *what* and the *why* of the ethics that the legal mechanism enforces.
+
 ---
 
 ## 2. TL;DR

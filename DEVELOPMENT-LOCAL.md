@@ -62,6 +62,8 @@ This file is an **optional** companion to the cursor-repo-root `DEVELOPMENT.md`.
 
 Anything below this heading is **project-owned** and will not be overwritten by the sync tool.
 
+- **Project values & contributor expectations**: see `MANIFESTO.md` at repo root. The AI-orchestrated-code distinction stated in §1.2 (rules + skills + agents apparatus = the default authoring path; drive-by Copilot paste = explicitly outside what the project endorses; manual writing welcomed for *learning*, discouraged for *committing*) is the contract between contributors and the project. The §3 commitments to empathy, family-friendly schedules, welcomed unionism, and explicit inclusivity are not boilerplate; new contributors should read the manifesto end-to-end before their first PR.
+
 - **Platform vision**: see `docs/PLATFORM-ARCHITECTURE.md` — high-level entry point for the horizontal-platform-with-vertical-modules direction, AI consultant blueprint, and AI add-on pricing model. Read this before any product/architecture discussion.
 
 - **Project summary (project-owned; restored 2026-05-12 after `@rftsu/cursor-rules` 3.1.1 sync removed it from the managed block)**:

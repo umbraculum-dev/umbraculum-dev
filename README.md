@@ -62,6 +62,10 @@ work the brewery vertical already does.
   the go-public criteria and plan are in
   [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
 
+## Project values
+
+The convictions Umbraculum is built around — Total Quality with capital Q (Galgano / Deming / Toyota / Kaizen lineage), AI-orchestrated code as discipline (rules + skills + agents apparatus, *not* drive-by Copilot paste), sustainability for the *whole ecosystem* (not just maintainers), horizontal accessibility, empathy as a structural commitment, people / family / unionism welcomed, and explicit inclusivity — live in [`MANIFESTO.md`](MANIFESTO.md). It is the public statement of what the project commits to and why; reading it is the fastest way to know whether Umbraculum is the kind of project you want to bet a profession or a business on.
+
 ## Who this is for
 
 - **Process manufacturers** — anyone running batch production where the
