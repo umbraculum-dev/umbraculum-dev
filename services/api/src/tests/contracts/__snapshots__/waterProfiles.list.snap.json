@@ -1,0 +1,78 @@
+{
+  "ok": "boolean",
+  "public": {
+    "__array": {
+      "bicarbonate": "number",
+      "calcium": "number",
+      "chloride": "number",
+      "createdAt": "string",
+      "id": "string",
+      "key": "string",
+      "magnesium": "number",
+      "name": "string",
+      "ph": "number",
+      "scope": "string",
+      "sodium": "number",
+      "source": "string",
+      "submittedByUserId": "string",
+      "sulfate": "number",
+      "type": "string",
+      "updatedAt": "string",
+      "verificationStatus": "string",
+      "verifiedAt": "null",
+      "verifiedByUserId": "null",
+      "workspaceId": "string"
+    },
+    "__length": "non-empty"
+  },
+  "system": {
+    "__array": {
+      "bicarbonate": "number",
+      "calcium": "number",
+      "chloride": "number",
+      "createdAt": "string",
+      "id": "string",
+      "key": "string",
+      "magnesium": "number",
+      "name": "string",
+      "ph": "null",
+      "scope": "string",
+      "sodium": "number",
+      "source": "string",
+      "submittedByUserId": "null",
+      "sulfate": "number",
+      "type": "string",
+      "updatedAt": "string",
+      "verificationStatus": "string",
+      "verifiedAt": "null",
+      "verifiedByUserId": "null",
+      "workspaceId": "null"
+    },
+    "__length": "non-empty"
+  },
+  "workspace": {
+    "__array": {
+      "bicarbonate": "number",
+      "calcium": "number",
+      "chloride": "number",
+      "createdAt": "string",
+      "id": "string",
+      "key": "string",
+      "magnesium": "number",
+      "name": "string",
+      "ph": "number",
+      "scope": "string",
+      "sodium": "number",
+      "source": "string",
+      "submittedByUserId": "string",
+      "sulfate": "number",
+      "type": "string",
+      "updatedAt": "string",
+      "verificationStatus": "string",
+      "verifiedAt": "null",
+      "verifiedByUserId": "null",
+      "workspaceId": "string"
+    },
+    "__length": "non-empty"
+  }
+}
