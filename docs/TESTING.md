@@ -2,7 +2,7 @@
 
 This is the single source of truth for "what do I test, where, and how" in this monorepo. Read it before adding a new test or asking the agent to add one. Pair with [TESTING-DECISION.md](TESTING-DECISION.md) (decision tree) if you can't decide which layer applies.
 
-**Status:** v1.3 (test-coverage hardening pass — Phase 1 + Phase 2 + Phase 3 landed 2026-05-17/18; see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟢 in progress (Phase 4b regression-pin trio L1+L4+L5 complete; Phase 5g L5 web pin complete)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
+**Status:** v1.4 (test-coverage hardening pass — Phase 1 + Phase 2 + Phase 3 + Phase 4a landed 2026-05-17/18; see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟢 in progress (regression-pin phase complete; Phase 4a L2 gap audit landed)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
 
 ## Layers (cheapest to most expensive)
 
@@ -225,7 +225,7 @@ Headline numbers measured against master `00025dc` (just after the post-HIGH-ful
 |---|---|---:|---|---|
 | **L1 Unit** — contract parsers | `packages/contracts/src/**/*.test.ts` covering the 8 `parseX(unknown): X` parsers in `packages/contracts` | 8/8 parsers covered (was 5/8 pre-audit) | ✅ **Complete (2026-05-17)** — `parseAuthMeResponse` + `parseWaterProfileItem` + `parseWaterProfilesResponse` added as part of this audit. Total contracts vitest count: 70 tests across 5 suites (was 38 across 3 suites). | — |
 | **L1 Unit** — `packages/core` (math + unit conversion) | `packages/core/src/**/*.test.ts` | TBD (existing suite, not re-measured in this audit) | 🟡 **Audit-deferred** — TESTING.md L1 section explicitly mentions `packages/core/src/gravity.js` + `packages/core/src/units`, but a parser-by-function coverage audit was not done in this round. Recommended next round. | — |
-| **L2 API integration** | `services/api/src/tests/*.test.ts` (excluding `contracts/**`) | 26 spec files (~20+ specs per the original kickoff note) | 🟡 **No formal gap audit done yet** — all the major routes (recipes, water-profiles, brewSessions, ai, billing, etc.) have suites, but per-route route-coverage was not measured. The `waterProfiles.test.ts` suite *did* exercise the renamed `body.workspace` field (line 87-88) post-Phase-4b, so L2 was actually aligned with the rename — the bug was strictly UI-consumer drift. | Phase 4b NOT an L2 gap. |
+| **L2 API integration** | `services/api/src/tests/*.test.ts` (excluding `contracts/**`) | 18 L2 spec files exercising ~75 of ~120 distinct (method, path) routes | 🟡 **Audit landed 2026-05-18 (Phase 4a)** — see [Phase 4a route surface audit](#phase-4a-route-surface-audit-2026-05-18) below. Major-route happy-paths are well-covered; the largest gap is **cross-workspace isolation tests** on the brew-sessions surface (only 2 of ~17 brew-session routes have isolation assertions), and several workspace-scoped route files have **no L2 tests at all** (inventory, brewday-settings, water-compute-and-save, water-hub-summary, platform-recipes, platform-ads). Role-based ACL (`AclService.requireRole`) **exists but is unwired from all routes** — known v0 state, not a bug. | Audit complete; Phase 4b implementation backlog scoped below. |
 | **L4 BeerJSON contract snapshots** | `services/api/src/tests/contracts/*.test.ts` | **15 of ~15 native-consumed endpoints covered (was 2 pre-audit; Phase 2 complete 2026-05-18)**: `recipe.contract.test.ts` (POST /recipes + GET /recipes/:id), `auth.contract.test.ts` (GET /auth/me), `waterProfiles.contract.test.ts` (Phase 4b L4 regression-pin), `recipeWater.contract.test.ts` (GET /water-settings + GET /water-hub-summary), `recipeWaterCompute.contract.test.ts` (POST mash + sparge + boil compute-and-save), `brewSessions.contract.test.ts` (POST create + GET list + GET detail), `inventoryEndpoints.contract.test.ts` (GET equipment-profiles + GET ingredients/{fermentables,hops,yeasts}). | ✅ **Phase 2 complete (2026-05-18)** — full L4 coverage of the native-consumed surface; 7 contract test suites, 16 tests. | Phase 4b pinned at L4; entire water-calc surface has L1+L4 alignment; all primary native screens have snapshot coverage of their consumed endpoints. |
 | **L5 Web E2E** | `apps/web/e2e/**/*.spec.ts` | **9 specs** (auth, dashboard, water-calc, **water-profiles** ←Phase 3a 2026-05-18, **select-workspace** ←Phase 3b 2026-05-18, recipe-list, ai-pages, recipe-create, brew-session) | 🟢 **Improving — Phase 3a + Phase 3b landed 2026-05-18** — Phase 4b production-rendering symptom pinned at L5 (`smoke/water-profiles.spec.ts`, 2 tests). Phase 5g SelectWorkspace flow pinned at L5 (`smoke/select-workspace.spec.ts`, 3 tests covering the multi-workspace login redirect, the picker UI, and the `POST /api/auth/active-workspace` handoff + session mutation). Required a new fixture persona `e2e-multi-admin` and a second seed workspace `E2E Side Brewery` to make the SelectWorkspace route reachable from E2E (previously a dead branch since all personas were single-workspace). | Phase 4b ✅ pinned L1+L4+L5; Phase 5g ✅ pinned L5 (apps/web side; native side deferred until apps/native testing infra). |
 | **L6 Agentic browser E2E** | `var/test-runs/<timestamp>/` from on-demand runs; named jobs in `docs/agentic-jobs.md` | 3 named jobs | ⚪ **By design on-demand only** — not part of CI; not a closeable gap (per kickoff non-goals). | — |
@@ -239,10 +239,10 @@ This audit is **Phase 1 of the test-coverage hardening slice**. Subsequent phase
 | **Phase 1 — L1 contract parser coverage** | Bring the contract-parser test count from 5/8 to 8/8 by adding `parseAuthMeResponse`, `parseWaterProfileItem`, `parseWaterProfilesResponse` test files. Pin the `account → workspace` dual-key parser behavior (the same dual-key that allowed Phase 4b to be invisible at the wire level) so a future "remove legacy key" PR has an explicit test impact. | ~30 min | ✅ **Landed 2026-05-17** | This doc § above; commit landing the gap fix. |
 | **Phase 2 — L4 contract snapshots for the uncovered native-consumed endpoints** | Audit `apps/native/src/**` for `api.{get,post,patch,put,delete}` call sites; cross-reference against existing `*.contract.test.ts` files; author the missing snapshot tests. Split into sub-phases for bounded commits. | ~2-4 hours total | ✅ **Complete (2026-05-18)** — 13 new snapshots across 5 new contract test suites covering all primary native-consumed endpoints. L4 coverage 2/15 → 15/15. See [Phase 2b backlog](#phase-2b-backlog-l4-snapshots-still-missing) below for the per-endpoint closure log. |
 | **Phase 3 — L5 Playwright regression pins for Phase 4b + Phase 5g** | Split into 3a + 3b. **Phase 3a (Phase 4b L5 pin)**: assert workspace water profile appears in the `/en/water-profiles` table + asserts `/api/water-profiles` response carries `body.workspace`. **Phase 3b (Phase 5g SelectWorkspace flow)**: add a spec covering the SelectWorkspace flow (visible to apps/web users with multiple workspaces). | ~2-3 hours total | ✅ **Complete 2026-05-18.** Phase 3a (`apps/web/e2e/smoke/water-profiles.spec.ts`; 2 tests). Phase 3b (`apps/web/e2e/smoke/select-workspace.spec.ts`; 3 tests; required `e2e-multi-admin` persona + `secondaryWorkspaceId` seed extension). Full smoke suite: 15 → 18 tests, all green. | Phase 4b regression-pin trio complete (L1+L4+L5); Phase 5g L5 web pin complete. |
-| **Phase 4 — L2 integration coverage gap audit** | Per-route audit of `services/api/src/tests/*.test.ts`. Identify routes with thin coverage; add specs for ACL/scope edge cases. | Larger; needs route inventory first. | 🟡 Not started | TBD |
+| **Phase 4 — L2 integration coverage gap audit** | Split into 4a (audit-only, doc) + 4b/4c/… (gap-fix implementation sub-phases). **Phase 4a**: inventory routes + L2 tests, map per-route coverage axes (happy / unauth / cross-workspace / role), surface highest-risk gaps. **Phase 4b+**: implement the gap fixes in bounded sub-phases. | Audit ~1h; gap-fix sub-phases vary. | 🟢 **Phase 4a landed 2026-05-18 (audit doc, no code changes).** Phase 4b backlog scoped — see [Phase 4a route surface audit](#phase-4a-route-surface-audit-2026-05-18) below. | This doc → "Phase 4a route surface audit". |
 | **Phase 5 (optional) — `packages/core` math/units L1 gap audit** | Inventory `packages/core/src/{gravity.js,units}` exported functions; cross-reference with existing tests; fill gaps. | Smaller; bounded chunk. | 🟡 Not started | TBD |
 
-**Recommended order:** Phase 2 (L4 snapshots) ✅ done — the cheapest-bug-catching layer given Phase 4b was a "the wire format changed and we never noticed" failure. Phase 3a (Phase 4b L5 pin) ✅ done — closes the regression-pin trio for the original cleanest-signal bug across L1+L4+L5. Phase 3b (SelectWorkspace L5 web pin for Phase 5g) ✅ done — pins the multi-workspace handoff on apps/web; native-side equivalent deferred until apps/native gets a test runner. Phase 4-5 next (they're "no known bug yet" coverage extensions rather than regression pins — pick based on prevailing risk model).
+**Recommended order:** Phase 2 (L4 snapshots) ✅ done — the cheapest-bug-catching layer given Phase 4b was a "the wire format changed and we never noticed" failure. Phase 3a (Phase 4b L5 pin) ✅ done — closes the regression-pin trio for the original cleanest-signal bug across L1+L4+L5. Phase 3b (SelectWorkspace L5 web pin for Phase 5g) ✅ done — pins the multi-workspace handoff on apps/web; native-side equivalent deferred until apps/native gets a test runner. Phase 4a (L2 route surface audit) ✅ done — see audit findings + Phase 4b backlog below. Phase 4b-5 next (they're "no known bug yet" coverage extensions rather than regression pins — pick based on prevailing risk model; the cross-workspace isolation gap on brew-sessions is the highest-signal target).
 
 #### Phase 2b backlog (closure log)
 
@@ -264,6 +264,82 @@ All native-consumed endpoints identified in the Phase 1 audit now have L4 snapsh
 **Phase 2 closure summary:** 13 new snapshots across 5 new contract test suites in one day. Total contract test surface: **7 suites, 16 tests, all green**.
 
 Future Phase 2c (when prioritised): the integrations endpoints (`/workspaces/:id/integrations/*`, `/brew-sessions/:id/integrations/*`) — these are workspace-scoped device pairing flows that depend on external services. Not in the original native-consumed scope since they're guarded behind device-pairing UI gates and have higher fixture cost (each endpoint typically needs a paired-device mock). Decided out of scope for the initial L4 sweep; revisit when the integrations feature stabilises.
+
+### Phase 4a route surface audit (2026-05-18)
+
+This is the **L2 integration-coverage gap audit** scoped at the kickoff. The goal is not to write any tests in this phase — only to inventory the route surface, map it against the existing 18 L2 test files, and surface the highest-signal gaps so the Phase 4b implementation slice can be bounded and prioritised.
+
+#### Methodology
+
+1. Inventoried every `app.{get,post,put,patch,delete}` call site in `services/api/src/routes/**/*.ts` (~120 distinct `(method, path)` tuples across 28 route files).
+2. Inventoried every L2 test file in `services/api/src/tests/*.test.ts` (excluding `contracts/**` which is the L4 layer).
+3. For each test file, listed the `app.inject(...url)` call sites to build a route-to-test mapping.
+4. Searched for the four coverage axes: **happy path** (200), **unauthenticated** (401), **cross-workspace isolation** (403 from one workspace trying to touch another's data), and **role-based** (viewer/member trying admin actions).
+5. Cross-referenced with `services/api/src/services/acl.ts` to determine whether role enforcement is even wired into the routes today.
+
+#### Route surface inventory (by file, coverage at a glance)
+
+Coverage axes legend: ✅ covered · ⚠ partial · ❌ missing · N/A not applicable
+
+| Route file | Routes | Test file(s) | Happy | Unauth (401) | Cross-workspace (403/404) | Role (viewer/member 403) |
+|---|---:|---|:-:|:-:|:-:|:-:|
+| `auth.ts` | 8 | `authSessions.test.ts` + L4 `auth.contract.test.ts` | ⚠ (6/8) | ✅ | N/A (self-scoped) | N/A |
+| `workspaces.ts` | 5 | `accounts.test.ts` | ⚠ (2/5) | ✅ | ❌ (POST /workspaces, PATCH /workspaces/:id/brand untested) | N/A |
+| `recipes.ts` | 8 | `recipes.test.ts` + L4 | ✅ | ✅ | ✅ ("does not leak recipes across workspaces") | N/A (v0 no ACL) |
+| `brewSessions.ts` | 17 | `brewSessions.test.ts` + L4 + `integrationsTilt.test.ts` (partial) | ✅ | ⚠ | ❌ **High-risk gap — 0 of 17 routes have cross-workspace isolation tests** | N/A (v0 no ACL) |
+| `waterProfiles.ts` | 6 | `waterProfiles.test.ts` + L4 | ✅ | ✅ | ✅ (via L4 contract; also viewer-403 admin-action test) | ⚠ (viewer 403 on create only) |
+| `recipeWaterSettings.ts` | 2 | `recipeWaterSettings.test.ts` + L4 | ✅ | ✅ | ✅ ("does not leak settings across workspaces") | N/A |
+| `recipeWaterComputeAndSave.ts` | 3 | L4 only (`recipeWaterCompute.contract.test.ts`) | ⚠ (L4 only) | ❌ (no L2 401 test) | ❌ | N/A |
+| `recipeWaterHubSummary.ts` | 1 | L4 only (`recipeWater.contract.test.ts`) | ⚠ (L4 only) | ❌ | ❌ | N/A |
+| `waterCalc.ts` | 10 | `waterCalcMashRoutes.test.ts` + `waterCalcRoutes.test.ts` + `waterCalcSparge.test.ts` + `waterCalcSalts.test.ts` | ⚠ (~7/10) | ✅ | N/A (stateless calc) | N/A |
+| `equipmentProfiles.ts` | 4 | `equipmentProfiles.test.ts` + L4 (list only) | ✅ | ✅ | ❌ | ⚠ (explicit "v0: no ACL" comment in test) |
+| `ingredients.ts` | 5 | `ingredientsYeasts.test.ts` (yeasts only) + L4 (fermentables+hops+yeasts list only) | ⚠ (yeasts L2; fermentables/hops L4 only; admin sync endpoints untested) | ⚠ | N/A (system-scoped) | ❌ (admin sync routes not gated in test) |
+| `inventory.ts` | 4 | (none) | ❌ **No L2 test file** | ❌ | ❌ | N/A |
+| `ai.ts` | 4 | `ai/ai.integration.test.ts` + memory + parity | ✅ | ✅ | ⚠ (403 covered for tier gates; cross-workspace settings not isolation-tested) | N/A |
+| `billing.ts` | 3 + 2 webhooks | `billing.test.ts` | ✅ | ✅ | ⚠ (403 for tier gates; cross-workspace billing-intent not isolation-tested) | N/A |
+| `brewdaySettings.ts` | 2 | (none) | ❌ **No L2 test file** | ❌ | ❌ | N/A |
+| `integrationsGeneric.ts` | 5 | (none — Tilt-only is tested in `integrationsTilt.test.ts`) | ❌ for non-Tilt kinds | ❌ | ❌ | N/A |
+| `integrationsReveal.ts` | 2 | `integrationsTilt.test.ts` (Tilt reveal only) | ⚠ | ⚠ | ❌ | N/A |
+| `integrationsTilt.ts` | 8 | `integrationsTilt.test.ts` (well-covered: 20+ status-code assertions) | ✅ | ✅ | ⚠ | N/A |
+| `integrationsTiltIngest.ts` | 1 | `integrationsTilt.test.ts` | ✅ | N/A (token-based) | N/A | N/A |
+| `recipesImport.ts` | 4 | `recipesImport.test.ts` | ✅ | ✅ | ⚠ | N/A |
+| `recipesExport.ts` | 2 | `recipesExport.test.ts` | ⚠ (single covered; bulk export incompletely covered) | ✅ | ❌ | N/A |
+| `styles.ts` | 1 | (none) | ❌ (trivial public GET; low risk) | N/A | N/A | N/A |
+| `health.ts` | 1 | (L3 smoke) | ✅ via L3 | N/A | N/A | N/A |
+| `ads.ts` | 1 | `adsSlot.test.ts` | ✅ | N/A (public) | N/A | N/A |
+| `platformAds.ts` | 4 | (none) | ❌ **No L2 test file** for platform-admin routes | ❌ | N/A (platform-scoped) | ⚠ (platform-admin gate untested) |
+| `platformRecipes.ts` | 8 | (none) | ❌ **No L2 test file** for platform-admin routes | ❌ | N/A (platform-scoped) | ⚠ (platform-admin gate untested) |
+| `webhooksRevenuecat.ts` | 1 | `billing.test.ts` | ✅ | N/A (signature-based) | N/A | N/A |
+| `webhooksStripe.ts` | 1 | `billing.test.ts` | ✅ | N/A (signature-based) | N/A | N/A |
+
+#### Key findings
+
+1. **Cross-workspace isolation gap on the brew-sessions surface (highest-signal gap).** 17 routes operate on `brewSessionId` path params. **None of them have an explicit cross-workspace isolation test** in `brewSessions.test.ts` — the suite operates on a single workspace throughout. A missing scope filter in a route handler (e.g. forgetting `where: { workspaceId: ctx.workspaceId }` on a Prisma query) would silently leak another workspace's brew session to the caller. Compare with `recipes.test.ts:230` and `recipeWaterSettings.test.ts:240` which both have explicit "does not leak across workspaces" tests using a second workspace + a second persona.
+2. **Role-based ACL is not enforced in production routes.** `AclService.requireRole(userId, workspaceId, allowed)` exists in `services/api/src/services/acl.ts` but is **never invoked from any route file** (verified via `grep -r 'acl.requireRole\|AclService' services/api/src/routes/` → 0 matches). `equipmentProfiles.test.ts:115` explicitly notes "v0: no ACL". The only "viewer 403" test is `waterProfiles.test.ts:108`. This is a known v0 architectural state, **not a bug**, but it means the "Role (viewer/member 403)" column in the matrix above is mostly N/A by design. When role enforcement gets wired up (post-v0 milestone), every workspace-scoped route will need a viewer/member 403 test added — call this **Phase 4d (deferred)**.
+3. **Three workspace-scoped route files have zero L2 tests.** `inventory.ts` (4 routes — workspace-scoped CRUD), `brewdaySettings.ts` (2 routes — workspace-scoped GET + PATCH), and the generic non-Tilt branches of `integrationsGeneric.ts` (5 routes). These are not high-risk in the sense of "data leakage" (they're well-isolated by `requireActiveWorkspace` middleware), but they're medium-risk in the sense of "no regression-catching test exists at all" — any refactor of those route handlers ships with no L2 safety net.
+4. **Platform-admin routes are not tested.** `platformAds.ts` (4 routes) + `platformRecipes.ts` (8 routes) are platform-admin-only and depend on the `requirePlatformAdmin` middleware in `services/api/src/plugins/requirePlatformAdmin.ts`. Neither file has an L2 test. The `User.isPlatformAdmin` flag is set manually in seed/migration data. Low risk for production data leakage (platform admins are trusted by definition), but the gate itself (non-admin → 403) is untested.
+5. **`recipeWaterComputeAndSave.ts` (3 routes) + `recipeWaterHubSummary.ts` (1 route) have L4 contract coverage but no L2 happy-path / unauth tests.** This is mostly fine — the L4 contract test does cover the happy path with a real session, and `requireActiveWorkspace` middleware is reused with strong L2 coverage elsewhere. But there's no explicit "401 when no cookie" assertion on these endpoints, so a future regression that loosens auth requirements (e.g. accidentally making the middleware opt-in) wouldn't fail any test.
+
+#### Phase 4b implementation backlog
+
+Each sub-phase below is independently shippable and follows the established bounded-chunk discipline (one PR per sub-phase, all suites green before commit).
+
+| Sub-phase | Scope | Why it's the priority | Effort estimate |
+|---|---|---|---|
+| **Phase 4b-1 — cross-workspace isolation for brew-sessions** | Pick the ~6 highest-risk routes on `brewSessions.ts` (GET detail + PATCH + DELETE + start/pause/stop) and add a "second workspace, different persona, expects 403/404 not 200" assertion to each. | The brew-sessions surface is the single largest cross-workspace gap (0/17 isolation tests on workspace-scoped data) and has full L4 coverage already, so the L2 cross-workspace assertions complement an established testing rhythm. | ~2-3 hours |
+| **Phase 4b-2 — L2 tests for `inventory.ts`** | New `inventoryRoutes.test.ts` covering all 4 routes (GET list, POST create, PATCH update, DELETE). Includes happy + unauth + cross-workspace isolation. | Currently the largest "zero coverage" surface that handles workspace-scoped writable data. | ~2 hours |
+| **Phase 4b-3 — L2 tests for `brewdaySettings.ts`** | New `brewdaySettings.test.ts` covering GET + PATCH (happy + unauth). | Smaller surface but currently zero-coverage. | ~30-45 min |
+| **Phase 4b-4 — L2 happy/unauth pins for `recipeWaterComputeAndSave.ts` + `recipeWaterHubSummary.ts`** | Extend `recipeWaterSettings.test.ts` (or split into two) with happy + 401 assertions for the 4 endpoints currently L4-only. | Low cost; complements existing L4 coverage with explicit auth-gate assertions. | ~30 min |
+| **Phase 4b-5 — L2 tests for `platformAds.ts` + `platformRecipes.ts` platform-admin gate** | New `platformAdminRoutes.test.ts` asserting non-platform-admin → 403 on every route, then admin → 200/201/etc. for the happy paths. | Pins the platform-admin gate; uses the existing `User.isPlatformAdmin` plumbing. | ~1-1.5 hours |
+| **Phase 4d (deferred) — role-based ACL coverage** | When `AclService.requireRole` gets wired into routes, every workspace-scoped route will need a viewer/member 403 test. This becomes a separate slice tracked alongside the ACL wiring PR itself rather than this audit. | Out of scope for the Phase 4 hardening pass — it's a follow-on once the ACL wiring decision is made. | N/A (deferred) |
+
+#### Recommended sub-phase order
+
+1. **Phase 4b-1 first** — cross-workspace isolation on brew-sessions is the highest-signal gap (workspace-scoped writable data, 0 isolation tests, largest route surface).
+2. **Phase 4b-2 next** — inventory.ts is the largest zero-coverage workspace-scoped file.
+3. **Phase 4b-3 + 4b-4** are cheap fill-in work; pair them together if a quiet day allows.
+4. **Phase 4b-5** is medium-priority but tests an admin-only gate — low frequency of changes, low blast radius.
+5. **Phase 4d** waits for the ACL-wiring architectural decision.
 
 ### What this audit deliberately does NOT change
 
