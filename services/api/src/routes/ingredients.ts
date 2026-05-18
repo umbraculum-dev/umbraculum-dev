@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
 import { ForbiddenError } from "../errors.js";
 import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
@@ -39,18 +40,23 @@ export function ingredientsRoutes(app: FastifyInstance) {
     const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
     const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
-    const where = {
+    const filters: Prisma.FermentableWhereInput[] = [
+      ctx.activeWorkspaceId
+        ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] }
+        : { workspaceId: null },
+    ];
+    if (q) {
+      filters.push({
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { producer: { contains: q, mode: "insensitive" } },
+        ],
+      });
+    }
+    const where: Prisma.FermentableWhereInput = {
       deprecatedAt: null,
-      ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
-      ...(q
-        ? {
-            OR: [
-              { name: { contains: q, mode: "insensitive" } },
-              { producer: { contains: q, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    } as const;
+      AND: filters,
+    };
 
     const [total, items] = await Promise.all([
       app.prisma.fermentable.count({ where }),
@@ -111,11 +117,18 @@ export function ingredientsRoutes(app: FastifyInstance) {
     const offset = offsetRaw != null && offsetRaw >= 0 ? offsetRaw : 0;
     const limit = limitRaw != null ? clampInt(limitRaw, 1, 50) : 50;
 
-    const where = {
+    const filters: Prisma.HopWhereInput[] = [
+      ctx.activeWorkspaceId
+        ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] }
+        : { workspaceId: null },
+    ];
+    if (q) {
+      filters.push({ name: { contains: q, mode: "insensitive" } });
+    }
+    const where: Prisma.HopWhereInput = {
       deprecatedAt: null,
-      ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
-      ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
-    } as const;
+      AND: filters,
+    };
 
     const [total, items] = await Promise.all([
       app.prisma.hop.count({ where }),
@@ -146,20 +159,27 @@ export function ingredientsRoutes(app: FastifyInstance) {
     const query = (req.query ?? {}) as Record<string, unknown>;
     const q = getQueryString(query.query);
 
+    const filters: Prisma.YeastWhereInput[] = [
+      ctx.activeWorkspaceId
+        ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] }
+        : { workspaceId: null },
+    ];
+    if (q) {
+      filters.push({
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { lab: { contains: q, mode: "insensitive" } },
+          { productId: { contains: q, mode: "insensitive" } },
+        ],
+      });
+    }
+    const where: Prisma.YeastWhereInput = {
+      deprecatedAt: null,
+      AND: filters,
+    };
+
     const items = await app.prisma.yeast.findMany({
-      where: {
-        deprecatedAt: null,
-        ...(ctx.activeWorkspaceId ? { OR: [{ workspaceId: null }, { workspaceId: ctx.activeWorkspaceId }] } : { workspaceId: null }),
-        ...(q
-          ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" } },
-                { lab: { contains: q, mode: "insensitive" } },
-                { productId: { contains: q, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
+      where,
       orderBy: { name: "asc" },
       take: 50,
       select: {

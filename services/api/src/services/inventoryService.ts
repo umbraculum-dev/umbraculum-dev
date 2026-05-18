@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import type { InventoryCategory, InventoryUnit } from "@prisma/client";
 import type { PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
@@ -142,7 +143,7 @@ export class InventoryService {
         name,
         quantity,
         unit,
-        ...(metadataJson ? { metadataJson } : {}),
+        ...(metadataJson ? { metadataJson: metadataJson as Prisma.InputJsonValue } : {}),
       },
     });
   }
@@ -172,7 +173,12 @@ export class InventoryService {
         ...(name !== undefined ? { name } : {}),
         ...(quantity !== undefined ? { quantity } : {}),
         ...(unit !== undefined ? { unit } : {}),
-        ...(metadataJson !== undefined ? { metadataJson } : {}),
+        ...(metadataJson !== undefined
+          ? {
+              metadataJson:
+                metadataJson === null ? Prisma.DbNull : (metadataJson as Prisma.InputJsonValue),
+            }
+          : {}),
       },
     });
   }

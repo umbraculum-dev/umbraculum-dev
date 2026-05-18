@@ -1,4 +1,4 @@
-import type { BrewSessionLogKind, BrewSessionStatus, BrewSessionStepStatus, BrewSessionStepTimerState, PrismaClient } from "@prisma/client";
+import type { BrewSessionLogKind, BrewSessionStatus, BrewSessionStepStatus, BrewSessionStepTimerState, Prisma, PrismaClient } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../errors.js";
 import { isObject } from "../lib/typeGuards.js";
 import { WorkspacesService } from "./workspacesService.js";
@@ -1053,7 +1053,7 @@ export class BrewSessionsService {
   }
 
   private async addStepTimerDeltaSeconds(args: {
-    tx: PrismaClient;
+    tx: Prisma.TransactionClient;
     stepId: string;
     now: Date;
   }) {

@@ -96,7 +96,10 @@ export function parseSingleImportContent(format: ImportFormat, content: string):
     recipeName: meta.recipeName,
     notes: meta.notes,
     beerJsonRecipeJson: doc,
-    warnings: n.warnings as Array<{ code: string; message: string }>,
+    warnings: n.warnings.map((w) => ({
+      code: w.code,
+      message: `${w.path}: ${w.fromUnit} → ${w.toUnit}`,
+    })),
     styleCandidate: extractStyleCandidateFromBeerJsonRecipe(r0),
   };
 }
@@ -135,7 +138,10 @@ export function parseBulkImportContent(format: ImportFormat, content: string): B
       recipeName: meta.recipeName,
       notes: meta.notes,
       beerJsonRecipeJson: singleDoc,
-      warnings: n.warnings as Array<{ code: string; message: string }>,
+      warnings: n.warnings.map((w) => ({
+        code: w.code,
+        message: `${w.path}: ${w.fromUnit} → ${w.toUnit}`,
+      })),
       styleCandidate: extractStyleCandidateFromBeerJsonRecipe(r),
     };
   });

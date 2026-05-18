@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, Prisma } from "@prisma/client";
 import { WorkspacesService } from "./workspacesService.js";
 
 const PRESET_KEYS = [
@@ -450,9 +450,9 @@ export class BrewdaySettingsService {
       payload.sections && typeof payload.sections === "object" && "presetExcludes" in payload.sections
         ? payload.sections
         : parseSectionsJson(null);
-    const sectionsJson = sectionsToStore as unknown;
-    const customSectionsJson = Array.isArray(payload.customSteps) ? payload.customSteps : [];
-    const defaultStepsJson = Array.isArray(payload.defaultSteps) ? payload.defaultSteps : [];
+    const sectionsJson = sectionsToStore as Prisma.InputJsonValue;
+    const customSectionsJson = (Array.isArray(payload.customSteps) ? payload.customSteps : []) as Prisma.InputJsonValue;
+    const defaultStepsJson = (Array.isArray(payload.defaultSteps) ? payload.defaultSteps : []) as Prisma.InputJsonValue;
 
     const notes =
       typeof payload.notes === "string" ? payload.notes : payload.notes === null ? null : undefined;
