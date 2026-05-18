@@ -1,0 +1,52 @@
+name: docs-readmes
+
+# Gates the module-README structural + link checker on every PR that
+# could affect a module README, the standard, or the checker itself.
+#
+# Mirrors the typecheck gate (.github/workflows/typecheck.yml) in
+# topology: bounded path filter, single ubuntu-latest runner, container-
+# free Python (zero-dependency stdlib script). The checker enforces
+# the must-have checklist from docs/DOCS-README-STANDARDS.md §5.1
+# against the in-scope module READMEs listed in §2.1 of the standard.
+#
+# Failure aggregation: the checker iterates every in-scope README,
+# collects per-file pass/fail status with specific failure reasons,
+# prints a structured summary, and exits non-zero if any file fails.
+# This means a single PR run reports every regression at once rather
+# than failing on the first one.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "**/README.md"
+      - "docs/DOCS-README-STANDARDS.md"
+      - "scripts/docs/**"
+      - ".github/workflows/docs-readmes.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "**/README.md"
+      - "docs/DOCS-README-STANDARDS.md"
+      - "scripts/docs/**"
+      - ".github/workflows/docs-readmes.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: docs-readmes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-module-readmes:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run module-README structural + link checker
+        # Zero-dependency Python; runs against system python3 (always
+        # present on ubuntu-latest). Per-README failures aggregated;
+        # full report emitted to stdout for PR-author visibility.
+        run: python3 scripts/docs/check-readmes.py

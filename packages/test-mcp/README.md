@@ -5,6 +5,10 @@ Small HTTP server exposing testing tools as JSON endpoints. Modeled on the agent
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
 
+## What this is
+
+A developer-tooling HTTP server (and matching CLI) that wraps a fixed set of testing primitives — stack smoke, fixture seed, vitest runner, contracts-check runner, Playwright runner, login-as-persona — into one-call endpoints. The primary consumer is the agentic browser-MCP layer (the agent driving the integrated Chrome) which calls these endpoints to set deterministic state before/after a UI run; the secondary consumer is CI / shell users who want the same primitives without HTTP. Every subprocess-spawning tool emits a deterministic run-dir under `var/test-runs/<ISO-timestamp>-<tool>/` whose layout matches the contract documented in [`.cursor/skills/agentic-browser-web-app.md`](../../.cursor/skills/agentic-browser-web-app.md), so MCP-driven and agent-driven artifacts land in the same place.
+
 ## Scope
 
 - **Contains**: an HTTP server (port `MCP_PORT`, default `8932`) and a CLI mode (`--cli <tool>`) wrapping a fixed set of testing primitives — stack smoke, fixture seed, vitest runner, contracts-check runner, Playwright runner, login-as-persona — each emitting a deterministic run-dir under `var/test-runs/`.
@@ -126,6 +130,15 @@ This matches the run-dir layout documented in [.cursor/skills/agentic-browser-we
 - No tool writes outside `var/test-runs/` (which is in `.gitignore` already).
 - No tool ever modifies `docker-compose.yml` (per rule [`00-shared-no-unilateral-runner-compose-changes`](../../.cursor/rules/00-shared-no-unilateral-runner-compose-changes.mdc)).
 - The HTTP server binds to `MCP_PORT` (default `8932`). It does not authenticate; do NOT expose it beyond localhost.
+
+## Build / test / lint (local)
+
+This package is invoked at runtime via `tsx` (no separate build step needed for the dev / agentic loop) and runs container-friendly per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule.
+
+- **Run (HTTP server, in-stack)**: `docker compose exec api npx tsx /repo/packages/test-mcp/src/server.ts` — see HTTP usage above for the `node:20-slim` host alternative.
+- **Run (single CLI tool, host)**: `docker run --rm --network host -v "$PWD:/repo" -w /repo/packages/test-mcp node:20-slim bash -lc "npm install --no-audit --no-fund && npx tsx src/server.ts --cli <tool>"` — see CLI usage above for full examples.
+- **Test**: vitest is not configured in this workspace; the tools are exercised directly by the CI / agentic flows that consume them. See [`docs/TESTING.md`](../../docs/TESTING.md) §"Layer map".
+- **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace landed `noUncheckedIndexedAccess` in Phase 6b — fixing 4 latent index-out-of-bounds sites — and carries all 6 candidate strict flags after Phase 6h).
 
 ## How it fits in
 

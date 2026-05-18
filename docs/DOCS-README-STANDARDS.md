@@ -1,5 +1,5 @@
 **Tier:** Public
-**Status:** v1.0 — landed 2026-05-18 (Docs slice Phase 1)
+**Status:** v1.1 — Phase 4 CI gate landed 2026-05-18 (Docs slice feature-complete)
 **Audience:** contributors, documentation reviewers, future-maintainers running an audit pass against the module-README set.
 **Document role:** the canonical template + audit checklist for every module-level `README.md` in the repository. Anchors the "public-flip-quality module READMEs" bar described in [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.
 
@@ -269,16 +269,35 @@ The mascot **Umbi** (the canonical asset at [`media/umbi.png`](media/umbi.png)) 
 | Deferred decision | Trigger condition | Owner |
 |---|---|---|
 | Apply the standard mechanically to top-level `README.md` and `docs/README.md` | Sub-plan #9 lands the `@brewery/*` → `@umbraculum/*` rewrite, providing a natural "second pass" anchor | Docs maintainer |
-| CI gate enforcing the must-have checklist (markdown link-check + structural template check) | Docs slice Phase 4 (planned; mirrors the per-workspace typecheck gate from [`TYPING.md`](TYPING.md) Phase 5) | Docs maintainer |
 | Public-flip rendering preview (visual proof the READMEs render cleanly on github.com when public) | Public flip is scheduled (currently working-assumption H1 2027 per [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1) | Docs maintainer + flip-coordinator |
 | Standard for `docs/help/` end-user content (different audience: workspace operators, not contributors) | First content lands in `docs/help/` as the brewery vertical UI matures | Help-content owner (not yet assigned) |
+
+### 8.1 CI gate (LANDED 2026-05-18 — Docs slice Phase 4)
+
+The CI gate originally listed as deferred above landed on 2026-05-18 as Docs slice Phase 4. It enforces the must-have checklist from §5.1 against the in-scope set from §2.1 (full template) plus §5.4 (sub-component lighter scope), via:
+
+- **Workflow**: [`.github/workflows/docs-readmes.yml`](../.github/workflows/docs-readmes.yml). Triggers on push/PR touching any `**/README.md`, `docs/DOCS-README-STANDARDS.md`, `scripts/docs/**`, or the workflow itself. Mirrors the typecheck gate's topology (bounded path filter, single ubuntu-latest runner, concurrency-cancel on stale runs).
+- **Checker**: [`scripts/docs/check-readmes.py`](../scripts/docs/check-readmes.py). Zero-dependency Python (stdlib only, runs against `python3` already present on the runner). Per-README aggregation: every in-scope file is checked, failures collected with specific reasons, exit code is non-zero if any file fails so the PR run surfaces every regression at once rather than failing on the first.
+
+The checker enforces the following subset of §5.1's must-haves (those that can be checked structurally):
+
+1. Title matches `package.json` `"name"` field for full-scope READMEs.
+2. Tagline present within 3 lines of the title.
+3. Brand callout present (`> [!NOTE]` block with `Umbraculum` mention + link to `RENAME-DILIGENCE.md`).
+4. Required `##` headings present: `What this is`, `Scope`, `Build / test / lint (local)` (full scope); `What this is` or `Why this exists` (sub-component scope).
+5. ≥2 cross-references via relative links, with ≥1 into the `docs/` tree (full scope only).
+6. All relative links (excluding fenced code blocks) resolve to existing files.
+7. No mention of the historical `<PLATFORM_NAME>` placeholder token.
+8. No `@umbraculum/*` import paths in code blocks (the npm scope migration is sub-plan #9, deferred).
+
+Items the gate cannot mechanically check (inherent prose-quality constraints from §5.1's "must-haves" list — voice, honesty about trade-offs, "no marketing fluff", "no emojis except the canonical Umbi which lives outside module READMEs") remain the responsibility of the reviewer per the standard's §6 voice-and-tone guidance. The gate is the **floor**, not the ceiling.
 
 ---
 
 ## 9. Sign-off
 
-**Standard version:** v1.0
-**Landed:** 2026-05-18 (Docs slice Phase 1)
-**Next phase:** Docs slice Phase 2 — audit and standardize the 8 existing module READMEs against this standard, one commit per workspace cluster.
+**Standard version:** v1.1
+**Landed:** 2026-05-18 (Docs slice — feature-complete: Phase 1 published the standard; Phase 2 audited the existing 8 READMEs; Phase 3 wrote the 6 missing READMEs; Phase 4 landed the CI gate).
+**Next anchor:** sub-plan #9 — when the `@brewery/*` → `@umbraculum/*` npm scope migration ships, this standard's §3.1 "@brewery/* parking" section becomes obsolete; the gate's `@umbraculum/*` exclusion check is removed at the same time. The "apply this standard to top-level README.md and docs/README.md" item in §8 also unlocks then.
 
-This document is **versioned** — substantive changes (adding/removing must-haves, changing the template structure) bump the version and update the status banner. Cosmetic edits do not.
+This document is **versioned** — substantive changes (adding/removing must-haves, changing the template structure, adding/removing CI-gate checks) bump the version and update the status banner. Cosmetic edits do not.
