@@ -317,3 +317,90 @@ describe("recipe water-settings", () => {
   });
 });
 
+/**
+ * Phase 4b-4 — explicit L2 auth gate pins for the recipe-water-compute-and-save
+ * and recipe-water-hub-summary routes.
+ *
+ * Why this block exists
+ * ---------------------
+ * Per the Phase 4a route surface audit (docs/TESTING.md → "Phase 4a route
+ * surface audit"), `recipeWaterComputeAndSave.ts` (3 routes — mash + sparge
+ * + boil compute-and-save) and `recipeWaterHubSummary.ts` (1 route) had
+ * L4 contract-snapshot coverage (`services/api/src/tests/contracts/
+ * recipeWaterCompute.contract.test.ts` + `recipeWater.contract.test.ts`)
+ * but ZERO explicit L2 auth-gate assertions. The L4 tests happen to use a
+ * real authenticated session, so an `await app.inject({ url, ... })`
+ * regression that accidentally dropped `requireActiveWorkspace` from these
+ * routes would silently pass at L4 (because the L4 test always has a
+ * cookie) — it would only surface as a security incident in production.
+ *
+ * This block pins the auth gate explicitly: without a cookie or with a
+ * cookie-no-workspace, all 4 routes must return 401. It does NOT re-pin
+ * the response shape (that's L4's job) or behavior (that's the cross-
+ * workspace tests in the main block above). One assertion per route per
+ * unauth flavor: 4 routes × 2 flavors = 8 pins.
+ *
+ * Why a separate sibling describe (rather than extending the main one)
+ * ---------------------------------------------------------------------
+ * The main describe block above is about `/water-settings` (PUT/GET) and
+ * already has a heavy beforeAll fixture set (recipes, profiles). The
+ * compute-and-save + hub-summary routes are auth-gated BEFORE any DB
+ * work (the route handler's first line is `requireActiveWorkspace(req)`),
+ * so these assertions don't need the recipe/profile fixtures — using a
+ * dedicated lightweight `describe` keeps the auth-pin layer cheap and
+ * clearly separated from the round-trip-behavior tests. Same `app`
+ * instance per buildApp() pattern to avoid double-bootstrapping the
+ * Fastify server.
+ */
+describe("recipe water compute-and-save + hub-summary auth gates (Phase 4b-4)", () => {
+  const app = buildApp();
+  let cookieNoWorkspace = "";
+
+  beforeAll(async () => {
+    await app.ready();
+    const sess = await createSessionForTestUser(app, { activeWorkspace: false });
+    cookieNoWorkspace = sess.cookie;
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  // Recipe id can be any string — `requireActiveWorkspace` fires before
+  // the route handler ever reads :id, so the auth gate trips on a fake
+  // id just as it would on a real one.
+  const fakeRecipeId = "00000000-0000-0000-0000-000000000000";
+
+  // All 4 routes that previously had L4-only coverage. The route table
+  // and HTTP methods exactly match what's in
+  // `services/api/src/routes/recipeWaterComputeAndSave.ts` and
+  // `services/api/src/routes/recipeWaterHubSummary.ts`.
+  const routes: Array<{ method: "POST" | "GET"; url: string }> = [
+    { method: "POST", url: `/recipes/${fakeRecipeId}/water-settings/mash/compute-and-save` },
+    { method: "POST", url: `/recipes/${fakeRecipeId}/water-settings/sparge/compute-and-save` },
+    { method: "POST", url: `/recipes/${fakeRecipeId}/water-settings/boil/compute-and-save` },
+    { method: "GET", url: `/recipes/${fakeRecipeId}/water-hub-summary` },
+  ];
+
+  for (const route of routes) {
+    it(`${route.method} ${route.url} returns 401 missing_session without cookie`, async () => {
+      const res = await app.inject({ method: route.method, url: route.url });
+      expect(res.statusCode).toBe(401);
+      const body = res.json() as { ok: boolean; error: { code: string } };
+      expect(body.ok).toBe(false);
+      expect(body.error.code).toBe("missing_session");
+    });
+
+    it(`${route.method} ${route.url} returns 401 missing_active_workspace with no-workspace session`, async () => {
+      const res = await app.inject({
+        method: route.method,
+        url: route.url,
+        headers: { cookie: cookieNoWorkspace },
+      });
+      expect(res.statusCode).toBe(401);
+      const body = res.json() as { error: { code: string } };
+      expect(body.error.code).toBe("missing_active_workspace");
+    });
+  }
+});
+
