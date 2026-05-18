@@ -222,8 +222,19 @@ services:
       - ./infra/db-guard/db-guard.sh:/db-guard.sh:ro
 
 volumes:
+  # Explicit `name:` entries decouple volume identity from the compose project
+  # name (i.e., from the directory name). Without them, Docker prefixes volumes
+  # with `<project>_<short>` and a host-folder rename creates fresh empty
+  # volumes, orphaning the data. With them, volume identity follows the
+  # explicit name, so a folder rename is data-safe by construction.
+  # See: brewery-pre-rename volume migration runbook (2026-05-18).
   pgdata:
+    name: umbraculum_pgdata
   pgdata_replica:
+    name: umbraculum_pgdata_replica
   wal_archive:
+    name: umbraculum_wal_archive
   redisdata:
+    name: umbraculum_redisdata
   web_node_modules:
+    name: umbraculum_web_node_modules
