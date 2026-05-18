@@ -1,6 +1,13 @@
 # @brewery/recipes-ui
 
-Domain UI components for recipes and related brewing workflows.
+Domain UI components for recipes and related brewing workflows (cross-platform: web + native).
+
+> [!NOTE]
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+
+## What this is
+
+The recipe-domain UI layer, sitting one tier above `@brewery/ui` (which provides platform-neutral primitives). Components in this package are aware of brewing concepts — fermentables, hops, mash steps, water profiles — and orchestrate them into editable views consumed by both `apps/web` and `apps/native`. The package is **adapter-pattern-driven** (see below): app-specific concerns (navigation, API loading, image rendering) are injected as props rather than imported from the consumer's framework, so the same component renders correctly under Next.js and Expo without conditional code paths.
 
 ## Scope
 
@@ -16,12 +23,26 @@ Shared components accept injected functions/props for:
 - **API loading** (web cookie-session vs native bearer)
 - **Media rendering** (web `<img>` vs native image component)
 
-## Build output (native-ready)
+## Build / test / lint (local)
 
-This package ships runtime-safe JS + types under `dist/**`.
+This package ships runtime-safe JS + types under `dist/**` so it can be consumed by Metro (React Native) and Next.js without source-level transpilation.
 
-Rebuild from repo root:
+- **Build**: from repo root, `./scripts/build-packages-in-docker.sh` (Docker route — preferred per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule).
+- **Test**: `npm run test --workspace=@brewery/recipes-ui` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: `npm run lint --workspace=@brewery/recipes-ui`.
+- **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate".
 
-- `cd /home/rf/dkprojects/rfapps/brewery-app`
-- `./scripts/build-packages-in-docker.sh`
+## How it fits in
 
+- **Consumed by**: `apps/web` (recipe editor pages, water hub, brew-day flows); `apps/native` (the native recipe surfaces).
+- **Depends on**: `@brewery/ui` (primitives), `@brewery/contracts` (typed DTOs / parsers), `@brewery/i18n-react` (localized strings); does **not** depend on Next.js, Expo, React Navigation, or any app-specific API client.
+
+## Status
+
+Recipe-centric by name and by intent. As new vertical domains land additional shared UI (e.g. `@brewery/inventory-ui`, `@brewery/wms-ui`), they should ship as separate packages rather than expanding this one — see [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level vertical-module shape.
+
+## Further reading
+
+- [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and vertical-module shape
+- [`docs/architecture-Rev02.md`](../../docs/architecture-Rev02.md) — brewery-vertical implementation log (cross-platform UI boundary decisions)
+- [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

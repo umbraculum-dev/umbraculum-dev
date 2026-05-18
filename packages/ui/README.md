@@ -1,6 +1,13 @@
 # @brewery/ui
 
-Shared UI building blocks for web and native apps.
+Shared UI building blocks for web and native apps (Tamagui-based primitives + generic compound components).
+
+> [!NOTE]
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+
+## What this is
+
+The platform-neutral UI primitives layer, consumed by both `apps/web` (Next.js) and `apps/native` (React Native + Expo) through Tamagui's cross-platform component system. Intentionally domain-free — recipe-editing, water-page, and other brew-day-specific UI lives in `@brewery/recipes-ui`. See [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level framing and [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md) for the Tamagui type-system caveats and adaptation strategy.
 
 ## Scope
 
@@ -12,15 +19,28 @@ Shared UI building blocks for web and native apps.
 - Web: `@brewery/ui/tamagui-config-web` (uses `@tamagui/animations-css`)
 - Native: `@brewery/ui/tamagui-config-native` (native-safe; animation driver TBD)
 
-## Build output (native-ready)
+## Build / test / lint (local)
 
-This package ships runtime-safe JS + types:
+This package ships runtime-safe JS + types under `dist/**` so it can be consumed by Metro (React Native) and Next.js without source-level transpilation in the consumer.
 
-- Runtime entrypoints under `dist/**`
-- Type entrypoints under `dist/**`
+- **Build**: from repo root, `./scripts/build-packages-in-docker.sh` (Docker route — preferred per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule).
+- **Test**: `npm run test --workspace=@brewery/ui` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: `npm run lint --workspace=@brewery/ui`.
+- **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace landed in Phase 5, commit `aab5b41`, and carries all 6 candidate strict flags after Phase 6h).
 
-When you change `packages/ui/src/**`, rebuild the package outputs from repo root:
+When you change `packages/ui/src/**`, run the build before consumers can pick up the change.
 
-- `cd /home/rf/dkprojects/rfapps/brewery-app`
-- `./scripts/build-packages-in-docker.sh`
+## How it fits in
 
+- **Consumed by**: `apps/web` and `apps/native` directly; `@brewery/recipes-ui` (which adds domain-specific components on top of these primitives).
+- **Depends on**: Tamagui (the cross-platform component system); no other `@brewery/*` packages — this is the bottom of the UI dependency stack.
+
+## Status
+
+Stable for the brewery vertical's current surface area. The Tamagui upstream evolution is tracked in [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md); when Tamagui ships breaking changes that affect these primitives, the migration is staged through this package first.
+
+## Further reading
+
+- [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and module boundaries
+- [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md) — Tamagui type-system caveats and adaptation strategy
+- [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
