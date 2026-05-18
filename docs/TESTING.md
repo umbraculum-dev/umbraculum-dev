@@ -2,7 +2,7 @@
 
 This is the single source of truth for "what do I test, where, and how" in this monorepo. Read it before adding a new test or asking the agent to add one. Pair with [TESTING-DECISION.md](TESTING-DECISION.md) (decision tree) if you can't decide which layer applies.
 
-**Status:** v1.9 (test-coverage hardening pass — Phase 1 + Phase 2 + Phase 3 + Phase 4a + **all 5 Phase 4b sub-phases** + **Phase 5a (`packages/core` L1 audit + gap-fix)** landed 2026-05-17/18; see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟢 nearly complete (Phase 5a `packages/core` audit + gap-fix landed; only Phase 5b — deferred — `services/api/src/domain/waterCalc/` L1 unit tests (~1000 LoC of pure math/derivation with no direct unit tests, currently only L4-snapshot-covered) and the deferred Phase 4d ACL-coverage slice remain)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
+**Status:** v1.10 (test-coverage hardening pass — Phase 1 + Phase 2 + Phase 3 + Phase 4a + **all 5 Phase 4b sub-phases** + **Phase 5a (`packages/core` L1 audit + gap-fix)** + **Phase 5b-1 (waterCalc L1: `saltAdditions` + `residualAlkalinity`)** landed 2026-05-17/18; see [Coverage audit + hardening pass](#coverage-audit--hardening-pass-2026-05-17) below). The foundation-hardening pass ahead of the H1 2027 public-AGPLv3 flip ([`docs/ROADMAP.md`](ROADMAP.md)) has four slices: lint ✅ landed, **tests 🟢 in progress on the final Phase 5b sub-phases (5b-1 landed; 5b-2 through 5b-5 remain — see [Phase 5b sub-phase backlog](#phase-5b-implementation-backlog-watercalc-l1-unit-tests) below)**, types 🟡 not started, docs 🟡 not started. The "what to test" framework below is unchanged; the audit + phase log are new.
 
 ## Layers (cheapest to most expensive)
 
@@ -241,9 +241,9 @@ This audit is **Phase 1 of the test-coverage hardening slice**. Subsequent phase
 | **Phase 3 — L5 Playwright regression pins for Phase 4b + Phase 5g** | Split into 3a + 3b. **Phase 3a (Phase 4b L5 pin)**: assert workspace water profile appears in the `/en/water-profiles` table + asserts `/api/water-profiles` response carries `body.workspace`. **Phase 3b (Phase 5g SelectWorkspace flow)**: add a spec covering the SelectWorkspace flow (visible to apps/web users with multiple workspaces). | ~2-3 hours total | ✅ **Complete 2026-05-18.** Phase 3a (`apps/web/e2e/smoke/water-profiles.spec.ts`; 2 tests). Phase 3b (`apps/web/e2e/smoke/select-workspace.spec.ts`; 3 tests; required `e2e-multi-admin` persona + `secondaryWorkspaceId` seed extension). Full smoke suite: 15 → 18 tests, all green. | Phase 4b regression-pin trio complete (L1+L4+L5); Phase 5g L5 web pin complete. |
 | **Phase 4 — L2 integration coverage gap audit** | Split into 4a (audit-only, doc) + 4b/4c/… (gap-fix implementation sub-phases). **Phase 4a**: inventory routes + L2 tests, map per-route coverage axes (happy / unauth / cross-workspace / role), surface highest-risk gaps. **Phase 4b+**: implement the gap fixes in bounded sub-phases. | Audit ~1h; gap-fix sub-phases vary. | ✅ **Phase 4 complete — landed 2026-05-18.** Phase 4a (audit doc) + Phase 4b-1 through 4b-5 (all 5 gap-fix sub-phases) all shipped on 2026-05-18 — see [Phase 4a route surface audit](#phase-4a-route-surface-audit-2026-05-18) below. Phase 4d (deferred) remains gated on the ACL-wiring architectural decision. | This doc → "Phase 4a route surface audit". |
 | **Phase 5a — `packages/core` math/units L1 audit + gap-fix** | Inventory `packages/core/src/{gravity.js,units,water.js}` exported functions; cross-reference with existing tests; fill gaps. Audit found all *function* exports already covered with reasonable depth; only the `DEFAULT_MASH_TARGET_PH` constant and several un-pinned behavioral contracts were gaps. Added new `water.test.js` (2 tests) + extensions to `gravity.test.js` (+5 tests), `units/units.test.js` (+11 tests), `units/rounding.test.js` (+3 tests). Test count 26 → 47. | Smaller; bounded chunk. | ✅ **Landed 2026-05-18** | See [Phase 5a audit + gap-fix](#phase-5a-packagescore-audit--gap-fix-2026-05-18) below. |
-| **Phase 5b (deferred) — `services/api/src/domain/waterCalc/*` L1 unit tests** | Audit identified ~1000 LoC of pure-math/derivation code across 4 substantial files (`mashAcidificationTargetMashPh.ts` 307 LoC, `mashPhEstimateV1.ts` 215 LoC, `saltAdditions.ts` 183 LoC, `spargeAcidification.ts` 313 LoC) with no direct L1 unit tests. Currently only INDIRECTLY covered via L4 contract snapshots — any regression that changes the snapshot output would surface, but individual function-level edge cases are not pinned. Larger PR (~1-2 days). | ~1-2 days | 🟡 Deferred — surfaced as Phase 5a follow-on; not yet scheduled. | TBD |
+| **Phase 5b — `services/api/src/domain/waterCalc/*` L1 unit tests** | Split into 5 bounded sub-phases (5b-1 → 5b-5). Audit identified ~1000 LoC of pure-math/derivation code across 4 substantial files (`mashAcidificationTargetMashPh.ts` 307 LoC, `mashPhEstimateV1.ts` 215 LoC, `saltAdditions.ts` 183 LoC, `spargeAcidification.ts` 313 LoC) + 5 smaller files with no direct L1 unit tests. Currently only INDIRECTLY covered via L4 contract snapshots. **Phase 5b-1 (2026-05-18):** new `residualAlkalinity.test.ts` (17 tests) + new `saltAdditions.test.ts` (24 tests). services/api: 233 → 274 tests across 40 → 42 files. | ~1-2 days total | 🟢 **In progress** — 5b-1 ✅ landed 2026-05-18; 5b-2 through 5b-5 remain (see [Phase 5b implementation backlog](#phase-5b-implementation-backlog-watercalc-l1-unit-tests) below). | See [Phase 5b implementation backlog](#phase-5b-implementation-backlog-watercalc-l1-unit-tests) |
 
-**Recommended order:** Phase 2 (L4 snapshots) ✅ done. Phase 3a (Phase 4b L5 pin) ✅ done. Phase 3b (SelectWorkspace L5 web pin for Phase 5g) ✅ done. Phase 4a (L2 route surface audit) ✅ done. Phase 4b-1 through 4b-5 ✅ done — **all 5 Phase 4b sub-phases shipped 2026-05-18**. Phase 5a (`packages/core` audit + gap-fix) ✅ done — `packages/core` test count 26 → 47 across 4 files. **Remaining work:** Phase 5b (deferred) — `services/api/src/domain/waterCalc/*` ~1000 LoC of pure-math/derivation code currently only INDIRECTLY covered via L4 contract snapshots; needs direct L1 unit tests pinning per-function edge cases (~1-2 days estimated). Phase 4d (deferred) waits for the ACL-wiring architectural decision.
+**Recommended order:** Phase 2 (L4 snapshots) ✅ done. Phase 3a (Phase 4b L5 pin) ✅ done. Phase 3b (SelectWorkspace L5 web pin for Phase 5g) ✅ done. Phase 4a (L2 route surface audit) ✅ done. Phase 4b-1 through 4b-5 ✅ done — **all 5 Phase 4b sub-phases shipped 2026-05-18**. Phase 5a (`packages/core` audit + gap-fix) ✅ done. **Phase 5b-1 (waterCalc L1 for `saltAdditions` + `residualAlkalinity`) ✅ done 2026-05-18** — services/api 233 → 274 tests across 40 → 42 files. **Remaining work:** Phase 5b-2 through 5b-5 (4 sub-phases across the remaining 7 waterCalc files; ~1 day total). Phase 4d (deferred) waits for the ACL-wiring architectural decision.
 
 #### Phase 2b backlog (closure log)
 
@@ -411,13 +411,44 @@ The L1 audit for the `packages/core` math/units surface was the optional follow-
 
 **Test count before**: 26 across 3 files. **Test count after**: 47 across 4 files. All green.
 
-#### Phase 5b scope (deferred)
+#### Phase 5b implementation backlog (waterCalc L1 unit tests)
 
-If/when scheduled, Phase 5b should:
-1. Inventory per-function call sites in `services/api/src/domain/waterCalc/**` so the test author knows which input shapes are exercised by routes (vs. dead branches).
-2. Author one `.test.ts` sibling per non-trivial source file, focusing on:
+Phase 5b was originally scoped as deferred but is being executed incrementally in 5 bounded sub-phases (1 PR per sub-phase, all suites green before commit). The split groups files by their stoichiometric / mash-pH / sparge-acidification domains so each PR has cohesive scope:
+
+| Sub-phase | Files | Approach | Status |
+|---|---|---|:-:|
+| **Phase 5b-1** — stoichiometry + alkalinity primitives | `saltAdditions.ts` (183 LoC) + `residualAlkalinity.ts` (62 LoC) | New `saltAdditions.test.ts` (24 tests) covers stoichiometry per-salt (gypsum, CaCl2·2H2O, epsom, NaCl, NaHCO3 with literature-comparable ppm values), linearity (2x grams → 2x ppm), inverse volume scaling (2x volume → ½ ppm), multi-salt accumulation, breakdown shape invariants (per-ion sum = overall delta), and all validation error paths (non-finite volume, ≤0 volume, non-finite base ion, unknown saltKey, null addition, non-numeric / NaN / negative grams). New `residualAlkalinity.test.ts` (17 tests) covers Kolbach coefficients (0.713 Ca, 0.588 Mg), the clamp-to-zero on effective alkalinity, defaults-to-zero for missing Ca/Mg, all non-finite throw paths, and symmetry between the standalone helper and the embedded calculation inside `effectiveAlkalinityPpmCaCO3FromCaMg`. | ✅ **Landed 2026-05-18** |
+| **Phase 5b-2** — mash-pH estimator | `mashPhEstimateV1.ts` (215 LoC) | New `mashPhEstimateV1.test.ts` covering: typical pH window output for common grain bills; effective-alkalinity sensitivity (more alkalinity → higher predicted mash pH); acidulated-malt sensitivity (more acid malt → lower predicted pH); roasted-grain sensitivity (more roasted → lower predicted pH); boundary inputs (zero fermentables, zero alkalinity); validation error paths. Likely sibling extension to `mashPhEstimate.ts` (16 LoC trivial wrapper). | 🟡 Pending |
+| **Phase 5b-3** — mash acidification (target + manual) | `mashAcidificationTargetMashPh.ts` (307 LoC) + `mashAcidificationManual.ts` (136 LoC) | New sibling test files covering: target-mode acid required to hit a given mash pH delta (monotonic — larger delta → more acid); manual-mode pH effect given a fixed acid amount; lactic vs phosphoric vs sulfuric / hydrochloric coefficient correctness; derivation-trace shape consistency (the routes return derivations that the UI displays). | 🟡 Pending |
+| **Phase 5b-4** — sparge acidification (target + manual) | `spargeAcidification.ts` (313 LoC) + `spargeAcidificationManual.ts` (145 LoC) | Same structure as 5b-3 but for sparge water. The two halves of the surface (mash + sparge) share patterns, so 5b-4 should reuse fixtures/helpers from 5b-3 where possible. | 🟡 Pending |
+| **Phase 5b-5** — overall + small helpers | `overall.ts` (51 LoC) + `mashPhEstimate.ts` (16 LoC if not absorbed into 5b-2) | New sibling test files. `overall.ts` is the orchestration layer that calls into the other modules; tests should verify wiring (correct inputs flow to correct sub-functions) using stubs where possible, rather than re-asserting downstream math. | 🟡 Pending |
+
+**Phase 5b-1 deliverables in detail:**
+
+Files added:
+- `services/api/src/domain/waterCalc/saltAdditions.test.ts` (24 tests across 3 describe blocks: happy paths / invariants + breakdown shape / validation errors)
+- `services/api/src/domain/waterCalc/residualAlkalinity.test.ts` (17 tests across 2 describe blocks: `alkalinityReductionFromCaMgPpmCaCO3` / `effectiveAlkalinityPpmCaCO3FromCaMg`)
+
+Reference numerics pinned by `saltAdditions.test.ts` (cross-checked against the Bru'n Water convention of "1g salt per US gallon"):
+
+| Salt | 1g in 20L → ppm delta | Literature equivalent (1g/gal scaled to /20L = ×3.785/20 = ×0.18925) |
+|---|---|---|
+| Gypsum (CaSO4·2H2O) | Ca: 11.64 / SO4: 27.9 | ~62 Ca / ~147 SO4 per gallon → ~11.73 / 27.81 per 20L (✓ within precision) |
+| CaCl2·2H2O | Ca: 13.63 / Cl: 24.11 | ~72 Ca / ~127 Cl per gallon → ~13.63 / 24.04 per 20L (✓) |
+| Epsom (MgSO4·7H2O) | Mg: 4.93 / SO4: 19.49 | ~26 Mg / ~103 SO4 per gallon → ~4.92 / 19.49 per 20L (✓) |
+| NaCl | Na: 19.67 / Cl: 30.33 | ~104 Na / ~160 Cl per gallon → ~19.68 / 30.28 per 20L (✓) |
+| NaHCO3 | Na: 13.68 / HCO3: 36.32 | ~72 Na / ~192 HCO3 per gallon → ~13.62 / 36.33 per 20L (✓) |
+
+All 5 salts and both ions per salt are within the chosen `toBeCloseTo(value, 1)` (i.e. 0.1 ppm) precision. Future "coefficient drift" PRs will fail these tests loudly with a clear diff against literature values.
+
+**Phase 5b approach for the remaining sub-phases (5b-2 through 5b-5):**
+
+1. **Inventory per-function call sites first.** Before writing tests for `mashPhEstimateV1.ts`, etc., grep the routes (`services/api/src/routes/recipeWaterComputeAndSave.ts`) for the input shapes that actually get passed in production. This avoids spending time testing dead branches.
+2. **Author one `.test.ts` sibling per non-trivial source file** (skip the 16-LoC trivial wrapper if its only role is re-export).
+3. **Focus on:**
    - Boundary inputs (zero ions, zero fermentables, empty mash, etc.)
+   - Monotonic sensitivity checks (more X → more/less Y, in the direction the underlying chemistry dictates)
    - Sentinel/error-path behavior (NaN, negative, undefined optional fields)
-   - Symmetric round-trip checks where applicable (e.g. compute → derive → re-compute)
-3. Keep the L4 contract snapshots as-is — they're the "wire format" pin and aren't replaced by L1 function tests.
-4. Estimate: ~1-2 days for full coverage of the 4 substantial files (`mashAcidificationTargetMashPh`, `mashPhEstimateV1`, `saltAdditions`, `spargeAcidification`); the smaller files can be covered opportunistically.
+   - Symmetric round-trip checks where applicable (compute → derive → re-compute, or target-mode acid amount fed back into manual-mode → matches predicted pH)
+4. **Keep the L4 contract snapshots as-is.** They pin wire format; L1 owns per-function math. These layers are complementary, not redundant.
+5. **Estimate (remaining)**: ~1 day total across sub-phases 5b-2 through 5b-5 (~3-4 hours each, plus the smaller 5b-5).
