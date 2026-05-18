@@ -60,3 +60,54 @@ describe("sgToPlato", () => {
     expect(sgToPlato(Infinity)).toBeNull();
   });
 });
+
+// --------------------------------------------------------------------------
+// Phase 5a contract pins
+// --------------------------------------------------------------------------
+// These tests pin behaviors that downstream code (gravityAnalysis, OG/FG
+// derivation in the API) may depend on. Without explicit pins, a future
+// "tighten validation" or "tighten range" refactor could silently shift
+// what plato / SG values get accepted vs. nulled.
+describe("platoToSg upper boundary (Phase 5a)", () => {
+  // The current code accepts plato in [0, 100] (exclusive of 0 via the
+  // boundary contract above, inclusive of 100). Pinned so a change to the
+  // accepted range surfaces explicitly.
+  it("accepts the upper boundary at 100 plato (extreme barley wine)", () => {
+    const sg = platoToSg(100);
+    expect(sg).not.toBeNull();
+    expect(sg).toBeGreaterThan(1);
+    expect(sg).toBeLessThan(2);
+  });
+
+  it("rejects values just above the upper boundary", () => {
+    expect(platoToSg(100.001)).toBeNull();
+  });
+
+  it("accepts very small positive plato values (near no-sugar)", () => {
+    // 0.5 plato ≈ very dilute wort, still a valid SG slightly above 1.
+    const sg = platoToSg(0.5);
+    expect(sg).not.toBeNull();
+    expect(sg).toBeGreaterThan(1);
+    expect(sg).toBeLessThan(1.005);
+  });
+});
+
+describe("sgToPlato upper-bound behavior (Phase 5a)", () => {
+  // sgToPlato has NO upper-bound rejection: it only rejects sg <= 1 (and
+  // non-finite). High SG values produce large positive plato (returned
+  // when the polynomial result is >= 0). Pinned so a future "reject sg >
+  // 1.2" refactor surfaces explicitly rather than silently changing what
+  // analyzers/imports return for impossible-but-malformed payloads.
+  it("does not reject very-high SG (returns a large positive plato)", () => {
+    const p = sgToPlato(1.2);
+    expect(p).not.toBeNull();
+    expect(p).toBeGreaterThan(40);
+  });
+
+  it("returns null only when the polynomial result is negative", () => {
+    // SG just above 1.0 produces a small positive plato, not null.
+    const p = sgToPlato(1.001);
+    expect(p).not.toBeNull();
+    expect(p).toBeGreaterThanOrEqual(0);
+  });
+});

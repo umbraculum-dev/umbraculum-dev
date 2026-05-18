@@ -92,3 +92,104 @@ describe("litersToUsGallons + kgToLb (inverse helpers)", () => {
     expect(kgToLb(kg)).toBeCloseTo(5, 6);
   });
 });
+
+describe("Phase 5a contract pins", () => {
+  // ---------------------------------------------------------------------
+  // Negative-value passthrough on mass/volume conversions
+  // ---------------------------------------------------------------------
+  // The current contract only validates Number.isFinite, not sign. Negative
+  // mass/volume passes through as a negative number rather than being
+  // rejected. Callers (e.g. derivation code that subtracts ingredients)
+  // may depend on this. Pinned here so a future "reject negative" refactor
+  // surfaces explicitly.
+  describe("negative-value passthrough", () => {
+    it("massToKg accepts negatives and preserves sign", () => {
+      expect(massToKg(-2, "kg")).toBe(-2);
+      expect(massToKg(-1000, "g")).toBe(-1);
+      expect(massToKg(-1, "lb")).toBeCloseTo(-0.45359237, 6);
+    });
+
+    it("volumeToLiters accepts negatives and preserves sign", () => {
+      expect(volumeToLiters(-1, "l")).toBe(-1);
+      expect(volumeToLiters(-500, "ml")).toBe(-0.5);
+      expect(volumeToLiters(-1, "gal")).toBeCloseTo(-3.785411784, 6);
+    });
+  });
+
+  // ---------------------------------------------------------------------
+  // Defensive vs non-defensive contract
+  // ---------------------------------------------------------------------
+  // massToKg / massToGrams / volumeToLiters are defensive: invalid inputs
+  // return null. litersToUsGallons / kgToLb are NOT defensive: they
+  // perform a single division and propagate whatever number comes in
+  // (NaN -> NaN, Infinity -> Infinity, negatives -> negatives). Pinned
+  // here so a "make everything defensive by default" refactor surfaces
+  // explicitly rather than silently changing return shape.
+  describe("non-defensive helpers (litersToUsGallons / kgToLb)", () => {
+    it("litersToUsGallons returns NaN for NaN input (does not return null)", () => {
+      expect(Number.isNaN(litersToUsGallons(NaN))).toBe(true);
+    });
+
+    it("litersToUsGallons returns Infinity for Infinity input (does not return null)", () => {
+      expect(litersToUsGallons(Infinity)).toBe(Infinity);
+    });
+
+    it("kgToLb returns NaN for NaN input (does not return null)", () => {
+      expect(Number.isNaN(kgToLb(NaN))).toBe(true);
+    });
+
+    it("kgToLb passes through zero", () => {
+      expect(kgToLb(0)).toBe(0);
+      expect(litersToUsGallons(0)).toBe(0);
+    });
+  });
+
+  // ---------------------------------------------------------------------
+  // Strict-string unit matching
+  // ---------------------------------------------------------------------
+  // The guards use strict equality (===) on the unit string. They do NOT
+  // lowercase, trim, or accept aliases. Pinned here so a future
+  // "case-insensitive units" / "alias support" refactor surfaces
+  // explicitly rather than silently changing what payloads we accept.
+  describe("isMassUnitV1 / isVolumeUnitV1 strict-string matching", () => {
+    it("rejects uppercase / mixed-case mass units", () => {
+      for (const u of ["KG", "Kg", "LB", "G", "Oz"]) {
+        expect(isMassUnitV1(u)).toBe(false);
+      }
+    });
+
+    it("rejects whitespace-padded mass units", () => {
+      for (const u of [" kg", "kg ", " kg "]) {
+        expect(isMassUnitV1(u)).toBe(false);
+      }
+    });
+
+    it("rejects uppercase / aliased volume units", () => {
+      for (const u of ["L", "ML", "GAL", "gallon", "liter", "litre"]) {
+        expect(isVolumeUnitV1(u)).toBe(false);
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------
+  // massToKg / volumeToLiters: empty + non-string unit guards
+  // ---------------------------------------------------------------------
+  // Pinned because the early-return `return null` for unknown units is
+  // the only place these helpers reject undefined / number / object
+  // units. Without these tests, a refactor that adds `String(unit)`
+  // coercion could silently change behavior for callers that pass
+  // unexpected types.
+  describe("non-string unit inputs", () => {
+    it("massToKg returns null for undefined / number / object unit", () => {
+      expect(massToKg(1, undefined)).toBeNull();
+      expect(massToKg(1, 0)).toBeNull();
+      expect(massToKg(1, {})).toBeNull();
+    });
+
+    it("volumeToLiters returns null for undefined / number / object unit", () => {
+      expect(volumeToLiters(1, undefined)).toBeNull();
+      expect(volumeToLiters(1, 0)).toBeNull();
+      expect(volumeToLiters(1, {})).toBeNull();
+    });
+  });
+});

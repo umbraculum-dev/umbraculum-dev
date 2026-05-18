@@ -23,4 +23,23 @@ describe("roundTo", () => {
     expect(Number.isNaN(roundTo(Infinity, 2))).toBe(true);
     expect(Number.isNaN(roundTo("1.5", 2))).toBe(true);
   });
+
+  // Pinned (Phase 5a): JavaScript's Math.round breaks ties toward +Infinity
+  // (NOT half-away-from-zero, NOT banker's rounding). After the EPSILON
+  // nudge (which shifts toward +Inf by ~1 ULP), this means negative .5
+  // values round toward zero. This is the current contract; callers that
+  // need symmetric rounding around zero must do it themselves.
+  it("breaks ties toward +Infinity for negative half-values", () => {
+    expect(roundTo(-1.5, 0)).toBe(-1);
+    expect(roundTo(-2.5, 0)).toBe(-2);
+  });
+
+  it("handles negative inputs at higher decimal places", () => {
+    expect(roundTo(-1.2345, 3)).toBeCloseTo(-1.234, 10);
+  });
+
+  it("returns zero for zero input regardless of decimals", () => {
+    expect(roundTo(0, 0)).toBe(0);
+    expect(roundTo(0, 5)).toBe(0);
+  });
 });
