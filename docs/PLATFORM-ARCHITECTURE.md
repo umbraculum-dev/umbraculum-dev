@@ -338,6 +338,8 @@ This preserves the self-host path and avoids v0 chargeback / VAT / provider-cost
 
 ### 4.4 Module registration pattern
 
+The SDK shape sketched below is the *mechanism*; the *governance* around it — the canonical-module rule, reserved-code allocation, tier model, mini-RFC promotion procedure, and horizontal-platform-services consumption contract — is committed in [RFC-0001 — Modules, tiers, governance, and automation placement](rfcs/0001-modules-tiers-governance-and-automation-placement.md).
+
 Sketch (TypeScript pseudocode — not a code spec, just shape):
 
 ```ts
