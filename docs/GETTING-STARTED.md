@@ -128,18 +128,125 @@ doc — but Cursor is the primary supported path.
 
 ### 1.4 Git config + DCO sign-off
 
-Set your identity and turn on automatic DCO sign-off:
+Set your identity:
 
 ```bash
 git config --global user.name "Your Real Name"
 git config --global user.email "you@your-real-email.example"
-git config --global format.signOff true
 ```
 
-The `format.signOff true` flag adds a `Signed-off-by:` trailer to every
-commit automatically. DCO sign-off is **required on every commit** — see
-[`CONTRIBUTING.md`](../CONTRIBUTING.md) §"Developer Certificate of Origin
-(DCO)" for the full text + rationale.
+DCO sign-off (a `Signed-off-by:` trailer on every commit) is **required**
+in this project — see [`CONTRIBUTING.md`](../CONTRIBUTING.md) §"Developer
+Certificate of Origin (DCO)" for the full text + rationale. Setting this
+up correctly is more subtle than most OSS docs admit, so read this
+sub-section carefully even if you've configured DCO before.
+
+#### What does NOT work (the common trap)
+
+Many guides recommend:
+
+```bash
+git config --global format.signOff true   # MISLEADING — see below
+```
+
+The `format.signOff` config **only applies to `git format-patch`** (the
+patch-by-email workflow used by e.g. the Linux kernel). It does **nothing
+for `git commit`** — commits made after setting it will still **not**
+carry the `Signed-off-by:` trailer. There is no equivalent `commit.*`
+config in standard git. Multiple blog posts and Stack Overflow answers
+propagate this misunderstanding; do not trust them.
+
+#### What DOES work
+
+The reliable mechanisms are:
+
+1. **A `prepare-commit-msg` hook in `<repo>/.git/hooks/`** (per-clone;
+   recommended for this project).
+2. **A `core.hooksPath` config pointing at a committed hook directory**
+   (shared across clones including Cursor worktrees; the "permanent fix" —
+   not yet adopted by this repo, on the roadmap).
+3. **Typing `git commit -s` every time** (error-prone; one missed `-s` =
+   one unsigned commit).
+
+For umbraculum-dev, install the per-clone hook from option 1:
+
+```bash
+cat > "$(git rev-parse --show-toplevel)/.git/hooks/prepare-commit-msg" <<'HOOK'
+#!/bin/sh
+# Auto-append Signed-off-by trailer if missing (umbraculum DCO gate).
+# Reads GIT_COMMITTER_IDENT (= user.name + user.email) for the signer.
+# No-op on merge / squash commits.
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+
+case "$COMMIT_SOURCE" in
+  merge|squash) exit 0 ;;
+esac
+
+if grep -qiE "^Signed-off-by: " "$COMMIT_MSG_FILE"; then
+  exit 0
+fi
+
+SOB=$(git var GIT_COMMITTER_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+[ -z "$SOB" ] && exit 0
+
+if [ -s "$COMMIT_MSG_FILE" ] && [ -n "$(tail -c 1 "$COMMIT_MSG_FILE")" ]; then
+  printf '\n' >> "$COMMIT_MSG_FILE"
+fi
+printf '\n%s\n' "$SOB" >> "$COMMIT_MSG_FILE"
+HOOK
+
+chmod +x "$(git rev-parse --show-toplevel)/.git/hooks/prepare-commit-msg"
+```
+
+Run that command **once per clone** of `umbraculum-dev` (and once per
+clone of any other DCO-required umbraculum repo you contribute to). The
+`$(git rev-parse --show-toplevel)` expansion auto-detects the repo root,
+so you can paste-and-run from anywhere inside the clone.
+
+#### Verifying
+
+After installing the hook, verify it works on an empty test commit
+(**make sure your working tree and index are clean first** — see the
+sharp-edge note below):
+
+```bash
+git status               # must show "nothing to commit, working tree clean"
+git commit --allow-empty -m "test: DCO hook verification"
+git log -1 --format='%(trailers:only=true,key=Signed-off-by)'
+# Expect: Signed-off-by: Your Real Name <you@your-real-email.example>
+
+# Clean up the test commit (resets HEAD back one — only safe because
+# we just made it and have not pushed)
+git reset --hard HEAD~1
+```
+
+> [!WARNING]
+> **Sharp edge — do NOT run the verification with uncommitted work in
+> your index.** `git commit --allow-empty -m "..."` sweeps up any staged
+> changes into the test commit. If you have work in progress, either
+> `git stash -u` first (and `git stash pop` after), or run the
+> verification on a freshly cloned repo where nothing is staged.
+
+#### Cursor worktree caveat
+
+The hook lives in `<repo>/.git/hooks/`, which is **per-clone**. Cursor
+agent worktrees are separate clones (under `~/.cursor/worktrees/...`)
+and do **not** inherit the hook from your canonical clone. A planned
+rule in the umbraculum-toolset Cursor plugin pack (provisional id
+`umbraculum-toolset-common/rules/42-dco-signoff-gate.mdc` — **not yet
+shipped**, on the same roadmap as the `core.hooksPath` migration below)
+will detect the missing hook in a fresh Cursor worktree and prompt you
+with the install command, so you will not have to remember this. Until
+that rule lands, the install discipline is manual: when you open a
+fresh Cursor worktree, paste-and-run the install command from this
+section in the worktree path.
+
+A future revision of this guide will adopt `core.hooksPath` + a
+committed hook script (option 2 above) so the worktree caveat disappears
+entirely. Until that lands, the per-clone install is the canonical
+path.
 
 ---
 
@@ -310,9 +417,19 @@ git add docs/GETTING-STARTED.md
 git commit -m "docs: fix typo in getting-started"
 ```
 
-If you set `git config --global format.signOff true` in §1.4, the
-`Signed-off-by:` trailer is added automatically. Verify with
-`git log -1`.
+If you installed the `prepare-commit-msg` hook in §1.4, the
+`Signed-off-by:` trailer is appended automatically to every commit
+(including this one). Verify with:
+
+```bash
+git log -1 --format='%(trailers:only=true,key=Signed-off-by)'
+# Expect: Signed-off-by: Your Real Name <you@your-real-email.example>
+```
+
+If the trailer is missing, the hook is either not installed or not
+executable for this clone — re-run the install command from §1.4 and
+amend the commit with `git commit --amend --no-edit` (the hook fires on
+amend too).
 
 Commit messages: imperative subject ≤ 72 chars; body explains *why*. See
 [`CONTRIBUTING.md`](../CONTRIBUTING.md) §"Commit messages".

@@ -75,12 +75,20 @@ not a CLA. Every commit MUST include a `Signed-off-by` trailer:
 Signed-off-by: Jane Doe <jane@example.com>
 ```
 
-The easiest way to add it is `git commit --signoff` (or `git commit -s`).
-You can also configure git to add it automatically:
+The easiest way to add it is `git commit --signoff` (or `git commit -s`)
+on every commit. For an **automatic, set-and-forget** approach, install
+the `prepare-commit-msg` hook described in
+[`docs/GETTING-STARTED.md`](./docs/GETTING-STARTED.md) §1.4 — once
+installed in your clone, every commit auto-receives the trailer.
 
-```bash
-git config --global format.signOff true
-```
+> [!WARNING]
+> Do **not** rely on `git config --global format.signOff true` as the
+> sole DCO mechanism. The `format.signOff` config applies **only to
+> `git format-patch`**; it does **nothing** for `git commit`. This is
+> the single most common DCO misconfiguration — see
+> [`docs/GETTING-STARTED.md`](./docs/GETTING-STARTED.md) §1.4 for the
+> reliable mechanisms (`prepare-commit-msg` hook, `core.hooksPath` +
+> committed hook, or sustained manual `-s`).
 
 By signing off, you certify that:
 
