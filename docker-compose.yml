@@ -113,7 +113,7 @@ services:
       - ./packages/core:/packages/core:ro
       - ./packages/media:/packages/media:ro
       # Phase B-1: api consumes @brewery/module-sdk via registerModule()
-      # and @brewery/automation-contracts for the typed mailbox mirror.
+      # and @umbraculum/automation-contracts for the typed mailbox mirror.
       # Both packages already follow the file:../../packages/<name> npm
       # workspace convention; the symlink at node_modules/@brewery/<name>
       # resolves to /packages/<name>, which requires these bind mounts.

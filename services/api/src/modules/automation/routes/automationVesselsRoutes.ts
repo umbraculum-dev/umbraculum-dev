@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   VesselListResponseSchema,
   VesselStateResponseSchema,
-} from "@brewery/automation-contracts";
+} from "@umbraculum/automation-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { VesselsService } from "../services/vesselsService.js";
@@ -28,7 +28,7 @@ const VesselCodeParamsSchema = z.object({
  * Response shapes are pinned via `VesselListResponseSchema` /
  * `VesselStateResponseSchema` — clients consume the inferred
  * `VesselListResponse` / `VesselStateResponse` types from
- * `@brewery/automation-contracts`.
+ * `@umbraculum/automation-contracts`.
  *
  * Phase C adds: `POST /automation/vessels` (create), `PATCH
  * /automation/vessels/:code` (update mode/target temp), and the adapter

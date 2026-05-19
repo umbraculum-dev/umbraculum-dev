@@ -4,7 +4,7 @@ import {
   MAILBOX_SPEC,
   VesselSnapshotSchema,
   type AdapterReadContext,
-} from "@brewery/automation-contracts";
+} from "@umbraculum/automation-contracts";
 
 import { MOCK_ADAPTER_KIND, createMockAdapter } from "./mockAdapter.js";
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Wire-level contract version of `@brewery/automation-contracts`.
+ * Wire-level contract version of `@umbraculum/automation-contracts`.
  *
  * Tracks the OpenPLC sister-repo integrated release tag (semver-shaped),
  * which is the only existing baseline that fits semver. The sister-repo

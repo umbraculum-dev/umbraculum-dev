@@ -15,7 +15,7 @@
     "i18n:guardrail": "node scripts/i18n-guardrail.mjs"
   },
   "dependencies": {
-    "@brewery/automation-contracts": "file:../../packages/automation-contracts",
+    "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
     "@brewery/beerjson": "file:../../packages/beerjson",
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/core": "file:../../packages/core",

@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slots 1–3 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`); slots 4–14 pending serial execution. Recipe upgraded again at slot 3: `docker compose restart api` replaced by STOP → host-install → START sequence (see plan doc §4 step 4b).
+**Status:** Active 2026-05-19 — slots 1–4 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`); slots 5–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). Net effect: shorter, more robust recipe than the post-slot-3 version.
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -182,45 +182,62 @@ Doc references:
 
 ## Slot 4 — `@brewery/automation-contracts` → `@umbraculum/automation-contracts`
 
-**Status:** Pending.
+**Status:** **Done 2026-05-19** (commit hash recorded in the slot-4 commit message; the slot that finally isolated the build-script `npm ci` as the real devDep pruner — see plan doc §6.3).
 
-**Target + classification.** Platform (canonical-module contracts). Vessel-agnostic mailbox + adapter contracts. Already self-declares end-state name in its `package.json` description.
+**Target + classification.** Platform (canonical-module contracts, NOT brewery-vertical — vessel-agnostic). Already self-declared end-state name in its `package.json` description (cleaned up to current-state during the rename).
 
 **Hard stops.**
 
-- [`docs/design/openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) §1 + §7 reference the old name when describing what the sister-repo emitter pairs with — update both mentions. The sister repo itself does NOT import this package (plan doc §2.3); doc references are the only sister-side change.
-- The package's own [`packages/automation-contracts/src/version.ts`](../../packages/automation-contracts/src/version.ts) carries `CONTRACT_VERSION` constants — verify they aren't accidentally bumped during the rename.
+- [`docs/design/openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) §1 + §7 reference the old name when describing what the sister-repo emitter pairs with — both updated. Sister repo emits JSON-only artifacts and does NOT import this package (plan doc §2.3); doc references were the only sister-side change.
+- [`packages/automation-contracts/src/version.ts`](../../packages/automation-contracts/src/version.ts) carries `CONTRACT_VERSION = "2.0.1-dev"` — verified NOT bumped during the rename; only its JSDoc reference text was retitled.
 
 **File inventory.**
 
 Workspace name + own files:
-- [ ] [`packages/automation-contracts/package.json`](../../packages/automation-contracts/package.json) — `name` field (description already declares end-state — verify and clean up the "End-state" sentence to current-state).
-- [ ] [`packages/automation-contracts/README.md`](../../packages/automation-contracts/README.md).
-- [ ] [`packages/automation-contracts/src/version.ts`](../../packages/automation-contracts/src/version.ts).
+- [x] [`packages/automation-contracts/package.json`](../../packages/automation-contracts/package.json) — `name` field + description cleanup (removed "End-state npm scope: ..." sentence, replaced with "Renamed from ... as sub-plan #9 slot 4").
+- [x] [`packages/automation-contracts/README.md`](../../packages/automation-contracts/README.md) — heading + sub-plan note + 3 npm command references (`-w @umbraculum/automation-contracts`).
+- [x] [`packages/automation-contracts/src/version.ts`](../../packages/automation-contracts/src/version.ts) — JSDoc reference only; `CONTRACT_VERSION` constant value preserved at `"2.0.1-dev"`.
+
+Build configs:
+- [x] **[`package.json`](../../package.json)** (root) — `scripts.build:packages` (`-w @brewery/automation-contracts` → `-w @umbraculum/automation-contracts`). Per slot-2 HARD STOP.
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`services/api/package.json`](../../services/api/package.json).
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`services/api/package.json`](../../services/api/package.json).
 
-Source imports:
-- [ ] [`apps/web/app/[locale]/(automation)/page.tsx`](../../apps/web/app/[locale]/(automation)/page.tsx).
-- [ ] [`apps/web/app/[locale]/(automation)/[vesselCode]/page.tsx`](../../apps/web/app/[locale]/(automation)/[vesselCode]/page.tsx).
-- [ ] [`services/api/src/modules/automation/adapters/mockAdapter.ts`](../../services/api/src/modules/automation/adapters/mockAdapter.ts).
-- [ ] [`services/api/src/modules/automation/adapters/mockAdapter.test.ts`](../../services/api/src/modules/automation/adapters/mockAdapter.test.ts).
-- [ ] [`services/api/src/modules/automation/services/vesselsService.ts`](../../services/api/src/modules/automation/services/vesselsService.ts).
-- [ ] [`services/api/src/modules/automation/routes/automationVesselsRoutes.ts`](../../services/api/src/modules/automation/routes/automationVesselsRoutes.ts).
-- [ ] [`services/api/src/services/ai/tools/automation/listVessels.ts`](../../services/api/src/services/ai/tools/automation/listVessels.ts).
-- [ ] [`services/api/src/services/ai/tools/automation/vesselState.ts`](../../services/api/src/services/ai/tools/automation/vesselState.ts).
+Source imports (7 total — 2 web + 5 api):
+- [x] [`apps/web/app/[locale]/(automation)/page.tsx`](../../apps/web/app/[locale]/(automation)/page.tsx).
+- [x] [`apps/web/app/[locale]/(automation)/[vesselCode]/page.tsx`](../../apps/web/app/[locale]/(automation)/[vesselCode]/page.tsx).
+- [x] [`services/api/src/modules/automation/adapters/mockAdapter.ts`](../../services/api/src/modules/automation/adapters/mockAdapter.ts).
+- [x] [`services/api/src/modules/automation/adapters/mockAdapter.test.ts`](../../services/api/src/modules/automation/adapters/mockAdapter.test.ts).
+- [x] [`services/api/src/modules/automation/services/vesselsService.ts`](../../services/api/src/modules/automation/services/vesselsService.ts).
+- [x] [`services/api/src/modules/automation/routes/automationVesselsRoutes.ts`](../../services/api/src/modules/automation/routes/automationVesselsRoutes.ts) — both the `import` and a JSDoc reference.
+- [x] [`services/api/src/services/ai/tools/automation/listVessels.ts`](../../services/api/src/services/ai/tools/automation/listVessels.ts).
+- [x] [`services/api/src/services/ai/tools/automation/vesselState.ts`](../../services/api/src/services/ai/tools/automation/vesselState.ts).
 
 Other:
-- [ ] [`docker-compose.yml`](../../docker-compose.yml) — comments + any bind-mount references.
-- [ ] [`services/api/prisma/schema.prisma`](../../services/api/prisma/schema.prisma) — comment-only reference.
+- [x] [`docker-compose.yml`](../../docker-compose.yml) — line 116 comment.
+- [x] [`services/api/prisma/schema.prisma`](../../services/api/prisma/schema.prisma) — line 1330 comment; also cleaned up the parenthetical "(npm scope rename ... deferred to sub-plan #9)" since the rename is now done.
 
 Doc references:
-- [ ] [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md).
-- [ ] [`docs/design/openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) — sister-repo handoff doc; preserves sister-side contract.
+- [x] [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) — §12.2-area mention of the handshake source-of-truth package.
+- [x] [`docs/design/openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) — §1 "Pairs with" + §7 mirror description (slot-4-specific HARD STOP).
 
-**Verification + commit.** Plan doc §4 steps 4–7. Sister-repo coordination: doc-only (no sister-side code change).
+**Verification + commit.** Plan doc §4 steps 1–7 (with new STOP-build-install-START sequence) — all green:
+- Preflight skill: matched handoff inventory exactly; 18 hits, classification=platform, HARD-STOPS=2 (root build:packages + CONTRACT_VERSION not-bumped check), no `bin:`, no transpile/metro touch.
+- `CONTRACT_VERSION` constant unchanged at `"2.0.1-dev"`.
+- Lockfile diff: 14 lines, scoped to `@brewery/automation-contracts` → `@umbraculum/automation-contracts` rename.
+- API health: `{"ok":true}` post STOP-build-install-START sequence.
+- `scripts/build-packages-in-docker.sh`: green; `@umbraculum/automation-contracts@0.0.0` built single entrypoint (`dist/index.{js,cjs,d.ts,d.cts}`).
+- `npm run typecheck` (api): green.
+- `npm run test -- --run` (api): 413 tests pass, 51 test files (vitest baseline preserved — includes the rename-affected `mockAdapter.test.ts`).
+- Nginx smoke (`/api/health`, `/en/login`, `/en`, `/en/recipes`, `/en/equipment`, `/en/automation`): all HTTP 200. The `/en/automation` page renders the vessels list backed by `@umbraculum/automation-contracts` types end-to-end.
+
+**Lessons for slots 5–14** (folded back into plan doc §4 step 5 + §5 BEFORE the commit):
+
+1. **Step 4b's per-container api install was REMOVED** — step 5 wipes api devDeps anyway via the build script's `npm ci`, so any earlier install is wasted. Step 4b now only handles the web container's in-place reinstall.
+2. **Step 5 is now a STOP-build-install-START sequence:** `docker compose stop api` → `bash scripts/build-packages-in-docker.sh` → host one-shot `npm install --include=dev` into api bind-mount → `docker compose start api` → verify `/api/health`. The api container is OUT of the picture during the build; tsx watch cannot crash on the build's unlink events because tsx isn't running.
+3. **Recipe is now substantially shorter and more robust** than the post-slot-3 version. Slots 5–14 are expected to run cleanly on the first attempt provided the preflight skill identifies the inventory.
 
 ---
 

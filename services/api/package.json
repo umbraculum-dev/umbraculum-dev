@@ -28,7 +28,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
     "@beerjson/beerjson": "^1.0.2",
-    "@brewery/automation-contracts": "file:../../packages/automation-contracts",
+    "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/core": "file:../../packages/core",
     "@brewery/module-sdk": "file:../../packages/module-sdk",

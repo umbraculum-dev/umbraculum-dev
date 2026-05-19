@@ -3,7 +3,7 @@ import {
   type AdapterReadContext,
   type AutomationAdapterDefinition,
   type VesselSnapshot,
-} from "@brewery/automation-contracts";
+} from "@umbraculum/automation-contracts";
 
 /**
  * Phase B-2 mock adapter — deterministic `AutomationAdapterDefinition`

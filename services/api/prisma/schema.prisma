@@ -1327,10 +1327,10 @@ model AiUsageLedger {
 // Upgrade to a formal cross-schema @relation deferred to the H1 2027 brewery
 // canonical-layout migration tranche per RFC-0002 Decision D.
 //
-// Adapter contract types live in @brewery/automation-contracts (npm scope rename
-// to @umbraculum/* per RFC-0002 deferred to sub-plan #9). The Prisma models
-// reference adapter kinds and contract versions as plain strings; type-level
-// validation is at the service layer.
+// Adapter contract types live in @umbraculum/automation-contracts (renamed from
+// @brewery/automation-contracts as sub-plan #9 slot 4 on 2026-05-19 per RFC-0002
+// Decision C). The Prisma models reference adapter kinds and contract versions as
+// plain strings; type-level validation is at the service layer.
 // =============================================================================
 
 /// Runtime physical instance owned by the automation module.

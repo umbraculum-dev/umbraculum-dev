@@ -1,7 +1,7 @@
 import type { AiTool } from "@brewery/contracts";
 import type { PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { type VesselState } from "@brewery/automation-contracts";
+import { type VesselState } from "@umbraculum/automation-contracts";
 
 import { VesselsService } from "../../../../modules/automation/services/vesselsService.js";
 

@@ -6,7 +6,7 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 import {
   VesselListResponseSchema,
   type VesselState,
-} from "@brewery/automation-contracts";
+} from "@umbraculum/automation-contracts";
 
 import { Link } from "../../../src/i18n/navigation";
 import { ErrorBox } from "../../_components/recipe-edit";

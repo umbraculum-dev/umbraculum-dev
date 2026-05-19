@@ -1,9 +1,9 @@
-# @brewery/automation-contracts
+# @umbraculum/automation-contracts
 
 Phase A surface of the canonical `automation` module: typed Modbus mailbox spec, adapter SDK contract, and contract-version handshake.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md). End-state npm name: `@umbraculum/automation-contracts` per [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md); monorepo scope remains `@brewery/*` until sub-plan #9 ([`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10).
+> Part of [Umbraculum](../../README.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 4 (2026-05-19) per [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision C; see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). The sister repo (`brewery-alarms-tanks-supervisor`) emits JSON-only mailbox artifacts and does not import this package, so the rename was doc-only on the sister side.
 
 ## What this is
 
@@ -59,9 +59,9 @@ Never hand-edit `data/mailbox.json`. Bump `CONTRACT_VERSION` in `src/version.ts`
 
 From repo root (see [`DEVELOPMENT.md`](../../DEVELOPMENT.md) — run Node/npm inside the project container, not on the host):
 
-- **Build**: `npm run build -w @brewery/automation-contracts`
-- **Test**: `npm run test -w @brewery/automation-contracts`
-- **Typecheck**: `npm run typecheck -w @brewery/automation-contracts`
+- **Build**: `npm run build -w @umbraculum/automation-contracts`
+- **Test**: `npm run test -w @umbraculum/automation-contracts`
+- **Typecheck**: `npm run typecheck -w @umbraculum/automation-contracts`
 
 ## Cross-references
 

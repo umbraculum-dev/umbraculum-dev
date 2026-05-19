@@ -1,8 +1,8 @@
 {
-  "name": "@brewery/automation-contracts",
+  "name": "@umbraculum/automation-contracts",
   "private": true,
   "version": "0.0.0",
-  "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Phase A surface per docs/design/canonical-automation-module-surface.md §9. End-state npm scope: @umbraculum/automation-contracts per RFC-0002.",
+  "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic platform contract; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. Phase A surface per docs/design/canonical-automation-module-surface.md §9. Renamed from @brewery/automation-contracts as sub-plan #9 slot 4 (2026-05-19) per RFC-0002 Decision C.",
   "type": "module",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",

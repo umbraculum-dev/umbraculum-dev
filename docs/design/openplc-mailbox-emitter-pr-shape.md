@@ -4,7 +4,7 @@
 **Status:** Draft 2026-05-19 — handoff to OpenPLC sister-repo maintainer
 **Audience:** OpenPLC sister-repo maintainer (project lead is the same person as the platform `automation` module owner; this doc exists so the work can be picked up later without re-deriving context)
 **Builds on:** [`canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12.2 (B1), §12.5 (Phase A entry checklist step 4)
-**Pairs with:** [`@brewery/automation-contracts`](../../packages/automation-contracts/) — the platform mirror that will consume this artifact
+**Pairs with:** [`@umbraculum/automation-contracts`](../../packages/automation-contracts/) — the platform mirror that will consume this artifact (renamed from `@brewery/automation-contracts` as sub-plan #9 slot 4 on 2026-05-19; sister-repo emits JSON-only artifacts so this is a doc-only update on the sister side)
 
 > **Disclaimer.** This document describes the *shape* of the sister-repo PR — what files to emit, how the platform will consume them, and what gates the platform side waits for. It does not specify alarm-layer behavior, PLC ladder structure, or `PI_*` semantic content. Those remain owned by the sister repo.
 
@@ -12,7 +12,7 @@
 
 ## 1. Goal
 
-Replace today's manual / undocumented `PI_*` knowledge with a **machine-readable artifact** the OpenPLC sister repo emits as part of its build, so the platform's `@brewery/automation-contracts` package can mirror it (M2 mechanism per design §12.2).
+Replace today's manual / undocumented `PI_*` knowledge with a **machine-readable artifact** the OpenPLC sister repo emits as part of its build, so the platform's `@umbraculum/automation-contracts` package can mirror it (M2 mechanism per design §12.2).
 
 Outcomes:
 

@@ -2,7 +2,7 @@ import type { PrismaClient, Vessel } from "@prisma/client";
 import {
   VesselStateSchema,
   type VesselState,
-} from "@brewery/automation-contracts";
+} from "@umbraculum/automation-contracts";
 
 import { NotFoundError } from "../../../errors.js";
 import { WorkspacesService } from "../../../services/workspacesService.js";
