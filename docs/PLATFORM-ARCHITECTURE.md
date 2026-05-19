@@ -32,7 +32,7 @@ The brewery vertical is a **showcase** — a reference implementation that demon
 
 ### 1.1.1 Canonical modules are peer domains, not nested under "manufacturing"
 
-The canonical-module set (today: `mrp`, `wms`, `crm`, `crp`, `automation`; future allocations via mini-RFC) is a **flat peer decomposition**, not a hierarchy with "manufacturing" as a top-level umbrella that contains MRP / automation / etc. as sub-modules.
+The canonical-module set (today: `mrp`, `wms`, `crm`, `crp`, `automation`, `pim`; future allocations via mini-RFC) is a **flat peer decomposition**, not a hierarchy with "manufacturing" as a top-level umbrella that contains MRP / automation / etc. as sub-modules.
 
 This is a deliberate choice. The peer-module shape (sometimes called "SAP-style") matches how Drupal, SAP S/4HANA, Salesforce/Force.com, and Odoo decompose their domain coverage. The reasoning:
 

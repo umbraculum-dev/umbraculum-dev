@@ -25,6 +25,7 @@ This directory holds **per-artifact pages** linked from `MODULES.md`. It is inte
 | [`canonical/wms.md`](canonical/wms.md) | **Open door** stub — same. Native-mandatory when shipped. |
 | [`canonical/crm.md`](canonical/crm.md) | **Open door** stub — same. No firm horizon. |
 | [`canonical/crp.md`](canonical/crp.md) | **Open door** stub — same. Co-designed with `mrp`. |
+| [`canonical/pim.md`](canonical/pim.md) | **Open door** stub — code reserved by [RFC-0004](../rfcs/0004-canonical-pim.md) 2026-05-19; β layout pre-committed; surface design + Phase A contracts begin next tranche. |
 | [`verticals/brewery.md`](verticals/brewery.md) | **Shipped — reference vertical** (flat layout today; β migration H1 2027). |
 | [`contribute/README.md`](contribute/README.md) | Contributor entry — picks one of four paths below. |
 | [`contribute/canonical-module.md`](contribute/canonical-module.md) | Allocating a new canonical code (mini-RFC procedure). |

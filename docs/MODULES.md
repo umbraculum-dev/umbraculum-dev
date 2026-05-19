@@ -30,7 +30,7 @@ These five terms are used precisely throughout Umbraculum's docs. They are *not*
 | **package** | An npm artifact under `packages/<name>/` with its own `package.json`. A *publishing and build* unit. Not all packages are modules; horizontal infrastructure packages exist that no module owns. | [`packages/`](../packages/) tree; each package's own `README.md` |
 | **canonical module** | A reserved-domain registered unit, identified by a short `code` from a closed set. Materialized as four coordinated slices (API + web + native + contracts package) sharing the same code. Governance: Tier 1, gated by mini-RFC. | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §3–§4; [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3–§4 |
 | **vertical configuration** | A non-canonical module — same physical β shape (four slices), but its `code` is *not* in the reserved set. Tier 6, permissionless. Consumes canonical modules; never reimplements canonical domains. | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6); [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 |
-| **reserved canonical code** | One of the five strings in `RESERVED_CANONICAL_MODULE_CODES` — currently `mrp`, `wms`, `crm`, `crp`, `automation`. Allocation is gated by mini-RFC; collision in `registerModule()` is a boot error. | [`packages/module-sdk/src/reservedCodes.ts`](../packages/module-sdk/src/reservedCodes.ts) (code-authoritative); [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 (governance-authoritative) |
+| **reserved canonical code** | One of the six strings in `RESERVED_CANONICAL_MODULE_CODES` — currently `mrp`, `wms`, `crm`, `crp`, `automation`, `pim`. Allocation is gated by mini-RFC; collision in `registerModule()` is a boot error. | [`packages/module-sdk/src/reservedCodes.ts`](../packages/module-sdk/src/reservedCodes.ts) (code-authoritative); [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 + [RFC-0004](rfcs/0004-canonical-pim.md) (governance-authoritative) |
 | **module SDK** | The MIT-licensed npm package that defines `registerModule()`, the canonical-code validator, and the `ValidatedSchema<T>` contract. The reusable surface third-party module authors pin. | [`packages/module-sdk/README.md`](../packages/module-sdk/README.md); [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §5 (Decision C); [RFC-0003](rfcs/0003-validation-library-adoption.md) |
 
 **Three quick clarifications people stumble on:**
@@ -47,7 +47,7 @@ Three tables, one per category. Each row links to the artifact's own documentati
 
 ### 3.1 Canonical modules (Tier 1, reserved codes)
 
-The reserved set is closed — the five codes below are it, today. Additions go through the mini-RFC procedure ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 Decision D).
+The reserved set is closed — the six codes below are it, today. Additions go through the mini-RFC procedure ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 Decision D); the most recent allocation is `pim` via [RFC-0004](rfcs/0004-canonical-pim.md) 2026-05-19.
 
 | Code | Status | Surface | License | Page |
 |---|---|---|---|---|
@@ -56,6 +56,7 @@ The reserved set is closed — the five codes below are it, today. Additions go 
 | `wms` | Open door — H2 2027 (native-mandatory) | Warehouse management, stock movements, locations, lots/serials | AGPLv3 | [modules/canonical/wms.md](modules/canonical/wms.md) |
 | `crm` | Open door — no firm horizon | Customer relationships, contacts, accounts, opportunities | AGPLv3 | [modules/canonical/crm.md](modules/canonical/crm.md) |
 | `crp` | Open door — H1 2027 working assumption (paired with `mrp`) | Capacity requirements planning, resource scheduling, work-center load | AGPLv3 | [modules/canonical/crp.md](modules/canonical/crp.md) |
+| `pim` | Open door — surface design + Phase A contracts in next tranche per [RFC-0004](rfcs/0004-canonical-pim.md) | Master product information: products, variants, attribute sets, categories, media, channel + locale overrides (Akeneo / Pimcore class) | AGPLv3 | [modules/canonical/pim.md](modules/canonical/pim.md) |
 
 Note on "open door": the code is reserved and the folder shape is pre-committed by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md). The work to design and ship each module's surface is its own future RFC or design artifact ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §12.4); no implementation exists yet.
 

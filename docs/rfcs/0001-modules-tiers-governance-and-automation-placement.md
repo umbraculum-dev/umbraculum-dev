@@ -14,7 +14,7 @@
 This RFC commits to six decisions and defers one cluster of design work:
 
 - **Decision A — Canonical-module rule.** One canonical module per reserved domain code; extensions register INTO canonical modules; permissionlessness lives below the canonical layer. Structural enforcement via the `code` field in `registerModule()`.
-- **Decision B — Reserved canonical codes.** The authoritative initial set is five peer codes — `mrp`, `wms`, `crm`, `crp`, `automation` — decomposed SAP-style as flat peers, not nested under a single "manufacturing" umbrella. `brewery` is explicitly NOT in this set; it is a tier-6 vertical configuration.
+- **Decision B — Reserved canonical codes.** The authoritative initial set is five peer codes — `mrp`, `wms`, `crm`, `crp`, `automation` — decomposed SAP-style as flat peers, not nested under a single "manufacturing" umbrella. `brewery` is explicitly NOT in this set; it is a tier-6 vertical configuration. *(Extended 2026-05-19 by [RFC-0004](0004-canonical-pim.md) to add `pim` as a sixth peer code; see §4 amendment footer.)*
 - **Decision C — Module tier model.** Six tiers (core canonical / bundled SDK / community / third-party / private / vertical configuration) with rights and obligations per tier. Brewery is the canonical tier-6 example.
 - **Decision D — Governance.** Only canonical-code allocation is gated; tiers 3–6 are permissionless. Promotion to canonical via mini-RFC + core team approval; the mini-RFC checklist must include the consumption-contract confirmation from Decision F.
 - **Decision E — Automation placement.** Automation is promoted to canonical module status. The canonical-module *surface* (data model, adapter contract, AI tools, tier limits) and the brewery-OpenPLC translation are specified in the accepted design [`docs/design/canonical-automation-module-surface.md`](../design/canonical-automation-module-surface.md) (Accepted 2026-05-19). The H2 2026 implementation phasing in that doc preserves the horizon from [`docs/ROADMAP.md`](../ROADMAP.md) as a working assumption.
@@ -57,13 +57,14 @@ This is the hardest decision to retrofit later — once two community modules sh
 
 ## 4. Decision B — Reserved canonical codes (commit)
 
-The authoritative initial set of reserved canonical codes is **five peer codes**:
+The authoritative initial set of reserved canonical codes is **five peer codes** (extended to **six** on 2026-05-19 by [RFC-0004](0004-canonical-pim.md) — see §4 amendment footer):
 
 - `mrp` — material requirements planning, production planning, work orders.
 - `wms` — warehouse management, stock movements, locations, lots / serials.
 - `crm` — customer relationships, contacts, accounts, opportunities, customer-facing orders.
 - `crp` — capacity requirements planning, resource scheduling, work-center load.
 - `automation` — workspace-scoped runtime control surface for physical equipment, telemetry, alarms, setpoints. (Surface design deferred per Decision E.)
+- `pim` — master product information management: products, variants, attribute sets, categories, media assets, channel and locale overrides. Vertical-agnostic by design (Akeneo / Pimcore / Salsify class). *(Allocated by [RFC-0004](0004-canonical-pim.md) 2026-05-19 per Decision D mini-RFC procedure.)*
 
 `brewery` is NOT in this set. Brewery is a tier-6 vertical configuration consuming the canonical-module surface plus brewery-specific seed data (BJCP styles, BeerJSON, hop bitterness math, water chemistry), brewery-specific prompts, and brewery-specific UI flows. Treating brewery as a canonical module would be the category mistake [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §1.1.1 names: *"the same shape as building a CRM for a hotel and calling it Hotel instead of CRM."* The hotel is the vertical; the CRM is the canonical domain. The same applies here: brewery is the vertical; production planning, inventory, capacity, customer relationships, and automation are the canonical domains.
 
@@ -103,6 +104,8 @@ These clarifications are not changes to Decision A or Decision B. They refine §
 
 *§4.2 + §4.3 watch list and clarifications added 2026-05-19 (non-substantive amendment; no change to Decisions A–F; informational framing only).*
 
+*§4 reserved-code set extended from five to six on 2026-05-19 by [RFC-0004](0004-canonical-pim.md) (Decision D mini-RFC allocating `pim`). Decision B's commitment ("the authoritative initial set is five peer codes") describes RFC-0001's initial allocation at acceptance time; subsequent allocations via the Decision D mini-RFC procedure are recorded here. Body text in this section reflects the current set; the historical record of the initial five is preserved by the "(extended to six on …)" parenthetical on each enumeration.*
+
 ---
 
 ## 5. Decision C — Module tier model (commit)
@@ -111,7 +114,7 @@ Six tiers, with rights and obligations declared explicitly. Tier 1 (core canonic
 
 | Tier | Name | Allocation | License | Example |
 |---|---|---|---|---|
-| 1 | Core canonical | Gated (mini-RFC + core team approval per Decision D) | AGPLv3 (per [`docs/LICENSING.md`](../LICENSING.md) §6) | `mrp`, `wms`, `crm`, `crp`, `automation` |
+| 1 | Core canonical | Gated (mini-RFC + core team approval per Decision D) | AGPLv3 (per [`docs/LICENSING.md`](../LICENSING.md) §6) | `mrp`, `wms`, `crm`, `crp`, `automation`, `pim` |
 | 2 | Bundled SDK / contracts | Maintained by core team | MIT (per [`docs/LICENSING.md`](../LICENSING.md) §6.2) | `@umbraculum/module-sdk`, `@umbraculum/ai-tool-sdk`, `@umbraculum/api-client`, `@umbraculum/i18n-keys` |
 | 3 | Community module / extension | Permissionless | Author's choice (MIT-compatible recommended) | A community-built integration, an open-source vertical configuration |
 | 4 | Third-party vendor module | Permissionless | Commercial / proprietary OK (modules build on the MIT SDK) | A commercial vertical-specific add-on; a vendor's pre-built BI dashboards |
