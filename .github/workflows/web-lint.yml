@@ -62,6 +62,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}:/repo" \
             -w /repo \
+            -e NODE_OPTIONS='--max-old-space-size=6144' \
             node:20-slim \
             bash -lc "
               set -e
@@ -69,3 +70,17 @@ jobs:
               echo '--- full lint (HIGH-full: errors block; repo at zero warnings) ---'
               npm run lint
             "
+          # NODE_OPTIONS=--max-old-space-size=6144 surfaced 2026-05-19 after the
+          # sub-plan #9 slot-4 push (commit bd7d147) produced the first CI run
+          # to OOM the type-aware ESLint parser. Root cause is monotonic monorepo
+          # growth: eslint.config.mjs runs the type-aware parser (parserOptions.
+          # projectService with tsconfigRootDir = repo root) across the whole
+          # monorepo (services/api + apps/web + apps/native + packages/*), which
+          # loads the entire TS project graph plus rule contexts for the 12
+          # type-aware rules (promise correctness Tier A + no-unsafe-* Tiers
+          # C-narrow/wide) into a single node process. Default v8 heap (~4 GB)
+          # exceeded → SIGABRT (exit 134). ubuntu-latest runners ship with 7 GB
+          # RAM, so 6 GB v8 heap is safe. Re-evaluate if the lint surface keeps
+          # growing past 100 type-checked files per package average. See
+          # docs/LINTING.md "CI heap budget" subsection for rationale + bump
+          # guidance.

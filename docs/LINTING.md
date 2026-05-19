@@ -795,6 +795,24 @@ The `.github/workflows/web-lint.yml` workflow runs a single ESLint invocation on
 
 Runs inside a `node:20-slim` container to mirror the CI environment exactly. The historical `npm run lint:packages-strict` second step was dropped in Phase 5d (now redundant since the main `lint` is the strict gate).
 
+### CI heap budget
+
+The workflow passes `NODE_OPTIONS=--max-old-space-size=6144` to the node:20-slim container. Surfaced 2026-05-19 after the sub-plan #9 slot-4 push (commit `bd7d147`) produced the first CI run to OOM the type-aware ESLint parser with the default v8 heap (~4 GB):
+
+```
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+Aborted (core dumped)
+Error: Process completed with exit code 134.
+```
+
+**Root cause is monotonic monorepo growth, not a code defect.** `eslint.config.mjs` runs the type-aware parser repo-wide (`parserOptions.projectService` with `tsconfigRootDir` set to the repo root), which loads the entire TypeScript project graph (`services/api/**` + `apps/web/**` + `apps/native/**` + every `packages/*/`) into a single node process — plus rule contexts for all 12 type-aware rules (`no-floating-promises`, `no-misused-promises`, `await-thenable`, `require-await`, `prefer-promise-reject-errors`, `no-implied-eval`, `only-throw-error`, and the five `no-unsafe-*` for the api + web + native scopes). Default v8 old-generation cap (~4 GB) was sufficient at HIGH-full Phase 5 (May 16) but exceeded by sub-plan #9 slot 4 (May 19).
+
+**Why local doesn't hit it:** local editors use `eslint.config.editor.mjs`, which strips the type-aware rules from IDE-level lint (per Phase 5a). When running `npm run lint` locally outside the container, the host machine isn't constrained by node:20-slim's container memory envelope.
+
+**Why 6 GB:** GitHub-hosted `ubuntu-latest` runners ship with 7 GB RAM, so a 6 GB v8 old-generation cap leaves enough headroom for the node runtime + npm + ESLint scaffolding. Re-evaluate the cap if the type-checked file count per package crosses ~100 on average.
+
+**Local fix (if your dev machine starts hitting this):** export the same `NODE_OPTIONS` before running `npm run lint` — `NODE_OPTIONS='--max-old-space-size=6144' npm run lint`. The CI bump is the canonical anchor; copy it locally as needed.
+
 ---
 
 ## Adding a new rule
