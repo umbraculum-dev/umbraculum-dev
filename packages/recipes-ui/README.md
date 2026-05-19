@@ -35,7 +35,7 @@ This package ships runtime-safe JS + types under `dist/**` so it can be consumed
 ## How it fits in
 
 - **Consumed by**: `apps/web` (recipe editor pages, water hub, brew-day flows); `apps/native` (the native recipe surfaces).
-- **Depends on**: `@umbraculum/ui` (primitives), `@brewery/contracts` (typed DTOs / parsers), `@brewery/i18n-react` (localized strings); does **not** depend on Next.js, Expo, React Navigation, or any app-specific API client.
+- **Depends on**: `@umbraculum/ui` (primitives), `@brewery/contracts` (typed DTOs / parsers), `@umbraculum/i18n-react` (localized strings); does **not** depend on Next.js, Expo, React Navigation, or any app-specific API client.
 
 ## Status
 

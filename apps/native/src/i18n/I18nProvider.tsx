@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { ActivityIndicator, View } from "react-native";
 
 import { getSharedMessages, isLocale, type SupportedLocale } from "@umbraculum/i18n";
-import { LocaleProvider } from "@brewery/i18n-react";
+import { LocaleProvider } from "@umbraculum/i18n-react";
 
 import { getDeviceLocale, LOCALE_STORAGE_KEY } from "./locale";
 import { readString, writeString } from "./storage";

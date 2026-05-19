@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import type { RouteId, RouteRef } from "@umbraculum/navigation";
 import { getRouteAvailability } from "@umbraculum/navigation";
 import { Button, Heading, Screen, Text } from "@umbraculum/ui";

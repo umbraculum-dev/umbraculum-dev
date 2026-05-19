@@ -19,7 +19,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@brewery/beerjson": "file:../beerjson",
-    "@brewery/i18n-react": "file:../i18n-react",
+    "@umbraculum/i18n-react": "file:../i18n-react",
     "@umbraculum/ui": "file:../ui",
     "tamagui": "^2.0.0-rc.11"
   },

@@ -13,7 +13,7 @@ import {
 } from "@brewery/beerjson";
 import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";

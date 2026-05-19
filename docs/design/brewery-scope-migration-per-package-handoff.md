@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slots 1–7 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, 6: `brewery-core` — ⚠ TRAP slot held cleanly on first attempt under the §1.3 classification gate, 7: `i18n` — first slot with a controlled **transient cross-scope state** (i18n-react workspace stays named `@brewery/i18n-react` until slot 8 but its imports + dist are fully on `@umbraculum/i18n`)) + **post-slot-7 CI hygiene fix #2** (interlude, plan doc §6.7): isolated three independent local-vs-CI divergence mechanisms (gitignored cross-references, nested-workspace install drift, stale-node_modules bind-mount shadowing) and introduced `scripts/ci-parity-check.sh` so slot operators can reproduce CI's static-analysis jobs in a clean `git archive HEAD` snapshot before pushing. **All slot operators starting slot 8 onward should run `bash scripts/ci-parity-check.sh` as the last step before `git push` — see plan doc §6.7.** Slots 8–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). **Slot 6 added four further refinements**: (a) root `package.json` `test:packages` is a HARD STOP analog of `build:packages` — preflight skill grew Command 6; (b) `.github/workflows/api.yml` workflow step `name:` display strings are a separate HARD STOP class (path globs in `on.push.paths` use filesystem paths — no change; step display names use npm names — must change); (c) slot-5 gotcha refined — only `npm install` (not `npm run <script>`) prunes the api bind-mount; (d) bulk sed should exclude the just-edited `packages/<name>/package.json` whenever step 1's description deliberately contains a historical reference to the old name (TRAP-slot pattern). **Slot 7 added three further refinements**: (a) **NEW HARD STOP** — bulk sed must also exclude the plan doc + handoff doc themselves, because those docs maintain historical "Source name" columns in §1.1 / §1.4 / §3.1 / §4 tables that a naive scope-wide sed will overwrite (slot 5 implicitly avoided this by curating its sed file list; slot 7's Python sed re-included the docs and had to restore 4 cells post-bulk); (b) the "transient cross-scope state" for split packages (i18n / i18n-react, contracts / api-client) is precisely the **workspace name** of the downstream package — its CONTENT (deps + imports + dist) migrates fully in the upstream slot; (c) **substring collision safety re-verified** under the `[^a-zA-Z0-9_-]` regex tail — `@brewery/i18n-react` is NOT matched by the `@brewery/i18n` substitution pattern because `-` is in the negated class. Net effect across slots 1–7: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under heavy slot loads (slot 5), TRAP slot loads (slot 6), and controlled cross-scope transients (slot 7).
+**Status:** Active 2026-05-19 — slots 1–8 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, 6: `brewery-core` — ⚠ TRAP slot held cleanly on first attempt under the §1.3 classification gate, 7: `i18n` — first slot with a controlled **transient cross-scope state**, 8: `i18n-react` — closed slot 7's transient cross-scope state and validated the no-root-install / named-volume native-typecheck pattern as the slot-5-GOTCHA-free default) + **post-slot-7 CI hygiene fix #2** (interlude, plan doc §6.7): isolated three independent local-vs-CI divergence mechanisms (gitignored cross-references, nested-workspace install drift, stale-node_modules bind-mount shadowing) and introduced `scripts/ci-parity-check.sh` so slot operators can reproduce CI's static-analysis jobs in a clean `git archive HEAD` snapshot before pushing — codified into umbraculum-toolset as rule `72-ci-parity-local-vs-ci-divergence.mdc` + skill `ci-parity-local-reproduction` (umbraculum-toolset commit `5748c5b`). **All slot operators starting slot 8 onward should run `bash scripts/ci-parity-check.sh` as the last step before `git push` — see plan doc §6.7.** Slots 9–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). **Slot 6 added four further refinements**: (a) root `package.json` `test:packages` is a HARD STOP analog of `build:packages` — preflight skill grew Command 6; (b) `.github/workflows/api.yml` workflow step `name:` display strings are a separate HARD STOP class (path globs in `on.push.paths` use filesystem paths — no change; step display names use npm names — must change); (c) slot-5 gotcha refined — only `npm install` (not `npm run <script>`) prunes the api bind-mount; (d) bulk sed should exclude the just-edited `packages/<name>/package.json` whenever step 1's description deliberately contains a historical reference to the old name (TRAP-slot pattern). **Slot 7 added three further refinements**: (a) **NEW HARD STOP** — bulk sed must also exclude the plan doc + handoff doc themselves; (b) the "transient cross-scope state" for split packages is precisely the **workspace name** of the downstream package; (c) **substring collision safety re-verified** under the `[^a-zA-Z0-9_-]` regex tail. **Slot 8 added two further refinements**: (a) **NEW PREFERRED PATTERN** — native typecheck via the no-root-install / named-volume mount (`docker run -v "$PWD:/repo" -v brewery_app_root_node_modules:/repo/node_modules -w /repo/apps/native node:20-slim sh -c 'PATH="/repo/node_modules/.bin:$PATH" npm run typecheck'`) AVOIDS the slot-5 GOTCHA entirely — ~6s instead of ~60s, and api is provably unaffected; the older `cd /repo && npm install ...` pattern stays as a cold-start fallback; (b) **substring-collision sanity check expanded from 2-cousin to 4-cousin** — explicit verbiage in plan doc §4 step 3 now covers longer-prefix + shorter-prefix + just-renamed-sibling-in-new-scope + export-subpath cousins. Net effect across slots 1–8: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under heavy slot loads (slot 5), TRAP slot loads (slot 6), and controlled cross-scope transients (slots 7 + 8).
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -428,49 +428,70 @@ Hard stops (preflight commands 5–7 from updated skill):
 
 ## Slot 8 — `@brewery/i18n-react` → `@umbraculum/i18n-react`
 
-**Status:** Pending. **Depends on slot 7 (`@brewery/i18n` already renamed; landed 2026-05-19).**
+**Status:** Done 2026-05-19. Commit hash pending in §6.8 of [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) (look there for the canonical SHA + execution notes).
 
-**Target + classification.** Platform. Universal `useT` hook (web + native).
+**Target + classification.** Platform. Universal `useTranslator` hook (web + native) + LocaleProvider context + dual entry points (default + `./next-intl`).
 
-**Hard stops.**
+**Pre-execution hard stops (recorded so future slot leads can sanity-check the preflight checklist against this slot).**
 
-- Predecessor: slot 7 must have shipped. If it hasn't, this slot's `package.json` would still reference `@umbraculum/i18n` (stale) — typecheck will fail.
-- The package has two exports (`./index`, `./next-intl`) — both `dist/*.{js,cts,d.ts}` must rebuild.
+- Predecessor: slot 7 (`@brewery/i18n` → `@umbraculum/i18n`) shipped 2026-05-19 — confirmed in slot 8 preflight via `grep '"@umbraculum/i18n"' packages/i18n-react/package.json` returning the pre-existing dep entry (slot 7 had already updated it during the transient-cross-scope handling).
+- Two-entry-point shape: `./` default + `./next-intl` Next.js variant — both `dist/{index,next-intl}.{js,cjs,d.ts,d.cts}` must rebuild. Verified post-step-5: all 8 expected artifacts present in `packages/i18n-react/dist/`.
 
-**File inventory.**
+**File inventory (all checked Done 2026-05-19).**
 
 Workspace name + own files:
-- [ ] [`packages/i18n-react/package.json`](../../packages/i18n-react/package.json) — `name`; description.
-- [ ] [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md).
-- [ ] [`packages/i18n-react/src/index.tsx`](../../packages/i18n-react/src/index.tsx) — internal references.
+- [x] [`packages/i18n-react/package.json`](../../packages/i18n-react/package.json) — `name` → `@umbraculum/i18n-react`; classifying description added (platform; universal hook; no brewery-domain logic).
+- [x] [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md) — heading + brand callout + dual-entry-point examples + cross-link to `@brewery/recipes-ui` (with slot 13 forward-ref) updated.
+- [x] [`packages/i18n-react/src/index.tsx`](../../packages/i18n-react/src/index.tsx) — no internal `@brewery/i18n-react` references found in source (the package doesn't self-import; was already clean).
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
-- [ ] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json).
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json).
 
 Source imports — web:
-- [ ] [`apps/web/app/[locale]/layout.tsx`](../../apps/web/app/[locale]/layout.tsx).
+- [x] [`apps/web/app/[locale]/layout.tsx`](../../apps/web/app/[locale]/layout.tsx).
 
-Source imports — native (~20 screens; run grep from plan doc §4 step 3 and update each):
-- [ ] [`apps/native/src/components/AdSlot.tsx`](../../apps/native/src/components/AdSlot.tsx).
-- [ ] [`apps/native/src/i18n/I18nProvider.tsx`](../../apps/native/src/i18n/I18nProvider.tsx).
-- [ ] [`apps/native/src/navigation/AppNavigator.tsx`](../../apps/native/src/navigation/AppNavigator.tsx).
-- [ ] All `apps/native/src/screens/*.tsx` matching the grep.
+Source imports — native (~20 screens + 3 components/nav/i18n):
+- [x] [`apps/native/src/components/AdSlot.tsx`](../../apps/native/src/components/AdSlot.tsx).
+- [x] [`apps/native/src/i18n/I18nProvider.tsx`](../../apps/native/src/i18n/I18nProvider.tsx).
+- [x] [`apps/native/src/navigation/AppNavigator.tsx`](../../apps/native/src/navigation/AppNavigator.tsx).
+- [x] All `apps/native/src/screens/*.tsx` matching the grep (17 screen files: About, Ai, BlockedRoute, BrewdayStepsSettings, BrewSessionDetail, BrewSessionsList, Contributing, Dashboard, Equipment, FermDataIntegration, Login, RecipeEdit, RecipesList, SelectWorkspace, WaterBoil, WaterHub, WaterMash, WaterProfiles, WaterSparge, Yeast).
 
 Source imports — packages:
-- [ ] [`packages/recipes-ui/src/recipeMeta/RecipeMetaLine.tsx`](../../packages/recipes-ui/src/recipeMeta/RecipeMetaLine.tsx).
-- [ ] [`packages/recipes-ui/src/water/SaltAdditionsEditor.tsx`](../../packages/recipes-ui/src/water/SaltAdditionsEditor.tsx).
-- [ ] [`packages/recipes-ui/src/yeast/ManualCellCountHelpBox.tsx`](../../packages/recipes-ui/src/yeast/ManualCellCountHelpBox.tsx).
-- [ ] [`packages/ui/src/ai/AiChatPanel.tsx`](../../packages/ui/src/ai/AiChatPanel.tsx).
+- [x] [`packages/recipes-ui/src/recipeMeta/RecipeMetaLine.tsx`](../../packages/recipes-ui/src/recipeMeta/RecipeMetaLine.tsx).
+- [x] [`packages/recipes-ui/src/water/SaltAdditionsEditor.tsx`](../../packages/recipes-ui/src/water/SaltAdditionsEditor.tsx).
+- [x] [`packages/recipes-ui/src/yeast/ManualCellCountHelpBox.tsx`](../../packages/recipes-ui/src/yeast/ManualCellCountHelpBox.tsx).
+- [x] [`packages/ui/src/ai/AiChatPanel.tsx`](../../packages/ui/src/ai/AiChatPanel.tsx).
 
 Cross-package README references:
-- [ ] [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+- [x] [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../REACT-NATIVE-KICKOFF-READINESS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../REACT-NATIVE-KICKOFF-READINESS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md), [`docs/MODULES.md`](../MODULES.md), [`docs/modules/contribute/horizontal-package.md`](../modules/contribute/horizontal-package.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7.
+Hard stops (preflight commands 5–7 from updated skill):
+- [x] Root [`package.json`](../../package.json) `build:packages` script (line 20; the second item in the build chain since slot 7 — `npm run build -w @umbraculum/i18n && npm run build -w @brewery/i18n-react && ...`).
+- [x] Root [`package.json`](../../package.json) `test:packages` script — no entry needed for i18n-react (it has no test suite of its own).
+- [x] [`.github/workflows/*.yml`](../../.github/workflows/) workflow step display names — no entries reference `@brewery/i18n-react`.
+- [x] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages` — no `@brewery/i18n-react` entry (next-intl loads bundles via the package's `./next-intl` subpath export, not via transpilePackages).
+- [x] [`apps/native/metro.config.js`](../../apps/native/metro.config.js) — no `@brewery/i18n-react` entry.
+- [x] No `bin` field in [`packages/i18n-react/package.json`](../../packages/i18n-react/package.json) (preflight command 2 PASS — nothing to update in root `node_modules/.bin/` symlinks).
+
+Lockfiles regenerated (cleanly scoped):
+- [x] Root `package-lock.json` — 8/8 lines, ONLY i18n-react entries (workspace name + 2 consumer-side deps + workspace-link entry pair).
+- [x] `apps/web/package-lock.json` — 1 added + 1 removed (symlink swap from `@brewery/i18n-react` to `@umbraculum/i18n-react`).
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing).
+- [x] Root `npm run test:packages` 47/47 (4 test files = 3 from contracts + 1 from brewery-core).
+- [x] Nginx smoke 7/7 HTTP 200 — `/api/health`, `/en/{login,dashboard,recipes}`, `/it/{login,dashboard,recipes}` (both locales exercised through the renamed translator end-to-end).
+- [x] Native typecheck via the **no-root-install / named-volume pattern** — clean; ~6s vs ~60s for the older pattern. api `.bin/` count preserved at 21 (canonical devDep set); api `/api/health` still 200 post-typecheck. Slot-5 GOTCHA fully averted.
+- [x] Final commit message explicitly notes the cleared transient-cross-scope state from slot 7 and the closure of the i18n-stack migration.
+
+**Lessons folded back to plan doc §4 / §5 BEFORE commit:** two lessons recorded (NEW PREFERRED PATTERN — native typecheck via no-root-install / named-volume mount instead of slot-5-GOTCHA-risk recipe; NEW substring-collision verification expanded from 2-cousin to **4-cousin** sanity check covering longer-prefix + shorter-prefix + just-renamed-sibling + export-subpath cases). See plan doc §6.8 for full recap.
 
 ---
 

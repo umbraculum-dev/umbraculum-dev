@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 
 import type { RootStackParamList } from "../navigation/types";

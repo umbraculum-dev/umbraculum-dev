@@ -4,7 +4,7 @@ import { Modal, Pressable, ScrollView, View } from "react-native";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { parseBoilComputeAndSaveResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import type { WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";

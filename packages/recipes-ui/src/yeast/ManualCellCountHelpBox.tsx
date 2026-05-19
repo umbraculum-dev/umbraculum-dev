@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import React, { useState } from "react";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Card, Collapsible, Text } from "@umbraculum/ui";
 import { View, YStack } from "tamagui";
 

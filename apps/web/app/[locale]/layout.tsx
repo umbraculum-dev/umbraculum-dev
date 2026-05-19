@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { getSharedMessages } from "@umbraculum/i18n";
-import { LocaleProvider } from "@brewery/i18n-react";
+import { LocaleProvider } from "@umbraculum/i18n-react";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";

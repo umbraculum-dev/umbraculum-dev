@@ -1,7 +1,7 @@
 import React from "react";
 import { XStack, YStack } from "tamagui";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Input, SelectField, Text } from "@umbraculum/ui";
 
 export type SaltKey = "gypsum" | "calcium_chloride" | "epsom" | "table_salt" | "baking_soda";

@@ -8,7 +8,7 @@ import {
   type NativeStackScreenProps,
 } from "@react-navigation/native-stack";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import type { RouteId } from "@umbraculum/navigation";
 
 import { Spinner } from "@umbraculum/ui";

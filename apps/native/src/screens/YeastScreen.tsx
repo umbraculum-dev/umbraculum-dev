@@ -21,7 +21,7 @@ import {
   type EditorYeastRow,
   YEAST_PITCH_RATE_OPTIONS,
 } from "@brewery/beerjson";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";

@@ -15,7 +15,7 @@ Rule:
 
 Current buildable packages (native-consumed):
 - `packages/i18n` (`@umbraculum/i18n`)
-- `packages/i18n-react` (`@brewery/i18n-react`)
+- `packages/i18n-react` (`@umbraculum/i18n-react`)
 - `packages/navigation` (`@umbraculum/navigation`)
 - `packages/contracts` (`@brewery/contracts`)
 - `packages/api-client` (`@brewery/api-client`)
@@ -51,9 +51,9 @@ Why we commit `dist/`:
 Rule of thumb:
 - If a component needs Next.js, `next-intl`, React Navigation, Expo, or app-specific auth, it is **not** shared UI; keep it as an app-level adapter and pass callbacks/props into the shared component instead.
 
-#### `@brewery/i18n-react` import rules (web vs native)
-- Shared/native: import `useT` from `@brewery/i18n-react`.
-- Web-only adapter: import `useT` from `@brewery/i18n-react/next-intl` (Next.js only).
+#### `@umbraculum/i18n-react` import rules (web vs native)
+- Shared/native: import `useT` from `@umbraculum/i18n-react`.
+- Web-only adapter: import `useT` from `@umbraculum/i18n-react/next-intl` (Next.js only).
 
 ### Strict code placement rule (MANDATORY): if it might be reused, it must be shared
 Decision rule:

@@ -225,7 +225,7 @@ declare function consumeSseStream(res: Response, onEvent: (event: IncomingEvent)
 
 /**
  * Translation lookup. The shared component is i18n-agnostic — the caller
- * passes a typed translator so web (next-intl) and native (@brewery/i18n-react)
+ * passes a typed translator so web (next-intl) and native (@umbraculum/i18n-react)
  * can both supply their own implementation.
  */
 type AiChatTranslate = (key: string, vars?: Record<string, string | number>) => string;

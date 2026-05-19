@@ -31,7 +31,7 @@ module.exports = __toCommonJS(index_exports);
 
 // src/recipeMeta/RecipeMetaLine.tsx
 var import_react = require("react");
-var import_i18n_react = require("@brewery/i18n-react");
+var import_i18n_react = require("@umbraculum/i18n-react");
 var import_ui = require("@umbraculum/ui");
 var import_jsx_runtime = require("react/jsx-runtime");
 function parseRecipeMetaFromGetRecipeResponse(data) {
@@ -76,7 +76,7 @@ function RecipeMetaLine(props) {
 
 // src/yeast/ManualCellCountHelpBox.tsx
 var import_react2 = require("react");
-var import_i18n_react2 = require("@brewery/i18n-react");
+var import_i18n_react2 = require("@umbraculum/i18n-react");
 var import_ui2 = require("@umbraculum/ui");
 var import_tamagui = require("tamagui");
 var import_jsx_runtime2 = require("react/jsx-runtime");
@@ -145,7 +145,7 @@ function ManualCellCountHelpBox(props) {
 // src/water/SaltAdditionsEditor.tsx
 var import_react3 = require("react");
 var import_tamagui2 = require("tamagui");
-var import_i18n_react3 = require("@brewery/i18n-react");
+var import_i18n_react3 = require("@umbraculum/i18n-react");
 var import_ui3 = require("@umbraculum/ui");
 var import_jsx_runtime3 = require("react/jsx-runtime");
 var SALT_OPTIONS = [

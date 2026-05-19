@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { YStack } from "tamagui";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { AdSlot } from "../components/AdSlot";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Text } from "@umbraculum/ui";
 
 export type RecipeMeta = {

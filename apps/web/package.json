@@ -20,7 +20,7 @@
     "@brewery/contracts": "file:../../packages/contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",
     "@umbraculum/i18n": "file:../../packages/i18n",
-    "@brewery/i18n-react": "file:../../packages/i18n-react",
+    "@umbraculum/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/navigation": "file:../../packages/navigation",
     "@umbraculum/media": "file:../../packages/media",
     "@umbraculum/ui": "file:../../packages/ui",

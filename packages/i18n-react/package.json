@@ -1,8 +1,9 @@
 {
-  "name": "@brewery/i18n-react",
+  "name": "@umbraculum/i18n-react",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "React + next-intl bindings for @umbraculum/i18n. Universal useTranslator hook (web + native) + LocaleProvider context + dual entry points (default + ./next-intl). Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
   "scripts": {
     "build": "tsup src/index.tsx src/next-intl.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"

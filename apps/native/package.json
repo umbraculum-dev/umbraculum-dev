@@ -16,7 +16,7 @@
     "@brewery/beerjson": "file:../../packages/beerjson",
     "@brewery/contracts": "file:../../packages/contracts",
     "@umbraculum/i18n": "file:../../packages/i18n",
-    "@brewery/i18n-react": "file:../../packages/i18n-react",
+    "@umbraculum/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/media": "file:../../packages/media",
     "@umbraculum/navigation": "file:../../packages/navigation",
     "@brewery/recipes-ui": "file:../../packages/recipes-ui",

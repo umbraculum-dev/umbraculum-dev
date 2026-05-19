@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` package-scope migration plan
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — scoping pass + slots 1–7 landed (slot 1: `test-mcp` worked example, §6; slot 2: `media`, §6.1; slot 3: `navigation`, §6.2; slot 4: `automation-contracts`, §6.3; slot 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, §6.4; slot 6: `core` → `brewery-core` — ⚠ TRAP slot resolved cleanly on first attempt under the §1.3 classification gate, §6.5; slot 7: `i18n` — first slot with controlled transient cross-scope state (i18n-react workspace stays named `@brewery/i18n-react` until slot 8 but its imports + dist are fully on `@umbraculum/i18n`), §6.6; **post-slot-7 CI hygiene fix #2 isolated three independent local-vs-CI divergence root causes** — gitignored cross-references, nested-workspace install drift, stale bind-mounted `node_modules` shadowing, §6.7; each slot surfaced lessons folded back into §4/§5 before commit). Remaining 7 slots (6 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
+**Status:** Active 2026-05-19 — scoping pass + slots 1–8 landed (slot 1: `test-mcp` worked example, §6; slot 2: `media`, §6.1; slot 3: `navigation`, §6.2; slot 4: `automation-contracts`, §6.3; slot 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, §6.4; slot 6: `core` → `brewery-core` — ⚠ TRAP slot resolved cleanly on first attempt under the §1.3 classification gate, §6.5; slot 7: `i18n` — first slot with controlled transient cross-scope state (i18n-react workspace was still named `@brewery/i18n-react` at end of slot 7 but its imports + dist were fully on `@umbraculum/i18n`), §6.6; **post-slot-7 CI hygiene fix #2 isolated three independent local-vs-CI divergence root causes** — gitignored cross-references, nested-workspace install drift, stale bind-mounted `node_modules` shadowing, §6.7 + new `scripts/ci-parity-check.sh` + new umbraculum-toolset rule 72 + new `ci-parity-local-reproduction` skill; slot 8: `i18n-react` — completed the i18n stack migration started in slot 7; closed the transient cross-scope state via the standard recipe; native typecheck via the no-root-install pattern (named-volume mount only) successfully averted the slot-5 GOTCHA, §6.8; each slot surfaced lessons folded back into §4/§5 before commit). Remaining 6 slots (5 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
 **Audience:** core team executing the rename; future contributors picking up un-checked items from the handoff checklist; anyone evaluating the migration shape before the public flip.
 **Resolves:** umbrella plan sub-plan #9 (post-RFC-001 follow-on); the `@brewery/*` actual-scope migration referenced from [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md) §10.
 **Builds on:** [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §5.2 (rename commitment), [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §§4–5 (brewery is tier-6 vertical, NOT canonical), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §11.2 (H1 2027 restructure row that defers to this plan).
@@ -16,11 +16,11 @@
 |---|---|
 | Scoping pass | **Done 2026-05-19** (this doc + handoff doc + worked-example rename) |
 | Worked example landed | `@brewery/test-mcp` → `@umbraculum/test-mcp` (commit hash recorded in §6) |
-| Slots landed | 7 of 14 — slots 1–7 (`test-mcp`, `media`, `navigation`, `automation-contracts`, `ui`, `brewery-core`, `i18n`) |
-| Interlude — CI hygiene fixes | **#1 (76fbdd8, 2026-05-19, post-slot-6):** ESLint `eslint.config.mjs` `allowDefaultProject` extension + `spike/**` ignore + `@typescript-eslint/require-await` disable in `mockAdapter.ts` + `nonAdminUserId` → `_nonAdminUserId` + Zod v4 type-API drift fix in `meResponse.test.ts` + `check-readmes.py` stale `@umbraculum/*` guard removal + `.cursor/` pointer tolerance. **#2 (pending, post-slot-7):** Three local-vs-CI divergences isolated and fixed — see §6.7. |
-| Remaining slots to migrate | 7 (6 packages + 1 application-workspace bundle); see [handoff doc](./brewery-scope-migration-per-package-handoff.md) |
-| Estimated remaining sessions | 2–5 (1–3 slots per session; slot 9 `contracts` likely its own session) |
-| Skill capture in plugin pack | Deferred to second-package execution per "codify on second use" cadence |
+| Slots landed | 8 of 14 — slots 1–8 (`test-mcp`, `media`, `navigation`, `automation-contracts`, `ui`, `brewery-core`, `i18n`, `i18n-react`) |
+| Interlude — CI hygiene fixes | **#1 (76fbdd8, 2026-05-19, post-slot-6):** ESLint `eslint.config.mjs` `allowDefaultProject` extension + `spike/**` ignore + `@typescript-eslint/require-await` disable in `mockAdapter.ts` + `nonAdminUserId` → `_nonAdminUserId` + Zod v4 type-API drift fix in `meResponse.test.ts` + `check-readmes.py` stale `@umbraculum/*` guard removal + `.cursor/` pointer tolerance. **#2 (499c552, 2026-05-19, post-slot-7):** Three local-vs-CI divergences isolated and fixed — see §6.7. **Codification (5748c5b @ umbraculum-toolset, 2026-05-19):** the three mechanisms + the `scripts/ci-parity-check.sh` operational answer are now codified in umbraculum-toolset as rule `72-ci-parity-local-vs-ci-divergence.mdc` (always-on guardrail) + skill `ci-parity-local-reproduction` (bounded reproduction recipe) so every future agent sees them by default. |
+| Remaining slots to migrate | 6 (5 packages + 1 application-workspace bundle); see [handoff doc](./brewery-scope-migration-per-package-handoff.md) |
+| Estimated remaining sessions | 2–4 (1–3 slots per session; slot 9 `contracts` likely its own session given 122 occurrences across 75 files) |
+| Skill capture in plugin pack | `package-scope-migration-preflight` skill landed during slot 6; `ci-parity-local-reproduction` skill + rule 72 landed post-slot-7 (CI hygiene fix #2 codification); both per "codify on second use" cadence |
 | Blocking dependencies | None — both gates closed (rename primary substitution + RFC-0001 acceptance) |
 
 ---
@@ -243,6 +243,15 @@ For every file in the result list, replace `@brewery/<name>` with the target nam
 - **README files in `packages/*/README.md`, `apps/*/README.md`, `services/api/README.md`** — most carry an inventory section listing workspace packages.
 
 > **Bulk-sed self-exclusion for brewery-vertical TRAP slots (e.g. slot 6 `core`).** When the package.json `description` you authored in step 1 deliberately contains a historical reference like `"Renamed from @brewery/<name> to @umbraculum/brewery-<name> (NOT @umbraculum/<name>) as sub-plan #9 slot N"`, the bulk sed would corrupt that historical string by substituting the embedded `@brewery/<name>` to the new name a second time. **Exclude the just-edited `packages/<name>/package.json` from the sed target list** (alongside the always-excluded `brewery-scope-migration-*` docs). Slot 6's first execution caught this risk during step 3 planning and excluded `packages/core/package.json` from the bulk-sed file list, preserving the trap-avoidance description verbatim.
+
+> **Substring-collision sanity check — verify all 4 cousins before bulk-sed (slot-8 lesson, 2026-05-19).** The canonical regex tail `[^a-zA-Z0-9_-]|$` defends against three of four cousin patterns automatically; the fourth requires regex-anchor discipline. Pre-bulk-sed checklist:
+>
+> 1. **(a) Longer-prefix in old scope** (`@brewery/<X>-<Y>` when renaming `@brewery/<X>` — e.g. `@brewery/i18n-react` during the slot-7 `@brewery/i18n` rename). The regex tail's negated `-` correctly skips these because `-` is in the positive set. Verify via `grep -rohE "@brewery/<name>[a-zA-Z0-9_/.-]+" --exclude-dir=node_modules --exclude-dir=dist .` returns ONLY the legitimate workspace's own export subpaths (`/next-intl`, `/en`, `/it`, etc.); any standalone workspace match is a collision to investigate.
+> 2. **(b) Shorter-prefix in old scope** (`@brewery/<X>` when renaming `@brewery/<X>-<Y>` — slot 8's case re-checking `@brewery/i18n`). The `@brewery/<name>-anything` anchor at the regex START is what prevents corruption. Confirmed safe because the regex's literal `<name>-react` prefix can never match a literal `<name>` mid-string. No grep needed; structurally impossible.
+> 3. **(c) Just-renamed sibling in new scope** (`@umbraculum/<sibling-already-migrated>` from a previous slot — slot 8's `@umbraculum/i18n` from slot 7). The regex's literal `@brewery/` prefix is structurally distinct from `@umbraculum/`, so the new-scope sibling is structurally untouchable. No grep needed; structurally impossible.
+> 4. **(d) Export subpath of the package itself** (`@brewery/<name>/<subpath>` — e.g. `@brewery/i18n-react/next-intl`, `@brewery/i18n/en`). The regex tail's negated `/` (since `/` is NOT in `[a-zA-Z0-9_-]`) MATCHES these subpath references and substitutes them correctly. Verify via `grep -rohE "@brewery/<name>[/a-zA-Z0-9_.-]+" --exclude-dir=node_modules --exclude-dir=dist . | sort -u` — every result should be either the bare package name or a known export subpath (no surprise paths).
+>
+> Slot 8 ran the cousin (a) + (d) checks programmatically as the post-sweep verification gate in its Python script. Going forward, the preflight skill's command 7 (substring-collision sanity) should explicitly call out the 4-cousin checklist instead of mentioning only cousin (a).
 >
 > **NEW HARD STOP from slot 7 — bulk sed must also exclude `docs/design/brewery-scope-migration-plan.md` AND `docs/design/brewery-scope-migration-per-package-handoff.md`.** These two docs maintain historical "Source name" columns in §1.1 classification table, §1.4 framework-vs-content table, §3.1 footprint table, and §4 staged migration plan table. A naive scope-wide sed will overwrite those columns, turning `| @brewery/<name> | ... | @umbraculum/<name> | ...` into `| @umbraculum/<name> | ... | @umbraculum/<name> | ...` (both columns identical — historical record lost). Slot 7's Python-based sweep included these docs and had to restore 4 cells post-bulk; slot 5's curated `sed` file list implicitly avoided this. **Combined exclusion list for step 3 is now 3 paths minimum:** (a) just-edited `packages/<name>/package.json`, (b) `docs/design/brewery-scope-migration-plan.md`, (c) `docs/design/brewery-scope-migration-per-package-handoff.md`.
 >
@@ -366,6 +375,20 @@ If the renamed package is consumed by `apps/native`, also run `npm run typecheck
 > ```
 >
 > **Mitigation:** run native typecheck BEFORE step 5 (when api is already stopped from step 5a) if possible; or accept that the native typecheck triggers a recovery cycle and budget for it. **Surfaced during slot 5 verification (2026-05-19).**
+>
+> **Slot-8 PREFERRED PATTERN — no-root-install / named-volume-only mount** (2026-05-19): the cleaner alternative that AVOIDS the GOTCHA entirely. Mount the existing `brewery_app_root_node_modules` named volume into the one-shot and inject its `.bin/` into `PATH`, then run the native typecheck WITHOUT the root `npm install`:
+>
+> ```bash
+> docker run --rm \
+>   -v "$PWD:/repo" \
+>   -v brewery_app_root_node_modules:/repo/node_modules \
+>   -w /repo/apps/native \
+>   node:20-slim \
+>   sh -c 'PATH="/repo/node_modules/.bin:$PATH" npm run typecheck'
+> ```
+>
+> The one-shot exits in ~6s instead of ~60s, and api is provably unaffected (verified post-typecheck via `/app/node_modules/.bin/` count + `/api/health`). This pattern works whenever the named volume is already populated (i.e. any time after a `docker compose up`). Use the older `cd /repo && npm install ...` form ONLY as a cold-start fallback when the named volume is empty — and in that case, follow up with the api STOP-install-START recovery above.
+
 
 ### Step 7 — Commit + push as one revertable unit
 
@@ -612,7 +635,43 @@ Operators run this before pushing any commit with non-trivial CI surface — par
 
 **Three lessons landed in this plan doc BEFORE the CI hygiene #2 commit, mirroring slot-1..7 discipline.** The risk register (§5) gained three rows; the §0 status banner records the interlude; the recipe (§4) gains no new step but the existing step 7 commit/push direction now implicitly references `scripts/ci-parity-check.sh` as the pre-push verification surface for slot operators going forward.
 
-**Commit hash:** *(populated post-commit — recorded in the CI hygiene #2 commit message)*
+**Commit hash:** `499c552` (umbraculum-dev) for the in-repo fixes (`scripts/ci-parity-check.sh` + `.github/workflows/typecheck.yml` + 2 READMEs + 1 lint-fix + docs); `5748c5b` (umbraculum-toolset) for the codification (rule 72 + skill `ci-parity-local-reproduction`).
+
+---
+
+### 6.8. Slot 8 — `@brewery/i18n-react` → `@umbraculum/i18n-react`
+
+Platform-classified per §1.1 (universal `useTranslator` hook on top of `@umbraculum/i18n`; no brewery-domain logic). Closes the **transient cross-scope state** opened in slot 7: at the start of slot 8 the i18n-react workspace was still named `@brewery/i18n-react` while its imports + dist already pointed at `@umbraculum/i18n`; at the end of slot 8 the workspace itself is on the new scope and the i18n stack is fully migrated. Order-of-execution validation for the split-package pair pattern that will apply again to slot 9→10 (`contracts` → `api-client`) and slot 9→11 (`contracts` → `module-sdk`).
+
+**Footprint:** 48 files matched (~50 modifications including doc updates). Distribution: 1 own package (`packages/i18n-react/package.json` + README), 3 consumer `package.json` deps (`apps/{web,native}`, `packages/recipes-ui`), 22 source imports (1 web `app/[locale]/layout.tsx`, ~17 native screens + 2 native components/navigation/i18n provider, 3 `packages/recipes-ui/src/**`, 1 `packages/ui/src/ai/AiChatPanel.tsx`), 7 cross-package READMEs, 5 doc references, 1 root `package.json` `build:packages` HARD STOP (the second item in the build chain since slot 7), 3 stale `.next/server/**` generated files (auto-rebuilt by web container; excluded from sweep). Sweep regex `@brewery/i18n-react([^a-zA-Z0-9_-]|$)` — substring-collision safety **vs the just-renamed `@umbraculum/i18n`**: the negated tail correctly leaves `@umbraculum/i18n-react` untouched (`-` is in `[a-zA-Z0-9_-]` so it is NOT in the negated set), zero longer-prefix workspace-name collisions exist today, and the only matched subpath `@brewery/i18n-react/next-intl` is THIS workspace's intentional dual-export entry point (correctly substituted to `@umbraculum/i18n-react/next-intl`).
+
+**The recipe held cleanly on first attempt** for the per-package handoff steps 1–6. Bulk sweep: 42/42 candidate files updated with 55 substitutions; 6 files excluded by the established list (own README + own package.json + 2 migration docs + 3 `.next/server/**` generated artifacts; package.json was already updated in step 1 so it didn't surface to grep). Zero post-sweep `@brewery/i18n-react` mentions in non-excluded files; zero substring-collision variants.
+
+**Step-5 verification — both exports rebuilt + zero `@brewery` refs in dist:**
+- `packages/i18n-react/dist/` contains all 8 expected artifacts: `index.{cjs,d.cts,d.ts,js}` + `next-intl.{cjs,d.cts,d.ts,js}` (two-entrypoint shape per the §6.6 hard-stop note).
+- `grep -roh '@(brewery|umbraculum)/i18n[a-z-]*' dist/` → returns `@umbraculum/i18n` only (the dep). Zero `@brewery/*` refs.
+- Step 5 took ~110s end-to-end (build script + api restore + start).
+
+**Step-6 verification:**
+- api typecheck: clean.
+- api vitest: **51/51 files / 413/413 tests** — exactly matches slot 6/7 baseline.
+- root `npm run test:packages`: **47/47 tests** (4 files = 3 contracts + 1 brewery-core).
+- Nginx smoke through gateway: **7/7 HTTP 200** including `/it/login`, `/it/dashboard`, `/it/recipes` to exercise the i18n locale-switch path end-to-end through the renamed translator.
+- Native typecheck: clean — via the **no-root-install pattern**: `docker run --rm -v "$PWD:/repo" -v brewery_app_root_node_modules:/repo/node_modules -w /repo/apps/native node:20-slim sh -c 'PATH="/repo/node_modules/.bin:$PATH" npm run typecheck'`. This is the cleaner alternative to the slot-5-GOTCHA-risk pattern documented at §4 step 6 (which uses `cd /repo && npm install` and re-prunes api devDeps). Post-typecheck verification: api still HTTP 200, api `.bin/` still has the canonical 21 devDep binaries (`tsc`, `tsx`, `vitest`, etc.) — slot-5 GOTCHA fully averted.
+
+**Lockfiles regenerated:**
+- Root `package-lock.json`: 8/8 changed lines, all in the `@brewery/i18n-react` → `@umbraculum/i18n-react` entries (own workspace name + 2 consumer-side `dependencies` declarations + `node_modules/@umbraculum/i18n-react` link entry + `node_modules/@brewery/i18n-react` removal). Zero unrelated-package churn.
+- Web `apps/web/package-lock.json`: refreshed in-place via `docker compose exec web sh -c 'cd /app && npm install --include=dev --no-audit --no-fund'` — 1 added, 1 removed (the i18n-react symlink swap).
+
+**Two new lessons surfaced — folded back to §4 / §5 BEFORE commit:**
+
+1. **NEW PATTERN (preferred over slot-5 GOTCHA workaround) — native typecheck via no-root-install / named-volume-only mount.** The §4 step 6 native-typecheck recipe currently uses `docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim bash -lc 'cd /repo && npm install --no-audit --no-fund && cd apps/native && npm run typecheck'`. The `cd /repo && npm install` step is the exact failure mode documented in the slot-5 GOTCHA box: it re-prunes api devDeps via npm 10's degraded-resolution behavior against the bind-mounted workspace shape. Slot 8 used the cleaner alternative — mount the existing `brewery_app_root_node_modules` named volume read-write into the one-shot and inject its `.bin/` into PATH, **skipping the root install entirely**. The one-shot exits in ~6s instead of ~60s, and api is provably unaffected (verified post-typecheck via `.bin/` count + `/api/health`). §4 step 6 will be updated to recommend this pattern as the default; the old recipe stays as a fallback when the named volume is empty / cold-start.
+
+2. **Substring-collision verification is now a 4-cousin check, not 2-cousin.** Previous slots verified the regex tail correctly handles `@brewery/i18n` vs `@brewery/i18n-react` (slot 7) and similar in-scope pairs. Slot 8 added a NEW cousin: **`@brewery/i18n-react` vs the just-renamed `@umbraculum/i18n` (the dep that slot 7 created)**. The risk is that an overzealous Python `re.sub` with poorly chosen anchors could match `@umbraculum/i18n` mid-stream and re-corrupt it. Slot 8's sweep uses the explicit `@brewery/i18n-react([^a-zA-Z0-9_-]|$)` regex — anchored to `@brewery/` prefix, so `@umbraculum/i18n` is structurally untouchable. The verification gate at the end of the slot-8 Python script confirmed zero collisions across all 42 edited files. **Going forward, the substring-collision sanity check must verify against ALL 4 cousins**: (a) longer-prefix in old scope (`@brewery/X-Y` when renaming `@brewery/X`), (b) shorter-prefix in old scope (`@brewery/X` when renaming `@brewery/X-Y`), (c) the just-renamed sibling in new scope (`@umbraculum/sibling-already-migrated` for paired slots), (d) any export subpath of the package itself (`@brewery/X/subpath` like the `next-intl` entry point — must be substituted, not corrupted). §4 step 3 will be updated with this 4-cousin check; the umbraculum-toolset `package-scope-migration-preflight` skill's command 7 will likewise gain the 4-cousin verbiage.
+
+Three lessons landed in the plan doc BEFORE the slot-8 commit, mirroring slots 1–7 discipline. The recipe is now slot-8-tested as well — and **the transient cross-scope state from slot 7 closed without incident**, validating the upstream-then-downstream-rename ordering as load-bearing for the larger slot-9→10 / slot-9→11 contracts pair coming up.
+
+**Commit hash:** *(populated post-commit — recorded in the slot-8 commit message)*
 
 ---
 

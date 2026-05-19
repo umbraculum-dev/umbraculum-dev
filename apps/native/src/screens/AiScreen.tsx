@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { Linking, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { AiChatPanel, Screen, useAiChatStream } from "@umbraculum/ui";
 
 import { useAuth } from "../auth/AuthProvider";

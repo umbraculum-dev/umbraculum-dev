@@ -80,7 +80,7 @@ These packages are consumed by every module. They are not registered through `re
 | [`@umbraculum/automation-contracts`](../packages/automation-contracts/README.md) | (already renamed — slot 4 done) | Contracts slice of the `automation` canonical module. The Modbus mailbox mirror lives here. |
 | [`@brewery/api-client`](../packages/api-client/README.md) | `@umbraculum/api-client` (slot 10) | Fetch + auth boundary (cookie web, bearer native). |
 | [`@umbraculum/i18n`](../packages/i18n/README.md) | (already renamed — slot 7 done) | Cross-platform message catalog (web + native). |
-| [`@brewery/i18n-react`](../packages/i18n-react/README.md) | `@umbraculum/i18n-react` (slot 8) | Universal `useT` hook for React + React Native. |
+| [`@umbraculum/i18n-react`](../packages/i18n-react/README.md) | `@umbraculum/i18n-react` (slot 8) | Universal `useT` hook for React + React Native. |
 | [`@umbraculum/ui`](../packages/ui/README.md) | (already renamed — slot 5 done) | Tamagui primitives + design-system components. Industry-agnostic. |
 | [`@umbraculum/navigation`](../packages/navigation/README.md) | (already renamed — slot 3 done) | Route IDs + cross-platform routing policy. |
 | [`@umbraculum/media`](../packages/media/README.md) | (already renamed — slot 2 done) | Shared assets framework. |

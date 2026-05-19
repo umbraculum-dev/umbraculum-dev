@@ -1,6 +1,6 @@
 // src/recipeMeta/RecipeMetaLine.tsx
 import { useEffect, useState } from "react";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Text } from "@umbraculum/ui";
 import { jsxs } from "react/jsx-runtime";
 function parseRecipeMetaFromGetRecipeResponse(data) {
@@ -45,7 +45,7 @@ function RecipeMetaLine(props) {
 
 // src/yeast/ManualCellCountHelpBox.tsx
 import { useState as useState2 } from "react";
-import { useT as useT2 } from "@brewery/i18n-react";
+import { useT as useT2 } from "@umbraculum/i18n-react";
 import { Card, Collapsible, Text as Text2 } from "@umbraculum/ui";
 import { View, YStack } from "tamagui";
 import { jsx, jsxs as jsxs2 } from "react/jsx-runtime";
@@ -114,7 +114,7 @@ function ManualCellCountHelpBox(props) {
 // src/water/SaltAdditionsEditor.tsx
 import "react";
 import { XStack, YStack as YStack2 } from "tamagui";
-import { useT as useT3 } from "@brewery/i18n-react";
+import { useT as useT3 } from "@umbraculum/i18n-react";
 import { Button, Card as Card2, Input, SelectField, Text as Text3 } from "@umbraculum/ui";
 import { jsx as jsx2, jsxs as jsxs3 } from "react/jsx-runtime";
 var SALT_OPTIONS = [

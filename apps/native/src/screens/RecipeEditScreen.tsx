@@ -16,7 +16,7 @@ import {
   type EditorYeastRow,
 } from "@brewery/beerjson";
 import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Accordion, TextArea } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 

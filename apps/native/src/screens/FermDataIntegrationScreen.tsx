@@ -3,7 +3,7 @@ import { Alert, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Input, Screen, Spinner, Text } from "@umbraculum/ui";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 

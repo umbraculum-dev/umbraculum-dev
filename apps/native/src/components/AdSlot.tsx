@@ -3,7 +3,7 @@ import { Linking, Pressable } from "react-native";
 import { Image } from "expo-image";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
-import { useT } from "@brewery/i18n-react";
+import { useT } from "@umbraculum/i18n-react";
 
 import { AdSlotCard, Text } from "@umbraculum/ui";
 

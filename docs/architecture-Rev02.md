@@ -55,13 +55,13 @@ Implemented package:
 To share screens across web and native while keeping message syntax consistent, shared code must not import `next-intl` directly.
 
 Implemented package:
-- `packages/i18n-react` (`@brewery/i18n-react`)
+- `packages/i18n-react` (`@umbraculum/i18n-react`)
   - Universal runtime:
     - `LocaleProvider({ locale, messages })`
     - `useT(namespace)` returning `{ t(key, values), rich(key, values) }`
     - Native-ready formatting uses ICU via `intl-messageformat`, fed by `getSharedMessages(locale)`
   - Web adapter entrypoint (optional):
-    - `@brewery/i18n-react/next-intl` provides a `useT(namespace)` implemented via `next-intl` (thin wrapper)
+    - `@umbraculum/i18n-react/next-intl` provides a `useT(namespace)` implemented via `next-intl` (thin wrapper)
 
 ### 0.5 Web adapter scaffolding (Next.js)
 
@@ -216,11 +216,11 @@ If code is intended to be shared between web and native (screens/flows/component
 
 Instead it depends on small shared interfaces:
 - routing: `@umbraculum/navigation`
-- i18n: `@umbraculum/i18n` + `@brewery/i18n-react`
+- i18n: `@umbraculum/i18n` + `@umbraculum/i18n-react`
 
 #### Implemented boundary modules (source of truth)
 - **Locales + messages**: `packages/i18n` (`@umbraculum/i18n`)
-- **Universal translation hook**: `packages/i18n-react` (`@brewery/i18n-react`)
+- **Universal translation hook**: `packages/i18n-react` (`@umbraculum/i18n-react`)
 - **Universal route IDs + policy**: `packages/navigation` (`@umbraculum/navigation`)
 - **Web adapter**: `apps/web/src/navigation/appRouter.ts` (`useAppRouter()`)
 
@@ -481,7 +481,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
 - Cross-platform boundaries (implemented early to reduce rework):
   - locales/messages: `@umbraculum/i18n`
   - route manifest + policy: `@umbraculum/navigation`
-  - universal translation hook: `@brewery/i18n-react`
+  - universal translation hook: `@umbraculum/i18n-react`
   - web adapter: `apps/web/src/navigation/appRouter.ts`
 - Shared UI direction:
   - Keep Tamagui tokens/config/components in `packages/ui`
