@@ -1,8 +1,9 @@
 {
-  "name": "@brewery/beerjson",
+  "name": "@umbraculum/brewery-beerjson",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Brewery-vertical BeerJSON adaptation layer — typed BeerJSON wrappers, editor-row helpers, and SG↔Plato re-exports from @umbraculum/brewery-core. Brewery-vertical-classified per sub-plan #9 §1.1 (BeerJSON is brewing-specific; the @umbraculum/brewery-* prefix marks the vertical boundary).",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

@@ -1,9 +1,9 @@
-# @brewery/beerjson
+# @umbraculum/brewery-beerjson
 
 Typed BeerJSON wrapper + editor-row helpers — the canonical brewing-recipe interchange format for Umbraculum's brewery vertical.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/beerjson` to `@umbraculum/brewery-beerjson` as sub-plan #9 slot 12 (the `brewery-` prefix in the package name marks the brewery-vertical classification per §1.3 — not the platform-name `@umbraculum/beerjson`, which would have implied vertical-agnosticism).
 
 ## What this is
 
@@ -19,7 +19,7 @@ Math primitives (gravity / SG conversions, unit normalization) live in `@umbracu
 ## Usage
 
 ```ts
-import { sgToPlato, type EditorGristRow } from "@brewery/beerjson";
+import { sgToPlato, type EditorGristRow } from "@umbraculum/brewery-beerjson";
 
 const plato = sgToPlato(1.052);
 ```
@@ -36,7 +36,7 @@ This package ships dual-format runtime + types (ESM + CJS + d.ts) so it can be c
 Commands (run from repo root, container-friendly per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule):
 
 - **Build**: `npm run build:packages` (uses `tsup` per the package.json `build` script).
-- **Test**: `npm run test --workspace=@brewery/beerjson` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Test**: `npm run test --workspace=@umbraculum/brewery-beerjson` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace landed `exactOptionalPropertyTypes` in Phase 6g — one of the 5 deferred workspaces — and carries all 6 candidate strict flags after Phase 6h).
 
 ## How it fits in

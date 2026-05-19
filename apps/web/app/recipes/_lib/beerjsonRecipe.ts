@@ -31,6 +31,6 @@ export {
   type YeastFormat,
   type YeastPitchRateKey,
   type YeastSpeciesKey,
-} from "@brewery/beerjson";
+} from "@umbraculum/brewery-beerjson";
 
-export { sgToPlato } from "@brewery/beerjson";
+export { sgToPlato } from "@umbraculum/brewery-beerjson";

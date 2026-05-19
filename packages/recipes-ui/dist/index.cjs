@@ -217,11 +217,11 @@ function SaltAdditionsEditor(props) {
 // src/mash/MashStepsEditor.tsx
 var import_react4 = require("react");
 var import_tamagui3 = require("tamagui");
-var import_beerjson = require("@brewery/beerjson");
+var import_brewery_beerjson = require("@umbraculum/brewery-beerjson");
 var import_ui4 = require("@umbraculum/ui");
 var import_jsx_runtime4 = require("react/jsx-runtime");
 function stepTypeOptions(hideSparge) {
-  return hideSparge ? import_beerjson.MASH_STEP_TYPE_OPTIONS.filter((o) => o.value !== "sparge") : import_beerjson.MASH_STEP_TYPE_OPTIONS;
+  return hideSparge ? import_brewery_beerjson.MASH_STEP_TYPE_OPTIONS.filter((o) => o.value !== "sparge") : import_brewery_beerjson.MASH_STEP_TYPE_OPTIONS;
 }
 function MashStepsEditor(props) {
   const {
@@ -266,7 +266,7 @@ function MashStepsEditor(props) {
       mashRows.length ? mashRows.map((r, idx) => {
         const isSpargeStep = r.type === "sparge" && r.name.trim().toLowerCase() === "sparge";
         const amountDisplay = isSpargeStep && waterVolumes ? formatFixed(locale, waterVolumes.spargeLiters, 2) : r.amountL != null && Number.isFinite(r.amountL) ? formatFixed(locale, r.amountL, 2) : null;
-        const typeLabel = import_beerjson.MASH_STEP_TYPE_OPTIONS.find((o) => o.value === r.type)?.label ?? r.type;
+        const typeLabel = import_brewery_beerjson.MASH_STEP_TYPE_OPTIONS.find((o) => o.value === r.type)?.label ?? r.type;
         return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
           import_ui4.Card,
           {
@@ -505,7 +505,7 @@ function MashStepsEditor(props) {
           t("mashingAddFromTemplate"),
           ":"
         ] }),
-        import_beerjson.MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Button, { size: "$3", chromeless: true, onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
+        import_brewery_beerjson.MASH_TEMPLATES.filter((tpl) => tpl.id !== "sparge").map((tpl) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Button, { size: "$3", chromeless: true, onPress: () => onAddFromTemplate(tpl.id), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_ui4.Text, { fontSize: 12, children: t(tpl.labelKey) }) }, tpl.id))
       ] }) : null
     ] }),
     onSave ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_tamagui3.YStack, { gap: "$2", children: [

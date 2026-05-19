@@ -14,7 +14,7 @@ import {
   type EditorHopRow,
   type EditorMashStep,
   type EditorYeastRow,
-} from "@brewery/beerjson";
+} from "@umbraculum/brewery-beerjson";
 import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Accordion, TextArea } from "tamagui";

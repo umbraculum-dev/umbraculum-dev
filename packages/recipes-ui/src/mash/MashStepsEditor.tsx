@@ -1,8 +1,8 @@
 import React from "react";
 import { XStack, YStack } from "tamagui";
 
-import type { EditorMashStep, EditorMashStepType } from "@brewery/beerjson";
-import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@brewery/beerjson";
+import type { EditorMashStep, EditorMashStepType } from "@umbraculum/brewery-beerjson";
+import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@umbraculum/brewery-beerjson";
 
 import { BrewCheckbox, Button, Card, Input, ReadOnlyField, ReadOnlyFieldRow, SelectField, Text } from "@umbraculum/ui";
 

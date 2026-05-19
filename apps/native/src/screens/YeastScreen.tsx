@@ -20,7 +20,7 @@ import {
   type EditorMiscRow,
   type EditorYeastRow,
   YEAST_PITCH_RATE_OPTIONS,
-} from "@brewery/beerjson";
+} from "@umbraculum/brewery-beerjson";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";

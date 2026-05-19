@@ -186,7 +186,7 @@ function SaltAdditionsEditor(props) {
 // src/mash/MashStepsEditor.tsx
 import "react";
 import { XStack as XStack2, YStack as YStack3 } from "tamagui";
-import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@brewery/beerjson";
+import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@umbraculum/brewery-beerjson";
 import { BrewCheckbox, Button as Button2, Card as Card3, Input as Input2, ReadOnlyField, ReadOnlyFieldRow, SelectField as SelectField2, Text as Text4 } from "@umbraculum/ui";
 import { Fragment, jsx as jsx3, jsxs as jsxs4 } from "react/jsx-runtime";
 function stepTypeOptions(hideSparge) {

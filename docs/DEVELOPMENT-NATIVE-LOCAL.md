@@ -324,11 +324,11 @@ docker run --rm \
 
 A non-zero exit means at least one package will fail at runtime on Expo Go.
 
-### `apps/native` typecheck fails with `Property 'X' does not exist on type 'EditorGristRow'` (or similar `@brewery/beerjson` type)
+### `apps/native` typecheck fails with `Property 'X' does not exist on type 'EditorGristRow'` (or similar `@umbraculum/brewery-beerjson` type)
 
 Symptom: a fresh `npm run typecheck` in `apps/native` (or a red `native-deps.yml` PR check) complaining about a property that **clearly exists** in `packages/beerjson/src/index.ts`. The dist on disk (and committed to git) is older than the source.
 
-Root cause: `packages/beerjson/dist/*` is consumed via the workspace symlink, and tsup builds happen only when the `build:packages` script runs. Until 2026-05, the script omitted `@brewery/beerjson`, so dist could drift silently. The script now (re)builds beerjson before `@brewery/recipes-ui` — but if someone bypasses the script, the dist still goes stale.
+Root cause: `packages/beerjson/dist/*` is consumed via the workspace symlink, and tsup builds happen only when the `build:packages` script runs. Until 2026-05, the script omitted `@umbraculum/brewery-beerjson`, so dist could drift silently. The script now (re)builds beerjson before `@brewery/recipes-ui` — but if someone bypasses the script, the dist still goes stale.
 
 Fix:
 

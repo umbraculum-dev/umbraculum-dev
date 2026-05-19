@@ -90,7 +90,7 @@ These packages are consumed by every module. They are not registered through `re
 | [`@umbraculum/media`](../packages/media/README.md) | (already renamed — slot 2 done) | Shared assets framework. |
 | [`@umbraculum/test-mcp`](../packages/test-mcp/README.md) | (already renamed — slot 1 done) | Test-MCP HTTP server exposing testing tools. Developer tooling. |
 | `@umbraculum/brewery-core` ([`packages/core/`](../packages/core/)) | (already renamed — slot 6 done; vertical-prefixed) | Brewery-vertical brewing math (gravity, water). **Vertical-prefixed scope** — see RFC-0002 §4. No README yet — content sits in [`packages/core/src/`](../packages/core/src/). |
-| [`@brewery/beerjson`](../packages/beerjson/README.md) | `@umbraculum/brewery-beerjson` (slot 12) | Brewery-vertical BeerJSON spec layer. **Will be vertical-prefixed.** |
+| [`@umbraculum/brewery-beerjson`](../packages/beerjson/README.md) | `@umbraculum/brewery-beerjson` (slot 12) | Brewery-vertical BeerJSON spec layer. **Will be vertical-prefixed.** |
 | [`@brewery/recipes-ui`](../packages/recipes-ui/README.md) | `@umbraculum/brewery-recipes-ui` (slot 13) | Brewery-vertical recipe/water/yeast UI. **Will be vertical-prefixed.** |
 
 Note the asymmetry in the third column: horizontal packages keep an unprefixed `@umbraculum/<name>` scope; vertical-flavored packages carry a vertical prefix (`@umbraculum/brewery-<name>`). That distinction is enforced by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §4 and is the trap that slot 6 of sub-plan #9 was designed to catch ([brewery-scope-migration-per-package-handoff.md](design/brewery-scope-migration-per-package-handoff.md) — Slot 6 ⚠ TRAP).

@@ -38,7 +38,7 @@ Per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only
 ## How it fits in
 
 - **Consumed by**: end users (via the dev nginx today; via `umbraculum.dev` after the public flip per [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §10.1).
-- **Depends on**: `services/api` (HTTP backend); `@umbraculum/contracts` (typed responses); `@umbraculum/ui` + `@brewery/recipes-ui` (UI primitives + domain UI); `@umbraculum/i18n` + `@umbraculum/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with native); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing/normalization); `@umbraculum/brewery-core` (math primitives, gravity/SG conversions).
+- **Depends on**: `services/api` (HTTP backend); `@umbraculum/contracts` (typed responses); `@umbraculum/ui` + `@brewery/recipes-ui` (UI primitives + domain UI); `@umbraculum/i18n` + `@umbraculum/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with native); `@umbraculum/media` (assets); `@umbraculum/brewery-beerjson` (recipe parsing/normalization); `@umbraculum/brewery-core` (math primitives, gravity/SG conversions).
 - **Auth**: cookie-based (`sid` httpOnly). The native sibling rides bearer tokens — the difference is abstracted in `@umbraculum/api-client`.
 
 ## Status

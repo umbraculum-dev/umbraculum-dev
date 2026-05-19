@@ -683,41 +683,60 @@ Doc references:
 
 ## Slot 12 — `@brewery/beerjson` → `@umbraculum/brewery-beerjson`
 
-**Status:** Pending. **Depends on slot 6.**
+**Status:** Complete (2026-05-19). **First brewery-vertical slot since slot 6** — target carries the `brewery-` token *inside* the package name (`@umbraculum/brewery-beerjson`, NOT `@umbraculum/beerjson`); slot-6 TRAP discipline applies and held cleanly. **Depends on slot 6** (shipped).
 
-**Target + classification.** **Brewery-vertical.** BeerJSON brewing-specific interchange schema. Target name carries `brewery-` prefix.
+**Target + classification.** **Brewery-vertical.** BeerJSON brewing-specific interchange schema. Target name carries `brewery-` prefix per §1.3.
 
-**Hard stops.**
+**Hard stops cleared.**
 
-- Predecessor: slot 6 must have shipped (beerjson lists `@brewery/core` as a dep — after slot 6 it lists `@umbraculum/brewery-core`).
-- Add classifying description: `"Brewery-vertical BeerJSON schema layer. End-state npm scope: @umbraculum/brewery-beerjson per sub-plan #9."`
+- [x] Predecessor: slot 6 shipped — confirmed `packages/beerjson/package.json` already lists `"@umbraculum/brewery-core": "file:../core"` as its dep; only the workspace `name` field flipped in slot 12.
+- [x] Classifying description added (per slot-9/10/11 precedent): `"Brewery-vertical BeerJSON adaptation layer — typed BeerJSON wrappers, editor-row helpers, and SG↔Plato re-exports from @umbraculum/brewery-core. Brewery-vertical-classified per sub-plan #9 §1.1 (BeerJSON is brewing-specific; the @umbraculum/brewery-* prefix marks the vertical boundary)."` Reworded from the handoff's forecast template to a current-state description.
+- [x] Preflight skill 6 HARD STOP classes ran cleanly: only ONE HIT — root `build:packages` (slot's only stop). `bin` field absent; `next.config.js` transpilePackages does **NOT** include `@brewery/beerjson` (the package ships pre-built JS via `dist/` so Next.js consumes it directly without transpilation — same architectural pattern as api-client/automation-contracts/module-sdk; only `.tsx`-shipping packages like ui/recipes-ui need transpilePackages entries); `metro.config.js` extraNodeModules lists only `@brewery/recipes-ui` (slot-13's stop, not slot-12's); root `test:packages` does NOT include beerjson — see follow-up note below; workflow display names absent.
+- [x] 4-cousin substring-collision walk clean: (a) no `@brewery/beerjson-*` longer-prefix variants; (b) shorter-prefix N/A (no `@brewery/beer*` workspace exists); (c) cousin-(c) safety check found 9 pre-existing references to `@umbraculum/brewery-beerjson` in doc-tier files (migration plan + handoff doc + `MODULES.md` table + `docs/modules/contribute/vertical-configuration.md` example + `docs/modules/verticals/brewery.md` body) — **all factually-correct forecasts that became live state at slot-12 commit time**; no false-collision risk; (d) zero subpath imports.
+- [x] Slot-9 NEW HARD STOP held: `cursor-tmp/slot12-bulk-sed.py` excluded itself via `EXCLUDE_DIR_PARTS` set + the defensive belt-and-braces (script's `OLD_FULL` literal constructed from concatenated string segments).
+- [x] **Slot-6 TRAP discipline held:** the slot-12 bulk-sed `NEW_FULL` constant uses a different `NEW_PKG_NAME` (`brewery-beerjson`) than `OLD_PKG_NAME` (`beerjson`), mirroring the slot-6 bulk-sed shape; the substitution added the `brewery-` token across all 29 substitutions correctly; the §1.3 classification gate caught the brewery-vertical classification on first attempt.
 
-**File inventory.**
+**File inventory cleared.**
 
 Workspace name + own files:
-- [ ] [`packages/beerjson/package.json`](../../packages/beerjson/package.json) — `name`; description.
-- [ ] [`packages/beerjson/README.md`](../../packages/beerjson/README.md).
-- [ ] [`packages/beerjson/src/index.ts`](../../packages/beerjson/src/index.ts) — internal references.
+- [x] [`packages/beerjson/package.json`](../../packages/beerjson/package.json) — `name` flipped to `@umbraculum/brewery-beerjson`; `description` field added per handoff (reworded from forecast to current-state).
+- [x] [`packages/beerjson/README.md`](../../packages/beerjson/README.md) — heading + workspace command examples + Usage import example updated; rename history note added per slot-8/9/10/11 convention with explicit TRAP rationale (the `brewery-` prefix marks brewery-vertical classification, not the platform-name `@umbraculum/beerjson`).
+- [x] [`packages/beerjson/src/index.ts`](../../packages/beerjson/src/index.ts) — already clean (the slot-6 sweep had updated the `@umbraculum/brewery-core` import; no `@brewery/beerjson` self-references in this file).
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
-- [ ] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json) — recipes-ui dep.
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json) — recipes-ui dep.
 
 Source imports:
-- [ ] [`apps/native/src/screens/RecipeEditScreen.tsx`](../../apps/native/src/screens/RecipeEditScreen.tsx).
-- [ ] [`apps/native/src/screens/WaterMashScreen.tsx`](../../apps/native/src/screens/WaterMashScreen.tsx).
-- [ ] [`apps/native/src/screens/YeastScreen.tsx`](../../apps/native/src/screens/YeastScreen.tsx).
-- [ ] [`apps/web/app/recipes/_lib/beerjsonRecipe.ts`](../../apps/web/app/recipes/_lib/beerjsonRecipe.ts).
-- [ ] [`packages/recipes-ui/src/mash/MashStepsEditor.tsx`](../../packages/recipes-ui/src/mash/MashStepsEditor.tsx).
+- [x] [`apps/native/src/screens/RecipeEditScreen.tsx`](../../apps/native/src/screens/RecipeEditScreen.tsx).
+- [x] [`apps/native/src/screens/WaterMashScreen.tsx`](../../apps/native/src/screens/WaterMashScreen.tsx).
+- [x] [`apps/native/src/screens/YeastScreen.tsx`](../../apps/native/src/screens/YeastScreen.tsx).
+- [x] [`apps/web/app/recipes/_lib/beerjsonRecipe.ts`](../../apps/web/app/recipes/_lib/beerjsonRecipe.ts) — 2 substitutions.
+- [x] [`packages/recipes-ui/src/mash/MashStepsEditor.tsx`](../../packages/recipes-ui/src/mash/MashStepsEditor.tsx) — 2 substitutions.
 
 Cross-package README references:
-- [ ] [`packages/beerjson/README.md`](../../packages/beerjson/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+- [x] [`packages/beerjson/README.md`](../../packages/beerjson/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/LINTING.md`](../LINTING.md), [`docs/TYPING.md`](../TYPING.md), [`docs/NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md), [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/LINTING.md`](../LINTING.md), [`docs/TYPING.md`](../TYPING.md) (5 substitutions), [`docs/NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md), [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md) (2 substitutions), [`docs/ROADMAP.md`](../ROADMAP.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md) (2 substitutions; the file is tracked + not gitignored), [`docs/MODULES.md`](../MODULES.md), [`docs/modules/contribute/vertical-configuration.md`](../modules/contribute/vertical-configuration.md), [`docs/modules/verticals/brewery.md`](../modules/verticals/brewery.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7. Commit message notes the brewery-vertical classification: `"@umbraculum/brewery-beerjson (brewery-vertical, BeerJSON spec)"`.
+**Step-3 sweep results:** 21 files / 29 substitutions (vs 24-file plan-doc inventory; the 3-file delta = 3 explicit excludes — own README + 2 history docs; `packages/beerjson/package.json` self-excluded after step 1 had already updated the `name` field).
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing — exactly matches slot-7 / slot-8 / slot-9 / slot-10 / slot-11 baseline). The api consumes beerjson indirectly via `@umbraculum/brewery-core` re-exports + via the BeerJSON importer at `services/api/src/importers/`; clean api vitest is direct evidence the rename didn't break the importer wiring.
+- [x] Root `npm run test:packages` 9/9 files / 120/120 tests (5 contracts files / 73 tests + 4 brewery-core files / 47 tests) — same baseline as slot 9/10/11 since beerjson is not currently in the script.
+- [x] **Slot-specific:** beerjson's own tests (`npm test -w @umbraculum/brewery-beerjson`) — **1/1 files / 4/4 tests** — confirms `index.test.ts` passes under the new workspace-name resolution.
+- [x] Native typecheck via the **slot-8 no-root-install / named-volume pattern** — clean; ~5.5s wall-clock. api `.bin/` count preserved at canonical 21; api `/api/health` still 200 post-typecheck. Slot-5 GOTCHA fully averted.
+- [x] Nginx smoke 7/7 HTTP 200 — `/api/health`, `/en/{login,dashboard,recipes}`, `/it/{login,dashboard,recipes}`.
+- [x] beerjson dist content audit: `grep -roh '@(brewery|umbraculum)/[a-z][a-z0-9-]*[a-z0-9]' dist/` returned only `@umbraculum/brewery-core` (the only external import in beerjson source). Zero `@brewery/*` refs in dist.
+- [x] Final commit message notes the brewery-vertical classification.
+
+**No new lessons surfaced.** Slot 12 was a clean execution of the slot-6-validated brewery-vertical TRAP recipe under the slot-9-refined verification battery. **The slot-6 TRAP discipline is now fully proven across two attempts** (slot 6 `core → brewery-core`, slot 12 `beerjson → brewery-beerjson`); the §1.3 classification gate caught both correctly on the first attempt. See plan doc §6.12 for full recap.
+
+**Follow-up note (out of slot 12 scope, not blocking):** beerjson has 1 test file / 4 tests that is NOT included in root `test:packages`. Same shape as the slot-11 module-sdk follow-up; tracked as a future cleanup item rather than landed under sub-plan #9.
 
 ---
 

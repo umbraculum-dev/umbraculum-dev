@@ -77,7 +77,7 @@ Today brewery screens are flat under `apps/native/src/screens/` (`RecipesListScr
 | Package (current name) | End-state name | Role |
 |---|---|---|
 | `@umbraculum/brewery-core` ([`packages/core/`](../../../packages/core/)) | (already renamed — slot 6 done) | Brewing math: gravity, water chemistry, unit conversions. |
-| `@brewery/beerjson` ([`packages/beerjson/`](../../../packages/beerjson/README.md)) | `@umbraculum/brewery-beerjson` (slot 12 pending) | BeerJSON spec layer. |
+| `@umbraculum/brewery-beerjson` ([`packages/beerjson/`](../../../packages/beerjson/README.md)) | `@umbraculum/brewery-beerjson` (slot 12 pending) | BeerJSON spec layer. |
 | `@brewery/recipes-ui` ([`packages/recipes-ui/`](../../../packages/recipes-ui/README.md)) | `@umbraculum/brewery-recipes-ui` (slot 13 pending) | Recipe / mash / water / yeast UI components. |
 
 The `@umbraculum/brewery-<name>` scope prefix is the [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention for vertical-flavored packages — distinguishes them from horizontal packages (`@umbraculum/i18n`, `@umbraculum/ui`, …) at a glance.

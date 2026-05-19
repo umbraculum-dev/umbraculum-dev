@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@umbraculum/api-client": "file:../../packages/api-client",
-    "@brewery/beerjson": "file:../../packages/beerjson",
+    "@umbraculum/brewery-beerjson": "file:../../packages/beerjson",
     "@umbraculum/contracts": "file:../../packages/contracts",
     "@umbraculum/i18n": "file:../../packages/i18n",
     "@umbraculum/i18n-react": "file:../../packages/i18n-react",

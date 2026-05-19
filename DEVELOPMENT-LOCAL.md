@@ -101,9 +101,9 @@ Anything below this heading is **project-owned** and will not be overwritten by 
     - `./scripts/build-packages-in-docker.sh`
     - (Equivalent inside a Node container: `npm run build:packages`)
   - Reminder: do not run npm on the host in this repo. Run the build via Docker if needed.
-  - **Build order matters.** `package.json:11` runs the packages sequentially; `@brewery/beerjson` is built **before** `@brewery/recipes-ui` because recipes-ui imports types/values from beerjson at build time. Do not reorder casually — recipes-ui's `dist/` will silently encode whatever beerjson `dist/` was on disk at build time.
+  - **Build order matters.** `package.json:11` runs the packages sequentially; `@umbraculum/brewery-beerjson` is built **before** `@brewery/recipes-ui` because recipes-ui imports types/values from beerjson at build time. Do not reorder casually — recipes-ui's `dist/` will silently encode whatever beerjson `dist/` was on disk at build time.
   - **Drift detection (catches the original 2026-05 regression).** If you add or rename a field in `packages/beerjson/src/index.ts` and forget to rebuild, downstream consumers (`apps/native` first, because it has the only repo-wide `tsc --noEmit`; web won't notice locally) will fail typecheck against the stale `packages/beerjson/dist/*.d.ts`. Two ways to catch it:
-    1. **Automated, fast (preferred before pushing):** run `./scripts/check-packages-dist-up-to-date.sh` — it rebuilds all packages and `git diff --exit-code`s `packages/*/dist` and `packages/*/package.json`. Exit `0` = no drift; non-zero = `dist/` would have changed (rebuild it and commit). Note: this script only became effective for beerjson once `@brewery/beerjson` was added to `build:packages` in this commit.
+    1. **Automated, fast (preferred before pushing):** run `./scripts/check-packages-dist-up-to-date.sh` — it rebuilds all packages and `git diff --exit-code`s `packages/*/dist` and `packages/*/package.json`. Exit `0` = no drift; non-zero = `dist/` would have changed (rebuild it and commit). Note: this script only became effective for beerjson once `@umbraculum/brewery-beerjson` was added to `build:packages` in this commit.
     2. **End-to-end reproduction (for understanding the symptom):**
        ```bash
        # Wipe beerjson dist to simulate "field added, dist forgot to be rebuilt"

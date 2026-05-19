@@ -1,6 +1,6 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import { ReactNode } from 'react';
-import { EditorMashStep } from '@brewery/beerjson';
+import { EditorMashStep } from '@umbraculum/brewery-beerjson';
 
 type RecipeMeta = {
     name: string | null;

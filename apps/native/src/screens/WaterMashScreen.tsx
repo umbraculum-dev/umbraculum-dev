@@ -10,7 +10,7 @@ import {
   replaceMashInBeerJsonDocument,
   validateMashBeforeSave,
   type EditorMashStep,
-} from "@brewery/beerjson";
+} from "@umbraculum/brewery-beerjson";
 import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
