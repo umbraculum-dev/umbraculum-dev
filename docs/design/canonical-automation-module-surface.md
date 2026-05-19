@@ -1,7 +1,7 @@
 # Canonical `automation` module surface — design
 
 **Tier:** Public  
-**Status:** Draft design 2026-05-19 (NOT an Accepted RFC — implementation follows core-team review)  
+**Status:** Accepted design 2026-05-19 (core team approval recorded; B1–B3 pre–Phase A checkpoints resolved 2026-05-19, see §12; NOT a separate Accepted RFC — implementation is phased per §9; amendments per [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) §12)  
 **Audience:** core team, brewery-vertical maintainers, OpenPLC sister-repo maintainers, module SDK authors  
 **Resolves:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) Decision E §7.2  
 **Builds on:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.4, §6, [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md)
@@ -58,7 +58,7 @@ Three concerns must not collapse (RFC-0001 §7.1):
 
 **Rejected:** Single unified model — mixes snapshot-copy semantics with live PLC rows; confuses `maxRecipes` vs `maxVessels`.
 
-**MRP (deferred):** When `mrp` ships, reference `vesselId` via `@umbraculum/automation-contracts`; no `platform-equipment-contracts` until two modules conflict (RFC-0002 §7.3).
+**MRP / CRP entry point (deferred).** When `mrp` (and `crp`) ship, they will need read access to `EquipmentProfile` to do capacity planning (profiles × N vessels per profile = total workspace capacity — see §12 cardinality note). That is the second-consumer trigger from [RFC-0002 §7](../rfcs/0002-canonical-module-physical-layout.md#7-what-this-rfc-defers-open-questions-for-sub-plan-9) item 3 ("cross-module shared types") to extract `@umbraculum/equipment-contracts` (or `@brewery/equipment-contracts` if the concept stays brewery-specific). Until then, the field stays brewery-internal; `automation` references `vesselId` via `@umbraculum/automation-contracts`. No `platform-equipment-contracts` until the conflict is concrete — YAGNI.
 
 ---
 
@@ -247,11 +247,56 @@ Per [`docs/ROADMAP.md`](../ROADMAP.md) H2 2026 AI-first; full MRP ↔ automation
 - `brewery` schema split from `public`.
 - MRP ↔ vessel scheduling.
 - Native automation screens beyond minimal status unless proven.
-- Promoting this doc to Accepted RFC unless governance change control is needed.
+- Elevating this artifact to a separate Accepted RFC (RFC-0003) unless a future governance change explicitly requires the RFC track; canonical status and layout are already committed in RFC-0001 and RFC-0002.
 
 ---
 
-## 12. References
+## 12. Pre–Phase A checkpoints — Resolved 2026-05-19
+
+Owner: OpenPLC + API maintainer (project lead). All structural recommendations in §§3–6 are accepted; the items below close the remaining detail before Phase A contract work (`@umbraculum/automation-contracts` + adapter SDK types) starts. Tier-limit numerics (§8.2) and full MRP/CRP cross-references (§4) remain illustrative until their respective phases.
+
+### 12.1 Pilot context (informs the rest of this section)
+
+The OpenPLC sister repo today is a **dev / pilot** — not deployed in any customer's production environment. The brewery vertical is real, but does not currently consume the pilot. Implication for Phase A–C: we have full freedom to evolve `PI_*` names, add registers, restructure the contract, and break compatibility on our own bench without notifying anyone external. Discipline (version handshake, refuse-on-major-mismatch) is wired in **from day one** so that by the time real customers exist, the muscle memory is in place — not because today's churn would harm anyone.
+
+### 12.2 B1 — `PI_*` / Modbus mailbox source of truth
+
+- **SoT.** OpenPLC sister repo is authoritative for `PI_*` names, addresses, and semantics. Safety-validated alarm logic is part of that SoT and is not duplicated in TypeScript.
+- **Mirror mechanism (M2).** Sister repo emits a checked-in artifact (script-generated `PI_*.json` and/or `.ts`). Platform `@umbraculum/automation-contracts` imports / mirrors that artifact via PR. Drift becomes visible in PR diffs rather than at runtime. Upgrade to a published `@umbraculum/openplc-mailbox-spec` package (M3) deferred until a second adapter or third-party consumer appears.
+- **Platform extensions.** Platform never adds `PI_*` names unilaterally; new mailbox entries require sister-repo PR + revalidation. Non-PLC platform-only data (AI summaries, UI hints, saved presets) lives in Postgres on `Vessel`/sibling tables, not in the mailbox namespace.
+- **Version handshake.** Reuse the existing baseline `contract_version` from the integrated release (sister-repo `pyproject.toml` is the canonical sidecar source per the integrated-release-versioning rule). Phase A `automation-contracts` exports a `CONTRACT_VERSION` constant tracking that field. The PLC reports its runtime version via a dedicated `PI_FIRMWARE_VERSION` (or equivalent) register; if one does not yet exist in the sister repo, Phase A includes a sister-repo PR to add it.
+- **Mismatch policy.** Major-version mismatch → adapter refuses to connect, raises an `AutomationAlarmEvent`. Minor-version mismatch → connects with a warning surfaced on `automation.adapterHealth`. Patch differences are silent.
+- **Phase A scope for write path.** Types and version constants only. No Modbus client in the platform until Phase C (`brewery.openplc.v1`).
+
+### 12.3 B2 — `Vessel.equipmentProfileId` cross-schema link
+
+- **Mechanism (L1).** App-level UUID FK: `equipmentProfileId String?` on `Vessel`, nullable, no Prisma `@relation` across schemas. Application code validates the referenced `public.equipment_profiles.id` exists at write time.
+- **Future upgrade path (L2).** Move to a formal Prisma cross-schema relation when brewery migrates to the canonical β layout in the H1 2027 tranche (per RFC-0002 Decision D). Backfill is a one-shot data-integrity check + relation declaration; no data migration required.
+- **Cardinality — N:1 (industry-standard).** Multiple `Vessel` rows may reference the same `EquipmentProfile`. Concrete brewery example: one profile `P-FV-15bbl-Std` (15 bbl conical, glycol, 2" arm) referenced by four physical vessels K1, K2, K3, K4. Same physical layout, single design record, single calibration update applies to all four. The 1-of-1 case (mash tun, kettle, HLT — typically unique designs in a brewery) is the trivial sub-case of N:1 and is allowed without special handling.
+- **Profile delete semantics.** Default is **block** when any vessel references the profile; the API returns a clear error naming the referencing vessel codes. Explicit detach is supported via an opt-in flag (e.g. `?cascade=detach`) — never silent. Avoids surprise data loss while keeping the operator override path explicit.
+- **Tier interactions.** Automation not installed → brewery never reads or writes the field. Brewery not installed (post-canonical hypothetical) → the field stays nullable; vessels without profiles are allowed.
+- **MRP/CRP forward note.** When `mrp`/`crp` ships, capacity planning aggregates `count(vessels) × profile.capacity` per workspace. The N:1 cardinality is what makes that aggregation meaningful. Trigger for extracting `@umbraculum/equipment-contracts` is documented in §4 above.
+
+### 12.4 B3 — Phase A scope confirmation
+
+Phase A is strictly:
+
+- New `packages/automation-contracts/` — mailbox types, adapter SDK types, `CONTRACT_VERSION` constant. No runtime code.
+- Sister-repo PR(s) — emit the mailbox artifact; ensure `contract_version` baseline includes a slot for adapter consumers; add `PI_FIRMWARE_VERSION` register if absent.
+- This design doc — §12 (this section) records resolutions; §4 records the MRP/CRP entry point.
+
+Phase A explicitly does **not** include:
+
+- Prisma migrations (Phase B).
+- `registerModule({ code: "automation" })` registration in `app.ts` (lands with or before Phase B).
+- Any Modbus client implementation (Phase C).
+- Web `(automation)/` routes (Phase B).
+
+Implementation PRs should link this doc and cite the accepted Phase (§9).
+
+---
+
+## 13. References
 
 - [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) — Decision E §7.2, Decision F
 - [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) — β layout, `automation` schema name
@@ -262,4 +307,4 @@ Per [`docs/ROADMAP.md`](../ROADMAP.md) H2 2026 AI-first; full MRP ↔ automation
 
 ---
 
-*Draft 2026-05-19. Implementation PRs should link this doc and RFC-0001 §7.2.*
+*Accepted design 2026-05-19. Implementation PRs should link this doc, RFC-0001 §7.2, and RFC-0002 (β layout). Amendments follow the same lightweight design-review procedure as RFC-0002 §12 unless a formal RFC-0003 is opened for governance reasons.*

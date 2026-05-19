@@ -435,6 +435,8 @@ Physical directory layout for canonical modules and tier-6 vertical configuratio
 
 ## 6. AI consultant blueprint
 
+Canonical `automation` module surface (Vessel registry, adapter SDK, OpenPLC seam, automation AI tools, tier limits) is specified in the accepted design [`docs/design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) (RFC-0001 Decision E §7.2; β layout per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md)). Implementation is phased (H2 2026 read path per that doc §9); brewery flat API routes are unchanged until the H1 2027 tranche.
+
 ### 6.1 Three layers (recap with comparison)
 
 | Aspect | Layer A: Tools | Layer B: Reporting DSL | Layer C: RAG |
