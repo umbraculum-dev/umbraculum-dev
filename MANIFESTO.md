@@ -43,6 +43,9 @@ The structural-goal tagline at the top of this document is the literal claim: *t
 
 ### 1.2 AI-orchestrated code as discipline
 
+> [!NOTE]
+> This section is about how **the project itself is built** — AI-orchestrated code as an authoring discipline. For the AI consultant as a **product feature** in the running platform (chat surface, registered tools, per-workspace operational memory, BYOK + paid-tier unlock), see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md). The two AI stories are related but distinct, and the gap between them is the most common reading mistake people make about Umbraculum — *one* is about how the code gets written, *the other* is about what the code does for an operator. Keep them apart while reading §1.2.
+
 This is the section that will be misread the most, so it is the one we must write the most carefully. The distinction below is not optional, not deferrable, and not softenable in voice review. **It is the only way the rest of the manifesto holds together.**
 
 **What we mean by "AI-orchestrated code".** The default authoring path in this project is: a human consultant (developer + AI orchestrator + quality manager, increasingly one figure) directs an AI assistant — currently Cursor's main agent and its specialized subagents — to produce code, under the enforcement of:

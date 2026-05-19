@@ -4,7 +4,7 @@
 
 This folder is the canonical reference set for the Umbraculum platform. It is structured so that anyone — a new contributor, a self-hoster, a hosted-service customer, or a future maintainer — can find what they need without reading the whole repository.
 
-Documents are grouped by **purpose**, not by physical location. Most files sit at the top level — they have not been moved into per-purpose subfolders in order to keep cross-links inside the existing codebase stable; this index provides the navigation. The exceptions are `integrations/`, `figma/`, `calculators/` (pre-existing per-asset folders), `archive/` (superseded revisions), and `help/` (end-user / operator help, currently empty placeholder).
+Documents are grouped by **purpose**, not by physical location. Most files sit at the top level — they have not been moved into per-purpose subfolders in order to keep cross-links inside the existing codebase stable; this index provides the navigation. The exceptions are `integrations/`, `calculators/` (pre-existing per-asset folders), `archive/` (superseded revisions), and `help/` (end-user / operator help, currently empty placeholder).
 
 > **Brand resolution.** The project's brand was previously tracked via the `<PLATFORM_NAME>` placeholder convention, resolved on 2026-05-18 to **Umbraculum** (wordmark), `umbraculum` (namespace across npm / Composer / PyPI / crates.io / Docker Hub), `umbraculum.dev` (primary domain), and `umbraculum-dev` (GitHub org). See [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) for the full diligence record. Historical token references in this and sibling docs have been substituted in-place.
 
@@ -41,6 +41,16 @@ The high-level direction, business model, and license posture.
 
 - [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example.
 - [`modules/`](modules/) — per-module pages linked from `MODULES.md` (one page per canonical module / vertical configuration as each ships; today: `modules/canonical/automation.md`).
+
+## AI consultant
+
+*Audience: platform evaluators, hosted-service operators, module developers, end-users.*
+
+The workspace-scope AI consultant is the cornerstone the platform is organized around — every other structural choice (monorepo, one shell, canonical-module discipline, peer-module decomposition, vertical-configuration tier) is downstream of one principle: the consultant must see the workspace as one coherent thing. See [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.0 "AI-consultant context principle (cornerstone)" for the reasoning.
+
+- [`AI-CONSULTANT.md`](AI-CONSULTANT.md) — **Feature surface.** What the consultant is, what it can do today (registered tools by module), what it cannot do yet, how modules contribute tools, BYOK + paid-tier unlock, per-workspace operational memory.
+- [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.0, §4.3, §6, §7 — Architecture depth: cornerstone principle, AI-platform sub-system, tools + prompt composition + memory + worked example, BYOK monetization model.
+- [`help/`](help/) — Operator-facing usage guides (see [`help/asking-umbraculum.md`](help/asking-umbraculum.md)).
 
 ## Stack & dependencies
 
@@ -153,12 +163,6 @@ Per-integration design notes.
 - [`integrations/INTEGRATION-TOKENS.md`](integrations/INTEGRATION-TOKENS.md) — Integration token model.
 - [`integrations/TILT.md`](integrations/TILT.md) — Tilt hydrometer integration.
 - [`integrations/FLOATING-HYDROMETERS.md`](integrations/FLOATING-HYDROMETERS.md) — Floating hydrometer family.
-
-## Design assets
-
-*Audience: contributors, designers.*
-
-- [`figma/`](figma/) — Figma exports for the three UI pillars (dashboard, edit-recipe, water-calculator).
 
 ## Reference
 

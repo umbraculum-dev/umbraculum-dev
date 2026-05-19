@@ -34,6 +34,15 @@ brewery are the primitives any batch process manufacturer needs.** MRP
 and CRP are not future "new modules" — they are a generalization of
 work the brewery vertical already does.
 
+The platform is also structured around a **workspace-scope AI
+consultant** as a first-class operational surface. The architectural
+choices that follow — monorepo, one shell, canonical-module discipline,
+peer-module decomposition, vertical-configuration tier — are downstream
+of one principle: the consultant must see the workspace as one coherent
+thing. See [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md) for the
+feature surface and [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
+§4.0 for the cornerstone reasoning.
+
 ### What ships with the brewery vertical today
 
 - Brew-day reliability tooling — mash / sparge / boil step pages, water
@@ -170,7 +179,7 @@ translations, and security reports.
 |-----------------------------------|---------------|
 | Brewery vertical — web            | Shipping (WIP)|
 | Brewery vertical — native (Expo)  | Shipping (WIP)|
-| AI consultant — orchestrator + tools + memory + admin dashboard | Shipping (Sprint #2 complete) |
+| AI consultant — ask Umbraculum about recipes, brew sessions, equipment, inventory, and tank state; answers grounded in your workspace data; BYOK + paid-tier unlock (see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)) | Shipping (Sprint #2 complete) |
 | Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
 | Brand name                        | **Umbraculum** (resolved 2026-05-18; namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`); see [`docs/RENAME-DILIGENCE.md`](docs/RENAME-DILIGENCE.md) |
 | Public release                    | Not flipped (working assumption: H1 2027 — see `docs/PLATFORM-ARCHITECTURE.md` §10.1) |
