@@ -42,6 +42,16 @@ The high-level direction, business model, and license posture.
 - [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example.
 - [`modules/`](modules/) — per-module pages linked from `MODULES.md` (one page per canonical module / vertical configuration as each ships; today: `modules/canonical/automation.md`).
 
+## AI consultant
+
+*Audience: platform evaluators, hosted-service operators, module developers, end-users.*
+
+The workspace-scope AI consultant is the cornerstone the platform is organized around — every other structural choice (monorepo, one shell, canonical-module discipline, peer-module decomposition, vertical-configuration tier) is downstream of one principle: the consultant must see the workspace as one coherent thing. See [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.0 "AI-consultant context principle (cornerstone)" for the reasoning.
+
+- [`AI-CONSULTANT.md`](AI-CONSULTANT.md) — **Feature surface.** What the consultant is, what it can do today (registered tools by module), what it cannot do yet, how modules contribute tools, BYOK + paid-tier unlock, per-workspace operational memory.
+- [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.0, §4.3, §6, §7 — Architecture depth: cornerstone principle, AI-platform sub-system, tools + prompt composition + memory + worked example, BYOK monetization model.
+- [`help/`](help/) — Operator-facing usage guides (see [`help/asking-umbraculum.md`](help/asking-umbraculum.md)).
+
 ## Stack & dependencies
 
 *Audience: evaluators, future maintainers, partners — anyone who wants to know **what** the platform is built on and **why** each open-source choice was made.*
