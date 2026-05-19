@@ -35,6 +35,15 @@ The high-level direction, business model, and license posture.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
 - [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the current AI tier unlock and future managed-AI overlay are described in `PLATFORM-ARCHITECTURE.md` §7).
 
+## Governance (RFCs)
+
+*Audience: contributors, module developers, platform evaluators.*
+
+Public architectural and governance commitments. Process: [`LICENSING.md`](LICENSING.md) §10.
+
+- [`rfcs/0001-modules-tiers-governance-and-automation-placement.md`](rfcs/0001-modules-tiers-governance-and-automation-placement.md) — Canonical-module rule, reserved codes, tier model, governance, consumption contract, automation placement (Accepted 2026-05-18).
+- [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md) — Physical layout (β three-tree), naming conventions, `module-sdk` location, H1 2027 migration sequencing (Accepted 2026-05-19).
+
 ## Product
 
 *Audience: product readers, evaluators, hosted-service operators.*

@@ -221,7 +221,7 @@ Every cross-cutting concern below is **owned by the horizontal platform**. Modul
 
 ### 9.2 What this RFC explicitly does NOT do (non-goals)
 
-- **Module folder layout.** Whether canonical modules live in `packages/modules/<code>/` vs `services/api/src/modules/<code>/` vs `apps/web/app/[locale]/(<code>)/` is a separate post-RFC follow-on. RFC-0001 commits the conceptual model; the physical layout is a mechanical-translation question.
+- **Module folder layout.** Committed in [RFC-0002 — Canonical-module physical layout](0002-canonical-module-physical-layout.md) (Accepted 2026-05-19): β three-tree distribution (`services/api/src/modules/<code>/`, `apps/web/app/[locale]/(<code>)/`, `apps/native/src/modules/<code>/`, `packages/<code>-contracts/`). RFC-0001 committed the conceptual model; RFC-0002 is the mechanical layout.
 - **Lint enforcement of the consumption contract.** `eslint-plugin-boundaries` configuration, banned-import lists per module folder — out of scope. Lands once canonical-module folders exist.
 - **AclService wiring.** Decision F claims `AclService.requireRole`; the actual wiring of the service to routes is separate work tracked in [`docs/TYPING.md`](../TYPING.md) audit findings.
 - **License changes.** [`docs/LICENSING.md`](../LICENSING.md) §10 is its own RFC track; this RFC does not change license posture.

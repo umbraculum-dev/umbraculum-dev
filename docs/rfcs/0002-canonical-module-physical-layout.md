@@ -1,9 +1,9 @@
 # RFC-0002 — Canonical-module physical layout
 
 **Tier:** Public
-**Status:** Draft 2026-05-18 (first draft for core-team review; NOT Accepted — see §12 Resolution)
+**Status:** Accepted 2026-05-19 (core team approval recorded; this is a living RFC — see §12 Resolution for the change procedure)
 **Audience:** prospective contributors, self-hosters, third-party module developers, hosted-service customers, and anyone evaluating Umbraculum's module folder conventions as a long-term operational dependency.
-**Brand resolution:** the project's brand was resolved on 2026-05-18 to **Umbraculum** (wordmark), `umbraculum` (namespace), `umbraculum.dev` (primary domain), `umbraculum-dev` (GitHub org). See [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md).
+**Brand resolution:** the project's brand was resolved on 2026-05-18 to **Umbraculum** (wordmark), `umbraculum` (namespace), `umbraculum.dev` (primary domain), `umbraculum-dev` (GitHub org only). npm packages use scope `@umbraculum` (org claimed 2026-05-19). See [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md).
 
 > **Disclaimer.** This RFC sets physical-layout commitments for Umbraculum's canonical-module ecosystem. It is a public-readable artifact intended to outlive any single maintainer; the commitments here are durable but not unchangeable — the change procedure mirrors [RFC-0001](0001-modules-tiers-governance-and-automation-placement.md) §13 and [`docs/LICENSING.md`](../LICENSING.md) §10.
 
@@ -257,11 +257,13 @@ Each of `mrp`, `crm`, `crp`, `automation` (RFC-0001 Decision B) lands directly i
 
 ## 12. Resolution
 
-**Status: Draft 2026-05-18.**
+**Status: Accepted 2026-05-19.**
 
-Decisions A, B, C, and D are proposed for core-team acceptance. Until acceptance, implementers SHOULD treat β as the leading layout for new design docs and second-module work, but MUST NOT perform brewery-only mass renames without an explicit migration PR plan.
+Decisions A, B, C, and D are committed. Implementers MUST treat β as the authoritative layout for new design docs and second-module work. Brewery-only mass renames remain deferred per Decision D until the H1 2027 tranche alongside the second canonical module (explicit migration PR required).
 
-**Acceptance procedure.** Same as RFC-0001: solo author draft → core team review → core team approval → update Status to Accepted with date. Public-comment period per [`docs/LICENSING.md`](../LICENSING.md) §10 applies post-public-flip (working assumption H1 2027 per [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1).
+The 30-day public-comment period in [`docs/LICENSING.md`](../LICENSING.md) §10 applies post-public-flip (working assumption H1 2027 per [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Until then, solo author drafts → core team reviews → core team approves; this RFC was written as if it WILL be public-readable so the public flip re-publishes without rewrite.
+
+Post-public-flip, if the core team chooses to run a retroactive 30-day public-comment period for foundational RFCs (RFC-0002 included), the Resolution section may be amended at that time; the original Accepted date (2026-05-19) remains the canonical commitment date.
 
 **Change procedure for this RFC.** Successor RFC at `docs/rfcs/NNNN-<title>.md` with motivation, alternatives, impact, migration plan. Amendments that change Decision A (physical shape) are particularly consequential and expected to be rare.
 
@@ -269,13 +271,15 @@ Decisions A, B, C, and D are proposed for core-team acceptance. Until acceptance
 
 ## 13. Touched docs (sweep summary)
 
-Documentation cross-reference sweep for RFC-0002. This session produces a **single-file diff** (this RFC only). Follow-up edits are listed for a separate PR.
+Documentation cross-reference sweep for RFC-0002 (applied on acceptance, 2026-05-19):
 
 - **NEW**: `docs/rfcs/0002-canonical-module-physical-layout.md` (this file).
-- **Substantive cross-ref candidate (follow-up)**: [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §5.2 — add one-line forward pointer to RFC-0002 as the authoritative layout decision.
-- **One-line pointer candidate (follow-up)**: [`docs/ROADMAP.md`](../ROADMAP.md) — H1 2027 module restructure bullet may reference RFC-0002.
-- **Cross-link candidate (follow-up)**: [`docs/README.md`](../README.md) — add RFC-0002 to the doc index if an RFC list section exists.
-- **No-change-with-reason**: [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](0001-modules-tiers-governance-and-automation-placement.md) §9.2 (deferral text remains historically accurate; RFC-0002 supersedes in practice once Accepted — amend RFC-0001 only after acceptance); [`docs/LICENSING.md`](../LICENSING.md) (no license change); [`MANIFESTO.md`](../../MANIFESTO.md) (values unchanged); [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) (orthogonal); [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) (runtime validation strategy unchanged).
+- **Substantive cross-ref**: [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §5.2 — forward pointer to RFC-0002 as the authoritative physical-layout decision.
+- **One-line pointer**: [`docs/ROADMAP.md`](../ROADMAP.md) — H1 2027 restructure references RFC-0002.
+- **Index**: [`docs/README.md`](../README.md) — Governance (RFCs) section lists RFC-0001 and RFC-0002.
+- **Cross-ref amendment**: [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](0001-modules-tiers-governance-and-automation-placement.md) §9.2 — module folder layout non-goal now points to RFC-0002.
+- **Diligence update**: [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md) §6.2 — `@umbraculum` npm org claimed 2026-05-19.
+- **No-change-with-reason**: [`docs/LICENSING.md`](../LICENSING.md) (no license change); [`MANIFESTO.md`](../../MANIFESTO.md) (values unchanged); [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) (orthogonal); [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) (runtime validation strategy unchanged).
 
 ---
 

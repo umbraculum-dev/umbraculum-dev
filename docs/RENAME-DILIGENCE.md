@@ -148,7 +148,7 @@ The Latin diminutive **umbraculum** (literally "small parasol / shelter / shaded
 
 | Namespace | Status | Evidence |
 |---|---|---|
-| `@umbraculum` (npm scope) | **Available** | `npm view @umbraculum` returns 404; scope is unclaimed |
+| `@umbraculum` (npm scope) | **Claimed** | npm org `umbraculum` created 2026-05-19; no packages published yet (scope reserved for sub-plan #9 migration) |
 | `umbraculum` (npm package, top-level) | **Available** | `npm view umbraculum` returns 404 |
 | `umbraculum` (Composer / Packagist vendor) | **Available** | `https://packagist.org/packages/umbraculum/` returns no vendor page |
 | `umbraculum` (PyPI top-level) | **Available** | `https://pypi.org/project/umbraculum/` returns 404 |
@@ -296,7 +296,7 @@ Verification dates: 2026-05-17 / 2026-05-18. The trademark and namespace landsca
 **Wordmark:** Umbraculum (UMB short)
 **Primary domain:** umbraculum.dev
 **Github org:** umbraculum-dev
-**Package namespaces:** `@umbraculum` (npm) / `umbraculum` (Composer / PyPI / crates.io / Docker Hub)
+**Package namespaces:** `@umbraculum` (npm org `umbraculum` claimed 2026-05-19; publish deferred) / `umbraculum` (Composer / PyPI / crates.io / Docker Hub)
 **Logo concept:** Red umbrella (heritage-aligned with the heraldic *umbraculum*)
 
 This resolution unblocks the rename sub-plan's `find_placeholders_grep` → substitution → confirmation pipeline against the brewery-app repo and the openplc sister-repo, scoped per the umbrella plan §10 exclusions (the `@brewery/*` actual package scopes — distinct from the `<PLATFORM_NAME>` placeholder — remain out of scope; their migration is tracked as the new follow-on sub-plan #9 in the umbrella plan's "Sub-plans this plan is designed to spawn" list).

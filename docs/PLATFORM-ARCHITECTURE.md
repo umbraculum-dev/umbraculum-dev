@@ -410,6 +410,8 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 ### 5.2 Renamed / restructured when 2nd module ships
 
+Physical directory layout for canonical modules and tier-6 vertical configurations is committed in [RFC-0002 — Canonical-module physical layout](rfcs/0002-canonical-module-physical-layout.md) (β three-tree distribution: `services/api/src/modules/<code>/`, `apps/web/app/[locale]/(<code>)/`, `apps/native/src/modules/<code>/`, `packages/<code>-contracts/` → `@umbraculum/<code>-contracts`; `registerModule()` in `packages/module-sdk/`). The bullets below are the migration tranche mechanics; RFC-0002 is the authoritative layout decision.
+
 - `@brewery/*` scope split: horizontal packages move to the neutral platform scope `@umbraculum/*`; brewery-vertical packages stay branded as the brewery module package set (or re-scope under `@umbraculum/brewery-*`).
 - Web routes wrapped in `(brewery)` Next.js route group (no URL change).
 - Brewery-vertical Postgres tables stay in place; new module gets its own Postgres schema via Prisma `multiSchema`.
