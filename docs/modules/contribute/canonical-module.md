@@ -5,7 +5,7 @@
 **Audience:** anyone proposing a new reserved canonical code (e.g. `quality`, `maintenance`, `hr`).
 
 > [!NOTE]
-> This page is for **allocating a new canonical code**, not for implementing one of the five already-allocated codes (`mrp`, `wms`, `crm`, `crp`, `automation`). For those, see the per-canonical pages — the surface design doc is the immediate next step, not a mini-RFC.
+> This page is for **allocating a new canonical code**, not for implementing one of the six already-allocated codes (`mrp`, `wms`, `crm`, `crp`, `automation`, `pim`). For those, see the per-canonical pages — the surface design doc is the immediate next step, not a mini-RFC.
 
 ---
 

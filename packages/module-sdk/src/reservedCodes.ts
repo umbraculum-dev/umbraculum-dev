@@ -9,6 +9,7 @@ export const RESERVED_CANONICAL_MODULE_CODES = [
   "crm",
   "crp",
   "automation",
+  "pim",
 ] as const;
 
 export type CanonicalModuleCode = (typeof RESERVED_CANONICAL_MODULE_CODES)[number];

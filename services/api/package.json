@@ -31,7 +31,7 @@
     "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
     "@umbraculum/contracts": "file:../../packages/contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",
-    "@brewery/module-sdk": "file:../../packages/module-sdk",
+    "@umbraculum/module-sdk": "file:../../packages/module-sdk",
     "@fastify/cookie": "^10.0.0",
     "@fastify/cors": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",

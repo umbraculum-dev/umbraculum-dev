@@ -43,7 +43,8 @@ var RESERVED_CANONICAL_MODULE_CODES = [
   "wms",
   "crm",
   "crp",
-  "automation"
+  "automation",
+  "pim"
 ];
 function isCanonicalModuleCode(code) {
   return RESERVED_CANONICAL_MODULE_CODES.includes(code);

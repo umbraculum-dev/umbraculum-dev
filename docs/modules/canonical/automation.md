@@ -41,7 +41,7 @@ Postgres schema name is `automation` ([`services/api/prisma/schema.prisma`](../.
 
 ## 3. Registration
 
-The module is wired into the Fastify app via `@brewery/module-sdk`'s `registerModule()`. From [`services/api/src/modules/automation/index.ts`](../../../services/api/src/modules/automation/index.ts):
+The module is wired into the Fastify app via `@umbraculum/module-sdk`'s `registerModule()`. From [`services/api/src/modules/automation/index.ts`](../../../services/api/src/modules/automation/index.ts):
 
 ```44:66:services/api/src/modules/automation/index.ts
 export function registerAutomationModule(app: FastifyInstance): void {

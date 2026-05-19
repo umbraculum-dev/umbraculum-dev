@@ -621,43 +621,63 @@ Doc references:
 
 ## Slot 11 — `@brewery/module-sdk` → `@umbraculum/module-sdk`
 
-**Status:** Pending. **Depends on slot 9.**
+**Status:** Complete (2026-05-19). **Closes the LAST slot-9-opened transient cross-scope state** — the `@brewery/module-sdk` half. (The `@brewery/api-client` half closed on slot 10.) After this slot, **both halves of the slot-9 double-state are CLOSED**; the multi-state version of upstream-then-downstream-rename ordering held cleanly across slots 9→{10,11} with no observed inter-state interaction. **Depends on slot 9.**
 
-**Target + classification.** Platform. `registerModule()` contract + `ValidatedSchema<T>` interface. Already self-declares end-state name in `package.json` description.
+**Target + classification.** Platform. `registerModule()` contract + library-agnostic `ValidatedSchema<T>` interface. The `package.json` `description` field's pre-existing "End-state npm scope: @umbraculum/module-sdk per RFC-0002" forecast sentence has been rewritten to describe the contract surface (the end state is now the live state).
 
-**Hard stops.**
+**Hard stops cleared.**
 
-- Predecessor: slot 9 must have shipped (module-sdk lists `@brewery/contracts` as a dep).
-- [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) F5 explicitly tracks this rename as a coordination point — update the F5 row to mark this slot done.
-- [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) references `ValidatedSchema<T>` from `@brewery/module-sdk` — update.
+- [x] Predecessor: slot 9 shipped — confirmed `packages/module-sdk/package.json` already had `"@umbraculum/contracts": "file:../contracts"` at start of slot 11 (slot-9 sweep had updated the dep entry; only the workspace `name` field remained to flip).
+- [x] [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) F5 row updated: state column flipped from "In progress (scoping done)" to "**Done (2026-05-19, slot 11 of sub-plan #9)**"; the row's narrative rewritten to reflect that the `@umbraculum/module-sdk` name is now the live workspace name (no longer a future-state target) and that the two transient cross-scope states from slot 9 are both closed.
+- [x] [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) `ValidatedSchema<T>` reference updated by the bulk sweep (1 substitution).
+- [x] Preflight skill 6 HARD STOP classes ran cleanly: only ONE HIT — root `build:packages` (slot's only stop). `bin` field absent; `next.config.js` transpilePackages absent (web has no source-level dep on module-sdk); `metro.config.js` absent (will be slot 13's only HARD STOP for recipes-ui); root `test:packages` does NOT include module-sdk — see follow-up note below; workflow display names absent.
+- [x] 4-cousin substring-collision walk clean: (a) no `@brewery/module-sdk-*` longer-prefix variants; (b) shorter-prefix N/A — no `@brewery/module` workspace exists in the §1.1 classification table (the regex literal `-sdk` anchor would have protected it had one existed, continuing the slot-10 structural-untouchability claim); (c) no `@umbraculum/module-sdk*` collision (no prior slot renamed anything starting with that string); (d) zero subpath imports (`packages/module-sdk/package.json` declares only `.` as an export).
+- [x] Slot-9 + slot-10 NEW HARD STOPs held: `cursor-tmp/slot11-bulk-sed.py` excluded itself via the `EXCLUDE_DIR_PARTS` set + the defensive belt-and-braces (script's `OLD_FULL` literal constructed from concatenated string segments); the cousin-(b) shorter-prefix structural-untouchability claim continued to hold across all 17 substitutions.
 
-**File inventory.**
+**File inventory cleared.**
 
 Workspace name + own files:
-- [ ] [`packages/module-sdk/package.json`](../../packages/module-sdk/package.json) — `name`; clean up "End-state" sentence in description (now reflects current state).
-- [ ] [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md) — heading + all examples.
-- [ ] [`packages/module-sdk/src/types.ts`](../../packages/module-sdk/src/types.ts) — internal references.
+- [x] [`packages/module-sdk/package.json`](../../packages/module-sdk/package.json) — `name` flipped; pre-existing "End-state" sentence rewritten to describe the contract surface; the slot-9 sweep had already updated the `@umbraculum/contracts` dep entry, so no further dep changes needed.
+- [x] [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md) — heading + workspace command examples updated; rename history note added per slot-8 / slot-9 / slot-10 convention; "End-state" forecast NOTE rewritten to record the closure of both slot-9 transient states.
+- [x] [`packages/module-sdk/src/types.ts`](../../packages/module-sdk/src/types.ts) — already clean (the slot-9 sweep had updated the `@umbraculum/contracts` import; no `@brewery/module-sdk` self-references in this file).
 
 Consumer `package.json` deps:
-- [ ] [`services/api/package.json`](../../services/api/package.json).
+- [x] [`services/api/package.json`](../../services/api/package.json).
 
 Source imports:
-- [ ] [`services/api/src/app.ts`](../../services/api/src/app.ts) (comment reference).
-- [ ] [`services/api/src/modules/automation/index.ts`](../../services/api/src/modules/automation/index.ts).
-- [ ] [`services/api/src/tests/vitest.setup.ts`](../../services/api/src/tests/vitest.setup.ts).
+- [x] [`services/api/src/app.ts`](../../services/api/src/app.ts) (comment reference updated).
+- [x] [`services/api/src/modules/automation/index.ts`](../../services/api/src/modules/automation/index.ts) — 3 substitutions.
+- [x] [`services/api/src/tests/vitest.setup.ts`](../../services/api/src/tests/vitest.setup.ts) — 2 substitutions.
 
 Other:
-- [ ] [`docker-compose.yml`](../../docker-compose.yml) — comment references.
+- [x] [`docker-compose.yml`](../../docker-compose.yml) — line-115 comment reference updated; the on-disk bind-mount path on line 123 references the directory `packages/module-sdk/` (not the npm scope) and is correctly unchanged.
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md).
-- [ ] [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) — F5 row + any inline references; mark slot 11 done in F5.
-- [ ] [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) — ValidatedSchema reference.
-- [ ] [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) — references in B-1 closure note.
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md).
+- [x] [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) — F5 row marked Done + inline ValidatedSchema references updated.
+- [x] [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) — ValidatedSchema reference updated.
+- [x] [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) — 3 substitutions in B-1 closure note + surrounding references.
+- [x] [`docs/modules/canonical/automation.md`](../modules/canonical/automation.md) — 1 substitution.
 
-**Verification + commit.** Plan doc §4 steps 4–7. Slot-specific verification:
-- [ ] Confirm `services/api` boots clean (registerModule wiring is the hot path).
-- [ ] Update [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) F5 row to mark "rename complete" alongside the same commit.
+**Step-3 sweep results:** 12 files / 17 substitutions (vs 16-file plan-doc inventory; the 4-file delta = 1 self-exclusion of `packages/module-sdk/package.json` because step 1 had already updated the `name` field + 3 explicit excludes — own README + 2 history docs).
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing — exactly matches slot-7 / slot-8 / slot-9 / slot-10 baseline). The api consumes module-sdk via `registerModule()` so a clean api vitest is direct evidence the rename did not break the production wiring.
+- [x] Root `npm run test:packages` 9/9 files / 120/120 tests (5 contracts files / 73 tests + 4 brewery-core files / 47 tests) — same baseline as slot 9/10 since module-sdk is not currently in the script.
+- [x] **Slot-specific:** module-sdk's own tests (`npm test -w @umbraculum/module-sdk`) — **2/2 files / 8/8 tests** — confirms `registerModule.test.ts` + `validatedSchema.test.ts` pass under the new workspace-name resolution.
+- [x] Native typecheck via the **slot-8 no-root-install / named-volume pattern** — clean; ~5s wall-clock. api `.bin/` count preserved at canonical 21; api `/api/health` still 200 post-typecheck. Slot-5 GOTCHA fully averted.
+- [x] Nginx smoke 7/7 HTTP 200 — `/api/health`, `/en/{login,dashboard,recipes}`, `/it/{login,dashboard,recipes}`.
+- [x] Web-side lockfile diff after `npm install --include=dev` — **0 lines** (confirms web has no `package.json` dep on module-sdk).
+- [x] module-sdk dist content audit: `grep -roh '@(brewery|umbraculum)/module-sdk[a-zA-Z0-9_/.-]*' dist/` returned only the self-name `@umbraculum/module-sdk`; the contracts grep returned only `@umbraculum/contracts`. Zero `@brewery/*` refs in dist.
+- [x] **Slot-specific gate cleared:** api boots clean post-rename — registerModule wiring is the hot path, and the api startup logs show `Server listening at http://127.0.0.1:4000` followed by clean Pino-format request lifecycle on `/api/health` (200 / ~15ms responseTime), no collision warnings, no AI-tool-registry registration errors.
+- [x] **Slot-specific gate cleared:** F5 row in `docs/CONTRACTS-VALIDATION-STRATEGY.md` marked "**Done (2026-05-19, slot 11 of sub-plan #9)**" alongside the same commit.
+- [x] Final commit message explicitly notes the closure of the LAST slot-9-opened transient cross-scope state.
+
+**No new lessons surfaced.** Slot 11 was a clean execution of the slot-9-refined recipe; the slot-9 + slot-10 NEW HARD STOPs both held cleanly. See plan doc §6.11 for full recap.
+
+**Follow-up note (out of slot 11 scope, not blocking):** module-sdk has 2 test files / 8 tests that are NOT included in root `test:packages`. This is a pre-existing gap predating slot 11; module-sdk was missing from `test:packages` before the rename began. Slot 11 ran the missing tests directly as part of step-6 verification (all 8/8 passing). Adding module-sdk to root `test:packages` is a behavior change beyond the rename's atomic scope; tracked as a future cleanup item rather than landed under sub-plan #9.
 
 ---
 

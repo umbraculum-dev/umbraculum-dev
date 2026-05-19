@@ -1,8 +1,8 @@
 {
-  "name": "@brewery/module-sdk",
+  "name": "@umbraculum/module-sdk",
   "private": true,
   "version": "0.0.0",
-  "description": "Umbraculum module registration contract (registerModule). End-state npm scope: @umbraculum/module-sdk per RFC-0002.",
+  "description": "Umbraculum module registration contract (registerModule + registerWebModule + library-agnostic ValidatedSchema<T> interface) for canonical and third-party modules. Platform-classified per sub-plan #9 §1.1; placement per RFC-0002 Decision C.",
   "type": "module",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",

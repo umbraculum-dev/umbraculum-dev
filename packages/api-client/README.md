@@ -3,7 +3,7 @@
 Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node).
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/api-client` to `@umbraculum/api-client` as sub-plan #9 slot 10; closes one of the two transient cross-scope states opened by slot 9 (the other — `@brewery/module-sdk` — closes on slot 11).
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/api-client` to `@umbraculum/api-client` as sub-plan #9 slot 10; closes one of the two transient cross-scope states opened by slot 9 (the other — `@umbraculum/module-sdk` — closes on slot 11).
 
 ## What this is
 

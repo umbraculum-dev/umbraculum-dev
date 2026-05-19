@@ -101,7 +101,7 @@ export function buildApp() {
   app.register(webhooksRevenuecatRoutes);
 
   // Canonical `automation` module — Phase B foundation.
-  // - Phase B-1 wired the module via `@brewery/module-sdk` with no routes.
+  // - Phase B-1 wired the module via `@umbraculum/module-sdk` with no routes.
   // - Phase B-2 lands the mock adapter, vessel read services, routes
   //   (`/automation/vessels`, `/automation/vessels/:code`), and AI tools
   //   (`automation.listVessels`, `automation.vesselState`).

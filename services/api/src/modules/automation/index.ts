@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { listRegisteredModules, registerModule } from "@brewery/module-sdk";
+import { listRegisteredModules, registerModule } from "@umbraculum/module-sdk";
 
 import { automationVesselsRoutes } from "./routes/automationVesselsRoutes.js";
 
@@ -7,7 +7,7 @@ const MODULE_CODE = "automation";
 
 /**
  * Wire the canonical `automation` module into the Fastify host app via
- * `@brewery/module-sdk` and register its read-path routes.
+ * `@umbraculum/module-sdk` and register its read-path routes.
  *
  * Phase B-2 (this file's current scope):
  *   - Records module metadata (`code: "automation"`, `prismaSchema: "automation"`).
@@ -26,7 +26,7 @@ const MODULE_CODE = "automation";
  *
  * ## Repeat-call safety (idempotent metadata recording)
  *
- * `@brewery/module-sdk`'s `registerModule()` uses a process-wide singleton
+ * `@umbraculum/module-sdk`'s `registerModule()` uses a process-wide singleton
  * registry that throws `ModuleCodeAlreadyRegisteredError` on duplicate
  * registration. In production, `buildApp()` is called once per process so
  * this is a no-op safety net. In test workers, multiple Fastify instances

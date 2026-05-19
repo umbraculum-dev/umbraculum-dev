@@ -5,7 +5,7 @@ import { AiToolRegistry } from '@umbraculum/contracts';
  * Tier-6 vertical configurations (e.g. `brewery`) use the same
  * `registerModule({ code })` shape but are not in this set.
  */
-declare const RESERVED_CANONICAL_MODULE_CODES: readonly ["mrp", "wms", "crm", "crp", "automation"];
+declare const RESERVED_CANONICAL_MODULE_CODES: readonly ["mrp", "wms", "crm", "crp", "automation", "pim"];
 type CanonicalModuleCode = (typeof RESERVED_CANONICAL_MODULE_CODES)[number];
 declare function isCanonicalModuleCode(code: string): code is CanonicalModuleCode;
 

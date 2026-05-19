@@ -112,7 +112,7 @@ services:
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
       - ./packages/media:/packages/media:ro
-      # Phase B-1: api consumes @brewery/module-sdk via registerModule()
+      # Phase B-1: api consumes @umbraculum/module-sdk via registerModule()
       # and @umbraculum/automation-contracts for the typed mailbox mirror.
       # Both packages already follow the file:../../packages/<name> npm
       # workspace convention; the symlink at node_modules/@brewery/<name>

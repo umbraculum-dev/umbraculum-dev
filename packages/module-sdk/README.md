@@ -1,9 +1,9 @@
-# @brewery/module-sdk
+# @umbraculum/module-sdk
 
 Module registration contract for the Umbraculum platform (`registerModule`, reserved canonical codes, web registry stub).
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md). End-state npm name: `@umbraculum/module-sdk` per [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md); monorepo scope remains `@brewery/*` until sub-plan #9 ([`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10).
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/module-sdk` to `@umbraculum/module-sdk` as sub-plan #9 slot 11; closes the last of the two transient cross-scope states opened by slot 9 (the other — `@brewery/api-client` — closed on slot 10). Placement per [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision C.
 
 ## What this is
 
@@ -42,9 +42,9 @@ See `src/validatedSchema.ts` for the full interface + adapter + library-specific
 
 From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
 
-- **Build**: `npm run build -w @brewery/module-sdk`
-- **Test**: `npm run test -w @brewery/module-sdk`
-- **Typecheck**: `npm run typecheck -w @brewery/module-sdk`
+- **Build**: `npm run build -w @umbraculum/module-sdk`
+- **Test**: `npm run test -w @umbraculum/module-sdk`
+- **Typecheck**: `npm run typecheck -w @umbraculum/module-sdk`
 
 ## Cross-references
 

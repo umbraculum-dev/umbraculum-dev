@@ -5,7 +5,7 @@ if (process.env['DATABASE_URL_TEST']) {
   process.env['DATABASE_URL'] = process.env['DATABASE_URL_TEST'];
 }
 
-// Phase B-1: `@brewery/module-sdk`'s registerModule() uses a process-wide
+// Phase B-1: `@umbraculum/module-sdk`'s registerModule() uses a process-wide
 // singleton registry that throws ModuleCodeAlreadyRegisteredError on the
 // second buildApp() call within the same vitest worker. Clearing the
 // registry here (which runs before each test file's imports) lets each
@@ -13,7 +13,7 @@ if (process.env['DATABASE_URL_TEST']) {
 import {
   clearModuleRegistryForTests,
   clearWebModuleRegistryForTests,
-} from "@brewery/module-sdk";
+} from "@umbraculum/module-sdk";
 
 clearModuleRegistryForTests();
 clearWebModuleRegistryForTests();
