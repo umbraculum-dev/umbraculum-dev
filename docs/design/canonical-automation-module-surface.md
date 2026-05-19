@@ -58,7 +58,7 @@ Three concerns must not collapse (RFC-0001 §7.1):
 
 **Rejected:** Single unified model — mixes snapshot-copy semantics with live PLC rows; confuses `maxRecipes` vs `maxVessels`.
 
-**MRP / CRP entry point (deferred).** When `mrp` (and `crp`) ship, they will need read access to `EquipmentProfile` to do capacity planning (profiles × N vessels per profile = total workspace capacity — see §12 cardinality note). That is the second-consumer trigger from [RFC-0002 §7](../rfcs/0002-canonical-module-physical-layout.md#7-what-this-rfc-defers-open-questions-for-sub-plan-9) item 3 ("cross-module shared types") to extract `@umbraculum/equipment-contracts` (or `@brewery/equipment-contracts` if the concept stays brewery-specific). Until then, the field stays brewery-internal; `automation` references `vesselId` via `@umbraculum/automation-contracts`. No `platform-equipment-contracts` until the conflict is concrete — YAGNI.
+**MRP / CRP entry point (deferred).** When `mrp` (and `crp`) ship, they will need read access to `EquipmentProfile` to do capacity planning (profiles × N vessels per profile = total workspace capacity — see §12 cardinality note). That is the second-consumer trigger from [RFC-0002 §7](../rfcs/0002-canonical-module-physical-layout.md#7-what-this-rfc-defers-open-questions-for-sub-plan-9) item 3 ("cross-module shared types") to extract `@umbraculum/equipment-contracts` (or `@umbraculum/brewery-equipment-contracts` if the concept stays brewery-specific — vertical-prefixed per sub-plan #9 §1.3 TRAP-avoidance discipline). Until then, the field stays brewery-internal; `automation` references `vesselId` via `@umbraculum/automation-contracts`. No `platform-equipment-contracts` until the conflict is concrete — YAGNI.
 
 ---
 

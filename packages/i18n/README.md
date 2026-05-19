@@ -59,7 +59,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 ## How it fits in
 
 - **Consumed by**: `apps/web` (via next-intl), `apps/native` (via React Native bundling), `services/api` (for any operator-facing message strings), `@umbraculum/i18n-react` (the React-binding sibling).
-- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@umbraculum/contracts` and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
+- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@umbraculum/contracts` and `@umbraculum/media`.
 
 ## Status
 

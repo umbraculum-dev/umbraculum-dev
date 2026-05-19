@@ -109,9 +109,9 @@ export interface AdapterReadContext {
  *
  * Phase A: type only — no runtime client. Phase B-2 adds the mock adapter
  * in `services/api/src/modules/automation/adapters/mockAdapter.ts`. Phase C
- * will provide a concrete implementation in `@brewery/openplc-adapter` (or
- * equivalent) that speaks Modbus TCP (bench) / Modbus RTU (field) per the
- * bench-vs-field profile rule.
+ * will provide a concrete implementation in `@umbraculum/openplc-adapter`
+ * (or equivalent) that speaks Modbus TCP (bench) / Modbus RTU (field) per
+ * the bench-vs-field profile rule.
  *
  * The adapter definition is intentionally a plain TypeScript `interface`
  * (not a Zod schema): adapters carry runtime functions (`readSnapshot`)

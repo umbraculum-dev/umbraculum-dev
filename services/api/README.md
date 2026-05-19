@@ -1,9 +1,9 @@
-# @brewery/api
+# @umbraculum/api
 
 Fastify + Prisma + Postgres API service — the backend for Umbraculum's brewery vertical and the platform layer below it.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/api` to `@umbraculum/api` as sub-plan #9 slot 14 — the closing slot of the application-workspace bundle that completes sub-plan #9; with this rename, every `@brewery/*` workspace name is now `@umbraculum/*`.
 
 ## What this is
 

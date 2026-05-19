@@ -27,7 +27,7 @@ Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
   - `packages/i18n/src/en.json`
   - `packages/i18n/src/it.json`
 - [ ] Native i18n guardrail passes:
-  - `npm run i18n:guardrail -w @brewery/native` (run in a Node container per repo policy)
+  - `npm run i18n:guardrail -w @umbraculum/native` (run in a Node container per repo policy)
 - [ ] Native screens use `useT()` from `@umbraculum/i18n-react` for user-visible text and accessibility labels.
 
 ## Auth + web-only fallback routes (system browser bridge)

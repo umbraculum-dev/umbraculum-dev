@@ -1,7 +1,8 @@
 {
-  "name": "@brewery/native",
+  "name": "@umbraculum/native",
   "private": true,
   "version": "0.0.0",
+  "description": "Umbraculum native app — Expo + React Native mobile client for the brewery vertical, sharing UI primitives and recipe editors with the web app via @umbraculum/{ui, brewery-recipes-ui, …}. Application workspace; not imported by other workspaces. Renamed from @brewery/native as sub-plan #9 slot 14 (closing slot — application-workspace bundle).",
   "main": "index.js",
   "scripts": {
     "start": "expo start",

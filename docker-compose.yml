@@ -115,11 +115,12 @@ services:
       # Phase B-1: api consumes @umbraculum/module-sdk via registerModule()
       # and @umbraculum/automation-contracts for the typed mailbox mirror.
       # Both packages already follow the file:../../packages/<name> npm
-      # workspace convention; the symlink at node_modules/@brewery/<name>
+      # workspace convention; the symlink at node_modules/@umbraculum/<name>
       # resolves to /packages/<name>, which requires these bind mounts.
       # Pattern mirrors the contracts/core/media bind mounts above
       # (rename history: slot 2 media → @umbraculum/media; slot 6 core →
-      # @umbraculum/brewery-core; slot 9 contracts → @umbraculum/contracts).
+      # @umbraculum/brewery-core; slot 9 contracts → @umbraculum/contracts;
+      # sub-plan #9 closed slot 14 — all @brewery/* now @umbraculum/*).
       - ./packages/module-sdk:/packages/module-sdk:ro
       - ./packages/automation-contracts:/packages/automation-contracts:ro
 

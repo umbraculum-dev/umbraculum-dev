@@ -5,7 +5,7 @@
  * preferences to apply. Snapshot is shape-based (keys + JSON types) so it
  * doesn't drift on UUIDs/emails but DOES flag any key/type change.
  *
- * To intentionally update: UPDATE_CONTRACTS=1 npm test -w @brewery/api -- contracts/auth.contract.test.ts
+ * To intentionally update: UPDATE_CONTRACTS=1 npm test -w @umbraculum/api -- contracts/auth.contract.test.ts
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../../app.js";

@@ -18,7 +18,7 @@
  * water-hub-summary).
  *
  * To intentionally update:
- *   UPDATE_CONTRACTS=1 npm test -w @brewery/api -- contracts/recipeWaterCompute.contract.test.ts
+ *   UPDATE_CONTRACTS=1 npm test -w @umbraculum/api -- contracts/recipeWaterCompute.contract.test.ts
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../../app.js";

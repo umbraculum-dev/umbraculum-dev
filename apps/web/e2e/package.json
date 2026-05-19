@@ -1,8 +1,9 @@
 {
-  "name": "@brewery/web-e2e",
+  "name": "@umbraculum/web-e2e",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Umbraculum web E2E suite — Playwright tests for the @umbraculum/web storefront. Nested workspace (NOT in the root @umbraculum monorepo workspaces glob — Playwright + browser binaries are isolated per its own README and the slot-7 CI hygiene #2 lesson). Renamed from @brewery/web-e2e as sub-plan #9 slot 14 (closing slot — application-workspace bundle).",
   "scripts": {
     "test": "playwright test",
     "test:smoke": "playwright test --project=smoke",

@@ -1,7 +1,8 @@
 {
-  "name": "@brewery/web",
+  "name": "@umbraculum/web",
   "private": true,
   "version": "0.0.0",
+  "description": "Umbraculum web app — Next.js storefront for the brewery vertical (recipes, brew sessions, water/yeast workflows). Consumes @umbraculum/* packages (ui, recipes-ui, contracts, i18n, etc.) via workspace symlinks. Application workspace; not imported by other workspaces. Renamed from @brewery/web as sub-plan #9 slot 14 (closing slot — application-workspace bundle).",
   "scripts": {
     "postinstall": "node scripts/sync-media.mjs",
     "predev": "node scripts/sync-media.mjs",

@@ -1,8 +1,9 @@
 {
-  "name": "@brewery/api",
+  "name": "@umbraculum/api",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Umbraculum API service — Fastify + Prisma backend serving the brewery vertical (recipes, water, yeast, brew sessions, AI tools) and platform-wide concerns (auth, modules, automation contracts). Application workspace; consumed only via HTTP, not via npm imports. Renamed from @brewery/api as sub-plan #9 slot 14 (closing slot — application-workspace bundle).",
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",

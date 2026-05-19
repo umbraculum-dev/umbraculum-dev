@@ -74,24 +74,14 @@ The brand was resolved on 2026-05-18 (see [`RENAME-DILIGENCE.md`](RENAME-DILIGEN
 | **GitHub org** | `umbraculum-dev` |
 | **Mascot** | **Umbi** (canonical asset at [`media/umbi.png`](media/umbi.png)) |
 | **Brewery vertical** | "the brewery vertical" (lowercase; it is a *configuration* of Umbraculum, not a separate product) |
-| **Title of the README** | The literal `package.json` `"name"` field — currently `@brewery/<package>` for npm packages, plain `@brewery/<app>` for apps, plain workspace name for services |
+| **Title of the README** | The literal `package.json` `"name"` field — `@umbraculum/<package>` for platform npm packages, `@umbraculum/brewery-<package>` for brewery-vertical npm packages (per sub-plan #9 §1.3 TRAP-avoidance discipline), `@umbraculum/<app>` for application workspaces, plain workspace name for services |
 | **Install / import snippets** | Same — match the actual `package.json` `"name"` |
 
-### 3.1 The `@brewery/*` parking — explicit guidance
+### 3.1 Package-scope state — sub-plan #9 closed (historical note)
 
-The `@brewery/*` npm scope is **deliberately retained** while sub-plan #9 is pending (the `<repo>/brewery-app` repository name was previously parked alongside it but resolved to `umbraculum-dev` on 2026-05-18 — folder, npm `name`, and GitHub repo all renamed; only the npm scope migration remains). Per [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) §10 sign-off:
+The npm scope `@umbraculum/*` (with brewery-vertical packages re-scoped under `@umbraculum/brewery-*`) is the **live state** as of 2026-05-19; the prior `@brewery/*` scope was retired across 14 slots of sub-plan #9 (see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)).
 
-> "the `@brewery/*` actual package scopes — distinct from the `<PLATFORM_NAME>` placeholder — remain out of scope; their migration is tracked as the new follow-on sub-plan #9 in the umbrella plan's 'Sub-plans this plan is designed to spawn' list."
-
-When writing module READMEs **today**, this means:
-
-- ✅ **Title**: `# @umbraculum/api-client` (matches `package.json`).
-- ✅ **Imports** in code snippets: `import { … } from "@umbraculum/api-client";`.
-- ✅ **Prose**: "Umbraculum's API client" is the platform-level framing; "this package" or "@umbraculum/api-client" is the in-context framing.
-- ❌ Do **not** rewrite imports or titles to `@umbraculum/*` — they will not resolve. Sub-plan #9 will do the global rewrite atomically.
-- ❌ Do **not** introduce new placeholders like `<NEW_NPM_SCOPE>` — the resolved values are known; the only delay is the rewrite-and-publish ceremony.
-
-When sub-plan #9 lands, the module READMEs will be updated mechanically (the rename surface is small and bounded). The standard remains stable across that transition.
+Earlier revisions of this section described a "parking" arrangement while sub-plan #9 was in flight; that arrangement is **closed**. README titles and imports must use the current `@umbraculum/*` / `@umbraculum/brewery-*` names verbatim — they match each workspace's `package.json` `"name"` field and resolve at the package-manager layer through the workspaces convention. Code snippets, npm command examples, and the install/import sections all use the current scope. Rename-history sentences in the per-package NOTE block are retained as deliberate historical records (e.g. `Renamed from @brewery/<name> to @umbraculum/<name> as sub-plan #9 slot N`); the structural-checker treats them as inline prose, not import lines, so they pass the gate.
 
 ---
 
@@ -109,7 +99,7 @@ A new module README starts from this template. Strip optional sections that don'
 > do not fail the gate.
 
 ````markdown
-# @brewery/<package-name>
+# @umbraculum/<package-name>
 
 <!-- One-line tagline. What this module is, in plain language. No marketing
      fluff. Maximum one comma. -->
@@ -117,9 +107,11 @@ A new module README starts from this template. Strip optional sections that don'
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — the process-manufacturing platform,
 > brewery-configured by default. Brand resolved 2026-05-18; see
-> [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope
-> `@brewery/*` is parked pending sub-plan #9 (the rename diligence doc §10);
-> do not rewrite import paths.
+> [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from
+> `@brewery/<package-name>` to `@umbraculum/<package-name>` (or
+> `@umbraculum/brewery-<package-name>` for brewery-vertical packages — see
+> sub-plan #9 §1.3) as sub-plan #9 slot N (closed 2026-05-19); see
+> [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md).
 
 ## What this is
 
@@ -150,7 +142,7 @@ A new module README starts from this template. Strip optional sections that don'
      Code blocks must be runnable; do not abbreviate paths. -->
 
 ```ts
-import { … } from "@brewery/<package>";
+import { … } from "@umbraculum/<package>";
 ```
 
 ## Build / test / lint (local)
@@ -159,8 +151,8 @@ import { … } from "@brewery/<package>";
      the repo root unless explicitly noted. Do not show host-npm commands. -->
 
 - Build: `npm run build:packages` (or `./scripts/build-packages-in-docker.sh` for the Docker route)
-- Test: `npm run test --workspace=@brewery/<package>` (or container-equivalent)
-- Lint: `npm run lint --workspace=@brewery/<package>`
+- Test: `npm run test --workspace=@umbraculum/<package>` (or container-equivalent)
+- Lint: `npm run lint --workspace=@umbraculum/<package>`
 - Typecheck: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate"
 
 ## How it fits in
@@ -194,7 +186,7 @@ This is the canonical checklist used in **Docs slice Phase 2** (audit + standard
 
 ### 5.1 Must-haves
 
-- [ ] Title is `# @brewery/<package>` (or the literal `package.json` `"name"` for non-`@brewery/*` workspaces).
+- [ ] Title matches the literal `package.json` `"name"` field — typically `# @umbraculum/<package>` for platform packages, `# @umbraculum/brewery-<package>` for brewery-vertical packages, `# @umbraculum/<app>` for application workspaces, or the plain workspace name for non-scoped services.
 - [ ] One-line tagline directly under the title (no blank line between the tagline and the next section heading is acceptable).
 - [ ] Brand callout (the `> [!NOTE]` block) appears once near the top, with a link to [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md) on the first mention of "Umbraculum".
 - [ ] "What this is" section: 3-6 lines, explains the module without requiring the reader to leave the file.
@@ -268,7 +260,7 @@ The mascot **Umbi** (the canonical asset at [`media/umbi.png`](media/umbi.png)) 
 
 | Deferred decision | Trigger condition | Owner |
 |---|---|---|
-| Apply the standard mechanically to top-level `README.md` and `docs/README.md` | Sub-plan #9 lands the `@brewery/*` → `@umbraculum/*` rewrite, providing a natural "second pass" anchor | Docs maintainer |
+| Apply the standard mechanically to top-level `README.md` and `docs/README.md` | Originally anchored on the close of sub-plan #9 — that closed 2026-05-19; the second-pass work is now unblocked | Docs maintainer |
 | Public-flip rendering preview (visual proof the READMEs render cleanly on github.com when public) | Public flip is scheduled (currently working-assumption H1 2027 per [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1) | Docs maintainer + flip-coordinator |
 | Standard for `docs/help/` end-user content (different audience: workspace operators, not contributors) | First content lands in `docs/help/` as the brewery vertical UI matures | Help-content owner (not yet assigned) |
 
@@ -298,6 +290,6 @@ Items the gate cannot mechanically check (inherent prose-quality constraints fro
 
 **Standard version:** v1.1
 **Landed:** 2026-05-18 (Docs slice — feature-complete: Phase 1 published the standard; Phase 2 audited the existing 8 READMEs; Phase 3 wrote the 6 missing READMEs; Phase 4 landed the CI gate).
-**Next anchor:** sub-plan #9 — when the `@brewery/*` → `@umbraculum/*` npm scope migration ships, this standard's §3.1 "@brewery/* parking" section becomes obsolete; the gate's `@umbraculum/*` exclusion check is removed at the same time. The "apply this standard to top-level README.md and docs/README.md" item in §8 also unlocks then.
+**Next anchor:** the post-sub-plan-#9 doc-tier closeout — sub-plan #9 closed 2026-05-19; §3.1 was rewritten in slot 14 from "parking guidance" to "historical closure note", and the structural checker's `@umbraculum/*` exclusion check was already retired in an earlier slot. The "apply this standard to top-level README.md and docs/README.md" item in §8 is now unblocked.
 
 This document is **versioned** — substantive changes (adding/removing must-haves, changing the template structure, adding/removing CI-gate checks) bump the version and update the status banner. Cosmetic edits do not.

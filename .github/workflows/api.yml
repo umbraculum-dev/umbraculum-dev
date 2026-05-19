@@ -1,6 +1,6 @@
 name: api
 
-# Gates the existing @brewery/api vitest suite + shared-package unit tests on
+# Gates the existing @umbraculum/api vitest suite + shared-package unit tests on
 # every PR that could affect API behavior. Runs migrations against an ephemeral
 # postgres container, then runs vitest in a node:20-slim container so the
 # "no npm on host" policy is honored end-to-end (see
@@ -114,7 +114,7 @@ jobs:
           echo "postgres never became ready" >&2
           exit 1
 
-      - name: Run @brewery/api vitest suite
+      - name: Run @umbraculum/api vitest suite
         working-directory: services/api
         run: npm test
 

@@ -261,7 +261,7 @@ Same patterns as Phase 4 but for the React Native side. May land easier or harde
 **Verification:**
 
 - ESLint: `RecipeEditScreen.tsx` at 0 `no-explicit-any` warnings (12 remaining warnings are all pre-existing `no-unused-vars` in dead-code yeast-row helpers — Phase 6 mop-up territory). Both new files (`navigation/types.ts`, `lib/typeGuards.ts`) at 0 warnings.
-- `apps/native` TypeScript error count held exactly at the pre-change baseline of 0 errors (`npm run typecheck --workspace=@brewery/native` clean). The Phase 5a changes did not introduce a single new TS error — typed navigation is fully assignable across the 4 `navigate()` call sites.
+- `apps/native` TypeScript error count held exactly at the pre-change baseline of 0 errors (`npm run typecheck --workspace=@umbraculum/native` clean). The Phase 5a changes did not introduce a single new TS error — typed navigation is fully assignable across the 4 `navigate()` call sites.
 - Repo-wide `no-explicit-any` count: 262 → 206 (drop of 56, exactly matches Phase 5a scope).
 - Repo-wide all-warnings count: 342 → 286 (same -56 delta, no other warning category affected).
 - No new `apps/native` unit tests added (Phase 5a is type-tightening, no behavioural change).
@@ -309,7 +309,7 @@ Same patterns as Phase 4 but for the React Native side. May land easier or harde
 **Verification:**
 
 - ESLint: `apps/native` overall at **0 `no-explicit-any` warnings** (down from 99). The remaining 187 repo-wide warnings are all in `apps/web` (outside `app/recipes/**`) and `services/api` test stragglers.
-- `apps/native` TypeScript: 0 errors after Phase 5b (held at the pre-change baseline). The dom-shim change was the only place a TS error was introduced (`@tamagui/element/getWebElement.ts(19,28) TS2359`) and it was caught by `npm run typecheck --workspace=@brewery/native` and fixed before commit by switching from `unknown` to a constructor-shaped type. No new errors landed.
+- `apps/native` TypeScript: 0 errors after Phase 5b (held at the pre-change baseline). The dom-shim change was the only place a TS error was introduced (`@tamagui/element/getWebElement.ts(19,28) TS2359`) and it was caught by `npm run typecheck --workspace=@umbraculum/native` and fixed before commit by switching from `unknown` to a constructor-shaped type. No new errors landed.
 - `@umbraculum/contracts` TypeScript: 0 errors (sanity-checked because Phase 5b's WaterSparge/Boil simplification reads through the discriminated-union narrowing that contracts owns).
 - Repo-wide `no-explicit-any` count: 206 → 107 (drop of 99, exactly matches Phase 5b scope).
 - Repo-wide all-warnings count: 286 → 187 (same -99 delta).

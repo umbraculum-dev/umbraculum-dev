@@ -1,15 +1,15 @@
-# @brewery/web
+# @umbraculum/web
 
 Next.js + React + Tamagui web application — the desktop-first surface of Umbraculum's brewery vertical.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/web` to `@umbraculum/web` as sub-plan #9 slot 14 — the closing slot of the application-workspace bundle that completes sub-plan #9.
 
 ## What this is
 
 The web application — the primary user-facing surface of the brewery vertical today. Built on Next.js 15 (App Router) + React 19 + Tamagui (with `react-native-web` so platform-neutral components from `@umbraculum/ui` and `@umbraculum/brewery-recipes-ui` render identically here and in `apps/native`). Authentication rides cookie sessions (`sid` httpOnly) with the API service at `services/api`; localization runs through `next-intl` reading from `@umbraculum/i18n`; charts use Victory; chat surfaces and the AI consultant are integrated as first-class panels.
 
-The architectural shape — what's a feature here vs. in a sibling package — is documented in [`docs/architecture-Rev02.md`](../../docs/architecture-Rev02.md) (the brewery-vertical implementation log). The platform-level framing (web + native sharing core logic via `@brewery/*` packages) lives in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md).
+The architectural shape — what's a feature here vs. in a sibling package — is documented in [`docs/architecture-Rev02.md`](../../docs/architecture-Rev02.md) (the brewery-vertical implementation log). The platform-level framing (web + native sharing core logic via `@umbraculum/*` packages) lives in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md).
 
 ## Scope
 

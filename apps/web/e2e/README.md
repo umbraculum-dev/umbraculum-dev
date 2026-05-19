@@ -1,13 +1,13 @@
-# @brewery/web-e2e
+# @umbraculum/web-e2e
 
 Deterministic, headless end-to-end tests for `apps/web` (Playwright). Run via the official Playwright Docker image so the suite never depends on host npm or system Chromium.
 
 > [!NOTE]
-> Part of [Umbraculum](../../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/web-e2e` to `@umbraculum/web-e2e` as sub-plan #9 slot 14 — the closing slot of the application-workspace bundle that completes sub-plan #9.
 
 ## What this is
 
-The web app's end-to-end test suite. It exercises real user flows against a fully-running stack — the `apps/web` Next.js server, the `services/api` Fastify service, and the Postgres primary/replica via pgpool — using deterministic seeded fixtures (`@brewery/web-e2e` shares persona definitions with `services/api/src/cli/seedE2eFixture.ts`). The suite runs in a one-shot Playwright container against the dev stack via `--network host`, which keeps `docker-compose.yml` untouched per the [no-unilateral-runner-compose-changes](../../../.cursor/rules/00-shared-no-unilateral-runner-compose-changes.mdc) rule. See [`docs/TESTING.md`](../../../docs/TESTING.md) for the platform-wide test layer map.
+The web app's end-to-end test suite. It exercises real user flows against a fully-running stack — the `apps/web` Next.js server, the `services/api` Fastify service, and the Postgres primary/replica via pgpool — using deterministic seeded fixtures (`@umbraculum/web-e2e` shares persona definitions with `services/api/src/cli/seedE2eFixture.ts`). The suite runs in a one-shot Playwright container against the dev stack via `--network host`, which keeps `docker-compose.yml` untouched per the [no-unilateral-runner-compose-changes](../../../.cursor/rules/00-shared-no-unilateral-runner-compose-changes.mdc) rule. See [`docs/TESTING.md`](../../../docs/TESTING.md) for the platform-wide test layer map.
 
 ## Scope
 

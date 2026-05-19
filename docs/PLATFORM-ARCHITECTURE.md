@@ -175,7 +175,7 @@ Honest inventory of what is already platform-shaped versus what is brewery-coupl
 
 ### 3.3 Shared packages — `packages/*`
 
-All packages currently share the npm scope `@brewery/*`. Functionally they already split into two groups:
+Packages share the npm scope `@umbraculum/*` (renamed from `@brewery/*` under sub-plan #9, closed 2026-05-19 across 14 slots — see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)). Functionally they split into two groups:
 
 **Already horizontal (will become "platform" packages):**
 
@@ -194,7 +194,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 - `@umbraculum/brewery-recipes-ui` — domain UI for recipes, water, yeast.
 - `@umbraculum/brewery-beerjson` — BeerJSON schema layer.
 
-The `@brewery/*` scope is a **historical artifact** of starting with the brewery vertical. A neutral platform scope — `@umbraculum/*` per the resolved brand (see §10) — is the right end-state, but renaming touches hundreds of import sites and several user-visible i18n strings, so it is deferred to the dedicated `@brewery/*` package scope migration sub-plan, sequenced after the second module is on the table.
+The `@brewery/*` scope was a **historical artifact** of starting with the brewery vertical. The migration to the neutral platform scope `@umbraculum/*` (with brewery-vertical packages re-scoped under `@umbraculum/brewery-*` per the §1.3 TRAP-avoidance discipline) closed 2026-05-19 under sub-plan #9 — see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md).
 
 ### 3.4 Prisma schema
 
@@ -380,7 +380,7 @@ Concretely, the SDK surface includes:
 - `@umbraculum/api-client` (public types subset) — DTO types and route-ID conventions third parties can pin to.
 - `@umbraculum/i18n-keys` — namespace conventions for module-owned message keys.
 
-These names are the resolved end-state under the Umbraculum brand (see §10); the actual scope and package boundaries land when the `@brewery/*` → `@umbraculum/*` migration sub-plan executes (deferred until the second module is on the table). What matters today is that the *intent* is published as a stable public contract, not a private implementation detail.
+These names are the live state under the Umbraculum brand (see §10); the npm-scope migration that landed them closed under sub-plan #9 on 2026-05-19. What matters today is that the *intent* is published as a stable public contract, not a private implementation detail.
 
 ### 4.5 Prisma schema strategy
 
@@ -412,7 +412,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 Physical directory layout for canonical modules and tier-6 vertical configurations is committed in [RFC-0002 — Canonical-module physical layout](rfcs/0002-canonical-module-physical-layout.md) (β three-tree distribution: `services/api/src/modules/<code>/`, `apps/web/app/[locale]/(<code>)/`, `apps/native/src/modules/<code>/`, `packages/<code>-contracts/` → `@umbraculum/<code>-contracts`; `registerModule()` in `packages/module-sdk/`). The bullets below are the migration tranche mechanics; RFC-0002 is the authoritative layout decision.
 
-- `@brewery/*` scope split: horizontal packages move to the neutral platform scope `@umbraculum/*`; brewery-vertical packages stay branded as the brewery module package set (or re-scope under `@umbraculum/brewery-*`). **Operational follow-up: sub-plan #9** — scoping pass done 2026-05-19; see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) (L1 plan with mis-classification audit; `@umbraculum/brewery-core` → `@umbraculum/brewery-core` flagged as the one rename trap) and [`docs/design/brewery-scope-migration-per-package-handoff.md`](design/brewery-scope-migration-per-package-handoff.md) (per-slot checklist; 14 slots; slot 1 worked example landed).
+- `@brewery/*` scope split: **DONE under sub-plan #9 (closed 2026-05-19, 14 slots)** — horizontal packages now live under the neutral platform scope `@umbraculum/*`; brewery-vertical packages re-scoped under `@umbraculum/brewery-*` per the §1.3 TRAP-avoidance discipline. See [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) (L1 plan + slot-by-slot recaps + risk register) and [`docs/design/brewery-scope-migration-per-package-handoff.md`](design/brewery-scope-migration-per-package-handoff.md) (per-slot execution log).
 - Web routes wrapped in `(brewery)` Next.js route group (no URL change).
 - Brewery-vertical Postgres tables stay in place; new module gets its own Postgres schema via Prisma `multiSchema`.
 - `tierLimitsService` becomes module-aware: each module contributes a `tierLimits(tier)` slice; the platform composes them.
@@ -711,23 +711,22 @@ The licensing posture, governance, and foundation-question bullets below are the
 This subsection records the operational decision for *when and how* this repository becomes public.
 
 - **Current state.** The repository is **developed privately**. The Phase 3 launch-readiness artifacts ([`LICENSE`](../LICENSE), [`CONTRIBUTING.md`](../CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md), [`SECURITY.md`](../SECURITY.md), and the public-facing [`README.md`](../README.md)) are already in place, written as if the repository were already public, so that the history is clean when the flip happens. The brand was resolved on 2026-05-18 to **Umbraculum** (see [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md)); the placeholder substitution from the prior `<PLATFORM_NAME>` convention has been applied to docs and code.
-- **Decision.** Keep the repository private through the working-assumption window of **H1 2027** for the public flip. The brand resolution does not unilaterally accelerate the flip; it removes one prerequisite (brand selection) but the other prerequisites — second-vertical-module shape, package-name migration of the actual `@brewery/*` scopes (separate sub-plan), and the pre-flip checklist below — still gate timing. At the flip, **seed a fresh public repository from this one under the `umbraculum-dev` GitHub org** rather than renaming this repository in place. The original repository remains as the private development history and is archived once the public seed catches up.
+- **Decision.** Keep the repository private through the working-assumption window of **H1 2027** for the public flip. The brand resolution does not unilaterally accelerate the flip; it removes one prerequisite (brand selection) but the other prerequisites — second-vertical-module shape and the pre-flip checklist below — still gate timing. (The package-name migration prerequisite was retired by sub-plan #9, closed 2026-05-19.) At the flip, **seed a fresh public repository from this one under the `umbraculum-dev` GitHub org** rather than renaming this repository in place. The original repository remains as the private development history and is archived once the public seed catches up.
 - **Why a fresh public seed (not a rename in place).**
-  - **Avoids exposing the historical `@brewery/*` package naming, route IDs, and brewery-vertical-flavored class names on the public branch.** Those names are appropriate for the brewery vertical configuration but misleading on a public process-manufacturing platform; the `@brewery/*` → `@umbraculum/*` migration is a separate post-RFC-001 follow-on (see [`umbrella plan`](#) §Sub-plans entry 9), and the public seed is the natural commit boundary to land it.
+  - **Keeps the public branch's git history clean of historical brewery-vertical-flavored route IDs and class names that are appropriate for brewery configuration but misleading on a public process-manufacturing platform.** Those names live in the private history but should not be the public repo's first impression. (The `@brewery/*` → `@umbraculum/*` package-scope migration that previously also motivated the fresh seed already closed under sub-plan #9 on 2026-05-19, so this concern is now narrower than originally written.)
   - Gives a clean opportunity to align the codebase with the resolved Umbraculum brand as a single atomic change, rather than leaving rename artifacts scattered across git history.
   - Keeps the public commit history aligned with the public framing in [§1.1](#11-positioning--process-manufacturing-platform-brewery-configured-by-default), instead of having the public audience read backwards through brewery-only history.
 - **Conditions that would justify an earlier flip.**
   - A community contributor or paying customer concretely needs public-source visibility to evaluate adoption — and waiting until H1 2027 would lose them.
   - A security or governance reason requires public auditability sooner than planned.
-  - The `@brewery/*` package scope migration lands materially earlier than expected and the rest of the pre-flip checklist fits inside a single sprint.
+  - The remaining pre-flip checklist items (second-vertical-module shape; pre-flip housekeeping below) finish materially earlier than expected and fit inside a single sprint.
 - **Conditions that would justify a later flip.**
   - The second-vertical-module shape is still not stable by H1 2027 and the project is materially better served by another six months of focused, private iteration before exposing the architecture to public review.
   - A foundation-transfer conversation (see §10.1, *Foundation question*) is in flight and the public flip is best done together with the transfer rather than separately.
 - **Pre-flip checklist** (kept here so the conditions are explicit, not folkloric):
-  1. **Brand resolved** ✅ (2026-05-18: Umbraculum across docs and code; see [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md)). The remaining brand-adjacent work — `@brewery/*` package scope migration, route-prefix audit, AI prompt audit, billing UI copy audit — is tracked under the post-RFC-001 follow-on sub-plans.
+  1. **Brand resolved** ✅ (2026-05-18: Umbraculum across docs and code; see [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md)). **Package-scope migration ✅** (2026-05-19: sub-plan #9 closed across 14 slots — all `@brewery/*` workspaces are now `@umbraculum/*` / `@umbraculum/brewery-*`; see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)). The remaining brand-adjacent work — route-prefix audit, AI prompt audit, billing UI copy audit — is tracked under the post-RFC-001 follow-on sub-plans.
   2. `internal/**` audited and confirmed excluded from the public seed; cross-links from `docs/**` to `internal/**` removed.
   3. Contact email placeholders in [`CODE_OF_CONDUCT.md`](../CODE_OF_CONDUCT.md) and [`SECURITY.md`](../SECURITY.md) replaced with monitored, real addresses on the resolved `umbraculum.dev` domain.
   4. Copyright header in [`LICENSE`](../LICENSE) resolved to the final entity name (placeholder substitution complete: `Copyright (C) 2026 Umbraculum contributors`; the eventual legal-entity name — single-founder company / future foundation — substitutes here at incorporation time).
-  5. Migration path documented for the few callers (if any) that depend on the `@brewery/*` package names — covered by the dedicated post-RFC-001 follow-on sub-plan.
-  6. A short public-launch blog post / `docs/`-hosted announcement explaining the project, the licensing posture, and how to contribute.
+  5. A short public-launch blog post / `docs/`-hosted announcement explaining the project, the licensing posture, and how to contribute.
 - **Non-goals at the flip.** A coordinated marketing launch, a paid hosted service GA, or a v1.0 release are *not* required to flip the repo public. The flip is about source visibility and a contribution surface; commercial milestones can land on their own cadence afterwards.

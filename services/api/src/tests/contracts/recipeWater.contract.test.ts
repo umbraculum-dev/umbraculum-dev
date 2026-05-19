@@ -17,7 +17,7 @@
  *   here pins the wire payload that the L1 parser is meant to consume.
  *
  * To intentionally update:
- *   UPDATE_CONTRACTS=1 npm test -w @brewery/api -- contracts/recipeWater.contract.test.ts
+ *   UPDATE_CONTRACTS=1 npm test -w @umbraculum/api -- contracts/recipeWater.contract.test.ts
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../../app.js";
