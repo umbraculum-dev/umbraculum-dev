@@ -18,7 +18,19 @@ This directory holds **per-artifact pages** linked from `MODULES.md`. It is inte
 
 ## What's here today
 
-- [`canonical/automation.md`](canonical/automation.md) — the first (and currently only) canonical module to ship. Use this as the template when documenting the next canonical module.
+| Path | Coverage |
+|---|---|
+| [`canonical/automation.md`](canonical/automation.md) | **Shipped** — read path + L2 isolation tests; Phase C pending. Use this as the template for the next canonical module. |
+| [`canonical/mrp.md`](canonical/mrp.md) | **Open door** stub — code reserved, β layout pre-committed, no implementation yet. |
+| [`canonical/wms.md`](canonical/wms.md) | **Open door** stub — same. Native-mandatory when shipped. |
+| [`canonical/crm.md`](canonical/crm.md) | **Open door** stub — same. No firm horizon. |
+| [`canonical/crp.md`](canonical/crp.md) | **Open door** stub — same. Co-designed with `mrp`. |
+| [`verticals/brewery.md`](verticals/brewery.md) | **Shipped — reference vertical** (flat layout today; β migration H1 2027). |
+| [`contribute/README.md`](contribute/README.md) | Contributor entry — picks one of four paths below. |
+| [`contribute/canonical-module.md`](contribute/canonical-module.md) | Allocating a new canonical code (mini-RFC procedure). |
+| [`contribute/vertical-configuration.md`](contribute/vertical-configuration.md) | Building a new vertical (uses brewery as worked example). |
+| [`contribute/third-party-module.md`](contribute/third-party-module.md) | Tier 3 / Tier 4 connector or extension against an existing canonical. |
+| [`contribute/horizontal-package.md`](contribute/horizontal-package.md) | New cross-cutting package under `packages/<name>/`. |
 
 ## Adding a per-module page
 

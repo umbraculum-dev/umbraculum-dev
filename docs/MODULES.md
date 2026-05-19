@@ -52,10 +52,10 @@ The reserved set is closed — the five codes below are it, today. Additions go 
 | Code | Status | Surface | License | Page |
 |---|---|---|---|---|
 | `automation` | **Shipped — read path (Phase B-3, 2026-05-19); Phase C real adapter pending** | Fleet, vessels, alarms; OpenPLC bridge via brewery adapter | AGPLv3 | [modules/canonical/automation.md](modules/canonical/automation.md) |
-| `mrp` | Open door — H1 2027 working assumption | Material requirements planning, production orders, work orders | AGPLv3 | _(stub — page lands when work starts)_ |
-| `wms` | Open door | Warehouse management, stock movements, locations, lots/serials | AGPLv3 | _(stub)_ |
-| `crm` | Open door | Customer relationships, contacts, accounts, opportunities | AGPLv3 | _(stub)_ |
-| `crp` | Open door | Capacity requirements planning, resource scheduling, work-center load | AGPLv3 | _(stub)_ |
+| `mrp` | Open door — H1 2027 working assumption | Material requirements planning, production orders, work orders | AGPLv3 | [modules/canonical/mrp.md](modules/canonical/mrp.md) |
+| `wms` | Open door — H2 2027 (native-mandatory) | Warehouse management, stock movements, locations, lots/serials | AGPLv3 | [modules/canonical/wms.md](modules/canonical/wms.md) |
+| `crm` | Open door — no firm horizon | Customer relationships, contacts, accounts, opportunities | AGPLv3 | [modules/canonical/crm.md](modules/canonical/crm.md) |
+| `crp` | Open door — H1 2027 working assumption (paired with `mrp`) | Capacity requirements planning, resource scheduling, work-center load | AGPLv3 | [modules/canonical/crp.md](modules/canonical/crp.md) |
 
 Note on "open door": the code is reserved and the folder shape is pre-committed by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md). The work to design and ship each module's surface is its own future RFC or design artifact ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §12.4); no implementation exists yet.
 
@@ -65,7 +65,7 @@ Vertical configurations use the same β shape as canonical modules but with a ve
 
 | Code | Status | Consumes (planned) | License | Page |
 |---|---|---|---|---|
-| `brewery` | **Shipped — reference vertical** (flat layout today; β migration H1 2027 per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) Decision D) | `automation` (shipped), `mrp` (planned), `wms` (planned), `crm` (planned) | AGPLv3 (this bundle); third-party verticals are author's choice | _(per-page lands with the H1 2027 β migration)_ |
+| `brewery` | **Shipped — reference vertical** (flat layout today; β migration H1 2027 per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) Decision D) | `automation` (shipped), `mrp` (planned), `wms` (planned), `crm` (planned) | AGPLv3 (this bundle); third-party verticals are author's choice | [modules/verticals/brewery.md](modules/verticals/brewery.md) |
 
 Future verticals (distillery, kombucha, cosmetics, food-batch, fragrance) are explicitly anticipated by [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 but unimplemented. They can be community-built — the Tier 6 path is permissionless.
 
@@ -97,30 +97,18 @@ Note the asymmetry in the third column: horizontal packages keep an unprefixed `
 
 The right contribution path depends on which kind of thing you're adding. Use this tree before you start; the ceremony cost varies by an order of magnitude across the rows.
 
-### 4.1 …a new canonical module (e.g. `quality`, `maintenance`, `hr`)
+Quick map (full per-path guides linked below):
 
-Allocating a new reserved code is the single gated path in the ecosystem ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 Decision D). Required ceremony:
+| You want to add… | Read | Ceremony |
+|---|---|---|
+| A new canonical module (new reserved code) | [`modules/contribute/canonical-module.md`](modules/contribute/canonical-module.md) | **High** — mini-RFC + consumption-contract checklist + core team approval. |
+| A vertical configuration (e.g. `distillery`, `kombucha`) | [`modules/contribute/vertical-configuration.md`](modules/contribute/vertical-configuration.md) | **None** — Tier 6, permissionless. Use `brewery` as model. |
+| A third-party / community module against an existing canonical | [`modules/contribute/third-party-module.md`](modules/contribute/third-party-module.md) | **None** — Tier 3 / Tier 4, permissionless. Pin the SDK. |
+| A horizontal package (cross-cutting infrastructure) | [`modules/contribute/horizontal-package.md`](modules/contribute/horizontal-package.md) | **Low** — regular PR; reviewer agreement on cross-cutting nature. |
 
-1. **Mini-RFC** at `docs/rfcs/NNNN-canonical-<code>.md` — motivation, alternatives, impact, migration plan.
-2. **Consumption-contract checklist** — explicit confirmation the module uses platform auth, tenancy, ACL, billing, AI, observability, i18n, UI, secrets, integrations, HTTP, and DB ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2 obligation table).
-3. **Public-comment period** (post-public-flip) — minimum 30 days.
-4. **Core team approval** — verifies Decisions A–F are honored.
+The full set of contributor guides lives under [`modules/contribute/`](modules/contribute/). Each page covers the procedure, common pitfalls, and worked examples.
 
-The minimum bar is high on purpose: a reserved code, once allocated, is forward-only ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 step 5). Don't start here unless cross-vertical demand is real and a reference implementation is underway.
-
-### 4.2 …a vertical configuration (e.g. `distillery`, `kombucha`)
-
-Tier 6, **permissionless**. You can ship without asking — just consume the canonical-module SDK from your own repo or open a PR to add `apps/web/app/[locale]/(<your-code>)/` plus siblings in this monorepo. The constraint is the consumption contract ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8) — your vertical may not reimplement auth, billing, AI, or any other horizontal service. Use what `brewery` does as the model; the brewery-as-vertical-configuration shape is documented in [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 and the canonical Tier 6 row in [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5.
-
-### 4.3 …a third-party / community module against an existing canonical (e.g. a Salesforce-CRM-connector for the `crm` canonical when it ships)
-
-Tier 3 or Tier 4, **permissionless**. Pin `@umbraculum/module-sdk` and the relevant `@umbraculum/<code>-contracts` package; ship your module's package from your own repo; consumers install it like any npm package. The SDK shape ([`packages/module-sdk/src/types.ts`](../packages/module-sdk/src/types.ts)) is the public contract; nothing else is.
-
-### 4.4 …a horizontal package (e.g. a new shared utility, a new cross-cutting service)
-
-Tier 2 — maintained by the core team. The bar is *not* a mini-RFC; it's a regular PR with reviewer agreement that the concern is genuinely cross-cutting (not module-specific). If the answer is "this is one module's data, not horizontal", put it inside the module instead.
-
-### 4.5 …a new AI tool, a tier-limit field, an addon code
+### 4.x …a new AI tool, a tier-limit field, an addon code
 
 These attach *to a module*. They are not standalone artifacts. Find the right module's `registerModule({ ... })` call and add the entry there — see §5 for what that looks like for `automation`.
 
