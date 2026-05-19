@@ -144,7 +144,7 @@ Rationale:
 ### 8.2 What this RFC explicitly does NOT do (non-goals)
 
 - **Lint enforcement of module import boundaries.** `eslint-plugin-boundaries` banned-import lists per `modules/<code>/` — post-RFC follow-on once folders exist (RFC-0001 §9.2).
-- **Mechanical `@brewery/*` migration.** Package renames and `package.json` workspace updates — sub-plan #9; listed in §11 migration plan as same window, not same RFC.
+- **Mechanical `@brewery/*` migration.** Package renames and `package.json` workspace updates — sub-plan #9; listed in §11 migration plan as same window, not same RFC. Scoping pass done 2026-05-19; see [`docs/design/brewery-scope-migration-plan.md`](../design/brewery-scope-migration-plan.md) (L1 plan with mis-classification audit + verification recipe) + [`docs/design/brewery-scope-migration-per-package-handoff.md`](../design/brewery-scope-migration-per-package-handoff.md) (per-slot execution checklist; 14 slots; worked example landed).
 - **Prisma `multiSchema` activation.** Configuration and migration of the first non-`public` schema — implementation work bundled with second module; RFC-0002 only commits naming (`schema name = code`).
 - **Canonical `automation` surface design.** RFC-0001 Decision E §7.2 — separate sub-plan.
 - **Accepting this RFC.** Status remains Draft until core-team review (§12).
