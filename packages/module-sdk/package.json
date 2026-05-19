@@ -1,0 +1,28 @@
+{
+  "name": "@brewery/module-sdk",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Umbraculum module registration contract (registerModule). End-state npm scope: @umbraculum/module-sdk per RFC-0002.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@brewery/contracts": "file:../contracts"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

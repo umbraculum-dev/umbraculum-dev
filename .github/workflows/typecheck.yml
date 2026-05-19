@@ -1,13 +1,13 @@
 name: typecheck
 
-# Gates `tsc --noEmit` across the 13 currently-clean TS workspaces on every PR
+# Gates `tsc --noEmit` across the 14 currently-clean TS workspaces on every PR
 # that could affect TypeScript sources. Runs inside a single node:20-slim
 # container that hoists /repo/node_modules — the same method used by
 # native-deps.yml (and documented in docs/TYPING.md as the canonical
 # measurement method).
 #
 # Scope (per docs/TYPING.md):
-#   - 13 workspaces are gated. apps/web is EXCLUDED by explicit decision
+#   - 14 workspaces are gated. apps/web is EXCLUDED by explicit decision
 #     (Phase 4 — its 585 errors are all in the Tamagui shorthand-prop /
 #     theme-token accepted-cost class per docs/TAMAGUI.md; gating them
 #     produces no signal and harms future Tamagui upgrades).
@@ -15,7 +15,7 @@ name: typecheck
 #   - packages/core is JavaScript-only (no tsconfig.json); not in scope.
 #
 # Failure aggregation: each workspace's typecheck runs sequentially under
-# `set +e` so all 13 results are reported even if early workspaces fail.
+# `set +e` so all 14 results are reported even if early workspaces fail.
 # The job exits non-zero if any single workspace produced errors.
 
 on:
@@ -85,6 +85,7 @@ jobs:
                 "packages/api-client"
                 "packages/beerjson"
                 "packages/contracts"
+                "packages/module-sdk"
                 "packages/i18n"
                 "packages/i18n-react"
                 "packages/media"

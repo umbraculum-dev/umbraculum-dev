@@ -57,6 +57,7 @@ FULL_SCOPE_README_PATHS = [
     "packages/api-client/README.md",
     "packages/beerjson/README.md",
     "packages/contracts/README.md",
+    "packages/module-sdk/README.md",
     "packages/i18n/README.md",
     "packages/i18n-react/README.md",
     "packages/media/README.md",

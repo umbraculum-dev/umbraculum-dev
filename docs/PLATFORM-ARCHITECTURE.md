@@ -420,7 +420,7 @@ Physical directory layout for canonical modules and tier-6 vertical configuratio
 
 ### 5.3 Net-new before 2nd module ships
 
-- `registerModule()` helper in the API and a parallel registry on the web side.
+- `registerModule()` helper in the API and a parallel registry on the web side. **v0 scaffold landed** in `packages/module-sdk/` (`@brewery/module-sdk`; end-state `@umbraculum/module-sdk` per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) Decision C). Brewery flat routes are not migrated yet; API wiring follows in the H1 2027 tranche.
 - Extract the H2 AI contracts into public SDK/package surfaces once the module boundary is stable:
   - `packages/ai-platform-contracts` (Tool, ToolCall, Session, UsageRecord, provider mode).
   - `packages/ai-platform-ui` (Tamagui chat panel + composer + streaming hook), if the shared UI package gets too broad.

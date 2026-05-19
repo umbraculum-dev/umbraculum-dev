@@ -44,6 +44,12 @@ Public architectural and governance commitments. Process: [`LICENSING.md`](LICEN
 - [`rfcs/0001-modules-tiers-governance-and-automation-placement.md`](rfcs/0001-modules-tiers-governance-and-automation-placement.md) — Canonical-module rule, reserved codes, tier model, governance, consumption contract, automation placement (Accepted 2026-05-18).
 - [`rfcs/0002-canonical-module-physical-layout.md`](rfcs/0002-canonical-module-physical-layout.md) — Physical layout (β three-tree), naming conventions, `module-sdk` location, H1 2027 migration sequencing (Accepted 2026-05-19).
 
+## Design (pre-RFC / follow-on)
+
+*Audience: core team, module authors implementing RFC decisions.*
+
+- [`design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) — Canonical `automation` module surface (RFC-0001 Decision E §7.2): adapter SDK, Vessel vs EquipmentProfile, OpenPLC seam, AI tools, tier limits (Draft 2026-05-19).
+
 ## Product
 
 *Audience: product readers, evaluators, hosted-service operators.*
