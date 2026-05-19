@@ -174,3 +174,19 @@ Before implementing native app login, complete these items.
 
 - [ ] **Comprehensive developer-onboarding doc** — walk a new contributor from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running". Should cover: Ubuntu prerequisites, Cursor + plugins setup, Docker / Node / pnpm versions, repo bootstrap, where rules / skills / agents live, how to verify the apparatus is engaged, first PR walkthrough. Tracked because [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 explicitly names this as the missing mechanism for its claims. Closest current substitutes: [`DEVELOPMENT.md`](../../DEVELOPMENT.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md), [`CONTRIBUTING.md`](../../CONTRIBUTING.md), [`docs/modules/contribute/`](../../docs/modules/contribute/) — but none of these is the end-to-end onboarding doc the MANIFESTO claims.
 
+- [ ] **Comprehensive open-source-dependencies page** (working title: `docs/OPEN-SOURCE-STACK.md`) — the exhaustive companion to [`MANIFESTO.md`](../../MANIFESTO.md) §1.4's *representative* dependency list. For each load-bearing dependency: (a) what role it plays in the discipline-apparatus, (b) why it was picked over the proprietary alternative, (c) what reach of the apparatus would shrink if it were swapped for a closed-source equivalent. Minimum coverage list (extend as appropriate):
+  - **OS / runtime layer**: Linux (Ubuntu), Docker, Node.js, Python (for sister-repo tooling).
+  - **Data layer**: Postgres, pgpool, Redis.
+  - **Backend layer**: Fastify, Prisma, Pino, tsx.
+  - **Frontend layer (web)**: Next.js, React, Tamagui, Turbopack.
+  - **Frontend layer (native)**: React Native, Expo, Tamagui (native config).
+  - **Validation + types**: Zod, TypeScript.
+  - **Test layer**: Vitest, Playwright.
+  - **Lint / format / quality**: ESLint, Prettier-equivalent if any, `eslint-plugin-boundaries`.
+  - **Industrial automation**: OpenPLC (Editor + Runtime), the FastAPI sidecar stack.
+  - **Build orchestration**: npm workspaces (today; turbo / nx alternatives noted).
+  - **Brewery-domain libraries**: BeerJSON.
+  - **Docs / observability / CI**: GitHub Actions stack, Markdown, mermaid (if used).
+  - Plus anything else in the workspace package.json files at the time of writing.
+  Page should be Tier: Public, follow [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md), and be linked from both [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 (replacing the "representative not exhaustive" framing) and [`docs/README.md`](../../docs/README.md) (a new "Stack & dependencies" section, or under the existing "Architecture" group).
+
