@@ -152,6 +152,13 @@ translations, and security reports.
 
 - Start with [`CONTRIBUTING.md`](CONTRIBUTING.md) — DCO sign-off is
   required on every commit.
+- AI assistants and contributors using Cursor: install the
+  *umbraculum-toolset Cursor plugin pack* — see
+  [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md). The plugin pack is
+  the apparatus referenced in [`MANIFESTO.md`](MANIFESTO.md) §1.2 and is
+  what keeps the contribution bar low ([`MANIFESTO.md`](MANIFESTO.md) §1.3,
+  §2.2). The repo-root [`AGENTS.md`](AGENTS.md) is the agent self-check
+  that runs first in any Cursor session.
 - The [`Code of Conduct`](CODE_OF_CONDUCT.md) is in force in all
   project spaces.
 - For security issues, please follow [`SECURITY.md`](SECURITY.md)

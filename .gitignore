@@ -4,9 +4,6 @@ backups/
 # Local-only / developer-specific (do not commit)
 # ------------------------------------------------------------
 
-# Local development notes (repo-specific)
-DEVELOPMENT.md
-
 # Cursor artifacts (synced via npx / developer-managed)
 .cursor/
 .cursorignore

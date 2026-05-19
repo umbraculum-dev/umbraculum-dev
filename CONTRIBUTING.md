@@ -29,6 +29,25 @@ translations, and thoughtful issue triage.
   monorepo; selected SDK packages may be MIT — see the licensing doc).
 - Read [`DEVELOPMENT.md`](./DEVELOPMENT.md), and if it exists in your
   checkout, the project-local addendum `DEVELOPMENT-LOCAL.md`.
+- **Recommended path — contribute with the apparatus.** Umbraculum is an
+  AI-orchestrated-code project ([`MANIFESTO.md`](./MANIFESTO.md) §1.2): the
+  default authoring path is AI assistance under enforced discipline, where
+  the discipline lives in the **umbraculum-toolset Cursor plugin pack** ("the
+  apparatus"). The project's CI gates (lint, types, tests, docs structural
+  checks, module-README audits, contract-validation audits) are calibrated to
+  a high bar that the plugin pack is designed to make one-shot achievable.
+  Without the pack loaded, an AI assistant operating in this repo will
+  produce code that does not clear those gates in one shot — you will round-
+  trip with reviewers until the code converges on what the pack would have
+  produced from the start. Installing the pack is what
+  [`MANIFESTO.md`](./MANIFESTO.md) §1.3 + §2.2 call "the equalizer that keeps
+  the contribution bar low" — it is the project lowering the bar, not
+  raising it. See [`docs/CURSOR-PLUGINS.md`](./docs/CURSOR-PLUGINS.md) for
+  the install procedure and [`AGENTS.md`](./AGENTS.md) for the agent self-
+  check that runs first thing in any Cursor session in this repo. Manual
+  hand-typed contribution without AI assistance is **welcome for learning**
+  (per `MANIFESTO.md` §1.2) and explicitly accepted; expect more CI feedback
+  latency than the AI-assisted path.
 - Security issues do **not** go through public issues or pull requests.
   Please follow [`SECURITY.md`](./SECURITY.md).
 
