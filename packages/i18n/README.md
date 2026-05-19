@@ -1,9 +1,9 @@
-# @brewery/i18n
+# @umbraculum/i18n
 
 Shared i18n message tree for web and native apps. Single source of truth.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@umbraculum/i18n` to `@umbraculum/i18n` as sub-plan #9 slot 7 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). The bundle MACHINERY (TypeScript types + JSON loader + copy-json build step) is platform-neutral; the bundle CONTENT (`en.json`, `it.json`) is currently brewery-flavored — content split into a `brewery-locales` bundle is deferred per plan doc §1.4.
 
 ## What this is
 
@@ -26,7 +26,7 @@ The web app loads messages via `getSharedMessages(locale)` in `i18n/request.ts` 
 ## Usage (native)
 
 ```ts
-import { getSharedMessages } from "@brewery/i18n";
+import { getSharedMessages } from "@umbraculum/i18n";
 
 const messages = getSharedMessages("en");
 ```
@@ -34,7 +34,7 @@ const messages = getSharedMessages("en");
 Or import locale-specific JSON:
 
 ```ts
-import en from "@brewery/i18n/en";
+import en from "@umbraculum/i18n/en";
 ```
 
 ## Adding new keys
@@ -52,8 +52,8 @@ This package is consumed by Metro (React Native) and Node (services, tests) and 
 Commands (run from repo root, container-friendly per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule):
 
 - **Build**: `npm run build:packages` (rebuilds this package and any other source-level packages whose outputs need refreshing).
-- **Test**: `npm run test --workspace=@brewery/i18n` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
-- **Lint**: `npm run lint --workspace=@brewery/i18n`.
+- **Test**: `npm run test --workspace=@umbraculum/i18n` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: `npm run lint --workspace=@umbraculum/i18n`.
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate".
 
 ## How it fits in

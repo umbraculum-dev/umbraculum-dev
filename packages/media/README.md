@@ -54,7 +54,7 @@ When adding a new asset:
 ## How it fits in
 
 - **Consumed by**: `apps/web` (via the sync script), `apps/native` (via Metro direct import), `@brewery/recipes-ui` (for any domain illustration shipped in a shared component — pending rename to `@umbraculum/brewery-recipes-ui` per sub-plan #9 slot 13).
-- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/i18n` and `@brewery/contracts` (both pending sub-plan #9 renames).
+- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@umbraculum/i18n` and `@brewery/contracts` (both pending sub-plan #9 renames).
 
 ## Status
 

@@ -1,6 +1,6 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import { ReactNode } from 'react';
-import { SupportedLocale } from '@brewery/i18n';
+import { SupportedLocale } from '@umbraculum/i18n';
 
 type TranslationValues = Record<string, string | number | Date>;
 type RichTranslationValue = ReactNode | ((chunks: ReactNode) => ReactNode);

@@ -1,6 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
 
-import { getSharedMessages } from "@brewery/i18n";
+import { getSharedMessages } from "@umbraculum/i18n";
 import { defaultLocale, isLocale } from "../src/i18n/routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {

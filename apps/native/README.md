@@ -7,14 +7,14 @@ React Native + Expo + Tamagui mobile application — the on-the-go brew-day surf
 
 ## What this is
 
-The native (iOS + Android) application for brewers who need brew-day reliability tooling on a phone or tablet during a brew session. Built on React Native 0.81 + Expo 54 + Tamagui, sharing the bulk of its UI surface with `apps/web` through the `@umbraculum/ui` (primitives) and `@brewery/recipes-ui` (domain UI) packages — the platform-neutral components render identically on both surfaces. Authentication uses bearer tokens stored in `expo-secure-store` and refreshed against `services/api` via `@brewery/api-client`; localization runs through `@brewery/i18n-react` reading from `@brewery/i18n`; charts use `victory-native` + `react-native-svg`.
+The native (iOS + Android) application for brewers who need brew-day reliability tooling on a phone or tablet during a brew session. Built on React Native 0.81 + Expo 54 + Tamagui, sharing the bulk of its UI surface with `apps/web` through the `@umbraculum/ui` (primitives) and `@brewery/recipes-ui` (domain UI) packages — the platform-neutral components render identically on both surfaces. Authentication uses bearer tokens stored in `expo-secure-store` and refreshed against `services/api` via `@brewery/api-client`; localization runs through `@brewery/i18n-react` reading from `@umbraculum/i18n`; charts use `victory-native` + `react-native-svg`.
 
 The native-specific build / CI / publishing strategy is documented in [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md); the kickoff readiness criteria (now mostly cleared) are in [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../../docs/REACT-NATIVE-KICKOFF-READINESS.md). Local-development setup is in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md).
 
 ## Scope
 
 - **Contains**: Expo entrypoint (`App.tsx`, `index.js`); React Navigation stack/tab/native-stack glue (`src/navigation/`); auth integration with `expo-secure-store` (`src/auth/`); per-screen views (`src/screens/`); native-side bootstrap (locale detection, Tamagui theme injection — `src/bootstrap.ts`, `src/i18n/`, `src/theme/`); native-component shims for things web doesn't need (`src/components/`); Metro bundler config (`metro.config.js`); the i18n-coverage guardrail (`scripts/i18n-guardrail.mjs`).
-- **Does not contain**: API route handlers (`services/api`); shared UI primitives (`@umbraculum/ui`); domain UI (`@brewery/recipes-ui`); message catalogs (`@brewery/i18n`); contract types (`@brewery/contracts`); media assets (`@umbraculum/media` — referenced directly via Metro bundling); the API client (`@brewery/api-client`); the web app (`apps/web`).
+- **Does not contain**: API route handlers (`services/api`); shared UI primitives (`@umbraculum/ui`); domain UI (`@brewery/recipes-ui`); message catalogs (`@umbraculum/i18n`); contract types (`@brewery/contracts`); media assets (`@umbraculum/media` — referenced directly via Metro bundling); the API client (`@brewery/api-client`); the web app (`apps/web`).
 
 ## Quick start
 
@@ -40,7 +40,7 @@ The native app expects `services/api` to be reachable; for local development aga
 ## How it fits in
 
 - **Consumed by**: end users on iOS and Android (via the future store releases). Internal alpha distribution runs through Expo's tooling per [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md).
-- **Depends on**: `services/api` (HTTP backend, bearer auth); `@brewery/api-client` (transport); `@brewery/contracts` (typed responses); `@umbraculum/ui` + `@brewery/recipes-ui` (UI); `@brewery/i18n` + `@brewery/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with web); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing).
+- **Depends on**: `services/api` (HTTP backend, bearer auth); `@brewery/api-client` (transport); `@brewery/contracts` (typed responses); `@umbraculum/ui` + `@brewery/recipes-ui` (UI); `@umbraculum/i18n` + `@brewery/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with web); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing).
 - **Auth**: bearer tokens in `expo-secure-store`. The web sibling rides cookie sessions — the difference is abstracted in `@brewery/api-client`.
 
 ## Status

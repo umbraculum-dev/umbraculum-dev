@@ -24,7 +24,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@brewery/i18n": "file:../i18n",
+    "@umbraculum/i18n": "file:../i18n",
     "intl-messageformat": "^10.7.14"
   },
   "peerDependencies": {

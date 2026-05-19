@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import React, { createContext, useContext, useMemo } from "react";
 import { IntlMessageFormat } from "intl-messageformat";
 
-import type { SupportedLocale } from "@brewery/i18n";
+import type { SupportedLocale } from "@umbraculum/i18n";
 
 export type TranslationValues = Record<string, string | number | Date>;
 

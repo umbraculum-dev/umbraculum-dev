@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slots 1–6 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, 6: `brewery-core` — ⚠ TRAP slot held cleanly on first attempt under the §1.3 classification gate); slots 7–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). **Slot 6 added four further refinements**: (a) root `package.json` `test:packages` is a HARD STOP analog of `build:packages` — preflight skill grew Command 6; (b) `.github/workflows/api.yml` workflow step `name:` display strings are a separate HARD STOP class (path globs in `on.push.paths` use filesystem paths — no change; step display names use npm names — must change); (c) slot-5 gotcha refined — only `npm install` (not `npm run <script>`) prunes the api bind-mount; (d) bulk sed should exclude the just-edited `packages/<name>/package.json` whenever step 1's description deliberately contains a historical reference to the old name (TRAP-slot pattern). Net effect across slots 1–6: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under both the heavy slot load (slot 5) and the ⚠ TRAP slot load (slot 6).
+**Status:** Active 2026-05-19 — slots 1–7 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, 6: `brewery-core` — ⚠ TRAP slot held cleanly on first attempt under the §1.3 classification gate, 7: `i18n` — first slot with a controlled **transient cross-scope state** (i18n-react workspace stays named `@brewery/i18n-react` until slot 8 but its imports + dist are fully on `@umbraculum/i18n`)); slots 8–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). **Slot 6 added four further refinements**: (a) root `package.json` `test:packages` is a HARD STOP analog of `build:packages` — preflight skill grew Command 6; (b) `.github/workflows/api.yml` workflow step `name:` display strings are a separate HARD STOP class (path globs in `on.push.paths` use filesystem paths — no change; step display names use npm names — must change); (c) slot-5 gotcha refined — only `npm install` (not `npm run <script>`) prunes the api bind-mount; (d) bulk sed should exclude the just-edited `packages/<name>/package.json` whenever step 1's description deliberately contains a historical reference to the old name (TRAP-slot pattern). **Slot 7 added three further refinements**: (a) **NEW HARD STOP** — bulk sed must also exclude the plan doc + handoff doc themselves, because those docs maintain historical "Source name" columns in §1.1 / §1.4 / §3.1 / §4 tables that a naive scope-wide sed will overwrite (slot 5 implicitly avoided this by curating its sed file list; slot 7's Python sed re-included the docs and had to restore 4 cells post-bulk); (b) the "transient cross-scope state" for split packages (i18n / i18n-react, contracts / api-client) is precisely the **workspace name** of the downstream package — its CONTENT (deps + imports + dist) migrates fully in the upstream slot; (c) **substring collision safety re-verified** under the `[^a-zA-Z0-9_-]` regex tail — `@brewery/i18n-react` is NOT matched by the `@brewery/i18n` substitution pattern because `-` is in the negated class. Net effect across slots 1–7: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under heavy slot loads (slot 5), TRAP slot loads (slot 6), and controlled cross-scope transients (slot 7).
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -375,58 +375,66 @@ Lockfiles regenerated (cleanly scoped):
 
 ## Slot 7 — `@brewery/i18n` → `@umbraculum/i18n`
 
-**Status:** Pending.
+**Status:** Done 2026-05-19. Commit hash pending in §6.6 of [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) (look there for the canonical SHA + execution notes).
 
 **Target + classification.** Platform (framework). Generic locale bundle framework. Current bundles are brewery-flavored; content split deferred (plan doc §1.4).
 
-**Hard stops.**
+**Pre-execution hard stops (recorded so future slot leads can sanity-check the preflight checklist against this slot).**
 
-- `i18n-react` depends on `i18n`. After this slot ships, `i18n-react` still imports `@brewery/i18n` — that's expected and stays until slot 8 ships. The lockfile after slot 7 will show `@umbraculum/i18n` + `@brewery/i18n-react` (still referencing `@brewery/i18n` via dist). This is a *transient* state that resolves at slot 8.
-- The package ships a JSON locale bundle and a `copy-json.mjs` script ([`packages/i18n/scripts/`](../../packages/i18n/scripts/)). The script copies content into `dist/` and may need a re-run after the rename. Run `npm run build` in the package after the rename.
+- `i18n-react` depends on `i18n`. Originally predicted as "After this slot ships, `i18n-react` still imports `@brewery/i18n` — transient cross-scope state until slot 8". **Actual post-rename state:** the bulk sweep properly updated `packages/i18n-react/package.json` deps AND `packages/i18n-react/src/index.tsx` imports to `@umbraculum/i18n`; the rebuilt `packages/i18n-react/dist/*` artifacts reference `@umbraculum/i18n` only (verified `grep -rohE "@(brewery|umbraculum)/i18n" packages/i18n-react/dist/` → `@umbraculum/i18n` only). The transient cross-scope state is only that the i18n-react **workspace itself is still named** `@brewery/i18n-react` — its CONTENT (deps + imports + dist) is fully migrated to the new scope. Slot 8 will rename the workspace name itself.
+- The package ships a JSON locale bundle and a `copy-json.mjs` script ([`packages/i18n/scripts/`](../../packages/i18n/scripts/)). The script copies content into `dist/` and was re-run successfully via `npm run build:packages` in step 5. Verified `packages/i18n/dist/` contains `en.json`, `it.json`, `index.cjs`, `index.d.cts`, `index.d.ts`, `index.js`.
 
-**File inventory.**
+**File inventory (all checked Done 2026-05-19).**
 
 Workspace name + own files:
-- [ ] [`packages/i18n/package.json`](../../packages/i18n/package.json) — `name`; description.
-- [ ] [`packages/i18n/README.md`](../../packages/i18n/README.md).
+- [x] [`packages/i18n/package.json`](../../packages/i18n/package.json) — `name` → `@umbraculum/i18n`; classifying description added (platform-framework; brewery-flavored content per plan doc §1.4 deferred-content-split).
+- [x] [`packages/i18n/README.md`](../../packages/i18n/README.md) — heading + brand callout updated.
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
-- [ ] [`packages/i18n-react/package.json`](../../packages/i18n-react/package.json) — `i18n-react` lists `i18n` as a dep; update.
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`packages/i18n-react/package.json`](../../packages/i18n-react/package.json) — i18n-react workspace still NAMED `@brewery/i18n-react` (slot 8 surface) but its `dependencies` entry for the i18n peer is now `@umbraculum/i18n`.
 
 Source imports:
-- [ ] [`apps/native/src/auth/AuthProvider.tsx`](../../apps/native/src/auth/AuthProvider.tsx).
-- [ ] [`apps/native/src/i18n/I18nProvider.tsx`](../../apps/native/src/i18n/I18nProvider.tsx).
-- [ ] [`apps/native/src/i18n/locale.ts`](../../apps/native/src/i18n/locale.ts).
-- [ ] [`apps/native/src/navigation/openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts).
-- [ ] [`apps/native/src/screens/DashboardScreen.tsx`](../../apps/native/src/screens/DashboardScreen.tsx).
-- [ ] [`apps/web/app/[locale]/layout.tsx`](../../apps/web/app/[locale]/layout.tsx).
-- [ ] [`apps/web/i18n/request.ts`](../../apps/web/i18n/request.ts).
-- [ ] [`apps/web/src/i18n/routing.ts`](../../apps/web/src/i18n/routing.ts).
-- [ ] [`apps/web/src/navigation/appRouter.ts`](../../apps/web/src/navigation/appRouter.ts).
-- [ ] [`packages/i18n-react/src/index.tsx`](../../packages/i18n-react/src/index.tsx).
+- [x] [`apps/native/src/auth/AuthProvider.tsx`](../../apps/native/src/auth/AuthProvider.tsx).
+- [x] [`apps/native/src/i18n/I18nProvider.tsx`](../../apps/native/src/i18n/I18nProvider.tsx).
+- [x] [`apps/native/src/i18n/locale.ts`](../../apps/native/src/i18n/locale.ts).
+- [x] [`apps/native/src/navigation/openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts).
+- [x] [`apps/native/src/screens/DashboardScreen.tsx`](../../apps/native/src/screens/DashboardScreen.tsx).
+- [x] [`apps/web/app/[locale]/layout.tsx`](../../apps/web/app/[locale]/layout.tsx).
+- [x] [`apps/web/i18n/request.ts`](../../apps/web/i18n/request.ts).
+- [x] [`apps/web/src/i18n/routing.ts`](../../apps/web/src/i18n/routing.ts).
+- [x] [`apps/web/src/navigation/appRouter.ts`](../../apps/web/src/navigation/appRouter.ts).
+- [x] [`packages/i18n-react/src/index.tsx`](../../packages/i18n-react/src/index.tsx) — imports updated to `@umbraculum/i18n`; dist rebuilt and verified to reference `@umbraculum/i18n` only.
 
 Cross-package README references:
-- [ ] [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+- [x] [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md).
-- [ ] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md).
+- [x] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7.
+Hard stops (preflight commands 5–7 from updated skill):
+- [x] Root [`package.json`](../../package.json) `build:packages` script (line 20; the leading `npm run build -w @brewery/i18n` was the first item in the build chain).
+- [x] Root [`package.json`](../../package.json) `test:packages` script — no entry needed for i18n (it has no test suite).
+- [x] [`.github/workflows/*.yml`](../../.github/workflows/) workflow step display names — no entries reference `@brewery/i18n` (the only `@brewery/i18n-react` reference is the SUBSTRING-collision-safe sibling, NOT touched by slot 7).
+- [x] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages` — no `@brewery/i18n` entry (next-intl loads bundles via the package's `./en` and `./it` subpath exports, not via transpilePackages).
+- [x] [`apps/native/metro.config.js`](../../apps/native/metro.config.js) — no `@brewery/i18n` entry.
+- [x] No `bin` field in [`packages/i18n/package.json`](../../packages/i18n/package.json) (preflight command 2 PASS — nothing to update in root `node_modules/.bin/` symlinks).
+
+**Lessons folded back to plan doc §4 / §5 BEFORE commit:** three lessons recorded (NEW HARD STOP — exclude plan + handoff docs from bulk sed to preserve historical "Source name" columns; refined the transient-cross-scope description to clarify it's the WORKSPACE NAME that lingers, not the imports; substring-collision-with-i18n-react verified safe under the `[^a-zA-Z0-9_-]` regex tail). See plan doc §6.6 for full recap.
 
 ---
 
 ## Slot 8 — `@brewery/i18n-react` → `@umbraculum/i18n-react`
 
-**Status:** Pending. **Depends on slot 7 (`@brewery/i18n` already renamed).**
+**Status:** Pending. **Depends on slot 7 (`@brewery/i18n` already renamed; landed 2026-05-19).**
 
 **Target + classification.** Platform. Universal `useT` hook (web + native).
 
 **Hard stops.**
 
-- Predecessor: slot 7 must have shipped. If it hasn't, this slot's `package.json` would still reference `@brewery/i18n` (stale) — typecheck will fail.
+- Predecessor: slot 7 must have shipped. If it hasn't, this slot's `package.json` would still reference `@umbraculum/i18n` (stale) — typecheck will fail.
 - The package has two exports (`./index`, `./next-intl`) — both `dist/*.{js,cts,d.ts}` must rebuild.
 
 **File inventory.**

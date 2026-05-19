@@ -1,20 +1,20 @@
 # @brewery/i18n-react
 
-React + next-intl bindings for `@brewery/i18n`. The translator API and locale provider used by both web and native.
+React + next-intl bindings for `@umbraculum/i18n`. The translator API and locale provider used by both web and native.
 
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
 
 ## What this is
 
-The React-binding layer on top of [`@brewery/i18n`](../i18n/README.md). It provides a `LocaleProvider` context, a `Translator` interface (with `t(key, values)` for plain strings and `rich(key, values)` for ReactNode-flavored interpolation), and the `useTranslator(namespace?)` hook consumed by every React component that needs localized strings — on both web and native. Two entry points are exported: the default React entry point (`@brewery/i18n-react`) and a Next.js / next-intl-flavored variant (`@brewery/i18n-react/next-intl`) that integrates with next-intl's middleware and request-scoped locale on the server. Internally, both paths route formatting through `intl-messageformat` so plural / select / number / date interpolation behavior matches across platforms.
+The React-binding layer on top of [`@umbraculum/i18n`](../i18n/README.md). It provides a `LocaleProvider` context, a `Translator` interface (with `t(key, values)` for plain strings and `rich(key, values)` for ReactNode-flavored interpolation), and the `useTranslator(namespace?)` hook consumed by every React component that needs localized strings — on both web and native. Two entry points are exported: the default React entry point (`@brewery/i18n-react`) and a Next.js / next-intl-flavored variant (`@brewery/i18n-react/next-intl`) that integrates with next-intl's middleware and request-scoped locale on the server. Internally, both paths route formatting through `intl-messageformat` so plural / select / number / date interpolation behavior matches across platforms.
 
-The runtime catalogs themselves live in `@brewery/i18n` (which is intentionally framework-neutral so it can also be consumed by Node services and tests); this package is the React-flavored adapter on top.
+The runtime catalogs themselves live in `@umbraculum/i18n` (which is intentionally framework-neutral so it can also be consumed by Node services and tests); this package is the React-flavored adapter on top.
 
 ## Scope
 
 - **Contains**: `LocaleProvider` (context provider for `{ locale, messages }`); `useTranslator(namespace?)` (returns `{ t, rich }`); the `Translator` / `I18nRuntime` type contracts; the `next-intl` sub-entrypoint that integrates with Next.js's per-request locale resolution.
-- **Does not contain**: message catalogs (live in `@brewery/i18n`); language detection logic for native (lives in `apps/native/src/i18n/` using `expo-localization`); Next.js i18n routing config (lives in `apps/web/middleware.ts` and `apps/web/i18n/`); date / number formatters that don't go through translation keys (use `Intl.*` directly).
+- **Does not contain**: message catalogs (live in `@umbraculum/i18n`); language detection logic for native (lives in `apps/native/src/i18n/` using `expo-localization`); Next.js i18n routing config (lives in `apps/web/middleware.ts` and `apps/web/i18n/`); date / number formatters that don't go through translation keys (use `Intl.*` directly).
 
 ## Usage
 
@@ -22,7 +22,7 @@ The runtime catalogs themselves live in `@brewery/i18n` (which is intentionally 
 
 ```ts
 import { LocaleProvider, useTranslator } from "@brewery/i18n-react";
-import { getSharedMessages } from "@brewery/i18n";
+import { getSharedMessages } from "@umbraculum/i18n";
 
 const messages = getSharedMessages("en");
 
@@ -60,7 +60,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 ## How it fits in
 
 - **Consumed by**: `apps/web` (via `next-intl` entry point), `apps/native` (via default entry point), `@brewery/recipes-ui` (any component that renders translated strings), `@umbraculum/ui` (components with text labels).
-- **Depends on**: `@brewery/i18n` (the message catalogs); `intl-messageformat` (ICU MessageFormat parser); peer-depends on `react >=18` and `next-intl >=4` (the latter only required if the `next-intl` sub-entrypoint is used).
+- **Depends on**: `@umbraculum/i18n` (the message catalogs); `intl-messageformat` (ICU MessageFormat parser); peer-depends on `react >=18` and `next-intl >=4` (the latter only required if the `next-intl` sub-entrypoint is used).
 
 ## Status
 
@@ -68,7 +68,7 @@ Stable for the brewery vertical's current surface area. The two-entrypoint shape
 
 ## Further reading
 
-- [`@brewery/i18n`](../i18n/README.md) — the message catalog this package binds to React
+- [`@umbraculum/i18n`](../i18n/README.md) — the message catalog this package binds to React
 - [`docs/I18N-AUDIT.md`](../../docs/I18N-AUDIT.md) — internationalization audit and guardrails
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

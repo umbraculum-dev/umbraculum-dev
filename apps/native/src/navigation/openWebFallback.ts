@@ -1,6 +1,6 @@
 import { Linking } from "react-native";
 
-import type { SupportedLocale } from "@brewery/i18n";
+import type { SupportedLocale } from "@umbraculum/i18n";
 import type { RouteRef } from "@umbraculum/navigation";
 import { routeToLocalePath } from "@umbraculum/navigation";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";

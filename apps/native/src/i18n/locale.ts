@@ -1,4 +1,4 @@
-import { defaultLocale, isLocale, type SupportedLocale } from "@brewery/i18n";
+import { defaultLocale, isLocale, type SupportedLocale } from "@umbraculum/i18n";
 
 import * as Localization from "expo-localization";
 

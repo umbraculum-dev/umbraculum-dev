@@ -1,7 +1,8 @@
 {
-  "name": "@brewery/i18n",
+  "name": "@umbraculum/i18n",
   "private": true,
   "version": "0.0.0",
+  "description": "Generic locale-bundle framework (TypeScript types + JSON bundles + copy-json build step). Platform scope: the bundle MACHINERY is platform-neutral; the current bundle CONTENT (en.json / it.json) is brewery-flavored. Per sub-plan #9 plan doc \u00a71.4, content split (extracting brewery-vertical strings into a separate brewery-locales package) is deferred to a future sub-plan. Renamed from @brewery/i18n to @umbraculum/i18n as sub-plan #9 slot 7 (2026-05-19).",
   "type": "module",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",

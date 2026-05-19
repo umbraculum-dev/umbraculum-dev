@@ -12,7 +12,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 ## Native readiness: buildable packages + shared UI (MANDATORY before starting `apps/native`)
 
 - [x] Make native-consumed packages **runtime-safe** (ship `dist/**/*.js` + `dist/**/*.d.ts`) and stop exporting raw TS at the package boundary:
-  - `@brewery/i18n`
+  - `@umbraculum/i18n`
   - `@brewery/contracts`
   - `@brewery/api-client`
 - [x] Create `@umbraculum/ui` and split Tamagui config into web vs native entrypoints:

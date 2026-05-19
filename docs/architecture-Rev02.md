@@ -15,7 +15,7 @@ This section describes decisions that are now **implemented in the repo**.
 
 ### 0.1 Supported locales are single-source-of-truth
 
-- **Canonical locale ownership**: `packages/i18n` (`@brewery/i18n`)
+- **Canonical locale ownership**: `packages/i18n` (`@umbraculum/i18n`)
 - Implemented exports:
   - `locales` (readonly tuple)
   - `SupportedLocale`
@@ -24,7 +24,7 @@ This section describes decisions that are now **implemented in the repo**.
   - `getSharedMessages(locale)` (full message tree)
 
 Web integrates via a thin re-export:
-- `apps/web/src/i18n/routing.ts` re-exports from `@brewery/i18n` so web can keep its existing structure while avoiding drift.
+- `apps/web/src/i18n/routing.ts` re-exports from `@umbraculum/i18n` so web can keep its existing structure while avoiding drift.
 
 ### 0.2 Cross-platform routing boundary (route IDs + typed params)
 
@@ -216,10 +216,10 @@ If code is intended to be shared between web and native (screens/flows/component
 
 Instead it depends on small shared interfaces:
 - routing: `@umbraculum/navigation`
-- i18n: `@brewery/i18n` + `@brewery/i18n-react`
+- i18n: `@umbraculum/i18n` + `@brewery/i18n-react`
 
 #### Implemented boundary modules (source of truth)
-- **Locales + messages**: `packages/i18n` (`@brewery/i18n`)
+- **Locales + messages**: `packages/i18n` (`@umbraculum/i18n`)
 - **Universal translation hook**: `packages/i18n-react` (`@brewery/i18n-react`)
 - **Universal route IDs + policy**: `packages/navigation` (`@umbraculum/navigation`)
 - **Web adapter**: `apps/web/src/navigation/appRouter.ts` (`useAppRouter()`)
@@ -479,7 +479,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
   - Do not export raw TS at the runtime boundary for native-consumed packages
   - Strict placement rule: if code might be reused in native, it lives under `packages/**` first
 - Cross-platform boundaries (implemented early to reduce rework):
-  - locales/messages: `@brewery/i18n`
+  - locales/messages: `@umbraculum/i18n`
   - route manifest + policy: `@umbraculum/navigation`
   - universal translation hook: `@brewery/i18n-react`
   - web adapter: `apps/web/src/navigation/appRouter.ts`

@@ -179,7 +179,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 
 **Already horizontal (will become "platform" packages):**
 
-- `@brewery/i18n` — locales + shared messages.
+- `@umbraculum/i18n` — locales + shared messages.
 - `@brewery/i18n-react` — universal `useT` hook (web + native).
 - `@umbraculum/navigation` — route IDs + cross-platform routing policy (renamed from `@brewery/navigation` 2026-05-19 as sub-plan #9 slot 3; current route IDs include brewery routes pending content-split deferred to second-vertical landing).
 - `@brewery/api-client` — fetch boundary + auth (cookie web, bearer native).
@@ -402,7 +402,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 - Workspace tenancy model (`Workspace`, `WorkspaceMember`, role-based ACL).
 - Plugin-composed Fastify (cross-cutting via `app.register`).
-- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@umbraculum/navigation`, `@brewery/api-client`, `@umbraculum/ui`, `@umbraculum/media`).
+- Cross-platform boundary packages (`@umbraculum/i18n`, `@brewery/i18n-react`, `@umbraculum/navigation`, `@brewery/api-client`, `@umbraculum/ui`, `@umbraculum/media`).
 - Cookie/bearer auth split (web vs native).
 - Redis cache pattern with Postgres source-of-truth.
 - Stripe + RevenueCat as billing providers; Fastify as billing source-of-truth.

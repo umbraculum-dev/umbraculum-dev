@@ -14,7 +14,7 @@ Rule:
   - app code must import from the package **exports**, not from `packages/*/src/**`
 
 Current buildable packages (native-consumed):
-- `packages/i18n` (`@brewery/i18n`)
+- `packages/i18n` (`@umbraculum/i18n`)
 - `packages/i18n-react` (`@brewery/i18n-react`)
 - `packages/navigation` (`@umbraculum/navigation`)
 - `packages/contracts` (`@brewery/contracts`)

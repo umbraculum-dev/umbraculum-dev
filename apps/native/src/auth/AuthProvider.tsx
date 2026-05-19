@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
-import type { SupportedLocale } from "@brewery/i18n";
+import type { SupportedLocale } from "@umbraculum/i18n";
 
 import { getApiBaseUrl } from "./apiBaseUrl";
 import { clearToken, readToken, writeToken } from "./tokenStorage";
