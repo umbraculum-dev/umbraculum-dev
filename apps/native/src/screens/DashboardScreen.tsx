@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import type { RouteRef } from "@umbraculum/navigation";
 import { useT } from "@umbraculum/i18n-react";
 import { locales, type SupportedLocale } from "@umbraculum/i18n";

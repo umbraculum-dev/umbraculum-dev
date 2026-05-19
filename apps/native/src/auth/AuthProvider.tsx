@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import type { SupportedLocale } from "@umbraculum/i18n";
 
 import { getApiBaseUrl } from "./apiBaseUrl";

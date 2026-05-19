@@ -81,7 +81,7 @@ These packages are consumed by every module. They are not registered through `re
 | [`@umbraculum/module-sdk`](../packages/module-sdk/README.md) | `@umbraculum/module-sdk` (rename pending — sub-plan #9 slot 11) | The SDK every module pins. `registerModule()`, reserved-code validation, `ValidatedSchema<T>`. |
 | [`@umbraculum/contracts`](../packages/contracts/README.md) | `@umbraculum/contracts` (sub-plan #9 slot 9) | Platform-wide auth/me DTOs, AI tool contract types. |
 | [`@umbraculum/automation-contracts`](../packages/automation-contracts/README.md) | (already renamed — slot 4 done) | Contracts slice of the `automation` canonical module. The Modbus mailbox mirror lives here. |
-| [`@brewery/api-client`](../packages/api-client/README.md) | `@umbraculum/api-client` (slot 10) | Fetch + auth boundary (cookie web, bearer native). |
+| [`@umbraculum/api-client`](../packages/api-client/README.md) | `@umbraculum/api-client` (slot 10) | Fetch + auth boundary (cookie web, bearer native). |
 | [`@umbraculum/i18n`](../packages/i18n/README.md) | (already renamed — slot 7 done) | Cross-platform message catalog (web + native). |
 | [`@umbraculum/i18n-react`](../packages/i18n-react/README.md) | `@umbraculum/i18n-react` (slot 8) | Universal `useT` hook for React + React Native. |
 | [`@umbraculum/ui`](../packages/ui/README.md) | (already renamed — slot 5 done) | Tamagui primitives + design-system components. Industry-agnostic. |

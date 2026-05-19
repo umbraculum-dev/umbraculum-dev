@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";

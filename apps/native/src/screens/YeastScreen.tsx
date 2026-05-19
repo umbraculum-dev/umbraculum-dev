@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,

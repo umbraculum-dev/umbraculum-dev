@@ -568,38 +568,54 @@ Lockfiles regenerated (cleanly scoped):
 
 ## Slot 10 — `@brewery/api-client` → `@umbraculum/api-client`
 
-**Status:** Pending. **Depends on slot 9.**
+**Status:** Complete (2026-05-19). **Closes one of the two transient cross-scope states opened by slot 9** — the `@brewery/api-client` half. (The `@brewery/module-sdk` half remains open until slot 11.) **Depends on slot 9.**
 
 **Target + classification.** Platform. Generic fetch + auth boundary (cookie web, bearer native).
 
-**Hard stops.**
+**Hard stops cleared.**
 
-- Predecessor: slot 9 must have shipped (api-client lists `@brewery/contracts` as a dep).
-- Consumed primarily by `apps/native` (AuthProvider + screens); minimal `apps/web` consumption.
+- [x] Predecessor: slot 9 shipped — confirmed `packages/api-client/package.json` already had `"@umbraculum/contracts": "file:../contracts"` at start of slot 10 (slot-9 sweep had updated the dep entry; only the workspace `name` field remained to flip).
+- [x] Consumed primarily by `apps/native` (AuthProvider + screens); minimal `apps/web` consumption — confirmed via canonical grep + post-`npm install` web-side lockfile diff being **empty** (web consumes only at the README documentation level, no `package.json` dep entry).
+- [x] Preflight skill 6 HARD STOP classes ran cleanly: only ONE HIT — root `build:packages` (slot's only stop). `bin` field absent; `next.config.js` transpilePackages absent (web has no source dep); `metro.config.js` absent; root `test:packages` absent (api-client has no test suite); workflow display names absent. **First slot whose preflight identified only ONE HARD STOP class** — narrowing blast radius is the cumulative apparatus paying off.
+- [x] 4-cousin substring-collision walk clean: (a) no `@brewery/api-client-*` longer-prefix variants; (b) shorter-prefix `@brewery/api` (currently `services/api/package.json` workspace `name`, scheduled for slot 14) **structurally untouchable** by the literal-`-client` regex anchor — confirmed in practice across slot 10's 41 substitutions; (c) no `@umbraculum/api-client*` collision (no prior slot renamed anything starting with that string); (d) zero subpath imports (`packages/api-client/package.json` declares only `.` as an export).
+- [x] Slot-9 NEW HARD STOP held: `cursor-tmp/slot10-bulk-sed.py` excluded itself via the slot-9-folded-back `EXCLUDE_DIR_PARTS` set + a defensive belt-and-braces (the script's `OLD_FULL` literal is constructed from concatenated string segments, so the script source does not contain the literal target as a single substring).
 
-**File inventory.**
+**File inventory cleared.**
 
 Workspace name + own files:
-- [ ] [`packages/api-client/package.json`](../../packages/api-client/package.json) — `name`; description; dep on `@brewery/contracts` (now `@umbraculum/contracts`).
-- [ ] [`packages/api-client/README.md`](../../packages/api-client/README.md).
+- [x] [`packages/api-client/package.json`](../../packages/api-client/package.json) — `name` flipped; `description` added (slot-8 precedent); the slot-9 sweep had already updated the `@umbraculum/contracts` dep entry, so no further dep changes needed.
+- [x] [`packages/api-client/README.md`](../../packages/api-client/README.md) — heading + workspace command examples updated; rename history note added per slot-8 / slot-9 convention.
 
 Consumer `package.json` deps:
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
 
 Source imports — native:
-- [ ] [`apps/native/src/auth/AuthProvider.tsx`](../../apps/native/src/auth/AuthProvider.tsx).
-- [ ] [`apps/native/src/components/AdSlot.tsx`](../../apps/native/src/components/AdSlot.tsx).
-- [ ] [`apps/native/src/navigation/openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts).
-- [ ] All `apps/native/src/screens/*.tsx` matching the grep (BrewdayStepsSettings, BrewSessionDetail, BrewSessionsList, Dashboard, Equipment, FermDataIntegration, RecipeEdit, RecipesList, SelectWorkspace, WaterBoil, WaterHub, WaterMash, WaterProfiles, WaterSparge, Yeast).
+- [x] [`apps/native/src/auth/AuthProvider.tsx`](../../apps/native/src/auth/AuthProvider.tsx).
+- [x] [`apps/native/src/components/AdSlot.tsx`](../../apps/native/src/components/AdSlot.tsx).
+- [x] [`apps/native/src/navigation/openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts).
+- [x] All 15 `apps/native/src/screens/*.tsx` matching the grep (BrewdayStepsSettings, BrewSessionDetail, BrewSessionsList, Dashboard, Equipment, FermDataIntegration, RecipeEdit, RecipesList, SelectWorkspace, WaterBoil, WaterHub, WaterMash, WaterProfiles, WaterSparge, Yeast).
 
 Cross-package README references:
-- [ ] [`packages/api-client/README.md`](../../packages/api-client/README.md), [`packages/contracts/README.md`](../../packages/contracts/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md), [`services/api/README.md`](../../services/api/README.md).
+- [x] [`packages/api-client/README.md`](../../packages/api-client/README.md), [`packages/contracts/README.md`](../../packages/contracts/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md), [`services/api/README.md`](../../services/api/README.md).
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md).
-- [ ] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md), [`docs/MODULES.md`](../MODULES.md), [`docs/modules/contribute/horizontal-package.md`](../modules/contribute/horizontal-package.md).
+- [x] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7. Native typecheck especially important here since native is the dominant consumer.
+**Step-3 sweep results:** 31 files / 41 substitutions (vs 35-file plan-doc inventory; the 4-file delta = 1 self-exclusion of `packages/api-client/package.json` because step 1 had already updated the `name` field + 3 explicit excludes — own README + 2 history docs).
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing — exactly matches slot-7 / slot-8 / slot-9 baseline).
+- [x] Root `npm run test:packages` 9/9 files / 120/120 tests (5 contracts files / 73 tests + 4 brewery-core files / 47 tests) — same baseline as slot 9 since api-client has no test suite.
+- [x] Native typecheck via the **slot-8 no-root-install / named-volume pattern** — clean; ~7.8s wall-clock. api `.bin/` count preserved at canonical 21 (`tsc`/`tsx`/`vitest` all present); api `/api/health` still 200 post-typecheck. Slot-5 GOTCHA fully averted.
+- [x] Nginx smoke 7/7 HTTP 200 — `/api/health`, `/en/{login,dashboard,recipes}`, `/it/{login,dashboard,recipes}` (both locales exercised through the renamed transport layer end-to-end).
+- [x] Web-side lockfile diff after `npm install --include=dev` — **0 lines** (confirms web has no `package.json` dep on api-client, README-only consumption).
+- [x] api-client dist content audit: `grep -roh '@(brewery|umbraculum)/api-client[a-zA-Z0-9_/.-]*' dist/` returned empty (runtime JS is pure auth + fetch logic; `@umbraculum/contracts` import is types-only and gets erased at build time — confirmed clean via broader-net `grep -rohE "@[a-z-]+/[a-z-]+" dist/`).
+- [x] Final commit message explicitly notes that this slot CLOSES the `@brewery/api-client` half of slot 9's two-state cross-scope window; the `@brewery/module-sdk` half remains open until slot 11.
+
+**No new lessons surfaced.** Slot 10 was a clean execution of the slot-9-refined recipe; the slot-9 NEW HARD STOPs (`cursor-tmp/` exclusion + cousin (b) shorter-prefix structural-untouchability claim) both held cleanly in practice. See plan doc §6.10 for full recap.
 
 ---
 

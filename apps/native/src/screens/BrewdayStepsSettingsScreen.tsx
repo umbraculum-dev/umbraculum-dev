@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 import type { RootStackParamList } from "../navigation/types";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";

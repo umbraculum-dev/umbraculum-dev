@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Linking, Pressable } from "react-native";
 import { Image } from "expo-image";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 
 import { AdSlotCard, Text } from "@umbraculum/ui";

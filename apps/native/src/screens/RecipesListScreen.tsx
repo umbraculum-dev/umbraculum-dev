@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
+import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navigation/native";

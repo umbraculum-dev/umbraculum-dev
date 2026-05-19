@@ -85,9 +85,9 @@ The `@brewery/*` npm scope is **deliberately retained** while sub-plan #9 is pen
 
 When writing module READMEs **today**, this means:
 
-- ✅ **Title**: `# @brewery/api-client` (matches `package.json`).
-- ✅ **Imports** in code snippets: `import { … } from "@brewery/api-client";`.
-- ✅ **Prose**: "Umbraculum's API client" is the platform-level framing; "this package" or "@brewery/api-client" is the in-context framing.
+- ✅ **Title**: `# @umbraculum/api-client` (matches `package.json`).
+- ✅ **Imports** in code snippets: `import { … } from "@umbraculum/api-client";`.
+- ✅ **Prose**: "Umbraculum's API client" is the platform-level framing; "this package" or "@umbraculum/api-client" is the in-context framing.
 - ❌ Do **not** rewrite imports or titles to `@umbraculum/*` — they will not resolve. Sub-plan #9 will do the global rewrite atomically.
 - ❌ Do **not** introduce new placeholders like `<NEW_NPM_SCOPE>` — the resolved values are known; the only delay is the rewrite-and-publish ceremony.
 

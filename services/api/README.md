@@ -14,7 +14,7 @@ Every cross-boundary type the API serializes is defined in `@umbraculum/contract
 ## Scope
 
 - **Contains**: Fastify app + plugin wiring (`src/app.ts`, `src/plugins/`); HTTP route handlers grouped by domain (`src/routes/`); business-logic services (`src/services/`); the Prisma schema + migrations (`prisma/`); domain models layered on top of Prisma (`src/domain/`); BeerJSON / BeerXML import handlers (`src/beerjson/`, `src/importers/`); seed scripts (`src/seed/`, `prisma/seed.ts`); CLI utilities for backfills, the E2E fixture seed, and one-off migrations (`src/cli/`); scheduled jobs (`src/jobs/` — Beerproto sync, session cleanup); test suites (`src/tests/` — unit + integration + contract-snapshot tests); the entrypoint (`src/server.ts`).
-- **Does not contain**: web UI (`apps/web`); native UI (`apps/native`); shared types or runtime parsers (`@umbraculum/contracts`); the API client wrapper consumers use (`@brewery/api-client`).
+- **Does not contain**: web UI (`apps/web`); native UI (`apps/native`); shared types or runtime parsers (`@umbraculum/contracts`); the API client wrapper consumers use (`@umbraculum/api-client`).
 
 ## Quick start
 
@@ -42,7 +42,7 @@ Per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` (cookie auth), `apps/native` (bearer auth), `@brewery/api-client` (the typed wrapper used by both apps and external SDK consumers when the public flip happens), `apps/web/e2e/` (Playwright E2E suite via the seeded fixture).
+- **Consumed by**: `apps/web` (cookie auth), `apps/native` (bearer auth), `@umbraculum/api-client` (the typed wrapper used by both apps and external SDK consumers when the public flip happens), `apps/web/e2e/` (Playwright E2E suite via the seeded fixture).
 - **Depends on**: Postgres (primary + replica), pgpool, Redis, Anthropic Claude API (for AI orchestrator routes); `@umbraculum/contracts` (typed contracts); `@umbraculum/brewery-core` (math primitives shared with web/native); the upstream `@beerjson/beerjson` schema package.
 - **Auth surfaces**: cookies for web (`sid` httpOnly), bearer tokens for native + Node SDKs. Both routes converge on the same internal session model — see [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) and [`docs/AUTH-HARDENING-ASSESSMENT.md`](../../docs/AUTH-HARDENING-ASSESSMENT.md).
 

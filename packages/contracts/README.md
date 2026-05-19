@@ -7,14 +7,14 @@ Shared DTOs, types, and runtime parsers. The contract layer between the API and 
 
 ## What this is
 
-The single source of truth for every cross-boundary type in the platform — auth payloads, water-chemistry compute responses, gravity-analysis results, AI-tool I/O shapes, format hints. Both the API (`services/api`) and the clients (`apps/web`, `apps/native`, `@brewery/api-client`) import the same `ResponseV1` / `RequestV1` types and the same hand-rolled runtime parsers, which guarantees that what the API serializes is exactly what the client deserializes — type-checked at compile time and shape-validated at runtime.
+The single source of truth for every cross-boundary type in the platform — auth payloads, water-chemistry compute responses, gravity-analysis results, AI-tool I/O shapes, format hints. Both the API (`services/api`) and the clients (`apps/web`, `apps/native`, `@umbraculum/api-client`) import the same `ResponseV1` / `RequestV1` types and the same hand-rolled runtime parsers, which guarantees that what the API serializes is exactly what the client deserializes — type-checked at compile time and shape-validated at runtime.
 
 The package uses **hand-rolled validators** (rather than Zod / Valibot / TypeBox) for the reasons documented in [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../../docs/CONTRACTS-VALIDATION-STRATEGY.md): the trade-off between dependency surface, parser-payload size on native bundles, and type-system fidelity favors the hand-rolled approach for now; the doc tracks trigger criteria for revisiting.
 
 ## Scope
 
 - **Contains**: DTO/type definitions and their matching `parse*` runtime validators; format-hint types (`NumberFormatHintV1`, `NumberFormatUnit`); response envelopes (`MashComputeAndSaveResponseV1`, etc.); AI-tool I/O contracts.
-- **Does not contain**: the Prisma schema (lives in `services/api/prisma/`); HTTP route handlers (live in `services/api/src/routes/`); UI rendering of contract data (lives in `@brewery/recipes-ui` / `apps/web` / `apps/native`); transport-layer concerns (auth headers, retries — those live in `@brewery/api-client`).
+- **Does not contain**: the Prisma schema (lives in `services/api/prisma/`); HTTP route handlers (live in `services/api/src/routes/`); UI rendering of contract data (lives in `@brewery/recipes-ui` / `apps/web` / `apps/native`); transport-layer concerns (auth headers, retries — those live in `@umbraculum/api-client`).
 
 ## Exports
 
@@ -51,7 +51,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 
 ## How it fits in
 
-- **Consumed by**: `services/api` (the producer side), `apps/web` and `apps/native` (the consumer sides), `@brewery/api-client` (transport layer that returns parsed responses).
+- **Consumed by**: `services/api` (the producer side), `apps/web` and `apps/native` (the consumer sides), `@umbraculum/api-client` (transport layer that returns parsed responses).
 - **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@umbraculum/i18n` and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
 
 ## Status

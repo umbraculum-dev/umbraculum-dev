@@ -1,9 +1,9 @@
-# @brewery/api-client
+# @umbraculum/api-client
 
 Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node).
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/api-client` to `@umbraculum/api-client` as sub-plan #9 slot 10; closes one of the two transient cross-scope states opened by slot 9 (the other — `@brewery/module-sdk` — closes on slot 11).
 
 ## What this is
 
@@ -41,8 +41,8 @@ This package ships runtime-safe JS + types:
 Commands (run from repo root, container-friendly per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule):
 
 - **Build**: `npm run build:packages`
-- **Test**: `npm run test --workspace=@brewery/api-client` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
-- **Lint**: `npm run lint --workspace=@brewery/api-client`.
+- **Test**: `npm run test --workspace=@umbraculum/api-client` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: `npm run lint --workspace=@umbraculum/api-client`.
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate".
 
 ## How it fits in

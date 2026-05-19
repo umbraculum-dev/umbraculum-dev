@@ -18,7 +18,7 @@ Current buildable packages (native-consumed):
 - `packages/i18n-react` (`@umbraculum/i18n-react`)
 - `packages/navigation` (`@umbraculum/navigation`)
 - `packages/contracts` (`@umbraculum/contracts`)
-- `packages/api-client` (`@brewery/api-client`)
+- `packages/api-client` (`@umbraculum/api-client`)
 - `packages/ui` (`@umbraculum/ui`)
 - `packages/recipes-ui` (`@brewery/recipes-ui`)
 

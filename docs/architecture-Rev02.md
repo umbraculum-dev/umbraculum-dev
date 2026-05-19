@@ -75,7 +75,7 @@ Implemented file:
 ### 0.6 Cross-platform API client (fetch boundary + auth)
 
 Implemented package:
-- `packages/api-client` (`@brewery/api-client`)
+- `packages/api-client` (`@umbraculum/api-client`)
   - Uses a minimal cross-platform fetch contract (injectable `fetch`) and avoids DOM-only typing in its public API.
   - **Auth direction (current)**:
     - Web: cookie sessions (`sid`) via `cookieAuth()`
