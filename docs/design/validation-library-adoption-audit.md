@@ -1,10 +1,20 @@
 # Validation-library adoption audit (pre-RFC-0003)
 
+> [!NOTE]
+> **Status: Superseded by [RFC-0003](../rfcs/0003-validation-library-adoption.md) (Accepted 2026-05-19).**
+> Preserved verbatim as the **reasoning trail that produced RFC-0003 §B Decision** (Zod v4). The body of this document was the evidence base; the seven Decisions A–G in RFC-0003 are the operational commitment.
+>
+> **For the live decision** see [`docs/rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md).
+> **For the live strategy + F1–F9 follow-up tracker** see [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) v2.0.
+> **For the slice-level summary** see [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) §4.5 (validation slice).
+>
+> Do not edit the body to update facts or add new audit rounds — the skeptical-test framework in §5 is the reusable methodology, captured separately at [`docs/design/architectural-audit-template.md`](./architectural-audit-template.md). Future audits (F2 next-cadence, F3 Zod v5 tracker, or any new schema-library rethink) should copy that template into a NEW audit doc at `docs/design/<topic>-audit.md`, walk the framework against fresh evidence, and conclude in a successor RFC — not in amendments here. See §10 "How to use this document going forward" below.
+
 **Tier:** Internal
-**Status:** Draft 2026-05-19 — pre-RFC-0003 deliberation; not a commitment
-**Audience:** project lead + future-self; one round of skeptical review before opening RFC-0003 or returning to canonical-automation-module Phase B-2
+**Status:** Superseded by RFC-0003 (Accepted 2026-05-19). Preserved as historical evidence-of-reasoning.
+**Audience:** future-self performing the next architectural audit (use §5 as the methodology template via the extracted template doc); historians asking "why did we pick Zod over Valibot in 2026-05?"; reviewers of RFC-0003 who want to inspect the verdict chain.
 **Owners:** project lead
-**Related:** [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) (current decision: hand-rolled), [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) §8 (plugin-pack manifest with proposed `22-typescript-contracts-runtime-validation.mdc` rewrite), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) (β layout + `@umbraculum/<code>-contracts` packages × 5), [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12 (`packages/automation-contracts/` Phase A done 2026-05-19)
+**Related:** [`docs/rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md) (the canonical commitment artifact, Accepted 2026-05-19), [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) v2.0 (live strategy + F1–F9 follow-up tracker), [`docs/FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md) §4.5 (validation slice deep-dive) + §8.6 (plugin-pack mapping for the Zod v4 standard), [`docs/design/architectural-audit-template.md`](./architectural-audit-template.md) (the reusable §5 skeptical-test framework, extracted from this doc for use in future audits), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) (β layout + `@umbraculum/<code>-contracts` packages × 5 — one of the two premise-shifts that triggered this audit), [`docs/design/canonical-automation-module-surface.md`](./canonical-automation-module-surface.md) §12 (`packages/automation-contracts/` Phase A done 2026-05-19 — the other premise-shift).
 
 ---
 
@@ -585,12 +595,40 @@ This recommendation has all four counterweights present. It is *changing because
 
 ## 9. Sign-off
 
-| Date | Reviewer | Verdict |
-|---|---|---|
-| 2026-05-19 | Project lead | _Pending review_ |
+| Date | Reviewer | Verdict | Notes |
+|---|---|---|---|
+| 2026-05-19 | Project lead | **SOUND** | Verdict accepted; [RFC-0003](../rfcs/0003-validation-library-adoption.md) opened the same day with Decisions A–G mirroring §6 of this audit plus the structural caveat from §6 (library-agnostic SDK interface). RFC-0003 was Accepted same day after the Phase 1 spike (`spike/validation-library/`) returned PASS on falsifiable tests F1–F6 (F7 container-side bundle measurement deferred as a named follow-up). |
 
-When the lead signs off, append a row above (most recent first), recording one of: SOUND / NOT SOUND / NEEDS BROADER ANALYSIS, plus a one-paragraph rationale.
+This row is closed. Do **not** append additional rows for re-litigation of the same decision — the change procedure is in RFC-0003 §15 (successor RFC). Future re-audits (per F2 next-cadence, F3 Zod v5 tracker, or any unrelated schema-library question) live in new audit docs at `docs/design/<topic>-audit.md`, each with their own §9 sign-off and their own successor RFC.
 
 ---
 
-*Internal audit; not a commitment. RFC-0003 is the artifact that records the actual commitment, if any.*
+## 10. How to use this document going forward
+
+After RFC-0003 was Accepted on 2026-05-19, this audit doc has three legitimate uses. All three are read-only; the body is the historical record.
+
+### 10.1 Historical archaeology
+
+Reading this doc answers "why did we pick Zod v4 over Valibot / TypeBox / hand-rolled in May 2026?" without forcing a re-derivation from the verdict. The §3 worked examples + §4 honest-loss inventory + §5 skeptical-test pass + §6 verdict are the chain.
+
+When a future contributor asks "why is Zod the standard?", point them here, then to RFC-0003 for the operational commitment.
+
+### 10.2 Template for the next architectural audit
+
+§5 walks six skeptical tests — novelty bias, cost honesty, intermediate-option exhaustion, timing, cost of being wrong, falsifiable spike conditions — that generalize across any cross-cutting-tooling adoption question. That framework is extracted as a reusable template at [`docs/design/architectural-audit-template.md`](./architectural-audit-template.md). When **F2** (next validation-slice audit cadence) or **F3** (Zod v5 tracker) fires, OR when an unrelated cross-cutting question arises (next: OpenAPI generator choice, AI-tool-runtime adapter library, etc.), copy the template into a new audit doc at `docs/design/<topic>-audit.md`, walk the framework against fresh evidence, conclude in a successor RFC. This doc stays as the worked-example precedent.
+
+### 10.3 Structural-caveat ledger
+
+§6 verdict carries one structural caveat: **library-agnostic SDK boundary**. The caveat is now operationalized as RFC-0003 Decision C + [`packages/module-sdk/src/validatedSchema.ts`](../../packages/module-sdk/src/validatedSchema.ts) (`ValidatedSchema<T>` interface + `fromParser` adapter). If a future re-audit tightens or relaxes that caveat, the new audit's verdict section should cite §6 here as the prior posture.
+
+### 10.4 What this document is NOT
+
+- Not the live decision (that's RFC-0003).
+- Not the live strategy (that's `docs/CONTRACTS-VALIDATION-STRATEGY.md` v2.0).
+- Not the live tracker (that's `CONTRACTS-VALIDATION-STRATEGY.md` §"Follow-ups (F1–F9)").
+- Not a re-audit log — re-audits go in new docs, not this one.
+- Not a living document — its body is frozen at the 2026-05-19 verdict.
+
+---
+
+*Internal audit, frozen 2026-05-19. RFC-0003 is the canonical commitment artifact; this doc is the evidence base that produced the RFC.*
