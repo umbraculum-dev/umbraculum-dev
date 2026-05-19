@@ -14,7 +14,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 - [x] Make native-consumed packages **runtime-safe** (ship `dist/**/*.js` + `dist/**/*.d.ts`) and stop exporting raw TS at the package boundary:
   - `@umbraculum/i18n`
   - `@umbraculum/contracts`
-  - `@brewery/api-client`
+  - `@umbraculum/api-client`
 - [x] Create `@umbraculum/ui` and split Tamagui config into web vs native entrypoints:
   - web uses `@tamagui/animations-css`
   - native must not import web-only animation/CSS drivers
@@ -172,7 +172,7 @@ Before implementing native app login, complete these items.
 
 ## Documentation gaps
 
-- [ ] **Comprehensive developer-onboarding doc** — walk a new contributor from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running". Should cover: Ubuntu prerequisites, Cursor + plugins setup, Docker / Node / pnpm versions, repo bootstrap, where rules / skills / agents live, how to verify the apparatus is engaged, first PR walkthrough. Tracked because [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 explicitly names this as the missing mechanism for its claims. Closest current substitutes: [`DEVELOPMENT.md`](../../DEVELOPMENT.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md), [`CONTRIBUTING.md`](../../CONTRIBUTING.md), [`docs/modules/contribute/`](../../docs/modules/contribute/) — but none of these is the end-to-end onboarding doc the MANIFESTO claims.
+- [x] **Comprehensive developer-onboarding doc** — landed as [`docs/GETTING-STARTED.md`](../../docs/GETTING-STARTED.md) (2026-05-19). Linear tutorial from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running": OS-bootstrap (apt / Docker / Cursor / git+DCO), repo-bootstrap (`docker compose up` + verification), apparatus install (thin pointer to the apparatus docs), policy + skill inventory pointers, and a first-PR walkthrough with concrete task categories. Targets the [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 gap directly; the corresponding "Onboarding mechanism — landed" paragraph in §1.4 has been updated to point at the new doc. *Living document — extensions welcome as parts of the apparatus surface stabilize.*
 
 - [ ] **Comprehensive open-source-dependencies page** (working title: `docs/OPEN-SOURCE-STACK.md`) — the exhaustive companion to [`MANIFESTO.md`](../../MANIFESTO.md) §1.4's *representative* dependency list. For each load-bearing dependency: (a) what role it plays in the discipline-apparatus, (b) why it was picked over the proprietary alternative, (c) what reach of the apparatus would shrink if it were swapped for a closed-source equivalent. Minimum coverage list (extend as appropriate):
   - **OS / runtime layer**: Linux (Ubuntu), Docker, Node.js, Python (for sister-repo tooling).
