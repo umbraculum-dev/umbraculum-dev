@@ -1,9 +1,9 @@
-# @brewery/recipes-ui
+# @umbraculum/brewery-recipes-ui
 
 Domain UI components for recipes and related brewing workflows (cross-platform: web + native).
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/recipes-ui` to `@umbraculum/brewery-recipes-ui` as sub-plan #9 slot 13 (the `brewery-` prefix in the package name marks the brewery-vertical classification per §1.3 — not the platform-name `@umbraculum/recipes-ui`, which would have implied vertical-agnosticism). Slot 13 is the **closing slot of the package rename set** (only application-workspace `name` flips remain in slot 14).
 
 ## What this is
 
@@ -13,7 +13,7 @@ The recipe-domain UI layer, sitting one tier above `@umbraculum/ui` (which provi
 
 - **Contains**: reusable, cross-platform UI for recipe editors and feature widgets (web + native).
 - **Does not contain**: Next.js, `next-intl`, React Navigation, Expo Router, or app-specific API/auth wiring.
-- **Naming intent**: this package is intentionally recipe-centric (water, yeast, mash editors). As new domains get shared UI, prefer adding new domain packages (e.g. `@brewery/inventory-ui`) rather than turning this into a general “everything UI” bucket.
+- **Naming intent**: this package is intentionally recipe-centric (water, yeast, mash editors). As new domains get shared UI, prefer adding new domain packages (e.g. `@umbraculum/brewery-inventory-ui`) rather than turning this into a general “everything UI” bucket.
 
 ## Adapter pattern (mandatory)
 
@@ -28,8 +28,8 @@ Shared components accept injected functions/props for:
 This package ships runtime-safe JS + types under `dist/**` so it can be consumed by Metro (React Native) and Next.js without source-level transpilation.
 
 - **Build**: from repo root, `./scripts/build-packages-in-docker.sh` (Docker route — preferred per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule).
-- **Test**: `npm run test --workspace=@brewery/recipes-ui` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
-- **Lint**: `npm run lint --workspace=@brewery/recipes-ui`.
+- **Test**: `npm run test --workspace=@umbraculum/brewery-recipes-ui` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: `npm run lint --workspace=@umbraculum/brewery-recipes-ui`.
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate".
 
 ## How it fits in
@@ -39,7 +39,7 @@ This package ships runtime-safe JS + types under `dist/**` so it can be consumed
 
 ## Status
 
-Recipe-centric by name and by intent. As new vertical domains land additional shared UI (e.g. `@brewery/inventory-ui`, `@brewery/wms-ui`), they should ship as separate packages rather than expanding this one — see [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level vertical-module shape.
+Recipe-centric by name and by intent. As new vertical domains land additional shared UI (e.g. `@umbraculum/brewery-inventory-ui`, `@umbraculum/brewery-wms-ui`), they should ship as separate packages rather than expanding this one — see [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level vertical-module shape.
 
 ## Further reading
 

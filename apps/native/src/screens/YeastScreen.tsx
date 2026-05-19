@@ -23,10 +23,10 @@ import {
 } from "@umbraculum/brewery-beerjson";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { Accordion } from "tamagui";
 
-import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
+import { ManualCellCountHelpBox } from "@umbraculum/brewery-recipes-ui";
 import { isMediaAssetKey } from "@umbraculum/media";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { Input } from "../components/AppInput";

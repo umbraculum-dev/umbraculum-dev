@@ -92,7 +92,7 @@ These are the **minimum** professional bar for the current stack:
 | API `/api/health` triage + esbuild recovery doc | Prevents false “native bugs” when API is 502 |
 | “Quick triage order” in native doc | Reduces random debugging |
 | Shared packages: avoid React internals / version-sensitive APIs | Reduces silent breakage across web vs native |
-| `@umbraculum/brewery-beerjson` is in `build:packages` (before `@brewery/recipes-ui`) | Prevents stale `packages/beerjson/dist/*` from silently breaking `apps/native` and `packages/recipes-ui` consumers (see `DEVELOPMENT-LOCAL.md` → "Shared packages build") |
+| `@umbraculum/brewery-beerjson` is in `build:packages` (before `@umbraculum/brewery-recipes-ui`) | Prevents stale `packages/beerjson/dist/*` from silently breaking `apps/native` and `packages/recipes-ui` consumers (see `DEVELOPMENT-LOCAL.md` → "Shared packages build") |
 | `./scripts/check-packages-dist-up-to-date.sh` before pushing | Catches any `packages/*/dist` drift automatically. Now actually covers beerjson too (it didn't before this commit, because beerjson wasn't in the upstream `build:packages` chain). |
 
 Optional enhancements (nice-to-have, not required for solo honesty):

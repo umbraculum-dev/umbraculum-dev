@@ -82,16 +82,16 @@ These packages are consumed by every module. They are not registered through `re
 | [`@umbraculum/module-sdk`](../packages/module-sdk/README.md) | `@umbraculum/module-sdk` (rename pending — sub-plan #9 slot 11) | The SDK every module pins. `registerModule()`, reserved-code validation, `ValidatedSchema<T>`. |
 | [`@umbraculum/contracts`](../packages/contracts/README.md) | `@umbraculum/contracts` (sub-plan #9 slot 9) | Platform-wide auth/me DTOs, AI tool contract types. |
 | [`@umbraculum/automation-contracts`](../packages/automation-contracts/README.md) | (already renamed — slot 4 done) | Contracts slice of the `automation` canonical module. The Modbus mailbox mirror lives here. |
-| [`@umbraculum/api-client`](../packages/api-client/README.md) | `@umbraculum/api-client` (slot 10) | Fetch + auth boundary (cookie web, bearer native). |
-| [`@umbraculum/i18n`](../packages/i18n/README.md) | (already renamed — slot 7 done) | Cross-platform message catalog (web + native). |
-| [`@umbraculum/i18n-react`](../packages/i18n-react/README.md) | `@umbraculum/i18n-react` (slot 8) | Universal `useT` hook for React + React Native. |
-| [`@umbraculum/ui`](../packages/ui/README.md) | (already renamed — slot 5 done) | Tamagui primitives + design-system components. Industry-agnostic. |
-| [`@umbraculum/navigation`](../packages/navigation/README.md) | (already renamed — slot 3 done) | Route IDs + cross-platform routing policy. |
-| [`@umbraculum/media`](../packages/media/README.md) | (already renamed — slot 2 done) | Shared assets framework. |
-| [`@umbraculum/test-mcp`](../packages/test-mcp/README.md) | (already renamed — slot 1 done) | Test-MCP HTTP server exposing testing tools. Developer tooling. |
-| `@umbraculum/brewery-core` ([`packages/core/`](../packages/core/)) | (already renamed — slot 6 done; vertical-prefixed) | Brewery-vertical brewing math (gravity, water). **Vertical-prefixed scope** — see RFC-0002 §4. No README yet — content sits in [`packages/core/src/`](../packages/core/src/). |
-| [`@umbraculum/brewery-beerjson`](../packages/beerjson/README.md) | `@umbraculum/brewery-beerjson` (slot 12) | Brewery-vertical BeerJSON spec layer. **Will be vertical-prefixed.** |
-| [`@brewery/recipes-ui`](../packages/recipes-ui/README.md) | `@umbraculum/brewery-recipes-ui` (slot 13) | Brewery-vertical recipe/water/yeast UI. **Will be vertical-prefixed.** |
+| [`@umbraculum/api-client`](../packages/api-client/README.md) | (renamed — slot 10 done) | Fetch + auth boundary (cookie web, bearer native). |
+| [`@umbraculum/i18n`](../packages/i18n/README.md) | (renamed — slot 7 done) | Cross-platform message catalog (web + native). |
+| [`@umbraculum/i18n-react`](../packages/i18n-react/README.md) | (renamed — slot 8 done) | Universal `useT` hook for React + React Native. |
+| [`@umbraculum/ui`](../packages/ui/README.md) | (renamed — slot 5 done) | Tamagui primitives + design-system components. Industry-agnostic. |
+| [`@umbraculum/navigation`](../packages/navigation/README.md) | (renamed — slot 3 done) | Route IDs + cross-platform routing policy. |
+| [`@umbraculum/media`](../packages/media/README.md) | (renamed — slot 2 done) | Shared assets framework. |
+| [`@umbraculum/test-mcp`](../packages/test-mcp/README.md) | (renamed — slot 1 done) | Test-MCP HTTP server exposing testing tools. Developer tooling. |
+| `@umbraculum/brewery-core` ([`packages/core/`](../packages/core/)) | (renamed — slot 6 done; vertical-prefixed) | Brewery-vertical brewing math (gravity, water). **Vertical-prefixed scope** — see RFC-0002 §4. No README yet — content sits in [`packages/core/src/`](../packages/core/src/). |
+| [`@umbraculum/brewery-beerjson`](../packages/beerjson/README.md) | (renamed — slot 12 done; vertical-prefixed) | Brewery-vertical BeerJSON spec layer. |
+| [`@umbraculum/brewery-recipes-ui`](../packages/recipes-ui/README.md) | (renamed — slot 13 done; vertical-prefixed) | Brewery-vertical recipe/water/yeast UI. |
 
 Note the asymmetry in the third column: horizontal packages keep an unprefixed `@umbraculum/<name>` scope; vertical-flavored packages carry a vertical prefix (`@umbraculum/brewery-<name>`). That distinction is enforced by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §4 and is the trap that slot 6 of sub-plan #9 was designed to catch ([brewery-scope-migration-per-package-handoff.md](design/brewery-scope-migration-per-package-handoff.md) — Slot 6 ⚠ TRAP).
 

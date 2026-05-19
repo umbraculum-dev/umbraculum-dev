@@ -16,16 +16,16 @@ import {
   newMashRowId,
   type EditorMashStep,
 } from "../../../_lib/beerjsonRecipe";
-import { MashStepsEditor } from "@brewery/recipes-ui";
+import { MashStepsEditor } from "@umbraculum/brewery-recipes-ui";
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
-import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewery/recipes-ui";
+import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@umbraculum/brewery-recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
-import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";
 import { Accordion, Button, H3, Input, SizableText, View, XStack, YStack } from "tamagui";

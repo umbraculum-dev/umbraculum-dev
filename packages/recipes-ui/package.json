@@ -1,8 +1,9 @@
 {
-  "name": "@brewery/recipes-ui",
+  "name": "@umbraculum/brewery-recipes-ui",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Brewery-vertical domain UI — recipe / mash / water / yeast editors. Sits one tier above @umbraculum/ui (platform-neutral primitives). Cross-platform (web + native) via injected-adapter pattern. Brewery-vertical-classified per sub-plan #9 §1.1 (recipe domain is brewing-specific; the @umbraculum/brewery-* prefix marks the vertical boundary).",
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"

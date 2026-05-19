@@ -19,7 +19,7 @@ import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow"
 import { mathExplain } from "./_lib/mathExplain";
 import { buildWaterMathBody } from "./_lib/mathBodies";
 import { ErrorBox, FieldBadge } from "../../../_components/recipe-edit";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
 
 type DisplayStream = {

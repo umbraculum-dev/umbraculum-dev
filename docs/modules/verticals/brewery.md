@@ -74,11 +74,11 @@ Today brewery screens are flat under `apps/native/src/screens/` (`RecipesListScr
 
 ### 3.4 Brewery-vertical packages
 
-| Package (current name) | End-state name | Role |
+| Package | Sub-plan #9 slot | Role |
 |---|---|---|
-| `@umbraculum/brewery-core` ([`packages/core/`](../../../packages/core/)) | (already renamed — slot 6 done) | Brewing math: gravity, water chemistry, unit conversions. |
-| `@umbraculum/brewery-beerjson` ([`packages/beerjson/`](../../../packages/beerjson/README.md)) | `@umbraculum/brewery-beerjson` (slot 12 pending) | BeerJSON spec layer. |
-| `@brewery/recipes-ui` ([`packages/recipes-ui/`](../../../packages/recipes-ui/README.md)) | `@umbraculum/brewery-recipes-ui` (slot 13 pending) | Recipe / mash / water / yeast UI components. |
+| `@umbraculum/brewery-core` ([`packages/core/`](../../../packages/core/)) | slot 6 (done) | Brewing math: gravity, water chemistry, unit conversions. |
+| `@umbraculum/brewery-beerjson` ([`packages/beerjson/`](../../../packages/beerjson/README.md)) | slot 12 (done) | BeerJSON spec layer. |
+| `@umbraculum/brewery-recipes-ui` ([`packages/recipes-ui/`](../../../packages/recipes-ui/README.md)) | slot 13 (done) | Recipe / mash / water / yeast UI components. |
 
 The `@umbraculum/brewery-<name>` scope prefix is the [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention for vertical-flavored packages — distinguishes them from horizontal packages (`@umbraculum/i18n`, `@umbraculum/ui`, …) at a glance.
 

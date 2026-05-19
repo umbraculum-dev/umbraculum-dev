@@ -191,7 +191,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 **Brewery-vertical (will become "module" packages):**
 
 - `@umbraculum/brewery-core` — brewing calculations and unit conversions.
-- `@brewery/recipes-ui` — domain UI for recipes, water, yeast.
+- `@umbraculum/brewery-recipes-ui` — domain UI for recipes, water, yeast.
 - `@umbraculum/brewery-beerjson` — BeerJSON schema layer.
 
 The `@brewery/*` scope is a **historical artifact** of starting with the brewery vertical. A neutral platform scope — `@umbraculum/*` per the resolved brand (see §10) — is the right end-state, but renaming touches hundreds of import sites and several user-visible i18n strings, so it is deferred to the dedicated `@brewery/*` package scope migration sub-plan, sequenced after the second module is on the table.

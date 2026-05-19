@@ -6,7 +6,7 @@ import type { IonProfilePpm, RecipeWaterHubSummaryResponse } from "@umbraculum/c
 import { parseRecipeWaterHubSummaryResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { Accordion } from "tamagui";
 
 import { useAuth } from "../auth/AuthProvider";

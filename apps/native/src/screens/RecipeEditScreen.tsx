@@ -30,7 +30,7 @@ import {
   SURFACE_BACKGROUND,
   SURFACE_BORDER,
 } from "../theme/colors";
-import { MashStepsEditor, SpargeStepReadOnlyRow, type WaterVolumes } from "@brewery/recipes-ui";
+import { MashStepsEditor, SpargeStepReadOnlyRow, type WaterVolumes } from "@umbraculum/brewery-recipes-ui";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

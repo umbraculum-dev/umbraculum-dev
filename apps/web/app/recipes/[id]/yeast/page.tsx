@@ -24,10 +24,10 @@ import {
 } from "../../_lib/beerjsonRecipe";
 import { formatFixed } from "../../../../src/i18n/format";
 import { getMediaPublicPath } from "@umbraculum/media";
-import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
+import { ManualCellCountHelpBox } from "@umbraculum/brewery-recipes-ui";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 
 type Recipe = {
   id: string;

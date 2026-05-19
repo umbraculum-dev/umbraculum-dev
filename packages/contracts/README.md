@@ -14,7 +14,7 @@ The package uses **hand-rolled validators** (rather than Zod / Valibot / TypeBox
 ## Scope
 
 - **Contains**: DTO/type definitions and their matching `parse*` runtime validators; format-hint types (`NumberFormatHintV1`, `NumberFormatUnit`); response envelopes (`MashComputeAndSaveResponseV1`, etc.); AI-tool I/O contracts.
-- **Does not contain**: the Prisma schema (lives in `services/api/prisma/`); HTTP route handlers (live in `services/api/src/routes/`); UI rendering of contract data (lives in `@brewery/recipes-ui` / `apps/web` / `apps/native`); transport-layer concerns (auth headers, retries — those live in `@umbraculum/api-client`).
+- **Does not contain**: the Prisma schema (lives in `services/api/prisma/`); HTTP route handlers (live in `services/api/src/routes/`); UI rendering of contract data (lives in `@umbraculum/brewery-recipes-ui` / `apps/web` / `apps/native`); transport-layer concerns (auth headers, retries — those live in `@umbraculum/api-client`).
 
 ## Exports
 

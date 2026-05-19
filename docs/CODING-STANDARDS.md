@@ -20,7 +20,7 @@ Current buildable packages (native-consumed):
 - `packages/contracts` (`@umbraculum/contracts`)
 - `packages/api-client` (`@umbraculum/api-client`)
 - `packages/ui` (`@umbraculum/ui`)
-- `packages/recipes-ui` (`@brewery/recipes-ui`)
+- `packages/recipes-ui` (`@umbraculum/brewery-recipes-ui`)
 
 Build workflow:
 - When you change any of the packages above, rebuild `dist/` and commit the updated `dist/` outputs.
@@ -45,7 +45,7 @@ Why we commit `dist/`:
 #### UI layering (mandatory for scalability)
 
 - **Generic primitives** (buttons, inputs, selects, cards, collapsibles): `@umbraculum/ui`
-- **Domain feature UI** (recipe editors, water/yeast widgets): `@brewery/recipes-ui`
+- **Domain feature UI** (recipe editors, water/yeast widgets): `@umbraculum/brewery-recipes-ui`
 - **Adapters** (Next.js routing, cookie-session fetch, native bearer auth, media rendering): stay in `apps/web/**` and `apps/native/**`
 
 Rule of thumb:

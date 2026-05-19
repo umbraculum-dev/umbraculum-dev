@@ -3,16 +3,16 @@
 Shared UI building blocks for web and native apps (Tamagui-based primitives + generic compound components).
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 5 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). Industry-agnostic by construction — no brewery-specific knowledge lives here; domain-flavored components live in `@brewery/recipes-ui` (pending sub-plan #9 slot 13).
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 5 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). Industry-agnostic by construction — no brewery-specific knowledge lives here; domain-flavored components live in `@umbraculum/brewery-recipes-ui`.
 
 ## What this is
 
-The platform-neutral UI primitives layer, consumed by both `apps/web` (Next.js) and `apps/native` (React Native + Expo) through Tamagui's cross-platform component system. Intentionally domain-free — recipe-editing, water-page, and other brew-day-specific UI lives in `@brewery/recipes-ui` (pending sub-plan #9 slot 13 rename). See [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level framing and [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md) for the Tamagui type-system caveats and adaptation strategy.
+The platform-neutral UI primitives layer, consumed by both `apps/web` (Next.js) and `apps/native` (React Native + Expo) through Tamagui's cross-platform component system. Intentionally domain-free — recipe-editing, water-page, and other brew-day-specific UI lives in `@umbraculum/brewery-recipes-ui`. See [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) for the platform-level framing and [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md) for the Tamagui type-system caveats and adaptation strategy.
 
 ## Scope
 
 - **Contains**: platform-neutral UI primitives and generic compound components (Tamagui-based).
-- **Does not contain**: domain/feature UI (recipes editors, water pages, etc.). Those live in `@brewery/recipes-ui` (pending sub-plan #9 slot 13 rename).
+- **Does not contain**: domain/feature UI (recipes editors, water pages, etc.). Those live in `@umbraculum/brewery-recipes-ui`.
 
 ## Tamagui config entrypoints
 
@@ -32,7 +32,7 @@ When you change `packages/ui/src/**`, run the build before consumers can pick up
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` and `apps/native` directly; `@brewery/recipes-ui` (pending sub-plan #9 slot 13 rename; adds domain-specific components on top of these primitives).
+- **Consumed by**: `apps/web` and `apps/native` directly; `@umbraculum/brewery-recipes-ui` (adds domain-specific components on top of these primitives).
 - **Depends on**: Tamagui (the cross-platform component system); no other workspace packages — this is the bottom of the UI dependency stack.
 
 ## Status

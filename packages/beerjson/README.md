@@ -7,14 +7,14 @@ Typed BeerJSON wrapper + editor-row helpers — the canonical brewing-recipe int
 
 ## What this is
 
-The platform's BeerJSON adaptation layer. The brewery vertical is **BeerJSON-first** — every recipe is canonically modeled as a BeerJSON document, with BeerXML supported only as an import path (see [`docs/BEERJSON-FIRST.md`](../../docs/BEERJSON-FIRST.md) for the strict-export discipline). This package wraps the upstream `@beerjson/beerjson` schema with TypeScript types tuned for our editor surface, plus a small library of "editor-row" helpers that translate between the on-disk BeerJSON shape and the in-memory shape consumed by `@brewery/recipes-ui` editors (grist rows, hop rows, water-profile rows, etc.). Pure conversions like SG ↔ Plato come from `@umbraculum/brewery-core`; this package focuses on schema-aware transformations.
+The platform's BeerJSON adaptation layer. The brewery vertical is **BeerJSON-first** — every recipe is canonically modeled as a BeerJSON document, with BeerXML supported only as an import path (see [`docs/BEERJSON-FIRST.md`](../../docs/BEERJSON-FIRST.md) for the strict-export discipline). This package wraps the upstream `@beerjson/beerjson` schema with TypeScript types tuned for our editor surface, plus a small library of "editor-row" helpers that translate between the on-disk BeerJSON shape and the in-memory shape consumed by `@umbraculum/brewery-recipes-ui` editors (grist rows, hop rows, water-profile rows, etc.). Pure conversions like SG ↔ Plato come from `@umbraculum/brewery-core`; this package focuses on schema-aware transformations.
 
 Math primitives (gravity / SG conversions, unit normalization) live in `@umbraculum/brewery-core` rather than here, so non-recipe surfaces can use them without pulling in BeerJSON-specific types.
 
 ## Scope
 
 - **Contains**: BeerJSON-aware TypeScript types (`BeerJsonRecipe`, `BeerJsonDocument`, `EditorGristRow`, etc.); editor-row converters between BeerJSON and the editor-friendly in-memory shape; `parseValueWithUnit` and similar BeerJSON-shaped value extractors; re-exports of `sgToPlato` from `@umbraculum/brewery-core` for editor-side ergonomics; a vitest suite (`src/index.test.ts`) covering the converters.
-- **Does not contain**: the upstream BeerJSON schema itself (lives in `@beerjson/beerjson`); BeerXML import logic (lives in `services/api/src/importers/`); the editor UI (lives in `@brewery/recipes-ui`); pure math primitives that don't need BeerJSON shape (live in `@umbraculum/brewery-core`).
+- **Does not contain**: the upstream BeerJSON schema itself (lives in `@beerjson/beerjson`); BeerXML import logic (lives in `services/api/src/importers/`); the editor UI (lives in `@umbraculum/brewery-recipes-ui`); pure math primitives that don't need BeerJSON shape (live in `@umbraculum/brewery-core`).
 
 ## Usage
 
@@ -24,7 +24,7 @@ import { sgToPlato, type EditorGristRow } from "@umbraculum/brewery-beerjson";
 const plato = sgToPlato(1.052);
 ```
 
-Detailed editor-row conversion examples live next to the editor that consumes them in `@brewery/recipes-ui`; this package is the type/converter source-of-truth, not the docs surface for editor behavior.
+Detailed editor-row conversion examples live next to the editor that consumes them in `@umbraculum/brewery-recipes-ui`; this package is the type/converter source-of-truth, not the docs surface for editor behavior.
 
 ## Build / test / lint (local)
 
@@ -41,7 +41,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 
 ## How it fits in
 
-- **Consumed by**: `apps/web`, `apps/native`, `services/api` (BeerJSON parsing on import), `@brewery/recipes-ui` (editor-row converters).
+- **Consumed by**: `apps/web`, `apps/native`, `services/api` (BeerJSON parsing on import), `@umbraculum/brewery-recipes-ui` (editor-row converters).
 - **Depends on**: `@umbraculum/brewery-core` (re-exports `sgToPlato`); the upstream `@beerjson/beerjson` schema (referenced through `services/api`'s direct dependency, not bundled here).
 
 ## Status

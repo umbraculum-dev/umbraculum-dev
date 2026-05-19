@@ -6,12 +6,12 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BrewSelect } from "../../../../_components/BrewSelect";
-import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewery/recipes-ui";
+import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@umbraculum/brewery-recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
-import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { Accordion, Button, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";

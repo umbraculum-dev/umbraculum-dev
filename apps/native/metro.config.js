@@ -28,7 +28,7 @@ config.resolver.extraNodeModules = {
   scheduler: path.join(rootNodeModules, "scheduler"),
   "react-native": path.join(appNodeModules, "react-native"),
   // Explicitly resolve workspace packages that may not be hoisted to root node_modules.
-  "@brewery/recipes-ui": path.join(workspaceRoot, "packages", "recipes-ui"),
+  "@umbraculum/brewery-recipes-ui": path.join(workspaceRoot, "packages", "recipes-ui"),
 };
 
 module.exports = config;

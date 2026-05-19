@@ -74,7 +74,7 @@ The native slice is required only if your vertical needs a native shell (per [RO
 
 Beyond the contracts package, your vertical may ship additional packages with vertical-flavored content (`@umbraculum/distillery-spirits-catalog`, `@umbraculum/cosmetics-ingredient-compat`). These carry the `@umbraculum/<your-code>-<name>` prefix per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) — to distinguish vertical-flavored packages from horizontal infrastructure at a glance.
 
-Brewery's example: `@umbraculum/brewery-core`, `@umbraculum/brewery-beerjson` (becomes `@umbraculum/brewery-beerjson` after sub-plan #9 slot 12), `@brewery/recipes-ui` (becomes `@umbraculum/brewery-recipes-ui` after slot 13).
+Brewery's example: `@umbraculum/brewery-core`, `@umbraculum/brewery-beerjson`, `@umbraculum/brewery-recipes-ui` (all three renamed under sub-plan #9 — slot 6, slot 12, slot 13 respectively).
 
 ### Step 5 — Register via `@umbraculum/module-sdk`
 

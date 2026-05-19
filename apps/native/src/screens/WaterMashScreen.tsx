@@ -15,12 +15,12 @@ import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseW
 import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
-import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { Accordion } from "tamagui";
 
 import { ModeFieldset } from "@umbraculum/ui";
-import { SaltAdditionsEditor, type SaltAdditionRow } from "@brewery/recipes-ui";
-import { MashStepsEditor, type WaterVolumes } from "@brewery/recipes-ui";
+import { SaltAdditionsEditor, type SaltAdditionRow } from "@umbraculum/brewery-recipes-ui";
+import { MashStepsEditor, type WaterVolumes } from "@umbraculum/brewery-recipes-ui";
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

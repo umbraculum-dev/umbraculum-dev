@@ -742,55 +742,79 @@ Doc references:
 
 ## Slot 13 — `@brewery/recipes-ui` → `@umbraculum/brewery-recipes-ui`
 
-**Status:** Pending. **Depends on slots 5, 8, 12.**
+**Status:** Complete (2026-05-19). **Closes the package rename set.** After slot 13 ships, only slot 14 (four application-workspace `name` flips with zero workspace-consumer deps) remains in sub-plan #9. Brewery-vertical TRAP discipline now proven across **3 of 3** vertical-prefixed slots (slot 6 / 12 / 13). **Depended on slots 5, 8, 12** — all shipped.
 
-**Target + classification.** **Brewery-vertical.** Recipes, mash, water, yeast UIs (brewery domain). Target name carries `brewery-` prefix.
+**Target + classification.** **Brewery-vertical.** Recipes, mash, water, yeast UIs (brewery domain). Target name carries `brewery-` prefix per §1.3.
 
-**Hard stops.**
+**Hard stops cleared.**
 
-- Predecessors: slots 5 (`ui`), 8 (`i18n-react`), 12 (`beerjson`) must all have shipped — recipes-ui depends on all three.
-- **`apps/native/metro.config.js`** has `extraNodeModules: { "@brewery/recipes-ui": ... }` — must update. This is the only `metro.config.js` extraNodeModules pin in the repo.
-- Add classifying description: `"Brewery-vertical domain UI (recipes, mash, water, yeast). End-state npm scope: @umbraculum/brewery-recipes-ui per sub-plan #9."`
-- This is the final package-rename slot — after this ships, only slot 14 (application workspaces) remains.
+- [x] Predecessors: slots 5 (`ui`), 8 (`i18n-react`), 12 (`beerjson`) all shipped — confirmed `packages/recipes-ui/package.json` lists `@umbraculum/brewery-beerjson`, `@umbraculum/i18n-react`, `@umbraculum/ui` as deps before step 1.
+- [x] **`apps/native/metro.config.js`** line 31 `extraNodeModules: { "@brewery/recipes-ui": ... }` updated to `@umbraculum/brewery-recipes-ui` by the bulk sweep — the on-disk symlink target stays as `packages/recipes-ui` (the directory name doesn't change). This is the only metro `extraNodeModules` pin in the repo and slot-13's flagship HARD STOP. Cleared by sweep.
+- [x] Classifying description added (per slot-9..12 precedent): `"Brewery-vertical domain UI — recipe / mash / water / yeast editors. Sits one tier above @umbraculum/ui (platform-neutral primitives). Cross-platform (web + native) via injected-adapter pattern. Brewery-vertical-classified per sub-plan #9 §1.1 (recipe domain is brewing-specific; the @umbraculum/brewery-* prefix marks the vertical boundary)."`
+- [x] Preflight skill 6 HARD STOP classes ran: 2 HITS — `apps/native/metro.config.js` (above) + root `build:packages` (10th item in chain, cleared by sweep). Bin field absent; `next.config.js` transpilePackages does NOT include recipes-ui (ships pre-built dist/, same architectural pattern as beerjson/api-client/automation-contracts/module-sdk); root `test:packages` does NOT include recipes-ui (recipes-ui has NO own tests in `src/` — slot-13 has zero own-test-files to invoke); workflow display names absent.
+- [x] 4-cousin substring-collision walk surfaced **two slot-specific findings**:
+  - **Cousin (c2):** `@umbraculum/recipes-ui` (the platform-bare name) appears in EXACTLY ONE place — `docs/modules/contribute/horizontal-package.md:113` — as **deliberate pedagogy** explicitly contrasting the WRONG name with the CORRECT brewery-prefixed target. The slot-13 sweep regex is anchored on `@brewery/recipes-ui`, not on `@umbraculum/recipes-ui`, so this pedagogy text was correctly untouched. **First slot whose cousin-(c2) check found a deliberate "anti-pattern documentation" entry** — confirms the post-slot-6 TRAP-recap pedagogy doctrine is live.
+  - **Cousin (c):** 11 pre-existing `@umbraculum/brewery-recipes-ui` forecast references in doc-tier files. The sweep correctly converted them to live-state references AT THE LEADING `@brewery/recipes-ui` site, BUT the parenthetical forecast text (e.g. `(will be renamed to @umbraculum/brewery-recipes-ui in slot 13)`) was left intact — turning the sentence into a self-referential tautology post-sweep.
+- [x] **NEW LESSON** — forecast-becomes-live doc-tier tautology purge — surfaced during slot 13, captured in plan doc §5 risk register + §4 step-3 NEW POST-SWEEP CHECKLIST block. Cleanup pass executed on 8 sites: 6 new slot-13 sites (i18n-react/README, media/README, navigation/README ×2, ui/README ×4, MODULES.md, brewery.md, vertical-configuration.md) + 2 leftover slot-12 sites (vertical-configuration.md ×1, brewery.md ×1) that the slot-12 sweep had not bulk-grep'd. Out-of-strict-slot-13-scope cleanup of slot-12-leftover but inside the natural cleanup pass; called out explicitly in commit message.
+- [x] Slot-9 NEW HARD STOP held: `cursor-tmp/slot13-bulk-sed.py` excluded itself via `EXCLUDE_DIR_PARTS` set + the slot-9 defensive belt-and-braces (script's `OLD_FULL` literal constructed from concatenated string segments).
+- [x] **Slot-6 TRAP discipline held — third proof point:** the slot-13 bulk-sed `NEW_FULL` constant uses a different `NEW_PKG_NAME` (`brewery-recipes-ui`) than `OLD_PKG_NAME` (`recipes-ui`). The §1.3 classification gate caught the brewery-vertical classification on first attempt for the third consecutive vertical-prefixed slot.
 
-**File inventory.**
+**File inventory cleared.**
 
 Workspace name + own files:
-- [ ] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json) — `name`; description; deps on `beerjson`, `i18n-react`, `ui` already updated to `@umbraculum/*` via prior slots.
-- [ ] [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md).
-- [ ] All internal `packages/recipes-ui/src/**/*.tsx` files matching the grep — already updated to point at `@umbraculum/beerjson`, `@umbraculum/i18n-react`, `@umbraculum/ui` if predecessors shipped.
+- [x] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json) — `name` flipped to `@umbraculum/brewery-recipes-ui`; `description` field added per handoff (reworded from forecast to current-state).
+- [x] [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md) — heading + workspace command examples + future-package-name examples updated; rename history note added per slot-8/9/10/11/12 convention with explicit TRAP rationale (`brewery-` prefix marks brewery-vertical classification, not the platform-name `@umbraculum/recipes-ui` — the latter is the explicit anti-pattern in `docs/modules/contribute/horizontal-package.md:113`); `RENAME-DILIGENCE.md` link preserved per slot-11 lesson.
+- [x] All internal `packages/recipes-ui/src/**/*.tsx` files — already on `@umbraculum/brewery-beerjson`, `@umbraculum/i18n-react`, `@umbraculum/ui` from prior slots; no in-package self-reference to update (recipes-ui doesn't import itself).
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
 
 Build configs:
-- [ ] [`apps/native/metro.config.js`](../../apps/native/metro.config.js) — `extraNodeModules` pin (HARD STOP — the only metro pin in the repo).
+- [x] [`apps/native/metro.config.js`](../../apps/native/metro.config.js) — `extraNodeModules` pin updated by sweep (HARD STOP — the only metro pin in the repo).
 
-Source imports — web:
-- [ ] [`apps/web/app/_components/RecipeTitleWithMeta.tsx`](../../apps/web/app/_components/RecipeTitleWithMeta.tsx).
-- [ ] [`apps/web/app/recipes/[id]/edit/page.tsx`](../../apps/web/app/recipes/[id]/edit/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/boil/page.tsx`](../../apps/web/app/recipes/[id]/water/boil/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/mash/page.tsx`](../../apps/web/app/recipes/[id]/water/mash/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/page.tsx`](../../apps/web/app/recipes/[id]/water/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/sparge/page.tsx`](../../apps/web/app/recipes/[id]/water/sparge/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/yeast/page.tsx`](../../apps/web/app/recipes/[id]/yeast/page.tsx).
+Source imports — web (7 files):
+- [x] [`apps/web/app/_components/RecipeTitleWithMeta.tsx`](../../apps/web/app/_components/RecipeTitleWithMeta.tsx).
+- [x] [`apps/web/app/recipes/[id]/edit/page.tsx`](../../apps/web/app/recipes/[id]/edit/page.tsx) — 2 substitutions.
+- [x] [`apps/web/app/recipes/[id]/water/boil/page.tsx`](../../apps/web/app/recipes/[id]/water/boil/page.tsx) — 2 substitutions.
+- [x] [`apps/web/app/recipes/[id]/water/mash/page.tsx`](../../apps/web/app/recipes/[id]/water/mash/page.tsx) — 3 substitutions.
+- [x] [`apps/web/app/recipes/[id]/water/page.tsx`](../../apps/web/app/recipes/[id]/water/page.tsx).
+- [x] [`apps/web/app/recipes/[id]/water/sparge/page.tsx`](../../apps/web/app/recipes/[id]/water/sparge/page.tsx) — 2 substitutions.
+- [x] [`apps/web/app/recipes/[id]/yeast/page.tsx`](../../apps/web/app/recipes/[id]/yeast/page.tsx) — 2 substitutions.
 
-Source imports — native:
-- [ ] [`apps/native/src/screens/RecipeEditScreen.tsx`](../../apps/native/src/screens/RecipeEditScreen.tsx).
-- [ ] [`apps/native/src/screens/WaterBoilScreen.tsx`](../../apps/native/src/screens/WaterBoilScreen.tsx).
-- [ ] [`apps/native/src/screens/WaterHubScreen.tsx`](../../apps/native/src/screens/WaterHubScreen.tsx).
-- [ ] [`apps/native/src/screens/WaterMashScreen.tsx`](../../apps/native/src/screens/WaterMashScreen.tsx).
-- [ ] [`apps/native/src/screens/WaterSpargeScreen.tsx`](../../apps/native/src/screens/WaterSpargeScreen.tsx).
-- [ ] [`apps/native/src/screens/YeastScreen.tsx`](../../apps/native/src/screens/YeastScreen.tsx).
+Source imports — native (6 files):
+- [x] [`apps/native/src/screens/RecipeEditScreen.tsx`](../../apps/native/src/screens/RecipeEditScreen.tsx).
+- [x] [`apps/native/src/screens/WaterBoilScreen.tsx`](../../apps/native/src/screens/WaterBoilScreen.tsx) — 2 substitutions.
+- [x] [`apps/native/src/screens/WaterHubScreen.tsx`](../../apps/native/src/screens/WaterHubScreen.tsx).
+- [x] [`apps/native/src/screens/WaterMashScreen.tsx`](../../apps/native/src/screens/WaterMashScreen.tsx) — 3 substitutions.
+- [x] [`apps/native/src/screens/WaterSpargeScreen.tsx`](../../apps/native/src/screens/WaterSpargeScreen.tsx) — 2 substitutions.
+- [x] [`apps/native/src/screens/YeastScreen.tsx`](../../apps/native/src/screens/YeastScreen.tsx) — 2 substitutions.
 
-Cross-package README references:
-- [ ] [`packages/beerjson/README.md`](../../packages/beerjson/README.md), [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md), [`packages/ui/README.md`](../../packages/ui/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+Cross-package README references (substituted + tautology-purged):
+- [x] [`packages/beerjson/README.md`](../../packages/beerjson/README.md) — 4 substitutions, [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md) — 2 substitutions + 2 tautology purges, [`packages/media/README.md`](../../packages/media/README.md) — 1 substitution + 1 tautology purge, [`packages/navigation/README.md`](../../packages/navigation/README.md) — 2 substitutions + 2 tautology purges, [`packages/ui/README.md`](../../packages/ui/README.md) — 4 substitutions + 4 tautology purges, [`apps/native/README.md`](../../apps/native/README.md) — 4 substitutions, [`apps/web/README.md`](../../apps/web/README.md) — 4 substitutions.
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md), [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md), [`docs/NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md) — 2 substitutions, [`docs/architecture-Rev02.md`](../architecture-Rev02.md) — 2 substitutions, [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md), [`docs/NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md), [`docs/MODULES.md`](../MODULES.md) — 1 sub + table tautology purge, [`docs/modules/contribute/vertical-configuration.md`](../modules/contribute/vertical-configuration.md) — 1 sub + 2 tautology purges (slot-12 + slot-13 leftovers), [`docs/modules/verticals/brewery.md`](../modules/verticals/brewery.md) — 1 sub + 2 tautology purges (slot-12 + slot-13).
 
-**Verification + commit.** Plan doc §4 steps 4–7. Closing the package set — final commit message: `"sub-plan #9 slot 13 of 14 — closes the package rename set; only application workspace names (slot 14) remain"`.
+**Step-3 sweep results:** 34 files / 61 substitutions in the bulk pass + 8 doc-tier tautology purges in the cleanup pass = 36 distinct modified files (some files received both passes). 3 explicit excludes (own README + 2 history docs).
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing — exactly matches slot-7..12 baseline).
+- [x] Root `npm run test:packages` 9/9 files / 120/120 tests (5 contracts files / 73 tests + 4 brewery-core files / 47 tests) — same baseline as slot 9..12.
+- [x] **Slot-specific:** recipes-ui has NO own tests. Per the package's own README, behavior is covered by consuming-app E2E + the per-workspace typecheck gate.
+- [x] **CRITICAL gate:** Native typecheck via the slot-8 no-root-install / named-volume pattern — clean; **~4.8s wall-clock, fastest yet**. This is the slot-13 critical path because metro.config.js's `extraNodeModules` pin is the only HARD STOP that would surface as a typecheck error if the sweep had missed it. api `.bin/` count preserved at canonical 21; api `/api/health` still 200 post-typecheck. Slot-5 GOTCHA fully averted.
+- [x] Nginx smoke 7/7 HTTP 200 — `/api/health`, `/en/{login,dashboard,recipes}`, `/it/{login,dashboard,recipes}`. **Closing-slot smoke**: all 7 routes touch the recipes-ui-rendered surface.
+- [x] recipes-ui dist content audit: `grep -roh '@(brewery|umbraculum)/[a-z][a-z0-9-]*[a-z0-9]' dist/` returned only `@umbraculum/brewery-beerjson`, `@umbraculum/i18n-react`, `@umbraculum/ui` — the three external imports declared in `dependencies`. Zero `@brewery/*` refs in dist; zero stale references to old self-name.
+- [x] **Forecast-becomes-live tautology audit (NEW gate from slot 13):** post-cleanup grep for the slot-13-codified pattern returned ZERO matches outside `docs/design/` (the migration plan + handoff docs deliberately retain forecast wording for status tracking).
+- [x] Final commit message notes: closes the package rename set + brewery-vertical TRAP discipline proven 3-of-3 + tautology-purge cleanup.
+
+**ONE NEW LESSON surfaced** — captured in plan doc §6.13 + §5 risk register + §4 step-3 post-sweep checklist:
+
+- **Forecast-becomes-live doc-tier tautologies.** Brewery-vertical slots create cross-package README forecasts of the form `(will be renamed to @umbraculum/brewery-<name> in slot N)` that become tautological post-rename. Slot 12 left 2 such tautologies untouched; slot 13's larger doc-tier footprint created 6 new ones. Mitigation is a post-sweep grep + cleanup pass before commit.
+
+**Follow-up note (out of slot 13 scope, not blocking):** the generic "remaining `@brewery/*` packages pending sub-plan #9 slots" footers in `packages/contracts/README.md:55`, `packages/navigation/README.md:55`, `packages/i18n/README.md:62` are intentionally retained — they're factually correct as long as slot 14 still has 4 application workspaces in scope. **Slot 14 will need to clean these up under the same tautology-purge lesson** when the closing condition lands.
 
 ---
 

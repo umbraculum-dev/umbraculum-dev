@@ -43,10 +43,10 @@ import {
   type EditorMiscRow,
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
-import { MashStepsEditor, SpargeStepReadOnlyRow } from "@brewery/recipes-ui";
+import { MashStepsEditor, SpargeStepReadOnlyRow } from "@umbraculum/brewery-recipes-ui";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { RecipeEditSectionsNav } from "../../_components/RecipeEditSectionsNav";
-import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
+import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { RecipeTitleWithMeta } from "../../../_components/RecipeTitleWithMeta";
 import {
   fetchRecipeWaterSettings,

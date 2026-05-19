@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { RecipeMetaLine } from "@brewery/recipes-ui";
+import { RecipeMetaLine } from "@umbraculum/brewery-recipes-ui";
 import { H1, YStack } from "tamagui";
 
 export function RecipeTitleWithMeta(props: {

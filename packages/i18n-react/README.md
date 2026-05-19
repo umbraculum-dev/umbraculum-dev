@@ -59,12 +59,12 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` (via `next-intl` entry point), `apps/native` (via default entry point), `@brewery/recipes-ui` (any component that renders translated strings; will be renamed to `@umbraculum/brewery-recipes-ui` in slot 13), `@umbraculum/ui` (components with text labels).
+- **Consumed by**: `apps/web` (via `next-intl` entry point), `apps/native` (via default entry point), `@umbraculum/brewery-recipes-ui` (any component that renders translated strings), `@umbraculum/ui` (components with text labels).
 - **Depends on**: `@umbraculum/i18n` (the message catalogs); `intl-messageformat` (ICU MessageFormat parser); peer-depends on `react >=18` and `next-intl >=4` (the latter only required if the `next-intl` sub-entrypoint is used).
 
 ## Status
 
-Stable for the brewery vertical's current surface area. The two-entrypoint shape (default + `next-intl`) is the architectural anchor: it lets the same component code call `useTranslator` regardless of platform, which is what makes `@brewery/recipes-ui` (→ `@umbraculum/brewery-recipes-ui` in slot 13) legitimately platform-neutral.
+Stable for the brewery vertical's current surface area. The two-entrypoint shape (default + `next-intl`) is the architectural anchor: it lets the same component code call `useTranslator` regardless of platform, which is what makes `@umbraculum/brewery-recipes-ui` legitimately platform-neutral.
 
 ## Further reading
 
