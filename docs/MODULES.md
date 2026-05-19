@@ -69,6 +69,9 @@ Vertical configurations use the same β shape as canonical modules but with a ve
 
 Future verticals (distillery, kombucha, cosmetics, food-batch, fragrance) are explicitly anticipated by [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 but unimplemented. They can be community-built — the Tier 6 path is permissionless.
 
+> [!NOTE]
+> **Vertical configurations may have sister repos.** A vertical's surface is not always exclusively TypeScript — verticals with safety-validated PLC code, embedded firmware, hardware drivers, or other runtime-asymmetric assets typically live in a separate repository coupled to this monorepo by a versioned interface contract. The brewery vertical is the worked example: its OpenPLC ladder logic lives in a sister repo joined here by the `PI_*` Modbus mailbox + `CONTRACT_VERSION` + `integrated_release_tag`. See [`modules/verticals/brewery.md §3.7`](modules/verticals/brewery.md) for the worked example, and [`modules/contribute/vertical-configuration.md §4`](modules/contribute/vertical-configuration.md) for the generalized "multi-runtime modules" pattern.
+
 ### 3.3 Horizontal packages (cross-cutting infrastructure, NOT modules)
 
 These packages are consumed by every module. They are not registered through `registerModule()`; they have no `code`. They are the platform-owned services from the *consumption contract* ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8 Decision F) that modules must use rather than reimplement.

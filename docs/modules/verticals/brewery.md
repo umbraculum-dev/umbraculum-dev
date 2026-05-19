@@ -96,6 +96,51 @@ Brewery-specific modeling and analytical references live under `docs/` today (wi
 - [YEAST-MATH.md](../../YEAST-MATH.md) — pitching, propagation math.
 - [RAW-MATERIALS-SEEDABLE-SOURCES.md](../../RAW-MATERIALS-SEEDABLE-SOURCES.md) — seed data sources.
 
+### 3.7 Sister repos — the OpenPLC PLC slice
+
+The brewery vertical's surface is not exclusively TypeScript. A substantial code asset lives in a **sister repository** alongside this monorepo: the **OpenPLC project** that owns the brewery's safety-validated PLC ladder logic (alarm interlocks, pump priority, low/high level sensors, runtime upload bundle).
+
+Conceptually that sister repo IS part of the brewery vertical — it is the brewery-specific implementation of the [`automation`](../canonical/automation.md) canonical's adapter contract at the PLC layer (the `brewery.openplc.v1` adapter, Phase C pending). It is co-owned and co-versioned with the platform-side brewery code via the `integrated_release_tag` discipline.
+
+#### 3.7.1 What lives in the sister repo
+
+Per [canonical-automation-module-surface.md §5.1](../../design/canonical-automation-module-surface.md):
+
+- **Safety-validated alarm ladder / interlocks** — the frozen `2.0.1-dev` baseline. Owned by the sister repo, not duplicated in TypeScript.
+- **OpenPLC Editor artifacts** — serialized `.xml`, compiled `.st`, bench vs field profile configurations.
+- **Runtime upload bundle** — `prepare_openplc_runtime_upload.py` and its output, the canonical artifact uploaded to the OpenPLC runtime (bench Linux runtime, port 502) or the CONTROLLINO MEGA Pure (field, Modbus RTU over USB-Serial).
+- **`PI_*` Modbus mailbox source of truth** — the address map for every coil and holding register exchanged between the PLC and the platform.
+- **Pi sidecar (field UI)** — the FastAPI + Jinja application that gives operators on-site a controller UI when the platform cloud is unreachable.
+
+#### 3.7.2 Why the physical separation is correct (and durable)
+
+The sister-repo arrangement is not accidental colocation drift — it is the *result* of four binding boundary conditions, all of which still hold:
+
+1. **Validation boundary.** The alarm ladder is safety-validated PLC code subject to its own validation regime. Co-locating with TypeScript invites "let me just tweak this" edits that break the validation chain. The frozen `2.0.1-dev` baseline depends on the separation.
+2. **Runtime asymmetry.** PLC code runs on a CONTROLLINO MEGA Pure (field profile — Modbus RTU over USB-Serial) or on a Linux-hosted OpenPLC Runtime (bench profile — Modbus TCP on port 502). The `PI_*` map is identical across both profiles; only the transport changes. Platform code runs in Node.js / web — entirely different deploy targets, different release cadences. (Bench-vs-field profile discipline is owned by the OpenPLC sister repo's own contribution rules.)
+3. **Toolchain isolation.** OpenPLC Editor uses serialized XML and Structured Text (`.st`); mixing with TypeScript tooling helps no one and creates accidental coupling.
+4. **Lifecycle independence.** PLC releases follow sister-repo validation discipline; the platform ships on normal API / web cadence. Coupling by repo would force one cadence on the other.
+
+This is the standard "multi-runtime module with a versioned interface contract" pattern — same shape as a mobile SDK + backend, or a hardware driver + control plane.
+
+#### 3.7.3 The contract layer — `PI_*` mailbox + `CONTRACT_VERSION` + integrated release tag
+
+The two repos are joined by an explicit, versioned contract:
+
+- **`PI_*` Modbus mailbox spec** — sister repo is the source of truth; platform mirrors via a script-generated artifact (`PI_*.json` / `.ts`) checked into [`packages/automation-contracts/`](../../../packages/automation-contracts/README.md) via PR. Drift is visible in PR diffs rather than at runtime. Per [canonical-automation-module-surface.md §12.2](../../design/canonical-automation-module-surface.md).
+- **`CONTRACT_VERSION` handshake** — major-version mismatch refuses connection; minor mismatch warns and continues. Pinned in `@umbraculum/automation-contracts`.
+- **`integrated_release_tag`** — the PLC version + sidecar version + contract_version + API version move together as one coordinated baseline. (The integrated-release-versioning discipline is documented and enforced in the OpenPLC sister repo; the discipline is what lets the two repos evolve independently without diverging out of compatibility silently.)
+
+#### 3.7.4 Navigational pointer
+
+The OpenPLC sister repo's location, branding, and public URL are out of scope for this page (and per-developer for now). For now, the binding source-of-truth pointer is [canonical-automation-module-surface.md §5](../../design/canonical-automation-module-surface.md) + [§12.2 (B1 — mailbox SoT)](../../design/canonical-automation-module-surface.md), which the surface-design doc maintainers keep current. The audience line of that doc explicitly lists "OpenPLC sister-repo maintainers" — the two doc sets are designed to stay in sync.
+
+#### 3.7.5 What this means for contributors
+
+- A contributor working on the brewery vertical's **platform side** (TypeScript, Prisma, AI tools, UI) operates entirely in this monorepo and consumes the mirrored mailbox spec from `@umbraculum/automation-contracts`.
+- A contributor working on the brewery vertical's **PLC side** (alarm ladder, runtime, mailbox additions) operates in the sister repo, follows its validation discipline, and proposes mailbox changes there first; the platform mirror updates by PR after.
+- A contributor adding a **new mailbox entry** opens a PR in the sister repo first (it is the SoT), then opens a paired PR in this monorepo to update the `@umbraculum/automation-contracts` mirror. Both PRs land under one `integrated_release_tag` bump.
+
 ---
 
 ## 4. Canonical-module consumption — today and planned

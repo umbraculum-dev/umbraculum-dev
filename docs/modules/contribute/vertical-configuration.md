@@ -118,7 +118,49 @@ Tier 6 is permissionless. You ship in a normal PR. For external repos (a vertica
 
 ---
 
-## 4. Bundling decisions (separate from the technical contribution path)
+## 4. Multi-runtime modules — when your vertical has non-TypeScript code
+
+Some verticals own substantial code that does NOT run in Node.js or the browser — PLC ladder logic, embedded firmware, hardware drivers, robot controllers, control-system configuration files. The brewery vertical is the worked example: alarm-ladder PLC code that runs on a CONTROLLINO MEGA Pure (or a Linux-hosted OpenPLC runtime in bench profile) lives in a **separate sister repository**, joined to the platform by a **versioned interface contract** (the `PI_*` Modbus mailbox + `CONTRACT_VERSION` + `integrated_release_tag`). See [`verticals/brewery.md §3.7`](../verticals/brewery.md) for the worked example end-to-end.
+
+**This is the recommended shape** for any vertical with runtime-asymmetric code. The four binding reasons (per [`verticals/brewery.md §3.7.2`](../verticals/brewery.md)) generalize:
+
+1. **Validation boundary.** Safety-validated code (PLC ladders, certified firmware, FDA-cleared algorithms) follows its own validation regime. Co-locating with TypeScript invites edits that break the validation chain.
+2. **Runtime asymmetry.** PLC firmware / embedded code / hardware drivers run on different targets than Node.js or web. Different deploy mechanisms; different release cadences.
+3. **Toolchain isolation.** OpenPLC Editor (XML + Structured Text), Arduino IDE, PlatformIO, microcontroller toolchains — none of these mix cleanly with a TypeScript monorepo's lint / test / build pipeline.
+4. **Lifecycle independence.** Sister-repo releases follow their own validation discipline; the platform ships on normal API / web cadence. Co-location forces one cadence on the other.
+
+### 4.1 What the contract layer looks like
+
+Brewery's `PI_*` Modbus mailbox is one shape; other verticals will pick differently. The pattern that generalizes is:
+
+| Layer | Brewery example | Generalization |
+|---|---|---|
+| **Source-of-truth artifact in the sister repo** | `PI_*` mailbox spec (script-generated `PI_*.json` + `.ts`) | Whatever the integration surface is, declared canonically in the runtime-specific repo. |
+| **Mirror in the platform monorepo** | `@umbraculum/automation-contracts` imports the artifact via PR | The platform-side npm package consumes the artifact; drift visible in PR diffs, not at runtime. |
+| **Version handshake** | `CONTRACT_VERSION` in `@umbraculum/automation-contracts`; major mismatch refuses connection, minor warns | The adapter validates the runtime's reported version on connect; semver discipline. |
+| **Coordinated release tag** | `integrated_release_tag` ties PLC version + sidecar version + contract_version + API version | The vertical defines an integrated release baseline so the two repos can evolve independently without diverging silently. |
+
+### 4.2 Why we don't formalize this as an RFC (yet)
+
+Brewery is currently the only multi-runtime vertical in the ecosystem. The pattern is real and documented, but the *specifics* (Modbus mailbox shape, FastAPI sidecar choice, OpenPLC editor toolchain) are brewery-shaped. The second multi-runtime vertical — when it appears — might want gRPC contracts, an OCI image registry for firmware artifacts, or a different version-handshake mechanism. Pinning this as an RFC now would force a specificity we don't have evidence to support. The right discipline is:
+
+1. Today: document the brewery worked example end-to-end (this section + `verticals/brewery.md §3.7`).
+2. When a second multi-runtime vertical appears: assess whether the shapes converge. If they do, an RFC formalizes the converged pattern. If they diverge, the docs note the divergence and let each vertical pick.
+
+If you're about to build a multi-runtime vertical, that means **you are the second case**. Open a doc-only PR proposing your contract-layer shape, ideally before code lands, so the two examples can be compared and the docs updated coherently.
+
+### 4.3 What you ship
+
+For a multi-runtime vertical, your contribution actually spans two repos:
+
+- This monorepo: the platform-side surface (TypeScript) — your vertical's four β slices per §3 above, plus the platform mirror of your contract artifact (typically a generated file under `packages/<your-code>-contracts/`).
+- Your sister repo: the runtime-specific code (PLC ladders, firmware, drivers, …) + the SoT artifact for your contract layer + a `README.md` that names this monorepo as the platform counterpart and links to [`docs/modules/verticals/<your-code>.md`](../verticals/).
+
+The two PRs land coordinated under a single integrated-release-tag bump.
+
+---
+
+## 5. Bundling decisions (separate from the technical contribution path)
 
 Whether your vertical gets **bundled** with the platform's hosted offering — the way `brewery` is bundled today as the reference vertical — is a separate conversation with the core team. The technical contribution path is permissionless; bundling is curatorial.
 
@@ -126,13 +168,13 @@ Most third-party verticals stay external (Tier 6 community-built); a few may eve
 
 ---
 
-## 5. Worked example
+## 6. Worked example
 
 Read [`verticals/brewery.md`](../verticals/brewery.md) end-to-end — it documents the brewery vertical as it exists today (flat layout, pre-H1 2027) and the β shape it migrates to. The page also lists every brewery-specific surface (routes, packages, docs, i18n namespace) so you have a concrete checklist for what your own vertical needs.
 
 ---
 
-## 6. Common pitfalls
+## 7. Common pitfalls
 
 - **Reimplementing a canonical concern in your vertical.** "We'll ship our own MRP because the canonical is too generic" — no. Once `mrp` ships, your vertical configures it; you don't fork it. If the canonical surface lacks something you need, that's an extension-point feature request against the canonical, not a parallel implementation.
 - **Skipping the vertical-prefix on packages.** `@umbraculum/distillery-spirits-catalog` is correct; `@umbraculum/spirits-catalog` is the wrong shape (looks horizontal). The prefix is the visual signal that the package is vertical-flavored. See [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) and the slot-6 TRAP discussion in [brewery-scope-migration-per-package-handoff.md](../../design/brewery-scope-migration-per-package-handoff.md).
@@ -141,7 +183,7 @@ Read [`verticals/brewery.md`](../verticals/brewery.md) end-to-end — it documen
 
 ---
 
-## 7. Cross-references
+## 8. Cross-references
 
 - [`verticals/brewery.md`](../verticals/brewery.md) — the worked example.
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6 row), §8 (consumption contract).
