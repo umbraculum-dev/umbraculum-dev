@@ -1,4 +1,5 @@
 // src/primitives/Card.tsx
+import "react";
 import { YStack } from "tamagui";
 import { jsx } from "react/jsx-runtime";
 function Card(props) {
@@ -16,6 +17,7 @@ function Card(props) {
 }
 
 // src/primitives/Text.tsx
+import "react";
 import { SizableText } from "tamagui";
 import { jsx as jsx2 } from "react/jsx-runtime";
 function Text(props) {

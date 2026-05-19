@@ -143,6 +143,7 @@ function ManualCellCountHelpBox(props) {
 }
 
 // src/water/SaltAdditionsEditor.tsx
+var import_react3 = require("react");
 var import_tamagui2 = require("tamagui");
 var import_i18n_react3 = require("@brewery/i18n-react");
 var import_ui3 = require("@brewery/ui");
@@ -173,7 +174,7 @@ function SaltAdditionsEditor(props) {
             value: row.saltKey,
             onValueChange: (v) => updateRow(idx, { saltKey: v }),
             options: SALT_OPTIONS,
-            disabled,
+            ...disabled !== void 0 ? { disabled } : {},
             width: "full",
             "aria-label": t("salt"),
             closeLabel: tCommon("close")
@@ -214,6 +215,7 @@ function SaltAdditionsEditor(props) {
 }
 
 // src/mash/MashStepsEditor.tsx
+var import_react4 = require("react");
 var import_tamagui3 = require("tamagui");
 var import_beerjson = require("@brewery/beerjson");
 var import_ui4 = require("@brewery/ui");
@@ -269,7 +271,7 @@ function MashStepsEditor(props) {
           import_ui4.Card,
           {
             "data-mash-step-card": true,
-            theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
+            ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
             gap: "$2",
             padding: "$3",
             backgroundColor: cardBackgroundColor ?? "$background",
@@ -514,6 +516,7 @@ function MashStepsEditor(props) {
 }
 
 // src/mash/SpargeStepReadOnlyRow.tsx
+var import_react5 = require("react");
 var import_tamagui4 = require("tamagui");
 var import_ui5 = require("@brewery/ui");
 var import_jsx_runtime5 = require("react/jsx-runtime");
@@ -523,7 +526,7 @@ function SpargeStepReadOnlyRow(props) {
     import_ui5.Card,
     {
       "data-mash-step-card": true,
-      theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
+      ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
       backgroundColor: cardBackgroundColor ?? "$background",
       borderWidth: 1,
       borderColor: cardBorderColor ?? "$borderColor",

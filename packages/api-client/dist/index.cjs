@@ -87,19 +87,19 @@ function createApiClient(baseUrl, auth, options) {
     post(path, body) {
       return request(path, {
         method: "POST",
-        body: body != null ? JSON.stringify(body) : void 0
+        ...body != null ? { body: JSON.stringify(body) } : {}
       });
     },
     put(path, body) {
       return request(path, {
         method: "PUT",
-        body: body != null ? JSON.stringify(body) : void 0
+        ...body != null ? { body: JSON.stringify(body) } : {}
       });
     },
     patch(path, body) {
       return request(path, {
         method: "PATCH",
-        body: body != null ? JSON.stringify(body) : void 0
+        ...body != null ? { body: JSON.stringify(body) } : {}
       });
     },
     delete(path) {

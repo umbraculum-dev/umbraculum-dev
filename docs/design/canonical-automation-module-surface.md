@@ -294,6 +294,23 @@ Phase A explicitly does **not** include:
 
 Implementation PRs should link this doc and cite the accepted Phase (§9).
 
+### 12.5 Phase A entry checklist
+
+Concrete steps Phase A includes, in order. Tracked under sub-plan #7 (umbrella plan).
+
+| # | Step | Repo | Status |
+|---|---|---|---|
+| 1 | Scaffold `packages/automation-contracts/` (types-only, vitest, tsup) | `umbraculum-dev` | **Done** — see commit log |
+| 2 | Wire new package into root `build:packages` and `.github/workflows/typecheck.yml` workspaces array | `umbraculum-dev` | **Done** |
+| 3 | Mailbox-emitter PR shape draft (handoff to sister-repo maintainer) | `umbraculum-dev` (`docs/design/openplc-mailbox-emitter-pr-shape.md`) | **Done** |
+| 4 | Sister-repo PR — emit `PI_*` mailbox artifact (`mailbox.json` and/or `.ts`); align `contract_version` slot for adapter consumers; add `PI_FIRMWARE_VERSION` register if missing | OpenPLC sister repo | Pending |
+| 5 | Sync first emitted mailbox artifact into `packages/automation-contracts/` (M2 mirror); bump `CONTRACT_VERSION` to first non-`-dev` value agreed with sister-repo maintainer | `umbraculum-dev` | Pending (depends on #4) |
+| 6 | Phase B unblock signal — when #5 merges, Phase B (read path: Prisma `automation` schema, `vesselState`, `listVessels`, read-only `(automation)/`) becomes the active focus per §9 | both | Pending |
+
+**Hold rule.** Steps 1–3 land independently in `umbraculum-dev` (types and shape only — no consumer). Step 4 is the first sister-repo touch and needs the maintainer's review window. Step 5 is the first time the platform mirror carries real `PI_*` names, so it should land in a single dedicated PR for clean diff review.
+
+**No-customer pilot context (per §12.1).** Steps 4 + 5 may iterate freely on names and addresses without external compatibility concern; the version handshake (steps 1 + 5) is the discipline that catches accidental skew on our own bench during Phase B/C.
+
 ---
 
 ## 13. References

@@ -2,7 +2,7 @@ import {
   Card,
   Heading,
   Text
-} from "./chunk-XF6MCNOA.js";
+} from "./chunk-YO4JCC5S.js";
 
 // src/theme/nativeReadonlyTokens.ts
 var FIELD_READONLY_BG = "#232934";
@@ -24,6 +24,7 @@ function ThemeVarsInjector() {
 }
 
 // src/primitives/AdSlotCard.tsx
+import "react";
 import { Platform } from "react-native";
 import { YStack } from "tamagui";
 import { jsx, jsxs } from "react/jsx-runtime";
@@ -60,6 +61,7 @@ function AdSlotCard(props) {
 }
 
 // src/primitives/Button.tsx
+import "react";
 import { Platform as Platform2 } from "react-native";
 import { Button as TamaguiButton } from "tamagui";
 import { jsx as jsx2 } from "react/jsx-runtime";
@@ -87,6 +89,7 @@ function Button(props) {
 }
 
 // src/primitives/BrewCheckbox.tsx
+import "react";
 import { Platform as Platform3 } from "react-native";
 import { Checkbox as TamaguiCheckbox } from "tamagui";
 import { jsx as jsx3 } from "react/jsx-runtime";
@@ -117,6 +120,7 @@ function BrewCheckbox(props) {
 }
 
 // src/primitives/Collapsible.tsx
+import "react";
 import { Platform as Platform4 } from "react-native";
 import { YStack as YStack2 } from "tamagui";
 import { jsx as jsx4, jsxs as jsxs2 } from "react/jsx-runtime";
@@ -154,6 +158,7 @@ function Collapsible(props) {
 }
 
 // src/primitives/Input.tsx
+import "react";
 import { Platform as Platform5 } from "react-native";
 import { Input as TamaguiInput } from "tamagui";
 import { jsx as jsx5 } from "react/jsx-runtime";
@@ -181,6 +186,7 @@ function Input(props) {
 }
 
 // src/primitives/ModeFieldset.tsx
+import "react";
 import { Label, RadioGroup, XStack, YStack as YStack3 } from "tamagui";
 import { jsx as jsx6, jsxs as jsxs3 } from "react/jsx-runtime";
 function ModeFieldset(props) {
@@ -236,6 +242,7 @@ function ModeFieldset(props) {
 }
 
 // src/primitives/ReadOnlyField.tsx
+import "react";
 import { Platform as Platform6 } from "react-native";
 import { XStack as XStack2, YStack as YStack4 } from "tamagui";
 import { jsx as jsx7, jsxs as jsxs4 } from "react/jsx-runtime";
@@ -270,6 +277,7 @@ function ReadOnlyFieldRow({ children }) {
 }
 
 // src/primitives/Screen.tsx
+import "react";
 import { Platform as Platform7, StatusBar } from "react-native";
 import { YStack as YStack5 } from "tamagui";
 import { jsx as jsx8 } from "react/jsx-runtime";
@@ -356,7 +364,7 @@ function SelectField({
           borderColor: "$borderColor",
           disabled,
           accessibilityLabel: ariaLabel,
-          children: /* @__PURE__ */ jsx9(Text, { fontSize: 12, children: (renderValue ? String(renderValue(value)) : selectedLabel) || placeholder || "\u2014" })
+          children: /* @__PURE__ */ jsx9(Text, { fontSize: 12, children: (renderValue ? renderValue(value) : selectedLabel) || placeholder || "\u2014" })
         }
       ),
       /* @__PURE__ */ jsx9(Modal, { visible: open, transparent: true, animationType: "fade", onRequestClose: () => setOpen(false), children: /* @__PURE__ */ jsx9(
@@ -390,6 +398,7 @@ function SelectField({
 }
 
 // src/primitives/Spinner.tsx
+import "react";
 import { Spinner as TamaguiSpinner } from "tamagui";
 import { jsx as jsx10 } from "react/jsx-runtime";
 function Spinner(props) {

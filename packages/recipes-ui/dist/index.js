@@ -112,6 +112,7 @@ function ManualCellCountHelpBox(props) {
 }
 
 // src/water/SaltAdditionsEditor.tsx
+import "react";
 import { XStack, YStack as YStack2 } from "tamagui";
 import { useT as useT3 } from "@brewery/i18n-react";
 import { Button, Card as Card2, Input, SelectField, Text as Text3 } from "@brewery/ui";
@@ -142,7 +143,7 @@ function SaltAdditionsEditor(props) {
             value: row.saltKey,
             onValueChange: (v) => updateRow(idx, { saltKey: v }),
             options: SALT_OPTIONS,
-            disabled,
+            ...disabled !== void 0 ? { disabled } : {},
             width: "full",
             "aria-label": t("salt"),
             closeLabel: tCommon("close")
@@ -183,6 +184,7 @@ function SaltAdditionsEditor(props) {
 }
 
 // src/mash/MashStepsEditor.tsx
+import "react";
 import { XStack as XStack2, YStack as YStack3 } from "tamagui";
 import { MASH_STEP_TYPE_OPTIONS, MASH_TEMPLATES } from "@brewery/beerjson";
 import { BrewCheckbox, Button as Button2, Card as Card3, Input as Input2, ReadOnlyField, ReadOnlyFieldRow, SelectField as SelectField2, Text as Text4 } from "@brewery/ui";
@@ -238,7 +240,7 @@ function MashStepsEditor(props) {
           Card3,
           {
             "data-mash-step-card": true,
-            theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
+            ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
             gap: "$2",
             padding: "$3",
             backgroundColor: cardBackgroundColor ?? "$background",
@@ -483,6 +485,7 @@ function MashStepsEditor(props) {
 }
 
 // src/mash/SpargeStepReadOnlyRow.tsx
+import "react";
 import { YStack as YStack4 } from "tamagui";
 import { Card as Card4, ReadOnlyField as ReadOnlyField2, ReadOnlyFieldRow as ReadOnlyFieldRow2, Text as Text5 } from "@brewery/ui";
 import { jsx as jsx4, jsxs as jsxs5 } from "react/jsx-runtime";
@@ -492,7 +495,7 @@ function SpargeStepReadOnlyRow(props) {
     Card4,
     {
       "data-mash-step-card": true,
-      theme: cardBackgroundColor ?? cardBorderColor ? void 0 : "surface2",
+      ...cardBackgroundColor ?? cardBorderColor ? {} : { theme: "surface2" },
       backgroundColor: cardBackgroundColor ?? "$background",
       borderWidth: 1,
       borderColor: cardBorderColor ?? "$borderColor",

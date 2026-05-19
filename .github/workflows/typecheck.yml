@@ -1,13 +1,13 @@
 name: typecheck
 
-# Gates `tsc --noEmit` across the 14 currently-clean TS workspaces on every PR
+# Gates `tsc --noEmit` across the 15 currently-clean TS workspaces on every PR
 # that could affect TypeScript sources. Runs inside a single node:20-slim
 # container that hoists /repo/node_modules — the same method used by
 # native-deps.yml (and documented in docs/TYPING.md as the canonical
 # measurement method).
 #
 # Scope (per docs/TYPING.md):
-#   - 14 workspaces are gated. apps/web is EXCLUDED by explicit decision
+#   - 15 workspaces are gated. apps/web is EXCLUDED by explicit decision
 #     (Phase 4 — its 585 errors are all in the Tamagui shorthand-prop /
 #     theme-token accepted-cost class per docs/TAMAGUI.md; gating them
 #     produces no signal and harms future Tamagui upgrades).
@@ -15,7 +15,7 @@ name: typecheck
 #   - packages/core is JavaScript-only (no tsconfig.json); not in scope.
 #
 # Failure aggregation: each workspace's typecheck runs sequentially under
-# `set +e` so all 14 results are reported even if early workspaces fail.
+# `set +e` so all 15 results are reported even if early workspaces fail.
 # The job exits non-zero if any single workspace produced errors.
 
 on:
@@ -56,7 +56,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Run tsc --noEmit across the 13 clean workspaces
+      - name: Run tsc --noEmit across the 14 clean workspaces
         # Single node:20-slim container hoists /repo/node_modules once
         # (matches the canonical measurement method documented in
         # docs/TYPING.md §Methodology). apps/web + packages/ui are
@@ -83,6 +83,7 @@ jobs:
                 "apps/native"
                 "apps/web/e2e"
                 "packages/api-client"
+                "packages/automation-contracts"
                 "packages/beerjson"
                 "packages/contracts"
                 "packages/module-sdk"
@@ -121,7 +122,7 @@ jobs:
               echo ""
               echo "=== Summary ==="
               if [ ${#failed[@]} -eq 0 ]; then
-                echo "All 13 workspaces typecheck clean."
+                echo "All 14 workspaces typecheck clean."
                 exit 0
               else
                 echo "Failed workspaces (${#failed[@]}):"

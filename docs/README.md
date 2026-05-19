@@ -49,6 +49,7 @@ Public architectural and governance commitments. Process: [`LICENSING.md`](LICEN
 *Audience: core team, module authors implementing RFC decisions.*
 
 - [`design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) — Canonical `automation` module surface (RFC-0001 Decision E §7.2): adapter SDK, Vessel vs EquipmentProfile, OpenPLC seam, AI tools, tier limits (**Accepted design** 2026-05-19; implementation phased per doc §9).
+- [`design/openplc-mailbox-emitter-pr-shape.md`](design/openplc-mailbox-emitter-pr-shape.md) — sister-repo PR shape for the mailbox-artifact emitter (Phase A step 4 hand-off; pairs with [`packages/automation-contracts/`](../packages/automation-contracts/)).
 
 ## Product
 

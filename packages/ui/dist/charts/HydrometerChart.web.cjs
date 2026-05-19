@@ -24,11 +24,12 @@ __export(HydrometerChart_web_exports, {
   HydrometerChart: () => HydrometerChart
 });
 module.exports = __toCommonJS(HydrometerChart_web_exports);
-var import_react = require("react");
+var import_react3 = require("react");
 var import_tamagui3 = require("tamagui");
 var import_victory = require("victory");
 
 // src/primitives/Card.tsx
+var import_react = require("react");
 var import_tamagui = require("tamagui");
 var import_jsx_runtime = require("react/jsx-runtime");
 function Card(props) {
@@ -46,6 +47,7 @@ function Card(props) {
 }
 
 // src/primitives/Text.tsx
+var import_react2 = require("react");
 var import_tamagui2 = require("tamagui");
 var import_jsx_runtime2 = require("react/jsx-runtime");
 function Text(props) {
@@ -122,14 +124,14 @@ function HydrometerChart({
   gravityAxisLabel,
   temperatureAxisLabel
 }) {
-  const gravitySeries = (0, import_react.useMemo)(() => toSeries(points, "gravitySg"), [points]);
-  const temperatureSeries = (0, import_react.useMemo)(() => toSeries(points, "temperatureC"), [points]);
+  const gravitySeries = (0, import_react3.useMemo)(() => toSeries(points, "gravitySg"), [points]);
+  const temperatureSeries = (0, import_react3.useMemo)(() => toSeries(points, "temperatureC"), [points]);
   if (!gravitySeries.length && !temperatureSeries.length) return null;
   const gravityDomain = clampDomain(getNumberDomain(gravitySeries.map((p) => p.y)), 0.95, 1.2);
   const temperatureDomain = getNumberDomain(temperatureSeries.map((p) => p.y));
   const [gMin, gMax] = gravityDomain;
   const [tMin, tMax] = temperatureDomain;
-  const temperatureSeriesMapped = (0, import_react.useMemo)(() => {
+  const temperatureSeriesMapped = (0, import_react3.useMemo)(() => {
     if (!temperatureSeries.length) return [];
     return temperatureSeries.map((p) => ({
       x: p.x,
@@ -137,7 +139,7 @@ function HydrometerChart({
       yRaw: p.y
     }));
   }, [temperatureSeries, tMin, tMax, gMin, gMax]);
-  const temperatureAxisTickValues = (0, import_react.useMemo)(() => {
+  const temperatureAxisTickValues = (0, import_react3.useMemo)(() => {
     if (!temperatureSeries.length) return [];
     const temps = buildTickValues(tMin, tMax, 5);
     return temps.map((temp) => mapRange(temp, tMin, tMax, gMin, gMax));

@@ -65,10 +65,12 @@ function ThemeVarsInjector() {
 }
 
 // src/primitives/AdSlotCard.tsx
+var import_react3 = require("react");
 var import_react_native = require("react-native");
 var import_tamagui2 = require("tamagui");
 
 // src/primitives/Card.tsx
+var import_react2 = require("react");
 var import_tamagui = require("tamagui");
 var import_jsx_runtime = require("react/jsx-runtime");
 function Card(props) {
@@ -120,6 +122,7 @@ function AdSlotCard(props) {
 }
 
 // src/primitives/Button.tsx
+var import_react4 = require("react");
 var import_react_native2 = require("react-native");
 var import_tamagui3 = require("tamagui");
 var import_jsx_runtime3 = require("react/jsx-runtime");
@@ -147,10 +150,12 @@ function Button(props) {
 }
 
 // src/primitives/BrewCheckbox.tsx
+var import_react6 = require("react");
 var import_react_native3 = require("react-native");
 var import_tamagui5 = require("tamagui");
 
 // src/primitives/Text.tsx
+var import_react5 = require("react");
 var import_tamagui4 = require("tamagui");
 var import_jsx_runtime4 = require("react/jsx-runtime");
 function Text(props) {
@@ -197,6 +202,7 @@ function BrewCheckbox(props) {
 }
 
 // src/primitives/Collapsible.tsx
+var import_react7 = require("react");
 var import_react_native4 = require("react-native");
 var import_tamagui6 = require("tamagui");
 var import_jsx_runtime6 = require("react/jsx-runtime");
@@ -234,6 +240,7 @@ function Collapsible(props) {
 }
 
 // src/primitives/Input.tsx
+var import_react8 = require("react");
 var import_react_native5 = require("react-native");
 var import_tamagui7 = require("tamagui");
 var import_jsx_runtime7 = require("react/jsx-runtime");
@@ -261,6 +268,7 @@ function Input(props) {
 }
 
 // src/primitives/ModeFieldset.tsx
+var import_react9 = require("react");
 var import_tamagui8 = require("tamagui");
 var import_jsx_runtime8 = require("react/jsx-runtime");
 function ModeFieldset(props) {
@@ -316,6 +324,7 @@ function ModeFieldset(props) {
 }
 
 // src/primitives/ReadOnlyField.tsx
+var import_react10 = require("react");
 var import_react_native6 = require("react-native");
 var import_tamagui9 = require("tamagui");
 var import_jsx_runtime9 = require("react/jsx-runtime");
@@ -350,6 +359,7 @@ function ReadOnlyFieldRow({ children }) {
 }
 
 // src/primitives/Screen.tsx
+var import_react11 = require("react");
 var import_react_native7 = require("react-native");
 var import_tamagui10 = require("tamagui");
 var import_jsx_runtime10 = require("react/jsx-runtime");
@@ -375,7 +385,7 @@ function Screen({ flex, style, ...props }) {
 }
 
 // src/primitives/SelectField.tsx
-var import_react2 = require("react");
+var import_react12 = require("react");
 var import_react_native8 = require("react-native");
 var import_jsx_runtime11 = require("react/jsx-runtime");
 function SelectField({
@@ -392,8 +402,8 @@ function SelectField({
   closeLabel
 }) {
   const isWeb = import_react_native8.Platform.OS === "web";
-  const [open, setOpen] = (0, import_react2.useState)(false);
-  const selectedLabel = (0, import_react2.useMemo)(
+  const [open, setOpen] = (0, import_react12.useState)(false);
+  const selectedLabel = (0, import_react12.useMemo)(
     () => options.find((opt) => opt.value === value)?.label ?? value,
     [value, options]
   );
@@ -436,7 +446,7 @@ function SelectField({
           borderColor: "$borderColor",
           disabled,
           accessibilityLabel: ariaLabel,
-          children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { fontSize: 12, children: (renderValue ? String(renderValue(value)) : selectedLabel) || placeholder || "\u2014" })
+          children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { fontSize: 12, children: (renderValue ? renderValue(value) : selectedLabel) || placeholder || "\u2014" })
         }
       ),
       /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_react_native8.Modal, { visible: open, transparent: true, animationType: "fade", onRequestClose: () => setOpen(false), children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
@@ -470,6 +480,7 @@ function SelectField({
 }
 
 // src/primitives/Spinner.tsx
+var import_react13 = require("react");
 var import_tamagui11 = require("tamagui");
 var import_jsx_runtime12 = require("react/jsx-runtime");
 function Spinner(props) {
@@ -477,7 +488,7 @@ function Spinner(props) {
 }
 
 // src/ai/useAiChatStream.ts
-var import_react3 = require("react");
+var import_react14 = require("react");
 function newId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
@@ -485,11 +496,11 @@ function newId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 function useAiChatStream(input) {
-  const [messages, setMessages] = (0, import_react3.useState)([]);
-  const [pending, setPending] = (0, import_react3.useState)(false);
-  const [terminalError, setTerminalError] = (0, import_react3.useState)(null);
-  const abortRef = (0, import_react3.useRef)(null);
-  const send = (0, import_react3.useCallback)(
+  const [messages, setMessages] = (0, import_react14.useState)([]);
+  const [pending, setPending] = (0, import_react14.useState)(false);
+  const [terminalError, setTerminalError] = (0, import_react14.useState)(null);
+  const abortRef = (0, import_react14.useRef)(null);
+  const send = (0, import_react14.useCallback)(
     async (text) => {
       const trimmed = text.trim();
       if (trimmed.length === 0 || pending) return;
@@ -568,7 +579,7 @@ function useAiChatStream(input) {
     },
     [pending, input]
   );
-  const reset = (0, import_react3.useCallback)(() => {
+  const reset = (0, import_react14.useCallback)(() => {
     abortRef.current?.abort();
     abortRef.current = null;
     setMessages([]);
@@ -676,12 +687,12 @@ function applyEvent(setMessages, turnId, event) {
 }
 
 // src/ai/AiChatPanel.tsx
-var import_react4 = require("react");
+var import_react15 = require("react");
 var import_tamagui12 = require("tamagui");
 var import_jsx_runtime13 = require("react/jsx-runtime");
 function AiChatPanel({ chat, t, onOpenUpgrade }) {
   const { messages, pending, terminalError, send } = chat;
-  const [draft, setDraft] = (0, import_react4.useState)("");
+  const [draft, setDraft] = (0, import_react15.useState)("");
   const handleSend = () => {
     const text = draft.trim();
     if (!text || pending) return;

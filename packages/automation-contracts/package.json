@@ -1,0 +1,25 @@
+{
+  "name": "@brewery/automation-contracts",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Phase A surface per docs/design/canonical-automation-module-surface.md §9. End-state npm scope: @umbraculum/automation-contracts per RFC-0002.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

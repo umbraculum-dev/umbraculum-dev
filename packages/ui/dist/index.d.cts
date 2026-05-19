@@ -101,7 +101,7 @@ interface SelectFieldProps {
     width?: "auto" | "full";
     "aria-label"?: string;
     "aria-labelledby"?: string;
-    renderValue?: (value: string) => ReactNode;
+    renderValue?: (value: string) => string;
     closeLabel?: string;
 }
 declare function SelectField({ value, onValueChange, options, placeholder, disabled, id, width, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, renderValue, closeLabel, }: SelectFieldProps): react_jsx_runtime.JSX.Element;
