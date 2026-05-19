@@ -22,9 +22,11 @@ import { WorkspacesService } from "../../../services/workspacesService.js";
  * handshake is enforced.
  */
 export class VesselsService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private readonly workspaces: WorkspacesService;
 
-  private readonly workspaces = new WorkspacesService(this.prisma);
+  constructor(private readonly prisma: PrismaClient) {
+    this.workspaces = new WorkspacesService(prisma);
+  }
 
   /**
    * List all vessels in the active workspace, ordered by `code` for a

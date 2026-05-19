@@ -122,6 +122,7 @@ export function PrimaryNav() {
     { href: "/", label: t("dashboard"), isActive: isActive("/") },
     { href: "/recipes", label: t("recipes"), isActive: isActive("/recipes") },
     { href: "/equipment", label: t("equipment"), isActive: isActive("/equipment") },
+    { href: "/automation", label: t("automation"), isActive: isActive("/automation") },
     { href: "/about", label: t("about"), isActive: isActive("/about") },
   ];
 

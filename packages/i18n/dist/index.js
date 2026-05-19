@@ -1,5 +1,36 @@
 // src/en.json
 var en_default = {
+  automation: {
+    title: "Automation",
+    subtitle: "Live controller state for the vessels in this workspace. (Scheduling, capacity, and utilization belong to the future capacity-resource-planning module \u2014 not this surface.)",
+    listTitle: "Vessels",
+    noVessels: "No vessels in this workspace yet. Vessels appear here once the automation supervisor receives the first snapshot from a connected adapter.",
+    loading: "Loading\u2026",
+    refresh: "Refresh",
+    refreshing: "Refreshing\u2026",
+    openDetail: "View details",
+    back: "Back to vessels",
+    error: "Could not load vessels.",
+    notFound: "Vessel not found in this workspace.",
+    fields: {
+      code: "Code",
+      displayName: "Display name",
+      vesselKind: "Kind",
+      mode: "Mode",
+      currentTempC: "Current temperature (\xB0C)",
+      targetTempC: "Target temperature (\xB0C)",
+      alarmActive: "Alarm",
+      lastSeenAt: "Last seen",
+      equipmentProfileId: "Equipment profile",
+      adapterConnectionId: "Adapter connection"
+    },
+    values: {
+      alarmOn: "Active",
+      alarmOff: "None",
+      never: "Never",
+      none: "\u2014"
+    }
+  },
   common: {
     backToDashboard: "Back to Dashboard",
     loading: "Loading\u2026",
@@ -42,6 +73,7 @@ var en_default = {
     inventory: "Inventory",
     waterProfiles: "Water profiles",
     equipment: "Equipment",
+    automation: "Automation",
     about: "About",
     language: "Language",
     accessibility: "Accessibility",
@@ -342,16 +374,24 @@ var en_default = {
       },
       breakdowns: {
         salt_additions: {
-          perSaltDeltas: { title: "Per-salt ion deltas (ppm)" }
+          perSaltDeltas: {
+            title: "Per-salt ion deltas (ppm)"
+          }
         },
         mash_overall: {
-          saltBreakdown: { title: "Salt contributions (per-salt deltas)" }
+          saltBreakdown: {
+            title: "Salt contributions (per-salt deltas)"
+          }
         },
         sparge_overall: {
-          saltBreakdown: { title: "Salt contributions (per-salt deltas)" }
+          saltBreakdown: {
+            title: "Salt contributions (per-salt deltas)"
+          }
         },
         boil_overall: {
-          saltBreakdown: { title: "Salt contributions (per-salt deltas)" }
+          saltBreakdown: {
+            title: "Salt contributions (per-salt deltas)"
+          }
         }
       },
       notes: {
@@ -1697,6 +1737,37 @@ var en_default = {
 
 // src/it.json
 var it_default = {
+  automation: {
+    title: "Automazione",
+    subtitle: "Stato in tempo reale del controllore per i vessel di questo workspace. (Pianificazione, capacit\xE0 e utilizzo appartengono al futuro modulo di capacity-resource-planning \u2014 non a questa superficie.)",
+    listTitle: "Vessel",
+    noVessels: "Nessun vessel in questo workspace. I vessel appaiono qui dopo il primo snapshot dell'adapter.",
+    loading: "Caricamento\u2026",
+    refresh: "Aggiorna",
+    refreshing: "Aggiornamento\u2026",
+    openDetail: "Vedi dettagli",
+    back: "Torna ai vessel",
+    error: "Impossibile caricare i vessel.",
+    notFound: "Vessel non trovato in questo workspace.",
+    fields: {
+      code: "Codice",
+      displayName: "Nome",
+      vesselKind: "Tipo",
+      mode: "Modalit\xE0",
+      currentTempC: "Temperatura attuale (\xB0C)",
+      targetTempC: "Temperatura target (\xB0C)",
+      alarmActive: "Allarme",
+      lastSeenAt: "Ultimo aggiornamento",
+      equipmentProfileId: "Profilo attrezzatura",
+      adapterConnectionId: "Connessione adapter"
+    },
+    values: {
+      alarmOn: "Attivo",
+      alarmOff: "Nessuno",
+      never: "Mai",
+      none: "\u2014"
+    }
+  },
   common: {
     backToDashboard: "Torna alla Dashboard",
     loading: "Caricamento\u2026",
@@ -1739,6 +1810,7 @@ var it_default = {
     inventory: "Inventario",
     waterProfiles: "Profili acqua",
     equipment: "Attrezzatura",
+    automation: "Automazione",
     about: "Info",
     language: "Lingua",
     accessibility: "Accessibilit\xE0",

@@ -1,4 +1,35 @@
 {
+  "automation": {
+    "title": "Automation",
+    "subtitle": "Live controller state for the vessels in this workspace. (Scheduling, capacity, and utilization belong to the future capacity-resource-planning module — not this surface.)",
+    "listTitle": "Vessels",
+    "noVessels": "No vessels in this workspace yet. Vessels appear here once the automation supervisor receives the first snapshot from a connected adapter.",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
+    "openDetail": "View details",
+    "back": "Back to vessels",
+    "error": "Could not load vessels.",
+    "notFound": "Vessel not found in this workspace.",
+    "fields": {
+      "code": "Code",
+      "displayName": "Display name",
+      "vesselKind": "Kind",
+      "mode": "Mode",
+      "currentTempC": "Current temperature (°C)",
+      "targetTempC": "Target temperature (°C)",
+      "alarmActive": "Alarm",
+      "lastSeenAt": "Last seen",
+      "equipmentProfileId": "Equipment profile",
+      "adapterConnectionId": "Adapter connection"
+    },
+    "values": {
+      "alarmOn": "Active",
+      "alarmOff": "None",
+      "never": "Never",
+      "none": "—"
+    }
+  },
   "common": {
     "backToDashboard": "Back to Dashboard",
     "loading": "Loading…",
@@ -41,6 +72,7 @@
     "inventory": "Inventory",
     "waterProfiles": "Water profiles",
     "equipment": "Equipment",
+    "automation": "Automation",
     "about": "About",
     "language": "Language",
     "accessibility": "Accessibility",
@@ -341,16 +373,24 @@
       },
       "breakdowns": {
         "salt_additions": {
-          "perSaltDeltas": { "title": "Per-salt ion deltas (ppm)" }
+          "perSaltDeltas": {
+            "title": "Per-salt ion deltas (ppm)"
+          }
         },
         "mash_overall": {
-          "saltBreakdown": { "title": "Salt contributions (per-salt deltas)" }
+          "saltBreakdown": {
+            "title": "Salt contributions (per-salt deltas)"
+          }
         },
         "sparge_overall": {
-          "saltBreakdown": { "title": "Salt contributions (per-salt deltas)" }
+          "saltBreakdown": {
+            "title": "Salt contributions (per-salt deltas)"
+          }
         },
         "boil_overall": {
-          "saltBreakdown": { "title": "Salt contributions (per-salt deltas)" }
+          "saltBreakdown": {
+            "title": "Salt contributions (per-salt deltas)"
+          }
         }
       },
       "notes": {
@@ -374,8 +414,7 @@
           "boil_overall": {
             "v1": "Overall ions = ions(after salts) + acid counter-ions, and HCO3 is derived from final alkalinity."
           }
-        }
-        ,
+        },
         "analysis": {
           "pre_boil_volume": {
             "v1": "pre_boil_volume = mash_water + sparge_water - grain_absorption - mash_losses - leftover + boil_additions"
@@ -1694,4 +1733,3 @@
     }
   }
 }
-

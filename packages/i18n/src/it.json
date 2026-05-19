@@ -1,4 +1,35 @@
 {
+  "automation": {
+    "title": "Automazione",
+    "subtitle": "Stato in tempo reale del controllore per i vessel di questo workspace. (Pianificazione, capacità e utilizzo appartengono al futuro modulo di capacity-resource-planning — non a questa superficie.)",
+    "listTitle": "Vessel",
+    "noVessels": "Nessun vessel in questo workspace. I vessel appaiono qui dopo il primo snapshot dell'adapter.",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "openDetail": "Vedi dettagli",
+    "back": "Torna ai vessel",
+    "error": "Impossibile caricare i vessel.",
+    "notFound": "Vessel non trovato in questo workspace.",
+    "fields": {
+      "code": "Codice",
+      "displayName": "Nome",
+      "vesselKind": "Tipo",
+      "mode": "Modalità",
+      "currentTempC": "Temperatura attuale (°C)",
+      "targetTempC": "Temperatura target (°C)",
+      "alarmActive": "Allarme",
+      "lastSeenAt": "Ultimo aggiornamento",
+      "equipmentProfileId": "Profilo attrezzatura",
+      "adapterConnectionId": "Connessione adapter"
+    },
+    "values": {
+      "alarmOn": "Attivo",
+      "alarmOff": "Nessuno",
+      "never": "Mai",
+      "none": "—"
+    }
+  },
   "common": {
     "backToDashboard": "Torna alla Dashboard",
     "loading": "Caricamento…",
@@ -41,6 +72,7 @@
     "inventory": "Inventario",
     "waterProfiles": "Profili acqua",
     "equipment": "Attrezzatura",
+    "automation": "Automazione",
     "about": "Info",
     "language": "Lingua",
     "accessibility": "Accessibilità",
