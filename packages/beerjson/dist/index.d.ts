@@ -1,4 +1,4 @@
-export { sgToPlato } from '@brewery/core';
+export { sgToPlato } from '@umbraculum/brewery-core';
 
 type BeerJsonRecipe = Record<string, unknown>;
 type BeerJsonDocument = {

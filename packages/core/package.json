@@ -1,7 +1,8 @@
 {
-  "name": "@brewery/core",
+  "name": "@umbraculum/brewery-core",
   "private": true,
   "version": "0.0.0",
+  "description": "Brewery-vertical brewing calculations (gravity, water chemistry) and brewing-specific unit conversions. Brewery-vertical scope: this package contains brewing-domain math (saccharomyces, mash water profiles, OG/FG/ABV, etc.) and is NOT loaded by non-brewery verticals. Renamed from @brewery/core to @umbraculum/brewery-core (NOT @umbraculum/core) as sub-plan #9 slot 6 (2026-05-19) per plan doc \u00a71.3 trap-avoidance \u2014 the bare @umbraculum/core is reserved for a future platform-core framework package.",
   "type": "module",
   "scripts": {
     "test": "vitest run"

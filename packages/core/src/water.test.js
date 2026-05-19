@@ -5,7 +5,7 @@ describe("DEFAULT_MASH_TARGET_PH (Phase 5a)", () => {
   // Pinned because this constant is documented as coupled to the Prisma
   // column default on `recipe_water_settings.mash_target_ph`. Changing the
   // value here without also updating the Prisma migration creates silent
-  // drift between the @brewery/core default and the database default.
+  // drift between the @umbraculum/brewery-core default and the database default.
   // If you intend to change the value, also update:
   //   - prisma/schema.prisma (mash_target_ph default)
   //   - prisma/migrations/*  (new migration with the new default)

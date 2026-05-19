@@ -42,12 +42,12 @@ test:
 
 ```bash
 docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
-  bash -lc "npm install --no-audit --no-fund -w @brewery/contracts -w @brewery/core --include-workspace-root && \
-            npm test -w @brewery/contracts && npm test -w @brewery/core"
+  bash -lc "npm install --no-audit --no-fund -w @brewery/contracts -w @umbraculum/brewery-core --include-workspace-root && \
+            npm test -w @brewery/contracts && npm test -w @umbraculum/brewery-core"
 ```
 
 Notes:
-- `-w @brewery/contracts -w @brewery/core` scopes installation to just
+- `-w @brewery/contracts -w @umbraculum/brewery-core` scopes installation to just
   those two workspaces (plus their hoistable deps) and leaves
   `services/api/node_modules` and `apps/web/node_modules` alone.
 - `--include-workspace-root` is required so the root devDependency

@@ -183,14 +183,14 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 - `@brewery/i18n-react` — universal `useT` hook (web + native).
 - `@umbraculum/navigation` — route IDs + cross-platform routing policy (renamed from `@brewery/navigation` 2026-05-19 as sub-plan #9 slot 3; current route IDs include brewery routes pending content-split deferred to second-vertical landing).
 - `@brewery/api-client` — fetch boundary + auth (cookie web, bearer native).
-- `@brewery/ui` — Tamagui primitives.
+- `@umbraculum/ui` — Tamagui primitives.
 - `@umbraculum/media` — shared image assets + manifest (renamed from `@brewery/media` 2026-05-19 as sub-plan #9 slot 2; current asset content remains brewery-flavored pending content split deferred to second-vertical landing).
 - `@brewery/contracts` — DTOs / shared types.
 - `@umbraculum/test-mcp` — testing tools server (renamed from `@brewery/test-mcp` 2026-05-19 as sub-plan #9 slot 1 worked example).
 
 **Brewery-vertical (will become "module" packages):**
 
-- `@brewery/core` — brewing calculations and unit conversions.
+- `@umbraculum/brewery-core` — brewing calculations and unit conversions.
 - `@brewery/recipes-ui` — domain UI for recipes, water, yeast.
 - `@brewery/beerjson` — BeerJSON schema layer.
 
@@ -402,7 +402,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 - Workspace tenancy model (`Workspace`, `WorkspaceMember`, role-based ACL).
 - Plugin-composed Fastify (cross-cutting via `app.register`).
-- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@umbraculum/navigation`, `@brewery/api-client`, `@brewery/ui`, `@umbraculum/media`).
+- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@umbraculum/navigation`, `@brewery/api-client`, `@umbraculum/ui`, `@umbraculum/media`).
 - Cookie/bearer auth split (web vs native).
 - Redis cache pattern with Postgres source-of-truth.
 - Stripe + RevenueCat as billing providers; Fastify as billing source-of-truth.
@@ -412,7 +412,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 Physical directory layout for canonical modules and tier-6 vertical configurations is committed in [RFC-0002 — Canonical-module physical layout](rfcs/0002-canonical-module-physical-layout.md) (β three-tree distribution: `services/api/src/modules/<code>/`, `apps/web/app/[locale]/(<code>)/`, `apps/native/src/modules/<code>/`, `packages/<code>-contracts/` → `@umbraculum/<code>-contracts`; `registerModule()` in `packages/module-sdk/`). The bullets below are the migration tranche mechanics; RFC-0002 is the authoritative layout decision.
 
-- `@brewery/*` scope split: horizontal packages move to the neutral platform scope `@umbraculum/*`; brewery-vertical packages stay branded as the brewery module package set (or re-scope under `@umbraculum/brewery-*`). **Operational follow-up: sub-plan #9** — scoping pass done 2026-05-19; see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) (L1 plan with mis-classification audit; `@brewery/core` → `@umbraculum/brewery-core` flagged as the one rename trap) and [`docs/design/brewery-scope-migration-per-package-handoff.md`](design/brewery-scope-migration-per-package-handoff.md) (per-slot checklist; 14 slots; slot 1 worked example landed).
+- `@brewery/*` scope split: horizontal packages move to the neutral platform scope `@umbraculum/*`; brewery-vertical packages stay branded as the brewery module package set (or re-scope under `@umbraculum/brewery-*`). **Operational follow-up: sub-plan #9** — scoping pass done 2026-05-19; see [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) (L1 plan with mis-classification audit; `@umbraculum/brewery-core` → `@umbraculum/brewery-core` flagged as the one rename trap) and [`docs/design/brewery-scope-migration-per-package-handoff.md`](design/brewery-scope-migration-per-package-handoff.md) (per-slot checklist; 14 slots; slot 1 worked example landed).
 - Web routes wrapped in `(brewery)` Next.js route group (no URL change).
 - Brewery-vertical Postgres tables stay in place; new module gets its own Postgres schema via Prisma `multiSchema`.
 - `tierLimitsService` becomes module-aware: each module contributes a `tierLimits(tier)` slice; the platform composes them.

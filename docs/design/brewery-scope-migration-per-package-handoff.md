@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slots 1–5 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe); slots 6–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). Net effect across slots 1–5: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under the heavy slot load.
+**Status:** Active 2026-05-19 — slots 1–6 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, 6: `brewery-core` — ⚠ TRAP slot held cleanly on first attempt under the §1.3 classification gate); slots 7–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). **Slot 6 added four further refinements**: (a) root `package.json` `test:packages` is a HARD STOP analog of `build:packages` — preflight skill grew Command 6; (b) `.github/workflows/api.yml` workflow step `name:` display strings are a separate HARD STOP class (path globs in `on.push.paths` use filesystem paths — no change; step display names use npm names — must change); (c) slot-5 gotcha refined — only `npm install` (not `npm run <script>`) prunes the api bind-mount; (d) bulk sed should exclude the just-edited `packages/<name>/package.json` whenever step 1's description deliberately contains a historical reference to the old name (TRAP-slot pattern). Net effect across slots 1–6: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under both the heavy slot load (slot 5) and the ⚠ TRAP slot load (slot 6).
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -310,47 +310,66 @@ Doc references (10 files):
 
 ## Slot 6 — `@brewery/core` → `@umbraculum/brewery-core` ⚠ TRAP
 
-**Status:** Pending.
+**Status:** **Done 2026-05-19** (commit hash recorded in the slot-6 commit message; see git log). ⚠ TRAP held cleanly on first attempt — §1.3 classification gate + sed substitution string `@umbraculum/brewery-core` (NOT bare `core`) baked the right answer into the bulk pass.
 
 **Target + classification.** **Brewery-vertical.** Brewing math (`gravity.js`, `water.js`, brewing-specific unit conversions). Target name is `@umbraculum/brewery-core`, **NOT `@umbraculum/core`**. See plan doc §1.3.
 
-**Hard stops.**
+**Hard stops cleared.**
 
-- ⚠ **TRAP**: the mechanical substitution `@brewery/` → `@umbraculum/` produces the WRONG target. The reviewer MUST confirm the target is `@umbraculum/brewery-core` before any consumer file is touched. Plan doc §4 step 2 (Classification gate) is non-skippable for this slot.
-- Add a classifying `description` to the package: `"Brewery-vertical brewing calculations (gravity, water chemistry) and unit conversions. End-state npm scope: @umbraculum/brewery-core per sub-plan #9."`
-- The package's own tests ([`packages/core/src/water.test.js`](../../packages/core/src/water.test.js)) import from `@brewery/core` — update.
+- ⚠ **TRAP** ✓: mechanical substitution `@brewery/` → `@umbraculum/` would have produced the WRONG target. Classification gate confirmed target = `@umbraculum/brewery-core` **before** any consumer file was touched. Plan doc §4 step 2 held.
+- Classifying `description` added to `packages/core/package.json`: brewery-vertical scope explicitly stated + historical "Renamed from @brewery/core to @umbraculum/brewery-core (NOT @umbraculum/core) as sub-plan #9 slot 6" reference preserved verbatim by self-excluding the file from the bulk sed pass.
+- Package's own test ([`packages/core/src/water.test.js`](../../packages/core/src/water.test.js)) updated.
+- **NEW HARD STOPS surfaced during slot 6 preflight, not in original inventory:**
+  - Root `package.json` line 21 `test:packages` script — analog of `build:packages` but tracks the *tested* workspace set (`@brewery/contracts` + `@brewery/core`). Preflight skill's Command 5 only grepped `build:packages`; slot 6 grew Command 6 to mirror.
+  - `.github/workflows/api.yml` line 43 workflow step display name `Run @brewery/contracts + @brewery/core unit tests` — separate from path globs in `on.push.paths` (which use filesystem paths like `packages/core/**` and do NOT need updating).
 
-**File inventory.**
+**File inventory.** All 20 files updated (matches handoff inventory exactly).
 
 Workspace name + own files:
-- [ ] [`packages/core/package.json`](../../packages/core/package.json) — `name` → `@umbraculum/brewery-core` (NOT `@umbraculum/core`); add classifying description.
-- [ ] [`packages/core/src/water.test.js`](../../packages/core/src/water.test.js) — test imports.
+- [x] [`packages/core/package.json`](../../packages/core/package.json) — `name` → `@umbraculum/brewery-core` (NOT `@umbraculum/core`); classifying description added (excluded from bulk sed to preserve historical reference).
+- [x] [`packages/core/src/water.test.js`](../../packages/core/src/water.test.js) — test imports.
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`services/api/package.json`](../../services/api/package.json).
-- [ ] [`packages/beerjson/package.json`](../../packages/beerjson/package.json).
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`services/api/package.json`](../../services/api/package.json).
+- [x] [`packages/beerjson/package.json`](../../packages/beerjson/package.json).
 
 Source imports:
-- [ ] [`apps/web/app/_lib/gravity.ts`](../../apps/web/app/_lib/gravity.ts).
-- [ ] [`apps/web/app/recipes/[id]/water/mash/page.tsx`](../../apps/web/app/recipes/[id]/water/mash/page.tsx).
-- [ ] [`packages/beerjson/src/index.ts`](../../packages/beerjson/src/index.ts).
-- [ ] [`services/api/src/beerjson/normalizeBeerJsonUnits.ts`](../../services/api/src/beerjson/normalizeBeerJsonUnits.ts).
-- [ ] [`services/api/src/routes/waterCalc.ts`](../../services/api/src/routes/waterCalc.ts).
-- [ ] [`services/api/src/tests/unitsCore.test.ts`](../../services/api/src/tests/unitsCore.test.ts).
+- [x] [`apps/web/app/_lib/gravity.ts`](../../apps/web/app/_lib/gravity.ts).
+- [x] [`apps/web/app/recipes/[id]/water/mash/page.tsx`](../../apps/web/app/recipes/[id]/water/mash/page.tsx).
+- [x] [`packages/beerjson/src/index.ts`](../../packages/beerjson/src/index.ts).
+- [x] [`services/api/src/beerjson/normalizeBeerJsonUnits.ts`](../../services/api/src/beerjson/normalizeBeerJsonUnits.ts).
+- [x] [`services/api/src/routes/waterCalc.ts`](../../services/api/src/routes/waterCalc.ts).
+- [x] [`services/api/src/tests/unitsCore.test.ts`](../../services/api/src/tests/unitsCore.test.ts).
 
 CI:
-- [ ] [`.github/workflows/api.yml`](../../.github/workflows/api.yml) — workflow references.
+- [x] [`.github/workflows/api.yml`](../../.github/workflows/api.yml) — line 43 workflow step display name.
+
+Root scripts:
+- [x] [`package.json`](../../package.json) — line 21 `test:packages` script (newly discovered HARD STOP; not in original inventory).
 
 Cross-package README references:
-- [ ] [`packages/beerjson/README.md`](../../packages/beerjson/README.md), [`apps/web/README.md`](../../apps/web/README.md), [`services/api/README.md`](../../services/api/README.md).
+- [x] [`packages/beerjson/README.md`](../../packages/beerjson/README.md), [`apps/web/README.md`](../../apps/web/README.md), [`services/api/README.md`](../../services/api/README.md).
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) — verify both inventory mention (§3) AND the renaming row (§5.2) reflect the brewery-vertical target.
-- [ ] [`docs/TESTING.md`](../TESTING.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md).
+- [x] [`docs/TESTING.md`](../TESTING.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7. Slot-specific verification:
-- [ ] Final commit message explicitly notes the trap-avoidance: `"renamed to @umbraculum/brewery-core (NOT @umbraculum/core) per plan doc §1.3 trap"`.
+Lockfiles regenerated (cleanly scoped):
+- [x] Root `package-lock.json` — 8/8 lines, only the `node_modules/@brewery/core` → `node_modules/@umbraculum/brewery-core` entry changed.
+- [x] `apps/web/package-lock.json` — 7/7 lines, same scoping.
+- [x] `services/api/package-lock.json` — 6/6 lines, regenerated during step 5c host-install.
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing).
+- [x] Root `npm run test:packages` 47/47 (4 test files = 3 from contracts + 1 from brewery-core).
+- [x] Nginx smoke 4/4 HTTP 200 (`/api/health`, `/en/login`, `/en/dashboard`, `/en/recipes`).
+- [x] Native typecheck **SKIPPED** — no native consumer of `@brewery/core` (brewing math doesn't ship to native).
+- [x] Final commit message explicitly notes trap-avoidance: `"renamed to @umbraculum/brewery-core (NOT @umbraculum/core) per plan doc §1.3 trap"`.
+
+**Lessons folded back to plan doc §4 / §5 BEFORE commit:** four lessons recorded (root `test:packages` HARD STOP, `api.yml` step-name HARD STOP, slot-5 gotcha refinement — `npm run` is safe, only `npm install` prunes, bulk-sed self-exclusion for TRAP slots with historical descriptions). See plan doc §6.5 for full recap.
 
 ---
 

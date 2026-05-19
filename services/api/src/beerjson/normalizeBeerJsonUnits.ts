@@ -5,7 +5,7 @@ import {
   massToKg,
   volumeToLiters,
   type UnitConversionWarningV1,
-} from "@brewery/core";
+} from "@umbraculum/brewery-core";
 import { isObject } from "../lib/typeGuards.js";
 
 type AmountNode = { unit?: unknown; value?: unknown };

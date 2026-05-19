@@ -39,7 +39,7 @@ import { buildWaterMathBody } from "../_lib/mathBodies";
 import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@brewery/contracts";
 import type { WaterCalcDerivation } from "@brewery/contracts";
 import { asRecord } from "../../../../_lib/typeGuards";
-import { DEFAULT_MASH_TARGET_PH } from "@brewery/core";
+import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import { fetchRecipeWaterSettings, saveRecipeWaterSettings } from "../_lib/waterSettings";
 

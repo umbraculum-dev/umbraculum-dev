@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { massToGrams, massToKg, roundTo, volumeToLiters } from "@brewery/core";
+import { massToGrams, massToKg, roundTo, volumeToLiters } from "@umbraculum/brewery-core";
 
-describe("@brewery/core units", () => {
+describe("@umbraculum/brewery-core units", () => {
   it("converts US customary volumes to liters", () => {
     expect(volumeToLiters(5, "gal")).toBeCloseTo(18.927_058_92, 10);
     expect(volumeToLiters(1, "qt")).toBeCloseTo(0.946_352_946, 10);

@@ -1,9 +1,9 @@
 /**
  * Gravity conversion utilities (SG ↔ Plato).
- * Re-exports from @brewery/core; formatSgWithPlato is web-specific.
+ * Re-exports from @umbraculum/brewery-core; formatSgWithPlato is web-specific.
  */
 
-import { platoToSg, sgToPlato } from "@brewery/core";
+import { platoToSg, sgToPlato } from "@umbraculum/brewery-core";
 
 export { platoToSg, sgToPlato };
 

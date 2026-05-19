@@ -18,7 +18,7 @@
     "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
     "@brewery/beerjson": "file:../../packages/beerjson",
     "@brewery/contracts": "file:../../packages/contracts",
-    "@brewery/core": "file:../../packages/core",
+    "@umbraculum/brewery-core": "file:../../packages/core",
     "@brewery/i18n": "file:../../packages/i18n",
     "@brewery/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/navigation": "file:../../packages/navigation",

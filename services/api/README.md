@@ -43,7 +43,7 @@ Per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only
 ## How it fits in
 
 - **Consumed by**: `apps/web` (cookie auth), `apps/native` (bearer auth), `@brewery/api-client` (the typed wrapper used by both apps and external SDK consumers when the public flip happens), `apps/web/e2e/` (Playwright E2E suite via the seeded fixture).
-- **Depends on**: Postgres (primary + replica), pgpool, Redis, Anthropic Claude API (for AI orchestrator routes); `@brewery/contracts` (typed contracts); `@brewery/core` (math primitives shared with web/native); the upstream `@beerjson/beerjson` schema package.
+- **Depends on**: Postgres (primary + replica), pgpool, Redis, Anthropic Claude API (for AI orchestrator routes); `@brewery/contracts` (typed contracts); `@umbraculum/brewery-core` (math primitives shared with web/native); the upstream `@beerjson/beerjson` schema package.
 - **Auth surfaces**: cookies for web (`sid` httpOnly), bearer tokens for native + Node SDKs. Both routes converge on the same internal session model — see [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) and [`docs/AUTH-HARDENING-ASSESSMENT.md`](../../docs/AUTH-HARDENING-ASSESSMENT.md).
 
 ## Status

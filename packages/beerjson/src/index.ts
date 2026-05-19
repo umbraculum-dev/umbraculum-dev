@@ -1,4 +1,4 @@
-import { platoToSg, sgToPlato } from "@brewery/core";
+import { platoToSg, sgToPlato } from "@umbraculum/brewery-core";
 
 export { sgToPlato };
 

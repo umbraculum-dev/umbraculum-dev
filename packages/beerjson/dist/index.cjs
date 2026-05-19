@@ -37,11 +37,11 @@ __export(index_exports, {
   mergeYeastAttenuationRangeFromExt: () => mergeYeastAttenuationRangeFromExt,
   newMashRowId: () => newMashRowId,
   replaceMashInBeerJsonDocument: () => replaceMashInBeerJsonDocument,
-  sgToPlato: () => import_core.sgToPlato,
+  sgToPlato: () => import_brewery_core.sgToPlato,
   validateMashBeforeSave: () => validateMashBeforeSave
 });
 module.exports = __toCommonJS(index_exports);
-var import_core = require("@brewery/core");
+var import_brewery_core = require("@umbraculum/brewery-core");
 function isObject(v) {
   return v != null && typeof v === "object" && !Array.isArray(v);
 }
@@ -79,7 +79,7 @@ function computeEstimatedCellsB(batchSizeLiters, ogEstimatedSg, pitchRateKey) {
     return null;
   if (typeof ogEstimatedSg !== "number" || !Number.isFinite(ogEstimatedSg) || ogEstimatedSg <= 1)
     return null;
-  const plato = (0, import_core.sgToPlato)(ogEstimatedSg);
+  const plato = (0, import_brewery_core.sgToPlato)(ogEstimatedSg);
   if (plato == null || plato <= 0) return null;
   const rate = pitchRateKey && pitchRateKey in PITCH_RATE_TO_MILLION_CELLS_PER_ML_P ? PITCH_RATE_TO_MILLION_CELLS_PER_ML_P[pitchRateKey] : null;
   if (rate == null) return null;
@@ -211,7 +211,7 @@ function buildFermentableAddition(row) {
   } else if (row.potential?.kind === "ppg") {
     sgValue = ppgToSg(row.potential.value);
   } else if (row.potential?.kind === "plato") {
-    sgValue = (0, import_core.platoToSg)(row.potential.value);
+    sgValue = (0, import_brewery_core.platoToSg)(row.potential.value);
   }
   const yieldObj = row.potential?.kind === "yieldPercent" ? { fine_grind: { unit: "%", value: row.potential.value } } : sgValue != null && sgValue > 1 ? { potential: { unit: "sg", value: sgValue } } : { fine_grind: { unit: "%", value: 0 } };
   const colorLovibond = typeof row.colorLovibond === "number" && Number.isFinite(row.colorLovibond) && row.colorLovibond >= 0 ? row.colorLovibond : null;

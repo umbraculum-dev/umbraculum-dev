@@ -1,5 +1,5 @@
 // src/index.ts
-import { platoToSg, sgToPlato } from "@brewery/core";
+import { platoToSg, sgToPlato } from "@umbraculum/brewery-core";
 function isObject(v) {
   return v != null && typeof v === "object" && !Array.isArray(v);
 }

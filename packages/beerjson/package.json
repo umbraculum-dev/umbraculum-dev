@@ -19,7 +19,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@brewery/core": "file:../core"
+    "@umbraculum/brewery-core": "file:../core"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

@@ -23,7 +23,7 @@ import {
 } from "../domain/waterCalc/overall.js";
 import { buildSaltAdditionsDerivation } from "../domain/waterCalc/derivation/saltAdditionsDerivation.js";
 import { buildAcidificationDerivation } from "../domain/waterCalc/derivation/acidificationDerivation.js";
-import { DEFAULT_MASH_TARGET_PH } from "@brewery/core";
+import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 
 function colorLovibondToEbc(colorLovibond: number | null): number | null {
   if (colorLovibond === null) return null;
