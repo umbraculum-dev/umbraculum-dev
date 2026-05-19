@@ -7,7 +7,7 @@
  * engine, not the contract.
  */
 import { describe, expect, it } from "vitest";
-import { ZodError, type z } from "zod";
+import { ZodError } from "zod";
 import { AuthMeResponseSchema, parseAuthMeResponse } from "./meResponse";
 
 /**
@@ -220,7 +220,13 @@ describe("AuthMeResponseSchema (exported schema)", () => {
   });
 
   it("safeParse returns success: false with issues for invalid input", () => {
-    const result: z.SafeParseReturnType<unknown, unknown> = AuthMeResponseSchema.safeParse({
+    // Note: prior revision annotated `result` with `z.SafeParseReturnType<unknown, unknown>`
+    // (a Zod v3 type). Zod v4 renamed that type to `z.ZodSafeParseResult<T>`
+    // with a single type parameter. The annotation was redundant (TS infers
+    // it from `safeParse`'s return type) — removed during CI hygiene sweep
+    // (sub-plan #9 mid-execution, 2026-05-19) so we don't have to track the
+    // Zod-v4-vs-v3 type-name drift just to spell out what TS already knows.
+    const result = AuthMeResponseSchema.safeParse({
       ok: true,
       user: { id: "", email: "" },
       workspaces: [],

@@ -22,11 +22,21 @@ Checks (per README):
   5. At least 2 cross-references via relative links, with at least 1
      into the docs/ tree.
   6. All relative links (excluding fenced code blocks) resolve to
-     existing files.
+     existing files. **Exception:** paths under `.cursor/rules/` and
+     `.cursor/skills/` are treated as documentation pointers to Cursor
+     IDE rules/skills that live in the user's `~/.cursor/plugins/local/`
+     plugin packs (not in the repo). They render as label-only for
+     readers without Cursor; for readers with Cursor, the IDE resolves
+     them. See `scripts/docs/check-readmes.py` `_is_cursor_pointer`.
   7. No mention of the historical `<PLATFORM_NAME>` placeholder token.
-  8. No `@umbraculum/*` import paths in code blocks (the npm scope
-     migration is sub-plan #9, deferred; module READMEs continue to
-     reference `@brewery/*` until that ships).
+
+(Earlier revisions of this checker included an `@umbraculum/*` guard
+that required module READMEs to keep referencing `@brewery/*` until
+sub-plan #9 landed. Sub-plan #9 is now actively landing slot-by-slot
+(see `docs/design/brewery-scope-migration-plan.md` §6); each slot's
+README updates ARE the migration. The guard was removed 2026-05-19
+mid-sub-plan-#9 as a CI-hygiene unblock — it was firing on every slot
+that touched a downstream README.)
 
 Usage:
   python3 scripts/docs/check-readmes.py
@@ -255,6 +265,21 @@ def check_cross_refs(
         )
 
 
+def _is_cursor_pointer(target: str) -> bool:
+    """Documentation pointers to Cursor IDE rules/skills that live in the
+    user's local `~/.cursor/plugins/local/<plugin>/{rules,skills}/` plugin
+    packs (NOT in the repo). They render as label-only for readers without
+    Cursor; for Cursor users, the IDE resolves them. Skipped by the link-
+    resolution check on purpose — see this module's docstring (item 6)."""
+    base = target.split("#")[0]
+    return (
+        ".cursor/rules/" in base
+        or ".cursor/skills/" in base
+        or base.startswith(".cursor/rules/")
+        or base.startswith(".cursor/skills/")
+    )
+
+
 def check_links_resolve(
     text: str, readme_path: Path, result: CheckResult
 ) -> None:
@@ -267,6 +292,8 @@ def check_links_resolve(
             continue
         base = target.split("#")[0]
         if not base:
+            continue
+        if _is_cursor_pointer(target):
             continue
         rel = (doc_dir / base).resolve()
         if not rel.exists():
@@ -283,17 +310,6 @@ def check_no_platform_name(text: str, result: CheckResult) -> None:
             "Mentions historical `<PLATFORM_NAME>` placeholder "
             "(resolved 2026-05-18; should be replaced with the literal "
             "name `Umbraculum`)."
-        )
-
-
-def check_no_umbraculum_imports(text: str, result: CheckResult) -> None:
-    code_text = extract_fenced_code(text)
-    if re.search(r"@umbraculum/", code_text):
-        result.failures.append(
-            "Code block contains `@umbraculum/*` import paths "
-            "(npm scope migration is sub-plan #9, deferred; "
-            "module READMEs must continue to reference `@brewery/*` "
-            "until sub-plan #9 lands)."
         )
 
 
@@ -316,7 +332,6 @@ def check_full_scope(readme_path_str: str) -> CheckResult:
     check_cross_refs(text, readme_path, result)
     check_links_resolve(text, readme_path, result)
     check_no_platform_name(text, result)
-    check_no_umbraculum_imports(text, result)
 
     if result.failures:
         result.passed = False
@@ -339,7 +354,6 @@ def check_sub_component(readme_path_str: str) -> CheckResult:
     check_required_headings_sub(text, REQUIRED_HEADINGS_SUB, result)
     check_links_resolve(text, readme_path, result)
     check_no_platform_name(text, result)
-    check_no_umbraculum_imports(text, result)
 
     if result.failures:
         result.passed = False

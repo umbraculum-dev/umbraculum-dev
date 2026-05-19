@@ -143,7 +143,7 @@ describe("platform-admin route gates (Phase 4b-5)", () => {
   let cookieNonAdmin = "";
   let adminUserId = "";
   let adminWorkspaceId = "";
-  let nonAdminUserId = "";
+  let _nonAdminUserId = "";
   let nonAdminWorkspaceId = "";
 
   // Track ad rows created by the happy-path tests for cleanup.
@@ -155,7 +155,7 @@ describe("platform-admin route gates (Phase 4b-5)", () => {
     // Non-admin: standard authenticated user. Used as the 403 probe.
     const sessNonAdmin = await createSessionForTestUser(app, { activeWorkspace: true });
     cookieNonAdmin = sessNonAdmin.cookie;
-    nonAdminUserId = sessNonAdmin.userId;
+    _nonAdminUserId = sessNonAdmin.userId;
     nonAdminWorkspaceId = sessNonAdmin.workspaceId;
 
     // Admin: standard authenticated user, then promoted via direct

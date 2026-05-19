@@ -56,6 +56,14 @@ export default [
       "packages/*/dist/**",
       // Vendored / third-party text
       "LICENSE",
+      // RFC-0003 validation-library spike (Zod v4 vs Valibot) — exploratory
+      // Phase 1 code per spike/validation-library/README.md. Excluded from
+      // lint because spike code intentionally includes async-no-await
+      // Fastify route handlers + unused-type imports as part of the
+      // side-by-side comparison artifact; holding it to production-grade
+      // lint rules destroys the comparison value. Migration PRs (Phase 2+)
+      // will re-introduce the patterns under standard lint coverage.
+      "spike/**",
     ],
   },
 
@@ -104,6 +112,7 @@ export default [
             "services/api/vitest.config.ts",
             "apps/web/vitest.config.ts",
             "apps/native/vitest.config.ts",
+            "packages/automation-contracts/vitest.config.ts",
             "packages/beerjson/vitest.config.ts",
             "packages/contracts/vitest.config.ts",
             "packages/core/vitest.config.ts",

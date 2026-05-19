@@ -64,6 +64,7 @@ export function createMockAdapter(
       applyCommand: false,
       subscribeAlarms: false,
     },
+    // eslint-disable-next-line @typescript-eslint/require-await -- adapter contract requires async signature for forward-compat with real network-backed adapters (httpAdapter, openplcAdapter); the mock implementation is synchronous but must share the async signature so callers can `await` uniformly across adapter types
     async readSnapshot(_ctx: AdapterReadContext): Promise<readonly VesselSnapshot[]> {
       const capturedAt = new Date(now()).toISOString();
       return codes.map((code) => ({
