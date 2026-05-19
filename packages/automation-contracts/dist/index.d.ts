@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Wire-level contract version of `@brewery/automation-contracts`.
  *
@@ -56,58 +58,83 @@ declare function classifyContractVersionSkew(runtime: string, expected?: string)
  * This package mirrors a sister-repo-emitted artifact via PR per the M2
  * mechanism in `docs/design/canonical-automation-module-surface.md` §12.2.
  *
+ * v2.0 (RFC-0003 Decision A): the types in this file are *inferred from*
+ * Zod schemas via `z.infer`. The schema is the single source of truth;
+ * hand-authored `interface MailboxEntry { ... }` declarations were
+ * removed when the migration landed.
+ *
  * Until the sister-repo emitter lands, this file holds only the type
  * shapes the artifact will conform to. No literal `PI_*` names live here.
  */
-type ModbusEntryKind = "coil" | "discrete_input" | "input_register" | "holding_register";
-type ScalarType = "bool" | "int16" | "uint16" | "int32" | "uint32" | "float";
-interface MailboxEntry {
-    /** PI_* name from the sister repo (e.g. `"PI_K1_CURRENT_TEMP_C_X10"`). */
-    readonly name: string;
-    /** 0-based Modbus address. */
-    readonly address: number;
-    /** Modbus function-code family. */
-    readonly kind: ModbusEntryKind;
-    /** Scalar interpretation. */
-    readonly scalar: ScalarType;
-    /**
-     * Optional fixed-point scale: engineering value = raw * scale.
-     * Omitted for non-scalar / boolean entries.
-     */
-    readonly scale?: number;
-    /** Engineering unit (e.g. `"degC"`, `"bbl"`, `"%"`) — informational. */
-    readonly unit?: string;
-    /** Whether the platform is allowed to write this entry. */
-    readonly writable: boolean;
-    /** Human-readable description from the sister repo. */
-    readonly description: string;
-}
-interface MailboxSpec {
-    /**
-     * Platform-facing semver-shaped version string used by the version
-     * handshake (`classifyContractVersionSkew`). Phase A reuses the
-     * sister-repo integrated release tag because it is the only existing
-     * baseline that is semver-shaped.
-     */
-    readonly contractVersion: string;
-    /**
-     * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
-     * not consumed by the version handshake. Captures the
-     * monotonically-bumped marker the sister repo uses internally when
-     * the address layout changes.
-     */
-    readonly schemaMarker?: string;
-    /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
-    readonly plcVersion?: string;
-    /**
-     * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
-     * to `contractVersion` (same value, distinct field for forward
-     * compatibility when the rails diverge).
-     */
-    readonly integratedReleaseTag?: string;
-    /** All `PI_*` entries the runtime exposes. */
-    readonly entries: readonly MailboxEntry[];
-}
+
+declare const ModbusEntryKindSchema: z.ZodEnum<{
+    coil: "coil";
+    discrete_input: "discrete_input";
+    input_register: "input_register";
+    holding_register: "holding_register";
+}>;
+declare const ScalarTypeSchema: z.ZodEnum<{
+    bool: "bool";
+    int16: "int16";
+    uint16: "uint16";
+    int32: "int32";
+    uint32: "uint32";
+    float: "float";
+}>;
+declare const MailboxEntrySchema: z.ZodReadonly<z.ZodObject<{
+    name: z.ZodString;
+    address: z.ZodNumber;
+    kind: z.ZodEnum<{
+        coil: "coil";
+        discrete_input: "discrete_input";
+        input_register: "input_register";
+        holding_register: "holding_register";
+    }>;
+    scalar: z.ZodEnum<{
+        bool: "bool";
+        int16: "int16";
+        uint16: "uint16";
+        int32: "int32";
+        uint32: "uint32";
+        float: "float";
+    }>;
+    scale: z.ZodOptional<z.ZodNumber>;
+    unit: z.ZodOptional<z.ZodString>;
+    writable: z.ZodBoolean;
+    description: z.ZodString;
+}, z.core.$strip>>;
+declare const MailboxSpecSchema: z.ZodObject<{
+    contractVersion: z.ZodString;
+    schemaMarker: z.ZodOptional<z.ZodString>;
+    plcVersion: z.ZodOptional<z.ZodString>;
+    integratedReleaseTag: z.ZodOptional<z.ZodString>;
+    entries: z.ZodArray<z.ZodReadonly<z.ZodObject<{
+        name: z.ZodString;
+        address: z.ZodNumber;
+        kind: z.ZodEnum<{
+            coil: "coil";
+            discrete_input: "discrete_input";
+            input_register: "input_register";
+            holding_register: "holding_register";
+        }>;
+        scalar: z.ZodEnum<{
+            bool: "bool";
+            int16: "int16";
+            uint16: "uint16";
+            int32: "int32";
+            uint32: "uint32";
+            float: "float";
+        }>;
+        scale: z.ZodOptional<z.ZodNumber>;
+        unit: z.ZodOptional<z.ZodString>;
+        writable: z.ZodBoolean;
+        description: z.ZodString;
+    }, z.core.$strip>>>;
+}, z.core.$strip>;
+type ModbusEntryKind = z.infer<typeof ModbusEntryKindSchema>;
+type ScalarType = z.infer<typeof ScalarTypeSchema>;
+type MailboxEntry = z.infer<typeof MailboxEntrySchema>;
+type MailboxSpec = z.infer<typeof MailboxSpecSchema>;
 /**
  * Reserved PI_* register name slot for the runtime firmware version.
  *
@@ -134,10 +161,20 @@ declare function findMailboxEntry(spec: MailboxSpec, name: string): MailboxEntry
  *
  * This module:
  *   1. Imports the JSON via TypeScript's `resolveJsonModule`.
- *   2. Runs a structural validator at module-load time (loud failure on
- *      drift — better than a confusing runtime exception deep in an
- *      adapter).
- *   3. Re-exports it as `MAILBOX_SPEC`, typed as `MailboxSpec`.
+ *   2. Validates structure at module-load time via `MailboxSpecSchema.parse`
+ *      (loud failure on drift — better than a confusing runtime exception
+ *      deep in an adapter).
+ *   3. Re-exports the parsed result as `MAILBOX_SPEC`, typed as `MailboxSpec`.
+ *
+ * v2.0 (RFC-0003 Decision A): migrated from hand-rolled `assertEntry` /
+ * `assertSpec` validators (168 lines) to a Zod schema declared in
+ * `mailbox.ts`. The schema captures:
+ *   - Structural validation (object shape, primitive types, enum membership).
+ *   - Pattern validation (`PI_*` name prefix via regex).
+ *   - Cross-entry drift detection (duplicate name + duplicate address-per-kind
+ *     via superRefine).
+ * All checks the hand-rolled validator performed are preserved; the
+ * implementation is smaller and the type is inferred from the same source.
  *
  * Refresh procedure: `bash scripts/sync-automation-mailbox-mirror.sh`
  * (copies the sister-repo `out/mailbox.json` into `data/mailbox.json`).
@@ -151,7 +188,10 @@ declare function findMailboxEntry(spec: MailboxSpec, name: string): MailboxEntry
  *
  * Adapters and tests should consume this constant rather than reading
  * `data/mailbox.json` directly. Drift is caught at module-load time
- * with a `MailboxMirrorError`.
+ * with a `ZodError` whose `issues` array carries the per-entry path
+ * (`["entries", N, "<field>"]`) and a machine-readable `code` for each
+ * violation. The `ZodError.message` JSON-stringifies all issues so the
+ * boot-time failure is self-describing in the log.
  */
 declare const MAILBOX_SPEC: MailboxSpec;
 
@@ -162,35 +202,99 @@ declare const MAILBOX_SPEC: MailboxSpec;
  * `applyCommand` and `subscribeAlarms` are reserved for Phase D/E and stay
  * `false` in Phase B/C reference adapters.
  */
-interface AdapterCapabilities {
-    readonly readSnapshot: boolean;
-    readonly applyCommand: boolean;
-    readonly subscribeAlarms: boolean;
-}
+declare const AdapterCapabilitiesSchema: z.ZodReadonly<z.ZodObject<{
+    readSnapshot: z.ZodBoolean;
+    applyCommand: z.ZodBoolean;
+    subscribeAlarms: z.ZodBoolean;
+}, z.core.$strip>>;
 /**
  * Snapshot of one vessel's current state read from the adapter.
  *
  * The shape mirrors the platform `Vessel` model fields the supervisor
  * needs (§7 of the design doc) without binding adapters to Prisma rows.
  */
-interface VesselSnapshot {
-    readonly vesselCode: string;
-    readonly mode?: string;
-    readonly currentTempC?: number;
-    readonly targetTempC?: number;
-    readonly alarmActive: boolean;
-    /** ISO 8601 timestamp the adapter assigned when the read completed. */
-    readonly capturedAt: string;
-    /**
-     * Optional raw mailbox values keyed by `PI_*` name — informational, for
-     * debugging and AI tools. Not the source of truth for `Vessel` rows.
-     */
-    readonly raw?: Readonly<Record<string, number | boolean>>;
-}
+declare const VesselSnapshotSchema: z.ZodReadonly<z.ZodObject<{
+    vesselCode: z.ZodString;
+    mode: z.ZodOptional<z.ZodString>;
+    currentTempC: z.ZodOptional<z.ZodNumber>;
+    targetTempC: z.ZodOptional<z.ZodNumber>;
+    alarmActive: z.ZodBoolean;
+    capturedAt: z.ZodString;
+    raw: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnion<readonly [z.ZodNumber, z.ZodBoolean]>>>;
+}, z.core.$strip>>;
+/**
+ * Vessel-state shape exposed to API consumers (clients + AI tools).
+ *
+ * Distinct from `VesselSnapshotSchema` (adapter-side, transient) and the
+ * Prisma `Vessel` row (DB-side, fully owned by the service layer). This is
+ * the canonical wire shape for `/automation/vessels` + `/automation/vessels/:code`
+ * route responses and for the `automation.listVessels` / `automation.vesselState`
+ * AI tool outputs.
+ */
+declare const VesselStateSchema: z.ZodObject<{
+    id: z.ZodString;
+    workspaceId: z.ZodString;
+    code: z.ZodString;
+    displayName: z.ZodString;
+    vesselKind: z.ZodString;
+    equipmentProfileId: z.ZodNullable<z.ZodString>;
+    adapterConnectionId: z.ZodNullable<z.ZodString>;
+    mode: z.ZodNullable<z.ZodString>;
+    currentTempC: z.ZodNullable<z.ZodNumber>;
+    targetTempC: z.ZodNullable<z.ZodNumber>;
+    alarmActive: z.ZodBoolean;
+    lastSeenAt: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+declare const VesselListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    vessels: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        code: z.ZodString;
+        displayName: z.ZodString;
+        vesselKind: z.ZodString;
+        equipmentProfileId: z.ZodNullable<z.ZodString>;
+        adapterConnectionId: z.ZodNullable<z.ZodString>;
+        mode: z.ZodNullable<z.ZodString>;
+        currentTempC: z.ZodNullable<z.ZodNumber>;
+        targetTempC: z.ZodNullable<z.ZodNumber>;
+        alarmActive: z.ZodBoolean;
+        lastSeenAt: z.ZodNullable<z.ZodString>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const VesselStateResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    vessel: z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        code: z.ZodString;
+        displayName: z.ZodString;
+        vesselKind: z.ZodString;
+        equipmentProfileId: z.ZodNullable<z.ZodString>;
+        adapterConnectionId: z.ZodNullable<z.ZodString>;
+        mode: z.ZodNullable<z.ZodString>;
+        currentTempC: z.ZodNullable<z.ZodNumber>;
+        targetTempC: z.ZodNullable<z.ZodNumber>;
+        alarmActive: z.ZodBoolean;
+        lastSeenAt: z.ZodNullable<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+type AdapterCapabilities = z.infer<typeof AdapterCapabilitiesSchema>;
+type VesselSnapshot = z.infer<typeof VesselSnapshotSchema>;
+type VesselState = z.infer<typeof VesselStateSchema>;
+type VesselListResponse = z.infer<typeof VesselListResponseSchema>;
+type VesselStateResponse = z.infer<typeof VesselStateResponseSchema>;
 /**
  * Context passed to adapter read calls. The supervisor injects the active
  * `MailboxSpec` and version triple so adapters do not parse the artifact
  * themselves.
+ *
+ * Kept as a plain interface (not a Zod schema) because `mailbox` here is
+ * already a validated `MailboxSpec` from `MailboxSpecSchema.parse(...)` at
+ * boot — passing a Zod-validated value across an internal boundary does
+ * not need a second validation pass per the
+ * `22-typescript-contracts-runtime-validation.mdc` rule (only external /
+ * unknown-typed boundaries get re-validated).
  */
 interface AdapterReadContext {
     readonly mailbox: MailboxSpec;
@@ -200,13 +304,20 @@ interface AdapterReadContext {
 /**
  * Adapter SDK contract.
  *
- * Phase A: type only — no runtime client. Phase C will provide a concrete
- * implementation in `@brewery/openplc-adapter` (or equivalent) that
- * speaks Modbus TCP (bench) / Modbus RTU (field) per the bench-vs-field
- * profile rule.
+ * Phase A: type only — no runtime client. Phase B-2 adds the mock adapter
+ * in `services/api/src/modules/automation/adapters/mockAdapter.ts`. Phase C
+ * will provide a concrete implementation in `@brewery/openplc-adapter` (or
+ * equivalent) that speaks Modbus TCP (bench) / Modbus RTU (field) per the
+ * bench-vs-field profile rule.
+ *
+ * The adapter definition is intentionally a plain TypeScript `interface`
+ * (not a Zod schema): adapters carry runtime functions (`readSnapshot`)
+ * which Zod cannot meaningfully validate, and the surface is internal —
+ * the boundary that gets schema-validated is the `VesselSnapshot[]`
+ * `readSnapshot` returns.
  */
 interface AutomationAdapterDefinition {
-    /** Adapter kind identifier (e.g. `"brewery.openplc.v1"`). */
+    /** Adapter kind identifier (e.g. `"brewery.openplc.v1"`, `"automation.mock.v0"`). */
     readonly kind: string;
     /** Human-readable display name. */
     readonly displayName: string;
@@ -224,9 +335,11 @@ interface AutomationAdapterDefinition {
     /**
      * Read one round of vessel snapshots.
      *
-     * Phase A: declared only. Implementations land in Phase C.
+     * The supervisor re-parses the returned array via `VesselSnapshotSchema`
+     * before persisting to the `vessels` table (adapter-source-of-truth
+     * boundary).
      */
     readSnapshot(context: AdapterReadContext): Promise<readonly VesselSnapshot[]>;
 }
 
-export { type AdapterCapabilities, type AdapterReadContext, type AutomationAdapterDefinition, CONTRACT_VERSION, FIRMWARE_VERSION_REGISTER_NAME, MAILBOX_SPEC, type MailboxEntry, type MailboxSpec, type ModbusEntryKind, type ScalarType, type SemVer, type VersionMismatchSeverity, type VesselSnapshot, classifyContractVersionSkew, findMailboxEntry, parseSemVer };
+export { type AdapterCapabilities, AdapterCapabilitiesSchema, type AdapterReadContext, type AutomationAdapterDefinition, CONTRACT_VERSION, FIRMWARE_VERSION_REGISTER_NAME, MAILBOX_SPEC, type MailboxEntry, type MailboxSpec, type ModbusEntryKind, type ScalarType, type SemVer, type VersionMismatchSeverity, type VesselListResponse, VesselListResponseSchema, type VesselSnapshot, VesselSnapshotSchema, type VesselState, type VesselStateResponse, VesselStateResponseSchema, VesselStateSchema, classifyContractVersionSkew, findMailboxEntry, parseSemVer };

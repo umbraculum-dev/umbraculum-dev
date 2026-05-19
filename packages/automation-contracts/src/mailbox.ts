@@ -6,66 +6,113 @@
  * This package mirrors a sister-repo-emitted artifact via PR per the M2
  * mechanism in `docs/design/canonical-automation-module-surface.md` §12.2.
  *
+ * v2.0 (RFC-0003 Decision A): the types in this file are *inferred from*
+ * Zod schemas via `z.infer`. The schema is the single source of truth;
+ * hand-authored `interface MailboxEntry { ... }` declarations were
+ * removed when the migration landed.
+ *
  * Until the sister-repo emitter lands, this file holds only the type
  * shapes the artifact will conform to. No literal `PI_*` names live here.
  */
+import { z } from "zod";
 
-export type ModbusEntryKind =
-  | "coil"
-  | "discrete_input"
-  | "input_register"
-  | "holding_register";
+export const ModbusEntryKindSchema = z.enum([
+  "coil",
+  "discrete_input",
+  "input_register",
+  "holding_register",
+]);
 
-export type ScalarType = "bool" | "int16" | "uint16" | "int32" | "uint32" | "float";
+export const ScalarTypeSchema = z.enum([
+  "bool",
+  "int16",
+  "uint16",
+  "int32",
+  "uint32",
+  "float",
+]);
 
-export interface MailboxEntry {
-  /** PI_* name from the sister repo (e.g. `"PI_K1_CURRENT_TEMP_C_X10"`). */
-  readonly name: string;
-  /** 0-based Modbus address. */
-  readonly address: number;
-  /** Modbus function-code family. */
-  readonly kind: ModbusEntryKind;
-  /** Scalar interpretation. */
-  readonly scalar: ScalarType;
-  /**
-   * Optional fixed-point scale: engineering value = raw * scale.
-   * Omitted for non-scalar / boolean entries.
-   */
-  readonly scale?: number;
-  /** Engineering unit (e.g. `"degC"`, `"bbl"`, `"%"`) — informational. */
-  readonly unit?: string;
-  /** Whether the platform is allowed to write this entry. */
-  readonly writable: boolean;
-  /** Human-readable description from the sister repo. */
-  readonly description: string;
-}
+export const MailboxEntrySchema = z
+  .object({
+    /** PI_* name from the sister repo (e.g. `"PI_K1_CURRENT_TEMP_C_X10"`). */
+    name: z.string().regex(/^PI_/, "expected PI_* name"),
+    /** 0-based Modbus address. */
+    address: z.number().int().nonnegative(),
+    /** Modbus function-code family. */
+    kind: ModbusEntryKindSchema,
+    /** Scalar interpretation. */
+    scalar: ScalarTypeSchema,
+    /**
+     * Optional fixed-point scale: engineering value = raw * scale.
+     * Omitted for non-scalar / boolean entries.
+     */
+    scale: z.number().optional(),
+    /** Engineering unit (e.g. `"degC"`, `"bbl"`, `"%"`) — informational. */
+    unit: z.string().optional(),
+    /** Whether the platform is allowed to write this entry. */
+    writable: z.boolean(),
+    /** Human-readable description from the sister repo. */
+    description: z.string(),
+  })
+  .readonly();
 
-export interface MailboxSpec {
-  /**
-   * Platform-facing semver-shaped version string used by the version
-   * handshake (`classifyContractVersionSkew`). Phase A reuses the
-   * sister-repo integrated release tag because it is the only existing
-   * baseline that is semver-shaped.
-   */
-  readonly contractVersion: string;
-  /**
-   * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
-   * not consumed by the version handshake. Captures the
-   * monotonically-bumped marker the sister repo uses internally when
-   * the address layout changes.
-   */
-  readonly schemaMarker?: string;
-  /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
-  readonly plcVersion?: string;
-  /**
-   * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
-   * to `contractVersion` (same value, distinct field for forward
-   * compatibility when the rails diverge).
-   */
-  readonly integratedReleaseTag?: string;
-  /** All `PI_*` entries the runtime exposes. */
-  readonly entries: readonly MailboxEntry[];
-}
+export const MailboxSpecSchema = z
+  .object({
+    /**
+     * Platform-facing semver-shaped version string used by the version
+     * handshake (`classifyContractVersionSkew`). Phase A reuses the
+     * sister-repo integrated release tag because it is the only existing
+     * baseline that is semver-shaped.
+     */
+    contractVersion: z.string().min(1),
+    /**
+     * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
+     * not consumed by the version handshake. Captures the
+     * monotonically-bumped marker the sister repo uses internally when
+     * the address layout changes.
+     */
+    schemaMarker: z.string().optional(),
+    /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
+    plcVersion: z.string().optional(),
+    /**
+     * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
+     * to `contractVersion` (same value, distinct field for forward
+     * compatibility when the rails diverge).
+     */
+    integratedReleaseTag: z.string().optional(),
+    /** All `PI_*` entries the runtime exposes. */
+    entries: z.array(MailboxEntrySchema),
+  })
+  .superRefine((spec, ctx) => {
+    const seenNames = new Set<string>();
+    const seenAddresses = new Map<string, string>();
+    for (let i = 0; i < spec.entries.length; i++) {
+      const e = spec.entries[i]!;
+      if (seenNames.has(e.name)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["entries", i, "name"],
+          message: `duplicate PI_* name: ${e.name}`,
+        });
+      }
+      seenNames.add(e.name);
+      const addrKey = `${e.kind}:${e.address}`;
+      const prior = seenAddresses.get(addrKey);
+      if (prior !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["entries", i, "address"],
+          message: `duplicate ${e.kind} address ${e.address}: ${prior} vs ${e.name}`,
+        });
+      }
+      seenAddresses.set(addrKey, e.name);
+    }
+  });
+
+export type ModbusEntryKind = z.infer<typeof ModbusEntryKindSchema>;
+export type ScalarType = z.infer<typeof ScalarTypeSchema>;
+export type MailboxEntry = z.infer<typeof MailboxEntrySchema>;
+export type MailboxSpec = z.infer<typeof MailboxSpecSchema>;
 
 /**
  * Reserved PI_* register name slot for the runtime firmware version.

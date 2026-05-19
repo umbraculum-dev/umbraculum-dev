@@ -11,8 +11,32 @@ MIT-licensed SDK surface (per [`docs/LICENSING.md`](../../docs/LICENSING.md) §6
 
 ## Scope
 
-- **Contains**: registration types, in-memory module registry (boot-time collision detection), `RESERVED_CANONICAL_MODULE_CODES`, `registerModule`, `registerWebModule`.
+- **Contains**: registration types, in-memory module registry (boot-time collision detection), `RESERVED_CANONICAL_MODULE_CODES`, `registerModule`, `registerWebModule`, and the **library-agnostic `ValidatedSchema<T>` interface** + `fromParser` adapter (per [RFC-0003](../../docs/rfcs/0003-validation-library-adoption.md) Decision C — third-party modules may use Zod, Valibot, TypeBox, or hand-rolled validators that satisfy the interface).
 - **Does not contain**: Prisma models, Fastify plugins for auth/billing, AI orchestrator implementation, or brewery route migration (flat `services/api/src/routes/` until H1 2027 per RFC-0002 Decision D).
+
+## Validated-schema contract
+
+```typescript
+export interface ValidatedSchema<T> {
+  parse(input: unknown): T;
+}
+```
+
+The Umbraculum codebase internally commits to **Zod v4** (RFC-0003 Decision B). Zod schemas satisfy this interface by construction — pass a Zod schema directly anywhere `ValidatedSchema<T>` is expected. For non-Zod libraries (Valibot, TypeBox, hand-rolled), wrap via `fromParser`:
+
+```typescript
+import * as v from "valibot";
+import { fromParser, registerModule } from "@umbraculum/module-sdk";
+
+const MyToolInput = v.object({ id: v.string() });
+registerModule({
+  code: "my-module",
+  // ... wrap a Valibot schema for the SDK boundary:
+  // (real registration shape will be richer in the H1 2027 SDK design)
+});
+```
+
+See `src/validatedSchema.ts` for the full interface + adapter + library-specific usage examples.
 
 ## Build / test / lint (local)
 

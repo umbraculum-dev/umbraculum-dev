@@ -27,6 +27,7 @@ __export(index_exports, {
   assertValidModuleCode: () => assertValidModuleCode,
   clearModuleRegistryForTests: () => clearModuleRegistryForTests,
   clearWebModuleRegistryForTests: () => clearWebModuleRegistryForTests,
+  fromParser: () => fromParser,
   isCanonicalModuleCode: () => isCanonicalModuleCode,
   listRegisteredModules: () => listRegisteredModules,
   recordModuleRegistration: () => recordModuleRegistration,
@@ -131,6 +132,15 @@ function registerWebModule(options) {
 function clearWebModuleRegistryForTests() {
   webModulesByCode.clear();
 }
+
+// src/validatedSchema.ts
+function fromParser(parser) {
+  return {
+    parse(input) {
+      return parser(input);
+    }
+  };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   InvalidModuleCodeError,
@@ -140,6 +150,7 @@ function clearWebModuleRegistryForTests() {
   assertValidModuleCode,
   clearModuleRegistryForTests,
   clearWebModuleRegistryForTests,
+  fromParser,
   isCanonicalModuleCode,
   listRegisteredModules,
   recordModuleRegistration,

@@ -9,8 +9,8 @@ Canonical `automation` module — Phase B foundation.
 
 | Phase | What lives here |
 |---|---|
-| **B-1 (this commit)** | `index.ts` exporting `registerAutomationModule(app)` calling `registerModule({ code: "automation", prismaSchema: "automation" })`. No routes / services / AI tools yet — the skeleton exists so subsequent PRs focus on the read path. |
-| B-2 | `adapters/mockAdapter.ts`, `services/vesselsService.ts`, `routes/automationVesselsRoutes.ts`, `aiTools/{listVessels,vesselState}.ts`, vitest unit tests. |
+| B-1 | `index.ts` exporting `registerAutomationModule(app)` calling `registerModule({ code: "automation", prismaSchema: "automation" })`. No routes / services / AI tools yet — the skeleton exists so subsequent PRs focus on the read path. |
+| **B-2 (this commit)** | `adapters/mockAdapter.ts` (deterministic `automation.mock.v0`), `services/vesselsService.ts` (DB read + `VesselStateSchema.parse(...)` translation), `routes/automationVesselsRoutes.ts` (`GET /automation/vessels`, `GET /automation/vessels/:code`), AI tools `automation.listVessels` + `automation.vesselState` (registered in `app.ts` alongside the brewery tool family), and Zod-schema migration of `packages/automation-contracts/src/adapter.ts` per [RFC-0003](../../../../../docs/rfcs/0003-validation-library-adoption.md). |
 | B-3 | Web routes under `apps/web/app/[locale]/(automation)/` and integration tests covering workspace scoping + adapter wiring. |
 | C | Real `brewery.openplc.v1` adapter implementation; `adapter_connections` lifecycle + version handshake (`AdapterConnection.contractVersion` ↔ `MAILBOX_SPEC.contractVersion`). |
 | D | `AutomationAlarmEvent` raise/clear semantics, `automation.activeAlarms` AI tool, integration-metadata bridge. |

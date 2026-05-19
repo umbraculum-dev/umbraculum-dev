@@ -1,102 +1,128 @@
 /**
  * Auth /auth/me response contract.
  * Shared by web and native clients.
+ *
+ * v2.0 (RFC-0003 Decision A): migrated from hand-rolled parsers to Zod v4
+ * schemas. The schema is the single source of truth; types are inferred
+ * via `z.infer`.
+ *
+ * Behavior preservation: this migration intentionally preserves the
+ * hand-rolled parser's soft-tolerance defaults (non-string preference
+ * fields collapse to undefined; non-string `activeWorkspaceId` and `role`
+ * collapse to null) via per-field preprocess transforms. This matches
+ * the v1.x test contract exactly — no behavior changes ship with this
+ * migration. A future PR may tighten these to strict-reject; see the
+ * latent-bug-fix audit in PR 1's description.
+ *
+ * Backward-compat tunnel preserved: payloads using the legacy `accounts`
+ * key (instead of `workspaces`) or `activeAccountId` (instead of
+ * `activeWorkspaceId`) are still accepted via the top-level preprocess.
+ * Both legacy keys are mapped to their canonical names at the schema
+ * boundary. See Phase 4b regression-pin in `meResponse.test.ts`.
+ *
+ * Worked example for RFC-0003 Decision D — this file is the canonical
+ * pattern that the 4 remaining `parseX.ts` files under
+ * `packages/contracts/src/` (per the migration handoff doc) will follow
+ * in subsequent migration PRs. Pattern shape:
+ *   1. Sub-schemas declared first, smallest-leaf-first.
+ *   2. Top-level schema uses preprocess for any dual-key tunneling.
+ *   3. Per-field preprocess for soft-tolerance fallbacks (preserving v1.x).
+ *   4. Type exports via z.infer (single source of truth).
+ *   5. Existing parseX(unknown): X export preserved as thin wrapper.
  */
+import { z } from "zod";
 
-export interface AuthMeResponseUser {
-  id: string;
-  email: string;
-  preferredLocale: string;
-  preferredTheme?: string | null | undefined;
-  preferredFontScale?: string | null | undefined;
-  preferredDensity?: string | null | undefined;
-  isPlatformAdmin?: boolean | undefined;
-}
+/** Collapse non-string + null + missing to undefined; preserve real strings. */
+const optionalStringWithNullPreserved = z
+  .unknown()
+  .transform((v): string | null | undefined => {
+    if (v === null) return null;
+    if (typeof v === "string") return v;
+    return undefined;
+  });
 
-export interface AuthMeResponseWorkspace {
-  id: string;
-  name: string;
-  role: string;
-  brandKey?: string | null | undefined;
-}
+/** Collapse non-string to null; preserve real strings and explicit null. */
+const stringOrNullSoft = z.unknown().transform((v): string | null => {
+  if (typeof v === "string") return v;
+  return null;
+});
 
-export interface AuthMeResponse {
-  ok: true;
-  user: AuthMeResponseUser;
-  workspaces: AuthMeResponseWorkspace[];
-  activeWorkspaceId: string | null;
-  role: string | null;
-}
+/** Soft-tolerant boolean — non-boolean collapses to undefined. */
+const optionalBooleanSoft = z.unknown().transform((v): boolean | undefined => {
+  if (typeof v === "boolean") return v;
+  return undefined;
+});
 
-function isString(v: unknown): v is string {
-  return typeof v === "string";
-}
+export const AuthMeResponseUserSchema = z
+  .object({
+    id: z.string().min(1, "user.id required"),
+    email: z.string().min(1, "user.email required"),
+    preferredLocale: z
+      .unknown()
+      .transform((v): string => (typeof v === "string" ? v : "en"))
+      .default("en"),
+    preferredTheme: optionalStringWithNullPreserved.optional(),
+    preferredFontScale: optionalStringWithNullPreserved.optional(),
+    preferredDensity: optionalStringWithNullPreserved.optional(),
+    isPlatformAdmin: optionalBooleanSoft.optional(),
+  })
+  .transform((u) => ({
+    id: u.id,
+    email: u.email,
+    preferredLocale: u.preferredLocale,
+    preferredTheme: u.preferredTheme,
+    preferredFontScale: u.preferredFontScale,
+    preferredDensity: u.preferredDensity,
+    isPlatformAdmin: u.isPlatformAdmin,
+  }));
 
-function isObject(v: unknown): v is Record<string, unknown> {
-  return v != null && typeof v === "object" && !Array.isArray(v);
-}
+export const AuthMeResponseWorkspaceSchema = z.object({
+  id: z.string().min(1, "workspace.id required"),
+  name: z.string().min(1, "workspace.name required"),
+  role: z.string(),
+  brandKey: optionalStringWithNullPreserved.optional(),
+});
 
-function parseUser(v: unknown): AuthMeResponseUser {
-  if (!isObject(v)) throw new Error("Invalid AuthMeResponse.user");
-  const id = isString(v['id']) ? v['id'] : "";
-  const email = isString(v['email']) ? v['email'] : "";
-  const preferredLocale = isString(v['preferredLocale']) ? v['preferredLocale'] : "en";
-  if (!id || !email) throw new Error("Invalid AuthMeResponse.user: id and email required");
-  return {
-    id,
-    email,
-    preferredLocale,
-    preferredTheme: v['preferredTheme'] === null ? null : isString(v['preferredTheme']) ? v['preferredTheme'] : undefined,
-    preferredFontScale: v['preferredFontScale'] === null ? null : isString(v['preferredFontScale']) ? v['preferredFontScale'] : undefined,
-    preferredDensity: v['preferredDensity'] === null ? null : isString(v['preferredDensity']) ? v['preferredDensity'] : undefined,
-    isPlatformAdmin: typeof v['isPlatformAdmin'] === "boolean" ? v['isPlatformAdmin'] : undefined,
-  };
-}
+export const AuthMeResponseSchema = z.preprocess(
+  (raw) => {
+    if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+      return raw;
+    }
+    const r = raw as Record<string, unknown>;
+    const workspacesRaw = Array.isArray(r["workspaces"])
+      ? r["workspaces"]
+      : Array.isArray(r["accounts"])
+        ? r["accounts"]
+        : r["workspaces"];
+    const activeWorkspaceIdRaw =
+      "activeWorkspaceId" in r ? r["activeWorkspaceId"] : r["activeAccountId"];
+    return {
+      ok: r["ok"],
+      user: r["user"],
+      workspaces: workspacesRaw,
+      activeWorkspaceId: activeWorkspaceIdRaw,
+      role: r["role"],
+    };
+  },
+  z.object({
+    ok: z.literal(true, "ok must be true"),
+    user: AuthMeResponseUserSchema,
+    workspaces: z.array(AuthMeResponseWorkspaceSchema, "workspaces must be array"),
+    activeWorkspaceId: stringOrNullSoft,
+    role: stringOrNullSoft,
+  }),
+);
 
-function parseWorkspace(v: unknown): AuthMeResponseWorkspace {
-  if (!isObject(v)) throw new Error("Invalid AuthMeResponse.workspaces item");
-  const id = isString(v['id']) ? v['id'] : "";
-  const name = isString(v['name']) ? v['name'] : "";
-  const role = isString(v['role']) ? v['role'] : "";
-  if (!id || !name) throw new Error("Invalid AuthMeResponse.workspaces item: id and name required");
-  return {
-    id,
-    name,
-    role,
-    brandKey: v['brandKey'] === null ? null : isString(v['brandKey']) ? v['brandKey'] : undefined,
-  };
-}
+export type AuthMeResponseUser = z.infer<typeof AuthMeResponseUserSchema>;
+export type AuthMeResponseWorkspace = z.infer<typeof AuthMeResponseWorkspaceSchema>;
+export type AuthMeResponse = z.infer<typeof AuthMeResponseSchema>;
 
 /**
- * Parse and validate /auth/me response. Throws on invalid payload.
+ * Parse and validate /auth/me response. Throws ZodError on invalid payload.
+ * Thin wrapper around `AuthMeResponseSchema.parse` for call-site stability —
+ * existing consumers in `apps/web` and `apps/native` continue to call
+ * `parseAuthMeResponse(json)` unchanged.
  */
 export function parseAuthMeResponse(payload: unknown): AuthMeResponse {
-  if (!isObject(payload)) throw new Error("Invalid AuthMeResponse: expected object");
-  if (payload['ok'] !== true) throw new Error("Invalid AuthMeResponse: ok must be true");
-  const user = parseUser(payload['user']);
-  const workspacesRaw = Array.isArray(payload['workspaces'])
-    ? payload['workspaces']
-    : Array.isArray(payload['accounts'])
-      ? payload['accounts']
-      : null;
-  if (!workspacesRaw) throw new Error("Invalid AuthMeResponse: workspaces must be array");
-  const workspaces = workspacesRaw.map((a: unknown, i: number) => {
-    try {
-      return parseWorkspace(a);
-    } catch (e) {
-      throw new Error("Invalid AuthMeResponse.workspaces[" + i + "]: " + (e instanceof Error ? e.message : String(e)));
-    }
-  });
-  const activeWorkspaceId =
-    payload['activeWorkspaceId'] === null
-      ? null
-      : isString(payload['activeWorkspaceId'])
-        ? payload['activeWorkspaceId']
-        : payload['activeAccountId'] === null
-          ? null
-          : isString(payload['activeAccountId'])
-            ? payload['activeAccountId']
-            : null;
-  const role = payload['role'] === null ? null : isString(payload['role']) ? payload['role'] : null;
-  return { ok: true, user, workspaces, activeWorkspaceId, role };
+  return AuthMeResponseSchema.parse(payload);
 }

@@ -280,6 +280,43 @@ export default [
   },
 
   // -------------------------------------------------------------------
+  // RFC-0003 — packages/*-contracts/ runtime-validation discipline.
+  //
+  // Per RFC-0003 Decision A (Accepted 2026-05-19), every boundary
+  // payload in `packages/contracts/`, `packages/automation-contracts/`,
+  // and the 4 future module-contracts packages MUST be validated via a
+  // Zod schema. Hand-rolled `parseX(unknown): X` functions are no longer
+  // permitted as the primary validator — they may exist only as thin
+  // wrappers around `Schema.parse()` for call-site stability.
+  //
+  // Detection: forbid in contracts source any declared type-guard helper
+  // matching the hand-rolled drift pattern (`function isX(v: unknown):
+  // v is X`). The lint surfaces drift; the fix is to replace with a Zod
+  // schema and drop the helper.
+  //
+  // Test files are exempted via the later test-files relaxation block
+  // (they may still use hand-rolled assertion helpers).
+  //
+  // See `docs/rfcs/0003-validation-library-adoption.md` Decision E, and
+  // `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/
+  // 22-typescript-contracts-runtime-validation.mdc` for the IDE guidance.
+  // -------------------------------------------------------------------
+  {
+    files: ["packages/*-contracts/src/**/*.{ts,tsx}", "packages/contracts/src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "TSTypePredicate[parameterName.name='v'] > TSTypeReference[typeName.name=/^[A-Z]/]",
+          message:
+            "RFC-0003: hand-rolled type-guard helpers (`function isX(v: unknown): v is X`) are forbidden in packages/*-contracts/. Use a Zod schema (z.object/...) and infer the type via z.infer<typeof Schema>. See docs/rfcs/0003-validation-library-adoption.md.",
+        },
+      ],
+    },
+  },
+
+  // -------------------------------------------------------------------
   // React hook rules (manual; the plugin doesn't ship a flat preset).
   // -------------------------------------------------------------------
   {

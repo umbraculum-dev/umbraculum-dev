@@ -1,22 +1,28 @@
 import type { FastifyInstance } from "fastify";
 import { listRegisteredModules, registerModule } from "@brewery/module-sdk";
 
+import { automationVesselsRoutes } from "./routes/automationVesselsRoutes.js";
+
 const MODULE_CODE = "automation";
 
 /**
- * Phase B foundation — wire the canonical `automation` module into the
- * Fastify host app via `@brewery/module-sdk`.
+ * Wire the canonical `automation` module into the Fastify host app via
+ * `@brewery/module-sdk` and register its read-path routes.
  *
- * Phase B-1 (this file's current scope):
+ * Phase B-2 (this file's current scope):
  *   - Records module metadata (`code: "automation"`, `prismaSchema: "automation"`).
- *   - No routes registered yet — vessel + adapter routes land in Phase B-2.
- *   - No AI tools registered yet — `automation.listVessels` /
- *     `automation.vesselState` land in Phase B-2.
+ *   - Registers read-path Fastify routes (`automationVesselsRoutes`) at the
+ *     top-level app scope so they mount at `/automation/vessels` /
+ *     `/automation/vessels/:code`.
+ *   - AI-tool registration lives in `app.ts` next to brewery-tool
+ *     registration so both tool families share the orchestrator's registry
+ *     and the registry's lifetime tracks the AI plugin block (one registry
+ *     per `buildApp()`).
  *   - No tier-limits contributor yet — added with the first vessel-create
  *     route in Phase C (`maxVessels`, `maxAdaptersConnected` per design §8.2).
- *
- * The skeleton exists in this commit so Phase B-2 PRs can focus on the
- * read path without re-litigating registration plumbing.
+ *   - No adapter supervisor loop yet — the mock adapter
+ *     (`adapters/mockAdapter.ts`) exists for tests + Phase C development, but
+ *     no background snapshot reconciliation runs.
  *
  * ## Repeat-call safety (idempotent metadata recording)
  *
@@ -31,7 +37,7 @@ const MODULE_CODE = "automation";
  * within a single file, repeated `buildApp()` calls re-enter this function
  * and the guard below skips the second-and-later registrations. Per-app
  * Fastify route registration happens via `app.register(...)` calls, which
- * Phase B-2 will add below the guard.
+ * always run regardless of the singleton metadata-record state.
  *
  * See: `docs/design/canonical-automation-module-surface.md` §8.3, §9 Phase B.
  */
@@ -45,11 +51,16 @@ export function registerAutomationModule(app: FastifyInstance): void {
       code: MODULE_CODE,
       prismaSchema: "automation",
       addonCodes: ["automation_module"],
+      // Routes registered via per-app `app.register(...)` below so they
+      // attach on every `buildApp()` call. `registerModule` records the
+      // metadata once per process; if `routes:` were passed here, the
+      // guarded first-call path would register routes too, but
+      // second-and-later `buildApp()` calls (test workers) would skip
+      // both metadata AND routes — leaving the second app without the
+      // module's routes wired.
       routes: [],
     });
   }
 
-  // Phase B-2 will call `app.register(automationVesselsRoutes)` here. Per-app
-  // route registration must run on every `buildApp()` call regardless of the
-  // singleton metadata-record state above.
+  app.register(automationVesselsRoutes);
 }

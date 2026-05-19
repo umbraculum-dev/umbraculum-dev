@@ -15,9 +15,19 @@ export type {
 
 export { MAILBOX_SPEC } from "./mailbox-data.js";
 
+export {
+  AdapterCapabilitiesSchema,
+  VesselListResponseSchema,
+  VesselSnapshotSchema,
+  VesselStateResponseSchema,
+  VesselStateSchema,
+} from "./adapter.js";
 export type {
   AdapterCapabilities,
   AdapterReadContext,
   AutomationAdapterDefinition,
+  VesselListResponse,
   VesselSnapshot,
+  VesselState,
+  VesselStateResponse,
 } from "./adapter.js";

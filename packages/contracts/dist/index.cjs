@@ -20,6 +20,9 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  AuthMeResponseSchema: () => AuthMeResponseSchema,
+  AuthMeResponseUserSchema: () => AuthMeResponseUserSchema,
+  AuthMeResponseWorkspaceSchema: () => AuthMeResponseWorkspaceSchema,
   analysisFormatHints: () => analysisFormatHints,
   parseAuthMeResponse: () => parseAuthMeResponse,
   parseBoilComputeAndSaveResponse: () => parseBoilComputeAndSaveResponse,
@@ -34,57 +37,69 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/auth/meResponse.ts
-function isString(v) {
-  return typeof v === "string";
-}
-function isObject(v) {
-  return v != null && typeof v === "object" && !Array.isArray(v);
-}
-function parseUser(v) {
-  if (!isObject(v)) throw new Error("Invalid AuthMeResponse.user");
-  const id = isString(v["id"]) ? v["id"] : "";
-  const email = isString(v["email"]) ? v["email"] : "";
-  const preferredLocale = isString(v["preferredLocale"]) ? v["preferredLocale"] : "en";
-  if (!id || !email) throw new Error("Invalid AuthMeResponse.user: id and email required");
-  return {
-    id,
-    email,
-    preferredLocale,
-    preferredTheme: v["preferredTheme"] === null ? null : isString(v["preferredTheme"]) ? v["preferredTheme"] : void 0,
-    preferredFontScale: v["preferredFontScale"] === null ? null : isString(v["preferredFontScale"]) ? v["preferredFontScale"] : void 0,
-    preferredDensity: v["preferredDensity"] === null ? null : isString(v["preferredDensity"]) ? v["preferredDensity"] : void 0,
-    isPlatformAdmin: typeof v["isPlatformAdmin"] === "boolean" ? v["isPlatformAdmin"] : void 0
-  };
-}
-function parseWorkspace(v) {
-  if (!isObject(v)) throw new Error("Invalid AuthMeResponse.workspaces item");
-  const id = isString(v["id"]) ? v["id"] : "";
-  const name = isString(v["name"]) ? v["name"] : "";
-  const role = isString(v["role"]) ? v["role"] : "";
-  if (!id || !name) throw new Error("Invalid AuthMeResponse.workspaces item: id and name required");
-  return {
-    id,
-    name,
-    role,
-    brandKey: v["brandKey"] === null ? null : isString(v["brandKey"]) ? v["brandKey"] : void 0
-  };
-}
-function parseAuthMeResponse(payload) {
-  if (!isObject(payload)) throw new Error("Invalid AuthMeResponse: expected object");
-  if (payload["ok"] !== true) throw new Error("Invalid AuthMeResponse: ok must be true");
-  const user = parseUser(payload["user"]);
-  const workspacesRaw = Array.isArray(payload["workspaces"]) ? payload["workspaces"] : Array.isArray(payload["accounts"]) ? payload["accounts"] : null;
-  if (!workspacesRaw) throw new Error("Invalid AuthMeResponse: workspaces must be array");
-  const workspaces = workspacesRaw.map((a, i) => {
-    try {
-      return parseWorkspace(a);
-    } catch (e) {
-      throw new Error("Invalid AuthMeResponse.workspaces[" + i + "]: " + (e instanceof Error ? e.message : String(e)));
+var import_zod = require("zod");
+var optionalStringWithNullPreserved = import_zod.z.unknown().transform((v) => {
+  if (v === null) return null;
+  if (typeof v === "string") return v;
+  return void 0;
+});
+var stringOrNullSoft = import_zod.z.unknown().transform((v) => {
+  if (typeof v === "string") return v;
+  return null;
+});
+var optionalBooleanSoft = import_zod.z.unknown().transform((v) => {
+  if (typeof v === "boolean") return v;
+  return void 0;
+});
+var AuthMeResponseUserSchema = import_zod.z.object({
+  id: import_zod.z.string().min(1, "user.id required"),
+  email: import_zod.z.string().min(1, "user.email required"),
+  preferredLocale: import_zod.z.unknown().transform((v) => typeof v === "string" ? v : "en").default("en"),
+  preferredTheme: optionalStringWithNullPreserved.optional(),
+  preferredFontScale: optionalStringWithNullPreserved.optional(),
+  preferredDensity: optionalStringWithNullPreserved.optional(),
+  isPlatformAdmin: optionalBooleanSoft.optional()
+}).transform((u) => ({
+  id: u.id,
+  email: u.email,
+  preferredLocale: u.preferredLocale,
+  preferredTheme: u.preferredTheme,
+  preferredFontScale: u.preferredFontScale,
+  preferredDensity: u.preferredDensity,
+  isPlatformAdmin: u.isPlatformAdmin
+}));
+var AuthMeResponseWorkspaceSchema = import_zod.z.object({
+  id: import_zod.z.string().min(1, "workspace.id required"),
+  name: import_zod.z.string().min(1, "workspace.name required"),
+  role: import_zod.z.string(),
+  brandKey: optionalStringWithNullPreserved.optional()
+});
+var AuthMeResponseSchema = import_zod.z.preprocess(
+  (raw) => {
+    if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+      return raw;
     }
-  });
-  const activeWorkspaceId = payload["activeWorkspaceId"] === null ? null : isString(payload["activeWorkspaceId"]) ? payload["activeWorkspaceId"] : payload["activeAccountId"] === null ? null : isString(payload["activeAccountId"]) ? payload["activeAccountId"] : null;
-  const role = payload["role"] === null ? null : isString(payload["role"]) ? payload["role"] : null;
-  return { ok: true, user, workspaces, activeWorkspaceId, role };
+    const r = raw;
+    const workspacesRaw = Array.isArray(r["workspaces"]) ? r["workspaces"] : Array.isArray(r["accounts"]) ? r["accounts"] : r["workspaces"];
+    const activeWorkspaceIdRaw = "activeWorkspaceId" in r ? r["activeWorkspaceId"] : r["activeAccountId"];
+    return {
+      ok: r["ok"],
+      user: r["user"],
+      workspaces: workspacesRaw,
+      activeWorkspaceId: activeWorkspaceIdRaw,
+      role: r["role"]
+    };
+  },
+  import_zod.z.object({
+    ok: import_zod.z.literal(true, "ok must be true"),
+    user: AuthMeResponseUserSchema,
+    workspaces: import_zod.z.array(AuthMeResponseWorkspaceSchema, "workspaces must be array"),
+    activeWorkspaceId: stringOrNullSoft,
+    role: stringOrNullSoft
+  })
+);
+function parseAuthMeResponse(payload) {
+  return AuthMeResponseSchema.parse(payload);
 }
 
 // src/water/parseHubSummary.ts
@@ -233,26 +248,26 @@ function parseRecipeWaterHubSummaryResponse(x) {
 }
 
 // src/water/waterProfile.ts
-function isString2(v) {
+function isString(v) {
   return typeof v === "string";
 }
 function isNumber(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
-function isObject2(v) {
+function isObject(v) {
   return v != null && typeof v === "object" && !Array.isArray(v);
 }
 var SCOPES = ["system", "account", "public"];
 var TYPES = ["water", "dilution"];
 var VERIFICATION_STATUSES = ["verified", "unverified"];
 function parseWaterProfile(v) {
-  if (!isObject2(v)) throw new Error("Invalid WaterProfile: expected object");
-  const id = isString2(v["id"]) ? v["id"] : "";
-  const key = isString2(v["key"]) ? v["key"] : "";
-  const scope = isString2(v["scope"]) && SCOPES.includes(v["scope"]) ? v["scope"] : "system";
-  const type = isString2(v["type"]) && TYPES.includes(v["type"]) ? v["type"] : "water";
-  const workspaceId = v["workspaceId"] === null ? null : isString2(v["workspaceId"]) ? v["workspaceId"] : v["accountId"] === null ? null : isString2(v["accountId"]) ? v["accountId"] : null;
-  const name = isString2(v["name"]) ? v["name"] : "";
+  if (!isObject(v)) throw new Error("Invalid WaterProfile: expected object");
+  const id = isString(v["id"]) ? v["id"] : "";
+  const key = isString(v["key"]) ? v["key"] : "";
+  const scope = isString(v["scope"]) && SCOPES.includes(v["scope"]) ? v["scope"] : "system";
+  const type = isString(v["type"]) && TYPES.includes(v["type"]) ? v["type"] : "water";
+  const workspaceId = v["workspaceId"] === null ? null : isString(v["workspaceId"]) ? v["workspaceId"] : v["accountId"] === null ? null : isString(v["accountId"]) ? v["accountId"] : null;
+  const name = isString(v["name"]) ? v["name"] : "";
   const ph = v["ph"] === null || v["ph"] === void 0 ? void 0 : isNumber(v["ph"]) ? v["ph"] : void 0;
   const calcium = isNumber(v["calcium"]) ? v["calcium"] : 0;
   const magnesium = isNumber(v["magnesium"]) ? v["magnesium"] : 0;
@@ -260,8 +275,8 @@ function parseWaterProfile(v) {
   const sulfate = isNumber(v["sulfate"]) ? v["sulfate"] : 0;
   const chloride = isNumber(v["chloride"]) ? v["chloride"] : 0;
   const bicarbonate = isNumber(v["bicarbonate"]) ? v["bicarbonate"] : 0;
-  const verificationStatus = isString2(v["verificationStatus"]) && VERIFICATION_STATUSES.includes(v["verificationStatus"]) ? v["verificationStatus"] : "unverified";
-  const source = isString2(v["source"]) ? v["source"] : "";
+  const verificationStatus = isString(v["verificationStatus"]) && VERIFICATION_STATUSES.includes(v["verificationStatus"]) ? v["verificationStatus"] : "unverified";
+  const source = isString(v["source"]) ? v["source"] : "";
   if (!id || !key || !name) throw new Error("Invalid WaterProfile: id, key, name required");
   return {
     id,
@@ -295,7 +310,7 @@ function parseArray(v, parse) {
   });
 }
 function parseWaterProfilesResponse(payload) {
-  if (!isObject2(payload)) throw new Error("Invalid WaterProfilesResponse: expected object");
+  if (!isObject(payload)) throw new Error("Invalid WaterProfilesResponse: expected object");
   if (payload["ok"] !== true) throw new Error("Invalid WaterProfilesResponse: ok must be true");
   const system = parseArray(payload["system"], parseWaterProfile);
   const publicProfiles = parseArray(payload["public"], parseWaterProfile);
@@ -309,11 +324,11 @@ function parseWaterProfilesResponse(payload) {
 function isFiniteNumber2(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
-function isObject3(v) {
+function isObject2(v) {
   return v != null && typeof v === "object" && !Array.isArray(v);
 }
 function parseIonProfilePpm2(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const keys = ["calcium", "magnesium", "sodium", "sulfate", "chloride", "bicarbonate"];
   for (const k of keys) {
     if (!isFiniteNumber2(v[k])) throw new Error(`Invalid ${label}.${String(k)}`);
@@ -328,7 +343,7 @@ function parseIonProfilePpm2(v, label) {
   };
 }
 function parseDerivationValue(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   if (v["kind"] === "number") {
     if (!isFiniteNumber2(v["value"])) throw new Error(`Invalid ${label}.value`);
     const unit = typeof v["unit"] === "string" ? v["unit"] : void 0;
@@ -346,13 +361,13 @@ function parseDerivationValue(v, label) {
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseDerivationLine(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const id = typeof v["id"] === "string" ? v["id"] : "";
   if (!id) throw new Error(`Invalid ${label}.id`);
   return { id, value: parseDerivationValue(v["value"], `${label}.value`) };
 }
 function parseDerivation(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const kind = typeof v["kind"] === "string" ? v["kind"] : "";
   if (!kind) throw new Error(`Invalid ${label}.kind`);
   if (v["version"] !== 1) throw new Error(`Invalid ${label}.version`);
@@ -361,11 +376,11 @@ function parseDerivation(v, label) {
   const inputs = Array.isArray(v["inputs"]) ? v["inputs"].map((x, i) => parseDerivationLine(x, `${label}.inputs[${i}]`)) : [];
   const intermediates = Array.isArray(v["intermediates"]) ? v["intermediates"].map((x, i) => parseDerivationLine(x, `${label}.intermediates[${i}]`)) : [];
   const breakdowns = Array.isArray(v["breakdowns"]) ? v["breakdowns"].filter(
-    (b) => isObject3(b) && typeof b["id"] === "string" && Array.isArray(b["rows"])
+    (b) => isObject2(b) && typeof b["id"] === "string" && Array.isArray(b["rows"])
   ).map((b) => ({
     id: b["id"],
     rows: b["rows"].filter(
-      (r) => isObject3(r)
+      (r) => isObject2(r)
     )
   })) : void 0;
   const notes = Array.isArray(v["notes"]) ? v["notes"].filter((n) => typeof n === "string") : void 0;
@@ -380,27 +395,27 @@ function parseDerivation(v, label) {
   };
 }
 function parseSettingsSavedRef(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const recipeId = typeof v["recipeId"] === "string" ? v["recipeId"] : "";
   if (!recipeId) throw new Error(`Invalid ${label}.recipeId`);
   return { recipeId };
 }
 function parseSaltAdditionsResult(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const baseProfile = parseIonProfilePpm2(v["baseProfile"], `${label}.baseProfile`);
   const resultingProfile = parseIonProfilePpm2(v["resultingProfile"], `${label}.resultingProfile`);
   const deltasPpm = parseIonProfilePpm2(v["deltasPpm"], `${label}.deltasPpm`);
   const breakdown = Array.isArray(v["breakdown"]) ? v["breakdown"].filter(
-    (r) => isObject3(r) && typeof r["saltKey"] === "string" && isFiniteNumber2(r["grams"])
+    (r) => isObject2(r) && typeof r["saltKey"] === "string" && isFiniteNumber2(r["grams"])
   ).map((r) => ({
     saltKey: r["saltKey"],
     grams: r["grams"],
-    deltasPpm: isObject3(r["deltasPpm"]) ? r["deltasPpm"] : {}
+    deltasPpm: isObject2(r["deltasPpm"]) ? r["deltasPpm"] : {}
   })) : [];
   return { baseProfile, resultingProfile, deltasPpm, breakdown };
 }
 function parseAcidificationResult(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const finalAlkalinityPpmCaCO3 = isFiniteNumber2(v["finalAlkalinityPpmCaCO3"]) ? v["finalAlkalinityPpmCaCO3"] : NaN;
   const sulfateAddedPpm = isFiniteNumber2(v["sulfateAddedPpm"]) ? v["sulfateAddedPpm"] : NaN;
   const chlorideAddedPpm = isFiniteNumber2(v["chlorideAddedPpm"]) ? v["chlorideAddedPpm"] : NaN;
@@ -415,11 +430,11 @@ function parseAcidificationResult(v, label) {
     finalAlkalinityPpmCaCO3,
     sulfateAddedPpm,
     chlorideAddedPpm,
-    debug: isObject3(v["debug"]) ? v["debug"] : void 0
+    debug: isObject2(v["debug"]) ? v["debug"] : void 0
   };
 }
 function parseAcidificationManualResult(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const achievedPh = isFiniteNumber2(v["achievedPh"]) ? v["achievedPh"] : NaN;
   if (!Number.isFinite(achievedPh)) throw new Error(`Invalid ${label}.achievedPh`);
   const clamped = v["clamped"] === "none" || v["clamped"] === "low" || v["clamped"] === "high" ? v["clamped"] : "none";
@@ -437,19 +452,19 @@ function parseAcidificationManualResult(v, label) {
 }
 function parseMashTargetMashPhResult(v, label) {
   const base = parseAcidificationResult(v, label);
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const estimatedMashPhRoomTemp = isFiniteNumber2(v["estimatedMashPhRoomTemp"]) ? v["estimatedMashPhRoomTemp"] : NaN;
   if (!Number.isFinite(estimatedMashPhRoomTemp)) throw new Error(`Invalid ${label}.estimatedMashPhRoomTemp`);
   return { ...base, estimatedMashPhRoomTemp };
 }
 function parseOverallResult(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const calculatedAt = typeof v["calculatedAt"] === "string" ? v["calculatedAt"] : "";
   if (!calculatedAt) throw new Error(`Invalid ${label}.calculatedAt`);
   const ionsPpm = parseIonProfilePpm2(v["ionsPpm"], `${label}.ionsPpm`);
   const finalAlkalinityPpmCaCO3 = isFiniteNumber2(v["finalAlkalinityPpmCaCO3"]) ? v["finalAlkalinityPpmCaCO3"] : NaN;
   if (!Number.isFinite(finalAlkalinityPpmCaCO3)) throw new Error(`Invalid ${label}.finalAlkalinityPpmCaCO3`);
-  const ph = isObject3(v["ph"]) ? v["ph"] : null;
+  const ph = isObject2(v["ph"]) ? v["ph"] : null;
   const kind = ph?.["kind"] === "target" || ph?.["kind"] === "estimated" ? ph["kind"] : null;
   const value = isFiniteNumber2(ph?.["value"]) ? ph["value"] : null;
   if (!kind || value === null) throw new Error(`Invalid ${label}.ph`);
@@ -458,11 +473,11 @@ function parseOverallResult(v, label) {
     ionsPpm,
     finalAlkalinityPpmCaCO3,
     ph: { kind, value },
-    debug: isObject3(v["debug"]) ? v["debug"] : void 0
+    debug: isObject2(v["debug"]) ? v["debug"] : void 0
   };
 }
 function parseMashAcidBlock(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const kind = v["kind"];
   if (kind === "mash_acidification_manual") {
     return {
@@ -491,7 +506,7 @@ function parseMashAcidBlock(v, label) {
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseSpargeAcidBlock(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const kind = v["kind"];
   if (kind === "sparge_acidification_manual") {
     return {
@@ -512,7 +527,7 @@ function parseSpargeAcidBlock(v, label) {
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseBoilAcidBlock(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   const kind = v["kind"];
   if (kind === "boil_acidification_manual") {
     return {
@@ -533,14 +548,14 @@ function parseBoilAcidBlock(v, label) {
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseNumberFormatHintV1(v, label) {
-  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject2(v)) throw new Error(`Invalid ${label}`);
   if (v["version"] !== 1) throw new Error(`Invalid ${label}.version`);
   const style = v["style"] === "fixed" || v["style"] === "significant" ? v["style"] : null;
   if (!style) throw new Error(`Invalid ${label}.style`);
   const decimals = isFiniteNumber2(v["decimals"]) ? v["decimals"] : NaN;
   if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
   const unitRaw = typeof v["unit"] === "string" ? v["unit"] : void 0;
-  const clamp = isObject3(v["clamp"]) ? {
+  const clamp = isObject2(v["clamp"]) ? {
     min: isFiniteNumber2(v["clamp"]["min"]) ? v["clamp"]["min"] : void 0,
     max: isFiniteNumber2(v["clamp"]["max"]) ? v["clamp"]["max"] : void 0
   } : void 0;
@@ -549,7 +564,7 @@ function parseNumberFormatHintV1(v, label) {
 function parseFormatHints(root) {
   const hintsOut = {};
   const h = root["formatHints"];
-  if (isObject3(h)) {
+  if (isObject2(h)) {
     for (const [k, val] of Object.entries(h)) {
       try {
         hintsOut[k] = parseNumberFormatHintV1(val, `formatHints.${k}`);
@@ -560,12 +575,12 @@ function parseFormatHints(root) {
   return hintsOut;
 }
 function parseMashComputeAndSaveResponse(x) {
-  if (!isObject3(x)) throw new Error("Invalid MashComputeAndSaveResponseV1");
+  if (!isObject2(x)) throw new Error("Invalid MashComputeAndSaveResponseV1");
   if (x["ok"] !== true) throw new Error("Invalid MashComputeAndSaveResponseV1.ok");
   if (x["version"] !== 1) throw new Error("Invalid MashComputeAndSaveResponseV1.version");
-  const salts = isObject3(x["salts"]) ? x["salts"] : {};
+  const salts = isObject2(x["salts"]) ? x["salts"] : {};
   const acid = x["acid"];
-  const overall = isObject3(x["overall"]) ? x["overall"] : {};
+  const overall = isObject2(x["overall"]) ? x["overall"] : {};
   const formatHints = parseFormatHints(x);
   return {
     ok: true,
@@ -584,10 +599,10 @@ function parseMashComputeAndSaveResponse(x) {
   };
 }
 function parseSpargeComputeAndSaveResponse(x) {
-  if (!isObject3(x)) throw new Error("Invalid SpargeComputeAndSaveResponseV1");
+  if (!isObject2(x)) throw new Error("Invalid SpargeComputeAndSaveResponseV1");
   if (x["ok"] !== true) throw new Error("Invalid SpargeComputeAndSaveResponseV1.ok");
   if (x["version"] !== 1) throw new Error("Invalid SpargeComputeAndSaveResponseV1.version");
-  const salts = isObject3(x["salts"]) ? x["salts"] : {};
+  const salts = isObject2(x["salts"]) ? x["salts"] : {};
   const acid = x["acid"];
   const formatHints = parseFormatHints(x);
   return {
@@ -603,12 +618,12 @@ function parseSpargeComputeAndSaveResponse(x) {
   };
 }
 function parseBoilComputeAndSaveResponse(x) {
-  if (!isObject3(x)) throw new Error("Invalid BoilComputeAndSaveResponseV1");
+  if (!isObject2(x)) throw new Error("Invalid BoilComputeAndSaveResponseV1");
   if (x["ok"] !== true) throw new Error("Invalid BoilComputeAndSaveResponseV1.ok");
   if (x["version"] !== 1) throw new Error("Invalid BoilComputeAndSaveResponseV1.version");
-  const salts = isObject3(x["salts"]) ? x["salts"] : {};
+  const salts = isObject2(x["salts"]) ? x["salts"] : {};
   const acid = x["acid"];
-  const overall = isObject3(x["overall"]) ? x["overall"] : {};
+  const overall = isObject2(x["overall"]) ? x["overall"] : {};
   const formatHints = parseFormatHints(x);
   return {
     ok: true,
@@ -660,31 +675,31 @@ var analysisFormatHints = {
 function isFiniteNumber3(v) {
   return typeof v === "number" && Number.isFinite(v);
 }
-function isObject4(v) {
+function isObject3(v) {
   return v != null && typeof v === "object" && !Array.isArray(v);
 }
 function parseCanonicalModels(v) {
-  const o = isObject4(v) ? v : null;
+  const o = isObject3(v) ? v : null;
   const ibu = o?.["ibu"] === "tinseth" || o?.["ibu"] === "rager" ? o["ibu"] : "tinseth";
   const srm = o?.["srm"] === "morey" || o?.["srm"] === "daniels" ? o["srm"] : "morey";
   return { ibu, srm };
 }
 function parseNumberFormatHintV12(v, label) {
-  if (!isObject4(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
   if (v["version"] !== 1) throw new Error(`Invalid ${label}.version`);
   const style = v["style"] === "fixed" || v["style"] === "significant" ? v["style"] : null;
   if (!style) throw new Error(`Invalid ${label}.style`);
   const decimals = isFiniteNumber3(v["decimals"]) ? v["decimals"] : NaN;
   if (!Number.isFinite(decimals) || decimals < 0) throw new Error(`Invalid ${label}.decimals`);
   const unit = typeof v["unit"] === "string" ? v["unit"] : void 0;
-  const clamp = isObject4(v["clamp"]) ? {
+  const clamp = isObject3(v["clamp"]) ? {
     min: isFiniteNumber3(v["clamp"]["min"]) ? v["clamp"]["min"] : void 0,
     max: isFiniteNumber3(v["clamp"]["max"]) ? v["clamp"]["max"] : void 0
   } : void 0;
   return { version: 1, style, decimals, unit, clamp };
 }
 function parseDerivationLineValue(v, label) {
-  if (!isObject4(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
   if (v["kind"] === "number") {
     if (!isFiniteNumber3(v["value"])) throw new Error(`Invalid ${label}.value`);
     const unit = typeof v["unit"] === "string" ? v["unit"] : void 0;
@@ -702,12 +717,12 @@ function parseDerivationLineValue(v, label) {
   throw new Error(`Invalid ${label}.kind`);
 }
 function parseDerivation2(v, label) {
-  if (!isObject4(v)) throw new Error(`Invalid ${label}`);
+  if (!isObject3(v)) throw new Error(`Invalid ${label}`);
   if (typeof v["kind"] !== "string" || !v["kind"]) throw new Error(`Invalid ${label}.kind`);
   if (v["version"] !== 1) throw new Error(`Invalid ${label}.version`);
   if (typeof v["formulaId"] !== "string" || !v["formulaId"]) throw new Error(`Invalid ${label}.formulaId`);
   const parseLine = (x, i, base) => {
-    if (!isObject4(x)) throw new Error(`Invalid ${base}[${i}]`);
+    if (!isObject3(x)) throw new Error(`Invalid ${base}[${i}]`);
     if (typeof x["id"] !== "string" || !x["id"]) throw new Error(`Invalid ${base}[${i}].id`);
     return { id: x["id"], value: parseDerivationLineValue(x["value"], `${base}[${i}].value`) };
   };
@@ -724,14 +739,14 @@ function parseDerivation2(v, label) {
   };
 }
 function parseGravityAnalysisResponseV1(x) {
-  if (!isObject4(x)) throw new Error("Invalid GravityAnalysisResponseV1");
+  if (!isObject3(x)) throw new Error("Invalid GravityAnalysisResponseV1");
   if (x["ok"] !== true) throw new Error("Invalid GravityAnalysisResponseV1.ok");
   if (x["version"] !== 1) throw new Error("Invalid GravityAnalysisResponseV1.version");
   const canonicalModels = parseCanonicalModels(x["canonicalModels"]);
-  if (!isObject4(x["result"])) throw new Error("Invalid GravityAnalysisResponseV1.result");
+  if (!isObject3(x["result"])) throw new Error("Invalid GravityAnalysisResponseV1.result");
   const r = x["result"];
   const warningsRaw = Array.isArray(r["warnings"]) ? r["warnings"] : [];
-  const warnings = warningsRaw.map((w) => isObject4(w) && typeof w["code"] === "string" ? w["code"] : "").filter((c) => Boolean(c)).map((code) => ({ code }));
+  const warnings = warningsRaw.map((w) => isObject3(w) && typeof w["code"] === "string" ? w["code"] : "").filter((c) => Boolean(c)).map((code) => ({ code }));
   const result = {
     boilTimeMinutes: r["boilTimeMinutes"] === null ? null : isFiniteNumber3(r["boilTimeMinutes"]) ? r["boilTimeMinutes"] : null,
     kettleVolumeLiters: r["kettleVolumeLiters"] === null ? null : isFiniteNumber3(r["kettleVolumeLiters"]) ? r["kettleVolumeLiters"] : null,
@@ -749,7 +764,7 @@ function parseGravityAnalysisResponseV1(x) {
     warnings
   };
   const derivationsOut = {};
-  if (isObject4(x["derivations"])) {
+  if (isObject3(x["derivations"])) {
     for (const [k, val] of Object.entries(x["derivations"])) {
       try {
         derivationsOut[k] = parseDerivation2(val, `GravityAnalysisResponseV1.derivations.${k}`);
@@ -758,7 +773,7 @@ function parseGravityAnalysisResponseV1(x) {
     }
   }
   const hintsOut = {};
-  if (isObject4(x["formatHints"])) {
+  if (isObject3(x["formatHints"])) {
     for (const [k, val] of Object.entries(x["formatHints"])) {
       try {
         hintsOut[k] = parseNumberFormatHintV12(val, `GravityAnalysisResponseV1.formatHints.${k}`);
@@ -777,6 +792,9 @@ function parseGravityAnalysisResponseV1(x) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  AuthMeResponseSchema,
+  AuthMeResponseUserSchema,
+  AuthMeResponseWorkspaceSchema,
   analysisFormatHints,
   parseAuthMeResponse,
   parseBoilComputeAndSaveResponse,

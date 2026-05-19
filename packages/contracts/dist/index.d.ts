@@ -1,8 +1,55 @@
+import { z } from 'zod';
+
 /**
  * Auth /auth/me response contract.
  * Shared by web and native clients.
+ *
+ * v2.0 (RFC-0003 Decision A): migrated from hand-rolled parsers to Zod v4
+ * schemas. The schema is the single source of truth; types are inferred
+ * via `z.infer`.
+ *
+ * Behavior preservation: this migration intentionally preserves the
+ * hand-rolled parser's soft-tolerance defaults (non-string preference
+ * fields collapse to undefined; non-string `activeWorkspaceId` and `role`
+ * collapse to null) via per-field preprocess transforms. This matches
+ * the v1.x test contract exactly — no behavior changes ship with this
+ * migration. A future PR may tighten these to strict-reject; see the
+ * latent-bug-fix audit in PR 1's description.
+ *
+ * Backward-compat tunnel preserved: payloads using the legacy `accounts`
+ * key (instead of `workspaces`) or `activeAccountId` (instead of
+ * `activeWorkspaceId`) are still accepted via the top-level preprocess.
+ * Both legacy keys are mapped to their canonical names at the schema
+ * boundary. See Phase 4b regression-pin in `meResponse.test.ts`.
+ *
+ * Worked example for RFC-0003 Decision D — this file is the canonical
+ * pattern that the 4 remaining `parseX.ts` files under
+ * `packages/contracts/src/` (per the migration handoff doc) will follow
+ * in subsequent migration PRs. Pattern shape:
+ *   1. Sub-schemas declared first, smallest-leaf-first.
+ *   2. Top-level schema uses preprocess for any dual-key tunneling.
+ *   3. Per-field preprocess for soft-tolerance fallbacks (preserving v1.x).
+ *   4. Type exports via z.infer (single source of truth).
+ *   5. Existing parseX(unknown): X export preserved as thin wrapper.
  */
-interface AuthMeResponseUser {
+
+declare const AuthMeResponseUserSchema: z.ZodPipe<z.ZodObject<{
+    id: z.ZodString;
+    email: z.ZodString;
+    preferredLocale: z.ZodDefault<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string, unknown>>>;
+    preferredTheme: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    preferredFontScale: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    preferredDensity: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    isPlatformAdmin: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<boolean | undefined, unknown>>>;
+}, z.core.$strip>, z.ZodTransform<{
+    id: string;
+    email: string;
+    preferredLocale: string;
+    preferredTheme: string | null | undefined;
+    preferredFontScale: string | null | undefined;
+    preferredDensity: string | null | undefined;
+    isPlatformAdmin: boolean | undefined;
+}, {
     id: string;
     email: string;
     preferredLocale: string;
@@ -10,22 +57,57 @@ interface AuthMeResponseUser {
     preferredFontScale?: string | null | undefined;
     preferredDensity?: string | null | undefined;
     isPlatformAdmin?: boolean | undefined;
-}
-interface AuthMeResponseWorkspace {
-    id: string;
-    name: string;
-    role: string;
-    brandKey?: string | null | undefined;
-}
-interface AuthMeResponse {
-    ok: true;
-    user: AuthMeResponseUser;
-    workspaces: AuthMeResponseWorkspace[];
-    activeWorkspaceId: string | null;
-    role: string | null;
-}
+}>>;
+declare const AuthMeResponseWorkspaceSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    role: z.ZodString;
+    brandKey: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+}, z.core.$strip>;
+declare const AuthMeResponseSchema: z.ZodPreprocess<z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    user: z.ZodPipe<z.ZodObject<{
+        id: z.ZodString;
+        email: z.ZodString;
+        preferredLocale: z.ZodDefault<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string, unknown>>>;
+        preferredTheme: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+        preferredFontScale: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+        preferredDensity: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+        isPlatformAdmin: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<boolean | undefined, unknown>>>;
+    }, z.core.$strip>, z.ZodTransform<{
+        id: string;
+        email: string;
+        preferredLocale: string;
+        preferredTheme: string | null | undefined;
+        preferredFontScale: string | null | undefined;
+        preferredDensity: string | null | undefined;
+        isPlatformAdmin: boolean | undefined;
+    }, {
+        id: string;
+        email: string;
+        preferredLocale: string;
+        preferredTheme?: string | null | undefined;
+        preferredFontScale?: string | null | undefined;
+        preferredDensity?: string | null | undefined;
+        isPlatformAdmin?: boolean | undefined;
+    }>>;
+    workspaces: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        role: z.ZodString;
+        brandKey: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    }, z.core.$strip>>;
+    activeWorkspaceId: z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null, unknown>>;
+    role: z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null, unknown>>;
+}, z.core.$strip>>;
+type AuthMeResponseUser = z.infer<typeof AuthMeResponseUserSchema>;
+type AuthMeResponseWorkspace = z.infer<typeof AuthMeResponseWorkspaceSchema>;
+type AuthMeResponse = z.infer<typeof AuthMeResponseSchema>;
 /**
- * Parse and validate /auth/me response. Throws on invalid payload.
+ * Parse and validate /auth/me response. Throws ZodError on invalid payload.
+ * Thin wrapper around `AuthMeResponseSchema.parse` for call-site stability —
+ * existing consumers in `apps/web` and `apps/native` continue to call
+ * `parseAuthMeResponse(json)` unchanged.
  */
 declare function parseAuthMeResponse(payload: unknown): AuthMeResponse;
 
@@ -646,4 +728,4 @@ interface WorkspaceAiUsageResponse {
     }>;
 }
 
-export { type AiProvider, type AiRoleLimits, type AiTool, type AiToolCallRecord, type AiToolContext, type AiToolDefinition, type AiToolRegistry, type AiToolScope, type AiUsageLedgerEntry, type AuthMeResponse, type AuthMeResponseUser, type AuthMeResponseWorkspace, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type NumberFormatHintV1, type NumberFormatUnit, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };
+export { type AiProvider, type AiRoleLimits, type AiTool, type AiToolCallRecord, type AiToolContext, type AiToolDefinition, type AiToolRegistry, type AiToolScope, type AiUsageLedgerEntry, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type NumberFormatHintV1, type NumberFormatUnit, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };

@@ -93,6 +93,15 @@ function registerWebModule(options) {
 function clearWebModuleRegistryForTests() {
   webModulesByCode.clear();
 }
+
+// src/validatedSchema.ts
+function fromParser(parser) {
+  return {
+    parse(input) {
+      return parser(input);
+    }
+  };
+}
 export {
   InvalidModuleCodeError,
   ModuleCodeAlreadyRegisteredError,
@@ -101,6 +110,7 @@ export {
   assertValidModuleCode,
   clearModuleRegistryForTests,
   clearWebModuleRegistryForTests,
+  fromParser,
   isCanonicalModuleCode,
   listRegisteredModules,
   recordModuleRegistration,

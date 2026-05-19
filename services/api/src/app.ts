@@ -36,6 +36,7 @@ import { webhooksRevenuecatRoutes } from "./routes/webhooksRevenuecat.js";
 import { aiRoutes } from "./routes/ai.js";
 import { InMemoryAiToolRegistry } from "./services/ai/toolRegistry.js";
 import { registerBreweryTools } from "./services/ai/tools/brewery/index.js";
+import { registerAutomationTools } from "./services/ai/tools/automation/index.js";
 import { registerAutomationModule } from "./modules/automation/index.js";
 
 export function buildApp() {
@@ -99,15 +100,21 @@ export function buildApp() {
   app.register(webhooksStripeRoutes);
   app.register(webhooksRevenuecatRoutes);
 
-  // Canonical `automation` module — Phase B foundation. Phase B-1 wires the
-  // module via `@brewery/module-sdk` with no routes; Phase B-2 lands the
-  // mock adapter, vessel read services, routes, and AI tools.
+  // Canonical `automation` module — Phase B foundation.
+  // - Phase B-1 wired the module via `@brewery/module-sdk` with no routes.
+  // - Phase B-2 lands the mock adapter, vessel read services, routes
+  //   (`/automation/vessels`, `/automation/vessels/:code`), and AI tools
+  //   (`automation.listVessels`, `automation.vesselState`).
+  // The routes register at top-level scope here; the AI tools register
+  // inside the orchestrator plugin block below so the registry is shared
+  // with the brewery tools.
   // See: docs/design/canonical-automation-module-surface.md §8.3, §9.
   registerAutomationModule(app);
 
   app.register((instance, _opts, done) => {
     const registry = new InMemoryAiToolRegistry();
     registerBreweryTools(registry, instance.prisma);
+    registerAutomationTools(registry, instance.prisma);
     aiRoutes(registry)(instance);
     done();
   });

@@ -1,5 +1,43 @@
+/**
+ * v2.0 (RFC-0003): test assertions migrated from hand-rolled error-message
+ * regex (`/expected object/`, `/workspaces\[1\]/`) to ZodError-shaped
+ * path/message assertions via `expectIssuePath`. Behavior assertions
+ * (well-formed response shape, soft-default fallbacks, backward-compat
+ * tunnels) are preserved 1:1 — this migration changes the validation
+ * engine, not the contract.
+ */
 import { describe, expect, it } from "vitest";
-import { parseAuthMeResponse } from "./meResponse";
+import { ZodError, type z } from "zod";
+import { AuthMeResponseSchema, parseAuthMeResponse } from "./meResponse";
+
+/**
+ * Assert that calling `parseAuthMeResponse(value)` throws a ZodError whose
+ * FIRST issue's path starts with `expectedPathPrefix`. Use this in place of
+ * the v1.x `expect(() => fn()).toThrow(/regex/)` pattern for any test that
+ * was asserting on a specific path-tagged error message.
+ */
+function expectFirstIssuePathStartsWith(
+  value: unknown,
+  expectedPathPrefix: ReadonlyArray<string | number>,
+): void {
+  let error: unknown;
+  try {
+    parseAuthMeResponse(value);
+  } catch (e) {
+    error = e;
+  }
+  if (!(error instanceof ZodError)) {
+    throw new Error("expected ZodError, got: " + (error === undefined ? "no throw" : String(error)));
+  }
+  const path = error.issues[0]?.path ?? [];
+  for (let i = 0; i < expectedPathPrefix.length; i++) {
+    if (path[i] !== expectedPathPrefix[i]) {
+      throw new Error(
+        `expected error.issues[0].path[${i}] === ${JSON.stringify(expectedPathPrefix[i])}, got path=${JSON.stringify(path)}`,
+      );
+    }
+  }
+}
 
 function validUser() {
   return {
@@ -53,49 +91,50 @@ describe("parseAuthMeResponse", () => {
   });
 
   it("rejects when payload is not an object", () => {
-    expect(() => parseAuthMeResponse(null)).toThrow(/expected object/);
-    expect(() => parseAuthMeResponse("nope")).toThrow(/expected object/);
-    expect(() => parseAuthMeResponse([])).toThrow(/expected object/);
+    expect(() => parseAuthMeResponse(null)).toThrow(ZodError);
+    expect(() => parseAuthMeResponse("nope")).toThrow(ZodError);
+    expect(() => parseAuthMeResponse([])).toThrow(ZodError);
   });
 
   it("rejects when ok is not true", () => {
     const r = validResponse();
     (r as { ok: unknown }).ok = false;
-    expect(() => parseAuthMeResponse(r)).toThrow(/ok/);
+    expectFirstIssuePathStartsWith(r, ["ok"]);
   });
 
   it("rejects when user.id is missing", () => {
     const r = validResponse();
     (r.user as { id: unknown }).id = "";
-    expect(() => parseAuthMeResponse(r)).toThrow(/user/);
+    expectFirstIssuePathStartsWith(r, ["user", "id"]);
   });
 
   it("rejects when user.email is missing", () => {
     const r = validResponse();
     (r.user as { email: unknown }).email = "";
-    expect(() => parseAuthMeResponse(r)).toThrow(/user/);
+    expectFirstIssuePathStartsWith(r, ["user", "email"]);
   });
 
   it("rejects when workspaces is not an array", () => {
     const r = validResponse();
     (r as { workspaces: unknown }).workspaces = "not-an-array";
-    expect(() => parseAuthMeResponse(r)).toThrow(/workspaces/);
+    expectFirstIssuePathStartsWith(r, ["workspaces"]);
   });
 
-  it("includes the offending workspace index in the error message", () => {
+  it("includes the offending workspace index in the error path", () => {
     const r = validResponse();
     const bad = validWorkspace();
     (bad as { name: unknown }).name = "";
     (r as { workspaces: unknown[] }).workspaces = [validWorkspace(), bad];
-    expect(() => parseAuthMeResponse(r)).toThrow(/workspaces\[1\]/);
+    expectFirstIssuePathStartsWith(r, ["workspaces", 1, "name"]);
   });
 
   // Backward-compat tunnel for the staged `account → workspace` rename
-  // (commit `87876d0`). The parser accepts both keys on the wire and
-  // always normalises to `workspaces` / `activeWorkspaceId` in output.
-  // This is the same dual-key handling that made the Phase 4b stale-rename
-  // bug invisible at the parser level — pinning it down here so a future
-  // "remove legacy account fallback" PR sees an explicit test impact.
+  // (commit `87876d0`). The schema's top-level preprocess maps `accounts`
+  // to `workspaces` and `activeAccountId` to `activeWorkspaceId` before
+  // validation. This is the same dual-key handling that made the Phase
+  // 4b stale-rename bug invisible at the parser level — pinning it
+  // down here so a future "remove legacy account fallback" PR sees an
+  // explicit test impact.
   it("accepts the legacy `accounts` key (staged rename backward-compat)", () => {
     const r = validResponse() as { workspaces?: unknown; accounts?: unknown };
     r.accounts = r.workspaces;
@@ -159,5 +198,37 @@ describe("parseAuthMeResponse", () => {
     const r2 = validResponse();
     (r2.workspaces[0] as { brandKey: unknown }).brandKey = 42;
     expect(parseAuthMeResponse(r2).workspaces[0]!.brandKey).toBeUndefined();
+  });
+});
+
+// Schema export is intentional — call sites in `apps/web` and
+// `apps/native` may import `AuthMeResponseSchema` for inline validation
+// (e.g. in tanstack-query callbacks). Smoke check that the export is
+// the schema, not the parser function.
+describe("AuthMeResponseSchema (exported schema)", () => {
+  it("is a Zod schema with a parse method", () => {
+    expect(typeof AuthMeResponseSchema.parse).toBe("function");
+    expect(typeof AuthMeResponseSchema.safeParse).toBe("function");
+  });
+
+  it("safeParse returns success: true for valid input", () => {
+    const result = AuthMeResponseSchema.safeParse(validResponse());
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.user.id).toBe("user-1");
+    }
+  });
+
+  it("safeParse returns success: false with issues for invalid input", () => {
+    const result: z.SafeParseReturnType<unknown, unknown> = AuthMeResponseSchema.safeParse({
+      ok: true,
+      user: { id: "", email: "" },
+      workspaces: [],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.length).toBeGreaterThan(0);
+      expect(result.error.issues[0]!.path).toEqual(["user", "id"]);
+    }
   });
 });

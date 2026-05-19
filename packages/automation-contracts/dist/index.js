@@ -26,6 +26,92 @@ function classifyContractVersionSkew(runtime, expected = CONTRACT_VERSION) {
 }
 
 // src/mailbox.ts
+import { z } from "zod";
+var ModbusEntryKindSchema = z.enum([
+  "coil",
+  "discrete_input",
+  "input_register",
+  "holding_register"
+]);
+var ScalarTypeSchema = z.enum([
+  "bool",
+  "int16",
+  "uint16",
+  "int32",
+  "uint32",
+  "float"
+]);
+var MailboxEntrySchema = z.object({
+  /** PI_* name from the sister repo (e.g. `"PI_K1_CURRENT_TEMP_C_X10"`). */
+  name: z.string().regex(/^PI_/, "expected PI_* name"),
+  /** 0-based Modbus address. */
+  address: z.number().int().nonnegative(),
+  /** Modbus function-code family. */
+  kind: ModbusEntryKindSchema,
+  /** Scalar interpretation. */
+  scalar: ScalarTypeSchema,
+  /**
+   * Optional fixed-point scale: engineering value = raw * scale.
+   * Omitted for non-scalar / boolean entries.
+   */
+  scale: z.number().optional(),
+  /** Engineering unit (e.g. `"degC"`, `"bbl"`, `"%"`) — informational. */
+  unit: z.string().optional(),
+  /** Whether the platform is allowed to write this entry. */
+  writable: z.boolean(),
+  /** Human-readable description from the sister repo. */
+  description: z.string()
+}).readonly();
+var MailboxSpecSchema = z.object({
+  /**
+   * Platform-facing semver-shaped version string used by the version
+   * handshake (`classifyContractVersionSkew`). Phase A reuses the
+   * sister-repo integrated release tag because it is the only existing
+   * baseline that is semver-shaped.
+   */
+  contractVersion: z.string().min(1),
+  /**
+   * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
+   * not consumed by the version handshake. Captures the
+   * monotonically-bumped marker the sister repo uses internally when
+   * the address layout changes.
+   */
+  schemaMarker: z.string().optional(),
+  /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
+  plcVersion: z.string().optional(),
+  /**
+   * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
+   * to `contractVersion` (same value, distinct field for forward
+   * compatibility when the rails diverge).
+   */
+  integratedReleaseTag: z.string().optional(),
+  /** All `PI_*` entries the runtime exposes. */
+  entries: z.array(MailboxEntrySchema)
+}).superRefine((spec, ctx) => {
+  const seenNames = /* @__PURE__ */ new Set();
+  const seenAddresses = /* @__PURE__ */ new Map();
+  for (let i = 0; i < spec.entries.length; i++) {
+    const e = spec.entries[i];
+    if (seenNames.has(e.name)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["entries", i, "name"],
+        message: `duplicate PI_* name: ${e.name}`
+      });
+    }
+    seenNames.add(e.name);
+    const addrKey = `${e.kind}:${e.address}`;
+    const prior = seenAddresses.get(addrKey);
+    if (prior !== void 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["entries", i, "address"],
+        message: `duplicate ${e.kind} address ${e.address}: ${prior} vs ${e.name}`
+      });
+    }
+    seenAddresses.set(addrKey, e.name);
+  }
+});
 var FIRMWARE_VERSION_REGISTER_NAME = "PI_FIRMWARE_VERSION";
 function findMailboxEntry(spec, name) {
   return spec.entries.find((entry) => entry.name === name);
@@ -2890,129 +2976,66 @@ var mailbox_default = {
 };
 
 // src/mailbox-data.ts
-var VALID_KINDS = /* @__PURE__ */ new Set([
-  "coil",
-  "discrete_input",
-  "input_register",
-  "holding_register"
-]);
-var VALID_SCALARS = /* @__PURE__ */ new Set([
-  "bool",
-  "int16",
-  "uint16",
-  "int32",
-  "uint32",
-  "float"
-]);
-var MailboxMirrorError = class extends Error {
-  name = "MailboxMirrorError";
-};
-function isPlainObject(x) {
-  return typeof x === "object" && x !== null && !Array.isArray(x);
-}
-function assertEntry(raw, idx) {
-  if (!isPlainObject(raw)) {
-    throw new MailboxMirrorError(
-      `entries[${idx}]: expected object, got ${typeof raw}`
-    );
-  }
-  const name = raw["name"];
-  if (typeof name !== "string" || !name.startsWith("PI_")) {
-    throw new MailboxMirrorError(
-      `entries[${idx}].name: expected string starting with "PI_", got ${JSON.stringify(name)}`
-    );
-  }
-  const address = raw["address"];
-  if (typeof address !== "number" || !Number.isInteger(address) || address < 0) {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).address: expected non-negative integer, got ${JSON.stringify(address)}`
-    );
-  }
-  const kind = raw["kind"];
-  if (typeof kind !== "string" || !VALID_KINDS.has(kind)) {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).kind: expected one of ${[...VALID_KINDS].join("|")}, got ${JSON.stringify(kind)}`
-    );
-  }
-  const scalar = raw["scalar"];
-  if (typeof scalar !== "string" || !VALID_SCALARS.has(scalar)) {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).scalar: expected one of ${[...VALID_SCALARS].join("|")}, got ${JSON.stringify(scalar)}`
-    );
-  }
-  const writable = raw["writable"];
-  if (typeof writable !== "boolean") {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).writable: expected boolean, got ${typeof writable}`
-    );
-  }
-  const description = raw["description"];
-  if (typeof description !== "string") {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).description: expected string, got ${typeof description}`
-    );
-  }
-  const entry = {
-    name,
-    address,
-    kind,
-    scalar,
-    writable,
-    description,
-    ...typeof raw["scale"] === "number" ? { scale: raw["scale"] } : {},
-    ...typeof raw["unit"] === "string" ? { unit: raw["unit"] } : {}
-  };
-  return entry;
-}
-function assertSpec(raw) {
-  if (!isPlainObject(raw)) {
-    throw new MailboxMirrorError(
-      `top-level: expected object, got ${typeof raw}`
-    );
-  }
-  const contractVersion = raw["contractVersion"];
-  if (typeof contractVersion !== "string" || contractVersion.length === 0) {
-    throw new MailboxMirrorError(
-      `contractVersion: expected non-empty string, got ${JSON.stringify(contractVersion)}`
-    );
-  }
-  const entriesRaw = raw["entries"];
-  if (!Array.isArray(entriesRaw)) {
-    throw new MailboxMirrorError(
-      `entries: expected array, got ${typeof entriesRaw}`
-    );
-  }
-  const entries = entriesRaw.map((e, i) => assertEntry(e, i));
-  const seenNames = /* @__PURE__ */ new Set();
-  const seenAddresses = /* @__PURE__ */ new Map();
-  for (const e of entries) {
-    if (seenNames.has(e.name)) {
-      throw new MailboxMirrorError(`duplicate PI_* name: ${e.name}`);
-    }
-    seenNames.add(e.name);
-    const addrKey = `${e.kind}:${e.address}`;
-    const prior = seenAddresses.get(addrKey);
-    if (prior !== void 0) {
-      throw new MailboxMirrorError(
-        `duplicate ${e.kind} address ${e.address}: ${prior} vs ${e.name}`
-      );
-    }
-    seenAddresses.set(addrKey, e.name);
-  }
-  const spec = {
-    contractVersion,
-    entries,
-    ...typeof raw["schemaMarker"] === "string" ? { schemaMarker: raw["schemaMarker"] } : {},
-    ...typeof raw["plcVersion"] === "string" ? { plcVersion: raw["plcVersion"] } : {},
-    ...typeof raw["integratedReleaseTag"] === "string" ? { integratedReleaseTag: raw["integratedReleaseTag"] } : {}
-  };
-  return spec;
-}
-var MAILBOX_SPEC = Object.freeze(assertSpec(mailbox_default));
+var MAILBOX_SPEC = Object.freeze(
+  MailboxSpecSchema.parse(mailbox_default)
+);
+
+// src/adapter.ts
+import { z as z2 } from "zod";
+var AdapterCapabilitiesSchema = z2.object({
+  readSnapshot: z2.boolean(),
+  applyCommand: z2.boolean(),
+  subscribeAlarms: z2.boolean()
+}).readonly();
+var VesselSnapshotSchema = z2.object({
+  vesselCode: z2.string().min(1, "vesselCode required"),
+  mode: z2.string().optional(),
+  currentTempC: z2.number().finite().optional(),
+  targetTempC: z2.number().finite().optional(),
+  alarmActive: z2.boolean(),
+  /** ISO 8601 timestamp the adapter assigned when the read completed. */
+  capturedAt: z2.string().min(1, "capturedAt required").refine(
+    (s) => !Number.isNaN(Date.parse(s)),
+    "capturedAt must be ISO 8601"
+  ),
+  /**
+   * Optional raw mailbox values keyed by `PI_*` name — informational, for
+   * debugging and AI tools. Not the source of truth for `Vessel` rows.
+   */
+  raw: z2.record(z2.string(), z2.union([z2.number(), z2.boolean()])).optional()
+}).readonly();
+var VesselStateSchema = z2.object({
+  id: z2.string().min(1, "id required"),
+  workspaceId: z2.string().min(1, "workspaceId required"),
+  code: z2.string().min(1, "code required"),
+  displayName: z2.string().min(1, "displayName required"),
+  vesselKind: z2.string().min(1, "vesselKind required"),
+  equipmentProfileId: z2.string().nullable(),
+  adapterConnectionId: z2.string().nullable(),
+  mode: z2.string().nullable(),
+  currentTempC: z2.number().finite().nullable(),
+  targetTempC: z2.number().finite().nullable(),
+  alarmActive: z2.boolean(),
+  /** ISO 8601 timestamp; null until the first adapter snapshot lands. */
+  lastSeenAt: z2.string().nullable()
+});
+var VesselListResponseSchema = z2.object({
+  ok: z2.literal(true),
+  vessels: z2.array(VesselStateSchema)
+});
+var VesselStateResponseSchema = z2.object({
+  ok: z2.literal(true),
+  vessel: VesselStateSchema
+});
 export {
+  AdapterCapabilitiesSchema,
   CONTRACT_VERSION,
   FIRMWARE_VERSION_REGISTER_NAME,
   MAILBOX_SPEC,
+  VesselListResponseSchema,
+  VesselSnapshotSchema,
+  VesselStateResponseSchema,
+  VesselStateSchema,
   classifyContractVersionSkew,
   findMailboxEntry,
   parseSemVer

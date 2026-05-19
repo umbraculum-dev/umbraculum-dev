@@ -26,3 +26,5 @@ export {
 
 export { registerModule } from "./registerModule.js";
 export { clearWebModuleRegistryForTests, registerWebModule, type RegisterWebModuleOptions } from "./registerWebModule.js";
+
+export { fromParser, type ValidatedSchema } from "./validatedSchema.js";

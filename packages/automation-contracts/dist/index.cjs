@@ -20,9 +20,14 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  AdapterCapabilitiesSchema: () => AdapterCapabilitiesSchema,
   CONTRACT_VERSION: () => CONTRACT_VERSION,
   FIRMWARE_VERSION_REGISTER_NAME: () => FIRMWARE_VERSION_REGISTER_NAME,
   MAILBOX_SPEC: () => MAILBOX_SPEC,
+  VesselListResponseSchema: () => VesselListResponseSchema,
+  VesselSnapshotSchema: () => VesselSnapshotSchema,
+  VesselStateResponseSchema: () => VesselStateResponseSchema,
+  VesselStateSchema: () => VesselStateSchema,
   classifyContractVersionSkew: () => classifyContractVersionSkew,
   findMailboxEntry: () => findMailboxEntry,
   parseSemVer: () => parseSemVer
@@ -57,6 +62,92 @@ function classifyContractVersionSkew(runtime, expected = CONTRACT_VERSION) {
 }
 
 // src/mailbox.ts
+var import_zod = require("zod");
+var ModbusEntryKindSchema = import_zod.z.enum([
+  "coil",
+  "discrete_input",
+  "input_register",
+  "holding_register"
+]);
+var ScalarTypeSchema = import_zod.z.enum([
+  "bool",
+  "int16",
+  "uint16",
+  "int32",
+  "uint32",
+  "float"
+]);
+var MailboxEntrySchema = import_zod.z.object({
+  /** PI_* name from the sister repo (e.g. `"PI_K1_CURRENT_TEMP_C_X10"`). */
+  name: import_zod.z.string().regex(/^PI_/, "expected PI_* name"),
+  /** 0-based Modbus address. */
+  address: import_zod.z.number().int().nonnegative(),
+  /** Modbus function-code family. */
+  kind: ModbusEntryKindSchema,
+  /** Scalar interpretation. */
+  scalar: ScalarTypeSchema,
+  /**
+   * Optional fixed-point scale: engineering value = raw * scale.
+   * Omitted for non-scalar / boolean entries.
+   */
+  scale: import_zod.z.number().optional(),
+  /** Engineering unit (e.g. `"degC"`, `"bbl"`, `"%"`) — informational. */
+  unit: import_zod.z.string().optional(),
+  /** Whether the platform is allowed to write this entry. */
+  writable: import_zod.z.boolean(),
+  /** Human-readable description from the sister repo. */
+  description: import_zod.z.string()
+}).readonly();
+var MailboxSpecSchema = import_zod.z.object({
+  /**
+   * Platform-facing semver-shaped version string used by the version
+   * handshake (`classifyContractVersionSkew`). Phase A reuses the
+   * sister-repo integrated release tag because it is the only existing
+   * baseline that is semver-shaped.
+   */
+  contractVersion: import_zod.z.string().min(1),
+  /**
+   * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
+   * not consumed by the version handshake. Captures the
+   * monotonically-bumped marker the sister repo uses internally when
+   * the address layout changes.
+   */
+  schemaMarker: import_zod.z.string().optional(),
+  /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
+  plcVersion: import_zod.z.string().optional(),
+  /**
+   * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
+   * to `contractVersion` (same value, distinct field for forward
+   * compatibility when the rails diverge).
+   */
+  integratedReleaseTag: import_zod.z.string().optional(),
+  /** All `PI_*` entries the runtime exposes. */
+  entries: import_zod.z.array(MailboxEntrySchema)
+}).superRefine((spec, ctx) => {
+  const seenNames = /* @__PURE__ */ new Set();
+  const seenAddresses = /* @__PURE__ */ new Map();
+  for (let i = 0; i < spec.entries.length; i++) {
+    const e = spec.entries[i];
+    if (seenNames.has(e.name)) {
+      ctx.addIssue({
+        code: import_zod.z.ZodIssueCode.custom,
+        path: ["entries", i, "name"],
+        message: `duplicate PI_* name: ${e.name}`
+      });
+    }
+    seenNames.add(e.name);
+    const addrKey = `${e.kind}:${e.address}`;
+    const prior = seenAddresses.get(addrKey);
+    if (prior !== void 0) {
+      ctx.addIssue({
+        code: import_zod.z.ZodIssueCode.custom,
+        path: ["entries", i, "address"],
+        message: `duplicate ${e.kind} address ${e.address}: ${prior} vs ${e.name}`
+      });
+    }
+    seenAddresses.set(addrKey, e.name);
+  }
+});
 var FIRMWARE_VERSION_REGISTER_NAME = "PI_FIRMWARE_VERSION";
 function findMailboxEntry(spec, name) {
   return spec.entries.find((entry) => entry.name === name);
@@ -2921,130 +3012,67 @@ var mailbox_default = {
 };
 
 // src/mailbox-data.ts
-var VALID_KINDS = /* @__PURE__ */ new Set([
-  "coil",
-  "discrete_input",
-  "input_register",
-  "holding_register"
-]);
-var VALID_SCALARS = /* @__PURE__ */ new Set([
-  "bool",
-  "int16",
-  "uint16",
-  "int32",
-  "uint32",
-  "float"
-]);
-var MailboxMirrorError = class extends Error {
-  name = "MailboxMirrorError";
-};
-function isPlainObject(x) {
-  return typeof x === "object" && x !== null && !Array.isArray(x);
-}
-function assertEntry(raw, idx) {
-  if (!isPlainObject(raw)) {
-    throw new MailboxMirrorError(
-      `entries[${idx}]: expected object, got ${typeof raw}`
-    );
-  }
-  const name = raw["name"];
-  if (typeof name !== "string" || !name.startsWith("PI_")) {
-    throw new MailboxMirrorError(
-      `entries[${idx}].name: expected string starting with "PI_", got ${JSON.stringify(name)}`
-    );
-  }
-  const address = raw["address"];
-  if (typeof address !== "number" || !Number.isInteger(address) || address < 0) {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).address: expected non-negative integer, got ${JSON.stringify(address)}`
-    );
-  }
-  const kind = raw["kind"];
-  if (typeof kind !== "string" || !VALID_KINDS.has(kind)) {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).kind: expected one of ${[...VALID_KINDS].join("|")}, got ${JSON.stringify(kind)}`
-    );
-  }
-  const scalar = raw["scalar"];
-  if (typeof scalar !== "string" || !VALID_SCALARS.has(scalar)) {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).scalar: expected one of ${[...VALID_SCALARS].join("|")}, got ${JSON.stringify(scalar)}`
-    );
-  }
-  const writable = raw["writable"];
-  if (typeof writable !== "boolean") {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).writable: expected boolean, got ${typeof writable}`
-    );
-  }
-  const description = raw["description"];
-  if (typeof description !== "string") {
-    throw new MailboxMirrorError(
-      `entries[${idx}] (${name}).description: expected string, got ${typeof description}`
-    );
-  }
-  const entry = {
-    name,
-    address,
-    kind,
-    scalar,
-    writable,
-    description,
-    ...typeof raw["scale"] === "number" ? { scale: raw["scale"] } : {},
-    ...typeof raw["unit"] === "string" ? { unit: raw["unit"] } : {}
-  };
-  return entry;
-}
-function assertSpec(raw) {
-  if (!isPlainObject(raw)) {
-    throw new MailboxMirrorError(
-      `top-level: expected object, got ${typeof raw}`
-    );
-  }
-  const contractVersion = raw["contractVersion"];
-  if (typeof contractVersion !== "string" || contractVersion.length === 0) {
-    throw new MailboxMirrorError(
-      `contractVersion: expected non-empty string, got ${JSON.stringify(contractVersion)}`
-    );
-  }
-  const entriesRaw = raw["entries"];
-  if (!Array.isArray(entriesRaw)) {
-    throw new MailboxMirrorError(
-      `entries: expected array, got ${typeof entriesRaw}`
-    );
-  }
-  const entries = entriesRaw.map((e, i) => assertEntry(e, i));
-  const seenNames = /* @__PURE__ */ new Set();
-  const seenAddresses = /* @__PURE__ */ new Map();
-  for (const e of entries) {
-    if (seenNames.has(e.name)) {
-      throw new MailboxMirrorError(`duplicate PI_* name: ${e.name}`);
-    }
-    seenNames.add(e.name);
-    const addrKey = `${e.kind}:${e.address}`;
-    const prior = seenAddresses.get(addrKey);
-    if (prior !== void 0) {
-      throw new MailboxMirrorError(
-        `duplicate ${e.kind} address ${e.address}: ${prior} vs ${e.name}`
-      );
-    }
-    seenAddresses.set(addrKey, e.name);
-  }
-  const spec = {
-    contractVersion,
-    entries,
-    ...typeof raw["schemaMarker"] === "string" ? { schemaMarker: raw["schemaMarker"] } : {},
-    ...typeof raw["plcVersion"] === "string" ? { plcVersion: raw["plcVersion"] } : {},
-    ...typeof raw["integratedReleaseTag"] === "string" ? { integratedReleaseTag: raw["integratedReleaseTag"] } : {}
-  };
-  return spec;
-}
-var MAILBOX_SPEC = Object.freeze(assertSpec(mailbox_default));
+var MAILBOX_SPEC = Object.freeze(
+  MailboxSpecSchema.parse(mailbox_default)
+);
+
+// src/adapter.ts
+var import_zod2 = require("zod");
+var AdapterCapabilitiesSchema = import_zod2.z.object({
+  readSnapshot: import_zod2.z.boolean(),
+  applyCommand: import_zod2.z.boolean(),
+  subscribeAlarms: import_zod2.z.boolean()
+}).readonly();
+var VesselSnapshotSchema = import_zod2.z.object({
+  vesselCode: import_zod2.z.string().min(1, "vesselCode required"),
+  mode: import_zod2.z.string().optional(),
+  currentTempC: import_zod2.z.number().finite().optional(),
+  targetTempC: import_zod2.z.number().finite().optional(),
+  alarmActive: import_zod2.z.boolean(),
+  /** ISO 8601 timestamp the adapter assigned when the read completed. */
+  capturedAt: import_zod2.z.string().min(1, "capturedAt required").refine(
+    (s) => !Number.isNaN(Date.parse(s)),
+    "capturedAt must be ISO 8601"
+  ),
+  /**
+   * Optional raw mailbox values keyed by `PI_*` name — informational, for
+   * debugging and AI tools. Not the source of truth for `Vessel` rows.
+   */
+  raw: import_zod2.z.record(import_zod2.z.string(), import_zod2.z.union([import_zod2.z.number(), import_zod2.z.boolean()])).optional()
+}).readonly();
+var VesselStateSchema = import_zod2.z.object({
+  id: import_zod2.z.string().min(1, "id required"),
+  workspaceId: import_zod2.z.string().min(1, "workspaceId required"),
+  code: import_zod2.z.string().min(1, "code required"),
+  displayName: import_zod2.z.string().min(1, "displayName required"),
+  vesselKind: import_zod2.z.string().min(1, "vesselKind required"),
+  equipmentProfileId: import_zod2.z.string().nullable(),
+  adapterConnectionId: import_zod2.z.string().nullable(),
+  mode: import_zod2.z.string().nullable(),
+  currentTempC: import_zod2.z.number().finite().nullable(),
+  targetTempC: import_zod2.z.number().finite().nullable(),
+  alarmActive: import_zod2.z.boolean(),
+  /** ISO 8601 timestamp; null until the first adapter snapshot lands. */
+  lastSeenAt: import_zod2.z.string().nullable()
+});
+var VesselListResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  vessels: import_zod2.z.array(VesselStateSchema)
+});
+var VesselStateResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  vessel: VesselStateSchema
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  AdapterCapabilitiesSchema,
   CONTRACT_VERSION,
   FIRMWARE_VERSION_REGISTER_NAME,
   MAILBOX_SPEC,
+  VesselListResponseSchema,
+  VesselSnapshotSchema,
+  VesselStateResponseSchema,
+  VesselStateSchema,
   classifyContractVersionSkew,
   findMailboxEntry,
   parseSemVer
