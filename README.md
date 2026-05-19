@@ -179,7 +179,7 @@ translations, and security reports.
 |-----------------------------------|---------------|
 | Brewery vertical — web            | Shipping (WIP)|
 | Brewery vertical — native (Expo)  | Shipping (WIP)|
-| AI consultant — orchestrator + tools + memory + admin dashboard | Shipping (Sprint #2 complete) |
+| AI consultant — ask Umbraculum about recipes, brew sessions, equipment, inventory, and tank state; answers grounded in your workspace data; BYOK + paid-tier unlock (see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)) | Shipping (Sprint #2 complete) |
 | Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
 | Brand name                        | **Umbraculum** (resolved 2026-05-18; namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`); see [`docs/RENAME-DILIGENCE.md`](docs/RENAME-DILIGENCE.md) |
 | Public release                    | Not flipped (working assumption: H1 2027 — see `docs/PLATFORM-ARCHITECTURE.md` §10.1) |
