@@ -9,16 +9,41 @@ Phase A surface of the canonical `automation` module: typed Modbus mailbox spec,
 
 MIT-licensed contract types for the canonical `automation` module ([`docs/design/canonical-automation-module-surface.md`](../../docs/design/canonical-automation-module-surface.md), Accepted 2026-05-19).
 
-Three exported surfaces:
+Four exported surfaces:
 
-- **`CONTRACT_VERSION` + `classifyContractVersionSkew`** — version-handshake primitives. Mismatch policy per design §12.2: `major` → adapter refuses, `minor` → warn on `adapterHealth`, `patch` → silent.
-- **`MailboxSpec` / `MailboxEntry` types** — type-only mirror of the OpenPLC sister-repo `PI_*` mailbox. The actual `PI_*` address map is owned by the sister repo and emitted as a checked-in artifact (M2 mechanism, design §12.2). This package does **not** ship the literal address map yet — Phase A is types only.
+- **`CONTRACT_VERSION` + `classifyContractVersionSkew`** — version-handshake primitives. Mismatch policy per design §12.2: `major` → adapter refuses, `minor` → warn on `adapterHealth`, `patch` → silent. Bumped from `0.0.0-dev` to `2.0.1-dev` in Phase A step 5 (tracks the sister-repo integrated release tag).
+- **`MailboxSpec` / `MailboxEntry` types** — typed mirror of the OpenPLC sister-repo `PI_*` mailbox. The actual `PI_*` address map is owned by the sister repo and emitted as a checked-in artifact (M2 mechanism, design §12.2).
+- **`MAILBOX_SPEC` constant** — the validated, frozen mirror of the sister-repo artifact. 356 entries as of `2.0.1-dev`. Loaded from `data/mailbox.json` and asserted at module-load time (loud failure on drift). Adapters consume this constant rather than reading the JSON directly.
 - **`AutomationAdapterDefinition`** — the adapter SDK contract that `brewery.openplc.v1` (and future adapters) implements. Phase A declares the type; Phase C lands the first reference adapter.
 
 ## Scope
 
-- **Contains**: TypeScript types, the `CONTRACT_VERSION` constant, helper functions for version classification and mailbox lookup.
-- **Does not contain**: any runtime Modbus client, any literal `PI_*` address map, Prisma models, route handlers, or AI tool implementations.
+- **Contains**: TypeScript types, the `CONTRACT_VERSION` constant, the validated `MAILBOX_SPEC` constant, and helper functions for version classification and mailbox lookup.
+- **Does not contain**: any runtime Modbus client, Prisma models, route handlers, or AI tool implementations.
+
+## Mailbox mirror — sync procedure
+
+The address map at `data/mailbox.json` is **byte-for-byte identical** to `out/mailbox.json` emitted by the sister repo `brewery-alarms-tanks-supervisor` (`tools/build_mailbox_artifact.py`). The sister repo is the single source of truth for `PI_*` names, addresses, and semantics; this package **mirrors** that artifact via PR (M2 mechanism, design §12.2).
+
+To refresh the mirror:
+
+```bash
+# In the sister repo: regenerate the artifact (after editing LOCATED_VAR_BLOCK)
+cd ../arduino-and-plc/openplc/brewery/tanks-pump-priority-and-low-high-levels-sensors-alarms
+make mailbox-artifact
+make test-tools
+
+# Back in umbraculum-dev: copy the artifact in
+bash scripts/sync-automation-mailbox-mirror.sh
+
+# Drift check (CI-friendly)
+bash scripts/sync-automation-mailbox-mirror.sh --check
+
+# Override the sister-repo path if it lives elsewhere
+SISTER_REPO=/path/to/sister-repo bash scripts/sync-automation-mailbox-mirror.sh
+```
+
+Never hand-edit `data/mailbox.json`. Bump `CONTRACT_VERSION` in `src/version.ts` whenever the sister-repo `INTEGRATED_RELEASE_TAG` moves — both move together per the integrated-release-versioning baseline rule.
 
 ## Phase coupling
 

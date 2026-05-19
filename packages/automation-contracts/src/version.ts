@@ -1,18 +1,26 @@
 /**
  * Wire-level contract version of `@brewery/automation-contracts`.
  *
- * Tracks the OpenPLC sister-repo `contract_version` from the integrated
- * release baseline (sister-repo `pyproject.toml` is canonical per the
- * integrated-release-versioning rule).
+ * Tracks the OpenPLC sister-repo integrated release tag (semver-shaped),
+ * which is the only existing baseline that fits semver. The sister-repo
+ * internal `CONTRACT_VERSION = "v2"` marker is preserved on every
+ * mirrored mailbox spec as `MailboxSpec.schemaMarker` but is not used
+ * by the version handshake (`classifyContractVersionSkew`).
  *
- * Phase A pre-release: `0.0.0-dev`. The first non-dev tag is agreed with
- * the sister-repo maintainer when the mailbox artifact emitter lands and
- * a `PI_FIRMWARE_VERSION` register exists.
+ * Bumped from `"0.0.0-dev"` to `"2.0.1-dev"` in Phase A step 5 when the
+ * first sister-repo mailbox artifact mirrored at
+ * `packages/automation-contracts/data/mailbox.json` (sister-repo
+ * `brewery-alarms-tanks-supervisor` `upgrade/v2` commit `114502d`).
+ *
+ * Subsequent bumps follow the integrated release tag in the sister
+ * repo's `tools/prepare_openplc_runtime_upload.py` and the sidecar's
+ * `pi-sidecar/pyproject.toml` — both move together per the
+ * integrated-release-versioning baseline rule.
  *
  * See: `docs/design/canonical-automation-module-surface.md` §12.2 (B1 SoT
- * + version handshake) and §9 Phase A.
+ * + version handshake), §12.5 step 5, and §9 Phase A.
  */
-export const CONTRACT_VERSION = "0.0.0-dev" as const;
+export const CONTRACT_VERSION = "2.0.1-dev" as const;
 
 export interface SemVer {
   readonly major: number;

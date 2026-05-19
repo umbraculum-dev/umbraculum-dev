@@ -1,18 +1,26 @@
 /**
  * Wire-level contract version of `@brewery/automation-contracts`.
  *
- * Tracks the OpenPLC sister-repo `contract_version` from the integrated
- * release baseline (sister-repo `pyproject.toml` is canonical per the
- * integrated-release-versioning rule).
+ * Tracks the OpenPLC sister-repo integrated release tag (semver-shaped),
+ * which is the only existing baseline that fits semver. The sister-repo
+ * internal `CONTRACT_VERSION = "v2"` marker is preserved on every
+ * mirrored mailbox spec as `MailboxSpec.schemaMarker` but is not used
+ * by the version handshake (`classifyContractVersionSkew`).
  *
- * Phase A pre-release: `0.0.0-dev`. The first non-dev tag is agreed with
- * the sister-repo maintainer when the mailbox artifact emitter lands and
- * a `PI_FIRMWARE_VERSION` register exists.
+ * Bumped from `"0.0.0-dev"` to `"2.0.1-dev"` in Phase A step 5 when the
+ * first sister-repo mailbox artifact mirrored at
+ * `packages/automation-contracts/data/mailbox.json` (sister-repo
+ * `brewery-alarms-tanks-supervisor` `upgrade/v2` commit `114502d`).
+ *
+ * Subsequent bumps follow the integrated release tag in the sister
+ * repo's `tools/prepare_openplc_runtime_upload.py` and the sidecar's
+ * `pi-sidecar/pyproject.toml` — both move together per the
+ * integrated-release-versioning baseline rule.
  *
  * See: `docs/design/canonical-automation-module-surface.md` §12.2 (B1 SoT
- * + version handshake) and §9 Phase A.
+ * + version handshake), §12.5 step 5, and §9 Phase A.
  */
-declare const CONTRACT_VERSION: "0.0.0-dev";
+declare const CONTRACT_VERSION: "2.0.1-dev";
 interface SemVer {
     readonly major: number;
     readonly minor: number;
@@ -75,9 +83,27 @@ interface MailboxEntry {
     readonly description: string;
 }
 interface MailboxSpec {
-    /** Tracks sister-repo `contract_version`. */
+    /**
+     * Platform-facing semver-shaped version string used by the version
+     * handshake (`classifyContractVersionSkew`). Phase A reuses the
+     * sister-repo integrated release tag because it is the only existing
+     * baseline that is semver-shaped.
+     */
     readonly contractVersion: string;
-    /** Tracks sister-repo `integrated_release_tag`, if available. */
+    /**
+     * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
+     * not consumed by the version handshake. Captures the
+     * monotonically-bumped marker the sister repo uses internally when
+     * the address layout changes.
+     */
+    readonly schemaMarker?: string;
+    /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
+    readonly plcVersion?: string;
+    /**
+     * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
+     * to `contractVersion` (same value, distinct field for forward
+     * compatibility when the rails diverge).
+     */
     readonly integratedReleaseTag?: string;
     /** All `PI_*` entries the runtime exposes. */
     readonly entries: readonly MailboxEntry[];
@@ -98,6 +124,36 @@ declare const FIRMWARE_VERSION_REGISTER_NAME: "PI_FIRMWARE_VERSION";
  * (<200 entries) and adapters call this at boot, not in the read loop.
  */
 declare function findMailboxEntry(spec: MailboxSpec, name: string): MailboxEntry | undefined;
+
+/**
+ * Typed mirror of the sister-repo mailbox artifact.
+ *
+ * The JSON file at `data/mailbox.json` is a byte-for-byte mirror of
+ * `out/mailbox.json` emitted by the sister repo
+ * `brewery-alarms-tanks-supervisor` (`tools/build_mailbox_artifact.py`).
+ *
+ * This module:
+ *   1. Imports the JSON via TypeScript's `resolveJsonModule`.
+ *   2. Runs a structural validator at module-load time (loud failure on
+ *      drift — better than a confusing runtime exception deep in an
+ *      adapter).
+ *   3. Re-exports it as `MAILBOX_SPEC`, typed as `MailboxSpec`.
+ *
+ * Refresh procedure: `bash scripts/sync-automation-mailbox-mirror.sh`
+ * (copies the sister-repo `out/mailbox.json` into `data/mailbox.json`).
+ *
+ * See: `docs/design/canonical-automation-module-surface.md` §12.2 (M2
+ * mirror mechanism), §12.5 step 5.
+ */
+
+/**
+ * Validated, frozen mirror of the sister-repo mailbox artifact.
+ *
+ * Adapters and tests should consume this constant rather than reading
+ * `data/mailbox.json` directly. Drift is caught at module-load time
+ * with a `MailboxMirrorError`.
+ */
+declare const MAILBOX_SPEC: MailboxSpec;
 
 /**
  * Capabilities a concrete adapter advertises to the canonical automation
@@ -173,4 +229,4 @@ interface AutomationAdapterDefinition {
     readSnapshot(context: AdapterReadContext): Promise<readonly VesselSnapshot[]>;
 }
 
-export { type AdapterCapabilities, type AdapterReadContext, type AutomationAdapterDefinition, CONTRACT_VERSION, FIRMWARE_VERSION_REGISTER_NAME, type MailboxEntry, type MailboxSpec, type ModbusEntryKind, type ScalarType, type SemVer, type VersionMismatchSeverity, type VesselSnapshot, classifyContractVersionSkew, findMailboxEntry, parseSemVer };
+export { type AdapterCapabilities, type AdapterReadContext, type AutomationAdapterDefinition, CONTRACT_VERSION, FIRMWARE_VERSION_REGISTER_NAME, MAILBOX_SPEC, type MailboxEntry, type MailboxSpec, type ModbusEntryKind, type ScalarType, type SemVer, type VersionMismatchSeverity, type VesselSnapshot, classifyContractVersionSkew, findMailboxEntry, parseSemVer };

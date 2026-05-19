@@ -13,6 +13,8 @@ export type {
   ScalarType,
 } from "./mailbox.js";
 
+export { MAILBOX_SPEC } from "./mailbox-data.js";
+
 export type {
   AdapterCapabilities,
   AdapterReadContext,

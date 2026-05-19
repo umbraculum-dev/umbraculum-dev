@@ -41,9 +41,27 @@ export interface MailboxEntry {
 }
 
 export interface MailboxSpec {
-  /** Tracks sister-repo `contract_version`. */
+  /**
+   * Platform-facing semver-shaped version string used by the version
+   * handshake (`classifyContractVersionSkew`). Phase A reuses the
+   * sister-repo integrated release tag because it is the only existing
+   * baseline that is semver-shaped.
+   */
   readonly contractVersion: string;
-  /** Tracks sister-repo `integrated_release_tag`, if available. */
+  /**
+   * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
+   * not consumed by the version handshake. Captures the
+   * monotonically-bumped marker the sister repo uses internally when
+   * the address layout changes.
+   */
+  readonly schemaMarker?: string;
+  /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
+  readonly plcVersion?: string;
+  /**
+   * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
+   * to `contractVersion` (same value, distinct field for forward
+   * compatibility when the rails diverge).
+   */
   readonly integratedReleaseTag?: string;
   /** All `PI_*` entries the runtime exposes. */
   readonly entries: readonly MailboxEntry[];
