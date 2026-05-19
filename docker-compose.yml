@@ -85,6 +85,10 @@ services:
       - ./packages/navigation:/packages/navigation:ro
       - ./packages/recipes-ui:/packages/recipes-ui:ro
       - ./packages/ui:/packages/ui:ro
+      # Phase B-3 prep: web pages under (automation)/ will consume the
+      # mailbox-mirror types (MailboxSpec, MAILBOX_SPEC) via this package.
+      # Mounted now so Phase B-3 PRs only have to add imports, not compose.
+      - ./packages/automation-contracts:/packages/automation-contracts:ro
 
   api:
     build: ./services/api
@@ -108,6 +112,14 @@ services:
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
       - ./packages/media:/packages/media:ro
+      # Phase B-1: api consumes @brewery/module-sdk via registerModule()
+      # and @brewery/automation-contracts for the typed mailbox mirror.
+      # Both packages already follow the file:../../packages/<name> npm
+      # workspace convention; the symlink at node_modules/@brewery/<name>
+      # resolves to /packages/<name>, which requires these bind mounts.
+      # Pattern mirrors @brewery/contracts/core/media above.
+      - ./packages/module-sdk:/packages/module-sdk:ro
+      - ./packages/automation-contracts:/packages/automation-contracts:ro
 
   redis:
     image: redis:7

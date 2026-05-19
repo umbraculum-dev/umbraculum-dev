@@ -305,11 +305,25 @@ Concrete steps Phase A includes, in order. Tracked under sub-plan #7 (umbrella p
 | 3 | Mailbox-emitter PR shape draft (handoff to sister-repo maintainer) | `umbraculum-dev` (`docs/design/openplc-mailbox-emitter-pr-shape.md`) | **Done** |
 | 4 | Sister-repo PR — emit `PI_*` mailbox artifact (`mailbox.json` and/or `.ts`); align `contract_version` slot for adapter consumers; add `PI_FIRMWARE_VERSION` register if missing | OpenPLC sister repo | **Done** — sister-repo `upgrade/v2` commit `114502d` (`tools/build_mailbox_artifact.py`, `tools/test_build_mailbox_artifact.py`, `out/mailbox.json` 356 entries, `PI_FIRMWARE_VERSION AT %QW222`, `make mailbox-artifact` / `make test-tools` 17/17 passing) |
 | 5 | Sync first emitted mailbox artifact into `packages/automation-contracts/` (M2 mirror); bump `CONTRACT_VERSION` to first non-`-dev` value agreed with sister-repo maintainer | `umbraculum-dev` | **Done** — `master` commit `9253b1b` (`packages/automation-contracts/data/mailbox.json` byte-for-byte mirror, `src/mailbox-data.ts` validator + frozen `MAILBOX_SPEC`, `CONTRACT_VERSION = "2.0.1-dev"` tracking sister-repo `INTEGRATED_RELEASE_TAG`, `scripts/sync-automation-mailbox-mirror.sh` with `--check` drift mode, vitest 28/28 passing in container, `dist/*` regenerated). Phase A 5/5 done. Note: `2.0.1-dev` retains the `-dev` suffix because the sister-repo integrated release itself is still pre-release; the first non-`-dev` bump is gated by sister-repo cutting `2.0.1` (or later) on its bench-acceptance milestone, then both repos move together. |
-| 6 | Phase B unblock signal — Phase B (read path: Prisma `automation` schema, `vesselState`, `listVessels`, read-only `(automation)/`) is now the active focus per §9 | both | Active — next |
+| 6 | Phase B unblock signal — Phase B (read path: Prisma `automation` schema, `vesselState`, `listVessels`, read-only `(automation)/`) is now the active focus per §9 | both | **Done** — Phase B-1 landed (see §12.6) |
 
 **Hold rule.** Steps 1–3 land independently in `umbraculum-dev` (types and shape only — no consumer). Step 4 is the first sister-repo touch and needs the maintainer's review window. Step 5 is the first time the platform mirror carries real `PI_*` names, so it should land in a single dedicated PR for clean diff review.
 
 **No-customer pilot context (per §12.1).** Steps 4 + 5 may iterate freely on names and addresses without external compatibility concern; the version handshake (steps 1 + 5) is the discipline that catches accidental skew on our own bench during Phase B/C.
+
+### 12.6 Phase B execution checklist
+
+Phase B is split into three reviewable commits, B-1 → B-3, all landing in `umbraculum-dev`. Each is independently typechecked and tested in container; the sister repo is not touched in Phase B.
+
+| # | Step | Status |
+|---|---|---|
+| B-1 | Prisma `multiSchema` enabled + `@@schema("public")` on all 58 existing models/enums + `Vessel` / `AdapterConnection` / `AutomationAlarmEvent` under `@@schema("automation")` (migration `add_automation_schema`); `services/api/src/modules/automation/` skeleton (`registerAutomationModule(app)` via `@brewery/module-sdk`, no routes); `app.ts` wire-up; docker-compose api+web service mounts for `module-sdk` + `automation-contracts`; vitest setup + idempotent guard for repeat `buildApp()` calls; api test suite green (49 files / 400 tests) | **Done** |
+| B-2 | `services/api/src/modules/automation/adapters/mockAdapter.ts` (deterministic `AutomationAdapterDefinition` impl, no real Modbus); `services/vesselsService.ts` (DB read); `routes/automationVesselsRoutes.ts` (`GET /automation/vessels`, `GET /automation/vessels/:code`, workspace-scoped); AI tools `automation.listVessels` + `automation.vesselState` registered via the orchestrator; vitest unit + integration tests | Pending |
+| B-3 | `apps/web/app/[locale]/(automation)/page.tsx` (vessel list); `apps/web/app/[locale]/(automation)/[vesselCode]/page.tsx` (vessel detail); integration tests covering workspace scoping + mock-adapter wiring; web typecheck verified in container | Pending |
+
+**B-1 invariants captured.** The migration is forward-only: existing tables stay in `public` (no rename, no data migration); the only structural change is the new `automation` schema. The cross-schema `equipmentProfileId` is the L1 app-level FK from §12.3 (no Prisma `@relation` across schemas yet). The adapter contract version handshake (`AdapterConnection.contractVersion` ↔ `MAILBOX_SPEC.contractVersion` from `@brewery/automation-contracts`) is wired into the table shape but not yet enforced — enforcement lands with the real `brewery.openplc.v1` adapter in Phase C.
+
+**B-1 follow-on captured for module-sdk.** `@brewery/module-sdk`'s `registerModule()` uses a process-wide singleton registry that throws on duplicate registration. The api `vitest.setup.ts` clears it between test files and `services/api/src/modules/automation/index.ts` carries an idempotent guard for intra-file repeats. The cleaner long-term fix is to split metadata-recording (process-wide, idempotent) from per-app route registration in module-sdk itself; tracked as a sub-plan #9 follow-on.
 
 ---
 

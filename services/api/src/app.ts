@@ -36,6 +36,7 @@ import { webhooksRevenuecatRoutes } from "./routes/webhooksRevenuecat.js";
 import { aiRoutes } from "./routes/ai.js";
 import { InMemoryAiToolRegistry } from "./services/ai/toolRegistry.js";
 import { registerBreweryTools } from "./services/ai/tools/brewery/index.js";
+import { registerAutomationModule } from "./modules/automation/index.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -97,6 +98,12 @@ export function buildApp() {
   app.register(integrationsRevealRoutes);
   app.register(webhooksStripeRoutes);
   app.register(webhooksRevenuecatRoutes);
+
+  // Canonical `automation` module — Phase B foundation. Phase B-1 wires the
+  // module via `@brewery/module-sdk` with no routes; Phase B-2 lands the
+  // mock adapter, vessel read services, routes, and AI tools.
+  // See: docs/design/canonical-automation-module-surface.md §8.3, §9.
+  registerAutomationModule(app);
 
   app.register((instance, _opts, done) => {
     const registry = new InMemoryAiToolRegistry();
