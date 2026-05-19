@@ -3,7 +3,7 @@
 Companion to [docs/TESTING.md](TESTING.md). `TESTING.md` answers "what do I test, where, and how"; this file answers "how do we land the L1-L6 scaffolding without surprising anybody".
 
 This file has two independent scopes:
-1. **Brewery scaffolding** (vitest in shared packages, smoke + seeder, API CI workflow, Playwright suite, `@brewery/test-mcp`, agentic-browser jobs).
+1. **Brewery scaffolding** (vitest in shared packages, smoke + seeder, API CI workflow, Playwright suite, `@umbraculum/test-mcp`, agentic-browser jobs).
 2. **`@rftsu/cursor-rules` 3.1.1** publish + sync into umbraculum-dev (the upstream codification of `20-tests-must-follow-changes.mdc` + the two new generic skills).
 
 They're independent: brewery scaffolding works fine with cursor-rules at 3.1.0; 3.1.1 is the upstream version.
@@ -23,7 +23,7 @@ Each phase was built to be mergeable on its own. Recommended slice order = phase
 | **S3 — L3 smoke + seeder** | `scripts/smoke.sh`, `services/api/src/cli/seedE2eFixture.ts`, `services/api/package.json` (`seed:e2e` script), root `smoke`/`seed:e2e` scripts | Low (idempotent seeder; only writes `e2e-*` rows) | `npm run seed:e2e -- --clean` | L3 functional; manual stack-up workflows get a `./scripts/smoke.sh` gate |
 | **S4 — L2 + L4 + CI gate** | `.github/workflows/api.yml`, `services/api/package.json` (`test:db:prepare`, `contracts:check`, `contracts:update`), `services/api/src/tests/contracts/**` | **Medium** — CI becomes blocking on PRs touching `services/api/**` or `packages/**` | Disable the workflow file | L1+L2+L4 gate every PR; biggest payoff |
 | **S5 — L5 Playwright** | `apps/web/e2e/**`, `apps/web/e2e/.gitignore`, `apps/web/e2e/README.md` | Low (separate workspace; nothing imports from it) | Delete the directory | L5 reproducible locally via `docker run` |
-| **S6 — `@brewery/test-mcp`** | `packages/test-mcp/**` + workspace registration | Low (new package; opt-in for agentic surface) | Remove the package | Lets agents one-shot smoke/seed/run without re-implementing |
+| **S6 — `@umbraculum/test-mcp`** | `packages/test-mcp/**` + workspace registration | Low (new package; opt-in for agentic surface) | Remove the package | Lets agents one-shot smoke/seed/run without re-implementing |
 
 Natural stopping point: **after S4**. That's the "deterministic CI gate is in place" moment. S5+S6 are amplifiers.
 
@@ -149,7 +149,7 @@ When the stack is up, this is the sequence — each step gates the next.
      bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke"
    ```
 
-8. **`@brewery/test-mcp` reachable** (optional but valuable)
+8. **`@umbraculum/test-mcp` reachable** (optional but valuable)
 
    ```bash
    curl -fsS http://localhost:8932/

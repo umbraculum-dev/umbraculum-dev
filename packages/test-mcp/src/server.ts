@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * @brewery/test-mcp - small HTTP server exposing testing tools as JSON endpoints.
+ * @umbraculum/test-mcp - small HTTP server exposing testing tools as JSON endpoints.
  *
  * Each tool is reachable two ways:
  *   1. HTTP POST /<toolName>   (body is JSON args)
@@ -112,7 +112,7 @@ function startServer() {
   });
 
   server.listen(PORT, () => {
-    console.log(`[@brewery/test-mcp] listening on http://localhost:${PORT}`);
+    console.log(`[@umbraculum/test-mcp] listening on http://localhost:${PORT}`);
   });
 }
 

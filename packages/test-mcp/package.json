@@ -1,11 +1,11 @@
 {
-  "name": "@brewery/test-mcp",
+  "name": "@umbraculum/test-mcp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Small HTTP server exposing umbraculum-dev testing tools (smoke, seed, vitest, Playwright, contracts) for Cursor MCP / shell consumers.",
+  "description": "Small HTTP server exposing umbraculum-dev testing tools (smoke, seed, vitest, Playwright, contracts) for Cursor MCP / shell consumers. End-state npm scope: @umbraculum/test-mcp per sub-plan #9 (landed 2026-05-19 as worked example).",
   "bin": {
-    "brewery-test-mcp": "src/server.ts"
+    "umbraculum-test-mcp": "src/server.ts"
   },
   "scripts": {
     "start": "tsx src/server.ts",

@@ -201,8 +201,10 @@ flowchart TD
 ### Step 1 — Update the package itself
 
 - Edit [`packages/<name>/package.json`](../../packages/) `name` field.
+- **Also check the `bin:` field**, if present. If the bin name encodes the old scope (e.g. `"brewery-<name>": "..."`), rename it to match the new scope (`"umbraculum-<name>": "..."`). Surfaced during slot 1 worked example: [`packages/test-mcp/package.json`](../../packages/test-mcp/package.json) had `"brewery-test-mcp"` as bin name; not renaming it would have left the CLI command inconsistent with the package name.
 - If `description` is empty or missing, add a classifying description: for platform, `"… End-state npm scope: @umbraculum/<name> per sub-plan #9."`; for brewery-vertical, `"… Brewery-vertical … End-state npm scope: @umbraculum/brewery-<name> per sub-plan #9."`
 - Update the package's own `README.md` heading and any in-text references to the old name.
+- **Also check the README for user-facing config samples** (MCP server entries, CLI command examples, copy-paste-able JSON snippets that reference the package by name or bin name). These are surface a user pastes into their own config; renaming them in the README is the only way the next reader of the README gets the right command. Surfaced during slot 1: the test-mcp README's Cursor MCP wiring example had `"brewery-test-mcp"` as the server key.
 
 ### Step 2 — Classification gate (HARD STOP)
 
@@ -238,19 +240,34 @@ For every file in the result list, replace `@brewery/<name>` with the target nam
 ### Step 4 — Regenerate lockfiles in container
 
 > **Cross-reference:** This step embodies the lesson from Phase B-3 ("vitest hoisted to root" gotcha). Read [`pr1-contracts-migration-handoff.md`](./pr1-contracts-migration-handoff.md) §"Mandatory prep before any consumer-side verification" if unfamiliar.
+>
+> **Hard-won during slot 1 worked example:** even when the renamed package has *zero* runtime consumers (e.g. `test-mcp`, no `apps/*` or `services/*` lists it as a dep), the root `npm install` still destructively prunes the bind-mounted `services/api/node_modules` and `apps/web/node_modules` directories. The api container then boots into `MODULE_NOT_FOUND` (`tsc: not found`, missing preload modules) and surfaces as a 502 through Nginx. The per-container reinstall + api restart below is therefore **unconditional**, not conditional on dep-graph membership.
 
 ```bash
-# Root lockfile + workspace-aware install (do this FIRST):
-docker compose exec api sh -c 'cd / && cd app/../.. && npm install --no-audit --no-fund'
-# … then per-container if the package is a runtime dep of api or web:
+# (a) Refresh root lockfile via one-shot node:20-slim container (DO NOT use `docker compose exec`
+#     against api/web here — those containers' /app mount is services/api/ or apps/web/,
+#     not the workspace root, so `npm install` there refreshes the wrong lockfile).
+docker run --rm \
+  -v "$PWD:/repo" \
+  -v brewery_app_root_node_modules:/repo/node_modules \
+  -w /repo \
+  -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" \
+  node:20-slim \
+  bash -lc 'npm install --no-audit --no-fund; rc=$?; chown -R "$HOST_UID:$HOST_GID" /repo/packages /repo/apps /repo/services /repo/package.json /repo/package-lock.json; exit $rc'
+
+# (b) MANDATORY (regardless of whether the renamed package is an api/web runtime dep):
+#     restore the bind-mounted services/api/node_modules and apps/web/node_modules
+#     pruned by step (a). Then restart api so the new node_modules is picked up.
 docker compose exec api sh -c 'cd /app && npm install --no-audit --no-fund'
 docker compose exec web sh -c 'cd /app && npm install --no-audit --no-fund'
+docker compose restart api
 ```
 
 After regeneration:
 
-- `git diff package-lock.json` — verify ONLY the renamed package's entries changed (plus the workspace-deps reverse-pointers). If unrelated packages appear in the diff, **STOP and investigate** before proceeding.
-- Verify the renamed package shows up under `node_modules/@umbraculum/<name>` in the container, not `node_modules/@brewery/<name>`.
+- `git diff --stat package-lock.json` — should show a small number of insertions/deletions (~6+6 for a single-package rename with no dep change; more if the package has cross-package consumers). Inspect the line-level diff to confirm changes are limited to the renamed package's entries (plus the workspace-deps reverse-pointers under each consumer's `node_modules` map). If *unrelated* packages appear in the diff, **STOP and investigate** before proceeding.
+- Verify the renamed package shows up under `node_modules/@umbraculum/<name>` in the root `node_modules`, not `node_modules/@brewery/<name>`.
+- Verify `curl -sS http://localhost:18080/api/health` returns `{"ok":true}` (proves api restarted cleanly with the refreshed node_modules).
 
 ### Step 5 — Rebuild `dist/` via the canonical script
 
@@ -300,6 +317,7 @@ If the verification surfaces any gotcha not yet documented in §4 or §5, **upda
 |---|---|---|---|
 | `@brewery/core` mechanically migrates to `@umbraculum/core`, promoting brewery math to platform-core in the public surface | Medium (most likely mistake) | High (the exact failure the rename is meant to fix) | Step 2 (Classification gate) + §1.3 trap pinned + handoff doc `core` section repeats target verbatim |
 | Lockfile churn drags unrelated packages into the diff | Medium | Medium | `--no-audit --no-fund` flags + post-regen diff review (step 4) + abort-if-unrelated-changed rule |
+| Root `npm install` destructively prunes bind-mounted `services/api/node_modules` + `apps/web/node_modules` → api container crashes with `MODULE_NOT_FOUND` → 502 through Nginx | High (happens EVERY rename, not just dep-graph-consuming ones) | Medium (recoverable in <30s but easy to misdiagnose as "rename broke something") | Per-container reinstall + api restart is unconditional in step 4; smoke check `curl http://localhost:18080/api/health` proves recovery before moving to step 5 |
 | `apps/web/next.config.js` `transpilePackages` not updated → web build silently misses the renamed package | Medium | Medium | Step 3 explicitly enumerates `next.config.js`; smoke step (step 6) catches if missed |
 | `apps/native/metro.config.js extraNodeModules` not updated → native build "Invalid hook call" or module-not-found | Low (only one pin today: `recipes-ui`) | Medium | Step 3 explicitly enumerates `metro.config.js`; flagged in the `recipes-ui` handoff section |
 | In-flight feature branches reference old `@brewery/<name>` → merge conflicts | Medium | Low | Single-package PRs are small and fast-conflict-resolvable; no long-lived feature branch should outrun the migration |
@@ -323,11 +341,17 @@ If the verification surfaces any gotcha not yet documented in §4 or §5, **upda
 - Platform-classified — no §1.3 trap risk.
 - Smallest possible "prove the lockfile + dist + container loop works" footprint.
 
-**Commit hash:** *(populated post-commit)*
+**Commit hash:** *(populated post-commit — recorded in the worked-example commit message)*
 
-**Lessons recorded back into §4 / §5:** *(populated post-execution; if any gotcha surfaces not yet in this doc, the gotcha lands here AND in §4 step or §5 row BEFORE the commit)*
+**Lessons recorded back into §4 / §5 during the worked example (2026-05-19):**
 
-**Status as recorded in handoff doc:** Pre-checked complete (slot 1 of 13).
+1. **Bin field rename surfaced** — `packages/test-mcp/package.json` had a `bin: { "brewery-test-mcp": "..." }` entry. Naive `name`-only rename would have left the CLI command name inconsistent with the package name. **§4 step 1 updated** to explicitly enumerate the `bin:` field check.
+2. **User-facing config samples in READMEs surfaced** — `packages/test-mcp/README.md` had a `~/.cursor/mcp.json` example with `"brewery-test-mcp"` as the server key. Users who copy-paste from the README post-rename would have stale config. **§4 step 1 updated** to explicitly enumerate user-facing config samples (MCP server entries, CLI command examples, JSON snippets).
+3. **Bind-mounted `node_modules` pruning bites every rename, not just dep-graph consumers** — even though test-mcp is consumed by zero `apps/*` or `services/*` packages, the root `npm install` (step 4a) still destructively pruned `services/api/node_modules` (host bind-mount). The api container immediately crashed with `MODULE_NOT_FOUND` (`tsc: not found`, preload modules missing) and surfaced as a 502 through Nginx. **§4 step 4 updated** to make the per-container reinstall + api restart UNCONDITIONAL; **§5 risk register row added** elevating this to High likelihood.
+
+All three lessons landed in the plan doc BEFORE the worked-example commit, so the recipe future sessions will follow already reflects the actual experience.
+
+**Status as recorded in handoff doc:** Slot 1 ticked complete with commit hash; slot 1's file inventory pre-updated to include the bin + MCP-config-sample items so the historical record is accurate.
 
 ---
 

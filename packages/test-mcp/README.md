@@ -1,9 +1,9 @@
-# @brewery/test-mcp
+# @umbraculum/test-mcp
 
 Small HTTP server exposing testing tools as JSON endpoints. Modeled on the agentic MCP server in `~/dkprojects/thesiteup/e2e/e2e-app/playwright-suite/scripts/agentic/mcp-server.ts`, scoped to this repo's stack.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). This package landed under the new `@umbraculum/*` scope as the worked-example slot of sub-plan #9 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md) for the migration plan.
 
 ## What this is
 
@@ -98,7 +98,7 @@ Add this entry to your Cursor MCP user config (typically `~/.cursor/mcp.json` or
 ```json
 {
   "mcpServers": {
-    "brewery-test-mcp": {
+    "umbraculum-test-mcp": {
       "command": "tsx",
       "args": [
         "/path/to/your/umbraculum-dev/packages/test-mcp/src/server.ts"

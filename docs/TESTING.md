@@ -10,10 +10,10 @@ This is the single source of truth for "what do I test, where, and how" in this 
 |---|---|---|---|---|
 | L1 Unit | vitest | `packages/contracts`, `packages/core` | every push, < 5s | parser regressions, math regressions, unit conversions |
 | L2 API integration | vitest + Prisma + Postgres | `services/api/src/tests/*.test.ts` | every push (CI) | route behavior, ACL, workspace scoping, BeerJSON round-trips |
-| L3 Smoke | bash + curl | `scripts/smoke.sh` | pre-push, post-`compose up`, in `@brewery/test-mcp` | nginx -> web -> api -> postgres path is alive |
+| L3 Smoke | bash + curl | `scripts/smoke.sh` | pre-push, post-`compose up`, in `@umbraculum/test-mcp` | nginx -> web -> api -> postgres path is alive |
 | L4 BeerJSON contract snapshots | vitest (shape-based) | `services/api/src/tests/contracts/*.snap.test.ts` | every push (CI) | native-consumed response shape drift |
 | L5 Web E2E (deterministic) | Playwright headless + axe | `apps/web/e2e/` | PR-triggered CI, on demand | UI flows, locale routing, a11y critical violations |
-| L6 Agentic browser E2E | Cursor browser-MCP + `@brewery/test-mcp` | on demand only | when investigating, exploring, or extending L5 | unknown unknowns, "something feels off" |
+| L6 Agentic browser E2E | Cursor browser-MCP + `@umbraculum/test-mcp` | on demand only | when investigating, exploring, or extending L5 | unknown unknowns, "something feels off" |
 
 Each layer is a **gate** for the one above: don't reach for L6 until L1-L5 are green.
 
@@ -133,7 +133,7 @@ If you ever need `RadioGroup native={true}` again (e.g. for a specific browser-a
 
 ### L6 - Agentic browser E2E
 
-Driven by the Cursor browser MCP, orchestrated through `@brewery/test-mcp`. Three named jobs:
+Driven by the Cursor browser MCP, orchestrated through `@umbraculum/test-mcp`. Three named jobs:
 
 - `agenticCreateRecipe`
 - `agenticBrewDay`
