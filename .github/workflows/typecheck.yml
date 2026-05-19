@@ -72,6 +72,28 @@ jobs:
               set -eu
               npm install --no-audit --no-fund --workspaces --include-workspace-root
 
+              # apps/web/e2e is a *nested* workspace (apps/web/e2e/) and the
+              # root `workspaces: ["apps/*", "services/*", "packages/*"]` glob
+              # only matches one level deep, so the install above does NOT
+              # install its devDependencies (@playwright/test, @axe-core/
+              # playwright, axe-core). The e2e workspace is also intentionally
+              # isolated per apps/web/e2e/README.md (playwright + browser
+              # binaries live in the mcr.microsoft.com/playwright:* image),
+              # so adding it to the root workspaces array would pollute the
+              # root install. Instead, do an explicit local install here so
+              # `tsc --noEmit` can resolve @playwright/test and friends.
+              #
+              # This surfaced 2026-05-19 (slot-7 push) when CI typecheck began
+              # reporting TS2307 "Cannot find module @playwright/test" across
+              # every e2e spec — the bug had been latent since aab5b41
+              # (2026-05-18) when this workflow first listed apps/web/e2e.
+              # Local reproductions kept passing because developer hosts have
+              # stale apps/web/e2e/node_modules from prior manual installs
+              # bind-mounted into the container. CI starts clean and the gap
+              # surfaces immediately. See docs/TYPING.md "CI vs local install
+              # gap (apps/web/e2e)" for the operator guidance.
+              (cd apps/web/e2e && npm install --no-audit --no-fund)
+
               export PATH="/repo/node_modules/.bin:$PATH"
 
               # Workspaces invoked via `npm run typecheck` from their dir.

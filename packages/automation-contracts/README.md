@@ -57,7 +57,7 @@ Never hand-edit `data/mailbox.json`. Bump `CONTRACT_VERSION` in `src/version.ts`
 
 ## Build / test / typecheck (local)
 
-From repo root (see [`DEVELOPMENT.md`](../../DEVELOPMENT.md) — run Node/npm inside the project container, not on the host):
+From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
 
 - **Build**: `npm run build -w @umbraculum/automation-contracts`
 - **Test**: `npm run test -w @umbraculum/automation-contracts`

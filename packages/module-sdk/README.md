@@ -40,7 +40,7 @@ See `src/validatedSchema.ts` for the full interface + adapter + library-specific
 
 ## Build / test / lint (local)
 
-From repo root (see [`DEVELOPMENT.md`](../../DEVELOPMENT.md) — run Node/npm inside the project container, not on the host):
+From repo root (run Node/npm inside the project container, not on the host — see the root [`README.md`](../../README.md) for service/container setup; the local-only `DEVELOPMENT.md` is per-developer and gitignored):
 
 - **Build**: `npm run build -w @brewery/module-sdk`
 - **Test**: `npm run test -w @brewery/module-sdk`

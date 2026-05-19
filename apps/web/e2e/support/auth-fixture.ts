@@ -62,7 +62,7 @@ export const test = base.extend<Fixtures & { personaKey: PersonaKey }>({
     const storagePath = storageStatePath(persona.key);
 
     if (!existsSync(storagePath)) {
-      await loginPersonaAndSaveState(baseURL, persona, storagePath, async () => browser.newContext());
+      await loginPersonaAndSaveState(baseURL, persona, storagePath, () => browser.newContext());
     }
 
     const context = await browser.newContext({ storageState: storagePath });
