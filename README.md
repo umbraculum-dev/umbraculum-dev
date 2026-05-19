@@ -34,6 +34,15 @@ brewery are the primitives any batch process manufacturer needs.** MRP
 and CRP are not future "new modules" — they are a generalization of
 work the brewery vertical already does.
 
+The platform is also structured around a **workspace-scope AI
+consultant** as a first-class operational surface. The architectural
+choices that follow — monorepo, one shell, canonical-module discipline,
+peer-module decomposition, vertical-configuration tier — are downstream
+of one principle: the consultant must see the workspace as one coherent
+thing. See [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md) for the
+feature surface and [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
+§4.0 for the cornerstone reasoning.
+
 ### What ships with the brewery vertical today
 
 - Brew-day reliability tooling — mash / sparge / boil step pages, water
