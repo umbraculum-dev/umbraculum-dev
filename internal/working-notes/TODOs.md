@@ -170,3 +170,7 @@ Before implementing native app login, complete these items.
 - [ ] Mash acidification: add “manual entry” mode (user inputs acid addition amount; app estimates resulting alkalinity/pH and stores both input + calculated snapshot).
 - [ ] If/when we add an overall brew-day water summary/profile, it must incorporate **sparge** salts + sparge acid ion contributions (not just mash).
 
+## Documentation gaps
+
+- [ ] **Comprehensive developer-onboarding doc** — walk a new contributor from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running". Should cover: Ubuntu prerequisites, Cursor + plugins setup, Docker / Node / pnpm versions, repo bootstrap, where rules / skills / agents live, how to verify the apparatus is engaged, first PR walkthrough. Tracked because [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 explicitly names this as the missing mechanism for its claims. Closest current substitutes: [`DEVELOPMENT.md`](../../DEVELOPMENT.md), [`DEVELOPMENT-LOCAL.md`](../../DEVELOPMENT-LOCAL.md), [`CONTRIBUTING.md`](../../CONTRIBUTING.md), [`docs/modules/contribute/`](../../docs/modules/contribute/) — but none of these is the end-to-end onboarding doc the MANIFESTO claims.
+

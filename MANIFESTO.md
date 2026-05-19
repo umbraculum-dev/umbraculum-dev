@@ -84,6 +84,37 @@ This is not "AI assistance" as the marketing term. It is closer to *poka-yoke* a
 
 The promise this section makes: **as Umbraculum grows, the toolset stays the entry point**. We will not progressively raise the bar of "you must read these N documents before you contribute". The documents will exist (they already do), but the apparatus carries them. This commitment is what keeps the project horizontal — see §2.2.
 
+### 1.4 Open source as discipline-enabler
+
+§1.3 promised the toolset stays the entry point as Umbraculum grows. This section names what the toolset structurally depends on for that promise to hold: every load-bearing dependency is open source, and that is not a sentimental choice. **When the source is readable, the discipline-apparatus extends to the dependency. When the source is closed, the apparatus halts at the boundary.**
+
+This is a different argument from §2.3's licensing argument. §2.3 is about *who gets to fork*; §1.4 is about *what an AI agent can reason over*. Both are open-source arguments, but they are different arguments with different mechanisms. We list them separately because conflating them buries the part that is genuinely new in the AI era.
+
+**The mechanism.** A Cursor agent operating under our rules / skills / agents (§1.2) can:
+
+- **Read a dependency's source to learn its actual behavior** — not just its documented behavior, but its actual behavior in the cases where the two diverge. Open source is the only condition under which the agent can resolve that gap without guessing.
+- **Reverse-engineer a toolchain that has no native agent integration.** There is no Cursor plugin for OpenPLC's Editor; there is no Copilot for ladder logic; there is no IDE-level AI for Structured Text. But because the OpenPLC project is open source, an agent armed with a sensible rules set ([`.cursor/rules/`](.cursor/rules/) — see the OpenPLC sister repo's rule set for the worked example) can produce correct ladder, structured-text, and serialized-XML output by reading the toolchain's source and the project's serialized formats. The agent's leverage compounds against the openness of what it operates on.
+- **Extend the rules / skills / agents stack to the dependency itself.** A rule that constrains how the project uses Zod can be authored *because Zod is open source and its surface is readable*. A skill that automates a Docker workflow exists *because Docker's behavior can be examined and pinned*. A subagent that diagnoses Prisma migration failures works *because Prisma's source resolves any ambiguity its documentation leaves*.
+
+The proprietary alternative forecloses each of these. A closed-source PLC stack (Siemens TIA Portal, Allen-Bradley Studio 5000), a closed-source database, a closed-source validator: the agent can *use* them, with luck; it cannot *reason over* them. The discipline-apparatus halts at the proprietary boundary, and the contribution surface narrows accordingly.
+
+**Recursive principle.** Every load-bearing dependency this project picks is open source. The list is not sentimental:
+
+- **Linux (Ubuntu)** at the bottom of the stack — the OS layer the apparatus runs on, and the only layer where reproducibility claims are fully verifiable end-to-end.
+- **Docker** — the containerization layer the runtime decisions commit to ([`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)).
+- **Postgres** — the database, with the corresponding architecture in [`docs/postgres-replication-architecture.md`](docs/postgres-replication-architecture.md).
+- **Node.js, React, React Native, Next.js, Fastify** — the platform runtime.
+- **Tamagui, Zod, Prisma, Vitest, ESLint, Playwright** — the application-layer libraries.
+- **OpenPLC** — the brewery vertical's PLC layer (see [`docs/modules/verticals/brewery.md`](docs/modules/verticals/brewery.md) §3.7).
+
+Each entry could in principle be replaced with a proprietary equivalent. Each replacement would shrink the apparatus's reach. We pick open source not because we have a moral preference (we have one — that lives in §2.3 — but it is not what we are arguing here); we pick open source because it is the structural precondition for the apparatus to do its job.
+
+**OpenPLC as an accessibility note.** OpenPLC is worth singling out, even though §2.2 (horizontal accessibility) carries the accessibility argument generally. OpenPLC is, today, brewery-vertical-tied — the safety-validated ladder logic for tanks, pumps, and level sensors lives in a sister repo coupled to the platform's `automation` canonical module by the `PI_*` mailbox contract. That coupling is real and the brewery vertical's page documents it. But the OpenPLC project is also something else: a free, readable, deeply-related-to-automation-and-manufacturing entry point that lets a developer, a returner-to-industry, or a student build real industrial-control intuition without paying for a $1,500-per-seat proprietary toolchain. That is the Magento-1.x low-bar lesson (§2.2) applied to a different domain. We name it here because the AI-orchestration angle compounds the accessibility: a practitioner with a commodity laptop, Ubuntu, Cursor, our rules, and OpenPLC's open source can actually ship safety-relevant ladder logic that runs on a real PLC. The learning curve becomes scalable in a way it has not been for a generation — and it is not gatekept by employment at a vendor.
+
+**Neutrality clarification.** None of this is an argument against Windows or Mac developers. Contributors using either are welcome on the same terms as Linux contributors; the apparatus runs on all three; the practitioner is what matters, not the OS lineage. What this section claims is that *open source unlocks AI-orchestration potential* in a way proprietary stacks cannot, regardless of which OS hosts the orchestrator. Ethics, vendor relationships, surveillance posture, and the broader politics of operating systems are separate concerns — addressed elsewhere where relevant ([`docs/LICENSING.md`](docs/LICENSING.md), §2.3, §3.x of this document) — and this section deliberately does not close doors on contributors whose ethical or practical accounting on those questions differs from the maintainers'.
+
+**Onboarding mechanism — pending.** Per the §"Why this document exists" guardrail #3, values pair with mechanism. The *contributor-facing* mechanism for this section — a comprehensive developer-onboarding doc that walks a new contributor from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running" — does not yet exist. It is a tracked gap. Until it lands, the closest substitutes are [`DEVELOPMENT.md`](DEVELOPMENT.md), [`DEVELOPMENT-LOCAL.md`](DEVELOPMENT-LOCAL.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), and the [`docs/modules/contribute/`](docs/modules/contribute/) sub-tree.
+
 ---
 
 ## 2. Who we serve
