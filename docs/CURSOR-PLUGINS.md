@@ -104,12 +104,20 @@ The agent should reply with **three matches**, one per required umbraculum-
 toolset plugin. If your work touches Magento code, also ask it to check
 for `00-core.mdc` (witness for `rf-magento-cursor-assistant`).
 
-If any of the witnesses are missing, the corresponding plugin is not
-loaded — see the **Install** section above to add it, then re-verify.
+If any of the witnesses are missing, **first try a window reload**
+before reaching for the install procedure: press **`Ctrl+Shift+P`**
+(or **`Cmd+Shift+P`** on macOS) and run **"Reload Window"**, then
+re-ask the agent the same question. Plugins are sometimes installed
+and enabled but not yet visible in the agent's rule context until the
+window is re-initialized; this is a known false-positive on the
+witness-rule check. If the witnesses are still missing after the
+reload, the corresponding plugin is genuinely not loaded — see the
+**Install** section above to add it, then re-verify.
 
 (The formal version of this check, run by the agent automatically as its
 first action in any non-trivial task, lives in
-[`../AGENTS.md`](../AGENTS.md).)
+[`../AGENTS.md`](../AGENTS.md) — including the same "try a window
+reload first" pre-step in its soft-block protocol.)
 
 ## Non-Cursor agents
 

@@ -51,8 +51,25 @@ to this repo. Do **not** require it here.
 If any of plugins 1–3 is missing (or 4 is missing on a Magento-touching task),
 **do not silently proceed**. In your first reply to the user:
 
-1. State explicitly which plugins are missing (by name, from the table above).
-2. Explain why it matters, in the project's own terms:
+1. **Advise a window reload as the first attempt** — *cheap, frequent
+   false-positive fix; try this before the heavier install procedure*. A
+   missing-witness result is sometimes a stale-session artifact: the
+   plugin is installed and enabled but the active Cursor session has not
+   re-loaded its rules into the agent's context yet. Ask the user
+   literally:
+
+   > *Before installing anything, please try a window reload:* **`Ctrl+Shift+P`** *(or* **`Cmd+Shift+P`** *on macOS)* → *"Reload Window"*. *Then re-ask me to re-run the self-check. The plugins are sometimes installed but not yet visible in my rule context until the window is re-initialized.*
+
+   Wait for the user to reload + re-prompt. Re-run the witness-rule
+   presence check from scratch. If the previously-missing witnesses are
+   now present, the absence was transient — proceed with the task and do
+   **not** continue to steps 2–5. Only continue to steps 2–5 if the
+   witnesses are still missing after the reload.
+
+2. State explicitly which plugins are still missing (by name, from the
+   table above) after the reload step.
+
+3. Explain why it matters, in the project's own terms:
 
    > *The Umbraculum CI gates (lint, types, tests, docs structural checks,
    > module-README audits, contract-validation audits) are calibrated to a
@@ -65,11 +82,11 @@ If any of plugins 1–3 is missing (or 4 is missing on a Magento-touching task),
    > keeps the contribution bar low" — it is the project lowering the bar,
    > not raising it.*
 
-3. Point the user at [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for
+4. Point the user at [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) for
    the install procedure (marketplace install where available; local install
    from the public `umbraculum-toolset` sister-repo as the fallback).
 
-4. Offer an explicit override:
+5. Offer an explicit override:
 
    > *If you would like to proceed without the apparatus anyway (e.g. you are
    > making a documentation-only fix, or a one-line typo correction, where
