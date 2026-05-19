@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` package-scope migration plan
 
 **Tier:** Public
-**Status:** Draft 2026-05-19 — scoping pass; one worked-example rename landed alongside this doc (see §6). Remaining 13 slots (12 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
+**Status:** Active 2026-05-19 — scoping pass + worked example landed (slot 1, see §6); slot 2 (`media`) landed in the next session as the first non-worked-example slot driven by §4 alone (see §6.1). Remaining 12 slots (11 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
 **Audience:** core team executing the rename; future contributors picking up un-checked items from the handoff checklist; anyone evaluating the migration shape before the public flip.
 **Resolves:** umbrella plan sub-plan #9 (post-RFC-001 follow-on); the `@brewery/*` actual-scope migration referenced from [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md) §10.
 **Builds on:** [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §5.2 (rename commitment), [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §§4–5 (brewery is tier-6 vertical, NOT canonical), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §11.2 (H1 2027 restructure row that defers to this plan).
@@ -231,6 +231,7 @@ grep -rlE "@brewery/<name>([^a-zA-Z0-9_-]|$)" \
 
 For every file in the result list, replace `@brewery/<name>` with the target name from §1.1. Particular attention to:
 
+- **Root `package.json` `build:packages` script** — references every workspace by full name (`npm run build -w @brewery/<name>`); if not updated, step 5 (`scripts/build-packages-in-docker.sh`) will fail with `npm error No workspaces found: --workspace=@brewery/<name>` for the renamed package. **Surfaced during slot 2 worked example** (was NOT in the original slot 1 inventory; missed because slot 1's `test-mcp` doesn't appear in this script).
 - **`apps/web/next.config.js`** `transpilePackages: [...]` array — Next.js will silently fail to transpile if the package is renamed without updating this list.
 - **`apps/native/metro.config.js`** `resolver.extraNodeModules` map — currently pins `@brewery/recipes-ui`; needs updating when that package migrates.
 - **`docker-compose.yml`** bind-mount comments + any volume names — references are comment-only but worth keeping accurate for grep-ability.
@@ -258,8 +259,16 @@ docker run --rm \
 # (b) MANDATORY (regardless of whether the renamed package is an api/web runtime dep):
 #     restore the bind-mounted services/api/node_modules and apps/web/node_modules
 #     pruned by step (a). Then restart api so the new node_modules is picked up.
-docker compose exec api sh -c 'cd /app && npm install --no-audit --no-fund'
-docker compose exec web sh -c 'cd /app && npm install --no-audit --no-fund'
+#
+#     IMPORTANT: --include=dev is REQUIRED for the api container (surfaced during
+#     slot 2). When run in-place against a running container with workspace deps
+#     that can't be resolved from /app's perspective (file:../../packages/...),
+#     npm 10's degraded resolution mode treats this as a production install and
+#     silently omits devDependencies (tsc, vitest, tsx). The container's startup
+#     `npm install` (via `docker compose up`) is unaffected; only in-place
+#     reinstall on a running container needs the flag.
+docker compose exec api sh -c 'cd /app && npm install --include=dev --no-audit --no-fund'
+docker compose exec web sh -c 'cd /app && npm install --include=dev --no-audit --no-fund'
 docker compose restart api
 ```
 
@@ -322,10 +331,12 @@ If the verification surfaces any gotcha not yet documented in §4 or §5, **upda
 | `apps/native/metro.config.js extraNodeModules` not updated → native build "Invalid hook call" or module-not-found | Low (only one pin today: `recipes-ui`) | Medium | Step 3 explicitly enumerates `metro.config.js`; flagged in the `recipes-ui` handoff section |
 | In-flight feature branches reference old `@brewery/<name>` → merge conflicts | Medium | Low | Single-package PRs are small and fast-conflict-resolvable; no long-lived feature branch should outrun the migration |
 | Doc drift — README or design doc references the old name post-rename | High (~30 doc files) | Low | Step 3 enumerates the doc file list; reviewer scans `git grep '@brewery/<name>'` before pushing each PR |
+| Root `package.json` `build:packages` script not updated → `scripts/build-packages-in-docker.sh` (step 5) fails with `No workspaces found: --workspace=@brewery/<name>` | High (every rename touches this script unless the package is omitted from it, like test-mcp was) | Low (loud failure; easy to diagnose and recover) | Step 3 explicitly lists this script as a HARD STOP file; preflight skill `package-scope-migration-preflight` checks it as Command 5. **Surfaced during slot 2 worked example.** |
+| In-place `npm install` in api container omits devDependencies (tsc, vitest, tsx missing → typecheck/test fail) | High (every in-place reinstall against a running container with workspace deps) | Medium (recoverable, easy to misdiagnose as "lockfile corrupted") | Step 4b uses `--include=dev` flag; container startup `npm install` (via `docker compose up`) is unaffected. **Surfaced during slot 2 worked example.** |
 | `dist/` not rebuilt → `SyntaxError: does not provide an export named` at api boot | Medium (easy to forget) | Medium | Step 5 + cross-reference to the canonical recovery in [`pr1-contracts-migration-handoff.md`](./pr1-contracts-migration-handoff.md) |
 | Sister-repo coordination overlooked when migrating `automation-contracts` | Low | Low | §2.3 confirms sister repo emits JSON only; one-line doc-link update in [`openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) is the only sister-side change |
 | Scoping pass under-estimates effort and execution sessions balloon | Medium | Low | Per-package handoff doc tracks actual size per slot; if early slots overrun estimated effort, reschedule remaining slots accordingly — no sunk-cost pressure to keep the same cadence |
-| Plugin-pack skill not yet present → reviewer skips Step 2 classification gate | Low (one reviewer = author for now) | High | Until second-package execution: explicit Step 2 callout in every per-package handoff section; after second package: skill formalizes the check |
+| Plugin-pack skill not yet present → reviewer skips Step 2 classification gate | Resolved as of slot 2 — `package-scope-migration-preflight` skill landed under `umbraculum-platform-tsjs-cursor-assistant/skills/`; formalizes inventory + classification gate + the slot-2 gotchas as bounded commands. | — | — |
 
 ---
 
@@ -353,11 +364,27 @@ All three lessons landed in the plan doc BEFORE the worked-example commit, so th
 
 **Status as recorded in handoff doc:** Slot 1 ticked complete with commit hash; slot 1's file inventory pre-updated to include the bin + MCP-config-sample items so the historical record is accurate.
 
+### 6.1. Slot 2 — `@brewery/media` → `@umbraculum/media`
+
+Executed in the next session as the first non-worked-example slot — i.e. the first slot driven by §4 of this doc rather than discovering the recipe. Platform-classified (media framework; brewery-flavored asset content split deferred per §1.4).
+
+**Footprint:** 20 files / 25 occurrences. Two real consumers (`apps/web`, `apps/native`) → exercises `transpilePackages` (web) for the first time. Publishes `dist/` (manifest + index) → exercises `scripts/build-packages-in-docker.sh` for the first time on a real consumer-bearing rename.
+
+**Lessons recorded back into §4 / §5 during slot 2 (2026-05-19):**
+
+1. **Root `package.json` `build:packages` script** — references every workspace by its full name (`npm run build -w @brewery/<name>`). Renaming the workspace without updating this script causes step 5 (`scripts/build-packages-in-docker.sh`) to fail with `npm error No workspaces found: --workspace=@brewery/<name>`. **§4 step 3 updated** to enumerate this script as a HARD STOP file; **§5 risk register row added** (High likelihood). Missed in slot 1 because `test-mcp` doesn't appear in `build:packages`.
+2. **In-place api-container `npm install` omits devDependencies** — when `npm install` runs in `/app` against a running container with workspace deps that can't resolve from /app's perspective (`file:../../packages/...` paths don't exist in the api's bind-mount view), npm 10 silently switches to a degraded resolution mode that omits devDependencies. Result: `tsc`, `vitest`, `tsx` disappear from `/app/node_modules/.bin/`, breaking step 6 typecheck + tests. The container's *startup* `npm install` (via `docker compose up`) is unaffected because npm runs that one with a fresh cache and no in-place pruning. **§4 step 4b updated** to use `--include=dev`; **§5 risk register row added** (High likelihood, Medium severity).
+3. **Plugin-pack skill `package-scope-migration-preflight` authored** per the "codify on second use" cadence (§5 last row, originally pending). Lives in `umbraculum-platform-tsjs-cursor-assistant/skills/package-scope-migration-preflight/`. Encodes the §4 step 3 file inventory check + the §1.3 core-trap gate + the two new gotchas as Command 5 + an "Operator follow-up" footer. Bounded (max 5 commands, no loops, inventory cap at 50).
+
+All three lessons landed in the plan doc BEFORE the slot-2 commit, mirroring the slot-1 discipline. The recipe is now slot-2-tested in addition to slot-1-tested.
+
+**Commit hash:** *(populated post-commit — recorded in the slot-2 commit message)*
+
 ---
 
 ## 7. Per-package handoff link
 
-The serial-execution checklist lives in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md). Open that doc, pick the next un-checked slot (next-after-`test-mcp` is `media`, slot 2), follow §4 of this doc, then tick the slot in the handoff doc and commit.
+The serial-execution checklist lives in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md). Open that doc, pick the next un-checked slot (next-after-`media` is `navigation`, slot 3), follow §4 of this doc, then tick the slot in the handoff doc and commit.
 
 ---
 

@@ -1,5 +1,5 @@
 /**
- * Sync shared media assets from @brewery/media into apps/web/public/media.
+ * Sync shared media assets from @umbraculum/media into apps/web/public/media.
  * Source of truth: packages/media/assets/**
  * Destination: apps/web/public/media/**
  *
@@ -25,7 +25,7 @@ fs.mkdirSync(publicMediaDir, { recursive: true });
 
 const manifestPath = path.join(mediaPkg, "src", "manifest.generated.json");
 if (!fs.existsSync(manifestPath)) {
-  console.warn("sync-media: manifest not found (run @brewery/media build first):", manifestPath);
+  console.warn("sync-media: manifest not found (run @umbraculum/media build first):", manifestPath);
   process.exit(0);
 }
 

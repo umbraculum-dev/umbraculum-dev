@@ -46,7 +46,7 @@ Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
 
 ## Media (shared assets)
 
-- [ ] Native can load shared media via `@brewery/media` URLs when base URL is configured:
+- [ ] Native can load shared media via `@umbraculum/media` URLs when base URL is configured:
   - `EXPO_PUBLIC_MEDIA_BASE_URL` is set appropriately for simulator/device.
   - Native example component: `apps/native/src/media/RemoteImage.tsx`.
 

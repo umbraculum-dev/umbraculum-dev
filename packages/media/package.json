@@ -1,8 +1,8 @@
 {
-  "name": "@brewery/media",
+  "name": "@umbraculum/media",
   "private": true,
   "version": "0.0.0",
-  "description": "Shared media assets for web and native apps",
+  "description": "Shared media assets framework for web and native apps (manifest + asset loader). Current asset content is brewery-flavored; content split deferred to second-vertical landing per sub-plan #9 §1.4. Renamed from @brewery/media as sub-plan #9 slot 2 (2026-05-19).",
   "type": "module",
   "scripts": {
     "generate:manifest": "node scripts/generate-manifest.mjs",

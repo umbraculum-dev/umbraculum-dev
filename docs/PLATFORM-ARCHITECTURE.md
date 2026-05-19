@@ -184,7 +184,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 - `@brewery/navigation` — route IDs + cross-platform routing policy.
 - `@brewery/api-client` — fetch boundary + auth (cookie web, bearer native).
 - `@brewery/ui` — Tamagui primitives.
-- `@brewery/media` — shared image assets + manifest.
+- `@umbraculum/media` — shared image assets + manifest (renamed from `@brewery/media` 2026-05-19 as sub-plan #9 slot 2; current asset content remains brewery-flavored pending content split deferred to second-vertical landing).
 - `@brewery/contracts` — DTOs / shared types.
 - `@umbraculum/test-mcp` — testing tools server (renamed from `@brewery/test-mcp` 2026-05-19 as sub-plan #9 slot 1 worked example).
 
@@ -402,7 +402,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 - Workspace tenancy model (`Workspace`, `WorkspaceMember`, role-based ACL).
 - Plugin-composed Fastify (cross-cutting via `app.register`).
-- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@brewery/navigation`, `@brewery/api-client`, `@brewery/ui`, `@brewery/media`).
+- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@brewery/navigation`, `@brewery/api-client`, `@brewery/ui`, `@umbraculum/media`).
 - Cookie/bearer auth split (web vs native).
 - Redis cache pattern with Postgres source-of-truth.
 - Stripe + RevenueCat as billing providers; Fastify as billing source-of-truth.

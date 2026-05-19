@@ -27,7 +27,7 @@ import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/r
 import { Accordion } from "tamagui";
 
 import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
-import { isMediaAssetKey } from "@brewery/media";
+import { isMediaAssetKey } from "@umbraculum/media";
 import { ReadOnlyField } from "../components/ReadOnlyField";
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";

@@ -101,11 +101,11 @@ The web app uses two CSS sources: `apps/web/app/globals.css` (imports) and `apps
 **Where to add new styles:** Variables → `variables.css`; layout/shell → `layout.css`; component classes → `components.css`.
 
 ### Shared media assets (MANDATORY)
-All shared images and media must live in `packages/media` (`@brewery/media`). Do not commit duplicates under `apps/web/public/` or app-local folders.
+All shared images and media must live in `packages/media` (`@umbraculum/media`). Do not commit duplicates under `apps/web/public/` or app-local folders.
 
 - **Folder conventions**: `packages/media/assets/<domain>/...` (e.g. `assets/yeast/`, `assets/hops/`).
 - **Web**: reference assets as `/media/<domain>/<filename>` (e.g. `/media/yeast/dilution-1-100.png`). The sync script (`apps/web/scripts/sync-media.mjs`) copies from `packages/media/assets/**` into `apps/web/public/media/**` before dev/build/start.
-- **Native (future)**: when a React Native / Expo app exists, import assets from `@brewery/media` (e.g. `require('@brewery/media/assets/yeast/dilution-1-100.png')` or equivalent bundler support). Do not duplicate assets in app-local folders.
+- **Native (future)**: when a React Native / Expo app exists, import assets from `@umbraculum/media` (e.g. `require('@umbraculum/media/assets/yeast/dilution-1-100.png')` or equivalent bundler support). Do not duplicate assets in app-local folders.
 
 ### TypeScript: `interface` vs `type`
 - **Use `interface` for object contracts**:

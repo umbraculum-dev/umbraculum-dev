@@ -17,7 +17,7 @@
     "@brewery/contracts": "file:../../packages/contracts",
     "@brewery/i18n": "file:../../packages/i18n",
     "@brewery/i18n-react": "file:../../packages/i18n-react",
-    "@brewery/media": "file:../../packages/media",
+    "@umbraculum/media": "file:../../packages/media",
     "@brewery/navigation": "file:../../packages/navigation",
     "@brewery/recipes-ui": "file:../../packages/recipes-ui",
     "@brewery/ui": "file:../../packages/ui",

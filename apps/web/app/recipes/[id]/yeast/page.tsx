@@ -23,7 +23,7 @@ import {
   type EditorYeastRow,
 } from "../../_lib/beerjsonRecipe";
 import { formatFixed } from "../../../../src/i18n/format";
-import { getMediaPublicPath } from "@brewery/media";
+import { getMediaPublicPath } from "@umbraculum/media";
 import { ManualCellCountHelpBox } from "@brewery/recipes-ui";
 import { YeastEditor } from "../../_components/YeastEditor";
 import { ErrorBox } from "../../../_components/recipe-edit";

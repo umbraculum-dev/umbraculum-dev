@@ -1,9 +1,9 @@
-# @brewery/media
+# @umbraculum/media
 
 Shared media assets (images, illustrations) for web and native clients. Source of truth across surfaces.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 2 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md) for the migration plan. The current asset content is brewery-flavored; a content-split (`@umbraculum/media` framework + `@umbraculum/brewery-media` brewery assets) is deferred until a second vertical configuration lands (plan doc §1.4).
 
 ## What this is
 
@@ -12,7 +12,7 @@ The single canonical home for media assets that need to render identically on ev
 ## Scope
 
 - **Contains**: domain illustration PNGs / SVGs grouped by domain folder under `assets/<domain>/`; the package manifest declaring entry points consumable by both Metro and Next.js.
-- **Does not contain**: the brand mascot Umbi (lives in `docs/media/`, see above); icon-font glyphs (lives in `@brewery/ui` Tamagui icons); generated thumbnails or transformed image variants (those are generated at build time by the consumer apps).
+- **Does not contain**: the brand mascot Umbi (lives in `docs/media/`, see above); icon-font glyphs (lives in `@brewery/ui` Tamagui icons — pending rename to `@umbraculum/ui` per sub-plan #9 slot 5); generated thumbnails or transformed image variants (those are generated at build time by the consumer apps).
 
 ## Structure
 
@@ -31,7 +31,7 @@ Assets are synced into `apps/web/public/media/` via `apps/web/scripts/sync-media
 Import from the package directly so Metro can bundle the binary:
 
 ```ts
-import yeastDilution from "@brewery/media/assets/yeast/dilution-1-100.png";
+import yeastDilution from "@umbraculum/media/assets/yeast/dilution-1-100.png";
 ```
 
 Do not duplicate assets into app-local folders — this package is the source of truth.
@@ -42,7 +42,7 @@ This package ships static assets with a thin entry-point manifest. There is no s
 
 - **No build**: `npm run build:packages` is a no-op for this package's assets but is safe to run.
 - **Sync into web**: from repo root, `npm run --workspace=apps/web sync-media` (or simply re-run the web build, which calls the script as part of the pipeline).
-- **Lint**: `npm run lint --workspace=@brewery/media` (lints the manifest / TS entry-point only).
+- **Lint**: `npm run lint --workspace=@umbraculum/media` (lints the manifest / TS entry-point only).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate".
 
 When adding a new asset:
@@ -53,8 +53,8 @@ When adding a new asset:
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` (via the sync script), `apps/native` (via Metro direct import), `@brewery/recipes-ui` (for any domain illustration shipped in a shared component).
-- **Depends on**: nothing in `@brewery/*`. This package is at the bottom of the `@brewery/*` dependency stack alongside `@brewery/i18n` and `@brewery/contracts`.
+- **Consumed by**: `apps/web` (via the sync script), `apps/native` (via Metro direct import), `@brewery/recipes-ui` (for any domain illustration shipped in a shared component — pending rename to `@umbraculum/brewery-recipes-ui` per sub-plan #9 slot 13).
+- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/i18n` and `@brewery/contracts` (both pending sub-plan #9 renames).
 
 ## Status
 

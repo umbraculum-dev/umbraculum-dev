@@ -59,7 +59,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 ## How it fits in
 
 - **Consumed by**: `apps/web` (via next-intl), `apps/native` (via React Native bundling), `services/api` (for any operator-facing message strings), `@brewery/i18n-react` (the React-binding sibling).
-- **Depends on**: nothing in `@brewery/*`. This package is at the bottom of the `@brewery/*` dependency stack alongside `@brewery/contracts` and `@brewery/media`.
+- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/contracts` and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
 
 ## Status
 

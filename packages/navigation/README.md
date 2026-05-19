@@ -52,7 +52,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 ## How it fits in
 
 - **Consumed by**: `apps/web` (Next.js router translates `RouteRef` → `href`); `apps/native` (React Navigation translates `RouteRef` → `navigation.navigate`); `@brewery/ui` and `@brewery/recipes-ui` (any platform-neutral component that needs to express "navigate to this target" without pulling in a routing library).
-- **Depends on**: nothing in `@brewery/*`. This package is at the bottom of the `@brewery/*` dependency stack alongside `@brewery/i18n`, `@brewery/contracts`, and `@brewery/media`.
+- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/i18n`, `@brewery/contracts`, and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
 
 ## Status
 

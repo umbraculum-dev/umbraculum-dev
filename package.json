@@ -17,7 +17,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build:packages": "npm run build -w @brewery/i18n && npm run build -w @brewery/i18n-react && npm run build -w @brewery/navigation && npm run build -w @brewery/contracts && npm run build -w @brewery/module-sdk && npm run build -w @brewery/automation-contracts && npm run build -w @brewery/api-client && npm run build -w @brewery/ui && npm run build -w @brewery/beerjson && npm run build -w @brewery/recipes-ui && npm run build -w @brewery/media",
+    "build:packages": "npm run build -w @brewery/i18n && npm run build -w @brewery/i18n-react && npm run build -w @brewery/navigation && npm run build -w @brewery/contracts && npm run build -w @brewery/module-sdk && npm run build -w @brewery/automation-contracts && npm run build -w @brewery/api-client && npm run build -w @brewery/ui && npm run build -w @brewery/beerjson && npm run build -w @brewery/recipes-ui && npm run build -w @umbraculum/media",
     "test:packages": "npm test -w @brewery/contracts && npm test -w @brewery/core",
     "test:all": "npm run test:packages",
     "lint": "eslint .",

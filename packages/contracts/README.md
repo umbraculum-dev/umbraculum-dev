@@ -52,7 +52,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 ## How it fits in
 
 - **Consumed by**: `services/api` (the producer side), `apps/web` and `apps/native` (the consumer sides), `@brewery/api-client` (transport layer that returns parsed responses).
-- **Depends on**: nothing in `@brewery/*`. This package is at the bottom of the `@brewery/*` dependency stack alongside `@brewery/i18n` and `@brewery/media`.
+- **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/i18n` and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
 
 ## Status
 

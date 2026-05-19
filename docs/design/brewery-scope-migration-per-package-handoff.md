@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slot 1 pre-checked (worked example); slots 2–14 pending serial execution.
+**Status:** Active 2026-05-19 — slot 1 done (worked example) and slot 2 done (`media`); slots 3–14 pending serial execution.
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -71,41 +71,55 @@ Notes:
 
 ## Slot 2 — `@brewery/media` → `@umbraculum/media`
 
-**Status:** Pending.
+**Status:** **Done 2026-05-19** (commit hash recorded in the slot-2 commit message; this slot is the first non-worked-example slot, driven by plan doc §4 alone).
 
 **Target + classification.** Platform (framework). Generic shared-assets framework. Current assets are brewery imagery; content split deferred to when second vertical lands (plan doc §1.4).
 
 **Hard stops.**
 
 - **`apps/web/next.config.js`** has `transpilePackages: [..., "@brewery/media", ...]` — must be updated. Forgetting this triggers a silent Next.js transpile-miss; the web build still compiles but the package's TS/TSX won't be transpiled correctly.
+- **Root `package.json` `build:packages` script** lists `npm run build -w @brewery/media` — must be updated. Forgetting this triggers `npm error No workspaces found: --workspace=@brewery/media` during step 5 (`scripts/build-packages-in-docker.sh`). **Discovered during slot 2 execution — was not in the pre-scoping inventory.** Now codified in plan doc §4 step 3 and §5 risk register; future slots must check this script.
 - The package ships assets (PNGs, etc.) in `packages/media/assets/`; the *content* is brewery-flavored. The rename does NOT split the content — that's deferred (plan doc §1.4). Do not delete or move assets in this PR.
 
 **File inventory.**
 
 Workspace name + own files:
-- [ ] [`packages/media/package.json`](../../packages/media/package.json) — update `name` field; add classifying description.
-- [ ] [`packages/media/README.md`](../../packages/media/README.md).
+- [x] [`packages/media/package.json`](../../packages/media/package.json) — update `name` field; add classifying description.
+- [x] [`packages/media/README.md`](../../packages/media/README.md) — heading + scope mentions of `@brewery/media` and the `@umbraculum/media` import sample.
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json) — `dependencies` entry.
-- [ ] [`apps/native/package.json`](../../apps/native/package.json) — `dependencies` entry.
+- [x] [`apps/web/package.json`](../../apps/web/package.json) — `dependencies` entry.
+- [x] [`apps/native/package.json`](../../apps/native/package.json) — `dependencies` entry.
 
 Build configs:
-- [ ] [`apps/web/next.config.js`](../../apps/web/next.config.js) — `transpilePackages` list (HARD STOP if missed).
-- [ ] [`apps/web/scripts/sync-media.mjs`](../../apps/web/scripts/sync-media.mjs) — script references.
+- [x] **[`package.json`](../../package.json)** (root) — `scripts.build:packages` last entry (`-w @brewery/media`). **NEW: surfaced during slot 2; now a HARD STOP for all future slots.**
+- [x] [`apps/web/next.config.js`](../../apps/web/next.config.js) — `transpilePackages` list (HARD STOP if missed).
+- [x] [`apps/web/scripts/sync-media.mjs`](../../apps/web/scripts/sync-media.mjs) — script references.
 
 Source imports:
-- [ ] [`apps/native/src/media/RemoteImage.tsx`](../../apps/native/src/media/RemoteImage.tsx).
-- [ ] [`apps/native/src/screens/YeastScreen.tsx`](../../apps/native/src/screens/YeastScreen.tsx).
-- [ ] [`apps/web/app/recipes/[id]/yeast/page.tsx`](../../apps/web/app/recipes/[id]/yeast/page.tsx).
+- [x] [`apps/native/src/media/RemoteImage.tsx`](../../apps/native/src/media/RemoteImage.tsx).
+- [x] [`apps/native/src/screens/YeastScreen.tsx`](../../apps/native/src/screens/YeastScreen.tsx).
+- [x] [`apps/web/app/recipes/[id]/yeast/page.tsx`](../../apps/web/app/recipes/[id]/yeast/page.tsx).
 
 Cross-package README references:
-- [ ] [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+- [x] [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../REACT-NATIVE-KICKOFF-READINESS.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../REACT-NATIVE-KICKOFF-READINESS.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7.
+**Verification + commit.** Plan doc §4 steps 1–7 — all green:
+- Lockfile diff: 14 lines, scoped to `@brewery/media` → `@umbraculum/media` rename.
+- API health: `{"ok":true}` post-restart.
+- `scripts/build-packages-in-docker.sh`: green; `@umbraculum/media@0.0.0` built (manifest + index in both ESM/CJS + .d.ts).
+- `npm run typecheck` (api): green.
+- `npm run test -- --run` (api): 413 tests pass, 51 test files.
+- Nginx smoke (`/api/health`, `/en/login`, `/en/recipes`, `/en/automation`): all HTTP 200.
+
+**Lessons for slots 3–14** (already folded back into plan doc §4 / §5 BEFORE the commit):
+
+1. **Root `package.json` `build:packages` script** is now a HARD STOP file in plan doc §4 step 3. Every remaining slot must verify it.
+2. **In-place `npm install` in api container** must use `--include=dev` to avoid omitting devDependencies (tsc, vitest, tsx). Plan doc §4 step 4b updated.
+3. **Plugin-pack skill `package-scope-migration-preflight` landed** under `umbraculum-platform-tsjs-cursor-assistant/skills/`. Slots 3–14 should invoke it (read its SKILL.md) before starting, to get a fresh inventory + hard-stop check.
 
 ---
 
