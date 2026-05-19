@@ -1,0 +1,227 @@
+# Umbraculum modules
+
+**Tier:** Public
+**Status:** v0.1 — first iteration 2026-05-19 (living document; per-module pages land as each module ships)
+**Audience:** anyone evaluating, contributing to, or building on top of the Umbraculum module ecosystem.
+
+> [!NOTE]
+> Part of [Umbraculum](../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`RENAME-DILIGENCE.md`](RENAME-DILIGENCE.md). This doc is the ecosystem entry point — the analog of `drupal.org/project/project_module` for Umbraculum. For substantive governance, the [RFCs](rfcs/) win; this doc indexes them.
+
+---
+
+## 1. What this page is
+
+Three different readers land here for three different reasons; the page tries to serve all three without making any of them dig:
+
+1. **Skeptic / evaluator** — *"how mature is this ecosystem, and what does it commit me to?"* The catalog in §3, the license/tier signals in §6, and the cross-references in §7 are for you.
+2. **Module developer (would-be contributor)** — *"how do I add a module, and what kind of module is right for me?"* The vocabulary in §2 and the decision tree in §4 are for you. §5 is the working code you copy from.
+3. **Future maintainer or integrator** — *"what's already shipped, and where does each piece live?"* The catalog in §3 and the per-module pages it links to are for you.
+
+This page does **not** relitigate the governance model — [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) does that, and is binding. This page also does **not** duplicate the physical layout decisions — [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) does that, and is binding. What this page adds is navigation, vocabulary, and a worked example so the RFCs are findable and approachable.
+
+---
+
+## 2. Vocabulary — the five words that matter
+
+These five terms are used precisely throughout Umbraculum's docs. They are *not* interchangeable; mixing them up is the single most common source of confusion when reading the codebase. Source-of-truth links are in the right-hand column.
+
+| Term | One-line meaning | Source of truth |
+|---|---|---|
+| **package** | An npm artifact under `packages/<name>/` with its own `package.json`. A *publishing and build* unit. Not all packages are modules; horizontal infrastructure packages exist that no module owns. | [`packages/`](../packages/) tree; each package's own `README.md` |
+| **canonical module** | A reserved-domain registered unit, identified by a short `code` from a closed set. Materialized as four coordinated slices (API + web + native + contracts package) sharing the same code. Governance: Tier 1, gated by mini-RFC. | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §3–§4; [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3–§4 |
+| **vertical configuration** | A non-canonical module — same physical β shape (four slices), but its `code` is *not* in the reserved set. Tier 6, permissionless. Consumes canonical modules; never reimplements canonical domains. | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6); [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 |
+| **reserved canonical code** | One of the five strings in `RESERVED_CANONICAL_MODULE_CODES` — currently `mrp`, `wms`, `crm`, `crp`, `automation`. Allocation is gated by mini-RFC; collision in `registerModule()` is a boot error. | [`packages/module-sdk/src/reservedCodes.ts`](../packages/module-sdk/src/reservedCodes.ts) (code-authoritative); [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 (governance-authoritative) |
+| **module SDK** | The MIT-licensed npm package that defines `registerModule()`, the canonical-code validator, and the `ValidatedSchema<T>` contract. The reusable surface third-party module authors pin. | [`packages/module-sdk/README.md`](../packages/module-sdk/README.md); [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §5 (Decision C); [RFC-0003](rfcs/0003-validation-library-adoption.md) |
+
+**Three quick clarifications people stumble on:**
+
+- *"Is `@umbraculum/i18n` a module?"* No — it's a horizontal **package** (cross-cutting infrastructure). It has no `code`, no API slice, no web slice. Modules consume it; it does not register itself.
+- *"Is `brewery` a canonical module?"* No — it's a **vertical configuration** (Tier 6). The `brewery` code is *not* in the reserved set. This is deliberate, and it is the single most important distinction in RFC-0001. The category mistake to avoid is "building a CRM for a hotel and calling it Hotel instead of CRM": the hotel is the vertical, the CRM is the canonical domain ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4; [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1.1).
+- *"What about `automation-contracts` — is that a module?"* No — it's the *contracts package* slice of the `automation` canonical module. The other three slices (`services/api/src/modules/automation/`, `apps/web/app/[locale]/(automation)/`, `apps/native/src/modules/automation/`) make up the rest of the module. See §5 below for the full picture.
+
+---
+
+## 3. Catalog — what's in the ecosystem today
+
+Three tables, one per category. Each row links to the artifact's own documentation.
+
+### 3.1 Canonical modules (Tier 1, reserved codes)
+
+The reserved set is closed — the five codes below are it, today. Additions go through the mini-RFC procedure ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 Decision D).
+
+| Code | Status | Surface | License | Page |
+|---|---|---|---|---|
+| `automation` | **Shipped — read path (Phase B-3, 2026-05-19); Phase C real adapter pending** | Fleet, vessels, alarms; OpenPLC bridge via brewery adapter | AGPLv3 | [modules/canonical/automation.md](modules/canonical/automation.md) |
+| `mrp` | Open door — H1 2027 working assumption | Material requirements planning, production orders, work orders | AGPLv3 | _(stub — page lands when work starts)_ |
+| `wms` | Open door | Warehouse management, stock movements, locations, lots/serials | AGPLv3 | _(stub)_ |
+| `crm` | Open door | Customer relationships, contacts, accounts, opportunities | AGPLv3 | _(stub)_ |
+| `crp` | Open door | Capacity requirements planning, resource scheduling, work-center load | AGPLv3 | _(stub)_ |
+
+Note on "open door": the code is reserved and the folder shape is pre-committed by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md). The work to design and ship each module's surface is its own future RFC or design artifact ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §12.4); no implementation exists yet.
+
+### 3.2 Vertical configurations (Tier 6, permissionless)
+
+Vertical configurations use the same β shape as canonical modules but with a vertical code instead of a reserved canonical code. They consume the canonical-module surface plus vertical-specific seed data and prompts ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 row 6).
+
+| Code | Status | Consumes (planned) | License | Page |
+|---|---|---|---|---|
+| `brewery` | **Shipped — reference vertical** (flat layout today; β migration H1 2027 per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) Decision D) | `automation` (shipped), `mrp` (planned), `wms` (planned), `crm` (planned) | AGPLv3 (this bundle); third-party verticals are author's choice | _(per-page lands with the H1 2027 β migration)_ |
+
+Future verticals (distillery, kombucha, cosmetics, food-batch, fragrance) are explicitly anticipated by [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 but unimplemented. They can be community-built — the Tier 6 path is permissionless.
+
+### 3.3 Horizontal packages (cross-cutting infrastructure, NOT modules)
+
+These packages are consumed by every module. They are not registered through `registerModule()`; they have no `code`. They are the platform-owned services from the *consumption contract* ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8 Decision F) that modules must use rather than reimplement.
+
+| Package (current name) | End-state name | Role |
+|---|---|---|
+| [`@umbraculum/module-sdk`](../packages/module-sdk/README.md) | `@umbraculum/module-sdk` (rename pending — sub-plan #9 slot 11) | The SDK every module pins. `registerModule()`, reserved-code validation, `ValidatedSchema<T>`. |
+| [`@brewery/contracts`](../packages/contracts/README.md) | `@umbraculum/contracts` (sub-plan #9 slot 9) | Platform-wide auth/me DTOs, AI tool contract types. |
+| [`@umbraculum/automation-contracts`](../packages/automation-contracts/README.md) | (already renamed — slot 4 done) | Contracts slice of the `automation` canonical module. The Modbus mailbox mirror lives here. |
+| [`@brewery/api-client`](../packages/api-client/README.md) | `@umbraculum/api-client` (slot 10) | Fetch + auth boundary (cookie web, bearer native). |
+| [`@umbraculum/i18n`](../packages/i18n/README.md) | (already renamed — slot 7 done) | Cross-platform message catalog (web + native). |
+| [`@brewery/i18n-react`](../packages/i18n-react/README.md) | `@umbraculum/i18n-react` (slot 8) | Universal `useT` hook for React + React Native. |
+| [`@umbraculum/ui`](../packages/ui/README.md) | (already renamed — slot 5 done) | Tamagui primitives + design-system components. Industry-agnostic. |
+| [`@umbraculum/navigation`](../packages/navigation/README.md) | (already renamed — slot 3 done) | Route IDs + cross-platform routing policy. |
+| [`@umbraculum/media`](../packages/media/README.md) | (already renamed — slot 2 done) | Shared assets framework. |
+| [`@umbraculum/test-mcp`](../packages/test-mcp/README.md) | (already renamed — slot 1 done) | Test-MCP HTTP server exposing testing tools. Developer tooling. |
+| `@umbraculum/brewery-core` ([`packages/core/`](../packages/core/)) | (already renamed — slot 6 done; vertical-prefixed) | Brewery-vertical brewing math (gravity, water). **Vertical-prefixed scope** — see RFC-0002 §4. No README yet — content sits in [`packages/core/src/`](../packages/core/src/). |
+| [`@brewery/beerjson`](../packages/beerjson/README.md) | `@umbraculum/brewery-beerjson` (slot 12) | Brewery-vertical BeerJSON spec layer. **Will be vertical-prefixed.** |
+| [`@brewery/recipes-ui`](../packages/recipes-ui/README.md) | `@umbraculum/brewery-recipes-ui` (slot 13) | Brewery-vertical recipe/water/yeast UI. **Will be vertical-prefixed.** |
+
+Note the asymmetry in the third column: horizontal packages keep an unprefixed `@umbraculum/<name>` scope; vertical-flavored packages carry a vertical prefix (`@umbraculum/brewery-<name>`). That distinction is enforced by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §4 and is the trap that slot 6 of sub-plan #9 was designed to catch ([brewery-scope-migration-per-package-handoff.md](design/brewery-scope-migration-per-package-handoff.md) — Slot 6 ⚠ TRAP).
+
+---
+
+## 4. "I want to build a ___" — decision tree
+
+The right contribution path depends on which kind of thing you're adding. Use this tree before you start; the ceremony cost varies by an order of magnitude across the rows.
+
+### 4.1 …a new canonical module (e.g. `quality`, `maintenance`, `hr`)
+
+Allocating a new reserved code is the single gated path in the ecosystem ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 Decision D). Required ceremony:
+
+1. **Mini-RFC** at `docs/rfcs/NNNN-canonical-<code>.md` — motivation, alternatives, impact, migration plan.
+2. **Consumption-contract checklist** — explicit confirmation the module uses platform auth, tenancy, ACL, billing, AI, observability, i18n, UI, secrets, integrations, HTTP, and DB ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2 obligation table).
+3. **Public-comment period** (post-public-flip) — minimum 30 days.
+4. **Core team approval** — verifies Decisions A–F are honored.
+
+The minimum bar is high on purpose: a reserved code, once allocated, is forward-only ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 step 5). Don't start here unless cross-vertical demand is real and a reference implementation is underway.
+
+### 4.2 …a vertical configuration (e.g. `distillery`, `kombucha`)
+
+Tier 6, **permissionless**. You can ship without asking — just consume the canonical-module SDK from your own repo or open a PR to add `apps/web/app/[locale]/(<your-code>)/` plus siblings in this monorepo. The constraint is the consumption contract ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8) — your vertical may not reimplement auth, billing, AI, or any other horizontal service. Use what `brewery` does as the model; the brewery-as-vertical-configuration shape is documented in [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 and the canonical Tier 6 row in [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5.
+
+### 4.3 …a third-party / community module against an existing canonical (e.g. a Salesforce-CRM-connector for the `crm` canonical when it ships)
+
+Tier 3 or Tier 4, **permissionless**. Pin `@umbraculum/module-sdk` and the relevant `@umbraculum/<code>-contracts` package; ship your module's package from your own repo; consumers install it like any npm package. The SDK shape ([`packages/module-sdk/src/types.ts`](../packages/module-sdk/src/types.ts)) is the public contract; nothing else is.
+
+### 4.4 …a horizontal package (e.g. a new shared utility, a new cross-cutting service)
+
+Tier 2 — maintained by the core team. The bar is *not* a mini-RFC; it's a regular PR with reviewer agreement that the concern is genuinely cross-cutting (not module-specific). If the answer is "this is one module's data, not horizontal", put it inside the module instead.
+
+### 4.5 …a new AI tool, a tier-limit field, an addon code
+
+These attach *to a module*. They are not standalone artifacts. Find the right module's `registerModule({ ... })` call and add the entry there — see §5 for what that looks like for `automation`.
+
+---
+
+## 5. Worked example — the `automation` canonical module
+
+This is the only canonical module that exists today, so it is the canonical worked example. Every column in the §3.1 catalog comes from real files in this repo; the snippets below are the load-bearing ones.
+
+### 5.1 The four slices
+
+The β layout from [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3 says every canonical module is materialized as four coordinated paths sharing the `code`. For `automation`:
+
+| Slice | Path | What it owns |
+|---|---|---|
+| API | [`services/api/src/modules/automation/`](../services/api/src/modules/automation/) | Fastify routes (`/automation/vessels`, `/automation/vessels/:code`), the mock adapter, the vessels service. |
+| Web | [`apps/web/app/[locale]/(automation)/`](../apps/web/app/[locale]/(automation)/) | Next.js pages — vessel list, vessel detail. Route group `(automation)/` — no URL prefix change. |
+| Native | (not yet wired) | Will be `apps/native/src/modules/automation/` per RFC-0002 §3 — pending native-side automation work. |
+| Contracts | [`packages/automation-contracts/`](../packages/automation-contracts/) → [`@umbraculum/automation-contracts`](../packages/automation-contracts/README.md) | Adapter SDK types (`AutomationAdapterDefinition`), `VesselStateSchema`, `CONTRACT_VERSION`, the typed Modbus mailbox mirror. The only piece a third-party adapter pins. |
+
+The Postgres schema is named `automation` (per [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §4 convention 4); the `Vessel`, `AdapterConnection`, and `AutomationAlarmEvent` models live there. See [`services/api/prisma/schema.prisma`](../services/api/prisma/schema.prisma) and [canonical-automation-module-surface.md §7](design/canonical-automation-module-surface.md) for the Prisma layout.
+
+### 5.2 The `registerModule()` call
+
+The shape every module follows. From [`services/api/src/modules/automation/index.ts`](../services/api/src/modules/automation/index.ts):
+
+```44:66:services/api/src/modules/automation/index.ts
+export function registerAutomationModule(app: FastifyInstance): void {
+  const alreadyRecorded = listRegisteredModules().some(
+    (m) => m.code === MODULE_CODE,
+  );
+
+  if (!alreadyRecorded) {
+    registerModule(app, {
+      code: MODULE_CODE,
+      prismaSchema: "automation",
+      addonCodes: ["automation_module"],
+      // Routes registered via per-app `app.register(...)` below so they
+      // attach on every `buildApp()` call. `registerModule` records the
+      // metadata once per process; if `routes:` were passed here, the
+      // guarded first-call path would register routes too, but
+      // second-and-later `buildApp()` calls (test workers) would skip
+      // both metadata AND routes — leaving the second app without the
+      // module's routes wired.
+      routes: [],
+    });
+  }
+
+  app.register(automationVesselsRoutes);
+}
+```
+
+Three things to notice for your own module:
+
+1. **`code`** is the canonical code from `RESERVED_CANONICAL_MODULE_CODES` (or your vertical code for Tier 6). Collision is a boot error.
+2. **`prismaSchema`** matches the code by convention. For Tier 6 verticals migrating from `public`, this may be the vertical code or stay as `public` until a dedicated migration ([RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3 Prisma alignment).
+3. **`addonCodes`** is the list of Stripe / RevenueCat addon SKUs your module's paid features unlock through. The platform owns billing — modules declare addon codes, they do not integrate Stripe directly ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2).
+
+The full SDK options surface (route registrars, `tierLimits`, `registerAiTools`) is documented in [`packages/module-sdk/src/types.ts`](../packages/module-sdk/src/types.ts).
+
+### 5.3 The contracts package — what third parties pin
+
+[`packages/automation-contracts/`](../packages/automation-contracts/) is the only piece of `automation` a third-party adapter author depends on. It exports four surfaces ([`@umbraculum/automation-contracts` README](../packages/automation-contracts/README.md)):
+
+- `CONTRACT_VERSION` constant + `classifyContractVersionSkew` helper (the major/minor/patch handshake policy).
+- `MailboxSpec` / `MailboxEntry` types (typed mirror of the OpenPLC sister-repo `PI_*` registers).
+- `MAILBOX_SPEC` frozen constant (the validated runtime mirror, 356 entries as of contract `2.0.1-dev`).
+- `AutomationAdapterDefinition` (the adapter contract that `brewery.openplc.v1` and any other adapter implements).
+
+The implementation surface (Fastify routes, Prisma models, AI tools, adapter supervisor loop) stays inside the API slice. Third parties never reach into `services/api/src/modules/automation/` directly — they pin `@umbraculum/automation-contracts` and depend on the `@umbraculum/module-sdk` SDK shape.
+
+### 5.4 The design doc
+
+[`docs/design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) is the accepted design (2026-05-19) for the `automation` module's surface — the adapter SDK shape, the `Vessel` vs `EquipmentProfile` decision, the OpenPLC translation seam, the AI tools, the tier limits, and the H2 2026 phasing. When you build another canonical module, write the equivalent design doc; it is the "what does this module actually look like at the platform's edges" artifact that RFC-0001 §7.2 leaves to the per-module follow-on.
+
+---
+
+## 6. Governance & license signals
+
+| Concern | Where it's pinned |
+|---|---|
+| **License posture** — Tier 1 canonical is AGPLv3; Tier 2 SDK is MIT; Tier 6 vertical (when bundled by core team) is AGPLv3 alongside the core; third-party verticals (Tier 4 / Tier 6 community-built) are author's choice. | [LICENSING.md](LICENSING.md) §6, [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 |
+| **Tier model and rights / obligations** | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Decision C) |
+| **What modules MUST consume (auth, billing, AI, …) and never reimplement** | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8 (Decision F, the consumption contract) |
+| **Mini-RFC procedure for promoting a community module to canonical** | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §6 (Decision D) |
+| **Folder / naming conventions for every module slice** | [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3–§4 (Decisions A + B) |
+| **Validation library posture (Zod v4 + `ValidatedSchema<T>` for third-party freedom)** | [RFC-0003](rfcs/0003-validation-library-adoption.md) |
+| **`@brewery/*` → `@umbraculum/*` migration progress** | [brewery-scope-migration-per-package-handoff.md](design/brewery-scope-migration-per-package-handoff.md) (slot-by-slot checklist) |
+
+---
+
+## 7. Cross-references
+
+- **[RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md)** — canonical-module rule, reserved codes, tier model, governance, consumption contract.
+- **[RFC-0002](rfcs/0002-canonical-module-physical-layout.md)** — physical layout (β three-tree distribution), naming conventions, module-SDK location.
+- **[RFC-0003](rfcs/0003-validation-library-adoption.md)** — validation library adoption (Zod v4 + library-agnostic `ValidatedSchema<T>`).
+- **[PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md)** — the platform vision; §1.1.1 explains why canonical modules are peer domains and not nested under "manufacturing"; §4.4 sketches the `registerModule()` runtime; §5.2 is the H1 2027 restructure tranche.
+- **[`packages/module-sdk/README.md`](../packages/module-sdk/README.md)** — the SDK's own README.
+- **[`docs/design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md)** — the worked example for "how a canonical module's surface design doc looks".
+- **[modules/canonical/automation.md](modules/canonical/automation.md)** — the per-module page for `automation`.
+
+---
+
+*This page is intentionally short and load-bearing. Substantive arguments live in the RFCs; per-artifact detail lives in the per-module pages and the package READMEs. If you find yourself reading this doc and wishing it explained something in more depth, the right answer is almost always to follow one of the links above — and if that link doesn't exist, that's a docs gap worth filing.*

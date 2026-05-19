@@ -35,6 +35,13 @@ The high-level direction, business model, and license posture.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
 - [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the current AI tier unlock and future managed-AI overlay are described in `PLATFORM-ARCHITECTURE.md` §7).
 
+## Modules ecosystem
+
+*Audience: anyone evaluating, contributing to, or building on top of the module set — the analog of `drupal.org/project/project_module` for Umbraculum.*
+
+- [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example.
+- [`modules/`](modules/) — per-module pages linked from `MODULES.md` (one page per canonical module / vertical configuration as each ships; today: `modules/canonical/automation.md`).
+
 ## Governance (RFCs)
 
 *Audience: contributors, module developers, platform evaluators.*
