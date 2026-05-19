@@ -42,6 +42,12 @@ The high-level direction, business model, and license posture.
 - [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example.
 - [`modules/`](modules/) — per-module pages linked from `MODULES.md` (one page per canonical module / vertical configuration as each ships; today: `modules/canonical/automation.md`).
 
+## Stack & dependencies
+
+*Audience: evaluators, future maintainers, partners — anyone who wants to know **what** the platform is built on and **why** each open-source choice was made.*
+
+- [`OPEN-SOURCE-STACK.md`](OPEN-SOURCE-STACK.md) — **per-dependency rationale.** Exhaustive companion to [`MANIFESTO.md`](../MANIFESTO.md) §1.4: for every load-bearing dependency (OS, runtime, data layer, backend, frontend web + native, validation, tests, lint, industrial automation, build, brewery-domain, docs/CI), answers three questions — role in the discipline-apparatus, why this over the proprietary alternative, what shrinks if swapped for closed source. Includes the single closed-source exception (Cursor itself) and the posture toward it.
+
 ## Governance (RFCs)
 
 *Audience: contributors, module developers, platform evaluators.*

@@ -174,19 +174,5 @@ Before implementing native app login, complete these items.
 
 - [x] **Comprehensive developer-onboarding doc** — landed as [`docs/GETTING-STARTED.md`](../../docs/GETTING-STARTED.md) (2026-05-19). Linear tutorial from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running": OS-bootstrap (apt / Docker / Cursor / git+DCO), repo-bootstrap (`docker compose up` + verification), apparatus install (thin pointer to the apparatus docs), policy + skill inventory pointers, and a first-PR walkthrough with concrete task categories. Targets the [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 gap directly; the corresponding "Onboarding mechanism — landed" paragraph in §1.4 has been updated to point at the new doc. *Living document — extensions welcome as parts of the apparatus surface stabilize.*
 
-- [ ] **Comprehensive open-source-dependencies page** (working title: `docs/OPEN-SOURCE-STACK.md`) — the exhaustive companion to [`MANIFESTO.md`](../../MANIFESTO.md) §1.4's *representative* dependency list. For each load-bearing dependency: (a) what role it plays in the discipline-apparatus, (b) why it was picked over the proprietary alternative, (c) what reach of the apparatus would shrink if it were swapped for a closed-source equivalent. Minimum coverage list (extend as appropriate):
-  - **OS / runtime layer**: Linux (Ubuntu), Docker, Node.js, Python (for sister-repo tooling).
-  - **Data layer**: Postgres, pgpool, Redis.
-  - **Backend layer**: Fastify, Prisma, Pino, tsx.
-  - **Frontend layer (web)**: Next.js, React, Tamagui, Turbopack.
-  - **Frontend layer (native)**: React Native, Expo, Tamagui (native config).
-  - **Validation + types**: Zod, TypeScript.
-  - **Test layer**: Vitest, Playwright.
-  - **Lint / format / quality**: ESLint, Prettier-equivalent if any, `eslint-plugin-boundaries`.
-  - **Industrial automation**: OpenPLC (Editor + Runtime), the FastAPI sidecar stack.
-  - **Build orchestration**: npm workspaces (today; turbo / nx alternatives noted).
-  - **Brewery-domain libraries**: BeerJSON.
-  - **Docs / observability / CI**: GitHub Actions stack, Markdown, mermaid (if used).
-  - Plus anything else in the workspace package.json files at the time of writing.
-  Page should be Tier: Public, follow [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md), and be linked from both [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 (replacing the "representative not exhaustive" framing) and [`docs/README.md`](../../docs/README.md) (a new "Stack & dependencies" section, or under the existing "Architecture" group).
+- [x] **Comprehensive open-source-dependencies page** — landed as [`docs/OPEN-SOURCE-STACK.md`](../../docs/OPEN-SOURCE-STACK.md) (2026-05-19; 656 lines). Per-dependency analytical companion to [`MANIFESTO.md`](../../MANIFESTO.md) §1.4: for every load-bearing dependency (OS / runtime / data / backend / frontend web + native / validation + types / test / lint / industrial automation / build / brewery-domain / docs+CI) the same three questions get a 1–2 sentence answer (role in apparatus, why over proprietary, what shrinks if swapped for closed source). Coverage matches the minimum list scoped here plus the Cursor closed-source-exception entry. Linked from [`MANIFESTO.md`](../../MANIFESTO.md) §1.4 (new sentence pointing to it after the recursive-principle list) and from [`docs/README.md`](../../docs/README.md) (new "Stack & dependencies" section between "Modules ecosystem" and "Governance (RFCs)"). Page is Tier: Public. *Maintenance discipline: when a new load-bearing dependency lands in a package.json, an entry should land in the same PR — see the doc's "Where this list comes from + how to extend it" section.*
 
