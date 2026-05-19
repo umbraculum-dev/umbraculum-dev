@@ -67,14 +67,9 @@ Goal: validate the "modules expand by config and SDK, not by core rewrite" promi
 - **Invest in foundations alongside features, not at the end.** Lint, type safety, test coverage, and developer-facing documentation compound — every bit of foundation paid down now makes every future feature cheaper and safer. The opposite — accumulating debt until "later" — never goes well. Living foundation docs: `docs/LINTING.md`, `docs/TAMAGUI.md`, `docs/TESTING.md`, `docs/DEVELOPMENT-ACCESSIBILITY.md`.
 - **The tone of this roadmap is honest commitment, not aspiration.** If a phase moves, the doc moves. If the underlying assumptions change, the trajectory changes openly via the same RFC process used for governance changes (`docs/LICENSING.md` §10).
 
-## UI pillars (from Figma)
+## UI pillars
 
-Figma exports live under `docs/figma/`:
-- `dashboard.png`
-- `edit-recipe.png`
-- `water-calculator-and-mash-chemistry.png`
-
-These map to three “pillars”:
+The v0 UI is organized around three pillars:
 1) Dashboard with simple navigation
 2) Recipe editor (complex)
 3) Water calculator / mash chemistry (complex)
