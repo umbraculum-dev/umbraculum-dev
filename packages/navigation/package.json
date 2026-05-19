@@ -1,7 +1,8 @@
 {
-  "name": "@brewery/navigation",
+  "name": "@umbraculum/navigation",
   "private": true,
   "version": "0.0.0",
+  "description": "Cross-platform routing-policy framework: route ID system, RouteRef type, web/native target mappers. Framework-agnostic by design (does not import React Navigation or Next.js types). Current route IDs include brewery routes; content split deferred per sub-plan #9 §1.4. Renamed from @brewery/navigation as sub-plan #9 slot 3 (2026-05-19).",
   "type": "module",
   "scripts": {
     "build": "tsup src/index.ts src/native.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",

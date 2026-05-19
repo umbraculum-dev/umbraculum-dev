@@ -9,7 +9,7 @@ import {
 } from "@react-navigation/native-stack";
 
 import { useT } from "@brewery/i18n-react";
-import type { RouteId } from "@brewery/navigation";
+import type { RouteId } from "@umbraculum/navigation";
 
 import { Spinner } from "@brewery/ui";
 

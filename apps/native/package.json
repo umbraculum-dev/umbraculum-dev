@@ -18,7 +18,7 @@
     "@brewery/i18n": "file:../../packages/i18n",
     "@brewery/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/media": "file:../../packages/media",
-    "@brewery/navigation": "file:../../packages/navigation",
+    "@umbraculum/navigation": "file:../../packages/navigation",
     "@brewery/recipes-ui": "file:../../packages/recipes-ui",
     "@brewery/ui": "file:../../packages/ui",
     "@react-navigation/bottom-tabs": "^7.15.0",

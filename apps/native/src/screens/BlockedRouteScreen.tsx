@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Alert } from "react-native";
 
 import { useT } from "@brewery/i18n-react";
-import type { RouteId, RouteRef } from "@brewery/navigation";
-import { getRouteAvailability } from "@brewery/navigation";
+import type { RouteId, RouteRef } from "@umbraculum/navigation";
+import { getRouteAvailability } from "@umbraculum/navigation";
 import { Button, Heading, Screen, Text } from "@brewery/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

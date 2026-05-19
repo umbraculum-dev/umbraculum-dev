@@ -34,7 +34,7 @@ We do **not** try to share Next.js routes or file-based routing across web/nativ
 - explicit policy for “ported vs not ported” flows
 
 Implemented package:
-- `packages/navigation` (`@brewery/navigation`)
+- `packages/navigation` (`@umbraculum/navigation`)
   - `RouteId`, `RouteParamsById`, `RouteRef`
   - `routeToPath(RouteRef)` produces a **non-locale** web path (e.g. `/inventory`, `/recipes/:id/water/mash`)
   - `getRouteAvailability(id, platform)` returns:
@@ -70,7 +70,7 @@ Web keeps Next App Router + `next-intl` locale-prefixed URLs.
 Implemented file:
 - `apps/web/src/navigation/appRouter.ts`
   - `useAppRouter()` implements `AppRouter` over `next-intl` navigation + locale prefixing
-  - It uses `routeToPath()` from `@brewery/navigation` and prefixes `/${locale}`.
+  - It uses `routeToPath()` from `@umbraculum/navigation` and prefixes `/${locale}`.
 
 ### 0.6 Cross-platform API client (fetch boundary + auth)
 
@@ -215,13 +215,13 @@ If code is intended to be shared between web and native (screens/flows/component
 - Expo Router modules
 
 Instead it depends on small shared interfaces:
-- routing: `@brewery/navigation`
+- routing: `@umbraculum/navigation`
 - i18n: `@brewery/i18n` + `@brewery/i18n-react`
 
 #### Implemented boundary modules (source of truth)
 - **Locales + messages**: `packages/i18n` (`@brewery/i18n`)
 - **Universal translation hook**: `packages/i18n-react` (`@brewery/i18n-react`)
-- **Universal route IDs + policy**: `packages/navigation` (`@brewery/navigation`)
+- **Universal route IDs + policy**: `packages/navigation` (`@umbraculum/navigation`)
 - **Web adapter**: `apps/web/src/navigation/appRouter.ts` (`useAppRouter()`)
 
 #### Route policy: avoid accidental “not ported” drift
@@ -480,7 +480,7 @@ Prefer accessibility selectors (`getByRole`, `getByLabel`) when stable, and use 
   - Strict placement rule: if code might be reused in native, it lives under `packages/**` first
 - Cross-platform boundaries (implemented early to reduce rework):
   - locales/messages: `@brewery/i18n`
-  - route manifest + policy: `@brewery/navigation`
+  - route manifest + policy: `@umbraculum/navigation`
   - universal translation hook: `@brewery/i18n-react`
   - web adapter: `apps/web/src/navigation/appRouter.ts`
 - Shared UI direction:

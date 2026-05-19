@@ -21,7 +21,7 @@
     "@brewery/core": "file:../../packages/core",
     "@brewery/i18n": "file:../../packages/i18n",
     "@brewery/i18n-react": "file:../../packages/i18n-react",
-    "@brewery/navigation": "file:../../packages/navigation",
+    "@umbraculum/navigation": "file:../../packages/navigation",
     "@umbraculum/media": "file:../../packages/media",
     "@brewery/ui": "file:../../packages/ui",
     "@brewery/recipes-ui": "file:../../packages/recipes-ui",

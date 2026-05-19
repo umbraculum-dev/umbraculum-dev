@@ -1,8 +1,8 @@
 import { useLocale } from "next-intl";
 
 import type { SupportedLocale } from "@brewery/i18n";
-import { routeToPath, getRouteAvailability } from "@brewery/navigation";
-import type { AppPlatform, AppRouter, RouteRef } from "@brewery/navigation";
+import { routeToPath, getRouteAvailability } from "@umbraculum/navigation";
+import type { AppPlatform, AppRouter, RouteRef } from "@umbraculum/navigation";
 
 import { useRouter } from "../i18n/navigation";
 

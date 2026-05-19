@@ -19,7 +19,7 @@ export interface NativeRouteTarget {
 /**
  * Map a shared route ref into a native navigation target.
  *
- * Note: This function intentionally avoids importing React Navigation types so `@brewery/navigation` stays framework-agnostic.
+ * Note: This function intentionally avoids importing React Navigation types so `@umbraculum/navigation` stays framework-agnostic.
  */
 export function routeToNativeTarget(ref: RouteRef): NativeRouteTarget {
   switch (ref.id) {

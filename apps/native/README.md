@@ -40,7 +40,7 @@ The native app expects `services/api` to be reachable; for local development aga
 ## How it fits in
 
 - **Consumed by**: end users on iOS and Android (via the future store releases). Internal alpha distribution runs through Expo's tooling per [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md).
-- **Depends on**: `services/api` (HTTP backend, bearer auth); `@brewery/api-client` (transport); `@brewery/contracts` (typed responses); `@brewery/ui` + `@brewery/recipes-ui` (UI); `@brewery/i18n` + `@brewery/i18n-react` (localization); `@brewery/navigation` (route ID system shared with web); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing).
+- **Depends on**: `services/api` (HTTP backend, bearer auth); `@brewery/api-client` (transport); `@brewery/contracts` (typed responses); `@brewery/ui` + `@brewery/recipes-ui` (UI); `@brewery/i18n` + `@brewery/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with web); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing).
 - **Auth**: bearer tokens in `expo-secure-store`. The web sibling rides cookie sessions — the difference is abstracted in `@brewery/api-client`.
 
 ## Status

@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` package-scope migration plan
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — scoping pass + worked example landed (slot 1, see §6); slot 2 (`media`) landed in the next session as the first non-worked-example slot driven by §4 alone (see §6.1). Remaining 12 slots (11 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
+**Status:** Active 2026-05-19 — scoping pass + slots 1–3 landed (slot 1: `test-mcp` worked example, §6; slot 2: `media`, §6.1; slot 3: `navigation`, §6.2; each slot surfaced lessons folded back into §4/§5 before commit). Remaining 11 slots (10 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
 **Audience:** core team executing the rename; future contributors picking up un-checked items from the handoff checklist; anyone evaluating the migration shape before the public flip.
 **Resolves:** umbrella plan sub-plan #9 (post-RFC-001 follow-on); the `@brewery/*` actual-scope migration referenced from [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md) §10.
 **Builds on:** [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §5.2 (rename commitment), [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §§4–5 (brewery is tier-6 vertical, NOT canonical), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §11.2 (H1 2027 restructure row that defers to this plan).
@@ -258,19 +258,30 @@ docker run --rm \
 
 # (b) MANDATORY (regardless of whether the renamed package is an api/web runtime dep):
 #     restore the bind-mounted services/api/node_modules and apps/web/node_modules
-#     pruned by step (a). Then restart api so the new node_modules is picked up.
+#     pruned by step (a). Use the STOP → host-install → START sequence — NOT
+#     `docker compose restart api` (see "Why not `docker compose restart`?" below).
 #
-#     IMPORTANT: --include=dev is REQUIRED for the api container (surfaced during
-#     slot 2). When run in-place against a running container with workspace deps
-#     that can't be resolved from /app's perspective (file:../../packages/...),
-#     npm 10's degraded resolution mode treats this as a production install and
-#     silently omits devDependencies (tsc, vitest, tsx). The container's startup
-#     `npm install` (via `docker compose up`) is unaffected; only in-place
-#     reinstall on a running container needs the flag.
-docker compose exec api sh -c 'cd /app && npm install --include=dev --no-audit --no-fund'
+#     IMPORTANT: --include=dev is REQUIRED for the host-side install (surfaced
+#     during slot 2). When run against a workspace-flavored package.json whose
+#     `file:../../packages/...` deps can't resolve from /app's perspective,
+#     npm 10's degraded resolution mode treats this as a production install
+#     and silently omits devDependencies (tsc, vitest, tsx).
+
+# api side: STOP → host-install (devDeps land in bind-mount) → START
+# (the api container's startup `sh -c "npm install && npm run dev"` will then
+#  see the lockfile + node_modules already in sync and run as a no-op,
+#  preserving devDeps for the subsequent build/typecheck steps).
+docker compose stop api
+docker run --rm -v "$PWD/services/api:/app" -w /app node:20-slim \
+  bash -lc 'npm install --include=dev --no-audit --no-fund'
+docker compose start api
+
+# web side: in-place install is safe (web container does not run a hot-reload
+# preload like tsx; the build script does not unlink-watch web's dist).
 docker compose exec web sh -c 'cd /app && npm install --include=dev --no-audit --no-fund'
-docker compose restart api
 ```
+
+**Why not `docker compose restart api`?** Surfaced during slot 3 worked-from-recipe execution. The api container's command is `sh -c "npm install && npm run dev"` — every restart re-runs `npm install`, which sometimes goes into degraded-resolution mode and prunes devDeps again. Then step 5 (`bash scripts/build-packages-in-docker.sh`) unlinks + recreates `dist/` files for every package. The running `tsx watch` (PID 1's child) detects those `unlink` events and tries to hot-reload, but `/app/node_modules/tsx/dist/preflight.cjs` was just pruned → `Cannot find module .../tsx/dist/preflight.cjs` → tsx process exits → api container crash-loops → `/api/health` returns 502 through Nginx for the rest of the slot. The STOP → host-install → START sequence avoids this entirely: the host one-shot install completes against an idle bind-mount with no concurrent tsx watching; when the container starts, npm sees the deps already satisfied (no prune); tsx watch comes up clean; subsequent build unlinks are absorbed normally.
 
 After regeneration:
 
@@ -333,6 +344,7 @@ If the verification surfaces any gotcha not yet documented in §4 or §5, **upda
 | Doc drift — README or design doc references the old name post-rename | High (~30 doc files) | Low | Step 3 enumerates the doc file list; reviewer scans `git grep '@brewery/<name>'` before pushing each PR |
 | Root `package.json` `build:packages` script not updated → `scripts/build-packages-in-docker.sh` (step 5) fails with `No workspaces found: --workspace=@brewery/<name>` | High (every rename touches this script unless the package is omitted from it, like test-mcp was) | Low (loud failure; easy to diagnose and recover) | Step 3 explicitly lists this script as a HARD STOP file; preflight skill `package-scope-migration-preflight` checks it as Command 5. **Surfaced during slot 2 worked example.** |
 | In-place `npm install` in api container omits devDependencies (tsc, vitest, tsx missing → typecheck/test fail) | High (every in-place reinstall against a running container with workspace deps) | Medium (recoverable, easy to misdiagnose as "lockfile corrupted") | Step 4b uses `--include=dev` flag; container startup `npm install` (via `docker compose up`) is unaffected. **Surfaced during slot 2 worked example.** |
+| `docker compose restart api` re-runs startup `npm install` (no `--include=dev`) → re-prunes devDeps → next `bash scripts/build-packages-in-docker.sh` unlinks dist files → tsx watch tries to hot-reload → tsx itself missing → api crash-loops → 502 through Nginx for the rest of the slot | High (slot 3 hit this on first execution of the post-slot-2 recipe; almost certainly hits every slot that runs the build step after a restart) | High (silent until smoke check; misdiagnosed as "build broke something") | **Slot 3 fix:** STOP → host-install (`docker run --rm -v "$PWD/services/api:/app"` one-shot with `--include=dev`) → START sequence, NEVER `docker compose restart api`. The host one-shot lands devDeps against an idle bind-mount; the container's startup `npm install` then sees deps satisfied and is a no-op; tsx watch survives the build's unlink events. Step 4b updated to enforce this. |
 | `dist/` not rebuilt → `SyntaxError: does not provide an export named` at api boot | Medium (easy to forget) | Medium | Step 5 + cross-reference to the canonical recovery in [`pr1-contracts-migration-handoff.md`](./pr1-contracts-migration-handoff.md) |
 | Sister-repo coordination overlooked when migrating `automation-contracts` | Low | Low | §2.3 confirms sister repo emits JSON only; one-line doc-link update in [`openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) is the only sister-side change |
 | Scoping pass under-estimates effort and execution sessions balloon | Medium | Low | Per-package handoff doc tracks actual size per slot; if early slots overrun estimated effort, reschedule remaining slots accordingly — no sunk-cost pressure to keep the same cadence |
@@ -378,13 +390,29 @@ Executed in the next session as the first non-worked-example slot — i.e. the f
 
 All three lessons landed in the plan doc BEFORE the slot-2 commit, mirroring the slot-1 discipline. The recipe is now slot-2-tested in addition to slot-1-tested.
 
-**Commit hash:** *(populated post-commit — recorded in the slot-2 commit message)*
+**Commit hash:** `ded49ea` (umbraculum-dev) + `6e65348` (umbraculum-toolset plugin skill).
+
+### 6.2. Slot 3 — `@brewery/navigation` → `@umbraculum/navigation`
+
+Platform-classified (cross-platform routing-policy framework with dual entry points `.` + `./native`; brewery-flavored route IDs split deferred per §1.4). First slot where the upgraded post-slot-2 recipe was run end-to-end, including the preflight skill in advance.
+
+**Footprint:** 18 files / 24 occurrences. Five real consumers (4 native source files + 1 web `appRouter.ts`). Publishes dual-entrypoint `dist/` (index + native, both in ESM/CJS/d.ts) → first slot exercising tsup with multiple entry points.
+
+**Lessons recorded back into §4 / §5 during slot 3 (2026-05-19):**
+
+1. **`docker compose restart api` re-prunes devDeps and kills tsx watch via the subsequent build's unlink events.** Surfaced on the first slot-3 execution: the `--include=dev` install + restart sequence worked through health-check, but then `bash scripts/build-packages-in-docker.sh` unlinked `dist/` files for every package, tsx watch tried to hot-reload, and tsx itself was missing from `/app/node_modules/tsx/dist/` because the restart's startup `npm install` had silently pruned it. The api crash-looped and returned 502 through Nginx for the rest of the smoke step. **§4 step 4b updated** to replace `docker compose restart api` with the safer `docker compose stop api` → host-side one-shot `npm install --include=dev` → `docker compose start api` sequence. **§5 risk register row added** (High likelihood, High severity).
+2. **Recovery procedure documented:** `docker compose stop api && docker run --rm -v "$PWD/services/api:/app" -w /app node:20-slim bash -lc 'npm install --include=dev --no-audit --no-fund' && docker compose start api`. The host one-shot lands devDeps against an idle bind-mount with no concurrent tsx watching; container startup install is then a no-op; tsx watch comes up clean.
+3. **Preflight skill confirmed correct on first real use.** The `package-scope-migration-preflight` skill authored at slot 2 was applied at slot 3's start: canonical grep returned 18 hits, classification was platform (target `@umbraculum/navigation`), the root `build:packages` HARD STOP was flagged, no §1.3 trap, no `bin:` field, no `next.config.js`/`metro.config.js` touch. The skill's inventory matched the handoff doc's pre-scoped slot-3 inventory exactly — confirms the skill's bounded methodology is sufficient for sole inventory authority on remaining slots.
+
+All three lessons landed in the plan doc BEFORE the slot-3 commit, mirroring slots 1–2 discipline. The recipe is now slot-3-tested as well.
+
+**Commit hash:** *(populated post-commit — recorded in the slot-3 commit message)*
 
 ---
 
 ## 7. Per-package handoff link
 
-The serial-execution checklist lives in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md). Open that doc, pick the next un-checked slot (next-after-`media` is `navigation`, slot 3), follow §4 of this doc, then tick the slot in the handoff doc and commit.
+The serial-execution checklist lives in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md). Open that doc, pick the next un-checked slot (next-after-`navigation` is `automation-contracts`, slot 4), follow §4 of this doc (now using the STOP → host-install → START sequence), then tick the slot in the handoff doc and commit.
 
 ---
 

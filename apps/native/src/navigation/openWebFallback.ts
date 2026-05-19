@@ -1,8 +1,8 @@
 import { Linking } from "react-native";
 
 import type { SupportedLocale } from "@brewery/i18n";
-import type { RouteRef } from "@brewery/navigation";
-import { routeToLocalePath } from "@brewery/navigation";
+import type { RouteRef } from "@umbraculum/navigation";
+import { routeToLocalePath } from "@umbraculum/navigation";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 
 export interface OpenWebFallbackOptions {

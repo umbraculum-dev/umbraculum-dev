@@ -181,7 +181,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 
 - `@brewery/i18n` — locales + shared messages.
 - `@brewery/i18n-react` — universal `useT` hook (web + native).
-- `@brewery/navigation` — route IDs + cross-platform routing policy.
+- `@umbraculum/navigation` — route IDs + cross-platform routing policy (renamed from `@brewery/navigation` 2026-05-19 as sub-plan #9 slot 3; current route IDs include brewery routes pending content-split deferred to second-vertical landing).
 - `@brewery/api-client` — fetch boundary + auth (cookie web, bearer native).
 - `@brewery/ui` — Tamagui primitives.
 - `@umbraculum/media` — shared image assets + manifest (renamed from `@brewery/media` 2026-05-19 as sub-plan #9 slot 2; current asset content remains brewery-flavored pending content split deferred to second-vertical landing).
@@ -215,7 +215,7 @@ There is **no multi-schema split** today and **no naming convention** separating
 This is the strongest part of the current architecture and the part that makes the multi-module vision realistic without a rewrite. See [`docs/architecture-Rev02.md`](architecture-Rev02.md) §0.1–0.7 for full detail. Summary:
 
 - **Locale-prefixed routing** is enforced by middleware; default locale `en`.
-- **Route IDs + typed params** in `@brewery/navigation` (no Next.js / Expo Router leakage into shared screens).
+- **Route IDs + typed params** in `@umbraculum/navigation` (no Next.js / Expo Router leakage into shared screens).
 - **Universal `useT` hook** in `@brewery/i18n-react` (web uses next-intl adapter; native uses ICU directly).
 - **Auth split**: web uses cookie sessions, native uses bearer tokens; the API client picks the right strategy via injection.
 - **Webview bridge**: short-lived single-use exchange codes mint a cookie session for "Continue on web" flows from native.
@@ -402,7 +402,7 @@ A planning aid: when someone asks "what would it take to add WMS?", the answer c
 
 - Workspace tenancy model (`Workspace`, `WorkspaceMember`, role-based ACL).
 - Plugin-composed Fastify (cross-cutting via `app.register`).
-- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@brewery/navigation`, `@brewery/api-client`, `@brewery/ui`, `@umbraculum/media`).
+- Cross-platform boundary packages (`@brewery/i18n`, `@brewery/i18n-react`, `@umbraculum/navigation`, `@brewery/api-client`, `@brewery/ui`, `@umbraculum/media`).
 - Cookie/bearer auth split (web vs native).
 - Redis cache pattern with Postgres source-of-truth.
 - Stripe + RevenueCat as billing providers; Fastify as billing source-of-truth.

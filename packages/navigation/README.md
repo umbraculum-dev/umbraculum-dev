@@ -1,15 +1,15 @@
-# @brewery/navigation
+# @umbraculum/navigation
 
 Cross-platform route IDs and typed route parameters. The navigation contract shared by web and native.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 3 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). Current route IDs include brewery-specific entries (e.g. `recipeEdit`, `waterMash`); a content split (`@umbraculum/navigation` framework + `@umbraculum/brewery-navigation` brewery routes) is deferred until a second vertical configuration lands.
 
 ## What this is
 
-The platform-neutral navigation contract. Both `apps/web` (Next.js routing) and `apps/native` (React Navigation) refer to the same set of `RouteId` values (`"dashboard"`, `"recipes"`, `"recipeEdit"`, `"waterMash"`, etc.) with the same typed parameter shape per route (`RouteParamsById`). A shared component that wants to navigate uses the typed `RouteRef` union — `{ id: "recipeEdit", params: { recipeId: "abc" } }` — and the host app translates that into its native navigation call (Next.js `<Link href={…}>` or React Navigation `navigation.navigate(…)`). This is the architectural mechanism that lets `@brewery/ui` and `@brewery/recipes-ui` ship navigation-aware components without depending on either Next.js or React Navigation.
+The platform-neutral navigation contract. Both `apps/web` (Next.js routing) and `apps/native` (React Navigation) refer to the same set of `RouteId` values (`"dashboard"`, `"recipes"`, `"recipeEdit"`, `"waterMash"`, etc.) with the same typed parameter shape per route (`RouteParamsById`). A shared component that wants to navigate uses the typed `RouteRef` union — `{ id: "recipeEdit", params: { recipeId: "abc" } }` — and the host app translates that into its native navigation call (Next.js `<Link href={…}>` or React Navigation `navigation.navigate(…)`). This is the architectural mechanism that lets `@brewery/ui` and `@brewery/recipes-ui` (both pending sub-plan #9 renames) ship navigation-aware components without depending on either Next.js or React Navigation.
 
-Two entry points are exported: the default (`@brewery/navigation`) for the platform-neutral types + helpers, and a native-flavored variant (`@brewery/navigation/native`) that adds React-Navigation-aware integration helpers used only by `apps/native`.
+Two entry points are exported: the default (`@umbraculum/navigation`) for the platform-neutral types + helpers, and a native-flavored variant (`@umbraculum/navigation/native`) that adds React-Navigation-aware integration helpers used only by `apps/native`.
 
 ## Scope
 
@@ -21,7 +21,7 @@ Two entry points are exported: the default (`@brewery/navigation`) for the platf
 ### Default entry point (web + native + shared UI)
 
 ```ts
-import type { RouteId, RouteRef, RouteParamsById } from "@brewery/navigation";
+import type { RouteId, RouteRef, RouteParamsById } from "@umbraculum/navigation";
 
 const target: RouteRef = { id: "recipeEdit", params: { recipeId: "abc" } };
 ```
@@ -31,7 +31,7 @@ A shared component receives a callback like `onNavigate(target: RouteRef)` from 
 ### Native entry point (apps/native only)
 
 ```ts
-import { … } from "@brewery/navigation/native";
+import { … } from "@umbraculum/navigation/native";
 ```
 
 The `./native` variant exists so the default entry point stays lean for web — Metro bundlers tree-shake the native helpers out of `apps/web` automatically.
@@ -51,7 +51,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` (Next.js router translates `RouteRef` → `href`); `apps/native` (React Navigation translates `RouteRef` → `navigation.navigate`); `@brewery/ui` and `@brewery/recipes-ui` (any platform-neutral component that needs to express "navigate to this target" without pulling in a routing library).
+- **Consumed by**: `apps/web` (Next.js router translates `RouteRef` → `href`); `apps/native` (React Navigation translates `RouteRef` → `navigation.navigate`); `@brewery/ui` and `@brewery/recipes-ui` (both pending sub-plan #9 renames; any platform-neutral component that needs to express "navigate to this target" without pulling in a routing library).
 - **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/i18n`, `@brewery/contracts`, and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
 
 ## Status

@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slot 1 done (worked example) and slot 2 done (`media`); slots 3–14 pending serial execution.
+**Status:** Active 2026-05-19 — slots 1–3 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`); slots 4–14 pending serial execution. Recipe upgraded again at slot 3: `docker compose restart api` replaced by STOP → host-install → START sequence (see plan doc §4 step 4b).
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -125,7 +125,7 @@ Doc references:
 
 ## Slot 3 — `@brewery/navigation` → `@umbraculum/navigation`
 
-**Status:** Pending.
+**Status:** **Done 2026-05-19** (commit hash recorded in the slot-3 commit message; first slot where the post-slot-2 recipe was executed end-to-end with preflight skill applied in advance).
 
 **Target + classification.** Platform (framework). Route IDs + cross-platform routing policy framework. Current route IDs include brewery routes; content split deferred (plan doc §1.4).
 
@@ -133,32 +133,50 @@ Doc references:
 
 - The package exposes two entry points — `.` (web) and `./native` (native). Both have `dist/index.{js,cts,d.ts}` outputs; rebuilds must produce both.
 - Route IDs themselves (e.g. `recipes`, `equipment`) are **not** renamed in this PR — they're public-facing route strings, not import paths. Only the npm scope changes.
+- **Root `package.json` `build:packages` script** lists `npm run build -w @brewery/navigation` — HARD STOP per slot-2 lesson; was updated.
 
 **File inventory.**
 
 Workspace name + own files:
-- [ ] [`packages/navigation/package.json`](../../packages/navigation/package.json) — update `name`; add description.
-- [ ] [`packages/navigation/README.md`](../../packages/navigation/README.md).
-- [ ] [`packages/navigation/src/native.ts`](../../packages/navigation/src/native.ts) — internal reference if any.
+- [x] [`packages/navigation/package.json`](../../packages/navigation/package.json) — `name` field + added classifying description.
+- [x] [`packages/navigation/README.md`](../../packages/navigation/README.md) — heading + scope text + both usage code samples (default + `./native` entrypoint) + dependency-stack mention.
+- [x] [`packages/navigation/src/native.ts`](../../packages/navigation/src/native.ts) — internal JSDoc reference updated to `@umbraculum/navigation`.
+
+Build configs:
+- [x] **[`package.json`](../../package.json)** (root) — `scripts.build:packages` (`-w @brewery/navigation` → `-w @umbraculum/navigation`). Per slot-2 HARD STOP.
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
 
 Source imports:
-- [ ] [`apps/native/src/navigation/AppNavigator.tsx`](../../apps/native/src/navigation/AppNavigator.tsx).
-- [ ] [`apps/native/src/navigation/openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts).
-- [ ] [`apps/native/src/screens/BlockedRouteScreen.tsx`](../../apps/native/src/screens/BlockedRouteScreen.tsx).
-- [ ] [`apps/native/src/screens/DashboardScreen.tsx`](../../apps/native/src/screens/DashboardScreen.tsx).
-- [ ] [`apps/web/src/navigation/appRouter.ts`](../../apps/web/src/navigation/appRouter.ts).
+- [x] [`apps/native/src/navigation/AppNavigator.tsx`](../../apps/native/src/navigation/AppNavigator.tsx).
+- [x] [`apps/native/src/navigation/openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts).
+- [x] [`apps/native/src/screens/BlockedRouteScreen.tsx`](../../apps/native/src/screens/BlockedRouteScreen.tsx).
+- [x] [`apps/native/src/screens/DashboardScreen.tsx`](../../apps/native/src/screens/DashboardScreen.tsx).
+- [x] [`apps/web/src/navigation/appRouter.ts`](../../apps/web/src/navigation/appRouter.ts).
 
 Cross-package README references:
-- [ ] [`packages/navigation/README.md`](../../packages/navigation/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+- [x] [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md). (navigation's own README already updated above.)
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) (3 mentions: package inventory, "Route IDs + typed params", cross-platform boundary packages list).
+- [x] [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md) (workspace package list).
+- [x] [`docs/architecture-Rev02.md`](../architecture-Rev02.md) (5 mentions across implementation log).
 
-**Verification + commit.** Plan doc §4 steps 4–7.
+**Verification + commit.** Plan doc §4 steps 1–7 — all green:
+- Preflight skill: 18 hits, classification=platform, HARD-STOPS=1 (root build:packages), no `bin:` field, no transpile/metro touch — matched handoff doc inventory exactly.
+- Lockfile diff: 14 lines, scoped to `@brewery/navigation` → `@umbraculum/navigation` rename.
+- API health: `{"ok":true}` post STOP → host-install → START sequence.
+- `scripts/build-packages-in-docker.sh`: green; `@umbraculum/navigation@0.0.0` built dual entrypoints (`dist/index.{js,cjs,d.ts,d.cts}` + `dist/native.{js,cjs,d.ts,d.cts}` + shared chunk).
+- `npm run typecheck` (api): green.
+- `npm run test -- --run` (api): 413 tests pass, 51 test files.
+- Nginx smoke (`/api/health`, `/en/login`, `/en`, `/en/recipes`, `/en/equipment`, `/en/automation`): all HTTP 200.
+
+**Lessons for slots 4–14** (already folded back into plan doc §4 / §5 BEFORE the commit):
+
+1. **`docker compose restart api` REPLACED by STOP → host-install → START** in §4 step 4b. The restart re-runs the container's startup `npm install` (no `--include=dev`) which silently re-prunes devDeps; the subsequent build step's unlink events then kill tsx watch because `/app/node_modules/tsx/dist/preflight.cjs` was pruned. New §5 row added (High likelihood, High severity).
+2. **Preflight skill confirmed sufficient for sole inventory authority** on remaining slots — the slot-3 result matched the pre-scoped handoff inventory exactly; subsequent slots may rely on the skill rather than re-deriving the inventory by hand.
 
 ---
 

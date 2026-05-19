@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
-import type { RouteRef } from "@brewery/navigation";
+import type { RouteRef } from "@umbraculum/navigation";
 import { useT } from "@brewery/i18n-react";
 import { locales, type SupportedLocale } from "@brewery/i18n";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
