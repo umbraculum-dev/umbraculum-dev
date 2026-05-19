@@ -73,6 +73,11 @@ tmp/
 var/
 logs/
 *.log
+# Cursor agent scratch dir for ad-hoc helper scripts (one-off transforms,
+# inspection scripts, slot-N bulk-sed migration scripts). See the
+# `cursor-tmp-scripts-and-logs` rule/skill in the umbraculum-toolset
+# plugin pack — these are session-local, not artifacts to ship.
+cursor-tmp/
 
 # ------------------------------------------------------------
 # IDE / OS
