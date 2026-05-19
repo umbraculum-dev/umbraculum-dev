@@ -80,9 +80,28 @@ We chose **flat peer decomposition** (sometimes called SAP-style) over hierarchi
 
 ### 4.2 Future allocations
 
-Future canonical codes are added via mini-RFC + core team approval (Decision D). Plausible future codes: `quality` (QC, NCR, CAPA), `maintenance` (preventive / predictive / asset registry), `hr` (workforce, payroll-adjacent), `finance` (general ledger, AR/AP — likely never canonical to Umbraculum because we expect customers to integrate with their finance system rather than replace it).
+Future canonical codes are added via mini-RFC + core team approval (Decision D). Plausible future codes (informational watch list — neither a commitment nor a roadmap, just a forward-looking framing):
+
+- `quality` — QC inspections, NCR (non-conformance reports), CAPA (corrective/preventive actions), inspection plans. Cross-vertical primitives: brewery BJCP scoring, distillery TTB sampling, cosmetics stability testing, food-batch HACCP records all map cleanly. Strongest candidate of the watch list.
+- `maintenance` — preventive / predictive maintenance, asset registry, maintenance work orders. Cross-vertical (any vertical with capital equipment); natural peer to `crp`.
+- `procurement` — purchase orders, supplier management, RFQ. Supply-side companion to `crm`. Cross-vertical (every manufacturing vertical buys raw materials).
+- `docs` (or `dms`) — controlled document management: SOPs, work instructions, GMP records, version-controlled procedures. Cross-vertical for regulated industries (cosmetics GMP, food HACCP, brewery FDA, distillery TTB).
+- `hr` — workforce, payroll-adjacent. Cross-vertical but the boundary with external HR-SaaS integrations is sharper than for the others above — most operators integrate with Gusto/Rippling/etc. rather than replace them. The canonical scope, if allocated, is likely narrower than full-HRIS (e.g., shift scheduling + competency records).
+- `finance` — general ledger, AR/AP. **Likely never canonical to Umbraculum.** We expect customers to integrate with their existing finance system (QuickBooks, Xero, NetSuite, SAP-FI) rather than replace it. Listed here only to record the explicit non-canonical posture.
 
 We pin the initial set at five and treat further allocation as YAGNI: a code is added when there is concrete demand and a reference implementation underway, not on speculation. The mini-RFC is cheap; pre-allocation is a category of debt the project does not need to take on now.
+
+### 4.3 Concerns that should NOT become canonical (framing clarifications)
+
+The mini-RFC decision in Decision D is partly a *negative* discipline — recognizing that some plausible-sounding additions to the canonical set would actually be category mistakes. Three patterns to watch for:
+
+- **`privacy` (and analytics / reporting / notifications) — horizontal, not canonical.** DSAR workflows, GDPR/CCPA enforcement, data-retention policies, audit-trail spanning, observability, notifications-as-a-service, and cross-module reporting all share a defining property: **every module participates uniformly in them**. That is the §8 / Decision F shape — the WordPress-hell shape Decision F exists to prevent. Treating any of these as canonical would invite parallel implementations across modules (a `crm` DSAR queue, an `mrp` DSAR queue, …) which is exactly the failure mode §2 names. They belong in the §8.2 obligation table as platform services that every module consumes, possibly with thin default-admin-UI shells; not as reserved canonical codes.
+- **`legal` and `compliance` — likelier Tier 3/4 connectors or vertical-specific surfaces.** Contracts / NDAs / regulatory filings have a real domain shape, but most operators (a) use external legal SaaS (Ironclad, DocuSign, Notion-Legal) and want a *connector* not a replacement, and (b) regulatory filings (TTB-Beer, TTB-Spirits, FDA-Cosmetics, FDA-Food) are *vertical-specific* not cross-vertical. The right shapes are Tier 3/4 connectors (against external legal SaaS) plus vertical-specific surfaces (TTB filing on the distillery vertical, FDA filing on the cosmetics vertical). Bundling them under a `compliance` umbrella also runs into §4.1's anti-umbrella rationale: quality / privacy / traceability / regulatory are too-different concerns to share a code.
+- **`traceability` — already in `wms` (lot/serial tracking) + `quality` (audit trail of inspections); does not need its own code.** Listed here so future contributors don't propose it as a standalone canonical without confronting the existing-coverage objection.
+
+These clarifications are not changes to Decision A or Decision B. They refine §4.2's forward-looking framing so contributors evaluating new code proposals have a clearer map of what the canonical-set shape resists.
+
+*§4.2 + §4.3 watch list and clarifications added 2026-05-19 (non-substantive amendment; no change to Decisions A–F; informational framing only).*
 
 ---
 
