@@ -21,6 +21,27 @@ PR 1 has a scope envelope of ~50 file changes (5 parser source files + 5 test fi
 | `eslint.config.mjs` — added `no-restricted-syntax` rule for `packages/*-contracts/**/*.{ts,tsx}` forbidding hand-rolled `function isX(v: unknown): v is X` drift | Landed |
 | `.cursor/plugins/local/umbraculum-node-react-cursor-assistant/rules/22-typescript-contracts-runtime-validation.mdc` — rewritten from "do NOT introduce Zod" to "Zod v4 is the project's strategy", with library-agnostic SDK interface + backward-compat tunnel + soft-tolerance patterns documented | Landed |
 
+## Mandatory prep before any consumer-side verification (containerized rebuild)
+
+> [!IMPORTANT]
+> Hit this gotcha during the 2026-05-19 Phase B-2 boot-fail incident — committed `packages/*/dist/**` is the contract surface that consumers actually import, NOT `packages/*/src/**`. Any time `packages/contracts/src/**` (or any other workspace package's `src/`) gains a new export, the committed `dist/` MUST be regenerated before downstream containers (api, web, native) can resolve the new symbol.
+
+After completing each parser migration (or batching 2–3) and BEFORE restarting the `api` / `web` containers to verify, do BOTH of these in order:
+
+1. From the host (this is the one mandatory `scripts/*.sh` exception to "no npm on host" — the script runs `npm ci` + `npm run build:packages` inside a one-off `node:20-slim` container that has `/repo` writable, so npm never actually runs on the host):
+   ```bash
+   cd <REPO_ROOT> && bash scripts/build-packages-in-docker.sh
+   ```
+   This rewrites all 11 committed `packages/*/dist/**` artifacts. Wall time ≈ 90–120s.
+2. If `services/api/package.json` (or any consumer workspace's `package.json`) was edited (e.g. to add `zod` as a direct dep — see PR 3 handoff), also reinstall inside the consumer container so the bind-mounted `node_modules` picks up the new dep:
+   ```bash
+   docker compose exec -T <consumer> sh -c "cd /app && npm install --no-audit --no-fund"
+   docker compose restart <consumer>
+   ```
+   `<consumer>` is `api` for backend changes, `web` for Next.js changes. (`apps/native` doesn't run in compose; rebuild via the Metro container per `docs/DEVELOPMENT.md` if/when native consumes the new symbols.)
+
+**Failure mode if skipped**: containers boot but throw `SyntaxError: The requested module '@brewery/contracts' does not provide an export named 'XSchema'` on first hit — because the running container is still resolving the stale `dist/index.js` that predates the new export. Same failure mode if the consumer's `node_modules` lacks `zod` (`Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'zod' imported from /app/src/...`).
+
 ## What's pending for the next session (container required)
 
 | File | Action | Pattern |

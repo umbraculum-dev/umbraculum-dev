@@ -23,11 +23,22 @@ Doing all of this as a single agent-session bulk edit is unsafe without per-rout
 
 ### Prep (one-time, before any route migration)
 
+> [!IMPORTANT]
+> **The "added zod to a workspace, container can't find it" gotcha.** Caught during the 2026-05-19 Phase B-2 boot-fail. After step 1 below (and *every* time you add a runtime dep to `services/api/package.json`), you must reinstall inside the api container so the bind-mounted `services/api/node_modules` picks up the new dep — the host edit alone does NOT propagate. Run these two commands after the package.json edit:
+> ```bash
+> docker compose exec -T api sh -c "cd /app && npm install --no-audit --no-fund"
+> docker compose restart api
+> ```
+> Failure mode if skipped: `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'zod' imported from /app/src/...` on api boot, with the api process exiting and nginx returning 502 on every request that proxies to it.
+>
+> **Pair with the package-dist rebuild gotcha** (also documented in [`pr1-contracts-migration-handoff.md`](pr1-contracts-migration-handoff.md) §"Mandatory prep before any consumer-side verification"): if PR 3 starts importing new Zod schemas from `packages/contracts` or `packages/automation-contracts` (which it will — route bodies reference contracts schemas), the consumer-visible `dist/` MUST be regenerated via `bash scripts/build-packages-in-docker.sh` BEFORE the api container is restarted. Otherwise api boots with `SyntaxError: The requested module '@brewery/contracts' does not provide an export named 'XSchema'`.
+
 1. Add deps to [`services/api/package.json`](../../services/api/package.json):
    ```json
    "zod": "^4.3.6",
    "fastify-type-provider-zod": "^4.0.0"
    ```
+   Then run the install + restart pair from the callout above.
 2. Wire the Fastify type provider in [`services/api/src/app.ts`](../../services/api/src/app.ts) immediately after `const app = Fastify(...)`:
    ```typescript
    import {
