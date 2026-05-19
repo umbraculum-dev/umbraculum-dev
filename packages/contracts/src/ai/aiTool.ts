@@ -4,8 +4,8 @@
  *
  * Notes on stability:
  * - This surface is intentionally minimal in v0 (Sprint #1). It will be
- *   extracted to a standalone `@brewery/ai-tool-sdk` package in H1 2027 per
- *   docs/ROADMAP.md; until then it lives here in `@brewery/contracts`.
+ *   extracted to a standalone `@umbraculum/ai-tool-sdk` package in H1 2027 per
+ *   docs/ROADMAP.md; until then it lives here in `@umbraculum/contracts`.
  * - Tool implementations live in `services/api/src/services/ai/tools/<module>/`
  *   and are responsible for ACL inheritance via the same service injection
  *   the rest of the API uses (no parallel access-control layer).

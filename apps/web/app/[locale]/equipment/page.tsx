@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../src/i18n/navigation";
-import type { AuthMeResponse } from "@brewery/contracts";
-import { parseAuthMeResponse } from "@brewery/contracts";
+import type { AuthMeResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse } from "@umbraculum/contracts";
 
 import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";

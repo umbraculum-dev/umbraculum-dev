@@ -4,7 +4,7 @@
  * Phase 4b L4 regression-pin.
  *
  * apps/native consumes this payload via `parseWaterProfilesResponse` in
- * @brewery/contracts to populate the water-profile dropdowns on the mash,
+ * @umbraculum/contracts to populate the water-profile dropdowns on the mash,
  * sparge, and boil water pages. The response is grouped by visibility into
  * three arrays: `system`, `public`, and `workspace`.
  *

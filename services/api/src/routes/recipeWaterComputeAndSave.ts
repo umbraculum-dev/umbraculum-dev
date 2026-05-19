@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { BadRequestError } from "../errors.js";
-import { waterFormatHints } from "@brewery/contracts";
+import { waterFormatHints } from "@umbraculum/contracts";
 import {
   RecipeWaterComputeAndSaveService,
   type BoilComputeAndSaveInput,

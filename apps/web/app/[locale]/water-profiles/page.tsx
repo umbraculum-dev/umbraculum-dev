@@ -6,8 +6,8 @@ import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } f
 
 import { Link } from "../../../src/i18n/navigation";
 
-import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
-import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
+import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 
 import { apiFetch } from "../../_lib/apiClient";
 import { BrewSelect } from "../../_components/BrewSelect";

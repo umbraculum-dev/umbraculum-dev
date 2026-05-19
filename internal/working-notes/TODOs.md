@@ -13,7 +13,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 
 - [x] Make native-consumed packages **runtime-safe** (ship `dist/**/*.js` + `dist/**/*.d.ts`) and stop exporting raw TS at the package boundary:
   - `@umbraculum/i18n`
-  - `@brewery/contracts`
+  - `@umbraculum/contracts`
   - `@brewery/api-client`
 - [x] Create `@umbraculum/ui` and split Tamagui config into web vs native entrypoints:
   - web uses `@tamagui/animations-css`
@@ -26,7 +26,7 @@ This file tracks near-term implementation tasks and “migration reminders” as
 Before implementing native app login, complete these items.
 
 ### Must complete first
-- [x] **Shared parsers**: Move `parseWaterComputeAndSave` and `parseGravityAnalysis` into `@brewery/contracts` so web + native use the same runtime validation.
+- [x] **Shared parsers**: Move `parseWaterComputeAndSave` and `parseGravityAnalysis` into `@umbraculum/contracts` so web + native use the same runtime validation.
 - [x] **Format hints consistency**: Apply `formatHints` consistently across all native-ready endpoints (water hub, compute-and-save, analysis).
 - [x] **Web auth hardening check**: Assess whether current cookie-based auth needs hardening (CSRF, secure flags, session cleanup) before adding token-based native auth. See `docs/AUTH-HARDENING-ASSESSMENT.md`.
 - [x] **Native login strategy**: Implemented (opaque session token via `POST /auth/login/native`). See `docs/AUTH-STRATEGY.md`.

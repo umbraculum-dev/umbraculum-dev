@@ -1,4 +1,4 @@
-import type { AiTool } from "@brewery/contracts";
+import type { AiTool } from "@umbraculum/contracts";
 import type { PrismaClient } from "@prisma/client";
 
 import { RecipeWaterSettingsService } from "../../../recipeWaterSettingsService.js";

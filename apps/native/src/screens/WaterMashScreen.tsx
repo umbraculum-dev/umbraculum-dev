@@ -11,8 +11,8 @@ import {
   validateMashBeforeSave,
   type EditorMashStep,
 } from "@brewery/beerjson";
-import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseWaterProfilesResponse } from "@brewery/contracts";
-import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
+import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";

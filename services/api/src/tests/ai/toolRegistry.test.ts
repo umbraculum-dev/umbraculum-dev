@@ -1,4 +1,4 @@
-import type { AiTool } from "@brewery/contracts";
+import type { AiTool } from "@umbraculum/contracts";
 import { describe, expect, it } from "vitest";
 
 import { InMemoryAiToolRegistry } from "../../services/ai/toolRegistry.js";

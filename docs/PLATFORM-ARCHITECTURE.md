@@ -185,7 +185,7 @@ All packages currently share the npm scope `@brewery/*`. Functionally they alrea
 - `@brewery/api-client` — fetch boundary + auth (cookie web, bearer native).
 - `@umbraculum/ui` — Tamagui primitives.
 - `@umbraculum/media` — shared image assets + manifest (renamed from `@brewery/media` 2026-05-19 as sub-plan #9 slot 2; current asset content remains brewery-flavored pending content split deferred to second-vertical landing).
-- `@brewery/contracts` — DTOs / shared types.
+- `@umbraculum/contracts` — DTOs / shared types.
 - `@umbraculum/test-mcp` — testing tools server (renamed from `@brewery/test-mcp` 2026-05-19 as sub-plan #9 slot 1 worked example).
 
 **Brewery-vertical (will become "module" packages):**

@@ -9,7 +9,7 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
-import { parseAuthMeResponse, type AuthMeResponseWorkspace } from "@brewery/contracts";
+import { parseAuthMeResponse, type AuthMeResponseWorkspace } from "@umbraculum/contracts";
 
 type WorkspaceListItem = AuthMeResponseWorkspace;
 

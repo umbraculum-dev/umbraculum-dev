@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import type { AuthMeResponse } from "@brewery/contracts";
-import { parseAuthMeResponse } from "@brewery/contracts";
+import type { AuthMeResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse } from "@umbraculum/contracts";
 
 import { apiFetch } from "./apiClient";
 

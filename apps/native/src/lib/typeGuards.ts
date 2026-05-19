@@ -7,7 +7,7 @@
  * `as any` / `as SomeShape` casts.
  *
  * Keep this small and dependency-free — boundaries that need full validation
- * (HTTP, MCP, storage) should still use a `parseXxx()` from `@brewery/contracts`.
+ * (HTTP, MCP, storage) should still use a `parseXxx()` from `@umbraculum/contracts`.
  */
 
 /**

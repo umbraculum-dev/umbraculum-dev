@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { RecipeWaterHubSummaryService } from "../services/recipeWaterHubSummaryService.js";
-import { waterFormatHints } from "@brewery/contracts";
+import { waterFormatHints } from "@umbraculum/contracts";
 
 export function recipeWaterHubSummaryRoutes(app: FastifyInstance) {
   const svc = new RecipeWaterHubSummaryService(app.prisma);

@@ -1,3 +1,3 @@
 export { apiFetch } from "../../../../_lib/apiClient";
-export type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
+export type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 

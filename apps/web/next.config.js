@@ -4,7 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig = {
-  transpilePackages: ["tamagui", "@tamagui/core", "@tamagui/config", "@umbraculum/ui", "@umbraculum/media", "@brewery/contracts"],
+  transpilePackages: ["tamagui", "@tamagui/core", "@tamagui/config", "@umbraculum/ui", "@umbraculum/media", "@umbraculum/contracts"],
   webpack: (config) => {
     // Webpack builds must also alias react-native -> react-native-web.
     // Otherwise Webpack tries to parse react-native's Flow types (e.g. `import typeof`).

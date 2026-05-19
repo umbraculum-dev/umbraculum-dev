@@ -17,7 +17,7 @@ Current buildable packages (native-consumed):
 - `packages/i18n` (`@umbraculum/i18n`)
 - `packages/i18n-react` (`@umbraculum/i18n-react`)
 - `packages/navigation` (`@umbraculum/navigation`)
-- `packages/contracts` (`@brewery/contracts`)
+- `packages/contracts` (`@umbraculum/contracts`)
 - `packages/api-client` (`@brewery/api-client`)
 - `packages/ui` (`@umbraculum/ui`)
 - `packages/recipes-ui` (`@brewery/recipes-ui`)
@@ -211,12 +211,12 @@ Guardrails:
   - For server-centralized domains (water, later analysis), the API is the source of truth.
   - Web/native should consume `result` + `derivation` and render it, with runtime parsing of network payloads (`unknown` → `parseXxx()`).
 
-### Shared contracts (`@brewery/contracts`) + versioning (MANDATORY for native-ready endpoints)
-We treat `@brewery/contracts` (`~/dkprojects/rfapps/umbraculum-dev/packages/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
+### Shared contracts (`@umbraculum/contracts`) + versioning (MANDATORY for native-ready endpoints)
+We treat `@umbraculum/contracts` (`~/dkprojects/rfapps/umbraculum-dev/packages/contracts/`) as the **single source of DTO truth** for endpoints that must stay stable across **web + native**.
 
 Standards:
 - **Type-only imports** for TS safety without runtime coupling:
-  - API/services and web clients import DTOs as `import type { ... } from "@brewery/contracts"`.
+  - API/services and web clients import DTOs as `import type { ... } from "@umbraculum/contracts"`.
 - **Every canonical/native-ready response is versioned**:
   - top-level `ok: true`
   - top-level `version: 1` (or higher later)
@@ -224,7 +224,7 @@ Standards:
 - **Runtime parsing is mandatory in clients**:
   - treat network JSON as `unknown`
   - parse/validate into contracts types before use.
-- **Runtime parsers** for water compute-and-save and gravity analysis live in `@brewery/contracts` (e.g. `parseMashComputeAndSaveResponse`, `parseGravityAnalysisResponseV1`).
+- **Runtime parsers** for water compute-and-save and gravity analysis live in `@umbraculum/contracts` (e.g. `parseMashComputeAndSaveResponse`, `parseGravityAnalysisResponseV1`).
 - **Water hub and compute-and-save** endpoints return `formatHints` (unit-keyed: L, pH, ppm_as_CaCO3, ppm, g, mL, kg) for consistent web/native number rendering.
 
 Current canonical “native beta” Water endpoints (v1):
@@ -281,7 +281,7 @@ Adding a new “math topic” end-to-end:
 We do **not** ship localized numeric strings from the API. Values remain numeric. To keep rendering consistent across web/native, the API may include **format hints** (non-localized) alongside results.
 
 Standard:
-- Use `@brewery/contracts` `NumberFormatHintV1` (`packages/contracts/src/format/numberFormat.ts`).
+- Use `@umbraculum/contracts` `NumberFormatHintV1` (`packages/contracts/src/format/numberFormat.ts`).
 - Hints must be **optional** and safe to ignore by older clients.
 - Clients apply hints when present; otherwise use existing local formatting defaults.
 

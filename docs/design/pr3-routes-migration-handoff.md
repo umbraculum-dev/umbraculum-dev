@@ -31,7 +31,7 @@ Doing all of this as a single agent-session bulk edit is unsafe without per-rout
 > ```
 > Failure mode if skipped: `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'zod' imported from /app/src/...` on api boot, with the api process exiting and nginx returning 502 on every request that proxies to it.
 >
-> **Pair with the package-dist rebuild gotcha** (also documented in [`pr1-contracts-migration-handoff.md`](pr1-contracts-migration-handoff.md) §"Mandatory prep before any consumer-side verification"): if PR 3 starts importing new Zod schemas from `packages/contracts` or `packages/automation-contracts` (which it will — route bodies reference contracts schemas), the consumer-visible `dist/` MUST be regenerated via `bash scripts/build-packages-in-docker.sh` BEFORE the api container is restarted. Otherwise api boots with `SyntaxError: The requested module '@brewery/contracts' does not provide an export named 'XSchema'`.
+> **Pair with the package-dist rebuild gotcha** (also documented in [`pr1-contracts-migration-handoff.md`](pr1-contracts-migration-handoff.md) §"Mandatory prep before any consumer-side verification"): if PR 3 starts importing new Zod schemas from `packages/contracts` or `packages/automation-contracts` (which it will — route bodies reference contracts schemas), the consumer-visible `dist/` MUST be regenerated via `bash scripts/build-packages-in-docker.sh` BEFORE the api container is restarted. Otherwise api boots with `SyntaxError: The requested module '@umbraculum/contracts' does not provide an export named 'XSchema'`.
 
 1. Add deps to [`services/api/package.json`](../../services/api/package.json):
    ```json

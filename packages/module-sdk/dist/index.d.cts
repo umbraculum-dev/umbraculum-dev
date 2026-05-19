@@ -1,4 +1,4 @@
-import { AiToolRegistry } from '@brewery/contracts';
+import { AiToolRegistry } from '@umbraculum/contracts';
 
 /**
  * Reserved canonical module codes per RFC-0001 Decision B.

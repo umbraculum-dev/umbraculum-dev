@@ -40,7 +40,7 @@ After completing each parser migration (or batching 2–3) and BEFORE restarting
    ```
    `<consumer>` is `api` for backend changes, `web` for Next.js changes. (`apps/native` doesn't run in compose; rebuild via the Metro container per `docs/DEVELOPMENT.md` if/when native consumes the new symbols.)
 
-**Failure mode if skipped**: containers boot but throw `SyntaxError: The requested module '@brewery/contracts' does not provide an export named 'XSchema'` on first hit — because the running container is still resolving the stale `dist/index.js` that predates the new export. Same failure mode if the consumer's `node_modules` lacks `zod` (`Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'zod' imported from /app/src/...`).
+**Failure mode if skipped**: containers boot but throw `SyntaxError: The requested module '@umbraculum/contracts' does not provide an export named 'XSchema'` on first hit — because the running container is still resolving the stale `dist/index.js` that predates the new export. Same failure mode if the consumer's `node_modules` lacks `zod` (`Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'zod' imported from /app/src/...`).
 
 ## What's pending for the next session (container required)
 

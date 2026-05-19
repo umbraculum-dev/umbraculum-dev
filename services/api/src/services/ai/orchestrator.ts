@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 import type Anthropic from "@anthropic-ai/sdk";
-import type { AiToolCallRecord, AiToolRegistry, AiRoleLimits } from "@brewery/contracts";
+import type { AiToolCallRecord, AiToolRegistry, AiRoleLimits } from "@umbraculum/contracts";
 
 import {
   BadRequestError,

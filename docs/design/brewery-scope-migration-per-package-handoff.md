@@ -497,58 +497,72 @@ Lockfiles regenerated (cleanly scoped):
 
 ## Slot 9 — `@brewery/contracts` → `@umbraculum/contracts`
 
-**Status:** Pending.
+**Status:** Complete (commit hash recorded post-commit). Heaviest slot in the migration (124 substitutions across 75 actually-edited files) landed under the §4 recipe on first attempt; recipe held cleanly. **Two transient cross-scope states OPEN** (slots 10 + 11 — see plan doc §6.9).
 
-**Target + classification.** Platform. Generic auth/me DTO + AI-tool contract types. Heaviest slot in the migration (122 occurrences across 75 files).
+**Target + classification.** Platform. Generic auth/me DTO + AI-tool contract types. Heaviest slot in the migration (122 occurrences across 75 files; live grep returned 85 candidate files of which 6 stale `.next/**` artifacts and 3 history docs were excluded, matching plan-doc estimate).
 
-**Hard stops.**
+**Hard stops (all 6 cleared).**
 
-- **`apps/web/next.config.js`** has `transpilePackages: [..., "@brewery/contracts", ...]` — must update.
-- This slot is the predecessor for slot 10 (`api-client`) and slot 11 (`module-sdk`) — both have `@brewery/contracts` as a dep.
-- After this slot ships, EVERY contract test in `services/api/src/tests/contracts/` will need its imports updated. The test names themselves stay the same; only the import paths change.
-- AI tool registrations in [`services/api/src/services/ai/tools/`](../../services/api/src/services/ai/tools/) all use `@brewery/contracts` types — every tool file needs updating.
-- Likely its own session given the scale.
+- [x] **`apps/web/next.config.js`** had `transpilePackages: [..., "@brewery/contracts", ...]` — UPDATED.
+- [x] Predecessor for slot 10 (`api-client`) and slot 11 (`module-sdk`) — both still hold `@brewery/*` workspace `name` field but their `dependencies` declarations + imports + dist already reference `@umbraculum/contracts`. **Two transient cross-scope states open simultaneously**; both close on slots 10 + 11 (which have no inter-dependency and may run in either order).
+- [x] All 3 contract tests in `services/api/src/tests/contracts/` (`shapeHelpers.ts`, `recipe.contract.test.ts`, `waterProfiles.contract.test.ts`) — UPDATED.
+- [x] All 8 AI tool registrations in [`services/api/src/services/ai/tools/`](../../services/api/src/services/ai/tools/) (`brewery/{recipeLookup,recipeWaterState,currentBrewSessionStatus,index,ingredientOnHand,equipmentProfileGet}.ts`, `automation/{vesselState,listVessels,index}.ts`) — UPDATED.
+- [x] Root [`package.json`](../../package.json) `build:packages` AND `test:packages` scripts — UPDATED (`@brewery/contracts` → `@umbraculum/contracts` in both).
+- [x] [`.github/workflows/api.yml`](../../.github/workflows/api.yml) line 43 workflow step display name `Run @brewery/contracts + @umbraculum/brewery-core unit tests` — UPDATED.
 
-**File inventory.** (Abbreviated — the full grep from plan doc §4 step 3 will surface everything. Below is the structural overview.)
+**File inventory.** (Live grep returned 85 candidates; bulk-sed script edited 75 files / 124 substitutions; 9 files excluded by skill items 11 + 12 + slot-9-new `cursor-tmp/` exclusion + slot-8 `.next/` precedent.)
 
-Workspace name + own files:
-- [ ] [`packages/contracts/package.json`](../../packages/contracts/package.json).
-- [ ] [`packages/contracts/README.md`](../../packages/contracts/README.md).
-- [ ] [`packages/contracts/src/ai/aiTool.ts`](../../packages/contracts/src/ai/aiTool.ts) — internal references.
+Workspace name + own files (manually edited in step 1; then excluded from bulk sed per item 11):
+- [x] [`packages/contracts/package.json`](../../packages/contracts/package.json) — `name: "@umbraculum/contracts"` + new classifying `description` field.
+- [x] [`packages/contracts/README.md`](../../packages/contracts/README.md) — heading + scoped workspace commands updated; bare brand callout rewritten to record the rename history (slot 9 of 14; first slot to open two simultaneous transient cross-scope states).
+- [x] [`packages/contracts/src/ai/aiTool.ts`](../../packages/contracts/src/ai/aiTool.ts) — internal `@brewery/contracts` reference + forward-looking `@brewery/ai-tool-sdk` reference both updated to `@umbraculum/*` scope.
 
-Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
-- [ ] [`services/api/package.json`](../../services/api/package.json).
-- [ ] [`packages/api-client/package.json`](../../packages/api-client/package.json) — dep entry.
-- [ ] [`packages/module-sdk/package.json`](../../packages/module-sdk/package.json) — dep entry.
+Consumer `package.json` deps (bulk sed):
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`services/api/package.json`](../../services/api/package.json).
+- [x] [`packages/api-client/package.json`](../../packages/api-client/package.json) — dep entry only (workspace `name` stays `@brewery/api-client` until slot 10).
+- [x] [`packages/module-sdk/package.json`](../../packages/module-sdk/package.json) — dep entry only (workspace `name` stays `@brewery/module-sdk` until slot 11).
 
 Build configs:
-- [ ] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages` (HARD STOP if missed).
-- [ ] [`docker-compose.yml`](../../docker-compose.yml).
+- [x] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages` (HARD STOP cleared).
+- [x] [`docker-compose.yml`](../../docker-compose.yml) — bulk sed updated 1 reference + slot 9 hand-fixed the slash-shorthand comment on line 120 (`Pattern mirrors @brewery/contracts/core/media above` → spelled out as the three packages with rename history; cosmetic-only fix to restore self-consistency post-rename per plan doc §6.9 lesson 2).
 
 Source imports — group by directory and execute the grep+replace:
-- [ ] All `apps/web/app/**/*.ts{,x}` matching the grep (auth pages, equipment, recipes, water).
-- [ ] All `apps/native/src/**/*.ts{,x}` matching the grep (~10 screens + lib/typeGuards.ts).
-- [ ] All `services/api/src/**/*.ts` matching the grep — routes, services, AI tools, orchestrator, settings.
-- [ ] All `services/api/src/tests/**/*.test.ts` and `**/*.contract.test.ts` matching the grep.
-- [ ] [`packages/module-sdk/src/types.ts`](../../packages/module-sdk/src/types.ts).
+- [x] All `apps/web/app/**/*.ts{,x}` matching the grep (15 files: auth pages + equipment + recipes/edit + recipes/water/{boil,mash,sparge,page,_lib/api,_lib/mathBodies,_lib/waterHubSummary} + ai/settings + water-profiles + _components/{PrimaryNav,AuthStatus} + _lib/{typeGuards,useRequireAuth} + select-workspace).
+- [x] All `apps/native/src/**/*.ts{,x}` matching the grep (8 files: lib/typeGuards.ts + 7 screens — Equipment, RecipeEdit, WaterBoil, WaterHub, WaterMash, WaterProfiles, WaterSparge).
+- [x] All `services/api/src/**/*.ts` matching the grep — routes (3 files), services (3 files), AI tools (8 files: brewery/* + automation/*), orchestrator, toolRegistry, aiSettingsService, recipeWaterHubSummaryService, gravityAnalysis.ts.
+- [x] All `services/api/src/tests/**/*.test.ts` and `**/*.contract.test.ts` matching the grep (4 files: contracts/{shapeHelpers,recipe.contract,waterProfiles.contract} + ai/toolRegistry.test).
+- [x] [`packages/module-sdk/src/types.ts`](../../packages/module-sdk/src/types.ts).
 
 CI:
-- [ ] [`.github/workflows/api.yml`](../../.github/workflows/api.yml).
+- [x] [`.github/workflows/api.yml`](../../.github/workflows/api.yml) — workflow step display name updated.
 
-Cross-package README references:
-- [ ] [`packages/api-client/README.md`](../../packages/api-client/README.md), [`packages/contracts/README.md`](../../packages/contracts/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md), [`apps/web/README.md`](../../apps/web/README.md), [`services/api/README.md`](../../services/api/README.md).
+Cross-package README references (bulk sed):
+- [x] [`packages/api-client/README.md`](../../packages/api-client/README.md), [`packages/i18n/README.md`](../../packages/i18n/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md), [`apps/web/README.md`](../../apps/web/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`services/api/README.md`](../../services/api/README.md). (Own README excluded per item 11.)
 
 Handoff docs (pre-existing, still relevant historical context):
-- [ ] [`docs/design/pr1-contracts-migration-handoff.md`](./pr1-contracts-migration-handoff.md) — update references.
-- [ ] [`docs/design/pr3-routes-migration-handoff.md`](./pr3-routes-migration-handoff.md) — update references.
+- [x] [`docs/design/pr1-contracts-migration-handoff.md`](./pr1-contracts-migration-handoff.md) — references updated.
+- [x] [`docs/design/pr3-routes-migration-handoff.md`](./pr3-routes-migration-handoff.md) — references updated.
 
 Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/LINTING.md`](../LINTING.md), [`docs/TESTING.md`](../TESTING.md), [`docs/TYPING.md`](../TYPING.md), [`docs/ROADMAP.md`](../ROADMAP.md).
-- [ ] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
+- [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/LINTING.md`](../LINTING.md), [`docs/TESTING.md`](../TESTING.md), [`docs/TYPING.md`](../TYPING.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`docs/MODULES.md`](../MODULES.md), [`docs/modules/contribute/horizontal-package.md`](../modules/contribute/horizontal-package.md).
+- [x] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
 
-**Verification + commit.** Plan doc §4 steps 4–7. Note: this slot's commit will be the largest single diff in sub-plan #9 — expect ~75 files touched, but the changes are uniform (only import paths). Reviewer attention focused on Step 2 (Classification gate — confirm target is `@umbraculum/contracts`, not accidentally something else) and Step 4 (lockfile diff scoped to contracts).
+Lockfiles regenerated (cleanly scoped):
+- [x] Root `package-lock.json` — 20/20 lines, ONLY contracts entries (workspace name + 4 consumer-side deps + workspace-link entry pair).
+- [x] `apps/web/package-lock.json` — 1 added + 1 removed (symlink swap from `@brewery/contracts` to `@umbraculum/contracts`).
+
+**Verification + commit cleared.**
+
+- [x] api typecheck green (`docker compose exec api npm run typecheck` clean).
+- [x] api vitest baseline preserved (51 files / 413/413 passing — exactly matches slot-7 / slot-8 baseline).
+- [x] Root `npm run test:packages` 9/9 files / 120/120 tests (5 contracts files / 73 tests + 4 brewery-core files / 47 tests).
+- [x] Native typecheck via the **slot-8 no-root-install / named-volume pattern** — clean; ~5s wall-clock. api `.bin/` count preserved at canonical 21; api `/api/health` still 200 post-typecheck. Slot-5 GOTCHA fully averted.
+- [x] Nginx smoke 7/7 HTTP 200 — `/api/health`, `/en/{login,dashboard,recipes}`, `/it/{login,dashboard,recipes}` (both locales exercised through the renamed contract layer end-to-end).
+- [x] Final commit message explicitly notes the TWO transient cross-scope states opened by this slot (slot 10 + slot 11 both still on `@brewery/*` workspace names but have `@umbraculum/contracts` deps + imports + dist).
+
+**Lessons folded back to plan doc §4 step 3 + §5 + §6.9 BEFORE commit:** two new lessons recorded (NEW HARD STOP — bulk-sed scripts under `cursor-tmp/` self-corrupt because the canonical-grep regex matches their own source code; new exclusion path added to step 3. NEW COSMETIC OBSERVATION — slash-delimited shorthand comments like `@brewery/contracts/core/media` become self-inconsistent post-rename; flagged in §5 risk register as cosmetic-only). See plan doc §6.9 for full recap.
 
 ---
 

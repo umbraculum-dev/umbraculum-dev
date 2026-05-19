@@ -4,7 +4,7 @@ import { BadRequestError } from "../errors.js";
 import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
 import { AiSettingsService } from "../services/ai/aiSettingsService.js";
 import { AiOrchestrator } from "../services/ai/orchestrator.js";
-import type { AiToolRegistry } from "@brewery/contracts";
+import type { AiToolRegistry } from "@umbraculum/contracts";
 
 function assertWorkspaceId(v: unknown): string {
   const id = typeof v === "string" ? v.trim() : "";

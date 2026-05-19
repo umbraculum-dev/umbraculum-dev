@@ -7,12 +7,12 @@ Typed API client with pluggable auth strategies (cookie sessions for web; bearer
 
 ## What this is
 
-The transport layer between any client and `services/api`. Web (Next.js) and native (React Native + Expo) both consume from this package, but they authenticate differently — the web app rides a cookie session (`sid` httpOnly), the native app sends a bearer token (`Authorization: Bearer <token>`). This package abstracts that split behind two interchangeable auth-strategy factories (`cookieAuth()` and `bearerTokenAuth(getToken)`); the rest of the client surface is identical across platforms. Returned payloads are runtime-validated by the parsers in [`@brewery/contracts`](../contracts/README.md). See [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) for the platform-wide auth direction.
+The transport layer between any client and `services/api`. Web (Next.js) and native (React Native + Expo) both consume from this package, but they authenticate differently — the web app rides a cookie session (`sid` httpOnly), the native app sends a bearer token (`Authorization: Bearer <token>`). This package abstracts that split behind two interchangeable auth-strategy factories (`cookieAuth()` and `bearerTokenAuth(getToken)`); the rest of the client surface is identical across platforms. Returned payloads are runtime-validated by the parsers in [`@umbraculum/contracts`](../contracts/README.md). See [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) for the platform-wide auth direction.
 
 ## Scope
 
 - **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, the two auth-strategy factories (`cookieAuth()`, `bearerTokenAuth(getToken)`), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes).
-- **Does not contain**: contract DTO/parser definitions (those live in `@brewery/contracts`); auth backend logic — token issuance, session creation (lives in `services/api/src/routes/auth/`); UI session-state management (lives in the consuming app).
+- **Does not contain**: contract DTO/parser definitions (those live in `@umbraculum/contracts`); auth backend logic — token issuance, session creation (lives in `services/api/src/routes/auth/`); UI session-state management (lives in the consuming app).
 
 ## Exports
 
@@ -48,7 +48,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 ## How it fits in
 
 - **Consumed by**: `apps/web` (cookie auth), `apps/native` (bearer auth); Node-side test harnesses and scripts that need to call the API as an authenticated user (also bearer).
-- **Depends on**: `@brewery/contracts` (for the response parsers and DTO types). Does **not** depend on Next.js, Expo, React Navigation, or any UI framework.
+- **Depends on**: `@umbraculum/contracts` (for the response parsers and DTO types). Does **not** depend on Next.js, Expo, React Navigation, or any UI framework.
 
 ## Status
 
@@ -60,5 +60,5 @@ Stable. The "webview caveat" above is the one explicitly-flagged limitation: bea
 - [`docs/AUTH-HARDENING-ASSESSMENT.md`](../../docs/AUTH-HARDENING-ASSESSMENT.md) — auth hardening review and findings
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
-- [`@brewery/contracts`](../contracts/README.md) — the typed response parsers this client returns
+- [`@umbraculum/contracts`](../contracts/README.md) — the typed response parsers this client returns
 

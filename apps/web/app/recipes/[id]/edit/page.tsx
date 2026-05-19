@@ -53,8 +53,8 @@ import {
   type RecipeWaterSettingsResponse,
 } from "../water/_lib/waterSettings";
 import { mathExplain } from "./_lib/mathExplain";
-import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
-import type { NumberFormatHintV1, WaterCalcDerivation } from "@brewery/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
+import type { NumberFormatHintV1, WaterCalcDerivation } from "@umbraculum/contracts";
 import { renderDerivationBody } from "../water/_lib/mathBodies";
 import { formatSgWithPlato } from "../../../_lib/gravity";
 import { parseGristJson } from "../../../_lib/grist";

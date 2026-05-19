@@ -5,9 +5,9 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import type { IonProfilePpm } from "@brewery/contracts";
+import type { IonProfilePpm } from "@umbraculum/contracts";
 
-import { parseWaterProfilesResponse } from "@brewery/contracts";
+import { parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { Accordion, Button, H1, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
 
 import { apiFetch, type WaterProfilesResponse } from "./_lib/api";

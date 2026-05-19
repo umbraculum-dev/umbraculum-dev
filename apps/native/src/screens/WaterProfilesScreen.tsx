@@ -3,8 +3,8 @@ import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
-import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
-import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
+import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";

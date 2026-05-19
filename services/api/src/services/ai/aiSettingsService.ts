@@ -3,7 +3,7 @@ import type {
   AiRoleLimits,
   UpdateWorkspaceAiSettingsRequest,
   WorkspaceAiSettings,
-} from "@brewery/contracts";
+} from "@umbraculum/contracts";
 
 import { ForbiddenError } from "../../errors.js";
 import { WorkspacesService } from "../workspacesService.js";

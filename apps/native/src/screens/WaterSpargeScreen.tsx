@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
-import { parseSpargeComputeAndSaveResponse, parseWaterProfilesResponse } from "@brewery/contracts";
-import type { WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
+import { parseSpargeComputeAndSaveResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";

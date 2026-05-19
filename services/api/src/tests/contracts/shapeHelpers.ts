@@ -2,7 +2,7 @@
  * Shape-based snapshot helpers for native-consumed API responses.
  *
  * Why shape-based (not literal) snapshots?
- *   - Native apps consume these payloads via parsers in @brewery/contracts.
+ *   - Native apps consume these payloads via parsers in @umbraculum/contracts.
  *   - We want to catch *structural* drift (renamed keys, type changes,
  *     missing fields) without false positives from timestamps, UUIDs, or
  *     legitimate numeric variation.

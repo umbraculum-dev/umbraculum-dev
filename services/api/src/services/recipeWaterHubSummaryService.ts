@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
-import type { ExpectedRaRange, RecipeWaterHubStreamSummary, RecipeWaterHubSummary } from "@brewery/contracts";
+import type { ExpectedRaRange, RecipeWaterHubStreamSummary, RecipeWaterHubSummary } from "@umbraculum/contracts";
 import { WorkspacesService } from "./workspacesService.js";
 import { RecipesService } from "./recipesService.js";
 import type { IonProfilePpm } from "../domain/waterCalc/saltAdditions.js";

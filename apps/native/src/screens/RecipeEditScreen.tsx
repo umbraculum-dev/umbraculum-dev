@@ -15,7 +15,7 @@ import {
   type EditorMashStep,
   type EditorYeastRow,
 } from "@brewery/beerjson";
-import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Accordion, TextArea } from "tamagui";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";

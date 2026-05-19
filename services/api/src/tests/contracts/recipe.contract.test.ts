@@ -3,7 +3,7 @@
  *
  * Native (apps/native) reads recipe payloads to render recipe edit/brew flows.
  * If we add/rename a BeerJSON-derived field server-side and forget to update
- * the native parser in @brewery/contracts, this snapshot turns it into a PR red.
+ * the native parser in @umbraculum/contracts, this snapshot turns it into a PR red.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../../app.js";

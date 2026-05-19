@@ -1,9 +1,9 @@
-# @brewery/contracts
+# @umbraculum/contracts
 
 Shared DTOs, types, and runtime parsers. The contract layer between the API and every client.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). The npm scope `@brewery/*` is parked pending sub-plan #9 ([`RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md) §10); do not rewrite import paths.
+> Part of [Umbraculum](../../README.md) — the process-manufacturing platform, brewery-configured by default. Brand resolved 2026-05-18; see [`docs/RENAME-DILIGENCE.md`](../../docs/RENAME-DILIGENCE.md). Renamed from `@brewery/contracts` to `@umbraculum/contracts` as sub-plan #9 slot 9 (heaviest slot at 75-file footprint; first slot to open two simultaneous transient cross-scope states for slots 10 + 11).
 
 ## What this is
 
@@ -44,8 +44,8 @@ This package is consumed by web and native clients and the API itself; it ships 
 Commands (run from repo root, container-friendly per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only.md) rule):
 
 - **Build**: `npm run build:packages`
-- **Test**: `npm run test --workspace=@brewery/contracts` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
-- **Lint**: `npm run lint --workspace=@brewery/contracts`.
+- **Test**: `npm run test --workspace=@umbraculum/contracts` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: `npm run lint --workspace=@umbraculum/contracts`.
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace landed all 6 candidate strict flags after Phase 6h — `noImplicitOverride`, `noPropertyAccessFromIndexSignature`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, `isolatedModules`).
 - **Contracts check**: when an API response shape changes, run `npm run contracts:check` (or `contracts:update` to refresh the snapshot) inside the api container.
 

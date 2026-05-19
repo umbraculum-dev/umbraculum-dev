@@ -1,4 +1,4 @@
-import type { AiToolRegistry } from "@brewery/contracts";
+import type { AiToolRegistry } from "@umbraculum/contracts";
 
 /**
  * Billing tier slug aligned with Prisma `BillingTier` and

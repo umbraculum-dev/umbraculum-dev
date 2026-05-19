@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { AuthMeResponse } from "@brewery/contracts";
+import type { AuthMeResponse } from "@umbraculum/contracts";
 import { SizableText, XStack } from "tamagui";
 
 import { CodeInline } from "./CodeInline";

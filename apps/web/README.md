@@ -14,7 +14,7 @@ The architectural shape — what's a feature here vs. in a sibling package — i
 ## Scope
 
 - **Contains**: Next.js App Router routes (`app/[locale]/**`), middleware (`middleware.ts`), per-locale i18n request handler (`src/i18n/`), client-side navigation glue (`src/navigation/`), Tamagui config (`tamagui.config.ts`), Next config (`next.config.js`), the media-sync script (`scripts/sync-media.mjs`), the i18n-coverage guardrail (`scripts/i18n-guardrail.mjs`), the Playwright E2E sub-suite (`e2e/`).
-- **Does not contain**: API route handlers (those live in `services/api`); shared UI primitives (`@umbraculum/ui`); domain UI (`@brewery/recipes-ui`); message catalogs (`@umbraculum/i18n`); contract types (`@brewery/contracts`); media assets (`@umbraculum/media` — synced into `public/media/` by the pre-build script); the native app (`apps/native`).
+- **Does not contain**: API route handlers (those live in `services/api`); shared UI primitives (`@umbraculum/ui`); domain UI (`@brewery/recipes-ui`); message catalogs (`@umbraculum/i18n`); contract types (`@umbraculum/contracts`); media assets (`@umbraculum/media` — synced into `public/media/` by the pre-build script); the native app (`apps/native`).
 
 ## Quick start
 
@@ -38,7 +38,7 @@ Per the [`node-npm-container-only`](../../.cursor/skills/node-npm-container-only
 ## How it fits in
 
 - **Consumed by**: end users (via the dev nginx today; via `umbraculum.dev` after the public flip per [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §10.1).
-- **Depends on**: `services/api` (HTTP backend); `@brewery/contracts` (typed responses); `@umbraculum/ui` + `@brewery/recipes-ui` (UI primitives + domain UI); `@umbraculum/i18n` + `@umbraculum/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with native); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing/normalization); `@umbraculum/brewery-core` (math primitives, gravity/SG conversions).
+- **Depends on**: `services/api` (HTTP backend); `@umbraculum/contracts` (typed responses); `@umbraculum/ui` + `@brewery/recipes-ui` (UI primitives + domain UI); `@umbraculum/i18n` + `@umbraculum/i18n-react` (localization); `@umbraculum/navigation` (route ID system shared with native); `@umbraculum/media` (assets); `@brewery/beerjson` (recipe parsing/normalization); `@umbraculum/brewery-core` (math primitives, gravity/SG conversions).
 - **Auth**: cookie-based (`sid` httpOnly). The native sibling rides bearer tokens — the difference is abstracted in `@brewery/api-client`.
 
 ## Status

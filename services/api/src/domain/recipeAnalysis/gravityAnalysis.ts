@@ -3,8 +3,8 @@ import type {
   GravityAnalysisResponseV1,
   GravityAnalysisWarningCode,
   WaterCalcDerivation,
-} from "@brewery/contracts";
-import { analysisFormatHints } from "@brewery/contracts";
+} from "@umbraculum/contracts";
+import { analysisFormatHints } from "@umbraculum/contracts";
 import { isFiniteNumber, isObject } from "../../lib/typeGuards.js";
 
 /**

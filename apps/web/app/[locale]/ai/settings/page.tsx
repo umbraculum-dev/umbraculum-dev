@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import type { WorkspaceAiSettings } from "@brewery/contracts";
+import type { WorkspaceAiSettings } from "@umbraculum/contracts";
 
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";

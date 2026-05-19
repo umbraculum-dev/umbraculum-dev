@@ -23,7 +23,7 @@ import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewer
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
-import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
+import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
@@ -36,8 +36,8 @@ import {
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@brewery/contracts";
-import type { WaterCalcDerivation } from "@brewery/contracts";
+import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@umbraculum/contracts";
+import type { WaterCalcDerivation } from "@umbraculum/contracts";
 import { asRecord } from "../../../../_lib/typeGuards";
 import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";

@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import type { AuthMeResponse } from "@brewery/contracts";
-import { parseAuthMeResponse } from "@brewery/contracts";
+import type { AuthMeResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse } from "@umbraculum/contracts";
 import { SizableText, XStack } from "tamagui";
 
 import { apiFetch } from "../_lib/apiClient";

@@ -20,7 +20,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@brewery/contracts": "file:../contracts"
+    "@umbraculum/contracts": "file:../contracts"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

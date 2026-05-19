@@ -41,7 +41,7 @@ For reference, the packages currently in the horizontal set (as catalogued in [`
 | Package | Role |
 |---|---|
 | `@umbraculum/module-sdk` | The SDK every module pins (`registerModule`, reserved codes, `ValidatedSchema<T>`). |
-| `@brewery/contracts` (becomes `@umbraculum/contracts`, slot 9) | Platform-wide auth/me DTOs, AI tool contract types. |
+| `@umbraculum/contracts` (becomes `@umbraculum/contracts`, slot 9) | Platform-wide auth/me DTOs, AI tool contract types. |
 | `@umbraculum/automation-contracts` | Contracts slice of the `automation` canonical — note: this *is* tied to a canonical module, but is exported as a horizontal-shaped package because it's the consumption surface third parties pin. The β layout in [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md) treats `<code>-contracts/` as the contracts slice of the canonical, not as horizontal infrastructure. The taxonomy is a convenience in §3.3 of the entry page. |
 | `@brewery/api-client` (becomes `@umbraculum/api-client`, slot 10) | Fetch + auth boundary (cookie web, bearer native). |
 | `@umbraculum/i18n` | Cross-platform message catalog (web + native). |

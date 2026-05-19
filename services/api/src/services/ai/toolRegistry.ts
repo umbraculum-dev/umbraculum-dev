@@ -1,4 +1,4 @@
-import type { AiTool, AiToolRegistry, AiToolScope } from "@brewery/contracts";
+import type { AiTool, AiToolRegistry, AiToolScope } from "@umbraculum/contracts";
 
 /**
  * In-memory implementation of `AiToolRegistry`.

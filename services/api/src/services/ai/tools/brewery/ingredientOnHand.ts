@@ -1,4 +1,4 @@
-import type { AiTool } from "@brewery/contracts";
+import type { AiTool } from "@umbraculum/contracts";
 import type { PrismaClient, InventoryCategory } from "@prisma/client";
 
 import { InventoryService } from "../../../inventoryService.js";

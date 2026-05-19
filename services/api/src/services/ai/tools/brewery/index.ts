@@ -1,4 +1,4 @@
-import type { AiTool, AiToolRegistry } from "@brewery/contracts";
+import type { AiTool, AiToolRegistry } from "@umbraculum/contracts";
 import type { PrismaClient } from "@prisma/client";
 
 import { createRecipeLookupTool } from "./recipeLookup.js";
