@@ -4,8 +4,8 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, SelectField, Text } from "@brewery/ui";
-import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
+import { Button, Card, Heading, Screen, SelectField, Text } from "@umbraculum/ui";
+import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

@@ -192,7 +192,7 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 ## Related
 
 - `docs/LINTING.md` — the lint roadmap and full phase log; HIGH-full landed 2026-05-16 with the Tamagui-wall framing materially revised (see `docs/LINTING.md` "Realised output of HIGH-full" + the Phase 4b post-mortem for the stale-rename root-cause analysis).
-- `packages/ui/README.md` — `@brewery/ui` package overview, especially the platform-forking primitives in `src/primitives/*`.
+- `packages/ui/README.md` — `@umbraculum/ui` package overview, especially the platform-forking primitives in `src/primitives/*`.
 - `eslint.config.mjs` — the `no-restricted-imports` block for `packages/ui/src/{ai,charts}/**` that enforces "never import raw Tamagui Button/Input/Checkbox in cross-platform components".
 - `packages/ui/src/primitives/AdSlotCard.tsx` — canonical example of the caveat-3 (`as="aside"`) pattern.
 - `packages/ui/src/primitives/Button.web.tsx` / `Button.native.tsx` — canonical example of the caveat-4 (a11y prop fork) pattern.

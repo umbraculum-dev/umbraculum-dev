@@ -19,7 +19,7 @@ Current buildable packages (native-consumed):
 - `packages/navigation` (`@umbraculum/navigation`)
 - `packages/contracts` (`@brewery/contracts`)
 - `packages/api-client` (`@brewery/api-client`)
-- `packages/ui` (`@brewery/ui`)
+- `packages/ui` (`@umbraculum/ui`)
 - `packages/recipes-ui` (`@brewery/recipes-ui`)
 
 Build workflow:
@@ -36,15 +36,15 @@ Why we commit `dist/`:
 - Our Docker dev stack mounts shared packages read-only (`docker-compose.yml` `:ro`), so containers must be able to consume prebuilt outputs.
 - It reduces Metro/Expo kickoff risk by avoiding “transpile external workspace TS” configuration during early native bootstrapping.
 
-#### `@brewery/ui` import rules (important for native safety)
-- The root entrypoint `@brewery/ui` is intentionally **platform-neutral** (may be empty).
+#### `@umbraculum/ui` import rules (important for native safety)
+- The root entrypoint `@umbraculum/ui` is intentionally **platform-neutral** (may be empty).
 - Import Tamagui configs via explicit subpaths:
-  - Web: `@brewery/ui/tamagui-config-web` (uses `@tamagui/animations-css`)
-  - Native: `@brewery/ui/tamagui-config-native` (native-safe)
+  - Web: `@umbraculum/ui/tamagui-config-web` (uses `@tamagui/animations-css`)
+  - Native: `@umbraculum/ui/tamagui-config-native` (native-safe)
 
 #### UI layering (mandatory for scalability)
 
-- **Generic primitives** (buttons, inputs, selects, cards, collapsibles): `@brewery/ui`
+- **Generic primitives** (buttons, inputs, selects, cards, collapsibles): `@umbraculum/ui`
 - **Domain feature UI** (recipe editors, water/yeast widgets): `@brewery/recipes-ui`
 - **Adapters** (Next.js routing, cookie-session fetch, native bearer auth, media rendering): stay in `apps/web/**` and `apps/native/**`
 

@@ -25,7 +25,7 @@
 
   /* Field semantics (color is supportive; badges/text still required). */
   --field-input-bg: var(--surface);
-  /* Shared with native via @brewery/ui nativeReadonlyTokens. Must stay in sync. */
+  /* Shared with native via @umbraculum/ui nativeReadonlyTokens. Must stay in sync. */
   --field-readonly-bg: #232934;
   --field-computed-bg: color-mix(in srgb, var(--success) 7%, var(--surface));
   --field-readonly-border: #3a4558;

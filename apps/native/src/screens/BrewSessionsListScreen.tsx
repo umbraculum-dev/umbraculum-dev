@@ -4,7 +4,7 @@ import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type Rout
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

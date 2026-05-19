@@ -23,7 +23,7 @@
     "@brewery/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/navigation": "file:../../packages/navigation",
     "@umbraculum/media": "file:../../packages/media",
-    "@brewery/ui": "file:../../packages/ui",
+    "@umbraculum/ui": "file:../../packages/ui",
     "@brewery/recipes-ui": "file:../../packages/recipes-ui",
     "@tamagui/animations-css": "^2.0.0-rc.11",
     "@tamagui/config": "^2.0.0-rc.7",

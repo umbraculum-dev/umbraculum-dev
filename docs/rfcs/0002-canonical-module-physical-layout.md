@@ -237,7 +237,7 @@ When the second canonical module (example: `wms`) ships:
 | Native brewery screens (today under `apps/native/src/screens/` etc.) | `apps/native/src/modules/brewery/**` |
 | New contracts (greenfield) | `packages/wms-contracts/`, `packages/brewery-contracts/` (brewery contracts may start as re-export of existing `@brewery/*` types during migration) |
 | `services/api/src/app.ts` flat `register` calls | `registerModule()` per installed module |
-| `@brewery/i18n`, `@brewery/ui`, … | `@umbraculum/*` horizontal; `@umbraculum/brewery-*` or equivalent for vertical packages (sub-plan #9) |
+| `@brewery/i18n`, `@umbraculum/ui`, … | `@umbraculum/*` horizontal; `@umbraculum/brewery-*` or equivalent for vertical packages (sub-plan #9) |
 
 **Prisma:** new module schema `wms` (example); brewery tables remain `public` until a follow-on migration authorizes `brewery` schema.
 

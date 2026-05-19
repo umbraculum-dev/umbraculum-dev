@@ -20,7 +20,7 @@
   "dependencies": {
     "@brewery/beerjson": "file:../beerjson",
     "@brewery/i18n-react": "file:../i18n-react",
-    "@brewery/ui": "file:../ui",
+    "@umbraculum/ui": "file:../ui",
     "tamagui": "^2.0.0-rc.11"
   },
   "peerDependencies": {

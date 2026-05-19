@@ -5,11 +5,11 @@ import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { parseBoilComputeAndSaveResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import type { WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";
 
-import { ModeFieldset } from "@brewery/ui";
+import { ModeFieldset } from "@umbraculum/ui";
 import { SaltAdditionsEditor, type SaltAdditionRow } from "@brewery/recipes-ui";
 import { Input } from "../components/AppInput";
 import { useAuth } from "../auth/AuthProvider";

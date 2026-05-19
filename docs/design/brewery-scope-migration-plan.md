@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` package-scope migration plan
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — scoping pass + slots 1–4 landed (slot 1: `test-mcp` worked example, §6; slot 2: `media`, §6.1; slot 3: `navigation`, §6.2; slot 4: `automation-contracts`, §6.3; each slot surfaced lessons folded back into §4/§5 before commit). Remaining 10 slots (9 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
+**Status:** Active 2026-05-19 — scoping pass + slots 1–5 landed (slot 1: `test-mcp` worked example, §6; slot 2: `media`, §6.1; slot 3: `navigation`, §6.2; slot 4: `automation-contracts`, §6.3; slot 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe, §6.4; each slot surfaced lessons folded back into §4/§5 before commit). Remaining 9 slots (8 packages + 1 application-workspace bundle) tracked in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md).
 **Audience:** core team executing the rename; future contributors picking up un-checked items from the handoff checklist; anyone evaluating the migration shape before the public flip.
 **Resolves:** umbrella plan sub-plan #9 (post-RFC-001 follow-on); the `@brewery/*` actual-scope migration referenced from [`docs/RENAME-DILIGENCE.md`](../RENAME-DILIGENCE.md) §10.
 **Builds on:** [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §5.2 (rename commitment), [`docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §§4–5 (brewery is tier-6 vertical, NOT canonical), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §11.2 (H1 2027 restructure row that defers to this plan).
@@ -16,8 +16,9 @@
 |---|---|
 | Scoping pass | **Done 2026-05-19** (this doc + handoff doc + worked-example rename) |
 | Worked example landed | `@brewery/test-mcp` → `@umbraculum/test-mcp` (commit hash recorded in §6) |
-| Remaining slots to migrate | 13 (12 packages + 1 application-workspace bundle); see [handoff doc](./brewery-scope-migration-per-package-handoff.md) |
-| Estimated remaining sessions | 5–8 (1–3 slots per session; slot 9 `contracts` and slot 5 `ui` likely their own session) |
+| Slots landed | 5 of 14 — slots 1–5 (`test-mcp`, `media`, `navigation`, `automation-contracts`, `ui`) |
+| Remaining slots to migrate | 9 (8 packages + 1 application-workspace bundle); see [handoff doc](./brewery-scope-migration-per-package-handoff.md) |
+| Estimated remaining sessions | 3–6 (1–3 slots per session; slot 9 `contracts` likely its own session; slot 6 `core` is a ⚠ TRAP slot per §1.3 needing the classification gate but is otherwise small) |
 | Skill capture in plugin pack | Deferred to second-package execution per "codify on second use" cadence |
 | Blocking dependencies | None — both gates closed (rename primary substitution + RFC-0001 acceptance) |
 
@@ -323,11 +324,37 @@ SyntaxError: The requested module '@umbraculum/<name>' does not provide an expor
 ```bash
 docker compose exec api  sh -c 'cd /app && npm run typecheck && npm run test'
 docker compose exec web  sh -c 'cd /app && npm run typecheck'
-# Smoke: hit a real page through Nginx (NOT localhost:3000 — that bypasses the gateway)
+# Smoke: hit real pages through Nginx (NOT localhost:3000 — that bypasses the gateway).
+# Include UI-heavy pages if the slot touches @umbraculum/ui or @brewery/recipes-ui.
 curl -sS http://localhost:18080/api/health
+curl -sS -o /dev/null -w 'HTTP %{http_code}\n' http://localhost:18080/en/dashboard
+curl -sS -o /dev/null -w 'HTTP %{http_code}\n' http://localhost:18080/en/recipes
 ```
 
+> **`apps/web` typecheck is EXCLUDED from CI gating by explicit decision** (see [`.github/workflows/typecheck.yml`](../../.github/workflows/typecheck.yml) header comment + [`docs/TYPING.md`](../TYPING.md) Phase 4 + [`docs/TAMAGUI.md`](../TAMAGUI.md)). Running `npm run typecheck` against `apps/web` locally currently produces ~1000–1100 `TS2322` errors, all in the accepted-cost Tamagui shorthand-prop / theme-token class (e.g. `Property 'mt' does not exist`, `Property 'minW' does not exist`, `Property 'bg' does not exist`). **Surfaced during slot 5 verification (2026-05-19) — 1063 of 1073 errors were TS2322 in the documented class.** Do NOT treat these as a slot regression. The proper web verification is the Nginx smoke through the gateway (above). If you want to confirm none of the errors are new, sort the error codes (`npm run typecheck 2>&1 | grep -oE "error TS[0-9]+" | sort | uniq -c | sort -rn`) — the TS2322 count should dominate by ≥98%.
+
 If the renamed package is consumed by `apps/native`, also run `npm run typecheck` from `apps/native/` (typecheck-only; native runtime smoke is out of scope for this migration).
+
+> **Slot-5 GOTCHA — native typecheck via host one-shot container prunes api devDeps.** Running native typecheck commonly takes the form:
+>
+> ```bash
+> docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim \
+>   bash -lc 'cd /repo && npm install --no-audit --no-fund && cd apps/native && npm run typecheck'
+> ```
+>
+> The `npm install` step against the repo root inside that one-shot container hits the SAME root-cause failure mode as the step-5 build script: against the workspace shape with bind-mounted `services/api/node_modules`, npm 10's degraded resolution mode silently prunes api's devDeps. The api container appears healthy (`/api/health` returns `{"ok":true}`) because tsx is already loaded into the running process's memory, but `/app/node_modules/.bin/` is left with ~8 binaries instead of ~140 (no `tsc`, `tsx`, `vitest`). Any subsequent `docker compose exec api npm run typecheck` or `npm run test` will fail with `tsc: not found`.
+>
+> **Recovery is the same as step 5's STOP-install-START sequence** (without the build, since dist/ is already current):
+>
+> ```bash
+> docker compose stop api
+> docker run --rm -v "$PWD/services/api:/app" -w /app node:20-slim \
+>   bash -lc 'npm install --include=dev --no-audit --no-fund'
+> docker compose start api
+> curl -sS http://localhost:18080/api/health  # expect {"ok":true}
+> ```
+>
+> **Mitigation:** run native typecheck BEFORE step 5 (when api is already stopped from step 5a) if possible; or accept that the native typecheck triggers a recovery cycle and budget for it. **Surfaced during slot 5 verification (2026-05-19).**
 
 ### Step 7 — Commit + push as one revertable unit
 
@@ -361,6 +388,8 @@ If the verification surfaces any gotcha not yet documented in §4 or §5, **upda
 | In-place `npm install` in api container omits devDependencies (tsc, vitest, tsx missing → typecheck/test fail) | High (every in-place reinstall against a running container with workspace deps) | Medium (recoverable, easy to misdiagnose as "lockfile corrupted") | Step 4b uses `--include=dev` flag; container startup `npm install` (via `docker compose up`) is unaffected. **Surfaced during slot 2 worked example.** |
 | `scripts/build-packages-in-docker.sh`'s `npm ci` (against `${REPO_ROOT}:/repo` mount) silently prunes `services/api/node_modules` devDeps (no `tsc`, `vitest`, `tsx`) → then `npm run build:packages` unlinks dist files → if api container is running, tsx watch tries to hot-reload → tsx itself missing → api crash-loops → 502 through Nginx for the rest of the slot | High (every slot that runs step 5 with api live; surfaced piecemeal across slots 1, 3, and 4) | High (silent until smoke check; misdiagnosed across three slots as "restart broke things" or "host-install fixed it" before slot 4 isolated the real culprit) | **Slot 4 fix:** step 5 is now a STOP-build-install-START sequence: `docker compose stop api` → `bash scripts/build-packages-in-docker.sh` → host one-shot `npm install --include=dev` into the api bind-mount → `docker compose start api`. With api stopped during the build, tsx watch cannot crash on the build's unlink events; after the build, the host one-shot restores devDeps; on start, the container's startup `npm install` sees deps satisfied and is a no-op. Step 4b's per-container install for api is REMOVED (it would be wiped by step 5 anyway); web's in-place install is retained because the build's `npm ci` does not prune web's bind-mount the same way (and web has no tsx-watch failure mode). |
 | `docker compose restart api` on its own (without a subsequent build) is also unsafe: re-runs the container's startup `sh -c "npm install && npm run dev"`; the startup `npm install` can re-prune devDeps depending on workspace-resolution state. | Medium (surfaces only if used as a "fix" between step 4 and step 5; the new step 5 recipe doesn't issue any restart) | Medium (caught by smoke if tested after) | **Plan-doc directive:** never use `docker compose restart api` during a slot's execution; the start/stop sequencing of step 5 (and only step 5) is the canonical state-mutation path for the api container. |
+| Native typecheck via host one-shot container (`docker run -v $PWD:/repo ... npm install ... npm run typecheck`) silently prunes the api bind-mount the same way step 5's build script does — but post-step-5, when api is running again. API appears healthy (`/api/health` returns `{"ok":true}`) because tsx is already loaded into memory; `/app/node_modules/.bin/` is left with ~8 entries instead of ~140 (no `tsc`, `tsx`, `vitest`). Any subsequent `docker compose exec api npm run typecheck` or `npm run test` fails with `tsc: not found`. | High (every slot that touches a native-consumed package and runs native typecheck after step 5; surfaced during slot 5 — apps/native has 24 files updated) | Medium (silent, then misdiagnosed as "the rename broke api"; recovery is a 30s STOP-install-START with no rebuild) | **Slot-5 fix:** any out-of-band `npm install` against the workspace root with the api bind-mount intact requires a STOP-install-START recovery: `docker compose stop api && docker run --rm -v "$PWD/services/api:/app" -w /app node:20-slim bash -lc 'npm install --include=dev ...' && docker compose start api`. Step 6 native typecheck block in §4 documents the full sequence + a sniff check (`ls /app/node_modules/.bin/ \| grep -E "^(tsc\|tsx\|vitest)$"`) to confirm devDeps survived. Preferred ordering: run native typecheck BEFORE step 5 (api already stopped from step 5a), eliminating the recovery cycle. |
+| `apps/web` typecheck appears to "regress" with ~1000–1100 `TS2322` errors after a slot lands. | High (every slot — `apps/web` is excluded from CI gating and accumulates Tamagui shorthand-prop / theme-token errors as the codebase grows; the count was ~585 at HIGH-full Phase 4 measurement and is ~1073 as of slot 5) | Low (accepted-cost per [`docs/TYPING.md`](../TYPING.md) Phase 4 + [`docs/TAMAGUI.md`](../TAMAGUI.md); reflected in the `.github/workflows/typecheck.yml` header which explicitly excludes `apps/web` from the gated set) | **Slot-5 fix:** §4 step 6 now warns explicitly that `apps/web` typecheck is excluded from CI; the proper web verification for a slot is the Nginx smoke through the gateway (not local typecheck). Error-class fingerprint (`grep -oE "error TS[0-9]+" \| sort \| uniq -c \| sort -rn`) should be ≥98% TS2322; if a different code dominates, escalate. **Surfaced during slot 5 verification (2026-05-19).** |
 | `dist/` not rebuilt → `SyntaxError: does not provide an export named` at api boot | Medium (easy to forget) | Medium | Step 5 + cross-reference to the canonical recovery in [`pr1-contracts-migration-handoff.md`](./pr1-contracts-migration-handoff.md) |
 | Sister-repo coordination overlooked when migrating `automation-contracts` | Low | Low | §2.3 confirms sister repo emits JSON only; one-line doc-link update in [`openplc-mailbox-emitter-pr-shape.md`](./openplc-mailbox-emitter-pr-shape.md) is the only sister-side change |
 | Scoping pass under-estimates effort and execution sessions balloon | Medium | Low | Per-package handoff doc tracks actual size per slot; if early slots overrun estimated effort, reschedule remaining slots accordingly — no sunk-cost pressure to keep the same cadence |
@@ -440,13 +469,31 @@ Platform-classified (canonical-module contracts, NOT brewery-vertical; vessel-ag
 
 Three lessons landed in the plan doc BEFORE the slot-4 commit, mirroring slots 1–3 discipline. The recipe is now slot-4-tested as well — and is **substantially shorter and more robust** than the post-slot-3 version (api state-mutation is now confined to step 5, not split across steps 4b and 5).
 
-**Commit hash:** *(populated post-commit — recorded in the slot-4 commit message)*
+**Commit hash:** `bd7d147` (umbraculum-dev) + `467b4ba` (umbraculum-toolset preflight skill update).
+
+### 6.4. Slot 5 — `@brewery/ui` → `@umbraculum/ui`
+
+Platform-classified (Tamagui primitives + design-system components; industry-agnostic by construction — no brewery-domain knowledge lives here). The first **heavy** slot: 69 files / ~100 occurrences, the largest by ~2× of any prior slot. First slot to exercise a **quadruple-entrypoint** tsup build (`.`, `./tamagui-config-web`, `./tamagui-config-native`, `./charts/HydrometerChart` with web/native platform-fork via `react-native` export condition). First slot to touch all 5 slot-5-specific HARD STOPS in one go: `apps/web/next.config.js` `transpilePackages`, both `apps/{web,native}/tamagui.config.ts`, `apps/web/app/variables.css`, and the root `build:packages`.
+
+**Footprint:** 69 files. Distribution: 1 own package (`packages/ui/package.json`), 3 consumer `package.json` deps (`apps/{web,native}`, `packages/recipes-ui`), root `package.json` `build:packages`, 4 hard-stop build configs (`next.config.js` + 2 `tamagui.config.ts` + `variables.css`), ~50 source imports (~10 web, ~25 native, ~5 packages/recipes-ui, 1 services/api test, 1 packages/ui itself), 7 cross-package READMEs, ~10 doc references. Sweep regex `@brewery/ui([^a-zA-Z0-9_-]|$)` — anchored to avoid `@brewery/ui-anything-else` matches; only 3 sub-paths exist (`/tamagui-config-web`, `/tamagui-config-native`, `/charts/HydrometerChart`) so the regex is unambiguous. **Initial sed had a bug — `/` was overzealously added to the exclusion class, so subpath imports were missed; fixed by removing `/` (the safety regex never had it) on the second pass.** First slot to exercise a controlled bulk sed across this many files; previous slots used StrReplace for every file individually.
+
+**The recipe (now slot-4-corrected) held cleanly on first attempt** for the per-package handoff steps 1–5. No api crash-loop, no missing-export errors, no lockfile churn beyond the rename itself (root: 8/8, web: 7/7). Step 5's STOP-build-install-START sequence took ~110s total (5b build = 96s, 5c host install = 5s, 5d start + warm = 8s). All 4 dist entrypoints rebuilt with both `.cjs`/`.js`/`.d.ts`/`.d.cts` artifacts. Vitest baseline preserved (413/413). Nginx smoke 6/6 HTTP 200 across the UI-heavy pages (`/en/dashboard`, `/en/recipes`, `/en/automation`, `/en/yeast-bank`, plus `/en/login` and `/api/health`).
+
+**Lessons recorded back into §4 / §5 during slot 5 (2026-05-19):**
+
+1. **`apps/web` typecheck is excluded from CI by explicit decision** ([`.github/workflows/typecheck.yml`](../../.github/workflows/typecheck.yml) header + [`docs/TYPING.md`](../TYPING.md) Phase 4 + [`docs/TAMAGUI.md`](../TAMAGUI.md)). Local `apps/web` typecheck currently produces ~1000–1100 errors, all in the accepted-cost Tamagui shorthand-prop / theme-token class (`mt`, `mb`, `bg`, `minW`, `items`, etc.). Slot 5 verification measured 1073 errors of which 1063 (~99%) were `TS2322` in that class. **Without this context, a future slot's verifier would treat the "regression" as a slot-introduced bug and rabbit-hole into Tamagui type debugging.** §4 step 6 was updated with an inline note and an error-class fingerprint check (`grep -oE "error TS[0-9]+" | sort | uniq -c | sort -rn` → TS2322 should be ≥98%). §5 risk register row added (High likelihood, Low severity because it's accepted-cost, not a real regression).
+2. **Native typecheck via host one-shot container prunes the api bind-mount.** The standard invocation `docker run -v "$PWD:/repo" -w /repo/apps/native node:20-slim bash -lc 'cd /repo && npm install && cd apps/native && npm run typecheck'` runs `npm install` against the workspace root inside the one-shot container, which hits the SAME root cause as the build script's `npm ci`: against the workspace shape with bind-mounted `services/api/node_modules`, npm 10 silently prunes api devDeps. The api appears healthy (`/api/health` returns `{"ok":true}` because tsx is loaded into the running process's memory), but `/app/node_modules/.bin/` is left with ~8 entries (no `tsc`/`tsx`/`vitest`). Any subsequent `docker compose exec api npm run typecheck` or `npm run test` fails with `tsc: not found`. **Slot 5 hit this gap, recovered with a STOP-install-START sequence (no rebuild — dist/ was already current).** §4 step 6 was updated with the explicit gotcha block + recovery commands + a preferred ordering note (run native typecheck BEFORE step 5, when api is already stopped from step 5a, to eliminate the recovery cycle). §5 risk register row added (High likelihood for slots touching native-consumed packages, Medium severity for misdiagnosis risk).
+3. **Bulk sed for slots with 50+ source-import files is justified and SAFE provided the post-character class is correct.** Slot 5 was the first to use a single `xargs ... sed -i` pass instead of per-file StrReplace. The regex must use the same boundary class as the inventory grep (`[^a-zA-Z0-9_-]` — explicitly excluding `/` is wrong because subpaths legitimately follow with `/`). First-attempt regex `[^a-zA-Z0-9_/-]` was overcautious and missed subpath imports (caught by post-sweep `grep -rl` showing 12 remaining hits, all in files with subpath imports). Plan-doc note: future heavy slots should mirror the safety regex from §4 step 3 verbatim — do NOT add characters to the exclusion class. (This is recipe execution discipline, not a §5 risk row.)
+
+Three lessons landed in the plan doc BEFORE the slot-5 commit, mirroring slots 1–4 discipline. The recipe is now slot-5-tested as well — and is **proven robust under the heavy slot load** (largest by 2× and multi-entrypoint).
+
+**Commit hash:** *(populated post-commit — recorded in the slot-5 commit message)*
 
 ---
 
 ## 7. Per-package handoff link
 
-The serial-execution checklist lives in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md). Open that doc, pick the next un-checked slot (next-after-`automation-contracts` is `ui`, slot 5 — heavy, likely its own session), follow §4 of this doc (now using the STOP-build-install-START sequence in step 5), then tick the slot in the handoff doc and commit.
+The serial-execution checklist lives in [`brewery-scope-migration-per-package-handoff.md`](./brewery-scope-migration-per-package-handoff.md). Open that doc, pick the next un-checked slot (next-after-`ui` is `core`, slot 6 — ⚠ TRAP: §1.3 classification gate is non-skippable; target is `@umbraculum/brewery-core`, NOT `@umbraculum/core`), follow §4 of this doc (now using the STOP-build-install-START sequence in step 5 + the slot-5-discovered native-typecheck-prunes-api gotcha awareness in step 6), then tick the slot in the handoff doc and commit.
 
 ---
 

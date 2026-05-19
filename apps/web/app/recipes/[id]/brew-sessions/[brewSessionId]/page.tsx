@@ -9,7 +9,7 @@ import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, Y
 
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { PageWideActionBar } from "../../../../_components/PageWideActionBar";
-import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
+import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { asRecord } from "../../../../_lib/typeGuards";

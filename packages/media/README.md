@@ -12,7 +12,7 @@ The single canonical home for media assets that need to render identically on ev
 ## Scope
 
 - **Contains**: domain illustration PNGs / SVGs grouped by domain folder under `assets/<domain>/`; the package manifest declaring entry points consumable by both Metro and Next.js.
-- **Does not contain**: the brand mascot Umbi (lives in `docs/media/`, see above); icon-font glyphs (lives in `@brewery/ui` Tamagui icons — pending rename to `@umbraculum/ui` per sub-plan #9 slot 5); generated thumbnails or transformed image variants (those are generated at build time by the consumer apps).
+- **Does not contain**: the brand mascot Umbi (lives in `docs/media/`, see above); icon-font glyphs (lives in `@umbraculum/ui` Tamagui icons — pending rename to `@umbraculum/ui` per sub-plan #9 slot 5); generated thumbnails or transformed image variants (those are generated at build time by the consumer apps).
 
 ## Structure
 

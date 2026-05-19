@@ -5,7 +5,7 @@ import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import type { IonProfilePpm, RecipeWaterHubSummaryResponse } from "@brewery/contracts";
 import { parseRecipeWaterHubSummaryResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion } from "tamagui";
 

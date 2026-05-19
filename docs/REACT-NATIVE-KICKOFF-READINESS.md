@@ -16,10 +16,10 @@ Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
 
 ## Shared UI design system (`packages/ui`)
 
-- [ ] `@brewery/ui` exports initial shared primitives (Tamagui-based):
+- [ ] `@umbraculum/ui` exports initial shared primitives (Tamagui-based):
   - `Button`, `Text`, `Heading`, `Card`, `Screen`, `Spinner`
-- [ ] At least one web component uses shared UI (example: `apps/web/app/_components/LogoutButton.tsx` imports `Button` from `@brewery/ui`).
-- [ ] At least one native screen uses shared UI (example: `apps/native/src/screens/DashboardScreen.tsx` uses `Screen`, `Heading`, `Text`, `Button` from `@brewery/ui`).
+- [ ] At least one web component uses shared UI (example: `apps/web/app/_components/LogoutButton.tsx` imports `Button` from `@umbraculum/ui`).
+- [ ] At least one native screen uses shared UI (example: `apps/native/src/screens/DashboardScreen.tsx` uses `Screen`, `Heading`, `Text`, `Button` from `@umbraculum/ui`).
 
 ## i18n (no hard-coded strings)
 

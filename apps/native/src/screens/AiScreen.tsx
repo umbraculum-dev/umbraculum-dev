@@ -3,7 +3,7 @@ import { Linking, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { useT } from "@brewery/i18n-react";
-import { AiChatPanel, Screen, useAiChatStream } from "@brewery/ui";
+import { AiChatPanel, Screen, useAiChatStream } from "@umbraculum/ui";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

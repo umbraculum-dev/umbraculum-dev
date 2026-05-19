@@ -1,7 +1,7 @@
 import React from "react";
 import { YStack } from "tamagui";
 
-import { Card, ReadOnlyField, ReadOnlyFieldRow, Text } from "@brewery/ui";
+import { Card, ReadOnlyField, ReadOnlyFieldRow, Text } from "@umbraculum/ui";
 
 export interface SpargeStepReadOnlyRowProps {
   stepNumber: number;

@@ -24,7 +24,7 @@ import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
-import { ModeFieldset } from "@brewery/ui";
+import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
 import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";

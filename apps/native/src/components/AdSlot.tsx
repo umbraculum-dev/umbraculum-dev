@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
 
-import { AdSlotCard, Text } from "@brewery/ui";
+import { AdSlotCard, Text } from "@umbraculum/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useAuth } from "../auth/AuthProvider";

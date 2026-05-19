@@ -865,4 +865,4 @@ A large fraction of `any` warnings (and the future-HIGH-full `no-unsafe-*` viola
 - `docs/TESTING.md` — test layer map (unit / integration / contract / Playwright). Lint complements but does not replace tests.
 - `docs/PLATFORM-ARCHITECTURE.md` — broader architectural context, especially §10.1.1 (go-public path) where public-quality lint hygiene is part of the pre-flip checklist.
 - `docs/ROADMAP.md` — milestone alignment; HIGH-full targets Q4 2026 / Q1 2027 alongside the public AGPLv3 flip.
-- `packages/ui/README.md` — `@brewery/ui` package overview, including the platform-forking primitives that the cross-platform import guardrail references.
+- `packages/ui/README.md` — `@umbraculum/ui` package overview, including the platform-forking primitives that the cross-platform import guardrail references.

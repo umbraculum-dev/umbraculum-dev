@@ -3,7 +3,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { useT } from "@brewery/i18n-react";
-import { Screen, Text } from "@brewery/ui";
+import { Screen, Text } from "@umbraculum/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useLocaleController } from "../i18n/I18nProvider";

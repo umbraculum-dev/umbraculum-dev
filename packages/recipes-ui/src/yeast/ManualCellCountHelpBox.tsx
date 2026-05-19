@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import React, { useState } from "react";
 
 import { useT } from "@brewery/i18n-react";
-import { Card, Collapsible, Text } from "@brewery/ui";
+import { Card, Collapsible, Text } from "@umbraculum/ui";
 import { View, YStack } from "tamagui";
 
 export interface RecipeImageProps {

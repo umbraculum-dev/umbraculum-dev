@@ -1,4 +1,4 @@
-import importedConfig from "@brewery/ui/tamagui-config-web";
+import importedConfig from "@umbraculum/ui/tamagui-config-web";
 
 export const config = importedConfig;
 

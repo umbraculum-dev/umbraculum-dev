@@ -5,7 +5,7 @@ import { useNavigation, type NavigationProp } from "@react-navigation/native";
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
 import type { RootStackParamList } from "../navigation/types";
-import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { TextArea } from "tamagui";
 
 import { Input } from "../components/AppInput";

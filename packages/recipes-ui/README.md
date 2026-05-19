@@ -7,7 +7,7 @@ Domain UI components for recipes and related brewing workflows (cross-platform: 
 
 ## What this is
 
-The recipe-domain UI layer, sitting one tier above `@brewery/ui` (which provides platform-neutral primitives). Components in this package are aware of brewing concepts — fermentables, hops, mash steps, water profiles — and orchestrate them into editable views consumed by both `apps/web` and `apps/native`. The package is **adapter-pattern-driven** (see below): app-specific concerns (navigation, API loading, image rendering) are injected as props rather than imported from the consumer's framework, so the same component renders correctly under Next.js and Expo without conditional code paths.
+The recipe-domain UI layer, sitting one tier above `@umbraculum/ui` (which provides platform-neutral primitives). Components in this package are aware of brewing concepts — fermentables, hops, mash steps, water profiles — and orchestrate them into editable views consumed by both `apps/web` and `apps/native`. The package is **adapter-pattern-driven** (see below): app-specific concerns (navigation, API loading, image rendering) are injected as props rather than imported from the consumer's framework, so the same component renders correctly under Next.js and Expo without conditional code paths.
 
 ## Scope
 
@@ -35,7 +35,7 @@ This package ships runtime-safe JS + types under `dist/**` so it can be consumed
 ## How it fits in
 
 - **Consumed by**: `apps/web` (recipe editor pages, water hub, brew-day flows); `apps/native` (the native recipe surfaces).
-- **Depends on**: `@brewery/ui` (primitives), `@brewery/contracts` (typed DTOs / parsers), `@brewery/i18n-react` (localized strings); does **not** depend on Next.js, Expo, React Navigation, or any app-specific API client.
+- **Depends on**: `@umbraculum/ui` (primitives), `@brewery/contracts` (typed DTOs / parsers), `@brewery/i18n-react` (localized strings); does **not** depend on Next.js, Expo, React Navigation, or any app-specific API client.
 
 ## Status
 

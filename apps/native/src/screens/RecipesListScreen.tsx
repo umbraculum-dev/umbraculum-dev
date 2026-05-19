@@ -3,7 +3,7 @@ import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { Input } from "../components/AppInput";

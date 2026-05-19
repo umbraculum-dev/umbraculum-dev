@@ -7,7 +7,7 @@ import { Image } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
-import { AdSlotCard, Text } from "@brewery/ui";
+import { AdSlotCard, Text } from "@umbraculum/ui";
 
 export type AdPlacementV1 =
   | "global_top"

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import { useAiChatStream } from "@brewery/ui";
+import { useAiChatStream } from "@umbraculum/ui";
 
 /**
  * Web binding of the shared {@link useAiChatStream} hook.
@@ -31,4 +31,4 @@ export function useAiChat() {
   return useAiChatStream(input);
 }
 
-export type { AiChatMessage, AiChatTurn, AiToolCallView } from "@brewery/ui";
+export type { AiChatMessage, AiChatTurn, AiToolCallView } from "@umbraculum/ui";

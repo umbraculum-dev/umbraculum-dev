@@ -3,7 +3,7 @@ import { Alert, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";

@@ -11,7 +11,7 @@ import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { ModeFieldset } from "@brewery/ui";
+import { ModeFieldset } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 

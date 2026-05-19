@@ -9,7 +9,7 @@ import { Link } from "../../../src/i18n/navigation";
 import { BrewAccordionSection } from "../../_components/BrewAccordionSection";
 import { BrewSelect } from "../../_components/BrewSelect";
 import { CodeInline } from "../../_components/CodeInline";
-import { HydrometerChart } from "@brewery/ui/charts/HydrometerChart";
+import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 import { MessageBox } from "../../_components/recipe-edit/MessageBox";
 import { apiFetch } from "../../_lib/apiClient";
 import { useRequireAuth } from "../../_lib/useRequireAuth";

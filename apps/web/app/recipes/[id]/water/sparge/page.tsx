@@ -10,7 +10,7 @@ import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@brewer
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
 import { parseWaterProfilesResponse } from "@brewery/contracts";
-import { ModeFieldset } from "@brewery/ui";
+import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@brewery/recipes-ui";
 import { Accordion, Button, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 

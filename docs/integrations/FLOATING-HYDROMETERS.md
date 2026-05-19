@@ -163,7 +163,7 @@ Implementation detail:
 
 ### Charting (Victory)
 
-Charts are implemented in `@brewery/ui` for reuse:
+Charts are implemented in `@umbraculum/ui` for reuse:
 
 - Web implementation: `packages/ui/src/charts/HydrometerChart.web.tsx`
 - Native implementation: `packages/ui/src/charts/HydrometerChart.native.tsx`

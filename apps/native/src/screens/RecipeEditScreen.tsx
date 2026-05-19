@@ -18,7 +18,7 @@ import {
 import { parseGravityAnalysisResponseV1 } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
 import { Accordion, TextArea } from "tamagui";
-import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 
 import { AdSlot } from "../components/AdSlot";
 import { Input } from "../components/AppInput";

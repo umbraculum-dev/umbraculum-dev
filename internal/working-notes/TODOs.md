@@ -15,10 +15,10 @@ This file tracks near-term implementation tasks and “migration reminders” as
   - `@brewery/i18n`
   - `@brewery/contracts`
   - `@brewery/api-client`
-- [x] Create `@brewery/ui` and split Tamagui config into web vs native entrypoints:
+- [x] Create `@umbraculum/ui` and split Tamagui config into web vs native entrypoints:
   - web uses `@tamagui/animations-css`
   - native must not import web-only animation/CSS drivers
-- [ ] Choose and document the native animation driver (Expo-friendly) for Tamagui animations (e.g. reanimated/moti), then wire it into `@brewery/ui` native config.
+- [ ] Choose and document the native animation driver (Expo-friendly) for Tamagui animations (e.g. reanimated/moti), then wire it into `@umbraculum/ui` native config.
 - [ ] Add initial `apps/native` bootstrap (Expo) once the above is stable.
 
 ## Native login gate (MANDATORY before React Native auth)

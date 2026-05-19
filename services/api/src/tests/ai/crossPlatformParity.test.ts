@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
  * Cross-platform parity smoke test (Sprint #2 acceptance criteria).
  *
  * Verifies that the shared SSE consumer (used by both the web hook and the
- * native screen via `@brewery/ui`) produces identical events when fed:
+ * native screen via `@umbraculum/ui`) produces identical events when fed:
  *
  *   1. a Web-style Response (streaming `body.getReader()`)
  *   2. a Native-style Response (no streaming body; only `text()`)
@@ -35,7 +35,7 @@ import { createSessionForTestUser } from "../helpers/session.js";
 /**
  * NOTE — keep in sync with `packages/ui/src/ai/useAiChatStream.ts`.
  *
- * The shared consumer lives in `@brewery/ui`, which depends on Tamagui +
+ * The shared consumer lives in `@umbraculum/ui`, which depends on Tamagui +
  * React Native and cannot be imported into a node-only test context. The
  * algorithm is small and self-contained, so we replicate it here. Any
  * drift would be caught at integration time, but a refactor of the shared

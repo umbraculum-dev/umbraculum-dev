@@ -7,7 +7,7 @@ Cross-platform route IDs and typed route parameters. The navigation contract sha
 
 ## What this is
 
-The platform-neutral navigation contract. Both `apps/web` (Next.js routing) and `apps/native` (React Navigation) refer to the same set of `RouteId` values (`"dashboard"`, `"recipes"`, `"recipeEdit"`, `"waterMash"`, etc.) with the same typed parameter shape per route (`RouteParamsById`). A shared component that wants to navigate uses the typed `RouteRef` union — `{ id: "recipeEdit", params: { recipeId: "abc" } }` — and the host app translates that into its native navigation call (Next.js `<Link href={…}>` or React Navigation `navigation.navigate(…)`). This is the architectural mechanism that lets `@brewery/ui` and `@brewery/recipes-ui` (both pending sub-plan #9 renames) ship navigation-aware components without depending on either Next.js or React Navigation.
+The platform-neutral navigation contract. Both `apps/web` (Next.js routing) and `apps/native` (React Navigation) refer to the same set of `RouteId` values (`"dashboard"`, `"recipes"`, `"recipeEdit"`, `"waterMash"`, etc.) with the same typed parameter shape per route (`RouteParamsById`). A shared component that wants to navigate uses the typed `RouteRef` union — `{ id: "recipeEdit", params: { recipeId: "abc" } }` — and the host app translates that into its native navigation call (Next.js `<Link href={…}>` or React Navigation `navigation.navigate(…)`). This is the architectural mechanism that lets `@umbraculum/ui` and `@brewery/recipes-ui` (both pending sub-plan #9 renames) ship navigation-aware components without depending on either Next.js or React Navigation.
 
 Two entry points are exported: the default (`@umbraculum/navigation`) for the platform-neutral types + helpers, and a native-flavored variant (`@umbraculum/navigation/native`) that adds React-Navigation-aware integration helpers used only by `apps/native`.
 
@@ -51,7 +51,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` (Next.js router translates `RouteRef` → `href`); `apps/native` (React Navigation translates `RouteRef` → `navigation.navigate`); `@brewery/ui` and `@brewery/recipes-ui` (both pending sub-plan #9 renames; any platform-neutral component that needs to express "navigate to this target" without pulling in a routing library).
+- **Consumed by**: `apps/web` (Next.js router translates `RouteRef` → `href`); `apps/native` (React Navigation translates `RouteRef` → `navigation.navigate`); `@umbraculum/ui` and `@brewery/recipes-ui` (both pending sub-plan #9 renames; any platform-neutral component that needs to express "navigate to this target" without pulling in a routing library).
 - **Depends on**: nothing in the workspace scope. This package is at the bottom of the package dependency stack alongside `@brewery/i18n`, `@brewery/contracts`, and `@umbraculum/media` (the latter renamed under sub-plan #9 slot 2; remaining `@brewery/*` packages pending sub-plan #9 slots).
 
 ## Status

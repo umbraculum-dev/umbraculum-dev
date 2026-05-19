@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import { YStack } from "tamagui";
 
 import { useT } from "@brewery/i18n-react";
-import { Button, Heading, Screen, Text } from "@brewery/ui";
+import { Button, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { AdSlot } from "../components/AdSlot";
 import { Input } from "../components/AppInput";

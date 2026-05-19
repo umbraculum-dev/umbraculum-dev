@@ -59,7 +59,7 @@ Commands (run from repo root, container-friendly per the [`node-npm-container-on
 
 ## How it fits in
 
-- **Consumed by**: `apps/web` (via `next-intl` entry point), `apps/native` (via default entry point), `@brewery/recipes-ui` (any component that renders translated strings), `@brewery/ui` (components with text labels).
+- **Consumed by**: `apps/web` (via `next-intl` entry point), `apps/native` (via default entry point), `@brewery/recipes-ui` (any component that renders translated strings), `@umbraculum/ui` (components with text labels).
 - **Depends on**: `@brewery/i18n` (the message catalogs); `intl-messageformat` (ICU MessageFormat parser); peer-depends on `react >=18` and `next-intl >=4` (the latter only required if the `next-intl` sub-entrypoint is used).
 
 ## Status

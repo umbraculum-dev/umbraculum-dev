@@ -177,8 +177,8 @@ Docs:
   - runtime: `dist/**/*.js`
   - types: `dist/**/*.d.ts`
 - Shared UI uses Tamagui with a layered approach:
-  - `@brewery/ui`: platform-neutral primitives + generic compound components
-  - `@brewery/recipes-ui`: domain UI for recipes/water/yeast built on top of `@brewery/ui` (intentionally recipe-centric; add additional domain UI packages as needed)
+  - `@umbraculum/ui`: platform-neutral primitives + generic compound components
+  - `@brewery/recipes-ui`: domain UI for recipes/water/yeast built on top of `@umbraculum/ui` (intentionally recipe-centric; add additional domain UI packages as needed)
   - apps provide small adapters (auth/routing/media) instead of re-implementing UI trees
   - Platform-specific Tamagui config entrypoints (web vs native) avoid importing web-only dependencies in native.
 - **Strict placement rule**: if code might be reused in native, it lives under `packages/**` first.
@@ -198,11 +198,11 @@ Root causes of drift:
 
 - Web components pulled in **Next.js** / **`next-intl`** / DOM-only elements, which are not importable in native.
 - Native components pulled in **bearer auth** and native-only modules (e.g. `expo-image`, `Linking`).
-- Shared UI was initially limited to primitives (`@brewery/ui`), so feature components were implemented app-locally.
+- Shared UI was initially limited to primitives (`@umbraculum/ui`), so feature components were implemented app-locally.
 
 Resolution pattern:
 
-- Shared presentational UI moved into `@brewery/ui` and `@brewery/recipes-ui`.
+- Shared presentational UI moved into `@umbraculum/ui` and `@brewery/recipes-ui`.
 - App-level adapters keep platform-specific concerns (auth, routing, media rendering) out of shared packages.
 
 ### Cross-platform boundaries (routing + i18n)

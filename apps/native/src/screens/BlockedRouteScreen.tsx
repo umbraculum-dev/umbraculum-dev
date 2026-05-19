@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 import { useT } from "@brewery/i18n-react";
 import type { RouteId, RouteRef } from "@umbraculum/navigation";
 import { getRouteAvailability } from "@umbraculum/navigation";
-import { Button, Heading, Screen, Text } from "@brewery/ui";
+import { Button, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useAuth } from "../auth/AuthProvider";

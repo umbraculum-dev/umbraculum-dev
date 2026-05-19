@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 
-import { Text } from "@brewery/ui";
+import { Text } from "@umbraculum/ui";
 
 import { FIELD_READONLY_BG, FIELD_READONLY_BORDER } from "../theme/colors";
 

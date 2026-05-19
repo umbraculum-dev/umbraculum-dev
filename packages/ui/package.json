@@ -1,7 +1,8 @@
 {
-  "name": "@brewery/ui",
+  "name": "@umbraculum/ui",
   "private": true,
   "version": "0.0.0",
+  "description": "Cross-platform UI primitive layer built on Tamagui: design tokens, platform-forking primitives (Button/Input/BrewCheckbox), AI chat panel, hydrometer chart. Quadruple-entrypoint package (default + tamagui-config-web + tamagui-config-native + charts/HydrometerChart with platform-fork via react-native condition). Industry-agnostic by construction — consumed by both apps/web (Next.js) and apps/native (React Native + Expo). Renamed from @brewery/ui as sub-plan #9 slot 5 (2026-05-19).",
   "type": "module",
   "scripts": {
     "build": "tsup --config tsup.config.ts",

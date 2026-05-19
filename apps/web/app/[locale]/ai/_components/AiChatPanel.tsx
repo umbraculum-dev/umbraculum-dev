@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import { AiChatPanel as SharedAiChatPanel } from "@brewery/ui";
+import { AiChatPanel as SharedAiChatPanel } from "@umbraculum/ui";
 
 import { useAiChat } from "./useAiChat";
 

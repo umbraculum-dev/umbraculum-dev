@@ -6,7 +6,7 @@ import { bearerTokenAuth, createApiClient } from "@brewery/api-client";
 import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@brewery/contracts";
 import { parseAuthMeResponse, parseWaterProfilesResponse } from "@brewery/contracts";
 import { useT } from "@brewery/i18n-react";
-import { Button, Card, Heading, Screen, Spinner, Text } from "@brewery/ui";
+import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
 
 import { Input } from "../components/AppInput";

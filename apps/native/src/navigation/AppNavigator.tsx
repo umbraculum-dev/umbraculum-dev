@@ -11,7 +11,7 @@ import {
 import { useT } from "@brewery/i18n-react";
 import type { RouteId } from "@umbraculum/navigation";
 
-import { Spinner } from "@brewery/ui";
+import { Spinner } from "@umbraculum/ui";
 
 import type { RootStackParamList, TabParamList } from "./types";
 import { useAuth } from "../auth/AuthProvider";

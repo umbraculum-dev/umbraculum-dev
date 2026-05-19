@@ -49,7 +49,7 @@
 - Shared packages that cross the web/native boundary are treated as **buildable packages**:
   - runtime: `dist/**/*.js`
   - types: `dist/**/*.d.ts`
-- Shared UI uses Tamagui, with a dedicated `@brewery/ui` package and platform-specific config entrypoints (web vs native) to avoid importing web-only dependencies in native.
+- Shared UI uses Tamagui, with a dedicated `@umbraculum/ui` package and platform-specific config entrypoints (web vs native) to avoid importing web-only dependencies in native.
 
 ### Why these choices (summary)
 - **TypeScript everywhere** reduces context switching and increases AI effectiveness (types catch mistakes).

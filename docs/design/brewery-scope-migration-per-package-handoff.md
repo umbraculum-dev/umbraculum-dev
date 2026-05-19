@@ -1,7 +1,7 @@
 # `@brewery/*` → `@umbraculum/*` per-package handoff checklist
 
 **Tier:** Public
-**Status:** Active 2026-05-19 — slots 1–4 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`); slots 5–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). Net effect: shorter, more robust recipe than the post-slot-3 version.
+**Status:** Active 2026-05-19 — slots 1–5 done (1: `test-mcp` worked example, 2: `media`, 3: `navigation`, 4: `automation-contracts`, 5: `ui` — heavy 69-file slot held cleanly on first attempt under the slot-4-corrected recipe); slots 6–14 pending serial execution. **Slot 4 corrected the slot-3 recipe**: the real devDep pruner is the build script's `npm ci`, not any restart. Step 5 is now a STOP-build-install-START sequence (see plan doc §4 step 5); step 4b's per-container api install was REMOVED (web-only now). **Slot 5 added two further awarenesses to step 6**: (a) `apps/web` typecheck is excluded from CI and currently produces ~1073 accepted-cost `TS2322` errors — do not treat as a regression; (b) running native typecheck via host one-shot `docker run -v "$PWD:/repo" ... npm install` prunes api devDeps the same way the build script does — recovery is STOP-install-START (no rebuild). Net effect across slots 1–5: the recipe is now substantially shorter and more robust than the post-slot-3 version, and is proven robust under the heavy slot load.
 **Audience:** the person executing the next slot — could be the original author days/weeks later, or another contributor.
 **Pairs with:** [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md) — the L1 plan doc. Read §1 (classification), §4 (verification recipe), and §5 (risk register) of the plan doc BEFORE picking up a slot from this checklist.
 
@@ -243,70 +243,68 @@ Doc references:
 
 ## Slot 5 — `@brewery/ui` → `@umbraculum/ui`
 
-**Status:** Pending.
+**Status:** **Done 2026-05-19** (commit hash recorded in the slot-5 commit message; the first **heavy** slot — 69 files / ~100 occurrences, ~2× the largest prior slot — held cleanly on first attempt under the slot-4-corrected recipe).
 
-**Target + classification.** Platform. Tamagui primitives + design-system components.
+**Target + classification.** Platform. Tamagui primitives + design-system components. Industry-agnostic by construction; no brewery-domain knowledge.
 
-**Hard stops.**
+**Hard stops (all triggered + cleared on first attempt).**
 
-- **`apps/web/next.config.js`** has `transpilePackages: [..., "@brewery/ui", ...]` — must update. Same silent-fail risk as `media`.
-- **`apps/web/tamagui.config.ts`** + **`apps/native/tamagui.config.ts`** reference the package as a Tamagui config source — must update both.
-- **`apps/web/app/variables.css`** has a CSS path reference — update.
-- Heavy package (67 files, 104 occurrences). Likely its own session.
+- **`apps/web/next.config.js`** had `transpilePackages: [..., "@brewery/ui", ...]` — updated. Same silent-fail risk as `media`.
+- **`apps/web/tamagui.config.ts`** + **`apps/native/tamagui.config.ts`** referenced the package as a Tamagui config source — both updated.
+- **`apps/web/app/variables.css`** had a comment-level path reference — updated.
+- **Root `package.json` `build:packages`** referenced the package by name — updated (step-2-lesson HARD STOP).
+- Heavy package (69 files, ~100 occurrences). Its own session as predicted.
 
-**File inventory.**
+**File inventory (post-execution; matches what was actually changed).**
 
 Workspace name + own files:
-- [ ] [`packages/ui/package.json`](../../packages/ui/package.json) — `name`; add description.
-- [ ] [`packages/ui/README.md`](../../packages/ui/README.md).
-- [ ] [`packages/ui/src/ai/AiChatPanel.tsx`](../../packages/ui/src/ai/AiChatPanel.tsx) — internal references (e.g. import paths from `@brewery/contracts` and `@brewery/i18n-react`; if those slots have already shipped, the references are already correct).
+- [x] [`packages/ui/package.json`](../../packages/ui/package.json) — `name` + new classifying `description` (quadruple-entrypoint package; industry-agnostic).
+- [x] [`packages/ui/README.md`](../../packages/ui/README.md) — heading + scope/consumed-by paragraphs + npm command samples.
+- *(`packages/ui/src/ai/AiChatPanel.tsx` — no `@brewery/ui` self-references; the source imports it had were `@brewery/contracts` + `@brewery/i18n-react`, still pending slots 7+9.)*
 
 Consumer `package.json` deps:
-- [ ] [`apps/web/package.json`](../../apps/web/package.json).
-- [ ] [`apps/native/package.json`](../../apps/native/package.json).
-- [ ] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json) — recipes-ui depends on `ui`; update dep entry now even though `recipes-ui` itself isn't renamed until slot 13.
+- [x] [`apps/web/package.json`](../../apps/web/package.json).
+- [x] [`apps/native/package.json`](../../apps/native/package.json).
+- [x] [`packages/recipes-ui/package.json`](../../packages/recipes-ui/package.json) — recipes-ui itself stays at `@brewery/recipes-ui` for now (slot 13) but its dep was updated.
 
-Build configs:
-- [ ] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages` (HARD STOP if missed).
-- [ ] [`apps/web/tamagui.config.ts`](../../apps/web/tamagui.config.ts).
-- [ ] [`apps/native/tamagui.config.ts`](../../apps/native/tamagui.config.ts).
-- [ ] [`apps/web/app/variables.css`](../../apps/web/app/variables.css).
-- [ ] [`apps/native/src/theme/colors.ts`](../../apps/native/src/theme/colors.ts).
+Build configs (all HARD STOPS):
+- [x] [`apps/web/next.config.js`](../../apps/web/next.config.js) `transpilePackages`.
+- [x] [`apps/web/tamagui.config.ts`](../../apps/web/tamagui.config.ts) `import importedConfig from "@umbraculum/ui/tamagui-config-web"`.
+- [x] [`apps/native/tamagui.config.ts`](../../apps/native/tamagui.config.ts) `import importedConfig from "@umbraculum/ui/tamagui-config-native"`.
+- [x] [`apps/web/app/variables.css`](../../apps/web/app/variables.css) (comment).
+- [x] [`apps/native/src/theme/colors.ts`](../../apps/native/src/theme/colors.ts) (JSDoc + import path).
+- [x] Root [`package.json`](../../package.json) `build:packages` (slot-2-discovered HARD STOP).
 
-Source imports — web (apps/web/app/**):
-- [ ] [`apps/web/app/_components/AdSlot.tsx`](../../apps/web/app/_components/AdSlot.tsx).
-- [ ] [`apps/web/app/_components/LogoutButton.tsx`](../../apps/web/app/_components/LogoutButton.tsx).
-- [ ] [`apps/web/app/_components/TamaguiProviderWrapper.tsx`](../../apps/web/app/_components/TamaguiProviderWrapper.tsx).
-- [ ] [`apps/web/app/[locale]/ai/_components/AiChatPanel.tsx`](../../apps/web/app/[locale]/ai/_components/AiChatPanel.tsx).
-- [ ] [`apps/web/app/[locale]/ai/_components/useAiChat.ts`](../../apps/web/app/[locale]/ai/_components/useAiChat.ts).
-- [ ] [`apps/web/app/[locale]/ferm-data-integration/page.tsx`](../../apps/web/app/[locale]/ferm-data-integration/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/page.tsx`](../../apps/web/app/recipes/[id]/brew-sessions/[brewSessionId]/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/boil/page.tsx`](../../apps/web/app/recipes/[id]/water/boil/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/mash/page.tsx`](../../apps/web/app/recipes/[id]/water/mash/page.tsx).
-- [ ] [`apps/web/app/recipes/[id]/water/sparge/page.tsx`](../../apps/web/app/recipes/[id]/water/sparge/page.tsx).
+Source imports — web (apps/web/app/**, 10 files):
+- [x] `_components/AdSlot.tsx`, `_components/LogoutButton.tsx`, `_components/TamaguiProviderWrapper.tsx`.
+- [x] `[locale]/ai/_components/AiChatPanel.tsx`, `[locale]/ai/_components/useAiChat.ts`, `[locale]/ferm-data-integration/page.tsx`.
+- [x] `recipes/[id]/brew-sessions/[brewSessionId]/page.tsx`, `recipes/[id]/water/{boil,mash,sparge}/page.tsx`.
 
-Source imports — native (apps/native/src/**):
-- [ ] [`apps/native/src/components/AdSlot.tsx`](../../apps/native/src/components/AdSlot.tsx), [`apps/native/src/components/ReadOnlyField.tsx`](../../apps/native/src/components/ReadOnlyField.tsx).
-- [ ] [`apps/native/src/navigation/AppNavigator.tsx`](../../apps/native/src/navigation/AppNavigator.tsx).
-- [ ] All ~20 `apps/native/src/screens/*.tsx` files that import from `@brewery/ui` — run the grep from plan doc §4 step 3 and update each.
+Source imports — native (apps/native/src/**, 24 files):
+- [x] `components/AdSlot.tsx`, `components/ReadOnlyField.tsx`.
+- [x] `navigation/AppNavigator.tsx`.
+- [x] All 20 `screens/*.tsx` files plus `theme/colors.ts` — handled via bulk sed (slot-5 lesson: justified at 50+ files provided the post-character class is correct; see plan doc §6.4 lesson 3).
 
-Source imports — packages (cross-package consumers):
-- [ ] [`packages/recipes-ui/src/mash/MashStepsEditor.tsx`](../../packages/recipes-ui/src/mash/MashStepsEditor.tsx).
-- [ ] [`packages/recipes-ui/src/mash/SpargeStepReadOnlyRow.tsx`](../../packages/recipes-ui/src/mash/SpargeStepReadOnlyRow.tsx).
-- [ ] [`packages/recipes-ui/src/recipeMeta/RecipeMetaLine.tsx`](../../packages/recipes-ui/src/recipeMeta/RecipeMetaLine.tsx).
-- [ ] [`packages/recipes-ui/src/water/SaltAdditionsEditor.tsx`](../../packages/recipes-ui/src/water/SaltAdditionsEditor.tsx).
-- [ ] [`packages/recipes-ui/src/yeast/ManualCellCountHelpBox.tsx`](../../packages/recipes-ui/src/yeast/ManualCellCountHelpBox.tsx).
+Source imports — packages (cross-package consumers, 5 files):
+- [x] `packages/recipes-ui/src/{mash/MashStepsEditor.tsx, mash/SpargeStepReadOnlyRow.tsx, recipeMeta/RecipeMetaLine.tsx, water/SaltAdditionsEditor.tsx, yeast/ManualCellCountHelpBox.tsx}`.
 
 Tests:
-- [ ] [`services/api/src/tests/ai/crossPlatformParity.test.ts`](../../services/api/src/tests/ai/crossPlatformParity.test.ts).
+- [x] [`services/api/src/tests/ai/crossPlatformParity.test.ts`](../../services/api/src/tests/ai/crossPlatformParity.test.ts) (JSDoc references only).
 
-Cross-package README references:
-- [ ] [`packages/i18n-react/README.md`](../../packages/i18n-react/README.md), [`packages/media/README.md`](../../packages/media/README.md), [`packages/navigation/README.md`](../../packages/navigation/README.md), [`packages/recipes-ui/README.md`](../../packages/recipes-ui/README.md), [`packages/ui/README.md`](../../packages/ui/README.md), [`apps/native/README.md`](../../apps/native/README.md), [`apps/web/README.md`](../../apps/web/README.md).
+Cross-package README references (7 files):
+- [x] `packages/{i18n-react,media,navigation,recipes-ui,ui}/README.md`, `apps/{native,web}/README.md`.
 
-Doc references:
-- [ ] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/LINTING.md`](../LINTING.md), [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../REACT-NATIVE-KICKOFF-READINESS.md), [`docs/TAMAGUI.md`](../TAMAGUI.md), [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../DEVELOPMENT-NATIVE-LOCAL.md), [`docs/architecture-Rev02.md`](../architecture-Rev02.md), [`docs/archive/architecture-Rev01.md`](../archive/architecture-Rev01.md), [`docs/integrations/FLOATING-HYDROMETERS.md`](../integrations/FLOATING-HYDROMETERS.md), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md).
+Doc references (10 files):
+- [x] `docs/{PLATFORM-ARCHITECTURE,CODING-STANDARDS,LINTING,REACT-NATIVE-KICKOFF-READINESS,TAMAGUI,DEVELOPMENT-NATIVE-LOCAL,architecture-Rev02}.md`, `docs/archive/architecture-Rev01.md`, `docs/integrations/FLOATING-HYDROMETERS.md`, `docs/rfcs/0002-canonical-module-physical-layout.md`.
 
-**Verification + commit.** Plan doc §4 steps 4–7. Note: web + native smoke important here since UI primitives back nearly every screen.
+**Verification (all green; smoke especially important as predicted because UI primitives back nearly every screen):**
+- API typecheck: clean.
+- API vitest baseline: **413/413 preserved**.
+- Web typecheck: 1063/1073 TS2322 = documented accepted-cost Tamagui shorthand-prop class (plan doc §4 step 6 + §6.4 lesson 1). NOT a regression. **Excluded from CI by explicit decision per [`.github/workflows/typecheck.yml`](../../.github/workflows/typecheck.yml) header + [`docs/TYPING.md`](../TYPING.md) Phase 4 + [`docs/TAMAGUI.md`](../TAMAGUI.md).**
+- Native typecheck: clean. **(triggered the slot-5 "host one-shot npm install prunes api bind-mount" gotcha; recovered via STOP-install-START — see plan doc §4 step 6 + §6.4 lesson 2.)**
+- Nginx smoke: **6/6 HTTP 200** (`/api/health`, `/en/login`, `/en/dashboard`, `/en/recipes`, `/en/automation`, `/en/yeast-bank`).
+
+**Three lessons captured back into plan doc §4/§5 + §6.4 BEFORE commit** (apps/web typecheck = accepted-cost; native typecheck prunes api bind-mount; bulk sed exclusion class must mirror inventory grep). See plan doc §6.4 for full text.
 
 ---
 
