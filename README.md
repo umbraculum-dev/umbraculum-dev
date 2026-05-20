@@ -112,6 +112,41 @@ scripts/       One-shot maintenance + container build scripts
 .cursor/       AI agent rules + skills for in-repo coding workflows
 ```
 
+## Native out of the box (why Tamagui)
+
+Web + native are not coincidence in this stack — they are the platform's
+deliberate shape. The reason `apps/native/` ships alongside `apps/web/`,
+and the reason Tamagui sits at the bottom of the UI dependency stack, is
+that the platform commits to **one source of truth shipping to both
+surfaces almost out of the box**:
+
+- **Tamagui** gives us one component tree that resolves to real DOM on
+  web and real React Native primitives on device — one design-token
+  system, one accessibility surface, one set of primitives — instead of
+  two parallel UI libraries kept in sync by hand. The alternatives
+  comparison and the accepted-cost discipline live in
+  [`docs/TAMAGUI.md`](docs/TAMAGUI.md).
+- **React Native + Expo** is the device-side runtime. The cross-platform
+  packages (`@umbraculum/ui`, `@umbraculum/brewery-recipes-ui`,
+  `@umbraculum/navigation`, `@umbraculum/i18n-react`,
+  `@umbraculum/api-client`, `@umbraculum/media`) are the boundary layer
+  that abstracts the web-vs-native split so feature code rarely has to
+  fork.
+- **Module shape mirrors this.** Per
+  [`docs/rfcs/0002-canonical-module-physical-layout.md`](docs/rfcs/0002-canonical-module-physical-layout.md),
+  every canonical or vertical module materializes as four coordinated
+  slices — API, web, **native** (`apps/native/src/modules/<code>/`),
+  and a contracts package — and the native slice is one of those four
+  by design, not an afterthought.
+
+That is what
+[`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1
+means when it says the cross-platform infrastructure "lets one source of
+truth ship as both a web app and a native app almost out of the box".
+For the native-specific risk posture, CI strategy, and local dev, see
+[`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) and
+[`docs/DEVELOPMENT-NATIVE-LOCAL.md`](docs/DEVELOPMENT-NATIVE-LOCAL.md).
+
 ## Stack
 
 - **Web:** Next.js + React + TypeScript + Tamagui.

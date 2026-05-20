@@ -14,6 +14,19 @@ MIT-licensed SDK surface (per [`docs/LICENSING.md`](../../docs/LICENSING.md) §6
 - **Contains**: registration types, in-memory module registry (boot-time collision detection), `RESERVED_CANONICAL_MODULE_CODES`, `registerModule`, `registerWebModule`, and the **library-agnostic `ValidatedSchema<T>` interface** + `fromParser` adapter (per [RFC-0003](../../docs/rfcs/0003-validation-library-adoption.md) Decision C — third-party modules may use Zod, Valibot, TypeBox, or hand-rolled validators that satisfy the interface).
 - **Does not contain**: Prisma models, Fastify plugins for auth/billing, AI orchestrator implementation, or brewery route migration (flat `services/api/src/routes/` until H1 2027 per RFC-0002 Decision D).
 
+## What this SDK is *not* (where module code actually lives)
+
+This package is **contract-only plus registration helpers**. The actual per-module code lives in the module's four β slices ([RFC-0002 §3](../../docs/rfcs/0002-canonical-module-physical-layout.md)):
+
+| What | Where |
+|---|---|
+| Module's Fastify routes, services, AI tools, Prisma slice | `services/api/src/modules/<code>/` |
+| Module's web pages (Next.js App Router) | `apps/web/app/[locale]/(<code>)/` |
+| Module's **native** screens, navigation entries, native-only components | `apps/native/src/modules/<code>/` |
+| Module's DTO types, route ID constants, third-party-pinnable types | `packages/<code>-contracts/` → `@umbraculum/<code>-contracts` |
+
+The SDK is *only* the registration shape — `registerModule`, `registerWebModule`, and the future `registerNativeModule` exported from this same package per [RFC-0002 §5](../../docs/rfcs/0002-canonical-module-physical-layout.md). Native shell code lives in `apps/native/`; cross-platform UI primitives live in `@umbraculum/ui` (industry-agnostic) and `@umbraculum/brewery-recipes-ui` (brewery-vertical); Prisma schemas live in `services/api/prisma/`. This separation is intentional: it keeps the SDK's MIT-licensed surface small and stable, which is what makes it safe for third-party module authors to pin without inheriting platform-internal volatility. The "one source of truth ships to both web and native almost out of the box" commitment ([`PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §1.1) is delivered by the cross-platform packages and the β layout — not by this SDK directly.
+
 ## Validated-schema contract
 
 ```typescript

@@ -26,6 +26,20 @@ These docs are the project's load-bearing references. Read them before broad wor
 - [`docs/DOCS-README-STANDARDS.md`](docs/DOCS-README-STANDARDS.md) — module-README authoring standard.
 - [`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) — native app build + CI strategy.
 
+## Cross-platform shape (web + native, one source of truth)
+
+Umbraculum commits to **one source of truth shipping to both web and native almost out of the box** ([`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1; [`MANIFESTO.md`](MANIFESTO.md) §2.2 reach-both-surfaces clause). That commitment is what selected Tamagui (one component tree → real DOM on web + real React Native on device — see [`docs/TAMAGUI.md`](docs/TAMAGUI.md) for the alternatives comparison and accepted-cost discipline) and what shapes the per-module β layout where `apps/native/src/modules/<code>/` is one of the four coordinated slices ([RFC-0002](docs/rfcs/0002-canonical-module-physical-layout.md) §3).
+
+The native-facing operational docs form one bundle — read them together when touching `apps/native/**` or any cross-platform package (`packages/ui/`, `packages/recipes-ui/`, `packages/navigation/`, `packages/i18n-react/`, `packages/api-client/`, `packages/media/`):
+
+- [`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) — strategy, risk posture, optional CI.
+- [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](docs/DEVELOPMENT-NATIVE-LOCAL.md) — local dev (Metro, LAN-IP autodetect, troubleshooting).
+- [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](docs/REACT-NATIVE-KICKOFF-READINESS.md) — kickoff readiness criteria.
+- [`docs/TAMAGUI.md`](docs/TAMAGUI.md) — Tamagui type-system caveats + adaptation strategy.
+- [`apps/native/README.md`](apps/native/README.md) — the native app's own module README.
+
+The module SDK ([`packages/module-sdk/README.md`](packages/module-sdk/README.md)) is **contract-only plus registration helpers** — native code does not live there. Per-module native screens, navigation entries, and native-only components live in `apps/native/src/modules/<code>/` (the native β slice from RFC-0002 §3); the SDK only owns the registration shape (`registerModule`, `registerWebModule`, and the future `registerNativeModule` exported from the same package per RFC-0002 §5).
+
 ## Policies (apply by default)
 
 - **Node / npm container-only.** Do not run `node` / `npm` / `npx` on the host for project commands. Run inside the `api` or `web` containers via `docker compose exec -T <service> ...`. See the `node-npm-container-only` skill.
