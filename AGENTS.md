@@ -137,6 +137,32 @@ user's explicit choice.
 This file's single job is: ensure the agent confirms the apparatus is
 present *before* it starts producing changes.
 
+## Adjacent context for plan authors and executors
+
+This file deliberately doesn't carry the deeper *"how do I draft a plan
+for executor X?"* or *"what FAIL patterns has executor X exhibited
+historically?"* knowledge. For that, see
+[`docs/NON-FRONTIER-EXECUTOR-FITNESS-TRACKER.md`](docs/NON-FRONTIER-EXECUTOR-FITNESS-TRACKER.md):
+
+- If you are **drafting a plan** that will be handed to a *non-frontier*
+  AI executor (e.g. `composer-2.5-fast`, Cursor-fast variants, future
+  local models), read the tracker's §10 *before* drafting. It enumerates
+  the load-bearing extra-specifications (enumerate gate skills by name,
+  enumerate per-file artifacts, pre-author README boilerplate, etc.)
+  that prior runs have shown are needed for non-frontier executors to
+  land plans correctly on the first pass.
+
+- If you **are** a non-frontier executor about to execute a plan in this
+  repo, skim the per-run WRONG-rows in §6.1 — those are the known FAIL
+  patterns your model family exhibited on the last assessed run. Treat
+  them as traps to actively avoid, not as *"this won't happen to me."*
+
+The tracker is per-run and append-only; the §10 lessons are the
+distilled, actionable section. The same guidance is also carried by the
+`umbraculum-toolset-common` Cursor plugin (rule
+`43-non-frontier-executor-fitness-tracker.mdc`) so it propagates to
+sibling Umbraculum repos when they adopt the toolset.
+
 ## Forward
 
 If the apparatus check passes (or the user explicitly overrides it),

@@ -330,37 +330,27 @@ FAIL pattern.
 
 ## §11 Discoverability hooks
 
-**Status: TBD** — pending decision after the first user review of
-this document.
+**Status: RESOLVED — 2026-05-20** — option **C (both A + B)** landed
+the same session this document was authored. Belt-and-suspenders:
+AGENTS.md pointer for immediate effect in this repo; plugin rule for
+the structural cross-repo home.
 
-The question this document answers (*"how do I scope a plan for
-executor X?"*) is only useful if the right people see it at the
-right time. Candidate hooks:
+| # | Hook | Where it lives | Effective when |
+|---|---|---|---|
+| A | "Adjacent context for plan authors and executors" section in [`AGENTS.md`](../AGENTS.md) (inserted between "What this file is NOT" and "Forward") | This repo, branch `pim-canonical-build-2026-05-19` | Immediately — every agent in this repo reads `AGENTS.md` at session start, no install step. |
+| B | `rules/43-non-frontier-executor-fitness-tracker.mdc` in the `umbraculum-toolset-common` Cursor plugin | Plugin source repo (`~/dkprojects/rfapps/umbraculum-toolset/`); plugin version bumped `0.6.0 → 0.7.0` | Once the toolset plugin is re-installed locally (`cursor-plugins/scripts/install-local.sh`) and the Cursor window reloaded. Cross-repo: any sibling Umbraculum repo that adopts the toolset gets the rule automatically. |
 
-- **A — root [`AGENTS.md`](../AGENTS.md) reference.** Add a single-paragraph
-  pointer in the post-apparatus-check section: "If you are about to
-  hand a plan off to a non-frontier executor — or *are* a non-frontier
-  executor about to execute a plan — read
-  `docs/NON-FRONTIER-EXECUTOR-FITNESS-TRACKER.md` §10 first." Pros:
-  every agent in this repo sees it at session start; zero install
-  surface. Cons: AGENTS.md is meant to be terse (it's an
-  interceptor); adding a section dilutes its singular purpose.
-- **B — `umbraculum-toolset-common` plugin rule.** Add a new rule
-  `42-non-frontier-executor-fitness-tracker.mdc` (or similar
-  number) pointing here, with the same trigger as `41-commit-message-ticket-prefix.mdc`
-  (always-on for plan-driven runs). Pros: cross-repo if/when other
-  Umbraculum repos are added; gets attached to the agent's rule
-  set at session start via the plugin manifest. Cons: requires a
-  plugin release; rule-set churn cost.
-- **C — plan-template reference.** If/when the project formalizes a
-  "non-frontier-executor plan template," embed a link to §10 of
-  this document as a required boilerplate section. Pros: tightest
-  scope (only fires when relevant); template-enforced. Cons: no
-  formal template exists yet.
-- **D — combination of A + B + C** (belt-and-suspenders).
+### Reading-path summary (post-landing)
 
-*Open question for the user to decide before this section is
-finalized.*
+For agents working *in this repo today*:
+
+- Read `AGENTS.md` at session start (apparatus self-check rule already enforces this).
+- AGENTS.md's "Adjacent context" section now points to this tracker — plan authors land on §10 before drafting; non-frontier executors land on §6.x WRONG-rows before executing.
+- Plugin rule 43 is the same guidance, delivered via the toolset, so it survives if AGENTS.md is ever pruned and propagates to sibling Umbraculum repos.
+
+### Rejected options (recorded for posterity)
+
+- **Plan-template embed** (originally listed as candidate option C): rejected at landing time because no formal plan template exists yet in this repo (plans live as Cursor plan files, not as a versioned project template). If/when a formal plan template is authored, embedding a §10 pointer as required boilerplate is a sensible second-order follow-up — append a row above and update this section's status from RESOLVED to RESOLVED+EXTENDED at that time.
 
 ## §12 References
 
