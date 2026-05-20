@@ -37,7 +37,9 @@ import { aiRoutes } from "./routes/ai.js";
 import { InMemoryAiToolRegistry } from "./services/ai/toolRegistry.js";
 import { registerBreweryTools } from "./services/ai/tools/brewery/index.js";
 import { registerAutomationTools } from "./services/ai/tools/automation/index.js";
+import { registerPimTools } from "./services/ai/tools/pim/index.js";
 import { registerAutomationModule } from "./modules/automation/index.js";
+import { registerPimModule } from "./modules/pim/index.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -110,11 +112,13 @@ export function buildApp() {
   // with the brewery tools.
   // See: docs/design/canonical-automation-module-surface.md §8.3, §9.
   registerAutomationModule(app);
+  registerPimModule(app);
 
   app.register((instance, _opts, done) => {
     const registry = new InMemoryAiToolRegistry();
     registerBreweryTools(registry, instance.prisma);
     registerAutomationTools(registry, instance.prisma);
+    registerPimTools(registry, instance.prisma);
     aiRoutes(registry)(instance);
     done();
   });

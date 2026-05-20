@@ -30,6 +30,7 @@
     "@anthropic-ai/sdk": "^0.96.0",
     "@beerjson/beerjson": "^1.0.2",
     "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
+    "@umbraculum/pim-contracts": "file:../../packages/pim-contracts",
     "@umbraculum/contracts": "file:../../packages/contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",
     "@umbraculum/module-sdk": "file:../../packages/module-sdk",

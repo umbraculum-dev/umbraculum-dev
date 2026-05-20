@@ -1,4 +1,50 @@
 {
+  "pim": {
+    "title": "Product Information Management",
+    "subtitle": "Master product, variant, attribute, and category catalog.",
+    "products": {
+      "title": "Products",
+      "listTitle": "Products",
+      "noProducts": "No products in this workspace yet.",
+      "loading": "Loading…",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "openDetail": "View product",
+      "back": "Back to products",
+      "searchPlaceholder": "Search by SKU or name…",
+      "notFound": "Product not found in this workspace."
+    },
+    "variants": {
+      "title": "Variants",
+      "noVariants": "No variants for this product yet."
+    },
+    "categories": {
+      "title": "Categories",
+      "noCategories": "No categories in this workspace yet.",
+      "back": "Back to products"
+    },
+    "attributeSets": {
+      "title": "Attribute sets",
+      "noSets": "No attribute sets in this workspace yet.",
+      "openDetail": "View set",
+      "back": "Back to attribute sets"
+    },
+    "fields": {
+      "sku": "SKU",
+      "name": "Name",
+      "status": "Status",
+      "description": "Description",
+      "attributeSet": "Attribute set",
+      "code": "Code",
+      "label": "Label"
+    },
+    "values": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived",
+      "none": "—"
+    }
+  },
   "automation": {
     "title": "Automation",
     "subtitle": "Live controller state for the vessels in this workspace. (Scheduling, capacity, and utilization belong to the future capacity-resource-planning module — not this surface.)",

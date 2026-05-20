@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
+    "@umbraculum/pim-contracts": "file:../../packages/pim-contracts",
     "@umbraculum/brewery-beerjson": "file:../../packages/beerjson",
     "@umbraculum/contracts": "file:../../packages/contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",

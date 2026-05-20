@@ -1,14 +1,14 @@
-# `pim` — canonical module (open door)
+# `pim` — canonical module
 
 **Tier:** Public
-**Status:** **Open door** — not implemented. Reserved code, β layout pre-committed. Working assumption: surface design doc + Phase A contracts begin in the next tranche, per [RFC-0004](../../rfcs/0004-canonical-pim.md) Resolution.
+**Status:** **Shipped — Phase A + B + C + D-integration-test-Option-B** (read path, web admin, cross-module composition proof). Phase E write paths, channel feeds, and Option-A real-FK cross-module integration deferred — see [`canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md) §"Open work".
 **Code:** `pim`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
-**Audience:** anyone evaluating Umbraculum's product-information-management roadmap or planning to extend the future PIM module.
+**Audience:** anyone evaluating Umbraculum's product-information-management surface, integrating PIM master data into another module, or planning Phase E+ work.
 
 > [!NOTE]
-> Per-module page for the (not-yet-implemented) `pim` canonical module. The code is reserved by [RFC-0004](../../rfcs/0004-canonical-pim.md) (which amended the [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) reserved-code table from five to six codes); the folder shape is pre-committed by [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md). When work starts, replace this stub with a real per-module page modeled on [`automation.md`](automation.md).
+> Per-module page for the canonical `pim` module. Code reserved by [RFC-0004](../../rfcs/0004-canonical-pim.md) (which amended the [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) reserved-code table from five to six codes). Folder shape per [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md). Phase A+B+C+D-Option-B landed 2026-05-20; build record at [`docs/design/canonical-pim-build-log.md`](../../design/canonical-pim-build-log.md). For the as-built surface details and what's queued, see the surface design doc: [`docs/design/canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md).
 
 ---
 
@@ -37,16 +37,16 @@ The Akeneo / Pimcore comparison set is the structural reference: those systems a
 
 ---
 
-## 3. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
+## 3. As-built slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
 
-When implementation lands, the module materializes as four coordinated paths:
-
-| Slice | Path (when shipped) |
-|---|---|
-| API | `services/api/src/modules/pim/` |
-| Web | `apps/web/app/[locale]/(pim)/` |
-| Native | `apps/native/src/modules/pim/` |
-| Contracts | `packages/pim-contracts/` → `@umbraculum/pim-contracts` |
+| Slice | Path | Status |
+|---|---|---|
+| API | [`services/api/src/modules/pim/`](../../../services/api/src/modules/pim/) | Shipped — 4 read services, 8 GET routes, 4 AI tools, `registerPimModule(app)` wired in [`app.ts`](../../../services/api/src/app.ts) alongside `registerAutomationModule` |
+| Web | [`apps/web/app/[locale]/pim/`](../../../apps/web/app/%5Blocale%5D/pim/) | Shipped — 5 Tamagui pages, `pim.*` i18n (en + it). **Directory is `pim/` not `(pim)/`** (route-group deviation; resolution pending the [forthcoming web-route-group audit](../../design/web-route-group-audit.md)) |
+| Native | `apps/native/src/modules/pim/` | Not started — deferred to a follow-on tranche |
+| Contracts | [`packages/pim-contracts/`](../../../packages/pim-contracts/) → `@umbraculum/pim-contracts` | Shipped — `CONTRACT_VERSION 0.1.0-alpha.1`, 6 schema families, 7/7 tests green, dist artifacts emitted |
+| Persistence | [`services/api/prisma/schema.prisma`](../../../services/api/prisma/schema.prisma) §pim + `migrations/20260519224732_pim_phase_b_tables/` | Shipped — 6 tables under `@@schema("pim")`, single migration |
+| Integration test | [`services/api/src/tests/pimBreweryIntegration.test.ts`](../../../services/api/src/tests/pimBreweryIntegration.test.ts) | Shipped (Option B — module composition + reference-not-copy semantics). Option A (real brewery↔PIM FK) **queued as tech debt** — set up when possible per [`canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md) §"Open work" §8.1 |
 
 Postgres schema name: `pim` (per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention 4).
 
@@ -89,25 +89,32 @@ Brewery does NOT ship a parallel product-catalog implementation once PIM ships. 
 
 ---
 
-## 7. What needs to happen before this stub becomes a real page
+## 7. Phase roadmap — what shipped, what's queued
 
-Per [`contribute/canonical-module.md`](../contribute/canonical-module.md) §4 step 4, the code is allocated by RFC-0004; implementation follows the normal phase rhythm:
+| Phase | Status | Notes |
+|---|---|---|
+| Surface design doc | **Shipped** | [`docs/design/canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md) (post-implementation — landed alongside Phase A+B+C, per RFC-0004 §7 note). |
+| Phase A — contracts | **Shipped** | [`packages/pim-contracts/`](../../../packages/pim-contracts/). 6 Zod schema families, `CONTRACT_VERSION 0.1.0-alpha.1`, 7/7 tests green. |
+| Phase B — read path | **Shipped** | 4 services, 8 GET routes, 4 AI tools, 32 L2 isolation tests across 4 route test files. |
+| Phase C — web admin | **Shipped (with caveat)** | 5 Tamagui pages, `pim.*` i18n. **Web slice uses `pim/` not `(pim)/`** route group — deviation retained pending the [forthcoming web-route-group audit](../../design/web-route-group-audit.md). |
+| Phase D — cross-module integration | **Shipped (Option B)** | [`services/api/src/tests/pimBreweryIntegration.test.ts`](../../../services/api/src/tests/pimBreweryIntegration.test.ts) — module composition + reference-not-copy semantics. **Option A (real brewery↔PIM FK) is queued as tech debt** — set up when possible per surface doc §"Open work" §8.1. |
+| Phase E — write paths + channel feeds | Not started | `POST/PATCH/DELETE` across all 6 entity families; inbound feed ingestion; outbound channel publication. Deferred. |
+| Brewery vertical integration | Not started | Brewery's recipe-as-product surface migrates to PIM primitives. Timing tied to the brewery β migration ([RFC-0002 §3 Decision D](../../rfcs/0002-canonical-module-physical-layout.md), H1 2027). |
 
-1. **Surface design doc** under `docs/design/canonical-pim-module-surface.md`, modeled on [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md). Resolves the data model, AI tool surface, tier-limit fields, phasing, and the pricing-locus question deferred from [RFC-0004 §3.2](../../rfcs/0004-canonical-pim.md).
-2. **Phase A — contracts.** Create `packages/pim-contracts/`, ship `ProductSchema` / `VariantSchema` / `AttributeSetSchema` / `CategorySchema` / `MediaAssetRefSchema` / `ChannelOverrideSchema` plus `ProductRef` / `VariantRef` (the cross-module shared types). Built on Zod v4 per [RFC-0003](../../rfcs/0003-validation-library-adoption.md). Ship `CONTRACT_VERSION`.
-3. **Phase B — read path.** Land `services/api/src/modules/pim/` skeleton, register via `@umbraculum/module-sdk`, ship initial read routes (list / get / search) and AI tools.
-4. **Phase C — write path + channel-feeds.** Inbound feed ingestion, outbound channel publication, the full Akeneo-shaped surface.
-5. **Brewery vertical integration.** Brewery's recipe-as-product surface migrates to PIM primitives. Timing tied to the brewery β migration ([RFC-0002 §3 Decision D](../../rfcs/0002-canonical-module-physical-layout.md), H1 2027).
+For the complete "Open work" inventory (with the explicit Option-A queue, write-path implications, channel-feed scoping, nav-menu entry deferral, cross-module FK column placement, web route-group audit, and media-asset role-enum hardening), read [`canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md) §8. **Anyone contributing the next tranche of PIM work should start there.**
 
 ---
 
 ## 8. Cross-references
 
+- [`docs/design/canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md) — **as-built surface design** (the load-bearing doc for Phase E+ contributors and for the Option-A tech-debt queue).
+- [`docs/design/canonical-pim-build-log.md`](../../design/canonical-pim-build-log.md) — implementation log (executor model + timing + gate-skill outputs + lessons learned).
 - [RFC-0004](../../rfcs/0004-canonical-pim.md) — the mini-RFC that allocated this code.
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 (reserved-code table, extended from five to six by RFC-0004), §7 (canonical-module placement principle), §8 (consumption contract).
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3–§4 (β layout, naming conventions).
-- [RFC-0003](../../rfcs/0003-validation-library-adoption.md) — Zod v4 standard `@umbraculum/pim-contracts` will adopt from Phase A.
-- [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) — template for what the eventual `canonical-pim-module-surface.md` will look like.
-- [`automation.md`](automation.md) — template for what this page will look like once `pim` ships its Phase B read path.
+- [RFC-0003](../../rfcs/0003-validation-library-adoption.md) — Zod-as-canonical-validator + defense-in-depth re-parse at every boundary; `@umbraculum/pim-contracts` adopts this throughout.
+- [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) — sibling canonical's surface doc; structural template for the PIM one.
+- [`automation.md`](automation.md) — sibling canonical's per-module page; structural template for this one.
 - [`docs/MODULES.md`](../../MODULES.md) §3.1 — ecosystem entry page; canonical-modules catalog.
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../PLATFORM-ARCHITECTURE.md) §1.1.1 — canonical-set positioning.
+- [`docs/design/web-route-group-audit.md`](../../design/web-route-group-audit.md) (forthcoming) — separate audit triggered by the PIM web slice's `pim/` vs `(pim)/` directory question.

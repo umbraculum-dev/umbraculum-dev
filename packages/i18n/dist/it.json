@@ -1,4 +1,50 @@
 {
+  "pim": {
+    "title": "Product Information Management",
+    "subtitle": "Catalogo master di prodotti, varianti, attributi e categorie.",
+    "products": {
+      "title": "Prodotti",
+      "listTitle": "Prodotti",
+      "noProducts": "Nessun prodotto in questo workspace.",
+      "loading": "Caricamento…",
+      "refresh": "Aggiorna",
+      "refreshing": "Aggiornamento…",
+      "openDetail": "Apri prodotto",
+      "back": "Torna ai prodotti",
+      "searchPlaceholder": "Cerca per SKU o nome…",
+      "notFound": "Prodotto non trovato in questo workspace."
+    },
+    "variants": {
+      "title": "Varianti",
+      "noVariants": "Nessuna variante per questo prodotto."
+    },
+    "categories": {
+      "title": "Categorie",
+      "noCategories": "Nessuna categoria in questo workspace.",
+      "back": "Torna ai prodotti"
+    },
+    "attributeSets": {
+      "title": "Set di attributi",
+      "noSets": "Nessun set di attributi in questo workspace.",
+      "openDetail": "Apri set",
+      "back": "Torna ai set di attributi"
+    },
+    "fields": {
+      "sku": "SKU",
+      "name": "Nome",
+      "status": "Stato",
+      "description": "Descrizione",
+      "attributeSet": "Set attributi",
+      "code": "Codice",
+      "label": "Etichetta"
+    },
+    "values": {
+      "draft": "Bozza",
+      "active": "Attivo",
+      "archived": "Archiviato",
+      "none": "—"
+    }
+  },
   "automation": {
     "title": "Automazione",
     "subtitle": "Stato in tempo reale del controllore per i vessel di questo workspace. (Pianificazione, capacità e utilizzo appartengono al futuro modulo di capacity-resource-planning — non a questa superficie.)",

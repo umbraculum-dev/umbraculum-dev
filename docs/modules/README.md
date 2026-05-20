@@ -25,7 +25,7 @@ This directory holds **per-artifact pages** linked from `MODULES.md`. It is inte
 | [`canonical/wms.md`](canonical/wms.md) | **Open door** stub — same. Native-mandatory when shipped. |
 | [`canonical/crm.md`](canonical/crm.md) | **Open door** stub — same. No firm horizon. |
 | [`canonical/crp.md`](canonical/crp.md) | **Open door** stub — same. Co-designed with `mrp`. |
-| [`canonical/pim.md`](canonical/pim.md) | **Open door** stub — code reserved by [RFC-0004](../rfcs/0004-canonical-pim.md) 2026-05-19; β layout pre-committed; surface design + Phase A contracts begin next tranche. |
+| [`canonical/pim.md`](canonical/pim.md) | **Shipped — Phase A + B + C + D-integration-test-Option-B** (read path, web admin, cross-module composition proof); Phase E write paths + channel feeds + Option-A real-FK queued per [surface doc](../design/canonical-pim-module-surface.md) §"Open work". Build record at [`design/canonical-pim-build-log.md`](../design/canonical-pim-build-log.md). |
 | [`verticals/brewery.md`](verticals/brewery.md) | **Shipped — reference vertical** (flat layout today; β migration H1 2027). |
 | [`contribute/README.md`](contribute/README.md) | Contributor entry — picks one of four paths below. |
 | [`contribute/canonical-module.md`](contribute/canonical-module.md) | Allocating a new canonical code (mini-RFC procedure). |

@@ -1,5 +1,51 @@
 // src/en.json
 var en_default = {
+  pim: {
+    title: "Product Information Management",
+    subtitle: "Master product, variant, attribute, and category catalog.",
+    products: {
+      title: "Products",
+      listTitle: "Products",
+      noProducts: "No products in this workspace yet.",
+      loading: "Loading\u2026",
+      refresh: "Refresh",
+      refreshing: "Refreshing\u2026",
+      openDetail: "View product",
+      back: "Back to products",
+      searchPlaceholder: "Search by SKU or name\u2026",
+      notFound: "Product not found in this workspace."
+    },
+    variants: {
+      title: "Variants",
+      noVariants: "No variants for this product yet."
+    },
+    categories: {
+      title: "Categories",
+      noCategories: "No categories in this workspace yet.",
+      back: "Back to products"
+    },
+    attributeSets: {
+      title: "Attribute sets",
+      noSets: "No attribute sets in this workspace yet.",
+      openDetail: "View set",
+      back: "Back to attribute sets"
+    },
+    fields: {
+      sku: "SKU",
+      name: "Name",
+      status: "Status",
+      description: "Description",
+      attributeSet: "Attribute set",
+      code: "Code",
+      label: "Label"
+    },
+    values: {
+      draft: "Draft",
+      active: "Active",
+      archived: "Archived",
+      none: "\u2014"
+    }
+  },
   automation: {
     title: "Automation",
     subtitle: "Live controller state for the vessels in this workspace. (Scheduling, capacity, and utilization belong to the future capacity-resource-planning module \u2014 not this surface.)",
@@ -1738,6 +1784,52 @@ var en_default = {
 
 // src/it.json
 var it_default = {
+  pim: {
+    title: "Product Information Management",
+    subtitle: "Catalogo master di prodotti, varianti, attributi e categorie.",
+    products: {
+      title: "Prodotti",
+      listTitle: "Prodotti",
+      noProducts: "Nessun prodotto in questo workspace.",
+      loading: "Caricamento\u2026",
+      refresh: "Aggiorna",
+      refreshing: "Aggiornamento\u2026",
+      openDetail: "Apri prodotto",
+      back: "Torna ai prodotti",
+      searchPlaceholder: "Cerca per SKU o nome\u2026",
+      notFound: "Prodotto non trovato in questo workspace."
+    },
+    variants: {
+      title: "Varianti",
+      noVariants: "Nessuna variante per questo prodotto."
+    },
+    categories: {
+      title: "Categorie",
+      noCategories: "Nessuna categoria in questo workspace.",
+      back: "Torna ai prodotti"
+    },
+    attributeSets: {
+      title: "Set di attributi",
+      noSets: "Nessun set di attributi in questo workspace.",
+      openDetail: "Apri set",
+      back: "Torna ai set di attributi"
+    },
+    fields: {
+      sku: "SKU",
+      name: "Nome",
+      status: "Stato",
+      description: "Descrizione",
+      attributeSet: "Set attributi",
+      code: "Codice",
+      label: "Etichetta"
+    },
+    values: {
+      draft: "Bozza",
+      active: "Attivo",
+      archived: "Archiviato",
+      none: "\u2014"
+    }
+  },
   automation: {
     title: "Automazione",
     subtitle: "Stato in tempo reale del controllore per i vessel di questo workspace. (Pianificazione, capacit\xE0 e utilizzo appartengono al futuro modulo di capacity-resource-planning \u2014 non a questa superficie.)",

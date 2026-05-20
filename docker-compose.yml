@@ -89,6 +89,7 @@ services:
       # mailbox-mirror types (MailboxSpec, MAILBOX_SPEC) via this package.
       # Mounted now so Phase B-3 PRs only have to add imports, not compose.
       - ./packages/automation-contracts:/packages/automation-contracts:ro
+      - ./packages/pim-contracts:/packages/pim-contracts:ro
 
   api:
     build: ./services/api
@@ -123,6 +124,7 @@ services:
       # sub-plan #9 closed slot 14 — all @brewery/* now @umbraculum/*).
       - ./packages/module-sdk:/packages/module-sdk:ro
       - ./packages/automation-contracts:/packages/automation-contracts:ro
+      - ./packages/pim-contracts:/packages/pim-contracts:ro
 
   redis:
     image: redis:7
