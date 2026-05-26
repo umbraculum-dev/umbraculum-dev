@@ -1,6 +1,6 @@
 import {
   routeToPath
-} from "./chunk-25KPR5LC.js";
+} from "./chunk-GDLMIHVU.js";
 
 // src/native.ts
 function routeToNativeTarget(ref) {
@@ -42,6 +42,13 @@ function routeToNativeTarget(ref) {
     case "categories":
     case "attributeSets":
     case "attributeSetDetail":
+    case "productionOrders":
+    case "productionOrderDetail":
+    case "materialRequirements":
+    case "capacity":
+    case "schedule":
+    case "resources":
+    case "resourceDetail":
       throw new Error(
         `routeToNativeTarget(${ref.id}): no native target \u2014 this RouteId is web-only and must be gated by getRouteAvailability(_, "native") === "blocked"`
       );

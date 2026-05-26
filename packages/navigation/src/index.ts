@@ -1,12 +1,12 @@
 export type AppPlatform = "web" | "native";
 
-// TODO(post-audit): the seven canonical-module RouteIds added in Week 1
-// (`vessels`, `vesselDetail`, `products`, `productDetail`, `categories`,
-// `attributeSets`, `attributeSetDetail`) are hardcoded module-knowledge in
-// the navigation package. The follow-on RFC ("module-driven navigation
-// registry" — to be authored after Week 1 lands) should derive these from
-// `@umbraculum/module-sdk`'s `listRegisteredWebModules()` so the navigation
-// package no longer ships per-module branches. Tracked alongside
+// TODO(post-audit): canonical-module RouteIds added before the module-driven
+// navigation registry (automation/PIM in Week 1, MRP/CRP in Wave 3) are
+// hardcoded module-knowledge in the navigation package. The follow-on RFC
+// ("module-driven navigation registry" — to be authored after Week 1 lands)
+// should derive these from `@umbraculum/module-sdk`'s
+// `listRegisteredWebModules()` so the navigation package no longer ships per-
+// module branches. Tracked alongside
 // `docs/design/web-route-group-audit.md` §5 ("D3 outcome").
 export type RouteId =
   | "dashboard"
@@ -32,7 +32,16 @@ export type RouteId =
   | "productDetail"
   | "categories"
   | "attributeSets"
-  | "attributeSetDetail";
+  | "attributeSetDetail"
+  // MRP module — Wave 3 read-only alpha experience.
+  | "productionOrders"
+  | "productionOrderDetail"
+  | "materialRequirements"
+  // CRP module — Wave 3 read-only alpha experience.
+  | "capacity"
+  | "schedule"
+  | "resources"
+  | "resourceDetail";
 
 export interface RouteParamsById {
   dashboard: Record<string, never>;
@@ -57,6 +66,13 @@ export interface RouteParamsById {
   categories: Record<string, never>;
   attributeSets: Record<string, never>;
   attributeSetDetail: { setId: string };
+  productionOrders: Record<string, never>;
+  productionOrderDetail: { orderId: string };
+  materialRequirements: Record<string, never>;
+  capacity: Record<string, never>;
+  schedule: Record<string, never>;
+  resources: Record<string, never>;
+  resourceDetail: { resourceId: string };
 }
 
 export type RouteRef = {
@@ -145,6 +161,20 @@ export function routeToPath(ref: RouteRef): string {
       return "/attribute-sets";
     case "attributeSetDetail":
       return `/attribute-sets/${ref.params.setId}`;
+    case "productionOrders":
+      return "/production-orders";
+    case "productionOrderDetail":
+      return `/production-orders/${ref.params.orderId}`;
+    case "materialRequirements":
+      return "/material-requirements";
+    case "capacity":
+      return "/capacity";
+    case "schedule":
+      return "/schedule";
+    case "resources":
+      return "/resources";
+    case "resourceDetail":
+      return `/resources/${ref.params.resourceId}`;
   }
 
   const exhaustive: never = ref;

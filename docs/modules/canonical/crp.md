@@ -1,14 +1,14 @@
 # `crp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Wave 2 brewery projection shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, and read-time brewery/automation projections exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Wave 3 read-only alpha experience shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery/automation projections, and read-only web pages exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `crp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
 **Audience:** anyone evaluating Umbraculum's capacity-planning roadmap or planning to extend the future CRP module.
 
 > [!NOTE]
-> Per-module page for the foundation-stage `crp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md), [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md), the `crp` Prisma schema, and Wave 2 read-time brewery/automation projections. The current planning/build artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical CRP module surface design](../../design/canonical-crp-module-surface.md), the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md), and the [Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md).
+> Per-module page for the foundation-stage `crp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md), [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md), the `crp` Prisma schema, Wave 2 read-time brewery/automation projections, and Wave 3 read-only web pages. The current planning/build artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical CRP module surface design](../../design/canonical-crp-module-surface.md), the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md), the [Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md), and the [Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md).
 
 ---
 
@@ -79,7 +79,8 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 1. **Surface design doc** under [`docs/design/canonical-crp-module-surface.md`](../../design/canonical-crp-module-surface.md), including the extensibility contract for resource/calendar primitives and future optimizer plug-ins. **Done.**
 2. **Wave 1 — contracts + read-only API foundation.** `packages/crp-contracts/`, `services/api/src/modules/crp/`, the `crp` Prisma schema, module registration, and L2 isolation tests are **shipped as foundation-only**.
 3. **Wave 2 — coordinated brewery/resource projection.** Existing brewery and automation routes remain stable while vessels, equipment profiles, and timed brew-session steps project into CRP resource, work-center, scheduled-operation, capacity-load, and conflict read models. **Shipped as read-time projection only.**
-4. **Later — AI/runtime rendering/write workflows.** Planned contract payloads exist, but no runtime AI tools, document-template registration, optimizer, or write routes ship in Wave 1.
+4. **Wave 3 — read-only web alpha experience.** `apps/web/app/[locale]/(crp)/resources/`, `capacity/`, and `schedule/` expose those read models without write controls. **Shipped as web read-only proof only.**
+5. **Later — AI/runtime rendering/write workflows.** Planned contract payloads exist, but no runtime AI tools, document-template registration, optimizer, native screens, or write routes ship in Wave 3.
 
 ---
 
@@ -91,6 +92,7 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 - [Canonical CRP module surface design](../../design/canonical-crp-module-surface.md) — planned CRP surface.
 - [MRP/CRP Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md) — foundation implementation record.
 - [MRP/CRP Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md) — read-time projection implementation record.
+- [MRP/CRP Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md) — web read-only implementation record.
 - [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery + MRP + CRP co-design.

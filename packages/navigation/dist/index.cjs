@@ -101,6 +101,20 @@ function routeToPath(ref) {
       return "/attribute-sets";
     case "attributeSetDetail":
       return `/attribute-sets/${ref.params.setId}`;
+    case "productionOrders":
+      return "/production-orders";
+    case "productionOrderDetail":
+      return `/production-orders/${ref.params.orderId}`;
+    case "materialRequirements":
+      return "/material-requirements";
+    case "capacity":
+      return "/capacity";
+    case "schedule":
+      return "/schedule";
+    case "resources":
+      return "/resources";
+    case "resourceDetail":
+      return `/resources/${ref.params.resourceId}`;
   }
   const exhaustive = ref;
   throw new Error(`Unhandled route ref: ${String(exhaustive)}`);

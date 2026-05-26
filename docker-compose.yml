@@ -106,6 +106,8 @@ services:
       # Mounted now so Phase B-3 PRs only have to add imports, not compose.
       - ./packages/automation-contracts:/packages/automation-contracts:ro
       - ./packages/pim-contracts:/packages/pim-contracts:ro
+      - ./packages/mrp-contracts:/packages/mrp-contracts:ro
+      - ./packages/crp-contracts:/packages/crp-contracts:ro
 
   docs-site:
     image: node:20-slim

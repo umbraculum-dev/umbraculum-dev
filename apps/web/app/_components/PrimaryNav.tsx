@@ -124,13 +124,16 @@ export function PrimaryNav() {
   // collided with `[locale]/page.tsx` and shadowed every non-static URL) to
   // `/vessels` (the canonical owned-segment), and PIM gained a primary nav
   // entry at `/products` (its previous URL `/pim/*` was an RFC-0002 Decision B
-  // violation corrected by RFC-0006).
+  // violation corrected by RFC-0006). Wave 3 adds read-only planning entries
+  // through the MRP/CRP owned segments without creating a grouped shell.
   const mainNavItems = [
     { href: "/", label: t("dashboard"), isActive: isActive("/") },
     { href: "/recipes", label: t("recipes"), isActive: isActive("/recipes") },
     { href: "/equipment", label: t("equipment"), isActive: isActive("/equipment") },
     { href: "/vessels", label: t("automation"), isActive: isActive("/vessels") },
     { href: "/products", label: t("pim"), isActive: isActive("/products") },
+    { href: "/production-orders", label: t("mrp"), isActive: isActive("/production-orders") },
+    { href: "/capacity", label: t("crp"), isActive: isActive("/capacity") },
     { href: "/ai", label: t("ai"), isActive: isActive("/ai") },
     { href: "/about", label: t("about"), isActive: isActive("/about") },
   ];
@@ -169,13 +172,13 @@ export function PrimaryNav() {
         bottom={
           <>
             {authKnown && me ? (
-              <XStack ai="center" gap="$3" flexWrap="wrap" minWidth={0}>
+              <XStack alignItems="center" gap="$3" flexWrap="wrap" minWidth={0}>
                 <AuthStatus me={me} activeWorkspace={active} />
                 <SwitchAccountLink />
               </XStack>
             ) : null}
             {process.env.NODE_ENV !== "production" && authError ? (
-              <XStack ai="center" minHeight={28}>
+              <XStack alignItems="center" minHeight={28}>
                 <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
                   (auth: {authError})
                 </SizableText>

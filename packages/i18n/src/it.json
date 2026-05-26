@@ -82,6 +82,123 @@
       "none": "—"
     }
   },
+  "mrp": {
+    "title": "Pianificazione produzione",
+    "subtitle": "Vista alpha MRP in sola lettura su ricette e sessioni di cotta esistenti.",
+    "alphaNote": "Le righe marcate come proiettate sono read model. Brewery resta la fonte autorevole; questa pagina non crea righe MRP.",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "error": "Impossibile caricare i dati di pianificazione produzione.",
+    "noProductionOrders": "Nessun ordine di produzione o proiezione brewery in questo workspace.",
+    "noMaterialRequirements": "Nessun fabbisogno materiali visibile.",
+    "productionOrders": {
+      "listTitle": "Ordini di produzione",
+      "openDetail": "Apri ordine",
+      "back": "Torna agli ordini di produzione",
+      "materialRequirements": "Fabbisogni materiali",
+      "operations": "Operazioni",
+      "capacityLink": "Apri vista capacità",
+      "scheduleLink": "Apri schedule CRP"
+    },
+    "materialRequirements": {
+      "title": "Fabbisogni materiali",
+      "subtitle": "Punto di ingresso in sola lettura per i fabbisogni materiali per ordine. Apri un ordine per vedere i fabbisogni derivati dagli ingredienti.",
+      "openOrder": "Apri fabbisogni ordine"
+    },
+    "fields": {
+      "orderNumber": "Numero ordine",
+      "status": "Stato",
+      "quantity": "Quantità",
+      "plannedStartAt": "Inizio pianificato",
+      "dueAt": "Scadenza",
+      "createdAt": "Creato",
+      "source": "Fonte",
+      "sourceRefId": "Riferimento fonte",
+      "debugId": "ID debug",
+      "outputProductId": "Prodotto in uscita",
+      "lineCount": "Righe",
+      "operationCode": "Codice operazione",
+      "operationName": "Operazione",
+      "duration": "Durata",
+      "earliestStartAt": "Primo inizio",
+      "availability": "Disponibilità",
+      "availabilityNote": "Nota disponibilità",
+      "material": "Materiale",
+      "requiredQuantity": "Quantità richiesta",
+      "productionOrder": "Ordine di produzione"
+    },
+    "values": {
+      "none": "—",
+      "unknownDate": "Non schedulato",
+      "canonicalMrpRow": "Riga MRP canonica",
+      "projectedFromBrewery": "Proiettato da brewery",
+      "projectedFromModule": "Proiettato da {module}"
+    }
+  },
+  "crp": {
+    "title": "Pianificazione capacità",
+    "subtitle": "Vista alpha CRP in sola lettura su vessel di automazione, attrezzatura brewery e step di cotta temporizzati.",
+    "alphaNote": "Le righe marcate come proiettate sono read model. Automation e brewery restano le fonti autorevoli; questa pagina non crea righe CRP.",
+    "loading": "Caricamento…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
+    "error": "Impossibile caricare i dati di pianificazione capacità.",
+    "noResources": "Nessuna risorsa di capacità o proiezione automation in questo workspace.",
+    "noCapacity": "Nessun bucket di carico capacità visibile.",
+    "noSchedule": "Nessuna operazione schedulata visibile.",
+    "noConflicts": "Nessun avviso di capacità visibile.",
+    "resources": {
+      "listTitle": "Risorse",
+      "openDetail": "Apri risorsa",
+      "back": "Torna alle risorse",
+      "capacityLink": "Apri vista capacità",
+      "scheduleLink": "Apri schedule"
+    },
+    "capacity": {
+      "title": "Carico capacità",
+      "note": "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacità calendario finale del CRP."
+    },
+    "schedule": {
+      "title": "Schedule",
+      "conflictsTitle": "Avvisi in sola lettura",
+      "resourcesLink": "Apri risorse",
+      "capacityLink": "Apri capacità"
+    },
+    "fields": {
+      "resource": "Risorsa",
+      "code": "Codice",
+      "name": "Nome",
+      "kind": "Tipo",
+      "status": "Stato",
+      "source": "Fonte",
+      "sourceRefId": "Riferimento fonte",
+      "createdAt": "Creato",
+      "updatedAt": "Aggiornato",
+      "debugId": "ID debug",
+      "bucketStartAt": "Inizio bucket",
+      "bucketEndAt": "Fine bucket",
+      "availableMinutes": "Minuti disponibili",
+      "plannedMinutes": "Minuti pianificati",
+      "overloadMinutes": "Minuti sovraccarico",
+      "operationCode": "Codice operazione",
+      "productionOrder": "Ordine di produzione",
+      "workCenter": "Centro di lavoro",
+      "startsAt": "Inizia",
+      "endsAt": "Finisce",
+      "duration": "Durata",
+      "conflict": "Conflitto",
+      "severity": "Severità"
+    },
+    "values": {
+      "none": "—",
+      "canonicalCrpRow": "Riga CRP canonica",
+      "projectedFromAutomationVessel": "Proiettato da vessel automation",
+      "projectedFromBrewery": "Proiettato da brewery",
+      "projectedFromModule": "Proiettato da {module}",
+      "zeroAvailabilityAlpha": "0 minuti disponibili (read model alpha)"
+    }
+  },
   "common": {
     "backToDashboard": "Torna alla Dashboard",
     "loading": "Caricamento…",
@@ -126,6 +243,8 @@
     "equipment": "Attrezzatura",
     "automation": "Automazione",
     "pim": "Prodotti",
+    "mrp": "Pianificazione produzione",
+    "crp": "Pianificazione capacità",
     "ai": "AI",
     "about": "Info",
     "language": "Lingua",
