@@ -1,0 +1,71 @@
+name: Raw materials (missing/incorrect ingredient)
+description: Report a missing or incorrect fermentable/hop/yeast/other ingredient (or related brewing datasets).
+title: "[Raw materials]: "
+labels:
+  - raw-materials
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the raw materials database.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of raw material?
+      options:
+        - Fermentable
+        - Hop
+        - Yeast
+        - Other ingredient (misc)
+        - Salt
+        - Acid
+        - Water profile
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's missing or incorrect?
+      description: Describe the issue clearly and concisely.
+      placeholder: "Example: 'Pale Malt (Weyermann) is missing' or 'Cascade alpha acid range is wrong'."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_values
+    attributes:
+      label: Expected values / spec sheet (if known)
+      description: Include any key numbers you have (units matter).
+      placeholder: |
+        - Name:
+        - Producer:
+        - Country:
+        - Color (Lovibond/EBC/SRM):
+        - Yield % / Potential / PPG:
+        - Alpha acid % (hops):
+        - Attenuation % (yeast):
+        - Notes:
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / reference
+      description: Link to the most authoritative source you have (producer page, spec PDF, BeerProto row ID, etc.).
+      placeholder: "Paste URL(s) here."
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (optional)
+      description: Screenshots help avoid ambiguity (especially for UI-only issues).
+
+  - type: input
+    id: app_context
+    attributes:
+      label: Where did you notice this? (optional)
+      description: Example: recipe edit → fermentables search; water profiles page; import results, etc.
+      placeholder: "e.g. /en/recipes/<id>/edit"
+

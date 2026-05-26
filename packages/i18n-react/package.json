@@ -1,0 +1,36 @@
+{
+  "name": "@umbraculum/i18n-react",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "React + next-intl bindings for @umbraculum/i18n. Universal useTranslator hook (web + native) + LocaleProvider context + dual entry points (default + ./next-intl). Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
+  "scripts": {
+    "build": "tsup src/index.tsx src/next-intl.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./next-intl": {
+      "types": "./dist/next-intl.d.ts",
+      "import": "./dist/next-intl.js",
+      "require": "./dist/next-intl.cjs",
+      "default": "./dist/next-intl.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/i18n": "file:../i18n",
+    "intl-messageformat": "^10.7.14"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "next-intl": ">=4"
+  }
+}
+

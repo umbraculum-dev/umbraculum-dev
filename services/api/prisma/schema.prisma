@@ -1,0 +1,1614 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_DIRECT")
+  schemas   = ["public", "automation", "pim", "rendering"]
+}
+
+enum WorkspaceRole {
+  brewery_admin
+  member
+  viewer
+
+  @@map("workspace_role")
+  @@schema("public")
+}
+
+enum AdPlacement {
+  global_top
+  global_bottom
+  recipe_edit_after_fermentables
+  recipe_edit_after_hops
+  recipe_edit_after_yeast
+
+  @@map("ad_placement")
+  @@schema("public")
+}
+
+enum AdPlatform {
+  web
+
+  @@map("ad_platform")
+  @@schema("public")
+}
+
+enum WaterProfileScope {
+  system
+  account
+  public
+
+  @@map("water_profile_scope")
+  @@schema("public")
+}
+
+enum WaterProfileType {
+  water
+  dilution
+
+  @@map("water_profile_type")
+  @@schema("public")
+}
+
+enum WaterProfileVerificationStatus {
+  unverified
+  verified
+
+  @@map("water_profile_verification_status")
+  @@schema("public")
+}
+
+enum IngredientKind {
+  fermentable
+  hop
+  yeast
+
+  @@map("ingredient_kind")
+  @@schema("public")
+}
+
+enum ColorUnit {
+  ebc
+  srm
+  lovibond
+  unknown
+
+  @@map("color_unit")
+  @@schema("public")
+}
+
+enum BrewSessionStatus {
+  draft
+  running
+  paused
+  stopped
+
+  @@map("brew_session_status")
+  @@schema("public")
+}
+
+enum BrewSessionStepStatus {
+  pending
+  in_progress
+  done
+  skipped
+  not_applicable
+
+  @@map("brew_session_step_status")
+  @@schema("public")
+}
+
+enum BrewSessionStepTimerState {
+  idle
+  running
+  paused
+  stopped
+
+  @@map("brew_session_step_timer_state")
+  @@schema("public")
+}
+
+enum BrewSessionLogKind {
+  session_created
+  session_started
+  session_paused
+  session_stopped
+  steps_saved
+  step_status_saved
+  step_timer_started
+  step_timer_paused
+  step_timer_stopped
+
+  @@map("brew_session_log_kind")
+  @@schema("public")
+}
+
+enum IntegrationKind {
+  tilt
+  ispindel
+  rapt
+
+  @@map("integration_kind")
+  @@schema("public")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String?  @map("password_hash")
+  preferredLocale String   @default("en") @map("preferred_locale")
+  /** UI theme preset key (e.g. "default", "hc_dark", "hc_light"). */
+  preferredTheme  String?  @default("default") @map("preferred_theme")
+  /** UI font scale key (e.g. "sm", "md", "lg", "xl"). */
+  preferredFontScale String? @default("md") @map("preferred_font_scale")
+  /** UI density key (e.g. "comfortable", "compact"). */
+  preferredDensity String? @default("comfortable") @map("preferred_density")
+  /** Platform admin flag (not account-scoped). Enables platform-wide admin features. */
+  isPlatformAdmin Boolean @default(false) @map("is_platform_admin")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  memberships             WorkspaceMember[]
+  sessions                Session[]
+  webviewExchangeCodes    WebviewExchangeCode[]
+  emailVerificationTokens EmailVerificationToken[]
+  billingPurchaseIntents  BillingPurchaseIntent[]
+  billingWorkspaceBinding BillingUserWorkspaceBinding?
+  billingEvents           BillingEvent[]
+  aiUsageLedger           AiUsageLedger[]
+
+  @@index([email])
+  @@map("users")
+  @@schema("public")
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  /** Optional workspace/company branding accent key (e.g. "default", "acme"). */
+  brandKey  String?  @default("default") @map("brand_key")
+  /** If true, ads are disabled for this workspace (platform-controlled). */
+  adsDisabled Boolean @default(false) @map("ads_disabled")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members             WorkspaceMember[]
+  sessions            Session[]             @relation("SessionActiveWorkspace")
+  recipes             Recipe[]
+  waterProfiles       WaterProfile[]
+  equipmentProfiles   EquipmentProfile[]
+  recipeWaterSettings RecipeWaterSettings[]
+
+  fermentables Fermentable[]
+  hops         Hop[]
+  yeasts       Yeast[]
+  brewdaySettings BrewdaySettings?
+  brewSessions  BrewSession[]
+  inventoryItems InventoryItem[]
+  billing       WorkspaceBilling?
+  billingPurchaseIntents BillingPurchaseIntent[]
+  billingWorkspaceBindings BillingUserWorkspaceBinding[]
+  billingEvents BillingEvent[]
+  integrations Integration[]
+  aiSettings    WorkspaceAiSettings?
+  aiMemory      WorkspaceAiMemory?
+  aiUsageLedger AiUsageLedger[]
+
+  @@map("workspaces")
+  @@schema("public")
+}
+
+model BrewdaySettings {
+  id        String   @id @default(uuid())
+  workspaceId String   @unique @map("workspace_id")
+  brewingType String @default("all_grain") @map("brewing_type")
+  sectionsJson Json  @map("sections_json")
+  customSectionsJson Json? @map("custom_sections_json")
+  defaultStepsJson Json? @map("default_steps_json")
+  notes     String?  @map("notes")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@map("brewday_settings")
+  @@schema("public")
+}
+
+model BrewSession {
+  id        String           @id @default(uuid())
+  workspaceId String           @map("workspace_id")
+  recipeId  String           @map("recipe_id")
+  code      String
+
+  status    BrewSessionStatus @default(draft)
+  startedAt DateTime?        @map("started_at")
+  pausedAt  DateTime?        @map("paused_at")
+  stoppedAt DateTime?        @map("stopped_at")
+
+  /** Optional scheduled/programmed date for the brew session (date only, no time). */
+  scheduledDate DateTime?    @map("scheduled_date")
+
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  workspace Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  recipe    Recipe           @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  steps     BrewSessionStep[]
+  logs      BrewSessionLog[]
+  integrationDeviceAttachments IntegrationDeviceAttachment[]
+  integrationReadings IntegrationReading[]
+
+  @@index([workspaceId])
+  @@index([recipeId])
+  @@index([workspaceId, recipeId])
+  @@unique([workspaceId, code])
+  @@map("brew_sessions")
+  @@schema("public")
+}
+
+model Integration {
+  id          String          @id @default(uuid())
+  workspaceId String          @map("workspace_id")
+  kind        IntegrationKind
+  /** Token version for deterministic token derivation. */
+  tokenVersion Int           @default(1) @map("token_version")
+  /** Hash of the integration token (store hash only). */
+  tokenHash   String          @unique @map("token_hash")
+  revokedAt   DateTime?       @map("revoked_at")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  devices   IntegrationDevice[]
+
+  @@index([workspaceId])
+  @@index([kind])
+  @@map("integrations")
+  @@schema("public")
+}
+
+model IntegrationDevice {
+  id            String   @id @default(uuid())
+  integrationId String   @map("integration_id")
+  /** Stable identity string (e.g. uuid:..., mac:..., color:...). */
+  deviceKey     String   @map("device_key")
+  /** UI display name (e.g. color). */
+  displayName   String?  @map("display_name")
+  /** Raw identity metadata for forward compatibility. */
+  metadataJson  Json?    @map("metadata_json")
+  lastSeenAt    DateTime? @map("last_seen_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  attachments IntegrationDeviceAttachment[]
+  readings    IntegrationReading[]
+
+  @@unique([integrationId, deviceKey])
+  @@index([integrationId])
+  @@index([lastSeenAt])
+  @@map("integration_devices")
+  @@schema("public")
+}
+
+model IntegrationDeviceAttachment {
+  id           String   @id @default(uuid())
+  deviceId     String   @map("device_id")
+  brewSessionId String  @map("brew_session_id")
+  attachedAt   DateTime @default(now()) @map("attached_at")
+  detachedAt   DateTime? @map("detached_at")
+
+  device      IntegrationDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  brewSession BrewSession       @relation(fields: [brewSessionId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId])
+  @@index([brewSessionId])
+  @@index([deviceId, detachedAt])
+  @@map("integration_device_attachments")
+  @@schema("public")
+}
+
+model IntegrationReading {
+  id           String   @id @default(uuid())
+  deviceId     String   @map("device_id")
+  brewSessionId String? @map("brew_session_id")
+  /** Timestamp reported by the device/gateway (optional). */
+  recordedAt   DateTime? @map("recorded_at")
+  /** Timestamp when the API received the reading. */
+  receivedAt   DateTime @default(now()) @map("received_at")
+  temperatureC Float?   @map("temperature_c")
+  gravitySg    Float?   @map("gravity_sg")
+  rawJson      Json     @map("raw_json")
+
+  device      IntegrationDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  brewSession BrewSession?      @relation(fields: [brewSessionId], references: [id], onDelete: SetNull)
+
+  @@index([deviceId])
+  @@index([brewSessionId])
+  @@index([receivedAt])
+  @@map("integration_readings")
+  @@schema("public")
+}
+
+model Ad {
+  id        String      @id @default(uuid())
+  placement AdPlacement
+  platform  AdPlatform
+
+  imageUrl String @map("image_url")
+  linkUrl  String @map("link_url")
+  altText  String @map("alt_text")
+
+  isActive Boolean   @default(true) @map("is_active")
+  startsAt DateTime? @map("starts_at")
+  endsAt   DateTime? @map("ends_at")
+
+  /** Higher values win. Used to break ties deterministically. */
+  priority Int @default(0)
+  /** Future-proofing: selection weight for rotation within same priority tier. */
+  weight   Int @default(1)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([placement, platform, isActive])
+  @@index([platform, isActive])
+  @@index([startsAt])
+  @@index([endsAt])
+  @@map("ads")
+  @@schema("public")
+}
+
+model WorkspaceMember {
+  id        String      @id @default(uuid())
+  workspaceId String      @map("workspace_id")
+  userId    String      @map("user_id")
+  role      WorkspaceRole @default(member)
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("workspace_members")
+  @@schema("public")
+}
+
+model Session {
+  id              String   @id
+  userId          String   @map("user_id")
+  activeWorkspaceId String?  @map("active_workspace_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  expiresAt       DateTime @map("expires_at")
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeWorkspace Workspace? @relation("SessionActiveWorkspace", fields: [activeWorkspaceId], references: [id], onDelete: SetNull)
+  webviewExchangeCodes WebviewExchangeCode[]
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([activeWorkspaceId])
+  @@map("sessions")
+  @@schema("public")
+}
+
+model WebviewExchangeCode {
+  id        String   @id @default(uuid())
+  codeHash  String   @unique @map("code_hash")
+  /** Session id that created this code (traceability). */
+  sessionId String   @map("session_id")
+  /** User id tied to this code (authoritative for minting a cookie session). */
+  userId    String   @map("user_id")
+  /** Snapshot of active workspace when the code was issued (optional). */
+  activeWorkspaceId String? @map("active_workspace_id")
+  /** Optional audit/debug snapshot of requested redirect path. */
+  requestedNextPath String? @map("requested_next_path")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([usedAt])
+  @@map("webview_exchange_codes")
+  @@schema("public")
+}
+
+model EmailVerificationToken {
+  id        String    @id
+  userId    String    @map("user_id")
+  email     String
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([email])
+  @@map("email_verification_tokens")
+  @@schema("public")
+}
+
+model BeerStyle {
+  /** Stable canonical key (e.g. "bjcp-2021:13C" or "custom"). */
+  key      String  @id
+  source   String  // e.g. "bjcp"
+  version  String  // e.g. "2021"
+  code     String  // e.g. "13C"
+  name     String
+  category String?
+  categoryId String? @map("category_id")
+
+  sortOrder Int     @default(0) @map("sort_order")
+  isActive  Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  recipes Recipe[]
+  aliases BeerStyleAlias[]
+
+  @@index([source, version])
+  @@index([code])
+  @@map("beer_styles")
+  @@schema("public")
+}
+
+model BeerStyleAlias {
+  id       String @id @default(uuid())
+  /** Stable alias key (e.g. "bjcp-2017:13C") mapping into a canonical `BeerStyle.key`. */
+  aliasKey String @unique @map("alias_key")
+  styleKey String @map("style_key")
+  note     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  style BeerStyle @relation(fields: [styleKey], references: [key], onDelete: Cascade)
+
+  @@index([styleKey])
+  @@map("beer_style_aliases")
+  @@schema("public")
+}
+
+model Recipe {
+  id        String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  name      String
+  style     String?
+  /** Version family id (all versions share this id). */
+  versionGroupId String @map("version_group_id")
+  /** Integer version number within `versionGroupId` (starts at 0). */
+  version   Int    @default(0)
+  /** Canonical style reference (preferred). */
+  styleKey  String?  @map("style_key")
+  notes     String?  @db.Text
+  /** Canonical BeerJSON representation (Option A). */
+  beerJsonRecipeJson Json? @map("beer_json_recipe_json")
+  /** Internal extensions/metadata not covered by BeerJSON (Option 2.1). */
+  recipeExtJson Json? @map("recipe_ext_json")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace     Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  waterSettings RecipeWaterSettings?
+  beerStyle     BeerStyle?           @relation(fields: [styleKey], references: [key], onDelete: Restrict)
+  brewSessions  BrewSession[]
+
+  @@index([workspaceId])
+  @@index([workspaceId, versionGroupId])
+  @@unique([workspaceId, versionGroupId, version])
+  @@index([styleKey])
+  @@map("recipes")
+  @@schema("public")
+}
+
+model BrewSessionStep {
+  id            String                   @id @default(uuid())
+  brewSessionId String                   @map("brew_session_id")
+
+  sectionId     String                   @map("section_id")
+  /** Custom section display name snapshot (preset sections use i18n labels). */
+  sectionName   String?                  @map("section_name")
+  name          String
+  isDisabled    Boolean                  @default(false) @map("is_disabled")
+  sortOrder     Int                      @map("sort_order")
+  minutesPlanned Int?                    @map("minutes_planned")
+
+  status        BrewSessionStepStatus    @default(pending)
+  note          String?                  @db.Text
+
+  timerState    BrewSessionStepTimerState @default(idle) @map("timer_state")
+  timerStartedAt DateTime?               @map("timer_started_at")
+  timerLastStartedAt DateTime?           @map("timer_last_started_at")
+  timerPausedAt DateTime?                @map("timer_paused_at")
+  timerStoppedAt DateTime?               @map("timer_stopped_at")
+  timerAccumulatedSeconds Int            @default(0) @map("timer_accumulated_seconds")
+
+  /** Optional relative scheduling to another step's timer (e.g. -15 min from end of Boil). */
+  relativeToStepId String?               @map("relative_to_step_id")
+  /** Minutes from end of base step. Example: -15 means 15 minutes before the end. */
+  offsetMinutesFromEnd Int?              @map("offset_minutes_from_end")
+
+  /** When true, show per-step timer UI (elapsed, Start/Pause/Stop, Relative to, Offset). */
+  customTimerEnabled Boolean             @default(false) @map("custom_timer_enabled")
+
+  createdAt     DateTime                 @default(now()) @map("created_at")
+  updatedAt     DateTime                 @updatedAt @map("updated_at")
+
+  brewSession   BrewSession              @relation(fields: [brewSessionId], references: [id], onDelete: Cascade)
+  logs          BrewSessionLog[]
+  relativeToStep BrewSessionStep?        @relation("BrewSessionStepRelative", fields: [relativeToStepId], references: [id], onDelete: SetNull)
+  relativeSteps  BrewSessionStep[]       @relation("BrewSessionStepRelative")
+
+  @@index([brewSessionId])
+  @@index([brewSessionId, sortOrder])
+  @@index([sectionId])
+  @@index([relativeToStepId])
+  @@map("brew_session_steps")
+  @@schema("public")
+}
+
+model BrewSessionLog {
+  id           String            @id @default(uuid())
+  brewSessionId String           @map("brew_session_id")
+  stepId       String?           @map("step_id")
+  kind         BrewSessionLogKind
+  message      String
+  payloadJson  Json?             @map("payload_json")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  brewSession  BrewSession       @relation(fields: [brewSessionId], references: [id], onDelete: Cascade)
+  step         BrewSessionStep?  @relation(fields: [stepId], references: [id], onDelete: SetNull)
+
+  @@index([brewSessionId])
+  @@index([stepId])
+  @@index([brewSessionId, createdAt])
+  @@map("brew_session_logs")
+  @@schema("public")
+}
+
+model RecipeWaterSettings {
+  id        String @id @default(uuid())
+  workspaceId String @map("workspace_id")
+  recipeId  String @unique @map("recipe_id")
+
+  // Profile selections
+  sourceWaterProfileId   String? @map("source_water_profile_id")
+  targetWaterProfileId   String? @map("target_water_profile_id")
+  dilutionWaterProfileId String? @map("dilution_water_profile_id")
+
+  // Mixing (sheet 4 v0): tap + dilution volumes to create a mixed source profile
+  tapWaterVolumeLiters      Float? @default(0) @map("tap_water_volume_liters")
+  dilutionWaterVolumeLiters Float? @default(0) @map("dilution_water_volume_liters")
+
+  // Mash water acidification inputs (liters-first)
+  mashStartingAlkalinityPpmCaCO3 Float  @default(0) @map("mash_starting_alkalinity_ppm_caco3")
+  mashStartingPh                 Float  @default(7.0) @map("mash_starting_ph")
+  mashTargetPh                   Float  @default(5.6) @map("mash_target_ph")
+  mashWaterVolumeLiters          Float  @default(20) @map("mash_water_volume_liters")
+  mashAcidType                   String @default("phosphoric") @map("mash_acid_type")
+  mashStrengthKind               String @default("percent") @map("mash_strength_kind")
+  mashStrengthValue              Float? @map("mash_strength_value")
+
+  // Mash water acidification last snapshot (optional)
+  mashLastAcidRequiredMl          Float? @map("mash_last_acid_required_ml")
+  mashLastAcidRequiredTsp         Float? @map("mash_last_acid_required_tsp")
+  mashLastAcidRequiredGrams       Float? @map("mash_last_acid_required_grams")
+  mashLastAcidRequiredKg          Float? @map("mash_last_acid_required_kg")
+  mashLastFinalAlkalinityPpmCaCO3 Float? @map("mash_last_final_alkalinity_ppm_caco3")
+  mashLastSulfateAddedPpm         Float? @map("mash_last_sulfate_added_ppm")
+  mashLastChlorideAddedPpm        Float? @map("mash_last_chloride_added_ppm")
+  mashLastCalculatedAt            DateTime? @map("mash_last_calculated_at")
+
+  // Mash water acidification manual-entry mode (v0): user enters amount added; we estimate achieved pH.
+  mashAcidificationMode                 String    @default("targetPh") @map("mash_acidification_mode") // "targetPh" | "manual"
+  mashManualAcidAddedMl                 Float? @map("mash_manual_acid_added_ml")
+  mashManualAcidAddedGrams              Float? @map("mash_manual_acid_added_grams")
+  mashManualLastAchievedPh              Float? @map("mash_manual_last_achieved_ph")
+  mashManualLastFinalAlkalinityPpmCaCO3 Float? @map("mash_manual_last_final_alkalinity_ppm_caco3")
+  mashManualLastSulfateAddedPpm         Float? @map("mash_manual_last_sulfate_added_ppm")
+  mashManualLastChlorideAddedPpm        Float? @map("mash_manual_last_chloride_added_ppm")
+  mashManualLastCalculatedAt            DateTime? @map("mash_manual_last_calculated_at")
+
+  // Mash salt additions (manual)
+  mashSaltAdditionsJson   Json? @map("mash_salt_additions_json")
+  mashSaltsLastResultJson Json? @map("mash_salts_last_result_json")
+
+  // Mash overall adjustment snapshot (Sheet 5, v0): combined salts + acid output for debugging/audit.
+  mashOverallLastResultJson   Json? @map("mash_overall_last_result_json")
+  mashOverallLastCalculatedAt DateTime? @map("mash_overall_last_calculated_at")
+
+  // Mash grist snapshot (imported from recipe; read-only in water calculator)
+  mashGristImportedJson          Json? @map("mash_grist_imported_json")
+  mashGristImportedAt            DateTime? @map("mash_grist_imported_at")
+  mashGristSourceRecipeUpdatedAt DateTime? @map("mash_grist_source_recipe_updated_at")
+
+  // Sparge acidification inputs (liters-first)
+  spargeWaterProfileId             String? @map("sparge_water_profile_id")
+  spargeStartingAlkalinityPpmCaCO3 Float   @default(0) @map("sparge_starting_alkalinity_ppm_caco3")
+  spargeStartingPh                 Float   @default(7.0) @map("sparge_starting_ph")
+  spargeTargetPh                   Float   @default(5.6) @map("sparge_target_ph")
+  spargeVolumeLiters               Float   @default(20) @map("sparge_volume_liters")
+  spargeAcidType                   String  @default("phosphoric") @map("sparge_acid_type")
+  spargeStrengthKind               String  @default("percent") @map("sparge_strength_kind")
+  spargeStrengthValue              Float? @map("sparge_strength_value")
+
+  // Last calculated snapshot (optional)
+  spargeLastAcidRequiredMl          Float? @map("sparge_last_acid_required_ml")
+  spargeLastAcidRequiredTsp         Float? @map("sparge_last_acid_required_tsp")
+  spargeLastAcidRequiredGrams       Float? @map("sparge_last_acid_required_grams")
+  spargeLastAcidRequiredKg          Float? @map("sparge_last_acid_required_kg")
+  spargeLastFinalAlkalinityPpmCaCO3 Float? @map("sparge_last_final_alkalinity_ppm_caco3")
+  spargeLastSulfateAddedPpm         Float? @map("sparge_last_sulfate_added_ppm")
+  spargeLastChlorideAddedPpm        Float? @map("sparge_last_chloride_added_ppm")
+  spargeLastCalculatedAt            DateTime? @map("sparge_last_calculated_at")
+
+  // Sparge acidification manual-entry mode (v0): user enters amount added; we estimate achieved pH.
+  spargeAcidificationMode                 String    @default("targetPh") @map("sparge_acidification_mode") // "targetPh" | "manual"
+  spargeManualAcidAddedMl                 Float? @map("sparge_manual_acid_added_ml")
+  spargeManualAcidAddedGrams              Float? @map("sparge_manual_acid_added_grams")
+  spargeManualLastAchievedPh              Float? @map("sparge_manual_last_achieved_ph")
+  spargeManualLastFinalAlkalinityPpmCaCO3 Float? @map("sparge_manual_last_final_alkalinity_ppm_caco3")
+  spargeManualLastSulfateAddedPpm         Float? @map("sparge_manual_last_sulfate_added_ppm")
+  spargeManualLastChlorideAddedPpm        Float? @map("sparge_manual_last_chloride_added_ppm")
+  spargeManualLastCalculatedAt            DateTime? @map("sparge_manual_last_calculated_at")
+
+  // Sparge salt additions (manual)
+  spargeSaltAdditionsJson   Json? @map("sparge_salt_additions_json")
+  spargeSaltsLastResultJson Json? @map("sparge_salts_last_result_json")
+
+  // Sparge step temperature (editable in Edit recipe when sparge is configured)
+  spargeStepTemperatureC Float? @default(76) @map("sparge_step_temperature_c")
+
+  // Sparge configuration (Time, Ramp, Type)
+  spargeStepTimeMin Int?    @default(60) @map("sparge_step_time_min")
+  spargeStepRampMin Int?    @default(0) @map("sparge_step_ramp_min")
+  spargeMethodType  String? @default("fly_sparge") @map("sparge_method_type")
+
+  // Boil/kettle add-on water (v0): separate from mash/sparge.
+  // Profile selections (like mash)
+  boilSourceWaterProfileId   String? @map("boil_source_water_profile_id")
+  boilTargetWaterProfileId   String? @map("boil_target_water_profile_id")
+  boilDilutionWaterProfileId String? @map("boil_dilution_water_profile_id")
+
+  // Mixing volumes (like mash)
+  boilTapWaterVolumeLiters      Float? @default(0) @map("boil_tap_water_volume_liters")
+  boilDilutionWaterVolumeLiters Float? @default(0) @map("boil_dilution_water_volume_liters")
+
+  // Boil water acidification inputs (liters-first; like sparge)
+  boilStartingAlkalinityPpmCaCO3 Float  @default(0) @map("boil_starting_alkalinity_ppm_caco3")
+  boilStartingPh                 Float  @default(7.0) @map("boil_starting_ph")
+  boilTargetPh                   Float  @default(5.6) @map("boil_target_ph")
+  boilWaterVolumeLiters          Float  @default(0) @map("boil_water_volume_liters") // derived from boilTap + boilDilution
+  boilAcidType                   String @default("phosphoric") @map("boil_acid_type")
+  boilStrengthKind               String @default("percent") @map("boil_strength_kind")
+  boilStrengthValue              Float? @map("boil_strength_value")
+
+  // Last calculated snapshot (optional)
+  boilLastAcidRequiredMl          Float? @map("boil_last_acid_required_ml")
+  boilLastAcidRequiredTsp         Float? @map("boil_last_acid_required_tsp")
+  boilLastAcidRequiredGrams       Float? @map("boil_last_acid_required_grams")
+  boilLastAcidRequiredKg          Float? @map("boil_last_acid_required_kg")
+  boilLastFinalAlkalinityPpmCaCO3 Float? @map("boil_last_final_alkalinity_ppm_caco3")
+  boilLastSulfateAddedPpm         Float? @map("boil_last_sulfate_added_ppm")
+  boilLastChlorideAddedPpm        Float? @map("boil_last_chloride_added_ppm")
+  boilLastCalculatedAt            DateTime? @map("boil_last_calculated_at")
+
+  // Manual-entry mode (v0): user enters acid amount; we estimate achieved pH.
+  boilAcidificationMode                 String    @default("targetPh") @map("boil_acidification_mode") // "targetPh" | "manual"
+  boilManualAcidAddedMl                 Float? @map("boil_manual_acid_added_ml")
+  boilManualAcidAddedGrams              Float? @map("boil_manual_acid_added_grams")
+  boilManualLastAchievedPh              Float? @map("boil_manual_last_achieved_ph")
+  boilManualLastFinalAlkalinityPpmCaCO3 Float? @map("boil_manual_last_final_alkalinity_ppm_caco3")
+  boilManualLastSulfateAddedPpm         Float? @map("boil_manual_last_sulfate_added_ppm")
+  boilManualLastChlorideAddedPpm        Float? @map("boil_manual_last_chloride_added_ppm")
+  boilManualLastCalculatedAt            DateTime? @map("boil_manual_last_calculated_at")
+
+  // Boil salt additions (manual)
+  boilSaltAdditionsJson   Json? @map("boil_salt_additions_json")
+  boilSaltsLastResultJson Json? @map("boil_salts_last_result_json")
+
+  // Boil overall adjustment snapshot (v0): combined salts + acid output for debugging/audit.
+  boilOverallLastResultJson   Json? @map("boil_overall_last_result_json")
+  boilOverallLastCalculatedAt DateTime? @map("boil_overall_last_calculated_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  recipe  Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+  @@index([workspaceId])
+  @@map("recipe_water_settings")
+  @@schema("public")
+}
+
+model WaterProfile {
+  id  String @id @default(uuid())
+  key String @unique
+
+  scope WaterProfileScope
+  type  WaterProfileType
+
+  // `workspaceId` is only set for workspace-scoped profiles and for audit of admin-created public ones.
+  workspaceId String? @map("workspace_id")
+  name      String
+
+  // ppm (mg/L) ions
+  calcium     Float
+  magnesium   Float
+  sodium      Float
+  sulfate     Float
+  chloride    Float
+  bicarbonate Float
+
+  // Optional pH (for sparge/mash UX; many water reports include it, but it may be unknown).
+  ph Float?
+
+  verificationStatus WaterProfileVerificationStatus @default(unverified) @map("verification_status")
+  submittedByUserId  String? @map("submitted_by_user_id")
+  verifiedByUserId   String? @map("verified_by_user_id")
+  verifiedAt         DateTime? @map("verified_at")
+
+  source String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([scope])
+  @@index([type])
+  @@index([workspaceId])
+  @@map("water_profiles")
+  @@schema("public")
+}
+
+model EquipmentProfile {
+  id        String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  name      String
+
+  kettleVolumeLiters                     Float? @map("kettle_volume_liters")
+  kettleLossesLiters                     Float? @map("kettle_losses_liters")
+  kettleBoilEvaporationRatePercentPerHour Float? @map("kettle_boil_evaporation_rate_percent_per_hour")
+  kettleCoolingShrinkagePercent          Float? @map("kettle_cooling_shrinkage_percent")
+  kettleHopsAbsorptionLiters             Float? @map("kettle_hops_absorption_liters")
+
+  mashVolumeLiters           Float? @map("mash_volume_liters")
+  mashEfficiencyPercent      Float? @map("mash_efficiency_percent")
+  mashLossesLiters           Float? @map("mash_losses_liters")
+  mashThicknessLPerKg        Float? @map("mash_thickness_l_per_kg")
+  mashGrainAbsorptionLPerKg  Float? @map("mash_grain_absorption_l_per_kg")
+  mashWaterLeftoverLiters    Float? @map("mash_water_leftover_liters")
+
+  otherLossesLiters Float? @map("other_losses_liters")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+  @@map("equipment_profiles")
+  @@schema("public")
+}
+
+model Fermentable {
+  id        String  @id @default(uuid())
+  // null for system-wide canonical records; set for future workspace-specific overrides
+  workspaceId String? @map("workspace_id")
+
+  name     String
+  producer String?
+  group    String?
+  type     String?
+  country  String?
+  notes    String? @db.Text
+
+  // Color: canonical + original + convenience
+  colorEbc          Float? @map("color_ebc")
+  colorOriginal     Float? @map("color_original")
+  colorOriginalUnit ColorUnit @default(unknown) @map("color_original_unit")
+  colorLovibond     Float? @map("color_lovibond")
+  colorSrm          Float? @map("color_srm")
+  // BeerProto also includes a “Standard (ASBC/EBC/ION)” field; preserve verbatim.
+  standard          String?
+
+  // Potential / yield (canonical-ish; we’ll fill what we can from sources)
+  potentialSg  Float? @map("potential_sg")
+  yieldPercent Float? @map("yield_percent")
+  ppg          Float?
+
+  // Mash pH model parameters (v1, experimental)
+  // - `mashDiPh`: distilled-water mash pH (room temp, ~20-25C)
+  // - `mashTaToPh57_mEqPerKg`: titratable acidity to pH 5.7, mEq/kg (Troester-style)
+  mashDiPh              Float? @map("mash_di_ph")
+  mashTaToPh57_mEqPerKg Float? @map("mash_ta_to_ph57_meq_per_kg")
+  mashPhModelKey        String? @map("mash_ph_model_key")
+  mashPhModelSource     String? @map("mash_ph_model_source")
+  mashPhModelVersion    Int? @map("mash_ph_model_version")
+
+  deprecatedAt DateTime? @map("deprecated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  workspace  Workspace?            @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  sourceMaps IngredientSourceMap[]
+
+  @@index([workspaceId])
+  @@index([name])
+  @@index([producer])
+  @@map("fermentables")
+  @@schema("public")
+}
+
+model Hop {
+  id        String  @id @default(uuid())
+  workspaceId String? @map("workspace_id")
+
+  name    String
+  country String?
+  type    String?
+  notes   String? @db.Text
+
+  // alpha/beta acids (%), often a range; keep min/max where available.
+  alphaMin Float? @map("alpha_min")
+  alphaMax Float? @map("alpha_max")
+  betaMin  Float? @map("beta_min")
+  betaMax  Float? @map("beta_max")
+
+  deprecatedAt DateTime? @map("deprecated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  workspace  Workspace?            @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  sourceMaps IngredientSourceMap[]
+
+  @@index([workspaceId])
+  @@index([name])
+  @@map("hops")
+  @@schema("public")
+}
+
+model Yeast {
+  id        String  @id @default(uuid())
+  workspaceId String? @map("workspace_id")
+
+  name             String
+  lab              String?
+  // BeerProto "Product ID" (vendor code), e.g. "US-05"
+  productId        String? @map("product_id")
+  type             String?
+  form             String?
+  species          String?
+  endPhMin         Float? @map("end_ph_min")
+  endPhMax         Float? @map("end_ph_max")
+  flavorAroma      String? @db.Text
+  pitch            String? @db.Text
+  pitchTempC       Float? @map("pitch_temp_c")
+  tolerancePercent Float? @map("tolerance_percent")
+  notes            String? @db.Text
+
+  attenuationMin      Float? @map("attenuation_min")
+  attenuationMax      Float? @map("attenuation_max")
+  flocculationPercent Float? @map("flocculation_percent")
+  tempMinC            Float? @map("temp_min_c")
+  tempMaxC            Float? @map("temp_max_c")
+  bestFor             String? @db.Text
+
+  deprecatedAt DateTime? @map("deprecated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  workspace  Workspace?            @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  sourceMaps IngredientSourceMap[]
+
+  @@index([workspaceId])
+  @@index([name])
+  @@index([lab])
+  @@index([productId])
+  @@index([species])
+  @@map("yeasts")
+  @@schema("public")
+}
+
+model IngredientSource {
+  id            String @id @default(uuid())
+  sourceName    String @map("source_name")
+  sourceUrl     String @map("source_url")
+  sourceLicense String @map("source_license")
+  resourcePath  String @map("resource_path")
+
+  etag          String?
+  lastCheckedAt DateTime? @map("last_checked_at")
+  lastAppliedAt DateTime? @map("last_applied_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  runs IngredientImportRun[]
+
+  @@unique([sourceName, resourcePath])
+  @@index([sourceName])
+  @@map("ingredient_sources")
+  @@schema("public")
+}
+
+model IngredientImportRun {
+  id         String    @id @default(uuid())
+  sourceId   String    @map("source_id")
+  startedAt  DateTime  @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+  status     String
+  statsJson  Json?     @map("stats_json")
+  error      String?   @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  source      IngredientSource       @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  stagingRows IngredientStagingRow[]
+
+  @@index([sourceId])
+  @@index([startedAt])
+  @@map("ingredient_import_runs")
+  @@schema("public")
+}
+
+model IngredientStagingRow {
+  id             String         @id @default(uuid())
+  importRunId    String         @map("import_run_id")
+  kind           IngredientKind
+  sourceKey      String         @map("source_key")
+  rawPayloadJson Json           @map("raw_payload_json")
+  warningsJson   Json?          @map("warnings_json")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  importRun IngredientImportRun @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+
+  @@index([importRunId])
+  @@index([kind])
+  @@index([sourceKey])
+  @@map("ingredient_staging_rows")
+  @@schema("public")
+}
+
+model IngredientSourceMap {
+  id         String         @id @default(uuid())
+  kind       IngredientKind
+  sourceName String         @map("source_name")
+  sourceKey  String         @map("source_key")
+
+  fermentableId String?     @map("fermentable_id")
+  hopId         String?     @map("hop_id")
+  yeastId       String?     @map("yeast_id")
+
+  confidence Float?    @default(1.0)
+  notes      String?   @db.Text
+  lastSeenAt DateTime? @map("last_seen_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  fermentable Fermentable? @relation(fields: [fermentableId], references: [id], onDelete: Cascade)
+  hop         Hop?         @relation(fields: [hopId], references: [id], onDelete: Cascade)
+  yeast       Yeast?       @relation(fields: [yeastId], references: [id], onDelete: Cascade)
+
+  @@unique([kind, sourceName, sourceKey])
+  @@index([sourceName])
+  @@index([sourceKey])
+  @@index([fermentableId])
+  @@index([hopId])
+  @@index([yeastId])
+  @@map("ingredient_source_maps")
+  @@schema("public")
+}
+
+enum InventoryCategory {
+  fermentable
+  hop
+  speciality
+  acid_salt
+  detergent_sanitizer
+  kegging
+
+  @@map("inventory_category")
+  @@schema("public")
+}
+
+enum InventoryUnit {
+  kg
+  g
+  ml
+  count
+
+  @@map("inventory_unit")
+  @@schema("public")
+}
+
+model InventoryItem {
+  id           String            @id @default(uuid())
+  workspaceId  String            @map("workspace_id")
+  category     InventoryCategory
+  ingredientId String?           @map("ingredient_id")
+  name         String
+  quantity     Float
+  unit         InventoryUnit     @default(kg)
+  metadataJson Json?             @map("metadata_json")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([workspaceId, category])
+  @@map("inventory_items")
+  @@schema("public")
+}
+
+enum BillingTier {
+  free
+  premium
+  pro
+  pro_plus
+
+  @@map("billing_tier")
+  @@schema("public")
+}
+
+enum BillingSource {
+  stripe
+  apple
+  google
+  manual
+
+  @@map("billing_source")
+  @@schema("public")
+}
+
+enum BillingPurchaseProvider {
+  stripe
+  apple
+  google
+
+  @@map("billing_purchase_provider")
+  @@schema("public")
+}
+
+enum BillingPurchaseIntentMode {
+  purchase
+  restore
+
+  @@map("billing_purchase_intent_mode")
+  @@schema("public")
+}
+
+enum BillingPurchaseIntentStatus {
+  created
+  fulfilled
+  expired
+  cancelled
+
+  @@map("billing_purchase_intent_status")
+  @@schema("public")
+}
+
+enum BillingEventProvider {
+  stripe
+  revenuecat
+
+  @@map("billing_event_provider")
+  @@schema("public")
+}
+
+model WorkspaceBilling {
+  id          String      @id @default(uuid())
+  workspaceId String      @unique @map("workspace_id")
+  tier        BillingTier @default(free)
+  expiresAt   DateTime?   @map("expires_at")
+  source      BillingSource @default(manual)
+
+  stripeCustomerId     String? @map("stripe_customer_id")
+  stripeSubscriptionId String? @map("stripe_subscription_id")
+
+  /** The RevenueCat app_user_id (equals `user_id`). */
+  rcAppUserId String? @map("rc_app_user_id")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([stripeSubscriptionId])
+  @@map("workspace_billing")
+  @@schema("public")
+}
+
+model BillingPurchaseIntent {
+  id String @id @default(uuid())
+
+  userId      String @map("user_id")
+  workspaceId String @map("workspace_id")
+
+  planCode  String @map("plan_code")
+  provider  BillingPurchaseProvider
+  mode      BillingPurchaseIntentMode @default(purchase)
+  status    BillingPurchaseIntentStatus @default(created)
+  expiresAt DateTime @map("expires_at")
+
+  stripeCheckoutSessionId String? @map("stripe_checkout_session_id")
+  stripeSubscriptionId    String? @map("stripe_subscription_id")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  fulfilledAt DateTime? @map("fulfilled_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([userId, workspaceId])
+  @@map("billing_purchase_intents")
+  @@schema("public")
+}
+
+model BillingUserWorkspaceBinding {
+  userId      String @id @map("user_id")
+  workspaceId String @map("workspace_id")
+
+  provider BillingPurchaseProvider? @map("provider")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@map("billing_user_workspace_binding")
+  @@schema("public")
+}
+
+model BillingEvent {
+  id String @id @default(uuid())
+
+  provider BillingEventProvider
+  externalEventId String? @unique @map("external_event_id")
+
+  userId      String? @map("user_id")
+  workspaceId String? @map("workspace_id")
+
+  payloadJson Json @map("payload_json")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([provider])
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("billing_events")
+  @@schema("public")
+}
+
+enum AiProvider {
+  anthropic
+
+  @@map("ai_provider")
+  @@schema("public")
+}
+
+/**
+ * Per-workspace AI consultant configuration. One row per workspace.
+ *
+ * - `encryptedKey` stores a BYOK provider API key encrypted at rest via
+ *   AES-256-GCM (keyVault.ts). Never returned to clients.
+ * - `roleLimits` is `{ [WorkspaceRole]: number }` — per-role monthly token
+ *   cap (sum of tokensIn + tokensOut over trailing 30 days). 0 / missing
+ *   key = no role cap.
+ * - `perUserDailyCap` is the per-user daily token ceiling (tokensIn +
+ *   tokensOut today). Default 200_000 tokens/day ≈ $0.60/user/day at
+ *   current Claude Sonnet pricing.
+ * - Cancellation discipline (internal/MOAT-AND-COMPETITIVE-STRATEGY.md):
+ *   when a workspace downgrades back to `free`, this row is preserved so
+ *   the memory asset survives churn and can be re-activated on re-upgrade.
+ */
+model WorkspaceAiSettings {
+  workspaceId          String      @id @map("workspace_id")
+  provider             AiProvider  @default(anthropic)
+  encryptedKey         String?     @map("encrypted_key")
+  enabled              Boolean     @default(false)
+  roleLimits           Json        @default("{}") @map("role_limits")
+  perUserDailyCap      Int         @default(200000) @map("per_user_daily_cap")
+  dataEgressAccepted   Boolean     @default(false) @map("data_egress_accepted")
+  dataEgressAcceptedAt DateTime?   @map("data_egress_accepted_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_ai_settings")
+  @@schema("public")
+}
+
+/**
+ * Per-workspace operational memory — the moat.
+ *
+ * `memoryBlob` is the serialized {@link WorkspaceAiMemoryBlob} from
+ * `services/api/src/services/ai/promptComposer.ts` (facts + recurring
+ * issues + lastUpdated + schemaVersion). Defaults to an empty object so
+ * the very first chat turn does not need an explicit seed row.
+ *
+ * `version` is a monotonic row-level counter incremented by every
+ * successful writer run. It is *not* the JSON's internal `schemaVersion`.
+ * `lastWriterRunAt` records the most recent successful writer run; if a
+ * writer fails the row is left unchanged so the next turn retries.
+ *
+ * The memory blob is bounded to roughly ~2k tokens (~10k characters);
+ * the writer in `memoryWriter.ts` enforces the bound by pruning oldest
+ * entries first. See plan §6.5 + Sprint #2 acceptance criteria.
+ */
+model WorkspaceAiMemory {
+  workspaceId     String    @id @map("workspace_id")
+  memoryBlob      Json      @default("{}") @map("memory_blob")
+  version         Int       @default(0)
+  lastWriterRunAt DateTime? @map("last_writer_run_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_ai_memory")
+  @@schema("public")
+}
+
+/**
+ * Append-only ledger of AI chat turns. Used by:
+ *   - per-role + per-user rate-limit preflight (aggregated reads)
+ *   - workspace admin usage dashboard (Sprint #2)
+ *   - future credit-resale reconciliation (deferred to v1.5)
+ *
+ * `toolCalls` is the ordered list of tool invocations during the turn; see
+ * `packages/contracts/src/ai/aiUsage.ts` `AiToolCallRecord` for the shape.
+ */
+model AiUsageLedger {
+  id                String  @id @default(uuid())
+  workspaceId       String  @map("workspace_id")
+  userId            String  @map("user_id")
+  sessionId         String? @map("session_id")
+  model             String
+  tokensIn          Int     @default(0) @map("tokens_in")
+  tokensOut         Int     @default(0) @map("tokens_out")
+  costMicroUsd      BigInt  @default(0) @map("cost_micro_usd")
+  durationMs        Int     @default(0) @map("duration_ms")
+  providerRequestId String? @map("provider_request_id")
+  toolCalls         Json    @default("[]") @map("tool_calls")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ai_usage_ledger")
+  @@schema("public")
+}
+
+// =============================================================================
+// automation schema (Phase B foundation)
+//
+// First canonical-module schema split. Lives under @@schema("automation") per
+// docs/design/canonical-automation-module-surface.md §7.
+//
+// `Vessel.equipmentProfileId` is an app-level UUID FK to public.equipment_profiles
+// (link mechanism L1 from design §12.3); no Prisma cross-schema @relation is
+// declared here. Application code validates the reference at write time.
+// Upgrade to a formal cross-schema @relation deferred to the H1 2027 brewery
+// canonical-layout migration tranche per RFC-0002 Decision D.
+//
+// Adapter contract types live in @umbraculum/automation-contracts. The Prisma
+// models reference adapter kinds and contract versions as plain strings;
+// type-level validation is at the service layer.
+// =============================================================================
+
+/// Runtime physical instance owned by the automation module.
+/// Distinct from EquipmentProfile (brewery design-time params) — see design §4.
+/// Cardinality is N:1 against EquipmentProfile (multiple physical vessels can
+/// share a single design profile, e.g. four FV-15bbl-Std fermenters).
+model Vessel {
+  id                  String   @id @default(uuid())
+  workspaceId         String   @map("workspace_id")
+  /// Short workspace-unique code (e.g. "K1", "FV-1"). Stable identifier used
+  /// in the field UI, alarm messages, and AI tool addressing.
+  code                String
+  displayName         String   @map("display_name")
+  /// Free-form vessel taxonomy (e.g. "fermenter", "brite", "kettle", "mash_tun").
+  /// Not an enum at this stage — design §4 expects this set to evolve as more
+  /// adapters land; promotion to enum tracked under sub-plan #9.
+  vesselKind          String   @map("vessel_kind")
+  /// App-level FK to public.equipment_profiles.id (L1 mechanism). Nullable —
+  /// vessels imported from PLC discovery can exist without a brewery profile.
+  equipmentProfileId  String?  @map("equipment_profile_id")
+  adapterConnectionId String?  @map("adapter_connection_id")
+  /// Operational mode reported by the adapter (e.g. "fermenter", "brite_stage_1").
+  /// Adapter-defined string; the service layer validates against the active
+  /// AutomationAdapterDefinition's known modes.
+  mode                String?
+  currentTempC        Float?   @map("current_temp_c")
+  targetTempC         Float?   @map("target_temp_c")
+  alarmActive         Boolean  @default(false) @map("alarm_active")
+  /// Last successful adapter snapshot timestamp; null until first read.
+  lastSeenAt          DateTime? @map("last_seen_at")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  adapterConnection AdapterConnection?      @relation(fields: [adapterConnectionId], references: [id])
+  alarmEvents       AutomationAlarmEvent[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+  @@index([adapterConnectionId])
+  @@map("vessels")
+  @@schema("automation")
+}
+
+/// Persistent record of an adapter connection (e.g. one OpenPLC bench
+/// instance). Owns secrets-ref, status, and the version-handshake fields
+/// (`contractVersion` / `runtimeVersion`) consumed by classifyContractVersionSkew.
+model AdapterConnection {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  /// Adapter definition kind (e.g. "brewery.openplc.v1", "automation.mock.v0").
+  /// Resolved at boot against the in-process adapter registry.
+  adapterKind     String    @map("adapter_kind")
+  displayName     String    @map("display_name")
+  /// One of: "disconnected" | "connecting" | "connected" | "error" | "version_skew".
+  /// Service-layer enum; not a Prisma enum because Phase B keeps the adapter
+  /// supervisor pluggable (Phase C/D may add states).
+  status          String    @default("disconnected")
+  /// Free-form adapter-specific config (host, port, slave-id, scan rate, ...).
+  /// Schema validation lives at the adapter definition layer.
+  configJson      Json      @map("config_json")
+  /// Reference to a secret in the platform secret store (Phase D scope).
+  /// Phase B leaves this null — mock adapter does not require secrets.
+  secretRefId     String?   @map("secret_ref_id")
+  /// Sister-repo MailboxSpec.contractVersion observed at last connect, used
+  /// for the version handshake; mismatch policy per design §12.2.
+  contractVersion String    @map("contract_version")
+  /// Sister-repo PI_FIRMWARE_VERSION encoded value (decoded at the adapter
+  /// boundary). Null until first successful handshake.
+  runtimeVersion  String?   @map("runtime_version")
+  lastSeenAt      DateTime? @map("last_seen_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  vessels Vessel[]
+
+  @@index([workspaceId])
+  @@index([adapterKind])
+  @@map("adapter_connections")
+  @@schema("automation")
+}
+
+/// Open / historical alarm events surfaced by the adapter or by platform-side
+/// guards (e.g. version-skew alarms). Phase B: the table exists and the
+/// service layer can write rows; Phase D wires up activeAlarms tools and
+/// raise/clear semantics.
+model AutomationAlarmEvent {
+  id        String    @id @default(uuid())
+  vesselId  String    @map("vessel_id")
+  /// Stable alarm code (e.g. "version_skew.major", "mailbox.mismatch",
+  /// "vessel.cold_low.latched"). Used for de-duplication and AI tool filtering.
+  code      String
+  /// One of: "info" | "warning" | "error" | "critical".
+  severity  String
+  message   String
+  active    Boolean   @default(true)
+  raisedAt  DateTime  @default(now()) @map("raised_at")
+  clearedAt DateTime? @map("cleared_at")
+
+  vessel Vessel @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+
+  @@index([vesselId, active])
+  @@index([code, active])
+  @@map("alarm_events")
+  @@schema("automation")
+}
+
+// =============================================================================
+// Canonical `pim` module — RFC-0004 Phase B read path.
+// =============================================================================
+
+model PimProduct {
+  id                    String   @id @default(uuid())
+  workspaceId           String   @map("workspace_id")
+  sku                   String
+  name                  String
+  description           String?
+  primaryAttributeSetId String?  @map("primary_attribute_set_id")
+  status                String   @default("draft")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  primaryAttributeSet PimAttributeSet? @relation(fields: [primaryAttributeSetId], references: [id], onDelete: SetNull)
+  variants            PimVariant[]
+  mediaAssetRefs      PimMediaAssetRef[]
+
+  @@unique([workspaceId, sku])
+  @@index([workspaceId])
+  @@map("products")
+  @@schema("pim")
+}
+
+model PimVariant {
+  id              String   @id @default(uuid())
+  productId       String   @map("product_id")
+  sku             String
+  name            String
+  attributeValues Json     @default("{}") @map("attribute_values")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  product PimProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, sku])
+  @@index([productId])
+  @@map("variants")
+  @@schema("pim")
+}
+
+model PimAttributeSet {
+  id           String   @id @default(uuid())
+  workspaceId  String   @map("workspace_id")
+  code         String
+  label        String
+  attributeIds String[] @map("attribute_ids")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  products PimProduct[]
+
+  @@unique([workspaceId, code])
+  @@map("attribute_sets")
+  @@schema("pim")
+}
+
+model PimAttribute {
+  id            String   @id @default(uuid())
+  workspaceId   String   @map("workspace_id")
+  code          String
+  type          String
+  label         String
+  required      Boolean  @default(false)
+  defaultValue  Json?    @map("default_value")
+  selectOptions Json?    @map("select_options")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([workspaceId, code])
+  @@map("attributes")
+  @@schema("pim")
+}
+
+model PimCategory {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  code        String
+  label       String
+  parentId    String?  @map("parent_id")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  parent   PimCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children PimCategory[] @relation("CategoryTree")
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+  @@map("categories")
+  @@schema("pim")
+}
+
+model PimMediaAssetRef {
+  id           String   @id @default(uuid())
+  productId    String   @map("product_id")
+  mediaAssetId String   @map("media_asset_id")
+  role         String
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  product PimProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("media_asset_refs")
+  @@schema("pim")
+}
+
+// =============================================================================
+// Canonical rendering pipeline — RFC-0007 PR3 job-runner state.
+// =============================================================================
+
+model RenderJob {
+  id           String   @id @default(uuid())
+  workspaceId  String   @map("workspace_id")
+  requestedById String  @map("requested_by_id")
+  templateRef  String   @map("template_ref")
+  kind         String
+  status       String
+  deliveryMode String   @map("delivery_mode")
+  deliveryJson Json     @map("delivery_json")
+  inputJson    Json     @map("input_json")
+  requestedAt  DateTime @default(now()) @map("requested_at")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+  mediaAssetId String?  @map("media_asset_id")
+  error        Json?
+
+  attempts RenderJobAttempt[]
+  artifact RenderArtifact?
+
+  @@index([workspaceId, status, requestedAt])
+  @@index([templateRef])
+  @@index([requestedById])
+  @@map("render_jobs")
+  @@schema("rendering")
+}
+
+model RenderJobAttempt {
+  id            String   @id @default(uuid())
+  jobId         String   @map("job_id")
+  attemptNumber Int     @map("attempt_number")
+  startedAt     DateTime @default(now()) @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  error         Json?
+
+  job RenderJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, attemptNumber])
+  @@index([jobId])
+  @@map("render_job_attempts")
+  @@schema("rendering")
+}
+
+model RenderArtifact {
+  id                String   @id @default(uuid())
+  jobId             String   @unique @map("job_id")
+  workspaceId        String  @map("workspace_id")
+  contentType        String  @map("content_type")
+  filename           String
+  filenameExtension  String  @map("filename_extension")
+  sha256             String
+  bytes              Int
+  body               Bytes
+  expiresAt          DateTime @map("expires_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  job RenderJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([expiresAt])
+  @@map("render_artifacts")
+  @@schema("rendering")
+}

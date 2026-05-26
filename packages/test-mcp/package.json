@@ -1,0 +1,21 @@
+{
+  "name": "@umbraculum/test-mcp",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Small HTTP server exposing umbraculum-dev testing tools (smoke, seed, vitest, Playwright, contracts) for Cursor MCP / shell consumers. End-state npm scope: @umbraculum/test-mcp per sub-plan #9 (landed 2026-05-19 as worked example).",
+  "bin": {
+    "umbraculum-test-mcp": "src/server.ts"
+  },
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "smoke": "tsx src/server.ts --cli smokeStack",
+    "seed:e2e": "tsx src/server.ts --cli seedE2eFixture",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,322 @@
+{
+  "acid": {
+    "derivation": {
+      "formulaId": "string",
+      "inputs": {
+        "__array": {
+          "id": "string",
+          "value": {
+            "kind": "string",
+            "value": "string"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "intermediates": {
+        "__array": {
+          "id": "string",
+          "value": {
+            "kind": "string",
+            "unit": "string",
+            "value": "number"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "kind": "string",
+      "version": "number"
+    },
+    "kind": "string",
+    "mode": "string",
+    "result": {
+      "acidRequiredGrams": "null",
+      "acidRequiredKg": "null",
+      "acidRequiredMl": "number",
+      "acidRequiredTsp": "number",
+      "chlorideAddedPpm": "number",
+      "debug": {
+        "acidRequired_mEqPerL": "number",
+        "alkalinityReductionFromCaMgPpmCaCO3": "number",
+        "calciumPpm": "number",
+        "effectiveAlkalinityPpmCaCO3": "number",
+        "frac_equivalentsPerMole": "number",
+        "mMRequired_mmolPerL": "number",
+        "magnesiumPpm": "number",
+        "sg_mgPerMl": "number"
+      },
+      "finalAlkalinityPpmCaCO3": "number",
+      "sulfateAddedPpm": "number"
+    }
+  },
+  "formatHints": {
+    "L": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "g": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "kg": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "mL": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "pH": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "ppm": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "ppm_as_CaCO3": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    }
+  },
+  "ok": "boolean",
+  "overall": {
+    "derivation": {
+      "breakdowns": {
+        "__array": {
+          "id": "string",
+          "rows": {
+            "__array": {
+              "bicarbonatePpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "calciumPpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "chloridePpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "grams": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "magnesiumPpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "saltKey": {
+                "kind": "string",
+                "value": "string"
+              },
+              "sodiumPpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "sulfatePpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              }
+            },
+            "__length": "non-empty"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "formulaId": "string",
+      "inputs": {
+        "__array": {
+          "id": "string",
+          "value": {
+            "kind": "string",
+            "unit": "string",
+            "value": "number"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "intermediates": {
+        "__array": {
+          "id": "string",
+          "value": {
+            "kind": "string",
+            "unit": "string",
+            "value": "number"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "kind": "string",
+      "notes": {
+        "__array": "string",
+        "__length": "non-empty"
+      },
+      "version": "number"
+    },
+    "result": {
+      "calculatedAt": "string",
+      "debug": {
+        "acidChlorideAddedPpm": "number",
+        "acidSulfateAddedPpm": "number",
+        "boilMode": "string",
+        "saltsDeltaBicarbonatePpm": "number",
+        "startingAlkalinityAfterSaltsPpmCaCO3": "number",
+        "startingAlkalinityPpmCaCO3": "number"
+      },
+      "finalAlkalinityPpmCaCO3": "number",
+      "ionsPpm": {
+        "bicarbonate": "number",
+        "calcium": "number",
+        "chloride": "number",
+        "magnesium": "number",
+        "sodium": "number",
+        "sulfate": "number"
+      },
+      "ph": {
+        "kind": "string",
+        "value": "number"
+      }
+    }
+  },
+  "salts": {
+    "derivation": {
+      "breakdowns": {
+        "__array": {
+          "id": "string",
+          "rows": {
+            "__array": {
+              "deltaBicarbonatePpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "deltaCalciumPpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "deltaChloridePpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "deltaMagnesiumPpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "deltaSodiumPpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "deltaSulfatePpm": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "grams": {
+                "kind": "string",
+                "unit": "string",
+                "value": "number"
+              },
+              "saltKey": {
+                "kind": "string",
+                "value": "string"
+              }
+            },
+            "__length": "non-empty"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "formulaId": "string",
+      "inputs": {
+        "__array": {
+          "id": "string",
+          "value": {
+            "kind": "string",
+            "unit": "string",
+            "value": "number"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "intermediates": {
+        "__array": {
+          "id": "string",
+          "value": {
+            "kind": "string",
+            "value": "string"
+          }
+        },
+        "__length": "non-empty"
+      },
+      "kind": "string",
+      "version": "number"
+    },
+    "result": {
+      "baseProfile": {
+        "bicarbonate": "number",
+        "calcium": "number",
+        "chloride": "number",
+        "magnesium": "number",
+        "sodium": "number",
+        "sulfate": "number"
+      },
+      "breakdown": {
+        "__array": {
+          "deltasPpm": {
+            "calcium": "number",
+            "sulfate": "number"
+          },
+          "grams": "number",
+          "saltKey": "string"
+        },
+        "__length": "non-empty"
+      },
+      "deltasPpm": {
+        "bicarbonate": "number",
+        "calcium": "number",
+        "chloride": "number",
+        "magnesium": "number",
+        "sodium": "number",
+        "sulfate": "number"
+      },
+      "resultingProfile": {
+        "bicarbonate": "number",
+        "calcium": "number",
+        "chloride": "number",
+        "magnesium": "number",
+        "sodium": "number",
+        "sulfate": "number"
+      }
+    }
+  },
+  "settings": {
+    "recipeId": "string"
+  },
+  "version": "number"
+}

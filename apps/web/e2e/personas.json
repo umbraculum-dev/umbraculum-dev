@@ -1,0 +1,39 @@
+{
+  "personas": [
+    {
+      "key": "e2e-admin",
+      "email": "e2e-admin@brewery.local",
+      "passwordEnv": "E2E_ADMIN_PASSWORD",
+      "defaultPassword": "e2e-admin-pw!",
+      "role": "brewery_admin"
+    },
+    {
+      "key": "e2e-member",
+      "email": "e2e-member@brewery.local",
+      "passwordEnv": "E2E_MEMBER_PASSWORD",
+      "defaultPassword": "e2e-member-pw!",
+      "role": "member"
+    },
+    {
+      "key": "e2e-viewer",
+      "email": "e2e-viewer@brewery.local",
+      "passwordEnv": "E2E_VIEWER_PASSWORD",
+      "defaultPassword": "e2e-viewer-pw!",
+      "role": "viewer"
+    },
+    {
+      "key": "e2e-multi-admin",
+      "email": "e2e-multi-admin@brewery.local",
+      "passwordEnv": "E2E_MULTI_ADMIN_PASSWORD",
+      "defaultPassword": "e2e-multi-admin-pw!",
+      "role": "brewery_admin"
+    }
+  ],
+  "fixture": {
+    "workspaceId": "e2e00000-0000-0000-0000-0000000000aa",
+    "secondaryWorkspaceId": "e2e00000-0000-0000-0000-0000000000bb",
+    "recipeId": "e2e00000-0000-0000-0000-000000000abc",
+    "waterProfileId": "e2e00000-0000-0000-0000-000000000fff",
+    "brewSessionId": "e2e00000-0000-0000-0000-000000000bbe"
+  }
+}

@@ -1,0 +1,63 @@
+name: check-web-url-segments
+
+# Gates the web-route β disciplines committed by RFC-0002 Decision B and
+# the audit decision-of-record `docs/design/web-route-group-audit.md`:
+#
+#   (A) Discipline 1 — no `apps/web/app/[locale]/(<code>)/page.tsx`.
+#   (B) Discipline 2 — no `apps/web/app/[locale]/(<code>)/[<dyn>]/page.tsx`
+#       at the route-group root.
+#   (C) Static sub-segment registration matches `KNOWN_MODULE_OWNERSHIP`.
+#   (D) Flat module folders are caught — every non-route-group folder
+#       under `[locale]/` must be in `PLATFORM_RESERVED_SEGMENTS`.
+#
+# The check is fast (~1 s); runs on every PR touching the web folder, the
+# module SDK, or this workflow itself.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "apps/web/app/**"
+      - "packages/module-sdk/**"
+      - "scripts/check-web-url-segments.ts"
+      - ".github/workflows/check-web-url-segments.yml"
+      - "package.json"
+      - "package-lock.json"
+  pull_request:
+    branches: [master]
+    paths:
+      - "apps/web/app/**"
+      - "packages/module-sdk/**"
+      - "scripts/check-web-url-segments.ts"
+      - ".github/workflows/check-web-url-segments.yml"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+concurrency:
+  group: check-web-url-segments-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-web-url-segments:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run check-web-url-segments inside node:20-slim
+        # Same one-off-container method as docs-readmes.yml and typecheck.yml
+        # (canonical per docs/TYPING.md §Methodology). The script is pure
+        # Node stdlib + tsx; install + run is ~5 s wall.
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            -w /repo \
+            node:20-slim \
+            bash -lc '
+              set -eu
+              npm install --no-audit --no-fund --workspaces --include-workspace-root
+              npm run check-web-url-segments
+            '

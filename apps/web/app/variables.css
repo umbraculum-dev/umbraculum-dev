@@ -1,0 +1,89 @@
+/* Default theme tokens (dark grey). Keep contrast WCAG AA+ */
+:root {
+  --bg: #121417;
+  --surface: #1a1d22;
+  --surface-2: #222734;
+  --text: #e7eaf0;
+  --text-muted: #b7bdc9;
+  --border: #2a2f3a;
+  --focus-ring: #7aa2ff;
+
+  --danger: #ff5c7a;
+  --warning: #ffcc66;
+  --success: #5de4c7;
+  --info: #8bb8ff;
+
+  --radius: 10px;
+
+  /* Global UI sizing knobs. */
+  --panel-padding: 12px;
+  --app-shell-padding: 16px;
+  --brew-section-gap: 16px;
+  --control-padding: 8px;
+  --button-padding-y: 8px;
+  --button-padding-x: 10px;
+
+  /* Field semantics (color is supportive; badges/text still required). */
+  --field-input-bg: var(--surface);
+  /* Shared with native via @umbraculum/ui nativeReadonlyTokens. Must stay in sync. */
+  --field-readonly-bg: #232934;
+  --field-computed-bg: color-mix(in srgb, var(--success) 7%, var(--surface));
+  --field-readonly-border: #3a4558;
+  --field-computed-border: color-mix(in srgb, var(--success) 30%, var(--border));
+}
+
+/* Theme presets. Applied via <html data-theme="..."> from `app/layout.tsx`. */
+html[data-theme="hc_dark"] {
+  --bg: #0c0e12;
+  --surface: #141820;
+  --surface-2: #1c2230;
+  --text: #f3f6ff;
+  --text-muted: #d3daea;
+  --border: #3a4357;
+  --focus-ring: #9ec1ff;
+}
+
+html[data-theme="hc_light"] {
+  --bg: #ffffff;
+  --surface: #f4f6fb;
+  --surface-2: #e7ecf6;
+  --text: #0c1220;
+  --text-muted: #2b3448;
+  --border: #a8b2c7;
+  --focus-ring: #1a5dff;
+}
+
+/* Account/company accent branding (Phase 2 minimal). Applied via <html data-brand="...">. */
+html[data-brand="acme"] {
+  --info: #62e6a8;
+  --focus-ring: #62e6a8;
+}
+
+html[data-brand="forest"] {
+  --info: #7fdc6b;
+  --focus-ring: #7fdc6b;
+}
+
+/* Density presets. */
+html[data-density="compact"] {
+  --panel-padding: 10px;
+  --app-shell-padding: 12px;
+  --brew-section-gap: 12px;
+  --control-padding: 6px;
+  --button-padding-y: 6px;
+  --button-padding-x: 8px;
+}
+
+/* Font scale presets (affects rem-based and default-size text). */
+html[data-font-scale="sm"] {
+  font-size: 90%;
+}
+html[data-font-scale="md"] {
+  font-size: 100%;
+}
+html[data-font-scale="lg"] {
+  font-size: 110%;
+}
+html[data-font-scale="xl"] {
+  font-size: 125%;
+}

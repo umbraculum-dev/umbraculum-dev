@@ -1,0 +1,85 @@
+// VS Code / Cursor recommended workspace settings.
+//
+// HOW TO USE
+// ----------
+// 1) Copy this file to `.vscode/settings.json` (gitignored — your local
+//    settings will not be committed; tweak freely).
+// 2) Reload the editor window so the ESLint extension picks up the new
+//    config.
+//
+// WHY THIS FILE EXISTS (HIGH-full Phase 5 prerequisite — mitigation A)
+// -------------------------------------------------------------------
+// `eslint.config.mjs` enables 12 type-aware rules (Phase 2 promise
+// correctness + Phases 3-4 no-unsafe-*). Type-aware rules require
+// loading the full TypeScript program for each lint pass, which is
+// fine in CI (~42s, accepted) but adds ~3-5x latency to inline editor
+// feedback and several hundred MB of RAM to the ESLint server. Worse,
+// `source.fixAll.eslint: true` (a default many contributors carry over
+// from previous projects) can have the typescript-eslint auto-fixer
+// strip `eslint-disable` directives and rewrite type assertions in
+// ways that break `tsc --noEmit` — Phase 1 lost ~17 disable comments
+// and 11 files this way before we caught the pattern.
+//
+// This file is the recommended editor setup for this repo. It does
+// two things:
+//
+//   1) Points the ESLint extension at `eslint.config.editor.mjs`, a
+//      derived config that strips type-aware rules and the
+//      `parserOptions.projectService` block. You get instant inline
+//      feedback for every non-type-aware rule (no-explicit-any: error,
+//      no-unused-vars: error, react-hooks/exhaustive-deps: error,
+//      jsx-a11y/recommended, etc.) while CI keeps the full type-aware
+//      enforcement via the production `eslint.config.mjs`.
+//
+//   2) Sets `source.fixAll.eslint: "explicit"` instead of `true`. The
+//      "explicit" mode runs auto-fix only when you explicitly invoke
+//      it (e.g. via the command palette), never silently on save. See
+//      the plugin-shipped `23-eslint-fixall-discipline.mdc` rule for the policy.
+//
+// See `docs/LINTING.md` § "Recommended editor configuration" for the
+// full mitigation stack (C + A + E + F).
+{
+  // ----------------------------------------------------------------
+  // ESLint extension config
+  // ----------------------------------------------------------------
+
+  // Point the editor extension at the editor-only config (mitigation
+  // C). CI and `npm run lint` continue to use `eslint.config.mjs`
+  // unchanged.
+  "eslint.options": {
+    "overrideConfigFile": "eslint.config.editor.mjs"
+  },
+
+  // Lint on save, not on every keystroke. Drops typing latency and
+  // matches CI's actual gate (lint runs once per commit, not on every
+  // edit).
+  "eslint.run": "onSave",
+
+  // Use the workspace folder as the working directory for the ESLint
+  // server, so paths in the config (relative imports, `tsconfig`
+  // references, etc.) resolve as they do in CI.
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+
+  // ----------------------------------------------------------------
+  // Editor auto-fix discipline
+  // ----------------------------------------------------------------
+
+  // CRITICAL: keep this at "explicit", NEVER "true".
+  //
+  // "explicit": auto-fix runs only when you invoke it (command palette
+  // → "ESLint: Fix all auto-fixable Problems", or right-click "Source
+  // Action..."). Predictable, reviewable.
+  //
+  // "true" / true: auto-fix runs on every save, silently. Combined
+  // with type-aware rules, this is the failure mode that lost 17
+  // disable comments and 11 files in HIGH-full Phase 1 before we
+  // caught the pattern. The typescript-eslint auto-fixer is allowed
+  // to remove `eslint-disable` directives that look "unused" against
+  // a transient rule state, and to rewrite assertions in ways that
+  // break `tsc --noEmit`.
+  //
+  // See the plugin-shipped `23-eslint-fixall-discipline.mdc` rule.
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}

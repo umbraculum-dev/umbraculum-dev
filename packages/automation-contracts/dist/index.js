@@ -1,0 +1,3042 @@
+// src/version.ts
+var CONTRACT_VERSION = "2.0.1-dev";
+function parseSemVer(input) {
+  const match = /^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/.exec(input);
+  if (!match) return null;
+  const major = Number(match[1]);
+  const minor = Number(match[2]);
+  const patch = Number(match[3]);
+  if (!Number.isInteger(major) || !Number.isInteger(minor) || !Number.isInteger(patch)) {
+    return null;
+  }
+  const prerelease = match[4];
+  if (prerelease === void 0) {
+    return { major, minor, patch };
+  }
+  return { major, minor, patch, prerelease };
+}
+function classifyContractVersionSkew(runtime, expected = CONTRACT_VERSION) {
+  const r = parseSemVer(runtime);
+  const e = parseSemVer(expected);
+  if (!r || !e) return "unparseable";
+  if (r.major !== e.major) return "major";
+  if (r.minor !== e.minor) return "minor";
+  if (r.patch !== e.patch) return "patch";
+  return "match";
+}
+
+// src/mailbox.ts
+import { z } from "zod";
+var ModbusEntryKindSchema = z.enum([
+  "coil",
+  "discrete_input",
+  "input_register",
+  "holding_register"
+]);
+var ScalarTypeSchema = z.enum([
+  "bool",
+  "int16",
+  "uint16",
+  "int32",
+  "uint32",
+  "float"
+]);
+var MailboxEntrySchema = z.object({
+  /** PI_* name from the sister repo (e.g. `"PI_K1_CURRENT_TEMP_C_X10"`). */
+  name: z.string().regex(/^PI_/, "expected PI_* name"),
+  /** 0-based Modbus address. */
+  address: z.number().int().nonnegative(),
+  /** Modbus function-code family. */
+  kind: ModbusEntryKindSchema,
+  /** Scalar interpretation. */
+  scalar: ScalarTypeSchema,
+  /**
+   * Optional fixed-point scale: engineering value = raw * scale.
+   * Omitted for non-scalar / boolean entries.
+   */
+  scale: z.number().optional(),
+  /** Engineering unit (e.g. `"degC"`, `"bbl"`, `"%"`) — informational. */
+  unit: z.string().optional(),
+  /** Whether the platform is allowed to write this entry. */
+  writable: z.boolean(),
+  /** Human-readable description from the sister repo. */
+  description: z.string()
+}).readonly();
+var MailboxSpecSchema = z.object({
+  /**
+   * Platform-facing semver-shaped version string used by the version
+   * handshake (`classifyContractVersionSkew`). Phase A reuses the
+   * sister-repo integrated release tag because it is the only existing
+   * baseline that is semver-shaped.
+   */
+  contractVersion: z.string().min(1),
+  /**
+   * Sister-repo internal schema marker (e.g. `"v2"`). Informational —
+   * not consumed by the version handshake. Captures the
+   * monotonically-bumped marker the sister repo uses internally when
+   * the address layout changes.
+   */
+  schemaMarker: z.string().optional(),
+  /** Sister-repo `PLC_VERSION` (PLC firmware/runtime tag). */
+  plcVersion: z.string().optional(),
+  /**
+   * Sister-repo `INTEGRATED_RELEASE_TAG`. Phase A this is identical
+   * to `contractVersion` (same value, distinct field for forward
+   * compatibility when the rails diverge).
+   */
+  integratedReleaseTag: z.string().optional(),
+  /** All `PI_*` entries the runtime exposes. */
+  entries: z.array(MailboxEntrySchema)
+}).superRefine((spec, ctx) => {
+  const seenNames = /* @__PURE__ */ new Set();
+  const seenAddresses = /* @__PURE__ */ new Map();
+  for (let i = 0; i < spec.entries.length; i++) {
+    const e = spec.entries[i];
+    if (seenNames.has(e.name)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["entries", i, "name"],
+        message: `duplicate PI_* name: ${e.name}`
+      });
+    }
+    seenNames.add(e.name);
+    const addrKey = `${e.kind}:${e.address}`;
+    const prior = seenAddresses.get(addrKey);
+    if (prior !== void 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["entries", i, "address"],
+        message: `duplicate ${e.kind} address ${e.address}: ${prior} vs ${e.name}`
+      });
+    }
+    seenAddresses.set(addrKey, e.name);
+  }
+});
+var FIRMWARE_VERSION_REGISTER_NAME = "PI_FIRMWARE_VERSION";
+function findMailboxEntry(spec, name) {
+  return spec.entries.find((entry) => entry.name === name);
+}
+
+// data/mailbox.json
+var mailbox_default = {
+  contractVersion: "2.0.1-dev",
+  schemaMarker: "v2",
+  plcVersion: "2.0.1-dev",
+  integratedReleaseTag: "2.0.1-dev",
+  entries: [
+    {
+      name: "PI_M_AnyAlarmLatched",
+      address: 800,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_AnyAlarmBypassActive",
+      address: 801,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_AlarmBypassServiceCommFault",
+      address: 802,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_AlarmBypassStateRetainedDueToCommFault",
+      address: 803,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_Psu24vFault",
+      address: 804,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ServiceCommHealthy",
+      address: 805,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdLowTestForceHealthy",
+      address: 806,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_ColdLowAlarmPresent",
+      address: 808,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_ColdLowLatched",
+      address: 809,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_ColdLowBypassActive",
+      address: 810,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdLowBypassEnabled",
+      address: 811,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdLowBypassReq",
+      address: 812,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdLowBypassExtend",
+      address: 813,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdLowBypassClear",
+      address: 814,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdLowTestForceAlarm",
+      address: 815,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_ColdHighAlarmPresent",
+      address: 816,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_ColdHighLatched",
+      address: 817,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_ColdHighBypassActive",
+      address: 818,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdHighBypassEnabled",
+      address: 819,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdHighBypassReq",
+      address: 820,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdHighBypassExtend",
+      address: 821,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_ColdHighBypassClear",
+      address: 822,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_HotLowAlarmPresent",
+      address: 824,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_HotLowLatched",
+      address: 825,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_HotLowBypassActive",
+      address: 826,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotLowBypassEnabled",
+      address: 827,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotLowBypassReq",
+      address: 828,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotLowBypassExtend",
+      address: 829,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotLowBypassClear",
+      address: 830,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_HotHighAlarmPresent",
+      address: 832,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_HotHighLatched",
+      address: 833,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_HotHighBypassActive",
+      address: 834,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotHighBypassEnabled",
+      address: 835,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotHighBypassReq",
+      address: 836,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotHighBypassExtend",
+      address: 837,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_SVC_HotHighBypassClear",
+      address: 838,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_I_F1CoolReq",
+      address: 840,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_Q_F1CoolPermitted",
+      address: 841,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1CoolDeniedByPriority",
+      address: 842,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1CoolDeniedByColdTemp",
+      address: 843,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_CFG_F1TempVisible",
+      address: 844,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1PrioEffHigh",
+      address: 845,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1PrioEffNormal",
+      address: 846,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1PrioEffLow",
+      address: 847,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1ModeEffFermentor",
+      address: 848,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1ModeEffBriteStage1",
+      address: 849,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1ModeEffBriteStage2OrLager",
+      address: 850,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F1ColdEnough",
+      address: 851,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_I_F2CoolReq",
+      address: 852,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_Q_F2CoolPermitted",
+      address: 853,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2CoolDeniedByPriority",
+      address: 854,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2CoolDeniedByColdTemp",
+      address: 855,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_CFG_F2TempVisible",
+      address: 856,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2PrioEffHigh",
+      address: 857,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2PrioEffNormal",
+      address: 858,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2PrioEffLow",
+      address: 859,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2ModeEffFermentor",
+      address: 860,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2ModeEffBriteStage1",
+      address: 861,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2ModeEffBriteStage2OrLager",
+      address: 862,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F2ColdEnough",
+      address: 863,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_I_F3CoolReq",
+      address: 864,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_Q_F3CoolPermitted",
+      address: 865,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3CoolDeniedByPriority",
+      address: 866,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3CoolDeniedByColdTemp",
+      address: 867,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_CFG_F3TempVisible",
+      address: 868,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3PrioEffHigh",
+      address: 869,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3PrioEffNormal",
+      address: 870,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3PrioEffLow",
+      address: 871,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3ModeEffFermentor",
+      address: 872,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3ModeEffBriteStage1",
+      address: 873,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3ModeEffBriteStage2OrLager",
+      address: 874,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_F3ColdEnough",
+      address: 875,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_I_B1CoolReq",
+      address: 876,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_Q_B1CoolPermitted",
+      address: 877,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1CoolDeniedByPriority",
+      address: 878,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1CoolDeniedByColdTemp",
+      address: 879,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_CFG_B1TempVisible",
+      address: 880,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1PrioEffHigh",
+      address: 881,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1PrioEffNormal",
+      address: 882,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1PrioEffLow",
+      address: 883,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1ModeEffFermentor",
+      address: 884,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1ModeEffBriteStage1",
+      address: 885,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1ModeEffBriteStage2OrLager",
+      address: 886,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_M_B1ColdEnough",
+      address: 887,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] External Raspberry Pi / API contract. OpenPLC exposes these located booleans through grouped coil addresses."
+    },
+    {
+      name: "PI_Q_ColdPumpDemandRaw",
+      address: 888,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_Q_HotPumpDemandRaw",
+      address: 889,
+      kind: "coil",
+      scalar: "bool",
+      writable: false,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F1MailboxCommit",
+      address: 891,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F2MailboxCommit",
+      address: 892,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F3MailboxCommit",
+      address: 893,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_B1MailboxCommit",
+      address: 894,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_ThresholdMailboxCommit",
+      address: 895,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_SVC_MaintenanceMailboxCommit",
+      address: 896,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F1ThermostatMailboxCommit",
+      address: 897,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F2ThermostatMailboxCommit",
+      address: 898,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F3ThermostatMailboxCommit",
+      address: 899,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_B1ThermostatMailboxCommit",
+      address: 900,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F1ThermostatCommissioned",
+      address: 901,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F2ThermostatCommissioned",
+      address: 902,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_F3ThermostatCommissioned",
+      address: 903,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_CFG_B1ThermostatCommissioned",
+      address: 904,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][MODBUS] Shared raw pump-demand handoff signals. These are diagnostic-only readback of PLC demand, not final motor power state."
+    },
+    {
+      name: "PI_SVC_BenchAnalogSimEnabled",
+      address: 905,
+      kind: "coil",
+      scalar: "bool",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only analog simulation hook for the Linux/OpenPLC runtime path. Disabled by default and intentionally excluded from authored controller-side logic in main.ld."
+    },
+    {
+      name: "PI_CFG_F1PriorityCode",
+      address: 320,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_F1ModeCode",
+      address: 321,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_F2PriorityCode",
+      address: 322,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_F2ModeCode",
+      address: 323,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_F3PriorityCode",
+      address: 324,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_F3ModeCode",
+      address: 325,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_B1PriorityCode",
+      address: 326,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_B1ModeCode",
+      address: 327,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_ThreshFermentorDeciC",
+      address: 330,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_ThreshBriteStage1DeciC",
+      address: 331,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_ThreshBriteStage2OrLagerDeciC",
+      address: 332,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_HystDeadbandDeciC",
+      address: 333,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] PLC-backed numeric vessel-configuration ingress. These writable holding registers are now published as %QW because the current runtime demonstrably consumes that path inside the scan, unlike the previous %MW numeric ingress attempt."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW1",
+      address: 340,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW2",
+      address: 341,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW3",
+      address: 342,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW4",
+      address: 343,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW5",
+      address: 344,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW6",
+      address: 345,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW7",
+      address: 346,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW8",
+      address: 347,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW9",
+      address: 348,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW10",
+      address: 349,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW11",
+      address: 350,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW12",
+      address: 351,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW13",
+      address: 352,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW14",
+      address: 353,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW15",
+      address: 354,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1DescriptionW16",
+      address: 355,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW1",
+      address: 356,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW2",
+      address: 357,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW3",
+      address: 358,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW4",
+      address: 359,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW5",
+      address: 360,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW6",
+      address: 361,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW7",
+      address: 362,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW8",
+      address: 363,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW9",
+      address: 364,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW10",
+      address: 365,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW11",
+      address: 366,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW12",
+      address: 367,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW13",
+      address: 368,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW14",
+      address: 369,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW15",
+      address: 370,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2DescriptionW16",
+      address: 371,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW1",
+      address: 372,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW2",
+      address: 373,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW3",
+      address: 374,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW4",
+      address: 375,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW5",
+      address: 376,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW6",
+      address: 377,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW7",
+      address: 378,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW8",
+      address: 379,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW9",
+      address: 380,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW10",
+      address: 381,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW11",
+      address: 382,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW12",
+      address: 383,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW13",
+      address: 384,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW14",
+      address: 385,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW15",
+      address: 386,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3DescriptionW16",
+      address: 387,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW1",
+      address: 388,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW2",
+      address: 389,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW3",
+      address: 390,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW4",
+      address: 391,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW5",
+      address: 392,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW6",
+      address: 393,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW7",
+      address: 394,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW8",
+      address: 395,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW9",
+      address: 396,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW10",
+      address: 397,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW11",
+      address: 398,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW12",
+      address: 399,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW13",
+      address: 400,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW14",
+      address: 401,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW15",
+      address: 402,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1DescriptionW16",
+      address: 403,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1MailboxRequestId",
+      address: 404,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2MailboxRequestId",
+      address: 405,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3MailboxRequestId",
+      address: 406,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1MailboxRequestId",
+      address: 407,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1MailboxStatus",
+      address: 408,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2MailboxStatus",
+      address: 409,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3MailboxStatus",
+      address: 410,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1MailboxStatus",
+      address: 411,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1MailboxLastRequestId",
+      address: 412,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2MailboxLastRequestId",
+      address: 413,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3MailboxLastRequestId",
+      address: 414,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1MailboxLastRequestId",
+      address: 415,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1MailboxErrorCode",
+      address: 416,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2MailboxErrorCode",
+      address: 417,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3MailboxErrorCode",
+      address: 418,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1MailboxErrorCode",
+      address: 419,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedPriorityCode",
+      address: 420,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedPriorityCode",
+      address: 421,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedPriorityCode",
+      address: 422,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedPriorityCode",
+      address: 423,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedModeCode",
+      address: 424,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedModeCode",
+      address: 425,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedModeCode",
+      address: 426,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedModeCode",
+      address: 427,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW1",
+      address: 430,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW2",
+      address: 431,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW3",
+      address: 432,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW4",
+      address: 433,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW5",
+      address: 434,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW6",
+      address: 435,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW7",
+      address: 436,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW8",
+      address: 437,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW9",
+      address: 438,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW10",
+      address: 439,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW11",
+      address: 440,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW12",
+      address: 441,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW13",
+      address: 442,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW14",
+      address: 443,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW15",
+      address: 444,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1AppliedDescriptionW16",
+      address: 445,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW1",
+      address: 446,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW2",
+      address: 447,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW3",
+      address: 448,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW4",
+      address: 449,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW5",
+      address: 450,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW6",
+      address: 451,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW7",
+      address: 452,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW8",
+      address: 453,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW9",
+      address: 454,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW10",
+      address: 455,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW11",
+      address: 456,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW12",
+      address: 457,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW13",
+      address: 458,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW14",
+      address: 459,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW15",
+      address: 460,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2AppliedDescriptionW16",
+      address: 461,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW1",
+      address: 462,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW2",
+      address: 463,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW3",
+      address: 464,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW4",
+      address: 465,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW5",
+      address: 466,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW6",
+      address: 467,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW7",
+      address: 468,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW8",
+      address: 469,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW9",
+      address: 470,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW10",
+      address: 471,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW11",
+      address: 472,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW12",
+      address: 473,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW13",
+      address: 474,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW14",
+      address: 475,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW15",
+      address: 476,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3AppliedDescriptionW16",
+      address: 477,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW1",
+      address: 478,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW2",
+      address: 479,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW3",
+      address: 480,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW4",
+      address: 481,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW5",
+      address: 482,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW6",
+      address: 483,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW7",
+      address: 484,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW8",
+      address: 485,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW9",
+      address: 486,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW10",
+      address: 487,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW11",
+      address: 488,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW12",
+      address: 489,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW13",
+      address: 490,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW14",
+      address: 491,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW15",
+      address: 492,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1AppliedDescriptionW16",
+      address: 493,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThresholdMailboxRequestId",
+      address: 494,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThresholdMailboxStatus",
+      address: 495,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThresholdMailboxLastRequestId",
+      address: 496,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThresholdMailboxErrorCode",
+      address: 497,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThreshFermentorAppliedDeciC",
+      address: 498,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThreshBriteStage1AppliedDeciC",
+      address: 499,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_ThreshBriteStage2OrLagerAppliedDeciC",
+      address: 500,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_HystDeadbandAppliedDeciC",
+      address: 501,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceCommandCode",
+      address: 502,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceArgument0",
+      address: 503,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceArgument1",
+      address: 504,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceRequestId",
+      address: 505,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceStatus",
+      address: 506,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceLastRequestId",
+      address: 507,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_MaintenanceErrorCode",
+      address: 508,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatSetpointDeciC",
+      address: 509,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatCoolHystDeciC",
+      address: 510,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatRuleCode",
+      address: 511,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatSetpointDeciC",
+      address: 512,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatCoolHystDeciC",
+      address: 513,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatRuleCode",
+      address: 514,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatSetpointDeciC",
+      address: 515,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatCoolHystDeciC",
+      address: 516,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatRuleCode",
+      address: 517,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatSetpointDeciC",
+      address: 518,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatCoolHystDeciC",
+      address: 519,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatRuleCode",
+      address: 520,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatMailboxRequestId",
+      address: 521,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatMailboxRequestId",
+      address: 522,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatMailboxRequestId",
+      address: 523,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatMailboxRequestId",
+      address: 524,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatMailboxStatus",
+      address: 525,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatMailboxStatus",
+      address: 526,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatMailboxStatus",
+      address: 527,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatMailboxStatus",
+      address: 528,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatMailboxLastRequestId",
+      address: 529,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatMailboxLastRequestId",
+      address: 530,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatMailboxLastRequestId",
+      address: 531,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatMailboxLastRequestId",
+      address: 532,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatMailboxErrorCode",
+      address: 533,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatMailboxErrorCode",
+      address: 534,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatMailboxErrorCode",
+      address: 535,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatMailboxErrorCode",
+      address: 536,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatAppliedSetpointDeciC",
+      address: 537,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatAppliedSetpointDeciC",
+      address: 538,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatAppliedSetpointDeciC",
+      address: 539,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatAppliedSetpointDeciC",
+      address: 540,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatAppliedCoolHystDeciC",
+      address: 541,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatAppliedCoolHystDeciC",
+      address: 542,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatAppliedCoolHystDeciC",
+      address: 543,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatAppliedCoolHystDeciC",
+      address: 544,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatAppliedRuleCode",
+      address: 545,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatAppliedRuleCode",
+      address: 546,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatAppliedRuleCode",
+      address: 547,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatAppliedRuleCode",
+      address: 548,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatHeatHystDeciC",
+      address: 549,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatHeatHystDeciC",
+      address: 550,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatHeatHystDeciC",
+      address: 551,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatHeatHystDeciC",
+      address: 552,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F1ThermostatAppliedHeatHystDeciC",
+      address: 553,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F2ThermostatAppliedHeatHystDeciC",
+      address: 554,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_F3ThermostatAppliedHeatHystDeciC",
+      address: 555,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_CFG_B1ThermostatAppliedHeatHystDeciC",
+      address: 556,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Mailbox-staged vessel descriptions now share the writable %QW path with the other consumed mailbox words so the PLC can copy them into applied echoes after commit."
+    },
+    {
+      name: "PI_SVC_BenchSimColdTankTempDeciC",
+      address: 557,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only simulated analog temperatures in deci-C for the Linux/OpenPLC runtime path."
+    },
+    {
+      name: "PI_SVC_BenchSimHotTankTempDeciC",
+      address: 558,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only simulated analog temperatures in deci-C for the Linux/OpenPLC runtime path."
+    },
+    {
+      name: "PI_SVC_BenchSimF1TempDeciC",
+      address: 559,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only simulated analog temperatures in deci-C for the Linux/OpenPLC runtime path."
+    },
+    {
+      name: "PI_SVC_BenchSimF2TempDeciC",
+      address: 560,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only simulated analog temperatures in deci-C for the Linux/OpenPLC runtime path."
+    },
+    {
+      name: "PI_SVC_BenchSimF3TempDeciC",
+      address: 561,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only simulated analog temperatures in deci-C for the Linux/OpenPLC runtime path."
+    },
+    {
+      name: "PI_SVC_BenchSimB1TempDeciC",
+      address: 562,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: true,
+      description: "[PI][BENCH-SIM] Bench-only simulated analog temperatures in deci-C for the Linux/OpenPLC runtime path."
+    },
+    {
+      name: "PI_AI_F1ActiveThresholdDeciC",
+      address: 200,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_F1TempDeciC",
+      address: 201,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_F2ActiveThresholdDeciC",
+      address: 202,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_F2TempDeciC",
+      address: 203,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_F3ActiveThresholdDeciC",
+      address: 204,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_F3TempDeciC",
+      address: 205,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_B1ActiveThresholdDeciC",
+      address: 206,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_B1TempDeciC",
+      address: 207,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_ColdTankTempDeciC",
+      address: 208,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_AI_HotTankTempDeciC",
+      address: 209,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_P_ThreshFermentorDeciC",
+      address: 210,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_P_ThreshBriteStage1DeciC",
+      address: 211,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_P_ThreshBriteStage2OrLagerDeciC",
+      address: 212,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_P_HystDeadbandDeciC",
+      address: 213,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_P_HotMinUsefulTempDeciC",
+      address: 214,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][MODBUS] Vessel temperatures come from the converter-backed analog path, while thermostat settings are PLC-applied mailbox state."
+    },
+    {
+      name: "PI_DBG_F1CfgPriorityCodeEcho",
+      address: 216,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][DIAG] These published echoes let bench checks confirm whether the PLC scan is consuming the writable %QW config ingress words."
+    },
+    {
+      name: "PI_DBG_F1CfgModeCodeEcho",
+      address: 217,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][DIAG] These published echoes let bench checks confirm whether the PLC scan is consuming the writable %QW config ingress words."
+    },
+    {
+      name: "PI_DBG_ThreshFermentorCfgEchoDeciC",
+      address: 218,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][DIAG] These published echoes let bench checks confirm whether the PLC scan is consuming the writable %QW config ingress words."
+    },
+    {
+      name: "PI_DBG_ThreshBriteStage1CfgEchoDeciC",
+      address: 219,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][DIAG] These published echoes let bench checks confirm whether the PLC scan is consuming the writable %QW config ingress words."
+    },
+    {
+      name: "PI_DBG_ThreshBriteStage2OrLagerCfgEchoDeciC",
+      address: 220,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][DIAG] These published echoes let bench checks confirm whether the PLC scan is consuming the writable %QW config ingress words."
+    },
+    {
+      name: "PI_DBG_HystDeadbandCfgEchoDeciC",
+      address: 221,
+      kind: "holding_register",
+      scalar: "int16",
+      writable: false,
+      description: "[PI][DIAG] These published echoes let bench checks confirm whether the PLC scan is consuming the writable %QW config ingress words."
+    },
+    {
+      name: "PI_FIRMWARE_VERSION",
+      address: 222,
+      kind: "holding_register",
+      scalar: "uint16",
+      writable: false,
+      description: "[PI][VERSION] Runtime firmware version sanity-check register for the platform-side mailbox-artifact handshake. Encoded as major*10000 + minor*100 + patch; 2.0.1 -> 20001. The canonical full version string lives in the emitted mailbox.json contractVersion field (tools/build_mailbox_artifact.py). Read-only from outside; not part of any alarm-layer or ladder logic."
+    }
+  ]
+};
+
+// src/mailbox-data.ts
+var MAILBOX_SPEC = Object.freeze(
+  MailboxSpecSchema.parse(mailbox_default)
+);
+
+// src/adapter.ts
+import { z as z2 } from "zod";
+var AdapterCapabilitiesSchema = z2.object({
+  readSnapshot: z2.boolean(),
+  applyCommand: z2.boolean(),
+  subscribeAlarms: z2.boolean()
+}).readonly();
+var VesselSnapshotSchema = z2.object({
+  vesselCode: z2.string().min(1, "vesselCode required"),
+  mode: z2.string().optional(),
+  currentTempC: z2.number().finite().optional(),
+  targetTempC: z2.number().finite().optional(),
+  alarmActive: z2.boolean(),
+  /** ISO 8601 timestamp the adapter assigned when the read completed. */
+  capturedAt: z2.string().min(1, "capturedAt required").refine(
+    (s) => !Number.isNaN(Date.parse(s)),
+    "capturedAt must be ISO 8601"
+  ),
+  /**
+   * Optional raw mailbox values keyed by `PI_*` name — informational, for
+   * debugging and AI tools. Not the source of truth for `Vessel` rows.
+   */
+  raw: z2.record(z2.string(), z2.union([z2.number(), z2.boolean()])).optional()
+}).readonly();
+var VesselStateSchema = z2.object({
+  id: z2.string().min(1, "id required"),
+  workspaceId: z2.string().min(1, "workspaceId required"),
+  code: z2.string().min(1, "code required"),
+  displayName: z2.string().min(1, "displayName required"),
+  vesselKind: z2.string().min(1, "vesselKind required"),
+  equipmentProfileId: z2.string().nullable(),
+  adapterConnectionId: z2.string().nullable(),
+  mode: z2.string().nullable(),
+  currentTempC: z2.number().finite().nullable(),
+  targetTempC: z2.number().finite().nullable(),
+  alarmActive: z2.boolean(),
+  /** ISO 8601 timestamp; null until the first adapter snapshot lands. */
+  lastSeenAt: z2.string().nullable()
+});
+var VesselListResponseSchema = z2.object({
+  ok: z2.literal(true),
+  vessels: z2.array(VesselStateSchema)
+});
+var VesselStateResponseSchema = z2.object({
+  ok: z2.literal(true),
+  vessel: VesselStateSchema
+});
+export {
+  AdapterCapabilitiesSchema,
+  CONTRACT_VERSION,
+  FIRMWARE_VERSION_REGISTER_NAME,
+  MAILBOX_SPEC,
+  VesselListResponseSchema,
+  VesselSnapshotSchema,
+  VesselStateResponseSchema,
+  VesselStateSchema,
+  classifyContractVersionSkew,
+  findMailboxEntry,
+  parseSemVer
+};

@@ -1,0 +1,101 @@
+# Local DB backups (pg_dump)
+backups/
+# ------------------------------------------------------------
+# Local-only / developer-specific (do not commit)
+# ------------------------------------------------------------
+
+# Cursor artifacts (synced via npx / developer-managed)
+.cursor/
+.cursorignore
+
+# npm auth / registry config (often contains tokens)
+.npmrc
+
+# ------------------------------------------------------------
+# Secrets / environment
+# ------------------------------------------------------------
+.env
+.env.*
+!.env.sample
+
+# ------------------------------------------------------------
+# Python helper-script bytecode (scripts/docs/check-readmes.py etc.)
+# ------------------------------------------------------------
+__pycache__/
+*.pyc
+
+# ------------------------------------------------------------
+# Node / Next.js / TypeScript
+# ------------------------------------------------------------
+node_modules/
+.next/
+# Backup dirs created by our “move aside .next” reset
+apps/web/.next.bak-*/
+# Generated from packages/media (do not commit; sync via apps/web/scripts/sync-media.mjs)
+apps/web/public/media/
+out/
+dist/
+build/
+coverage/
+.turbo/
+.eslintcache
+*.tsbuildinfo
+
+# ------------------------------------------------------------
+# Shared packages: commit dist outputs (native-ready)
+# ------------------------------------------------------------
+!packages/*/dist/
+!packages/*/dist/**
+
+# npm/yarn/pnpm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------------------------------------
+# Playwright (when added)
+# ------------------------------------------------------------
+playwright-report/
+test-results/
+
+# ------------------------------------------------------------
+# Prisma / SQLite dev DBs (when added)
+# ------------------------------------------------------------
+**/*.db
+**/*.db-journal
+
+# ------------------------------------------------------------
+# Docker (optional local overrides)
+# ------------------------------------------------------------
+docker-compose.override.yml
+docker-compose.*.override.yml
+
+# ------------------------------------------------------------
+# Local scratch / runtime artifacts
+# ------------------------------------------------------------
+.local/
+tmp/
+var/
+logs/
+*.log
+# Cursor agent scratch dir for ad-hoc helper scripts (one-off transforms,
+# inspection scripts, slot-N bulk-sed migration scripts). See the
+# `cursor-tmp-scripts-and-logs` rule/skill in the umbraculum-toolset
+# plugin pack — these are session-local, not artifacts to ship.
+cursor-tmp/
+
+# ------------------------------------------------------------
+# IDE / OS
+# ------------------------------------------------------------
+# Use `.vscode/*` (not `.vscode/`) so the file-level negation below works:
+# git ignores files inside `.vscode/` but still recurses into the dir,
+# allowing `!.vscode/settings.json.example` to re-include the example.
+.vscode/*
+# Track the recommended-settings example (HIGH-full Phase 5 prereq);
+# real `.vscode/settings.json` stays gitignored so contributors can
+# tweak locally.
+!.vscode/settings.json.example
+.idea/
+.DS_Store
+

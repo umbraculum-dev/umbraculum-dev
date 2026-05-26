@@ -1,0 +1,27 @@
+{
+  "name": "@umbraculum/i18n",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Generic locale-bundle framework (TypeScript types + JSON bundles + copy-json build step). Platform scope: the bundle MACHINERY is platform-neutral; the current bundle CONTENT (en.json / it.json) is brewery-flavored. Per sub-plan #9 plan doc §1.4, content split (extracting brewery-vertical strings into a separate brewery-locales package) is deferred to a future sub-plan.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json && node scripts/copy-json.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./en": {
+      "default": "./dist/en.json"
+    },
+    "./it": {
+      "default": "./dist/it.json"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts"
+}

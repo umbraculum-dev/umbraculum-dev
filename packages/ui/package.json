@@ -1,0 +1,53 @@
+{
+  "name": "@umbraculum/ui",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Cross-platform UI primitive layer built on Tamagui: design tokens, platform-forking primitives (Button/Input/BrewCheckbox), AI chat panel, hydrometer chart. Quadruple-entrypoint package (default + tamagui-config-web + tamagui-config-native + charts/HydrometerChart with platform-fork via react-native condition). Industry-agnostic by construction — consumed by both apps/web (Next.js) and apps/native (React Native + Expo).",
+  "type": "module",
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./tamagui-config-web": {
+      "types": "./dist/tamagui/config.web.d.ts",
+      "import": "./dist/tamagui/config.web.js",
+      "require": "./dist/tamagui/config.web.cjs",
+      "default": "./dist/tamagui/config.web.js"
+    },
+    "./tamagui-config-native": {
+      "types": "./dist/tamagui/config.native.d.ts",
+      "import": "./dist/tamagui/config.native.js",
+      "require": "./dist/tamagui/config.native.cjs",
+      "default": "./dist/tamagui/config.native.js"
+    },
+    "./charts/HydrometerChart": {
+      "types": "./dist/charts/HydrometerChart.web.d.ts",
+      "react-native": "./dist/charts/HydrometerChart.native.js",
+      "import": "./dist/charts/HydrometerChart.web.js",
+      "require": "./dist/charts/HydrometerChart.web.cjs",
+      "default": "./dist/charts/HydrometerChart.web.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@tamagui/animations-css": "^2.0.0-rc.11",
+    "@tamagui/animations-react-native": "^2.0.0-rc.11",
+    "@tamagui/config": "^2.0.0-rc.7",
+    "react-native-svg": "^15.12.0",
+    "tamagui": "^2.0.0-rc.11",
+    "victory": "^36.9.2",
+    "victory-native": "^36.9.2"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.70"
+  }
+}

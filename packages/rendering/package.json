@@ -1,0 +1,44 @@
+{
+  "name": "@umbraculum/rendering",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Canonical document and file rendering adapter layer for Umbraculum. Exposes engine helpers for eta, MJML, CSV, XLSX, XML, barcode/QR, and Gotenberg; API-owned BullMQ workers, Prisma schema, and Fastify routes landed in RFC-0007 PR3.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.29.7",
+    "@fast-csv/format": "^5.0.0",
+    "@umbraculum/module-sdk": "file:../module-sdk",
+    "bullmq": "^5.0.0",
+    "bwip-js": "^4.0.0",
+    "eta": "^3.0.0",
+    "exceljs": "^4.0.0",
+    "mjml": "^5.0.0",
+    "xmlbuilder2": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/bwip-js": "^3.2.3",
+    "@types/mjml": "^5.0.0",
+    "@types/node": "^25.9.1",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "ok": "boolean",
+  "recipe": {
+    "analysis": {
+      "canonicalModels": {
+        "ibu": "string",
+        "srm": "string"
+      },
+      "derivations": {},
+      "formatHints": {
+        "abvEstimatedPercent": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "attenuationEffectivePercent": {
+          "clamp": {
+            "max": "number",
+            "min": "number"
+          },
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "boilTimeMinutes": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "buGuRatio": {
+          "clamp": {
+            "min": "number"
+          },
+          "decimals": "number",
+          "style": "string",
+          "version": "number"
+        },
+        "colorSrmDanielsEstimated": {
+          "clamp": {
+            "min": "number"
+          },
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "colorSrmMoreyEstimated": {
+          "clamp": {
+            "min": "number"
+          },
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "fgEstimatedSg": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "ibuRagerEstimated": {
+          "clamp": {
+            "min": "number"
+          },
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "ibuTinsethEstimated": {
+          "clamp": {
+            "min": "number"
+          },
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "kettleVolumeLiters": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "ogEstimatedSg": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "pbgEstimatedSg": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        },
+        "preBoilVolumeLiters": {
+          "decimals": "number",
+          "style": "string",
+          "unit": "string",
+          "version": "number"
+        }
+      },
+      "ok": "boolean",
+      "result": {
+        "abvEstimatedPercent": "null",
+        "attenuationEffectivePercent": "null",
+        "boilTimeMinutes": "number",
+        "buGuRatio": "null",
+        "colorSrmDanielsEstimated": "null",
+        "colorSrmMoreyEstimated": "null",
+        "fgEstimatedSg": "null",
+        "ibuRagerEstimated": "null",
+        "ibuTinsethEstimated": "null",
+        "kettleVolumeLiters": "null",
+        "ogEstimatedSg": "null",
+        "pbgEstimatedSg": "null",
+        "preBoilVolumeLiters": "null",
+        "warnings": {
+          "__array": {
+            "code": "string"
+          },
+          "__length": "non-empty"
+        }
+      },
+      "version": "number"
+    },
+    "beerJsonRecipeJson": {
+      "beerjson": {
+        "recipes": {
+          "__array": {
+            "author": "string",
+            "batch_size": {
+              "unit": "string",
+              "value": "number"
+            },
+            "efficiency": {
+              "brewhouse": {
+                "unit": "string",
+                "value": "number"
+              }
+            },
+            "ingredients": {
+              "culture_additions": {
+                "__array": "undefined",
+                "__length": "empty"
+              },
+              "fermentable_additions": {
+                "__array": {
+                  "amount": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "color": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "id": "string",
+                  "name": "string",
+                  "type": "string",
+                  "yield": {
+                    "potential": {
+                      "unit": "string",
+                      "value": "number"
+                    }
+                  }
+                },
+                "__length": "non-empty"
+              },
+              "hop_additions": {
+                "__array": {
+                  "alpha_acid": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "amount": {
+                    "unit": "string",
+                    "value": "number"
+                  },
+                  "name": "string",
+                  "timing": {
+                    "duration": {
+                      "unit": "string",
+                      "value": "number"
+                    },
+                    "use": "string"
+                  }
+                },
+                "__length": "non-empty"
+              },
+              "miscellaneous_additions": {
+                "__array": "undefined",
+                "__length": "empty"
+              }
+            },
+            "name": "string",
+            "type": "string"
+          },
+          "__length": "non-empty"
+        },
+        "version": "number"
+      }
+    },
+    "createdAt": "string",
+    "id": "string",
+    "name": "string",
+    "notes": "null",
+    "recipeExtJson": "null",
+    "style": "string",
+    "styleKey": "string",
+    "updatedAt": "string",
+    "version": "number",
+    "versionGroupId": "string",
+    "workspaceId": "string"
+  }
+}
