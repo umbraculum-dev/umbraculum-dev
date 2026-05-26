@@ -10,9 +10,15 @@ var en_default = {
       loading: "Loading\u2026",
       refresh: "Refresh",
       refreshing: "Refreshing\u2026",
+      create: "Create product",
+      creating: "Creating\u2026",
+      createSuccess: "Product created.",
+      createError: "Could not create product.",
+      createRequired: "SKU and name are required.",
       openDetail: "View product",
       back: "Back to products",
       searchPlaceholder: "Search by SKU or name\u2026",
+      attributeSetPlaceholder: "Optional attribute set id",
       notFound: "Product not found in this workspace."
     },
     variants: {
@@ -1795,9 +1801,15 @@ var it_default = {
       loading: "Caricamento\u2026",
       refresh: "Aggiorna",
       refreshing: "Aggiornamento\u2026",
+      create: "Crea prodotto",
+      creating: "Creazione\u2026",
+      createSuccess: "Prodotto creato.",
+      createError: "Impossibile creare il prodotto.",
+      createRequired: "SKU e nome sono obbligatori.",
       openDetail: "Apri prodotto",
       back: "Torna ai prodotti",
       searchPlaceholder: "Cerca per SKU o nome\u2026",
+      attributeSetPlaceholder: "ID set attributi opzionale",
       notFound: "Prodotto non trovato in questo workspace."
     },
     variants: {

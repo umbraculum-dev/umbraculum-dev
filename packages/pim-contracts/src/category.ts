@@ -23,6 +23,32 @@ export interface CategoryTreeNode extends z.infer<typeof CategorySchema> {
   readonly children: readonly CategoryTreeNode[];
 }
 
+export const CategoryCreateRequestSchema = z
+  .object({
+    code: z.string().min(1, "code required"),
+    label: z.string().min(1, "label required"),
+    parentId: z.string().min(1).nullable().optional(),
+    sortOrder: z.number().int().optional(),
+  })
+  .strict();
+
+export const CategoryUpdateRequestSchema = z
+  .object({
+    code: z.string().min(1, "code required").optional(),
+    label: z.string().min(1, "label required").optional(),
+    parentId: z.string().min(1).nullable().optional(),
+    sortOrder: z.number().int().optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (Object.values(value).every((v) => v === undefined)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "at least one field required",
+      });
+    }
+  });
+
 export const CategoryListResponseSchema = z.object({
   ok: z.literal(true),
   items: z.array(CategorySchema),
@@ -37,3 +63,5 @@ export const CategoryGetResponseSchema = z.object({
 export type Category = z.infer<typeof CategorySchema>;
 export type CategoryListResponse = z.infer<typeof CategoryListResponseSchema>;
 export type CategoryGetResponse = z.infer<typeof CategoryGetResponseSchema>;
+export type CategoryCreateRequest = z.infer<typeof CategoryCreateRequestSchema>;
+export type CategoryUpdateRequest = z.infer<typeof CategoryUpdateRequestSchema>;

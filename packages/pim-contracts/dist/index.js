@@ -25,14 +25,15 @@ function classifyContractVersionSkew(runtime, expected = CONTRACT_VERSION) {
   return "match";
 }
 
-// src/attribute.ts
-import { z as z2 } from "zod";
-
 // src/shared.ts
 import { z } from "zod";
 var IsoDateTimeStringSchema = z.string().min(1, "timestamp required").refine((s) => !Number.isNaN(Date.parse(s)), "must be ISO 8601");
+var PimDeleteResponseSchema = z.object({
+  ok: z.literal(true)
+});
 
 // src/attribute.ts
+import { z as z2 } from "zod";
 var AttributeTypeSchema = z2.enum([
   "string",
   "number",
@@ -68,6 +69,29 @@ var AttributeValueSchema = z2.discriminatedUnion("type", [
   z2.object({ type: z2.literal("media_ref"), value: z2.string().min(1) }),
   z2.object({ type: z2.literal("reference"), value: z2.string().min(1) })
 ]);
+var AttributeCreateRequestSchema = z2.object({
+  code: z2.string().min(1, "code required"),
+  type: AttributeTypeSchema,
+  label: z2.string().min(1, "label required"),
+  required: z2.boolean().optional(),
+  defaultValue: z2.unknown().nullable().optional(),
+  selectOptions: z2.array(z2.string().min(1)).nullable().optional()
+}).strict();
+var AttributeUpdateRequestSchema = z2.object({
+  code: z2.string().min(1, "code required").optional(),
+  type: AttributeTypeSchema.optional(),
+  label: z2.string().min(1, "label required").optional(),
+  required: z2.boolean().optional(),
+  defaultValue: z2.unknown().nullable().optional(),
+  selectOptions: z2.array(z2.string().min(1)).nullable().optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var AttributeListResponseSchema = z2.object({
   ok: z2.literal(true),
   items: z2.array(AttributeSchema)
@@ -90,6 +114,23 @@ var AttributeSetSchema = z3.object({
 });
 var AttributeSetRefSchema = z3.object({
   attributeSetId: z3.string().min(1, "attributeSetId required")
+});
+var AttributeSetCreateRequestSchema = z3.object({
+  code: z3.string().min(1, "code required"),
+  label: z3.string().min(1, "label required"),
+  attributeIds: z3.array(z3.string().min(1)).optional()
+}).strict();
+var AttributeSetUpdateRequestSchema = z3.object({
+  code: z3.string().min(1, "code required").optional(),
+  label: z3.string().min(1, "label required").optional(),
+  attributeIds: z3.array(z3.string().min(1)).optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
 });
 var AttributeSetListResponseSchema = z3.object({
   ok: z3.literal(true),
@@ -117,6 +158,27 @@ var ProductSchema = z4.object({
 var ProductRefSchema = z4.object({
   productId: z4.string().min(1, "productId required")
 });
+var ProductCreateRequestSchema = z4.object({
+  sku: z4.string().min(1, "sku required"),
+  name: z4.string().min(1, "name required"),
+  description: z4.string().nullable().optional(),
+  primaryAttributeSetId: z4.string().min(1).nullable().optional(),
+  status: ProductStatusSchema.optional()
+}).strict();
+var ProductUpdateRequestSchema = z4.object({
+  sku: z4.string().min(1, "sku required").optional(),
+  name: z4.string().min(1, "name required").optional(),
+  description: z4.string().nullable().optional(),
+  primaryAttributeSetId: z4.string().min(1).nullable().optional(),
+  status: ProductStatusSchema.optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var ProductListResponseSchema = z4.object({
   ok: z4.literal(true),
   items: z4.array(ProductSchema)
@@ -139,6 +201,23 @@ var VariantSchema = z5.object({
 });
 var VariantRefSchema = z5.object({
   variantId: z5.string().min(1, "variantId required")
+});
+var VariantCreateRequestSchema = z5.object({
+  sku: z5.string().min(1, "sku required"),
+  name: z5.string().min(1, "name required"),
+  attributeValues: z5.record(z5.string(), AttributeValueSchema).optional()
+}).strict();
+var VariantUpdateRequestSchema = z5.object({
+  sku: z5.string().min(1, "sku required").optional(),
+  name: z5.string().min(1, "name required").optional(),
+  attributeValues: z5.record(z5.string(), AttributeValueSchema).optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
 });
 var VariantListResponseSchema = z5.object({
   ok: z5.literal(true),
@@ -166,6 +245,25 @@ var CategoryTreeNodeSchema = z6.lazy(
     children: z6.array(CategoryTreeNodeSchema)
   })
 );
+var CategoryCreateRequestSchema = z6.object({
+  code: z6.string().min(1, "code required"),
+  label: z6.string().min(1, "label required"),
+  parentId: z6.string().min(1).nullable().optional(),
+  sortOrder: z6.number().int().optional()
+}).strict();
+var CategoryUpdateRequestSchema = z6.object({
+  code: z6.string().min(1, "code required").optional(),
+  label: z6.string().min(1, "label required").optional(),
+  parentId: z6.string().min(1).nullable().optional(),
+  sortOrder: z6.number().int().optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var CategoryListResponseSchema = z6.object({
   ok: z6.literal(true),
   items: z6.array(CategorySchema),
@@ -188,37 +286,72 @@ var MediaAssetRefSchema = z7.object({
   createdAt: IsoDateTimeStringSchema,
   updatedAt: IsoDateTimeStringSchema
 });
+var MediaAssetRefCreateRequestSchema = z7.object({
+  mediaAssetId: z7.string().min(1, "mediaAssetId required"),
+  role: MediaAssetRoleSchema,
+  sortOrder: z7.number().int().optional()
+}).strict();
+var MediaAssetRefUpdateRequestSchema = z7.object({
+  mediaAssetId: z7.string().min(1, "mediaAssetId required").optional(),
+  role: MediaAssetRoleSchema.optional(),
+  sortOrder: z7.number().int().optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var MediaAssetRefListResponseSchema = z7.object({
   ok: z7.literal(true),
   items: z7.array(MediaAssetRefSchema)
 });
+var MediaAssetRefGetResponseSchema = z7.object({
+  ok: z7.literal(true),
+  item: MediaAssetRefSchema
+});
 export {
+  AttributeCreateRequestSchema,
   AttributeGetResponseSchema,
   AttributeListResponseSchema,
   AttributeSchema,
+  AttributeSetCreateRequestSchema,
   AttributeSetGetResponseSchema,
   AttributeSetListResponseSchema,
   AttributeSetRefSchema,
   AttributeSetSchema,
+  AttributeSetUpdateRequestSchema,
   AttributeTypeSchema,
+  AttributeUpdateRequestSchema,
   AttributeValueSchema,
   CONTRACT_VERSION,
+  CategoryCreateRequestSchema,
   CategoryGetResponseSchema,
   CategoryListResponseSchema,
   CategorySchema,
   CategoryTreeNodeSchema,
+  CategoryUpdateRequestSchema,
+  MediaAssetRefCreateRequestSchema,
+  MediaAssetRefGetResponseSchema,
   MediaAssetRefListResponseSchema,
   MediaAssetRefSchema,
+  MediaAssetRefUpdateRequestSchema,
   MediaAssetRoleSchema,
+  PimDeleteResponseSchema,
+  ProductCreateRequestSchema,
   ProductGetResponseSchema,
   ProductListResponseSchema,
   ProductRefSchema,
   ProductSchema,
   ProductStatusSchema,
+  ProductUpdateRequestSchema,
+  VariantCreateRequestSchema,
   VariantGetResponseSchema,
   VariantListResponseSchema,
   VariantRefSchema,
   VariantSchema,
+  VariantUpdateRequestSchema,
   classifyContractVersionSkew,
   parseSemVer
 };

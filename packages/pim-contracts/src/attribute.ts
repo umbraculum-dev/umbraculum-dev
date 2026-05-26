@@ -43,6 +43,36 @@ export const AttributeValueSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("reference"), value: z.string().min(1) }),
 ]);
 
+export const AttributeCreateRequestSchema = z
+  .object({
+    code: z.string().min(1, "code required"),
+    type: AttributeTypeSchema,
+    label: z.string().min(1, "label required"),
+    required: z.boolean().optional(),
+    defaultValue: z.unknown().nullable().optional(),
+    selectOptions: z.array(z.string().min(1)).nullable().optional(),
+  })
+  .strict();
+
+export const AttributeUpdateRequestSchema = z
+  .object({
+    code: z.string().min(1, "code required").optional(),
+    type: AttributeTypeSchema.optional(),
+    label: z.string().min(1, "label required").optional(),
+    required: z.boolean().optional(),
+    defaultValue: z.unknown().nullable().optional(),
+    selectOptions: z.array(z.string().min(1)).nullable().optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (Object.values(value).every((v) => v === undefined)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "at least one field required",
+      });
+    }
+  });
+
 export const AttributeListResponseSchema = z.object({
   ok: z.literal(true),
   items: z.array(AttributeSchema),
@@ -56,5 +86,7 @@ export const AttributeGetResponseSchema = z.object({
 export type AttributeType = z.infer<typeof AttributeTypeSchema>;
 export type Attribute = z.infer<typeof AttributeSchema>;
 export type AttributeValue = z.infer<typeof AttributeValueSchema>;
+export type AttributeCreateRequest = z.infer<typeof AttributeCreateRequestSchema>;
+export type AttributeUpdateRequest = z.infer<typeof AttributeUpdateRequestSchema>;
 export type AttributeListResponse = z.infer<typeof AttributeListResponseSchema>;
 export type AttributeGetResponse = z.infer<typeof AttributeGetResponseSchema>;
