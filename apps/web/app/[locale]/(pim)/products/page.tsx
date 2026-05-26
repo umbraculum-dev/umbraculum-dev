@@ -168,7 +168,6 @@ export default function PimProductsPage() {
       </XStack>
 
       <section
-        role="region"
         aria-labelledby="create-product-heading"
         style={{
           border: "1px solid var(--border)",
