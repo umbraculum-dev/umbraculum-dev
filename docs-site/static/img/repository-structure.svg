@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Umbraculum repository dependency diagram</title>
+  <desc id="desc">Five-layer dependency diagram for Umbraculum: applications consume services, horizontal infrastructure packages, contracts packages, the module SDK, and brewery vertical packages.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#365b46"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fbf7; }
+      .layer { fill: #ffffff; stroke: #c9d8cf; stroke-width: 2; rx: 18; }
+      .title { font: 700 24px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #1d3528; }
+      .layerTitle { font: 700 16px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #234532; }
+      .box { fill: #eef7f1; stroke: #8fb59d; stroke-width: 1.5; rx: 10; }
+      .boxVertical { fill: #f6f1e8; stroke: #c7a86b; stroke-width: 1.5; rx: 10; }
+      .boxContract { fill: #eef2ff; stroke: #9aa9d8; stroke-width: 1.5; rx: 10; }
+      .text { font: 13px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #26382e; }
+      .small { font: 11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #4e6658; }
+      .arrow { fill: none; stroke: #365b46; stroke-width: 2; marker-end: url(#arrow); opacity: .85; }
+    </style>
+  </defs>
+  <rect class="bg" width="1280" height="720"/>
+  <text class="title" x="40" y="48">Umbraculum repository dependency diagram</text>
+  <text class="small" x="40" y="72">Legal consumes direction only; peer-to-peer and cross-vertical imports are intentionally absent.</text>
+
+  <rect class="layer" x="40" y="105" width="220" height="170"/>
+  <text class="layerTitle" x="60" y="132">Applications</text>
+  <rect class="box" x="60" y="152" width="180" height="44"/>
+  <text class="text" x="78" y="180">apps/web</text>
+  <text class="small" x="78" y="194">Next.js + Tamagui</text>
+  <rect class="box" x="60" y="212" width="180" height="44"/>
+  <text class="text" x="78" y="240">apps/native</text>
+  <text class="small" x="78" y="254">Expo + Tamagui</text>
+
+  <rect class="layer" x="330" y="105" width="220" height="170"/>
+  <text class="layerTitle" x="350" y="132">Services</text>
+  <rect class="box" x="350" y="165" width="180" height="58"/>
+  <text class="text" x="368" y="191">services/api</text>
+  <text class="small" x="368" y="207">Fastify + Prisma</text>
+
+  <rect class="layer" x="620" y="85" width="280" height="235"/>
+  <text class="layerTitle" x="640" y="112">Horizontal infrastructure</text>
+  <rect class="box" x="640" y="132" width="110" height="34"/><text class="small" x="655" y="154">@umbraculum/ui</text>
+  <rect class="box" x="770" y="132" width="110" height="34"/><text class="small" x="780" y="154">navigation</text>
+  <rect class="box" x="640" y="178" width="110" height="34"/><text class="small" x="659" y="200">i18n-react</text>
+  <rect class="box" x="770" y="178" width="110" height="34"/><text class="small" x="794" y="200">i18n</text>
+  <rect class="box" x="640" y="224" width="110" height="34"/><text class="small" x="662" y="246">api-client</text>
+  <rect class="box" x="770" y="224" width="110" height="34"/><text class="small" x="795" y="246">media</text>
+  <rect class="box" x="640" y="270" width="240" height="34"/><text class="small" x="695" y="292">rendering (allocated)</text>
+
+  <rect class="layer" x="960" y="85" width="280" height="235"/>
+  <text class="layerTitle" x="980" y="112">Contracts packages</text>
+  <rect class="boxContract" x="980" y="135" width="220" height="38"/>
+  <text class="small" x="1000" y="159">@umbraculum/contracts</text>
+  <rect class="boxContract" x="980" y="185" width="220" height="38"/>
+  <text class="small" x="1000" y="209">automation-contracts</text>
+  <rect class="boxContract" x="980" y="235" width="220" height="38"/>
+  <text class="small" x="1000" y="259">pim-contracts</text>
+
+  <rect class="layer" x="250" y="395" width="780" height="220"/>
+  <text class="layerTitle" x="275" y="425">Module SDK + vertical-flavored packages</text>
+  <rect class="boxContract" x="275" y="455" width="190" height="50"/>
+  <text class="small" x="294" y="478">@umbraculum/module-sdk</text>
+  <text class="small" x="294" y="493">MIT registration contract</text>
+  <rect class="boxContract" x="495" y="455" width="190" height="50"/>
+  <text class="small" x="515" y="478">@umbraculum/ai-tool-sdk</text>
+  <text class="small" x="515" y="493">MIT AI-tool contract</text>
+  <rect class="boxVertical" x="715" y="455" width="135" height="50"/>
+  <text class="small" x="735" y="478">brewery-core</text>
+  <text class="small" x="735" y="493">domain math</text>
+  <rect class="boxVertical" x="870" y="455" width="135" height="50"/>
+  <text class="small" x="890" y="478">beerjson</text>
+  <text class="small" x="890" y="493">adaptation</text>
+  <rect class="boxVertical" x="715" y="535" width="290" height="50"/>
+  <text class="small" x="740" y="558">brewery-recipes-ui</text>
+  <text class="small" x="740" y="573">cross-platform brewery domain UI</text>
+
+  <path class="arrow" d="M260 182 C290 182 300 192 330 192"/>
+  <path class="arrow" d="M260 232 C370 305 520 300 640 240"/>
+  <path class="arrow" d="M260 206 C440 380 545 430 715 535"/>
+  <path class="arrow" d="M550 195 C665 195 765 178 960 154"/>
+  <path class="arrow" d="M550 205 C670 335 765 410 870 455"/>
+  <path class="arrow" d="M465 480 L495 480"/>
+  <path class="arrow" d="M715 560 C610 520 570 500 465 480"/>
+  <path class="arrow" d="M715 560 C690 510 710 485 715 480"/>
+  <path class="arrow" d="M850 560 C860 525 880 500 890 480"/>
+  <path class="arrow" d="M760 132 C835 110 900 110 980 154"/>
+  <path class="arrow" d="M760 240 C840 250 900 250 980 254"/>
+
+  <text class="small" x="40" y="670">Generated for docs-site v1 from the Mermaid source in docs/REPOSITORY-STRUCTURE.md.</text>
+</svg>

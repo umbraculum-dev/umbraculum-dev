@@ -1,0 +1,19 @@
+{
+  "brewSessions": {
+    "__array": {
+      "code": "string",
+      "createdAt": "string",
+      "id": "string",
+      "pausedAt": "null",
+      "recipeId": "string",
+      "scheduledDate": "null",
+      "startedAt": "null",
+      "status": "string",
+      "stoppedAt": "null",
+      "updatedAt": "string",
+      "workspaceId": "string"
+    },
+    "__length": "non-empty"
+  },
+  "ok": "boolean"
+}

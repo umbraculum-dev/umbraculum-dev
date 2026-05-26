@@ -1,0 +1,35 @@
+{
+  "ok": "boolean",
+  "profiles": {
+    "__array": {
+      "createdAt": "string",
+      "equipment": {
+        "kettle": {
+          "kettleBoilEvaporationRatePercentPerHour": "number",
+          "kettleCoolingShrinkagePercent": "number",
+          "kettleHopsAbsorptionLiters": "number",
+          "kettleLossesLiters": "number",
+          "kettleVolumeLiters": "number",
+          "name": "string"
+        },
+        "mash": {
+          "mashEfficiencyPercent": "number",
+          "mashGrainAbsorptionLPerKg": "number",
+          "mashLossesLiters": "number",
+          "mashThicknessLPerKg": "number",
+          "mashVolumeLiters": "number",
+          "mashWaterLeftoverLiters": "number",
+          "name": "string"
+        },
+        "misc": {
+          "otherLossesLiters": "number"
+        }
+      },
+      "id": "string",
+      "name": "string",
+      "updatedAt": "string",
+      "workspaceId": "string"
+    },
+    "__length": "non-empty"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@umbraculum/ai-tool-sdk",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Umbraculum AI-tool SDK — the library-agnostic interface every callable tool the AI consultant may invoke must satisfy (AiTool, AiToolScope, AiToolContext, AiToolRegistry, AiToolDefinition). Platform-classified per sub-plan #9 §1.1; published as a peer of @umbraculum/module-sdk per PLATFORM-ARCHITECTURE.md §4.4. Extracted from @umbraculum/contracts on 2026-05-21.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

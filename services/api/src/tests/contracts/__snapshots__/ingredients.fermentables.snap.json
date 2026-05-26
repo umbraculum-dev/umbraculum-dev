@@ -1,0 +1,28 @@
+{
+  "items": {
+    "__array": {
+      "colorEbc": "number",
+      "colorLovibond": "number",
+      "country": "string",
+      "group": "string",
+      "id": "string",
+      "mashDiPh": "number",
+      "mashPhModelKey": "string",
+      "mashPhModelSource": "string",
+      "mashPhModelVersion": "number",
+      "mashTaToPh57_mEqPerKg": "number",
+      "name": "string",
+      "notes": "null",
+      "ppg": "number",
+      "producer": "string",
+      "type": "string",
+      "workspaceId": "null",
+      "yieldPercent": "number"
+    },
+    "__length": "non-empty"
+  },
+  "limit": "number",
+  "offset": "number",
+  "ok": "boolean",
+  "total": "number"
+}

@@ -1,0 +1,50 @@
+name: native-deps
+
+# Lean guardrail for apps/native: verifies dependency alignment with the
+# installed Expo SDK (so Expo Go ABI matches at runtime) and that apps/native
+# still type-checks. Intentionally no emulators, no macOS runners, no app
+# builds. See docs/NATIVE-STRATEGY-AND-CI.md for the full rationale.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "apps/native/**"
+      - "packages/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/native-deps.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "apps/native/**"
+      - "packages/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/native-deps.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: native-deps-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # Honor [skip ci] / [ci skip] in commit subject or body for manual override.
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run expo install --check + apps/native typecheck (Docker, matches local rule)
+        # Uses node:20-slim to match the local docker run pattern documented in
+        # docs/DEVELOPMENT-NATIVE-LOCAL.md and the repo-wide "no npm on host"
+        # policy (plugin-shipped 00-shared-node-npm-container-only.mdc).
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            -w /repo/apps/native \
+            node:20-slim \
+            bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"

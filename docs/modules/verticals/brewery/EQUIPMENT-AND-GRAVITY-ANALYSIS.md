@@ -1,0 +1,179 @@
+# Equipment and gravity analysis (v0)
+
+This document describes the current (v0) “equipment + analysis” implementation for:
+
+- volumes (kettle and pre-boil)
+- gravity estimates (OG, FG, PBG)
+- ABV estimate
+- yeast attenuation selection (including user overrides)
+
+This is intentionally **best-effort** and explainable. It is **not** a full brew process model yet.
+
+## Storage: `recipeExtJson` (v1)
+
+We store equipment and overrides on the recipe as internal extensions:
+
+- `recipeExtJson.equipment`
+  - `kettle.*`
+  - `mash.*`
+  - `misc.*`
+- `recipeExtJson.equipmentSource`
+  - `{ equipmentProfileId: string; copiedAt: string }`
+  - records which account-level equipment template was copied into `equipment` (snapshot provenance)
+- `recipeExtJson.yeastAttenuationOverridesPercent`
+  - `{ [yeastRowId: string]: number }`
+  - keys are BeerJSON culture addition IDs (`beerjson.recipes[0].ingredients.culture_additions[*].id`)
+
+Validation lives in `services/api/src/beerjson/recipeExtValidator.ts`.
+
+## Equipment templates (account-scoped)
+
+Equipment templates are stored per account and selected by recipes via snapshot copy:
+
+- DB model: `EquipmentProfile` (`services/api/prisma/schema.prisma`) mapped to `equipment_profiles`
+- API:
+  - `GET /api/equipment-profiles` (active account required)
+  - `POST /api/equipment-profiles` (admin-only)
+  - `PATCH /api/equipment-profiles/:id` (admin-only)
+  - `DELETE /api/equipment-profiles/:id` (admin-only)
+- Web:
+  - Company-wide templates page: `apps/web/app/[locale]/equipment/page.tsx`
+  - Recipe selection lives in the recipe editor section `#equipment` (`apps/web/app/recipes/[id]/edit/page.tsx`)
+
+Semantics:
+
+- Selecting a template copies values into `recipeExtJson.equipment`
+- `recipeExtJson.equipmentSource` is updated to record the template ID + copy time
+- Templates are not “live linked”: editing a template does not change existing recipes unless the user explicitly reloads/applies it
+
+## Derived outputs: `recipe.analysis`
+
+The API computes a derived analysis payload (never stored in DB) and attaches it to:
+
+- `GET /api/recipes/:id`
+
+The calculator lives in:
+
+- `services/api/src/domain/recipeAnalysis/gravityAnalysis.ts`
+
+All values are `number | null`. `null` means “insufficient data”.
+
+## Gravity model (v0)
+
+### Inputs used
+
+- fermentables: BeerJSON `fermentable_additions[*]`
+  - amount: `kg` (or `g` converted to kg)
+  - yield/potential:
+    - `yield.potential` (`sg`), or
+    - `yield.fine_grind` (`%`)
+- efficiency:
+  - preferred: `equipment.mash.mashEfficiencyPercent`
+  - fallback: `recipeExtJson.brewhouseEfficiencyPercent`
+  - fallback: BeerJSON `efficiency.brewhouse`
+- volumes:
+  - **requires saved water settings** (`RecipeWaterSettings` row) for volume estimates
+  - mash + sparge (and optional boil add-on) water volumes come from `RecipeWaterSettings`
+  - mash absorption/losses come from `recipeExtJson.equipment.mash.*`
+  - kettle losses/evap/shrink/hops absorption come from `recipeExtJson.equipment.kettle.*` + `misc.otherLossesLiters`
+  - kettle capacity/target (`equipment.kettle.kettleVolumeLiters`) is used only for warnings (it does not drive the calculation)
+
+### OG (estimated)
+
+We compute gravity points from fermentables using a PPG-based approximation:
+
+- if potential `sg`: \(PPG = (SG - 1) \cdot 1000\)
+- if yield `%`: \(PPG = 46 \cdot (yield\\% / 100)\)
+
+Then:
+
+- \(points = \\frac{\\sum(PPG_i \\cdot lb_i)}{gal} \\cdot efficiency\)
+- \(OG = 1 + points/1000\)
+
+### PBG (pre-boil gravity, estimated)
+
+Same numerator as OG, but uses **pre-boil volume** instead of kettle volume.
+
+### FG (estimated)
+
+Given OG and an effective yeast attenuation percent \(A\\):
+
+- \(FG = 1 + (OG - 1) \\cdot (1 - A/100)\)
+
+### ABV (estimated)
+
+- \(ABV\\% \\approx (OG - FG) \\cdot 131.25\)
+
+## Volume model (v0)
+
+### Hot-side vs cold-side volumes
+
+All current volumes are **hot-side** (pre-fermentation). Units are liters (`l`).
+
+**Hot-side** (implemented):
+
+- Mash water, sparge water, boil add-on water
+- Runoff (to kettle)
+- Pre-boil volume
+- Post-boil kettle volume (cooled, after evaporation and losses)
+
+**Cold-side** (not yet implemented):
+
+- Fermenter volume is a future stage. The model does not yet track volumes beyond the kettle.
+
+### Gating rule
+
+If the recipe has no saved water settings (`RecipeWaterSettings` is missing), the analysis returns:
+- `kettleVolumeLiters = null`
+- `preBoilVolumeLiters = null`
+
+So the UI shows **“Insufficient data”** for those fields.
+
+### Boil time inference
+
+We infer boil time from BeerJSON hop additions:
+
+- max duration of hop additions with `timing.use = add_to_boil`
+- default: 60 min
+
+### Forward volume calculation
+
+We compute volumes forward from mash/sparge water:
+
+1) **Runoff (to kettle, pre-boil base)**:
+- `grainAbsorptionLiters = mashGrainAbsorptionLPerKg * totalGrainKg`
+  - `totalGrainKg` is the sum of fermentables with `type = "grain"` (kg/g supported)
+- `runoffLiters = mashWaterVolume + spargeVolume - grainAbsorptionLiters - mashLossesLiters - mashWaterLeftoverLiters`
+
+2) **Pre-boil volume**:
+- `preBoilVolumeLiters = runoffLiters + boilWaterVolumeLiters`
+
+3) **Kettle volume (estimated, cooled, after losses)**:
+- `postBoilHotVolume = preBoilVolumeLiters * (1 - evapRate * boilTimeHours)`
+- `cooledVolume = postBoilHotVolume * (1 - coolingShrinkagePercent)`
+- `kettleHopAbsorptionLiters = kettleHopsAbsorption(L/g) * kettleHopMass(g)` (using boil hop additions)
+- `kettleVolumeLiters = cooledVolume - kettleLossesLiters - kettleHopAbsorptionLiters - otherLossesLiters`
+
+If any step implies an invalid/negative volume, the affected output becomes `null` and a warning is returned.
+
+## Yeast attenuation selection (v0)
+
+For each yeast row:
+
+- effective attenuation = user override (if present) else BeerJSON attenuation (single % value)
+
+Across multiple yeasts:
+
+- sort effective attenuations descending
+- take the top 2 (or 1 if only one yeast)
+- average them
+
+This produces `attenuationEffectivePercent`.
+
+## Future improvements (tracked)
+
+- Fermenter volume stage (post-kettle) and a clearer hot-side vs cold-side model
+- Explicit boil time input (instead of inference)
+- Persist attenuation min/max ranges for better uncertainty reporting
+- Fermenter volume stage (post-kettle) and a clearer hot-side vs cold-side model
+

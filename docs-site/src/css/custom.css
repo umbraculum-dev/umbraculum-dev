@@ -1,0 +1,47 @@
+:root {
+  --ifm-color-primary: #214e7a;
+  --ifm-color-primary-dark: #1d466e;
+  --ifm-color-primary-darker: #1b4268;
+  --ifm-color-primary-darkest: #163655;
+  --ifm-color-primary-light: #255686;
+  --ifm-color-primary-lighter: #275a8d;
+  --ifm-color-primary-lightest: #2d67a1;
+
+  --umbraculum-brand-primary: #214e7a;
+  --umbraculum-brand-secondary: #1f2937;
+  --umbraculum-brand-accent: #3b82f6;
+  --umbraculum-brand-surface: #f8fafc;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #67a6ff;
+  --ifm-color-primary-dark: #4d97ff;
+  --ifm-color-primary-darker: #3f90ff;
+  --ifm-color-primary-darkest: #1a78ff;
+  --ifm-color-primary-light: #81b5ff;
+  --ifm-color-primary-lighter: #8fbcff;
+  --ifm-color-primary-lightest: #b7d5ff;
+  --umbraculum-brand-surface: #0f172a;
+}
+
+.navbar {
+  border-bottom: 1px solid rgba(33, 78, 122, 0.18);
+}
+
+.navbar__title {
+  letter-spacing: 0.01em;
+}
+
+.footer--dark {
+  background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+}
+
+.footer__title {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.hero {
+  background-color: var(--umbraculum-brand-surface);
+}

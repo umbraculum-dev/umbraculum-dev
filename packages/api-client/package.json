@@ -1,0 +1,24 @@
+{
+  "name": "@umbraculum/api-client",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node). The transport layer between any client and services/api. Returned payloads are runtime-validated by parsers from @umbraculum/contracts. Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/contracts": "file:../contracts"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@umbraculum/module-sdk",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Umbraculum module registration contract (registerModule + registerWebModule + library-agnostic ValidatedSchema<T> interface) for canonical and third-party modules. Platform-classified per sub-plan #9 §1.1; placement per RFC-0002 Decision C.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@umbraculum/ai-tool-sdk": "file:../ai-tool-sdk"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

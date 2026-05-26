@@ -1,0 +1,20 @@
+{
+  "name": "@umbraculum/web-e2e",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Umbraculum web E2E suite — Playwright tests for the @umbraculum/web storefront. Nested workspace (NOT in the root @umbraculum monorepo workspaces glob — Playwright + browser binaries are isolated per its own README and the slot-7 CI hygiene #2 lesson).",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --project=smoke",
+    "test:brewday": "playwright test --project=brewday",
+    "trace": "playwright show-trace",
+    "install:browsers": "playwright install chromium",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "1.60.0",
+    "axe-core": "^4.10.0"
+  }
+}

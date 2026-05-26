@@ -1,0 +1,111 @@
+{
+  "formatHints": {
+    "L": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "g": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "kg": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "mL": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "pH": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "ppm": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    },
+    "ppm_as_CaCO3": {
+      "decimals": "number",
+      "style": "string",
+      "unit": "string",
+      "version": "number"
+    }
+  },
+  "ok": "boolean",
+  "summary": {
+    "finalRecap": {
+      "predictedMashPh": {
+        "kind": "string",
+        "value": "number"
+      },
+      "residualAlkalinityMashOverallPpmCaCO3": "number",
+      "residualAlkalinityMergedPpmCaCO3": "number",
+      "styleExpectedRa": "null"
+    },
+    "merged": {
+      "finalAlkalinityPpmCaCO3": "number",
+      "ionsPpm": {
+        "bicarbonate": "number",
+        "calcium": "number",
+        "chloride": "number",
+        "magnesium": "number",
+        "sodium": "number",
+        "sulfate": "number"
+      },
+      "ph": "number",
+      "totalVolumeLiters": "number"
+    },
+    "status": {
+      "boilAcidificationMode": "string",
+      "boilLastCalculatedAt": "null",
+      "mashAcidificationMode": "string",
+      "mashLastCalculatedAt": "null",
+      "mashOverallSnapshot": {
+        "finalAlkalinityPpmCaCO3": "number",
+        "ph": {
+          "kind": "string",
+          "value": "number"
+        }
+      },
+      "spargeAcidificationMode": "string",
+      "spargeLastCalculatedAt": "null"
+    },
+    "streams": {
+      "__array": {
+        "acidAmountGrams": "null",
+        "acidAmountMl": "null",
+        "acidMode": "string",
+        "acidStrengthKind": "string",
+        "acidStrengthValue": "number",
+        "acidType": "string",
+        "finalAlkalinityPpmCaCO3": "number",
+        "ionsPpm": {
+          "bicarbonate": "number",
+          "calcium": "number",
+          "chloride": "number",
+          "magnesium": "number",
+          "sodium": "number",
+          "sulfate": "number"
+        },
+        "key": "string",
+        "ph": "number",
+        "saltsBreakdown": "null",
+        "volumeLiters": "number"
+      },
+      "__length": "non-empty"
+    },
+    "version": "number"
+  }
+}

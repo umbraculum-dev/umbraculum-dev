@@ -1,0 +1,27 @@
+{
+  "name": "@umbraculum/navigation",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Cross-platform routing-policy framework: route ID system, RouteRef type, web/native target mappers. Framework-agnostic by design (does not import React Navigation or Next.js types). Current route IDs include brewery routes; content split deferred per sub-plan #9 §1.4.",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts src/native.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./native": {
+      "types": "./dist/native.d.ts",
+      "import": "./dist/native.js",
+      "require": "./dist/native.cjs",
+      "default": "./dist/native.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts"
+}

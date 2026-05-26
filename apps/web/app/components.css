@@ -1,0 +1,292 @@
+.brew-error-box {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
+  border-radius: var(--radius);
+  padding: 12px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.brew-muted {
+  color: var(--text-muted);
+}
+
+.brew-ingredient-card {
+  background: color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.brew-ingredient-card + .brew-ingredient-card {
+  margin-top: 12px;
+}
+
+.brew-ingredient-card-label {
+  display: block;
+  font-size: 12px;
+}
+
+.brew-recipe-edit-list-disc {
+  list-style: disc;
+  padding-left: 20px;
+}
+.brew-mash-steps-editor input {
+  text-align: left !important;
+}
+
+[data-mash-step-card] {
+  background-color: var(--field-readonly-bg) !important;
+  border-color: var(--field-readonly-border) !important;
+}
+
+.brew-field-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.brew-field-block-header {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.brew-field-badge {
+  display: inline-block;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.brew-field-block--readonly {
+  background: var(--field-readonly-bg);
+  border-color: var(--field-readonly-border);
+}
+
+.brew-field-block--readonly .brew-field-badge {
+  border-color: var(--field-readonly-border);
+}
+
+.brew-field-block--computed {
+  background: var(--field-computed-bg);
+  border-color: var(--field-computed-border);
+}
+
+.brew-field-block--computed .brew-field-badge {
+  border-color: var(--field-computed-border);
+}
+
+.brew-recipe-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.brew-recipe-list-row {
+  padding: 10px;
+  border-radius: var(--radius);
+}
+
+.brew-recipe-list-row:nth-child(odd) {
+  background: color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+}
+
+.brew-recipe-list-delete-button {
+  padding: 6px 10px !important;
+  font-size: 13px;
+  line-height: 1.1;
+}
+
+.brew-math-fx-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.brew-math-fx-button {
+  background: color-mix(in srgb, var(--info) 14%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--info) 25%, var(--border));
+  color: var(--text);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.brew-math-fx-button--md {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.brew-math-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  width: min(460px, 75vw);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.brew-math-popover-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.brew-math-popover-body {
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.brew-fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--panel-padding);
+}
+.brew-fieldset-legend {
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+.brew-fieldset-noborder {
+  border: 0;
+  padding: 0;
+  margin-top: 12px;
+}
+.brew-details-summary {
+  cursor: pointer;
+}
+
+.brew-hr {
+  margin: 16px 0;
+  border: 0;
+  height: 1px;
+  background: var(--border);
+}
+.brew-table-wrap {
+  overflow-x: auto;
+}
+
+.brew-table-wrap-mt {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+.brew-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.brew-table-row-alt {
+  background-color: color-mix(in srgb, var(--surface-2) 35%, var(--surface));
+}
+
+.brew-table-cell-top {
+  vertical-align: top;
+  padding-top: 8px;
+}
+.brew-grid-2col {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.brew-grid-full {
+  grid-column: 1 / -1;
+}
+
+.brew-grid-3col {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.brew-grid-export {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr auto auto;
+  align-items: end;
+}
+
+.brew-preview-label {
+  padding-right: 12px;
+}
+
+.brew-list-mt0 {
+  margin-top: 0;
+}
+
+.brew-list-mt1 {
+  margin-top: 4px;
+}
+
+.brew-list-mt2 {
+  margin-top: 8px;
+}
+
+.brew-list-item-mb {
+  margin-bottom: 8px;
+}
+
+.brew-list-mb0 {
+  margin-bottom: 0;
+}
+
+.brew-text-sm-mt1 {
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.brew-pre-mb3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.brew-radio-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.brew-mt3 {
+  margin-top: 12px;
+}
+
+.brew-ml1 {
+  margin-left: 6px;
+}
+
+.brew-link-inline-flex {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.brew-link-inline-flex-shrink-0 {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.brew-link-contents {
+  display: contents;
+  text-decoration: none;
+}
+.brew-main-margin {
+  margin-top: 16px;
+}
+.brew-block {
+  display: block;
+}

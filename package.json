@@ -1,0 +1,55 @@
+{
+  "name": "umbraculum-monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "description": "AI-orchestrated open platform with composable vertical modules. Brewery seeded; MRP / WMS / CRM / CRP / automation next.",
+  "homepage": "https://umbraculum.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/romeof1980/umbraculum-dev.git"
+  },
+  "bugs": {
+    "url": "https://github.com/romeof1980/umbraculum-dev/issues"
+  },
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*",
+    "docs-site"
+  ],
+  "scripts": {
+    "build:packages": "npm run build -w @umbraculum/ai-tool-sdk && npm run build -w @umbraculum/i18n && npm run build -w @umbraculum/i18n-react && npm run build -w @umbraculum/navigation && npm run build -w @umbraculum/contracts && npm run build -w @umbraculum/module-sdk && npm run build -w @umbraculum/rendering && npm run build -w @umbraculum/pim-contracts && npm run build -w @umbraculum/automation-contracts && npm run build -w @umbraculum/api-client && npm run build -w @umbraculum/ui && npm run build -w @umbraculum/brewery-beerjson && npm run build -w @umbraculum/brewery-recipes-ui && npm run build -w @umbraculum/media",
+    "test:packages": "npm test -w @umbraculum/contracts && npm test -w @umbraculum/module-sdk && npm test -w @umbraculum/rendering && npm test -w @umbraculum/brewery-core && npm test -w @umbraculum/pim-contracts",
+    "test:all": "npm run test:packages",
+    "lint": "eslint .",
+    "check-web-url-segments": "tsx scripts/check-web-url-segments.ts",
+    "smoke": "./scripts/smoke.sh",
+    "seed:e2e": "docker compose exec -T api npm run seed:e2e",
+    "dev": "docker compose up --build",
+    "down": "docker compose down",
+    "logs": "docker compose logs -f --tail=200"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^17.6.0",
+    "tsup": "^8.5.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.59.3"
+  },
+  "overrides": {
+    "postcss": "8.5.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  }
+}

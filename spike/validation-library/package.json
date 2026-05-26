@@ -1,0 +1,23 @@
+{
+  "name": "@umbraculum/spike-validation-library",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Phase 1 spike: Zod v4 vs Valibot side-by-side per docs/rfcs/0003-validation-library-adoption.md",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "bundle:zod": "esbuild zod/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/zod.bundle.js && gzip -kf dist/zod.bundle.js && ls -la dist/zod.bundle.js.gz",
+    "bundle:valibot": "esbuild valibot/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/valibot.bundle.js && gzip -kf dist/valibot.bundle.js && ls -la dist/valibot.bundle.js.gz"
+  },
+  "dependencies": {
+    "zod": "^4.3.6",
+    "valibot": "^1.0.0",
+    "fastify": "^5.0.0",
+    "fastify-type-provider-zod": "^4.0.0",
+    "@valibot/to-json-schema": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.0"
+  }
+}

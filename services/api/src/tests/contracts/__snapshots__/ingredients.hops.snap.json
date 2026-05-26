@@ -1,0 +1,20 @@
+{
+  "items": {
+    "__array": {
+      "alphaMax": "number",
+      "alphaMin": "number",
+      "betaMax": "number",
+      "betaMin": "number",
+      "country": "string",
+      "id": "string",
+      "name": "string",
+      "type": "string",
+      "workspaceId": "null"
+    },
+    "__length": "non-empty"
+  },
+  "limit": "number",
+  "offset": "number",
+  "ok": "boolean",
+  "total": "number"
+}
