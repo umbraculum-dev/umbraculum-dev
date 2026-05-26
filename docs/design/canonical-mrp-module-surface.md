@@ -1,13 +1,13 @@
 # Canonical `mrp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; not implemented  
+**Status:** Draft surface design 2026-05-26; Wave 1 foundation shipped (contracts + read-only API skeleton), alpha proof not complete
 **Audience:** core team, MRP implementers, brewery-vertical maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `mrp` open-door next step from [`modules/canonical/mrp.md`](../modules/canonical/mrp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`RFC-0007`](../rfcs/0007-canonical-document-rendering.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> This is a surface design for a future canonical module. No `mrp` code, package, Prisma model, route, web page, native screen, AI tool, or document template is claimed as shipped by this document.
+> Wave 1 has shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. This is still foundation-only: no web page, native screen, brewery projection, AI runtime tool, rendering job, write workflow, WMS behavior, or complete alpha proof is claimed as shipped.
 
 ---
 
@@ -19,8 +19,8 @@ MRP does not own inventory execution, capacity scheduling, live controller state
 
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
-| Contracts | `packages/mrp-contracts/` -> `@umbraculum/mrp-contracts` | DTOs, Zod schemas, route IDs, `CONTRACT_VERSION`, production-order/material-requirement refs. |
-| API | `services/api/src/modules/mrp/` | Routes, services, Prisma `mrp` schema, AI tool handlers, document-template registration. |
+| Contracts | `packages/mrp-contracts/` -> `@umbraculum/mrp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, production-order/BOM/material-requirement refs, planned AI/rendering payload schemas. |
+| API | `services/api/src/modules/mrp/` | **Wave 1 shipped:** read-only routes, services, Prisma `mrp` schema, module registration. AI tool handlers and document-template registration remain future work. |
 | Web | `apps/web/app/[locale]/(mrp)/` | Planned read/propose planning pages under registered static URL segments. |
 | Native | `apps/native/src/modules/mrp/` | Future operator/manager screens; may trail web in alpha. |
 | Rendering | module-registered templates | Work orders, route cards, material-requirement exports. |
@@ -135,7 +135,7 @@ The model intentionally uses cross-module references by ID/string rather than di
 
 ## 5. Contracts package
 
-Planned package: `packages/mrp-contracts/` published as `@umbraculum/mrp-contracts`.
+Wave 1 package: [`packages/mrp-contracts/`](../../packages/mrp-contracts/) published in-repo as `@umbraculum/mrp-contracts`.
 
 Expected exports:
 
@@ -155,7 +155,7 @@ Internal Umbraculum code uses Zod v4 schemas per [`RFC-0003`](../rfcs/0003-valid
 
 ## 6. API surface
 
-Planned read/propose-first API routes:
+Wave 1 read-only API routes:
 
 | Route | Method | Purpose |
 |---|---|---|
@@ -164,8 +164,8 @@ Planned read/propose-first API routes:
 | `/mrp/production-orders/:orderId/material-requirements` | GET | Expanded material requirements for one order. |
 | `/mrp/boms` | GET | List BOM definitions visible to the active workspace. |
 | `/mrp/boms/:bomId` | GET | Get one BOM. |
-| `/mrp/work-orders/:orderId/preview` | GET | Preview the work-order payload before rendering. |
-| `/mrp/work-orders/:orderId/render-jobs` | POST | Submit a work-order render job through `@umbraculum/rendering`. |
+| `/mrp/work-orders/:orderId/preview` | GET | Future: preview the work-order payload before rendering. |
+| `/mrp/work-orders/:orderId/render-jobs` | POST | Future: submit a work-order render job through `@umbraculum/rendering`. |
 
 Write routes are not part of the first alpha proof unless the implementation plan explicitly includes human-approved create/update flows and route-level L2 isolation tests.
 

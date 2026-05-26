@@ -157,6 +157,8 @@ services:
       - ./packages/rendering:/packages/rendering:ro
       - ./packages/automation-contracts:/packages/automation-contracts:ro
       - ./packages/pim-contracts:/packages/pim-contracts:ro
+      - ./packages/mrp-contracts:/packages/mrp-contracts:ro
+      - ./packages/crp-contracts:/packages/crp-contracts:ro
       # ai-tool-sdk landed 2026-05-21 as the dedicated home for the AI-tool SDK
       # contract (PLATFORM-ARCHITECTURE.md §4.4); extracted from @umbraculum/contracts.
       # The api consumes it directly (services/api/src/services/ai/**) and

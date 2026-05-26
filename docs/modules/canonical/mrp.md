@@ -1,14 +1,14 @@
 # `mrp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Open door** — not implemented. Reserved code, β layout pre-committed. August 2026 alpha co-design target documented; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Wave 1 foundation shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, and L2 isolation tests exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `mrp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
 **Audience:** anyone evaluating Umbraculum's manufacturing-planning roadmap or planning to extend the future MRP module.
 
 > [!NOTE]
-> Per-module page for the (not-yet-implemented) `mrp` canonical module. The code is reserved by [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md), the folder shape is pre-committed by [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md), but no code lives under `services/api/src/modules/mrp/` yet. The current planning artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md) and the [canonical MRP module surface design](../../design/canonical-mrp-module-surface.md).
+> Per-module page for the foundation-stage `mrp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md), [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md), and the `mrp` Prisma schema. The current planning artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical MRP module surface design](../../design/canonical-mrp-module-surface.md), and the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md).
 
 ---
 
@@ -41,14 +41,14 @@ The first useful implementation should therefore bias toward stable contracts an
 
 ## 4. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
 
-When implementation lands, the module materializes as four coordinated paths:
+The module materializes as four coordinated paths; Wave 1 has shipped the contracts and API foundation only:
 
 | Slice | Path (when shipped) |
 |---|---|
-| API | `services/api/src/modules/mrp/` |
+| API | [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/) |
 | Web | `apps/web/app/[locale]/(mrp)/` |
 | Native | `apps/native/src/modules/mrp/` |
-| Contracts | `packages/mrp-contracts/` → `@umbraculum/mrp-contracts` |
+| Contracts | [`packages/mrp-contracts/`](../../../packages/mrp-contracts/) → `@umbraculum/mrp-contracts` |
 
 Postgres schema name: `mrp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention 4).
 
@@ -69,10 +69,10 @@ Postgres schema name: `mrp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md), no mini-RFC is required for `mrp` to ship — the canonical code is already allocated by RFC-0001 §4. The procedure is:
 
-1. **Surface design doc** under [`docs/design/canonical-mrp-module-surface.md`](../../design/canonical-mrp-module-surface.md), modeled on [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md). Resolves the data model, extensibility contract, AI tool surface, tier-limit fields, phasing. **Done as design; not implemented.**
-2. **Phase A — contracts.** Create `packages/mrp-contracts/`, ship types + `CONTRACT_VERSION`.
-3. **Phase B — read path.** Land `services/api/src/modules/mrp/` skeleton, register via `@umbraculum/module-sdk`, ship initial read routes and AI tools.
-4. **Coordinated brewery projection.** Keep existing brewery routes stable first; project brew sessions and recipes into MRP production-order/BOM primitives when implementation starts. The exact reshape follows the surface design doc.
+1. **Surface design doc** under [`docs/design/canonical-mrp-module-surface.md`](../../design/canonical-mrp-module-surface.md), modeled on [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md). Resolves the data model, extensibility contract, AI tool surface, tier-limit fields, phasing. **Done.**
+2. **Wave 1 — contracts + read-only API foundation.** `packages/mrp-contracts/`, `services/api/src/modules/mrp/`, the `mrp` Prisma schema, module registration, and L2 isolation tests are **shipped as foundation-only**.
+3. **Next — coordinated brewery projection.** Keep existing brewery routes stable first; project brew sessions and recipes into MRP production-order/BOM primitives in a later implementation wave.
+4. **Later — AI/runtime rendering/write workflows.** Planned contract payloads exist, but no runtime AI tools, document-template registration, or write routes ship in Wave 1.
 
 ---
 
@@ -82,6 +82,9 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3–§4 (β layout, naming conventions).
 - [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md) — bounded alpha acceleration target.
 - [Canonical MRP module surface design](../../design/canonical-mrp-module-surface.md) — planned MRP surface.
+- [MRP/CRP Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md) — foundation implementation record.
+- [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md) — Wave 1 contracts package.
+- [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery-and-MRP-and-CRP co-design.
 - [ROADMAP.md §H1 2027](../../ROADMAP.md) — brewery-vertical promotion + canonical-module co-design.
 - [`automation.md`](automation.md) — template for what this page will look like once `mrp` ships.
