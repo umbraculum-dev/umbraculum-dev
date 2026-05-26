@@ -1,7 +1,7 @@
 # Canonical `pim` module surface — design
 
 **Tier:** Public  
-**Status:** As-built post-implementation 2026-05-20; updated by RFC-0007 PR7 channel-feed rendering work and PIM Phase E read/write work (Phase A + B + C + D-integration-test-Option-B landed in one tranche per [`docs/design/canonical-pim-build-log.md`](canonical-pim-build-log.md); core team approval implicit via solo-dev internal-alpha project posture per [`MANIFESTO.md`](../MANIFESTO.md) §1.2)<br>
+**Status:** As-built post-implementation 2026-05-20; updated by RFC-0007 PR7 channel-feed rendering work and PIM Phase E read/write work (Phase A + B + C + D-integration-test-Option-B landed in one tranche per [`docs/design/canonical-pim-build-log.md`](canonical-pim-build-log.md); core team approval implicit via solo-dev internal-alpha project posture per [`MANIFESTO.md`](../../MANIFESTO.md) §1.2)<br>
 **Audience:** core team, PIM-vertical maintainers, future commerce / channel-feed implementors, module SDK authors  
 **Resolves:** [RFC-0004](../rfcs/0004-canonical-pim.md) §7 ("Phase A delivers contracts; Phase B delivers read path; Phase C delivers web admin; surface doc lands post-implementation")  
 **Builds on:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md), [RFC-0003](../rfcs/0003-validation-library-adoption.md), [RFC-0004](../rfcs/0004-canonical-pim.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.4, §6, [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md), [`docs/design/canonical-automation-module-surface.md`](canonical-automation-module-surface.md) (sibling template)
@@ -63,7 +63,7 @@ Canonical `pim` exists to avoid these failure modes by owning the master, the at
 | Inventory levels, stock-on-hand, picking | `wms` (canonical, reserved code) | PIM is master-data; WMS is operational-state |
 | Production planning, BOM expansion, work orders | `mrp` (canonical, reserved code) | Same separation: master vs operational |
 | Customer-facing storefronts, cart, checkout | A future `commerce` (or vertical-specific) module | PIM master should serve N storefronts, none of which it knows about |
-| Recipe authoring (brewery-vertical) | Brewery flat routes (`services/api/src/routes/recipes.ts`); future canonical `recipes` module (reserved code) | Recipe ≠ Product; a recipe *references* a PIM product, doesn't replace it. Today the link is uni-directional service-layer (no FK) — see Open work §6 |
+| Recipe authoring (brewery-vertical) | Brewery vertical routes under `services/api/src/modules/brewery/routes/`; future canonical `recipes` module if allocated | Recipe ≠ Product; a recipe *references* a PIM product, doesn't replace it. Today the link is uni-directional service-layer (no FK) — see Open work §6 |
 | Binary media pipeline (uploads, transforms, CDN) | `@umbraculum/media` package | PIM only references media-asset IDs |
 | Pricing rules, discount engines | Out of scope project-wide for now | Will land as a sibling canonical when needed |
 | Vendor-specific channel-feed projections (Shopify, Amazon, etc.) | Future PIM Phase F or sibling commerce canonical | PIM is the source; PR7 only ships the vendor-neutral product-catalog CSV proof through RFC-0007 rendering |
@@ -217,7 +217,7 @@ i18n namespace: `pim.*` in [`packages/i18n/src/en.json`](../../packages/i18n/src
 
 [`services/api/src/tests/pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts) — two cross-module assertions per the "Option B" pattern locked down before execution (see §"Open work" §6 for the rejected Option A and its queued tech debt):
 
-1. **Module composition** — `GET /recipes` (brewery flat-route, pre-RFC-0002) and `GET /pim/products` (canonical β-layout) both return 200 in the same Fastify app instance, proving registration of `registerPimModule(app)` alongside `recipesRoutes` and the brewery tool family produces no route conflict.
+1. **Module composition** — `GET /recipes` (brewery vertical route, now registered from `services/api/src/modules/brewery/`) and `GET /pim/products` (canonical β-layout) both return 200 in the same Fastify app instance, proving registration of `registerPimModule(app)` alongside `registerBreweryModule(app)` produces no route conflict.
 2. **Reference-not-copy semantics** — read a PIM product via the public HTTP surface, mutate it directly through Prisma (write APIs are out of scope for this tranche), re-read via the public HTTP surface; the new name appears immediately, proving no cached projection blocks freshness.
 
 The test bypasses the brewery schema entirely (it does not create a brewery `Recipe` that references the PIM product). That is by design — the architectural claim being demonstrated is module composition + reference semantics, not cross-module FK linkage, which is queued as Option A.

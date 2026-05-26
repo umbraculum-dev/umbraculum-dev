@@ -3,7 +3,11 @@
 Canonical `automation` module — Phase B foundation.
 
 > [!NOTE]
-> First module in the new `services/api/src/modules/<code>/` β-layout per [RFC-0002](../../../../../docs/rfcs/0002-canonical-module-physical-layout.md). Brewery flat routes in `services/api/src/routes/` are not migrated yet (RFC-0002 Decision D — H1 2027 tranche).
+> First module in the new `services/api/src/modules/<code>/` β-layout per [RFC-0002](../../../../../docs/rfcs/0002-canonical-module-physical-layout.md). Brewery has since joined the same API module shape under `services/api/src/modules/brewery/` via the RFC-0006 acceleration; this module remains the canonical reference for the automation-vs-CRP boundary.
+
+## What this is
+
+API-side slice of the canonical `automation` module: workspace-scoped vessel state, adapter-facing contracts, alarm/event surface, and AI tools for live controller status. Scheduling and utilization remain out of scope here and belong to the future `crp` module.
 
 ## Scope by phase
 
@@ -46,11 +50,11 @@ VALUES
    'idle', NULL, NULL, false, NOW(), NOW());
 ```
 
-Run this from inside the database container — see [`scripts/runtime/mysql-debug-select.sh`](../../../../../scripts/runtime/) or the equivalent psql helper if present. Delete the rows with `DELETE FROM automation.vessels WHERE workspace_id = '<your-workspace-id>';` when finished.
+Run this from inside the database container with the local psql helper available in your environment. Delete the rows with `DELETE FROM automation.vessels WHERE workspace_id = '<your-workspace-id>';` when finished.
 
 ## Cross-references
 
 - [`docs/design/canonical-automation-module-surface.md`](../../../../../docs/design/canonical-automation-module-surface.md) §7 (Prisma sketch), §8 (AI tools, tier limits, registration), §9 (phasing).
 - [`packages/automation-contracts/`](../../../../../packages/automation-contracts/) — `MailboxSpec`, `AutomationAdapterDefinition`, `CONTRACT_VERSION`.
 - [`packages/module-sdk/`](../../../../../packages/module-sdk/) — `registerModule`.
-- [`services/api/prisma/schema.prisma`](../../../../prisma/schema.prisma) §automation — `Vessel`, `AdapterConnection`, `AutomationAlarmEvent`.
+- [`services/api/prisma/schema.prisma`](../../../prisma/schema.prisma) §automation — `Vessel`, `AdapterConnection`, `AutomationAlarmEvent`.

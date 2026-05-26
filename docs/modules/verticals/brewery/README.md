@@ -150,9 +150,9 @@ The brewery vertical's role is to **consume** canonical modules, not to compete 
 | Canonical module | Status | How brewery uses it |
 |---|---|---|
 | `automation` | **Shipped (Phase B)** | The `(automation)/` shell shows brewery vessels (fermenters, kettles); brewery's `EquipmentProfile.id` is the planned cross-schema reference target for `automation.Vessel.equipmentProfileId` ([surface design §12.3](../../../design/canonical-automation-module-surface.md)). Phase C lands the `brewery.openplc.v1` adapter — the brewery-specific Modbus implementation against the canonical adapter contract. |
-| `mrp` | Open door (H1 2027) | Brew sessions become production orders; recipes become bills of materials. Coordinated migration per [PLATFORM-ARCHITECTURE.md §5.2](../../../PLATFORM-ARCHITECTURE.md). |
+| `mrp` | Open door (August 2026 alpha co-design target; mature scope H1 2027) | Brew sessions become production orders; recipes become bills of materials. The bounded alpha planning artifacts are the joint [MRP/CRP co-design plan](../../../design/mrp-crp-august-2026-co-design-plan.md) and the [MRP surface design](../../../design/canonical-mrp-module-surface.md); implementation remains future work. |
 | `wms` | Open door (H2 2027) | Brewery ingredients become catalog SKUs; the on-hand inventory becomes WMS stock-on-hand. |
-| `crp` | Open door (H1 2027) | Vessels-as-resources, brew-session scheduling — co-designed with `mrp` per [crp.md](../../canonical/crp.md). |
+| `crp` | Open door (August 2026 alpha co-design target; mature scope H1 2027) | Vessels-as-resources and brew-session scheduling are co-designed with `mrp` in the [MRP/CRP co-design plan](../../../design/mrp-crp-august-2026-co-design-plan.md) and the [CRP surface design](../../../design/canonical-crp-module-surface.md); implementation remains future work. |
 | `crm` | Open door (no firm horizon) | Brewery is currently CRM-light; a brewery configuration that needs distributor relationships would be the first concrete demand signal. |
 
 ---

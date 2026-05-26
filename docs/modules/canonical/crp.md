@@ -1,14 +1,14 @@
 # `crp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Open door** — not implemented. Reserved code, β layout pre-committed. Working assumption: lands in the H1 2027 tranche alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Open door** — not implemented. Reserved code, β layout pre-committed. August 2026 alpha co-design target documented; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `crp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
 **Audience:** anyone evaluating Umbraculum's capacity-planning roadmap or planning to extend the future CRP module.
 
 > [!NOTE]
-> Per-module page for the (not-yet-implemented) `crp` canonical module. The code is reserved by [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md); the folder shape is pre-committed by [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md). When work starts, replace this stub with a real per-module page modeled on [`automation.md`](automation.md).
+> Per-module page for the (not-yet-implemented) `crp` canonical module. The code is reserved by [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md); the folder shape is pre-committed by [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md). The current planning artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md) and the [canonical CRP module surface design](../../design/canonical-crp-module-surface.md).
 
 ---
 
@@ -16,7 +16,7 @@
 
 Per [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md): **capacity requirements planning, resource scheduling, work-center load**.
 
-The CRP canonical module owns the platform's "do we have enough physical capacity to fulfil the production plan, and when?" surface. Concretely (illustrative, refined by the future surface design doc):
+The CRP canonical module owns the platform's "do we have enough physical capacity to fulfil the production plan, and when?" surface. Concretely (illustrative, refined by the surface design doc):
 
 - Work-center / resource registry — capacity per unit time.
 - Load profile (committed + planned hours per resource per window).
@@ -61,7 +61,7 @@ Postgres schema name: `crp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 | Module | Relationship |
 |---|---|
-| `mrp` | Strong — MRP production orders are the input; CRP allocates them onto resources. Co-designed in the H1 2027 tranche per [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md). |
+| `mrp` | Strong — MRP production orders are the input; CRP allocates them onto resources. Co-designed for the August 2026 alpha target, with mature scope still H1 2027 per [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md). |
 | `automation` | Read-only — CRP reads `automation.Vessel` rows (via the shared equipment-contracts package) to present vessel-as-resource views. No data copy. |
 | `wms` | Loose — material availability constrains schedulable production; coupling is via stock-on-hand queries. |
 | `crm` | Loose — long-range demand forecast feeds capacity-planning windows. |
@@ -74,9 +74,9 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 
 ---
 
-## 7. What needs to happen before this stub becomes a real page
+## 7. What needs to happen before implementation
 
-1. **Surface design doc** under `docs/design/canonical-crp-module-surface.md`, including the extensibility contract for resource/calendar primitives and future optimizer plug-ins.
+1. **Surface design doc** under [`docs/design/canonical-crp-module-surface.md`](../../design/canonical-crp-module-surface.md), including the extensibility contract for resource/calendar primitives and future optimizer plug-ins. **Done as design; not implemented.**
 2. **Phase A — contracts.** Create `packages/crp-contracts/`, ship types + `CONTRACT_VERSION`. Likely paired with the `@umbraculum/equipment-contracts` extraction.
 3. **Phase B — read path.** Calendar / schedule read views consuming MRP production orders and `automation.Vessel` rows.
 
@@ -86,6 +86,8 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4, §7.
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3, §4, §7 item 3.
+- [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md) — bounded alpha acceleration target.
+- [Canonical CRP module surface design](../../design/canonical-crp-module-surface.md) — planned CRP surface.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery + MRP + CRP co-design.
 - [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) §4, §11 — the surface boundary already documented.
 - [`services/api/src/modules/automation/README.md`](../../../services/api/src/modules/automation/README.md) §"Surface boundary — automation vs. crp" — the in-code guardrail.
