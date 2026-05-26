@@ -1,13 +1,13 @@
 # Canonical `crp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 1 foundation shipped (contracts + read-only API skeleton), alpha proof not complete
+**Status:** Draft surface design 2026-05-26; Wave 2 brewery projection shipped (read-time projections), alpha proof not complete
 **Audience:** core team, CRP implementers, brewery-vertical maintainers, automation maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `crp` open-door next step from [`modules/canonical/crp.md`](../modules/canonical/crp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`canonical-automation-module-surface.md`](canonical-automation-module-surface.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> Wave 1 has shipped `@umbraculum/crp-contracts`, the `crp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. This is still foundation-only: no web page, native screen, brewery projection, AI runtime tool, rendering job, write workflow, optimizer, automation-control behavior, or complete alpha proof is claimed as shipped.
+> Wave 1 shipped `@umbraculum/crp-contracts`, the `crp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 now projects brewery/automation planning sources into those read routes at request time. This is still not alpha-complete: no web page, native screen, AI runtime tool, rendering job, write workflow, optimizer, automation-control behavior, or complete public-alpha proof is claimed as shipped.
 
 ---
 
@@ -18,7 +18,7 @@
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
 | Contracts | `packages/crp-contracts/` -> `@umbraculum/crp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, resource/work-center/calendar/load/conflict refs, planned AI/rendering payload schemas. |
-| API | `services/api/src/modules/crp/` | **Wave 1 shipped:** read-only routes, services, Prisma `crp` schema, module registration. AI tool handlers and document-template registration remain future work. |
+| API | `services/api/src/modules/crp/` | **Wave 1 + Wave 2 shipped:** read-only routes, services, Prisma `crp` schema, module registration, and read-time brewery/automation projections. AI tool handlers and document-template registration remain future work. |
 | Web | `apps/web/app/[locale]/(crp)/` | Planned capacity-load and schedule/conflict pages. |
 | Native | `apps/native/src/modules/crp/` | Future operator/manager screens; may trail web in alpha. |
 | Rendering | module-registered templates | Capacity-load exports, schedule PDFs, resource-calendar CSVs. |
@@ -251,7 +251,9 @@ Brewery proves CRP without becoming CRP.
 | `automation.Vessel` | Vessel/resource identity and optional current-state context. |
 | MRP production order | Demand/load source. |
 
-The alpha implementation should prefer projections and references over irreversible data migration. Existing brewery and automation routes remain stable.
+Wave 2 shipped the first read-time adapter: automation vessels project as CRP resources, brewery equipment profiles project as work centers, and timed brew-session steps project as scheduled operations/load where the source data is sufficient. Missing duration or missing unambiguous resource assignment is surfaced as a conservative read-only conflict rather than invented scheduling data.
+
+The alpha implementation should continue to prefer projections and references over irreversible data migration. Existing brewery and automation routes remain stable.
 
 ---
 
