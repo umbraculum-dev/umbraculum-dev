@@ -1,8 +1,13 @@
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
 import {
+  AttributeSetCreateRequestSchema,
   AttributeSetGetResponseSchema,
   AttributeSetListResponseSchema,
+  AttributeSetUpdateRequestSchema,
+  PimDeleteResponseSchema,
 } from "@umbraculum/pim-contracts";
 
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
@@ -13,6 +18,7 @@ const SetIdParamsSchema = z.object({
 });
 
 export function pimAttributeSetsRoutes(app: FastifyInstance): void {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new AttributeSetsService(app.prisma);
 
   app.get("/pim/attribute-sets", async (req) => {
@@ -31,4 +37,72 @@ export function pimAttributeSetsRoutes(app: FastifyInstance): void {
     );
     return AttributeSetGetResponseSchema.parse({ ok: true, item });
   });
+
+  zodApp.post(
+    "/pim/attribute-sets",
+    {
+      schema: {
+        body: AttributeSetCreateRequestSchema,
+        response: {
+          201: AttributeSetGetResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req, reply) => {
+      const ctx = requireActiveWorkspace(req);
+      const item = await svc.createAttributeSet(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.body,
+      );
+      return reply.status(201).send(AttributeSetGetResponseSchema.parse({ ok: true, item }));
+    },
+  );
+
+  zodApp.patch(
+    "/pim/attribute-sets/:setId",
+    {
+      schema: {
+        params: SetIdParamsSchema,
+        body: AttributeSetUpdateRequestSchema,
+        response: {
+          200: AttributeSetGetResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const item = await svc.updateAttributeSet(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.setId,
+        req.body,
+      );
+      return AttributeSetGetResponseSchema.parse({ ok: true, item });
+    },
+  );
+
+  zodApp.delete(
+    "/pim/attribute-sets/:setId",
+    {
+      schema: {
+        params: SetIdParamsSchema,
+        response: {
+          200: PimDeleteResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      await svc.deleteAttributeSet(ctx.userId, ctx.activeWorkspaceId, req.params.setId);
+      return PimDeleteResponseSchema.parse({ ok: true });
+    },
+  );
 }

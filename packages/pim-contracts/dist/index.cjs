@@ -20,32 +20,46 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  AttributeCreateRequestSchema: () => AttributeCreateRequestSchema,
   AttributeGetResponseSchema: () => AttributeGetResponseSchema,
   AttributeListResponseSchema: () => AttributeListResponseSchema,
   AttributeSchema: () => AttributeSchema,
+  AttributeSetCreateRequestSchema: () => AttributeSetCreateRequestSchema,
   AttributeSetGetResponseSchema: () => AttributeSetGetResponseSchema,
   AttributeSetListResponseSchema: () => AttributeSetListResponseSchema,
   AttributeSetRefSchema: () => AttributeSetRefSchema,
   AttributeSetSchema: () => AttributeSetSchema,
+  AttributeSetUpdateRequestSchema: () => AttributeSetUpdateRequestSchema,
   AttributeTypeSchema: () => AttributeTypeSchema,
+  AttributeUpdateRequestSchema: () => AttributeUpdateRequestSchema,
   AttributeValueSchema: () => AttributeValueSchema,
   CONTRACT_VERSION: () => CONTRACT_VERSION,
+  CategoryCreateRequestSchema: () => CategoryCreateRequestSchema,
   CategoryGetResponseSchema: () => CategoryGetResponseSchema,
   CategoryListResponseSchema: () => CategoryListResponseSchema,
   CategorySchema: () => CategorySchema,
   CategoryTreeNodeSchema: () => CategoryTreeNodeSchema,
+  CategoryUpdateRequestSchema: () => CategoryUpdateRequestSchema,
+  MediaAssetRefCreateRequestSchema: () => MediaAssetRefCreateRequestSchema,
+  MediaAssetRefGetResponseSchema: () => MediaAssetRefGetResponseSchema,
   MediaAssetRefListResponseSchema: () => MediaAssetRefListResponseSchema,
   MediaAssetRefSchema: () => MediaAssetRefSchema,
+  MediaAssetRefUpdateRequestSchema: () => MediaAssetRefUpdateRequestSchema,
   MediaAssetRoleSchema: () => MediaAssetRoleSchema,
+  PimDeleteResponseSchema: () => PimDeleteResponseSchema,
+  ProductCreateRequestSchema: () => ProductCreateRequestSchema,
   ProductGetResponseSchema: () => ProductGetResponseSchema,
   ProductListResponseSchema: () => ProductListResponseSchema,
   ProductRefSchema: () => ProductRefSchema,
   ProductSchema: () => ProductSchema,
   ProductStatusSchema: () => ProductStatusSchema,
+  ProductUpdateRequestSchema: () => ProductUpdateRequestSchema,
+  VariantCreateRequestSchema: () => VariantCreateRequestSchema,
   VariantGetResponseSchema: () => VariantGetResponseSchema,
   VariantListResponseSchema: () => VariantListResponseSchema,
   VariantRefSchema: () => VariantRefSchema,
   VariantSchema: () => VariantSchema,
+  VariantUpdateRequestSchema: () => VariantUpdateRequestSchema,
   classifyContractVersionSkew: () => classifyContractVersionSkew,
   parseSemVer: () => parseSemVer
 });
@@ -78,14 +92,15 @@ function classifyContractVersionSkew(runtime, expected = CONTRACT_VERSION) {
   return "match";
 }
 
-// src/attribute.ts
-var import_zod2 = require("zod");
-
 // src/shared.ts
 var import_zod = require("zod");
 var IsoDateTimeStringSchema = import_zod.z.string().min(1, "timestamp required").refine((s) => !Number.isNaN(Date.parse(s)), "must be ISO 8601");
+var PimDeleteResponseSchema = import_zod.z.object({
+  ok: import_zod.z.literal(true)
+});
 
 // src/attribute.ts
+var import_zod2 = require("zod");
 var AttributeTypeSchema = import_zod2.z.enum([
   "string",
   "number",
@@ -121,6 +136,29 @@ var AttributeValueSchema = import_zod2.z.discriminatedUnion("type", [
   import_zod2.z.object({ type: import_zod2.z.literal("media_ref"), value: import_zod2.z.string().min(1) }),
   import_zod2.z.object({ type: import_zod2.z.literal("reference"), value: import_zod2.z.string().min(1) })
 ]);
+var AttributeCreateRequestSchema = import_zod2.z.object({
+  code: import_zod2.z.string().min(1, "code required"),
+  type: AttributeTypeSchema,
+  label: import_zod2.z.string().min(1, "label required"),
+  required: import_zod2.z.boolean().optional(),
+  defaultValue: import_zod2.z.unknown().nullable().optional(),
+  selectOptions: import_zod2.z.array(import_zod2.z.string().min(1)).nullable().optional()
+}).strict();
+var AttributeUpdateRequestSchema = import_zod2.z.object({
+  code: import_zod2.z.string().min(1, "code required").optional(),
+  type: AttributeTypeSchema.optional(),
+  label: import_zod2.z.string().min(1, "label required").optional(),
+  required: import_zod2.z.boolean().optional(),
+  defaultValue: import_zod2.z.unknown().nullable().optional(),
+  selectOptions: import_zod2.z.array(import_zod2.z.string().min(1)).nullable().optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var AttributeListResponseSchema = import_zod2.z.object({
   ok: import_zod2.z.literal(true),
   items: import_zod2.z.array(AttributeSchema)
@@ -143,6 +181,23 @@ var AttributeSetSchema = import_zod3.z.object({
 });
 var AttributeSetRefSchema = import_zod3.z.object({
   attributeSetId: import_zod3.z.string().min(1, "attributeSetId required")
+});
+var AttributeSetCreateRequestSchema = import_zod3.z.object({
+  code: import_zod3.z.string().min(1, "code required"),
+  label: import_zod3.z.string().min(1, "label required"),
+  attributeIds: import_zod3.z.array(import_zod3.z.string().min(1)).optional()
+}).strict();
+var AttributeSetUpdateRequestSchema = import_zod3.z.object({
+  code: import_zod3.z.string().min(1, "code required").optional(),
+  label: import_zod3.z.string().min(1, "label required").optional(),
+  attributeIds: import_zod3.z.array(import_zod3.z.string().min(1)).optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
 });
 var AttributeSetListResponseSchema = import_zod3.z.object({
   ok: import_zod3.z.literal(true),
@@ -170,6 +225,27 @@ var ProductSchema = import_zod4.z.object({
 var ProductRefSchema = import_zod4.z.object({
   productId: import_zod4.z.string().min(1, "productId required")
 });
+var ProductCreateRequestSchema = import_zod4.z.object({
+  sku: import_zod4.z.string().min(1, "sku required"),
+  name: import_zod4.z.string().min(1, "name required"),
+  description: import_zod4.z.string().nullable().optional(),
+  primaryAttributeSetId: import_zod4.z.string().min(1).nullable().optional(),
+  status: ProductStatusSchema.optional()
+}).strict();
+var ProductUpdateRequestSchema = import_zod4.z.object({
+  sku: import_zod4.z.string().min(1, "sku required").optional(),
+  name: import_zod4.z.string().min(1, "name required").optional(),
+  description: import_zod4.z.string().nullable().optional(),
+  primaryAttributeSetId: import_zod4.z.string().min(1).nullable().optional(),
+  status: ProductStatusSchema.optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var ProductListResponseSchema = import_zod4.z.object({
   ok: import_zod4.z.literal(true),
   items: import_zod4.z.array(ProductSchema)
@@ -192,6 +268,23 @@ var VariantSchema = import_zod5.z.object({
 });
 var VariantRefSchema = import_zod5.z.object({
   variantId: import_zod5.z.string().min(1, "variantId required")
+});
+var VariantCreateRequestSchema = import_zod5.z.object({
+  sku: import_zod5.z.string().min(1, "sku required"),
+  name: import_zod5.z.string().min(1, "name required"),
+  attributeValues: import_zod5.z.record(import_zod5.z.string(), AttributeValueSchema).optional()
+}).strict();
+var VariantUpdateRequestSchema = import_zod5.z.object({
+  sku: import_zod5.z.string().min(1, "sku required").optional(),
+  name: import_zod5.z.string().min(1, "name required").optional(),
+  attributeValues: import_zod5.z.record(import_zod5.z.string(), AttributeValueSchema).optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
 });
 var VariantListResponseSchema = import_zod5.z.object({
   ok: import_zod5.z.literal(true),
@@ -219,6 +312,25 @@ var CategoryTreeNodeSchema = import_zod6.z.lazy(
     children: import_zod6.z.array(CategoryTreeNodeSchema)
   })
 );
+var CategoryCreateRequestSchema = import_zod6.z.object({
+  code: import_zod6.z.string().min(1, "code required"),
+  label: import_zod6.z.string().min(1, "label required"),
+  parentId: import_zod6.z.string().min(1).nullable().optional(),
+  sortOrder: import_zod6.z.number().int().optional()
+}).strict();
+var CategoryUpdateRequestSchema = import_zod6.z.object({
+  code: import_zod6.z.string().min(1, "code required").optional(),
+  label: import_zod6.z.string().min(1, "label required").optional(),
+  parentId: import_zod6.z.string().min(1).nullable().optional(),
+  sortOrder: import_zod6.z.number().int().optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var CategoryListResponseSchema = import_zod6.z.object({
   ok: import_zod6.z.literal(true),
   items: import_zod6.z.array(CategorySchema),
@@ -241,38 +353,73 @@ var MediaAssetRefSchema = import_zod7.z.object({
   createdAt: IsoDateTimeStringSchema,
   updatedAt: IsoDateTimeStringSchema
 });
+var MediaAssetRefCreateRequestSchema = import_zod7.z.object({
+  mediaAssetId: import_zod7.z.string().min(1, "mediaAssetId required"),
+  role: MediaAssetRoleSchema,
+  sortOrder: import_zod7.z.number().int().optional()
+}).strict();
+var MediaAssetRefUpdateRequestSchema = import_zod7.z.object({
+  mediaAssetId: import_zod7.z.string().min(1, "mediaAssetId required").optional(),
+  role: MediaAssetRoleSchema.optional(),
+  sortOrder: import_zod7.z.number().int().optional()
+}).strict().superRefine((value, ctx) => {
+  if (Object.values(value).every((v) => v === void 0)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "at least one field required"
+    });
+  }
+});
 var MediaAssetRefListResponseSchema = import_zod7.z.object({
   ok: import_zod7.z.literal(true),
   items: import_zod7.z.array(MediaAssetRefSchema)
 });
+var MediaAssetRefGetResponseSchema = import_zod7.z.object({
+  ok: import_zod7.z.literal(true),
+  item: MediaAssetRefSchema
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  AttributeCreateRequestSchema,
   AttributeGetResponseSchema,
   AttributeListResponseSchema,
   AttributeSchema,
+  AttributeSetCreateRequestSchema,
   AttributeSetGetResponseSchema,
   AttributeSetListResponseSchema,
   AttributeSetRefSchema,
   AttributeSetSchema,
+  AttributeSetUpdateRequestSchema,
   AttributeTypeSchema,
+  AttributeUpdateRequestSchema,
   AttributeValueSchema,
   CONTRACT_VERSION,
+  CategoryCreateRequestSchema,
   CategoryGetResponseSchema,
   CategoryListResponseSchema,
   CategorySchema,
   CategoryTreeNodeSchema,
+  CategoryUpdateRequestSchema,
+  MediaAssetRefCreateRequestSchema,
+  MediaAssetRefGetResponseSchema,
   MediaAssetRefListResponseSchema,
   MediaAssetRefSchema,
+  MediaAssetRefUpdateRequestSchema,
   MediaAssetRoleSchema,
+  PimDeleteResponseSchema,
+  ProductCreateRequestSchema,
   ProductGetResponseSchema,
   ProductListResponseSchema,
   ProductRefSchema,
   ProductSchema,
   ProductStatusSchema,
+  ProductUpdateRequestSchema,
+  VariantCreateRequestSchema,
   VariantGetResponseSchema,
   VariantListResponseSchema,
   VariantRefSchema,
   VariantSchema,
+  VariantUpdateRequestSchema,
   classifyContractVersionSkew,
   parseSemVer
 });

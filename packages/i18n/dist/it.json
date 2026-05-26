@@ -9,9 +9,15 @@
       "loading": "Caricamento…",
       "refresh": "Aggiorna",
       "refreshing": "Aggiornamento…",
+      "create": "Crea prodotto",
+      "creating": "Creazione…",
+      "createSuccess": "Prodotto creato.",
+      "createError": "Impossibile creare il prodotto.",
+      "createRequired": "SKU e nome sono obbligatori.",
       "openDetail": "Apri prodotto",
       "back": "Torna ai prodotti",
       "searchPlaceholder": "Cerca per SKU o nome…",
+      "attributeSetPlaceholder": "ID set attributi opzionale",
       "notFound": "Prodotto non trovato in questo workspace."
     },
     "variants": {

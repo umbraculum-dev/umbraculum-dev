@@ -7,9 +7,11 @@ import {
 } from "@umbraculum/module-sdk";
 
 import { pimDocumentTemplates } from "./documentTemplates.js";
+import { pimAttributesRoutes } from "./routes/attributesRoutes.js";
 import { pimAttributeSetsRoutes } from "./routes/attributeSetsRoutes.js";
 import { pimCategoriesRoutes } from "./routes/categoriesRoutes.js";
 import { pimChannelFeedsRoutes } from "./routes/channelFeedsRoutes.js";
+import { pimMediaAssetRefsRoutes } from "./routes/mediaAssetRefsRoutes.js";
 import { pimProductsRoutes } from "./routes/productsRoutes.js";
 import { pimVariantsRoutes } from "./routes/variantsRoutes.js";
 import { registerPimTools } from "../../services/ai/tools/pim/index.js";
@@ -71,7 +73,9 @@ export function registerPimModule(app: FastifyInstance): void {
 
   app.register(pimProductsRoutes);
   app.register(pimVariantsRoutes);
+  app.register(pimAttributesRoutes);
   app.register(pimAttributeSetsRoutes);
   app.register(pimCategoriesRoutes);
+  app.register(pimMediaAssetRefsRoutes);
   app.register(pimChannelFeedsRoutes);
 }

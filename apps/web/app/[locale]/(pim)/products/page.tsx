@@ -2,8 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { Button, H1, Input, SizableText, View, XStack, YStack } from "tamagui";
+import { Button, H1, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 import {
+  ProductGetResponseSchema,
   ProductListResponseSchema,
   type Product,
 } from "@umbraculum/pim-contracts";
@@ -48,6 +49,13 @@ export default function PimProductsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createSku, setCreateSku] = useState("");
+  const [createName, setCreateName] = useState("");
+  const [createDescription, setCreateDescription] = useState("");
+  const [createAttributeSetId, setCreateAttributeSetId] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createSuccess, setCreateSuccess] = useState(false);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -83,6 +91,51 @@ export default function PimProductsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState.status]);
 
+  const createProduct = async () => {
+    if (!canCall || creating) return;
+
+    const sku = createSku.trim();
+    const name = createName.trim();
+    if (!sku || !name) {
+      setCreateSuccess(false);
+      setCreateError(tProducts("createRequired"));
+      return;
+    }
+
+    setCreateError(null);
+    setCreateSuccess(false);
+    setCreating(true);
+    try {
+      const res = await apiFetch("/api/pim/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sku,
+          name,
+          description: createDescription.trim() || null,
+          primaryAttributeSetId: createAttributeSetId.trim() || null,
+          status: "draft",
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(
+          typeof res.data === "string" ? res.data : JSON.stringify(res.data),
+        );
+      }
+      ProductGetResponseSchema.parse(res.data);
+      setCreateSku("");
+      setCreateName("");
+      setCreateDescription("");
+      setCreateAttributeSetId("");
+      setCreateSuccess(true);
+      await refresh();
+    } catch (err) {
+      setCreateError(String(err));
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <YStack gap="$3">
       <H1 mb="$2">{t("title")}</H1>
@@ -113,6 +166,96 @@ export default function PimProductsPage() {
         <Link href="/categories">{t("categories.title")}</Link>
         <Link href="/attribute-sets">{t("attributeSets.title")}</Link>
       </XStack>
+
+      <section
+        role="region"
+        aria-labelledby="create-product-heading"
+        style={{
+          border: "1px solid var(--border)",
+          borderRadius: "12px",
+          padding: "12px",
+        }}
+      >
+        <YStack gap="$3">
+          <SizableText
+            id="create-product-heading"
+            size="$4"
+            fontWeight="bold"
+            fontFamily="$heading"
+          >
+            {tProducts("create")}
+          </SizableText>
+          <XStack gap="$3" flexWrap="wrap">
+            <YStack gap="$1.5" flex={1} minWidth={180}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                {tFields("sku")}
+              </SizableText>
+              <Input
+                value={createSku}
+                onChangeText={setCreateSku}
+                disabled={!canCall || creating}
+              />
+            </YStack>
+            <YStack gap="$1.5" flex={1} minWidth={180}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                {tFields("name")}
+              </SizableText>
+              <Input
+                value={createName}
+                onChangeText={setCreateName}
+                disabled={!canCall || creating}
+              />
+            </YStack>
+            <YStack gap="$1.5" flex={1} minWidth={180}>
+              <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+                {tFields("attributeSet")}
+              </SizableText>
+              <Input
+                value={createAttributeSetId}
+                onChangeText={setCreateAttributeSetId}
+                placeholder={tProducts("attributeSetPlaceholder")}
+                disabled={!canCall || creating}
+              />
+            </YStack>
+          </XStack>
+          <YStack gap="$1.5">
+            <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+              {tFields("description")}
+            </SizableText>
+            <TextArea
+              value={createDescription}
+              onChangeText={setCreateDescription}
+              disabled={!canCall || creating}
+              minHeight={80}
+            />
+          </YStack>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            {tFields("status")}: {tValues("draft")}
+          </SizableText>
+          {createError ? <ErrorBox>{createError}</ErrorBox> : null}
+          {createSuccess ? (
+            <SizableText size="$2" color="var(--success)" fontFamily="$body">
+              {tProducts("createSuccess")}
+            </SizableText>
+          ) : null}
+          <button
+            type="button"
+            style={{
+              alignSelf: "flex-start",
+              background: "var(--surface-2)",
+              border: "1px solid var(--border)",
+              borderRadius: "8px",
+              color: "var(--text)",
+              cursor: !canCall || creating ? "not-allowed" : "pointer",
+              padding: "8px 12px",
+            }}
+            onClick={() => void createProduct()}
+            disabled={!canCall || creating}
+          >
+            {creating ? tProducts("creating") : tProducts("create")}
+          </button>
+        </YStack>
+      </section>
 
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 

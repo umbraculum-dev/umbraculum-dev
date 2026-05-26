@@ -1,7 +1,7 @@
 # Canonical `pim` module surface — design
 
 **Tier:** Public  
-**Status:** As-built post-implementation 2026-05-20; updated by RFC-0007 PR7 channel-feed rendering work (Phase A + B + C + D-integration-test-Option-B landed in one tranche per [`docs/design/canonical-pim-build-log.md`](canonical-pim-build-log.md); core team approval implicit via solo-dev internal-alpha project posture per [`MANIFESTO.md`](../MANIFESTO.md) §1.2)<br>
+**Status:** As-built post-implementation 2026-05-20; updated by RFC-0007 PR7 channel-feed rendering work and PIM Phase E read/write work (Phase A + B + C + D-integration-test-Option-B landed in one tranche per [`docs/design/canonical-pim-build-log.md`](canonical-pim-build-log.md); core team approval implicit via solo-dev internal-alpha project posture per [`MANIFESTO.md`](../MANIFESTO.md) §1.2)<br>
 **Audience:** core team, PIM-vertical maintainers, future commerce / channel-feed implementors, module SDK authors  
 **Resolves:** [RFC-0004](../rfcs/0004-canonical-pim.md) §7 ("Phase A delivers contracts; Phase B delivers read path; Phase C delivers web admin; surface doc lands post-implementation")  
 **Builds on:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md), [RFC-0003](../rfcs/0003-validation-library-adoption.md), [RFC-0004](../rfcs/0004-canonical-pim.md), [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.4, §6, [`packages/module-sdk/README.md`](../../packages/module-sdk/README.md), [`docs/design/canonical-automation-module-surface.md`](canonical-automation-module-surface.md) (sibling template)
@@ -16,14 +16,14 @@
 
 | Layer | β-layout location | Shipped today |
 |---|---|---|
-| Contracts | [`packages/pim-contracts/`](../../packages/pim-contracts/) | `CONTRACT_VERSION 0.1.0-alpha.1`, 6 entity-family Zod schemas (Product, Variant, AttributeSet, Attribute, Category, MediaAssetRef), response envelopes |
-| API | [`services/api/src/modules/pim/`](../../services/api/src/modules/pim/) | `registerPimModule(app)`, 4 read-only services, 8 read routes (`GET /pim/{products,variants,attribute-sets,categories}` ± by-id), 1 channel-feed job route (`POST /pim/channel-feeds/product-catalog-csv/jobs`) |
+| Contracts | [`packages/pim-contracts/`](../../packages/pim-contracts/) | `CONTRACT_VERSION 0.1.0-alpha.1`, 6 entity-family Zod schemas (Product, Variant, AttributeSet, Attribute, Category, MediaAssetRef), create/update request schemas, response envelopes, delete envelope |
+| API | [`services/api/src/modules/pim/`](../../services/api/src/modules/pim/) | `registerPimModule(app)`, 6 workspace-scoped services, read/write routes for all six entity families, 1 channel-feed job route (`POST /pim/channel-feeds/product-catalog-csv/jobs`) |
 | AI tools | [`services/api/src/services/ai/tools/pim/`](../../services/api/src/services/ai/tools/pim/) | 4 read-only tools (`pim.searchProducts`, `pim.getProductDetail`, `pim.listCategories`, `pim.listAttributeSets`) registered alongside brewery + automation tools |
-| Web admin | [`apps/web/app/[locale]/(pim)/`](../../apps/web/app/%5Blocale%5D/%28pim%29/) | 5 Tamagui pages (product list at `/en/products`, product detail at `/en/products/<id>`, categories tree at `/en/categories`, attribute-set list at `/en/attribute-sets`, attribute-set detail at `/en/attribute-sets/<id>`), `pim.*` i18n namespace (en + it). Aligned with Week-1 audit (RFC-0006 + [`web-route-group-audit.md`](web-route-group-audit.md)). |
+| Web admin | [`apps/web/app/[locale]/(pim)/`](../../apps/web/app/%5Blocale%5D/%28pim%29/) | 5 Tamagui pages (product list/create at `/en/products`, product detail at `/en/products/<id>`, categories tree at `/en/categories`, attribute-set list at `/en/attribute-sets`, attribute-set detail at `/en/attribute-sets/<id>`), `pim.*` i18n namespace (en + it). Aligned with Week-1 audit (RFC-0006 + [`web-route-group-audit.md`](web-route-group-audit.md)). |
 | Persistence | [`services/api/prisma/schema.prisma`](../../services/api/prisma/schema.prisma) §pim | 6 tables under `@@schema("pim")`, multi-rooted category tree, workspace-scoped uniqueness on every workspace-owned entity, single migration `20260519224732_pim_phase_b_tables` |
 | Integration test | [`services/api/src/tests/pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts) | Option-B test proving module composition + reference-not-copy semantics; Option-A queued in §"Open work" |
 
-L2 cross-workspace isolation coverage: 32 axis-tests across 4 route files (products, variants, attribute sets, categories), all green.
+L2 cross-workspace isolation coverage: read-route coverage across products, variants, attribute sets, and categories, plus Phase E write/read-gap coverage for all six entity families, all green in the targeted PIM API test run.
 
 ---
 
@@ -54,7 +54,7 @@ Canonical `pim` exists to avoid these failure modes by owning the master, the at
 - **Attribute framework** — `Attribute` (typed: 8-value union covering primitives + select/multiselect + media-ref + reference), `AttributeSet` (named groupings tied to product families).
 - **Category taxonomy** — `Category` (multi-rooted tree via nullable `parentId`).
 - **Media reference** — `MediaAssetRef` (opaque pointer into `@umbraculum/media` with a `role` enum: `primary|gallery|swatch|document`). PIM owns the *reference*, not the binary pipeline.
-- **Read APIs + AI tools** — list/get for every entity; AI tools for the four read primitives most likely to be composed by a conversational agent.
+- **Read/write APIs + AI tools** — list/get and `POST/PATCH/DELETE` for every entity family; AI tools remain read-only for the four primitives most likely to be composed by a conversational agent.
 
 ### 3.2 Out of scope (other canonicals or sister modules own)
 
@@ -84,14 +84,15 @@ PIM and `automation` are sibling canonicals with **zero shared schema**. The arc
 Public exports (six surface families):
 
 - `CONTRACT_VERSION` + `classifyContractVersionSkew` + `parseSemVer` — version handshake primitives, semantics shared with `@umbraculum/automation-contracts` (major → refuse, minor → warn, patch → silent). Initial version `0.1.0-alpha.1`.
-- `ProductSchema` / `ProductRefSchema` / `ProductStatusSchema` + response envelopes (`ProductListResponseSchema`, `ProductGetResponseSchema`).
-- `VariantSchema` / `VariantRefSchema` + response envelopes. `attributeValues` is a discriminated-union map keyed by attribute code.
-- `AttributeSchema` / `AttributeTypeSchema` / `AttributeValueSchema` + response envelopes. `AttributeType` is an 8-value literal union.
-- `AttributeSetSchema` / `AttributeSetRefSchema` + response envelopes.
-- `CategorySchema` / `CategoryTreeNodeSchema` + response envelopes. List response carries both flat `items` and built `tree`.
-- `MediaAssetRefSchema` / `MediaAssetRoleSchema` + list response. Opaque ID-only reference into `@umbraculum/media`.
+- `ProductSchema` / `ProductRefSchema` / `ProductStatusSchema` + create/update request schemas + response envelopes (`ProductListResponseSchema`, `ProductGetResponseSchema`).
+- `VariantSchema` / `VariantRefSchema` + create/update request schemas + response envelopes. `attributeValues` is a discriminated-union map keyed by attribute code.
+- `AttributeSchema` / `AttributeTypeSchema` / `AttributeValueSchema` + create/update request schemas + response envelopes. `AttributeType` is an 8-value literal union.
+- `AttributeSetSchema` / `AttributeSetRefSchema` + create/update request schemas + response envelopes.
+- `CategorySchema` / `CategoryTreeNodeSchema` + create/update request schemas + response envelopes. List response carries both flat `items` and built `tree`.
+- `MediaAssetRefSchema` / `MediaAssetRoleSchema` + create/update request schemas + list/get response envelopes. Opaque ID-only reference into `@umbraculum/media`.
+- `PimDeleteResponseSchema` — shared `{ ok: true }` delete envelope for Phase E mutation routes.
 
-Test coverage: 4 Vitest files, 7 tests, all green. Strict-flag verification: 6/6 (strict, noImplicitOverride, noPropertyAccessFromIndexSignature, noUncheckedIndexedAccess, exactOptionalPropertyTypes, verbatimModuleSyntax) — see build-log §"Gate-skill re-verification" for the run record.
+Test coverage: focused schema tests for entity responses, version skew, and Phase E write request validation. Strict-flag verification: 6/6 (strict, noImplicitOverride, noPropertyAccessFromIndexSignature, noUncheckedIndexedAccess, exactOptionalPropertyTypes, verbatimModuleSyntax) — see build-log §"Gate-skill re-verification" for the historical run record.
 
 ---
 
@@ -116,17 +117,19 @@ Single migration: `services/api/prisma/migrations/20260519224732_pim_phase_b_tab
 
 [`services/api/src/modules/pim/services/`](../../services/api/src/modules/pim/services/):
 
-- `ProductsService` — `listProducts`, `getProductById`.
-- `VariantsService` — `listVariantsForProduct(workspaceId, productId)`, `getVariantById`.
-- `AttributeSetsService` — `listAttributeSets`, `getAttributeSetById`.
-- `CategoriesService` — `listCategories` (returns both flat `items` and built `tree`), `getCategoryById`.
+- `ProductsService` — `listProducts`, `getProductById`, `createProduct`, `updateProduct`, `deleteProduct`.
+- `VariantsService` — `listVariantsForProduct(workspaceId, productId)`, `getVariantById`, `createVariantForProduct`, `updateVariant`, `deleteVariant`.
+- `AttributesService` — `listAttributes`, `getAttributeById`, `createAttribute`, `updateAttribute`, `deleteAttribute`.
+- `AttributeSetsService` — `listAttributeSets`, `getAttributeSetById`, `createAttributeSet`, `updateAttributeSet`, `deleteAttributeSet`.
+- `CategoriesService` — `listCategories` (returns both flat `items` and built `tree`), `getCategoryById`, `createCategory`, `updateCategory`, `deleteCategory`.
+- `MediaAssetRefsService` — `listMediaAssetRefsForProduct`, `getMediaAssetRefById`, `createMediaAssetRefForProduct`, `updateMediaAssetRef`, `deleteMediaAssetRef`.
 
 Every service method:
 
 - Takes `userId, workspaceId` as the first two arguments (canonical workspace-scoping pattern).
-- Calls `workspaces.assertMembership(userId, workspaceId)` before any Prisma read.
+- Calls `workspaces.assertMembership(userId, workspaceId)` before any Prisma read or write.
 - Returns Zod-parsed shapes (defense in depth per [RFC-0003](../rfcs/0003-validation-library-adoption.md) Decision A — no raw Prisma rows leak past the service boundary).
-- Throws `NotFoundError` from [`services/api/src/errors.ts`](../../services/api/src/errors.ts) on misses; error code is the resource-specific token (`product_not_found`, `variant_not_found`, `attribute_set_not_found`, `category_not_found`).
+- Throws `NotFoundError` from [`services/api/src/errors.ts`](../../services/api/src/errors.ts) on misses; error code is the resource-specific token (`product_not_found`, `variant_not_found`, `attribute_not_found`, `attribute_set_not_found`, `category_not_found`, `media_asset_ref_not_found`).
 
 ### 5.3 Routes
 
@@ -135,19 +138,31 @@ Every service method:
 | Route | Method | Source file |
 |---|---|---|
 | `/pim/products` | GET | `productsRoutes.ts` |
+| `/pim/products` | POST | `productsRoutes.ts` |
 | `/pim/products/:productId` | GET | `productsRoutes.ts` |
+| `/pim/products/:productId` | PATCH, DELETE | `productsRoutes.ts` |
 | `/pim/products/:productId/variants` | GET | `variantsRoutes.ts` |
+| `/pim/products/:productId/variants` | POST | `variantsRoutes.ts` |
 | `/pim/variants/:variantId` | GET | `variantsRoutes.ts` |
+| `/pim/variants/:variantId` | PATCH, DELETE | `variantsRoutes.ts` |
+| `/pim/attributes` | GET, POST | `attributesRoutes.ts` |
+| `/pim/attributes/:attributeId` | GET, PATCH, DELETE | `attributesRoutes.ts` |
 | `/pim/attribute-sets` | GET | `attributeSetsRoutes.ts` |
+| `/pim/attribute-sets` | POST | `attributeSetsRoutes.ts` |
 | `/pim/attribute-sets/:setId` | GET | `attributeSetsRoutes.ts` |
+| `/pim/attribute-sets/:setId` | PATCH, DELETE | `attributeSetsRoutes.ts` |
 | `/pim/categories` | GET | `categoriesRoutes.ts` |
+| `/pim/categories` | POST | `categoriesRoutes.ts` |
 | `/pim/categories/:categoryId` | GET | `categoriesRoutes.ts` |
+| `/pim/categories/:categoryId` | PATCH, DELETE | `categoriesRoutes.ts` |
+| `/pim/products/:productId/media-asset-refs` | GET, POST | `mediaAssetRefsRoutes.ts` |
+| `/pim/media-asset-refs/:mediaAssetRefId` | GET, PATCH, DELETE | `mediaAssetRefsRoutes.ts` |
 
 Every route calls `requireActiveWorkspace(req)` first, parses URL params via inline Zod, and re-validates the outgoing response with the contracts-side envelope schema before returning. The route-level re-parse is the second of the three RFC-0003 §"defense-in-depth" boundary points; the third is the web-side re-parse in §6 below.
 
 ### 5.4 Module registration
 
-[`services/api/src/modules/pim/index.ts`](../../services/api/src/modules/pim/index.ts) exports `registerPimModule(app)`, which calls `registerModule({ code: "pim", prismaSchema: "pim" })` from `@umbraculum/module-sdk` and registers all four route families.
+[`services/api/src/modules/pim/index.ts`](../../services/api/src/modules/pim/index.ts) exports `registerPimModule(app)`, which calls `registerModule({ code: "pim", prismaSchema: "pim" })` from `@umbraculum/module-sdk` and registers all six route families.
 
 [`services/api/src/app.ts`](../../services/api/src/app.ts) wires it alongside `registerAutomationModule(app)`:
 
@@ -186,7 +201,7 @@ Registered in `app.ts` alongside brewery + automation tools — see Phase D §"i
 
 | Page | Route | Source |
 |---|---|---|
-| Product list | `/{locale}/products` | `(pim)/products/page.tsx` |
+| Product list + create draft product | `/{locale}/products` | `(pim)/products/page.tsx` |
 | Product detail | `/{locale}/products/{productId}` | `(pim)/products/[productId]/page.tsx` |
 | Categories tree | `/{locale}/categories` | `(pim)/categories/page.tsx` |
 | Attribute-set list | `/{locale}/attribute-sets` | `(pim)/attribute-sets/page.tsx` |
@@ -226,13 +241,13 @@ Option A artifacts (when authored):
 - A second variant of [`pimBreweryIntegration.test.ts`](../../services/api/src/tests/pimBreweryIntegration.test.ts) that exercises the FK round-trip.
 - Update of this surface doc §7 to mark Option A "shipped" and demote Option B to "first-iteration variant".
 
-### 8.2 Write paths (PIM Phase E equivalent)
+### 8.2 Write paths — CLOSED for API, partial for web UX
 
-`POST/PATCH/DELETE` for all six entity families are not yet wired. Surface design implications when they land:
+PIM Phase E wires `POST/PATCH/DELETE` for all six entity families and adds a minimal draft-product creation path to `/en/products`. Remaining UX and AI implications:
 
 - AI tool registry gets `pim.proposeProduct`, `pim.proposeVariant`, etc. — proposal-only (human-in-the-loop), modeled on the automation Phase E pattern.
-- Contracts package gets `*WriteSchema` siblings for each `*Schema`.
-- L2 isolation axes for write routes (8 additional axes per the `l2-cross-workspace-isolation-test` skill template).
+- Full edit/delete UI for every entity family is still deferred; only the product create flow is shipped.
+- Dedicated web read pages for attributes and media-asset refs are still deferred; their API read/write surfaces are shipped.
 
 ### 8.3 Channel-feed projections
 
