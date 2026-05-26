@@ -3,7 +3,7 @@
 Canonical `pim` module — RFC-0004 PIM API slice plus Phase E read/write paths.
 
 > [!NOTE]
-> Sixth module in the `services/api/src/modules/<code>/` β-layout per [RFC-0002](../../../../../docs/rfcs/0002-canonical-module-physical-layout.md), sibling of [`services/api/src/modules/automation/`](../automation/). Brewery flat routes in `services/api/src/routes/` are not migrated yet (RFC-0002 Decision D — H1 2027 tranche).
+> Sixth module in the `services/api/src/modules/<code>/` β-layout per [RFC-0002](../../../../../docs/rfcs/0002-canonical-module-physical-layout.md), sibling of [`services/api/src/modules/automation/`](../automation/). Brewery has since joined the same API module shape under `services/api/src/modules/brewery/` via the RFC-0006 acceleration.
 
 ## What this is
 

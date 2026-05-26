@@ -203,7 +203,7 @@ No migration. PIM is net-new code; nothing exists today to be moved. The path fo
 2. **Phase A — contracts.** `packages/pim-contracts/` → `@umbraculum/pim-contracts`. Ships `ProductSchema`, `VariantSchema`, `AttributeSetSchema`, `CategorySchema`, `MediaAssetRefSchema`, `ChannelOverrideSchema`, plus `ProductRef` / `VariantRef` (the cross-module shared types). Built on Zod v4 per [RFC-0003](0003-validation-library-adoption.md). Carries `CONTRACT_VERSION`.
 3. **Phase B — read path.** `services/api/src/modules/pim/` skeleton with `registerModule({ code: "pim", ... })`. Read routes (list / get / search), AI tools (search / suggest / detect-duplicates), workspace-scoped data model.
 4. **Phase C — write path + channel-feeds.** Inbound feed ingestion, outbound channel publication, the full Akeneo-shaped surface.
-5. **Brewery vertical integration.** Brewery's recipe-as-product surface migrates to PIM primitives. Timing tied to the brewery β migration ([RFC-0002](0002-canonical-module-physical-layout.md) §3 Decision D, H1 2027).
+5. **Brewery vertical integration.** Brewery's recipe-as-product surface migrates to PIM primitives. Calendar note: the brewery β file move was later accelerated by [RFC-0006](0006-amend-rfc-0002-brewery-file-move-acceleration.md); the real brewery↔PIM FK/projection integration remains future work.
 
 The reference-pamphlet update of [RFC-0003](0003-validation-library-adoption.md)'s "five upcoming contracts packages" count becomes six with Phase A; no in-place edit to RFC-0003 is required — RFC-0003's count was a snapshot at its acceptance and remains historically accurate. The accurate forward count lives in [`docs/MODULES.md`](../MODULES.md) §3.1, which this PR updates.
 

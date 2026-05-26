@@ -222,7 +222,9 @@ Enterprises auditing codebase structure for acquisitions or compliance reviews g
 
 ## 11. Migration plan
 
-### 11.1 Today's flat brewery surface (unchanged until H1 2027 tranche)
+> **Amendment note (RFC-0006):** The TypeScript/API/web/native brewery file move described in this section has already landed under the RFC-0006 acceleration. The historical rows below remain useful to understand the before/after mapping; they are not a current-state inventory. The Prisma `brewery.*` schema split remains deferred.
+
+### 11.1 Historical flat brewery surface (pre-RFC-0006)
 
 **API routes (flat `services/api/src/routes/`):** brewery-vertical handlers include `brewdaySettings.ts`, `brewSessions.ts`, `equipmentProfiles.ts`, `ingredients.ts`, `inventory.ts`, `recipes.ts`, `recipesExport.ts`, `recipesImport.ts`, `recipeWaterComputeAndSave.ts`, `recipeWaterHubSummary.ts`, `recipeWaterSettings.ts`, `styles.ts`, `waterCalc.ts`, `waterProfiles.ts` — registered from `services/api/src/app.ts`.
 
@@ -230,13 +232,13 @@ Enterprises auditing codebase structure for acquisitions or compliance reviews g
 
 **Web routes (flat `apps/web/app/[locale]/`):** brewery-vertical segments include `recipes/`, `inventory/`, `equipment/`, `water-profiles/`, `brewday-steps-settings/`, `ferm-data-integration/`, plus supporting segments `about/`, `contact/`, `contributing/`, `i18n-contributing/`. Platform/auth segments: `(auth)/`, `platform/`, `ai/`, `accessibility/`.
 
-**Native (`apps/native/src/`):** screens and navigation today are not grouped by module folder; migration creates `apps/native/src/modules/brewery/` and moves brewery screens there in the H1 2027 tranche.
+**Native (`apps/native/src/`):** screens and navigation were not grouped by module folder; RFC-0006 moved brewery screens into `apps/native/src/modules/brewery/`.
 
-**Packages:** horizontal and brewery-vertical packages remain under current `@brewery/*` scopes until sub-plan #9.
+**Packages:** horizontal and brewery-vertical packages were under `@brewery/*` scopes until sub-plan #9 moved them to `@umbraculum/*` and `@umbraculum/brewery-*`.
 
-### 11.2 H1 2027 restructure — concrete folder moves (β target)
+### 11.2 RFC-0006 accelerated restructure — concrete folder moves
 
-When the second canonical module (example: `wms`) ships:
+When the second canonical module shipped and the web-route audit landed, RFC-0006 pulled the brewery file move forward:
 
 | From (today) | To (β target) |
 |---|---|

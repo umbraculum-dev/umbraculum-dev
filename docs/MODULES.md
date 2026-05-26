@@ -54,13 +54,13 @@ The reserved set is closed — the six codes below are it, today. Additions go t
 | Code | Status | Surface | License | Page |
 |---|---|---|---|---|
 | `automation` | **Shipped — read path (Phase B-3, 2026-05-19); Phase C real adapter pending** | Fleet, vessels, alarms; OpenPLC bridge via brewery adapter | AGPLv3 | [modules/canonical/automation.md](modules/canonical/automation.md) |
-| `mrp` | Open door — H1 2027 working assumption | Material requirements planning, production orders, work orders | AGPLv3 | [modules/canonical/mrp.md](modules/canonical/mrp.md) |
+| `mrp` | Open door — August 2026 alpha co-design target documented; mature scope still H1 2027 | Material requirements planning, production orders, work orders | AGPLv3 | [modules/canonical/mrp.md](modules/canonical/mrp.md) |
 | `wms` | Open door — H2 2027 (native-mandatory) | Warehouse management, stock movements, locations, lots/serials | AGPLv3 | [modules/canonical/wms.md](modules/canonical/wms.md) |
 | `crm` | Open door — no firm horizon | Customer relationships, contacts, accounts, opportunities | AGPLv3 | [modules/canonical/crm.md](modules/canonical/crm.md) |
-| `crp` | Open door — H1 2027 working assumption (paired with `mrp`) | Capacity requirements planning, resource scheduling, work-center load | AGPLv3 | [modules/canonical/crp.md](modules/canonical/crp.md) |
+| `crp` | Open door — August 2026 alpha co-design target documented; mature scope still H1 2027 (paired with `mrp`) | Capacity requirements planning, resource scheduling, work-center load | AGPLv3 | [modules/canonical/crp.md](modules/canonical/crp.md) |
 | `pim` | Shipped — Phase A + B + C + D-integration-test-Option-B + RFC-0007 PR7 vendor-neutral channel-feed proof (read path, web admin, 4 AI tools, cross-module composition proof, `pim:product-catalog-csv@v1` async render job); Phase E write paths + vendor-specific feed adapters + Option-A real-FK integration queued per [RFC-0004](rfcs/0004-canonical-pim.md) + [surface doc](design/canonical-pim-module-surface.md) §"Open work" | Master product information: products, variants, attribute sets, categories, media, channel + locale overrides (Akeneo / Pimcore class) | AGPLv3 | [modules/canonical/pim.md](modules/canonical/pim.md) |
 
-Note on "open door": the code is reserved and the folder shape is pre-committed by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md). The work to design and ship each module's surface is its own future RFC or design artifact ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §12.4); no implementation exists yet.
+Note on "open door": the code is reserved and the folder shape is pre-committed by [RFC-0002](rfcs/0002-canonical-module-physical-layout.md). The work to design and ship each module's surface is its own future RFC or design artifact ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §12.4); no implementation exists yet. For `mrp` and `crp`, the August 2026 alpha planning artifacts are [`design/mrp-crp-august-2026-co-design-plan.md`](design/mrp-crp-august-2026-co-design-plan.md), [`design/canonical-mrp-module-surface.md`](design/canonical-mrp-module-surface.md), and [`design/canonical-crp-module-surface.md`](design/canonical-crp-module-surface.md).
 
 ### 3.2 Vertical configurations (Tier 6, permissionless)
 

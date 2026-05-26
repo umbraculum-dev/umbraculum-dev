@@ -122,7 +122,7 @@ Three tables ([`services/api/prisma/schema.prisma`](../../../services/api/prisma
 - `AdapterConnection` — one per installed PLC connection: `adapterKind`, `contractVersion`, `runtimeVersion`, `status`. Carries the version handshake.
 - `AutomationAlarmEvent` — open/cleared alarm records with code / severity / message / `raisedAt` / `clearedAt`. Phase D enables raise-and-clear flow.
 
-The cross-schema FK to `public.equipment_profiles` is app-level today; Prisma `@relation` across schemas will land in the H1 2027 tranche alongside the brewery → β migration ([surface design §12.3](../../design/canonical-automation-module-surface.md)).
+The cross-schema FK to `public.equipment_profiles` is app-level today. Brewery's TypeScript file layout has already migrated to the β shape under RFC-0006; a formal Prisma `@relation` across schemas remains a future data-layer upgrade tied to the brewery schema split or another adjacent data migration ([surface design §12.3](../../design/canonical-automation-module-surface.md)).
 
 ---
 
