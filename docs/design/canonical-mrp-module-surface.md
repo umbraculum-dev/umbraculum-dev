@@ -1,13 +1,13 @@
 # Canonical `mrp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 1 foundation shipped (contracts + read-only API skeleton), alpha proof not complete
+**Status:** Draft surface design 2026-05-26; Wave 2 brewery projection shipped (read-time projections), alpha proof not complete
 **Audience:** core team, MRP implementers, brewery-vertical maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `mrp` open-door next step from [`modules/canonical/mrp.md`](../modules/canonical/mrp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`RFC-0007`](../rfcs/0007-canonical-document-rendering.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> Wave 1 has shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. This is still foundation-only: no web page, native screen, brewery projection, AI runtime tool, rendering job, write workflow, WMS behavior, or complete alpha proof is claimed as shipped.
+> Wave 1 shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 now projects brewery recipes and brew sessions into those read routes at request time. This is still not alpha-complete: no web page, native screen, AI runtime tool, rendering job, write workflow, WMS behavior, or complete public-alpha proof is claimed as shipped.
 
 ---
 
@@ -20,7 +20,7 @@ MRP does not own inventory execution, capacity scheduling, live controller state
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
 | Contracts | `packages/mrp-contracts/` -> `@umbraculum/mrp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, production-order/BOM/material-requirement refs, planned AI/rendering payload schemas. |
-| API | `services/api/src/modules/mrp/` | **Wave 1 shipped:** read-only routes, services, Prisma `mrp` schema, module registration. AI tool handlers and document-template registration remain future work. |
+| API | `services/api/src/modules/mrp/` | **Wave 1 + Wave 2 shipped:** read-only routes, services, Prisma `mrp` schema, module registration, and read-time brewery projections. AI tool handlers and document-template registration remain future work. |
 | Web | `apps/web/app/[locale]/(mrp)/` | Planned read/propose planning pages under registered static URL segments. |
 | Native | `apps/native/src/modules/mrp/` | Future operator/manager screens; may trail web in alpha. |
 | Rendering | module-registered templates | Work orders, route cards, material-requirement exports. |
@@ -213,7 +213,9 @@ Brewery proves MRP without becoming MRP.
 | `InventoryItem` | Material availability assumption only; WMS remains future. |
 | PIM product/variant refs | Finished-good or sellable-unit identity where present. |
 
-The alpha implementation should prefer adapters/projections over irreversible data migration. Existing brewery routes remain stable until a later implementation plan explicitly moves behavior.
+Wave 2 shipped the first read-time adapter: recipes project as BOMs, brew sessions project as production orders, session steps project as operations, and recipe ingredients project as assumption-only material requirements. Projection IDs are deterministic (`brewery-recipe-<recipeId>`, `brewery-brew-session-<sessionId>`, `brewery-brew-session-step-<stepId>`), and persisted `mrp.*` rows are not created or required.
+
+The alpha implementation should continue to prefer adapters/projections over irreversible data migration. Existing brewery routes remain stable until a later implementation plan explicitly moves behavior.
 
 ---
 

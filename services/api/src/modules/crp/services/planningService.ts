@@ -19,6 +19,7 @@ import {
 } from "@umbraculum/crp-contracts";
 
 import { WorkspacesService } from "../../../services/workspacesService.js";
+import { CrpBreweryProjectionService } from "./breweryProjectionService.js";
 
 type ResourceWithLoadRows = Prisma.CrpResourceGetPayload<{
   include: { calendars: { include: { windows: true } }; scheduledOperations: true };
@@ -26,9 +27,11 @@ type ResourceWithLoadRows = Prisma.CrpResourceGetPayload<{
 
 export class CrpPlanningService {
   private readonly workspaces: WorkspacesService;
+  private readonly breweryProjections: CrpBreweryProjectionService;
 
   constructor(private readonly prisma: PrismaClient) {
     this.workspaces = new WorkspacesService(prisma);
+    this.breweryProjections = new CrpBreweryProjectionService(prisma);
   }
 
   async listWorkCenters(userId: string, workspaceId: string): Promise<readonly WorkCenter[]> {
@@ -37,7 +40,9 @@ export class CrpPlanningService {
       where: { workspaceId },
       orderBy: [{ code: "asc" }],
     });
-    return rows.map((row) => toWorkCenter(row));
+    const persisted = rows.map((row) => toWorkCenter(row));
+    const projected = await this.breweryProjections.listProjectedWorkCenters(workspaceId);
+    return [...persisted, ...projected].sort((a, b) => a.code.localeCompare(b.code));
   }
 
   async getCapacityLoad(
@@ -51,9 +56,14 @@ export class CrpPlanningService {
       include: { calendars: { include: { windows: true } }, scheduledOperations: true },
       orderBy: [{ code: "asc" }],
     });
-    return CapacityLoadSchema.parse({
+    const persisted = CapacityLoadSchema.parse({
       workspaceId,
       buckets: resources.flatMap((resource) => toCapacityBuckets(resource)),
+    });
+    const projected = await this.breweryProjections.getProjectedCapacityLoad(workspaceId, resourceId);
+    return CapacityLoadSchema.parse({
+      workspaceId,
+      buckets: [...persisted.buckets, ...projected.buckets],
     });
   }
 
@@ -66,7 +76,9 @@ export class CrpPlanningService {
       where: { workspaceId },
       orderBy: [{ startsAt: "asc" }, { id: "asc" }],
     });
-    return rows.map((row) => toScheduledOperation(row));
+    const persisted = rows.map((row) => toScheduledOperation(row));
+    const projected = await this.breweryProjections.listProjectedScheduledOperations(workspaceId);
+    return [...persisted, ...projected].sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
   }
 
   async listConflicts(userId: string, workspaceId: string): Promise<readonly CapacityConflict[]> {
@@ -75,7 +87,9 @@ export class CrpPlanningService {
       where: { workspaceId },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
-    return rows.map((row) => toConflict(row));
+    const persisted = rows.map((row) => toConflict(row));
+    const projected = await this.breweryProjections.listProjectedConflicts(workspaceId);
+    return [...persisted, ...projected].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
   }
 }
 

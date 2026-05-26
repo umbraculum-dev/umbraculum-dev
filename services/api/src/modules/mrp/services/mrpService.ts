@@ -13,6 +13,7 @@ import {
 
 import { NotFoundError } from "../../../errors.js";
 import { WorkspacesService } from "../../../services/workspacesService.js";
+import { MrpBreweryProjectionService } from "./breweryProjectionService.js";
 
 type ProductionOrderRow = Prisma.MrpProductionOrderGetPayload<{
   include: { lines: true };
@@ -28,9 +29,11 @@ type BomRow = Prisma.MrpBomGetPayload<{
 
 export class MrpService {
   private readonly workspaces: WorkspacesService;
+  private readonly breweryProjections: MrpBreweryProjectionService;
 
   constructor(private readonly prisma: PrismaClient) {
     this.workspaces = new WorkspacesService(prisma);
+    this.breweryProjections = new MrpBreweryProjectionService(prisma);
   }
 
   async listProductionOrders(
@@ -44,7 +47,9 @@ export class MrpService {
       include: { lines: true },
       orderBy: [{ orderNumber: "asc" }],
     });
-    return rows.map((row) => toProductionOrder(row));
+    const persisted = rows.map((row) => toProductionOrder(row));
+    const projected = await this.breweryProjections.listProjectedProductionOrders(workspaceId, status);
+    return [...persisted, ...projected].sort((a, b) => a.orderNumber.localeCompare(b.orderNumber));
   }
 
   async getProductionOrderById(
@@ -58,6 +63,11 @@ export class MrpService {
       include: { lines: true, operations: true, materialRequirements: true },
     });
     if (!row) {
+      const projected = await this.breweryProjections.getProjectedProductionOrderById(
+        workspaceId,
+        productionOrderId,
+      );
+      if (projected) return projected;
       throw new NotFoundError(
         "production_order_not_found",
         `No production order with id ${productionOrderId}`,
@@ -82,7 +92,9 @@ export class MrpService {
       include: { lines: true },
       orderBy: [{ code: "asc" }],
     });
-    return rows.map((row) => toBom(row));
+    const persisted = rows.map((row) => toBom(row));
+    const projected = await this.breweryProjections.listProjectedBoms(workspaceId);
+    return [...persisted, ...projected].sort((a, b) => a.code.localeCompare(b.code));
   }
 
   async getBomById(userId: string, workspaceId: string, bomId: string): Promise<Bom> {
@@ -92,6 +104,8 @@ export class MrpService {
       include: { lines: true },
     });
     if (!row) {
+      const projected = await this.breweryProjections.getProjectedBomById(workspaceId, bomId);
+      if (projected) return projected;
       throw new NotFoundError("bom_not_found", `No BOM with id ${bomId}`);
     }
     return toBom(row);
@@ -107,7 +121,12 @@ export class MrpService {
       where: { workspaceId, ...(productionOrderId ? { productionOrderId } : {}) },
       orderBy: [{ description: "asc" }],
     });
-    return rows.map((row) => toMaterialRequirement(row));
+    const persisted = rows.map((row) => toMaterialRequirement(row));
+    const projected = await this.breweryProjections.listProjectedMaterialRequirements(
+      workspaceId,
+      productionOrderId,
+    );
+    return [...persisted, ...projected].sort((a, b) => a.description.localeCompare(b.description));
   }
 }
 

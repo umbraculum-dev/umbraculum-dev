@@ -6,12 +6,15 @@ import {
 
 import { NotFoundError } from "../../../errors.js";
 import { WorkspacesService } from "../../../services/workspacesService.js";
+import { CrpBreweryProjectionService } from "./breweryProjectionService.js";
 
 export class CrpResourcesService {
   private readonly workspaces: WorkspacesService;
+  private readonly breweryProjections: CrpBreweryProjectionService;
 
   constructor(private readonly prisma: PrismaClient) {
     this.workspaces = new WorkspacesService(prisma);
+    this.breweryProjections = new CrpBreweryProjectionService(prisma);
   }
 
   async listResources(userId: string, workspaceId: string, kind?: string): Promise<readonly Resource[]> {
@@ -20,7 +23,9 @@ export class CrpResourcesService {
       where: { workspaceId, ...(kind ? { kind } : {}) },
       orderBy: [{ code: "asc" }],
     });
-    return rows.map((row) => toResource(row));
+    const persisted = rows.map((row) => toResource(row));
+    const projected = await this.breweryProjections.listProjectedResources(workspaceId, kind);
+    return [...persisted, ...projected].sort((a, b) => a.code.localeCompare(b.code));
   }
 
   async getResourceById(userId: string, workspaceId: string, resourceId: string): Promise<Resource> {
@@ -29,6 +34,8 @@ export class CrpResourcesService {
       where: { id: resourceId, workspaceId },
     });
     if (!row) {
+      const projected = await this.breweryProjections.getProjectedResourceById(workspaceId, resourceId);
+      if (projected) return projected;
       throw new NotFoundError("resource_not_found", `No resource with id ${resourceId}`);
     }
     return toResource(row);
