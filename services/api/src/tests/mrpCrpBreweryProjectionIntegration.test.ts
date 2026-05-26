@@ -5,12 +5,17 @@ import {
   ProductionOrderListResponseSchema,
 } from "@umbraculum/mrp-contracts";
 import {
+  CapacityConflictListResponseSchema,
   CapacityLoadResponseSchema,
   ScheduledOperationListResponseSchema,
 } from "@umbraculum/crp-contracts";
 
 import { buildApp } from "../app.js";
-import { automationVesselResourceId } from "../modules/crp/services/breweryProjectionIds.js";
+import {
+  automationVesselResourceId,
+  breweryCapacityConflictId,
+  breweryScheduledOperationId,
+} from "../modules/crp/services/breweryProjectionIds.js";
 import {
   breweryBrewSessionProductionOrderId,
   breweryRecipeBomId,
@@ -25,6 +30,7 @@ describe("mrp/crp brewery projection integration — Wave 2 read path", () => {
   let recipeId = "";
   let sessionId = "";
   let stepId = "";
+  let missingDurationStepId = "";
   let profileId = "";
   let vesselId = "";
 
@@ -72,18 +78,27 @@ describe("mrp/crp brewery projection integration — Wave 2 read path", () => {
         status: "draft",
         scheduledDate: new Date("2026-08-05T00:00:00.000Z"),
         steps: {
-          create: [{
-            sectionId: "boil",
-            name: "Boil",
-            sortOrder: 1,
-            minutesPlanned: 75,
-          }],
+          create: [
+            {
+              sectionId: "boil",
+              name: "Boil",
+              sortOrder: 1,
+              minutesPlanned: 75,
+            },
+            {
+              sectionId: "cooling",
+              name: "Cooling Missing Duration",
+              sortOrder: 2,
+              minutesPlanned: null,
+            },
+          ],
         },
       },
       include: { steps: true },
     });
     sessionId = brewSession.id;
-    stepId = brewSession.steps[0]?.id ?? "";
+    stepId = brewSession.steps.find((step) => step.name === "Boil")?.id ?? "";
+    missingDurationStepId = brewSession.steps.find((step) => step.name === "Cooling Missing Duration")?.id ?? "";
   });
 
   afterAll(async () => {
@@ -125,7 +140,10 @@ describe("mrp/crp brewery projection integration — Wave 2 read path", () => {
     });
     expect(scheduled.statusCode).toBe(200);
     const scheduledBody = ScheduledOperationListResponseSchema.parse(scheduled.json());
-    expect(scheduledBody.items[0]?.resourceId).toBe(automationVesselResourceId(vesselId));
+    const scheduledOperation = scheduledBody.items.find((item) => item.id === breweryScheduledOperationId(stepId));
+    expect(scheduledOperation?.resourceId).toBe(automationVesselResourceId(vesselId));
+    expect(scheduledOperation?.productionOrderId).toBe(breweryBrewSessionProductionOrderId(sessionId));
+    expect(scheduledOperation?.sourceRefId).toBe(stepId);
 
     const load = await app.inject({
       method: "GET",
@@ -134,6 +152,19 @@ describe("mrp/crp brewery projection integration — Wave 2 read path", () => {
     });
     expect(load.statusCode).toBe(200);
     expect(CapacityLoadResponseSchema.parse(load.json()).item.buckets[0]?.plannedMinutes).toBe(75);
+
+    const conflicts = await app.inject({
+      method: "GET",
+      url: "/crp/conflicts",
+      headers: { cookie },
+    });
+    expect(conflicts.statusCode).toBe(200);
+    const conflictsBody = CapacityConflictListResponseSchema.parse(conflicts.json());
+    expect(
+      conflictsBody.items.some((item) =>
+        item.id === breweryCapacityConflictId("missing-duration", missingDurationStepId)
+      ),
+    ).toBe(true);
 
     expect(await app.prisma.mrpBom.count({ where: { workspaceId } })).toBe(0);
     expect(await app.prisma.mrpProductionOrder.count({ where: { workspaceId } })).toBe(0);

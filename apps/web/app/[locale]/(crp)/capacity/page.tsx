@@ -98,7 +98,14 @@ export default function CrpCapacityPage() {
           <ul className="brew-recipe-list">
             {buckets.map((bucket) => (
               <li key={`${bucket.resourceId}:${bucket.bucketStartAt}`} className="brew-recipe-list-row">
-                <CapacityBucketSummary bucket={bucket} labels={labels} />
+                <YStack gap="$2">
+                  <CapacityBucketSummary bucket={bucket} labels={labels} />
+                  <XStack gap="$3" flexWrap="wrap">
+                    <Link href={`/resources/${encodeURIComponent(bucket.resourceId)}`}>
+                      {tCapacity("resourceLink")}
+                    </Link>
+                  </XStack>
+                </YStack>
               </li>
             ))}
           </ul>

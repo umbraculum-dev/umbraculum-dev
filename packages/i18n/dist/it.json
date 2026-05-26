@@ -145,19 +145,25 @@
     "refreshing": "Aggiornamento…",
     "error": "Impossibile caricare i dati di pianificazione capacità.",
     "noResources": "Nessuna risorsa di capacità o proiezione automation in questo workspace.",
+    "noWorkCenters": "Nessuna proiezione di centro di lavoro in questo workspace.",
     "noCapacity": "Nessun bucket di carico capacità visibile.",
     "noSchedule": "Nessuna operazione schedulata visibile.",
     "noConflicts": "Nessun avviso di capacità visibile.",
     "resources": {
       "listTitle": "Risorse",
       "openDetail": "Apri risorsa",
+      "workCentersTitle": "Centri di lavoro",
+      "workCentersNote": "I centri di lavoro sono proiezioni in sola lettura dei profili attrezzatura brewery. Spiegano il contesto di capacità senza spostare la proprietà fuori da brewery.",
+      "openRelatedResource": "Apri risorsa collegata",
+      "automationSourceLink": "Apri vessel automation",
       "back": "Torna alle risorse",
       "capacityLink": "Apri vista capacità",
       "scheduleLink": "Apri schedule"
     },
     "capacity": {
       "title": "Carico capacità",
-      "note": "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacità calendario finale del CRP."
+      "note": "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacità calendario finale del CRP.",
+      "resourceLink": "Apri dettaglio risorsa"
     },
     "schedule": {
       "title": "Schedule",

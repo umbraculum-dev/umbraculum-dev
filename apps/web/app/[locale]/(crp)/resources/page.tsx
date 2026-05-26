@@ -1,6 +1,11 @@
 "use client";
 
-import { ResourceListResponseSchema, type Resource } from "@umbraculum/crp-contracts";
+import {
+  ResourceListResponseSchema,
+  WorkCenterListResponseSchema,
+  type Resource,
+  type WorkCenter,
+} from "@umbraculum/crp-contracts";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
@@ -9,7 +14,12 @@ import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
-import { RefreshButton, ResourceSummary, SectionCard } from "../_components/CrpReadOnly";
+import {
+  RefreshButton,
+  ResourceSummary,
+  SectionCard,
+  WorkCenterSummary,
+} from "../_components/CrpReadOnly";
 
 export default function CrpResourcesPage() {
   const t = useTranslations("crp");
@@ -21,6 +31,7 @@ export default function CrpResourcesPage() {
   const canCall = authState.status === "ready";
 
   const [resources, setResources] = useState<readonly Resource[]>([]);
+  const [workCenters, setWorkCenters] = useState<readonly WorkCenter[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,15 +40,32 @@ export default function CrpResourcesPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/crp/resources");
-      if (!res.ok) {
-        throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      const [resourcesRes, workCentersRes] = await Promise.all([
+        apiFetch("/api/crp/resources"),
+        apiFetch("/api/crp/work-centers"),
+      ]);
+      if (!resourcesRes.ok) {
+        throw new Error(
+          typeof resourcesRes.data === "string"
+            ? resourcesRes.data
+            : JSON.stringify(resourcesRes.data),
+        );
       }
-      const parsed = ResourceListResponseSchema.parse(res.data);
-      setResources(parsed.items);
+      if (!workCentersRes.ok) {
+        throw new Error(
+          typeof workCentersRes.data === "string"
+            ? workCentersRes.data
+            : JSON.stringify(workCentersRes.data),
+        );
+      }
+      const parsedResources = ResourceListResponseSchema.parse(resourcesRes.data);
+      const parsedWorkCenters = WorkCenterListResponseSchema.parse(workCentersRes.data);
+      setResources(parsedResources.items);
+      setWorkCenters(parsedWorkCenters.items);
     } catch (err) {
       setError(String(err));
       setResources([]);
+      setWorkCenters([]);
     } finally {
       setLoading(false);
     }
@@ -55,6 +83,7 @@ export default function CrpResourcesPage() {
     source: tFields("source"),
     sourceRefId: tFields("sourceRefId"),
     debugId: tFields("debugId"),
+    resource: tFields("resource"),
     canonical: tValues("canonicalCrpRow"),
     automation: tValues("projectedFromAutomationVessel"),
     brewery: tValues("projectedFromBrewery"),
@@ -82,13 +111,13 @@ export default function CrpResourcesPage() {
 
       {error ? <ErrorBox>{error}</ErrorBox> : null}
 
-      {loading && resources.length === 0 ? (
+      {loading && resources.length === 0 && workCenters.length === 0 ? (
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
           {t("loading")}
         </SizableText>
       ) : null}
 
-      {!loading && resources.length === 0 && !error ? (
+      {!loading && resources.length === 0 && workCenters.length === 0 && !error ? (
         <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
           {t("noResources")}
         </SizableText>
@@ -106,6 +135,30 @@ export default function CrpResourcesPage() {
                       {tResources("openDetail")}
                     </Link>
                   </XStack>
+                </YStack>
+              </li>
+            ))}
+          </ul>
+        </SectionCard>
+      ) : null}
+
+      {workCenters.length > 0 ? (
+        <SectionCard headingId="crp-work-centers-heading" title={tResources("workCentersTitle")}>
+          <SizableText size="$2" color="var(--text-muted)" fontFamily="$body">
+            {tResources("workCentersNote")}
+          </SizableText>
+          <ul className="brew-recipe-list">
+            {workCenters.map((workCenter) => (
+              <li key={workCenter.id} className="brew-recipe-list-row">
+                <YStack gap="$2">
+                  <WorkCenterSummary workCenter={workCenter} labels={labels} />
+                  {workCenter.resourceId ? (
+                    <XStack gap="$3" flexWrap="wrap">
+                      <Link href={`/resources/${encodeURIComponent(workCenter.resourceId)}`}>
+                        {tResources("openRelatedResource")}
+                      </Link>
+                    </XStack>
+                  ) : null}
                 </YStack>
               </li>
             ))}

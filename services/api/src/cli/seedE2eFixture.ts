@@ -27,6 +27,10 @@ const E2E_RECIPE_ID = "e2e00000-0000-0000-0000-000000000abc";
 const E2E_RECIPE_VERSION_GROUP_ID = E2E_RECIPE_ID;
 const E2E_WATER_PROFILE_ID = "e2e00000-0000-0000-0000-000000000fff";
 const E2E_BREW_SESSION_ID = "e2e00000-0000-0000-0000-000000000bbe";
+const E2E_EQUIPMENT_PROFILE_ID = "e2e00000-0000-0000-0000-000000000e01";
+const E2E_VESSEL_ID = "e2e00000-0000-0000-0000-000000000e02";
+const E2E_BREW_SESSION_MASH_STEP_ID = "e2e00000-0000-0000-0000-000000000e03";
+const E2E_BREW_SESSION_BOIL_STEP_ID = "e2e00000-0000-0000-0000-000000000e04";
 
 const ADMIN_EMAIL = "e2e-admin@brewery.local";
 const MEMBER_EMAIL = "e2e-member@brewery.local";
@@ -227,6 +231,44 @@ async function seed() {
       },
     });
 
+    await prisma.equipmentProfile.upsert({
+      where: { id: E2E_EQUIPMENT_PROFILE_ID },
+      create: {
+        id: E2E_EQUIPMENT_PROFILE_ID,
+        workspaceId: E2E_WORKSPACE_ID,
+        name: "E2E Alpha Brewhouse",
+        kettleVolumeLiters: 35,
+        mashVolumeLiters: 30,
+        mashEfficiencyPercent: 75,
+      },
+      update: {
+        workspaceId: E2E_WORKSPACE_ID,
+        name: "E2E Alpha Brewhouse",
+        kettleVolumeLiters: 35,
+        mashVolumeLiters: 30,
+        mashEfficiencyPercent: 75,
+      },
+    });
+
+    await prisma.vessel.upsert({
+      where: { id: E2E_VESSEL_ID },
+      create: {
+        id: E2E_VESSEL_ID,
+        workspaceId: E2E_WORKSPACE_ID,
+        code: "E2E-KETTLE-01",
+        displayName: "E2E Alpha Kettle",
+        vesselKind: "kettle",
+        equipmentProfileId: E2E_EQUIPMENT_PROFILE_ID,
+      },
+      update: {
+        workspaceId: E2E_WORKSPACE_ID,
+        code: "E2E-KETTLE-01",
+        displayName: "E2E Alpha Kettle",
+        vesselKind: "kettle",
+        equipmentProfileId: E2E_EQUIPMENT_PROFILE_ID,
+      },
+    });
+
     const recipeName = "E2E Pale Ale";
     await prisma.recipe.upsert({
       where: { id: E2E_RECIPE_ID },
@@ -240,6 +282,12 @@ async function seed() {
         styleKey: "custom",
         notes: "Seeded recipe used by Playwright + browser-MCP E2E flows.",
         beerJsonRecipeJson: buildE2EPaleAleBeerJson(recipeName),
+        recipeExtJson: {
+          equipmentSource: {
+            equipmentProfileId: E2E_EQUIPMENT_PROFILE_ID,
+            copiedAt: "2026-08-01T00:00:00.000Z",
+          },
+        },
       },
       update: {
         workspaceId: E2E_WORKSPACE_ID,
@@ -250,6 +298,12 @@ async function seed() {
         styleKey: "custom",
         notes: "Seeded recipe used by Playwright + browser-MCP E2E flows.",
         beerJsonRecipeJson: buildE2EPaleAleBeerJson(recipeName),
+        recipeExtJson: {
+          equipmentSource: {
+            equipmentProfileId: E2E_EQUIPMENT_PROFILE_ID,
+            copiedAt: "2026-08-01T00:00:00.000Z",
+          },
+        },
       },
     });
 
@@ -261,15 +315,69 @@ async function seed() {
         recipeId: E2E_RECIPE_ID,
         code: "E2E-PA-001",
         status: "draft",
+        scheduledDate: new Date("2026-08-03T00:00:00.000Z"),
       },
       update: {
         workspaceId: E2E_WORKSPACE_ID,
         recipeId: E2E_RECIPE_ID,
         code: "E2E-PA-001",
+        status: "draft",
+        scheduledDate: new Date("2026-08-03T00:00:00.000Z"),
       },
     });
 
-     
+    await prisma.brewSessionStep.upsert({
+      where: { id: E2E_BREW_SESSION_MASH_STEP_ID },
+      create: {
+        id: E2E_BREW_SESSION_MASH_STEP_ID,
+        brewSessionId: E2E_BREW_SESSION_ID,
+        sectionId: "mash",
+        sectionName: "Mash",
+        name: "E2E Alpha Mash",
+        sortOrder: 1,
+        minutesPlanned: 60,
+        customTimerEnabled: true,
+      },
+      update: {
+        brewSessionId: E2E_BREW_SESSION_ID,
+        sectionId: "mash",
+        sectionName: "Mash",
+        name: "E2E Alpha Mash",
+        isDisabled: false,
+        sortOrder: 1,
+        minutesPlanned: 60,
+        relativeToStepId: null,
+        offsetMinutesFromEnd: null,
+        customTimerEnabled: true,
+      },
+    });
+
+    await prisma.brewSessionStep.upsert({
+      where: { id: E2E_BREW_SESSION_BOIL_STEP_ID },
+      create: {
+        id: E2E_BREW_SESSION_BOIL_STEP_ID,
+        brewSessionId: E2E_BREW_SESSION_ID,
+        sectionId: "boil",
+        sectionName: "Boil",
+        name: "E2E Alpha Boil Missing Duration",
+        sortOrder: 2,
+        minutesPlanned: null,
+        customTimerEnabled: true,
+      },
+      update: {
+        brewSessionId: E2E_BREW_SESSION_ID,
+        sectionId: "boil",
+        sectionName: "Boil",
+        name: "E2E Alpha Boil Missing Duration",
+        isDisabled: false,
+        sortOrder: 2,
+        minutesPlanned: null,
+        relativeToStepId: null,
+        offsetMinutesFromEnd: null,
+        customTimerEnabled: true,
+      },
+    });
+
     console.log(
       JSON.stringify(
         {
@@ -281,6 +389,10 @@ async function seed() {
             recipeId: E2E_RECIPE_ID,
             waterProfileId: E2E_WATER_PROFILE_ID,
             brewSessionId: E2E_BREW_SESSION_ID,
+            equipmentProfileId: E2E_EQUIPMENT_PROFILE_ID,
+            vesselId: E2E_VESSEL_ID,
+            mashStepId: E2E_BREW_SESSION_MASH_STEP_ID,
+            boilStepId: E2E_BREW_SESSION_BOIL_STEP_ID,
           },
         },
         null,
@@ -295,7 +407,16 @@ async function seed() {
 async function clean() {
   const prisma = new PrismaClient();
   try {
+    await prisma.brewSessionStep.deleteMany({
+      where: {
+        id: {
+          in: [E2E_BREW_SESSION_MASH_STEP_ID, E2E_BREW_SESSION_BOIL_STEP_ID],
+        },
+      },
+    });
     await prisma.brewSession.deleteMany({ where: { id: E2E_BREW_SESSION_ID } });
+    await prisma.vessel.deleteMany({ where: { id: E2E_VESSEL_ID } });
+    await prisma.equipmentProfile.deleteMany({ where: { id: E2E_EQUIPMENT_PROFILE_ID } });
     await prisma.recipeWaterSettings.deleteMany({ where: { recipeId: E2E_RECIPE_ID } });
     await prisma.recipe.deleteMany({ where: { id: E2E_RECIPE_ID } });
     await prisma.waterProfile.deleteMany({ where: { id: E2E_WATER_PROFILE_ID } });
@@ -317,7 +438,6 @@ async function clean() {
         },
       },
     });
-     
     console.log(JSON.stringify({ ok: true, cleaned: true }, null, 2));
   } finally {
     await prisma.$disconnect();

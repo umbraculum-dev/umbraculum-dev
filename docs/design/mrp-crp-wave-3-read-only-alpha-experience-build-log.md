@@ -1,7 +1,7 @@
 # MRP/CRP Wave 3 read-only alpha experience build log
 
 **Tier:** Public
-**Status:** Completed 2026-05-26 — read-only alpha experience shipped; full August alpha proof still open
+**Status:** Completed 2026-05-26 — read-only alpha experience shipped; superseded by Wave 4 deterministic proof hardening for fixture-backed evidence
 **Started:** 2026-05-26
 **Executor model:** GPT-5.5
 **Scope:** read-only web alpha experience for the canonical `mrp` and `crp` read surfaces.
@@ -11,6 +11,10 @@
 > create persisted MRP/CRP projection rows, add write routes, rewrite brewery
 > ownership, add native screens, register AI runtime tools, or introduce
 > rendering workflows.
+>
+> Wave 4 builds on this work by adding deterministic E2E fixture data and
+> stronger API/UI/Playwright assertions. See
+> [`mrp-crp-wave-4-alpha-proof-hardening-build-log.md`](mrp-crp-wave-4-alpha-proof-hardening-build-log.md).
 
 ---
 
