@@ -5,6 +5,7 @@ import type {
   CapacityConflict,
   Resource,
   ScheduledOperation,
+  WorkCenter,
 } from "@umbraculum/crp-contracts";
 import type { ReactNode } from "react";
 import { SizableText, XStack, YStack } from "tamagui";
@@ -142,6 +143,51 @@ export function ResourceSummary({
       <XStack gap="$3" flexWrap="wrap">
         <Meta label={labels.sourceRefId} value={resource.sourceRefId ?? labels.none} />
         <Meta label={labels.debugId} value={resource.id} />
+      </XStack>
+    </YStack>
+  );
+}
+
+export function WorkCenterSummary({
+  workCenter,
+  labels,
+}: {
+  workCenter: WorkCenter;
+  labels: {
+    code: string;
+    status: string;
+    source: string;
+    sourceRefId: string;
+    resource: string;
+    debugId: string;
+    canonical: string;
+    automation: string;
+    brewery: string;
+    projectedFromModule: (module: string) => string;
+    none: string;
+  };
+}) {
+  const provenance = sourceLabel(workCenter.sourceModule, {
+    canonical: labels.canonical,
+    automation: labels.automation,
+    brewery: labels.brewery,
+    projectedFromModule: labels.projectedFromModule,
+  });
+
+  return (
+    <YStack gap="$1.5">
+      <SizableText fontFamily="$body">
+        <SizableText fontWeight="bold">{workCenter.code}</SizableText>
+        <SizableText color="var(--text-muted)"> · {workCenter.name}</SizableText>
+      </SizableText>
+      <XStack gap="$3" flexWrap="wrap">
+        <Meta label={labels.status} value={workCenter.status} />
+        <Meta label={labels.resource} value={workCenter.resourceId ?? labels.none} />
+        <Meta label={labels.source} value={provenance} />
+      </XStack>
+      <XStack gap="$3" flexWrap="wrap">
+        <Meta label={labels.sourceRefId} value={workCenter.sourceRefId ?? labels.none} />
+        <Meta label={labels.debugId} value={workCenter.id} />
       </XStack>
     </YStack>
   );

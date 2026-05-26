@@ -1,14 +1,14 @@
 # `mrp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Wave 3 read-only alpha experience shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery recipe/session projections, and read-only web pages exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Wave 4 deterministic read-only alpha proof shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery recipe/session projections, read-only web pages, and deterministic fixture-backed proof exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `mrp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
 **Audience:** anyone evaluating Umbraculum's manufacturing-planning roadmap or planning to extend the future MRP module.
 
 > [!NOTE]
-> Per-module page for the foundation-stage `mrp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md), [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md), the `mrp` Prisma schema, Wave 2 read-time brewery projections, and Wave 3 read-only web pages. The current planning/build artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical MRP module surface design](../../design/canonical-mrp-module-surface.md), the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md), the [Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md), and the [Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md).
+> Per-module page for the foundation-stage `mrp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md), [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md), the `mrp` Prisma schema, Wave 2 read-time brewery projections, Wave 3 read-only web pages, and Wave 4 deterministic fixture-backed proof. The current planning/build artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical MRP module surface design](../../design/canonical-mrp-module-surface.md), the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md), the [Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md), the [Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md), and the [Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md).
 
 ---
 
@@ -41,7 +41,7 @@ The first useful implementation should therefore bias toward stable contracts an
 
 ## 4. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
 
-The module materializes as four coordinated paths; Wave 1 shipped the contracts/API foundation, Wave 2 added read-time brewery projections, and Wave 3 exposes the read models in web:
+The module materializes as four coordinated paths; Wave 1 shipped the contracts/API foundation, Wave 2 added read-time brewery projections, Wave 3 exposes the read models in web, and Wave 4 pins deterministic fixture-backed proof:
 
 | Slice | Path (when shipped) |
 |---|---|
@@ -73,7 +73,8 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 2. **Wave 1 — contracts + read-only API foundation.** `packages/mrp-contracts/`, `services/api/src/modules/mrp/`, the `mrp` Prisma schema, module registration, and L2 isolation tests are **shipped as foundation-only**.
 3. **Wave 2 — coordinated brewery projection.** Existing brewery routes remain stable while recipes and brew sessions project into MRP BOM, production-order, operation, and material-requirement read models. **Shipped as read-time projection only.**
 4. **Wave 3 — read-only web alpha experience.** `apps/web/app/[locale]/(mrp)/production-orders/` and `material-requirements/` expose those read models without write controls. **Shipped as web read-only proof only.**
-5. **Later — AI/runtime rendering/write workflows.** Planned contract payloads exist, but no runtime AI tools, document-template registration, native screens, or write routes ship in Wave 3.
+5. **Wave 4 — deterministic read-only alpha proof.** E2E fixture data and focused Playwright assertions now prove the MRP/CRP read-only projection path without creating MRP rows. **Shipped as proof hardening only.**
+6. **Later — AI/runtime rendering/write workflows.** Planned contract payloads exist, but no runtime AI tools, document-template registration, native screens, or write routes ship in Wave 4.
 
 ---
 
@@ -86,6 +87,7 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 - [MRP/CRP Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md) — foundation implementation record.
 - [MRP/CRP Wave 2 brewery projection build log](../../design/mrp-crp-wave-2-brewery-projection-build-log.md) — read-time projection implementation record.
 - [MRP/CRP Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md) — web read-only implementation record.
+- [MRP/CRP Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md) — deterministic proof implementation record.
 - [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery-and-MRP-and-CRP co-design.

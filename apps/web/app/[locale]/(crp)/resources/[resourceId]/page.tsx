@@ -128,6 +128,13 @@ export default function CrpResourceDetailPage() {
             <DetailRow label={tFields("createdAt")} value={formatDateTime(resource.createdAt, tValues("none"))} />
             <DetailRow label={tFields("updatedAt")} value={formatDateTime(resource.updatedAt, tValues("none"))} />
           </YStack>
+          {resource.sourceModule === "automation" ? (
+            <XStack gap="$3" flexWrap="wrap">
+              <Link href={`/vessels/${encodeURIComponent(resource.code)}`}>
+                {tResources("automationSourceLink")}
+              </Link>
+            </XStack>
+          ) : null}
         </SectionCard>
       ) : null}
     </YStack>

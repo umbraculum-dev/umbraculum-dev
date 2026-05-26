@@ -12,8 +12,11 @@ import {
 import { buildApp } from "../app.js";
 import {
   automationVesselResourceId,
+  breweryCapacityConflictId,
+  breweryScheduledOperationId,
   equipmentProfileWorkCenterId,
 } from "../modules/crp/services/breweryProjectionIds.js";
+import { breweryBrewSessionProductionOrderId } from "../modules/mrp/services/breweryProjectionIds.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
 describe("crp brewery projections — Wave 2 read path", () => {
@@ -25,6 +28,8 @@ describe("crp brewery projections — Wave 2 read path", () => {
   let workspaceB = "";
   let recipeAId = "";
   let sessionAId = "";
+  let timedStepAId = "";
+  let missingDurationStepAId = "";
   let profileAId = "";
   let vesselAId = "";
   let recipeBId = "";
@@ -97,8 +102,11 @@ describe("crp brewery projections — Wave 2 read path", () => {
           ],
         },
       },
+      include: { steps: true },
     });
     sessionAId = brewSessionA.id;
+    timedStepAId = brewSessionA.steps.find((step) => step.name === "Mash")?.id ?? "";
+    missingDurationStepAId = brewSessionA.steps.find((step) => step.name === "Boil")?.id ?? "";
 
     profileBId = (await app.prisma.equipmentProfile.create({
       data: {
@@ -195,8 +203,13 @@ describe("crp brewery projections — Wave 2 read path", () => {
     });
     expect(scheduled.statusCode).toBe(200);
     const scheduledBody = ScheduledOperationListResponseSchema.parse(scheduled.json());
-    expect(scheduledBody.items[0]?.resourceId).toBe(automationVesselResourceId(vesselAId));
-    expect(scheduledBody.items[0]?.plannedDurationMinutes).toBe(60);
+    const scheduledOperation = scheduledBody.items.find((item) => item.id === breweryScheduledOperationId(timedStepAId));
+    expect(scheduledOperation?.resourceId).toBe(automationVesselResourceId(vesselAId));
+    expect(scheduledOperation?.workCenterId).toBe(equipmentProfileWorkCenterId(profileAId));
+    expect(scheduledOperation?.productionOrderId).toBe(breweryBrewSessionProductionOrderId(sessionAId));
+    expect(scheduledOperation?.plannedDurationMinutes).toBe(60);
+    expect(scheduledOperation?.sourceModule).toBe("brewery");
+    expect(scheduledOperation?.sourceRefId).toBe(timedStepAId);
 
     const load = await app.inject({
       method: "GET",
@@ -207,13 +220,19 @@ describe("crp brewery projections — Wave 2 read path", () => {
     const loadBody = CapacityLoadResponseSchema.parse(load.json());
     expect(loadBody.item.buckets[0]?.plannedMinutes).toBe(60);
     expect(loadBody.item.buckets[0]?.availableMinutes).toBe(0);
+    expect(loadBody.item.buckets[0]?.overloadMinutes).toBe(60);
   });
 
   it("reports conservative read-only conflicts for missing projection inputs", async () => {
     const res = await app.inject({ method: "GET", url: "/crp/conflicts", headers: { cookie: cookieA } });
     expect(res.statusCode).toBe(200);
     const body = CapacityConflictListResponseSchema.parse(res.json());
-    expect(body.items.some((item) => item.message.includes("no positive planned duration"))).toBe(true);
+    const conflict = body.items.find((item) =>
+      item.id === breweryCapacityConflictId("missing-duration", missingDurationStepAId)
+    );
+    expect(conflict?.message).toContain("no positive planned duration");
+    expect(conflict?.resourceId).toBeNull();
+    expect(conflict?.scheduledOperationId).toBeNull();
   });
 
   it("L2 cross-workspace isolation keeps projected IDs scoped to the active workspace", async () => {

@@ -164,6 +164,12 @@ Stable IDs (so tests can hardcode):
 - Workspace UUIDs: `e2e00000-0000-0000-0000-0000000000aa` (primary) + `e2e00000-0000-0000-0000-0000000000bb` (secondary, multi-admin only)
 - Recipe ("E2E Pale Ale") UUID: `e2e00000-0000-0000-0000-000000000abc`
 - Water profile UUID: `e2e00000-0000-0000-0000-000000000fff`
+- Brew session ("E2E-PA-001") UUID: `e2e00000-0000-0000-0000-000000000bbe`
+- Equipment profile ("E2E Alpha Brewhouse") UUID: `e2e00000-0000-0000-0000-000000000e01`
+- Automation vessel ("E2E-KETTLE-01") UUID: `e2e00000-0000-0000-0000-000000000e02`
+- Brew-session step UUIDs: `e2e00000-0000-0000-0000-000000000e03` (timed mash) + `e2e00000-0000-0000-0000-000000000e04` (missing-duration conflict)
+
+The MRP/CRP Wave 4 deterministic proof intentionally uses these fixture rows to prove read-only projections end to end: brewery remains the source of truth, automation remains the source of truth for the vessel, and no MRP/CRP projection rows are created by the seed.
 
 Seed:
 

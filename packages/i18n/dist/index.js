@@ -146,19 +146,25 @@ var en_default = {
     refreshing: "Refreshing\u2026",
     error: "Could not load capacity planning data.",
     noResources: "No capacity resources or automation projections in this workspace yet.",
+    noWorkCenters: "No work-center projections in this workspace yet.",
     noCapacity: "No capacity load buckets are visible yet.",
     noSchedule: "No scheduled operations are visible yet.",
     noConflicts: "No capacity warnings are visible.",
     resources: {
       listTitle: "Resources",
       openDetail: "View resource",
+      workCentersTitle: "Work centers",
+      workCentersNote: "Work centers are read-only brewery equipment profile projections. They explain the capacity context without moving ownership out of brewery.",
+      openRelatedResource: "Open related resource",
+      automationSourceLink: "Open automation vessel",
       back: "Back to resources",
       capacityLink: "Open capacity view",
       scheduleLink: "Open schedule"
     },
     capacity: {
       title: "Capacity load",
-      note: "Alpha buckets with 0 available minutes are read-model evidence, not final CRP calendar capacity."
+      note: "Alpha buckets with 0 available minutes are read-model evidence, not final CRP calendar capacity.",
+      resourceLink: "Open resource detail"
     },
     schedule: {
       title: "Schedule",
@@ -2056,19 +2062,25 @@ var it_default = {
     refreshing: "Aggiornamento\u2026",
     error: "Impossibile caricare i dati di pianificazione capacit\xE0.",
     noResources: "Nessuna risorsa di capacit\xE0 o proiezione automation in questo workspace.",
+    noWorkCenters: "Nessuna proiezione di centro di lavoro in questo workspace.",
     noCapacity: "Nessun bucket di carico capacit\xE0 visibile.",
     noSchedule: "Nessuna operazione schedulata visibile.",
     noConflicts: "Nessun avviso di capacit\xE0 visibile.",
     resources: {
       listTitle: "Risorse",
       openDetail: "Apri risorsa",
+      workCentersTitle: "Centri di lavoro",
+      workCentersNote: "I centri di lavoro sono proiezioni in sola lettura dei profili attrezzatura brewery. Spiegano il contesto di capacit\xE0 senza spostare la propriet\xE0 fuori da brewery.",
+      openRelatedResource: "Apri risorsa collegata",
+      automationSourceLink: "Apri vessel automation",
       back: "Torna alle risorse",
       capacityLink: "Apri vista capacit\xE0",
       scheduleLink: "Apri schedule"
     },
     capacity: {
       title: "Carico capacit\xE0",
-      note: "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacit\xE0 calendario finale del CRP."
+      note: "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacit\xE0 calendario finale del CRP.",
+      resourceLink: "Apri dettaglio risorsa"
     },
     schedule: {
       title: "Schedule",

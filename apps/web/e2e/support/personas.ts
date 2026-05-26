@@ -22,6 +22,10 @@ export interface FixtureIdentities {
   recipeId: string;
   waterProfileId: string;
   brewSessionId: string;
+  equipmentProfileId: string;
+  vesselId: string;
+  mashStepId: string;
+  boilStepId: string;
 }
 
 interface PersonasFile {

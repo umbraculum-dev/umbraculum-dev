@@ -145,19 +145,25 @@
     "refreshing": "Refreshing…",
     "error": "Could not load capacity planning data.",
     "noResources": "No capacity resources or automation projections in this workspace yet.",
+    "noWorkCenters": "No work-center projections in this workspace yet.",
     "noCapacity": "No capacity load buckets are visible yet.",
     "noSchedule": "No scheduled operations are visible yet.",
     "noConflicts": "No capacity warnings are visible.",
     "resources": {
       "listTitle": "Resources",
       "openDetail": "View resource",
+      "workCentersTitle": "Work centers",
+      "workCentersNote": "Work centers are read-only brewery equipment profile projections. They explain the capacity context without moving ownership out of brewery.",
+      "openRelatedResource": "Open related resource",
+      "automationSourceLink": "Open automation vessel",
       "back": "Back to resources",
       "capacityLink": "Open capacity view",
       "scheduleLink": "Open schedule"
     },
     "capacity": {
       "title": "Capacity load",
-      "note": "Alpha buckets with 0 available minutes are read-model evidence, not final CRP calendar capacity."
+      "note": "Alpha buckets with 0 available minutes are read-model evidence, not final CRP calendar capacity.",
+      "resourceLink": "Open resource detail"
     },
     "schedule": {
       "title": "Schedule",
