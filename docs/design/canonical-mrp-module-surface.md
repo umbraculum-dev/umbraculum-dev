@@ -1,13 +1,13 @@
 # Canonical `mrp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 2 brewery projection shipped (read-time projections), alpha proof not complete
+**Status:** Draft surface design 2026-05-26; Wave 3 read-only alpha experience shipped, alpha proof not complete
 **Audience:** core team, MRP implementers, brewery-vertical maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `mrp` open-door next step from [`modules/canonical/mrp.md`](../modules/canonical/mrp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`RFC-0007`](../rfcs/0007-canonical-document-rendering.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> Wave 1 shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 now projects brewery recipes and brew sessions into those read routes at request time. This is still not alpha-complete: no web page, native screen, AI runtime tool, rendering job, write workflow, WMS behavior, or complete public-alpha proof is claimed as shipped.
+> Wave 1 shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 projects brewery recipes and brew sessions into those read routes at request time. Wave 3 now exposes those read models in the web app through read-only production-order and material-requirement pages. This is still not alpha-complete: no native screen, AI runtime tool, rendering job, write workflow, WMS behavior, or complete public-alpha proof is claimed as shipped.
 
 ---
 
@@ -21,7 +21,7 @@ MRP does not own inventory execution, capacity scheduling, live controller state
 |---|---|---|
 | Contracts | `packages/mrp-contracts/` -> `@umbraculum/mrp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, production-order/BOM/material-requirement refs, planned AI/rendering payload schemas. |
 | API | `services/api/src/modules/mrp/` | **Wave 1 + Wave 2 shipped:** read-only routes, services, Prisma `mrp` schema, module registration, and read-time brewery projections. AI tool handlers and document-template registration remain future work. |
-| Web | `apps/web/app/[locale]/(mrp)/` | Planned read/propose planning pages under registered static URL segments. |
+| Web | `apps/web/app/[locale]/(mrp)/` | **Wave 3 shipped:** read-only production-order list/detail and material-requirement entry pages under registered static URL segments. Proposal/write pages remain future work. |
 | Native | `apps/native/src/modules/mrp/` | Future operator/manager screens; may trail web in alpha. |
 | Rendering | module-registered templates | Work orders, route cards, material-requirement exports. |
 | AI tools | module-owned `registerAiTools` hook | Read/propose tools that explain production and material requirements. |
@@ -215,6 +215,8 @@ Brewery proves MRP without becoming MRP.
 
 Wave 2 shipped the first read-time adapter: recipes project as BOMs, brew sessions project as production orders, session steps project as operations, and recipe ingredients project as assumption-only material requirements. Projection IDs are deterministic (`brewery-recipe-<recipeId>`, `brewery-brew-session-<sessionId>`, `brewery-brew-session-step-<stepId>`), and persisted `mrp.*` rows are not created or required.
 
+Wave 3 shipped the first web proof of that adapter: `/production-orders`, `/production-orders/<orderId>`, and `/material-requirements` render the existing HTTP read APIs with contract-schema validation and explicit provenance labels such as "Projected from brewery." The UI is read-only and does not parse projection IDs to infer source ownership.
+
 The alpha implementation should continue to prefer adapters/projections over irreversible data migration. Existing brewery routes remain stable until a later implementation plan explicitly moves behavior.
 
 ---
@@ -290,7 +292,7 @@ The exact values belong to the future implementation plan; this surface doc only
 | A | Contracts package with schemas, tests, version helpers. |
 | B | API skeleton and read-only routes registered via `registerModule()`. |
 | C | Brewery projection from recipe/session to production-order proof. |
-| D | Web read/proposal pages and `registerWebModule()` segment ownership. |
+| D | **Wave 3 partially shipped:** web read pages and route/navigation ownership. Proposal pages remain future work. |
 | E | Rendering templates and work-order render-job route. |
 | F | AI tools and integration proof. |
 | Mature | Write workflows, WMS integration, richer scheduling with CRP, native operator flows. |
@@ -310,11 +312,14 @@ The alpha proof is complete when a user can:
 
 The proof must make clear that this is an extensible canonical module surface, not a finished commercial MRP product.
 
+Wave 3 satisfies the read-only web visibility portions of this proof (items 1-3) but does not close the rendering, AI, write-workflow, native, or WMS portions.
+
 ---
 
 ## 15. Cross-references
 
 - [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md) - joint plan.
+- [`mrp-crp-wave-3-read-only-alpha-experience-build-log.md`](mrp-crp-wave-3-read-only-alpha-experience-build-log.md) - Wave 3 web read-only implementation record.
 - [`canonical-crp-module-surface.md`](canonical-crp-module-surface.md) - paired capacity-planning surface.
 - [`modules/canonical/mrp.md`](../modules/canonical/mrp.md) - open-door module page.
 - [`modules/verticals/brewery/README.md`](../modules/verticals/brewery/README.md) - reference vertical.

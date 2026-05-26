@@ -24,6 +24,8 @@
     "@umbraculum/i18n": "file:../../packages/i18n",
     "@umbraculum/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/navigation": "file:../../packages/navigation",
+    "@umbraculum/mrp-contracts": "file:../../packages/mrp-contracts",
+    "@umbraculum/crp-contracts": "file:../../packages/crp-contracts",
     "@umbraculum/media": "file:../../packages/media",
     "@umbraculum/module-sdk": "file:../../packages/module-sdk",
     "@umbraculum/ui": "file:../../packages/ui",

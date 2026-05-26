@@ -1,5 +1,5 @@
 type AppPlatform = "web" | "native";
-type RouteId = "dashboard" | "inventory" | "recipes" | "brewdayStepsSettings" | "waterProfiles" | "recipeEdit" | "waterHub" | "waterMash" | "waterSparge" | "waterBoil" | "yeast" | "equipment" | "fermDataIntegration" | "quality" | "login" | "vessels" | "vesselDetail" | "products" | "productDetail" | "categories" | "attributeSets" | "attributeSetDetail";
+type RouteId = "dashboard" | "inventory" | "recipes" | "brewdayStepsSettings" | "waterProfiles" | "recipeEdit" | "waterHub" | "waterMash" | "waterSparge" | "waterBoil" | "yeast" | "equipment" | "fermDataIntegration" | "quality" | "login" | "vessels" | "vesselDetail" | "products" | "productDetail" | "categories" | "attributeSets" | "attributeSetDetail" | "productionOrders" | "productionOrderDetail" | "materialRequirements" | "capacity" | "schedule" | "resources" | "resourceDetail";
 interface RouteParamsById {
     dashboard: Record<string, never>;
     inventory: Record<string, never>;
@@ -42,6 +42,17 @@ interface RouteParamsById {
     attributeSets: Record<string, never>;
     attributeSetDetail: {
         setId: string;
+    };
+    productionOrders: Record<string, never>;
+    productionOrderDetail: {
+        orderId: string;
+    };
+    materialRequirements: Record<string, never>;
+    capacity: Record<string, never>;
+    schedule: Record<string, never>;
+    resources: Record<string, never>;
+    resourceDetail: {
+        resourceId: string;
     };
 }
 type RouteRef = {

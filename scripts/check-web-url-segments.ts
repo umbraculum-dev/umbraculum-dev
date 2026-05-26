@@ -104,6 +104,8 @@ const PLATFORM_RESERVED_SEGMENTS = new Set<string>([
 const KNOWN_MODULE_OWNERSHIP: Readonly<Record<string, ReadonlyArray<string>>> = {
   automation: ["vessels"], // Week 1 target
   pim: ["products", "categories", "attribute-sets"], // Week 1 target
+  mrp: ["production-orders", "work-orders", "material-requirements"], // Wave 3 target
+  crp: ["capacity", "schedule", "resources"], // Wave 3 target
   brewery: [
     "recipes",
     "inventory",

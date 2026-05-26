@@ -60,8 +60,16 @@ export function routeToNativeTarget(ref: RouteRef): NativeRouteTarget {
     case "categories":
     case "attributeSets":
     case "attributeSetDetail":
-      // Week 1 audit (RFC-0006) added these RouteIds for the web automation
-      // + PIM modules. Native has no screens for them yet — they fall through
+    case "productionOrders":
+    case "productionOrderDetail":
+    case "materialRequirements":
+    case "capacity":
+    case "schedule":
+    case "resources":
+    case "resourceDetail":
+      // Week 1 audit (RFC-0006) added RouteIds for the web automation + PIM
+      // modules; Wave 3 added read-only web MRP/CRP route IDs. Native has no
+      // screens for them yet — they fall through
       // `getRouteAvailability(_, "native") === "blocked"` so callers should
       // route to `BlockedRouteScreen` BEFORE asking for a native target. This
       // arm exists only to keep `routeToNativeTarget` exhaustive at the type

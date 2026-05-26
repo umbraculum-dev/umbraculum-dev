@@ -72,6 +72,20 @@ function routeToPath(ref) {
       return "/attribute-sets";
     case "attributeSetDetail":
       return `/attribute-sets/${ref.params.setId}`;
+    case "productionOrders":
+      return "/production-orders";
+    case "productionOrderDetail":
+      return `/production-orders/${ref.params.orderId}`;
+    case "materialRequirements":
+      return "/material-requirements";
+    case "capacity":
+      return "/capacity";
+    case "schedule":
+      return "/schedule";
+    case "resources":
+      return "/resources";
+    case "resourceDetail":
+      return `/resources/${ref.params.resourceId}`;
   }
   const exhaustive = ref;
   throw new Error(`Unhandled route ref: ${String(exhaustive)}`);
@@ -117,6 +131,13 @@ function routeToNativeTarget(ref) {
     case "categories":
     case "attributeSets":
     case "attributeSetDetail":
+    case "productionOrders":
+    case "productionOrderDetail":
+    case "materialRequirements":
+    case "capacity":
+    case "schedule":
+    case "resources":
+    case "resourceDetail":
       throw new Error(
         `routeToNativeTarget(${ref.id}): no native target \u2014 this RouteId is web-only and must be gated by getRouteAvailability(_, "native") === "blocked"`
       );

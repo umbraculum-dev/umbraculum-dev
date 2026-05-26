@@ -83,6 +83,123 @@ var en_default = {
       none: "\u2014"
     }
   },
+  mrp: {
+    title: "Production planning",
+    subtitle: "Read-only MRP alpha view over existing brewery recipes and brew sessions.",
+    alphaNote: "Rows marked as projected are read models. Brewery remains the source of truth; no MRP rows are created from this page.",
+    loading: "Loading\u2026",
+    refresh: "Refresh",
+    refreshing: "Refreshing\u2026",
+    error: "Could not load production planning data.",
+    noProductionOrders: "No production orders or brewery projections in this workspace yet.",
+    noMaterialRequirements: "No material requirements are visible yet.",
+    productionOrders: {
+      listTitle: "Production orders",
+      openDetail: "View order",
+      back: "Back to production orders",
+      materialRequirements: "Material requirements",
+      operations: "Operations",
+      capacityLink: "Open capacity view",
+      scheduleLink: "Open CRP schedule"
+    },
+    materialRequirements: {
+      title: "Material requirements",
+      subtitle: "Read-only entry point for per-order material requirements. Open an order to see its ingredient-derived requirements.",
+      openOrder: "Open order requirements"
+    },
+    fields: {
+      orderNumber: "Order number",
+      status: "Status",
+      quantity: "Quantity",
+      plannedStartAt: "Planned start",
+      dueAt: "Due",
+      createdAt: "Created",
+      source: "Source",
+      sourceRefId: "Source reference",
+      debugId: "Debug ID",
+      outputProductId: "Output product",
+      lineCount: "Lines",
+      operationCode: "Operation code",
+      operationName: "Operation",
+      duration: "Duration",
+      earliestStartAt: "Earliest start",
+      availability: "Availability",
+      availabilityNote: "Availability note",
+      material: "Material",
+      requiredQuantity: "Required quantity",
+      productionOrder: "Production order"
+    },
+    values: {
+      none: "\u2014",
+      unknownDate: "Not scheduled",
+      canonicalMrpRow: "Canonical MRP row",
+      projectedFromBrewery: "Projected from brewery",
+      projectedFromModule: "Projected from {module}"
+    }
+  },
+  crp: {
+    title: "Capacity planning",
+    subtitle: "Read-only CRP alpha view over automation vessels, brewery equipment, and timed brew-session steps.",
+    alphaNote: "Rows marked as projected are read models. Automation and brewery remain the sources of truth; no CRP rows are created from this page.",
+    loading: "Loading\u2026",
+    refresh: "Refresh",
+    refreshing: "Refreshing\u2026",
+    error: "Could not load capacity planning data.",
+    noResources: "No capacity resources or automation projections in this workspace yet.",
+    noCapacity: "No capacity load buckets are visible yet.",
+    noSchedule: "No scheduled operations are visible yet.",
+    noConflicts: "No capacity warnings are visible.",
+    resources: {
+      listTitle: "Resources",
+      openDetail: "View resource",
+      back: "Back to resources",
+      capacityLink: "Open capacity view",
+      scheduleLink: "Open schedule"
+    },
+    capacity: {
+      title: "Capacity load",
+      note: "Alpha buckets with 0 available minutes are read-model evidence, not final CRP calendar capacity."
+    },
+    schedule: {
+      title: "Schedule",
+      conflictsTitle: "Read-only warnings",
+      resourcesLink: "Open resources",
+      capacityLink: "Open capacity"
+    },
+    fields: {
+      resource: "Resource",
+      code: "Code",
+      name: "Name",
+      kind: "Kind",
+      status: "Status",
+      source: "Source",
+      sourceRefId: "Source reference",
+      createdAt: "Created",
+      updatedAt: "Updated",
+      debugId: "Debug ID",
+      bucketStartAt: "Bucket start",
+      bucketEndAt: "Bucket end",
+      availableMinutes: "Available minutes",
+      plannedMinutes: "Planned minutes",
+      overloadMinutes: "Overload minutes",
+      operationCode: "Operation code",
+      productionOrder: "Production order",
+      workCenter: "Work center",
+      startsAt: "Starts",
+      endsAt: "Ends",
+      duration: "Duration",
+      conflict: "Conflict",
+      severity: "Severity"
+    },
+    values: {
+      none: "\u2014",
+      canonicalCrpRow: "Canonical CRP row",
+      projectedFromAutomationVessel: "Projected from automation vessel",
+      projectedFromBrewery: "Projected from brewery",
+      projectedFromModule: "Projected from {module}",
+      zeroAvailabilityAlpha: "0 available minutes (alpha read model)"
+    }
+  },
   common: {
     backToDashboard: "Back to Dashboard",
     loading: "Loading\u2026",
@@ -127,6 +244,8 @@ var en_default = {
     equipment: "Equipment",
     automation: "Automation",
     pim: "Products",
+    mrp: "Production planning",
+    crp: "Capacity planning",
     ai: "AI",
     about: "About",
     language: "Language",
@@ -1874,6 +1993,123 @@ var it_default = {
       none: "\u2014"
     }
   },
+  mrp: {
+    title: "Pianificazione produzione",
+    subtitle: "Vista alpha MRP in sola lettura su ricette e sessioni di cotta esistenti.",
+    alphaNote: "Le righe marcate come proiettate sono read model. Brewery resta la fonte autorevole; questa pagina non crea righe MRP.",
+    loading: "Caricamento\u2026",
+    refresh: "Aggiorna",
+    refreshing: "Aggiornamento\u2026",
+    error: "Impossibile caricare i dati di pianificazione produzione.",
+    noProductionOrders: "Nessun ordine di produzione o proiezione brewery in questo workspace.",
+    noMaterialRequirements: "Nessun fabbisogno materiali visibile.",
+    productionOrders: {
+      listTitle: "Ordini di produzione",
+      openDetail: "Apri ordine",
+      back: "Torna agli ordini di produzione",
+      materialRequirements: "Fabbisogni materiali",
+      operations: "Operazioni",
+      capacityLink: "Apri vista capacit\xE0",
+      scheduleLink: "Apri schedule CRP"
+    },
+    materialRequirements: {
+      title: "Fabbisogni materiali",
+      subtitle: "Punto di ingresso in sola lettura per i fabbisogni materiali per ordine. Apri un ordine per vedere i fabbisogni derivati dagli ingredienti.",
+      openOrder: "Apri fabbisogni ordine"
+    },
+    fields: {
+      orderNumber: "Numero ordine",
+      status: "Stato",
+      quantity: "Quantit\xE0",
+      plannedStartAt: "Inizio pianificato",
+      dueAt: "Scadenza",
+      createdAt: "Creato",
+      source: "Fonte",
+      sourceRefId: "Riferimento fonte",
+      debugId: "ID debug",
+      outputProductId: "Prodotto in uscita",
+      lineCount: "Righe",
+      operationCode: "Codice operazione",
+      operationName: "Operazione",
+      duration: "Durata",
+      earliestStartAt: "Primo inizio",
+      availability: "Disponibilit\xE0",
+      availabilityNote: "Nota disponibilit\xE0",
+      material: "Materiale",
+      requiredQuantity: "Quantit\xE0 richiesta",
+      productionOrder: "Ordine di produzione"
+    },
+    values: {
+      none: "\u2014",
+      unknownDate: "Non schedulato",
+      canonicalMrpRow: "Riga MRP canonica",
+      projectedFromBrewery: "Proiettato da brewery",
+      projectedFromModule: "Proiettato da {module}"
+    }
+  },
+  crp: {
+    title: "Pianificazione capacit\xE0",
+    subtitle: "Vista alpha CRP in sola lettura su vessel di automazione, attrezzatura brewery e step di cotta temporizzati.",
+    alphaNote: "Le righe marcate come proiettate sono read model. Automation e brewery restano le fonti autorevoli; questa pagina non crea righe CRP.",
+    loading: "Caricamento\u2026",
+    refresh: "Aggiorna",
+    refreshing: "Aggiornamento\u2026",
+    error: "Impossibile caricare i dati di pianificazione capacit\xE0.",
+    noResources: "Nessuna risorsa di capacit\xE0 o proiezione automation in questo workspace.",
+    noCapacity: "Nessun bucket di carico capacit\xE0 visibile.",
+    noSchedule: "Nessuna operazione schedulata visibile.",
+    noConflicts: "Nessun avviso di capacit\xE0 visibile.",
+    resources: {
+      listTitle: "Risorse",
+      openDetail: "Apri risorsa",
+      back: "Torna alle risorse",
+      capacityLink: "Apri vista capacit\xE0",
+      scheduleLink: "Apri schedule"
+    },
+    capacity: {
+      title: "Carico capacit\xE0",
+      note: "I bucket alpha con 0 minuti disponibili sono evidenza del read model, non la capacit\xE0 calendario finale del CRP."
+    },
+    schedule: {
+      title: "Schedule",
+      conflictsTitle: "Avvisi in sola lettura",
+      resourcesLink: "Apri risorse",
+      capacityLink: "Apri capacit\xE0"
+    },
+    fields: {
+      resource: "Risorsa",
+      code: "Codice",
+      name: "Nome",
+      kind: "Tipo",
+      status: "Stato",
+      source: "Fonte",
+      sourceRefId: "Riferimento fonte",
+      createdAt: "Creato",
+      updatedAt: "Aggiornato",
+      debugId: "ID debug",
+      bucketStartAt: "Inizio bucket",
+      bucketEndAt: "Fine bucket",
+      availableMinutes: "Minuti disponibili",
+      plannedMinutes: "Minuti pianificati",
+      overloadMinutes: "Minuti sovraccarico",
+      operationCode: "Codice operazione",
+      productionOrder: "Ordine di produzione",
+      workCenter: "Centro di lavoro",
+      startsAt: "Inizia",
+      endsAt: "Finisce",
+      duration: "Durata",
+      conflict: "Conflitto",
+      severity: "Severit\xE0"
+    },
+    values: {
+      none: "\u2014",
+      canonicalCrpRow: "Riga CRP canonica",
+      projectedFromAutomationVessel: "Proiettato da vessel automation",
+      projectedFromBrewery: "Proiettato da brewery",
+      projectedFromModule: "Proiettato da {module}",
+      zeroAvailabilityAlpha: "0 minuti disponibili (read model alpha)"
+    }
+  },
   common: {
     backToDashboard: "Torna alla Dashboard",
     loading: "Caricamento\u2026",
@@ -1918,6 +2154,8 @@ var it_default = {
     equipment: "Attrezzatura",
     automation: "Automazione",
     pim: "Prodotti",
+    mrp: "Pianificazione produzione",
+    crp: "Pianificazione capacit\xE0",
     ai: "AI",
     about: "Info",
     language: "Lingua",
