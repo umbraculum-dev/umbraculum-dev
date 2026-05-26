@@ -45,6 +45,14 @@ Goal: harden the shipped v0 AI consultant into the platform's cross-module conne
 - **Write-action drafts with human-in-the-loop confirmation** from the first AI feature that touches mutable domain state. No autonomous domain writes in v0 or v1.
 - **License + governance** as a parallel track: publish `docs/LICENSING.md` publicly, adopt DCO sign-off on contributions, write the contributor README, and pick the AGPLv3 + MIT SDK split intentionally before the first community contribution arrives (much harder to retrofit after).
 
+**Status snapshot (2026-05-25):**
+
+- **Done — module-owned AI-tool registration.** The shipped domain tools for brewery, `automation`, and `pim` now register through `registerModule({ registerAiTools })`, and API boot composes those module-owned registrars into the single platform AI registry. The horizontal `render_document` tool remains platform-owned in the API boot path, preserving the distinction between module-contributed domain tools and cross-cutting platform services.
+- **TODO — prompt / knowledge hardening.** Module overlays, per-route overlays, and knowledge-source registration are still future work.
+- **TODO — semantic reporting / RAG.** Typed reporting DSL, curated reporting views, full product-doc / timeline RAG, and pgvector-backed retrieval remain unshipped.
+- **TODO — managed-AI and provider router.** BYOK Anthropic is the shipped v0 path; provider routing, managed-AI credits, pricebook, and add-on billing remain deferred.
+- **TODO — future module expansion.** MRP/WMS/CRM/CRP tool bundles and richer cross-module reasoning are still tied to later module milestones.
+
 Already shipped in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8): BYOK + paid tier unlock, Anthropic-only v0, opt-in workspace enablement, usage ledger, per-workspace memory, module-owned AI-tool registration for shipped domain modules, controlled rendering-job submission through `render_document`, and no net-new Stripe surface for v0 AI.
 
 ### H1 2027 — Brewery production planning is promoted to first-class MRP/CRP, and the platform is repositioned
