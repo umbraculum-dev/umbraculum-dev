@@ -25,13 +25,21 @@ The MRP canonical module owns the platform's "what do we make, when, and what ra
 
 ---
 
-## 2. Why it exists separately from `wms` and `crp`
+## 2. Canonical extensibility, not a finished MRP suite
+
+`mrp` is a **canonical module**: an extensible kernel of shared production-planning primitives that vertical configurations and third-party modules can build on. It is not intended to land as a complete ready-to-sell MRP/ERP product with every planner, optimizer, procurement workflow, costing model, accounting integration, and MES execution loop built in.
+
+The first useful implementation should therefore bias toward stable contracts and extension points: production orders, BOM/material-requirement primitives, work-order/document hooks, AI-tool hooks, and clean cross-module references. Brewery proves the surface with recipes-as-BOMs and brew sessions-as-production-orders, but brewery assumptions must not become canonical invariants unless they generalize cleanly beyond brewery.
+
+---
+
+## 3. Why it exists separately from `wms` and `crp`
 
 [RFC-0001 §4.1](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) (the decomposition-rationale section) is explicit: MRP / WMS / CRP / CRM / `automation` are *peer* canonical concerns, not nested under a "manufacturing" umbrella. MRP plans production; WMS executes stock movement; CRP plans the resource side; CRM connects to customer demand. Each is its own canonical module with its own AI tools, tier limits, and Postgres schema. Verticals consume an arbitrary subset.
 
 ---
 
-## 3. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
+## 4. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
 
 When implementation lands, the module materializes as four coordinated paths:
 
@@ -46,7 +54,7 @@ Postgres schema name: `mrp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 ---
 
-## 4. Expected dependencies on other canonical modules
+## 5. Expected dependencies on other canonical modules
 
 | Module | Relationship |
 |---|---|
@@ -57,18 +65,18 @@ Postgres schema name: `mrp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 ---
 
-## 5. What needs to happen before this stub becomes a real page
+## 6. What needs to happen before this stub becomes a real page
 
 Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md), no mini-RFC is required for `mrp` to ship — the canonical code is already allocated by RFC-0001 §4. The procedure is:
 
-1. **Surface design doc** under `docs/design/canonical-mrp-module-surface.md`, modeled on [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md). Resolves the data model, AI tool surface, tier-limit fields, phasing.
+1. **Surface design doc** under `docs/design/canonical-mrp-module-surface.md`, modeled on [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md). Resolves the data model, extensibility contract, AI tool surface, tier-limit fields, phasing.
 2. **Phase A — contracts.** Create `packages/mrp-contracts/`, ship types + `CONTRACT_VERSION`.
 3. **Phase B — read path.** Land `services/api/src/modules/mrp/` skeleton, register via `@umbraculum/module-sdk`, ship initial read routes and AI tools.
 4. **Coordinated brewery → β migration.** Brew sessions move from `services/api/src/routes/brewSessions.ts` to either the brewery vertical's `services/api/src/modules/brewery/` slice (still vertical-flavored) **and / or** are reframed as MRP production orders. The exact reshape is the surface design doc's job.
 
 ---
 
-## 6. Cross-references
+## 7. Cross-references
 
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 (reserved codes), §7 (canonical-module placement principle), §12.4 (mrp/wms/crm/crp migration trajectory).
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3–§4 (β layout, naming conventions).
