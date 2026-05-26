@@ -230,7 +230,7 @@ export class MrpBreweryProjectionService {
         code: operationCode(step),
         name: step.name,
         requiredResourceKind: step.sectionId,
-        plannedDurationMinutes: step.minutesPlanned,
+        plannedDurationMinutes: isPositiveInt(step.minutesPlanned) ? step.minutesPlanned : null,
         earliestStartAt: productionOrderStart(session)?.toISOString() ?? null,
         dueAt: null,
       });

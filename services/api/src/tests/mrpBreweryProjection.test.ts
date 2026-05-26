@@ -27,6 +27,7 @@ describe("mrp brewery projections — Wave 2 read path", () => {
   let sessionAId = "";
   let sessionBId = "";
   let stepAId = "";
+  let zeroDurationStepAId = "";
 
   beforeAll(async () => {
     await app.ready();
@@ -56,18 +57,27 @@ describe("mrp brewery projections — Wave 2 read path", () => {
         status: "running",
         startedAt: new Date("2026-08-01T08:00:00.000Z"),
         steps: {
-          create: [{
-            sectionId: "mash",
-            name: "Mash",
-            sortOrder: 1,
-            minutesPlanned: 60,
-          }],
+          create: [
+            {
+              sectionId: "mash",
+              name: "Mash",
+              sortOrder: 1,
+              minutesPlanned: 60,
+            },
+            {
+              sectionId: "cleanup",
+              name: "Cleanup placeholder",
+              sortOrder: 2,
+              minutesPlanned: 0,
+            },
+          ],
         },
       },
       include: { steps: true },
     });
     sessionAId = brewSessionA.id;
-    stepAId = brewSessionA.steps[0]?.id ?? "";
+    stepAId = brewSessionA.steps.find((step) => step.name === "Mash")?.id ?? "";
+    zeroDurationStepAId = brewSessionA.steps.find((step) => step.name === "Cleanup placeholder")?.id ?? "";
 
     const recipeB = await app.prisma.recipe.create({
       data: {
@@ -142,6 +152,11 @@ describe("mrp brewery projections — Wave 2 read path", () => {
     const body = ProductionOrderGetResponseSchema.parse(detail.json());
     expect(body.item.operations[0]?.id).toContain(stepAId);
     expect(body.item.operations[0]?.plannedDurationMinutes).toBe(60);
+    expect(zeroDurationStepAId).not.toBe("");
+    const zeroDurationOperation = body.item.operations.find((operation) =>
+      operation.id.includes(zeroDurationStepAId)
+    );
+    expect(zeroDurationOperation?.plannedDurationMinutes).toBeNull();
   });
 
   it("derives production-order material requirements from the source recipe", async () => {
