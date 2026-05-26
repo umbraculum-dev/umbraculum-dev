@@ -23,7 +23,15 @@ If what you're building doesn't *need* to be canonical (i.e. doesn't need to be 
 
 ---
 
-## 2. Preconditions — when to start the mini-RFC vs wait
+## 2. What canonical means for implementation scope
+
+A canonical module is an **extensible domain kernel**, not a promise that the first implementation is a complete commercial suite for that domain. The first implementation should expose stable primitives, contracts, module registration, extension points, AI-tool hooks, rendering-template hooks when relevant, tier-limit/add-on declarations, and clear ownership boundaries. Vertical configurations and third-party modules build on that surface.
+
+Do not turn a canonical module into a vertical product in disguise. A brewery proof can validate `mrp` or `crp`, for example, but brewery assumptions cannot become canonical invariants unless they generalize cleanly across other process-manufacturing verticals. Likewise, shipping `crp` does not mean the project must ship a full APS optimizer on day one; shipping `mrp` does not mean the project must ship procurement, accounting, WMS, MES, and enterprise planning integrations on day one.
+
+---
+
+## 3. Preconditions — when to start the mini-RFC vs wait
 
 [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) lays out the promotion path. In practice, the right time to start the mini-RFC is when **all four** of these are true:
 
@@ -36,7 +44,7 @@ If you cannot tick all four, the right path today is Tier 3/4 ([`third-party-mod
 
 ---
 
-## 3. The mini-RFC — required structure
+## 4. The mini-RFC — required structure
 
 Create `docs/rfcs/NNNN-canonical-<code>.md`. The number is the next available; copy the section structure from [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) or [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md). At minimum, the mini-RFC contains:
 
@@ -53,7 +61,7 @@ The mini-RFC is written **as if it will be public-readable**, even pre-public-fl
 
 ---
 
-## 4. Procedure
+## 5. Procedure
 
 1. **Draft the mini-RFC** in a branch. Cite the reference implementation.
 2. **Solo author drafts → core team reviews → core team approves** (pre-public-flip procedure per [RFC-0001 §13](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md)). Post-public-flip, a 30-day public-comment period applies ([LICENSING.md §10](../../LICENSING.md)).
@@ -64,16 +72,17 @@ The mini-RFC allocates the code; the surface design doc and subsequent PRs imple
 
 ---
 
-## 5. Common pitfalls
+## 6. Common pitfalls
 
 - **Pre-allocating without a reference implementation.** RFC-0001 §4.2 explicitly rejects speculative allocation. If you don't have working code at Tier 3 or Tier 4, you don't have a mini-RFC yet — you have a wish.
 - **Naming the code with a vertical-specific prefix.** Canonical codes are *cross-vertical*. `brewery-quality` is not a canonical code; `quality` is. The vertical prefix lives on the Tier 6 vertical configuration's pages and packages, not on canonicals.
+- **Treating the first implementation as a full product suite.** Canonical status means the module owns the shared primitives and extension points for a domain. It does not require the first PR sequence to implement every advanced workflow that commercial products in that domain eventually accumulate.
 - **Skipping the consumption-contract checklist.** The single most common reason a canonical-allocation proposal fails review is "but we want to own X" where X is a row in RFC-0001 §8.2. The checklist forces you to confront this in writing before review.
 - **Drafting the surface design inside the mini-RFC.** The mini-RFC allocates the code; the surface design lives in a separate `docs/design/canonical-<code>-module-surface.md` doc that lands later. Keep the artifacts separate.
 
 ---
 
-## 6. Cross-references
+## 7. Cross-references
 
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4 (reserved codes), §6 (governance), §8 (consumption contract), §13 (change procedure).
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) — the layout the new canonical will follow.

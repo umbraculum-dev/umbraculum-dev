@@ -26,7 +26,15 @@ The CRP canonical module owns the platform's "do we have enough physical capacit
 
 ---
 
-## 2. The `automation` ↔ `crp` boundary — already pre-committed
+## 2. Canonical extensibility, not a finished CRP suite
+
+`crp` is a **canonical module**: an extensible kernel of shared capacity-planning primitives that vertical configurations and third-party modules can build on. It is not intended to land as a complete ready-to-sell CRP/APS product with every finite-capacity optimizer, labor-planning engine, multi-plant scheduler, MES dispatch loop, and enterprise planning integration built in.
+
+The first useful implementation should therefore bias toward stable contracts and extension points: resource/work-center primitives, calendars, capacity-load views, conflict detection, scheduling-proposal hooks, AI-tool hooks, and rendering-template hooks. Brewery proves the surface with vessels-as-resources and brew-session scheduling, but brewery assumptions must not become canonical invariants unless they generalize cleanly beyond brewery.
+
+---
+
+## 3. The `automation` ↔ `crp` boundary — already pre-committed
 
 The lane separation between `automation` (live controller state, "what is this vessel doing right now?") and `crp` (planning resource state, "what is this vessel scheduled for?") is committed today in the automation module's README — see [`services/api/src/modules/automation/README.md`](../../../services/api/src/modules/automation/README.md) §"Surface boundary — automation vs. crp". Concrete contributor guidance:
 
@@ -36,7 +44,7 @@ The lane separation between `automation` (live controller state, "what is this v
 
 ---
 
-## 3. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
+## 4. Expected slices (β layout from [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md))
 
 | Slice | Path (when shipped) |
 |---|---|
@@ -49,7 +57,7 @@ Postgres schema name: `crp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 ---
 
-## 4. Expected dependencies on other canonical modules
+## 5. Expected dependencies on other canonical modules
 
 | Module | Relationship |
 |---|---|
@@ -60,21 +68,21 @@ Postgres schema name: `crp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 ---
 
-## 5. The `@umbraculum/equipment-contracts` extraction trigger
+## 6. The `@umbraculum/equipment-contracts` extraction trigger
 
 Per [canonical-automation-module-surface.md §4](../../design/canonical-automation-module-surface.md): when CRP ships, `EquipmentProfile` (currently brewery-internal) needs to be readable by both `automation` and `crp`. The cross-module shared type extraction (`@umbraculum/equipment-contracts`) is the second-consumer trigger from [RFC-0002 §7 item 3](../../rfcs/0002-canonical-module-physical-layout.md). Until then, the field stays brewery-internal and `automation` references `vesselId` directly.
 
 ---
 
-## 6. What needs to happen before this stub becomes a real page
+## 7. What needs to happen before this stub becomes a real page
 
-1. **Surface design doc** under `docs/design/canonical-crp-module-surface.md`.
+1. **Surface design doc** under `docs/design/canonical-crp-module-surface.md`, including the extensibility contract for resource/calendar primitives and future optimizer plug-ins.
 2. **Phase A — contracts.** Create `packages/crp-contracts/`, ship types + `CONTRACT_VERSION`. Likely paired with the `@umbraculum/equipment-contracts` extraction.
 3. **Phase B — read path.** Calendar / schedule read views consuming MRP production orders and `automation.Vessel` rows.
 
 ---
 
-## 7. Cross-references
+## 8. Cross-references
 
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §4, §7.
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3, §4, §7 item 3.
