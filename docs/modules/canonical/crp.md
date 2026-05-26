@@ -1,14 +1,14 @@
 # `crp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Open door** — not implemented. Reserved code, β layout pre-committed. August 2026 alpha co-design target documented; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Wave 1 foundation shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, and L2 isolation tests exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `crp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
 **Audience:** anyone evaluating Umbraculum's capacity-planning roadmap or planning to extend the future CRP module.
 
 > [!NOTE]
-> Per-module page for the (not-yet-implemented) `crp` canonical module. The code is reserved by [RFC-0001 §4](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md); the folder shape is pre-committed by [RFC-0002 §3](../../rfcs/0002-canonical-module-physical-layout.md). The current planning artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md) and the [canonical CRP module surface design](../../design/canonical-crp-module-surface.md).
+> Per-module page for the foundation-stage `crp` canonical module. The current implementation is deliberately narrow: [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md), [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md), and the `crp` Prisma schema. The current planning artifacts are the joint [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md), the [canonical CRP module surface design](../../design/canonical-crp-module-surface.md), and the [Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md).
 
 ---
 
@@ -48,10 +48,10 @@ The lane separation between `automation` (live controller state, "what is this v
 
 | Slice | Path (when shipped) |
 |---|---|
-| API | `services/api/src/modules/crp/` |
+| API | [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/) |
 | Web | `apps/web/app/[locale]/(crp)/` |
 | Native | `apps/native/src/modules/crp/` |
-| Contracts | `packages/crp-contracts/` → `@umbraculum/crp-contracts` |
+| Contracts | [`packages/crp-contracts/`](../../../packages/crp-contracts/) → `@umbraculum/crp-contracts` |
 
 Postgres schema name: `crp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention 4).
 
@@ -76,9 +76,10 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 
 ## 7. What needs to happen before implementation
 
-1. **Surface design doc** under [`docs/design/canonical-crp-module-surface.md`](../../design/canonical-crp-module-surface.md), including the extensibility contract for resource/calendar primitives and future optimizer plug-ins. **Done as design; not implemented.**
-2. **Phase A — contracts.** Create `packages/crp-contracts/`, ship types + `CONTRACT_VERSION`. Likely paired with the `@umbraculum/equipment-contracts` extraction.
-3. **Phase B — read path.** Calendar / schedule read views consuming MRP production orders and `automation.Vessel` rows.
+1. **Surface design doc** under [`docs/design/canonical-crp-module-surface.md`](../../design/canonical-crp-module-surface.md), including the extensibility contract for resource/calendar primitives and future optimizer plug-ins. **Done.**
+2. **Wave 1 — contracts + read-only API foundation.** `packages/crp-contracts/`, `services/api/src/modules/crp/`, the `crp` Prisma schema, module registration, and L2 isolation tests are **shipped as foundation-only**.
+3. **Next — coordinated brewery/resource projection.** Keep existing brewery and automation routes stable first; project vessels/resources and MRP operations into CRP in a later implementation wave.
+4. **Later — AI/runtime rendering/write workflows.** Planned contract payloads exist, but no runtime AI tools, document-template registration, optimizer, or write routes ship in Wave 1.
 
 ---
 
@@ -88,6 +89,9 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) §3, §4, §7 item 3.
 - [MRP/CRP August 2026 co-design plan](../../design/mrp-crp-august-2026-co-design-plan.md) — bounded alpha acceleration target.
 - [Canonical CRP module surface design](../../design/canonical-crp-module-surface.md) — planned CRP surface.
+- [MRP/CRP Wave 1 build log](../../design/mrp-crp-wave-1-build-log.md) — foundation implementation record.
+- [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md) — Wave 1 contracts package.
+- [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery + MRP + CRP co-design.
 - [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) §4, §11 — the surface boundary already documented.
 - [`services/api/src/modules/automation/README.md`](../../../services/api/src/modules/automation/README.md) §"Surface boundary — automation vs. crp" — the in-code guardrail.

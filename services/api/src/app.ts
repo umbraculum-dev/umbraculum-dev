@@ -37,6 +37,8 @@ import { registerRenderingTools } from "./services/ai/tools/rendering/index.js";
 import { renderingRuntimePlugin } from "./services/rendering/index.js";
 import { registerAutomationModule } from "./modules/automation/index.js";
 import { registerBreweryModule } from "./modules/brewery/index.js";
+import { registerCrpModule } from "./modules/crp/index.js";
+import { registerMrpModule } from "./modules/mrp/index.js";
 import { registerPimModule } from "./modules/pim/index.js";
 
 type AppInstance = FastifyInstance<
@@ -113,6 +115,8 @@ export function buildApp() {
   //      docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md.
   registerAutomationModule(app);
   registerBreweryModule(app);
+  registerCrpModule(app);
+  registerMrpModule(app);
   registerPimModule(app);
 
   app.register((instance, _opts, done) => {

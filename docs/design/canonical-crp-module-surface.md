@@ -1,13 +1,13 @@
 # Canonical `crp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; not implemented  
+**Status:** Draft surface design 2026-05-26; Wave 1 foundation shipped (contracts + read-only API skeleton), alpha proof not complete
 **Audience:** core team, CRP implementers, brewery-vertical maintainers, automation maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `crp` open-door next step from [`modules/canonical/crp.md`](../modules/canonical/crp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`canonical-automation-module-surface.md`](canonical-automation-module-surface.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> This is a surface design for a future canonical module. No `crp` code, package, Prisma model, route, web page, native screen, AI tool, or document template is claimed as shipped by this document.
+> Wave 1 has shipped `@umbraculum/crp-contracts`, the `crp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. This is still foundation-only: no web page, native screen, brewery projection, AI runtime tool, rendering job, write workflow, optimizer, automation-control behavior, or complete alpha proof is claimed as shipped.
 
 ---
 
@@ -17,8 +17,8 @@
 
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
-| Contracts | `packages/crp-contracts/` -> `@umbraculum/crp-contracts` | DTOs, Zod schemas, route IDs, `CONTRACT_VERSION`, resource/calendar/load refs. |
-| API | `services/api/src/modules/crp/` | Routes, services, Prisma `crp` schema, AI tool handlers, document-template registration. |
+| Contracts | `packages/crp-contracts/` -> `@umbraculum/crp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, resource/work-center/calendar/load/conflict refs, planned AI/rendering payload schemas. |
+| API | `services/api/src/modules/crp/` | **Wave 1 shipped:** read-only routes, services, Prisma `crp` schema, module registration. AI tool handlers and document-template registration remain future work. |
 | Web | `apps/web/app/[locale]/(crp)/` | Planned capacity-load and schedule/conflict pages. |
 | Native | `apps/native/src/modules/crp/` | Future operator/manager screens; may trail web in alpha. |
 | Rendering | module-registered templates | Capacity-load exports, schedule PDFs, resource-calendar CSVs. |
@@ -171,7 +171,7 @@ CRP references MRP operations by contract-level IDs, not by direct Prisma relati
 
 ## 7. Contracts package
 
-Planned package: `packages/crp-contracts/` published as `@umbraculum/crp-contracts`.
+Wave 1 package: [`packages/crp-contracts/`](../../packages/crp-contracts/) published in-repo as `@umbraculum/crp-contracts`.
 
 Expected exports:
 
@@ -194,7 +194,7 @@ Internal Umbraculum code uses Zod v4 schemas per [`RFC-0003`](../rfcs/0003-valid
 
 ## 8. API surface
 
-Planned read/propose-first API routes:
+Wave 1 read-only API routes:
 
 | Route | Method | Purpose |
 |---|---|---|
@@ -204,8 +204,8 @@ Planned read/propose-first API routes:
 | `/crp/capacity-load` | GET | Load/capacity summary by resource/window. |
 | `/crp/scheduled-operations` | GET | List scheduled operations by time/resource/order filters. |
 | `/crp/conflicts` | GET | List detected conflicts. |
-| `/crp/schedule-proposals` | POST | Produce a human-reviewable schedule proposal, not a direct write. |
-| `/crp/capacity-load/render-jobs` | POST | Submit a capacity export through `@umbraculum/rendering`. |
+| `/crp/schedule-proposals` | POST | Future: produce a human-reviewable schedule proposal, not a direct write. |
+| `/crp/capacity-load/render-jobs` | POST | Future: submit a capacity export through `@umbraculum/rendering`. |
 
 Every route must:
 

@@ -6,7 +6,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DATABASE_URL_DIRECT")
-  schemas   = ["public", "automation", "pim", "rendering"]
+  schemas   = ["public", "automation", "pim", "mrp", "crp", "rendering"]
 }
 
 enum WorkspaceRole {
@@ -1544,6 +1544,275 @@ model PimMediaAssetRef {
   @@index([productId])
   @@map("media_asset_refs")
   @@schema("pim")
+}
+
+// =============================================================================
+// Canonical `mrp` module — Wave 1 read-only API skeleton.
+// =============================================================================
+
+model MrpProductionOrder {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  orderNumber     String    @map("order_number")
+  status          String    @default("planned")
+  sourceModule    String?   @map("source_module")
+  sourceRefId     String?   @map("source_ref_id")
+  outputProductId String?   @map("output_product_id")
+  outputVariantId String?   @map("output_variant_id")
+  quantity        Float
+  unit            String
+  plannedStartAt  DateTime? @map("planned_start_at")
+  dueAt           DateTime? @map("due_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  lines                MrpProductionOrderLine[]
+  operations           MrpOperation[]
+  materialRequirements MrpMaterialRequirement[]
+
+  @@unique([workspaceId, orderNumber])
+  @@index([workspaceId])
+  @@index([status])
+  @@map("production_orders")
+  @@schema("mrp")
+}
+
+model MrpProductionOrderLine {
+  id                String  @id @default(uuid())
+  productionOrderId String  @map("production_order_id")
+  lineNumber        Int     @map("line_number")
+  outputProductId   String? @map("output_product_id")
+  outputVariantId   String? @map("output_variant_id")
+  description       String?
+  quantity          Float
+  unit              String
+
+  productionOrder MrpProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([productionOrderId, lineNumber])
+  @@index([productionOrderId])
+  @@map("production_order_lines")
+  @@schema("mrp")
+}
+
+model MrpBom {
+  id          String @id @default(uuid())
+  workspaceId String @map("workspace_id")
+  code        String
+  name        String
+  ownerModule String? @map("owner_module")
+  sourceRefId String? @map("source_ref_id")
+
+  lines MrpBomLine[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+  @@map("boms")
+  @@schema("mrp")
+}
+
+model MrpBomLine {
+  id                String  @id @default(uuid())
+  bomId             String  @map("bom_id")
+  lineNumber        Int     @map("line_number")
+  materialRefModule String? @map("material_ref_module")
+  materialRefId     String? @map("material_ref_id")
+  description       String
+  quantity          Float
+  unit              String
+  lossPercent       Float?  @map("loss_percent")
+
+  bom                  MrpBom @relation(fields: [bomId], references: [id], onDelete: Cascade)
+  materialRequirements MrpMaterialRequirement[]
+
+  @@unique([bomId, lineNumber])
+  @@index([bomId])
+  @@map("bom_lines")
+  @@schema("mrp")
+}
+
+model MrpOperation {
+  id                     String    @id @default(uuid())
+  workspaceId            String    @map("workspace_id")
+  productionOrderId      String    @map("production_order_id")
+  sequence               Int
+  code                   String
+  name                   String
+  requiredResourceKind   String?   @map("required_resource_kind")
+  plannedDurationMinutes Int?      @map("planned_duration_minutes")
+  earliestStartAt        DateTime? @map("earliest_start_at")
+  dueAt                  DateTime? @map("due_at")
+
+  productionOrder MrpProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([productionOrderId, sequence])
+  @@index([workspaceId])
+  @@index([productionOrderId])
+  @@map("operations")
+  @@schema("mrp")
+}
+
+model MrpMaterialRequirement {
+  id                 String  @id @default(uuid())
+  workspaceId        String  @map("workspace_id")
+  productionOrderId  String  @map("production_order_id")
+  bomLineId          String? @map("bom_line_id")
+  materialRefModule  String? @map("material_ref_module")
+  materialRefId      String? @map("material_ref_id")
+  description        String
+  requiredQuantity   Float   @map("required_quantity")
+  unit               String
+  availabilityStatus String  @default("planned") @map("availability_status")
+  availabilityNote   String? @map("availability_note")
+
+  productionOrder MrpProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+  bomLine         MrpBomLine?        @relation(fields: [bomLineId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([productionOrderId])
+  @@index([bomLineId])
+  @@map("material_requirements")
+  @@schema("mrp")
+}
+
+// =============================================================================
+// Canonical `crp` module — Wave 1 read-only API skeleton.
+// =============================================================================
+
+model CrpResource {
+  id           String   @id @default(uuid())
+  workspaceId  String   @map("workspace_id")
+  code         String
+  name         String
+  kind         String
+  status       String   @default("active")
+  sourceModule String?  @map("source_module")
+  sourceRefId  String?  @map("source_ref_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  calendars           CrpResourceCalendar[]
+  workCenters         CrpWorkCenter[]
+  scheduledOperations CrpScheduledOperation[]
+  conflicts           CrpCapacityConflict[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+  @@index([kind])
+  @@map("resources")
+  @@schema("crp")
+}
+
+model CrpWorkCenter {
+  id                     String   @id @default(uuid())
+  workspaceId            String   @map("workspace_id")
+  code                   String
+  name                   String
+  resourceId             String?  @map("resource_id")
+  status                 String   @default("active")
+  sourceModule           String?  @map("source_module")
+  sourceRefId            String?  @map("source_ref_id")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  resource            CrpResource?          @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  scheduledOperations CrpScheduledOperation[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+  @@index([resourceId])
+  @@map("work_centers")
+  @@schema("crp")
+}
+
+model CrpResourceCalendar {
+  id         String @id @default(uuid())
+  workspaceId String @map("workspace_id")
+  resourceId String @map("resource_id")
+  code       String
+  name       String
+  timezone   String @default("UTC")
+
+  resource CrpResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  windows  CrpAvailabilityWindow[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+  @@index([resourceId])
+  @@map("resource_calendars")
+  @@schema("crp")
+}
+
+model CrpAvailabilityWindow {
+  id              String   @id @default(uuid())
+  workspaceId     String   @map("workspace_id")
+  calendarId      String   @map("calendar_id")
+  resourceId      String   @map("resource_id")
+  startsAt        DateTime @map("starts_at")
+  endsAt          DateTime @map("ends_at")
+  capacityMinutes Int      @map("capacity_minutes")
+  sourceModule    String?  @map("source_module")
+  sourceRefId     String?  @map("source_ref_id")
+
+  calendar CrpResourceCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([calendarId])
+  @@index([resourceId])
+  @@index([startsAt, endsAt])
+  @@map("availability_windows")
+  @@schema("crp")
+}
+
+model CrpScheduledOperation {
+  id                     String   @id @default(uuid())
+  workspaceId            String   @map("workspace_id")
+  resourceId             String?  @map("resource_id")
+  workCenterId           String?  @map("work_center_id")
+  productionOrderId      String?  @map("production_order_id")
+  operationId            String?  @map("operation_id")
+  operationCode          String   @map("operation_code")
+  name                   String
+  status                 String   @default("scheduled")
+  sourceModule           String?  @map("source_module")
+  sourceRefId            String?  @map("source_ref_id")
+  startsAt               DateTime @map("starts_at")
+  endsAt                 DateTime @map("ends_at")
+  plannedDurationMinutes Int      @map("planned_duration_minutes")
+
+  resource   CrpResource?   @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  workCenter CrpWorkCenter? @relation(fields: [workCenterId], references: [id], onDelete: SetNull)
+  conflicts  CrpCapacityConflict[]
+
+  @@index([workspaceId])
+  @@index([resourceId])
+  @@index([workCenterId])
+  @@index([startsAt, endsAt])
+  @@map("scheduled_operations")
+  @@schema("crp")
+}
+
+model CrpCapacityConflict {
+  id                   String    @id @default(uuid())
+  workspaceId          String    @map("workspace_id")
+  severity             String
+  status               String    @default("open")
+  message              String
+  resourceId           String?   @map("resource_id")
+  scheduledOperationId String?   @map("scheduled_operation_id")
+  startsAt             DateTime? @map("starts_at")
+  endsAt               DateTime? @map("ends_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+
+  resource           CrpResource?           @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  scheduledOperation CrpScheduledOperation? @relation(fields: [scheduledOperationId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([resourceId])
+  @@index([scheduledOperationId])
+  @@index([status])
+  @@map("capacity_conflicts")
+  @@schema("crp")
 }
 
 // =============================================================================
