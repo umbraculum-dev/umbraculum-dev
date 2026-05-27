@@ -52,6 +52,7 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 | Toolset plugins | `https://github.com/umbraculum-dev/umbraculum-toolset` |
 | Documentation | `https://docs.umbraculum.dev` |
 | Brochure | `https://umbraculum.dev` |
+| Community forum | `https://forum.umbraculum.dev` |
 | Open-source stack recap | [`OPEN-SOURCE-STACK.md`](OPEN-SOURCE-STACK.md) |
 | Security | [`SECURITY.md`](../SECURITY.md) |
 
@@ -65,5 +66,5 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 |---------|--------|-------|
 | GitHub release notes | Paste adapted body; attach `v0.0.1-alpha` | ☐ |
 | Brochure / docs | Remove `noindex`; link announcement from home if desired | ☐ |
-| [Discussions / forum TBD] | Cross-post | ☐ |
+| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; open **Proposals** category | ☐ |
 | Social / newsletter | Optional short version | ☐ |

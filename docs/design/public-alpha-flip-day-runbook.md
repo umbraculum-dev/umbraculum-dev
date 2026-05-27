@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1 maintainer checklist — execute only after Stage 1 sign-off  
 **Audience:** maintainer performing the atomic July 2026 public-alpha flip  
-**Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1
+**Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-runbook.md`](community-forum-runbook.md), [`donation-channels.md`](donation-channels.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md), [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1
 
 > [!IMPORTANT]
 > **Atomic moment:** `umbraculum-dev` and `umbraculum-toolset` visibility → **public** in the **same** maintenance window, with marketplace submission started the same day. See [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) marketplace closure criterion.
@@ -15,9 +15,11 @@
 | Gate | Doc |
 |------|-----|
 | Stage 1 hygiene signed off | [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §7 |
+| **Donation channel accounts live** | [`donation-channels.md`](donation-channels.md) §3 + §8 — **roadmap Phase 2 `2d`** (before removing `noindex`) |
 | Contact mailboxes live | `security@umbraculum.dev`, `conduct@umbraculum.dev` — update [`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md) |
 | Toolset parity | [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) gaps closed |
 | Cloudflare projects created (can be pre-flip while repos still private — use preview URLs first) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) |
+| Community forum ready (or scheduled same week as flip) | [`community-forum-runbook.md`](community-forum-runbook.md) |
 
 ---
 
@@ -118,19 +120,21 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 
 ---
 
-## 8. Launch comms (2d)
+## 8. Launch comms (2e)
 
 | Channel | Action |
 |---------|--------|
 | GitHub Release | Publish `v0.0.1-alpha` body from announcement draft |
+| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening per [`community-forum-runbook.md`](community-forum-runbook.md) |
 | Brochure / social | Optional short post linking docs + clone URL |
-| Support page | Add GitHub Sponsors / Open Collective links when chosen |
+| Support page | Confirm Liberapay + Buy Me a Coffee links (completed in **2d** before flip) |
 
 ---
 
 ## 9. Post-flip smoke (15 min)
 
 - [ ] `GETTING-STARTED` clone + `docker compose up` path (or document known gaps)
+- [ ] `https://forum.umbraculum.dev/` live (or tracked in [`community-forum-runbook.md`](community-forum-runbook.md) §12 sign-off)
 - [ ] `docs-readmes` + `docs-site-build` + `website-build` green on `master`
 - [ ] [`AGENTS.md`](../../AGENTS.md) apparatus path: marketplace-first install documented
 - [ ] Update [`ROADMAP.md`](../ROADMAP.md) Week 3 / Phase 2 rows with flip date

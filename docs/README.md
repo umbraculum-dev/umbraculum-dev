@@ -42,7 +42,7 @@ The high-level direction, business model, and license posture.
 - [`ROADMAP.md`](ROADMAP.md) — Living roadmap with 12–30 month trajectory.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
 - [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the current AI tier unlock and future managed-AI overlay are described in `PLATFORM-ARCHITECTURE.md` §7).
-- [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) — How community proposals, collaborators, sponsors, and AI-compute support fit into core development without buying priority or governance rights.
+- [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) — How community proposals, collaborators, sponsors, and AI-compute support fit into core development without buying priority or governance rights; canonical channels at `forum.umbraculum.dev` (§4.6); donation rails in [`design/donation-channels.md`](design/donation-channels.md).
 - [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md) — Maintainer draft for the July 2026 public-alpha launch post (do not publish until flip).
 
 ## Modules ecosystem
@@ -167,7 +167,7 @@ Day-to-day engineering conventions and runbooks.
 - [`DEVELOPMENT-ACCESSIBILITY.md`](DEVELOPMENT-ACCESSIBILITY.md) — Accessibility constraints (hard requirements).
 - [`DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) — Local development for the native app.
 - [`I18N-AUDIT.md`](I18N-AUDIT.md) — Internationalization audit and guardrails.
-- [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) — Community proposal mechanism and sponsorship principles, including the AI-compute capacity ask.
+- [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) — Community proposal mechanism, sponsorship principles (including the AI-compute capacity ask), canonical channels at `forum.umbraculum.dev` (§4.6), donation rails [`design/donation-channels.md`](design/donation-channels.md).
 
 ## Help & guides (operator-facing)
 
