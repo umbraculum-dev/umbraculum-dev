@@ -136,7 +136,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | # | Item | Why it matters | Entry points |
 |---|------|----------------|--------------|
 | **2a** | **Human alpha walkthrough + gap-log sign-off** | Closes MRP/CRP α proof without claiming mature product | [`mrp-crp-alpha-demo-walkthrough.md`](design/mrp-crp-alpha-demo-walkthrough.md) |
-| **2b** | **Stage 1 hygiene** — secrets scan, Tier: Public link audit, toolset repo parity | Gates public flip | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 |
+| **2b** | **Stage 1 hygiene** — secrets scan, Tier: Public link audit, toolset repo parity | Automated pass 2026-05-27 ([`public-alpha-preflip-hygiene-audit-2026-05-27.md`](design/public-alpha-preflip-hygiene-audit-2026-05-27.md)); maintainer sign-off + toolset + gitleaks remain | [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) |
 | **2c** | **Stage 2 atomic flip** — repos public, `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α | Week 3 tranche above, [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
 | **2d** | **Support / donations page** + launch announcement | `/support/` + [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md) drafts shipped; wire sponsors + publish at flip | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 |
 | **2e** | **MIT npm SDK publish batch** | Registry install for third-party module authors | [`LICENSING.md`](LICENSING.md) §6.2.1 |
