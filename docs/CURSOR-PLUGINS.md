@@ -103,6 +103,17 @@ After install, restart Cursor. The four plugins will appear in
 
 Enable each plugin from the Plugins settings panel.
 
+### Extended rules (umbraculum-toolset-common ≥ 0.0.2)
+
+After reinstalling from source, these additional **always-on** rules ship in `umbraculum-toolset-common`:
+
+| Rule | Purpose |
+|------|---------|
+| `48-rfc-companion-documentation-gate.mdc` | Read RFC §1 + companion surface docs before implementing RFC-backed consumers; update rendering registry when adding templates |
+| `49-plan-documentation-context.mdc` | Feature plans include a **Documentation context** table (RFC, surfaces, plugin rules, runbook) |
+
+Companion skills: `rfc-companion-doc-audit`, `plan-documentation-context`. Repo pointers: [`docs/rfcs/README.md`](rfcs/README.md) §3, [`docs/design/rfc-companion-documentation-audit.md`](design/rfc-companion-documentation-audit.md).
+
 ## Verify the install
 
 Open this repo in Cursor, start a fresh agent session, and ask the agent

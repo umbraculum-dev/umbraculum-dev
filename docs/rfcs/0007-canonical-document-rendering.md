@@ -506,6 +506,9 @@ Same audience-impact shape [RFC-0004 §6](0004-canonical-pim.md) used.
 - [`packages/i18n/`](../../packages/i18n/) — the locale pipeline `RenderContext.locale` feeds.
 - [`services/api/src/modules/brewery/routes/recipesExport.ts`](../../services/api/src/modules/brewery/routes/recipesExport.ts) — the first sync-mode proof per §12 PR #5.
 - [`docs/design/canonical-pim-module-surface.md`](../design/canonical-pim-module-surface.md) §3.2, §8.3 — the PIM Phase E channel-feed deferral that becomes the first heavy-render consumer per §12 PR #7.
+- [`docs/design/canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md) — horizontal as-built surface: template registry, delivery modes, module author checklist (update §2 when adding `documentTemplates`).
+- [`docs/design/rfc-companion-documentation-audit.md`](../design/rfc-companion-documentation-audit.md) — companion-doc inventory row for RFC-0007.
+- [`docs/design/canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md) — horizontal as-built surface: template registry, delivery modes, module author checklist (RFC §11.7 optional polish; landed 2026-05-27).
 - [`docs/MODULES.md`](../MODULES.md) §3.3 — horizontal packages catalog `@umbraculum/rendering` joins.
 - [`docs/REPOSITORY-STRUCTURE.md`](../REPOSITORY-STRUCTURE.md) §3.3 — layer-3 packages inventory `@umbraculum/rendering` joins.
 

@@ -60,7 +60,7 @@ The consultant has access to a closed set of tools registered by the installed c
 
 Domain tools enforce workspace membership at the service layer ([`requireActiveWorkspace`](../services/api/src/plugins/requestContext.ts)) — the AI cannot read data outside the operator's active workspace, even if it tries to construct a tool call that would cross workspaces. `render_document` submits a rendering job for the active workspace using registered templates; it is a platform-controlled output operation, not a domain-record mutation. Tool calls and results are visible in the chat surface for transparency.
 
-**Registered MRP/CRP template refs (Wave 6, via `render_document` only — no per-module export tools):**
+**Registered document template refs** — full registry (brewery, pim, mrp, crp): [`docs/design/canonical-document-rendering-surface.md`](design/canonical-document-rendering-surface.md) §2. MRP/CRP subset below is via `render_document` only (no per-module export tools):
 
 | Template ref | Kind | Module |
 |---|---|---|
