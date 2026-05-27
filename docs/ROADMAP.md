@@ -96,7 +96,7 @@ Ordered for typical execution; pick the row that matches what you want this week
 
 **Not in this H2 alpha slice:** WMS, native MRP/CRP operator screens, irreversible brewery→MRP schema migration, scheduling optimizer, ready-to-sell commercial MRP/CRP — see [§ H1 2027 mature](#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) below.
 
-### H1 2027 — Mature MRP/CRP + WMS + commercial scope (deferred from original H1 2027)
+### H1 2027 — Mature MRP/CRP + WMS + commercial scope (deferred from original H1 2027) {#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027}
 
 Goal: move from **read-only alpha proof** to **production-ready** manufacturing modules and the WMS pairing described in [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §5.2.
 
