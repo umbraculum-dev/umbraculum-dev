@@ -9,6 +9,14 @@ Static marketing brochure for **umbraculum.dev** — workspace-shaped positionin
 
 A **build-only** workspace: HTML + CSS in `public/`, copied to `dist/` on build. The Umbi mascot is copied from the canonical asset [`docs/media/umbi.png`](../../docs/media/umbi.png) at build time (not duplicated in git). Intended for Cloudflare Pages with output directory `apps/website/dist`.
 
+Every page header must include the shared **`brand-row`** block (Umbi logo + title) and `<link rel="icon" href="/img/umbi.png" />` — copy from `public/index.html` or `public/support/index.html`.
+
+## Design and tone
+
+**Less ego, more facts.** The brochure is a modest orientation surface for developers and technicians — not a growth-marketing landing page. Primary objective: **sustain ordinary work** (groceries, running costs), not jackpot or “once in a lifetime” deal theatre — sponsorship is welcome but not the headline. Avoid startup tropes (rockets, neon heroes, super-impactful colors, motion-for-attention). Keep copy precise and link to docs for depth.
+
+Canonical policy: [`docs/design/brochure-site-design-policy.md`](../../docs/design/brochure-site-design-policy.md). Aligns with [`MANIFESTO.md`](../../MANIFESTO.md) §1 (“not a marketing document”).
+
 ## Quick start
 
 **With Docker Compose** (starts with the rest of the dev stack):
@@ -43,6 +51,7 @@ Cloudflare Pages project — build command `npm ci && npm run build -w @umbracul
 
 ## Further reading
 
+- [`docs/design/brochure-site-design-policy.md`](../../docs/design/brochure-site-design-policy.md) — visual and copy policy (less ego, more facts)
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §1.1 — positioning copy source
 - [`docs/ROADMAP.md`](../../docs/ROADMAP.md) — Phase 1 / Phase 2 TODO table
 - [`docs/rfcs/0005-docs-site.md`](../../docs/rfcs/0005-docs-site.md) — docs hosting decision (Cloudflare)
