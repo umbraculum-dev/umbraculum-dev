@@ -30,6 +30,7 @@ export default defineConfig({
       name: "smoke",
       testMatch: /smoke\/.*\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
+      fullyParallel: false,
     },
     {
       name: "brewday",

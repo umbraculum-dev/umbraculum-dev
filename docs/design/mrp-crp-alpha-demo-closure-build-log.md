@@ -48,8 +48,15 @@
 
 - **API:** `docker compose exec -T api npx vitest run src/tests/mrpCrpRendering.test.ts src/tests/mrpCrpModuleRegistration.test.ts src/tests/pimChannelFeeds.test.ts`
 - **Web:** `docker compose exec -T web npm run typecheck` (after `npm run build -w @umbraculum/i18n` if message bundles changed)
-- **Playwright:** `mrp-crp-export-alpha.spec.ts` (requires gotenberg + redis)
+- **Playwright:** `mrp-crp-export-alpha.spec.ts` — run [quick gates](mrp-crp-alpha-demo-walkthrough.md#quick-gates-before-playwright) first (`seed:e2e`, api+web healthy, gotenberg + redis; pass `E2E_ADMIN_PASSWORD` if api overrides it). Verified green with Playwright Docker image + `--workers=1`.
 - **Docs:** `python3 scripts/docs/check-readmes.py`
+
+---
+
+## Follow-up (tooling)
+
+- **Repo docs are canonical** for Playwright prereqs: [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) § Quick gates, [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md), [`docs/TESTING.md`](../TESTING.md) § L5.
+- **Plugin (optional):** mirror the same gate block in `umbraculum-node-react-cursor-assistant` (`agentic-e2e-runbook` or `playwright-runner-docs-gate`) so agents see it without opening MRP/CRP design docs — not required for alpha closure; open a `umbraculum-toolset` issue if agents keep skipping gates.
 
 ---
 

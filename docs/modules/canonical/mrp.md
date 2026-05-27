@@ -76,7 +76,8 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 5. **Wave 4 — deterministic read-only alpha proof.** E2E fixture data and focused Playwright assertions now prove the MRP/CRP read-only projection path without creating MRP rows. **Shipped as proof hardening only.**
 6. **Wave 5 — read-only AI planning advisor.** `mrp.listProductionOrders`, `mrp.getProductionOrder`, and `mrp.explainMaterialRequirements` register through `registerModule({ registerAiTools })` and call the existing read services. **Shipped as advisor proof only.**
 7. **Wave 6 — rendering templates.** Four RFC-0007 templates (`mrp:work-order-pdf@v1`, `mrp:route-card-pdf@v1`, `mrp:material-requirements-xlsx@v1`, `mrp:production-order-csv@v1`) register through `registerModule({ documentTemplates })` with module-owned render-job routes. **Shipped as rendering proof only.**
-8. **Later — write workflows.** Propose/write routes and native operator flows remain future work.
+8. **Alpha demo closure.** Web export buttons, operator walkthrough, full render-job API matrix, Playwright export smoke — see [`mrp-crp-alpha-demo-walkthrough.md`](../../design/mrp-crp-alpha-demo-walkthrough.md) (quick gates before Playwright) and [`mrp-crp-alpha-demo-closure-build-log.md`](../../design/mrp-crp-alpha-demo-closure-build-log.md). **Human sign-off still pending.**
+9. **Later — write workflows.** Propose/write routes and native operator flows remain future work.
 
 ---
 
@@ -92,6 +93,8 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 - [MRP/CRP Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md) — deterministic proof implementation record.
 - [MRP/CRP Wave 5 AI planning advisor build log](../../design/mrp-crp-wave-5-ai-planning-advisor-build-log.md) — read-only AI advisor implementation record.
 - [MRP/CRP Wave 6 rendering templates build log](../../design/mrp-crp-wave-6-rendering-templates-build-log.md) — RFC-0007 templates and render-job routes.
+- [MRP/CRP alpha demo walkthrough](../../design/mrp-crp-alpha-demo-walkthrough.md) — operator runbook + Playwright quick gates.
+- [MRP/CRP alpha demo closure build log](../../design/mrp-crp-alpha-demo-closure-build-log.md) — web exports + CI proof.
 - [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery-and-MRP-and-CRP co-design.
