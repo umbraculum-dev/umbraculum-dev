@@ -217,6 +217,25 @@ distilled, actionable section. The same guidance is also carried by the
 `43-non-frontier-executor-fitness-tracker.mdc`) so it propagates to
 sibling Umbraculum repos when they adopt the toolset.
 
+### RFC and plan documentation quality
+
+Before implementing or reviewing code tied to an **accepted RFC** (especially
+horizontal services in [RFC-0001](docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2 — rendering, notifications, validation):
+
+1. Read the RFC §1 summary and the **companion artifacts** listed in
+   [`docs/rfcs/README.md`](docs/rfcs/README.md) §3 and the row for that RFC in
+   [`docs/design/rfc-companion-documentation-audit.md`](docs/design/rfc-companion-documentation-audit.md).
+2. Do not ship consumer features (new `documentTemplates`, delivery modes, module
+   export routes) without updating the **horizontal or module surface doc** and,
+   for rendering, the template registry in
+   [`docs/design/canonical-document-rendering-surface.md`](docs/design/canonical-document-rendering-surface.md).
+3. When **authoring** a multi-phase Cursor/plan file, include a **Documentation
+   context** table per
+   [`docs/design/plan-documentation-context-template.md`](docs/design/plan-documentation-context-template.md).
+
+Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
+`49-plan-documentation-context.mdc`.
+
 ## Release/version notation guardrail
 
 When touching release metadata, preserve the repo convention from

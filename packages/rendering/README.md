@@ -60,9 +60,20 @@ Run commands from the repo root inside the project container, not via host `npm`
 - **Lint**: `npm run lint --workspace=@umbraculum/rendering`
 - **Typecheck**: `npm run typecheck --workspace=@umbraculum/rendering`
 
+## Consumer modules
+
+Registered templates and convenience routes are indexed in the horizontal surface doc (source of truth for operators and plan authors):
+
+- [`docs/design/canonical-document-rendering-surface.md`](../../docs/design/canonical-document-rendering-surface.md) §3 — template registry
+- **brewery** — `brewery:beerjson-export@v1` (sync proof)
+- **pim** — `pim:product-catalog-csv@v1` (first async consumer, PR7)
+- **mrp** / **crp** — eight templates (Wave 6); see module surface docs §11 / §13
+
+When adding a module-owned template, update the registry row in the same PR.
+
 ## How it fits in
 
-- **Consumed by**: module templates registered through `@umbraculum/module-sdk`; `services/api` rendering job orchestration that submits and executes rendering jobs. Current worked consumers are BeerJSON export sync rendering and the async PIM product-catalog CSV feed.
+- **Consumed by**: module templates registered through `@umbraculum/module-sdk`; `services/api` rendering job orchestration that submits and executes rendering jobs. Current worked consumers include BeerJSON export, PIM product-catalog CSV, and MRP/CRP Wave 6 templates.
 - **Depends on**: `@umbraculum/module-sdk` for the MIT-owned type surface and the selected engine packages from RFC-0007 §6.1.
 - **Hands off to**: `services/api` for `persist-to-media` delivery, v1 DB-backed artifacts, and signed URLs until a future media persistence layer exists.
 
@@ -70,9 +81,19 @@ Run commands from the repo root inside the project container, not via host `npm`
 
 RFC-0007 PR1-PR7 are complete. Engine-major pins are present in `package.json`: Gotenberg is wired as an internal `gotenberg/gotenberg:8` Compose sidecar, while the npm-backed engines are pinned to the RFC-0007 §6.1 major families except MJML, which is pinned to v5 after PR1 dependency-audit review found the v4 tree carried high-severity transitive advisories. Gotenberg client code remains injectable and tested with mocks in this package; BullMQ, Prisma schema, Fastify routes, v1 DB-backed artifact persistence, AI tooling, and first consumers live outside this package in the API service.
 
+## Consumer modules
+
+Registered template refs and delivery-mode rules are maintained in the horizontal surface doc (single source of truth for agents and reviewers):
+
+- [`docs/design/canonical-document-rendering-surface.md`](../../docs/design/canonical-document-rendering-surface.md) §2 — template registry (`module:template@version`)
+- [`docs/AI-CONSULTANT.md`](../../docs/AI-CONSULTANT.md) — `render_document` tool and consultant-visible refs
+
+When adding templates from a new module, update the registry table in the same PR.
+
 ## Further reading
 
 - [`docs/rfcs/0007-canonical-document-rendering.md`](../../docs/rfcs/0007-canonical-document-rendering.md) — commitment artifact for canonical rendering
+- [`docs/design/canonical-document-rendering-surface.md`](../../docs/design/canonical-document-rendering-surface.md) — as-built horizontal surface
 - [`docs/design/canonical-document-rendering-engine-rationale.md`](../../docs/design/canonical-document-rendering-engine-rationale.md) — comparative rationale behind the engine picks
 - [`docs/modules/contribute/horizontal-package.md`](../../docs/modules/contribute/horizontal-package.md) — horizontal-package contribution path and consumption-contract checklist
 - [`packages/module-sdk/README.md`](../module-sdk/README.md) — SDK package that owns the MIT type surface

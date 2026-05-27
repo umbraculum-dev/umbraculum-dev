@@ -183,6 +183,8 @@ Hosted customers gain a coherent delivery story over time: one place for provide
 
 The public alpha can honestly say: email-ready rendering exists, general email delivery does not, and modules are not allowed to fill that gap privately. That clarity is the deliverable of this RFC.
 
+**Companion surface (pre-implementation):** [`docs/design/canonical-notifications-outbound-delivery-surface.md`](../design/canonical-notifications-outbound-delivery-surface.md) — horizontal boundary doc for module authors (2026-05-27).
+
 ---
 
 ## 10. Resolution

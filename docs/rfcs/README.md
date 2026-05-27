@@ -59,7 +59,30 @@ The `(commit)` suffix on each Decision heading is deliberate — RFCs distinguis
 
 ---
 
-## 3. Adding a new RFC
+## 3. Expected companion artifacts
+
+Accepted RFCs are not self-contained implementation manuals. Each RFC commits *what* the platform or a module must do; companion docs record *how it is built today* and give agents and reviewers stable citation targets. The living inventory and gap scoring live in [`../design/rfc-companion-documentation-audit.md`](../design/rfc-companion-documentation-audit.md).
+
+| Artifact type | Role | When required | Examples |
+|---------------|------|---------------|----------|
+| **RFC** | Governance commitment | Always | `docs/rfcs/0007-*.md` |
+| **Audit / rationale doc** | Deep analysis; RFC is the commitment | Cross-cutting stack picks (RFC-0003 shape) | [`validation-library-adoption-audit.md`](../design/validation-library-adoption-audit.md), [`canonical-document-rendering-engine-rationale.md`](../design/canonical-document-rendering-engine-rationale.md) |
+| **Module surface doc** | As-built per canonical module | Each allocated canonical code | [`canonical-pim-module-surface.md`](../design/canonical-pim-module-surface.md) |
+| **Horizontal surface doc** | As-built for platform extension points spanning modules | Horizontal RFCs with `register*` slots | [`canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md), [`canonical-notifications-outbound-delivery-surface.md`](../design/canonical-notifications-outbound-delivery-surface.md) |
+| **Execution plan** | Composer/human operational breakdown | Large RFC execution (optional) | [`rfc-0005-execution-plan.md`](../design/rfc-0005-execution-plan.md) |
+| **Decision / audit record** | Narrow amendment + bundled work | Amendments, audits | [`web-route-group-audit.md`](../design/web-route-group-audit.md) |
+| **Build log** | Wave execution record | Multi-phase feature waves | `mrp-crp-wave-*-build-log.md` |
+| **Package README** | Workspace consumer surface | Every `packages/*` | Enforced by `scripts/docs/check-readmes.py` |
+
+**When you accept a new RFC**, land or schedule the companion set in the same PR window as implementation (or, for horizontal services, a boundary surface doc before the first consumer wave). **When you add a `documentTemplates` entry or a new `module:template@version` ref**, update the horizontal rendering surface registry in the same PR ([`canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md) §2).
+
+**Gold-standard precedent:** [RFC-0003](0003-validation-library-adoption.md) + [`validation-library-adoption-audit.md`](../design/validation-library-adoption-audit.md). **Per-module precedent:** [RFC-0004](0004-canonical-pim.md) → [`canonical-pim-module-surface.md`](../design/canonical-pim-module-surface.md).
+
+Feature plans (Cursor `.plan.md` files) MUST include a **Documentation context** table citing the governing RFC, horizontal/module surface docs, and relevant plugin rules — see [`AGENTS.md`](../../AGENTS.md) §"Adjacent context" and umbraculum-toolset-common rule `49-plan-documentation-context.mdc` (after toolset install).
+
+---
+
+## 4. Adding a new RFC
 
 For a new RFC:
 
@@ -71,8 +94,40 @@ For a new RFC:
 
 ---
 
-## 4. Why this index exists
+## 5. Why this index exists
 
 The eight RFCs above are referenced from many places — `MODULES.md`, `PLATFORM-ARCHITECTURE.md`, `REPOSITORY-STRUCTURE.md`, individual module pages, README files in `packages/<code>-contracts/`. Before this index existed, an evaluator who wanted the full picture had to click through five docs to discover the RFC set. This page is the single artifact that answers "what has Umbraculum formally committed to, and where do I read the full text?"
 
 When a future RFC lands (likely candidates: `0009-billing-model` covering `WorkspaceBillingAddon` + Stripe subscription-item flow + RevenueCat consumables; an eventual successor RFC promoting the route-group β disciplines from plugin-pack rule [46-web-route-shape.mdc](https://github.com/umbraculum-dev/umbraculum-toolset) to RFC-level commitment if third-party modules contest them; or a successor amending RFC-0002 §11.4 to authorize the brewery Postgres schema split from `public.*` to `brewery.*`), it is added here first; the change is not done until this index reflects it.
+
+---
+
+## 5. Companion documentation expectations
+
+RFCs record **governance commitments**. Implementations and operators rely on a ladder of companion artifacts so behavior is discoverable without re-reading every Decision section. The living inventory and remediation priorities live in [`../design/rfc-companion-documentation-audit.md`](../design/rfc-companion-documentation-audit.md).
+
+### 5.1 Artifact taxonomy
+
+| Artifact type | Role | When required | Examples |
+|---------------|------|---------------|----------|
+| **RFC** | Governance commitment | Always | `docs/rfcs/0007-*.md` |
+| **Audit / rationale doc** | Deep analysis; RFC is the commitment | Cross-cutting stack picks (RFC-0003 shape) | [`validation-library-adoption-audit.md`](../design/validation-library-adoption-audit.md), [`canonical-document-rendering-engine-rationale.md`](../design/canonical-document-rendering-engine-rationale.md) |
+| **Module surface doc** | As-built per canonical module | Each allocated canonical code | [`canonical-pim-module-surface.md`](../design/canonical-pim-module-surface.md) |
+| **Horizontal surface doc** | As-built for platform extension points spanning modules | Horizontal RFCs with `register*` slots | [`canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md), [`canonical-notifications-outbound-delivery-surface.md`](../design/canonical-notifications-outbound-delivery-surface.md) |
+| **Execution plan** | Composer/human operational breakdown | Large RFC execution (optional) | [`rfc-0005-execution-plan.md`](../design/rfc-0005-execution-plan.md) |
+| **Decision / audit record** | Narrow amendment + bundled work | Amendments, audits | [`web-route-group-audit.md`](../design/web-route-group-audit.md) |
+| **Build log** | Wave execution record | Multi-phase feature waves | `mrp-crp-wave-*-build-log.md` |
+| **Package README** | Workspace consumer surface | Every `packages/*` | Enforced by `scripts/docs/check-readmes.py` |
+
+**Gold standard:** [RFC-0003](0003-validation-library-adoption.md) + audit + contracts migration. **Module pattern:** [RFC-0004](0004-canonical-pim.md) → `canonical-*-module-surface.md` tracks as-built phases.
+
+### 5.2 When you accept or implement an RFC
+
+1. List expected companion types in the RFC (or link this taxonomy).
+2. Land or update companions **in the same PR** when the implementation changes operator-visible behavior (template registry rows, new `registerModule` slots, delivery modes).
+3. Refresh the audit matrix row and `last reviewed` date.
+4. Feature plans for multi-phase work include a **Documentation context** section — template: [`../design/plan-documentation-context-template.md`](../design/plan-documentation-context-template.md) (toolset rule `49-plan-documentation-context.mdc` when installed).
+
+### 5.3 Optional CI
+
+[`scripts/docs/check-rfc-companion-links.py`](../../scripts/docs/check-rfc-companion-links.py) checks that implemented RFCs still link to on-disk companion paths declared in the audit matrix. Non-blocking until one green cycle; then promote in CI alongside `check-readmes.py`.
