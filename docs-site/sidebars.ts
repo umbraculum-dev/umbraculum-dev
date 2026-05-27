@@ -19,7 +19,7 @@ const sidebars: SidebarsConfig = {
         'PLATFORM-ARCHITECTURE',
         'ROADMAP',
         'LICENSING',
-        'ARCHITECTURE-REV02',
+        'CROSS-PLATFORM-BOUNDARIES',
       ],
     },
     {
@@ -65,6 +65,7 @@ const sidebars: SidebarsConfig = {
               label: 'brewery reference vertical',
               items: [
                 'modules/verticals/brewery/README',
+                'modules/verticals/brewery/IMPLEMENTATION-LOG',
                 'modules/verticals/brewery/BEERJSON-FIRST',
                 'modules/verticals/brewery/EQUIPMENT-AND-GRAVITY-ANALYSIS',
                 'modules/verticals/brewery/WATER-CHEM-MASH-PH-MODEL',
@@ -140,7 +141,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Architecture — platform-wide',
       items: [
-        'ARCHITECTURE-REV02',
+        'CROSS-PLATFORM-BOUNDARIES',
         'NATIVE-STRATEGY-AND-CI',
         'REACT-NATIVE-KICKOFF-READINESS',
       ],

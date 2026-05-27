@@ -14,7 +14,7 @@ Two entry points are exported: the default (`@umbraculum/navigation`) for the pl
 ## Scope
 
 - **Contains**: the `RouteId` string-literal union; the `RouteParamsById` map (per-route typed parameters); the `RouteRef` discriminated union; the `AppPlatform` type (`"web" | "native"`); helper utilities for serializing / deserializing `RouteRef` values; the `./native` sub-entrypoint with React Navigation integration adapters.
-- **Does not contain**: Next.js routing config (lives in `apps/web/app/[locale]/**` and `apps/web/middleware.ts`); React Navigation stack/tab definitions (live in `apps/native/src/navigation/`); deep-link URL schemes (live in the consuming app's platform config); Expo Router config (the native app uses React Navigation directly per [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md)).
+- **Does not contain**: Next.js routing config (lives in `apps/web/app/[locale]/**` and `apps/web/middleware.ts`); React Navigation stack/tab definitions (live in `apps/native/src/navigation/`); deep-link URL schemes (live in the consuming app's platform config); Expo Router config (the native app uses React Navigation directly per [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md)).
 
 ## Usage
 
@@ -60,6 +60,6 @@ Stable for the brewery vertical's current route surface. Adding a new route is a
 
 ## Further reading
 
-- [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md) — brewery-vertical implementation log (cross-platform navigation choices)
+- [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md) — cross-platform navigation policy (route IDs, porting, webview whitelist)
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and module boundaries
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

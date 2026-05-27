@@ -18,7 +18,7 @@ If you are new to the project, read these three documents in order:
 2. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
 3. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
 
-The brewery-vertical implementation log lives in [`ARCHITECTURE-REV02.md`](ARCHITECTURE-REV02.md) — that is the source of truth for *what is wired up today* in the brewery vertical, and complements the platform-wide perspective above.
+Cross-platform (web + native) boundaries: [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md). The brewery-vertical implementation log: [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md). Together they complement the platform-wide perspective above.
 
 ---
 
@@ -107,7 +107,8 @@ User-facing product surfaces and operational concerns at the product level.
 
 Cross-cutting architectural decisions that apply to every module.
 
-- [`ARCHITECTURE-REV02.md`](ARCHITECTURE-REV02.md) — Brewery-vertical implementation log and cross-platform (web + native) boundary decisions. The current source of truth for "what is wired up". (Historical versions: [`archive/architecture-Rev00.md`](archive/architecture-Rev00.md), [`archive/architecture-Rev01.md`](archive/architecture-Rev01.md).)
+- [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md) — As-built contract for shared web/native packages (i18n, navigation, api-client auth, webview bridge, DB routing entrypoint).
+- Historical architecture revisions: [`archive/architecture-Rev00.md`](archive/architecture-Rev00.md), [`archive/architecture-Rev01.md`](archive/architecture-Rev01.md), [`archive/architecture-Rev02-2026-05-snapshot.md`](archive/architecture-Rev02-2026-05-snapshot.md) (frozen copy of the former `ARCHITECTURE-REV02.md`, split 2026-05-27).
 - [`NATIVE-STRATEGY-AND-CI.md`](NATIVE-STRATEGY-AND-CI.md) — Native strategy and CI pipeline notes.
 - [`REACT-NATIVE-KICKOFF-READINESS.md`](REACT-NATIVE-KICKOFF-READINESS.md) — Readiness criteria for the React Native kickoff.
 
@@ -145,6 +146,7 @@ Brewery-specific modeling, data formats, and analytical models.
 - [`modules/verticals/brewery/WATER-CHEM-MASH-PH-MODEL.md`](modules/verticals/brewery/WATER-CHEM-MASH-PH-MODEL.md) — Water chemistry and mash pH model.
 - [`modules/verticals/brewery/YEAST-MATH.md`](modules/verticals/brewery/YEAST-MATH.md) — Yeast pitching and propagation math.
 - [`modules/verticals/brewery/RAW-MATERIALS-SEEDABLE-SOURCES.md`](modules/verticals/brewery/RAW-MATERIALS-SEEDABLE-SOURCES.md) — Seed data sources and licensing notes for raw materials.
+- [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md) — Brewery vertical product rules, offline/sync intent, water/recipe constraints, and living engineering constraints.
 
 ## Engineering — development
 

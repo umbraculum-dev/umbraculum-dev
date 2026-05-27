@@ -53,7 +53,8 @@ Shipping. AI orchestrator + per-workspace operational memory + admin dashboard l
 ## Further reading
 
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision, AI consultant blueprint, BYOK + paid tier unlock
-- [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md) — brewery-vertical implementation log
+- [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md) — web/native as-built boundaries
+- [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../../docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md) — brewery-vertical implementation log
 - [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) — cookie + bearer + future webview bridge
 - [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md) — primary + replica + pgpool + pgvector image rationale
 - [`docs/design/canonical-ai-rag-surface.md`](../../docs/design/canonical-ai-rag-surface.md) — Layer C RAG (`ai.doc_chunks`, ingest, `platform.searchProductDocs`)

@@ -1,6 +1,6 @@
 # Brewing SaaS - Architecture & Implementation Plan (AI-first)
 
-**NOTE:** This revision has been superseded by [`../ARCHITECTURE-REV02.md`](../ARCHITECTURE-REV02.md) (new source of truth). Keep Rev01 as historical context; apply new decisions in Rev02.
+**NOTE:** This revision is historical only. Successor docs: [`../PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`../CROSS-PLATFORM-BOUNDARIES.md`](../CROSS-PLATFORM-BOUNDARIES.md), [`../modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../modules/verticals/brewery/IMPLEMENTATION-LOG.md). Full Rev02 text: [`architecture-Rev02-2026-05-snapshot.md`](architecture-Rev02-2026-05-snapshot.md).
 
 **Status:** v0.2 (living document)  
 **Primary goal:** ship a bfr-style product with **native mobile apps** (marketing + brew-day reliability) and a **desktop-first web app** (workhorse), built with an **AI-first workflow** (Cursor + GPT-5.2-codex).  

@@ -9,7 +9,7 @@ Next.js + React + Tamagui web application — the desktop-first surface of Umbra
 
 The web application — the primary user-facing surface of the brewery vertical today. Built on Next.js 15 (App Router) + React 19 + Tamagui (with `react-native-web` so platform-neutral components from `@umbraculum/ui` and `@umbraculum/brewery-recipes-ui` render identically here and in `apps/native`). Authentication rides cookie sessions (`sid` httpOnly) with the API service at `services/api`; localization runs through `next-intl` reading from `@umbraculum/i18n`; charts use Victory; chat surfaces and the AI consultant are integrated as first-class panels.
 
-The architectural shape — what's a feature here vs. in a sibling package — is documented in [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md) (the brewery-vertical implementation log). The platform-level framing (web + native sharing core logic via `@umbraculum/*` packages) lives in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md).
+The architectural shape — what's a feature here vs. in a sibling package — is documented in [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../../docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md) and [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md). Platform vision lives in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md).
 
 ## Scope
 
@@ -48,7 +48,8 @@ Shipping (work-in-progress). The brewery-vertical UI is the core surface; the AI
 ## Further reading
 
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision, AI consultant blueprint, public-flip trajectory
-- [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md) — brewery-vertical implementation log
+- [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md) — cross-platform boundaries
+- [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../../docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md) — brewery-vertical implementation log
 - [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) — cookie-web + bearer-native + future webview bridge
 - [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md) — Tamagui type-system caveats and adaptation strategy
 - [`docs/TESTING.md`](../../docs/TESTING.md) — platform-wide test layer map

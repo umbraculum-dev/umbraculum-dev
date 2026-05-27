@@ -195,6 +195,8 @@ If your vertical wants to be **bundled** with the platform's hosted offering (th
 
 ## 7. Cross-references
 
+- [`IMPLEMENTATION-LOG.md`](IMPLEMENTATION-LOG.md) — brewery vertical product rules, offline/sync intent, water/recipe constraints, living engineering constraints.
+- [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md) — web/native as-built boundaries (route IDs, auth, webview bridge).
 - [RFC-0001](../../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6 row), §8 (consumption contract).
 - [RFC-0002](../../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §6 (Decision D — brewery sequencing), §11.2 (concrete migration table).
 - [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — accelerated brewery file relocation.

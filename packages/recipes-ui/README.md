@@ -44,5 +44,6 @@ Recipe-centric by name and by intent. As new vertical domains land additional sh
 ## Further reading
 
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and vertical-module shape
-- [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md) — brewery-vertical implementation log (cross-platform UI boundary decisions)
+- [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md) — cross-platform UI boundaries
+- [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](../../docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md) — brewery vertical implementation log
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
