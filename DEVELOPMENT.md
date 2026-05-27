@@ -98,7 +98,15 @@ The full skill inventory is per-plugin (see each plugin's `skills/` folder, inde
 Dev and CI Postgres services use **`pgvector/pgvector:pg16`**, not stock `postgres:16`, because Layer C RAG (post-α H2 D1) requires the `vector` extension for `ai.doc_chunks`. This is a structural requirement documented in [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §3 gaps / §4.3 Layer C and [`docs/design/canonical-ai-rag-surface.md`](docs/design/canonical-ai-rag-surface.md).
 
 - **Upgrading a long-running dev stack:** `docker compose pull postgres postgres-replica && docker compose up -d --force-recreate postgres postgres-replica` then `docker compose exec -T api npx prisma migrate deploy` — **preserves** data on existing `pgdata` volumes; does not run `migrate reset`.
-- **RAG ingest:** after migrations, populate chunks via `AI_RAG_INGEST_ON_BOOT=1` or the api workspace ingest script documented in the RAG surface doc.
+- **RAG ingest:** after migrations, populate chunks:
+
+  ```bash
+  docker compose exec -T api npm run rag:ingest
+  ```
+
+  Optional: set `AI_RAG_INGEST_ON_BOOT=1` on the `api` service to re-ingest on every container start (dev only).
+
+- **Brochure site (Cloudflare Pages):** `apps/website/` builds static `umbraculum.dev` output; deploy in Phase 2 per [`docs/design/public-alpha-cloudflare-pages-runbook.md`](docs/design/public-alpha-cloudflare-pages-runbook.md).
 
 Replication/pgpool behavior is unchanged; see [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](docs/POSTGRES-REPLICATION-ARCHITECTURE.md) §"pgvector image".
 

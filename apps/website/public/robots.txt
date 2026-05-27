@@ -1,0 +1,3 @@
+# Pre-public-alpha: disallow indexing until Phase 2 flip (see docs/design/public-alpha-cloudflare-pages-runbook.md).
+User-agent: *
+Disallow: /

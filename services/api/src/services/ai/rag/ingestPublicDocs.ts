@@ -1,17 +1,34 @@
 import { createHash, randomUUID } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import type { PrismaClient } from "@prisma/client";
 
 import { embedTextLocal, embeddingToPgVector } from "./embedTextLocal.js";
 
-const DOC_PATHS = [
-  "docs/help/asking-umbraculum.md",
+const STATIC_DOC_PATHS = [
   "docs/AI-CONSULTANT.md",
   "docs/design/canonical-ai-prompt-composition-surface.md",
+  "docs/design/canonical-ai-rag-surface.md",
   "docs/design/canonical-mrp-module-surface.md",
+  "docs/design/canonical-crp-module-surface.md",
+  "docs/help/asking-umbraculum.md",
 ];
+
+async function collectPublicDocPaths(repoRoot: string): Promise<string[]> {
+  const paths = new Set(STATIC_DOC_PATHS);
+  const helpDir = join(repoRoot, "docs/help");
+  try {
+    for (const ent of await readdir(helpDir, { withFileTypes: true })) {
+      if (ent.isFile() && ent.name.endsWith(".md")) {
+        paths.add(`docs/help/${ent.name}`);
+      }
+    }
+  } catch {
+    // help dir optional when repo root is not mounted
+  }
+  return [...paths];
+}
 
 function chunkMarkdown(text: string, maxLen = 1500): string[] {
   const parts = text.split(/\n(?=#+ )/);
@@ -34,7 +51,8 @@ export async function ingestPublicDocs(
   repoRoot: string,
 ): Promise<{ ingested: number }> {
   let ingested = 0;
-  for (const rel of DOC_PATHS) {
+  const docPaths = await collectPublicDocPaths(repoRoot);
+  for (const rel of docPaths) {
     const abs = join(repoRoot, rel);
     let text: string;
     try {

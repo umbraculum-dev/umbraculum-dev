@@ -41,6 +41,7 @@ import { registerBreweryModule } from "./modules/brewery/index.js";
 import { registerCrpModule } from "./modules/crp/index.js";
 import { registerMrpModule } from "./modules/mrp/index.js";
 import { registerPimModule } from "./modules/pim/index.js";
+import { ingestPublicDocs } from "./services/ai/rag/ingestPublicDocs.js";
 
 type AppInstance = FastifyInstance<
   RawServerDefault,
@@ -130,6 +131,18 @@ export function buildApp() {
   });
 
   installZodCompilers(app);
+
+  app.addHook("onReady", async () => {
+    if (process.env["AI_RAG_INGEST_ON_BOOT"] !== "1") return;
+    const repoRoot = process.env["UMBRACULUM_REPO_ROOT"] ?? "/umbraculum";
+    try {
+      const { ingested } = await ingestPublicDocs(app.prisma, repoRoot);
+      app.log.info({ ingested, repoRoot }, "RAG public docs ingest on boot");
+    } catch (err: unknown) {
+      app.log.error({ err, repoRoot }, "RAG public docs ingest on boot failed");
+    }
+  });
+
   return app;
 }
 

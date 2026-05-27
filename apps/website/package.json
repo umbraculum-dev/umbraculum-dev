@@ -1,0 +1,13 @@
+{
+  "name": "@umbraculum/website",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Static marketing brochure for umbraculum.dev (Cloudflare Pages).",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "npx --yes serve dist -p 4321"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
