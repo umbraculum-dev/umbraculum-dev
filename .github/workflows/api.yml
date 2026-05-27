@@ -2,9 +2,9 @@ name: api
 
 # Gates the existing @umbraculum/api vitest suite + shared-package unit tests on
 # every PR that could affect API behavior. Runs migrations against an ephemeral
-# postgres container, then runs vitest in a node:20-slim container so the
-# "no npm on host" policy is honored end-to-end (see the plugin-shipped
-# 00-shared-node-npm-container-only.mdc rule and docs/TESTING.md).
+# postgres container, then runs vitest on the runner (postgres + redis + gotenberg
+# service containers). Gotenberg is required for HTML→PDF rendering integration
+# tests (mrpCrpRendering.test.ts); see docs/design/mrp-crp-wave-6-rendering-templates-build-log.md.
 
 on:
   push:
@@ -76,6 +76,10 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      gotenberg:
+        image: gotenberg/gotenberg:8
+        ports:
+          - 3000:3000
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/brewapp_test
@@ -83,6 +87,7 @@ jobs:
       DATABASE_URL_DIRECT: postgresql://postgres:postgres@localhost:5432/brewapp_test
       DATABASE_URL_RO: postgresql://postgres:postgres@localhost:5432/brewapp_test
       REDIS_URL: redis://localhost:6379/0
+      GOTENBERG_BASE_URL: http://localhost:3000
       STRIPE_WEBHOOK_SECRET: ci-only-not-real
 
     steps:
@@ -112,6 +117,18 @@ jobs:
             sleep 2
           done
           echo "postgres never became ready" >&2
+          exit 1
+
+      - name: Wait for Gotenberg
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health > /dev/null 2>&1; then
+              echo "gotenberg ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "gotenberg never became ready" >&2
           exit 1
 
       - name: Run @umbraculum/api vitest suite
