@@ -14,6 +14,8 @@ name: docs-readmes
 # prints a structured summary, and exits non-zero if any file fails.
 # This means a single PR run reports every regression at once rather
 # than failing on the first one.
+#
+# Repository: github.com/umbraculum-dev/umbraculum-dev (org transfer verified).
 
 on:
   push:
