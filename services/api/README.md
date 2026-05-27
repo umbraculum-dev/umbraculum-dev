@@ -7,7 +7,7 @@ Fastify + Prisma + Postgres API service — the backend for Umbraculum's brewery
 
 ## What this is
 
-The primary API service. Fastify 5 + Prisma 6 against Postgres (primary + replica fronted by pgpool — see [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md)) with Redis for sessions and BullMQ rendering queues. The service is the source of truth for every contract surface: auth (`/auth/*` — cookie sessions for web, bearer tokens for native), recipes / brew-day computations, water chemistry, gravity analysis, billing (Stripe + RevenueCat per [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](../../docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md)), canonical rendering jobs (`/rendering/*` per RFC-0007), and the AI consultant orchestrator (Anthropic Claude SDK, BYOK + paid-tier unlock per [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §6–§7).
+The primary API service. Fastify 5 + Prisma 6 against Postgres (primary + replica fronted by pgpool; **`pgvector/pgvector:pg16`** for the `vector` extension used by AI RAG — see [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md) and [`docs/design/canonical-ai-rag-surface.md`](../../docs/design/canonical-ai-rag-surface.md)) with Redis for sessions and BullMQ rendering queues. The service is the source of truth for every contract surface: auth (`/auth/*` — cookie sessions for web, bearer tokens for native), recipes / brew-day computations, water chemistry, gravity analysis, billing (Stripe + RevenueCat per [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](../../docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md)), canonical rendering jobs (`/rendering/*` per RFC-0007), and the AI consultant orchestrator (Anthropic Claude SDK, BYOK + paid-tier unlock per [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §6–§7).
 
 Every cross-boundary type the API serializes is defined in `@umbraculum/contracts` — both the producer (this service) and the consumers (web, native) compile against the same types and run the same hand-rolled runtime parsers, which is what makes the contract layer trustworthy. The hand-rolled-validator decision is documented in [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../../docs/CONTRACTS-VALIDATION-STRATEGY.md).
 
@@ -55,7 +55,8 @@ Shipping. AI orchestrator + per-workspace operational memory + admin dashboard l
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision, AI consultant blueprint, BYOK + paid tier unlock
 - [`docs/ARCHITECTURE-REV02.md`](../../docs/ARCHITECTURE-REV02.md) — brewery-vertical implementation log
 - [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) — cookie + bearer + future webview bridge
-- [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md) — primary + replica + pgpool
+- [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md) — primary + replica + pgpool + pgvector image rationale
+- [`docs/design/canonical-ai-rag-surface.md`](../../docs/design/canonical-ai-rag-surface.md) — Layer C RAG (`ai.doc_chunks`, ingest, `platform.searchProductDocs`)
 - [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../../docs/CONTRACTS-VALIDATION-STRATEGY.md) — why the API uses hand-rolled runtime validators
 - [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](../../docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md) — billing source-of-truth design
 - [`docs/TESTING.md`](../../docs/TESTING.md) — platform-wide test layer map

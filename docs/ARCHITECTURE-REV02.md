@@ -119,7 +119,8 @@ To enable “single URL” scaling (Magento-cloud-like) while keeping **auth/ses
 Implemented pieces:
 
 - Compose wiring: `docker-compose.yml`
-  - `postgres`, `postgres-replica`, `pgpool`, `db-guard`
+  - `postgres`, `postgres-replica` on **`pgvector/pgvector:pg16`** (AI RAG `vector` extension; see `docs/POSTGRES-REPLICATION-ARCHITECTURE.md` §"pgvector image")
+  - `pgpool`, `db-guard`
 - Postgres durability:
   - archive volume: `wal_archive` mounted at `/wal-archive`
   - slot: `replica1`

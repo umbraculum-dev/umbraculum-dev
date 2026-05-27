@@ -197,6 +197,9 @@ services:
       - ./packages/contracts:/packages/contracts:ro
       - ./packages/core:/packages/core:ro
 
+  # pgvector/pgvector:pg16 (not stock postgres:16): AI Layer C RAG needs the `vector`
+  # extension (ai.doc_chunks). Image swap + force-recreate keeps pgdata volumes.
+  # See docs/POSTGRES-REPLICATION-ARCHITECTURE.md §"pgvector image".
   postgres:
     image: pgvector/pgvector:pg16
     entrypoint: ["/bin/bash", "/primary-entrypoint.sh"]

@@ -22,6 +22,27 @@ This doc describes the **production-like** DB foundation implemented in Docker C
 
 See `~/dkprojects/rfapps/umbraculum-dev/docker-compose.yml`.
 
+### pgvector image (why not stock `postgres:16`)
+
+Post-α H2 **AI consultant RAG (Layer C D1)** stores embeddings in `ai.doc_chunks` using the Postgres **`vector`** extension (pgvector). Stock `postgres:16` images do not include that extension; migrations and init SQL are written to apply only when `pg_available_extensions` lists `vector`.
+
+- **Dev compose + CI** use `pgvector/pgvector:pg16` for `postgres` and `postgres-replica` — same major version as before, with pgvector prebuilt.
+- **First boot** on an empty volume: `infra/postgres/init/03-ai-pgvector.sql` creates the extension and `ai` schema objects.
+- **Existing dev volumes:** swapping the image and running `prisma migrate deploy` applies `20260527120200_ai_pgvector_rag_schema` without wiping `brewapp` data (`docker compose up -d --force-recreate` keeps `pgdata` / `pgdata_replica` volumes).
+- **Runtime contract:** operational tables stay in existing schemas; vectors are isolated in `ai.doc_chunks` (see [`docs/design/canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md)).
+
+Do **not** use `docker compose down -v` or `prisma migrate reset` on `brewapp` when upgrading — those destroy dev data.
+
+**Collation version after image swap:** if the new Postgres image ships a different glibc/ICU collation version than the volume was created with, Postgres emits a `collation version mismatch` **NOTICE** on connect. **pgpool-II treats that notice as fatal** during session setup (`FATAL: unable to get session context`), which breaks login and any `DATABASE_URL` routed through pgpool. Fix (dev, preserves data):
+
+```bash
+docker compose exec -T postgres psql -U postgres -d postgres -c \
+  "ALTER DATABASE brewapp REFRESH COLLATION VERSION;
+   ALTER DATABASE brewapp_test REFRESH COLLATION VERSION;
+   ALTER DATABASE postgres REFRESH COLLATION VERSION;"
+docker compose restart pgpool api
+```
+
 ### pgpool image source (why not Docker Hub `bitnami/pgpool`)
 
 - Docker Hub `bitnami/pgpool` is listed as “active”, but in this environment it had **no pullable tags** (attempts to pull `bitnami/pgpool:latest` / `bitnami/pgpool:4.x` returned `manifest unknown`).
