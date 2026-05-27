@@ -11,6 +11,21 @@ A **build-only** workspace: HTML + CSS in `public/`, copied to `dist/` on build.
 
 ## Quick start
 
+**With Docker Compose** (starts with the rest of the dev stack):
+
+```bash
+docker compose up -d website
+# open http://127.0.0.1:4321/support/
+```
+
+After editing `public/**`, restart to rebuild `dist/`:
+
+```bash
+docker compose restart website
+```
+
+**Host preview** (no container):
+
 ```bash
 npm run build -w @umbraculum/website
 npm run preview -w @umbraculum/website
