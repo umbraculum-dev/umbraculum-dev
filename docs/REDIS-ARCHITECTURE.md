@@ -67,7 +67,7 @@
 
 From repo root:
 
-- `cd ~/dkprojects/rfapps/umbraculum-dev`
+- `cd $REPO_ROOT`
 - Redis up: `docker compose ps redis`
 - Smoke test from API container:
   - `docker compose exec -T api node --input-type=module -e "import { createClient } from 'redis'; const c=createClient({url:process.env.REDIS_URL}); await c.connect(); await c.set('brewery:smoke','ok',{EX:30}); console.log(await c.get('brewery:smoke')); await c.quit();"`

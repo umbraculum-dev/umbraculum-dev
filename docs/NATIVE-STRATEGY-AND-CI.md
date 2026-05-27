@@ -1,6 +1,6 @@
 # Native strategy, risk posture, and CI (prose)
 
-Canonical repo root (example): `~/dkprojects/rfapps/umbraculum-dev`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 This document captures **why** we accept certain trade-offs for native development today, **what** keeps that posture professionally safe for a small team or solo maintainer, and **whether** continuous integration (e.g. GitHub Actions) is recommended—and how to keep it lean.
 
@@ -187,7 +187,7 @@ Run the same checks **locally before push**:
 
 ```bash
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check && npm run typecheck"

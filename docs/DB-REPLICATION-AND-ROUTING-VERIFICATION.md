@@ -1,11 +1,11 @@
 # DB replication + pgpool routing verification (runbook)
 
-Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 ## Prerequisites
 
 - Stack is up:
-  - `cd ~/dkprojects/rfapps/umbraculum-dev`
+  - `cd $REPO_ROOT`
   - `docker compose ps`
 - Services expected: `postgres`, `postgres-replica`, `pgpool`, `db-guard`, `api`
 

@@ -179,7 +179,7 @@ Following [`docs/design/architectural-audit-template.md`](architectural-audit-te
 
 **Question:** Is the cost estimate credible, or am I optimistically lowballing?
 
-**Evidence:** Estimate is 14–18 days in a single PR per [`/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md`](/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md) §3. Breakdown: Phase 1 (registry infra + RFC + doc) 3–4 days; Phase 2 (automation refactor) 2 days; Phase 3 (PIM refactor) 2 days; Phase 4 (brewery file-move) 4–5 days; Phase 5 (platform + nav) 1 day; Phase 6 (plugin rule) 1 day; Phase 7 (cross-doc updates) 1 day; Phase 8 (verification) 1–2 days. Each phase has explicit acceptance criteria. The 14–18 day estimate is from the planning conversation; reality may run hotter due to test-import path cascades in Phase 4 (brewery has ~400 services/api tests that reference moved paths).
+**Evidence:** Estimate is 14–18 days in a single PR per Cursor plan `web_route_shape_finalized_0edbdf7e.plan.md` (author-local; not in-repo) §3. Breakdown: Phase 1 (registry infra + RFC + doc) 3–4 days; Phase 2 (automation refactor) 2 days; Phase 3 (PIM refactor) 2 days; Phase 4 (brewery file-move) 4–5 days; Phase 5 (platform + nav) 1 day; Phase 6 (plugin rule) 1 day; Phase 7 (cross-doc updates) 1 day; Phase 8 (verification) 1–2 days. Each phase has explicit acceptance criteria. The 14–18 day estimate is from the planning conversation; reality may run hotter due to test-import path cascades in Phase 4 (brewery has ~400 services/api tests that reference moved paths).
 
 **Worst-case scenarios surfaced:**
 
@@ -276,7 +276,7 @@ Rejected: D5b (split — three review cycles, verification-cost-per-PR not per-f
 
 ## 7. The Week 1 execution plan (forward-pointer)
 
-The execution detail (phase-by-phase, file-by-file, with acceptance criteria and risks) lives in [`/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md`](/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md) — 8 phases, 14–18 days estimated, ~50–70 files touched, single PR. This audit doc and RFC-0006 do not duplicate that plan; together the three docs (RFC + audit + plan) form the Week 1 commitment surface.
+The execution detail (phase-by-phase, file-by-file, with acceptance criteria and risks) lives in Cursor plan `web_route_shape_finalized_0edbdf7e.plan.md` (author-local; not in-repo) — 8 phases, 14–18 days estimated, ~50–70 files touched, single PR. This audit doc and RFC-0006 do not duplicate that plan; together the three docs (RFC + audit + plan) form the Week 1 commitment surface.
 
 Summary of the eight phases:
 
@@ -325,7 +325,7 @@ These are explicitly out-of-scope for Week 1 and deferred to a future RFC or aud
 The audit recommends:
 
 1. Open [RFC-0006](../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — Accepted 2026-05-21 in parallel with this audit's acceptance.
-2. Execute the Week 1 PR per [`/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md`](/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md).
+2. Execute the Week 1 PR per Cursor plan `web_route_shape_finalized_0edbdf7e.plan.md` (author-local; not in-repo).
 3. Land plugin rule `46-web-route-shape.mdc` in `umbraculum-platform-tsjs-cursor-assistant` alongside the implementing PR.
 4. Append a post-Week-1 lessons addendum to this doc when the PR merges.
 
@@ -343,7 +343,7 @@ The audit recommends:
 - **Reviewer:** project lead (pre-public-flip solo-author governance per [`docs/LICENSING.md`](../LICENSING.md) §10)
 - **Verdict:** SOUND
 - **Successor RFC:** [RFC-0006](../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) (Accepted 2026-05-21)
-- **Implementing plan:** [`/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md`](/home/rf/.cursor/plans/web_route_shape_finalized_0edbdf7e.plan.md)
+- **Implementing plan:** Cursor plan `web_route_shape_finalized_0edbdf7e.plan.md` (author-local; not in-repo)
 - **Frozen after sign-off:** §1–§10 are the audit substrate; the post-Week-1 lessons addendum lands in a §12 appended after the implementing PR merges.
 
 ---

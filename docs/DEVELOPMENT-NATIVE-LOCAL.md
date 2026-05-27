@@ -1,6 +1,6 @@
 # Native local development (Expo)
 
-Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
+> **Path convention:** `$REPO_ROOT` is your monorepo clone (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)). Example: `export REPO_ROOT=~/src/umbraculum-dev`.
 
 For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`. The same dependency check runs in CI: `.github/workflows/native-deps.yml`.
 
@@ -29,7 +29,7 @@ Verify at any time:
 
 ```bash
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check"
@@ -52,14 +52,14 @@ Exit 0 with "Dependencies are up to date" means you're good. Non-zero means at l
 ## 1) Build shared packages (required after changes under `packages/**`)
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
+cd $REPO_ROOT
 ./scripts/build-packages-in-docker.sh
 ```
 
 ## 2) Start API + web (serves `/api/**` and `/media/**`)
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
+cd $REPO_ROOT
 docker compose up --build
 ```
 
@@ -72,8 +72,8 @@ Default local entrypoint is nginx:
 The web app serves shared assets from `apps/web/public/media/**`. Sync is normally run by `apps/web` lifecycle scripts, but you can run it explicitly:
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
-docker run --rm -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" -w /repo/apps/web node:20-slim bash -lc "node scripts/sync-media.mjs"
+cd $REPO_ROOT
+docker run --rm -v "$REPO_ROOT:/repo" -w /repo/apps/web node:20-slim bash -lc "node scripts/sync-media.mjs"
 ```
 
 ## 4) Start Expo (containerized)
@@ -83,7 +83,7 @@ docker run --rm -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" -w /repo/apps/
 Use `./scripts/start-metro-dev.sh`. It auto-detects the laptop's outbound LAN IP, removes any stale `brewery-metro` container, and starts Metro in Docker with the right `REACT_NATIVE_PACKAGER_HOSTNAME`. The app then auto-derives its API base URL from Metro's bundle host at runtime — so you no longer edit `apps/native/app.json` when your IP drifts. See `docs/NATIVE-STRATEGY-AND-CI.md` §5.1 for the rationale.
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
+cd $REPO_ROOT
 ./scripts/start-metro-dev.sh
 docker logs -f brewery-metro    # follow Metro; Ctrl+C detaches the log tail (container keeps running)
 ```
@@ -110,13 +110,13 @@ If this fails, fix the stack (`docker compose up -d`) before scanning the QR —
 Only needed if you can't run the helper script (different OS, Docker socket issue, etc.). Use this as the explicit form of what the helper does:
 
 ```bash
-cd ~/dkprojects/rfapps/umbraculum-dev
+cd $REPO_ROOT
 LAN_IP="$(ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit}')"
 docker rm -f brewery-metro 2>/dev/null || true
 docker run -d --rm --name brewery-metro \
   -p 19000:19000 -p 19001:19001 -p 19002:19002 -p 8081:8081 \
   -e REACT_NATIVE_PACKAGER_HOSTNAME="${LAN_IP}" \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo start --lan -c"
@@ -262,7 +262,7 @@ Fix:
 
 ```bash
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --fix"
@@ -289,7 +289,7 @@ Then reinstall (inside a container to keep host-side Node out of the way) and re
 
 ```bash
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "npm install"
@@ -316,7 +316,7 @@ Whenever Metro logs version warnings on startup, do not ignore them on physical 
 
 ```bash
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check"
@@ -342,7 +342,7 @@ Fix:
 # see the apps/native error go away yourself):
 ./scripts/build-packages-in-docker.sh
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native node:20-slim \
   bash -lc "npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
 # exit 0 means dist drift is gone
@@ -363,7 +363,7 @@ Fix when triaging:
 ```bash
 # Reproduce CI's clean install locally — this exposes the same @types resolution CI sees.
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native node:20-slim \
   bash -lc "rm -rf node_modules && npm install --no-audit --no-fund && ./node_modules/.bin/expo install --check && npm run typecheck"
 ```
@@ -425,14 +425,14 @@ ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1); exit
 
 # verify versions in apps/native
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --check"
 
 # realign apps/native versions to SDK 54 expectations
 docker run --rm \
-  -v "$HOME/dkprojects/rfapps/umbraculum-dev:/repo" \
+  -v "$REPO_ROOT:/repo" \
   -w /repo/apps/native \
   node:20-slim \
   bash -lc "./node_modules/.bin/expo install --fix"

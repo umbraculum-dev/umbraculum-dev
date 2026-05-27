@@ -1,6 +1,6 @@
 # React Native kickoff readiness (web + native shared stack)
 
-Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 > **Status (2026-05-27):** Kickoff criteria below are **cleared** for daily Expo Go development. Ongoing native platform work (July 2026 EAS alpha, module registration, validation debt) is tracked in [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md).
 
@@ -12,7 +12,7 @@ Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
 ## Shared packages build (native-ready dist)
 
 - [x] After changes under `packages/**`, rebuild shared package outputs:
-  - `cd ~/dkprojects/rfapps/umbraculum-dev`
+  - `cd $REPO_ROOT`
   - `./scripts/build-packages-in-docker.sh`
 - [x] Verify `packages/*/dist/**` reflects the latest source changes (these outputs are committed in this repo).
 

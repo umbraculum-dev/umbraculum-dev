@@ -87,10 +87,10 @@ Use `scripts/session-cleanup-cron.sh`, which uses `flock -n` on `/tmp/brewery-se
 Example crontab (daily at 03:00):
 
 ```bash
-0 3 * * * REPO_ROOT=/home/deploy/umbraculum-dev /home/deploy/umbraculum-dev/scripts/session-cleanup-cron.sh >> /var/log/brewery-session-cleanup.log 2>&1
+0 3 * * * REPO_ROOT=/opt/umbraculum-dev /opt/umbraculum-dev/scripts/session-cleanup-cron.sh >> /var/log/brewery-session-cleanup.log 2>&1
 ```
 
-Use the **canonical repo root** on the VPS (e.g. `/home/deploy/umbraculum-dev`). `REPO_ROOT` can be omitted if cron runs from the repo directory. Alternatively, use a systemd timer that invokes the script.
+Use your VPS clone path for both `REPO_ROOT` and the script path (example above uses `/opt/umbraculum-dev`). `REPO_ROOT` can be omitted if cron runs from the repo directory. Alternatively, use a systemd timer that invokes the script.
 
 The job deletes `Session` rows where `expiresAt < now()`. The `expiresAt` column is indexed for efficient deletion.
 

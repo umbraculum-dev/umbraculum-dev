@@ -29,6 +29,7 @@ docker run --rm \
 
 - **Dev server**: included in the default repo `docker compose up -d` stack at `http://127.0.0.1:3001` (`DOCS_SITE_PORT` overrides the host port). For one-off container use, `npm run start` serves at `http://localhost:3000` when port `-p 3000:3000` is published.
 - **Production build**: `npm run build` → `build/`.
+- **CI note:** `docs-site-build` uses `cancel-in-progress` — rapid pushes cancel older runs with `The operation was canceled` (not a build failure). Check the latest run for `master`; use **workflow_dispatch** to re-run.
 - **Typecheck**: `npm run typecheck`.
 
 ## How it fits in

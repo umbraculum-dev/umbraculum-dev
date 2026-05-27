@@ -1,6 +1,6 @@
 # Postgres primary/replica + pgpool routing architecture
 
-Repo root (canonical): `~/dkprojects/rfapps/umbraculum-dev`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 This doc describes the **production-like** DB foundation implemented in Docker Compose:
 
@@ -20,7 +20,7 @@ This doc describes the **production-like** DB foundation implemented in Docker C
 - `pgpool` (DB proxy; clients connect here)
 - `db-guard` (health/lag guard; toggles routing + sync requirement)
 
-See `~/dkprojects/rfapps/umbraculum-dev/docker-compose.yml`.
+See `$REPO_ROOT/docker-compose.yml`.
 
 ### pgvector image (why not stock `postgres:16`)
 

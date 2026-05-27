@@ -228,7 +228,7 @@ grep -rlE "@brewery/<name>([^a-zA-Z0-9_-]|$)" \
   --include='*.json' --include='*.md' --include='*.py' --include='*.yml' --include='*.yaml' \
   --include='*.css' --include='*.prisma' \
   --exclude-dir=node_modules --exclude-dir=dist --exclude='package-lock.json' \
-  /home/rf/dkprojects/rfapps/umbraculum-dev
+  $REPO_ROOT
 ```
 
 For every file in the result list, replace `@brewery/<name>` with the target name from §1.1. Particular attention to:

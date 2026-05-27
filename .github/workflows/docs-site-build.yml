@@ -17,6 +17,10 @@ on:
       - ".github/workflows/docs-site-build.yml"
   workflow_dispatch:
 
+# Rapid successive pushes to master cancel the in-progress run (expected).
+# A run that ends with "The operation was canceled" after ~2m with only
+# docsDir/blogDir warnings — not a Docusaurus failure. Check the latest run
+# for the tip commit; re-run manually via workflow_dispatch if needed.
 concurrency:
   group: docs-site-build-${{ github.ref }}
   cancel-in-progress: true
