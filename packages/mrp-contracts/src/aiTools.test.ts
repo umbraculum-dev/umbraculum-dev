@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  MrpExplainMaterialRequirementsToolInputSchema,
   MrpGetProductionOrderToolInputSchema,
   MrpListProductionOrdersToolInputSchema,
   MrpSummarizeWorkOrderToolInputSchema,
@@ -13,6 +14,8 @@ describe("MRP AI-tool schemas", () => {
       status: "planned",
     });
     expect(MrpGetProductionOrderToolInputSchema.parse({ productionOrderId: "po-1" }))
+      .toEqual({ productionOrderId: "po-1" });
+    expect(MrpExplainMaterialRequirementsToolInputSchema.parse({ productionOrderId: "po-1" }))
       .toEqual({ productionOrderId: "po-1" });
   });
 

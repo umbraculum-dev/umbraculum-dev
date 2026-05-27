@@ -3,9 +3,11 @@ import {
   listRegisteredDocumentTemplates,
   listRegisteredModules,
   listRegisteredWebModules,
+  registerRegisteredModuleAiTools,
 } from "@umbraculum/module-sdk";
 
 import { buildApp } from "../app.js";
+import { InMemoryAiToolRegistry } from "../services/ai/toolRegistry.js";
 
 describe("MRP/CRP module registration — Wave 1", () => {
   const app = buildApp();
@@ -58,5 +60,24 @@ describe("MRP/CRP module registration — Wave 1", () => {
     const refs = listRegisteredDocumentTemplates().map((template) => template.ref);
     expect(refs.some((ref) => ref.startsWith("mrp:"))).toBe(false);
     expect(refs.some((ref) => ref.startsWith("crp:"))).toBe(false);
+  });
+
+  it("registers Wave 5 read-only MRP/CRP AI tools through module ownership", () => {
+    const registry = new InMemoryAiToolRegistry();
+    registerRegisteredModuleAiTools(registry, app);
+    const tools = registry.list().map((tool) => ({ name: tool.name, scope: tool.scope }));
+
+    expect(tools).toEqual(
+      expect.arrayContaining([
+        { name: "mrp.listProductionOrders", scope: "read" },
+        { name: "mrp.getProductionOrder", scope: "read" },
+        { name: "mrp.explainMaterialRequirements", scope: "read" },
+        { name: "crp.listResources", scope: "read" },
+        { name: "crp.listWorkCenters", scope: "read" },
+        { name: "crp.listScheduledOperations", scope: "read" },
+        { name: "crp.explainCapacityLoad", scope: "read" },
+        { name: "crp.listConflicts", scope: "read" },
+      ]),
+    );
   });
 });

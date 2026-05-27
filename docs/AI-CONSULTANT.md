@@ -48,6 +48,14 @@ The consultant has access to a closed set of tools registered by the installed c
 | `pim.getProductDetail` | Full product detail for one product id | `pim` (canonical) |
 | `pim.listCategories` | Flat category list for the active workspace | `pim` (canonical) |
 | `pim.listAttributeSets` | Attribute-set definitions available in the active workspace | `pim` (canonical) |
+| `mrp.listProductionOrders` | Production orders visible in the active workspace, including read-time brewery projections | `mrp` (canonical) |
+| `mrp.getProductionOrder` | One production order with operations and material requirements | `mrp` (canonical) |
+| `mrp.explainMaterialRequirements` | Material requirements and availability assumptions for one production order | `mrp` (canonical) |
+| `crp.listResources` | Capacity resources, including automation vessels projected as resources | `crp` (canonical) |
+| `crp.listWorkCenters` | Work centers, including brewery equipment-profile projections | `crp` (canonical) |
+| `crp.listScheduledOperations` | Read-time scheduled operations from existing planning sources | `crp` (canonical) |
+| `crp.explainCapacityLoad` | Planned, available, and overload minutes per capacity bucket | `crp` (canonical) |
+| `crp.listConflicts` | Read-only capacity warnings/conflicts | `crp` (canonical) |
 | `render_document` | Submit a registered document template to the canonical rendering pipeline | platform rendering service |
 
 Domain tools enforce workspace membership at the service layer ([`requireActiveWorkspace`](../services/api/src/plugins/requestContext.ts)) — the AI cannot read data outside the operator's active workspace, even if it tries to construct a tool call that would cross workspaces. `render_document` submits a rendering job for the active workspace using registered templates; it is a platform-controlled output operation, not a domain-record mutation. Tool calls and results are visible in the chat surface for transparency.
@@ -64,7 +72,7 @@ The consultant is deliberately bounded today. None of the following are shipped,
 - **No PLC commands.** The brewery's OpenPLC bridge (per [`docs/design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) §9 Phase E) does not expose write tools to the consultant until H1 2027+. Read tools (`automation.vesselState`, `automation.listVessels`) ship now; setpoint changes do not.
 - **No billing or admin actions.** Subscription changes, key vault rotation, workspace membership edits — all human-only.
 - **No cross-workspace queries.** Every tool is scoped to the active workspace; the AI cannot ask "across all my workspaces, where is the slowest fermentation?" — this is a tenancy guarantee, not a UX bug.
-- **No tools from canonical modules that have not shipped yet.** `mrp`, `wms`, `crm`, and `crp` are reserved canonical codes but have no surface (and therefore no tools) today. They are later tranches per [`ROADMAP.md`](ROADMAP.md).
+- **No planning mutations.** `mrp` and `crp` now expose read-only advisor tools for the Wave 4 proof path, but the consultant cannot create production orders, reschedule operations, optimize capacity, submit MRP/CRP render jobs, or materialize projection rows. `wms` and `crm` remain reserved canonical codes with no AI tool surface today.
 
 These bounds are not a hedge — they are the shape of v0. The architecture intentionally trades autonomy for coherence + auditability while the apparatus matures.
 
@@ -76,12 +84,12 @@ Tools are **owned by their respective modules**, not by the AI consultant itself
 
 So in v0:
 
-- Tool implementations co-locate under [`services/api/src/services/ai/tools/<module>/`](../services/api/src/services/ai/tools/) (today: `brewery/`, `automation/`, `pim/`).
+- Tool implementations co-locate under [`services/api/src/services/ai/tools/<module>/`](../services/api/src/services/ai/tools/) (today: `brewery/`, `automation/`, `pim/`, `mrp/`, `crp/`).
 - Each shipped domain module declares `registerAiTools` in [`services/api/src/modules/<code>/index.ts`](../services/api/src/modules/).
 - The api's [`app.ts`](../services/api/src/app.ts) creates the in-memory registry, invokes module-owned registrars through `@umbraculum/module-sdk`, then registers horizontal platform tools such as `render_document`.
 - The contract for tools is public and typed (`AiTool`, `AiToolRegistry`, `AiToolScope` in [`@umbraculum/ai-tool-sdk`](../packages/ai-tool-sdk/README.md)).
 
-What remains target-state is the richer composition around tools: module prompt overlays, per-route overlays, knowledge-source registration, semantic reporting, full RAG, and future MRP/WMS/CRM/CRP tool bundles. The module-owned tool path itself is now in place.
+What remains target-state is the richer composition around tools: module prompt overlays, per-route overlays, knowledge-source registration, semantic reporting, full RAG, and future WMS/CRM tool bundles. The module-owned tool path itself is now in place, and Wave 5 proves that canonical planning modules can join the same workspace-scope registry without replacing vertical source ownership.
 
 ---
 
@@ -131,4 +139,4 @@ Memory is workspace-scoped by construction: a workspace's notes never enter anot
 
 ---
 
-*This document will grow as additional canonical modules ship and contribute tools. When a new canonical module lands (next plausibly `mrp` or `crp` per [`ROADMAP.md`](ROADMAP.md) H1 2027), its tools land in §3 and the cross-module reasoning the AI can do expands accordingly. The cornerstone framing in §2 does not change.*
+*This document will grow as additional canonical modules ship and contribute tools. Wave 5 adds read-only MRP/CRP planning advisor tools; future WMS/CRM tools and richer reporting/RAG will expand the cross-module reasoning surface further. The cornerstone framing in §2 does not change.*
