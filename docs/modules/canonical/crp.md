@@ -1,7 +1,7 @@
 # `crp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery/automation projections, read-only web pages, deterministic fixture-backed proof, and module-owned read-only AI tools exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **H2 2026 alpha track shipped** (Waves 1–6 + alpha demo closure 2026-05-27) — read-only API, web UX, brewery/automation projection, AI advisor, RFC-0007 exports, and automated demo proof exist. **TODO:** human walkthrough gap-log sign-off; propose/write tools and mature commercial scope remain [ROADMAP § H1 2027 mature](../../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027). See [ROADMAP § H2 2026 MRP/CRP](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning).
 **Code:** `crp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
@@ -61,7 +61,7 @@ Postgres schema name: `crp` (per [RFC-0002 §4](../../rfcs/0002-canonical-module
 
 | Module | Relationship |
 |---|---|
-| `mrp` | Strong — MRP production orders are the input; CRP allocates them onto resources. Co-designed for the August 2026 alpha target, with mature scope still H1 2027 per [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md). |
+| `mrp` | Strong — MRP production orders are the input; CRP allocates them onto resources. H2 2026 alpha co-designed; mature scope [ROADMAP § H1 2027](../../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) per [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md). |
 | `automation` | Read-only — CRP reads `automation.Vessel` rows (via the shared equipment-contracts package) to present vessel-as-resource views. No data copy. |
 | `wms` | Loose — material availability constrains schedulable production; coupling is via stock-on-hand queries. |
 | `crm` | Loose — long-range demand forecast feeds capacity-planning windows. |
@@ -104,7 +104,8 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 - [MRP/CRP alpha demo closure build log](../../design/mrp-crp-alpha-demo-closure-build-log.md) — web exports + CI proof.
 - [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md) — Wave 1 read-only API skeleton.
-- [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery + MRP + CRP co-design.
+- [ROADMAP.md § H2 2026 MRP/CRP](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning) — alpha track.
+- [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — mature MRP + CRP + WMS pairing (H1 2027).
 - [`canonical-automation-module-surface.md`](../../design/canonical-automation-module-surface.md) §4, §11 — the surface boundary already documented.
 - [`services/api/src/modules/automation/README.md`](../../../services/api/src/modules/automation/README.md) §"Surface boundary — automation vs. crp" — the in-code guardrail.
 - [`automation.md`](automation.md) — template.

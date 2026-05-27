@@ -6,13 +6,13 @@
 **Document role:** joint co-design plan that precedes the per-module `mrp` and `crp` surface docs
 
 > [!NOTE]
-> This document expresses the project's willingness to bring a bounded MRP/CRP proof into the public alpha as early as August 2026. It is not a hard delivery promise, not a claim that MRP/CRP are implemented, and not a replacement for the mature H1 2027 roadmap target.
+> This document expresses the project's willingness to bring a bounded MRP/CRP proof into the public alpha as early as August 2026. It is not a hard delivery promise. **Waves 1–6 + alpha demo closure shipped 2026-05-27** (see [ROADMAP § H2 2026 MRP/CRP](../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning)); mature commercial scope remains [ROADMAP § H1 2027](../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027).
 
 ---
 
 ## 1. Summary
 
-The H1 2027 roadmap item says brewery production planning should be promoted into first-class `mrp` and `crp` canonical modules. The acceleration target is to pull the design and a bounded alpha proof forward to August 2026, because public alpha benefits from showing how the brewery reference vertical generalizes into the platform's canonical operational modules.
+The original H1 2027 roadmap item said brewery production planning should be promoted into first-class `mrp` and `crp` canonical modules. That work is now tracked as **[ROADMAP § H2 2026](../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning)** (alpha, largely shipped) plus **[§ H1 2027 mature](../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027)** (write workflows, WMS, commercial depth). This plan remains the August 2026 co-design package for the bounded brewery proof.
 
 The first move is **joint co-design**, not code. `mrp` and `crp` are strongly coupled at their boundary: MRP produces production orders and operations; CRP allocates those operations onto constrained resources. Designing one without the other would create either an MRP module that ignores capacity or a CRP module with no canonical production input.
 
@@ -55,7 +55,7 @@ This plan builds on already-accepted project decisions:
 
 | Source | Planning implication |
 |---|---|
-| [`ROADMAP.md`](../ROADMAP.md) | H1 2027 remains the mature MRP/CRP target; August 2026 is an alpha acceleration ambition. |
+| [`ROADMAP.md`](../ROADMAP.md) | [§ H2 2026](../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning) = alpha (Waves 1–6 shipped); [§ H1 2027 mature](../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) = write/WMS/commercial depth. |
 | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) | Brewery is a showcase vertical; the durable product is the platform/toolset and canonical-module surface. |
 | [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) | `mrp` and `crp` are already reserved canonical codes; no allocation RFC is needed. |
 | [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md) | Both modules use the beta layout: API, web, native, and contracts slices. |
@@ -197,7 +197,7 @@ This document is not the implementation plan, but it sets the execution order:
 | 5 | Rendering + AI | Planned templates and read/propose AI tools. |
 | 6 | Public-alpha demo | **Automated closure shipped (2026-05-26):** web export UI, [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md), full render-job API tests, Playwright export smoke — see [`mrp-crp-alpha-demo-closure-build-log.md`](mrp-crp-alpha-demo-closure-build-log.md). Human gap-log sign-off still pending; not alpha-complete. |
 
-Mature scope remains H1 2027: write workflows, WMS integration, richer scheduling, entitlement billing, native-first operator flows, and irreversible brewery schema migration.
+Mature scope remains [ROADMAP § H1 2027](../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027): write workflows, WMS integration, richer scheduling, entitlement billing, native-first operator flows, and irreversible brewery schema migration.
 
 ---
 

@@ -1,7 +1,7 @@
 # Canonical `mrp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor, Wave 6 rendering templates, and alpha demo walkthrough automation shipped; alpha proof not complete (human sign-off pending)
+**Status:** Draft surface design 2026-05-26; H2 2026 alpha track shipped (Waves 1–6 + demo closure 2026-05-27); alpha proof not complete until human walkthrough sign-off — see [ROADMAP § H2 2026 MRP/CRP](../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning)
 **Audience:** core team, MRP implementers, brewery-vertical maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `mrp` open-door next step from [`modules/canonical/mrp.md`](../modules/canonical/mrp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`RFC-0007`](../rfcs/0007-canonical-document-rendering.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
