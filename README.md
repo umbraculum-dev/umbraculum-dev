@@ -2,9 +2,10 @@
 
 > [!IMPORTANT]
 > This repository is **work in progress** and **not yet a public-facing
-> release**. The path to a public flip (working assumption: H1 2027,
-> seeded into a fresh public repo) is documented in
-> [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.
+> release** (visibility is **private** under the `umbraculum-dev` GitHub
+> org as of 2026-05-27). The path to a **July 2026 public alpha** is
+> documented in [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
+> §10.1.1 and [`docs/ROADMAP.md`](docs/ROADMAP.md) §"Late H1 / July 2026".
 > The public project identity is **Umbraculum** (primary domain
 > `umbraculum.dev`; GitHub org `umbraculum-dev`; mascot **Umbi** —
 > [`docs/media/umbi.png`](docs/media/umbi.png)).
@@ -224,4 +225,6 @@ translations, and security reports.
 | AI consultant — ask Umbraculum about recipes, brew sessions, equipment, inventory, and tank state; answers grounded in your workspace data; BYOK + paid-tier unlock (see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)) | Shipping (Sprint #2 complete) |
 | Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
 | Project identity                  | **Umbraculum** (namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`) |
-| Public release                    | Not flipped (working assumption: H1 2027 — see `docs/PLATFORM-ARCHITECTURE.md` §10.1) |
+| GitHub org hosting                | **Done 2026-05-27** — `github.com/umbraculum-dev/umbraculum-dev` (private); sister-repo `umbraculum-toolset` also under org (private). Commits, tags, and Actions workflows preserved on transfer; `docs-readmes` CI verified green post-transfer. |
+| Public release                    | Not flipped — target **July 2026 public alpha** (see `docs/PLATFORM-ARCHITECTURE.md` §10.1.1) |
+| MIT npm SDK packages              | In-repo ready; **not on public npm registry yet** — publish batch paired with public-alpha cutover ([`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1) |
