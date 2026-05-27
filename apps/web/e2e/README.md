@@ -14,13 +14,26 @@ The web app's end-to-end test suite. It exercises real user flows against a full
 - **Contains**: cross-page user-flow specs (smoke + brewday projects), persona-aware Playwright fixtures, centralized role/label locators (per the accessibility mandate in [`docs/DEVELOPMENT-ACCESSIBILITY.md`](../../../docs/DEVELOPMENT-ACCESSIBILITY.md)), axe-core a11y helpers, persisted per-persona storage state, HTML reporter wiring.
 - **Does not contain**: API-level integration tests (those live in `services/api/src/tests/`), unit tests (vitest in each workspace), the `services/api` E2E seed itself (lives in `services/api/src/cli/seedE2eFixture.ts` — this suite *consumes* its output), Cypress / Selenium / WebdriverIO harness code (the project standardized on Playwright; see [`docs/TESTING.md`](../../../docs/TESTING.md)).
 
+## Quick gates before Playwright
+
+Run from **repo root** in order before any Playwright invocation (smoke, brewday, MRP/CRP export). Stop on the first failure.
+
+```bash
+docker compose up -d api web gotenberg redis   # gotenberg+redis required for export/render specs
+./scripts/smoke.sh
+curl -sf http://localhost:18080/api/health | grep -q '"ok":true' \
+  || { echo "FAIL: API unhealthy (502?)"; exit 1; }
+curl -sf -o /dev/null -w '%{http_code}\n' http://localhost:18080/en/login | grep -q '^200$' \
+  || { echo "FAIL: web login not 200 (500?)"; exit 1; }
+docker compose exec api npm run seed:e2e
+# After stack recovery: rm -f apps/web/e2e/.auth/e2e-admin.json
+```
+
+MRP/CRP export troubleshooting (502/500/seed/password): [`docs/design/mrp-crp-alpha-demo-walkthrough.md`](../../../docs/design/mrp-crp-alpha-demo-walkthrough.md). Platform layer map: [`docs/TESTING.md`](../../../docs/TESTING.md) § L5.
+
 ## Quick start
 
-Prereqs (do these in order from repo root):
-
-1. Stack up: `docker compose up -d`
-2. Smoke gate: `./scripts/smoke.sh` (must exit 0)
-3. Seed fixture (idempotent): `docker compose exec api npm run seed:e2e`
+Prereqs: complete [Quick gates](#quick-gates-before-playwright) above.
 
 Run the full suite from repo root:
 
@@ -38,10 +51,23 @@ Single project (smoke only):
 ```bash
 docker run --rm --network host \
   -e E2E_BASE_URL=http://localhost:18080 \
+  -e E2E_ADMIN_PASSWORD="${E2E_ADMIN_PASSWORD:-e2e-admin-pw!}" \
   -v "$PWD/apps/web/e2e:/e2e" \
   -w /e2e \
   mcr.microsoft.com/playwright:v1.60.0-noble \
   bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke"
+```
+
+MRP/CRP export smoke only (`smoke/mrp-crp-export-alpha.spec.ts` — needs **gotenberg** + **redis**):
+
+```bash
+docker run --rm --network host \
+  -e E2E_BASE_URL=http://localhost:18080 \
+  -e E2E_ADMIN_PASSWORD="${E2E_ADMIN_PASSWORD:-e2e-admin-pw!}" \
+  -v "$PWD/apps/web/e2e:/e2e" \
+  -w /e2e \
+  mcr.microsoft.com/playwright:v1.60.0-noble \
+  bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke smoke/mrp-crp-export-alpha.spec.ts --workers=1"
 ```
 
 Open the HTML report (after a run):
@@ -84,7 +110,7 @@ docker run --rm --network host \
 ## Notes
 
 - `docker-compose.yml` is **not** modified by anything in this suite (the plugin-shipped `00-shared-no-unilateral-runner-compose-changes.mdc` rule applies).
-- Persona passwords default to the values in `personas.json`; override via `E2E_ADMIN_PASSWORD` / `E2E_MEMBER_PASSWORD` / `E2E_VIEWER_PASSWORD` env vars.
+- Persona passwords default to the values in `personas.json`; override via `E2E_ADMIN_PASSWORD` / `E2E_MEMBER_PASSWORD` / `E2E_VIEWER_PASSWORD` env vars. **The api `seed:e2e` script hashes the same env vars** — if login times out in Playwright, confirm seed ran and pass `-e E2E_ADMIN_PASSWORD=…` into the Playwright `docker run` to match the api container. Delete stale `apps/web/e2e/.auth/<persona>.json` after a password change.
 - The suite's tier marker is implicit (Tier: Public via the standard, since the README is part of the public-flip surface — see [`docs/DOCS-README-STANDARDS.md`](../../../docs/DOCS-README-STANDARDS.md)).
 
 ## Status

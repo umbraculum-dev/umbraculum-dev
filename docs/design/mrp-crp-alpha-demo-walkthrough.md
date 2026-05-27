@@ -12,12 +12,13 @@
 ## Prerequisites
 
 1. Stack running with **api**, **web**, **gotenberg**, **redis** — local `docker compose up -d` **or** hosted demo at **`https://demo.umbraculum.dev`** ([`demo-host-runbook.md`](demo-host-runbook.md)). Use `E2E_BASE_URL` / browser origin accordingly.
-2. Database seeded for E2E (default admin workspace). Fixture IDs match [`apps/web/e2e/personas.json`](../../apps/web/e2e/personas.json):
+2. **E2E seed (local stack, required):** `docker compose exec api npm run seed:e2e` — creates the smoke user `e2e-admin@brewery.local` (and fixture recipe/session/vessel rows). Without this, login and MRP/CRP projections fail. Password: `E2E_ADMIN_PASSWORD` on the **api** container if set, else default `e2e-admin-pw!` (must match Playwright — see [Automated export smoke](#automated-export-smoke-playwright) below).
+3. Fixture IDs match [`apps/web/e2e/personas.json`](../../apps/web/e2e/personas.json):
    - `brewSessionId`: `e2e00000-0000-0000-0000-000000000bbe`
    - Projected production order id: `brewery-brew-session-e2e00000-0000-0000-0000-000000000bbe`
    - Projected resource id: `automation-vessel-e2e00000-0000-0000-0000-000000000e02`
-3. Log in as `e2e-admin@brewery.local` (password from `E2E_ADMIN_PASSWORD` or personas default).
-4. Active workspace: E2E primary workspace (`e2e00000-0000-0000-0000-0000000000aa`).
+4. Log in as `e2e-admin@brewery.local` (password from `E2E_ADMIN_PASSWORD` or personas default).
+5. Active workspace: E2E primary workspace (`e2e00000-0000-0000-0000-0000000000aa`).
 
 ---
 
@@ -85,6 +86,56 @@ Open `/en/ai`. Sample prompts:
 - “List capacity conflicts.” (`crp.listConflicts`)
 
 Rendering: prefer module export buttons; `render_document` is available for registered template refs per [`AI-CONSULTANT.md`](../AI-CONSULTANT.md) and [`canonical-document-rendering-surface.md`](canonical-document-rendering-surface.md) §3.
+
+---
+
+## Quick gates before Playwright
+
+Run from **repo root** in order. Stop on the first failure — most Playwright auth/export failures are upstream (502 API, 500 web, missing seed, stale `.auth`).
+
+```bash
+docker compose up -d api web gotenberg redis
+./scripts/smoke.sh
+curl -sf http://localhost:18080/api/health | grep -q '"ok":true' \
+  || { echo "FAIL: API unhealthy (often 502 — see troubleshooting)"; exit 1; }
+curl -sf -o /dev/null -w '%{http_code}\n' http://localhost:18080/en/login | grep -q '^200$' \
+  || { echo "FAIL: web login page not 200"; exit 1; }
+docker compose exec api npm run seed:e2e
+# After recovering a broken stack, clear stale Playwright cookies:
+# rm -f apps/web/e2e/.auth/e2e-admin.json
+```
+
+Canonical copy also lives in [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md) (all smoke specs) and [`docs/TESTING.md`](../TESTING.md) § L5.
+
+---
+
+## Automated export smoke (Playwright)
+
+From repo root, after [Quick gates](#quick-gates-before-playwright). Uses the official Playwright image (not `api`/`web` containers). Full command: [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md).
+
+```bash
+# Pass the same E2E_ADMIN_PASSWORD as the api container if you override it in .env
+docker run --rm --network host \
+  -e E2E_BASE_URL=http://localhost:18080 \
+  -e E2E_ADMIN_PASSWORD="${E2E_ADMIN_PASSWORD:-e2e-admin-pw!}" \
+  -v "$PWD/apps/web/e2e:/e2e" \
+  -w /e2e \
+  mcr.microsoft.com/playwright:v1.60.0-noble \
+  bash -lc "npm install --no-audit --no-fund && npx playwright test --project=smoke smoke/mrp-crp-export-alpha.spec.ts --workers=1"
+```
+
+**Troubleshooting**
+
+| Symptom | Likely cause | Fix |
+|---------|----------------|-----|
+| `Log out` not found / Sign-in page | **API 502** (`curl http://localhost:18080/api/health`) | `docker compose logs api`; `docker compose exec api npm install`; `docker compose restart api`. Api `predev` creates `/packages/node_modules` → `/app/node_modules` (rendering + contracts resolve). |
+| Login form but Playwright cannot fill email | **Web 500** (`curl -o /dev/null -w '%{http_code}' http://localhost:18080/en/login`) | `docker compose logs web`; `docker compose exec web npm install`; `docker compose restart web` (rule 51 after large package/dist changes). |
+| `waitForURL` timeout on `/login` | Seed not applied | `docker compose exec api npm run seed:e2e` |
+| Stale session after stack recovery | Old `.auth` cookies | `rm -f apps/web/e2e/.auth/e2e-admin.json` then re-run Playwright |
+| Password drift | `E2E_ADMIN_PASSWORD` on api only | Pass same `-e E2E_ADMIN_PASSWORD=…` into the Playwright `docker run` |
+| Export button never shows download | gotenberg/redis down | `docker compose up -d gotenberg redis` |
+
+**Smoke user:** `e2e-admin@brewery.local` (from `seed:e2e`, not a separate export-only user). The export spec uses `authenticatedPage` from [`auth-fixture.ts`](../../apps/web/e2e/support/auth-fixture.ts).
 
 ---
 

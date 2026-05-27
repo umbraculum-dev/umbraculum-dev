@@ -99,6 +99,20 @@ docker compose exec api npm run contracts:check -- --update
 
 Lives in [apps/web/e2e](../apps/web/e2e). Each spec uses the persona fixture; auth is seeded via Prisma rather than re-traversing the login UI on every test. One spec (`auth.spec.ts`) does exercise real login UI.
 
+#### Quick gates before Playwright (repo root)
+
+Run in order; stop on first failure. Skipping these produces misleading auth/timeouts when api/web are unhealthy.
+
+```bash
+docker compose up -d api web gotenberg redis   # gotenberg+redis for render/export specs
+./scripts/smoke.sh
+curl -sf http://localhost:18080/api/health | grep -q '"ok":true' || exit 1
+curl -sf -o /dev/null -w '%{http_code}\n' http://localhost:18080/en/login | grep -q '^200$' || exit 1
+docker compose exec api npm run seed:e2e
+```
+
+MRP/CRP export smoke: also see [`docs/design/mrp-crp-alpha-demo-walkthrough.md`](design/mrp-crp-alpha-demo-walkthrough.md) and [`apps/web/e2e/README.md`](../apps/web/e2e/README.md).
+
 Run via a one-shot Docker container (no `docker-compose.yml` edits):
 
 ```bash

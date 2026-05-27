@@ -6,6 +6,7 @@
   "description": "Umbraculum API service — Fastify + Prisma backend serving the brewery vertical (recipes, water, yeast, brew sessions, AI tools) and platform-wide concerns (auth, modules, automation contracts). Application workspace; consumed only via HTTP, not via npm imports.",
   "scripts": {
     "postinstall": "prisma generate",
+    "predev": "mkdir -p /packages && ln -snf /app/node_modules /packages/node_modules",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json",
@@ -28,7 +29,9 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
+    "@babel/runtime": "^7.29.7",
     "@beerjson/beerjson": "^1.0.2",
+    "@fast-csv/format": "^5.0.7",
     "@fastify/cookie": "^10.0.0",
     "@fastify/cors": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",
@@ -45,12 +48,17 @@
     "ajv": "^8.18.0",
     "argon2": "^0.43.0",
     "bullmq": "^5.0.0",
+    "bwip-js": "^4.10.1",
     "csv-parse": "^6.1.0",
+    "eta": "^3.5.0",
+    "exceljs": "^4.4.0",
     "fast-xml-parser": "^5.3.6",
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0",
     "fastify-type-provider-zod": "^6.1.0",
+    "mjml": "^5.3.0",
     "redis": "^5.11.0",
+    "xmlbuilder2": "^3.1.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {

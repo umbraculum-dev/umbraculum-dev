@@ -1,12 +1,20 @@
 /**
  * mrp-crp-export-alpha.spec.ts — Alpha demo export smoke (Wave 6 + demo closure).
  *
- * Requires gotenberg + redis in the E2E stack (same as API render tests).
+ * Prerequisites (repo root):
+ *   docker compose up -d
+ *   ./scripts/smoke.sh  # must include api /api/health 200
+ *   docker compose exec api npm run seed:e2e
+ *
+ * Auth: `authenticatedPage` (e2e-admin). Stale `apps/web/e2e/.auth/e2e-admin.json` is
+ * refreshed automatically when the session no longer reaches a protected page.
+ *
+ * Requires gotenberg + redis (same as API render tests).
  */
 import { test, expect } from "../support/auth-fixture";
 import type { Page } from "@playwright/test";
 import { loginPage } from "../support/locators";
-import { getFixtureIdentities, type Persona } from "../support/personas";
+import { getFixtureIdentities } from "../support/personas";
 
 const fixture = getFixtureIdentities();
 const productionOrderId = `brewery-brew-session-${fixture.brewSessionId}`;
@@ -15,32 +23,46 @@ function localized(path: string): string {
   return `/en${path}`;
 }
 
-async function gotoAuthenticatedPage(page: Page, persona: Persona, path: string) {
-  await page.goto(path);
-  const loginEmail = loginPage.emailInput(page);
-  const logoutButton = page.getByRole("button", { name: "Log out" });
-  const authState = await Promise.race([
-    loginEmail.waitFor({ state: "visible", timeout: 10_000 }).then(() => "login" as const).catch(() => null),
-    logoutButton.waitFor({ state: "visible", timeout: 10_000 }).then(() => "ready" as const).catch(() => null),
-  ]);
-  if (authState === "login") {
-    await loginPage.emailInput(page).fill(persona.email);
-    await loginPage.passwordInput(page).fill(persona.password);
-    await Promise.all([
-      page.waitForURL((url) => !url.pathname.endsWith("/login"), { timeout: 15_000 }),
-      loginPage.submitButton(page).click(),
-    ]);
-    await page.goto(path);
+async function expectApiReachable() {
+  const base = process.env["E2E_BASE_URL"] ?? "http://localhost:18080";
+  const res = await fetch(`${base}/api/health`);
+  if (!res.ok) {
+    throw new Error(
+      `API not reachable at ${base}/api/health (${res.status}). ` +
+        "Fix the api container before Playwright export smoke (see docker compose logs api).",
+    );
   }
-  await expect(logoutButton).toBeVisible();
+}
+
+/** Protected navigation; fixture should already be logged in. */
+async function gotoWithSession(page: Page, path: string) {
+  await page.goto(path);
+  const logout = page.getByRole("button", { name: "Log out" });
+  const onLogin = loginPage.emailInput(page);
+  const state = await Promise.race([
+    logout.waitFor({ state: "visible", timeout: 12_000 }).then(() => "ready" as const),
+    onLogin.waitFor({ state: "visible", timeout: 12_000 }).then(() => "login" as const),
+  ]).catch(() => "unknown" as const);
+  if (state === "login") {
+    throw new Error(
+      `Expected authenticated session at ${path} but got Sign in. ` +
+        "Run seed:e2e, ensure api is healthy (not 502), and rm apps/web/e2e/.auth/e2e-admin.json if needed.",
+    );
+  }
+  await expect(logout).toBeVisible();
 }
 
 test.describe("MRP/CRP export alpha smoke (authenticated)", () => {
-  test("production order detail exports work-order PDF", async ({ authenticatedPage, persona }) => {
+  test.describe.configure({ mode: "serial" });
+
+  test.beforeAll(async () => {
+    await expectApiReachable();
+  });
+
+  test("production order detail exports work-order PDF", async ({ authenticatedPage }) => {
     test.setTimeout(60_000);
-    await gotoAuthenticatedPage(
+    await gotoWithSession(
       authenticatedPage,
-      persona,
       localized(`/production-orders/${encodeURIComponent(productionOrderId)}`),
     );
     await authenticatedPage.getByTestId("mrp-export-work-order-pdf").click();
@@ -49,9 +71,9 @@ test.describe("MRP/CRP export alpha smoke (authenticated)", () => {
     });
   });
 
-  test("capacity page exports capacity-load XLSX", async ({ authenticatedPage, persona }) => {
+  test("capacity page exports capacity-load XLSX", async ({ authenticatedPage }) => {
     test.setTimeout(60_000);
-    await gotoAuthenticatedPage(authenticatedPage, persona, localized("/capacity"));
+    await gotoWithSession(authenticatedPage, localized("/capacity"));
     await authenticatedPage.getByTestId("crp-export-capacity-load-xlsx").click();
     await expect(authenticatedPage.getByTestId("crp-export-capacity-load-xlsx-download")).toBeVisible({
       timeout: 30_000,

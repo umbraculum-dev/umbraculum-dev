@@ -82,7 +82,9 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 4. **Wave 3 — read-only web alpha experience.** `apps/web/app/[locale]/(crp)/resources/`, `capacity/`, and `schedule/` expose those read models without write controls. **Shipped as web read-only proof only.**
 5. **Wave 4 — deterministic read-only alpha proof.** E2E fixture data and focused Playwright assertions now prove CRP resource, work-center, capacity, schedule, and conflict projections without creating CRP rows. **Shipped as proof hardening only.**
 6. **Wave 5 — read-only AI planning advisor.** `crp.listResources`, `crp.listWorkCenters`, `crp.listScheduledOperations`, `crp.explainCapacityLoad`, and `crp.listConflicts` register through `registerModule({ registerAiTools })` and call the existing read services. **Shipped as advisor proof only.**
-7. **Later — rendering/write workflows.** Planned document-template payloads exist, but no document-template registration, optimizer, native screens, or write routes ship in Wave 5.
+7. **Wave 6 — rendering templates.** Four RFC-0007 templates and CRP render-job routes (capacity load XLSX, schedule PDF, conflict report, resource calendar CSV). **Shipped as rendering proof only.**
+8. **Alpha demo closure.** Web export buttons, shared walkthrough with MRP, Playwright export smoke — see [`mrp-crp-alpha-demo-walkthrough.md`](../../design/mrp-crp-alpha-demo-walkthrough.md) (quick gates before Playwright) and [`mrp-crp-alpha-demo-closure-build-log.md`](../../design/mrp-crp-alpha-demo-closure-build-log.md). **Human sign-off still pending.**
+9. **Later — write workflows.** Optimizer, native screens, and propose/write routes remain future work.
 
 ---
 
@@ -98,6 +100,8 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 - [MRP/CRP Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md) — deterministic proof implementation record.
 - [MRP/CRP Wave 5 AI planning advisor build log](../../design/mrp-crp-wave-5-ai-planning-advisor-build-log.md) — read-only AI advisor implementation record.
 - [MRP/CRP Wave 6 rendering templates build log](../../design/mrp-crp-wave-6-rendering-templates-build-log.md) — RFC-0007 templates and render-job routes.
+- [MRP/CRP alpha demo walkthrough](../../design/mrp-crp-alpha-demo-walkthrough.md) — operator runbook + Playwright quick gates.
+- [MRP/CRP alpha demo closure build log](../../design/mrp-crp-alpha-demo-closure-build-log.md) — web exports + CI proof.
 - [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery + MRP + CRP co-design.

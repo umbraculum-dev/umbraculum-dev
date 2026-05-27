@@ -363,7 +363,7 @@ The alpha proof is complete when a user can:
 
 The proof must make clear that this is an extensible canonical module surface, not a finished commercial CRP/APS product.
 
-Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for resources, capacity load, scheduled operations, and conflicts. Wave 6 satisfies item 5 for CRP schedule/load artifacts via the rendering pipeline. **Alpha demo walkthrough ready (2026-05-26):** browser export buttons on capacity (and stretch schedule/resources pages), runbook [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md), CI coverage for all CRP render-job routes — human gap-log sign-off still pending. Propose/write workflows, optimizer, native, and WMS portions remain open.
+Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for resources, capacity load, scheduled operations, and conflicts. Wave 6 satisfies item 5 for CRP schedule/load artifacts via the rendering pipeline. **Alpha demo walkthrough ready (2026-05-26):** browser export buttons on capacity (and stretch schedule/resources pages), runbook [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) (includes **quick gates before Playwright** — stack health, seed, stale `.auth`), CI coverage for all CRP render-job routes, Playwright export smoke — human gap-log sign-off still pending. Propose/write workflows, optimizer, native, and WMS portions remain open.
 
 ---
 
