@@ -168,7 +168,7 @@ export class AiOrchestrator {
       const systemPrompt = composeWorkspaceSystemPrompt({
         moduleOverlays: collectModulePromptOverlayTexts(),
         knowledgeSnippets: collectModuleKnowledgeSnippets(),
-        routeOverlay,
+        ...(routeOverlay !== undefined ? { routeOverlay } : {}),
         workspaceMemory,
       });
       const conversation: Array<{ role: "user" | "assistant"; content: unknown }> = [

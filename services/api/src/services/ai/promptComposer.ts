@@ -73,7 +73,7 @@ export function composeWorkspaceSystemPrompt(input: WorkspaceSystemPromptInput =
     platformOverlay: PLATFORM_OVERLAY,
     knowledgeSnippets: input.knowledgeSnippets ?? [],
     moduleOverlays: input.moduleOverlays ?? [],
-    routeOverlay: input.routeOverlay,
+    ...(input.routeOverlay !== undefined ? { routeOverlay: input.routeOverlay } : {}),
     workspaceMemory: input.workspaceMemory ?? null,
   });
 }

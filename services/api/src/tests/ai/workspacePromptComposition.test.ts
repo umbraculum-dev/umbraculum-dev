@@ -25,10 +25,11 @@ describe("workspace prompt composition with module registry", () => {
     expect(collectModulePromptOverlayTexts()).toEqual([MRP_MODULE_OVERLAY]);
     expect(resolveRoutePromptOverlay("productionOrders")).toBe("Route hint for MRP");
 
+    const routeOverlay = resolveRoutePromptOverlay("productionOrders");
     const prompt = composeWorkspaceSystemPrompt({
       moduleOverlays: collectModulePromptOverlayTexts(),
       knowledgeSnippets: collectModuleKnowledgeSnippets(),
-      routeOverlay: resolveRoutePromptOverlay("productionOrders"),
+      ...(routeOverlay !== undefined ? { routeOverlay } : {}),
     });
 
     expect(prompt).toContain(MRP_MODULE_OVERLAY);
