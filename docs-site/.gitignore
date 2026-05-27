@@ -1,3 +1,5 @@
 node_modules/
 build/
 .docusaurus/
+# Copied from docs/media/umbi.png by scripts/copy-brand-assets.mjs
+static/img/umbi.png
