@@ -418,6 +418,48 @@ function useAiChatStream(input) {
   const [pending, setPending] = useState2(false);
   const [terminalError, setTerminalError] = useState2(null);
   const abortRef = useRef(null);
+  const applyProposal = useCallback(
+    async (proposalId) => {
+      if (!input.proposalApply) return;
+      await input.proposalApply(proposalId);
+      setMessages(
+        (prev) => prev.map((m) => {
+          if (!m.turn) return m;
+          return {
+            ...m,
+            turn: {
+              ...m.turn,
+              proposals: m.turn.proposals.map(
+                (p) => p.proposalId === proposalId ? { ...p, status: "applied" } : p
+              )
+            }
+          };
+        })
+      );
+    },
+    [input.proposalApply]
+  );
+  const rejectProposal = useCallback(
+    async (proposalId) => {
+      if (!input.proposalReject) return;
+      await input.proposalReject(proposalId);
+      setMessages(
+        (prev) => prev.map((m) => {
+          if (!m.turn) return m;
+          return {
+            ...m,
+            turn: {
+              ...m.turn,
+              proposals: m.turn.proposals.map(
+                (p) => p.proposalId === proposalId ? { ...p, status: "rejected" } : p
+              )
+            }
+          };
+        })
+      );
+    },
+    [input.proposalReject]
+  );
   const send = useCallback(
     async (text) => {
       const trimmed = text.trim();
@@ -439,6 +481,7 @@ function useAiChatStream(input) {
           status: "streaming",
           text: "",
           toolCalls: [],
+          proposals: [],
           usage: null,
           error: null
         }
@@ -507,7 +550,7 @@ function useAiChatStream(input) {
     setPending(false);
     setTerminalError(null);
   }, []);
-  return { messages, pending, terminalError, send, reset };
+  return { messages, pending, terminalError, send, reset, applyProposal, rejectProposal };
 }
 async function consumeSseStream(res, onEvent) {
   const reader = res.body?.getReader?.();
@@ -593,6 +636,18 @@ function applyEvent(setMessages, turnId, event) {
           }
           break;
         }
+        case "proposal":
+          turn.proposals = [
+            ...turn.proposals,
+            {
+              proposalId: event.proposalId,
+              moduleCode: event.moduleCode,
+              proposalType: event.proposalType,
+              summary: event.summary,
+              status: "pending"
+            }
+          ];
+          break;
         case "complete":
           turn.status = "complete";
           turn.usage = event.usage;
@@ -673,7 +728,41 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             children: messages.length === 0 ? /* @__PURE__ */ jsx11(SizableText, { theme: "alt2", children: t("messages.empty") }) : messages.map((m) => /* @__PURE__ */ jsxs6(YStack6, { gap: "$1", children: [
               /* @__PURE__ */ jsx11(SizableText, { fontWeight: "600", children: m.role === "user" ? t("messages.you") : t("messages.assistant") }),
               /* @__PURE__ */ jsx11(SizableText, { children: m.text || (pending && m.role === "assistant" ? t("composer.thinking") : "") }),
-              m.turn?.toolCalls.map((tc, i) => /* @__PURE__ */ jsx11(SizableText, { size: "$1", theme: "alt2", children: tc.errored ? t("messages.toolError", { message: tc.name }) : t("messages.toolCall", { tool: tc.name }) }, `${m.id}-tc-${i}`))
+              m.turn?.toolCalls.map((tc, i) => /* @__PURE__ */ jsx11(SizableText, { size: "$1", theme: "alt2", children: tc.errored ? t("messages.toolError", { message: tc.name }) : t("messages.toolCall", { tool: tc.name }) }, `${m.id}-tc-${i}`)),
+              m.turn?.proposals.map((p) => /* @__PURE__ */ jsxs6(
+                YStack6,
+                {
+                  gap: "$2",
+                  padding: "$2",
+                  borderWidth: 1,
+                  borderColor: "$borderColor",
+                  borderRadius: "$2",
+                  children: [
+                    /* @__PURE__ */ jsx11(SizableText, { size: "$2", children: p.summary }),
+                    p.status === "pending" ? /* @__PURE__ */ jsxs6(XStack3, { gap: "$2", children: [
+                      /* @__PURE__ */ jsx11(
+                        Button,
+                        {
+                          size: "$2",
+                          onPress: () => void chat.applyProposal(p.proposalId),
+                          accessibilityLabel: t("proposals.apply"),
+                          children: t("proposals.apply")
+                        }
+                      ),
+                      /* @__PURE__ */ jsx11(
+                        Button,
+                        {
+                          size: "$2",
+                          onPress: () => void chat.rejectProposal(p.proposalId),
+                          accessibilityLabel: t("proposals.dismiss"),
+                          children: t("proposals.dismiss")
+                        }
+                      )
+                    ] }) : /* @__PURE__ */ jsx11(SizableText, { size: "$1", theme: "alt2", children: p.status === "applied" ? t("proposals.applied") : t("proposals.dismissed") })
+                  ]
+                },
+                `${m.id}-prop-${p.proposalId}`
+              ))
             ] }, m.id))
           }
         ),

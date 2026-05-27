@@ -34,6 +34,7 @@ import { aiRoutes } from "./routes/ai.js";
 import { renderingRoutes } from "./routes/rendering.js";
 import { InMemoryAiToolRegistry } from "./services/ai/toolRegistry.js";
 import { registerRenderingTools } from "./services/ai/tools/rendering/index.js";
+import { registerPlatformAiTools } from "./services/ai/tools/platform/index.js";
 import { renderingRuntimePlugin } from "./services/rendering/index.js";
 import { registerAutomationModule } from "./modules/automation/index.js";
 import { registerBreweryModule } from "./modules/brewery/index.js";
@@ -123,6 +124,7 @@ export function buildApp() {
     const registry = new InMemoryAiToolRegistry();
     registerRegisteredModuleAiTools(registry, instance);
     registerRenderingTools(registry, instance.renderingJobs);
+    registerPlatformAiTools(registry, instance.prisma);
     aiRoutes(registry)(instance);
     done();
   });

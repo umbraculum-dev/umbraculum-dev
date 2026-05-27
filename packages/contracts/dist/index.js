@@ -761,9 +761,56 @@ var AiChatRequestBodySchema = z2.object({
   routeId: z2.string().trim().min(1).max(128).optional()
 }).strict();
 
-// src/rendering/renderJobs.ts
+// src/ai/aiProposals.ts
 import { z as z3 } from "zod";
-var RenderKindSchema = z3.enum([
+var AiProposalStatusSchema = z3.enum(["pending", "applied", "rejected"]);
+var AiProposalDtoSchema = z3.object({
+  id: z3.string().uuid(),
+  workspaceId: z3.string().uuid(),
+  userId: z3.string().uuid(),
+  moduleCode: z3.string().min(1).max(32),
+  proposalType: z3.string().min(1).max(64),
+  summary: z3.string().min(1).max(2e3),
+  payloadJson: z3.record(z3.string(), z3.unknown()),
+  status: AiProposalStatusSchema,
+  createdAt: z3.string(),
+  appliedAt: z3.string().nullable(),
+  rejectedAt: z3.string().nullable()
+}).strict();
+var AiProposalListResponseSchema = z3.object({
+  ok: z3.literal(true),
+  items: z3.array(AiProposalDtoSchema)
+}).strict();
+var AiProposalActionResponseSchema = z3.object({
+  ok: z3.literal(true),
+  proposal: AiProposalDtoSchema,
+  appliedPreviewOnly: z3.boolean().optional()
+}).strict();
+var MrpProposeOrderAdjustmentInputSchema = z3.object({
+  productionOrderId: z3.string().uuid(),
+  suggestedStartDate: z3.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  suggestedQuantity: z3.number().positive().optional(),
+  rationale: z3.string().max(500).optional()
+}).strict();
+var MrpProposeOrderAdjustmentOutputSchema = z3.object({
+  ok: z3.literal(true),
+  proposalId: z3.string().uuid(),
+  summary: z3.string()
+}).strict();
+var CrpProposeScheduleAdjustmentInputSchema = z3.object({
+  resourceId: z3.string().uuid().optional(),
+  suggestedDate: z3.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  rationale: z3.string().max(500).optional()
+}).strict();
+var CrpProposeScheduleAdjustmentOutputSchema = z3.object({
+  ok: z3.literal(true),
+  proposalId: z3.string().uuid(),
+  summary: z3.string()
+}).strict();
+
+// src/rendering/renderJobs.ts
+import { z as z4 } from "zod";
+var RenderKindSchema = z4.enum([
   "pdf",
   "xlsx",
   "csv",
@@ -775,71 +822,71 @@ var RenderKindSchema = z3.enum([
   "barcode",
   "qr"
 ]);
-var RenderStatusSchema = z3.enum([
+var RenderStatusSchema = z4.enum([
   "queued",
   "running",
   "succeeded",
   "failed"
 ]);
-var RenderVisibilitySchema = z3.enum(["workspace", "public"]);
-var RenderDeliverySchema = z3.discriminatedUnion("mode", [
-  z3.object({ mode: z3.literal("stream-response") }).strict(),
-  z3.object({
-    mode: z3.literal("persist-to-media"),
+var RenderVisibilitySchema = z4.enum(["workspace", "public"]);
+var RenderDeliverySchema = z4.discriminatedUnion("mode", [
+  z4.object({ mode: z4.literal("stream-response") }).strict(),
+  z4.object({
+    mode: z4.literal("persist-to-media"),
     visibility: RenderVisibilitySchema
   }).strict(),
-  z3.object({
-    mode: z3.literal("email"),
-    to: z3.array(z3.string().email()).min(1, "email.to required"),
-    subject: z3.string().min(1, "email.subject required")
+  z4.object({
+    mode: z4.literal("email"),
+    to: z4.array(z4.string().email()).min(1, "email.to required"),
+    subject: z4.string().min(1, "email.subject required")
   }).strict()
 ]);
-var RenderErrorSchema = z3.object({
-  code: z3.string().min(1, "error.code required"),
-  message: z3.string().min(1, "error.message required")
+var RenderErrorSchema = z4.object({
+  code: z4.string().min(1, "error.code required"),
+  message: z4.string().min(1, "error.message required")
 }).strict();
-var RenderJobSubmitRequestSchema = z3.object({
-  templateRef: z3.string().min(1, "templateRef required"),
+var RenderJobSubmitRequestSchema = z4.object({
+  templateRef: z4.string().min(1, "templateRef required"),
   kind: RenderKindSchema.optional(),
-  data: z3.unknown(),
+  data: z4.unknown(),
   delivery: RenderDeliverySchema.optional()
 }).strict();
-var RenderJobStatusSchema = z3.object({
-  id: z3.string().min(1, "job.id required"),
-  templateRef: z3.string().min(1, "job.templateRef required"),
+var RenderJobStatusSchema = z4.object({
+  id: z4.string().min(1, "job.id required"),
+  templateRef: z4.string().min(1, "job.templateRef required"),
   kind: RenderKindSchema,
   status: RenderStatusSchema,
-  deliveryMode: z3.string().min(1, "job.deliveryMode required"),
-  requestedAt: z3.string().min(1, "job.requestedAt required"),
-  startedAt: z3.string().nullable(),
-  completedAt: z3.string().nullable(),
-  artifactId: z3.string().nullable(),
-  mediaAssetId: z3.string().nullable(),
+  deliveryMode: z4.string().min(1, "job.deliveryMode required"),
+  requestedAt: z4.string().min(1, "job.requestedAt required"),
+  startedAt: z4.string().nullable(),
+  completedAt: z4.string().nullable(),
+  artifactId: z4.string().nullable(),
+  mediaAssetId: z4.string().nullable(),
   error: RenderErrorSchema.nullable()
 }).strict();
-var RenderJobSubmitResponseSchema = z3.object({
-  ok: z3.literal(true),
-  mode: z3.literal("async"),
+var RenderJobSubmitResponseSchema = z4.object({
+  ok: z4.literal(true),
+  mode: z4.literal("async"),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobStatusResponseSchema = z3.object({
-  ok: z3.literal(true),
+var RenderJobStatusResponseSchema = z4.object({
+  ok: z4.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobCancelResponseSchema = z3.object({
-  ok: z3.literal(true),
+var RenderJobCancelResponseSchema = z4.object({
+  ok: z4.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobResultResponseSchema = z3.object({
-  ok: z3.literal(true),
+var RenderJobResultResponseSchema = z4.object({
+  ok: z4.literal(true),
   job: RenderJobStatusSchema,
-  signedUrl: z3.string().min(1, "signedUrl required"),
-  expiresAt: z3.string().min(1, "expiresAt required")
+  signedUrl: z4.string().min(1, "signedUrl required"),
+  expiresAt: z4.string().min(1, "expiresAt required")
 }).strict();
-var ErrorResponseSchema = z3.object({
-  ok: z3.literal(false),
+var ErrorResponseSchema = z4.object({
+  ok: z4.literal(false),
   error: RenderErrorSchema.extend({
-    details: z3.record(z3.string(), z3.unknown()).optional()
+    details: z4.record(z4.string(), z4.unknown()).optional()
   }).strict()
 }).strict();
 function parseRenderJobSubmitRequest(payload) {
@@ -850,45 +897,45 @@ function parseRenderJobStatusResponse(payload) {
 }
 
 // src/brewery/listResponses.ts
-import { z as z4 } from "zod";
-var RecipeListItemSchema = z4.object({
-  id: z4.string(),
-  accountId: z4.string().optional(),
-  name: z4.string(),
-  styleKey: z4.string().optional(),
-  style: z4.string().nullable().optional(),
-  version: z4.number().optional()
+import { z as z5 } from "zod";
+var RecipeListItemSchema = z5.object({
+  id: z5.string(),
+  accountId: z5.string().optional(),
+  name: z5.string(),
+  styleKey: z5.string().optional(),
+  style: z5.string().nullable().optional(),
+  version: z5.number().optional()
 });
-var RecipesListResponseSchema = z4.object({
-  ok: z4.literal(true),
-  recipes: z4.array(RecipeListItemSchema)
+var RecipesListResponseSchema = z5.object({
+  ok: z5.literal(true),
+  recipes: z5.array(RecipeListItemSchema)
 });
 function parseRecipesListResponse(payload) {
   return RecipesListResponseSchema.parse(payload);
 }
-var isoDateTime = z4.preprocess((v) => {
+var isoDateTime = z5.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z4.string());
-var BrewSessionListItemSchema = z4.object({
-  id: z4.string(),
-  code: z4.string(),
-  status: z4.string(),
+}, z5.string());
+var BrewSessionListItemSchema = z5.object({
+  id: z5.string(),
+  code: z5.string(),
+  status: z5.string(),
   createdAt: isoDateTime,
-  startedAt: z4.preprocess((v) => v instanceof Date ? v.toISOString() : v, z4.string().nullable()).optional(),
-  stoppedAt: z4.preprocess((v) => v instanceof Date ? v.toISOString() : v, z4.string().nullable()).optional()
+  startedAt: z5.preprocess((v) => v instanceof Date ? v.toISOString() : v, z5.string().nullable()).optional(),
+  stoppedAt: z5.preprocess((v) => v instanceof Date ? v.toISOString() : v, z5.string().nullable()).optional()
 });
-var BrewSessionsListResponseSchema = z4.object({
-  ok: z4.literal(true),
-  brewSessions: z4.array(BrewSessionListItemSchema)
+var BrewSessionsListResponseSchema = z5.object({
+  ok: z5.literal(true),
+  brewSessions: z5.array(BrewSessionListItemSchema)
 });
 function parseBrewSessionsListResponse(payload) {
   return BrewSessionsListResponseSchema.parse(payload);
 }
-var BrewSessionCreateResponseSchema = z4.object({
-  ok: z4.literal(true),
-  brewSession: z4.object({
-    id: z4.string()
+var BrewSessionCreateResponseSchema = z5.object({
+  ok: z5.literal(true),
+  brewSession: z5.object({
+    id: z5.string()
   })
 });
 function parseBrewSessionCreateResponse(payload) {
@@ -897,11 +944,19 @@ function parseBrewSessionCreateResponse(payload) {
 }
 export {
   AiChatRequestBodySchema,
+  AiProposalActionResponseSchema,
+  AiProposalDtoSchema,
+  AiProposalListResponseSchema,
+  AiProposalStatusSchema,
   AuthMeResponseSchema,
   AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema,
   BrewSessionsListResponseSchema,
+  CrpProposeScheduleAdjustmentInputSchema,
+  CrpProposeScheduleAdjustmentOutputSchema,
   ErrorResponseSchema,
+  MrpProposeOrderAdjustmentInputSchema,
+  MrpProposeOrderAdjustmentOutputSchema,
   RecipesListResponseSchema,
   RenderDeliverySchema,
   RenderErrorSchema,

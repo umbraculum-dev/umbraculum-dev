@@ -7,7 +7,7 @@ The library-agnostic AI-tool contract every callable tool the Umbraculum AI cons
 
 ## What this is
 
-The five interface types that define what an AI tool is, on the SDK side of the boundary: `AiTool<Input, Output>` (the tool itself — `name`, `description`, `scope`, `inputSchema`, `handler`), `AiToolContext` (per-invocation context: workspaceId, userId, requestId, AbortSignal), `AiToolScope` (`"read" | "write"`), `AiToolRegistry` (the boot-time registry surface), and `AiToolDefinition` (the serializable descriptor — no `handler`, safe to send to clients). Zero runtime code, zero schema library dependencies. Third-party module authors and platform-internal tool authors both depend on this package; the platform orchestrator at [`services/api/src/services/ai/orchestrator.ts`](../../services/api/src/services/ai/orchestrator.ts) consumes it via the registry interface.
+The five interface types that define what an AI tool is, on the SDK side of the boundary: `AiTool<Input, Output>` (the tool itself — `name`, `description`, `scope`, `inputSchema`, `handler`), `AiToolContext` (per-invocation context: workspaceId, userId, requestId, AbortSignal), `AiToolScope` (`"read" | "write" | "propose"`), `AiToolRegistry` (the boot-time registry surface), and `AiToolDefinition` (the serializable descriptor — no `handler`, safe to send to clients). Zero runtime code, zero schema library dependencies. Third-party module authors and platform-internal tool authors both depend on this package; the platform orchestrator at [`services/api/src/services/ai/orchestrator.ts`](../../services/api/src/services/ai/orchestrator.ts) consumes it via the registry interface.
 
 ## Scope
 

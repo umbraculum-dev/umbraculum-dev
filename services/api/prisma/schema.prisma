@@ -159,6 +159,7 @@ model User {
   billingWorkspaceBinding BillingUserWorkspaceBinding?
   billingEvents           BillingEvent[]
   aiUsageLedger           AiUsageLedger[]
+  aiProposals             AiProposal[]
 
   @@index([email])
   @@map("users")
@@ -196,6 +197,7 @@ model Workspace {
   aiSettings    WorkspaceAiSettings?
   aiMemory      WorkspaceAiMemory?
   aiUsageLedger AiUsageLedger[]
+  aiProposals   AiProposal[]
 
   @@map("workspaces")
   @@schema("public")
@@ -1213,8 +1215,18 @@ model BillingEvent {
 
 enum AiProvider {
   anthropic
+  openai
 
   @@map("ai_provider")
+  @@schema("public")
+}
+
+enum AiProposalStatus {
+  pending
+  applied
+  rejected
+
+  @@map("ai_proposal_status")
   @@schema("public")
 }
 
@@ -1312,6 +1324,32 @@ model AiUsageLedger {
   @@index([workspaceId, createdAt(sort: Desc)])
   @@index([userId, createdAt(sort: Desc)])
   @@map("ai_usage_ledger")
+  @@schema("public")
+}
+
+/**
+ * Human-in-the-loop AI proposals (propose-write). Tools with scope `propose`
+ * insert rows here; apply/reject are separate HTTP actions.
+ */
+model AiProposal {
+  id           String           @id @default(uuid())
+  workspaceId  String           @map("workspace_id")
+  userId       String           @map("user_id")
+  moduleCode   String           @map("module_code")
+  proposalType String           @map("proposal_type")
+  summary      String
+  payloadJson  Json             @map("payload_json")
+  status       AiProposalStatus @default(pending)
+
+  createdAt  DateTime  @default(now()) @map("created_at")
+  appliedAt  DateTime? @map("applied_at")
+  rejectedAt DateTime? @map("rejected_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@map("ai_proposals")
   @@schema("public")
 }
 

@@ -500,6 +500,48 @@ function useAiChatStream(input) {
   const [pending, setPending] = (0, import_react14.useState)(false);
   const [terminalError, setTerminalError] = (0, import_react14.useState)(null);
   const abortRef = (0, import_react14.useRef)(null);
+  const applyProposal = (0, import_react14.useCallback)(
+    async (proposalId) => {
+      if (!input.proposalApply) return;
+      await input.proposalApply(proposalId);
+      setMessages(
+        (prev) => prev.map((m) => {
+          if (!m.turn) return m;
+          return {
+            ...m,
+            turn: {
+              ...m.turn,
+              proposals: m.turn.proposals.map(
+                (p) => p.proposalId === proposalId ? { ...p, status: "applied" } : p
+              )
+            }
+          };
+        })
+      );
+    },
+    [input.proposalApply]
+  );
+  const rejectProposal = (0, import_react14.useCallback)(
+    async (proposalId) => {
+      if (!input.proposalReject) return;
+      await input.proposalReject(proposalId);
+      setMessages(
+        (prev) => prev.map((m) => {
+          if (!m.turn) return m;
+          return {
+            ...m,
+            turn: {
+              ...m.turn,
+              proposals: m.turn.proposals.map(
+                (p) => p.proposalId === proposalId ? { ...p, status: "rejected" } : p
+              )
+            }
+          };
+        })
+      );
+    },
+    [input.proposalReject]
+  );
   const send = (0, import_react14.useCallback)(
     async (text) => {
       const trimmed = text.trim();
@@ -521,6 +563,7 @@ function useAiChatStream(input) {
           status: "streaming",
           text: "",
           toolCalls: [],
+          proposals: [],
           usage: null,
           error: null
         }
@@ -589,7 +632,7 @@ function useAiChatStream(input) {
     setPending(false);
     setTerminalError(null);
   }, []);
-  return { messages, pending, terminalError, send, reset };
+  return { messages, pending, terminalError, send, reset, applyProposal, rejectProposal };
 }
 async function consumeSseStream(res, onEvent) {
   const reader = res.body?.getReader?.();
@@ -675,6 +718,18 @@ function applyEvent(setMessages, turnId, event) {
           }
           break;
         }
+        case "proposal":
+          turn.proposals = [
+            ...turn.proposals,
+            {
+              proposalId: event.proposalId,
+              moduleCode: event.moduleCode,
+              proposalType: event.proposalType,
+              summary: event.summary,
+              status: "pending"
+            }
+          ];
+          break;
         case "complete":
           turn.status = "complete";
           turn.usage = event.usage;
@@ -755,7 +810,41 @@ function AiChatPanel({ chat, t, onOpenUpgrade }) {
             children: messages.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { theme: "alt2", children: t("messages.empty") }) : messages.map((m) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_tamagui12.YStack, { gap: "$1", children: [
               /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { fontWeight: "600", children: m.role === "user" ? t("messages.you") : t("messages.assistant") }),
               /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { children: m.text || (pending && m.role === "assistant" ? t("composer.thinking") : "") }),
-              m.turn?.toolCalls.map((tc, i) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { size: "$1", theme: "alt2", children: tc.errored ? t("messages.toolError", { message: tc.name }) : t("messages.toolCall", { tool: tc.name }) }, `${m.id}-tc-${i}`))
+              m.turn?.toolCalls.map((tc, i) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { size: "$1", theme: "alt2", children: tc.errored ? t("messages.toolError", { message: tc.name }) : t("messages.toolCall", { tool: tc.name }) }, `${m.id}-tc-${i}`)),
+              m.turn?.proposals.map((p) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+                import_tamagui12.YStack,
+                {
+                  gap: "$2",
+                  padding: "$2",
+                  borderWidth: 1,
+                  borderColor: "$borderColor",
+                  borderRadius: "$2",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { size: "$2", children: p.summary }),
+                    p.status === "pending" ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_tamagui12.XStack, { gap: "$2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                        Button,
+                        {
+                          size: "$2",
+                          onPress: () => void chat.applyProposal(p.proposalId),
+                          accessibilityLabel: t("proposals.apply"),
+                          children: t("proposals.apply")
+                        }
+                      ),
+                      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                        Button,
+                        {
+                          size: "$2",
+                          onPress: () => void chat.rejectProposal(p.proposalId),
+                          accessibilityLabel: t("proposals.dismiss"),
+                          children: t("proposals.dismiss")
+                        }
+                      )
+                    ] }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_tamagui12.SizableText, { size: "$1", theme: "alt2", children: p.status === "applied" ? t("proposals.applied") : t("proposals.dismissed") })
+                  ]
+                },
+                `${m.id}-prop-${p.proposalId}`
+              ))
             ] }, m.id))
           }
         ),

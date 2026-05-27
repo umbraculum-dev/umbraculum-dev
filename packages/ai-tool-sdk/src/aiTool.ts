@@ -25,10 +25,10 @@
 
 /**
  * Capability scope hint surfaced to admins when configuring role limits.
- * Tools tagged `write` may mutate workspace state; v0 ships only `read` tools
- * but the type is reserved for forward compatibility.
+ * Tools tagged `write` may submit jobs (e.g. rendering); `propose` creates
+ * human-confirmed drafts only; `read` is lookup-only.
  */
-export type AiToolScope = "read" | "write";
+export type AiToolScope = "read" | "write" | "propose";
 
 /**
  * Per-invocation context passed to every tool's `handler`.

@@ -297,7 +297,7 @@ First AI tools, read-only subset shipped in Wave 5:
 | `crp.explainCapacityLoad` | read | Summarize load/capacity for a resource/window. |
 | `crp.listConflicts` | read | Explain conflicts and capacity exhaustion. |
 | `crp.explainResourceCalendar` | future read | Explain availability windows and downtime. |
-| `crp.proposeScheduleAdjustment` | future propose-write | Suggest moving/splitting/reassigning operations; human approval required. |
+| `crp.proposeScheduleAdjustment` | propose | Suggest schedule/capacity adjustments; human approval required ([`canonical-ai-propose-write-surface.md`](canonical-ai-propose-write-surface.md)). |
 
 The shipped Wave 5 tools are `scope: "read"` and return the existing route response envelopes. The future `propose-write` tool returns structured proposals. It must not directly mutate schedule state.
 

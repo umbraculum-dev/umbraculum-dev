@@ -56,7 +56,11 @@ The consultant has access to a closed set of tools registered by the installed c
 | `crp.listScheduledOperations` | Read-time scheduled operations from existing planning sources | `crp` (canonical) |
 | `crp.explainCapacityLoad` | Planned, available, and overload minutes per capacity bucket | `crp` (canonical) |
 | `crp.listConflicts` | Read-only capacity warnings/conflicts | `crp` (canonical) |
-| `render_document` | Submit a registered document template to the canonical rendering pipeline | platform rendering service |
+| `render_document` | Submit a registered document template to the canonical rendering pipeline | platform (`write` — job submit only) |
+| `platform.reportingQuery` | Run a typed reporting DSL query on curated views (row cap, date range required) | platform |
+| `platform.searchProductDocs` | Retrieve chunks from ingested public help/docs (pgvector D1) | platform |
+| `mrp.proposeOrderAdjustment` | Draft a production-order change; returns proposal id for human Apply | `mrp` (`propose`) |
+| `crp.proposeScheduleAdjustment` | Draft a schedule/capacity adjustment proposal | `crp` (`propose`) |
 
 Domain tools enforce workspace membership at the service layer ([`requireActiveWorkspace`](../services/api/src/plugins/requestContext.ts)) — the AI cannot read data outside the operator's active workspace, even if it tries to construct a tool call that would cross workspaces. `render_document` submits a rendering job for the active workspace using registered templates; it is a platform-controlled output operation, not a domain-record mutation. Tool calls and results are visible in the chat surface for transparency.
 
@@ -87,9 +91,9 @@ The consultant is deliberately bounded today. None of the following are shipped,
 - **No PLC commands.** The brewery's OpenPLC bridge (per [`docs/design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) §9 Phase E) does not expose write tools to the consultant until H1 2027+. Read tools (`automation.vesselState`, `automation.listVessels`) ship now; setpoint changes do not.
 - **No billing or admin actions.** Subscription changes, key vault rotation, workspace membership edits — all human-only.
 - **No cross-workspace queries.** Every tool is scoped to the active workspace; the AI cannot ask "across all my workspaces, where is the slowest fermentation?" — this is a tenancy guarantee, not a UX bug.
-- **No planning mutations.** `mrp` and `crp` expose read-only advisor tools and registered rendering templates (Wave 6), but the consultant cannot create production orders, reschedule operations, optimize capacity, or materialize projection rows. Export artifacts use `render_document` or human-triggered module render-job routes; they do not mutate domain state. `wms` and `crm` remain reserved canonical codes with no AI tool surface today.
-- **No ad-hoc analytics or product-doc RAG.** The consultant cannot run reporting DSL queries or search embedded documentation stores; static module `knowledge` snippets and workspace memory are the only non-tool context.
-- **No managed-AI mode.** v0 is BYOK Anthropic only; Umbraculum does not resell tokens or host a shared provider key at public α.
+- **No autonomous planning mutations.** Propose tools (`mrp.proposeOrderAdjustment`, `crp.proposeScheduleAdjustment`) create **pending proposals** only; the operator must **Apply** or **Dismiss** in chat. Apply may be preview-only until MRP/CRP write routes ship ([`canonical-ai-propose-write-surface.md`](design/canonical-ai-propose-write-surface.md)).
+- **Reporting and RAG are bounded.** `platform.reportingQuery` uses allowlisted views and caps ([`canonical-ai-reporting-dsl-surface.md`](design/canonical-ai-reporting-dsl-surface.md)). `platform.searchProductDocs` searches ingested public docs only (D1); per-workspace timeline RAG is deferred.
+- **No managed-AI credits.** BYOK supports Anthropic and OpenAI adapters; Umbraculum does not resell tokens at public α+H2.
 
 These bounds are not a hedge — they are the shape of v0. The architecture intentionally trades autonomy for coherence + auditability while the apparatus matures.
 
@@ -101,7 +105,13 @@ Each chat turn builds a system prompt in fixed order: **base → platform → mo
 
 Clients may send an optional `routeId` (from [`@umbraculum/navigation`](../packages/navigation/README.md)) on `POST /ai/chat` so route-specific hints apply — for example when opening `/ai?fromRoute=productionOrders`.
 
-Authoritative contract, limits, and deferred layers: [`design/canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md).
+Authoritative contract: [`design/canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md). Post-α surfaces: [`canonical-ai-propose-write-surface.md`](design/canonical-ai-propose-write-surface.md), [`canonical-ai-reporting-dsl-surface.md`](design/canonical-ai-reporting-dsl-surface.md), [`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md).
+
+---
+
+## 4.2 Human-in-the-loop proposals
+
+When the model calls a `propose`-scope tool, the chat stream emits a `proposal` SSE event. The UI shows **Apply** / **Dismiss**. Applying calls `POST /ai/proposals/:id/apply`; dismissing calls `POST /ai/proposals/:id/reject`. The orchestrator never applies proposals inside the tool loop.
 
 ---
 
@@ -116,7 +126,7 @@ So in v0:
 - The api's [`app.ts`](../services/api/src/app.ts) creates the in-memory registry, invokes module-owned registrars through `@umbraculum/module-sdk`, then registers horizontal platform tools such as `render_document`.
 - The contract for tools is public and typed (`AiTool`, `AiToolRegistry`, `AiToolScope` in [`@umbraculum/ai-tool-sdk`](../packages/ai-tool-sdk/README.md)).
 
-Modules also contribute **`aiPrompts`** (module overlay, per-route overlays, optional static `knowledge` snippet) alongside tools. Semantic reporting, pgvector RAG, and future WMS/CRM tool bundles remain post-α work.
+Modules also contribute **`aiPrompts`** alongside tools. Horizontal platform tools (`render_document`, `platform.reportingQuery`, `platform.searchProductDocs`) register at API boot. Future WMS/CRM tool bundles remain blocked until those modules exist.
 
 ---
 

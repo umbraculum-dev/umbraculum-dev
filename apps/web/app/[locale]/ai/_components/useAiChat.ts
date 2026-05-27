@@ -32,6 +32,20 @@ export function useAiChat() {
           }),
           signal: init.signal,
         }),
+      proposalApply: async (proposalId: string) => {
+        const res = await fetch(`/api/ai/proposals/${proposalId}/apply`, {
+          method: "POST",
+          credentials: "same-origin",
+        });
+        if (!res.ok) throw new Error(`apply failed: ${res.status}`);
+      },
+      proposalReject: async (proposalId: string) => {
+        const res = await fetch(`/api/ai/proposals/${proposalId}/reject`, {
+          method: "POST",
+          credentials: "same-origin",
+        });
+        if (!res.ok) throw new Error(`reject failed: ${res.status}`);
+      },
     }),
     [routeId],
   );

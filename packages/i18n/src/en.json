@@ -1827,6 +1827,12 @@
       "toolCall": "Looking up: {tool}",
       "toolError": "Tool error: {message}"
     },
+    "proposals": {
+      "apply": "Apply",
+      "dismiss": "Dismiss",
+      "applied": "Applied",
+      "dismissed": "Dismissed"
+    },
     "errors": {
       "subscriptionRequired": "AI consultant is available on paid tiers.",
       "subscriptionRequiredCta": "Upgrade to unlock",
@@ -1845,7 +1851,7 @@
       "enableLabel": "Enable AI consultant",
       "enableHint": "When enabled, members can use the AI consultant in this workspace.",
       "providerLabel": "AI provider",
-      "providerHint": "Currently only Anthropic Claude is supported.",
+      "providerHint": "Anthropic (full tools) or OpenAI BYOK (chat without tools until adapter completes).",
       "apiKeyLabel": "Anthropic API key",
       "apiKeyHint": "Stored encrypted at rest. We never display the key back; clear by saving an empty value.",
       "apiKeyConfigured": "A key is currently configured.",

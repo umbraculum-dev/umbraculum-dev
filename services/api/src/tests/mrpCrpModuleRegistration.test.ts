@@ -82,11 +82,13 @@ describe("MRP/CRP module registration — Wave 1", () => {
         { name: "mrp.listProductionOrders", scope: "read" },
         { name: "mrp.getProductionOrder", scope: "read" },
         { name: "mrp.explainMaterialRequirements", scope: "read" },
+        { name: "mrp.proposeOrderAdjustment", scope: "propose" },
         { name: "crp.listResources", scope: "read" },
         { name: "crp.listWorkCenters", scope: "read" },
         { name: "crp.listScheduledOperations", scope: "read" },
         { name: "crp.explainCapacityLoad", scope: "read" },
         { name: "crp.listConflicts", scope: "read" },
+        { name: "crp.proposeScheduleAdjustment", scope: "propose" },
       ]),
     );
   });

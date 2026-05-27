@@ -16,9 +16,10 @@
 | **Route overlays** | `aiPrompts.routes` + optional `routeId` on chat | Shipped |
 | **Static knowledge snippets** | `aiPrompts.knowledge` | Shipped (2 KB cap per module) |
 | **Workspace memory** | `WorkspaceAiMemoryService` | Shipped (v0) |
-| **Semantic reporting DSL** | Platform Layer B | **Not shipped** (v1) |
-| **pgvector RAG** | Platform Layer C | **Not shipped** (v1.5) |
-| **Managed-AI / multi-provider** | Platform §7.3 | **Not shipped** |
+| **Semantic reporting DSL** | Platform Layer B | **Shipped MVP** — [`canonical-ai-reporting-dsl-surface.md`](canonical-ai-reporting-dsl-surface.md) |
+| **pgvector RAG** | Platform Layer C | **D1 shipped** — [`canonical-ai-rag-surface.md`](canonical-ai-rag-surface.md); D2–D3 deferred |
+| **Propose-write (human confirm)** | Platform + modules | **Shipped** — [`canonical-ai-propose-write-surface.md`](canonical-ai-propose-write-surface.md) |
+| **Managed-AI credits** | Platform §7.3 | **Deferred** H1 2027; multi-provider BYOK router shipped |
 
 Every model call composes a **system prompt** in this order:
 
@@ -79,17 +80,25 @@ Web clients may pass `routeId` via query `?fromRoute=productionOrders` on `/ai`.
 
 ---
 
-## 4. What is deferred (do not claim at α)
+## 4. Sibling surfaces (post-α H2)
 
-- **Reporting DSL** — ad-hoc analytics without raw SQL ([`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) Layer B).  
-- **Full RAG** — pgvector over product docs + activity timelines (Layer C v1.5).  
-- **Managed-AI** — Umbraculum-resold tokens and credit balance.  
-- **Autonomous domain writes** — propose/confirm mutations for MRP/CRP and other modules.  
+| Capability | Surface doc |
+|------------|-------------|
+| Propose-write | [`canonical-ai-propose-write-surface.md`](canonical-ai-propose-write-surface.md) |
+| Reporting DSL | [`canonical-ai-reporting-dsl-surface.md`](canonical-ai-reporting-dsl-surface.md) |
+| RAG | [`canonical-ai-rag-surface.md`](canonical-ai-rag-surface.md) |
+| H2 build log | [`ai-consultant-post-alpha-h2-build-log.md`](ai-consultant-post-alpha-h2-build-log.md) |
+
+## 5. What remains deferred
+
+- **Full RAG** — per-workspace activity timelines + memory unify (Layer C D2–D3).  
+- **Managed-AI credits** — Umbraculum-resold tokens (`WorkspaceBillingAddon`).  
+- **Autonomous domain writes** — only human-confirmed proposals + `render_document` job submit.  
 - **Per-workspace module entitlements** — all boot-registered modules contribute overlays until an install model exists.
 
 ---
 
-## 5. Maintenance
+## 6. Maintenance
 
 - When adding a module overlay or route map, update the module's `services/api/src/services/ai/prompts/<code>.ts` and `services/api/src/modules/<code>/index.ts`.  
 - When adding a new `RouteId` with a dedicated AI hint, extend the module's `aiPrompts.routes` and [`packages/navigation`](../../packages/navigation/src/index.ts).  
@@ -98,6 +107,7 @@ Web clients may pass `routeId` via query `?fromRoute=productionOrders` on `/ai`.
 
 ---
 
-## 6. Build log
+## 7. Build logs
 
-Implementation record: [`ai-consultant-pre-alpha-hardening-build-log.md`](ai-consultant-pre-alpha-hardening-build-log.md).
+- Pre-α: [`ai-consultant-pre-alpha-hardening-build-log.md`](ai-consultant-pre-alpha-hardening-build-log.md)  
+- Post-α H2: [`ai-consultant-post-alpha-h2-build-log.md`](ai-consultant-post-alpha-h2-build-log.md)

@@ -140,11 +140,19 @@ interface AiToolCallView {
     durationMs: number | null;
     errored: boolean;
 }
+interface AiProposalView {
+    proposalId: string;
+    moduleCode: string;
+    proposalType: string;
+    summary: string;
+    status: "pending" | "applied" | "rejected";
+}
 interface AiChatTurn {
     id: string;
     status: "streaming" | "complete" | "error";
     text: string;
     toolCalls: AiToolCallView[];
+    proposals: AiProposalView[];
     usage: {
         tokensIn: number;
         tokensOut: number;
@@ -180,6 +188,12 @@ type IncomingEvent = {
     durationMs: number;
     errored: boolean;
 } | {
+    type: "proposal";
+    proposalId: string;
+    moduleCode: string;
+    proposalType: string;
+    summary: string;
+} | {
     type: "complete";
     usage: AiChatTurn["usage"];
 } | {
@@ -200,6 +214,8 @@ interface UseAiChatStreamInput {
     }) => Promise<Response>;
     /** Optional RouteId hint forwarded on each chat request. */
     routeId?: string | null;
+    proposalApply?: (proposalId: string) => Promise<void>;
+    proposalReject?: (proposalId: string) => Promise<void>;
 }
 /**
  * Shared chat state machine. One in-flight turn at a time; `send()` while
@@ -214,6 +230,8 @@ declare function useAiChatStream(input: UseAiChatStreamInput): {
     } | null;
     send: (text: string) => Promise<void>;
     reset: () => void;
+    applyProposal: (proposalId: string) => Promise<void>;
+    rejectProposal: (proposalId: string) => Promise<void>;
 };
 /**
  * Consume an SSE response. Prefers the streaming `getReader()` path
