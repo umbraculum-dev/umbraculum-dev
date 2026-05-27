@@ -70,7 +70,9 @@ The `(brewery)/` route group is structural only; URLs remain `/en/recipes`, `/en
 
 ### 3.3 Native — brewery screens ([`apps/native/src/modules/brewery/`](../../../../apps/native/src/modules/brewery/))
 
-Brewery screens live under `apps/native/src/modules/brewery/screens/` (`RecipesListScreen`, `RecipeEditScreen`, `WaterMashScreen`, `YeastScreen`, `BrewSessionsListScreen`, etc.). Native route registration remains app-owned; the screen files are now physically grouped by vertical.
+Brewery screens live under `apps/native/src/modules/brewery/screens/` (`RecipesListScreen`, `RecipeEditScreen`, `WaterMashScreen`, `YeastScreen`, `BrewSessionsListScreen`, etc.). Native route registration is recorded via `registerNativeModule({ code: "brewery", ... })` at app bootstrap ([`registerPlatformNativeModules.ts`](../../../../apps/native/src/navigation/registerPlatformNativeModules.ts)); React Navigation wiring remains in [`AppNavigator.tsx`](../../../../apps/native/src/navigation/AppNavigator.tsx).
+
+**Brew-day only on native.** MRP/CRP read models, AI planning advisor tools, and RFC-0007 document exports are **web-first** (see §4 below and [`canonical-native-platform-surface.md`](../../../design/canonical-native-platform-surface.md)). Operators who need inventory or planning on a phone today use **Open on web** (whitelisted `inventory` route) or the web app in a browser—not native screens for `productionOrders`, `capacity`, etc.
 
 ### 3.4 Brewery-vertical packages
 

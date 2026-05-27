@@ -840,11 +840,60 @@ function parseRenderJobSubmitRequest(payload) {
 function parseRenderJobStatusResponse(payload) {
   return RenderJobStatusResponseSchema.parse(payload);
 }
+
+// src/brewery/listResponses.ts
+import { z as z3 } from "zod";
+var RecipeListItemSchema = z3.object({
+  id: z3.string(),
+  accountId: z3.string().optional(),
+  name: z3.string(),
+  styleKey: z3.string().optional(),
+  style: z3.string().nullable().optional(),
+  version: z3.number().optional()
+});
+var RecipesListResponseSchema = z3.object({
+  ok: z3.literal(true),
+  recipes: z3.array(RecipeListItemSchema)
+});
+function parseRecipesListResponse(payload) {
+  return RecipesListResponseSchema.parse(payload);
+}
+var isoDateTime = z3.preprocess((v) => {
+  if (v instanceof Date) return v.toISOString();
+  return v;
+}, z3.string());
+var BrewSessionListItemSchema = z3.object({
+  id: z3.string(),
+  code: z3.string(),
+  status: z3.string(),
+  createdAt: isoDateTime,
+  startedAt: z3.preprocess((v) => v instanceof Date ? v.toISOString() : v, z3.string().nullable()).optional(),
+  stoppedAt: z3.preprocess((v) => v instanceof Date ? v.toISOString() : v, z3.string().nullable()).optional()
+});
+var BrewSessionsListResponseSchema = z3.object({
+  ok: z3.literal(true),
+  brewSessions: z3.array(BrewSessionListItemSchema)
+});
+function parseBrewSessionsListResponse(payload) {
+  return BrewSessionsListResponseSchema.parse(payload);
+}
+var BrewSessionCreateResponseSchema = z3.object({
+  ok: z3.literal(true),
+  brewSession: z3.object({
+    id: z3.string()
+  })
+});
+function parseBrewSessionCreateResponse(payload) {
+  const parsed = BrewSessionCreateResponseSchema.parse(payload);
+  return { brewSession: parsed.brewSession };
+}
 export {
   AuthMeResponseSchema,
   AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema,
+  BrewSessionsListResponseSchema,
   ErrorResponseSchema,
+  RecipesListResponseSchema,
   RenderDeliverySchema,
   RenderErrorSchema,
   RenderJobCancelResponseSchema,
@@ -859,9 +908,12 @@ export {
   analysisFormatHints,
   parseAuthMeResponse,
   parseBoilComputeAndSaveResponse,
+  parseBrewSessionCreateResponse,
+  parseBrewSessionsListResponse,
   parseGravityAnalysisResponseV1,
   parseMashComputeAndSaveResponse,
   parseRecipeWaterHubSummaryResponse,
+  parseRecipesListResponse,
   parseRenderJobStatusResponse,
   parseRenderJobSubmitRequest,
   parseSpargeComputeAndSaveResponse,

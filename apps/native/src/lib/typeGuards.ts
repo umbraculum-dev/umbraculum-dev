@@ -1,13 +1,13 @@
 /**
  * Local apps/native type guards.
  *
- * Mirrors `apps/web/app/_lib/typeGuards.ts` and the project-local hand-rolled
- * validation strategy described in `docs/CONTRACTS-VALIDATION-STRATEGY.md`:
- * when a payload is `unknown`, narrow it with a plain function rather than
- * `as any` / `as SomeShape` casts.
+ * Prefer `parseXxx()` from `@umbraculum/contracts` (Zod v4 per
+ * [RFC-0003](../../../../docs/rfcs/0003-validation-library-adoption.md)) for HTTP
+ * and other boundary payloads. Use helpers here only for narrow structural
+ * checks that are not yet modeled as contract parsers.
  *
- * Keep this small and dependency-free — boundaries that need full validation
- * (HTTP, MCP, storage) should still use a `parseXxx()` from `@umbraculum/contracts`.
+ * See [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../../../../docs/CONTRACTS-VALIDATION-STRATEGY.md)
+ * and [`docs/design/canonical-native-platform-surface.md`](../../../../docs/design/canonical-native-platform-surface.md) §6.
  */
 
 /**

@@ -1,3 +1,10 @@
+import {
+  clearNativeRoutePolicyForTests,
+  configureNativeRoutePolicy,
+  getNativeAvailableRouteIds,
+  getWebviewWhitelistRouteIds,
+} from "./nativeRoutePolicy.js";
+
 export type AppPlatform = "web" | "native";
 
 // TODO(post-audit): canonical-module RouteIds added before the module-driven
@@ -81,38 +88,53 @@ export type RouteRef = {
 
 export type RouteAvailability = "available" | "blocked" | "whitelisted_web_fallback";
 
-export const WEBVIEW_WHITELIST_ROUTE_IDS = ["inventory"] as const satisfies readonly RouteId[];
+export const WEBVIEW_WHITELIST_ROUTE_IDS = [
+  "inventory",
+  "productionOrders",
+  "materialRequirements",
+  "capacity",
+  "schedule",
+  "resources",
+] as const satisfies readonly RouteId[];
+
+export { clearNativeRoutePolicyForTests, configureNativeRoutePolicy };
 
 export function isWebviewWhitelistRouteId(id: RouteId): boolean {
-  return (WEBVIEW_WHITELIST_ROUTE_IDS as readonly RouteId[]).includes(id);
+  return (getWebviewWhitelistRouteIds() as readonly RouteId[]).includes(id);
 }
-
-const NATIVE_AVAILABLE_ROUTE_IDS = [
-  "recipes",
-  "recipeEdit",
-  "equipment",
-  "waterHub",
-  "waterMash",
-  "waterSparge",
-  "waterBoil",
-  "waterProfiles",
-  "fermDataIntegration",
-  "yeast",
-  "brewdayStepsSettings",
-] as const satisfies readonly RouteId[];
 
 export function getRouteAvailability(id: RouteId, platform: AppPlatform): RouteAvailability {
   if (platform === "web") return "available";
 
   // Native is "block by default" during the porting phase.
-  // Promote routes to "available" as they get real native screens.
-  if ((NATIVE_AVAILABLE_ROUTE_IDS as readonly RouteId[]).includes(id)) return "available";
+  // Promote routes via registerNativeModule + configureNativeRoutePolicy at app bootstrap.
+  if ((getNativeAvailableRouteIds() as readonly RouteId[]).includes(id)) return "available";
   if (isWebviewWhitelistRouteId(id)) return "whitelisted_web_fallback";
   return "blocked";
 }
 
 export function hasWebFallback(id: RouteId, platform: AppPlatform): boolean {
   return getRouteAvailability(id, platform) === "whitelisted_web_fallback";
+}
+
+/** Build a RouteRef for system-browser web fallback (empty-params routes only). */
+export function buildWebFallbackRouteRef(id: RouteId): RouteRef | null {
+  switch (id) {
+    case "inventory":
+      return { id: "inventory", params: {} };
+    case "productionOrders":
+      return { id: "productionOrders", params: {} };
+    case "materialRequirements":
+      return { id: "materialRequirements", params: {} };
+    case "capacity":
+      return { id: "capacity", params: {} };
+    case "schedule":
+      return { id: "schedule", params: {} };
+    case "resources":
+      return { id: "resources", params: {} };
+    default:
+      return null;
+  }
 }
 
 export function routeToPath(ref: RouteRef): string {

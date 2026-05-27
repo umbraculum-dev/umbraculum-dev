@@ -3,21 +3,17 @@ import { ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import {
+  parseBrewSessionCreateResponse,
+  parseBrewSessionsListResponse,
+  type BrewSessionListItem,
+} from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
 import type { RootStackParamList } from "../../../navigation/types";
-
-type BrewSessionListItem = {
-  id: string;
-  code: string;
-  status: string;
-  createdAt: string;
-  startedAt: string | null;
-  stoppedAt: string | null;
-};
 
 export function BrewSessionsListScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -42,8 +38,8 @@ export function BrewSessionsListScreen() {
       const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
       const res = await api.get(`/api/recipes/${recipeId}/brew-sessions`);
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const list = (res.data as { brewSessions?: unknown })?.brewSessions;
-      setSessions(Array.isArray(list) ? (list as BrewSessionListItem[]) : []);
+      const parsed = parseBrewSessionsListResponse(res.data);
+      setSessions(parsed.brewSessions);
     } catch (err) {
       setSessions([]);
       setError(String(err));
@@ -60,8 +56,8 @@ export function BrewSessionsListScreen() {
       const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
       const res = await api.post(`/api/recipes/${recipeId}/brew-sessions`, {});
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const id = (res.data as { brewSession?: { id?: unknown } })?.brewSession?.id;
-      if (typeof id !== "string" || !id) throw new Error("Create brew session response is missing brewSession.id");
+      const { brewSession } = parseBrewSessionCreateResponse(res.data);
+      const id = brewSession.id;
       navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: id });
     } catch (err) {
       setCreateError(String(err));

@@ -6,7 +6,8 @@
   "description": "Typed API client with pluggable auth strategies (cookie sessions for web; bearer tokens for native + Node). The transport layer between any client and services/api. Returned payloads are runtime-validated by parsers from @umbraculum/contracts. Platform-classified per sub-plan #9 §1.1 — no brewery-domain logic.",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "exports": {
     ".": {
@@ -20,5 +21,8 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@umbraculum/contracts": "file:../contracts"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
   }
 }

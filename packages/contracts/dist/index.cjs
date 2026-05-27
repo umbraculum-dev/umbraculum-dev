@@ -23,7 +23,9 @@ __export(index_exports, {
   AuthMeResponseSchema: () => AuthMeResponseSchema,
   AuthMeResponseUserSchema: () => AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema: () => AuthMeResponseWorkspaceSchema,
+  BrewSessionsListResponseSchema: () => BrewSessionsListResponseSchema,
   ErrorResponseSchema: () => ErrorResponseSchema,
+  RecipesListResponseSchema: () => RecipesListResponseSchema,
   RenderDeliverySchema: () => RenderDeliverySchema,
   RenderErrorSchema: () => RenderErrorSchema,
   RenderJobCancelResponseSchema: () => RenderJobCancelResponseSchema,
@@ -38,9 +40,12 @@ __export(index_exports, {
   analysisFormatHints: () => analysisFormatHints,
   parseAuthMeResponse: () => parseAuthMeResponse,
   parseBoilComputeAndSaveResponse: () => parseBoilComputeAndSaveResponse,
+  parseBrewSessionCreateResponse: () => parseBrewSessionCreateResponse,
+  parseBrewSessionsListResponse: () => parseBrewSessionsListResponse,
   parseGravityAnalysisResponseV1: () => parseGravityAnalysisResponseV1,
   parseMashComputeAndSaveResponse: () => parseMashComputeAndSaveResponse,
   parseRecipeWaterHubSummaryResponse: () => parseRecipeWaterHubSummaryResponse,
+  parseRecipesListResponse: () => parseRecipesListResponse,
   parseRenderJobStatusResponse: () => parseRenderJobStatusResponse,
   parseRenderJobSubmitRequest: () => parseRenderJobSubmitRequest,
   parseSpargeComputeAndSaveResponse: () => parseSpargeComputeAndSaveResponse,
@@ -892,12 +897,61 @@ function parseRenderJobSubmitRequest(payload) {
 function parseRenderJobStatusResponse(payload) {
   return RenderJobStatusResponseSchema.parse(payload);
 }
+
+// src/brewery/listResponses.ts
+var import_zod3 = require("zod");
+var RecipeListItemSchema = import_zod3.z.object({
+  id: import_zod3.z.string(),
+  accountId: import_zod3.z.string().optional(),
+  name: import_zod3.z.string(),
+  styleKey: import_zod3.z.string().optional(),
+  style: import_zod3.z.string().nullable().optional(),
+  version: import_zod3.z.number().optional()
+});
+var RecipesListResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  recipes: import_zod3.z.array(RecipeListItemSchema)
+});
+function parseRecipesListResponse(payload) {
+  return RecipesListResponseSchema.parse(payload);
+}
+var isoDateTime = import_zod3.z.preprocess((v) => {
+  if (v instanceof Date) return v.toISOString();
+  return v;
+}, import_zod3.z.string());
+var BrewSessionListItemSchema = import_zod3.z.object({
+  id: import_zod3.z.string(),
+  code: import_zod3.z.string(),
+  status: import_zod3.z.string(),
+  createdAt: isoDateTime,
+  startedAt: import_zod3.z.preprocess((v) => v instanceof Date ? v.toISOString() : v, import_zod3.z.string().nullable()).optional(),
+  stoppedAt: import_zod3.z.preprocess((v) => v instanceof Date ? v.toISOString() : v, import_zod3.z.string().nullable()).optional()
+});
+var BrewSessionsListResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  brewSessions: import_zod3.z.array(BrewSessionListItemSchema)
+});
+function parseBrewSessionsListResponse(payload) {
+  return BrewSessionsListResponseSchema.parse(payload);
+}
+var BrewSessionCreateResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  brewSession: import_zod3.z.object({
+    id: import_zod3.z.string()
+  })
+});
+function parseBrewSessionCreateResponse(payload) {
+  const parsed = BrewSessionCreateResponseSchema.parse(payload);
+  return { brewSession: parsed.brewSession };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AuthMeResponseSchema,
   AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema,
+  BrewSessionsListResponseSchema,
   ErrorResponseSchema,
+  RecipesListResponseSchema,
   RenderDeliverySchema,
   RenderErrorSchema,
   RenderJobCancelResponseSchema,
@@ -912,9 +966,12 @@ function parseRenderJobStatusResponse(payload) {
   analysisFormatHints,
   parseAuthMeResponse,
   parseBoilComputeAndSaveResponse,
+  parseBrewSessionCreateResponse,
+  parseBrewSessionsListResponse,
   parseGravityAnalysisResponseV1,
   parseMashComputeAndSaveResponse,
   parseRecipeWaterHubSummaryResponse,
+  parseRecipesListResponse,
   parseRenderJobStatusResponse,
   parseRenderJobSubmitRequest,
   parseSpargeComputeAndSaveResponse,

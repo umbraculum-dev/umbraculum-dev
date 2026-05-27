@@ -60,4 +60,14 @@ export {
   type RegisterWebModuleOptions,
 } from "./registerWebModule.js";
 
+export {
+  aggregateNativeAvailableRouteIds,
+  clearNativeModuleRegistryForTests,
+  listRegisteredNativeModules,
+  registerNativeModule,
+  type NativeRouteId,
+  type RegisteredNativeModuleSnapshot,
+  type RegisterNativeModuleOptions,
+} from "./registerNativeModule.js";
+
 export { fromParser, type ValidatedSchema } from "./validatedSchema.js";

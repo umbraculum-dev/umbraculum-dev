@@ -10,10 +10,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "i18n:guardrail": "node scripts/i18n-guardrail.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@umbraculum/api-client": "file:../../packages/api-client",
+    "@umbraculum/module-sdk": "file:../../packages/module-sdk",
     "@umbraculum/brewery-beerjson": "file:../../packages/beerjson",
     "@umbraculum/contracts": "file:../../packages/contracts",
     "@umbraculum/i18n": "file:../../packages/i18n",
@@ -41,6 +43,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.10",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
   }
 }

@@ -7,6 +7,9 @@ import config from "./tamagui.config";
 import { I18nProvider } from "./src/i18n/I18nProvider";
 import { AuthProvider } from "./src/auth/AuthProvider";
 import { AppNavigator } from "./src/navigation/AppNavigator";
+import { registerPlatformNativeModules } from "./src/navigation/registerPlatformNativeModules";
+
+registerPlatformNativeModules();
 
 export default function App() {
   return (

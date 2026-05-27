@@ -323,4 +323,44 @@ declare function snapshotSegmentOwnership(): ReadonlyArray<readonly [string, str
 /** Test-only reset. */
 declare function clearWebModuleRegistryForTests(): void;
 
-export { type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidUrlSegmentError, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, NavEntryPrimarySegmentNotOwnedError, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, assertModuleCodeAvailable, assertValidModuleCode, clearModuleRegistryForTests, clearWebModuleRegistryForTests, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredWebModules, recordModuleRegistration, registerModule, registerRegisteredModuleAiTools, registerWebModule, snapshotModule, snapshotSegmentOwnership };
+/**
+ * Route IDs a module exposes on native. Must be valid `@umbraculum/navigation` RouteIds.
+ * Declared as strings here to avoid a hard dependency from module-sdk on navigation.
+ */
+type NativeRouteId = string;
+interface RegisterNativeModuleOptions {
+    /** Module or vertical code (matches API `registerModule` code). */
+    code: string;
+    /**
+     * RouteIds with real native screens for this module.
+     * Aggregated into the native shell via `configureNativeRoutePolicy`.
+     */
+    availableRouteIds: readonly NativeRouteId[];
+    /**
+     * Optional tab label key (i18n) when this module contributes a primary tab.
+     */
+    tabEntry?: {
+        labelKey: string;
+        order?: number;
+    };
+}
+interface RegisteredNativeModuleSnapshot {
+    code: string;
+    availableRouteIds: readonly NativeRouteId[];
+    tabEntry?: {
+        labelKey: string;
+        order?: number;
+    };
+}
+/**
+ * Parallel native-side registry (RFC-0002 §5). Records which RouteIds each
+ * installed module promotes to `available` on native.
+ */
+declare function registerNativeModule(options: RegisterNativeModuleOptions): RegisteredNativeModuleSnapshot;
+declare function listRegisteredNativeModules(): RegisteredNativeModuleSnapshot[];
+/** Union of all `availableRouteIds` from registered native modules. */
+declare function aggregateNativeAvailableRouteIds(): readonly NativeRouteId[];
+/** Test-only reset. */
+declare function clearNativeModuleRegistryForTests(): void;
+
+export { type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidUrlSegmentError, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredWebModules, recordModuleRegistration, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, snapshotModule, snapshotSegmentOwnership };

@@ -1,9 +1,7 @@
-// src/index.ts
-var WEBVIEW_WHITELIST_ROUTE_IDS = ["inventory"];
-function isWebviewWhitelistRouteId(id) {
-  return WEBVIEW_WHITELIST_ROUTE_IDS.includes(id);
-}
-var NATIVE_AVAILABLE_ROUTE_IDS = [
+// src/nativeRoutePolicy.ts
+var configuredAvailable = null;
+var configuredWebFallback = null;
+var DEFAULT_NATIVE_AVAILABLE_ROUTE_IDS = [
   "recipes",
   "recipeEdit",
   "equipment",
@@ -16,14 +14,67 @@ var NATIVE_AVAILABLE_ROUTE_IDS = [
   "yeast",
   "brewdayStepsSettings"
 ];
+var DEFAULT_WEBVIEW_WHITELIST_ROUTE_IDS = [
+  "inventory",
+  "productionOrders",
+  "materialRequirements",
+  "capacity",
+  "schedule",
+  "resources"
+];
+function configureNativeRoutePolicy(options) {
+  configuredAvailable = [...options.availableRouteIds];
+  configuredWebFallback = options.webFallbackRouteIds !== void 0 ? [...options.webFallbackRouteIds] : [...DEFAULT_WEBVIEW_WHITELIST_ROUTE_IDS];
+}
+function getNativeAvailableRouteIds() {
+  return configuredAvailable ?? DEFAULT_NATIVE_AVAILABLE_ROUTE_IDS;
+}
+function getWebviewWhitelistRouteIds() {
+  return configuredWebFallback ?? DEFAULT_WEBVIEW_WHITELIST_ROUTE_IDS;
+}
+function clearNativeRoutePolicyForTests() {
+  configuredAvailable = null;
+  configuredWebFallback = null;
+}
+
+// src/index.ts
+var WEBVIEW_WHITELIST_ROUTE_IDS = [
+  "inventory",
+  "productionOrders",
+  "materialRequirements",
+  "capacity",
+  "schedule",
+  "resources"
+];
+function isWebviewWhitelistRouteId(id) {
+  return getWebviewWhitelistRouteIds().includes(id);
+}
 function getRouteAvailability(id, platform) {
   if (platform === "web") return "available";
-  if (NATIVE_AVAILABLE_ROUTE_IDS.includes(id)) return "available";
+  if (getNativeAvailableRouteIds().includes(id)) return "available";
   if (isWebviewWhitelistRouteId(id)) return "whitelisted_web_fallback";
   return "blocked";
 }
 function hasWebFallback(id, platform) {
   return getRouteAvailability(id, platform) === "whitelisted_web_fallback";
+}
+function buildWebFallbackRouteRef(id) {
+  switch (id) {
+    case "inventory":
+      return { id: "inventory", params: {} };
+    case "productionOrders":
+      return { id: "productionOrders", params: {} };
+    case "materialRequirements":
+      return { id: "materialRequirements", params: {} };
+    case "capacity":
+      return { id: "capacity", params: {} };
+    case "schedule":
+      return { id: "schedule", params: {} };
+    case "resources":
+      return { id: "resources", params: {} };
+    default:
+      return null;
+  }
 }
 function routeToPath(ref) {
   switch (ref.id) {
@@ -102,10 +153,13 @@ function routeToLocalePath(ref, locale) {
 }
 
 export {
+  configureNativeRoutePolicy,
+  clearNativeRoutePolicyForTests,
   WEBVIEW_WHITELIST_ROUTE_IDS,
   isWebviewWhitelistRouteId,
   getRouteAvailability,
   hasWebFallback,
+  buildWebFallbackRouteRef,
   routeToPath,
   prefixLocalePath,
   routeToLocalePath

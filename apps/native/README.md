@@ -11,6 +11,8 @@ The native (iOS + Android) application for brewers who need brew-day reliability
 
 The native-specific build / CI / publishing strategy is documented in [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md); the kickoff readiness criteria (now mostly cleared) are in [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../../docs/REACT-NATIVE-KICKOFF-READINESS.md). Local-development setup is in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](../../docs/DEVELOPMENT-NATIVE-LOCAL.md).
 
+**Platform context (post–RFC-0002/0003/0007):** The operational source of truth for route availability, module obligations, July 2026 alpha scope, and post-alpha gates is [`docs/design/canonical-native-platform-surface.md`](../../docs/design/canonical-native-platform-surface.md). Canonical modules (`mrp`, `crp`, `pim`, `automation`) ship **web-first** today; native covers **brewery brew-day** flows only. Planning, exports, and admin surfaces remain on web (with optional **Open on web** for whitelisted routes such as `inventory`).
+
 ## Scope
 
 - **Contains**: Expo entrypoint (`App.tsx`, `index.js`); React Navigation stack/tab/native-stack glue (`src/navigation/`); auth integration with `expo-secure-store` (`src/auth/`); per-screen views (`src/screens/`); native-side bootstrap (locale detection, Tamagui theme injection — `src/bootstrap.ts`, `src/i18n/`, `src/theme/`); native-component shims for things web doesn't need (`src/components/`); Metro bundler config (`metro.config.js`); the i18n-coverage guardrail (`scripts/i18n-guardrail.mjs`).
@@ -31,11 +33,11 @@ The native app expects `services/api` to be reachable; for local development aga
 ## Build / test / lint (local)
 
 - **Build (Expo dev)**: `npx expo start` (Metro bundler in dev mode).
-- **Build (production EAS)**: see [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md) for the EAS / store-submission flow.
+- **Build (production EAS)**: `eas.json` in this workspace; see [`docs/design/canonical-native-platform-surface.md`](../../docs/design/canonical-native-platform-surface.md) §5.2 (July 2026 internal alpha) and [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md).
 - **Lint**: not yet configured in this workspace (see [`docs/LINTING.md`](../../docs/LINTING.md) for the platform-wide linting strategy and current scope tiers).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace carries all 6 candidate strict flags after Phase 6h, and was the first non-pilot workspace to land `noUncheckedIndexedAccess` in Phase 6b — fixing 6 latent index-out-of-bounds sites in the process).
 - **i18n coverage check**: `npm run i18n:guardrail`.
-- **Unit tests**: vitest is not configured in this workspace; component-level testing happens in `@umbraculum/ui` and `@umbraculum/brewery-recipes-ui`. See [`docs/TESTING.md`](../../docs/TESTING.md) §"Layer map" for the per-layer responsibility split.
+- **Unit tests**: `npm run test` runs vitest for navigation/bootstrap helpers; component-level UI testing remains in `@umbraculum/ui` and `@umbraculum/brewery-recipes-ui`. See [`docs/TESTING.md`](../../docs/TESTING.md) §"Layer map".
 
 ## How it fits in
 
@@ -45,10 +47,13 @@ The native app expects `services/api` to be reachable; for local development aga
 
 ## Status
 
-Shipping (work-in-progress). The brewery-vertical core flows are in place; the brew-session ergonomics are tuned for use on a phone in a kettle-side environment. The webview-bridge feature (open a whitelisted web page already-authenticated, without re-handling the bearer token client-side) is documented as deferred in `@umbraculum/api-client`'s README and tracked on the H1 2027 trajectory.
+**July 2026 alpha (brewery-only):** Internal EAS distribution of brew-day flows (recipes, water, yeast, brew sessions, equipment). Out of scope for this alpha: native MRP/CRP/PIM/automation UI (web + AI advisor + RFC-0007 exports on web). Inventory uses **Open on web** via `openWebFallbackRoute`.
+
+Shipping (work-in-progress). Brew-session ergonomics are tuned for kettle-side use. Full webview-in-app embedding remains deferred; system-browser web fallback is implemented for whitelisted routes per [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md).
 
 ## Further reading
 
+- [`docs/design/canonical-native-platform-surface.md`](../../docs/design/canonical-native-platform-surface.md) — native SoT (routes, alpha scope, obligations)
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and module boundaries
 - [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md) — native strategy, CI, EAS pipeline
 - [`docs/REACT-NATIVE-KICKOFF-READINESS.md`](../../docs/REACT-NATIVE-KICKOFF-READINESS.md) — kickoff readiness criteria

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Alert } from "react-native";
 
 import { useT } from "@umbraculum/i18n-react";
-import type { RouteId, RouteRef } from "@umbraculum/navigation";
-import { getRouteAvailability } from "@umbraculum/navigation";
+import type { RouteId } from "@umbraculum/navigation";
+import { buildWebFallbackRouteRef, getRouteAvailability } from "@umbraculum/navigation";
 import { Button, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
@@ -20,16 +20,15 @@ export function BlockedRouteScreen({ routeId }: { routeId: RouteId }) {
 
   const availability = getRouteAvailability(routeId, "native");
   const canOpenOnWeb = availability === "whitelisted_web_fallback";
+  const webRoute = canOpenOnWeb ? buildWebFallbackRouteRef(routeId) : null;
 
   const onOpenWeb = async () => {
-    if (auth.state.status !== "logged_in") return;
+    if (auth.state.status !== "logged_in" || !webRoute) return;
     const baseUrl = getApiBaseUrl();
     if (!baseUrl) {
       Alert.alert(t("openOnWeb"), t("missingApiBaseUrl"));
       return;
     }
-
-    const route: RouteRef = { id: "inventory", params: {} };
 
     setOpening(true);
     try {
@@ -37,7 +36,7 @@ export function BlockedRouteScreen({ routeId }: { routeId: RouteId }) {
         baseUrl,
         token: auth.state.token,
         locale,
-        route,
+        route: webRoute,
       });
       if (!res.ok) Alert.alert(t("openOnWeb"), res.error ?? "Open on web failed");
     } finally {
@@ -50,7 +49,7 @@ export function BlockedRouteScreen({ routeId }: { routeId: RouteId }) {
       <Heading fontSize={22}>{t("notAvailableOnMobileYet")}</Heading>
       <Text fontSize={16}>{t("notAvailableOnMobileYet")}</Text>
 
-      {canOpenOnWeb ? (
+      {canOpenOnWeb && webRoute ? (
         <Button
           onPress={() => { void onOpenWeb(); }}
           disabled={opening || auth.state.status !== "logged_in"}
@@ -63,4 +62,3 @@ export function BlockedRouteScreen({ routeId }: { routeId: RouteId }) {
     </Screen>
   );
 }
-

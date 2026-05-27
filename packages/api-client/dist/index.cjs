@@ -22,7 +22,13 @@ var index_exports = {};
 __export(index_exports, {
   bearerTokenAuth: () => bearerTokenAuth,
   cookieAuth: () => cookieAuth,
-  createApiClient: () => createApiClient
+  createApiClient: () => createApiClient,
+  fetchRenderJobDownloadUrl: () => fetchRenderJobDownloadUrl,
+  pollRenderJobUntilSucceeded: () => pollRenderJobUntilSucceeded,
+  resolveArtifactDownloadUrl: () => resolveArtifactDownloadUrl,
+  runAsyncRenderJobExport: () => runAsyncRenderJobExport,
+  submitRenderJob: () => submitRenderJob,
+  toWebArtifactUrl: () => toWebArtifactUrl
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -107,9 +113,85 @@ function createApiClient(baseUrl, auth, options) {
     }
   };
 }
+
+// src/renderJob.ts
+var import_contracts = require("@umbraculum/contracts");
+var POLL_INTERVAL_MS = 50;
+var POLL_TIMEOUT_MS = 15e3;
+function toWebArtifactUrl(signedUrl, apiBaseUrl) {
+  if (signedUrl.startsWith("/api/")) return signedUrl;
+  if (signedUrl.startsWith("/rendering/")) return `/api${signedUrl}`;
+  if (signedUrl.startsWith("/") && apiBaseUrl) {
+    const base = apiBaseUrl.replace(/\/+$/, "");
+    return `${base}${signedUrl.startsWith("/api") ? signedUrl : `/api${signedUrl}`}`;
+  }
+  return signedUrl;
+}
+function resolveArtifactDownloadUrl(signedUrl, options) {
+  if (options?.platform === "web") {
+    return toWebArtifactUrl(signedUrl);
+  }
+  if (signedUrl.startsWith("http://") || signedUrl.startsWith("https://")) {
+    return signedUrl;
+  }
+  const base = options?.apiBaseUrl?.replace(/\/+$/, "") ?? "";
+  if (!base) return signedUrl;
+  if (signedUrl.startsWith("/api/")) return `${base}${signedUrl.slice(4)}`;
+  if (signedUrl.startsWith("/")) return `${base}${signedUrl}`;
+  return signedUrl;
+}
+async function submitRenderJob(client, postUrl, body) {
+  const res = await client.post(postUrl, body ?? {});
+  if (res.status !== 202) {
+    const detail = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
+    throw new Error(detail || `Render job submit failed (${res.status})`);
+  }
+  const parsed = import_contracts.RenderJobSubmitResponseSchema.parse(res.data);
+  return { jobId: parsed.job.id };
+}
+async function pollRenderJobUntilSucceeded(client, jobId) {
+  const deadline = Date.now() + POLL_TIMEOUT_MS;
+  let lastStatus = "";
+  while (Date.now() < deadline) {
+    const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}`);
+    if (res.status !== 200) {
+      throw new Error(`Render job status failed (${res.status})`);
+    }
+    const body = import_contracts.RenderJobStatusResponseSchema.parse(res.data);
+    lastStatus = body.job.status;
+    if (body.job.status === "succeeded") return;
+    if (body.job.status === "failed") {
+      throw new Error(body.job.error?.code ?? "render_job_failed");
+    }
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+  }
+  throw new Error(`Render job timed out (last status=${lastStatus})`);
+}
+async function fetchRenderJobDownloadUrl(client, jobId, options) {
+  const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}/result`);
+  if (res.status !== 200) {
+    throw new Error(`Render job result failed (${res.status})`);
+  }
+  const body = import_contracts.RenderJobResultResponseSchema.parse(res.data);
+  return resolveArtifactDownloadUrl(body.signedUrl, options);
+}
+async function runAsyncRenderJobExport(client, postUrl, options) {
+  const { jobId } = await submitRenderJob(client, postUrl, options?.body);
+  await pollRenderJobUntilSucceeded(client, jobId);
+  const downloadOpts = {};
+  if (options?.platform !== void 0) downloadOpts.platform = options.platform;
+  if (options?.apiBaseUrl !== void 0) downloadOpts.apiBaseUrl = options.apiBaseUrl;
+  return fetchRenderJobDownloadUrl(client, jobId, downloadOpts);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   bearerTokenAuth,
   cookieAuth,
-  createApiClient
+  createApiClient,
+  fetchRenderJobDownloadUrl,
+  pollRenderJobUntilSucceeded,
+  resolveArtifactDownloadUrl,
+  runAsyncRenderJobExport,
+  submitRenderJob,
+  toWebArtifactUrl
 });
