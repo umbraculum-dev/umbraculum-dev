@@ -13,7 +13,7 @@ A **build-only** npm workspace: configuration, theme CSS, and sidebar wiring for
 ## Scope
 
 - **Contains**: `docusaurus.config.ts` (v4 future flags, Mermaid, i18n scaffold), `sidebars.ts`, `src/css/custom.css`, `V4-UPGRADE.md` (flag tracker), build output under `build/`.
-- **Does not contain**: Authoritative prose (that lives in `docs/`), Algolia DocSearch or local search plugins (Pass 2 / P5), CI workflow (Pass 2 P4). Navbar/favicon use **Umbi** from [`docs/media/umbi.png`](../docs/media/umbi.png), copied into `static/img/umbi.png` by `scripts/copy-brand-assets.mjs` on `prestart` / `prebuild` (generated file; not committed).
+- **Does not contain**: Authoritative prose (that lives in `docs/`), production Algolia DocSearch credentials (Phase 2 submit — see [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md)). **Local search** uses `@easyops-cn/docusaurus-search-local` (lunr.js) until DocSearch approval. Navbar/favicon use **Umbi** from [`docs/media/umbi.png`](../docs/media/umbi.png), copied into `static/img/umbi.png` by `scripts/copy-brand-assets.mjs` on `prestart` / `prebuild` (generated file; not committed).
 
 ## Build / test / lint (local)
 
