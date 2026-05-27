@@ -139,7 +139,7 @@ The same logic applies to `EXPO_PUBLIC_MEDIA_BASE_URL` via `apps/native/src/medi
 **When to use overrides:**
 
 - **Tunnel mode** (`expo start --tunnel`): `hostUri` becomes the ngrok URL, which won't route to your laptop's API. Set `EXPO_PUBLIC_API_BASE_URL=http://<LAN_IP>:18080` (or a public URL) in your shell before starting Metro.
-- **EAS builds**: configure `EXPO_PUBLIC_API_BASE_URL` in `eas.json` per profile (staging/preview/production) so released binaries point at the right backend.
+- **EAS builds**: configure `EXPO_PUBLIC_API_BASE_URL` in `eas.json` per profile so released binaries point at the right backend. The **`preview`** profile is wired to **`https://demo.umbraculum.dev`** (demonstration host only — see [`docs/design/demo-host-runbook.md`](design/demo-host-runbook.md)). Future production hosted product will use a separate profile/host ([`docs/design/cloud-hosted-product-track.md`](design/cloud-hosted-product-track.md)).
 
 ### Environment variables (native)
 
