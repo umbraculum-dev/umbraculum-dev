@@ -78,6 +78,7 @@ RFC-0005 chose Cloudflare Pages for docs (free tier, fast CNAME, no Actions depl
 - [ ] `npm run build -w @umbraculum/website` green locally / in CI
 - [ ] `npm run build -w @umbraculum/docs-site` green in CI
 - [ ] Brochure copy reviewed (workspace-shaped positioning, not brewery-only)
+- [ ] Brochure design policy satisfied — no hype visuals/copy ([`brochure-site-design-policy.md`](brochure-site-design-policy.md))
 
 **At flip (Phase 2c):**
 
