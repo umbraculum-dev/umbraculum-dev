@@ -120,8 +120,8 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 |---|------|--------|----------------|--------------|
 | **1a** | **Brochure site scaffold** (`apps/website/`) + Cloudflare Pages runbook | **Shipped** | Static `umbraculum.dev` marketing shell; deploy in Phase 2 ([`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md)) | `apps/website/`, `.github/workflows/website-build.yml` |
 | **1b** | **RAG D1 ingest wiring** (`rag:ingest`, optional `AI_RAG_INGEST_ON_BOOT`) | **Shipped** | Run `docker compose exec -T api npm run rag:ingest` after migrate | [`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md) |
-| **1c** | **Week 1 closure audit** — route-shape + brewery β file-move | **Verify** | Tranche marked done in prose; run `npm run check-web-url-segments` on PRs touching web routes | `scripts/check-web-url-segments.ts`, RFC-0006 |
-| **1d** | **Docs-site P5 prep** — DocSearch form answers draft (not submit) | Open | Maintainer submits Algolia application in Phase 2 | [`rfcs/0005-docs-site.md`](rfcs/0005-docs-site.md) P5 |
+| **1c** | **Week 1 closure audit** — route-shape + brewery β file-move | **Verified** (2026-05-27) | `npm run check-web-url-segments` → 0 violations | `scripts/check-web-url-segments.ts`, RFC-0006 |
+| **1d** | **Docs-site P5 prep** — DocSearch draft + lunr fallback | **Shipped** | Form answers in [`docsearch-application-draft.md`](design/docsearch-application-draft.md); submit in Phase 2 **2f** | [`rfcs/0005-docs-site.md`](rfcs/0005-docs-site.md) P5, `docs-site/` |
 | **1e** | **ROADMAP / architecture hygiene** | Ongoing | Stale rows (e.g. propose-write shipped) corrected | This table |
 | **1f** | **MRP/CRP propose-write — domain apply** | **Deferred H1 2027** | Chat Apply is **preview-only** until MRP PATCH routes exist | [`canonical-ai-propose-write-surface.md`](design/canonical-ai-propose-write-surface.md) |
 

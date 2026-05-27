@@ -223,7 +223,23 @@ const config: Config = {
     ],
   ],
 
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: [
+    '@docusaurus/theme-mermaid',
+  [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['en'],
+        indexDocs: true,
+        docsRouteBasePath: [
+          '/',
+          'reference/apps',
+          'reference/services',
+          'reference/packages',
+        ],
+      },
+    ],
+  ],
 
   markdown: {
     format: 'detect',
@@ -292,7 +308,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Umbraculum documentation surface. Placeholder brand assets are used until maintainer-provided final assets land. © ${new Date().getFullYear()} Umbraculum contributors.`,
+      copyright: `© ${new Date().getFullYear()} Umbraculum contributors. Documentation is AGPLv3-aligned with the monorepo core.`,
     },
     prism: {
       theme: prismThemes.github,
