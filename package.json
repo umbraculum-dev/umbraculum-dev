@@ -6,10 +6,10 @@
   "homepage": "https://umbraculum.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/romeof1980/umbraculum-dev.git"
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git"
   },
   "bugs": {
-    "url": "https://github.com/romeof1980/umbraculum-dev/issues"
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
   },
   "workspaces": [
     "apps/*",

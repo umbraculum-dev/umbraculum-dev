@@ -321,7 +321,7 @@ chmod +x "$(git rev-parse --show-toplevel)/.git/hooks/prepare-commit-msg"
 
 ```bash
 mkdir -p ~/dev && cd ~/dev
-git clone git@github.com:romeof1980/umbraculum-dev.git
+git clone git@github.com:umbraculum-dev/umbraculum-dev.git
 cd umbraculum-dev
 ```
 
