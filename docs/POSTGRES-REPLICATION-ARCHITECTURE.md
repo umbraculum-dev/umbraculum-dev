@@ -1,6 +1,6 @@
 # Postgres primary/replica + pgpool routing architecture
 
-Repo root (canonical): `$REPO_ROOT`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 This doc describes the **production-like** DB foundation implemented in Docker Compose:
 

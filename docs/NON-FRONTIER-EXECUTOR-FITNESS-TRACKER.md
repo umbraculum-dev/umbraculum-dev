@@ -355,7 +355,7 @@ the structural cross-repo home.
 | # | Hook | Where it lives | Effective when |
 |---|---|---|---|
 | A | "Adjacent context for plan authors and executors" section in [`AGENTS.md`](../AGENTS.md) (inserted between "What this file is NOT" and "Forward") | This repo, branch `pim-canonical-build-2026-05-19` | Immediately — every agent in this repo reads `AGENTS.md` at session start, no install step. |
-| B | `rules/43-non-frontier-executor-fitness-tracker.mdc` in the `umbraculum-toolset-common` Cursor plugin | Plugin source repo (`~/dkprojects/rfapps/umbraculum-toolset/`); plugin version bumped `0.6.0 → 0.7.0` | Once the toolset plugin is re-installed locally (`cursor-plugins/scripts/install-local.sh`) and the Cursor window reloaded. Cross-repo: any sibling Umbraculum repo that adopts the toolset gets the rule automatically. |
+| B | `rules/43-non-frontier-executor-fitness-tracker.mdc` in the `umbraculum-toolset-common` Cursor plugin | Plugin source repo (`$TOOLSET_ROOT` — your clone of `github.com/umbraculum-dev/umbraculum-toolset`); plugin version bumped `0.6.0 → 0.7.0` | Once the toolset plugin is re-installed locally (`cursor-plugins/scripts/install-local.sh`) and the Cursor window reloaded. Cross-repo: any sibling Umbraculum repo that adopts the toolset gets the rule automatically. |
 
 ### Reading-path summary (post-landing)
 

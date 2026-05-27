@@ -19,7 +19,7 @@
 | Brochure build | **PASS** |
 | Repo metadata (3.1–3.2) | **PASS** |
 | Secrets in tracked code (2.1 quick) | **PASS** — dev placeholders only (`postgres`, `sk-ant-…` UI copy, test keys) |
-| Personal path examples (2.3) | **REVIEW** — 13 public docs still use `~/dkprojects/rfapps/…` or `/home/rf/…` (see §3) |
+| Personal path examples (2.3) | **PASS** (2026-05-27) — normalized to `$REPO_ROOT`; `check-public-docs-no-personal-paths.py` |
 | Toolset repo (5.3) | **NOT RUN** — requires clone |
 | CoC/SECURITY live mailboxes (5.2) | **BLOCKED** — placeholders until flip |
 | Cloudflare / DocSearch (6.3–6.4) | **MANUAL** |
@@ -38,18 +38,9 @@ No live production API keys found in tracked TS/JS/YML. Expected dev-only values
 
 ---
 
-## §3 Personal path examples (maintainer review)
+## §3 Personal path examples
 
-These **Tier: Public** docs embed a maintainer-specific clone path. They do not leak secrets but are poor first-impression on flip. Normalize to `<repo-root>` or `$REPO_ROOT` in a follow-up PR (not blocking CI today):
-
-| File | Occurrences (approx.) |
-|------|------------------------|
-| `docs/PGPOOL-VERIFICATION.md` | 11 |
-| `docs/DEVELOPMENT-NATIVE-LOCAL.md` | 6 |
-| `docs/design/web-route-group-audit.md` | 4 (`/home/rf/.cursor/plans/…` plan paths) |
-| `docs/POSTGRES-REPLICATION-ARCHITECTURE.md` | 2 |
-| `docs/REACT-NATIVE-KICKOFF-READINESS.md` | 2 |
-| Others (single hits) | `REDIS-ARCHITECTURE`, `CODING-STANDARDS`, `NATIVE-STRATEGY-AND-CI`, … |
+Remediated 2026-05-27: public docs use `$REPO_ROOT` (documented in [`DEVELOPMENT.md`](../DEVELOPMENT.md)). Cursor plan paths in audit docs are plain text, not links. CI: `check-public-docs-no-personal-paths.py`.
 
 ---
 
@@ -59,6 +50,7 @@ These **Tier: Public** docs embed a maintainer-specific clone path. They do not 
 python3 scripts/docs/check-readmes.py
 python3 scripts/docs/check-rfc-companion-links.py
 python3 scripts/docs/check-public-docs-no-internal-links.py
+python3 scripts/docs/check-public-docs-no-personal-paths.py
 npm run check-web-url-segments
 npm run build -w @umbraculum/docs-site   # Node 20 container
 node apps/website/scripts/build.mjs

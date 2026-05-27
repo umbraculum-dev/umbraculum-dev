@@ -40,6 +40,10 @@ The native-facing operational docs form one bundle — read them together when t
 
 The module SDK ([`packages/module-sdk/README.md`](packages/module-sdk/README.md)) is **contract-only plus registration helpers** — native code does not live there. Per-module native screens, navigation entries, and native-only components live in `apps/native/src/modules/<code>/` (the native β slice from RFC-0002 §3); the SDK only owns the registration shape (`registerModule`, `registerWebModule`, and the future `registerNativeModule` exported from the same package per RFC-0002 §5).
 
+## Path convention in docs
+
+Public docs use **`$REPO_ROOT`** for the monorepo clone directory (for example `~/src/umbraculum-dev`). Set it once per shell: `export REPO_ROOT=~/src/umbraculum-dev`. Docker examples mount `-v "$REPO_ROOT:/repo"`. Per-developer paths belong in gitignored `DEVELOPMENT-LOCAL.md`, not in Tier: Public prose.
+
 ## Policies (apply by default)
 
 - **Node / npm container-only.** Do not run `node` / `npm` / `npx` on the host for project commands. Run inside the `api` or `web` containers via `docker compose exec -T <service> ...`. See the `node-npm-container-only` skill.
@@ -116,7 +120,7 @@ Dev and CI Postgres services use **`pgvector/pgvector:pg16`**, not stock `postgr
 - **Search:** lunr.js fallback until Algolia DocSearch credentials land ([`docs/design/docsearch-application-draft.md`](docs/design/docsearch-application-draft.md)).
 - **Contracts doc snapshots (P6):** first execution per [`docs/design/docs-site-contracts-versioning-runbook.md`](docs/design/docs-site-contracts-versioning-runbook.md).
 - **Flip announcement draft:** [`docs/PUBLIC-ALPHA-ANNOUNCEMENT.md`](docs/PUBLIC-ALPHA-ANNOUNCEMENT.md).
-- **Pre-flip docs hygiene:** `python3 scripts/docs/check-public-docs-no-internal-links.py` (no markdown links from `docs/**` into `internal/`).
+- **Pre-flip docs hygiene:** `check-public-docs-no-internal-links.py` (no links into `internal/`); `check-public-docs-no-personal-paths.py` (no `/home/…` or `~/dkprojects/rfapps/` paths).
 
 Replication/pgpool behavior is unchanged; see [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](docs/POSTGRES-REPLICATION-ARCHITECTURE.md) §"pgvector image".
 

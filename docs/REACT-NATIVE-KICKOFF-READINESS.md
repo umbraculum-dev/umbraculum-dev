@@ -1,6 +1,6 @@
 # React Native kickoff readiness (web + native shared stack)
 
-Repo root (canonical): `$REPO_ROOT`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 > **Status (2026-05-27):** Kickoff criteria below are **cleared** for daily Expo Go development. Ongoing native platform work (July 2026 EAS alpha, module registration, validation debt) is tracked in [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md).
 

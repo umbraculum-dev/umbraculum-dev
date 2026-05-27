@@ -8,7 +8,7 @@ This doc verifies the DB routing foundation:
 - The `db-guard` auto-degrades to **primary-only** when replica is unhealthy/lagging.
 - Auth/session and read-after-write flows remain correct.
 
-Repo root (canonical):
+Set `REPO_ROOT` to your clone (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)), then:
 
 - `cd $REPO_ROOT`
 

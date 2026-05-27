@@ -1,6 +1,6 @@
 # DB replication + pgpool routing verification (runbook)
 
-Repo root (canonical): `$REPO_ROOT`
+Path convention: `$REPO_ROOT` = monorepo clone ([`DEVELOPMENT.md`](../DEVELOPMENT.md)).
 
 ## Prerequisites
 

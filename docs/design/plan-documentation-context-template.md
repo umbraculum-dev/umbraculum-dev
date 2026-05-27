@@ -28,4 +28,4 @@ Copy the section below into feature plans. Use **repo-relative markdown links** 
 - For file paths in executor instructions, use canonical absolute paths per `97-plans-must-include-canonical-absolute-paths.mdc`.  
 - When the plan adds `documentTemplates`, include updating [canonical-document-rendering-surface.md](canonical-document-rendering-surface.md) §2 in the same wave.
 
-**Worked example:** [MRP/CRP Wave 6 plan](/home/rf/.cursor/plans/mrp_crp_wave_6_9475516e.plan.md) (retrofit section).
+**Worked example:** Cursor plan `mrp_crp_wave_6_9475516e.plan.md` (author-local; not in-repo — retrofit section).

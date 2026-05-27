@@ -92,7 +92,7 @@ cd apps/native && npx eas-cli login && npx eas-cli init
 ## Pre-build gates (maintainer / CI)
 
 ```bash
-cd REPO_ROOT/umbraculum-dev
+cd $REPO_ROOT
 ./scripts/check-packages-dist-up-to-date.sh
 # native-deps parity (container):
 docker run --rm -v "$PWD:/repo" -w /repo/apps/native node:20-slim \

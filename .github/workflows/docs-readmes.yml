@@ -54,3 +54,4 @@ jobs:
         run: |
           python3 scripts/docs/check-readmes.py
           python3 scripts/docs/check-public-docs-no-internal-links.py
+          python3 scripts/docs/check-public-docs-no-personal-paths.py
