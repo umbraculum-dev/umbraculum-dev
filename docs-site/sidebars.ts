@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
         'ROADMAP',
         'LICENSING',
         'CROSS-PLATFORM-BOUNDARIES',
+        'PUBLIC-ALPHA-ANNOUNCEMENT',
       ],
     },
     {

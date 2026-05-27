@@ -127,6 +127,9 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **1g** | **Docs-site pre-flip SEO** (`noIndex`, `robots.txt`) | **Shipped** | Flip with Phase 2 **2c** | `docs-site/docusaurus.config.ts`, `static/robots.txt` |
 | **1h** | **Support page scaffold** (brochure `/support/`) | **Shipped** | Donation channels TBD at flip (**2d**) | `apps/website/public/support/`, [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 |
 | **1i** | **Stage 1 hygiene checklist** (agent-prepared) | **Shipped** | Maintainer runs sign-off in **2b** | [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) |
+| **1j** | **Flip announcement + P6 runbook skeletons** | **Shipped** (2026-05-27) | Publish / execute in Phase 2 **2c**–**2d** / first contracts release | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md), [`docs-site-contracts-versioning-runbook.md`](design/docs-site-contracts-versioning-runbook.md) |
+
+**Phase 1 complete** except **1f** (deferred H1 2027). Remaining work is Phase 2 (manual).
 
 ##### Phase 2 — manual (group when back; flip week)
 
@@ -135,7 +138,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **2a** | **Human alpha walkthrough + gap-log sign-off** | Closes MRP/CRP α proof without claiming mature product | [`mrp-crp-alpha-demo-walkthrough.md`](design/mrp-crp-alpha-demo-walkthrough.md) |
 | **2b** | **Stage 1 hygiene** — secrets scan, Tier: Public link audit, toolset repo parity | Gates public flip | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 |
 | **2c** | **Stage 2 atomic flip** — repos public, `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α | Week 3 tranche above, [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
-| **2d** | **Support / donations page** + launch announcement | Brochure `/support/` scaffold shipped (**1h**); wire GitHub Sponsors / Open Collective + announcement at flip | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §5, `apps/website/public/support/` |
+| **2d** | **Support / donations page** + launch announcement | `/support/` + [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md) drafts shipped; wire sponsors + publish at flip | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 |
 | **2e** | **MIT npm SDK publish batch** | Registry install for third-party module authors | [`LICENSING.md`](LICENSING.md) §6.2.1 |
 | **2f** | **DocSearch application submit** (Algolia) | Replaces lunr fallback on docs site | RFC-0005 P5 |
 | **2g** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 |

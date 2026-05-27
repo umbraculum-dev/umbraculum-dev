@@ -108,6 +108,15 @@ Dev and CI Postgres services use **`pgvector/pgvector:pg16`**, not stock `postgr
 
 - **Brochure site (Cloudflare Pages):** `apps/website/` builds static `umbraculum.dev` output; deploy in Phase 2 per [`docs/design/public-alpha-cloudflare-pages-runbook.md`](docs/design/public-alpha-cloudflare-pages-runbook.md).
 
+## Documentation site (`docs-site/`)
+
+- **Local dev:** `docker compose up -d docs-site` → `http://127.0.0.1:3001` (see `DOCS_SITE_PORT` in compose).
+- **Build:** `npm run build -w @umbraculum/docs-site` (Node 20 container only).
+- **Pre-flip SEO:** `noIndex: true` + `static/robots.txt` until public α — remove at flip per [`docs/design/public-alpha-cloudflare-pages-runbook.md`](docs/design/public-alpha-cloudflare-pages-runbook.md).
+- **Search:** lunr.js fallback until Algolia DocSearch credentials land ([`docs/design/docsearch-application-draft.md`](docs/design/docsearch-application-draft.md)).
+- **Contracts doc snapshots (P6):** first execution per [`docs/design/docs-site-contracts-versioning-runbook.md`](docs/design/docs-site-contracts-versioning-runbook.md).
+- **Flip announcement draft:** [`docs/PUBLIC-ALPHA-ANNOUNCEMENT.md`](docs/PUBLIC-ALPHA-ANNOUNCEMENT.md).
+
 Replication/pgpool behavior is unchanged; see [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](docs/POSTGRES-REPLICATION-ARCHITECTURE.md) §"pgvector image".
 
 ## When in doubt
