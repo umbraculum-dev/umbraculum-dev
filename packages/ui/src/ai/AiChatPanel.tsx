@@ -136,6 +136,42 @@ export function AiChatPanel({ chat, t, onOpenUpgrade }: AiChatPanelProps) {
                     : t("messages.toolCall", { tool: tc.name })}
                 </SizableText>
               ))}
+              {m.turn?.proposals.map((p) => (
+                <YStack
+                  key={`${m.id}-prop-${p.proposalId}`}
+                  gap="$2"
+                  padding="$2"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                  borderRadius="$2"
+                >
+                  <SizableText size="$2">{p.summary}</SizableText>
+                  {p.status === "pending" ? (
+                    <XStack gap="$2">
+                      <Button
+                        size="$2"
+                        onPress={() => void chat.applyProposal(p.proposalId)}
+                        accessibilityLabel={t("proposals.apply")}
+                      >
+                        {t("proposals.apply")}
+                      </Button>
+                      <Button
+                        size="$2"
+                        onPress={() => void chat.rejectProposal(p.proposalId)}
+                        accessibilityLabel={t("proposals.dismiss")}
+                      >
+                        {t("proposals.dismiss")}
+                      </Button>
+                    </XStack>
+                  ) : (
+                    <SizableText size="$1" theme="alt2">
+                      {p.status === "applied"
+                        ? t("proposals.applied")
+                        : t("proposals.dismissed")}
+                    </SizableText>
+                  )}
+                </YStack>
+              ))}
             </YStack>
           ))
         )}

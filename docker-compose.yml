@@ -198,7 +198,7 @@ services:
       - ./packages/core:/packages/core:ro
 
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     entrypoint: ["/bin/bash", "/primary-entrypoint.sh"]
     command:
       [
@@ -229,7 +229,7 @@ services:
       - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
 
   postgres-replica:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     user: postgres
     entrypoint: ["/bin/bash", "/replica-entrypoint.sh"]
     environment:

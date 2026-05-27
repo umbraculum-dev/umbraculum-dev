@@ -56,6 +56,10 @@
 
 | Deliverable | Path | Owner action on change |
 |-------------|------|----------------------|
+| AI propose-write surface | [`canonical-ai-propose-write-surface.md`](canonical-ai-propose-write-surface.md) | Update API paths, tool names, statuses when propose/apply changes |
+| AI reporting DSL surface | [`canonical-ai-reporting-dsl-surface.md`](canonical-ai-reporting-dsl-surface.md) | Update view registry + AST when adding reporting views |
+| AI RAG surface | [`canonical-ai-rag-surface.md`](canonical-ai-rag-surface.md) | Update ingest corpus + schema when RAG phases ship |
+| AI post-α H2 build log | [`ai-consultant-post-alpha-h2-build-log.md`](ai-consultant-post-alpha-h2-build-log.md) | Append per wave; link verification commands |
 | AI prompt composition (maintenance) | [`canonical-ai-prompt-composition-surface.md`](canonical-ai-prompt-composition-surface.md) | Sync module `aiPrompts` + route maps when adding modules or RouteIds |
 | Native horizontal surface | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | Update route matrix when promoting native routes; update §5 when demo scope shifts |
 | Demo host runbook | [`demo-host-runbook.md`](demo-host-runbook.md) | Update demo accounts table when seed emails change |

@@ -11,7 +11,7 @@
  * AI provider identifier. v0 ships Anthropic only; the union is reserved
  * for future provider adapters (OpenAI / Google / local).
  */
-export type AiProvider = "anthropic";
+export type AiProvider = "anthropic" | "openai";
 
 /**
  * Per-role monthly token cap (sum of `tokensIn + tokensOut` over the trailing

@@ -6,6 +6,7 @@ import { createCrpListConflictsTool } from "./listConflicts.js";
 import { createCrpListResourcesTool } from "./listResources.js";
 import { createCrpListScheduledOperationsTool } from "./listScheduledOperations.js";
 import { createCrpListWorkCentersTool } from "./listWorkCenters.js";
+import { createCrpProposeScheduleAdjustmentTool } from "./proposeScheduleAdjustment.js";
 
 export function registerCrpTools(registry: AiToolRegistry, prisma: PrismaClient): void {
   registry.register(createCrpListResourcesTool(prisma) as unknown as AiTool);
@@ -13,6 +14,7 @@ export function registerCrpTools(registry: AiToolRegistry, prisma: PrismaClient)
   registry.register(createCrpListScheduledOperationsTool(prisma) as unknown as AiTool);
   registry.register(createCrpExplainCapacityLoadTool(prisma) as unknown as AiTool);
   registry.register(createCrpListConflictsTool(prisma) as unknown as AiTool);
+  registry.register(createCrpProposeScheduleAdjustmentTool(prisma) as unknown as AiTool);
 }
 
 export {

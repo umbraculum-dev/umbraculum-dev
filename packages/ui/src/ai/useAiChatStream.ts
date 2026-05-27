@@ -28,11 +28,20 @@ export interface AiToolCallView {
   errored: boolean;
 }
 
+export interface AiProposalView {
+  proposalId: string;
+  moduleCode: string;
+  proposalType: string;
+  summary: string;
+  status: "pending" | "applied" | "rejected";
+}
+
 export interface AiChatTurn {
   id: string;
   status: "streaming" | "complete" | "error";
   text: string;
   toolCalls: AiToolCallView[];
+  proposals: AiProposalView[];
   usage: { tokensIn: number; tokensOut: number; durationMs: number; model: string } | null;
   error: { code: string; message: string } | null;
 }
@@ -58,6 +67,13 @@ type IncomingEvent =
       durationMs: number;
       errored: boolean;
     }
+  | {
+      type: "proposal";
+      proposalId: string;
+      moduleCode: string;
+      proposalType: string;
+      summary: string;
+    }
   | { type: "complete"; usage: AiChatTurn["usage"] }
   | { type: "error"; code: string; message: string };
 
@@ -74,6 +90,8 @@ export interface UseAiChatStreamInput {
   ) => Promise<Response>;
   /** Optional RouteId hint forwarded on each chat request. */
   routeId?: string | null;
+  proposalApply?: (proposalId: string) => Promise<void>;
+  proposalReject?: (proposalId: string) => Promise<void>;
 }
 
 function newId(): string {
@@ -94,6 +112,50 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
     { code: string; message: string } | null
   >(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const applyProposal = useCallback(
+    async (proposalId: string) => {
+      if (!input.proposalApply) return;
+      await input.proposalApply(proposalId);
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (!m.turn) return m;
+          return {
+            ...m,
+            turn: {
+              ...m.turn,
+              proposals: m.turn.proposals.map((p) =>
+                p.proposalId === proposalId ? { ...p, status: "applied" as const } : p,
+              ),
+            },
+          };
+        }),
+      );
+    },
+    [input.proposalApply],
+  );
+
+  const rejectProposal = useCallback(
+    async (proposalId: string) => {
+      if (!input.proposalReject) return;
+      await input.proposalReject(proposalId);
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (!m.turn) return m;
+          return {
+            ...m,
+            turn: {
+              ...m.turn,
+              proposals: m.turn.proposals.map((p) =>
+                p.proposalId === proposalId ? { ...p, status: "rejected" as const } : p,
+              ),
+            },
+          };
+        }),
+      );
+    },
+    [input.proposalReject],
+  );
 
   const send = useCallback(
     async (text: string) => {
@@ -117,6 +179,7 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
           status: "streaming",
           text: "",
           toolCalls: [],
+          proposals: [],
           usage: null,
           error: null,
         },
@@ -200,7 +263,7 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
     setTerminalError(null);
   }, []);
 
-  return { messages, pending, terminalError, send, reset };
+  return { messages, pending, terminalError, send, reset, applyProposal, rejectProposal };
 }
 
 /**
@@ -303,6 +366,18 @@ function applyEvent(
           }
           break;
         }
+        case "proposal":
+          turn.proposals = [
+            ...turn.proposals,
+            {
+              proposalId: event.proposalId,
+              moduleCode: event.moduleCode,
+              proposalType: event.proposalType,
+              summary: event.summary,
+              status: "pending",
+            },
+          ];
+          break;
         case "complete":
           turn.status = "complete";
           turn.usage = event.usage;

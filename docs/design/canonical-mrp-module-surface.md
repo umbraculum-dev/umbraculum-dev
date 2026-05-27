@@ -249,9 +249,9 @@ First AI tools, read-only subset shipped in Wave 5:
 | `mrp.getProductionOrder` | read | Fetch one order with lines, status, and source refs. |
 | `mrp.explainMaterialRequirements` | read | Explain expanded requirements and availability assumptions. |
 | `mrp.summarizeWorkOrder` | future read | Produce a concise operator-facing summary. |
-| `mrp.proposeOrderAdjustment` | future propose-write | Suggest changes to timing, quantity, or split strategy; human approval required. |
+| `mrp.proposeOrderAdjustment` | propose | Suggest changes to timing, quantity, or split strategy; human approval required ([`canonical-ai-propose-write-surface.md`](canonical-ai-propose-write-surface.md)). |
 
-The shipped Wave 5 tools are `scope: "read"` and return the existing route response envelopes. The future `propose-write` tool must not mutate state directly; it returns structured proposals that UI/API workflows can present for confirmation.
+Read tools return existing route response envelopes. Propose tools insert `ai_proposals` rows and return a proposal id; apply is a separate HTTP action (preview-only until domain write routes ship).
 
 ---
 

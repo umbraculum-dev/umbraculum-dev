@@ -58,6 +58,18 @@ The AI consultant answers questions grounded in **your workspace's data**. Below
 
 The AI may chain tools for compound questions — e.g. *"do I have enough Pilsner malt for the next brew?"* The chat panel shows each tool call and result.
 
+**Analytics (reporting)**
+
+- *"How many production orders per status this month?"* — uses the reporting tool on curated views (not raw SQL).
+
+**Product help (documentation search)**
+
+- *"How does MRP material requirements work?"* — searches ingested public help articles.
+
+**Suggested changes (proposals)**
+
+- *"Can we push order PO-1042 by two days?"* — the AI may draft a **proposal** card with **Apply** or **Dismiss**. Nothing changes until you confirm Apply. If domain write routes are not yet live, Apply records your confirmation as preview-only.
+
 **Context from the page you're on:** Open `/ai?fromRoute=productionOrders` (or use **Ask AI** links on some pages) so the assistant prefers tools for that area.
 
 ---

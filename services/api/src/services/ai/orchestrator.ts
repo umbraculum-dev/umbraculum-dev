@@ -14,7 +14,9 @@ import { WorkspacesService } from "../workspacesService.js";
 import { getTierLimits } from "../tierLimitsService.js";
 
 import { AiSettingsService } from "./aiSettingsService.js";
-import { createAnthropicClient, DEFAULT_MODEL } from "./anthropicClient.js";
+import { createAnthropicClient } from "./anthropicClient.js";
+import { createChatProviderClient } from "./providers/chatProvider.js";
+import { RagSearchService } from "./rag/ragSearchService.js";
 import { WorkspaceAiMemoryService } from "./memoryService.js";
 import {
   AnthropicMemoryWriter,
@@ -36,6 +38,13 @@ export type AiSseEvent =
   | { type: "assistant_chunk"; text: string }
   | { type: "tool_call"; name: string; argsJson: string }
   | { type: "tool_result"; name: string; resultJson: string; durationMs: number; errored: boolean }
+  | {
+      type: "proposal";
+      proposalId: string;
+      moduleCode: string;
+      proposalType: string;
+      summary: string;
+    }
   | { type: "complete"; usage: { tokensIn: number; tokensOut: number; durationMs: number; model: string } }
   | { type: "error"; code: string; message: string };
 
@@ -152,25 +161,37 @@ export class AiOrchestrator {
     const start = Date.now();
     try {
       const ctx = await this.preflight(input);
-      const tools = buildAnthropicTools(this.registry);
+      const settingsRow = await this.settings.getOrCreate(input.userId, input.workspaceId);
       const apiKey = await this.settings.getDecryptedKey(input.workspaceId);
-
-      const client = this.createClientOverride
-        ? this.createClientOverride(apiKey)
-        : createAnthropicClient(apiKey).client;
-
-      const model = DEFAULT_MODEL;
+      const chatClient = createChatProviderClient(settingsRow.provider, apiKey);
+      const model = chatClient.model;
+      const toolsForCall =
+        settingsRow.provider === "anthropic" ? buildAnthropicTools(this.registry) : [];
       const workspaceMemory = await this.memory.read(input.workspaceId);
       const routeOverlay =
         input.routeId && input.routeId.trim().length > 0
           ? resolveRoutePromptOverlay(input.routeId.trim())
           : undefined;
-      const systemPrompt = composeWorkspaceSystemPrompt({
+      let systemPrompt = composeWorkspaceSystemPrompt({
         moduleOverlays: collectModulePromptOverlayTexts(),
         knowledgeSnippets: collectModuleKnowledgeSnippets(),
         ...(routeOverlay !== undefined ? { routeOverlay } : {}),
         workspaceMemory,
       });
+      if (/[?]|how do|how does|what is/i.test(input.message)) {
+        try {
+          const rag = new RagSearchService(this.prisma);
+          const hits = await rag.searchProductDocs(input.message.slice(0, 200), 3);
+          if (hits.length > 0) {
+            const section = hits
+              .map((h) => `- (${h.sourceRef}) ${h.excerpt}`)
+              .join("\n");
+            systemPrompt = `${systemPrompt}\n\nRetrieved product documentation:\n${section}`;
+          }
+        } catch {
+          /* RAG optional when pgvector not initialized */
+        }
+      }
       const conversation: Array<{ role: "user" | "assistant"; content: unknown }> = [
         { role: "user", content: input.message },
       ];
@@ -183,30 +204,33 @@ export class AiOrchestrator {
       const MAX_TOOL_LOOPS = 6;
 
       for (let loop = 0; loop < MAX_TOOL_LOOPS; loop++) {
-        const response = await client.messages.create({
-          model,
-          max_tokens: 1024,
+        const response = await chatClient.complete({
           system: systemPrompt,
-          tools: tools as never,
-          messages: conversation as never,
+          tools: toolsForCall,
+          messages: conversation,
+          maxTokens: 1024,
         });
-        if (response.usage) {
-          totalTokensIn += response.usage.input_tokens ?? 0;
-          totalTokensOut += response.usage.output_tokens ?? 0;
-        }
-        providerRequestId = (response as { id?: string }).id ?? providerRequestId;
+        totalTokensIn += response.usage.inputTokens;
+        totalTokensOut += response.usage.outputTokens;
+        providerRequestId = response.requestId ?? providerRequestId;
 
-        const blocks = Array.isArray(response.content) ? response.content : [];
+        const blocks = (Array.isArray(response.content) ? response.content : []) as Array<{
+          type: string;
+          text?: string;
+          id?: string;
+          name?: string;
+          input?: unknown;
+        }>;
         const text = blocks
           .filter((b) => b.type === "text")
-          .map((b) => (b as { text: string }).text)
+          .map((b) => b.text ?? "")
           .join("");
         if (text.length > 0) {
           finalText += text;
           yield { type: "assistant_chunk", text };
         }
 
-        if (response.stop_reason !== "tool_use") break;
+        if (response.stopReason !== "tool_use") break;
 
         const toolUseBlocks = blocks.filter((b) => b.type === "tool_use") as Array<{
           id: string;
@@ -253,6 +277,32 @@ export class AiOrchestrator {
             ...(errored ? { is_error: true } : {}),
           });
           yield { type: "tool_result", name: tu.name, resultJson, durationMs, errored };
+          if (!errored) {
+            try {
+              const parsed = JSON.parse(resultJson) as {
+                proposalId?: string;
+                summary?: string;
+              };
+              if (typeof parsed.proposalId === "string" && typeof parsed.summary === "string") {
+                const moduleCode = tu.name.split(".")[0] ?? "unknown";
+                const proposalType =
+                  tu.name === "mrp.proposeOrderAdjustment"
+                    ? "orderAdjustment"
+                    : tu.name === "crp.proposeScheduleAdjustment"
+                      ? "scheduleAdjustment"
+                      : "proposal";
+                yield {
+                  type: "proposal",
+                  proposalId: parsed.proposalId,
+                  moduleCode,
+                  proposalType,
+                  summary: parsed.summary,
+                };
+              }
+            } catch {
+              /* not a proposal payload */
+            }
+          }
         }
 
         conversation.push({ role: "user", content: toolResults });
@@ -283,9 +333,13 @@ export class AiOrchestrator {
       // surface to the user (the chat turn already completed); they are
       // swallowed and surface in server logs only.
       try {
+        if (settingsRow.provider !== "anthropic") return;
+        const anthropicClient = this.createClientOverride
+          ? this.createClientOverride(apiKey)
+          : createAnthropicClient(apiKey).client;
         const writer = this.memoryWriterFactory
-          ? this.memoryWriterFactory(client)
-          : new AnthropicMemoryWriter(client, model);
+          ? this.memoryWriterFactory(anthropicClient)
+          : new AnthropicMemoryWriter(anthropicClient, model);
         const turn: MemoryWriterTurn = {
           userMessage: input.message,
           assistantText: finalText,

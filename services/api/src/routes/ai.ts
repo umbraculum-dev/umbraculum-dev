@@ -5,6 +5,7 @@ import { BadRequestError } from "../errors.js";
 import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
 import { AiSettingsService } from "../services/ai/aiSettingsService.js";
 import { AiOrchestrator } from "../services/ai/orchestrator.js";
+import { AiProposalService } from "../services/ai/proposalService.js";
 import type { AiToolRegistry } from "@umbraculum/ai-tool-sdk";
 
 function assertWorkspaceId(v: unknown): string {
@@ -21,6 +22,7 @@ function assertWorkspaceId(v: unknown): string {
 export function aiRoutes(toolRegistry: AiToolRegistry) {
   return function aiRoutesImpl(app: FastifyInstance) {
     const settings = new AiSettingsService(app.prisma);
+    const proposals = new AiProposalService(app.prisma);
 
     // ----- Chat (SSE) -----
     app.post("/ai/chat", async (req, reply) => {
@@ -98,10 +100,13 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
       };
       const input: Parameters<typeof settings.update>[2] = {};
       if (body.provider !== undefined) {
-        if (body.provider !== "anthropic") {
-          throw new BadRequestError("invalid_provider", "Body.provider must be 'anthropic' in v0");
+        if (body.provider !== "anthropic" && body.provider !== "openai") {
+          throw new BadRequestError(
+            "invalid_provider",
+            "Body.provider must be 'anthropic' or 'openai'",
+          );
         }
-        input.provider = "anthropic";
+        input.provider = body.provider;
       }
       if (body.apiKey !== undefined) {
         if (typeof body.apiKey !== "string") {
@@ -314,6 +319,47 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
         }),
         alerts: { roleAlerts, userAlerts },
       };
+    });
+
+    app.get("/ai/proposals", async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const rows = await proposals.list(ctx.userId, ctx.activeWorkspaceId);
+      return { ok: true, items: rows.map((r) => proposals.toDto(r)) };
+    });
+
+    app.get("/ai/proposals/:id", async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const params = (req.params ?? {}) as { id?: unknown };
+      const id = typeof params.id === "string" ? params.id.trim() : "";
+      if (!id) throw new BadRequestError("invalid_id", "Params.id is required");
+      const row = await proposals.getById(ctx.userId, ctx.activeWorkspaceId, id);
+      return { ok: true, proposal: proposals.toDto(row) };
+    });
+
+    app.post("/ai/proposals/:id/apply", async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const params = (req.params ?? {}) as { id?: unknown };
+      const id = typeof params.id === "string" ? params.id.trim() : "";
+      if (!id) throw new BadRequestError("invalid_id", "Params.id is required");
+      const { row, appliedPreviewOnly } = await proposals.apply(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        id,
+      );
+      return {
+        ok: true,
+        proposal: proposals.toDto(row),
+        ...(appliedPreviewOnly ? { appliedPreviewOnly: true } : {}),
+      };
+    });
+
+    app.post("/ai/proposals/:id/reject", async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const params = (req.params ?? {}) as { id?: unknown };
+      const id = typeof params.id === "string" ? params.id.trim() : "";
+      if (!id) throw new BadRequestError("invalid_id", "Params.id is required");
+      const row = await proposals.reject(ctx.userId, ctx.activeWorkspaceId, id);
+      return { ok: true, proposal: proposals.toDto(row) };
     });
   };
 }
