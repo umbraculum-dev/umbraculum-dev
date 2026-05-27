@@ -1,7 +1,7 @@
 # Canonical `crp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped, alpha proof not complete
+**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor, Wave 6 rendering templates, and alpha demo walkthrough automation shipped; alpha proof not complete (human sign-off pending)
 **Audience:** core team, CRP implementers, brewery-vertical maintainers, automation maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `crp` open-door next step from [`modules/canonical/crp.md`](../modules/canonical/crp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`canonical-automation-module-surface.md`](canonical-automation-module-surface.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
@@ -363,7 +363,7 @@ The alpha proof is complete when a user can:
 
 The proof must make clear that this is an extensible canonical module surface, not a finished commercial CRP/APS product.
 
-Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for resources, capacity load, scheduled operations, and conflicts. Wave 6 satisfies item 5 for CRP schedule/load artifacts via the rendering pipeline, but does not close propose/write workflows, optimizer, native, or WMS portions.
+Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for resources, capacity load, scheduled operations, and conflicts. Wave 6 satisfies item 5 for CRP schedule/load artifacts via the rendering pipeline. **Alpha demo walkthrough ready (2026-05-26):** browser export buttons on capacity (and stretch schedule/resources pages), runbook [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md), CI coverage for all CRP render-job routes — human gap-log sign-off still pending. Propose/write workflows, optimizer, native, and WMS portions remain open.
 
 ---
 
@@ -374,6 +374,8 @@ Wave 4 satisfies the deterministic read-only web visibility portions of this pro
 - [`mrp-crp-wave-4-alpha-proof-hardening-build-log.md`](mrp-crp-wave-4-alpha-proof-hardening-build-log.md) - Wave 4 deterministic proof record.
 - [`mrp-crp-wave-5-ai-planning-advisor-build-log.md`](mrp-crp-wave-5-ai-planning-advisor-build-log.md) - Wave 5 read-only AI planning advisor record.
 - [`mrp-crp-wave-6-rendering-templates-build-log.md`](mrp-crp-wave-6-rendering-templates-build-log.md) - Wave 6 rendering templates and render-job routes.
+- [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) - public-alpha demo operator runbook.
+- [`mrp-crp-alpha-demo-closure-build-log.md`](mrp-crp-alpha-demo-closure-build-log.md) - alpha demo closure (web exports + CI).
 - [`canonical-mrp-module-surface.md`](canonical-mrp-module-surface.md) - paired production-planning surface.
 - [`modules/canonical/crp.md`](../modules/canonical/crp.md) - open-door module page.
 - [`modules/verticals/brewery/README.md`](../modules/verticals/brewery/README.md) - reference vertical.

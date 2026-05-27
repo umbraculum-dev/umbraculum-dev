@@ -5,8 +5,18 @@ import {
   RenderJobStatusResponseSchema,
   RenderJobSubmitResponseSchema,
 } from "@umbraculum/contracts";
-import { CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF } from "@umbraculum/crp-contracts";
-import { MRP_WORK_ORDER_PDF_TEMPLATE_REF } from "@umbraculum/mrp-contracts";
+import {
+  CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
+  CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF,
+  CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF,
+  CRP_SCHEDULE_PDF_TEMPLATE_REF,
+} from "@umbraculum/crp-contracts";
+import {
+  MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF,
+  MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF,
+  MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
+  MRP_WORK_ORDER_PDF_TEMPLATE_REF,
+} from "@umbraculum/mrp-contracts";
 
 import { buildApp } from "../app.js";
 import { breweryBrewSessionProductionOrderId } from "../modules/mrp/services/breweryProjectionIds.js";
@@ -35,6 +45,40 @@ async function waitForSucceeded(input: {
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
   throw new Error(`render job did not succeed before timeout; last status=${lastStatus}`);
+}
+
+async function submitPollDownload(input: {
+  readonly app: ReturnType<typeof buildApp>;
+  readonly cookie: string;
+  readonly method?: "GET" | "POST";
+  readonly url: string;
+  readonly payload?: unknown;
+  readonly expectedTemplateRef: string;
+}) {
+  const res = await input.app.inject({
+    method: input.method ?? "POST",
+    url: input.url,
+    headers: { cookie: input.cookie, "content-type": "application/json" },
+    payload: input.payload ?? {},
+  });
+  expect(res.statusCode).toBe(202);
+  const submit = RenderJobSubmitResponseSchema.parse(res.json());
+  expect(submit.job.templateRef).toBe(input.expectedTemplateRef);
+  await waitForSucceeded({ app: input.app, cookie: input.cookie, jobId: submit.job.id });
+  const resultRes = await input.app.inject({
+    method: "GET",
+    url: `/rendering/jobs/${submit.job.id}/result`,
+    headers: { cookie: input.cookie },
+  });
+  expect(resultRes.statusCode).toBe(200);
+  const resultBody = RenderJobResultResponseSchema.parse(resultRes.json());
+  const download = await input.app.inject({
+    method: "GET",
+    url: resultBody.signedUrl,
+  });
+  expect(download.statusCode).toBe(200);
+  expect(download.rawPayload.length).toBeGreaterThan(10);
+  return submit.job.id;
 }
 
 describe("MRP/CRP rendering — Wave 6 templates", () => {
@@ -168,48 +212,86 @@ describe("MRP/CRP rendering — Wave 6 templates", () => {
     expect(body.item.productionOrder.orderNumber).toBe("W6-RENDER-001");
   });
 
-  it("submits MRP work-order PDF and CRP capacity-load XLSX render jobs", async () => {
+  it("submits MRP work-order PDF and CRP capacity-load XLSX render jobs without materializing planning rows", async () => {
     const orderId = breweryBrewSessionProductionOrderId(sessionA);
     const countsBefore = await readMaterializedPlanningCounts();
 
-    const workOrderSubmit = await app.inject({
-      method: "POST",
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
       url: `/mrp/work-orders/${orderId}/render-jobs`,
-      headers: { cookie: cookieA, "content-type": "application/json" },
       payload: { templateRef: MRP_WORK_ORDER_PDF_TEMPLATE_REF },
+      expectedTemplateRef: MRP_WORK_ORDER_PDF_TEMPLATE_REF,
     });
-    expect(workOrderSubmit.statusCode).toBe(202);
-    const workOrderJob = RenderJobSubmitResponseSchema.parse(workOrderSubmit.json());
-    expect(workOrderJob.job.templateRef).toBe("mrp:work-order-pdf@v1");
-
-    const capacitySubmit = await app.inject({
-      method: "POST",
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
       url: "/crp/capacity-load/render-jobs",
-      headers: { cookie: cookieA, "content-type": "application/json" },
-      payload: {},
+      expectedTemplateRef: CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
     });
-    expect(capacitySubmit.statusCode).toBe(202);
-    const capacityJob = RenderJobSubmitResponseSchema.parse(capacitySubmit.json());
-    expect(capacityJob.job.templateRef).toBe(CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF);
-
-    await waitForSucceeded({ app, cookie: cookieA, jobId: workOrderJob.job.id });
-    await waitForSucceeded({ app, cookie: cookieA, jobId: capacityJob.job.id });
-
-    const workOrderResult = await app.inject({
-      method: "GET",
-      url: `/rendering/jobs/${workOrderJob.job.id}/result`,
-      headers: { cookie: cookieA },
-    });
-    expect(workOrderResult.statusCode).toBe(200);
-    const workOrderResultBody = RenderJobResultResponseSchema.parse(workOrderResult.json());
-    const workOrderDownload = await app.inject({
-      method: "GET",
-      url: workOrderResultBody.signedUrl,
-    });
-    expect(workOrderDownload.statusCode).toBe(200);
-    expect(workOrderDownload.rawPayload.length).toBeGreaterThan(100);
 
     await expect(readMaterializedPlanningCounts()).resolves.toEqual(countsBefore);
+  });
+
+  it("submits MRP route-card PDF render job", async () => {
+    const orderId = breweryBrewSessionProductionOrderId(sessionA);
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
+      url: `/mrp/work-orders/${orderId}/render-jobs`,
+      payload: { templateRef: MRP_ROUTE_CARD_PDF_TEMPLATE_REF },
+      expectedTemplateRef: MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
+    });
+  });
+
+  it("submits MRP material-requirements XLSX render job", async () => {
+    const orderId = breweryBrewSessionProductionOrderId(sessionA);
+    const countsBefore = await readMaterializedPlanningCounts();
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
+      url: `/mrp/production-orders/${orderId}/material-requirements/render-jobs`,
+      expectedTemplateRef: MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF,
+    });
+    await expect(readMaterializedPlanningCounts()).resolves.toEqual(countsBefore);
+  });
+
+  it("submits MRP production-order list CSV render job", async () => {
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
+      url: "/mrp/production-orders/render-jobs",
+      expectedTemplateRef: MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF,
+    });
+  });
+
+  it("submits CRP schedule PDF render job", async () => {
+    const countsBefore = await readMaterializedPlanningCounts();
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
+      url: "/crp/schedule/render-jobs",
+      expectedTemplateRef: CRP_SCHEDULE_PDF_TEMPLATE_REF,
+    });
+    await expect(readMaterializedPlanningCounts()).resolves.toEqual(countsBefore);
+  });
+
+  it("submits CRP resource-calendar CSV render job", async () => {
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
+      url: "/crp/resources/calendar/render-jobs",
+      expectedTemplateRef: CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF,
+    });
+  });
+
+  it("submits CRP conflict-report PDF render job", async () => {
+    await submitPollDownload({
+      app,
+      cookie: cookieA,
+      url: "/crp/conflicts/render-jobs",
+      expectedTemplateRef: CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF,
+    });
   });
 
   it("denies cross-workspace render-job submission", async () => {

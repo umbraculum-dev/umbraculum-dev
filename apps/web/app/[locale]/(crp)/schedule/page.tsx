@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
+import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -24,6 +25,7 @@ import {
 export default function CrpSchedulePage() {
   const t = useTranslations("crp");
   const tSchedule = useTranslations("crp.schedule");
+  const tExport = useTranslations("crp.export");
   const tFields = useTranslations("crp.fields");
   const tValues = useTranslations("crp.values");
 
@@ -120,6 +122,22 @@ export default function CrpSchedulePage() {
         <Link href="/resources">{tSchedule("resourcesLink")}</Link>
         <Link href="/capacity">{tSchedule("capacityLink")}</Link>
         <Link href="/production-orders">{tFields("productionOrder")}</Link>
+        <AsyncExportButton
+          postUrl="/api/crp/schedule/render-jobs"
+          labelIdle={tExport("schedulePdf")}
+          labelWorking={tExport("working")}
+          labelReady={tExport("download")}
+          labelError={tExport("error")}
+          disabled={!canCall}
+        />
+        <AsyncExportButton
+          postUrl="/api/crp/conflicts/render-jobs"
+          labelIdle={tExport("conflictReportPdf")}
+          labelWorking={tExport("working")}
+          labelReady={tExport("download")}
+          labelError={tExport("error")}
+          disabled={!canCall}
+        />
       </XStack>
 
       {error ? <ErrorBox>{error}</ErrorBox> : null}

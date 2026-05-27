@@ -92,6 +92,15 @@
     "error": "Impossibile caricare i dati di pianificazione produzione.",
     "noProductionOrders": "Nessun ordine di produzione o proiezione brewery in questo workspace.",
     "noMaterialRequirements": "Nessun fabbisogno materiali visibile.",
+    "export": {
+      "workOrderPdf": "Esporta ordine di lavoro (PDF)",
+      "routeCardPdf": "Esporta scheda percorso (PDF)",
+      "materialRequirementsXlsx": "Esporta fabbisogni materiali (XLSX)",
+      "productionOrdersCsv": "Esporta ordini di produzione (CSV)",
+      "working": "Preparazione export…",
+      "download": "Scarica export",
+      "error": "Export non riuscito"
+    },
     "productionOrders": {
       "listTitle": "Ordini di produzione",
       "openDetail": "Apri ordine",
@@ -159,6 +168,15 @@
       "back": "Torna alle risorse",
       "capacityLink": "Apri vista capacità",
       "scheduleLink": "Apri schedule"
+    },
+    "export": {
+      "capacityLoadXlsx": "Esporta carico capacità (XLSX)",
+      "schedulePdf": "Esporta schedule (PDF)",
+      "conflictReportPdf": "Esporta report conflitti (PDF)",
+      "resourceCalendarCsv": "Esporta calendario risorse (CSV)",
+      "working": "Preparazione export…",
+      "download": "Scarica export",
+      "error": "Export non riuscito"
     },
     "capacity": {
       "title": "Carico capacità",

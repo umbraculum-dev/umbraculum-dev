@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
+import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -14,6 +15,7 @@ import { CapacityBucketSummary, RefreshButton, SectionCard } from "../_component
 export default function CrpCapacityPage() {
   const t = useTranslations("crp");
   const tCapacity = useTranslations("crp.capacity");
+  const tExport = useTranslations("crp.export");
   const tSchedule = useTranslations("crp.schedule");
   const tFields = useTranslations("crp.fields");
   const tValues = useTranslations("crp.values");
@@ -77,6 +79,15 @@ export default function CrpCapacityPage() {
         <Link href="/schedule">{tSchedule("title")}</Link>
         <Link href="/resources">{tSchedule("resourcesLink")}</Link>
         <Link href="/production-orders">{tFields("productionOrder")}</Link>
+        <AsyncExportButton
+          postUrl="/api/crp/capacity-load/render-jobs"
+          labelIdle={tExport("capacityLoadXlsx")}
+          labelWorking={tExport("working")}
+          labelReady={tExport("download")}
+          labelError={tExport("error")}
+          testId="crp-export-capacity-load-xlsx"
+          disabled={!canCall}
+        />
       </XStack>
 
       {error ? <ErrorBox>{error}</ErrorBox> : null}

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
+import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -14,6 +15,7 @@ import { ProductionOrderSummary, RefreshButton, SectionCard } from "../_componen
 export default function MrpProductionOrdersPage() {
   const t = useTranslations("mrp");
   const tOrders = useTranslations("mrp.productionOrders");
+  const tExport = useTranslations("mrp.export");
   const tFields = useTranslations("mrp.fields");
   const tValues = useTranslations("mrp.values");
 
@@ -82,6 +84,14 @@ export default function MrpProductionOrdersPage() {
         <Link href="/material-requirements">{tOrders("materialRequirements")}</Link>
         <Link href="/capacity">{tOrders("capacityLink")}</Link>
         <Link href="/schedule">{tOrders("scheduleLink")}</Link>
+        <AsyncExportButton
+          postUrl="/api/mrp/production-orders/render-jobs"
+          labelIdle={tExport("productionOrdersCsv")}
+          labelWorking={tExport("working")}
+          labelReady={tExport("download")}
+          labelError={tExport("error")}
+          disabled={!canCall}
+        />
       </XStack>
 
       {error ? <ErrorBox>{error}</ErrorBox> : null}
