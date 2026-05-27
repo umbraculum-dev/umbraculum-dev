@@ -56,7 +56,7 @@
 ## Follow-up (tooling)
 
 - **Repo docs are canonical** for Playwright prereqs: [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md) § Quick gates, [`apps/web/e2e/README.md`](../../apps/web/e2e/README.md), [`docs/TESTING.md`](../TESTING.md) § L5.
-- **Plugin (optional):** mirror the same gate block in `umbraculum-node-react-cursor-assistant` (`agentic-e2e-runbook` or `playwright-runner-docs-gate`) so agents see it without opening MRP/CRP design docs — not required for alpha closure; open a `umbraculum-toolset` issue if agents keep skipping gates.
+- **Plugin (shipped 2026-05-27):** `umbraculum-node-react-cursor-assistant` v0.0.2 — rule `67-playwright-quick-gates-before-run.mdc` + expanded `playwright-runner-docs-gate` skill in `umbraculum-toolset` (`cursor-plugins/`). Re-run `bash cursor-plugins/scripts/install-local.sh` and reload Cursor to pick up.
 
 ---
 
