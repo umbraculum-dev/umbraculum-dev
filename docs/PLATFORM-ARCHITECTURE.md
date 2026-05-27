@@ -258,10 +258,10 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 - Flat Prisma namespace will hurt around 80–100 models.
 - Brewery-shaped `tierLimitsService` needs a module-aware shape before any second module's limits can be expressed.
 - Module registration exists for routes, URL segments, document templates, add-on codes, and AI-tool hooks; remaining registry gaps are richer prompt overlays, knowledge-source registration, tier-limit composition, install/entitlement semantics, and external third-party module loading.
-- AI platform v0 exists and has expanded beyond brewery: Anthropic-only BYOK, paid-tier unlock, usage ledger, workspace memory, module-owned tools for brewery / automation / PIM, and the platform-owned `render_document` tool are shipped. Remaining gaps are the generic provider router, managed-AI pricebook, semantic/reporting DSL, full RAG, and future MRP/WMS/CRM/CRP tool surfaces.
+- AI platform v0 exists and has expanded beyond brewery: paid-tier unlock, usage ledger, workspace memory, module-owned tools for brewery / automation / PIM / MRP / CRP, platform-owned `render_document`, **propose-write** (preview apply), **reporting DSL MVP** (Layer B), **RAG D1** (Layer C over public product docs via pgvector), and **multi-provider BYOK routing** (Anthropic + OpenAI) are shipped post-α H2. Remaining gaps: managed-AI credits, RAG D2–D3 (per-workspace activity timelines + memory unification), richer module knowledge-source registration, and future WMS/CRM tool surfaces.
 - No `WorkspaceBillingAddon` → cannot sell managed-AI credits or per-module entitlements.
-- No semantic / reporting DSL → AI cannot answer ad-hoc data questions safely.
-- Per-workspace operational memory exists, but the full RAG layer over product docs + activity timelines + pgvector is still future work.
+- **Postgres runtime for AI:** dev and CI use `pgvector/pgvector:pg16` (not stock `postgres:16`) so the `vector` extension is available for `ai.doc_chunks`. See [`docs/design/canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md) §2 and [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](POSTGRES-REPLICATION-ARCHITECTURE.md) §"pgvector image".
+- Per-workspace operational memory is shipped; **product-doc RAG (D1)** is shipped (`platform.searchProductDocs`, pgvector index). **Activity-timeline RAG (D2)** and unified memory writer (D3) remain deferred.
 - Centralized document / file rendering is now implemented per [RFC-0007](rfcs/0007-canonical-document-rendering.md): `@umbraculum/rendering`, SDK-owned `DocumentTemplate<TData>` registration, engine adapters, BullMQ-on-Redis async jobs, API-owned rendering artifact persistence, sync BeerJSON export, platform-owned `render_document`, and the first async PIM channel-feed consumer. Remaining rendering gaps are downstream product surfaces, not the core platform pipeline: vendor-specific PIM feeds, media-layer artifact handoff once `@umbraculum/media` exposes the needed persistence surface, billing/add-on policy, and UI affordances.
 - No general notifications / outbound-delivery service exists yet. [RFC-0008](rfcs/0008-notifications-outbound-delivery.md) commits the boundary before public alpha: RFC-0007's eta + MJML support means email composition, not SMTP/provider transport; modules may contribute notification intents/templates/triggers, but delivery transport, recipient policy, unsubscribe/compliance, audit logs, and abuse/rate limits are horizontal platform concerns.
 
@@ -327,8 +327,8 @@ The AI consultant is not a feature of the brewery module — it is part of the h
 | Layer | Purpose | Mechanism | Risk | Build order |
 |---|---|---|---|---|
 | **A. Tools (function calling)** | Model acts on the user's actual data via your own endpoints | Read-only, ACL-aware functions. Model never sees the DB. | Low — every call goes through existing ACL. | v0 |
-| **B. Semantic layer + reporting DSL tool** | Answer ad-hoc data questions ("top 10 customers last quarter") | Typed query DSL on a curated set of reporting views. Never raw SQL. | Medium — needs row caps, statement timeouts, allowlists. | v1 |
-| **C. RAG over knowledge** | Answer "how does X work?" and "what is true about *this* workspace?" | v0 workspace memory now; later pgvector store for product docs (global) + per-workspace operational memory + activity timeline summaries. | Medium — PII / cross-tenant isolation discipline required. | memory v0, full RAG v1.5 |
+| **B. Semantic layer + reporting DSL tool** | Answer ad-hoc data questions ("top 10 customers last quarter") | Typed query DSL on curated reporting views (`platform.reportingQuery`). Never raw SQL. | Medium — needs row caps, statement timeouts, allowlists. | **MVP shipped** (post-α H2); expand views over time |
+| **C. RAG over knowledge** | Answer "how does X work?" and "what is true about *this* workspace?" | **D1 shipped:** pgvector `ai.doc_chunks` for global public help/docs (`platform.searchProductDocs`) + workspace memory in every prompt. **D2–D3 deferred:** per-workspace activity timelines + memory/RAG unification. | Medium — PII / cross-tenant isolation discipline required (D2 must filter `workspace_id`). | memory v0, RAG D1 shipped, D2–D3 v1.5 |
 
 **Module-pluggable status.** Tools and prompt composition are implemented: shipped domain modules register AI tools and `aiPrompts` through `registerModule`, and the orchestrator composes base + platform + module + route + memory per [`docs/design/canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md). Post-α H2 also ships propose-write ([`canonical-ai-propose-write-surface.md`](design/canonical-ai-propose-write-surface.md)), reporting DSL MVP ([`canonical-ai-reporting-dsl-surface.md`](design/canonical-ai-reporting-dsl-surface.md)), RAG D1 ([`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md)), and multi-provider BYOK routing. **Managed-AI credits** remain deferred until `WorkspaceBillingAddon` (§5.3).
 
@@ -382,7 +382,7 @@ registerModule(app, {
 });
 ```
 
-The same shape now applies to the shipped brewery vertical and the `automation` / `pim` / `mrp` / `crp` canonical modules for routes, URL-segment ownership, document templates where applicable, AI-tool registration, and `aiPrompts`. Full pgvector knowledge-source registration remains a future SDK slot.
+The same shape now applies to the shipped brewery vertical and the `automation` / `pim` / `mrp` / `crp` canonical modules for routes, URL-segment ownership, document templates where applicable, AI-tool registration, and `aiPrompts`. **Platform-owned product-doc RAG (D1)** ingests Tier: Public markdown via [`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md); per-module `registerKnowledgeSource()` for large module corpora remains a future SDK slot.
 
 **The module SDK is a first-class public artifact, not an internal convention.** A third-party developer — an indie consultancy, a vertical-specific software vendor, an in-house team at a customer — must be able to build a module **in their own repository**, depend on Umbraculum's SDK as published npm packages, and ship the module independently of platform releases. The SDK packages are licensed under MIT (see [`docs/LICENSING.md`](LICENSING.md) §6.2) precisely so module developers can license their own module's source code however they want, including proprietary, without their choice being constrained by the platform's AGPL core.
 
@@ -443,7 +443,7 @@ Physical directory layout for canonical modules and tier-6 vertical configuratio
 - Provider router / adapter layer beyond Anthropic-only BYOK.
 - Optional managed-AI credits: `WorkspaceBillingAddon` Prisma model + service + Stripe subscription-item / top-up flow + RevenueCat consumable mapping.
 - `pricebook.json` convention with `creditValueMicroUsd` and per-model multipliers for managed-AI mode only.
-- Full RAG store (pgvector when available) over product docs, workspace memory, and activity timeline summaries.
+- **DONE (RAG D1):** pgvector-backed product-doc index (`ai.doc_chunks`, `platform.searchProductDocs`, ingest of `docs/help/**` + listed surface summaries). **OPEN (RAG D2–D3):** per-workspace activity timeline summaries + unified memory/RAG writer.
 - Reporting DSL + curated reporting views (Layer B).
 - One additional Postgres role (`ai_readonly`) with `SELECT`-only on the curated reporting views (only needed if/when we choose the SQL-tool variant of Layer B).
 
@@ -463,7 +463,7 @@ Canonical `automation` module surface (Vessel registry, adapter SDK, OpenPLC sea
 | ACL | Inherits user session | Inherits role + curated view restrictions | Per-workspace index isolation |
 | Cost | Low (small JSON) | Low–medium (bounded result set) | Low (embeddings cached) |
 | Hallucination risk | Very low (deterministic numbers) | Low (typed query, deterministic execution) | Medium (model paraphrases retrieved text) |
-| Build order | v0 | v1 | memory v0, full RAG v1.5 |
+| Build order | v0 | v1 (MVP shipped) | memory v0 + **RAG D1 shipped**; D2–D3 v1.5 |
 
 ### 6.2 Module-pluggable tool registry (interface sketch)
 
@@ -649,10 +649,10 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 2. **Stripe surface:** zero net-new Stripe code for v0 AI. The existing billing-intent checkout flow and webhook lifecycle handling are reused.
 3. **Subscription primitive:** no new `WorkspaceSubscription` model. Existing `WorkspaceBilling` remains the current subscription source of truth.
 4. **Provider for v0:** Anthropic only. Multi-provider adapters are deferred until a second provider is needed.
-5. **v0 tool scope:** brewery recipe/water/session/inventory/equipment lookup, automation vessel state/list, PIM product/category/attribute-set lookup, and controlled rendering-job submission through `render_document`. Rich prompt overlays, semantic reporting, and full cross-module operations wait for later layers.
+5. **v0 tool scope (expanded post-α H2):** brewery / automation / PIM / MRP / CRP read tools, `render_document`, `platform.reportingQuery` (reporting DSL MVP), `platform.searchProductDocs` (pgvector product-doc RAG D1), and MRP/CRP **propose-write** previews. Managed-AI credits and autonomous domain writes remain deferred.
 6. **AI default:** opt-in per workspace. Admin enables AI, enters the key, and accepts the data-egress notice.
 7. **Per-user role gating:** no role gate. All workspace members can use AI once the workspace admin enables it; safety is enforced through per-role monthly caps, per-user daily caps, workspace opt-in, and the audit ledger.
-8. **Memory:** per-workspace operational memory is part of the H2 backbone. Full product-doc / timeline RAG remains future work.
+8. **Memory + RAG:** per-workspace operational memory is part of the H2 backbone. **Product-doc RAG (D1)** is shipped (pgvector + public-doc ingest + `platform.searchProductDocs`). Per-workspace activity-timeline RAG (D2) and memory/RAG unification (D3) remain future work — see [`docs/design/canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md).
 9. **Public-launch path:** launch artifacts exist, and §10.1.1 records the decision to seed a fresh public repository after Umbraculum is chosen.
 
 ### 8.2 Still open / deferred
@@ -682,7 +682,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 - **Module** — a self-contained vertical (Brewery, WMS, CRM, MRP, CRP, …) that registers routes / services / models / AI tools / prompts / knowledge / limits / add-on codes into the platform.
 - **MRR (Monthly Recurring Revenue)** — sum of normalized monthly subscription revenue.
 - **multiSchema** — Prisma preview feature that lets one Prisma client span multiple Postgres schemas.
-- **pgvector** — Postgres extension storing vector embeddings for similarity search; powers RAG.
+- **pgvector** — Postgres extension storing vector embeddings for similarity search; powers Layer C RAG. Dev/CI Postgres images are `pgvector/pgvector:pg16` (stock `postgres:16` does not ship the extension). Operational data stays in existing schemas; embeddings live in `ai.doc_chunks` (see [`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md)).
 - **Pricebook** — versioned mapping of model + token usage → credits.
 - **RAG (Retrieval-Augmented Generation)** — injecting retrieved knowledge chunks into the prompt to ground the model's answer.
 - **Retail overage** — buying more capacity above the included allowance, at posted per-unit prices (typically with volume discounts on larger packs).
