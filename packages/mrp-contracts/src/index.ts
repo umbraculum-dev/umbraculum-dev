@@ -105,6 +105,10 @@ export type {
 } from "./aiTools.js";
 
 export {
+  MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF,
+  MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF,
+  MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
+  MRP_WORK_ORDER_PDF_TEMPLATE_REF,
   MrpMaterialRequirementsXlsxInputSchema,
   MrpProductionOrderCsvInputSchema,
   MrpRouteCardPdfInputSchema,

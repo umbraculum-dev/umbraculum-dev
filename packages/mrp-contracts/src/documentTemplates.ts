@@ -6,6 +6,11 @@ import { ProductionOrderSchema } from "./productionOrder.js";
 import { WorkOrderDocumentInputSchema } from "./workOrder.js";
 import { NonEmptyStringSchema } from "./shared.js";
 
+export const MRP_WORK_ORDER_PDF_TEMPLATE_REF = "mrp:work-order-pdf@v1";
+export const MRP_ROUTE_CARD_PDF_TEMPLATE_REF = "mrp:route-card-pdf@v1";
+export const MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF = "mrp:material-requirements-xlsx@v1";
+export const MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF = "mrp:production-order-csv@v1";
+
 export const MrpWorkOrderPdfInputSchema = WorkOrderDocumentInputSchema;
 
 export const MrpRouteCardPdfInputSchema = z.object({
@@ -30,6 +35,4 @@ export type MrpRouteCardPdfInput = z.infer<typeof MrpRouteCardPdfInputSchema>;
 export type MrpMaterialRequirementsXlsxInput = z.infer<
   typeof MrpMaterialRequirementsXlsxInputSchema
 >;
-export type MrpProductionOrderCsvInput = z.infer<
-  typeof MrpProductionOrderCsvInputSchema
->;
+export type MrpProductionOrderCsvInput = z.infer<typeof MrpProductionOrderCsvInputSchema>;

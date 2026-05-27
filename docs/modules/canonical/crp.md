@@ -1,7 +1,7 @@
 # `crp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Wave 5 read-only AI planning advisor shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery/automation projections, read-only web pages, deterministic fixture-backed proof, and module-owned read-only AI tools exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery/automation projections, read-only web pages, deterministic fixture-backed proof, and module-owned read-only AI tools exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 alongside `mrp` per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `crp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
@@ -97,6 +97,7 @@ Per [canonical-automation-module-surface.md §4](../../design/canonical-automati
 - [MRP/CRP Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md) — web read-only implementation record.
 - [MRP/CRP Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md) — deterministic proof implementation record.
 - [MRP/CRP Wave 5 AI planning advisor build log](../../design/mrp-crp-wave-5-ai-planning-advisor-build-log.md) — read-only AI advisor implementation record.
+- [MRP/CRP Wave 6 rendering templates build log](../../design/mrp-crp-wave-6-rendering-templates-build-log.md) — RFC-0007 templates and render-job routes.
 - [`@umbraculum/crp-contracts`](../../../packages/crp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/crp/`](../../../services/api/src/modules/crp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery + MRP + CRP co-design.

@@ -17,12 +17,12 @@ Exported surfaces:
 - **`OperationSchema` / `OperationTemplateSchema` / `ScheduleableOperationSchema`** — operation payloads that can later be handed to `crp` without embedding capacity scheduling inside `mrp`.
 - **`MaterialRequirementSchema`** — read-side material demand lines with availability as an assumption, not WMS inventory truth.
 - **`WorkOrderPreviewSchema`** — renderable work-order preview input.
-- **Planned AI/rendering schemas** — typed input and output payloads for future module-owned AI tools and document templates; no runtime tool or renderer is registered in Wave 1.
+- **AI/rendering schemas** — typed payloads for module-owned AI tools (Wave 5) and RFC-0007 document templates (Wave 6): `mrp:work-order-pdf@v1`, `mrp:route-card-pdf@v1`, `mrp:material-requirements-xlsx@v1`, `mrp:production-order-csv@v1`.
 
 ## Scope
 
 - **Contains**: Zod v4 schemas, inferred TypeScript types, response envelopes, parse wrappers, version helpers, planned AI-tool payload schemas, and planned document-template payload schemas.
-- **Does not contain**: web/native pages, write request schemas, brewery projection code, AI runtime tool registration, rendering runtime registration, inventory reservation logic, WMS behavior, or a full ready-to-sell MRP product.
+- **Does not contain**: web/native pages, write request schemas, brewery projection code, API runtime tool/template registration (those live under `services/api/src/modules/mrp/`), inventory reservation logic, WMS behavior, or a full ready-to-sell MRP product.
 
 ## Build / test / lint (local)
 
@@ -37,6 +37,7 @@ From repo root, run Node/npm inside the project container:
 
 - [`docs/design/mrp-crp-august-2026-co-design-plan.md`](../../docs/design/mrp-crp-august-2026-co-design-plan.md)
 - [`docs/design/canonical-mrp-module-surface.md`](../../docs/design/canonical-mrp-module-surface.md)
+- [`docs/design/mrp-crp-wave-6-rendering-templates-build-log.md`](../../docs/design/mrp-crp-wave-6-rendering-templates-build-log.md)
 - [`docs/design/canonical-crp-module-surface.md`](../../docs/design/canonical-crp-module-surface.md)
 - [`docs/modules/canonical/mrp.md`](../../docs/modules/canonical/mrp.md)
 - [`services/api/src/modules/mrp/`](../../services/api/src/modules/mrp/)

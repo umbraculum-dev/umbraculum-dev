@@ -1,13 +1,13 @@
 # Canonical `crp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor shipped, alpha proof not complete
+**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped, alpha proof not complete
 **Audience:** core team, CRP implementers, brewery-vertical maintainers, automation maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `crp` open-door next step from [`modules/canonical/crp.md`](../modules/canonical/crp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`canonical-automation-module-surface.md`](canonical-automation-module-surface.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> Wave 1 shipped `@umbraculum/crp-contracts`, the `crp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 projects brewery/automation planning sources into those read routes at request time. Wave 3 exposes those read models in the web app through read-only resources, capacity, and schedule pages. Wave 4 adds deterministic E2E fixture proof across resources, work-center context, capacity load, scheduled operations, and read-only conflicts. Wave 5 adds module-owned read-only AI tools for resources, work centers, scheduled operations, capacity load, and conflicts. This is still not alpha-complete: no native screen, rendering job, write workflow, optimizer, automation-control behavior, or complete public-alpha proof is claimed as shipped.
+> Wave 1 shipped `@umbraculum/crp-contracts`, the `crp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 projects brewery/automation planning sources into those read routes at request time. Wave 3 exposes those read models in the web app through read-only resources, capacity, and schedule pages. Wave 4 adds deterministic E2E fixture proof across resources, work-center context, capacity load, scheduled operations, and read-only conflicts. Wave 5 adds module-owned read-only AI tools for resources, work centers, scheduled operations, capacity load, and conflicts. Wave 6 registers four RFC-0007 document templates and capacity/schedule render-job routes. This is still not alpha-complete: no native write workflow, optimizer, automation-control behavior, or complete public-alpha proof is claimed as shipped.
 
 ---
 
@@ -18,10 +18,10 @@
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
 | Contracts | `packages/crp-contracts/` -> `@umbraculum/crp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, resource/work-center/calendar/load/conflict refs, planned AI/rendering payload schemas. |
-| API | `services/api/src/modules/crp/` | **Wave 1 + Wave 2 + Wave 5 shipped:** read-only routes, services, Prisma `crp` schema, module registration, read-time brewery/automation projections, and read-only AI tool handlers. Document-template registration remains future work. |
+| API | `services/api/src/modules/crp/` | **Wave 1–6 shipped (read + rendering):** read-only routes, services, Prisma `crp` schema, module registration, read-time brewery/automation projections, read-only AI tool handlers, and RFC-0007 document templates with render-job routes. |
 | Web | `apps/web/app/[locale]/(crp)/` | **Wave 3 shipped:** read-only resources, resource detail, capacity-load, schedule, and conflict pages under registered static URL segments. Proposal/write pages remain future work. |
 | Native | `apps/native/src/modules/crp/` | Future operator/manager screens; may trail web in alpha. |
-| Rendering | module-registered templates | Capacity-load exports, schedule PDFs, resource-calendar CSVs. |
+| Rendering | module-registered templates | **Wave 6 shipped:** capacity-load XLSX, schedule PDF, resource-calendar CSV, conflict-report PDF via RFC-0007. |
 | AI tools | module-owned `registerAiTools` hook | **Wave 5 shipped:** `crp.listResources`, `crp.listWorkCenters`, `crp.listScheduledOperations`, `crp.explainCapacityLoad`, and `crp.listConflicts` as read-only advisor tools. Propose/write tools and optimizer behavior remain future work. |
 
 ---
@@ -205,7 +205,10 @@ Wave 1 read-only API routes:
 | `/crp/scheduled-operations` | GET | List scheduled operations by time/resource/order filters. |
 | `/crp/conflicts` | GET | List detected conflicts. |
 | `/crp/schedule-proposals` | POST | Future: produce a human-reviewable schedule proposal, not a direct write. |
-| `/crp/capacity-load/render-jobs` | POST | Future: submit a capacity export through `@umbraculum/rendering`. |
+| `/crp/capacity-load/render-jobs` | POST | **Wave 6 shipped:** capacity-load XLSX export through `@umbraculum/rendering`. |
+| `/crp/schedule/render-jobs` | POST | **Wave 6 shipped:** schedule PDF export. |
+| `/crp/resources/calendar/render-jobs` | POST | **Wave 6 shipped:** resource calendar CSV export. |
+| `/crp/conflicts/render-jobs` | POST | **Wave 6 shipped:** conflict-report PDF export. |
 
 Every route must:
 
@@ -302,7 +305,7 @@ The shipped Wave 5 tools are `scope: "read"` and return the existing route respo
 
 ## 13. Rendering templates
 
-Planned module-owned templates registered via `registerModule({ documentTemplates })`:
+**Wave 6 shipped.** Module-owned templates registered via `registerModule({ documentTemplates })`:
 
 | Template ref | Kind | Purpose |
 |---|---|---|
@@ -341,7 +344,7 @@ The exact values belong to the future implementation plan; this surface doc only
 | C | Resource projection from brewery equipment and automation vessels. |
 | D | Capacity-load and conflict calculations. |
 | E | **Wave 4 shipped:** deterministic read-only web proof over resources, work centers, capacity, schedule, and conflicts. Proposal pages remain future work. |
-| F | Rendering templates and capacity export route. |
+| F | **Wave 6 shipped:** rendering templates and capacity export routes. |
 | G | **Wave 5 shipped:** read-only AI tools and integration proof with MRP. Propose tools remain future work. |
 | Mature | Human-approved writes, richer scheduler/optimizer plug-ins, WMS constraints, native operator flows. |
 
@@ -360,7 +363,7 @@ The alpha proof is complete when a user can:
 
 The proof must make clear that this is an extensible canonical module surface, not a finished commercial CRP/APS product.
 
-Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for resources, capacity load, scheduled operations, and conflicts, but does not close rendering, propose/write workflows, optimizer, native, or WMS portions.
+Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for resources, capacity load, scheduled operations, and conflicts. Wave 6 satisfies item 5 for CRP schedule/load artifacts via the rendering pipeline, but does not close propose/write workflows, optimizer, native, or WMS portions.
 
 ---
 
@@ -370,6 +373,7 @@ Wave 4 satisfies the deterministic read-only web visibility portions of this pro
 - [`mrp-crp-wave-3-read-only-alpha-experience-build-log.md`](mrp-crp-wave-3-read-only-alpha-experience-build-log.md) - Wave 3 web read-only implementation record.
 - [`mrp-crp-wave-4-alpha-proof-hardening-build-log.md`](mrp-crp-wave-4-alpha-proof-hardening-build-log.md) - Wave 4 deterministic proof record.
 - [`mrp-crp-wave-5-ai-planning-advisor-build-log.md`](mrp-crp-wave-5-ai-planning-advisor-build-log.md) - Wave 5 read-only AI planning advisor record.
+- [`mrp-crp-wave-6-rendering-templates-build-log.md`](mrp-crp-wave-6-rendering-templates-build-log.md) - Wave 6 rendering templates and render-job routes.
 - [`canonical-mrp-module-surface.md`](canonical-mrp-module-surface.md) - paired production-planning surface.
 - [`modules/canonical/crp.md`](../modules/canonical/crp.md) - open-door module page.
 - [`modules/verticals/brewery/README.md`](../modules/verticals/brewery/README.md) - reference vertical.

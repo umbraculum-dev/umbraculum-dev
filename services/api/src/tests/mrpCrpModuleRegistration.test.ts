@@ -56,10 +56,20 @@ describe("MRP/CRP module registration — Wave 1", () => {
     );
   });
 
-  it("does not register MRP/CRP document templates before runtime rendering hooks exist", () => {
+  it("registers Wave 6 MRP/CRP document templates through module ownership", () => {
     const refs = listRegisteredDocumentTemplates().map((template) => template.ref);
-    expect(refs.some((ref) => ref.startsWith("mrp:"))).toBe(false);
-    expect(refs.some((ref) => ref.startsWith("crp:"))).toBe(false);
+    expect(refs).toEqual(
+      expect.arrayContaining([
+        "mrp:work-order-pdf@v1",
+        "mrp:route-card-pdf@v1",
+        "mrp:material-requirements-xlsx@v1",
+        "mrp:production-order-csv@v1",
+        "crp:capacity-load-xlsx@v1",
+        "crp:schedule-pdf@v1",
+        "crp:resource-calendar-csv@v1",
+        "crp:conflict-report-pdf@v1",
+      ]),
+    );
   });
 
   it("registers Wave 5 read-only MRP/CRP AI tools through module ownership", () => {

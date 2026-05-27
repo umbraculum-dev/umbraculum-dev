@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF,
+  MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF,
+  MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
+  MRP_WORK_ORDER_PDF_TEMPLATE_REF,
   MrpMaterialRequirementsXlsxInputSchema,
   MrpProductionOrderCsvInputSchema,
   MrpRouteCardPdfInputSchema,
@@ -27,6 +31,15 @@ const productionOrder = {
 };
 
 describe("MRP document-template schemas", () => {
+  it("exposes canonical template refs", () => {
+    expect(MRP_WORK_ORDER_PDF_TEMPLATE_REF).toBe("mrp:work-order-pdf@v1");
+    expect(MRP_ROUTE_CARD_PDF_TEMPLATE_REF).toBe("mrp:route-card-pdf@v1");
+    expect(MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF).toBe(
+      "mrp:material-requirements-xlsx@v1",
+    );
+    expect(MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF).toBe("mrp:production-order-csv@v1");
+  });
+
   it("accepts planned rendering payloads", () => {
     expect(MrpRouteCardPdfInputSchema.parse({
       workspaceId: "ws-1",

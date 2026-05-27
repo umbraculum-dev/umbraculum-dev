@@ -1,13 +1,13 @@
 # Canonical `mrp` module surface - design
 
 **Tier:** Public  
-**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor shipped, alpha proof not complete
+**Status:** Draft surface design 2026-05-26; Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped, alpha proof not complete
 **Audience:** core team, MRP implementers, brewery-vertical maintainers, module SDK authors, AI-consultant maintainers  
 **Resolves:** `mrp` open-door next step from [`modules/canonical/mrp.md`](../modules/canonical/mrp.md)  
 **Builds on:** [`RFC-0001`](../rfcs/0001-modules-tiers-governance-and-automation-placement.md), [`RFC-0002`](../rfcs/0002-canonical-module-physical-layout.md), [`RFC-0007`](../rfcs/0007-canonical-document-rendering.md), [`mrp-crp-august-2026-co-design-plan.md`](mrp-crp-august-2026-co-design-plan.md)
 
 > [!NOTE]
-> Wave 1 shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 projects brewery recipes and brew sessions into those read routes at request time. Wave 3 exposes those read models in the web app through read-only production-order and material-requirement pages. Wave 4 adds deterministic E2E fixture proof across the MRP/CRP read projections. Wave 5 adds module-owned read-only AI tools for production orders and material requirements. This is still not alpha-complete: no native screen, rendering job, write workflow, WMS behavior, or complete public-alpha proof is claimed as shipped.
+> Wave 1 shipped `@umbraculum/mrp-contracts`, the `mrp` Prisma schema, read-only API skeleton routes, module/web-segment registration, and L2 isolation tests. Wave 2 projects brewery recipes and brew sessions into those read routes at request time. Wave 3 exposes those read models in the web app through read-only production-order and material-requirement pages. Wave 4 adds deterministic E2E fixture proof across the MRP/CRP read projections. Wave 5 adds module-owned read-only AI tools for production orders and material requirements. Wave 6 registers four RFC-0007 document templates and module-owned render-job routes (work-order preview, work-order/route-card PDFs, material-requirement XLSX, production-order CSV). This is still not alpha-complete: no native write workflow, WMS behavior, or complete public-alpha proof is claimed as shipped.
 
 ---
 
@@ -20,7 +20,7 @@ MRP does not own inventory execution, capacity scheduling, live controller state
 | Layer | Planned beta-layout location | Planned responsibility |
 |---|---|---|
 | Contracts | `packages/mrp-contracts/` -> `@umbraculum/mrp-contracts` | **Wave 1 shipped:** DTOs, Zod schemas, `CONTRACT_VERSION`, production-order/BOM/material-requirement refs, planned AI/rendering payload schemas. |
-| API | `services/api/src/modules/mrp/` | **Wave 1 + Wave 2 + Wave 5 shipped:** read-only routes, services, Prisma `mrp` schema, module registration, read-time brewery projections, and read-only AI tool handlers. Document-template registration remains future work. |
+| API | `services/api/src/modules/mrp/` | **Wave 1–6 shipped (read + rendering):** read-only routes, services, Prisma `mrp` schema, module registration, read-time brewery projections, read-only AI tool handlers, and RFC-0007 document templates with render-job routes. |
 | Web | `apps/web/app/[locale]/(mrp)/` | **Wave 3 shipped:** read-only production-order list/detail and material-requirement entry pages under registered static URL segments. Proposal/write pages remain future work. |
 | Native | `apps/native/src/modules/mrp/` | Future operator/manager screens; may trail web in alpha. |
 | Rendering | module-registered templates | Work orders, route cards, material-requirement exports. |
@@ -164,8 +164,10 @@ Wave 1 read-only API routes:
 | `/mrp/production-orders/:orderId/material-requirements` | GET | Expanded material requirements for one order. |
 | `/mrp/boms` | GET | List BOM definitions visible to the active workspace. |
 | `/mrp/boms/:bomId` | GET | Get one BOM. |
-| `/mrp/work-orders/:orderId/preview` | GET | Future: preview the work-order payload before rendering. |
-| `/mrp/work-orders/:orderId/render-jobs` | POST | Future: submit a work-order render job through `@umbraculum/rendering`. |
+| `/mrp/work-orders/:orderId/preview` | GET | **Wave 6 shipped:** preview the work-order payload before rendering. |
+| `/mrp/work-orders/:orderId/render-jobs` | POST | **Wave 6 shipped:** submit work-order or route-card PDF render jobs through `@umbraculum/rendering`. |
+| `/mrp/production-orders/:orderId/material-requirements/render-jobs` | POST | **Wave 6 shipped:** material-requirements XLSX export. |
+| `/mrp/production-orders/render-jobs` | POST | **Wave 6 shipped:** production-order list CSV export. |
 
 Write routes are not part of the first alpha proof unless the implementation plan explicitly includes human-approved create/update flows and route-level L2 isolation tests.
 
@@ -293,7 +295,7 @@ The exact values belong to the future implementation plan; this surface doc only
 | B | API skeleton and read-only routes registered via `registerModule()`. |
 | C | Brewery projection from recipe/session to production-order proof. |
 | D | **Wave 4 shipped:** deterministic read-only web proof over the Wave 2 projections. Proposal pages remain future work. |
-| E | Rendering templates and work-order render-job route. |
+| E | **Wave 6 shipped:** rendering templates and work-order render-job routes. |
 | F | **Wave 5 shipped:** read-only AI tools and integration proof. Propose tools remain future work. |
 | Mature | Write workflows, WMS integration, richer scheduling with CRP, native operator flows. |
 
@@ -312,7 +314,7 @@ The alpha proof is complete when a user can:
 
 The proof must make clear that this is an extensible canonical module surface, not a finished commercial MRP product.
 
-Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for production orders and material requirements, but does not close rendering, propose/write workflows, native, or WMS portions.
+Wave 4 satisfies the deterministic read-only web visibility portions of this proof (items 1-4). Wave 5 satisfies the read-only AI explanation portion of item 6 for production orders and material requirements. Wave 6 satisfies item 5 for MRP work-order artifacts via the rendering pipeline, but does not close propose/write workflows, native, or WMS portions.
 
 ---
 
@@ -322,6 +324,7 @@ Wave 4 satisfies the deterministic read-only web visibility portions of this pro
 - [`mrp-crp-wave-3-read-only-alpha-experience-build-log.md`](mrp-crp-wave-3-read-only-alpha-experience-build-log.md) - Wave 3 web read-only implementation record.
 - [`mrp-crp-wave-4-alpha-proof-hardening-build-log.md`](mrp-crp-wave-4-alpha-proof-hardening-build-log.md) - Wave 4 deterministic proof record.
 - [`mrp-crp-wave-5-ai-planning-advisor-build-log.md`](mrp-crp-wave-5-ai-planning-advisor-build-log.md) - Wave 5 read-only AI planning advisor record.
+- [`mrp-crp-wave-6-rendering-templates-build-log.md`](mrp-crp-wave-6-rendering-templates-build-log.md) - Wave 6 rendering templates and render-job routes.
 - [`canonical-crp-module-surface.md`](canonical-crp-module-surface.md) - paired capacity-planning surface.
 - [`modules/canonical/mrp.md`](../modules/canonical/mrp.md) - open-door module page.
 - [`modules/verticals/brewery/README.md`](../modules/verticals/brewery/README.md) - reference vertical.

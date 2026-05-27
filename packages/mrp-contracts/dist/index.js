@@ -265,6 +265,10 @@ var MrpSummarizeWorkOrderToolOutputSchema = WorkOrderPreviewResponseSchema;
 
 // src/documentTemplates.ts
 import { z as z8 } from "zod";
+var MRP_WORK_ORDER_PDF_TEMPLATE_REF = "mrp:work-order-pdf@v1";
+var MRP_ROUTE_CARD_PDF_TEMPLATE_REF = "mrp:route-card-pdf@v1";
+var MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF = "mrp:material-requirements-xlsx@v1";
+var MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF = "mrp:production-order-csv@v1";
 var MrpWorkOrderPdfInputSchema = WorkOrderDocumentInputSchema;
 var MrpRouteCardPdfInputSchema = z8.object({
   workspaceId: NonEmptyStringSchema,
@@ -288,6 +292,10 @@ export {
   BomSchema,
   CONTRACT_VERSION,
   IsoDateTimeStringSchema,
+  MRP_MATERIAL_REQUIREMENTS_XLSX_TEMPLATE_REF,
+  MRP_PRODUCTION_ORDER_CSV_TEMPLATE_REF,
+  MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
+  MRP_WORK_ORDER_PDF_TEMPLATE_REF,
   MaterialRequirementListResponseSchema,
   MaterialRequirementSchema,
   MaterialRequirementStatusSchema,

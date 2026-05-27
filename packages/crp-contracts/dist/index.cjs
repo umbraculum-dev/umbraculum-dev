@@ -23,6 +23,10 @@ __export(index_exports, {
   AvailabilityWindowListResponseSchema: () => AvailabilityWindowListResponseSchema,
   AvailabilityWindowSchema: () => AvailabilityWindowSchema,
   CONTRACT_VERSION: () => CONTRACT_VERSION,
+  CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF: () => CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
+  CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF: () => CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF,
+  CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF: () => CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF,
+  CRP_SCHEDULE_PDF_TEMPLATE_REF: () => CRP_SCHEDULE_PDF_TEMPLATE_REF,
   CapacityBucketSchema: () => CapacityBucketSchema,
   CapacityConflictListResponseSchema: () => CapacityConflictListResponseSchema,
   CapacityConflictSchema: () => CapacityConflictSchema,
@@ -41,7 +45,8 @@ __export(index_exports, {
   CapacityScheduleSchema: () => CapacityScheduleSchema,
   CapacityWindowListResponseSchema: () => CapacityWindowListResponseSchema,
   CapacityWindowSchema: () => CapacityWindowSchema,
-  CrpCapacityPlanPdfInputSchema: () => CrpCapacityPlanPdfInputSchema,
+  CrpCapacityLoadXlsxInputSchema: () => CrpCapacityLoadXlsxInputSchema,
+  CrpConflictReportPdfInputSchema: () => CrpConflictReportPdfInputSchema,
   CrpDeleteResponseSchema: () => CrpDeleteResponseSchema,
   CrpExplainCapacityLoadToolInputSchema: () => CrpExplainCapacityLoadToolInputSchema,
   CrpExplainCapacityLoadToolOutputSchema: () => CrpExplainCapacityLoadToolOutputSchema,
@@ -57,8 +62,8 @@ __export(index_exports, {
   CrpListSchedulesToolOutputSchema: () => CrpListSchedulesToolOutputSchema,
   CrpListWorkCentersToolInputSchema: () => CrpListWorkCentersToolInputSchema,
   CrpListWorkCentersToolOutputSchema: () => CrpListWorkCentersToolOutputSchema,
-  CrpResourceLoadCsvInputSchema: () => CrpResourceLoadCsvInputSchema,
-  CrpScheduleExportCsvInputSchema: () => CrpScheduleExportCsvInputSchema,
+  CrpResourceCalendarCsvInputSchema: () => CrpResourceCalendarCsvInputSchema,
+  CrpSchedulePdfInputSchema: () => CrpSchedulePdfInputSchema,
   CrpScheduleableOperationSchema: () => CrpScheduleableOperationSchema,
   IsoDateTimeStringSchema: () => IsoDateTimeStringSchema,
   MrpHandoffBatchResponseSchema: () => MrpHandoffBatchResponseSchema,
@@ -554,25 +559,41 @@ var CrpListConflictsToolOutputSchema = CapacityConflictListResponseSchema;
 
 // src/documentTemplates.ts
 var import_zod12 = require("zod");
-var CrpCapacityPlanPdfInputSchema = import_zod12.z.object({
-  workspaceId: NonEmptyStringSchema,
-  schedule: CapacityScheduleSchema,
-  resources: import_zod12.z.array(CapacityResourceSchema),
-  loadBuckets: import_zod12.z.array(CapacityLoadBucketSchema)
-});
-var CrpResourceLoadCsvInputSchema = import_zod12.z.object({
+var CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF = "crp:capacity-load-xlsx@v1";
+var CRP_SCHEDULE_PDF_TEMPLATE_REF = "crp:schedule-pdf@v1";
+var CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF = "crp:resource-calendar-csv@v1";
+var CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF = "crp:conflict-report-pdf@v1";
+var CrpCapacityLoadXlsxInputSchema = import_zod12.z.object({
   workspaceId: NonEmptyStringSchema,
   loadBuckets: import_zod12.z.array(CapacityLoadBucketSchema)
 });
-var CrpScheduleExportCsvInputSchema = import_zod12.z.object({
+var CrpSchedulePdfInputSchema = import_zod12.z.object({
   workspaceId: NonEmptyStringSchema,
-  schedule: CapacityScheduleSchema
+  generatedAt: NonEmptyStringSchema,
+  resources: import_zod12.z.array(ResourceSchema),
+  scheduledOperations: import_zod12.z.array(ScheduledOperationSchema),
+  loadBuckets: import_zod12.z.array(CapacityLoadBucketSchema)
+});
+var CrpResourceCalendarCsvInputSchema = import_zod12.z.object({
+  workspaceId: NonEmptyStringSchema,
+  resources: import_zod12.z.array(ResourceSchema),
+  loadBuckets: import_zod12.z.array(CapacityLoadBucketSchema)
+});
+var CrpConflictReportPdfInputSchema = import_zod12.z.object({
+  workspaceId: NonEmptyStringSchema,
+  generatedAt: NonEmptyStringSchema,
+  conflicts: import_zod12.z.array(CapacityConflictSchema),
+  loadBuckets: import_zod12.z.array(CapacityLoadBucketSchema)
 });
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AvailabilityWindowListResponseSchema,
   AvailabilityWindowSchema,
   CONTRACT_VERSION,
+  CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
+  CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF,
+  CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF,
+  CRP_SCHEDULE_PDF_TEMPLATE_REF,
   CapacityBucketSchema,
   CapacityConflictListResponseSchema,
   CapacityConflictSchema,
@@ -591,7 +612,8 @@ var CrpScheduleExportCsvInputSchema = import_zod12.z.object({
   CapacityScheduleSchema,
   CapacityWindowListResponseSchema,
   CapacityWindowSchema,
-  CrpCapacityPlanPdfInputSchema,
+  CrpCapacityLoadXlsxInputSchema,
+  CrpConflictReportPdfInputSchema,
   CrpDeleteResponseSchema,
   CrpExplainCapacityLoadToolInputSchema,
   CrpExplainCapacityLoadToolOutputSchema,
@@ -607,8 +629,8 @@ var CrpScheduleExportCsvInputSchema = import_zod12.z.object({
   CrpListSchedulesToolOutputSchema,
   CrpListWorkCentersToolInputSchema,
   CrpListWorkCentersToolOutputSchema,
-  CrpResourceLoadCsvInputSchema,
-  CrpScheduleExportCsvInputSchema,
+  CrpResourceCalendarCsvInputSchema,
+  CrpSchedulePdfInputSchema,
   CrpScheduleableOperationSchema,
   IsoDateTimeStringSchema,
   MrpHandoffBatchResponseSchema,

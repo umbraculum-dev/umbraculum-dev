@@ -1,7 +1,7 @@
 # `mrp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Wave 5 read-only AI planning advisor shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery recipe/session projections, read-only web pages, deterministic fixture-backed proof, and module-owned read-only AI tools exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery recipe/session projections, read-only web pages, deterministic fixture-backed proof, and module-owned read-only AI tools exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
 **Code:** `mrp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
@@ -75,7 +75,8 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 4. **Wave 3 — read-only web alpha experience.** `apps/web/app/[locale]/(mrp)/production-orders/` and `material-requirements/` expose those read models without write controls. **Shipped as web read-only proof only.**
 5. **Wave 4 — deterministic read-only alpha proof.** E2E fixture data and focused Playwright assertions now prove the MRP/CRP read-only projection path without creating MRP rows. **Shipped as proof hardening only.**
 6. **Wave 5 — read-only AI planning advisor.** `mrp.listProductionOrders`, `mrp.getProductionOrder`, and `mrp.explainMaterialRequirements` register through `registerModule({ registerAiTools })` and call the existing read services. **Shipped as advisor proof only.**
-7. **Later — rendering/write workflows.** Planned document-template payloads exist, but no document-template registration, native screens, or write routes ship in Wave 5.
+7. **Wave 6 — rendering templates.** Four RFC-0007 templates (`mrp:work-order-pdf@v1`, `mrp:route-card-pdf@v1`, `mrp:material-requirements-xlsx@v1`, `mrp:production-order-csv@v1`) register through `registerModule({ documentTemplates })` with module-owned render-job routes. **Shipped as rendering proof only.**
+8. **Later — write workflows.** Propose/write routes and native operator flows remain future work.
 
 ---
 
@@ -90,6 +91,7 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 - [MRP/CRP Wave 3 read-only alpha experience build log](../../design/mrp-crp-wave-3-read-only-alpha-experience-build-log.md) — web read-only implementation record.
 - [MRP/CRP Wave 4 alpha proof hardening build log](../../design/mrp-crp-wave-4-alpha-proof-hardening-build-log.md) — deterministic proof implementation record.
 - [MRP/CRP Wave 5 AI planning advisor build log](../../design/mrp-crp-wave-5-ai-planning-advisor-build-log.md) — read-only AI advisor implementation record.
+- [MRP/CRP Wave 6 rendering templates build log](../../design/mrp-crp-wave-6-rendering-templates-build-log.md) — RFC-0007 templates and render-job routes.
 - [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md) — Wave 1 read-only API skeleton.
 - [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery-and-MRP-and-CRP co-design.
