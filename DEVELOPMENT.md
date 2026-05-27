@@ -120,6 +120,8 @@ Dev and CI Postgres services use **`pgvector/pgvector:pg16`**, not stock `postgr
 - **Search:** lunr.js fallback until Algolia DocSearch credentials land ([`docs/design/docsearch-application-draft.md`](docs/design/docsearch-application-draft.md)).
 - **Contracts doc snapshots (P6):** first execution per [`docs/design/docs-site-contracts-versioning-runbook.md`](docs/design/docs-site-contracts-versioning-runbook.md).
 - **Flip announcement draft:** [`docs/PUBLIC-ALPHA-ANNOUNCEMENT.md`](docs/PUBLIC-ALPHA-ANNOUNCEMENT.md).
+- **Flip-day runbook (Stage 2c):** [`docs/design/public-alpha-flip-day-runbook.md`](docs/design/public-alpha-flip-day-runbook.md).
+- **npm SDK publish preflight (2e):** [`docs/design/npm-sdk-publish-preflight.md`](docs/design/npm-sdk-publish-preflight.md).
 - **Pre-flip docs hygiene:** `check-public-docs-no-internal-links.py` (no links into `internal/`); `check-public-docs-no-personal-paths.py` (no `/home/…` or `~/dkprojects/rfapps/` paths).
 
 Replication/pgpool behavior is unchanged; see [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](docs/POSTGRES-REPLICATION-ARCHITECTURE.md) §"pgvector image".
