@@ -67,7 +67,7 @@ This is **not** an enterprise-feature paywall (the §9 commitments in [`LICENSIN
 
 ### 4.1 Anyone may propose
 
-Proposals are opened publicly — initially as a labelled GitHub Issue (label TBD when the public-flip cutover lands per [`ROADMAP.md`](ROADMAP.md) Week 3), later as whatever channel the public-facing project converges on (Discussions, dedicated tracker, etc.). A proposal is well-formed if it states:
+Proposals are opened publicly on the **canonical community forum** ([`forum.umbraculum.dev`](https://forum.umbraculum.dev) — see §4.6) in the **Proposals** category, starting at the public-alpha flip ([`ROADMAP.md`](ROADMAP.md) Phase 2 **2c**). Each forum topic links to a companion GitHub Issue when the proposal touches code (label TBD at flip); the forum topic is the durable discussion and voting surface; the GitHub Issue is the implementation tracker. A proposal is well-formed if it states:
 
 1. **What** — the change the project should make, concretely enough that a core-team reviewer can size it.
 2. **Why** — the user / contributor / operator value the change unlocks.
@@ -80,7 +80,7 @@ There is no minimum size. A typo fix is a proposal; a new canonical module is an
 
 A regular public meeting takes up the top-voted proposals. The starting cadence is **monthly** — small enough to be sustainable for a small team, large enough to accumulate a meaningful queue between meetings. The cadence is revisable (§9).
 
-Voting between meetings happens on the proposal channel itself (e.g. GitHub reactions on the issue; or whatever the public-facing project standardizes on). Vote weight is **one vote per real participant** — no sponsorship-weighted voting, no organization-weighted voting. The project uses [DCO sign-off discipline](../CONTRIBUTING.md) for the same reason it uses one-vote-per-participant here: the unit of trust is a real person who can be reached at a real address.
+Voting between meetings happens on the proposal forum topic itself (Discourse reactions or a pinned poll — whichever the core team publishes in the meeting-prep post for that cycle). Vote weight is **one vote per real participant** — no sponsorship-weighted voting, no organization-weighted voting. The project uses [DCO sign-off discipline](../CONTRIBUTING.md) for the same reason it uses one-vote-per-participant here: the unit of trust is a real person who can be reached at a real address.
 
 A proposal needs **N upvotes by T days before the meeting** to be slated for that meeting. Initial N + T are deliberately not over-specified at v0.1 — they will be calibrated by the first few cycles. The discipline that matters is that the **threshold is published in advance of each meeting** and **does not move retroactively**.
 
@@ -101,7 +101,7 @@ The core team holds a **veto, not a substitution right**. Specifically:
   - The proposal has a hidden architectural cost the proposers and voters were not aware of (silent cross-module coupling; would require major refactor; would dead-end a documented roadmap item).
   - The proposal has known-bad interactions with in-flight RFC work scheduled for the same window.
 - The core team **may NOT** veto a proposal in order to commit instead to a different proposal that the community did not vote in. The veto closes a door; it does not open a different door. The next slot is filled by **the next-highest-voted unvetoed proposal**, not by core-team substitution.
-- **Every veto must be recorded** — the proposal's issue (or successor channel) carries a comment with: which member of the core team vetoed, the cause from the recognized list above (or a clearly-stated new cause), the link to the relevant RFC / commitment / discipline if applicable, and — if the proposal can be reshaped to land — a sentence on what reshaping would unblock it.
+- **Every veto must be recorded** — the proposal's forum topic (and linked GitHub Issue, if any) carries a comment with: which member of the core team vetoed, the cause from the recognized list above (or a clearly-stated new cause), the link to the relevant RFC / commitment / discipline if applicable, and — if the proposal can be reshaped to land — a sentence on what reshaping would unblock it.
 - **Vetos are reviewable.** A proposer (or any community member) may request a meeting agenda item to review a veto. Review is not a re-vote; it is an opportunity to challenge the cause, surface information the core team did not have, or convert a "needs more discussion" veto into a follow-on RFC.
 
 This shape — community decides, core team can only stop for cause, every stop is recorded and reviewable — is what makes "community-first" a *mechanism* rather than a *posture*. It is the same shape (in spirit) that the [Linux kernel maintainer model](https://www.kernel.org/doc/html/v4.13/process/8.Conclusion.html), the [Apache foundation project model](https://www.apache.org/foundation/how-it-works.html), and the [Mozilla module ownership model](https://www.mozilla.org/en-US/about/governance/policies/module-ownership/) take: ownership is real, ownership is bounded, ownership is publicly accountable.
@@ -111,6 +111,86 @@ This shape — community decides, core team can only stop for cause, every stop 
 The core team is **not** idle between community-voted slots. It runs the apparatus, lands routine maintenance (security patches, dependency bumps, CI fixes, foundation-hardening work per [`docs/FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md), accessibility-correctness regressions, etc.), and authors / executes RFCs for the architectural commitments the platform needs to honor its public-facing promises. Those are not vetoed-because-substituted work — they are the **standing maintenance and architectural commitments** the project signed up for when it published its license, manifesto, and RFCs. The community-vote mechanism allocates **new feature scope**, not **maintenance budget**. Maintenance is non-discretionary.
 
 If the line between "maintenance" and "new feature scope" turns out to be contested in practice — a real risk — the §9 RFC-promotion path is how that line gets sharpened.
+
+### 4.6 Community channels — where discussion lives
+
+This section names the **operational surfaces** the §4 mechanism runs on. It is deliberately **cost-contained until traction is proven** — the project may not take off, and community infrastructure should not front-load spend or ops burden the way a mature foundation would.
+
+**Design constraints (non-negotiable for Umbraculum-owned surfaces):**
+
+- **Open source** for the canonical forum and any later chat/AV self-host paths (no proprietary chat platform as the system of record).
+- **Not inside the product.** Community discussion is **not** a module feature and **not** covered by [RFC-0008](rfcs/0008-notifications-outbound-delivery.md) (product outbound email). The running app's notification service may eventually webhook *release/RFC reminders* to community channels; it does not host governance.
+- **§6 anti-verticality applies** on Umbraculum-owned surfaces: fixed Umbraculum avatar, no stars/karma/badges/ranks, no system pings beyond the monthly policy email. Discourse trust levels and badges are **disabled or visually neutralized** at bootstrap.
+- **Brochure and docs stay on Cloudflare Pages** per [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) — community infra is a **separate subdomain on a separate VPS**, not mixed into the static-site pipeline.
+
+#### 4.6.1 DNS and domain layout (Cloudflare)
+
+The apex domain **`umbraculum.dev`** is already registered; DNS stays on **Cloudflare** (same zone as `umbraculum.dev` / `docs.umbraculum.dev` Pages CNAMEs).
+
+| Hostname | Target | Pattern |
+|----------|--------|---------|
+| `umbraculum.dev`, `www` | Cloudflare Pages (brochure) | CNAME → `*.pages.dev` (existing) |
+| `docs.umbraculum.dev` | Cloudflare Pages (Docusaurus) | CNAME → `*.pages.dev` (existing) |
+| **`forum.umbraculum.dev`** | Community VPS (Contabo) | **A record** → VPS public IPv4; **DNS only** (grey cloud) at bootstrap so Discourse's Let's Encrypt workflow stays straightforward |
+| `chat.umbraculum.dev` | Same VPS (Phase 1) | A record when chat lands |
+| `meet.umbraculum.dev` | Same or second VPS (Phase 2) | A record when self-hosted AV lands |
+
+**Bootstrap DNS steps (maintainer):** create the Contabo VPS → note its IPv4 → in Cloudflare, add `forum` **A** → that IP, proxy **off** → run Discourse install with `forum.umbraculum.dev` as hostname → verify HTTPS. Revisit Cloudflare proxy (orange cloud) only if abuse or DDoS appears; if proxied, use **Full (strict)** TLS to origin.
+
+#### 4.6.2 Phase 0 — bootstrap (public alpha default)
+
+Run **one service** on **one VPS** until the community proves it needs more.
+
+| Layer | Platform | URL | Role |
+|-------|----------|-----|------|
+| **Governance + archive** | [Discourse](https://www.discourse.org/) (self-host, GPL) | `https://forum.umbraculum.dev` | Proposals (§4.1), vote threads (§4.2), meeting agendas/minutes/transcripts (§4.3), policy posts, general help |
+| **Code + PRs** | GitHub (`umbraculum-dev` org) | Issues / PRs / Discussions for code-shaped Q&A | Implementation tracker linked from forum topics; DCO on commits ([`CONTRIBUTING.md`](../CONTRIBUTING.md)) |
+| **Informal talk** | Discourse categories (e.g. **Help**, **Introductions**) | on forum | **No separate chat app** at Phase 0 |
+| **Live meetings** | **Provisional external AV** (e.g. public Jitsi meeting link announced in the forum **Meetings** category) | link posted per meeting | Convenience only — **not** the canonical record. Recording and transcript (or detailed minutes) are **published on the forum** |
+| **Transactional email** | Free-tier SMTP (e.g. Brevo, Mailgun trial) | — | Required for Discourse invites/digests; free tier is sufficient at alpha scale |
+
+**Hosting (Phase 0):** Contabo **Cloud VPS 10** — **€3.60/month** (12-month term, auto backup enabled per Contabo checkout; list €4.50). Spec: 4 vCPU, **8 GB RAM**, 75 GB NVMe, 1 snapshot. Comfortable for Discourse alone with headroom for small upload growth.
+
+**Maintainer runbook:** [`community-forum-runbook.md`](design/community-forum-runbook.md) (install, DNS, §6 Discourse hardening, smoke tests).
+
+**Phase 0 infra total:** **~€3.60/month (~€43/year)** + maintainer ops time (~2–4 h/month for forum patches/backups; ~2 h/meeting when a public meeting runs).
+
+#### 4.6.3 Phase 1 — real-time chat (deferred)
+
+**Trigger (any one is enough):** sustained need for real-time coordination that clogs forum categories; or **≥10 monthly active forum participants** and repeated "we need a chat" signal at a community meeting.
+
+| Add | Platform | URL | Hosting |
+|-----|----------|-----|---------|
+| Real-time chat | [Matrix](https://matrix.org/) via a lightweight homeserver (e.g. Conduit) | `https://chat.umbraculum.dev` | Same **VPS 10** if RAM stays comfortable; else upgrade (§4.6.4) |
+
+**Alternative:** apply for [Zulip open-source project sponsorship](https://zulip.com/for/open-source/) — if accepted, chat may run on Zulip Cloud at **€0** infra while the forum stays self-hosted on Contabo.
+
+Chat is **informal**; binding votes and meeting records remain on the forum.
+
+#### 4.6.4 Phase 2 — self-hosted meetings (deferred)
+
+**Trigger:** the monthly public meeting (§4.2) is an established ritual **and** provisional external AV is no longer acceptable (retention, branding, or reliability).
+
+| Option | Platform | Infra |
+|--------|----------|-------|
+| **A (preferred)** | [Jitsi Meet](https://jitsi.org/) on upgraded VPS | Upgrade VPS 10 → **Cloud VPS 20** (**€5.60/month**, 12 GB RAM) — Discourse + chat + light Jitsi co-hosted |
+| **B** | Jitsi on second VPS 10 | **€7.20/month** (2× €3.60) — isolates video load from the forum |
+
+Add **Jibri** (recording) only when published recordings become policy, not at first self-hosted AV.
+
+#### 4.6.5 Cost summary (published expectation)
+
+| Phase | Contabo plan | Infra / month | When |
+|-------|--------------|---------------|------|
+| **0 — Alpha** | Cloud VPS 10 | **€3.60** | Public-alpha flip |
+| **1 — Chat** | VPS 10 (same) or VPS 20 if tight | **€3.60–5.60** | Chat trigger (§4.6.3) |
+| **2 — Own AV** | VPS 20 upgrade or 2× VPS 10 | **€5.60–7.20** | Meeting trigger (§4.6.4) |
+
+These figures assume the existing `umbraculum.dev` zone (no new domain purchase), free-tier SMTP, and Contabo auto backup (no separate off-site backup vendor at Phase 0). Sponsorship may expand capacity later; it does **not** change vote weight (§5.3).
+
+#### 4.6.6 Revisit
+
+Channel choices, vote tooling on Discourse, Sybil mitigation (§6), and Phase 1/2 triggers are **revisited** on the §9 schedule (first comprehensive revisit within six months after the July 2026 public alpha). Upgrades are **additive** — the forum URL remains the canonical governance home across phases.
 
 ---
 
@@ -136,7 +216,16 @@ The project asks the community, openly, to help carry the cost of the inputs the
 - **Infrastructure.** Hosting, CI minutes, monitoring, etc. — the standard list. Less unique to this project than the first two, but real.
 - **Specific named line items.** When a community-voted proposal has a knowable compute or hosting cost, the project will say so (e.g. "this proposal requires roughly $X in inference for the plan-authoring + verification pass"). Sponsors may earmark to specific line items if they wish; they may also sponsor general-purpose capacity.
 
-The channels through which the project accepts sponsorship are operational details that land separately (likely [GitHub Sponsors](https://github.com/sponsors) for individuals, [Open Collective](https://opencollective.com/) or equivalent for organizational sponsorship at v1). What this document commits is the **principle**: sponsorship is an honest ask, recorded publicly, with the §5.3 disciplines.
+**Payment channels (Phase 0 — solo project).** At public alpha, financial sponsorship uses two low-overhead rails documented in [`donation-channels.md`](design/donation-channels.md):
+
+- **[Liberapay](https://liberapay.com/Umbraculum/)** (`Umbraculum` team) — **recurring** donations; **0%** platform fee (payment-processor fees only).
+- **[Buy Me a Coffee](https://buymeacoffee.com/Umbraculum)** — **one-time** tips; ~5% platform fee (Liberapay is recurring-only).
+
+**In-kind** (AI/API organizational billing, cloud credit programs, infrastructure) is **not** a checkout button — sponsors coordinate via the public forum or `/support` per the runbook. **No shared API keys.**
+
+Umbraculum is **solo-maintained** at this stage. **Adding or replacing channels** (e.g. GitHub Sponsors, Open Collective for org invoices and public budget) follows a **community proposal and vote** (§4) when the triggers in [`donation-channels.md`](design/donation-channels.md) §5 fire — not a unilateral maintainer change. §5.3 disciplines apply to all channels.
+
+What this document commits is the **principle**: sponsorship is an honest ask, recorded publicly, with the §5.3 disciplines.
 
 ### 5.3 What sponsorship does NOT buy
 

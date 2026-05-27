@@ -242,8 +242,14 @@ See [`DEVELOPMENT.md`](./DEVELOPMENT.md) and the project-local addendum
 
 ## Questions
 
-For project / strategy questions: open a GitHub Discussion (when the
-repo is public) or an issue with the `question` label.
+For **community proposals, roadmap sequencing, and project/strategy
+discussion**: use the canonical forum at
+[`forum.umbraculum.dev`](https://forum.umbraculum.dev) (see
+[`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](./docs/CORE-DEVELOPMENT-AND-COMMUNITY.md)
+§4.6).
+
+For **code-shaped questions** (when the repo is public): open a GitHub
+Discussion or an issue with the `question` label.
 
 For security questions: see [`SECURITY.md`](./SECURITY.md).
 

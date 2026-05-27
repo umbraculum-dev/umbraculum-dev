@@ -39,7 +39,7 @@ Commands equivalent to monorepo Stage 1:
 
 - Presence of legal / onboarding files
 - `rg` for `sk-ant-`, `sk-proj-`, PEM headers — no hits
-- `rg` for `/home/rf/`, `~/dkprojects` in markdown — no hits
+- `rg` for maintainer-specific home-directory path prefixes in markdown — no hits
 
 **Not run:** `gitleaks` on toolset history (install on maintainer machine).
 
