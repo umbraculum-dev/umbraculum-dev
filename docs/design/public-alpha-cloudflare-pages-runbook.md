@@ -14,7 +14,7 @@ Both public static surfaces use the same hosting pattern as RFC-0005:
 - **No deploy secrets in GitHub Actions** — Cloudflare Pages connects to the repo and builds on merge to `master`.
 - **CI only validates build** — workflows mirror [`docs-site-build.yml`](../../.github/workflows/docs-site-build.yml) and [`website-build.yml`](../../.github/workflows/website-build.yml).
 - **Custom domains + HTTPS** — CNAME from DNS to `*.pages.dev`; TLS at Cloudflare edge.
-- **`noindex` until flip** — brochure ships with `robots.txt` disallow; remove or replace in Phase 2 when announcing α.
+- **`noindex` until flip** — brochure ships with `robots.txt` disallow + meta `noindex`; docs-site uses `noIndex: true` + `static/robots.txt`. Remove or replace in Phase 2 when announcing α.
 
 | Site | Domain (target) | Workspace | Build command | Output directory |
 |------|-------------------|-----------|---------------|------------------|

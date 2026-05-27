@@ -1,0 +1,3 @@
+# Pre–public-alpha policy (RFC-0005 P7). Remove or replace at July 2026 flip.
+User-agent: *
+Disallow: /

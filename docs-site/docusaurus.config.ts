@@ -135,6 +135,9 @@ const config: Config = {
   organizationName: 'umbraculum-dev',
   projectName: 'umbraculum-dev',
 
+  // RFC-0005 P7 — flip to false when public alpha is declared (with robots.txt).
+  noIndex: true,
+
   onBrokenLinks: 'throw',
 
   future: {
@@ -291,6 +294,7 @@ const config: Config = {
           items: [
             {label: 'Documentation home', to: '/'},
             {label: 'RFC index', to: '/rfcs/'},
+            {label: 'Open-source stack', to: '/OPEN-SOURCE-STACK'},
             {label: 'Reference READMEs', to: '/reference/apps/web/'},
           ],
         },
@@ -304,6 +308,10 @@ const config: Config = {
             {
               label: 'MANIFESTO',
               href: 'https://github.com/umbraculum-dev/umbraculum-dev/blob/master/MANIFESTO.md',
+            },
+            {
+              label: 'Support & sponsorship',
+              href: 'https://umbraculum.dev/support/',
             },
           ],
         },
