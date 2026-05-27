@@ -104,6 +104,8 @@ services:
       # Phase B-3 prep: web pages under (automation)/ will consume the
       # mailbox-mirror types (MailboxSpec, MAILBOX_SPEC) via this package.
       # Mounted now so Phase B-3 PRs only have to add imports, not compose.
+      # MRP/CRP async export (renderJobClient.ts) uses cookie-auth helpers from api-client.
+      - ./packages/api-client:/packages/api-client:ro
       - ./packages/automation-contracts:/packages/automation-contracts:ro
       - ./packages/pim-contracts:/packages/pim-contracts:ro
       - ./packages/mrp-contracts:/packages/mrp-contracts:ro
