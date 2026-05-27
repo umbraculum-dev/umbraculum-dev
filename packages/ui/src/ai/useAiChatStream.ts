@@ -106,6 +106,7 @@ function newId(): string {
  * `pending` is true is a no-op.
  */
 export function useAiChatStream(input: UseAiChatStreamInput) {
+  const { chatFetch, routeId, proposalApply, proposalReject } = input;
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
   const [pending, setPending] = useState(false);
   const [terminalError, setTerminalError] = useState<
@@ -115,8 +116,8 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
 
   const applyProposal = useCallback(
     async (proposalId: string) => {
-      if (!input.proposalApply) return;
-      await input.proposalApply(proposalId);
+      if (!proposalApply) return;
+      await proposalApply(proposalId);
       setMessages((prev) =>
         prev.map((m) => {
           if (!m.turn) return m;
@@ -132,13 +133,13 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
         }),
       );
     },
-    [input.proposalApply],
+    [proposalApply],
   );
 
   const rejectProposal = useCallback(
     async (proposalId: string) => {
-      if (!input.proposalReject) return;
-      await input.proposalReject(proposalId);
+      if (!proposalReject) return;
+      await proposalReject(proposalId);
       setMessages((prev) =>
         prev.map((m) => {
           if (!m.turn) return m;
@@ -154,7 +155,7 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
         }),
       );
     },
-    [input.proposalReject],
+    [proposalReject],
   );
 
   const send = useCallback(
@@ -189,9 +190,9 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
       const controller = new AbortController();
       abortRef.current = controller;
       try {
-        const res = await input.chatFetch(trimmed, {
+        const res = await chatFetch(trimmed, {
           signal: controller.signal,
-          routeId: input.routeId ?? null,
+          routeId: routeId ?? null,
         });
         if (!res.ok) {
           let code = `http_${res.status}`;
@@ -252,7 +253,7 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
         abortRef.current = null;
       }
     },
-    [pending, input],
+    [pending, chatFetch, routeId],
   );
 
   const reset = useCallback(() => {

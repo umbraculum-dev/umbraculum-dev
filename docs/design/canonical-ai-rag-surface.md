@@ -21,7 +21,7 @@ Static `aiPrompts.knowledge` (≤2 KB per module) remains for boot-time bullets;
 
 ## 2. Infrastructure
 
-- **Extension:** `vector` (pgvector) enabled on Postgres 16 via `pgvector/pgvector:pg16` image and `infra/postgres/init/03-ai-pgvector.sql`.
+- **Extension:** `vector` (pgvector) via `pgvector/pgvector:pg16` (`docker-compose.yml`, CI `api.yml`), `infra/postgres/init/03-ai-pgvector.sql` (first boot), and Prisma migration `20260527120200_ai_pgvector_rag_schema` (conditional on `pg_available_extensions`).
 - **Schema:** `ai.doc_chunks`
 
 | Column | Purpose |

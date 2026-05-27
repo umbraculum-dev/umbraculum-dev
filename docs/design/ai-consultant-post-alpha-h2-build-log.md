@@ -58,6 +58,8 @@
 | Area | Paths |
 |------|--------|
 | pgvector init | [`infra/postgres/init/03-ai-pgvector.sql`](../../infra/postgres/init/03-ai-pgvector.sql) |
+| pgvector migration | `services/api/prisma/migrations/20260527120200_ai_pgvector_rag_schema/` (conditional) |
+| CI pgvector | [`.github/workflows/api.yml`](../../.github/workflows/api.yml) uses `pgvector/pgvector:pg16` |
 | Ingest | [`services/api/src/services/ai/rag/ingestPublicDocs.ts`](../../services/api/src/services/ai/rag/ingestPublicDocs.ts) |
 | Tool | [`services/api/src/services/ai/tools/platform/searchProductDocs.ts`](../../services/api/src/services/ai/tools/platform/searchProductDocs.ts) |
 
