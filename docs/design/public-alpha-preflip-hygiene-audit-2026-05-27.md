@@ -20,7 +20,7 @@
 | Repo metadata (3.1–3.2) | **PASS** |
 | Secrets in tracked code (2.1 quick) | **PASS** — dev placeholders only (`postgres`, `sk-ant-…` UI copy, test keys) |
 | Personal path examples (2.3) | **PASS** (2026-05-27) — normalized to `$REPO_ROOT`; `check-public-docs-no-personal-paths.py` |
-| Toolset repo (5.3) | **NOT RUN** — requires clone |
+| Toolset repo (5.3) | **PARTIAL** — [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) |
 | CoC/SECURITY live mailboxes (5.2) | **BLOCKED** — placeholders until flip |
 | Cloudflare / DocSearch (6.3–6.4) | **MANUAL** |
 

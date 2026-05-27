@@ -128,6 +128,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **1h** | **Support page scaffold** (brochure `/support/`) | **Shipped** | Donation channels TBD at flip (**2d**) | `apps/website/public/support/`, [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 |
 | **1i** | **Stage 1 hygiene checklist** (agent-prepared) | **Shipped** | Maintainer runs sign-off in **2b** | [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) |
 | **1j** | **Flip announcement + P6 runbook skeletons** | **Shipped** (2026-05-27) | Publish / execute in Phase 2 **2c**–**2d** / first contracts release | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md), [`docs-site-contracts-versioning-runbook.md`](design/docs-site-contracts-versioning-runbook.md) |
+| **1k** | **Flip-day + npm preflight + toolset audit + support copy** | **Shipped** (2026-05-27) | Execute **2c** / **2e** / toolset CoC+SECURITY from maintainer docs | [`public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md), [`npm-sdk-publish-preflight.md`](design/npm-sdk-publish-preflight.md), [`toolset-preflip-hygiene-audit-2026-05-27.md`](design/toolset-preflip-hygiene-audit-2026-05-27.md) |
 
 **Phase 1 complete** except **1f** (deferred H1 2027). Remaining work is Phase 2 (manual).
 
@@ -137,9 +138,9 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 |---|------|----------------|--------------|
 | **2a** | **Human alpha walkthrough + gap-log sign-off** | Closes MRP/CRP α proof without claiming mature product | [`mrp-crp-alpha-demo-walkthrough.md`](design/mrp-crp-alpha-demo-walkthrough.md) |
 | **2b** | **Stage 1 hygiene** — secrets scan, Tier: Public link audit, toolset repo parity | Automated pass 2026-05-27 ([`public-alpha-preflip-hygiene-audit-2026-05-27.md`](design/public-alpha-preflip-hygiene-audit-2026-05-27.md)); maintainer sign-off + toolset + gitleaks remain | [`public-alpha-preflip-hygiene-checklist.md`](design/public-alpha-preflip-hygiene-checklist.md) |
-| **2c** | **Stage 2 atomic flip** — repos public, `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α | Week 3 tranche above, [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
+| **2c** | **Stage 2 atomic flip** — repos public, `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α | [`public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md), [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
 | **2d** | **Support / donations page** + launch announcement | `/support/` + [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md) drafts shipped; wire sponsors + publish at flip | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §5 |
-| **2e** | **MIT npm SDK publish batch** | Registry install for third-party module authors | [`LICENSING.md`](LICENSING.md) §6.2.1 |
+| **2e** | **MIT npm SDK publish batch** | Registry install for third-party module authors | [`npm-sdk-publish-preflight.md`](design/npm-sdk-publish-preflight.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |
 | **2f** | **DocSearch application submit** (Algolia) | Replaces lunr fallback on docs site | RFC-0005 P5 |
 | **2g** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 |
 | **2h** | **Tamagui intra-RC bump** | Hygiene | [`TAMAGUI.md`](TAMAGUI.md) |

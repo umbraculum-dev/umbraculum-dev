@@ -57,7 +57,7 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 |---|--------|-------|
 | 5.1 | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` present and aligned | ☐ |
 | 5.2 | Contact emails in CoC / SECURITY are real monitored addresses on `umbraculum.dev` (not placeholders) | ☐ |
-| 5.3 | Toolset repo README / LICENSE parity with monorepo posture | ☐ |
+| 5.3 | Toolset repo README / LICENSE parity with monorepo posture | Partial — see [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) (CoC + SECURITY gaps) |
 
 ---
 
