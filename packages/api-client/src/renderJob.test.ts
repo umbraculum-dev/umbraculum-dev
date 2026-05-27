@@ -36,42 +36,48 @@ describe("resolveArtifactDownloadUrl", () => {
 
 describe("runAsyncRenderJobExport", () => {
   it("submits, polls, and returns download url", async () => {
-    const fetch = vi.fn(async (url: string, init?: RequestInit) => {
+    const fetch = vi.fn((url: string, init?: RequestInit) => {
       const method = init?.method ?? "GET";
       if (method === "POST") {
-        return {
+        return Promise.resolve({
           ok: true,
           status: 202,
-          text: async () =>
-            JSON.stringify({
-              ok: true,
-              mode: "async",
-              job: validJob("queued"),
-            }),
-        };
+          text: () =>
+            Promise.resolve(
+              JSON.stringify({
+                ok: true,
+                mode: "async",
+                job: validJob("queued"),
+              }),
+            ),
+        });
       }
       if (url.includes("/result")) {
-        return {
+        return Promise.resolve({
           ok: true,
           status: 200,
-          text: async () =>
+          text: () =>
+            Promise.resolve(
+              JSON.stringify({
+                ok: true,
+                job: validJob("succeeded"),
+                signedUrl: "/rendering/artifacts/out.pdf",
+                expiresAt: "2026-05-25T00:05:00.000Z",
+              }),
+            ),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        text: () =>
+          Promise.resolve(
             JSON.stringify({
               ok: true,
               job: validJob("succeeded"),
-              signedUrl: "/rendering/artifacts/out.pdf",
-              expiresAt: "2026-05-25T00:05:00.000Z",
             }),
-        };
-      }
-      return {
-        ok: true,
-        status: 200,
-        text: async () =>
-          JSON.stringify({
-            ok: true,
-            job: validJob("succeeded"),
-          }),
-      };
+          ),
+      });
     });
 
     const client = createApiClient("http://test", {

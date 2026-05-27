@@ -25,6 +25,7 @@
     "App.tsx",
     "index.js",
     "tamagui.config.ts",
+    "vitest.config.ts",
     "src/**/*"
   ],
   "extends": "expo/tsconfig.base"
