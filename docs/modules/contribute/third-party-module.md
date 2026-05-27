@@ -34,10 +34,11 @@ If you want to ship the *one* canonical implementation of a new domain, you want
 
 ## 3. The stable surfaces you pin
 
-The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party module depends on. Three packages, two unconditional plus one per canonical you target:
+The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party module depends on. Four packages: three unconditional plus one per canonical you target:
 
-- **`@umbraculum/module-sdk`** ([`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md)) — `registerModule()`, `RESERVED_CANONICAL_MODULE_CODES`, `ValidatedSchema<T>`, `RegisterModuleOptions`. The module SDK proper.
+- **`@umbraculum/module-sdk`** ([`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md)) — `registerModule()`, `RESERVED_CANONICAL_MODULE_CODES`, `ValidatedSchema<T>`, `RegisterModuleOptions`, `registerWebModule()`, `registerNativeModule()`. The module SDK proper.
 - **`@umbraculum/ai-tool-sdk`** ([`packages/ai-tool-sdk/README.md`](../../../packages/ai-tool-sdk/README.md)) — `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. The AI-tool contract every module's tool implementations satisfy. Library-agnostic — third-party authors pick their own validation library for `inputSchema`. Pin if your module contributes AI tools (which most modules do via `registerAiTools` on `RegisterModuleOptions`).
+- **`@umbraculum/i18n-keys`** ([`packages/i18n-keys/README.md`](../../../packages/i18n-keys/README.md)) — `ModuleNavLabelKey`, `moduleMessageRoot`, `defaultModuleNavLabelKey`, `RESERVED_PLATFORM_MESSAGE_ROOTS`. Namespace conventions for module-owned message keys in locale bundles. Pin for any module that ships UI copy or registers `navEntry` / `tabEntry` label keys (typical for all modules with a web or native surface).
 - **`@umbraculum/<code>-contracts`** — the specific canonical's contracts package (e.g. `@umbraculum/automation-contracts` exports `AutomationAdapterDefinition`, `MAILBOX_SPEC`, `CONTRACT_VERSION`). One per canonical module you target.
 
 You do **not** import from `services/api/src/modules/<code>/` directly. That tree is platform internals and not version-stable. If something you need is not exported from a contracts package, that's a feature request against the contracts package, not a license to reach inside.
@@ -73,6 +74,7 @@ my-adapter-repo/
   "peerDependencies": {
     "@umbraculum/module-sdk": "^X.Y.Z",
     "@umbraculum/ai-tool-sdk": "^X.Y.Z",
+    "@umbraculum/i18n-keys": "^X.Y.Z",
     "@umbraculum/automation-contracts": "^X.Y.Z"
   }
 }
@@ -159,6 +161,7 @@ This is the same trajectory the Drupal ecosystem's most successful contributed m
 
 - [`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md) — the SDK's own README.
 - [`packages/ai-tool-sdk/README.md`](../../../packages/ai-tool-sdk/README.md) — the AI-tool SDK contract.
+- [`packages/i18n-keys/README.md`](../../../packages/i18n-keys/README.md) — module message-key conventions.
 - [`packages/automation-contracts/README.md`](../../../packages/automation-contracts/README.md) — example contracts package.
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 3 / Tier 4 rows), §8 (consumption contract).
 - [LICENSING.md §6.2](../../LICENSING.md) — MIT SDK posture.

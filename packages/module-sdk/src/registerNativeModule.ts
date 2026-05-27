@@ -1,3 +1,5 @@
+import type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";
+
 import { assertValidModuleCode } from "./moduleRegistry.js";
 
 /**
@@ -15,10 +17,11 @@ export interface RegisterNativeModuleOptions {
    */
   availableRouteIds: readonly NativeRouteId[];
   /**
-   * Optional tab label key (i18n) when this module contributes a primary tab.
+   * Optional tab label key (`nav.*` in locale bundles) when this module
+   * contributes a primary tab. See `@umbraculum/i18n-keys`.
    */
   tabEntry?: {
-    labelKey: string;
+    labelKey: ModuleNavLabelKey;
     order?: number;
   };
 }
@@ -27,7 +30,7 @@ export interface RegisteredNativeModuleSnapshot {
   code: string;
   availableRouteIds: readonly NativeRouteId[];
   tabEntry?: {
-    labelKey: string;
+    labelKey: ModuleNavLabelKey;
     order?: number;
   };
 }

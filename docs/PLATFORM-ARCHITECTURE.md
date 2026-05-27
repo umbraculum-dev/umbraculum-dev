@@ -195,6 +195,7 @@ Packages share the npm scope `@umbraculum/*` (renamed from `@brewery/*` under su
 - `@umbraculum/media` — shared image assets + manifest (renamed from `@brewery/media` 2026-05-19 as sub-plan #9 slot 2; current asset content remains brewery-flavored pending content split deferred to second-vertical landing).
 - `@umbraculum/contracts` — wire-shape DTOs / shared types.
 - `@umbraculum/ai-tool-sdk` — library-agnostic AI-tool SDK contract (`AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`). Extracted from `@umbraculum/contracts` on 2026-05-21 to realize the published-SDK commitment in §4.4 as a peer of `@umbraculum/module-sdk`.
+- `@umbraculum/i18n-keys` — module message-root and `nav.*` label-key conventions (`ModuleNavLabelKey`, `moduleMessageRoot`, `RESERVED_PLATFORM_MESSAGE_ROOTS`). Greenfield package landed 2026-05-27; locale JSON stays in `@umbraculum/i18n`.
 - `@umbraculum/test-mcp` — testing tools server (renamed from `@brewery/test-mcp` 2026-05-19 as sub-plan #9 slot 1 worked example).
 
 **Brewery-vertical (will become "module" packages):**
@@ -390,9 +391,9 @@ Concretely, the SDK surface includes:
 - `@umbraculum/module-sdk` — the `registerModule()` contract, types, and helper utilities. **Physical package** at [`packages/module-sdk/`](../packages/module-sdk/).
 - `@umbraculum/ai-tool-sdk` — the `AiTool<I, O>` interface, scope types, and `AiToolContext` definitions. **Physical package** at [`packages/ai-tool-sdk/`](../packages/ai-tool-sdk/) since 2026-05-21 (extracted from `@umbraculum/contracts` per the deferred-extraction note in [`packages/ai-tool-sdk/src/aiTool.ts`](../packages/ai-tool-sdk/src/aiTool.ts) header).
 - `@umbraculum/api-client` (public types subset) — DTO types and route-ID conventions third parties can pin to. **Physical package** at [`packages/api-client/`](../packages/api-client/).
-- `@umbraculum/i18n-keys` — namespace conventions for module-owned message keys. **Future package** — not yet split from [`@umbraculum/i18n`](../packages/i18n/); planned alongside the content-split work deferred to second-vertical landing.
+- `@umbraculum/i18n-keys` — namespace conventions for module-owned message keys (`ModuleNavLabelKey`, `moduleMessageRoot`, `RESERVED_PLATFORM_MESSAGE_ROOTS`). **Physical package** at [`packages/i18n-keys/`](../packages/i18n-keys/) since 2026-05-27 (greenfield SDK contract; locale **content** remains in [`@umbraculum/i18n`](../packages/i18n/)). Brewery content split to a future vertical bundle is a separate deferred concern per brewery-scope-migration §1.4.
 
-The first three packages are physically present in `packages/` today; `@umbraculum/i18n-keys` is the remaining future extraction. The npm-scope migration that landed the existing packages' Umbraculum names closed under sub-plan #9 on 2026-05-19. All four packages are workspace-`private: true` today; npm publishing is a separate post-flip concern per §10.1.1.
+All four SDK packages listed above are physically present in `packages/` today. The npm-scope migration that landed the existing packages' Umbraculum names closed under sub-plan #9 on 2026-05-19. All four packages are workspace-`private: true` today; npm publishing is a separate post-flip concern per §10.1.1.
 
 ### 4.5 Prisma schema strategy
 

@@ -1,4 +1,6 @@
 import { AiToolRegistry } from '@umbraculum/ai-tool-sdk';
+import { ModuleNavLabelKey } from '@umbraculum/i18n-keys';
+export { ModuleNavLabelKey } from '@umbraculum/i18n-keys';
 
 /**
  * Reserved canonical module codes per RFC-0001 Decision B.
@@ -261,12 +263,13 @@ interface RegisterWebModuleOptions {
     /**
      * Optional primary navigation entry. The web shell's `PrimaryNav` may read
      * the registry to compose nav items. `primarySegment` MUST be one of
-     * `ownedUrlSegments`. `order` is a sort key (lower is earlier; defaults to
-     * insertion order if omitted).
+     * `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale bundles
+     * (see `@umbraculum/i18n-keys`; default pattern `nav.<code>`).
+     * `order` is a sort key (lower is earlier; defaults to insertion order if omitted).
      */
     navEntry?: {
         primarySegment: string;
-        labelKey: string;
+        labelKey: ModuleNavLabelKey;
         order?: number;
     };
 }
@@ -275,7 +278,7 @@ interface RegisteredWebModuleSnapshot {
     ownedUrlSegments: readonly string[];
     navEntry?: {
         primarySegment: string;
-        labelKey: string;
+        labelKey: ModuleNavLabelKey;
         order?: number;
     };
 }
@@ -337,10 +340,11 @@ interface RegisterNativeModuleOptions {
      */
     availableRouteIds: readonly NativeRouteId[];
     /**
-     * Optional tab label key (i18n) when this module contributes a primary tab.
+     * Optional tab label key (`nav.*` in locale bundles) when this module
+     * contributes a primary tab. See `@umbraculum/i18n-keys`.
      */
     tabEntry?: {
-        labelKey: string;
+        labelKey: ModuleNavLabelKey;
         order?: number;
     };
 }
@@ -348,7 +352,7 @@ interface RegisteredNativeModuleSnapshot {
     code: string;
     availableRouteIds: readonly NativeRouteId[];
     tabEntry?: {
-        labelKey: string;
+        labelKey: ModuleNavLabelKey;
         order?: number;
     };
 }

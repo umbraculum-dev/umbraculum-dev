@@ -1,3 +1,5 @@
+import type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";
+
 import { assertValidModuleCode } from "./moduleRegistry.js";
 
 /**
@@ -24,12 +26,13 @@ export interface RegisterWebModuleOptions {
   /**
    * Optional primary navigation entry. The web shell's `PrimaryNav` may read
    * the registry to compose nav items. `primarySegment` MUST be one of
-   * `ownedUrlSegments`. `order` is a sort key (lower is earlier; defaults to
-   * insertion order if omitted).
+   * `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale bundles
+   * (see `@umbraculum/i18n-keys`; default pattern `nav.<code>`).
+   * `order` is a sort key (lower is earlier; defaults to insertion order if omitted).
    */
   navEntry?: {
     primarySegment: string;
-    labelKey: string;
+    labelKey: ModuleNavLabelKey;
     order?: number;
   };
 }
@@ -39,7 +42,7 @@ export interface RegisteredWebModuleSnapshot {
   ownedUrlSegments: readonly string[];
   navEntry?: {
     primarySegment: string;
-    labelKey: string;
+    labelKey: ModuleNavLabelKey;
     order?: number;
   };
 }

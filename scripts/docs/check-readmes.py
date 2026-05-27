@@ -66,6 +66,7 @@ FULL_SCOPE_README_PATHS = [
     "apps/native/README.md",
     "services/api/README.md",
     "packages/ai-tool-sdk/README.md",
+    "packages/i18n-keys/README.md",
     "packages/api-client/README.md",
     "packages/beerjson/README.md",
     "packages/contracts/README.md",
