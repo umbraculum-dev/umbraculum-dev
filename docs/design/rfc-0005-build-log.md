@@ -38,7 +38,7 @@ P5–P7: open (DocSearch submit, contracts versioning runbook, public indexing f
 | Phase | Owner | Entry |
 |-------|-------|-------|
 | P5 DocSearch | Maintainer | [`docsearch-application-draft.md`](docsearch-application-draft.md) |
-| P6 Contracts versioning | Maintainer + controller | First `@umbraculum/*-contracts` release |
+| P6 Contracts versioning | Maintainer + controller | [`docs-site-contracts-versioning-runbook.md`](docs-site-contracts-versioning-runbook.md) (skeleton; execute on first release) |
 | P7 Public indexing | Maintainer | Flip `noIndex`, robots.txt, brochure meta; [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) |
 
 ## Verification commands

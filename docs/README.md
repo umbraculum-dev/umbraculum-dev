@@ -43,6 +43,7 @@ The high-level direction, business model, and license posture.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
 - [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the current AI tier unlock and future managed-AI overlay are described in `PLATFORM-ARCHITECTURE.md` §7).
 - [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) — How community proposals, collaborators, sponsors, and AI-compute support fit into core development without buying priority or governance rights.
+- [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md) — Maintainer draft for the July 2026 public-alpha launch post (do not publish until flip).
 
 ## Modules ecosystem
 

@@ -69,6 +69,7 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 | 6.2 | Brochure: `noindex` meta + `robots.txt` until flip (`apps/website/public/`) | ☐ |
 | 6.3 | Cloudflare Pages projects configured per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | ☐ |
 | 6.4 | DocSearch application submitted after docs URL live ([`docsearch-application-draft.md`](docsearch-application-draft.md)) | ☐ |
+| 6.5 | Flip announcement reviewed ([`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)) | ☐ |
 
 ---
 
