@@ -206,12 +206,18 @@ export type {
 } from "./aiTools.js";
 
 export {
-  CrpCapacityPlanPdfInputSchema,
-  CrpResourceLoadCsvInputSchema,
-  CrpScheduleExportCsvInputSchema,
+  CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF,
+  CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF,
+  CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF,
+  CRP_SCHEDULE_PDF_TEMPLATE_REF,
+  CrpCapacityLoadXlsxInputSchema,
+  CrpConflictReportPdfInputSchema,
+  CrpResourceCalendarCsvInputSchema,
+  CrpSchedulePdfInputSchema,
 } from "./documentTemplates.js";
 export type {
-  CrpCapacityPlanPdfInput,
-  CrpResourceLoadCsvInput,
-  CrpScheduleExportCsvInput,
+  CrpCapacityLoadXlsxInput,
+  CrpConflictReportPdfInput,
+  CrpResourceCalendarCsvInput,
+  CrpSchedulePdfInput,
 } from "./documentTemplates.js";

@@ -970,36 +970,79 @@ type CrpListScheduledOperationsToolOutput = z.infer<typeof CrpListScheduledOpera
 type CrpExplainCapacityLoadToolOutput = z.infer<typeof CrpExplainCapacityLoadToolOutputSchema>;
 type CrpListConflictsToolOutput = z.infer<typeof CrpListConflictsToolOutputSchema>;
 
-declare const CrpCapacityPlanPdfInputSchema: z.ZodObject<{
+declare const CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF = "crp:capacity-load-xlsx@v1";
+declare const CRP_SCHEDULE_PDF_TEMPLATE_REF = "crp:schedule-pdf@v1";
+declare const CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF = "crp:resource-calendar-csv@v1";
+declare const CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF = "crp:conflict-report-pdf@v1";
+declare const CrpCapacityLoadXlsxInputSchema: z.ZodObject<{
     workspaceId: z.ZodString;
-    schedule: z.ZodObject<{
+    loadBuckets: z.ZodArray<z.ZodObject<{
+        resourceId: z.ZodString;
+        resourceCode: z.ZodString;
+        bucketStartAt: z.ZodString;
+        bucketEndAt: z.ZodString;
+        availableMinutes: z.ZodNumber;
+        plannedMinutes: z.ZodNumber;
+        overloadMinutes: z.ZodNumber;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const CrpSchedulePdfInputSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+    generatedAt: z.ZodString;
+    resources: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         workspaceId: z.ZodString;
         code: z.ZodString;
         name: z.ZodString;
-        status: z.ZodEnum<{
-            proposed: "proposed";
-            accepted: "accepted";
-            superseded: "superseded";
+        kind: z.ZodEnum<{
+            work_center: "work_center";
+            equipment: "equipment";
+            labor: "labor";
+            external: "external";
+            buffer: "buffer";
         }>;
-        horizonStartAt: z.ZodString;
-        horizonEndAt: z.ZodString;
+        status: z.ZodEnum<{
+            active: "active";
+            inactive: "inactive";
+        }>;
+        sourceModule: z.ZodNullable<z.ZodString>;
+        sourceRefId: z.ZodNullable<z.ZodString>;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
-        assignments: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            workspaceId: z.ZodString;
-            scheduleId: z.ZodString;
-            resourceId: z.ZodString;
-            productionOrderId: z.ZodNullable<z.ZodString>;
-            operationId: z.ZodNullable<z.ZodString>;
-            sourceModule: z.ZodNullable<z.ZodString>;
-            sourceRefId: z.ZodNullable<z.ZodString>;
-            startsAt: z.ZodString;
-            endsAt: z.ZodString;
-            plannedDurationMinutes: z.ZodNumber;
-        }, z.core.$strip>>;
-    }, z.core.$strip>;
+    }, z.core.$strip>>;
+    scheduledOperations: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        resourceId: z.ZodNullable<z.ZodString>;
+        workCenterId: z.ZodNullable<z.ZodString>;
+        productionOrderId: z.ZodNullable<z.ZodString>;
+        operationId: z.ZodNullable<z.ZodString>;
+        operationCode: z.ZodString;
+        name: z.ZodString;
+        status: z.ZodEnum<{
+            planned: "planned";
+            scheduled: "scheduled";
+            completed: "completed";
+            cancelled: "cancelled";
+        }>;
+        sourceModule: z.ZodNullable<z.ZodString>;
+        sourceRefId: z.ZodNullable<z.ZodString>;
+        startsAt: z.ZodString;
+        endsAt: z.ZodString;
+        plannedDurationMinutes: z.ZodNumber;
+    }, z.core.$strip>>;
+    loadBuckets: z.ZodArray<z.ZodObject<{
+        resourceId: z.ZodString;
+        resourceCode: z.ZodString;
+        bucketStartAt: z.ZodString;
+        bucketEndAt: z.ZodString;
+        availableMinutes: z.ZodNumber;
+        plannedMinutes: z.ZodNumber;
+        overloadMinutes: z.ZodNumber;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const CrpResourceCalendarCsvInputSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
     resources: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         workspaceId: z.ZodString;
@@ -1031,8 +1074,29 @@ declare const CrpCapacityPlanPdfInputSchema: z.ZodObject<{
         overloadMinutes: z.ZodNumber;
     }, z.core.$strip>>;
 }, z.core.$strip>;
-declare const CrpResourceLoadCsvInputSchema: z.ZodObject<{
+declare const CrpConflictReportPdfInputSchema: z.ZodObject<{
     workspaceId: z.ZodString;
+    generatedAt: z.ZodString;
+    conflicts: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        severity: z.ZodEnum<{
+            info: "info";
+            warning: "warning";
+            critical: "critical";
+        }>;
+        status: z.ZodEnum<{
+            open: "open";
+            acknowledged: "acknowledged";
+            resolved: "resolved";
+        }>;
+        message: z.ZodString;
+        resourceId: z.ZodNullable<z.ZodString>;
+        scheduledOperationId: z.ZodNullable<z.ZodString>;
+        startsAt: z.ZodNullable<z.ZodString>;
+        endsAt: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodString;
+    }, z.core.$strip>>;
     loadBuckets: z.ZodArray<z.ZodObject<{
         resourceId: z.ZodString;
         resourceCode: z.ZodString;
@@ -1043,39 +1107,9 @@ declare const CrpResourceLoadCsvInputSchema: z.ZodObject<{
         overloadMinutes: z.ZodNumber;
     }, z.core.$strip>>;
 }, z.core.$strip>;
-declare const CrpScheduleExportCsvInputSchema: z.ZodObject<{
-    workspaceId: z.ZodString;
-    schedule: z.ZodObject<{
-        id: z.ZodString;
-        workspaceId: z.ZodString;
-        code: z.ZodString;
-        name: z.ZodString;
-        status: z.ZodEnum<{
-            proposed: "proposed";
-            accepted: "accepted";
-            superseded: "superseded";
-        }>;
-        horizonStartAt: z.ZodString;
-        horizonEndAt: z.ZodString;
-        createdAt: z.ZodString;
-        updatedAt: z.ZodString;
-        assignments: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            workspaceId: z.ZodString;
-            scheduleId: z.ZodString;
-            resourceId: z.ZodString;
-            productionOrderId: z.ZodNullable<z.ZodString>;
-            operationId: z.ZodNullable<z.ZodString>;
-            sourceModule: z.ZodNullable<z.ZodString>;
-            sourceRefId: z.ZodNullable<z.ZodString>;
-            startsAt: z.ZodString;
-            endsAt: z.ZodString;
-            plannedDurationMinutes: z.ZodNumber;
-        }, z.core.$strip>>;
-    }, z.core.$strip>;
-}, z.core.$strip>;
-type CrpCapacityPlanPdfInput = z.infer<typeof CrpCapacityPlanPdfInputSchema>;
-type CrpResourceLoadCsvInput = z.infer<typeof CrpResourceLoadCsvInputSchema>;
-type CrpScheduleExportCsvInput = z.infer<typeof CrpScheduleExportCsvInputSchema>;
+type CrpCapacityLoadXlsxInput = z.infer<typeof CrpCapacityLoadXlsxInputSchema>;
+type CrpSchedulePdfInput = z.infer<typeof CrpSchedulePdfInputSchema>;
+type CrpResourceCalendarCsvInput = z.infer<typeof CrpResourceCalendarCsvInputSchema>;
+type CrpConflictReportPdfInput = z.infer<typeof CrpConflictReportPdfInputSchema>;
 
-export { type AvailabilityWindow, type AvailabilityWindowListResponse, AvailabilityWindowListResponseSchema, AvailabilityWindowSchema, CONTRACT_VERSION, type CapacityBucket, CapacityBucketSchema, type CapacityConflict, type CapacityConflictListResponse, CapacityConflictListResponseSchema, CapacityConflictSchema, type CapacityConflictSeverity, CapacityConflictSeveritySchema, type CapacityConflictStatus, CapacityConflictStatusSchema, type CapacityLoad, type CapacityLoadBucket, CapacityLoadBucketSchema, type CapacityLoadQuery, CapacityLoadQuerySchema, type CapacityLoadResponse, CapacityLoadResponseSchema, CapacityLoadSchema, type CapacityResource, type CapacityResourceGetResponse, CapacityResourceGetResponseSchema, type CapacityResourceListResponse, CapacityResourceListResponseSchema, type CapacityResourceRef, CapacityResourceRefSchema, CapacityResourceSchema, type CapacitySchedule, type CapacityScheduleGetResponse, CapacityScheduleGetResponseSchema, type CapacityScheduleListResponse, CapacityScheduleListResponseSchema, CapacityScheduleSchema, type CapacityWindow, type CapacityWindowListResponse, CapacityWindowListResponseSchema, CapacityWindowSchema, type CrpCapacityPlanPdfInput, CrpCapacityPlanPdfInputSchema, type CrpDeleteResponse, CrpDeleteResponseSchema, type CrpExplainCapacityLoadToolInput, CrpExplainCapacityLoadToolInputSchema, type CrpExplainCapacityLoadToolOutput, CrpExplainCapacityLoadToolOutputSchema, type CrpGetScheduleToolInput, CrpGetScheduleToolInputSchema, type CrpGetScheduleToolOutput, CrpGetScheduleToolOutputSchema, type CrpListConflictsToolInput, CrpListConflictsToolInputSchema, type CrpListConflictsToolOutput, CrpListConflictsToolOutputSchema, type CrpListResourcesToolInput, CrpListResourcesToolInputSchema, type CrpListResourcesToolOutput, CrpListResourcesToolOutputSchema, type CrpListScheduledOperationsToolInput, CrpListScheduledOperationsToolInputSchema, type CrpListScheduledOperationsToolOutput, CrpListScheduledOperationsToolOutputSchema, type CrpListSchedulesToolInput, CrpListSchedulesToolInputSchema, type CrpListSchedulesToolOutput, CrpListSchedulesToolOutputSchema, type CrpListWorkCentersToolInput, CrpListWorkCentersToolInputSchema, type CrpListWorkCentersToolOutput, CrpListWorkCentersToolOutputSchema, type CrpResourceLoadCsvInput, CrpResourceLoadCsvInputSchema, type CrpScheduleExportCsvInput, CrpScheduleExportCsvInputSchema, type CrpScheduleableOperation, CrpScheduleableOperationSchema, IsoDateTimeStringSchema, type MrpHandoffBatch, type MrpHandoffBatchResponse, MrpHandoffBatchResponseSchema, MrpHandoffBatchSchema, NonEmptyStringSchema, QuantitySchema, type Resource, type ResourceCalendar, type ResourceCalendarListResponse, ResourceCalendarListResponseSchema, ResourceCalendarSchema, type ResourceGetResponse, ResourceGetResponseSchema, type ResourceKind, ResourceKindSchema, type ResourceListResponse, ResourceListResponseSchema, type ResourceRef, ResourceRefSchema, ResourceSchema, type ResourceStatus, ResourceStatusSchema, type ScheduleAssignment, ScheduleAssignmentSchema, type ScheduleProposalInput, ScheduleProposalInputSchema, type ScheduleProposalOutput, ScheduleProposalOutputSchema, type ScheduleStatus, ScheduleStatusSchema, type ScheduledOperation, type ScheduledOperationListResponse, ScheduledOperationListResponseSchema, ScheduledOperationSchema, type ScheduledOperationStatus, ScheduledOperationStatusSchema, type SemVer, type VersionMismatchSeverity, type WorkCenter, type WorkCenterGetResponse, WorkCenterGetResponseSchema, type WorkCenterListResponse, WorkCenterListResponseSchema, WorkCenterSchema, type WorkCenterStatus, WorkCenterStatusSchema, classifyContractVersionSkew, parseAvailabilityWindow, parseAvailabilityWindowListResponse, parseCapacityBucket, parseCapacityConflict, parseCapacityConflictListResponse, parseCapacityLoad, parseCapacityLoadBucket, parseCapacityLoadResponse, parseCapacityResource, parseCapacityResourceGetResponse, parseCapacityResourceListResponse, parseCapacitySchedule, parseCapacityScheduleGetResponse, parseCapacityScheduleListResponse, parseCapacityWindow, parseCapacityWindowListResponse, parseCrpDeleteResponse, parseCrpScheduleableOperation, parseMrpHandoffBatch, parseMrpHandoffBatchResponse, parseResource, parseResourceCalendar, parseResourceCalendarListResponse, parseResourceGetResponse, parseResourceListResponse, parseScheduleAssignment, parseScheduleProposalInput, parseScheduleProposalOutput, parseScheduledOperation, parseScheduledOperationListResponse, parseSemVer, parseWorkCenter, parseWorkCenterGetResponse, parseWorkCenterListResponse };
+export { type AvailabilityWindow, type AvailabilityWindowListResponse, AvailabilityWindowListResponseSchema, AvailabilityWindowSchema, CONTRACT_VERSION, CRP_CAPACITY_LOAD_XLSX_TEMPLATE_REF, CRP_CONFLICT_REPORT_PDF_TEMPLATE_REF, CRP_RESOURCE_CALENDAR_CSV_TEMPLATE_REF, CRP_SCHEDULE_PDF_TEMPLATE_REF, type CapacityBucket, CapacityBucketSchema, type CapacityConflict, type CapacityConflictListResponse, CapacityConflictListResponseSchema, CapacityConflictSchema, type CapacityConflictSeverity, CapacityConflictSeveritySchema, type CapacityConflictStatus, CapacityConflictStatusSchema, type CapacityLoad, type CapacityLoadBucket, CapacityLoadBucketSchema, type CapacityLoadQuery, CapacityLoadQuerySchema, type CapacityLoadResponse, CapacityLoadResponseSchema, CapacityLoadSchema, type CapacityResource, type CapacityResourceGetResponse, CapacityResourceGetResponseSchema, type CapacityResourceListResponse, CapacityResourceListResponseSchema, type CapacityResourceRef, CapacityResourceRefSchema, CapacityResourceSchema, type CapacitySchedule, type CapacityScheduleGetResponse, CapacityScheduleGetResponseSchema, type CapacityScheduleListResponse, CapacityScheduleListResponseSchema, CapacityScheduleSchema, type CapacityWindow, type CapacityWindowListResponse, CapacityWindowListResponseSchema, CapacityWindowSchema, type CrpCapacityLoadXlsxInput, CrpCapacityLoadXlsxInputSchema, type CrpConflictReportPdfInput, CrpConflictReportPdfInputSchema, type CrpDeleteResponse, CrpDeleteResponseSchema, type CrpExplainCapacityLoadToolInput, CrpExplainCapacityLoadToolInputSchema, type CrpExplainCapacityLoadToolOutput, CrpExplainCapacityLoadToolOutputSchema, type CrpGetScheduleToolInput, CrpGetScheduleToolInputSchema, type CrpGetScheduleToolOutput, CrpGetScheduleToolOutputSchema, type CrpListConflictsToolInput, CrpListConflictsToolInputSchema, type CrpListConflictsToolOutput, CrpListConflictsToolOutputSchema, type CrpListResourcesToolInput, CrpListResourcesToolInputSchema, type CrpListResourcesToolOutput, CrpListResourcesToolOutputSchema, type CrpListScheduledOperationsToolInput, CrpListScheduledOperationsToolInputSchema, type CrpListScheduledOperationsToolOutput, CrpListScheduledOperationsToolOutputSchema, type CrpListSchedulesToolInput, CrpListSchedulesToolInputSchema, type CrpListSchedulesToolOutput, CrpListSchedulesToolOutputSchema, type CrpListWorkCentersToolInput, CrpListWorkCentersToolInputSchema, type CrpListWorkCentersToolOutput, CrpListWorkCentersToolOutputSchema, type CrpResourceCalendarCsvInput, CrpResourceCalendarCsvInputSchema, type CrpSchedulePdfInput, CrpSchedulePdfInputSchema, type CrpScheduleableOperation, CrpScheduleableOperationSchema, IsoDateTimeStringSchema, type MrpHandoffBatch, type MrpHandoffBatchResponse, MrpHandoffBatchResponseSchema, MrpHandoffBatchSchema, NonEmptyStringSchema, QuantitySchema, type Resource, type ResourceCalendar, type ResourceCalendarListResponse, ResourceCalendarListResponseSchema, ResourceCalendarSchema, type ResourceGetResponse, ResourceGetResponseSchema, type ResourceKind, ResourceKindSchema, type ResourceListResponse, ResourceListResponseSchema, type ResourceRef, ResourceRefSchema, ResourceSchema, type ResourceStatus, ResourceStatusSchema, type ScheduleAssignment, ScheduleAssignmentSchema, type ScheduleProposalInput, ScheduleProposalInputSchema, type ScheduleProposalOutput, ScheduleProposalOutputSchema, type ScheduleStatus, ScheduleStatusSchema, type ScheduledOperation, type ScheduledOperationListResponse, ScheduledOperationListResponseSchema, ScheduledOperationSchema, type ScheduledOperationStatus, ScheduledOperationStatusSchema, type SemVer, type VersionMismatchSeverity, type WorkCenter, type WorkCenterGetResponse, WorkCenterGetResponseSchema, type WorkCenterListResponse, WorkCenterListResponseSchema, WorkCenterSchema, type WorkCenterStatus, WorkCenterStatusSchema, classifyContractVersionSkew, parseAvailabilityWindow, parseAvailabilityWindowListResponse, parseCapacityBucket, parseCapacityConflict, parseCapacityConflictListResponse, parseCapacityLoad, parseCapacityLoadBucket, parseCapacityLoadResponse, parseCapacityResource, parseCapacityResourceGetResponse, parseCapacityResourceListResponse, parseCapacitySchedule, parseCapacityScheduleGetResponse, parseCapacityScheduleListResponse, parseCapacityWindow, parseCapacityWindowListResponse, parseCrpDeleteResponse, parseCrpScheduleableOperation, parseMrpHandoffBatch, parseMrpHandoffBatchResponse, parseResource, parseResourceCalendar, parseResourceCalendarListResponse, parseResourceGetResponse, parseResourceListResponse, parseScheduleAssignment, parseScheduleProposalInput, parseScheduleProposalOutput, parseScheduledOperation, parseScheduledOperationListResponse, parseSemVer, parseWorkCenter, parseWorkCenterGetResponse, parseWorkCenterListResponse };

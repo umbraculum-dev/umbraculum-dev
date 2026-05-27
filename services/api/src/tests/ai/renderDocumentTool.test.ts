@@ -102,6 +102,62 @@ describe("render_document AI tool", () => {
     });
   });
 
+  it("submits MRP and CRP template refs through the platform write tool", async () => {
+    const renderingJobs = fakeRenderingJobs();
+    const tool = createRenderDocumentTool(renderingJobs);
+
+    await tool.handler(
+      {
+        templateRef: "mrp:work-order-pdf@v1",
+        kind: "pdf",
+        data: {
+          workspaceId: "workspace-1",
+          productionOrderId: "po-1",
+          preview: {
+            productionOrder: {
+              id: "po-1",
+              workspaceId: "workspace-1",
+              orderNumber: "MRP-1",
+              status: "planned",
+              sourceModule: "brewery",
+              sourceRefId: "session-1",
+              outputProductId: null,
+              outputVariantId: null,
+              quantity: 1,
+              unit: "batch",
+              plannedStartAt: null,
+              dueAt: null,
+              createdAt: "2026-05-26T12:00:00.000Z",
+              updatedAt: "2026-05-26T12:00:00.000Z",
+              lines: [],
+            },
+            operations: [],
+            materialRequirements: [],
+            operatorNotes: [],
+          },
+        },
+      },
+      { userId: "user-1", workspaceId: "workspace-1", requestId: "request-1" },
+    );
+
+    await tool.handler(
+      {
+        templateRef: "crp:capacity-load-xlsx@v1",
+        kind: "xlsx",
+        data: { workspaceId: "workspace-1", loadBuckets: [] },
+      },
+      { userId: "user-1", workspaceId: "workspace-1", requestId: "request-2" },
+    );
+
+    expect(renderingJobs.submit).toHaveBeenCalledTimes(2);
+    expect(renderingJobs.submit.mock.calls[0]?.[0].request.templateRef).toBe(
+      "mrp:work-order-pdf@v1",
+    );
+    expect(renderingJobs.submit.mock.calls[1]?.[0].request.templateRef).toBe(
+      "crp:capacity-load-xlsx@v1",
+    );
+  });
+
   it("rejects stream-response delivery because AI tools return JSON metadata", async () => {
     const tool = createRenderDocumentTool(fakeRenderingJobs());
 

@@ -60,6 +60,21 @@ The consultant has access to a closed set of tools registered by the installed c
 
 Domain tools enforce workspace membership at the service layer ([`requireActiveWorkspace`](../services/api/src/plugins/requestContext.ts)) — the AI cannot read data outside the operator's active workspace, even if it tries to construct a tool call that would cross workspaces. `render_document` submits a rendering job for the active workspace using registered templates; it is a platform-controlled output operation, not a domain-record mutation. Tool calls and results are visible in the chat surface for transparency.
 
+**Registered MRP/CRP template refs (Wave 6, via `render_document` only — no per-module export tools):**
+
+| Template ref | Kind | Module |
+|---|---|---|
+| `mrp:work-order-pdf@v1` | pdf | mrp |
+| `mrp:route-card-pdf@v1` | pdf | mrp |
+| `mrp:material-requirements-xlsx@v1` | xlsx | mrp |
+| `mrp:production-order-csv@v1` | csv | mrp |
+| `crp:capacity-load-xlsx@v1` | xlsx | crp |
+| `crp:schedule-pdf@v1` | pdf | crp |
+| `crp:resource-calendar-csv@v1` | csv | crp |
+| `crp:conflict-report-pdf@v1` | pdf | crp |
+
+Operators may also use module-owned HTTP render-job routes (for example `POST /mrp/work-orders/:orderId/render-jobs`) that build template `data` server-side; the consultant uses `render_document` with a pre-built payload or should prefer those routes when orchestrating exports for humans.
+
 The shape of these tools is documented in the typed `AiTool` / `AiToolRegistry` contract in [`@umbraculum/ai-tool-sdk`](../packages/ai-tool-sdk/README.md); the orchestrator that runs them lives at [`services/api/src/services/ai/orchestrator.ts`](../services/api/src/services/ai/orchestrator.ts).
 
 ---
@@ -72,7 +87,7 @@ The consultant is deliberately bounded today. None of the following are shipped,
 - **No PLC commands.** The brewery's OpenPLC bridge (per [`docs/design/canonical-automation-module-surface.md`](design/canonical-automation-module-surface.md) §9 Phase E) does not expose write tools to the consultant until H1 2027+. Read tools (`automation.vesselState`, `automation.listVessels`) ship now; setpoint changes do not.
 - **No billing or admin actions.** Subscription changes, key vault rotation, workspace membership edits — all human-only.
 - **No cross-workspace queries.** Every tool is scoped to the active workspace; the AI cannot ask "across all my workspaces, where is the slowest fermentation?" — this is a tenancy guarantee, not a UX bug.
-- **No planning mutations.** `mrp` and `crp` now expose read-only advisor tools for the Wave 4 proof path, but the consultant cannot create production orders, reschedule operations, optimize capacity, submit MRP/CRP render jobs, or materialize projection rows. `wms` and `crm` remain reserved canonical codes with no AI tool surface today.
+- **No planning mutations.** `mrp` and `crp` expose read-only advisor tools and registered rendering templates (Wave 6), but the consultant cannot create production orders, reschedule operations, optimize capacity, or materialize projection rows. Export artifacts use `render_document` or human-triggered module render-job routes; they do not mutate domain state. `wms` and `crm` remain reserved canonical codes with no AI tool surface today.
 
 These bounds are not a hedge — they are the shape of v0. The architecture intentionally trades autonomy for coherence + auditability while the apparatus matures.
 
