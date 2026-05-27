@@ -412,7 +412,7 @@ Cross-package README references:
 
 Doc references:
 - [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/ARCHITECTURE-REV02.md`](../ARCHITECTURE-REV02.md), [`docs/rfcs/0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md).
-- [x] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
+- [x] `internal/working-notes/TODOs.md` (internal tree; not linked from public docs).
 
 Hard stops (preflight commands 5–7 from updated skill):
 - [x] Root [`package.json`](../../package.json) `build:packages` script (line 20; the leading `npm run build -w @brewery/i18n` was the first item in the build chain).
@@ -547,7 +547,7 @@ Handoff docs (pre-existing, still relevant historical context):
 
 Doc references:
 - [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/LINTING.md`](../LINTING.md), [`docs/TESTING.md`](../TESTING.md), [`docs/TYPING.md`](../TYPING.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`docs/MODULES.md`](../MODULES.md), [`docs/modules/contribute/horizontal-package.md`](../modules/contribute/horizontal-package.md).
-- [x] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
+- [x] `internal/working-notes/TODOs.md` (internal tree; not linked from public docs).
 
 Lockfiles regenerated (cleanly scoped):
 - [x] Root `package-lock.json` — 20/20 lines, ONLY contracts entries (workspace name + 4 consumer-side deps + workspace-link entry pair).
@@ -600,7 +600,7 @@ Cross-package README references:
 
 Doc references:
 - [x] [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md), [`docs/CODING-STANDARDS.md`](../CODING-STANDARDS.md), [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md), [`docs/ARCHITECTURE-REV02.md`](../ARCHITECTURE-REV02.md), [`docs/MODULES.md`](../MODULES.md), [`docs/modules/contribute/horizontal-package.md`](../modules/contribute/horizontal-package.md).
-- [x] [`internal/working-notes/TODOs.md`](../../internal/working-notes/TODOs.md).
+- [x] `internal/working-notes/TODOs.md` (internal tree; not linked from public docs).
 
 **Step-3 sweep results:** 31 files / 41 substitutions (vs 35-file plan-doc inventory; the 4-file delta = 1 self-exclusion of `packages/api-client/package.json` because step 1 had already updated the `name` field + 3 explicit excludes — own README + 2 history docs).
 

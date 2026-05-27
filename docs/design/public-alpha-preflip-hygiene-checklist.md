@@ -34,9 +34,9 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 
 | # | Check | Expected | Pass? |
 |---|--------|----------|-------|
-| 3.1 | `package.json` `repository` / `bugs` | `github.com/umbraculum-dev/umbraculum-dev` | ☐ |
-| 3.2 | Clone URLs in [`GETTING-STARTED.md`](../GETTING-STARTED.md) | `git@github.com:umbraculum-dev/umbraculum-dev.git` | ☐ |
-| 3.3 | `internal/**` not linked from public docs | `rg 'internal/' docs --glob '*.md'` — no accidental links | ☐ |
+| 3.1 | `package.json` `repository` / `bugs` | `github.com/umbraculum-dev/umbraculum-dev` | ☑ |
+| 3.2 | Clone URLs in [`GETTING-STARTED.md`](../GETTING-STARTED.md) | `git@github.com:umbraculum-dev/umbraculum-dev.git` | ☑ |
+| 3.3 | `internal/**` not linked from public docs | `python3 scripts/docs/check-public-docs-no-internal-links.py` | ☑ (2026-05-27 agent) |
 
 ---
 
@@ -44,10 +44,10 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 
 | # | Check | Command / action | Pass? |
 |---|--------|------------------|-------|
-| 4.1 | Module README structure | `python3 scripts/docs/check-readmes.py` (or CI `docs-readmes` workflow) | ☐ |
-| 4.2 | RFC companion links (optional) | `python3 scripts/docs/check-rfc-companion-links.py` | ☐ |
-| 4.3 | Docs site build | `npm run build -w @umbraculum/docs-site` in Node 20 container | ☐ |
-| 4.4 | Brochure build | `npm run build -w @umbraculum/website` | ☐ |
+| 4.1 | Module README structure | `python3 scripts/docs/check-readmes.py` (or CI `docs-readmes` workflow) | ☑ (20/20) |
+| 4.2 | RFC companion links (optional) | `python3 scripts/docs/check-rfc-companion-links.py` | ☑ (10/10) |
+| 4.3 | Docs site build | `npm run build -w @umbraculum/docs-site` in Node 20 container | ☑ |
+| 4.4 | Brochure build | `npm run build -w @umbraculum/website` | ☑ |
 
 ---
 
@@ -65,8 +65,8 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 
 | # | Check | Pass? |
 |---|--------|-------|
-| 6.1 | Docs: `noIndex: true` + `static/robots.txt` disallow until flip ([`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts)) | ☐ |
-| 6.2 | Brochure: `noindex` meta + `robots.txt` until flip (`apps/website/public/`) | ☐ |
+| 6.1 | Docs: `noIndex: true` + `static/robots.txt` disallow until flip ([`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts)) | ☑ |
+| 6.2 | Brochure: `noindex` meta + `robots.txt` until flip (`apps/website/public/`) | ☑ |
 | 6.3 | Cloudflare Pages projects configured per [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) | ☐ |
 | 6.4 | DocSearch application submitted after docs URL live ([`docsearch-application-draft.md`](docsearch-application-draft.md)) | ☐ |
 | 6.5 | Flip announcement reviewed ([`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)) | ☐ |
@@ -77,4 +77,4 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 
 | Date | Repo | Stage 1 result | Notes |
 |------|------|----------------|-------|
-| — | — | Not run | Agent-prepared checklist only |
+| 2026-05-27 | umbraculum-dev | **Partial (automated)** | Full report: [`public-alpha-preflip-hygiene-audit-2026-05-27.md`](public-alpha-preflip-hygiene-audit-2026-05-27.md). Maintainer sign-off still required for 2.2, 2.3 path normalization, 5.x, 6.3–6.4, toolset repo. |

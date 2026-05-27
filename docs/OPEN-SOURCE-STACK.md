@@ -496,8 +496,8 @@ formatters' interactions.
   works out of the box with the Node we already pin, doesn't
   require a separate lockfile-format migration, and matches the
   granularity we need today. pnpm + turbo would add caching
-  benefits at larger scale and are documented watch items in
-  [`internal/working-notes/TODOs.md`](../internal/working-notes/TODOs.md);
+  benefits at larger scale and are documented as watch items in the
+  repository's internal working-notes tree (not published on the docs site);
   not yet warranted.
 - **Closed-source-swap impact.** Apparatus skills around
   package-scope migration (`package-scope-migration-preflight`)
