@@ -1,7 +1,7 @@
 # `mrp` — canonical module (open door)
 
 **Tier:** Public
-**Status:** **Wave 5 read-only AI planning advisor and Wave 6 rendering templates shipped** — contracts package, Prisma schema, read-only API skeleton, module/web-segment registration, L2 isolation tests, read-time brewery recipe/session projections, read-only web pages, deterministic fixture-backed proof, and module-owned read-only AI tools exist. August 2026 alpha co-design target remains in progress; mature scope remains H1 2027 per [ROADMAP.md](../../ROADMAP.md).
+**Status:** **H2 2026 alpha track shipped** (Waves 1–6 + alpha demo closure 2026-05-27) — read-only API, web UX, brewery projection, AI advisor, RFC-0007 exports, and automated demo proof exist. **TODO:** human walkthrough gap-log sign-off; propose/write tools and mature commercial scope remain [ROADMAP § H1 2027 mature](../../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027). See [ROADMAP § H2 2026 MRP/CRP](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning).
 **Code:** `mrp`
 **Module tier:** 1 (core canonical, reserved code).
 **License:** AGPLv3 (per [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5).
@@ -21,7 +21,7 @@ The MRP canonical module owns the platform's "what do we make, when, and what ra
 - Production-order lifecycle (planned → released → in-progress → completed).
 - Bill of materials (BOM) traversal — given a production order, compute material requirements.
 - Lead-time and reorder-point logic that drives WMS replenishment proposals.
-- Brew sessions in the brewery vertical are *production orders* in MRP's language — the August 2026 co-design target defines the bounded alpha proof, while the mature H1 2027 tranche promotes the brewery's existing brew-session surface into MRP primitives ([PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md)).
+- Brew sessions in the brewery vertical are *production orders* in MRP's language — [ROADMAP § H2 2026](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning) defines the bounded read-only alpha proof; [§ H1 2027 mature](../../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) covers write workflows and irreversible brewery→MRP promotion ([PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md)).
 
 ---
 
@@ -97,7 +97,8 @@ Per [RFC-0001 §6 (Decision D)](../../rfcs/0001-modules-tiers-governance-and-aut
 - [MRP/CRP alpha demo closure build log](../../design/mrp-crp-alpha-demo-closure-build-log.md) — web exports + CI proof.
 - [`@umbraculum/mrp-contracts`](../../../packages/mrp-contracts/README.md) — Wave 1 contracts package.
 - [`services/api/src/modules/mrp/`](../../../services/api/src/modules/mrp/README.md) — Wave 1 read-only API skeleton.
-- [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — H1 2027 brewery-and-MRP-and-CRP co-design.
-- [ROADMAP.md §H1 2027](../../ROADMAP.md) — brewery-vertical promotion + canonical-module co-design.
+- [PLATFORM-ARCHITECTURE.md §5.2](../../PLATFORM-ARCHITECTURE.md) — mature MRP + CRP + WMS pairing (H1 2027).
+- [ROADMAP.md § H2 2026 MRP/CRP](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning) — alpha track (done/TODO).
+- [ROADMAP.md § H1 2027 mature](../../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) — write workflows, WMS, commercial depth.
 - [`automation.md`](automation.md) — template for what this page will look like once `mrp` ships.
 - [`docs/MODULES.md`](../../MODULES.md) — ecosystem entry page.
