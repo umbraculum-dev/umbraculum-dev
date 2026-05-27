@@ -195,7 +195,7 @@ This document is not the implementation plan, but it sets the execution order:
 | 3 | Brewery projection | Adapter/projection from recipes, brew sessions, brewday settings, equipment profiles. |
 | 4 | Web/read surfaces | Static route-group subsegments registered with `registerWebModule({ ownedUrlSegments })`. |
 | 5 | Rendering + AI | Planned templates and read/propose AI tools. |
-| 6 | Public-alpha demo | One coherent brewery production-order + capacity-load walkthrough. |
+| 6 | Public-alpha demo | **Automated closure shipped (2026-05-26):** web export UI, [`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md), full render-job API tests, Playwright export smoke — see [`mrp-crp-alpha-demo-closure-build-log.md`](mrp-crp-alpha-demo-closure-build-log.md). Human gap-log sign-off still pending; not alpha-complete. |
 
 Mature scope remains H1 2027: write workflows, WMS integration, richer scheduling, entitlement billing, native-first operator flows, and irreversible brewery schema migration.
 

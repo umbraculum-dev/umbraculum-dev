@@ -69,4 +69,5 @@
 - **API:** `docker compose exec -T api npm run typecheck`.
 - **Tests:** `docker compose exec -T api npx vitest run src/tests/mrpCrpRendering.test.ts src/tests/mrpCrpModuleRegistration.test.ts src/tests/ai/renderDocumentTool.test.ts` (requires `gotenberg` + `redis`).
 - **Docs:** `python3 scripts/docs/check-readmes.py`.
-- **Not claimed:** MRP/CRP alpha-complete, propose/write tools, email delivery, web export buttons (optional stretch deferred).
+- **Not claimed:** MRP/CRP alpha-complete, propose/write tools, email delivery.
+- **Follow-on:** [`mrp-crp-alpha-demo-closure-build-log.md`](mrp-crp-alpha-demo-closure-build-log.md) — web export buttons, walkthrough runbook, full render-job test matrix, Playwright export smoke.

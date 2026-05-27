@@ -124,6 +124,15 @@ var en_default = {
     error: "Could not load production planning data.",
     noProductionOrders: "No production orders or brewery projections in this workspace yet.",
     noMaterialRequirements: "No material requirements are visible yet.",
+    export: {
+      workOrderPdf: "Export work order (PDF)",
+      routeCardPdf: "Export route card (PDF)",
+      materialRequirementsXlsx: "Export material requirements (XLSX)",
+      productionOrdersCsv: "Export production orders (CSV)",
+      working: "Preparing export\u2026",
+      download: "Download export",
+      error: "Export failed"
+    },
     productionOrders: {
       listTitle: "Production orders",
       openDetail: "View order",
@@ -191,6 +200,15 @@ var en_default = {
       back: "Back to resources",
       capacityLink: "Open capacity view",
       scheduleLink: "Open schedule"
+    },
+    export: {
+      capacityLoadXlsx: "Export capacity load (XLSX)",
+      schedulePdf: "Export schedule (PDF)",
+      conflictReportPdf: "Export conflict report (PDF)",
+      resourceCalendarCsv: "Export resource calendar (CSV)",
+      working: "Preparing export\u2026",
+      download: "Download export",
+      error: "Export failed"
     },
     capacity: {
       title: "Capacity load",
@@ -2040,6 +2058,15 @@ var it_default = {
     error: "Impossibile caricare i dati di pianificazione produzione.",
     noProductionOrders: "Nessun ordine di produzione o proiezione brewery in questo workspace.",
     noMaterialRequirements: "Nessun fabbisogno materiali visibile.",
+    export: {
+      workOrderPdf: "Esporta ordine di lavoro (PDF)",
+      routeCardPdf: "Esporta scheda percorso (PDF)",
+      materialRequirementsXlsx: "Esporta fabbisogni materiali (XLSX)",
+      productionOrdersCsv: "Esporta ordini di produzione (CSV)",
+      working: "Preparazione export\u2026",
+      download: "Scarica export",
+      error: "Export non riuscito"
+    },
     productionOrders: {
       listTitle: "Ordini di produzione",
       openDetail: "Apri ordine",
@@ -2107,6 +2134,15 @@ var it_default = {
       back: "Torna alle risorse",
       capacityLink: "Apri vista capacit\xE0",
       scheduleLink: "Apri schedule"
+    },
+    export: {
+      capacityLoadXlsx: "Esporta carico capacit\xE0 (XLSX)",
+      schedulePdf: "Esporta schedule (PDF)",
+      conflictReportPdf: "Esporta report conflitti (PDF)",
+      resourceCalendarCsv: "Esporta calendario risorse (CSV)",
+      working: "Preparazione export\u2026",
+      download: "Scarica export",
+      error: "Export non riuscito"
     },
     capacity: {
       title: "Carico capacit\xE0",

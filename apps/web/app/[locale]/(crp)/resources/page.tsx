@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
+import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -24,6 +25,7 @@ import {
 export default function CrpResourcesPage() {
   const t = useTranslations("crp");
   const tResources = useTranslations("crp.resources");
+  const tExport = useTranslations("crp.export");
   const tFields = useTranslations("crp.fields");
   const tValues = useTranslations("crp.values");
 
@@ -107,6 +109,14 @@ export default function CrpResourcesPage() {
         </RefreshButton>
         <Link href="/capacity">{tResources("capacityLink")}</Link>
         <Link href="/schedule">{tResources("scheduleLink")}</Link>
+        <AsyncExportButton
+          postUrl="/api/crp/resources/calendar/render-jobs"
+          labelIdle={tExport("resourceCalendarCsv")}
+          labelWorking={tExport("working")}
+          labelReady={tExport("download")}
+          labelError={tExport("error")}
+          disabled={!canCall}
+        />
       </XStack>
 
       {error ? <ErrorBox>{error}</ErrorBox> : null}

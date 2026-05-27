@@ -92,6 +92,15 @@
     "error": "Could not load production planning data.",
     "noProductionOrders": "No production orders or brewery projections in this workspace yet.",
     "noMaterialRequirements": "No material requirements are visible yet.",
+    "export": {
+      "workOrderPdf": "Export work order (PDF)",
+      "routeCardPdf": "Export route card (PDF)",
+      "materialRequirementsXlsx": "Export material requirements (XLSX)",
+      "productionOrdersCsv": "Export production orders (CSV)",
+      "working": "Preparing export…",
+      "download": "Download export",
+      "error": "Export failed"
+    },
     "productionOrders": {
       "listTitle": "Production orders",
       "openDetail": "View order",
@@ -159,6 +168,15 @@
       "back": "Back to resources",
       "capacityLink": "Open capacity view",
       "scheduleLink": "Open schedule"
+    },
+    "export": {
+      "capacityLoadXlsx": "Export capacity load (XLSX)",
+      "schedulePdf": "Export schedule (PDF)",
+      "conflictReportPdf": "Export conflict report (PDF)",
+      "resourceCalendarCsv": "Export resource calendar (CSV)",
+      "working": "Preparing export…",
+      "download": "Download export",
+      "error": "Export failed"
     },
     "capacity": {
       "title": "Capacity load",

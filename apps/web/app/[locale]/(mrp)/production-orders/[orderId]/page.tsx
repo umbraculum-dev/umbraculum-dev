@@ -2,6 +2,8 @@
 
 import {
   MaterialRequirementListResponseSchema,
+  MRP_ROUTE_CARD_PDF_TEMPLATE_REF,
+  MRP_WORK_ORDER_PDF_TEMPLATE_REF,
   ProductionOrderGetResponseSchema,
   type MaterialRequirement,
   type Operation,
@@ -13,6 +15,7 @@ import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
 import { Link } from "../../../../../src/i18n/navigation";
+import { AsyncExportButton } from "../../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../../_components/recipe-edit";
 import { apiFetch } from "../../../../_lib/apiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
@@ -36,6 +39,7 @@ type DetailedProductionOrder = ProductionOrder & {
 export default function MrpProductionOrderDetailPage() {
   const t = useTranslations("mrp");
   const tOrders = useTranslations("mrp.productionOrders");
+  const tExport = useTranslations("mrp.export");
   const tFields = useTranslations("mrp.fields");
   const tValues = useTranslations("mrp.values");
 
@@ -173,6 +177,36 @@ export default function MrpProductionOrderDetailPage() {
 
       {order ? (
         <>
+          <XStack gap="$3" flexWrap="wrap" alignItems="center">
+            <AsyncExportButton
+              postUrl={`/api/mrp/work-orders/${encodeURIComponent(orderId)}/render-jobs`}
+              body={{ templateRef: MRP_WORK_ORDER_PDF_TEMPLATE_REF }}
+              labelIdle={tExport("workOrderPdf")}
+              labelWorking={tExport("working")}
+              labelReady={tExport("download")}
+              labelError={tExport("error")}
+              testId="mrp-export-work-order-pdf"
+              disabled={!canCall}
+            />
+            <AsyncExportButton
+              postUrl={`/api/mrp/work-orders/${encodeURIComponent(orderId)}/render-jobs`}
+              body={{ templateRef: MRP_ROUTE_CARD_PDF_TEMPLATE_REF }}
+              labelIdle={tExport("routeCardPdf")}
+              labelWorking={tExport("working")}
+              labelReady={tExport("download")}
+              labelError={tExport("error")}
+              disabled={!canCall}
+            />
+            <AsyncExportButton
+              postUrl={`/api/mrp/production-orders/${encodeURIComponent(orderId)}/material-requirements/render-jobs`}
+              labelIdle={tExport("materialRequirementsXlsx")}
+              labelWorking={tExport("working")}
+              labelReady={tExport("download")}
+              labelError={tExport("error")}
+              disabled={!canCall}
+            />
+          </XStack>
+
           <SectionCard headingId="mrp-order-detail-heading" title={tOrders("listTitle")}>
             <ProductionOrderSummary order={order} labels={orderLabels} />
             <YStack gap="$1.5">
