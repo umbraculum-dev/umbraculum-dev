@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   CrpExplainCapacityLoadToolInputSchema,
   CrpGetScheduleToolInputSchema,
+  CrpListConflictsToolInputSchema,
   CrpListResourcesToolInputSchema,
+  CrpListScheduledOperationsToolInputSchema,
+  CrpListWorkCentersToolInputSchema,
 } from "./aiTools.js";
 import { expectFirstIssuePathStartsWith } from "./testHelpers.js";
 
@@ -14,6 +17,9 @@ describe("CRP AI-tool schemas", () => {
     });
     expect(CrpExplainCapacityLoadToolInputSchema.parse({ resourceId: "res-1" }))
       .toEqual({ resourceId: "res-1" });
+    expect(CrpListWorkCentersToolInputSchema.parse({})).toEqual({});
+    expect(CrpListScheduledOperationsToolInputSchema.parse({})).toEqual({});
+    expect(CrpListConflictsToolInputSchema.parse({})).toEqual({});
   });
 
   it("rejects empty schedule ids with a field path", () => {

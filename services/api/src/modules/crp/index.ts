@@ -8,15 +8,15 @@ import {
 
 import { crpPlanningRoutes } from "./routes/planningRoutes.js";
 import { crpResourcesRoutes } from "./routes/resourcesRoutes.js";
+import { registerCrpTools } from "../../services/ai/tools/crp/index.js";
 
 const MODULE_CODE = "crp";
 
 /**
  * Wire the canonical `crp` module metadata and Wave 1 read-only API routes.
  *
- * Wave 1 intentionally records no runtime AI tools and no rendering templates:
- * `@umbraculum/crp-contracts` defines the future payload schemas, but the
- * runtime hooks wait for a later alpha wave with real capacity projections.
+ * Wave 5 registers read-only AI tools over the existing CRP read services.
+ * Rendering templates remain deferred to a later alpha wave.
  */
 export function registerCrpModule(app: FastifyInstance): void {
   const alreadyRecorded = listRegisteredModules().some((m) => m.code === MODULE_CODE);
@@ -27,6 +27,9 @@ export function registerCrpModule(app: FastifyInstance): void {
       prismaSchema: "crp",
       addonCodes: ["crp_module"],
       routes: [],
+      registerAiTools: (registry, hostApp) => {
+        registerCrpTools(registry, hostApp.prisma);
+      },
     });
   }
 

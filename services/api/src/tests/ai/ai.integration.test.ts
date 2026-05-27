@@ -240,6 +240,36 @@ describe("ai (chat + settings + gating)", () => {
     expect(res.payload).toContain("event: complete");
   });
 
+  it("mocked AI tool-use can call representative MRP and CRP planning tools", async () => {
+    mockCreate.mockResolvedValueOnce({
+      id: "msg_test_mrp_crp_tools_1",
+      content: [
+        { type: "tool_use", id: "toolu_mrp", name: "mrp.listProductionOrders", input: {} },
+        { type: "tool_use", id: "toolu_crp", name: "crp.listConflicts", input: {} },
+      ],
+      stop_reason: "tool_use",
+      usage: { input_tokens: 20, output_tokens: 10 },
+    });
+    mockCreate.mockResolvedValueOnce({
+      id: "msg_test_mrp_crp_tools_2",
+      content: [{ type: "text", text: "I checked the read-only planning tools." }],
+      stop_reason: "end_turn",
+      usage: { input_tokens: 30, output_tokens: 15 },
+    });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/ai/chat",
+      headers: { cookie: adminCookie, "content-type": "application/json" },
+      payload: { message: "check planning status" },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.payload).toContain("mrp.listProductionOrders");
+    expect(res.payload).toContain("crp.listConflicts");
+    expect(res.payload).toContain("event: tool_result");
+    expect(res.payload).toContain("event: complete");
+  });
+
   // ----- Per-user daily cap -----
 
   it("per-user daily cap rejects with 429 ai_rate_limit", async () => {

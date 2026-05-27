@@ -414,13 +414,19 @@ var CrpGetScheduleToolInputSchema = z11.object({
 var CrpListSchedulesToolInputSchema = z11.object({
   status: z11.enum(["proposed", "accepted", "superseded"]).optional()
 }).strict();
+var CrpListWorkCentersToolInputSchema = z11.object({}).strict();
+var CrpListScheduledOperationsToolInputSchema = z11.object({}).strict();
 var CrpExplainCapacityLoadToolInputSchema = z11.object({
   resourceId: NonEmptyStringSchema.optional()
 }).strict();
+var CrpListConflictsToolInputSchema = z11.object({}).strict();
 var CrpListResourcesToolOutputSchema = CapacityResourceListResponseSchema;
 var CrpListSchedulesToolOutputSchema = CapacityScheduleListResponseSchema;
 var CrpGetScheduleToolOutputSchema = CapacityScheduleGetResponseSchema;
+var CrpListWorkCentersToolOutputSchema = WorkCenterListResponseSchema;
+var CrpListScheduledOperationsToolOutputSchema = ScheduledOperationListResponseSchema;
 var CrpExplainCapacityLoadToolOutputSchema = CapacityLoadResponseSchema;
+var CrpListConflictsToolOutputSchema = CapacityConflictListResponseSchema;
 
 // src/documentTemplates.ts
 import { z as z12 } from "zod";
@@ -466,10 +472,16 @@ export {
   CrpExplainCapacityLoadToolOutputSchema,
   CrpGetScheduleToolInputSchema,
   CrpGetScheduleToolOutputSchema,
+  CrpListConflictsToolInputSchema,
+  CrpListConflictsToolOutputSchema,
   CrpListResourcesToolInputSchema,
   CrpListResourcesToolOutputSchema,
+  CrpListScheduledOperationsToolInputSchema,
+  CrpListScheduledOperationsToolOutputSchema,
   CrpListSchedulesToolInputSchema,
   CrpListSchedulesToolOutputSchema,
+  CrpListWorkCentersToolInputSchema,
+  CrpListWorkCentersToolOutputSchema,
   CrpResourceLoadCsvInputSchema,
   CrpScheduleExportCsvInputSchema,
   CrpScheduleableOperationSchema,

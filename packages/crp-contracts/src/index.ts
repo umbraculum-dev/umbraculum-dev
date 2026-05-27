@@ -177,20 +177,32 @@ export {
   CrpExplainCapacityLoadToolOutputSchema,
   CrpGetScheduleToolInputSchema,
   CrpGetScheduleToolOutputSchema,
+  CrpListConflictsToolInputSchema,
+  CrpListConflictsToolOutputSchema,
   CrpListResourcesToolInputSchema,
   CrpListResourcesToolOutputSchema,
   CrpListSchedulesToolInputSchema,
   CrpListSchedulesToolOutputSchema,
+  CrpListScheduledOperationsToolInputSchema,
+  CrpListScheduledOperationsToolOutputSchema,
+  CrpListWorkCentersToolInputSchema,
+  CrpListWorkCentersToolOutputSchema,
 } from "./aiTools.js";
 export type {
   CrpExplainCapacityLoadToolInput,
   CrpExplainCapacityLoadToolOutput,
   CrpGetScheduleToolInput,
   CrpGetScheduleToolOutput,
+  CrpListConflictsToolInput,
+  CrpListConflictsToolOutput,
   CrpListResourcesToolInput,
   CrpListResourcesToolOutput,
   CrpListSchedulesToolInput,
   CrpListSchedulesToolOutput,
+  CrpListScheduledOperationsToolInput,
+  CrpListScheduledOperationsToolOutput,
+  CrpListWorkCentersToolInput,
+  CrpListWorkCentersToolOutput,
 } from "./aiTools.js";
 
 export {

@@ -8,15 +8,15 @@ import {
 
 import { mrpBomsRoutes } from "./routes/bomsRoutes.js";
 import { mrpProductionOrdersRoutes } from "./routes/productionOrdersRoutes.js";
+import { registerMrpTools } from "../../services/ai/tools/mrp/index.js";
 
 const MODULE_CODE = "mrp";
 
 /**
  * Wire the canonical `mrp` module metadata and Wave 1 read-only API routes.
  *
- * Wave 1 intentionally records no runtime AI tools and no rendering templates:
- * `@umbraculum/mrp-contracts` defines the future payload schemas, but the
- * runtime hooks wait for a later alpha wave with real brewery projections.
+ * Wave 5 registers read-only AI tools over the existing MRP read services.
+ * Rendering templates remain deferred to a later alpha wave.
  */
 export function registerMrpModule(app: FastifyInstance): void {
   const alreadyRecorded = listRegisteredModules().some((m) => m.code === MODULE_CODE);
@@ -27,6 +27,9 @@ export function registerMrpModule(app: FastifyInstance): void {
       prismaSchema: "mrp",
       addonCodes: ["mrp_module"],
       routes: [],
+      registerAiTools: (registry, hostApp) => {
+        registerMrpTools(registry, hostApp.prisma);
+      },
     });
   }
 
