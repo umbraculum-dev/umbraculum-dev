@@ -111,6 +111,7 @@ Dev and CI Postgres services use **`pgvector/pgvector:pg16`**, not stock `postgr
   Optional: set `AI_RAG_INGEST_ON_BOOT=1` on the `api` service to re-ingest on every container start (dev only).
 
 - **Brochure site (Cloudflare Pages):** `apps/website/` builds static `umbraculum.dev` output; deploy in Phase 2 per [`docs/design/public-alpha-cloudflare-pages-runbook.md`](docs/design/public-alpha-cloudflare-pages-runbook.md).
+- **Brochure local dev:** `docker compose up -d website` → `http://127.0.0.1:4321` (see `WEBSITE_PORT`; rebuilds `dist/` from `public/` on start). Product nginx `:18080` does **not** serve the brochure.
 
 ## Documentation site (`docs-site/`)
 

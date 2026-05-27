@@ -13,6 +13,7 @@
 ##                                     this dev box)
 ##   - web (Next.js)     -> 3000:3000
 ##   - docs-site         -> 3001:3000
+##   - website (brochure)-> 4321:4321
 ##   - api (Fastify)     -> 4000:4000
 ##   - postgres primary  -> 5432:5432
 ##   - postgres replica  -> 5433:5432
@@ -123,6 +124,17 @@ services:
       - docs_site_root_node_modules:/repo/node_modules
       - docs_site_node_modules:/repo/docs-site/node_modules
       - docs_site_docusaurus:/repo/docs-site/.docusaurus
+
+  # Static umbraculum.dev brochure (Cloudflare Pages in production). Rebuilds
+  # dist/ from public/ on container start; not proxied through nginx:18080.
+  website:
+    image: node:20-slim
+    working_dir: /repo
+    command: sh -c "node apps/website/scripts/build.mjs && exec npx --yes serve@14 apps/website/dist -l tcp://0.0.0.0:4321"
+    ports:
+      - "${WEBSITE_PORT:-4321}:4321"
+    volumes:
+      - .:/repo
 
   api:
     build: ./services/api
