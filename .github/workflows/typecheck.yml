@@ -70,11 +70,33 @@ jobs:
             node:20-slim \
             bash -lc '
               set -eu
-              npm install --no-audit --no-fund --workspaces --include-workspace-root
+              # Transient registry blips (ECONNRESET) are common on CI; npm fetch
+              # retries plus a bounded shell retry avoid false-red typecheck runs.
+              npm config set fetch-retries 5
+              npm config set fetch-retry-mintimeout 20000
+              npm config set fetch-retry-maxtimeout 120000
+
+              run_with_retry() {
+                local attempt=1
+                local max=3
+                while [ "$attempt" -le "$max" ]; do
+                  if "$@"; then
+                    return 0
+                  fi
+                  if [ "$attempt" -eq "$max" ]; then
+                    return 1
+                  fi
+                  echo "Command failed (attempt ${attempt}/${max}); retrying in $((attempt * 15))s..."
+                  sleep $((attempt * 15))
+                  attempt=$((attempt + 1))
+                done
+              }
+
+              run_with_retry npm ci --no-audit --no-fund --workspaces --include-workspace-root
 
               # apps/web/e2e is a *nested* workspace (apps/web/e2e/) and the
               # root `workspaces: ["apps/*", "services/*", "packages/*"]` glob
-              # only matches one level deep, so the install above does NOT
+              # only matches one level deep, so the root ci above does NOT
               # install its devDependencies (@playwright/test, @axe-core/
               # playwright, axe-core). The e2e workspace is also intentionally
               # isolated per apps/web/e2e/README.md (playwright + browser
@@ -92,7 +114,7 @@ jobs:
               # bind-mounted into the container. CI starts clean and the gap
               # surfaces immediately. See docs/TYPING.md "CI vs local install
               # gap (apps/web/e2e)" for the operator guidance.
-              (cd apps/web/e2e && npm install --no-audit --no-fund)
+              run_with_retry bash -lc "cd apps/web/e2e && npm ci --no-audit --no-fund"
 
               export PATH="/repo/node_modules/.bin:$PATH"
 
