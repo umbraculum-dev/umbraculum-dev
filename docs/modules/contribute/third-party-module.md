@@ -43,6 +43,8 @@ The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party m
 
 You do **not** import from `services/api/src/modules/<code>/` directly. That tree is platform internals and not version-stable. If something you need is not exported from a contracts package, that's a feature request against the contracts package, not a license to reach inside.
 
+**npm registry vs monorepo (2026-05-27).** The four packages above are **MIT-licensed and source-complete in the Umbraculum monorepo**, but **`private: true` until the July 2026 public-alpha cutover** — they are **not** installable from the public npm registry yet. Until publish, depend via git submodule / workspace / `file:` against a checkout of `packages/*`, or wait for the batch in [`LICENSING.md`](../../LICENSING.md) §6.2.1. The `peerDependencies` versions in Step 2 below are the **compatibility contract** to pin once registry versions exist.
+
 ---
 
 ## 4. Procedure

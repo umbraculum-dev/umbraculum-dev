@@ -189,9 +189,10 @@ entry points:
 This project is licensed under the **GNU Affero General Public License
 v3.0 or later** (AGPLv3), with selected SDK / client packages released
 separately under the **MIT License** (look for `"license": "MIT"` in
-the relevant package's `package.json`). See [`LICENSE`](LICENSE) for
+the relevant package's `package.json` once published). See [`LICENSE`](LICENSE) for
 the full AGPLv3 text and [`docs/LICENSING.md`](docs/LICENSING.md) for
-the rationale.
+the rationale and [`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1 for
+which MIT SDK packages are on npm today (monorepo-only until July 2026 α).
 
 Copyright (C) 2026 Umbraculum contributors.
 
