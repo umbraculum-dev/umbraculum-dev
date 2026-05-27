@@ -93,6 +93,7 @@ One per module. Typed DTOs, Zod schemas (per [RFC-0003](rfcs/0003-validation-lib
 |---|---|---|
 | `packages/module-sdk/` | `@umbraculum/module-sdk` | The MIT-licensed registration contract: `registerModule()`, `registerWebModule()`, `RESERVED_CANONICAL_MODULE_CODES`, the library-agnostic `ValidatedSchema<T>` interface. **Contract-only — no UI, no Prisma, no native code.** Per-module code lives in the β slices, not in this package — see [`packages/module-sdk/README.md`](../packages/module-sdk/README.md) §"What this SDK is *not*". |
 | `packages/ai-tool-sdk/` | `@umbraculum/ai-tool-sdk` | The MIT-licensed AI-tool contract: `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. **Type-only, zero runtime dependencies, library-agnostic** — third-party tool authors may use any validation library that produces a JSON Schema for `inputSchema`. Extracted from `@umbraculum/contracts` on 2026-05-21 to realize the [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.4 published-SDK surface. |
+| `packages/i18n-keys/` | `@umbraculum/i18n-keys` | The MIT-licensed i18n **key convention** contract: `ModuleNavLabelKey`, `moduleMessageRoot`, `RESERVED_PLATFORM_MESSAGE_ROOTS`, `composeModuleMessageKey`. **Zero locale JSON** — bundles stay in `@umbraculum/i18n`; React bindings in `@umbraculum/i18n-react`. Greenfield package landed 2026-05-27; brewery **content** split remains deferred per brewery-scope-migration §1.4. |
 
 ### 3.6 Vertical-flavored packages (layer 5)
 
@@ -160,6 +161,7 @@ graph TB
     direction LR
     sdk["@umbraculum/module-sdk<br/>(MIT contract)"]
     atsdk["@umbraculum/ai-tool-sdk<br/>(MIT contract)"]
+    i18nkeys["@umbraculum/i18n-keys<br/>(MIT contract)"]
     bcore["@umbraculum/brewery-core"]
     bjson["@umbraculum/brewery-beerjson"]
     brui["@umbraculum/brewery-recipes-ui<br/>(domain UI)"]
@@ -195,6 +197,7 @@ graph TB
   api --> bjson
 
   sdk --> atsdk
+  sdk --> i18nkeys
 ```
 
 **What the diagram makes obvious** (and the prose above states but doesn't show):

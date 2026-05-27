@@ -98,6 +98,7 @@ services:
       # same bind-mount discipline applies even though apps/web has no direct
       # import — TS resolution can chase the transitive declaration.
       - ./packages/ai-tool-sdk:/packages/ai-tool-sdk:ro
+      - ./packages/i18n-keys:/packages/i18n-keys:ro
       - ./packages/navigation:/packages/navigation:ro
       - ./packages/recipes-ui:/packages/recipes-ui:ro
       - ./packages/ui:/packages/ui:ro
@@ -168,6 +169,9 @@ services:
       # The api consumes it directly (services/api/src/services/ai/**) and
       # transitively via @umbraculum/module-sdk's RegisterModuleOptions.registerAiTools.
       - ./packages/ai-tool-sdk:/packages/ai-tool-sdk:ro
+      # i18n-keys landed 2026-05-27; module-sdk dist/*.d.ts references
+      # @umbraculum/i18n-keys for ModuleNavLabelKey on nav/tab entries.
+      - ./packages/i18n-keys:/packages/i18n-keys:ro
 
   gotenberg:
     image: gotenberg/gotenberg:8

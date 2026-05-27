@@ -77,6 +77,7 @@ Already shipped in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8):
 - **`@brewery/*` → `@umbraculum/*` scope migration** — ✅ 2026-05-19 ([`brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)).
 - **RFC-0002 canonical module layout** — Accepted 2026-05-19; brewery β file-move scheduled in Late H1 2026 Week 1 (see tranche above).
 - **`@umbraculum/ai-tool-sdk` carve-out** — ✅ 2026-05-21 (workspace-only; npm publish deferred to July public alpha).
+- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 (greenfield conventions package; `ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred).
 - **Foundation hardening (lint, types, tests, docs)** — ✅ feature-complete May 2026 ([`FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md); phase logs in [`LINTING.md`](LINTING.md), [`TYPING.md`](TYPING.md), [`TESTING.md`](TESTING.md)).
 
 #### TODO — what to do next (pair with an agent)
@@ -90,7 +91,7 @@ Ordered for typical execution; pick the row that matches what you want this week
 | **3** | **Weeks 2–3** — docs site + July public-alpha cutover | External flip, marketplace plugins, brochure site | [`rfcs/0005-docs-site.md`](rfcs/0005-docs-site.md), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 |
 | **4** | **MRP/CRP propose/write AI tools** (human-in-the-loop) | First mutable-domain AI surface; read-only advisor is not enough for scheduling edits | [`canonical-mrp-module-surface.md`](design/canonical-mrp-module-surface.md), [`AI-CONSULTANT.md`](AI-CONSULTANT.md) |
 | **5** | **Platform repositioning on public surfaces** | Marketing site, docs copy, App Store framing as workspace-shaped toolset (not "brewery app only") | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1, Week 3 `apps/website/` |
-| **6** | **Module SDK + `ai-tool-sdk` npm publish** | Third-party modules need public MIT SDK artifacts | [`LICENSING.md`](LICENSING.md) §6.2, July cutover §10.1.1 |
+| **6** | **Module SDK + `ai-tool-sdk` + `i18n-keys` npm publish** | Third-party modules need public MIT SDK artifacts | [`LICENSING.md`](LICENSING.md) §6.2, July cutover §10.1.1 |
 | **7** | **`WorkspaceBillingAddon` + Stripe + RevenueCat** | Per-module entitlements + optional managed-AI credits | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) billing sections |
 | **8** | **Tamagui intra-RC bump experiment** (July) | Scheduled hygiene before long-term RC drift | [`TAMAGUI.md`](TAMAGUI.md) |
 

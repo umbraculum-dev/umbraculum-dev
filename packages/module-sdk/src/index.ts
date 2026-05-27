@@ -71,3 +71,5 @@ export {
 } from "./registerNativeModule.js";
 
 export { fromParser, type ValidatedSchema } from "./validatedSchema.js";
+
+export type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";

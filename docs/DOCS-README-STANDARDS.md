@@ -37,6 +37,7 @@ This standard governs the `README.md` at the root of every published workspace:
 | `services/api/README.md` | Service |
 | `docs-site/README.md` | Documentation application |
 | `packages/ai-tool-sdk/README.md` | Package (TS, MIT SDK contract) |
+| `packages/i18n-keys/README.md` | Package (TS, MIT SDK contract) |
 | `packages/api-client/README.md` | Package (TS, npm-publishable) |
 | `packages/beerjson/README.md` | Package |
 | `packages/contracts/README.md` | Package |
