@@ -129,7 +129,7 @@ function rewriteRepoRelativeLinks() {
 const config: Config = {
   title: 'Umbraculum Documentation',
   tagline: 'Operational-application toolset — canonical reference',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/umbi.png',
   url: 'https://docs.umbraculum.dev',
   baseUrl: '/',
   organizationName: 'umbraculum-dev',
@@ -247,8 +247,10 @@ const config: Config = {
     navbar: {
       title: 'Umbraculum',
       logo: {
-        alt: 'Umbraculum placeholder logo',
-        src: 'img/logo.svg',
+        alt: 'Umbi — Umbraculum mascot',
+        src: 'img/umbi.png',
+        width: 32,
+        height: 32,
       },
       items: [
         {

@@ -7,7 +7,7 @@ Static marketing brochure for **umbraculum.dev** — workspace-shaped positionin
 
 ## What this is
 
-A **build-only** workspace: HTML + CSS in `public/`, copied to `dist/` on build. No React, no npm runtime dependencies. Intended for Cloudflare Pages with output directory `apps/website/dist`.
+A **build-only** workspace: HTML + CSS in `public/`, copied to `dist/` on build. The Umbi mascot is copied from the canonical asset [`docs/media/umbi.png`](../../docs/media/umbi.png) at build time (not duplicated in git). Intended for Cloudflare Pages with output directory `apps/website/dist`.
 
 ## Quick start
 
