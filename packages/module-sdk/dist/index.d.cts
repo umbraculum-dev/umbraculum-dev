@@ -173,6 +173,21 @@ type ModuleRouteRegistrar<TApp = unknown> = (app: TApp) => void | Promise<void>;
  * instances in one process do not accidentally reuse the first app instance.
  */
 type ModuleAiToolRegistrar<TApp = unknown> = (registry: AiToolRegistry, app: TApp) => void;
+/** Module-contributed AI system-prompt fragments (public α). */
+interface ModuleAiPrompts {
+    /** Module-wide overlay (domain rules, tool hints). */
+    module?: string;
+    /** Per-route overlays; keys are RouteId strings from @umbraculum/navigation. */
+    routes?: Readonly<Record<string, string>>;
+    /** Static reference notes (boot-time; not pgvector RAG). Max 2048 chars. */
+    knowledge?: string;
+}
+interface RegisteredModulePromptSnapshot {
+    code: string;
+    module?: string;
+    knowledge?: string;
+    routes: Readonly<Record<string, string>>;
+}
 interface RegisterModuleOptions<TApp = unknown> {
     /** Module code — folder name, route group, and future Prisma schema name. */
     code: string;
@@ -189,6 +204,8 @@ interface RegisterModuleOptions<TApp = unknown> {
     tierLimits?: TierLimitsContributor;
     /** Register AI tools into the platform orchestrator registry at API boot. */
     registerAiTools?: ModuleAiToolRegistrar<TApp>;
+    /** Module-owned system-prompt overlays for the AI orchestrator. */
+    aiPrompts?: ModuleAiPrompts;
     /** Document templates this module contributes to the platform rendering registry. */
     documentTemplates?: readonly DocumentTemplate<unknown>[];
 }
@@ -199,6 +216,22 @@ interface RegisteredModuleSnapshot {
     isCanonical: boolean;
 }
 
+/** @internal Exported for tests and documentation parity. */
+declare const AI_PROMPT_MODULE_MAX_LENGTH = 4000;
+/** @internal */
+declare const AI_PROMPT_ROUTE_MAX_LENGTH = 1500;
+/** @internal */
+declare const AI_PROMPT_KNOWLEDGE_MAX_LENGTH = 2048;
+declare class InvalidAiPromptOverlayError extends Error {
+    readonly moduleCode: string;
+    constructor(moduleCode: string, message: string);
+}
+declare class AiPromptRouteKeyAlreadyRegisteredError extends Error {
+    readonly routeId: string;
+    readonly existingModuleCode: string;
+    readonly conflictingModuleCode: string;
+    constructor(routeId: string, existingModuleCode: string, conflictingModuleCode: string);
+}
 declare class ModuleCodeAlreadyRegisteredError extends Error {
     readonly code: string;
     constructor(code: string);
@@ -222,6 +255,12 @@ declare function recordModuleRegistration(options: RegisterModuleOptions<unknown
 declare function snapshotModule(code: string): RegisteredModuleSnapshot;
 /** Test-only reset; not for production boot paths. */
 declare function clearModuleRegistryForTests(): void;
+declare function collectRegisteredModulePromptOverlays(): RegisteredModulePromptSnapshot[];
+declare function resolveRoutePromptOverlay(routeId: string): string | undefined;
+/** Module overlay strings in stable alphabetical order (excludes knowledge). */
+declare function collectModulePromptOverlayTexts(): string[];
+/** Static knowledge snippets in stable alphabetical order by module code. */
+declare function collectModuleKnowledgeSnippets(): string[];
 declare function listRegisteredModules(): RegisteredModuleSnapshot[];
 declare function getRegisteredDocumentTemplate(ref: string): DocumentTemplate<unknown> | undefined;
 declare function listRegisteredDocumentTemplates(): RegisteredDocumentTemplateSnapshot[];
@@ -367,4 +406,4 @@ declare function aggregateNativeAvailableRouteIds(): readonly NativeRouteId[];
 /** Test-only reset. */
 declare function clearNativeModuleRegistryForTests(): void;
 
-export { type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidUrlSegmentError, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredWebModules, recordModuleRegistration, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, snapshotModule, snapshotSegmentOwnership };
+export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AiPromptRouteKeyAlreadyRegisteredError, type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredWebModules, recordModuleRegistration, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveRoutePromptOverlay, snapshotModule, snapshotSegmentOwnership };

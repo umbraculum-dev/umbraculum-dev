@@ -11,6 +11,11 @@ import { crpCapacityRenderRoutes } from "./routes/capacityRenderRoutes.js";
 import { crpPlanningRoutes } from "./routes/planningRoutes.js";
 import { crpResourcesRoutes } from "./routes/resourcesRoutes.js";
 import { registerCrpTools } from "../../services/ai/tools/crp/index.js";
+import {
+  CRP_KNOWLEDGE,
+  CRP_MODULE_OVERLAY,
+  CRP_ROUTE_OVERLAYS,
+} from "../../services/ai/prompts/crp.js";
 
 const MODULE_CODE = "crp";
 
@@ -32,6 +37,11 @@ export function registerCrpModule(app: FastifyInstance): void {
       documentTemplates: crpDocumentTemplates,
       registerAiTools: (registry, hostApp) => {
         registerCrpTools(registry, hostApp.prisma);
+      },
+      aiPrompts: {
+        module: CRP_MODULE_OVERLAY,
+        knowledge: CRP_KNOWLEDGE,
+        routes: { ...CRP_ROUTE_OVERLAYS },
       },
     });
   }

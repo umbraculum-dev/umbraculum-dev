@@ -1811,7 +1811,8 @@
   },
   "ai": {
     "title": "AI Consultant",
-    "subtitle": "Ask questions about your brewery’s recipes, water chemistry, equipment, sessions, and inventory.",
+    "subtitle": "Ask questions about your workspace — recipes, products, vessels, production planning, and inventory.",
+    "askAboutThisPage": "Ask AI about this page",
     "composer": {
       "placeholder": "Ask a question about your brewery…",
       "send": "Send",

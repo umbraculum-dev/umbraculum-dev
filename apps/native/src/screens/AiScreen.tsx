@@ -31,7 +31,7 @@ export function AiScreen() {
   const chat = useAiChatStream(
     useMemo(
       () => ({
-        chatFetch: (message: string, init: { signal: AbortSignal }) =>
+        chatFetch: (message: string, init: { signal: AbortSignal; routeId?: string | null }) =>
           fetch(`${baseUrl}/api/ai/chat`, {
             method: "POST",
             headers: {
@@ -39,7 +39,10 @@ export function AiScreen() {
               Accept: "text/event-stream",
               ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            body: JSON.stringify({ message }),
+            body: JSON.stringify({
+              message,
+              ...(init.routeId ? { routeId: init.routeId } : {}),
+            }),
             signal: init.signal,
           }),
       }),

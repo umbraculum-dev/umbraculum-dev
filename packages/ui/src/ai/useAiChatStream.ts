@@ -70,8 +70,10 @@ export interface UseAiChatStreamInput {
    */
   chatFetch: (
     message: string,
-    init: { signal: AbortSignal },
+    init: { signal: AbortSignal; routeId?: string | null },
   ) => Promise<Response>;
+  /** Optional RouteId hint forwarded on each chat request. */
+  routeId?: string | null;
 }
 
 function newId(): string {
@@ -124,7 +126,10 @@ export function useAiChatStream(input: UseAiChatStreamInput) {
       const controller = new AbortController();
       abortRef.current = controller;
       try {
-        const res = await input.chatFetch(trimmed, { signal: controller.signal });
+        const res = await input.chatFetch(trimmed, {
+          signal: controller.signal,
+          routeId: input.routeId ?? null,
+        });
         if (!res.ok) {
           let code = `http_${res.status}`;
           let message = `Request failed (${res.status})`;

@@ -57,13 +57,21 @@ Goal: harden the shipped v0 AI consultant into the platform's cross-module conne
 - **Write-action drafts with human-in-the-loop confirmation** from the first AI feature that touches mutable domain state. No autonomous domain writes in v0 or v1.
 - **License + governance** as a parallel track: publish `docs/LICENSING.md` publicly, adopt DCO sign-off on contributions, write the contributor README, and pick the AGPLv3 + MIT SDK split intentionally before the first community contribution arrives (much harder to retrofit after).
 
-**Status snapshot (2026-05-27):**
+**Status snapshot (2026-05-27, updated pre–public-alpha hardening):**
 
-- **Done — module-owned AI-tool registration.** The shipped domain tools for brewery, `automation`, `pim`, `mrp`, and `crp` now register through `registerModule({ registerAiTools })`, and API boot composes those module-owned registrars into the single platform AI registry. The horizontal `render_document` tool remains platform-owned in the API boot path, preserving the distinction between module-contributed domain tools and cross-cutting platform services.
-- **TODO — prompt / knowledge hardening.** Module overlays, per-route overlays, and knowledge-source registration are still future work.
-- **TODO — semantic reporting / RAG.** Typed reporting DSL, curated reporting views, full product-doc / timeline RAG, and pgvector-backed retrieval remain unshipped.
-- **TODO — managed-AI and provider router.** BYOK Anthropic is the shipped v0 path; provider routing, managed-AI credits, pricebook, and add-on billing remain deferred.
-- **TODO — future module expansion.** WMS/CRM tool bundles and richer cross-module reporting/RAG are still tied to later module milestones. MRP/CRP Waves 5–6 shipped read-only advisor tools, RFC-0007 rendering templates, and alpha-demo browser exports (operator runbook + full render-job CI); propose/write tools and human walkthrough gap-log sign-off remain future work.
+**Shipped at public α (prompt + Layer A):**
+
+- **Module-owned AI-tool registration** — brewery, `automation`, `pim`, `mrp`, and `crp` via `registerModule({ registerAiTools })`; platform `render_document` in API boot.
+- **Module-pluggable prompt composition** — `registerModule({ aiPrompts })` with module + route overlays; neutral base prompt; platform overlay; orchestrator composition per [`canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md).
+- **Optional route context** — `routeId` on `POST /ai/chat`; web `?fromRoute=` on `/ai`.
+- **Static knowledge snippets** — `aiPrompts.knowledge` (boot-time, capped); not pgvector RAG.
+- **BYOK, tier unlock, usage ledger, workspace memory** — unchanged v0 backbone.
+
+**Post-α H2 (still open):**
+
+- **Semantic reporting / RAG** — typed reporting DSL, curated views, full product-doc / timeline RAG, pgvector retrieval.
+- **Managed-AI and provider router** — BYOK Anthropic remains v0; provider routing, managed-AI credits, pricebook, add-on billing deferred.
+- **Future module expansion** — WMS/CRM tool bundles; MRP/CRP propose/write AI tools (human-in-the-loop); richer cross-module reporting.
 
 Already shipped in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8): BYOK + paid tier unlock, Anthropic-only v0, opt-in workspace enablement, usage ledger, per-workspace memory, module-owned AI-tool registration for shipped domain modules, MRP/CRP read-only planning advisor tools, controlled rendering-job submission through `render_document`, and no net-new Stripe surface for v0 AI.
 

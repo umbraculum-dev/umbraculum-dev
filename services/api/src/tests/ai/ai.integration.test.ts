@@ -270,6 +270,30 @@ describe("ai (chat + settings + gating)", () => {
     expect(res.payload).toContain("event: complete");
   });
 
+  it("accepts optional routeId on chat body (unknown route ids are ignored)", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/ai/chat",
+      headers: { cookie: adminCookie, "content-type": "application/json" },
+      payload: { message: "hello", routeId: "productionOrders" },
+    });
+    expect([200, 403, 402]).toContain(res.statusCode);
+    if (res.statusCode === 400) {
+      const body = res.json();
+      expect(body.error?.code).not.toBe("invalid_body");
+    }
+  });
+
+  it("rejects invalid chat body with 400", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/ai/chat",
+      headers: { cookie: adminCookie, "content-type": "application/json" },
+      payload: { message: "" },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
   // ----- Per-user daily cap -----
 
   it("per-user daily cap rejects with 429 ai_rate_limit", async () => {

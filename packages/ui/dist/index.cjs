@@ -529,7 +529,10 @@ function useAiChatStream(input) {
       const controller = new AbortController();
       abortRef.current = controller;
       try {
-        const res = await input.chatFetch(trimmed, { signal: controller.signal });
+        const res = await input.chatFetch(trimmed, {
+          signal: controller.signal,
+          routeId: input.routeId ?? null
+        });
         if (!res.ok) {
           let code = `http_${res.status}`;
           let message = `Request failed (${res.status})`;

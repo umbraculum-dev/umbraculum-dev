@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { AiChatRequestBodySchema } from "@umbraculum/contracts";
 
 import { BadRequestError } from "../errors.js";
 import { requireActiveWorkspace, requireUser } from "../plugins/requestContext.js";
@@ -10,15 +11,6 @@ function assertWorkspaceId(v: unknown): string {
   const id = typeof v === "string" ? v.trim() : "";
   if (!id) throw new BadRequestError("invalid_workspace_id", "Params.workspaceId is required");
   return id;
-}
-
-function assertMessage(v: unknown): string {
-  const s = typeof v === "string" ? v.trim() : "";
-  if (!s) throw new BadRequestError("invalid_message", "Body.message is required");
-  if (s.length > 8000) {
-    throw new BadRequestError("message_too_long", "Body.message must be 8000 chars or less");
-  }
-  return s;
 }
 
 /**
@@ -33,10 +25,13 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
     // ----- Chat (SSE) -----
     app.post("/ai/chat", async (req, reply) => {
       const ctx = requireActiveWorkspace(req);
-      const body = (req.body ?? {}) as { message?: unknown; sessionId?: unknown };
-      const message = assertMessage(body.message);
-      const sessionId =
-        typeof body.sessionId === "string" && body.sessionId.length > 0 ? body.sessionId : null;
+      const parsed = AiChatRequestBodySchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        throw new BadRequestError("invalid_body", "Body must match AiChatRequestBody");
+      }
+      const { message, sessionId: sessionIdRaw, routeId: routeIdRaw } = parsed.data;
+      const sessionId = sessionIdRaw ?? null;
+      const routeId = routeIdRaw ?? null;
 
       const orchestrator = new AiOrchestrator(app.prisma, toolRegistry);
 
@@ -49,6 +44,7 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
         userId: ctx.userId,
         message,
         sessionId,
+        routeId,
       });
 
       reply.raw.setHeader("Content-Type", "text/event-stream");
@@ -63,6 +59,7 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
           userId: ctx.userId,
           message,
           sessionId,
+          routeId,
         })) {
           if (req.raw.destroyed) break;
           reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);

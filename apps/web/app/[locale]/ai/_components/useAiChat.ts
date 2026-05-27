@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 import { useAiChatStream } from "@umbraculum/ui";
@@ -7,14 +8,17 @@ import { useAiChatStream } from "@umbraculum/ui";
 /**
  * Web binding of the shared {@link useAiChatStream} hook.
  *
- * Uses `credentials: "same-origin"` so the session cookie is forwarded to
- * the API. The shared hook handles SSE decoding and turn state; this
- * wrapper exists so the page can stay obnoxiously short.
+ * Reads optional `?fromRoute=` (or `?routeId=`) for route-scoped prompt overlays.
  */
 export function useAiChat() {
+  const searchParams = useSearchParams();
+  const routeId =
+    searchParams.get("fromRoute") ?? searchParams.get("routeId") ?? null;
+
   const input = useMemo(
     () => ({
-      chatFetch: (message: string, init: { signal: AbortSignal }) =>
+      routeId,
+      chatFetch: (message: string, init: { signal: AbortSignal; routeId?: string | null }) =>
         fetch("/api/ai/chat", {
           method: "POST",
           credentials: "same-origin",
@@ -22,11 +26,14 @@ export function useAiChat() {
             "Content-Type": "application/json",
             Accept: "text/event-stream",
           },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({
+            message,
+            ...(init.routeId ? { routeId: init.routeId } : {}),
+          }),
           signal: init.signal,
         }),
     }),
-    [],
+    [routeId],
   );
   return useAiChatStream(input);
 }

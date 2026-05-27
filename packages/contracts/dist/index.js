@@ -753,9 +753,17 @@ function parseGravityAnalysisResponseV1(x) {
   };
 }
 
-// src/rendering/renderJobs.ts
+// src/ai/aiChat.ts
 import { z as z2 } from "zod";
-var RenderKindSchema = z2.enum([
+var AiChatRequestBodySchema = z2.object({
+  message: z2.string().trim().min(1).max(8e3),
+  sessionId: z2.string().trim().min(1).max(200).optional(),
+  routeId: z2.string().trim().min(1).max(128).optional()
+}).strict();
+
+// src/rendering/renderJobs.ts
+import { z as z3 } from "zod";
+var RenderKindSchema = z3.enum([
   "pdf",
   "xlsx",
   "csv",
@@ -767,71 +775,71 @@ var RenderKindSchema = z2.enum([
   "barcode",
   "qr"
 ]);
-var RenderStatusSchema = z2.enum([
+var RenderStatusSchema = z3.enum([
   "queued",
   "running",
   "succeeded",
   "failed"
 ]);
-var RenderVisibilitySchema = z2.enum(["workspace", "public"]);
-var RenderDeliverySchema = z2.discriminatedUnion("mode", [
-  z2.object({ mode: z2.literal("stream-response") }).strict(),
-  z2.object({
-    mode: z2.literal("persist-to-media"),
+var RenderVisibilitySchema = z3.enum(["workspace", "public"]);
+var RenderDeliverySchema = z3.discriminatedUnion("mode", [
+  z3.object({ mode: z3.literal("stream-response") }).strict(),
+  z3.object({
+    mode: z3.literal("persist-to-media"),
     visibility: RenderVisibilitySchema
   }).strict(),
-  z2.object({
-    mode: z2.literal("email"),
-    to: z2.array(z2.string().email()).min(1, "email.to required"),
-    subject: z2.string().min(1, "email.subject required")
+  z3.object({
+    mode: z3.literal("email"),
+    to: z3.array(z3.string().email()).min(1, "email.to required"),
+    subject: z3.string().min(1, "email.subject required")
   }).strict()
 ]);
-var RenderErrorSchema = z2.object({
-  code: z2.string().min(1, "error.code required"),
-  message: z2.string().min(1, "error.message required")
+var RenderErrorSchema = z3.object({
+  code: z3.string().min(1, "error.code required"),
+  message: z3.string().min(1, "error.message required")
 }).strict();
-var RenderJobSubmitRequestSchema = z2.object({
-  templateRef: z2.string().min(1, "templateRef required"),
+var RenderJobSubmitRequestSchema = z3.object({
+  templateRef: z3.string().min(1, "templateRef required"),
   kind: RenderKindSchema.optional(),
-  data: z2.unknown(),
+  data: z3.unknown(),
   delivery: RenderDeliverySchema.optional()
 }).strict();
-var RenderJobStatusSchema = z2.object({
-  id: z2.string().min(1, "job.id required"),
-  templateRef: z2.string().min(1, "job.templateRef required"),
+var RenderJobStatusSchema = z3.object({
+  id: z3.string().min(1, "job.id required"),
+  templateRef: z3.string().min(1, "job.templateRef required"),
   kind: RenderKindSchema,
   status: RenderStatusSchema,
-  deliveryMode: z2.string().min(1, "job.deliveryMode required"),
-  requestedAt: z2.string().min(1, "job.requestedAt required"),
-  startedAt: z2.string().nullable(),
-  completedAt: z2.string().nullable(),
-  artifactId: z2.string().nullable(),
-  mediaAssetId: z2.string().nullable(),
+  deliveryMode: z3.string().min(1, "job.deliveryMode required"),
+  requestedAt: z3.string().min(1, "job.requestedAt required"),
+  startedAt: z3.string().nullable(),
+  completedAt: z3.string().nullable(),
+  artifactId: z3.string().nullable(),
+  mediaAssetId: z3.string().nullable(),
   error: RenderErrorSchema.nullable()
 }).strict();
-var RenderJobSubmitResponseSchema = z2.object({
-  ok: z2.literal(true),
-  mode: z2.literal("async"),
+var RenderJobSubmitResponseSchema = z3.object({
+  ok: z3.literal(true),
+  mode: z3.literal("async"),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobStatusResponseSchema = z2.object({
-  ok: z2.literal(true),
+var RenderJobStatusResponseSchema = z3.object({
+  ok: z3.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobCancelResponseSchema = z2.object({
-  ok: z2.literal(true),
+var RenderJobCancelResponseSchema = z3.object({
+  ok: z3.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobResultResponseSchema = z2.object({
-  ok: z2.literal(true),
+var RenderJobResultResponseSchema = z3.object({
+  ok: z3.literal(true),
   job: RenderJobStatusSchema,
-  signedUrl: z2.string().min(1, "signedUrl required"),
-  expiresAt: z2.string().min(1, "expiresAt required")
+  signedUrl: z3.string().min(1, "signedUrl required"),
+  expiresAt: z3.string().min(1, "expiresAt required")
 }).strict();
-var ErrorResponseSchema = z2.object({
-  ok: z2.literal(false),
+var ErrorResponseSchema = z3.object({
+  ok: z3.literal(false),
   error: RenderErrorSchema.extend({
-    details: z2.record(z2.string(), z2.unknown()).optional()
+    details: z3.record(z3.string(), z3.unknown()).optional()
   }).strict()
 }).strict();
 function parseRenderJobSubmitRequest(payload) {
@@ -842,45 +850,45 @@ function parseRenderJobStatusResponse(payload) {
 }
 
 // src/brewery/listResponses.ts
-import { z as z3 } from "zod";
-var RecipeListItemSchema = z3.object({
-  id: z3.string(),
-  accountId: z3.string().optional(),
-  name: z3.string(),
-  styleKey: z3.string().optional(),
-  style: z3.string().nullable().optional(),
-  version: z3.number().optional()
+import { z as z4 } from "zod";
+var RecipeListItemSchema = z4.object({
+  id: z4.string(),
+  accountId: z4.string().optional(),
+  name: z4.string(),
+  styleKey: z4.string().optional(),
+  style: z4.string().nullable().optional(),
+  version: z4.number().optional()
 });
-var RecipesListResponseSchema = z3.object({
-  ok: z3.literal(true),
-  recipes: z3.array(RecipeListItemSchema)
+var RecipesListResponseSchema = z4.object({
+  ok: z4.literal(true),
+  recipes: z4.array(RecipeListItemSchema)
 });
 function parseRecipesListResponse(payload) {
   return RecipesListResponseSchema.parse(payload);
 }
-var isoDateTime = z3.preprocess((v) => {
+var isoDateTime = z4.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z3.string());
-var BrewSessionListItemSchema = z3.object({
-  id: z3.string(),
-  code: z3.string(),
-  status: z3.string(),
+}, z4.string());
+var BrewSessionListItemSchema = z4.object({
+  id: z4.string(),
+  code: z4.string(),
+  status: z4.string(),
   createdAt: isoDateTime,
-  startedAt: z3.preprocess((v) => v instanceof Date ? v.toISOString() : v, z3.string().nullable()).optional(),
-  stoppedAt: z3.preprocess((v) => v instanceof Date ? v.toISOString() : v, z3.string().nullable()).optional()
+  startedAt: z4.preprocess((v) => v instanceof Date ? v.toISOString() : v, z4.string().nullable()).optional(),
+  stoppedAt: z4.preprocess((v) => v instanceof Date ? v.toISOString() : v, z4.string().nullable()).optional()
 });
-var BrewSessionsListResponseSchema = z3.object({
-  ok: z3.literal(true),
-  brewSessions: z3.array(BrewSessionListItemSchema)
+var BrewSessionsListResponseSchema = z4.object({
+  ok: z4.literal(true),
+  brewSessions: z4.array(BrewSessionListItemSchema)
 });
 function parseBrewSessionsListResponse(payload) {
   return BrewSessionsListResponseSchema.parse(payload);
 }
-var BrewSessionCreateResponseSchema = z3.object({
-  ok: z3.literal(true),
-  brewSession: z3.object({
-    id: z3.string()
+var BrewSessionCreateResponseSchema = z4.object({
+  ok: z4.literal(true),
+  brewSession: z4.object({
+    id: z4.string()
   })
 });
 function parseBrewSessionCreateResponse(payload) {
@@ -888,6 +896,7 @@ function parseBrewSessionCreateResponse(payload) {
   return { brewSession: parsed.brewSession };
 }
 export {
+  AiChatRequestBodySchema,
   AuthMeResponseSchema,
   AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema,

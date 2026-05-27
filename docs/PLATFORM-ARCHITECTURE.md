@@ -330,7 +330,7 @@ The AI consultant is not a feature of the brewery module — it is part of the h
 | **B. Semantic layer + reporting DSL tool** | Answer ad-hoc data questions ("top 10 customers last quarter") | Typed query DSL on a curated set of reporting views. Never raw SQL. | Medium — needs row caps, statement timeouts, allowlists. | v1 |
 | **C. RAG over knowledge** | Answer "how does X work?" and "what is true about *this* workspace?" | v0 workspace memory now; later pgvector store for product docs (global) + per-workspace operational memory + activity timeline summaries. | Medium — PII / cross-tenant isolation discipline required. | memory v0, full RAG v1.5 |
 
-**Module-pluggable status.** The tools portion is implemented: shipped domain modules register AI tools through `registerModule({ registerAiTools })`, and the API boot path invokes those module-owned registrars into one platform registry. The remaining target-state is richer composition around the tools — module prompt overlays, per-route overlays, knowledge-source registration, semantic reporting, and full RAG — so the orchestrator can reason across future MRP/WMS/CRM/CRP surfaces without hardcoded prompt assumptions.
+**Module-pluggable status.** Tools and prompt composition are implemented: shipped domain modules register AI tools and `aiPrompts` (module overlay, route overlays, static `knowledge` snippets) through `registerModule`, and the orchestrator composes base + platform + module + route + memory per [`docs/design/canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md). Remaining target-state: semantic reporting DSL, pgvector RAG, and managed-AI — not required for public α.
 
 **System prompt composition.** Every model call is prompted with:
 
@@ -382,7 +382,7 @@ registerModule(app, {
 });
 ```
 
-The same shape now applies to the shipped brewery vertical and the `automation` / `pim` canonical modules for routes, URL-segment ownership, document templates where applicable, and AI-tool registration. Prompt overlays and knowledge-source registration remain future SDK slots.
+The same shape now applies to the shipped brewery vertical and the `automation` / `pim` / `mrp` / `crp` canonical modules for routes, URL-segment ownership, document templates where applicable, AI-tool registration, and `aiPrompts`. Full pgvector knowledge-source registration remains a future SDK slot.
 
 **The module SDK is a first-class public artifact, not an internal convention.** A third-party developer — an indie consultancy, a vertical-specific software vendor, an in-house team at a customer — must be able to build a module **in their own repository**, depend on Umbraculum's SDK as published npm packages, and ship the module independently of platform releases. The SDK packages are licensed under MIT (see [`docs/LICENSING.md`](LICENSING.md) §6.2) precisely so module developers can license their own module's source code however they want, including proprietary, without their choice being constrained by the platform's AGPL core.
 

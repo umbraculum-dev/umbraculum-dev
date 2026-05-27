@@ -15,6 +15,7 @@ import { pimMediaAssetRefsRoutes } from "./routes/mediaAssetRefsRoutes.js";
 import { pimProductsRoutes } from "./routes/productsRoutes.js";
 import { pimVariantsRoutes } from "./routes/variantsRoutes.js";
 import { registerPimTools } from "../../services/ai/tools/pim/index.js";
+import { PIM_MODULE_OVERLAY, PIM_ROUTE_OVERLAYS } from "../../services/ai/prompts/pim.js";
 
 const MODULE_CODE = "pim";
 
@@ -53,6 +54,10 @@ export function registerPimModule(app: FastifyInstance): void {
       addonCodes: ["pim_module"],
       registerAiTools(registry, instance) {
         registerPimTools(registry, instance.prisma);
+      },
+      aiPrompts: {
+        module: PIM_MODULE_OVERLAY,
+        routes: { ...PIM_ROUTE_OVERLAYS },
       },
       documentTemplates: pimDocumentTemplates,
       routes: [],

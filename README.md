@@ -222,7 +222,7 @@ translations, and security reports.
 |-----------------------------------|---------------|
 | Brewery vertical — web            | Shipping (WIP)|
 | Brewery vertical — native (Expo)  | Shipping (WIP)|
-| AI consultant — ask Umbraculum about recipes, brew sessions, equipment, inventory, and tank state; answers grounded in your workspace data; BYOK + paid-tier unlock (see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)) | Shipping (Sprint #2 complete) |
+| AI consultant — workspace-scoped chat over recipes, inventory, vessels, PIM products, MRP/CRP planning (read-only), and document export; module-aware prompts; BYOK + paid-tier unlock (see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)) | Shipping |
 | Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
 | Project identity                  | **Umbraculum** (namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`) |
 | GitHub org hosting                | **Done 2026-05-27** — `github.com/umbraculum-dev/umbraculum-dev` (private); sister-repo `umbraculum-toolset` also under org (private). Commits, tags, and Actions workflows preserved on transfer; `docs-readmes` CI verified green post-transfer. |

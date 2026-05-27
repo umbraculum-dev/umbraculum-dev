@@ -14,6 +14,32 @@ function isCanonicalModuleCode(code) {
 // src/moduleRegistry.ts
 var modulesByCode = /* @__PURE__ */ new Map();
 var documentTemplatesByRef = /* @__PURE__ */ new Map();
+var routePromptOverlayByRouteId = /* @__PURE__ */ new Map();
+var AI_PROMPT_MODULE_MAX_LENGTH = 4e3;
+var AI_PROMPT_ROUTE_MAX_LENGTH = 1500;
+var AI_PROMPT_KNOWLEDGE_MAX_LENGTH = 2048;
+var InvalidAiPromptOverlayError = class extends Error {
+  moduleCode;
+  constructor(moduleCode, message) {
+    super(`registerModule: invalid aiPrompts for module "${moduleCode}" (${message})`);
+    this.name = "InvalidAiPromptOverlayError";
+    this.moduleCode = moduleCode;
+  }
+};
+var AiPromptRouteKeyAlreadyRegisteredError = class extends Error {
+  routeId;
+  existingModuleCode;
+  conflictingModuleCode;
+  constructor(routeId, existingModuleCode, conflictingModuleCode) {
+    super(
+      `registerModule: aiPrompts.routes key "${routeId}" is already registered by module "${existingModuleCode}" (conflict from "${conflictingModuleCode}")`
+    );
+    this.name = "AiPromptRouteKeyAlreadyRegisteredError";
+    this.routeId = routeId;
+    this.existingModuleCode = existingModuleCode;
+    this.conflictingModuleCode = conflictingModuleCode;
+  }
+};
 var ModuleCodeAlreadyRegisteredError = class extends Error {
   code;
   constructor(code) {
@@ -65,9 +91,51 @@ function assertModuleCodeAvailable(code) {
     throw new ModuleCodeAlreadyRegisteredError(code);
   }
 }
+function assertNonEmptyOverlayText(moduleCode, field, value, maxLength) {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new InvalidAiPromptOverlayError(moduleCode, `${field} must not be empty or whitespace`);
+  }
+  if (value.length > maxLength) {
+    throw new InvalidAiPromptOverlayError(
+      moduleCode,
+      `${field} exceeds max length ${maxLength} (got ${value.length})`
+    );
+  }
+}
+function validateAndIndexAiPrompts(moduleCode, aiPrompts) {
+  if (!aiPrompts) return;
+  if (aiPrompts.module !== void 0) {
+    assertNonEmptyOverlayText(moduleCode, "aiPrompts.module", aiPrompts.module, AI_PROMPT_MODULE_MAX_LENGTH);
+  }
+  if (aiPrompts.knowledge !== void 0) {
+    assertNonEmptyOverlayText(
+      moduleCode,
+      "aiPrompts.knowledge",
+      aiPrompts.knowledge,
+      AI_PROMPT_KNOWLEDGE_MAX_LENGTH
+    );
+  }
+  if (aiPrompts.routes) {
+    for (const [routeId, overlay] of Object.entries(aiPrompts.routes)) {
+      assertNonEmptyOverlayText(
+        moduleCode,
+        `aiPrompts.routes.${routeId}`,
+        overlay,
+        AI_PROMPT_ROUTE_MAX_LENGTH
+      );
+      const existingOwner = routePromptOverlayByRouteId.get(routeId);
+      if (existingOwner !== void 0 && existingOwner !== moduleCode) {
+        throw new AiPromptRouteKeyAlreadyRegisteredError(routeId, existingOwner, moduleCode);
+      }
+      routePromptOverlayByRouteId.set(routeId, moduleCode);
+    }
+  }
+}
 function recordModuleRegistration(options) {
   assertModuleCodeAvailable(options.code);
   const documentTemplates = validateDocumentTemplates(options.code, options.documentTemplates ?? []);
+  validateAndIndexAiPrompts(options.code, options.aiPrompts);
   modulesByCode.set(options.code, options);
   for (const template of documentTemplates) {
     documentTemplatesByRef.set(template.ref, {
@@ -121,6 +189,44 @@ function snapshotModule(code) {
 function clearModuleRegistryForTests() {
   modulesByCode.clear();
   documentTemplatesByRef.clear();
+  routePromptOverlayByRouteId.clear();
+}
+function collectRegisteredModulePromptOverlays() {
+  return Array.from(modulesByCode.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([code, entry]) => {
+    const prompts = entry.aiPrompts;
+    return {
+      code,
+      ...prompts?.module !== void 0 ? { module: prompts.module } : {},
+      ...prompts?.knowledge !== void 0 ? { knowledge: prompts.knowledge } : {},
+      routes: prompts?.routes ?? {}
+    };
+  });
+}
+function resolveRoutePromptOverlay(routeId) {
+  const trimmed = routeId.trim();
+  if (!trimmed) return void 0;
+  const ownerCode = routePromptOverlayByRouteId.get(trimmed);
+  if (!ownerCode) return void 0;
+  const entry = modulesByCode.get(ownerCode);
+  return entry?.aiPrompts?.routes?.[trimmed];
+}
+function collectModulePromptOverlayTexts() {
+  const out = [];
+  for (const snap of collectRegisteredModulePromptOverlays()) {
+    if (snap.module && snap.module.trim().length > 0) {
+      out.push(snap.module.trim());
+    }
+  }
+  return out;
+}
+function collectModuleKnowledgeSnippets() {
+  const out = [];
+  for (const snap of collectRegisteredModulePromptOverlays()) {
+    if (snap.knowledge && snap.knowledge.trim().length > 0) {
+      out.push(snap.knowledge.trim());
+    }
+  }
+  return out;
 }
 function listRegisteredModules() {
   return Array.from(modulesByCode.keys()).sort().map((code) => snapshotModule(code));
@@ -316,7 +422,12 @@ function fromParser(parser) {
   };
 }
 export {
+  AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
+  AI_PROMPT_MODULE_MAX_LENGTH,
+  AI_PROMPT_ROUTE_MAX_LENGTH,
+  AiPromptRouteKeyAlreadyRegisteredError,
   DocumentTemplateRefAlreadyRegisteredError,
+  InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
   InvalidModuleCodeError,
   InvalidUrlSegmentError,
@@ -330,6 +441,9 @@ export {
   clearModuleRegistryForTests,
   clearNativeModuleRegistryForTests,
   clearWebModuleRegistryForTests,
+  collectModuleKnowledgeSnippets,
+  collectModulePromptOverlayTexts,
+  collectRegisteredModulePromptOverlays,
   fromParser,
   getRegisteredDocumentTemplate,
   getSegmentOwner,
@@ -344,6 +458,7 @@ export {
   registerNativeModule,
   registerRegisteredModuleAiTools,
   registerWebModule,
+  resolveRoutePromptOverlay,
   snapshotModule,
   snapshotSegmentOwnership
 };

@@ -88,8 +88,20 @@ The consultant is deliberately bounded today. None of the following are shipped,
 - **No billing or admin actions.** Subscription changes, key vault rotation, workspace membership edits — all human-only.
 - **No cross-workspace queries.** Every tool is scoped to the active workspace; the AI cannot ask "across all my workspaces, where is the slowest fermentation?" — this is a tenancy guarantee, not a UX bug.
 - **No planning mutations.** `mrp` and `crp` expose read-only advisor tools and registered rendering templates (Wave 6), but the consultant cannot create production orders, reschedule operations, optimize capacity, or materialize projection rows. Export artifacts use `render_document` or human-triggered module render-job routes; they do not mutate domain state. `wms` and `crm` remain reserved canonical codes with no AI tool surface today.
+- **No ad-hoc analytics or product-doc RAG.** The consultant cannot run reporting DSL queries or search embedded documentation stores; static module `knowledge` snippets and workspace memory are the only non-tool context.
+- **No managed-AI mode.** v0 is BYOK Anthropic only; Umbraculum does not resell tokens or host a shared provider key at public α.
 
 These bounds are not a hedge — they are the shape of v0. The architecture intentionally trades autonomy for coherence + auditability while the apparatus matures.
+
+---
+
+## 4.1 Prompt composition (public α)
+
+Each chat turn builds a system prompt in fixed order: **base → platform → module overlays (alphabetical by module code) → optional route overlay → workspace memory**. Module and route text is contributed through `registerModule({ aiPrompts })` in [`@umbraculum/module-sdk`](../packages/module-sdk/README.md); the orchestrator collects overlays at request time.
+
+Clients may send an optional `routeId` (from [`@umbraculum/navigation`](../packages/navigation/README.md)) on `POST /ai/chat` so route-specific hints apply — for example when opening `/ai?fromRoute=productionOrders`.
+
+Authoritative contract, limits, and deferred layers: [`design/canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md).
 
 ---
 
@@ -104,7 +116,7 @@ So in v0:
 - The api's [`app.ts`](../services/api/src/app.ts) creates the in-memory registry, invokes module-owned registrars through `@umbraculum/module-sdk`, then registers horizontal platform tools such as `render_document`.
 - The contract for tools is public and typed (`AiTool`, `AiToolRegistry`, `AiToolScope` in [`@umbraculum/ai-tool-sdk`](../packages/ai-tool-sdk/README.md)).
 
-What remains target-state is the richer composition around tools: module prompt overlays, per-route overlays, knowledge-source registration, semantic reporting, full RAG, and future WMS/CRM tool bundles. The module-owned tool path itself is now in place, and Wave 5 proves that canonical planning modules can join the same workspace-scope registry without replacing vertical source ownership.
+Modules also contribute **`aiPrompts`** (module overlay, per-route overlays, optional static `knowledge` snippet) alongside tools. Semantic reporting, pgvector RAG, and future WMS/CRM tool bundles remain post-α work.
 
 ---
 
