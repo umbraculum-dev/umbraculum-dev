@@ -1,3 +1,10 @@
+declare function configureNativeRoutePolicy(options: {
+    availableRouteIds: readonly RouteId[];
+    webFallbackRouteIds?: readonly RouteId[];
+}): void;
+/** Test-only reset. */
+declare function clearNativeRoutePolicyForTests(): void;
+
 type AppPlatform = "web" | "native";
 type RouteId = "dashboard" | "inventory" | "recipes" | "brewdayStepsSettings" | "waterProfiles" | "recipeEdit" | "waterHub" | "waterMash" | "waterSparge" | "waterBoil" | "yeast" | "equipment" | "fermDataIntegration" | "quality" | "login" | "vessels" | "vesselDetail" | "products" | "productDetail" | "categories" | "attributeSets" | "attributeSetDetail" | "productionOrders" | "productionOrderDetail" | "materialRequirements" | "capacity" | "schedule" | "resources" | "resourceDetail";
 interface RouteParamsById {
@@ -62,10 +69,13 @@ type RouteRef = {
     };
 }[RouteId];
 type RouteAvailability = "available" | "blocked" | "whitelisted_web_fallback";
-declare const WEBVIEW_WHITELIST_ROUTE_IDS: readonly ["inventory"];
+declare const WEBVIEW_WHITELIST_ROUTE_IDS: readonly ["inventory", "productionOrders", "materialRequirements", "capacity", "schedule", "resources"];
+
 declare function isWebviewWhitelistRouteId(id: RouteId): boolean;
 declare function getRouteAvailability(id: RouteId, platform: AppPlatform): RouteAvailability;
 declare function hasWebFallback(id: RouteId, platform: AppPlatform): boolean;
+/** Build a RouteRef for system-browser web fallback (empty-params routes only). */
+declare function buildWebFallbackRouteRef(id: RouteId): RouteRef | null;
 declare function routeToPath(ref: RouteRef): string;
 declare function prefixLocalePath(pathname: string, locale: string): string;
 declare function routeToLocalePath(ref: RouteRef, locale: string): string;
@@ -77,4 +87,4 @@ interface AppRouter {
     href(ref: RouteRef): string;
 }
 
-export { type AppPlatform, type AppRouter, type RouteAvailability, type RouteId, type RouteParamsById, type RouteRef, WEBVIEW_WHITELIST_ROUTE_IDS, getRouteAvailability, hasWebFallback, isWebviewWhitelistRouteId, prefixLocalePath, routeToLocalePath, routeToPath };
+export { type AppPlatform, type AppRouter, type RouteAvailability, type RouteId, type RouteParamsById, type RouteRef, WEBVIEW_WHITELIST_ROUTE_IDS, buildWebFallbackRouteRef, clearNativeRoutePolicyForTests, configureNativeRoutePolicy, getRouteAvailability, hasWebFallback, isWebviewWhitelistRouteId, prefixLocalePath, routeToLocalePath, routeToPath };

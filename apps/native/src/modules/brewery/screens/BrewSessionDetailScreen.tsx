@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Alert, Linking, ScrollView, View } from "react-native";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { bearerTokenAuth, createApiClient, runAsyncRenderJobExport } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, SelectField, Text } from "@umbraculum/ui";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
@@ -60,6 +60,7 @@ export function BrewSessionDetailScreen() {
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [working, setWorking] = useState<null | "refresh" | "attach" | "detach">(null);
   const [hydrometerError, setHydrometerError] = useState<string | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const api = useMemo(() => {
     if (!canCall) return null;
@@ -202,6 +203,27 @@ export function BrewSessionDetailScreen() {
 
   const lastReading = readings[0] ?? null;
 
+  const exportWorkOrderPdf = useCallback(async () => {
+    if (!api || !brewSessionId) return;
+    setExportingPdf(true);
+    try {
+      const orderId = `brewery-brew-session-${brewSessionId}`;
+      const url = await runAsyncRenderJobExport(
+        api,
+        `/api/mrp/work-orders/${encodeURIComponent(orderId)}/render-jobs`,
+        {
+          platform: "native",
+          apiBaseUrl: getApiBaseUrl(),
+        },
+      );
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert(t("exportWorkOrderPdf"), t("exportWorkOrderPdfError"));
+    } finally {
+      setExportingPdf(false);
+    }
+  }, [api, brewSessionId, t]);
+
   const chartPoints = useMemo(
     () =>
       readings
@@ -225,6 +247,16 @@ export function BrewSessionDetailScreen() {
           <Text fontSize={12} opacity={0.8} mb="$3">
             {t("sessionCode")}: {session.code}
           </Text>
+        ) : null}
+
+        {session && api ? (
+          <Button
+            onPress={() => { void exportWorkOrderPdf(); }}
+            disabled={exportingPdf}
+            mb="$3"
+          >
+            <Text>{exportingPdf ? t("exportWorkOrderPdfWorking") : t("exportWorkOrderPdf")}</Text>
+          </Button>
         ) : null}
 
         {error ? (

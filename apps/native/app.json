@@ -1,13 +1,23 @@
 {
   "expo": {
-    "name": "Brewery App",
-    "slug": "brewery-app",
-    "scheme": "brewery",
-    "version": "0.0.0",
+    "name": "Umbraculum Brewery",
+    "slug": "umbraculum-brewery",
+    "scheme": "umbraculum-brewery",
+    "version": "0.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": ["**/*"],
-    "extra": {}
+    "android": {
+      "package": "dev.umbraculum.brewery"
+    },
+    "ios": {
+      "bundleIdentifier": "dev.umbraculum.brewery"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
+    }
   }
 }
 

@@ -11,7 +11,7 @@ The transport layer between any client and `services/api`. Web (Next.js) and nat
 
 ## Scope
 
-- **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, the two auth-strategy factories (`cookieAuth()`, `bearerTokenAuth(getToken)`), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes).
+- **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, the two auth-strategy factories (`cookieAuth()`, `bearerTokenAuth(getToken)`), RFC-0007 render-job helpers (`submitRenderJob`, `pollRenderJobUntilSucceeded`, `runAsyncRenderJobExport`), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes).
 - **Does not contain**: contract DTO/parser definitions (those live in `@umbraculum/contracts`); auth backend logic — token issuance, session creation (lives in `services/api/src/routes/auth/`); UI session-state management (lives in the consuming app).
 
 ## Exports

@@ -80,7 +80,14 @@ So “Mac-free” pushes the long-term path toward **EAS (or similar remote iOS 
 
 ---
 
-## 5. Mitigations to treat as mandatory (discipline + docs)
+## 5. EAS internal alpha (July 2026)
+
+- **Config:** [`apps/native/eas.json`](../apps/native/eas.json) — `preview` profile builds an Android APK for internal distribution; iOS uses EAS cloud builders (no local Mac required).
+- **CI:** [`.github/workflows/native-eas-build.yml`](../.github/workflows/native-eas-build.yml) — manual `workflow_dispatch` only (requires `EXPO_TOKEN` secret). Not gated on every PR.
+- **Scope:** Brewery-only brew-day flows per [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) §5.
+- **Before first build:** Run `eas init` in `apps/native/`, set `expo.extra.eas.projectId` in `app.json`, and configure `EXPO_PUBLIC_API_BASE_URL` for the alpha API host.
+
+## 6. Mitigations to treat as mandatory (discipline + docs)
 
 These are the **minimum** professional bar for the current stack:
 
@@ -101,7 +108,7 @@ Optional enhancements (nice-to-have, not required for solo honesty):
 
 ---
 
-## 5.1 Dev host autodetection (why auto-derive over DHCP / Tailscale / static IP)
+## 6.1 Dev host autodetection (why auto-derive over DHCP / Tailscale / static IP)
 
 **Problem.** The laptop's LAN IP drifts (DHCP renewal, switching WiFi↔Ethernet, network change). With a hardcoded `EXPO_PUBLIC_API_BASE_URL` in `apps/native/app.json` and a hardcoded `REACT_NATIVE_PACKAGER_HOSTNAME` in the Metro command, every drift required two manual edits and a Metro restart. This is the LAN-IP pre-flight item from §5, made automatic.
 
@@ -128,13 +135,13 @@ Optional enhancements (nice-to-have, not required for solo honesty):
 
 ---
 
-## 6. GitHub Actions (or similar): what is actually being suggested?
+## 7. GitHub Actions (or similar): what is actually being suggested?
 
-### 6.1 CI is not required for “professionalism”
+### 7.1 CI is not required for “professionalism”
 
 For a **solo** maintainer with **good local discipline** and **solid docs**, you can ship quality **without** GitHub Actions. CI is a **safety net** when humans forget steps or when multiple contributors don’t read the same runbook.
 
-### 6.2 If you add CI: keep it deliberately lean
+### 7.2 If you add CI: keep it deliberately lean
 
 Goals:
 
@@ -189,7 +196,7 @@ Document that one-liner next to your merge checklist. That is **professionally s
 
 ---
 
-## 7. Links
+## 8. Links
 
 - Native operations & troubleshooting: `docs/DEVELOPMENT-NATIVE-LOCAL.md`
 - Project-local rules (Expo Go ABI exception): `DEVELOPMENT-LOCAL.md`

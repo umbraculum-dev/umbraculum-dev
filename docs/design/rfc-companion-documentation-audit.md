@@ -18,6 +18,7 @@
 | **Adequate with known gaps** | 0001, 0004, 0005 |
 | **Drift-risk — P0 remediation shipped 2026-05-27** | 0007, 0008 |
 | **Medium follow-up** | 0002 |
+| **Adequate (horizontal native)** | — (see P1 row below) |
 
 ---
 
@@ -26,7 +27,7 @@
 | RFC | Impl. status | Expected companions | Present today | Gap | Priority |
 |-----|--------------|---------------------|---------------|-----|----------|
 | [0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) | Foundational | Automation surface; MODULES/PLATFORM | [`canonical-automation-module-surface.md`](canonical-automation-module-surface.md); ecosystem docs | No single horizontal "modules governance" one-pager | Low | P2 |
-| [0002](../rfcs/0002-canonical-module-physical-layout.md) | Shipped | Route audit; brewery migration | [`web-route-group-audit.md`](web-route-group-audit.md); brewery scope migration | No consolidated β-layout cheat sheet | Medium | P1 |
+| [0002](../rfcs/0002-canonical-module-physical-layout.md) | Shipped | Route audit; brewery migration; native surface | [`web-route-group-audit.md`](web-route-group-audit.md); brewery scope migration; [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | No consolidated β-layout cheat sheet | Medium | P1 |
 | [0003](../rfcs/0003-validation-library-adoption.md) | Phase 1 | Audit doc | [`validation-library-adoption-audit.md`](validation-library-adoption-audit.md) | — | **Met** | — |
 | [0004](../rfcs/0004-canonical-pim.md) | Partial | Module surface + build log | [`canonical-pim-module-surface.md`](canonical-pim-module-surface.md), [`canonical-pim-build-log.md`](canonical-pim-build-log.md) | Open work tracked in surface §8 | Low | P1 |
 | [0005](../rfcs/0005-docs-site.md) | P1–P4 | Execution plan | [`rfc-0005-execution-plan.md`](rfc-0005-execution-plan.md) | P5–P7 open per plan | Low | P2 |
@@ -51,6 +52,11 @@
 | AI consultant index | [`AI-CONSULTANT.md`](../AI-CONSULTANT.md) | Template ref SoT = horizontal surface |
 
 ### P1 (next tranche)
+
+| Deliverable | Path | Owner action on change |
+|-------------|------|----------------------|
+| Native horizontal surface | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | Update route matrix when promoting native routes; update §5 when alpha scope shifts |
+| RFC-0002 native companion | [`0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §5 | Link to native surface when `registerNativeModule` behavior changes |
 
 - Module surfaces: ensure **Rendering** subsections in MRP/CRP/PIM/automation point at horizontal surface + module refs (MRP/CRP updated in Wave 6).
 - Optional: [`canonical-module-physical-layout-as-built.md`](canonical-module-physical-layout-as-built.md) — β-layout cheat sheet (RFC-0002).

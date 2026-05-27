@@ -912,4 +912,58 @@ type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
 declare function parseRenderJobSubmitRequest(payload: unknown): RenderJobSubmitRequest;
 declare function parseRenderJobStatusResponse(payload: unknown): RenderJobStatusResponse;
 
-export { type AiProvider, type AiRoleLimits, type AiToolCallRecord, type AiUsageLedgerEntry, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type NumberFormatHintV1, type NumberFormatUnit, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };
+/**
+ * Brewery list API responses consumed by web and native clients.
+ */
+
+declare const RecipeListItemSchema: z.ZodObject<{
+    id: z.ZodString;
+    accountId: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    styleKey: z.ZodOptional<z.ZodString>;
+    style: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    version: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strip>;
+type RecipeListItem = z.infer<typeof RecipeListItemSchema>;
+declare const RecipesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    recipes: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        accountId: z.ZodOptional<z.ZodString>;
+        name: z.ZodString;
+        styleKey: z.ZodOptional<z.ZodString>;
+        style: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        version: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+type RecipesListResponse = z.infer<typeof RecipesListResponseSchema>;
+declare function parseRecipesListResponse(payload: unknown): RecipesListResponse;
+declare const BrewSessionListItemSchema: z.ZodObject<{
+    id: z.ZodString;
+    code: z.ZodString;
+    status: z.ZodString;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    startedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
+    stoppedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
+}, z.core.$strip>;
+type BrewSessionListItem = z.infer<typeof BrewSessionListItemSchema>;
+declare const BrewSessionsListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    brewSessions: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        code: z.ZodString;
+        status: z.ZodString;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        startedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
+        stoppedAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodString>>>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+type BrewSessionsListResponse = z.infer<typeof BrewSessionsListResponseSchema>;
+declare function parseBrewSessionsListResponse(payload: unknown): BrewSessionsListResponse;
+declare function parseBrewSessionCreateResponse(payload: unknown): {
+    brewSession: {
+        id: string;
+    };
+};
+
+export { type AiProvider, type AiRoleLimits, type AiToolCallRecord, type AiUsageLedgerEntry, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type BrewSessionListItem, type BrewSessionsListResponse, BrewSessionsListResponseSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type NumberFormatHintV1, type NumberFormatUnit, type RecipeListItem, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };

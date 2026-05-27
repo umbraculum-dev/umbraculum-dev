@@ -1,0 +1,47 @@
+# Manual EAS internal builds for July 2026 brewery alpha (non-blocking on PRs).
+name: native-eas-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "android | ios | all"
+        required: true
+        default: "android"
+      profile:
+        description: "EAS build profile"
+        required: true
+        default: "preview"
+
+jobs:
+  eas-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared packages
+        run: ./scripts/build-packages-in-docker.sh
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: EAS build (Android)
+        if: inputs.platform == 'android' || inputs.platform == 'all'
+        working-directory: apps/native
+        run: eas build --platform android --profile ${{ inputs.profile }} --non-interactive
+
+      - name: EAS build (iOS)
+        if: inputs.platform == 'ios' || inputs.platform == 'all'
+        working-directory: apps/native
+        run: eas build --platform ios --profile ${{ inputs.profile }} --non-interactive

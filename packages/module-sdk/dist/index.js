@@ -265,6 +265,48 @@ function clearWebModuleRegistryForTests() {
   segmentOwnership.clear();
 }
 
+// src/registerNativeModule.ts
+var nativeModulesByCode = /* @__PURE__ */ new Map();
+function registerNativeModule(options) {
+  assertValidModuleCode(options.code);
+  if (nativeModulesByCode.has(options.code)) {
+    throw new Error(`registerNativeModule: module code "${options.code}" is already registered`);
+  }
+  const snapshot = {
+    code: options.code,
+    availableRouteIds: [...options.availableRouteIds],
+    ...options.tabEntry !== void 0 ? {
+      tabEntry: {
+        labelKey: options.tabEntry.labelKey,
+        ...options.tabEntry.order !== void 0 ? { order: options.tabEntry.order } : {}
+      }
+    } : {}
+  };
+  nativeModulesByCode.set(options.code, snapshot);
+  return snapshot;
+}
+function listRegisteredNativeModules() {
+  return Array.from(nativeModulesByCode.keys()).sort().map((code) => {
+    const snapshot = nativeModulesByCode.get(code);
+    if (snapshot === void 0) {
+      throw new Error(`listRegisteredNativeModules: registry inconsistency for code "${code}"`);
+    }
+    return snapshot;
+  });
+}
+function aggregateNativeAvailableRouteIds() {
+  const ids = /* @__PURE__ */ new Set();
+  for (const mod of nativeModulesByCode.values()) {
+    for (const id of mod.availableRouteIds) {
+      ids.add(id);
+    }
+  }
+  return Array.from(ids).sort();
+}
+function clearNativeModuleRegistryForTests() {
+  nativeModulesByCode.clear();
+}
+
 // src/validatedSchema.ts
 function fromParser(parser) {
   return {
@@ -282,9 +324,11 @@ export {
   NavEntryPrimarySegmentNotOwnedError,
   RESERVED_CANONICAL_MODULE_CODES,
   UrlSegmentAlreadyOwnedError,
+  aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable,
   assertValidModuleCode,
   clearModuleRegistryForTests,
+  clearNativeModuleRegistryForTests,
   clearWebModuleRegistryForTests,
   fromParser,
   getRegisteredDocumentTemplate,
@@ -293,9 +337,11 @@ export {
   listOwnedUrlSegments,
   listRegisteredDocumentTemplates,
   listRegisteredModules,
+  listRegisteredNativeModules,
   listRegisteredWebModules,
   recordModuleRegistration,
   registerModule,
+  registerNativeModule,
   registerRegisteredModuleAiTools,
   registerWebModule,
   snapshotModule,

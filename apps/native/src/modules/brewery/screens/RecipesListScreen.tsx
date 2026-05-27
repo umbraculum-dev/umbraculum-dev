@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { parseRecipesListResponse, type RecipeListItem } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navigation/native";
@@ -10,14 +11,6 @@ import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
 import type { RootStackParamList } from "../../../navigation/types";
-
-type RecipeListItem = {
-  id: string;
-  accountId: string;
-  name: string;
-  style: string | null;
-  version?: number;
-};
 
 type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
 
@@ -99,8 +92,14 @@ export function RecipesListScreen() {
     try {
       const res = await api.get("/api/recipes");
       if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { recipes?: unknown })?.recipes;
-      setRecipes(Array.isArray(items) ? (items as RecipeListItem[]) : []);
+      const parsed = parseRecipesListResponse(res.data);
+      setRecipes(
+        parsed.recipes.map((r) => ({
+          ...r,
+          accountId: r.accountId ?? "",
+          style: r.style ?? r.styleKey ?? null,
+        })),
+      );
       setDeleteConfirmId(null);
     } catch (err) {
       setError(String(err));

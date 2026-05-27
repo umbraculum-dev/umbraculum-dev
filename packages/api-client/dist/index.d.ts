@@ -55,4 +55,27 @@ declare function createApiClient(baseUrl: string, auth: AuthStrategy, options?: 
     fetch?: FetchLike;
 }): ApiClient;
 
-export { type ApiClient, type ApiClientCredentials, type ApiRequestInit, type ApiResponse, type AuthStrategy, type FetchLike, type FetchResponseLike, bearerTokenAuth, cookieAuth, createApiClient };
+type RenderJobPhase = "idle" | "submitting" | "polling" | "ready" | "error";
+/** Prefix relative artifact paths for Next.js `/api` proxy (web). */
+declare function toWebArtifactUrl(signedUrl: string, apiBaseUrl?: string): string;
+/** Resolve download URL for native (absolute) or web (proxied). */
+declare function resolveArtifactDownloadUrl(signedUrl: string, options?: {
+    platform?: "web" | "native";
+    apiBaseUrl?: string;
+}): string;
+declare function submitRenderJob(client: ApiClient, postUrl: string, body?: Record<string, unknown>): Promise<{
+    jobId: string;
+}>;
+declare function pollRenderJobUntilSucceeded(client: ApiClient, jobId: string): Promise<void>;
+declare function fetchRenderJobDownloadUrl(client: ApiClient, jobId: string, options?: {
+    platform?: "web" | "native";
+    apiBaseUrl?: string;
+}): Promise<string>;
+/** Submit async render job, poll to success, return download URL. */
+declare function runAsyncRenderJobExport(client: ApiClient, postUrl: string, options?: {
+    body?: Record<string, unknown>;
+    platform?: "web" | "native";
+    apiBaseUrl?: string;
+}): Promise<string>;
+
+export { type ApiClient, type ApiClientCredentials, type ApiRequestInit, type ApiResponse, type AuthStrategy, type FetchLike, type FetchResponseLike, type RenderJobPhase, bearerTokenAuth, cookieAuth, createApiClient, fetchRenderJobDownloadUrl, pollRenderJobUntilSucceeded, resolveArtifactDownloadUrl, runAsyncRenderJobExport, submitRenderJob, toWebArtifactUrl };

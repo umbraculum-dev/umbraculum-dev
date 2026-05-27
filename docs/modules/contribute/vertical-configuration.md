@@ -70,6 +70,16 @@ packages/<your-code>-contracts/         → @umbraculum/<your-code>-contracts
 
 The native slice is required only if your vertical needs a native shell (per [ROADMAP.md §H2 2027](../../ROADMAP.md), some verticals are native-mandatory like brewery and WMS; others are web-only).
 
+#### Native slice when required
+
+| Vertical / module | Native slice | Notes |
+|-------------------|--------------|-------|
+| `brewery` (reference) | [`apps/native/src/modules/brewery/screens/`](../../../apps/native/src/modules/brewery/screens/) | Brew-day flows only; registered via `registerNativeModule({ code: "brewery", availableRouteIds: [...] })`. Planning (MRP/CRP) stays web-first — see [brewery README §3.3](../verticals/brewery/README.md). |
+| `wms` (future) | `apps/native/src/modules/wms/` | Native-mandatory per [wms.md](../canonical/wms.md) §4 — floor scanning, pick confirm, label PDF via RFC-0007. |
+| Web-only verticals | Omit `apps/native/src/modules/<code>/` | Consume canonical modules on web; no native registration. |
+
+Operational SoT: [`canonical-native-platform-surface.md`](../../design/canonical-native-platform-surface.md) (route matrix, alpha scope, render-job client, web fallback).
+
 ### Step 4 — Vertical-flavored packages
 
 Beyond the contracts package, your vertical may ship additional packages with vertical-flavored content (`@umbraculum/distillery-spirits-catalog`, `@umbraculum/cosmetics-ingredient-compat`). These carry the `@umbraculum/<your-code>-<name>` prefix per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) — to distinguish vertical-flavored packages from horizontal infrastructure at a glance.
