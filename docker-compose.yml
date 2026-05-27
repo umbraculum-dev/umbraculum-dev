@@ -136,6 +136,7 @@ services:
       - GOTENBERG_BASE_URL=http://gotenberg:3000
       - RENDERING_SIGNING_SECRET=dev-only-rendering-signing-secret
       - STRIPE_WEBHOOK_SECRET=...
+      - UMBRACULUM_REPO_ROOT=/umbraculum
     ports:
       - "4000:4000"
     depends_on:
@@ -172,6 +173,8 @@ services:
       # i18n-keys landed 2026-05-27; module-sdk dist/*.d.ts references
       # @umbraculum/i18n-keys for ModuleNavLabelKey on nav/tab entries.
       - ./packages/i18n-keys:/packages/i18n-keys:ro
+      # RAG D1 ingest reads docs/help and surface markdown (read-only).
+      - .:/umbraculum:ro
 
   gotenberg:
     image: gotenberg/gotenberg:8

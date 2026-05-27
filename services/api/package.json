@@ -25,7 +25,8 @@
     "contracts:update": "npm run test:db:prepare && UPDATE_CONTRACTS=1 vitest run src/tests/contracts",
     "seed:import": "tsx src/cli/seed-import.ts",
     "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts",
-    "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts"
+    "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts",
+    "rag:ingest": "tsx src/cli/ragIngestPublicDocs.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
