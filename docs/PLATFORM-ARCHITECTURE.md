@@ -42,9 +42,9 @@ This is a deliberate choice. The peer-module shape (sometimes called "SAP-style"
 
 **Brewery's relationship to the canonical set.** Brewery is a **tier-6 vertical configuration** consuming the canonical-module surface (and adding brewery-specific seed data: BJCP styles, BeerJSON, hop bitterness math, water chemistry, brewery-specific prompts and UI flows). Brewery is NOT a canonical module — that would be the same category mistake as building "a CRM for a hotel and calling it Hotel instead of CRM." The hotel is the vertical; the CRM is the canonical domain.
 
-This framing is formalized in RFC-0001 (modules, tiers, governance, and automation placement) once that RFC lands.
+This framing is formalized in [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) (modules, tiers, governance, and automation placement) (Accepted 2026-05-18).
 
-**Related implementation history.** [`docs/ARCHITECTURE-REV02.md`](ARCHITECTURE-REV02.md) remains the detailed implementation log for the first reference vertical and the original cross-platform (web + native) boundary decisions. Use it for legacy context and v0 phasing; use this document for platform-level direction, public positioning, the module model, the AI consultant blueprint, and the monetization path.
+**Related as-built docs (not platform vision).** Cross-platform (web + native) boundaries: [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md). Brewery reference vertical product rules: [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md). Use **this document** for platform-level direction, public positioning, the module model, the AI consultant blueprint, and the monetization path.
 
 ---
 
@@ -222,7 +222,7 @@ There is **no multi-schema split** today and **no naming convention** separating
 
 ### 3.5 Cross-platform boundaries
 
-This is the strongest part of the current architecture and the part that makes the multi-module vision realistic without a rewrite. See [`docs/ARCHITECTURE-REV02.md`](ARCHITECTURE-REV02.md) §0.1–0.7 for full detail. Summary:
+This is the strongest part of the current architecture and the part that makes the multi-module vision realistic without a rewrite. See [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md) for full detail. Summary:
 
 - **Locale-prefixed routing** is enforced by middleware; default locale `en`.
 - **Route IDs + typed params** in `@umbraculum/navigation` (no Next.js / Expo Router leakage into shared screens).
@@ -691,7 +691,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 - **Soft cap** — usage limit that *warns* but allows continued use, billing the overage.
 - **System prompt overlay** — a prompt fragment contributed by a module or route, composed with the base prompt and per-workspace memory.
 - **Tool call** — model-invoked function that runs in our backend (read-only, ACL-aware) and returns small JSON.
-- **Vertical** — synonym for "module" in this document.
+- **Vertical configuration** — a tier-6 bundle (e.g. brewery) that consumes canonical modules and adds vertical-specific seed data, prompts, and UI; **not** a canonical module (see §1.1.1).
 - **Write-action** — a tool that would mutate state. In v0/v1, write-actions are *proposed* by the model and require explicit user confirmation in the UI before execution.
 - **ZDR (Zero Data Retention)** — provider mode that disables training and short retention windows; configured per request or per account.
 
@@ -699,7 +699,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 
 ## 10. Document conventions and lifecycle
 
-- **This is the entry point.** When in doubt, link here from new docs and discussions; module-implementation details belong in domain docs (e.g. [`docs/ARCHITECTURE-REV02.md`](ARCHITECTURE-REV02.md), [`docs/TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md), [`docs/REDIS-ARCHITECTURE.md`](REDIS-ARCHITECTURE.md), [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md)).
+- **This is the entry point.** When in doubt, link here from new docs and discussions; module-implementation details belong in domain docs (e.g. [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md), [`docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md), [`docs/TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md), [`docs/REDIS-ARCHITECTURE.md`](REDIS-ARCHITECTURE.md), [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md)).
 - **Update protocol**:
   - Structural changes (sections 2, 3, 4, 7) should be reviewed before merging — they change shared assumptions.
   - Glossary additions and pricing-example numeric updates can land in normal PRs.

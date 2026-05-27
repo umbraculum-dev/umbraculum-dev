@@ -8,7 +8,8 @@ This roadmap captures the agreed “direction of travel” for the product so im
 
 - Platform vision (horizontal-platform-with-vertical-modules + AI consultant + add-on pricing): `docs/PLATFORM-ARCHITECTURE.md`
 - Licensing posture and rationale (AGPLv3 core + MIT SDK + commercial dual license): `docs/LICENSING.md`
-- Source of truth (brewery-vertical implementation log): `docs/ARCHITECTURE-REV02.md`
+- Cross-platform boundaries: `docs/CROSS-PLATFORM-BOUNDARIES.md`
+- Brewery-vertical implementation log: `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`
 - Accessibility hard constraint: `docs/DEVELOPMENT-ACCESSIBILITY.md`
 - Seed data sources + licensing notes: `docs/modules/verticals/brewery/RAW-MATERIALS-SEEDABLE-SOURCES.md`
 - Full doc index: `docs/README.md`

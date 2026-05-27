@@ -26,7 +26,9 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
 - **Project summary**:
   - This is a **custom TypeScript project** (not Magento, not PHP).
   - Stack: **Next.js (web) + Fastify (API) + Prisma + Postgres**, with **Docker Compose + Nginx** for local routing parity.
-  - Canonical big-picture plan: `docs/ARCHITECTURE-REV02.md`
+  - Platform architecture entry point: `docs/PLATFORM-ARCHITECTURE.md`
+  - Cross-platform boundaries: `docs/CROSS-PLATFORM-BOUNDARIES.md`
+  - Brewery vertical implementation log: `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`
   - Testing strategy: `docs/TESTING.md` (single source of truth) + `docs/ROLLOUT.md` (rollout plan) + `docs/AGENTIC-JOBS.md` (L6 agentic-browser job catalog).
 
 - **ACCESSIBILITY-FIRST (MANDATORY)**:
@@ -46,7 +48,7 @@ The in-repo `.cursor/rules/` directory is **intentionally empty** and reserved a
   - If accessibility requirements conflict with design, propose an accessible alternative—do not ship inaccessible UI.
 
 - **CSS structure**: See `docs/CODING-STANDARDS.md` → "CSS structure" for file layout and naming.
-- **Big picture**: `docs/ARCHITECTURE-REV02.md`
+- **Big picture**: `docs/PLATFORM-ARCHITECTURE.md` (vision); `docs/CROSS-PLATFORM-BOUNDARIES.md` + `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md` (as-built)
 - **Roadmap**: `docs/ROADMAP.md`
 - **Work tracker**: `internal/working-notes/TODOs.md`
 - **Local dev entrypoint**: `docker compose up --build`
