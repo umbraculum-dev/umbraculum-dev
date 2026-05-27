@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { Accordion, Button, H1, Input, SizableText, View, XStack, YStack } from "tamagui";
 
+import { AskAiLink } from "../../../_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
@@ -157,6 +158,9 @@ export default function RecipesPage() {
   return (
     <YStack gap="$3">
       <H1 mb="$2">{t("title")}</H1>
+      <SizableText size="$2" mb="$2">
+        <AskAiLink fromRoute="recipes" />
+      </SizableText>
 
       <YStack gap="$0">
         <Accordion

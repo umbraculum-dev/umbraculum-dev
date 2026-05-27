@@ -50,11 +50,13 @@
 | RFC-0007 cross-links | [`0007-canonical-document-rendering.md`](../rfcs/0007-canonical-document-rendering.md) §14 | Point to horizontal surface |
 | Rendering package README | [`packages/rendering/README.md`](../../packages/rendering/README.md) | Consumer modules subsection |
 | AI consultant index | [`AI-CONSULTANT.md`](../AI-CONSULTANT.md) | Template ref SoT = horizontal surface |
+| AI prompt composition surface | [`canonical-ai-prompt-composition-surface.md`](canonical-ai-prompt-composition-surface.md) | Update when `aiPrompts` SDK fields or composition order change |
 
 ### P1 (next tranche)
 
 | Deliverable | Path | Owner action on change |
 |-------------|------|----------------------|
+| AI prompt composition (maintenance) | [`canonical-ai-prompt-composition-surface.md`](canonical-ai-prompt-composition-surface.md) | Sync module `aiPrompts` + route maps when adding modules or RouteIds |
 | Native horizontal surface | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | Update route matrix when promoting native routes; update §5 when demo scope shifts |
 | Demo host runbook | [`demo-host-runbook.md`](demo-host-runbook.md) | Update demo accounts table when seed emails change |
 | Cloud hosted track (stub) | [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) | Amend when `cloud.umbraculum.dev` work starts |

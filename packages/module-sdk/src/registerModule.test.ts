@@ -1,11 +1,16 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import type { AiToolRegistry } from "@umbraculum/ai-tool-sdk";
 import {
+  AiPromptRouteKeyAlreadyRegisteredError,
   clearModuleRegistryForTests,
   clearWebModuleRegistryForTests,
+  collectModuleKnowledgeSnippets,
+  collectModulePromptOverlayTexts,
+  collectRegisteredModulePromptOverlays,
   DocumentTemplateRefAlreadyRegisteredError,
   getRegisteredDocumentTemplate,
   getSegmentOwner,
+  InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
   InvalidUrlSegmentError,
   listRegisteredDocumentTemplates,
@@ -16,6 +21,7 @@ import {
   registerModule,
   registerRegisteredModuleAiTools,
   registerWebModule,
+  resolveRoutePromptOverlay,
   snapshotSegmentOwnership,
   UrlSegmentAlreadyOwnedError,
 } from "./index.js";
@@ -419,6 +425,70 @@ describe("registerWebModule", () => {
       ["inventory", "brewery"],
       ["products", "pim"],
       ["recipes", "brewery"],
+    ]);
+  });
+});
+
+describe("aiPrompts registration", () => {
+  it("collects module overlays in alphabetical order by module code", () => {
+    registerModule(fakeApp(), {
+      code: "mrp",
+      aiPrompts: { module: "MRP overlay" },
+    });
+    registerModule(fakeApp(), {
+      code: "brewery",
+      aiPrompts: { module: "Brewery overlay" },
+    });
+
+    expect(collectModulePromptOverlayTexts()).toEqual(["Brewery overlay", "MRP overlay"]);
+    expect(collectRegisteredModulePromptOverlays().map((s) => s.code)).toEqual([
+      "brewery",
+      "mrp",
+    ]);
+  });
+
+  it("resolves route overlays and rejects duplicate route keys across modules", () => {
+    registerModule(fakeApp(), {
+      code: "mrp",
+      aiPrompts: {
+        module: "MRP",
+        routes: { productionOrders: "Prefer MRP tools" },
+      },
+    });
+
+    expect(resolveRoutePromptOverlay("productionOrders")).toBe("Prefer MRP tools");
+    expect(resolveRoutePromptOverlay("unknownRoute")).toBeUndefined();
+
+    expect(() =>
+      registerModule(fakeApp(), {
+        code: "crp",
+        aiPrompts: { routes: { productionOrders: "Conflict" } },
+      }),
+    ).toThrow(AiPromptRouteKeyAlreadyRegisteredError);
+  });
+
+  it("rejects empty module overlay text", () => {
+    expect(() =>
+      registerModule(fakeApp(), {
+        code: "pim",
+        aiPrompts: { module: "   " },
+      }),
+    ).toThrow(InvalidAiPromptOverlayError);
+  });
+
+  it("collects knowledge snippets in module code order", () => {
+    registerModule(fakeApp(), {
+      code: "mrp",
+      aiPrompts: { knowledge: "MRP knowledge" },
+    });
+    registerModule(fakeApp(), {
+      code: "brewery",
+      aiPrompts: { knowledge: "Brewery knowledge" },
+    });
+
+    expect(collectModuleKnowledgeSnippets()).toEqual([
+      "Brewery knowledge",
+      "MRP knowledge",
     ]);
   });
 });

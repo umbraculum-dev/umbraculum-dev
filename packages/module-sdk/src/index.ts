@@ -6,7 +6,9 @@ export {
 
 export type {
   BillingTierSlug,
+  ModuleAiPrompts,
   ModuleRouteRegistrar,
+  RegisteredModulePromptSnapshot,
   RegisteredModuleSnapshot,
   RegisterModuleOptions,
   TierLimitsContributor,
@@ -30,18 +32,27 @@ export type {
 } from "./renderingTypes.js";
 
 export {
+  AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
+  AI_PROMPT_MODULE_MAX_LENGTH,
+  AI_PROMPT_ROUTE_MAX_LENGTH,
+  AiPromptRouteKeyAlreadyRegisteredError,
   assertModuleCodeAvailable,
   assertValidModuleCode,
+  collectModuleKnowledgeSnippets,
+  collectModulePromptOverlayTexts,
+  collectRegisteredModulePromptOverlays,
   DocumentTemplateRefAlreadyRegisteredError,
   getRegisteredDocumentTemplate,
   clearModuleRegistryForTests,
-  InvalidModuleCodeError,
+  InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
+  InvalidModuleCodeError,
   listRegisteredDocumentTemplates,
   listRegisteredModules,
   ModuleCodeAlreadyRegisteredError,
   recordModuleRegistration,
   registerRegisteredModuleAiTools,
+  resolveRoutePromptOverlay,
   snapshotModule,
 } from "./moduleRegistry.js";
 

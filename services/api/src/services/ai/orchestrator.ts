@@ -21,7 +21,12 @@ import {
   type MemoryWriter,
   type MemoryWriterTurn,
 } from "./memoryWriter.js";
-import { composePrompt } from "./promptComposer.js";
+import {
+  collectModuleKnowledgeSnippets,
+  collectModulePromptOverlayTexts,
+  resolveRoutePromptOverlay,
+} from "@umbraculum/module-sdk";
+import { composeWorkspaceSystemPrompt } from "./promptComposer.js";
 
 /**
  * One SSE event emitted by the orchestrator. The route layer wraps these in
@@ -39,6 +44,8 @@ export interface RunChatTurnInput {
   userId: string;
   message: string;
   sessionId?: string | null;
+  /** Optional RouteId hint from the client (unknown values are ignored). */
+  routeId?: string | null;
 }
 
 /**
@@ -154,7 +161,16 @@ export class AiOrchestrator {
 
       const model = DEFAULT_MODEL;
       const workspaceMemory = await this.memory.read(input.workspaceId);
-      const systemPrompt = composePrompt({ workspaceMemory });
+      const routeOverlay =
+        input.routeId && input.routeId.trim().length > 0
+          ? resolveRoutePromptOverlay(input.routeId.trim())
+          : undefined;
+      const systemPrompt = composeWorkspaceSystemPrompt({
+        moduleOverlays: collectModulePromptOverlayTexts(),
+        knowledgeSnippets: collectModuleKnowledgeSnippets(),
+        routeOverlay,
+        workspaceMemory,
+      });
       const conversation: Array<{ role: "user" | "assistant"; content: unknown }> = [
         { role: "user", content: input.message },
       ];

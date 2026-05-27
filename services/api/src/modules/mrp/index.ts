@@ -11,6 +11,11 @@ import { mrpBomsRoutes } from "./routes/bomsRoutes.js";
 import { mrpProductionOrdersRoutes } from "./routes/productionOrdersRoutes.js";
 import { mrpWorkOrdersRoutes } from "./routes/workOrdersRoutes.js";
 import { registerMrpTools } from "../../services/ai/tools/mrp/index.js";
+import {
+  MRP_KNOWLEDGE,
+  MRP_MODULE_OVERLAY,
+  MRP_ROUTE_OVERLAYS,
+} from "../../services/ai/prompts/mrp.js";
 
 const MODULE_CODE = "mrp";
 
@@ -32,6 +37,11 @@ export function registerMrpModule(app: FastifyInstance): void {
       documentTemplates: mrpDocumentTemplates,
       registerAiTools: (registry, hostApp) => {
         registerMrpTools(registry, hostApp.prisma);
+      },
+      aiPrompts: {
+        module: MRP_MODULE_OVERLAY,
+        knowledge: MRP_KNOWLEDGE,
+        routes: { ...MRP_ROUTE_OVERLAYS },
       },
     });
   }

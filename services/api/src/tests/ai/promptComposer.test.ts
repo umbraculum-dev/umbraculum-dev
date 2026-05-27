@@ -4,39 +4,44 @@ import {
   BASE_PROMPT,
   BREWERY_OVERLAY,
   composePrompt,
+  composeWorkspaceSystemPrompt,
   emptyMemoryBlob,
   renderMemory,
 } from "../../services/ai/promptComposer.js";
+import { PLATFORM_OVERLAY } from "../../services/ai/prompts/platform.js";
 
 describe("promptComposer", () => {
-  it("composes base + brewery overlay in order, separated by a blank line", () => {
+  it("composes base + platform by default (no implicit brewery overlay)", () => {
     const out = composePrompt();
     expect(out.startsWith(BASE_PROMPT)).toBe(true);
-    expect(out.endsWith(BREWERY_OVERLAY)).toBe(true);
-    expect(out).toContain(`${BASE_PROMPT}\n\n${BREWERY_OVERLAY}`);
+    expect(out).toContain(PLATFORM_OVERLAY);
+    expect(out.toLowerCase()).not.toContain("beerjson");
   });
 
-  it("accepts overrides for testability", () => {
-    const out = composePrompt({ base: "BASE", breweryOverlay: "OVERLAY" });
-    expect(out).toBe("BASE\n\nOVERLAY");
+  it("accepts explicit module overlays for testability", () => {
+    const out = composePrompt({ base: "BASE", moduleOverlays: ["OVERLAY"] });
+    expect(out).toBe(`BASE\n\n${PLATFORM_OVERLAY}\n\nOVERLAY`);
   });
 
-  it("treats moduleOverlay as a synonym for breweryOverlay", () => {
+  it("treats moduleOverlay and breweryOverlay as legacy single-overlay inputs", () => {
     const out = composePrompt({ base: "BASE", moduleOverlay: "OVERLAY" });
-    expect(out).toBe("BASE\n\nOVERLAY");
+    expect(out).toContain("OVERLAY");
+    const out2 = composePrompt({ base: "BASE", breweryOverlay: "OVERLAY" });
+    expect(out2).toContain("OVERLAY");
   });
 
-  it("ships a non-empty base prompt mentioning tools and concision", () => {
+  it("ships a non-empty base prompt mentioning tools", () => {
     expect(BASE_PROMPT.length).toBeGreaterThan(50);
     expect(BASE_PROMPT.toLowerCase()).toContain("tool");
+    expect(BASE_PROMPT.toLowerCase()).toContain("operational");
   });
 
-  it("ships a non-empty brewery overlay mentioning BeerJSON or recipes", () => {
+  it("exports brewery overlay for tests", () => {
     expect(BREWERY_OVERLAY.length).toBeGreaterThan(50);
     expect(BREWERY_OVERLAY.toLowerCase()).toMatch(/beerjson|recipe/);
   });
 
-  describe("workspaceMemory slot (Sprint #2)", () => {
+  describe("workspaceMemory slot", () => {
     it("omits the memory section when the blob is null/empty", () => {
       expect(composePrompt({ workspaceMemory: null })).toBe(composePrompt());
       expect(composePrompt({ workspaceMemory: emptyMemoryBlob() })).toBe(
@@ -44,10 +49,10 @@ describe("promptComposer", () => {
       );
     });
 
-    it("appends the memory section after the module overlay", () => {
+    it("appends the memory section after module overlays", () => {
       const out = composePrompt({
         base: "BASE",
-        moduleOverlay: "OVERLAY",
+        moduleOverlays: ["OVERLAY"],
         workspaceMemory: {
           facts: ["mash pH target is 5.4"],
           recurringIssues: ["FV-3 runs cold"],
@@ -55,16 +60,15 @@ describe("promptComposer", () => {
           schemaVersion: 0,
         },
       });
-      expect(out.startsWith("BASE\n\nOVERLAY\n\n")).toBe(true);
       expect(out).toContain("Workspace memory");
       expect(out).toContain("mash pH target is 5.4");
       expect(out).toContain("FV-3 runs cold");
     });
 
-    it("composes in order base → moduleOverlay → routeOverlay → memory", () => {
+    it("composes in order base → platform → module → route → memory", () => {
       const out = composePrompt({
         base: "B",
-        moduleOverlay: "M",
+        moduleOverlays: ["M"],
         routeOverlay: "R",
         workspaceMemory: {
           facts: ["fact"],
@@ -74,12 +78,25 @@ describe("promptComposer", () => {
         },
       });
       const bIdx = out.indexOf("B");
+      const pIdx = out.indexOf(PLATFORM_OVERLAY);
       const mIdx = out.indexOf("M");
       const rIdx = out.indexOf("R");
       const memIdx = out.indexOf("Workspace memory");
-      expect(bIdx).toBeLessThan(mIdx);
+      expect(bIdx).toBeLessThan(pIdx);
+      expect(pIdx).toBeLessThan(mIdx);
       expect(mIdx).toBeLessThan(rIdx);
       expect(rIdx).toBeLessThan(memIdx);
+    });
+  });
+
+  describe("knowledge snippets", () => {
+    it("appends reference notes under the platform section", () => {
+      const out = composeWorkspaceSystemPrompt({
+        knowledgeSnippets: ["Note one", "Note two"],
+      });
+      expect(out).toContain("Reference notes");
+      expect(out).toContain("Note one");
+      expect(out).toContain("Note two");
     });
   });
 

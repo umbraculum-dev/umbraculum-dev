@@ -72,6 +72,23 @@ registerModule(app, {
 
 The API boot path creates an `AiToolRegistry` and calls `registerRegisteredModuleAiTools(registry, app)`. The host app is passed at invocation time so repeated `buildApp()` calls in tests do not reuse the first app instance captured by module metadata.
 
+## AI prompt registration — `registerModule({ aiPrompts })`
+
+Modules contribute system-prompt overlays for the platform orchestrator. See [`docs/design/canonical-ai-prompt-composition-surface.md`](../../docs/design/canonical-ai-prompt-composition-surface.md).
+
+```typescript
+registerModule(app, {
+  code: "mrp",
+  aiPrompts: {
+    module: "MRP read-only planning context…",
+    routes: { productionOrders: "Prefer mrp.* tools on this screen." },
+    knowledge: "Optional static reference notes (max 2048 chars).",
+  },
+});
+```
+
+Registry helpers: `collectModulePromptOverlayTexts()`, `collectModuleKnowledgeSnippets()`, `resolveRoutePromptOverlay(routeId)`.
+
 ## Document-template registration — `registerModule({ documentTemplates })`
 
 [RFC-0007](../../docs/rfcs/0007-canonical-document-rendering.md) adds document / file rendering to the platform consumption contract. Modules contribute typed templates through the SDK; the platform-owned `@umbraculum/rendering` package owns the engines and job runner.

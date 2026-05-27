@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { H1, SizableText, XStack, YStack } from "tamagui";
 
+import { AskAiLink } from "../../../_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
 import { AsyncExportButton } from "../../../_components/AsyncExportButton";
 import { ErrorBox } from "../../../_components/recipe-edit";
@@ -81,6 +82,7 @@ export default function MrpProductionOrdersPage() {
         <RefreshButton onClick={() => void refresh()} disabled={!canCall || loading}>
           {loading ? t("refreshing") : t("refresh")}
         </RefreshButton>
+        <AskAiLink fromRoute="productionOrders" />
         <Link href="/material-requirements">{tOrders("materialRequirements")}</Link>
         <Link href="/capacity">{tOrders("capacityLink")}</Link>
         <Link href="/schedule">{tOrders("scheduleLink")}</Link>

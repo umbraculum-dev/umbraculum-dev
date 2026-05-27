@@ -196,7 +196,10 @@ interface UseAiChatStreamInput {
      */
     chatFetch: (message: string, init: {
         signal: AbortSignal;
+        routeId?: string | null;
     }) => Promise<Response>;
+    /** Optional RouteId hint forwarded on each chat request. */
+    routeId?: string | null;
 }
 /**
  * Shared chat state machine. One in-flight turn at a time; `send()` while

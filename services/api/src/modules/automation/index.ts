@@ -8,6 +8,10 @@ import {
 
 import { automationVesselsRoutes } from "./routes/automationVesselsRoutes.js";
 import { registerAutomationTools } from "../../services/ai/tools/automation/index.js";
+import {
+  AUTOMATION_MODULE_OVERLAY,
+  AUTOMATION_ROUTE_OVERLAYS,
+} from "../../services/ai/prompts/automation.js";
 
 const MODULE_CODE = "automation";
 
@@ -72,6 +76,10 @@ export function registerAutomationModule(app: FastifyInstance): void {
       addonCodes: ["automation_module"],
       registerAiTools(registry, instance) {
         registerAutomationTools(registry, instance.prisma);
+      },
+      aiPrompts: {
+        module: AUTOMATION_MODULE_OVERLAY,
+        routes: { ...AUTOMATION_ROUTE_OVERLAYS },
       },
       // Routes registered via per-app `app.register(...)` below so they
       // attach on every `buildApp()` call. `registerModule` records the

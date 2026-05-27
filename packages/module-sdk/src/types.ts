@@ -30,6 +30,23 @@ export type ModuleAiToolRegistrar<TApp = unknown> = (
   app: TApp,
 ) => void;
 
+/** Module-contributed AI system-prompt fragments (public α). */
+export interface ModuleAiPrompts {
+  /** Module-wide overlay (domain rules, tool hints). */
+  module?: string;
+  /** Per-route overlays; keys are RouteId strings from @umbraculum/navigation. */
+  routes?: Readonly<Record<string, string>>;
+  /** Static reference notes (boot-time; not pgvector RAG). Max 2048 chars. */
+  knowledge?: string;
+}
+
+export interface RegisteredModulePromptSnapshot {
+  code: string;
+  module?: string;
+  knowledge?: string;
+  routes: Readonly<Record<string, string>>;
+}
+
 export interface RegisterModuleOptions<TApp = unknown> {
   /** Module code — folder name, route group, and future Prisma schema name. */
   code: string;
@@ -46,6 +63,8 @@ export interface RegisterModuleOptions<TApp = unknown> {
   tierLimits?: TierLimitsContributor;
   /** Register AI tools into the platform orchestrator registry at API boot. */
   registerAiTools?: ModuleAiToolRegistrar<TApp>;
+  /** Module-owned system-prompt overlays for the AI orchestrator. */
+  aiPrompts?: ModuleAiPrompts;
   /** Document templates this module contributes to the platform rendering registry. */
   documentTemplates?: readonly DocumentTemplate<unknown>[];
 }

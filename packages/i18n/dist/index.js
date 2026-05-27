@@ -1812,7 +1812,8 @@ var en_default = {
   },
   ai: {
     title: "AI Consultant",
-    subtitle: "Ask questions about your brewery\u2019s recipes, water chemistry, equipment, sessions, and inventory.",
+    subtitle: "Ask questions about your workspace \u2014 recipes, products, vessels, production planning, and inventory.",
+    askAboutThisPage: "Ask AI about this page",
     composer: {
       placeholder: "Ask a question about your brewery\u2026",
       send: "Send",

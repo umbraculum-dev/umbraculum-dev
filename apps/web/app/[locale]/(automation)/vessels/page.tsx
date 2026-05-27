@@ -8,6 +8,7 @@ import {
   type VesselState,
 } from "@umbraculum/automation-contracts";
 
+import { AskAiLink } from "../../../_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { apiFetch } from "../../../_lib/apiClient";
@@ -78,7 +79,8 @@ export default function AutomationVesselsPage() {
         {t("subtitle")}
       </SizableText>
 
-      <XStack gap="$3" alignItems="center">
+      <XStack gap="$3" alignItems="center" flexWrap="wrap">
+        <AskAiLink fromRoute="vessels" />
         <Button
           size="$3"
           bg="var(--surface-2)"

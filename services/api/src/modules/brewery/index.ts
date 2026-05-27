@@ -22,6 +22,11 @@ import { waterCalcRoutes } from "./routes/waterCalc.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { breweryDocumentTemplates } from "./documentTemplates.js";
 import { registerBreweryTools } from "../../services/ai/tools/brewery/index.js";
+import {
+  BREWERY_KNOWLEDGE,
+  BREWERY_MODULE_OVERLAY,
+  BREWERY_ROUTE_OVERLAYS,
+} from "../../services/ai/prompts/brewery.js";
 
 const MODULE_CODE = "brewery";
 
@@ -70,6 +75,11 @@ export function registerBreweryModule(app: FastifyInstance): void {
       addonCodes: ["brewery_module"],
       registerAiTools(registry, instance) {
         registerBreweryTools(registry, instance.prisma);
+      },
+      aiPrompts: {
+        module: BREWERY_MODULE_OVERLAY,
+        knowledge: BREWERY_KNOWLEDGE,
+        routes: { ...BREWERY_ROUTE_OVERLAYS },
       },
       documentTemplates: breweryDocumentTemplates,
       routes: [],

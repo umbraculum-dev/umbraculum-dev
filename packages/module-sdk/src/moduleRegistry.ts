@@ -1,5 +1,9 @@
 import type { AiToolRegistry } from "@umbraculum/ai-tool-sdk";
-import type { RegisteredModuleSnapshot, RegisterModuleOptions } from "./types.js";
+import type {
+  RegisteredModulePromptSnapshot,
+  RegisteredModuleSnapshot,
+  RegisterModuleOptions,
+} from "./types.js";
 import type {
   DocumentTemplate,
   RegisteredDocumentTemplateSnapshot,
@@ -11,6 +15,40 @@ const documentTemplatesByRef = new Map<
   string,
   { moduleCode: string; template: DocumentTemplate<unknown> }
 >();
+const routePromptOverlayByRouteId = new Map<string, string>();
+
+/** @internal Exported for tests and documentation parity. */
+export const AI_PROMPT_MODULE_MAX_LENGTH = 4_000;
+/** @internal */
+export const AI_PROMPT_ROUTE_MAX_LENGTH = 1_500;
+/** @internal */
+export const AI_PROMPT_KNOWLEDGE_MAX_LENGTH = 2_048;
+
+export class InvalidAiPromptOverlayError extends Error {
+  readonly moduleCode: string;
+
+  constructor(moduleCode: string, message: string) {
+    super(`registerModule: invalid aiPrompts for module "${moduleCode}" (${message})`);
+    this.name = "InvalidAiPromptOverlayError";
+    this.moduleCode = moduleCode;
+  }
+}
+
+export class AiPromptRouteKeyAlreadyRegisteredError extends Error {
+  readonly routeId: string;
+  readonly existingModuleCode: string;
+  readonly conflictingModuleCode: string;
+
+  constructor(routeId: string, existingModuleCode: string, conflictingModuleCode: string) {
+    super(
+      `registerModule: aiPrompts.routes key "${routeId}" is already registered by module "${existingModuleCode}" (conflict from "${conflictingModuleCode}")`,
+    );
+    this.name = "AiPromptRouteKeyAlreadyRegisteredError";
+    this.routeId = routeId;
+    this.existingModuleCode = existingModuleCode;
+    this.conflictingModuleCode = conflictingModuleCode;
+  }
+}
 
 export class ModuleCodeAlreadyRegisteredError extends Error {
   readonly code: string;
@@ -75,11 +113,66 @@ export function assertModuleCodeAvailable(code: string): void {
   }
 }
 
+function assertNonEmptyOverlayText(
+  moduleCode: string,
+  field: string,
+  value: string,
+  maxLength: number,
+): void {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new InvalidAiPromptOverlayError(moduleCode, `${field} must not be empty or whitespace`);
+  }
+  if (value.length > maxLength) {
+    throw new InvalidAiPromptOverlayError(
+      moduleCode,
+      `${field} exceeds max length ${maxLength} (got ${value.length})`,
+    );
+  }
+}
+
+function validateAndIndexAiPrompts(
+  moduleCode: string,
+  aiPrompts: RegisterModuleOptions<unknown>["aiPrompts"],
+): void {
+  if (!aiPrompts) return;
+
+  if (aiPrompts.module !== undefined) {
+    assertNonEmptyOverlayText(moduleCode, "aiPrompts.module", aiPrompts.module, AI_PROMPT_MODULE_MAX_LENGTH);
+  }
+
+  if (aiPrompts.knowledge !== undefined) {
+    assertNonEmptyOverlayText(
+      moduleCode,
+      "aiPrompts.knowledge",
+      aiPrompts.knowledge,
+      AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
+    );
+  }
+
+  if (aiPrompts.routes) {
+    for (const [routeId, overlay] of Object.entries(aiPrompts.routes)) {
+      assertNonEmptyOverlayText(
+        moduleCode,
+        `aiPrompts.routes.${routeId}`,
+        overlay,
+        AI_PROMPT_ROUTE_MAX_LENGTH,
+      );
+      const existingOwner = routePromptOverlayByRouteId.get(routeId);
+      if (existingOwner !== undefined && existingOwner !== moduleCode) {
+        throw new AiPromptRouteKeyAlreadyRegisteredError(routeId, existingOwner, moduleCode);
+      }
+      routePromptOverlayByRouteId.set(routeId, moduleCode);
+    }
+  }
+}
+
 export function recordModuleRegistration(
   options: RegisterModuleOptions<unknown>,
 ): RegisteredModuleSnapshot {
   assertModuleCodeAvailable(options.code);
   const documentTemplates = validateDocumentTemplates(options.code, options.documentTemplates ?? []);
+  validateAndIndexAiPrompts(options.code, options.aiPrompts);
 
   modulesByCode.set(options.code, options);
   for (const template of documentTemplates) {
@@ -145,6 +238,52 @@ export function snapshotModule(code: string): RegisteredModuleSnapshot {
 export function clearModuleRegistryForTests(): void {
   modulesByCode.clear();
   documentTemplatesByRef.clear();
+  routePromptOverlayByRouteId.clear();
+}
+
+export function collectRegisteredModulePromptOverlays(): RegisteredModulePromptSnapshot[] {
+  return Array.from(modulesByCode.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([code, entry]) => {
+      const prompts = entry.aiPrompts;
+      return {
+        code,
+        ...(prompts?.module !== undefined ? { module: prompts.module } : {}),
+        ...(prompts?.knowledge !== undefined ? { knowledge: prompts.knowledge } : {}),
+        routes: prompts?.routes ?? {},
+      };
+    });
+}
+
+export function resolveRoutePromptOverlay(routeId: string): string | undefined {
+  const trimmed = routeId.trim();
+  if (!trimmed) return undefined;
+  const ownerCode = routePromptOverlayByRouteId.get(trimmed);
+  if (!ownerCode) return undefined;
+  const entry = modulesByCode.get(ownerCode);
+  return entry?.aiPrompts?.routes?.[trimmed];
+}
+
+/** Module overlay strings in stable alphabetical order (excludes knowledge). */
+export function collectModulePromptOverlayTexts(): string[] {
+  const out: string[] = [];
+  for (const snap of collectRegisteredModulePromptOverlays()) {
+    if (snap.module && snap.module.trim().length > 0) {
+      out.push(snap.module.trim());
+    }
+  }
+  return out;
+}
+
+/** Static knowledge snippets in stable alphabetical order by module code. */
+export function collectModuleKnowledgeSnippets(): string[] {
+  const out: string[] = [];
+  for (const snap of collectRegisteredModulePromptOverlays()) {
+    if (snap.knowledge && snap.knowledge.trim().length > 0) {
+      out.push(snap.knowledge.trim());
+    }
+  }
+  return out;
 }
 
 export function listRegisteredModules(): RegisteredModuleSnapshot[] {
