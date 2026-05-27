@@ -65,6 +65,8 @@ license that covers the file you are modifying:
   is present at the top of the file. See `LICENSE` at the repo root.
 - Files in SDK / client packages explicitly marked **MIT** in their
   `package.json` `license` field are MIT.
+- **npm publication status** (which MIT packages are on the registry vs
+  monorepo-only today): [`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1.
 
 If you are unsure which license applies to the file you are touching,
 ask in the pull request before you commit.

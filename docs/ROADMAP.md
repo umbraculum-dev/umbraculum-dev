@@ -33,6 +33,18 @@ If Week 1 overruns, Weeks 2–3 slide one-for-one rather than the cadence breaki
 
 **Public-alpha outbound-delivery clarity.** The public alpha is not blocked on a general email-delivery implementation, but it is blocked on a clear contract that prevents modules and vertical configurations from filling the gap privately. [RFC-0008](rfcs/0008-notifications-outbound-delivery.md) is that contract: email-ready rendering from [RFC-0007](rfcs/0007-canonical-document-rendering.md) means composition only, while SMTP/provider transport, recipient policy, unsubscribe/compliance handling, audit logs, abuse/rate limits, and delivery billing belong to a future horizontal notifications / outbound-delivery service. Until that service lands, `delivery.mode: "email"` remains intentionally disabled and modules may only prepare templates/intents.
 
+**MIT npm SDK packages — publication status (2026-05-27).** The third-party module spine is **source-ready in the monorepo** but **not npm-registry-ready**:
+
+| Package | Landed in repo | On npm registry |
+|---------|----------------|-----------------|
+| `@umbraculum/ai-tool-sdk` | ✅ 2026-05-21 | ❌ deferred → July 2026 α |
+| `@umbraculum/i18n-keys` | ✅ 2026-05-27 | ❌ deferred → July 2026 α |
+| `@umbraculum/module-sdk` | ✅ (depends on both leaves via workspace `file:`) | ❌ deferred → July 2026 α |
+| `@umbraculum/<code>-contracts` | ✅ per canonical | ❌ same batch |
+| `@umbraculum/api-client` | ✅ in monorepo | ❌ deferred post-α (subset split TBD) |
+
+**Ready for external module authors via `npm install`?** **Not yet** — use monorepo workspaces / `file:` until the cutover checklist in [`LICENSING.md`](LICENSING.md) §6.2.1 completes. **Ready for in-repo and public-source contributors?** **Yes** — packages build, test, and document the MIT contract. Publish is tracked as roadmap priority **6** and pre-flip checklist item **6** in [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1.
+
 ### H2 2026 — AI consultant hardening and module-pluggable expansion
 
 Goal: harden the shipped v0 AI consultant into the platform's cross-module connective tissue. The backbone is no longer future-state: `/ai/chat`, BYOK Anthropic settings, usage ledger, per-workspace memory, `@umbraculum/ai-tool-sdk`, module-owned AI-tool registration, brewery tools, automation tools, PIM tools, and the platform-owned `render_document` tool all exist. H2 work is about making that surface durable, more module-pluggable, and less brewery-shaped at the prompt/reporting layer.
@@ -77,7 +89,7 @@ Already shipped in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8):
 - **`@brewery/*` → `@umbraculum/*` scope migration** — ✅ 2026-05-19 ([`brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)).
 - **RFC-0002 canonical module layout** — Accepted 2026-05-19; brewery β file-move scheduled in Late H1 2026 Week 1 (see tranche above).
 - **`@umbraculum/ai-tool-sdk` carve-out** — ✅ 2026-05-21 (workspace-only; npm publish deferred to July public alpha).
-- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 (greenfield conventions package; `ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred).
+- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 (greenfield conventions package; `ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred; **npm publish deferred to July public alpha** — see [`LICENSING.md`](LICENSING.md) §6.2.1 and the tranche table above).
 - **Foundation hardening (lint, types, tests, docs)** — ✅ feature-complete May 2026 ([`FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md); phase logs in [`LINTING.md`](LINTING.md), [`TYPING.md`](TYPING.md), [`TESTING.md`](TESTING.md)).
 
 #### TODO — what to do next (pair with an agent)
@@ -91,7 +103,7 @@ Ordered for typical execution; pick the row that matches what you want this week
 | **3** | **Weeks 2–3** — docs site + July public-alpha cutover | External flip, marketplace plugins, brochure site | [`rfcs/0005-docs-site.md`](rfcs/0005-docs-site.md), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 |
 | **4** | **MRP/CRP propose/write AI tools** (human-in-the-loop) | First mutable-domain AI surface; read-only advisor is not enough for scheduling edits | [`canonical-mrp-module-surface.md`](design/canonical-mrp-module-surface.md), [`AI-CONSULTANT.md`](AI-CONSULTANT.md) |
 | **5** | **Platform repositioning on public surfaces** | Marketing site, docs copy, App Store framing as workspace-shaped toolset (not "brewery app only") | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1, Week 3 `apps/website/` |
-| **6** | **Module SDK + `ai-tool-sdk` + `i18n-keys` npm publish** | Third-party modules need public MIT SDK artifacts | [`LICENSING.md`](LICENSING.md) §6.2, July cutover §10.1.1 |
+| **6** | **MIT npm SDK publish batch** (`module-sdk`, `ai-tool-sdk`, `i18n-keys`, `<code>-contracts`) | Registry install for out-of-repo module authors; in-repo source is ready | [`LICENSING.md`](LICENSING.md) §6.2.1, [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1 checklist **6** |
 | **7** | **`WorkspaceBillingAddon` + Stripe + RevenueCat** | Per-module entitlements + optional managed-AI credits | [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) billing sections |
 | **8** | **Tamagui intra-RC bump experiment** (July) | Scheduled hygiene before long-term RC drift | [`TAMAGUI.md`](TAMAGUI.md) |
 
