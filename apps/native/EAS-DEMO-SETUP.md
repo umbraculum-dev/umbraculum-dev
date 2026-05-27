@@ -8,8 +8,9 @@
 
 ## Prerequisites
 
-1. **`https://demo.umbraculum.dev`** is live (`curl …/api/health` → `{"ok":true}`).
-2. Expo account with access to the Umbraculum Expo project.
+1. **`https://demo.umbraculum.dev`** is live — from repo root: `./scripts/demo-host-verify.sh` must exit 0.
+2. Expo account — `npx eas-cli login` (agent environments are usually **not** logged in).
+3. GitHub repo secret **`EXPO_TOKEN`** (Settings → Secrets → Actions).
 
 ---
 

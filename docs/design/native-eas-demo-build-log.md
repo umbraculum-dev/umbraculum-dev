@@ -1,9 +1,9 @@
 # Native EAS demo build log
 
 **Tier:** Public  
-**Status:** **Paused — repo phase complete; G1 open** (resume when maintainer runs infra + EAS + device smoke)  
+**Status:** **Blocked on maintainer — G1 open** (demo DNS/VPS + `eas login` + physical device; see [G1 resume attempt](#g1-resume-attempt-2026-05-27))  
 **Started:** 2026-05-27  
-**Last updated:** 2026-05-27  
+**Last updated:** 2026-05-27 (G1 resume attempt)  
 **Scope:** July 2026 native EAS demo closure — `preview` APK → `https://demo.umbraculum.dev`
 
 > [!NOTE]
@@ -17,8 +17,8 @@
 |-------|--------|-------------------|
 | **Repo / docs (this commit)** | **Done** | `eas.json` → demo URL; runbooks; surface doc §5.2; [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) |
 | **Pre-build gates (local)** | **Done** (2026-05-27) | Re-run before EAS if `packages/**` or `apps/native/**` changed |
-| **Phase 0 — `demo.umbraculum.dev` live** | **Not started** | You: DNS, TLS, compose deploy, seed — [`demo-host-runbook.md`](demo-host-runbook.md) |
-| **Phase 1b/c — EAS project + `EXPO_TOKEN`** | **Not started** | You: `eas init`, GitHub secret, workflow dispatch |
+| **Phase 0 — `demo.umbraculum.dev` live** | **Blocked** | `./scripts/demo-host-verify.sh` fails — see runbook §Current status |
+| **Phase 1b/c — EAS project + `EXPO_TOKEN`** | **Blocked** | `eas whoami` → not logged in; `EXPO_TOKEN` not in agent env |
 | **Phase 3–4 — APK + device smoke** | **Not started** | You: install APK, fill §5.1 table below |
 | **Gate G1** ([surface doc](canonical-native-platform-surface.md) §8) | **Open** | Closes when phases 0, 1b/c, 3–4 pass |
 
@@ -58,6 +58,34 @@
 | [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) | Future `cloud` track stub |
 | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §5 | Demo naming + distribution URL |
 | [`NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md) §5 | Demo host + EAS |
+| [`scripts/demo-host-verify.sh`](../../scripts/demo-host-verify.sh) | Exit 0 = demo API ready |
+| [`scripts/demo-native-api-smoke.sh`](../../scripts/demo-native-api-smoke.sh) | API paths (login, recipes, webview-exchange) |
+| [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) | `server_name demo.umbraculum.dev` for VPS |
+
+---
+
+## G1 resume attempt (2026-05-27)
+
+| Step | Result |
+|------|--------|
+| `./scripts/demo-host-verify.sh` | **FAIL** — HTTPS timeout; HTTP returns registrar parking HTML |
+| `./scripts/demo-native-api-smoke.sh` (local) | **PASS** — `BASE_URL=http://localhost:18080` (API parity only; not G1) |
+| SSH `216.40.34.41:22` | **Timeout** — cannot deploy from agent environment |
+| `eas whoami` | **Not logged in** — run `eas login` locally, then `eas init` per [`EAS-DEMO-SETUP.md`](../../apps/native/EAS-DEMO-SETUP.md) |
+| Device §5.1 | **Not run** — requires EAS APK + physical Android |
+
+**Your next commands (in order):**
+
+```bash
+# 1) After VPS + TLS + compose deploy:
+./scripts/demo-host-verify.sh
+
+# 2) Expo + EAS (on your machine):
+cd apps/native && npx eas-cli login && npx eas-cli init
+# commit projectId; add EXPO_TOKEN to GitHub; run native-eas-build workflow
+
+# 3) On device: install APK; complete §5.1 table below
+```
 
 ---
 
