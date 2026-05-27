@@ -55,7 +55,9 @@
 
 | Deliverable | Path | Owner action on change |
 |-------------|------|----------------------|
-| Native horizontal surface | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | Update route matrix when promoting native routes; update §5 when alpha scope shifts |
+| Native horizontal surface | [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) | Update route matrix when promoting native routes; update §5 when demo scope shifts |
+| Demo host runbook | [`demo-host-runbook.md`](demo-host-runbook.md) | Update demo accounts table when seed emails change |
+| Cloud hosted track (stub) | [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) | Amend when `cloud.umbraculum.dev` work starts |
 | RFC-0002 native companion | [`0002-canonical-module-physical-layout.md`](../rfcs/0002-canonical-module-physical-layout.md) §5 | Link to native surface when `registerNativeModule` behavior changes |
 
 - Module surfaces: ensure **Rendering** subsections in MRP/CRP/PIM/automation point at horizontal surface + module refs (MRP/CRP updated in Wave 6).

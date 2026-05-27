@@ -113,7 +113,9 @@ Callers MUST check `getRouteAvailability` before `routeToNativeTarget` — web-o
 
 ---
 
-## 5. July 2026 alpha scope (brewery-only EAS)
+## 5. July 2026 native EAS demo scope (brewery-only)
+
+> **Demo vs cloud.** The hosted **demonstration** stack is **`https://demo.umbraculum.dev`** ([`demo-host-runbook.md`](demo-host-runbook.md)) — illustrative seed data, documented demo accounts, resets OK. **Not** production brewery data and **not** future customer-facing **`cloud.umbraculum.dev`** ([`cloud-hosted-product-track.md`](cloud-hosted-product-track.md)).
 
 **In scope**
 
@@ -129,22 +131,23 @@ Callers MUST check `getRouteAvailability` before `routeToNativeTarget` — web-o
 - Native inventory list (web fallback only).
 - `registerNativeModule` required for all modules (brewery registered; others deferred).
 - React 19.2 parity with web (Expo SDK 54 pins 19.1).
-- Store-wide public release (internal alpha only).
+- Store-wide public release; **`cloud.umbraculum.dev`** hosted product.
 
-### 5.1 Alpha smoke checklist
+### 5.1 Device smoke checklist (EAS `preview` → demo host)
 
 - [ ] `expo install --check` passes (CI: `.github/workflows/native-deps.yml`).
 - [ ] `./scripts/check-packages-dist-up-to-date.sh` passes before release branch.
-- [ ] Login → select workspace → recipes list → open recipe → water hub on device (Expo Go or EAS build).
-- [ ] API health on dashboard against LAN/dev stack.
-- [ ] Inventory tab shows blocked + **Open on web** succeeds.
+- [ ] Login → select workspace → recipes list → open recipe → water hub on device (Expo Go on LAN **or** EAS APK against **demo**).
+- [ ] API health on dashboard against **demo** (or LAN dev stack during local work).
+- [ ] Inventory tab shows blocked + **Open on web** succeeds (same origin as demo).
 - [ ] EAS Android internal build installs and launches.
 
-### 5.2 Alpha distribution
+### 5.2 Demo distribution
 
-- **EAS project:** `apps/native/eas.json` — `development`, `preview` (internal), `production` profiles.
-- **Credentials:** Expo account + Apple/Google developer accounts for store-internal tracks.
-- **API URL:** Production alpha builds MUST set `EXPO_PUBLIC_API_BASE_URL` (or documented override) — see [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md) §4.
+- **Demo URL:** `https://demo.umbraculum.dev` — API + web + media on one origin; see [`demo-host-runbook.md`](demo-host-runbook.md).
+- **EAS project:** `apps/native/eas.json` — `preview` profile bakes `EXPO_PUBLIC_API_BASE_URL` / `EXPO_PUBLIC_MEDIA_BASE_URL` to demo; `development`, `production` profiles unchanged.
+- **Build log:** [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md).
+- **Credentials:** Expo account + `EXPO_TOKEN` for [`.github/workflows/native-eas-build.yml`](../../.github/workflows/native-eas-build.yml); demo login per runbook (passwords not in git).
 
 ---
 
@@ -180,7 +183,7 @@ Full cast elimination is scheduled with [pr3-routes-migration-handoff.md](pr3-ro
 | Gate | Condition | Work |
 |------|-----------|------|
 | G0 | This doc accepted | Phase 1 EAS copy |
-| G1 | July alpha tagged | Phase 2 plumbing |
+| G1 | Native EAS demo loop closed (§5.1 on device vs demo) — **open; repo wiring shipped 2026-05-27; resume per build log** | [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) |
 | G2 | MRP/CRP alpha demo signed off | Optional native deep links / web fallback expansion |
 | G3 | WMS surface draft exists | `apps/native/src/modules/wms/` — [wms.md](../modules/canonical/wms.md) §4 |
 | G4 | H2 2027 | Re.Pack federation spike vs PWA + scanner companion |
@@ -205,6 +208,9 @@ When WMS surface design lands: [`apps/native/src/modules/wms/README.md`](../../a
 
 - [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) §3 native slice  
 - [RFC-0007](../rfcs/0007-canonical-document-rendering.md) — render jobs  
-- [canonical-mrp-module-surface.md](canonical-mrp-module-surface.md) / [canonical-crp-module-surface.md](canonical-crp-module-surface.md) — web-first alpha  
-- [mrp-crp-alpha-demo-walkthrough.md](mrp-crp-alpha-demo-walkthrough.md) — web-only demo  
+- [demo-host-runbook.md](demo-host-runbook.md) — **`demo.umbraculum.dev`** policy and demo accounts  
+- [cloud-hosted-product-track.md](cloud-hosted-product-track.md) — future **`cloud.umbraculum.dev`** (not demo)  
+- [native-eas-demo-build-log.md](native-eas-demo-build-log.md) — EAS build + smoke status  
+- [canonical-mrp-module-surface.md](canonical-mrp-module-surface.md) / [canonical-crp-module-surface.md](canonical-crp-module-surface.md) — web-first planning  
+- [mrp-crp-alpha-demo-walkthrough.md](mrp-crp-alpha-demo-walkthrough.md) — browser walkthrough on demo host  
 - [modules/verticals/brewery/README.md](../modules/verticals/brewery/README.md) §3.3  

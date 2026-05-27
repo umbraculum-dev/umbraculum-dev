@@ -80,12 +80,13 @@ So “Mac-free” pushes the long-term path toward **EAS (or similar remote iOS 
 
 ---
 
-## 5. EAS internal alpha (July 2026)
+## 5. EAS internal demo (July 2026)
 
-- **Config:** [`apps/native/eas.json`](../apps/native/eas.json) — `preview` profile builds an Android APK for internal distribution; iOS uses EAS cloud builders (no local Mac required).
+- **Demo host:** `https://demo.umbraculum.dev` — full API + web for walkthroughs and device smoke; **demo-only** ([`docs/design/demo-host-runbook.md`](design/demo-host-runbook.md)). Future customer-facing hosted product is **`cloud.umbraculum.dev`** ([`docs/design/cloud-hosted-product-track.md`](design/cloud-hosted-product-track.md)) — not this host.
+- **Config:** [`apps/native/eas.json`](../apps/native/eas.json) — `preview` profile builds an Android APK for internal distribution and bakes `EXPO_PUBLIC_*` URLs to **demo**; iOS uses EAS cloud builders (no local Mac required).
 - **CI:** [`.github/workflows/native-eas-build.yml`](../.github/workflows/native-eas-build.yml) — manual `workflow_dispatch` only (requires `EXPO_TOKEN` secret). Not gated on every PR.
 - **Scope:** Brewery-only brew-day flows per [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) §5.
-- **Before first build:** Run `eas init` in `apps/native/`, set `expo.extra.eas.projectId` in `app.json`, and configure `EXPO_PUBLIC_API_BASE_URL` for the alpha API host.
+- **Before first build:** Run `eas init` in `apps/native/`, set `expo.extra.eas.projectId` in `app.json` (replace placeholder), add `EXPO_TOKEN` to GitHub secrets. Demo host must be live — see [`docs/design/native-eas-demo-build-log.md`](design/native-eas-demo-build-log.md).
 
 ## 6. Mitigations to treat as mandatory (discipline + docs)
 

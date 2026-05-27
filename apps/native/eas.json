@@ -10,6 +10,10 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://demo.umbraculum.dev",
+        "EXPO_PUBLIC_MEDIA_BASE_URL": "https://demo.umbraculum.dev"
+      },
       "android": {
         "buildType": "apk"
       },

@@ -11,7 +11,7 @@
 
 ## Prerequisites
 
-1. Stack: `docker compose up -d` with **api**, **web**, **gotenberg**, **redis** running.
+1. Stack running with **api**, **web**, **gotenberg**, **redis** — local `docker compose up -d` **or** hosted demo at **`https://demo.umbraculum.dev`** ([`demo-host-runbook.md`](demo-host-runbook.md)). Use `E2E_BASE_URL` / browser origin accordingly.
 2. Database seeded for E2E (default admin workspace). Fixture IDs match [`apps/web/e2e/personas.json`](../../apps/web/e2e/personas.json):
    - `brewSessionId`: `e2e00000-0000-0000-0000-000000000bbe`
    - Projected production order id: `brewery-brew-session-e2e00000-0000-0000-0000-000000000bbe`

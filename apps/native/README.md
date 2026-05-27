@@ -33,7 +33,7 @@ The native app expects `services/api` to be reachable; for local development aga
 ## Build / test / lint (local)
 
 - **Build (Expo dev)**: `npx expo start` (Metro bundler in dev mode).
-- **Build (production EAS)**: `eas.json` in this workspace; see [`docs/design/canonical-native-platform-surface.md`](../../docs/design/canonical-native-platform-surface.md) §5.2 (July 2026 internal alpha) and [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md).
+- **Build (EAS demo)**: `eas.json` `preview` profile → `https://demo.umbraculum.dev`; operator steps: [`EAS-DEMO-SETUP.md`](EAS-DEMO-SETUP.md); policy: [`docs/design/demo-host-runbook.md`](../../docs/design/demo-host-runbook.md); [`docs/NATIVE-STRATEGY-AND-CI.md`](../../docs/NATIVE-STRATEGY-AND-CI.md) §5.
 - **Lint**: not yet configured in this workspace (see [`docs/LINTING.md`](../../docs/LINTING.md) for the platform-wide linting strategy and current scope tiers).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace carries all 6 candidate strict flags after Phase 6h, and was the first non-pilot workspace to land `noUncheckedIndexedAccess` in Phase 6b — fixing 6 latent index-out-of-bounds sites in the process).
 - **i18n coverage check**: `npm run i18n:guardrail`.
@@ -47,7 +47,7 @@ The native app expects `services/api` to be reachable; for local development aga
 
 ## Status
 
-**July 2026 alpha (brewery-only):** Internal EAS distribution of brew-day flows (recipes, water, yeast, brew sessions, equipment). Out of scope for this alpha: native MRP/CRP/PIM/automation UI (web + AI advisor + RFC-0007 exports on web). Inventory uses **Open on web** via `openWebFallbackRoute`.
+**July 2026 EAS demo (brewery-only):** Internal EAS `preview` APK against **`demo.umbraculum.dev`** (demonstration host — not production `cloud`). Brew-day flows only on native; MRP/CRP/PIM/automation remain web. Inventory uses **Open on web** via `openWebFallbackRoute`.
 
 Shipping (work-in-progress). Brew-session ergonomics are tuned for kettle-side use. Full webview-in-app embedding remains deferred; system-browser web fallback is implemented for whitelisted routes per [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md).
 
