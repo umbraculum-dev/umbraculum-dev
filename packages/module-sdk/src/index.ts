@@ -41,6 +41,7 @@ export {
   collectModuleKnowledgeSnippets,
   collectModulePromptOverlayTexts,
   collectRegisteredModulePromptOverlays,
+  composeModuleTierLimitSlices,
   DocumentTemplateRefAlreadyRegisteredError,
   getRegisteredDocumentTemplate,
   clearModuleRegistryForTests,
@@ -70,6 +71,15 @@ export {
   type RegisteredWebModuleSnapshot,
   type RegisterWebModuleOptions,
 } from "./registerWebModule.js";
+
+export {
+  PLATFORM_RESERVED_TIER_LIMIT_KEYS,
+  ReservedTierLimitKeyError,
+  TierLimitKeyCollisionError,
+  InvalidTierLimitKeyError,
+  InvalidTierLimitValueError,
+  listRegisteredTierLimitKeys,
+} from "./tierLimits.js";
 
 export {
   aggregateNativeAvailableRouteIds,

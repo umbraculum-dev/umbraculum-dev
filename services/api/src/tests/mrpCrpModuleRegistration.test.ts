@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   listRegisteredDocumentTemplates,
   listRegisteredModules,
+  listRegisteredTierLimitKeys,
   listRegisteredWebModules,
   registerRegisteredModuleAiTools,
 } from "@umbraculum/module-sdk";
@@ -91,5 +92,10 @@ describe("MRP/CRP module registration — Wave 1", () => {
         { name: "crp.proposeScheduleAdjustment", scope: "propose" },
       ]),
     );
+  });
+
+  it("does not register tier-limit keys for MRP or CRP (no enforcement yet)", () => {
+    expect(listRegisteredTierLimitKeys("mrp")).toEqual([]);
+    expect(listRegisteredTierLimitKeys("crp")).toEqual([]);
   });
 });

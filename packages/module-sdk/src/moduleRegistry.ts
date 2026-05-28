@@ -3,12 +3,18 @@ import type {
   RegisteredModulePromptSnapshot,
   RegisteredModuleSnapshot,
   RegisterModuleOptions,
+  BillingTierSlug,
+  TierLimitsSlice,
 } from "./types.js";
 import type {
   DocumentTemplate,
   RegisteredDocumentTemplateSnapshot,
 } from "./renderingTypes.js";
 import { isCanonicalModuleCode } from "./reservedCodes.js";
+import {
+  clearTierLimitRegistryForTests,
+  validateAndIndexTierLimits,
+} from "./tierLimits.js";
 
 const modulesByCode = new Map<string, RegisterModuleOptions<unknown>>();
 const documentTemplatesByRef = new Map<
@@ -173,6 +179,9 @@ export function recordModuleRegistration(
   assertModuleCodeAvailable(options.code);
   const documentTemplates = validateDocumentTemplates(options.code, options.documentTemplates ?? []);
   validateAndIndexAiPrompts(options.code, options.aiPrompts);
+  if (options.tierLimits !== undefined) {
+    validateAndIndexTierLimits(options.code, options.tierLimits);
+  }
 
   modulesByCode.set(options.code, options);
   for (const template of documentTemplates) {
@@ -239,6 +248,24 @@ export function clearModuleRegistryForTests(): void {
   modulesByCode.clear();
   documentTemplatesByRef.clear();
   routePromptOverlayByRouteId.clear();
+  clearTierLimitRegistryForTests();
+}
+
+/**
+ * Merge tier-limit slices from all registered modules in stable alphabetical
+ * module-code order. Call after module boot registration is complete.
+ */
+export function composeModuleTierLimitSlices(tier: BillingTierSlug): TierLimitsSlice {
+  const merged: Record<string, number | boolean> = {};
+
+  for (const [, entry] of Array.from(modulesByCode.entries()).sort(([a], [b]) =>
+    a.localeCompare(b),
+  )) {
+    if (entry.tierLimits === undefined) continue;
+    Object.assign(merged, entry.tierLimits(tier));
+  }
+
+  return merged;
 }
 
 export function collectRegisteredModulePromptOverlays(): RegisteredModulePromptSnapshot[] {
