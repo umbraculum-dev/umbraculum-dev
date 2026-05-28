@@ -189,6 +189,35 @@ When you encounter a TS or lint warning that looks Tamagui-related, ask:
 
 ---
 
+## UI stack choice — product vs public surfaces
+
+**Tamagui is the go-to for product UI.** Operational surfaces in `apps/web`, `apps/native`, and shared packages (`@umbraculum/ui`, domain UI packages) use Tamagui so one component tree ships to **real DOM on web and real React Native on device** ([`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §1.1, §3.5). Do **not** introduce a parallel product UI stack (MUI, Chakra, Tailwind-only app chrome, a second component library for the same screens) without an RFC and an explicit abandonment of the cross-platform commitment.
+
+**Docs site (`docs-site/`)** uses Docusaurus — documentation layout, search, and MDX are a different job. That is not a precedent for replacing Tamagui in the product apps.
+
+**Brochure (`apps/website/`)** is intentionally **static HTML + CSS** today ([`design/brochure-site-design-policy.md`](design/brochure-site-design-policy.md)): a small, web-only orientation surface at `umbraculum.dev`, not operational UI. Staying static is **not** a rejection of Tamagui; it reflects that Tamagui’s main payoff (web + native from one source) does not apply to a two-page pre-alpha brochure, and that a zero-dependency build keeps Cloudflare deploy and the “less ego, more facts” posture simple.
+
+### When to reconsider migrating the brochure to Tamagui
+
+Re-open this decision (RFC or roadmap note + maintainer sign-off) only when **at least one** of the following is true:
+
+1. **Brochure scope outgrows static HTML** — roughly **10+ pages** with shared nav, locale variants, or frequent copy/layout churn where component reuse clearly beats duplicated HTML.
+2. **Live product UI on marketing** — the brochure must embed real `@umbraculum/ui` (or module) components: interactive demos, “screenshots as code”, AI consultant teasers wired to the same primitives as the app.
+3. **Shared shell with product** — announcement, header, or auth-adjacent chrome must stay **pixel-identical** with Tamagui-rendered product surfaces, and maintaining parallel CSS is measurably failing (regressions every flip).
+4. **Token drift is recurring pain** — brochure and product visual identity diverge despite policy; a **shared token source** (JSON → CSS + `tamagui.config`) was tried and still does not keep parity.
+
+Until a trigger fires, prefer:
+
+- [`apps/website/announcement.config.json`](../apps/website/announcement.config.json) + shared announcement mapping for Docusaurus (already in tree).
+- New brochure pages as static HTML following [`apps/website/README.md`](../apps/website/README.md).
+- Optional **design-token export** from the Tamagui theme to brochure CSS — lighter than a full React + Tamagui brochure app.
+
+If migration proceeds later, the likely shape is **Vite (or similar) + React SSG + Tamagui web config only**, with a dedicated **`packages/marketing-shell`** (or equivalent) — **not** folding marketing layout into `@umbraculum/ui`, which stays operational primitives.
+
+Recorded on the roadmap under standing principles: [`ROADMAP.md`](ROADMAP.md) §“Standing principles”.
+
+---
+
 ## Related
 
 - `docs/LINTING.md` — the lint roadmap and full phase log; HIGH-full landed 2026-05-16 with the Tamagui-wall framing materially revised (see `docs/LINTING.md` "Realised output of HIGH-full" + the Phase 4b post-mortem for the stale-rename root-cause analysis).

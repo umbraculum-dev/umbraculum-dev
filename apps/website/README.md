@@ -15,7 +15,7 @@ New pages should also include the **site announcement** mount (`announcement.css
 
 ## Site announcement banner
 
-Reusable top-of-page banner for immediate news (public-alpha countdown, outages, deadlines). **Not Tamagui** — the brochure is static HTML/CSS; product apps use `@umbraculum/ui`.
+Reusable top-of-page banner for immediate news (public-alpha countdown, outages, deadlines). **Not Tamagui** — the brochure is static HTML/CSS; product apps use `@umbraculum/ui`. **When to reconsider** a Tamagui brochure: [`docs/TAMAGUI.md`](../../docs/TAMAGUI.md) §"UI stack choice — product vs public surfaces".
 
 | File | Role |
 |------|------|
