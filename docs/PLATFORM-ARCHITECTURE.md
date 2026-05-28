@@ -93,6 +93,8 @@ Brewery is the **shipped reference vertical configuration**. `automation` and `p
 
 Umbraculum is **open source** by design — not as a marketing tactic, but as the structural foundation for long-term sustainability with a small team, trust with operational customers, and a defensible position against hyperscaler capture.
 
+> **From practice, not theory.** The AGPL/MIT split below is backed by license analysis in [`LICENSING.md`](LICENSING.md), but the *conviction* comes from years building and maintaining **proprietary vertical ERPs** before this project. We watched customer after customer move — not only to the software house across the street, but to **different products entirely** (Magento Open Source vs Shopify today; the same pattern as ERP X vs ERP Y or MRP A vs MRP B). When that happens, **years of locked code do not travel with the relationship**. The durable moat was never the binary library; it was demos, domain fit, support, relationships, and marketing — which means you win by **building what the client needs**, not by hoarding syntax. We always saw **limited value** in locking platform code; **AI-assisted greenfield** work makes hiding source even harder to justify. Umbraculum keeps the **backbone open** so integrators and module authors invest in domain logic, operations, and trust — assets that survive a platform swap — rather than in opaque lock-in.
+
 **License posture** (rationale in [`docs/LICENSING.md`](LICENSING.md)):
 
 - **Core platform**: AGPLv3.
@@ -121,7 +123,7 @@ These are explicit commitments documented in [`docs/LICENSING.md`](LICENSING.md)
 
 ### 2.2 Governance & community
 
-The single biggest determinant of an open-source project's long-term health is **how welcome contributors feel** — not the license, not the technology, not the marketing. The Magento → Mage-OS history makes this concrete: Adobe inherited a permissive license and a thriving community, and lost the community by making contribution unwelcome.
+The single biggest determinant of an open-source project's long-term health is **how welcome contributors feel** — not the license, not the technology, not the marketing. The Magento → Mage-OS history makes this concrete: Adobe inherited a permissive license and a thriving community, and lost the community by making contribution unwelcome. A complementary lesson from **proprietary ERP practice** — good product, ecosystem never formed — is documented in [`design/ecosystem-case-study-omnis.md`](design/ecosystem-case-study-omnis.md); §2.1 above cites the same experience for why the **open backbone** is non-negotiable here.
 
 Governance principles, in priority order:
 
