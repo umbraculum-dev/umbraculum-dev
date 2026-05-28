@@ -2,19 +2,12 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { defaultLocale, isLocale } from "../src/i18n/routing";
+import { registerBuiltinWebModulesIfAbsent } from "@umbraculum/module-sdk";
 import { registerPlatformSegments } from "./_lib/registerPlatformSegments";
 import "./globals.css";
 import "../public/tamagui.generated.css";
 
-// Bootstrap: register platform-owned URL segments with @umbraculum/module-sdk.
-// Module-owned segments (vessels, products, categories, attribute-sets,
-// recipes, inventory, equipment, water-profiles, brewday-steps-settings,
-// ferm-data-integration) are registered by their server-side bootstraps in
-// services/api/src/modules/*/index.ts; this call records the residual
-// platform-owned segments (auth, ai, content pages) so the registry has a
-// complete picture. The function is idempotent (it guards against duplicate
-// registration via listRegisteredWebModules) so re-imports during HMR /
-// build-time pre-rendering do not collide.
+registerBuiltinWebModulesIfAbsent();
 registerPlatformSegments();
 
 export const metadata: Metadata = {

@@ -1,9 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   listRegisteredModules,
-  listRegisteredWebModules,
   registerModule,
-  registerWebModule,
 } from "@umbraculum/module-sdk";
 
 import { automationVesselsRoutes } from "./routes/automationVesselsRoutes.js";
@@ -89,18 +87,6 @@ export function registerAutomationModule(app: FastifyInstance): void {
       // both metadata AND routes — leaving the second app without the
       // module's routes wired.
       routes: [],
-    });
-  }
-
-  const alreadyRegisteredWeb = listRegisteredWebModules().some(
-    (m) => m.code === MODULE_CODE,
-  );
-
-  if (!alreadyRegisteredWeb) {
-    registerWebModule({
-      code: MODULE_CODE,
-      ownedUrlSegments: ["vessels"],
-      navEntry: { primarySegment: "vessels", labelKey: "nav.automation" },
     });
   }
 

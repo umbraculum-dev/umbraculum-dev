@@ -1,9 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   listRegisteredModules,
-  listRegisteredWebModules,
   registerModule,
-  registerWebModule,
 } from "@umbraculum/module-sdk";
 
 import { brewdaySettingsRoutes } from "./routes/brewdaySettings.js";
@@ -83,29 +81,6 @@ export function registerBreweryModule(app: FastifyInstance): void {
       },
       documentTemplates: breweryDocumentTemplates,
       routes: [],
-    });
-  }
-
-  const alreadyRegisteredWeb = listRegisteredWebModules().some(
-    (m) => m.code === MODULE_CODE,
-  );
-
-  if (!alreadyRegisteredWeb) {
-    registerWebModule({
-      code: MODULE_CODE,
-      ownedUrlSegments: [
-        "recipes",
-        "inventory",
-        "equipment",
-        "water-profiles",
-        "brewday-steps-settings",
-        "ferm-data-integration",
-      ],
-      navEntry: {
-        primarySegment: "recipes",
-        labelKey: "nav.recipes",
-        order: 1,
-      },
     });
   }
 

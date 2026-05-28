@@ -140,9 +140,9 @@ During the `@brewery/*` → `@umbraculum/*` scope migration, `@brewery/core` (br
 
 ### 5.3 Shell composition — related problem, different home
 
-Some **runtime** shell concerns are not fully extracted yet:
+Some **runtime** shell concerns are partially extracted:
 
-- **Registry-driven primary nav** — modules declare `navEntry` via `registerWebModule()`, but [`PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) still lists items by hand (known debt; registry introspection exists: `listRegisteredWebModules()`).
+- **Registry-driven primary nav** — `composeWebShellNavItems()` in `@umbraculum/module-sdk` reads `registerWebModule({ navEntries })` metadata from [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts); [`PrimaryNav.tsx`](../../apps/web/app/_components/PrimaryNav.tsx) receives composed items from the server layout.
 - **Platform-owned URL segments** — [`registerPlatformSegments.ts`](../../apps/web/app/_lib/registerPlatformSegments.ts) lives in `apps/web` today.
 - **Entitlement-gated nav / upgrade affordances** — tied to `WorkspaceBilling` and future `WorkspaceBillingAddon` ([PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) §3.6–§3.7).
 
