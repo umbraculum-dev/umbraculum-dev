@@ -1,9 +1,9 @@
 # Ecosystem case study — Omnis Studio and the Omnis ecosystem
 
 **Tier:** Public  
-**Status:** v1 — maintainer experience; informs horizontal-accessibility and community commitments  
+**Status:** v1.1 — maintainer experience; informs horizontal-accessibility and community commitments (2026-05-28: §5.1 pedagogical glosses, §3.4 open-source rationale)  
 **Audience:** contributors, platform evaluators, future maintainers reasoning about why documentation, community, and tryability are non-optional  
-**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.1–§2.2, [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.2 (Adobe → Magento — a *different* failure mode)
+**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.1–§2.2, [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.2–§5.3 (Adobe → Magento — a *different* failure mode; lesson 6 pairs with this doc)
 
 > [!NOTE]
 > This document is **gratitude and lesson**, not a product review. The founding maintainer earned a living on Omnis-backed systems, learned backend discipline there, and still recommends parts of that experience to backend developers learning how ERPs are built. The case study exists because Umbraculum must not repeat the *ecosystem* failures around a good product.
@@ -113,6 +113,14 @@ For a **backend programmer learning how ERPs feel to build and operate**, time o
 - why a debugger in the loop beats printf-only maintenance at ERP scale.
 
 That recommendation is **pedagogical**, not strategic: Umbraculum is not an Omnis clone; it is an open platform with Tamagui/React/Fastify/Postgres and a module SDK. The lesson transferred is **discipline**, not syntax.
+
+### 5.1 What those ERP lessons mean (short gloss)
+
+The three bullets above are **backend habits** Omnis made visible because screens and database state were tightly coupled:
+
+- **Screens tied to live data** — Operational users work on **documents and state** (order, batch, invoice), not static pages. A screen reflects **current business truth**; saving often **posts** facts (stock move, ledger line), not just stores form JSON. Umbraculum modules should model operational objects with state, not CRUD-only pages.
+- **Reports vs posting transactions** — **Posting** (OLTP) must stay short, atomic, and correct — few rows, constraints, audit trail. **Reporting** (reads at scale) scans, joins, and aggregates — different performance and locking profile. Mixing the two on the same DB path without discipline blocks production. Umbraculum separates these concerns in API design and future read-routing ([`POSTGRES-REPLICATION-ARCHITECTURE.md`](../POSTGRES-REPLICATION-ARCHITECTURE.md)).
+- **Debugger in the loop** — Stepping through live state beats printf-only maintenance at ERP scale; the habit transfers even when AI assists debugging.
 
 ---
 
