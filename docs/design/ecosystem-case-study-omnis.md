@@ -1,12 +1,20 @@
 # Ecosystem case study — Omnis Studio and the Omnis ecosystem
 
 **Tier:** Public  
-**Status:** v1.1 — maintainer experience; informs horizontal-accessibility and community commitments (2026-05-28: §5.1 pedagogical glosses, §3.4 open-source rationale)  
+**Status:** v1.2 — maintainer experience; informs horizontal-accessibility and community commitments (2026-05-28: scope disclaimer, §5.1 glosses, §3.4 open-source rationale)  
 **Audience:** contributors, platform evaluators, future maintainers reasoning about why documentation, community, and tryability are non-optional  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.1–§2.2, [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.2–§5.3 (Adobe → Magento — a *different* failure mode; lesson 6 pairs with this doc)
 
 > [!NOTE]
 > This document is **gratitude and lesson**, not a product review. The founding maintainer earned a living on Omnis-backed systems, learned backend discipline there, and still recommends parts of that experience to backend developers learning how ERPs are built. The case study exists because Umbraculum must not repeat the *ecosystem* failures around a good product.
+
+## Scope — what this case study is (and is not)
+
+**What we are describing is what we felt as developers of products built with Omnis** — not a scorecard of Omnis Studio features. That feeling matters: **developer experience is what shapes your sense of a product's quality.** If the product is technically excellent but the developers building on it do not *feel* that — isolated, blocked on docs, unable to try, share, or move freely — **something is wrong with the ecosystem**, not necessarily with the runtime your customers see.
+
+We are **not** reviewing Omnis the product here. We are recording **our experience** in that ecosystem at a particular time, so Umbraculum can learn from it.
+
+**Contrast (positive feeling despite rough edges):** Magento 1 — legacy Zend stack, dreadful initial debugging (Xdebug setup was painful), PHP before strict types — still gave many of us a **positive developer feeling**. Documentation existed. Community existed. PHP and MySQL were **pillars** you could take anywhere. The ecosystem **boosted potential** and **thrived**. Omnis taught us ERP discipline inside the IDE; Magento taught us what it feels like when the **ecosystem carries you**. Umbraculum aims to combine both lessons: ERP-grade rigour **and** an ecosystem that does not leave builders alone.
 
 ---
 
