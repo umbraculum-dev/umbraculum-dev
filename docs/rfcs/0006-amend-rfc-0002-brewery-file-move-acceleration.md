@@ -178,4 +178,10 @@ Documentation cross-reference sweep for RFC-0006 (applied on acceptance, 2026-05
 
 ---
 
+## 12. Forward amendment (RFC-0010 supersession note)
+
+**2026-05-28 — [RFC-0010](0010-platform-brewery-postgres-schema-split.md) supersedes the Prisma deferral in §3 and §4.** The historical text above (including `prismaSchema: undefined` and "brewery tables stay in `public`") records RFC-0006's intent at acceptance time and is **not rewritten**. Current state: platform tables live in `platform.*`, brewery domain tables in `brewery.*`, and `registerBreweryModule()` sets `prismaSchema: "brewery"`. See RFC-0010 and [`docs/design/platform-brewery-postgres-schema-split.md`](../design/platform-brewery-postgres-schema-split.md) for the migration runbook.
+
+---
+
 *RFC-0006 is part of the Umbraculum platform's governance documentation set. See [`docs/rfcs/README.md`](README.md) for the full RFC index, [RFC-0002](0002-canonical-module-physical-layout.md) for the physical-layout commitment this RFC amends, [`docs/design/web-route-group-audit.md`](../design/web-route-group-audit.md) for the audit decision-of-record and Week 1 execution detail, and [`docs/ROADMAP.md`](../ROADMAP.md) for the late-H1-2026 tranche calendar context.*

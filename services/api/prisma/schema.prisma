@@ -6,7 +6,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DATABASE_URL_DIRECT")
-  schemas   = ["public", "automation", "pim", "mrp", "crp", "rendering"]
+  schemas   = ["platform", "brewery", "automation", "pim", "mrp", "crp", "rendering"]
 }
 
 enum WorkspaceRole {
@@ -15,7 +15,7 @@ enum WorkspaceRole {
   viewer
 
   @@map("workspace_role")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum AdPlacement {
@@ -26,14 +26,14 @@ enum AdPlacement {
   recipe_edit_after_yeast
 
   @@map("ad_placement")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum AdPlatform {
   web
 
   @@map("ad_platform")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum WaterProfileScope {
@@ -42,7 +42,7 @@ enum WaterProfileScope {
   public
 
   @@map("water_profile_scope")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum WaterProfileType {
@@ -50,7 +50,7 @@ enum WaterProfileType {
   dilution
 
   @@map("water_profile_type")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum WaterProfileVerificationStatus {
@@ -58,7 +58,7 @@ enum WaterProfileVerificationStatus {
   verified
 
   @@map("water_profile_verification_status")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum IngredientKind {
@@ -67,7 +67,7 @@ enum IngredientKind {
   yeast
 
   @@map("ingredient_kind")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum ColorUnit {
@@ -77,7 +77,7 @@ enum ColorUnit {
   unknown
 
   @@map("color_unit")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum BrewSessionStatus {
@@ -87,7 +87,7 @@ enum BrewSessionStatus {
   stopped
 
   @@map("brew_session_status")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum BrewSessionStepStatus {
@@ -98,7 +98,7 @@ enum BrewSessionStepStatus {
   not_applicable
 
   @@map("brew_session_step_status")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum BrewSessionStepTimerState {
@@ -108,7 +108,7 @@ enum BrewSessionStepTimerState {
   stopped
 
   @@map("brew_session_step_timer_state")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum BrewSessionLogKind {
@@ -123,7 +123,7 @@ enum BrewSessionLogKind {
   step_timer_stopped
 
   @@map("brew_session_log_kind")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum IntegrationKind {
@@ -132,7 +132,7 @@ enum IntegrationKind {
   rapt
 
   @@map("integration_kind")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model User {
@@ -163,7 +163,7 @@ model User {
 
   @@index([email])
   @@map("users")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model Workspace {
@@ -200,7 +200,7 @@ model Workspace {
   aiProposals   AiProposal[]
 
   @@map("workspaces")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model BrewdaySettings {
@@ -218,7 +218,7 @@ model BrewdaySettings {
 
   @@index([workspaceId])
   @@map("brewday_settings")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model BrewSession {
@@ -250,7 +250,7 @@ model BrewSession {
   @@index([workspaceId, recipeId])
   @@unique([workspaceId, code])
   @@map("brew_sessions")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model Integration {
@@ -271,7 +271,7 @@ model Integration {
   @@index([workspaceId])
   @@index([kind])
   @@map("integrations")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model IntegrationDevice {
@@ -295,7 +295,7 @@ model IntegrationDevice {
   @@index([integrationId])
   @@index([lastSeenAt])
   @@map("integration_devices")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model IntegrationDeviceAttachment {
@@ -312,7 +312,7 @@ model IntegrationDeviceAttachment {
   @@index([brewSessionId])
   @@index([deviceId, detachedAt])
   @@map("integration_device_attachments")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model IntegrationReading {
@@ -334,7 +334,7 @@ model IntegrationReading {
   @@index([brewSessionId])
   @@index([receivedAt])
   @@map("integration_readings")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model Ad {
@@ -363,7 +363,7 @@ model Ad {
   @@index([startsAt])
   @@index([endsAt])
   @@map("ads")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model WorkspaceMember {
@@ -380,7 +380,7 @@ model WorkspaceMember {
   @@index([userId])
   @@index([workspaceId])
   @@map("workspace_members")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model Session {
@@ -398,7 +398,7 @@ model Session {
   @@index([expiresAt])
   @@index([activeWorkspaceId])
   @@map("sessions")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model WebviewExchangeCode {
@@ -425,7 +425,7 @@ model WebviewExchangeCode {
   @@index([expiresAt])
   @@index([usedAt])
   @@map("webview_exchange_codes")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model EmailVerificationToken {
@@ -442,7 +442,7 @@ model EmailVerificationToken {
   @@index([expiresAt])
   @@index([email])
   @@map("email_verification_tokens")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model BeerStyle {
@@ -467,7 +467,7 @@ model BeerStyle {
   @@index([source, version])
   @@index([code])
   @@map("beer_styles")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model BeerStyleAlias {
@@ -482,7 +482,7 @@ model BeerStyleAlias {
 
   @@index([styleKey])
   @@map("beer_style_aliases")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model Recipe {
@@ -514,7 +514,7 @@ model Recipe {
   @@unique([workspaceId, versionGroupId, version])
   @@index([styleKey])
   @@map("recipes")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model BrewSessionStep {
@@ -560,7 +560,7 @@ model BrewSessionStep {
   @@index([sectionId])
   @@index([relativeToStepId])
   @@map("brew_session_steps")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model BrewSessionLog {
@@ -579,7 +579,7 @@ model BrewSessionLog {
   @@index([stepId])
   @@index([brewSessionId, createdAt])
   @@map("brew_session_logs")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model RecipeWaterSettings {
@@ -736,7 +736,7 @@ model RecipeWaterSettings {
   @@index([recipeId])
   @@index([workspaceId])
   @@map("recipe_water_settings")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model WaterProfile {
@@ -777,7 +777,7 @@ model WaterProfile {
   @@index([type])
   @@index([workspaceId])
   @@map("water_profiles")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model EquipmentProfile {
@@ -804,11 +804,12 @@ model EquipmentProfile {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  vessels     Vessel[]
 
   @@unique([workspaceId, name])
   @@index([workspaceId])
   @@map("equipment_profiles")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model Fermentable {
@@ -857,7 +858,7 @@ model Fermentable {
   @@index([name])
   @@index([producer])
   @@map("fermentables")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model Hop {
@@ -885,7 +886,7 @@ model Hop {
   @@index([workspaceId])
   @@index([name])
   @@map("hops")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model Yeast {
@@ -927,7 +928,7 @@ model Yeast {
   @@index([productId])
   @@index([species])
   @@map("yeasts")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model IngredientSource {
@@ -949,7 +950,7 @@ model IngredientSource {
   @@unique([sourceName, resourcePath])
   @@index([sourceName])
   @@map("ingredient_sources")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model IngredientImportRun {
@@ -969,7 +970,7 @@ model IngredientImportRun {
   @@index([sourceId])
   @@index([startedAt])
   @@map("ingredient_import_runs")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model IngredientStagingRow {
@@ -988,7 +989,7 @@ model IngredientStagingRow {
   @@index([kind])
   @@index([sourceKey])
   @@map("ingredient_staging_rows")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model IngredientSourceMap {
@@ -1019,7 +1020,7 @@ model IngredientSourceMap {
   @@index([hopId])
   @@index([yeastId])
   @@map("ingredient_source_maps")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum InventoryCategory {
@@ -1031,7 +1032,7 @@ enum InventoryCategory {
   kegging
 
   @@map("inventory_category")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum InventoryUnit {
@@ -1041,7 +1042,7 @@ enum InventoryUnit {
   count
 
   @@map("inventory_unit")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 model InventoryItem {
@@ -1061,7 +1062,7 @@ model InventoryItem {
   @@index([workspaceId])
   @@index([workspaceId, category])
   @@map("inventory_items")
-  @@schema("public")
+  @@schema("brewery")
 }
 
 enum BillingTier {
@@ -1071,7 +1072,7 @@ enum BillingTier {
   pro_plus
 
   @@map("billing_tier")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum BillingSource {
@@ -1081,7 +1082,7 @@ enum BillingSource {
   manual
 
   @@map("billing_source")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum BillingPurchaseProvider {
@@ -1090,7 +1091,7 @@ enum BillingPurchaseProvider {
   google
 
   @@map("billing_purchase_provider")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum BillingPurchaseIntentMode {
@@ -1098,7 +1099,7 @@ enum BillingPurchaseIntentMode {
   restore
 
   @@map("billing_purchase_intent_mode")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum BillingPurchaseIntentStatus {
@@ -1108,7 +1109,7 @@ enum BillingPurchaseIntentStatus {
   cancelled
 
   @@map("billing_purchase_intent_status")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum BillingEventProvider {
@@ -1116,7 +1117,7 @@ enum BillingEventProvider {
   revenuecat
 
   @@map("billing_event_provider")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model WorkspaceBilling {
@@ -1140,7 +1141,7 @@ model WorkspaceBilling {
   @@index([workspaceId])
   @@index([stripeSubscriptionId])
   @@map("workspace_billing")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model BillingPurchaseIntent {
@@ -1170,7 +1171,7 @@ model BillingPurchaseIntent {
   @@index([expiresAt])
   @@index([userId, workspaceId])
   @@map("billing_purchase_intents")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model BillingUserWorkspaceBinding {
@@ -1187,7 +1188,7 @@ model BillingUserWorkspaceBinding {
 
   @@index([workspaceId])
   @@map("billing_user_workspace_binding")
-  @@schema("public")
+  @@schema("platform")
 }
 
 model BillingEvent {
@@ -1210,7 +1211,7 @@ model BillingEvent {
   @@index([userId])
   @@index([workspaceId])
   @@map("billing_events")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum AiProvider {
@@ -1218,7 +1219,7 @@ enum AiProvider {
   openai
 
   @@map("ai_provider")
-  @@schema("public")
+  @@schema("platform")
 }
 
 enum AiProposalStatus {
@@ -1227,7 +1228,7 @@ enum AiProposalStatus {
   rejected
 
   @@map("ai_proposal_status")
-  @@schema("public")
+  @@schema("platform")
 }
 
 /**
@@ -1261,7 +1262,7 @@ model WorkspaceAiSettings {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@map("workspace_ai_settings")
-  @@schema("public")
+  @@schema("platform")
 }
 
 /**
@@ -1291,7 +1292,7 @@ model WorkspaceAiMemory {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@map("workspace_ai_memory")
-  @@schema("public")
+  @@schema("platform")
 }
 
 /**
@@ -1324,7 +1325,7 @@ model AiUsageLedger {
   @@index([workspaceId, createdAt(sort: Desc)])
   @@index([userId, createdAt(sort: Desc)])
   @@map("ai_usage_ledger")
-  @@schema("public")
+  @@schema("platform")
 }
 
 /**
@@ -1350,7 +1351,7 @@ model AiProposal {
 
   @@index([workspaceId, createdAt(sort: Desc)])
   @@map("ai_proposals")
-  @@schema("public")
+  @@schema("platform")
 }
 
 // =============================================================================
@@ -1359,11 +1360,9 @@ model AiProposal {
 // First canonical-module schema split. Lives under @@schema("automation") per
 // docs/design/canonical-automation-module-surface.md §7.
 //
-// `Vessel.equipmentProfileId` is an app-level UUID FK to public.equipment_profiles
-// (link mechanism L1 from design §12.3); no Prisma cross-schema @relation is
-// declared here. Application code validates the reference at write time.
-// Upgrade to a formal cross-schema @relation deferred to the H1 2027 brewery
-// canonical-layout migration tranche per RFC-0002 Decision D.
+// `Vessel.equipmentProfileId` is a Prisma cross-schema FK to
+// `brewery.equipment_profiles` (RFC-0010). Nullable — vessels imported from PLC
+// discovery can exist without a brewery profile.
 //
 // Adapter contract types live in @umbraculum/automation-contracts. The Prisma
 // models reference adapter kinds and contract versions as plain strings;
@@ -1385,8 +1384,7 @@ model Vessel {
   /// Not an enum at this stage — design §4 expects this set to evolve as more
   /// adapters land; promotion to enum tracked under sub-plan #9.
   vesselKind          String   @map("vessel_kind")
-  /// App-level FK to public.equipment_profiles.id (L1 mechanism). Nullable —
-  /// vessels imported from PLC discovery can exist without a brewery profile.
+  /// Cross-schema FK to brewery.equipment_profiles (RFC-0010). Nullable.
   equipmentProfileId  String?  @map("equipment_profile_id")
   adapterConnectionId String?  @map("adapter_connection_id")
   /// Operational mode reported by the adapter (e.g. "fermenter", "brite_stage_1").
@@ -1402,6 +1400,7 @@ model Vessel {
   updatedAt           DateTime @updatedAt @map("updated_at")
 
   adapterConnection AdapterConnection?      @relation(fields: [adapterConnectionId], references: [id])
+  equipmentProfile  EquipmentProfile?       @relation(fields: [equipmentProfileId], references: [id], onDelete: SetNull)
   alarmEvents       AutomationAlarmEvent[]
 
   @@unique([workspaceId, code])

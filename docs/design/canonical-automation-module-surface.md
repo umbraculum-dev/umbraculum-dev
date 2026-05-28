@@ -51,7 +51,7 @@ Three concerns must not collapse (RFC-0001 §7.1):
 
 | Model | Owner | Schema | Purpose |
 |---|---|---|---|
-| `EquipmentProfile` | Brewery (tier 6) | `public` (until brewery split) | Design-time params for recipes / water |
+| `EquipmentProfile` | Brewery (tier 6) | `brewery.*` | Design-time params for recipes / water |
 | `Vessel` | Canonical `automation` | `automation.vessels` | Runtime instance: mode, temps, alarms, adapter link |
 
 **Link:** `Vessel.equipmentProfileId` → `EquipmentProfile.id` (optional). Vessel-only (PLC import) and profile-only (planning) are both valid.
@@ -116,7 +116,7 @@ PLC releases follow sister-repo validation; platform ships on normal API/web cad
 
 ## 7. Prisma sketch (`automation` schema)
 
-Illustrative; migrations land with implementation. `equipmentProfileId` may be app-level FK to `public.equipment_profiles` until cross-schema relations are enabled.
+Illustrative; migrations land with implementation. `equipmentProfileId` is a Prisma cross-schema FK to `brewery.equipment_profiles` ([RFC-0010](../rfcs/0010-platform-brewery-postgres-schema-split.md)).
 
 ```prisma
 model Vessel {
@@ -248,7 +248,6 @@ Per [`docs/ROADMAP.md`](../ROADMAP.md) H2 2026 AI-first; full MRP ↔ automation
 ## 11. Non-goals
 
 - `eslint-plugin-boundaries` for `modules/automation/` (RFC-0001 follow-on).
-- `brewery` schema split from `public`.
 - MRP ↔ vessel scheduling.
 - Native automation screens beyond minimal status unless proven.
 - Elevating this artifact to a separate Accepted RFC (RFC-0003) unless a future governance change explicitly requires the RFC track; canonical status and layout are already committed in RFC-0001 and RFC-0002.
@@ -274,8 +273,8 @@ The OpenPLC sister repo today is a **dev / pilot** — not deployed in any custo
 
 ### 12.3 B2 — `Vessel.equipmentProfileId` cross-schema link
 
-- **Mechanism (L1).** App-level UUID FK: `equipmentProfileId String?` on `Vessel`, nullable, no Prisma `@relation` across schemas. Application code validates the referenced `public.equipment_profiles.id` exists at write time.
-- **Future upgrade path (L2).** Brewery's TypeScript file layout has already migrated to the canonical β shape under RFC-0006; the remaining upgrade is the higher-risk data-layer decision. Move to a formal Prisma cross-schema relation only when the brewery schema split or another adjacent data migration justifies it. Backfill is a one-shot data-integrity check + relation declaration; no data migration required.
+- **Mechanism (L2 — shipped RFC-0010).** Prisma cross-schema FK: `equipmentProfileId String?` on `automation.Vessel` → `brewery.EquipmentProfile`, nullable, `@relation` with `onDelete: SetNull`. Application services still validate profile existence at write time.
+- **Prior L1 path.** Before RFC-0010, the link was an app-level UUID FK with no Prisma `@relation` across schemas; backfill + relation declaration completed in the schema-split migration.
 - **Cardinality — N:1 (industry-standard).** Multiple `Vessel` rows may reference the same `EquipmentProfile`. Concrete brewery example: one profile `P-FV-15bbl-Std` (15 bbl conical, glycol, 2" arm) referenced by four physical vessels K1, K2, K3, K4. Same physical layout, single design record, single calibration update applies to all four. The 1-of-1 case (mash tun, kettle, HLT — typically unique designs in a brewery) is the trivial sub-case of N:1 and is allowed without special handling.
 - **Profile delete semantics.** Default is **block** when any vessel references the profile; the API returns a clear error naming the referencing vessel codes. Explicit detach is supported via an opt-in flag (e.g. `?cascade=detach`) — never silent. Avoids surprise data loss while keeping the operator override path explicit.
 - **Tier interactions.** Automation not installed → brewery never reads or writes the field. Brewery not installed (post-canonical hypothetical) → the field stays nullable; vessels without profiles are allowed.
@@ -325,7 +324,7 @@ Phase B is split into three reviewable commits, B-1 → B-3, all landing in `umb
 | B-2 | `services/api/src/modules/automation/adapters/mockAdapter.ts` (deterministic `AutomationAdapterDefinition` impl, no real Modbus, `automation.mock.v0` kind); `services/vesselsService.ts` (DB read with `assertMembership` + `VesselStateSchema.parse(...)` translation); `routes/automationVesselsRoutes.ts` (`GET /automation/vessels`, `GET /automation/vessels/:code`, workspace-scoped, response shapes pinned via `VesselListResponseSchema` / `VesselStateResponseSchema`); AI tools `automation.listVessels` + `automation.vesselState` registered alongside brewery tools in `app.ts`; `packages/automation-contracts/src/adapter.ts` migrated to Zod schemas (`VesselSnapshotSchema`, `VesselStateSchema`, `VesselListResponseSchema`, `VesselStateResponseSchema`, `AdapterCapabilitiesSchema`) per RFC-0003; vitest unit tests for the mock adapter + the new schemas | **Done — 2026-05-19** |
 | B-3 | `apps/web/app/[locale]/(automation)/page.tsx` (vessel list); `apps/web/app/[locale]/(automation)/[vesselCode]/page.tsx` (vessel detail); top-nav entry in `PrimaryNav.tsx` + `automation` i18n namespace (English + Italian placeholder); api integration tests in `services/api/src/tests/automationVessels.test.ts` covering 401 unauth, list happy path with deterministic `code asc` ordering, get-by-code happy path + 404, **L2 cross-workspace isolation pins** (shared-code collision + B-only code 404 from A); api typecheck clean; full api vitest suite green (51 files / 413 tests); web typecheck has no new errors beyond the pre-existing project-wide Tamagui shorthand-prop type-resolution issue; `services/api/src/modules/automation/README.md` now carries an **automation-vs-crp surface-boundary guardrail** + "how to insert demo vessels locally" note (no seed extension per design) | **Done — 2026-05-19** |
 
-**B-1 invariants captured.** The migration is forward-only: existing tables stay in `public` (no rename, no data migration); the only structural change is the new `automation` schema. The cross-schema `equipmentProfileId` is the L1 app-level FK from §12.3 (no Prisma `@relation` across schemas yet). The adapter contract version handshake (`AdapterConnection.contractVersion` ↔ `MAILBOX_SPEC.contractVersion` from `@umbraculum/automation-contracts`) is wired into the table shape but not yet enforced — enforcement lands with the real `brewery.openplc.v1` adapter in Phase C.
+**B-1 invariants captured.** The migration is forward-only: existing tables stay in `public` (no rename, no data migration); the only structural change is the new `automation` schema. The cross-schema `equipmentProfileId` was L1 app-level at B-1 ship; RFC-0010 upgraded it to a formal Prisma `@relation` to `brewery.EquipmentProfile`. The adapter contract version handshake (`AdapterConnection.contractVersion` ↔ `MAILBOX_SPEC.contractVersion` from `@umbraculum/automation-contracts`) is wired into the table shape but not yet enforced — enforcement lands with the real `brewery.openplc.v1` adapter in Phase C.
 
 **B-1 follow-on captured for module-sdk.** `@umbraculum/module-sdk`'s `registerModule()` uses a process-wide singleton registry that throws on duplicate registration. The api `vitest.setup.ts` clears it between test files and `services/api/src/modules/automation/index.ts` carries an idempotent guard for intra-file repeats. The cleaner long-term fix is to split metadata-recording (process-wide, idempotent) from per-app route registration in module-sdk itself; tracked as a sub-plan #9 follow-on (sub-plan #9 scoping pass done 2026-05-19 — see [`brewery-scope-migration-plan.md`](./brewery-scope-migration-plan.md); the metadata/registration split is a *post-rename* refactor expected to land after slot 11 closes the `@umbraculum/module-sdk` rename).
 

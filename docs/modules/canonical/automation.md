@@ -118,11 +118,11 @@ A built-in reference adapter for development and testing lives in [`services/api
 
 Three tables ([`services/api/prisma/schema.prisma`](../../../services/api/prisma/schema.prisma), surface sketch in [canonical-automation-module-surface.md §7](../../design/canonical-automation-module-surface.md)):
 
-- `Vessel` — runtime instance: workspace-scoped `code`, kind, mode, current/target temps, alarm state, last-seen-at. Optional FK to `EquipmentProfile` (cross-schema, L1 app-level for now per [surface design §12.3](../../design/canonical-automation-module-surface.md)).
+- `Vessel` — runtime instance: workspace-scoped `code`, kind, mode, current/target temps, alarm state, last-seen-at. Optional FK to `brewery.EquipmentProfile` (Prisma cross-schema `@relation` per [RFC-0010](../../rfcs/0010-platform-brewery-postgres-schema-split.md) and [surface design §12.3](../../design/canonical-automation-module-surface.md)).
 - `AdapterConnection` — one per installed PLC connection: `adapterKind`, `contractVersion`, `runtimeVersion`, `status`. Carries the version handshake.
 - `AutomationAlarmEvent` — open/cleared alarm records with code / severity / message / `raisedAt` / `clearedAt`. Phase D enables raise-and-clear flow.
 
-The cross-schema FK to `public.equipment_profiles` is app-level today. Brewery's TypeScript file layout has already migrated to the β shape under RFC-0006; a formal Prisma `@relation` across schemas remains a future data-layer upgrade tied to the brewery schema split or another adjacent data migration ([surface design §12.3](../../design/canonical-automation-module-surface.md)).
+The cross-schema FK to `brewery.equipment_profiles` uses a formal Prisma `@relation` ([RFC-0010](../../rfcs/0010-platform-brewery-postgres-schema-split.md); [surface design §12.3](../../design/canonical-automation-module-surface.md)).
 
 ---
 

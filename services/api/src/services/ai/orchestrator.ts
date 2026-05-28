@@ -89,8 +89,8 @@ async function readRoleUsage(
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const rows = await prisma.$queryRawUnsafe<{ role: string; total: bigint }[]>(
     `SELECT wm.role::text AS role, COALESCE(SUM(l.tokens_in + l.tokens_out), 0) AS total
-     FROM ai_usage_ledger l
-     INNER JOIN workspace_members wm ON wm.workspace_id = l.workspace_id AND wm.user_id = l.user_id
+     FROM platform.ai_usage_ledger l
+     INNER JOIN platform.workspace_members wm ON wm.workspace_id = l.workspace_id AND wm.user_id = l.user_id
      WHERE l.workspace_id = $1 AND l.created_at >= $2
      GROUP BY wm.role`,
     workspaceId,

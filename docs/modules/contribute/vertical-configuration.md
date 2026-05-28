@@ -180,7 +180,7 @@ Most third-party verticals stay external (Tier 6 community-built); a few may eve
 
 ## 6. Worked example
 
-Read [`verticals/brewery/README.md`](../verticals/brewery/README.md) end-to-end — it documents the brewery vertical as a reference vertical, including the β file layout that now exists, the remaining Prisma-schema deferral, and every brewery-specific surface (routes, packages, docs, i18n namespace) so you have a concrete checklist for what your own vertical needs.
+Read [`verticals/brewery/README.md`](../verticals/brewery/README.md) end-to-end — it documents the brewery vertical as a reference vertical, including the β file layout, the shipped `platform.*` + `brewery.*` Prisma schemas ([RFC-0010](../../rfcs/0010-platform-brewery-postgres-schema-split.md)), and every brewery-specific surface (routes, packages, docs, i18n namespace) so you have a concrete checklist for what your own vertical needs.
 
 ---
 

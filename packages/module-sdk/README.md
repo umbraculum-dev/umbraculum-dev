@@ -96,6 +96,7 @@ Modules contribute per-tier limit slices; the platform merges them at runtime vi
 ```typescript
 registerModule(app, {
   code: "brewery",
+  prismaSchema: "brewery",
   tierLimits: (tier) => ({
     maxRecipesPerWorkspace: tier === "free" ? 5 : 25,
     maxVersionsPerRecipe: tier === "free" ? 2 : 3,

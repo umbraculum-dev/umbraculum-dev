@@ -195,7 +195,8 @@ interface RegisterModuleOptions<TApp = unknown> {
     routes?: readonly ModuleRouteRegistrar<TApp>[];
     /**
      * Postgres schema name when Prisma `multiSchema` is enabled for this module.
-     * Canonical modules use the code; brewery-vertical tables may stay in `public` until migrated.
+     * Canonical modules and tier-6 verticals use the module `code` (e.g. `brewery`, `automation`).
+     * Horizontal platform models live in the `platform` schema (no module registration).
      */
     prismaSchema?: string;
     /** Stripe / RevenueCat addon codes this module owns. */
