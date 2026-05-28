@@ -121,6 +121,65 @@ function toGithubUrl(targetPath: string, suffix: string): string {
   return `${githubBase}/${kind}/master/${encodeURI(relativePath)}${suffix}`;
 }
 
+const CONTRACTS_VERSION_MARKER = '**Contract version:**';
+
+function injectContractsVersionBanner(
+  filePath: string,
+  fileContent: string,
+): string {
+  if (!filePath.includes(`${path.sep}packages${path.sep}`)) {
+    return fileContent;
+  }
+
+  if (!filePath.endsWith(`${path.sep}README.md`)) {
+    return fileContent;
+  }
+
+  const packageDir = path.dirname(filePath);
+  const packageName = path.basename(packageDir);
+  if (!packageName.endsWith('-contracts')) {
+    return fileContent;
+  }
+
+  if (fileContent.includes(CONTRACTS_VERSION_MARKER)) {
+    return fileContent;
+  }
+
+  const versionPath = path.join(packageDir, 'src', 'version.ts');
+  if (!fs.existsSync(versionPath)) {
+    return fileContent;
+  }
+
+  const versionSrc = fs.readFileSync(versionPath, 'utf8');
+  const versionMatch = versionSrc.match(
+    /export const CONTRACT_VERSION\s*=\s*"([^"]+)"/,
+  );
+  if (!versionMatch) {
+    return fileContent;
+  }
+
+  const contractVersion = versionMatch[1];
+  const banner = [
+    '',
+    '> [!INFO]',
+    `> **Contract version:** \`${contractVersion}\` (from \`src/version.ts\`). Pin npm as \`@umbraculum/${packageName}@${contractVersion}\`. Per [RFC-0005](/rfcs/docs-site) this page tracks \`master\` until the first P6 docs snapshot is cut.`,
+    '',
+  ].join('\n');
+
+  const afterNote = fileContent.replace(
+    /(> \[!NOTE\][\s\S]*?)\n\n/,
+    `$1\n${banner}\n`,
+  );
+  if (afterNote !== fileContent) {
+    return afterNote;
+  }
+
+  return fileContent.replace(
+    /(^#[^\n]+\n(?:[^\n#].*\n)?)\n/,
+    `$1${banner}\n`,
+  );
+}
+
 function toReferenceDocsUrl(sourcePath: string, targetPath: string): string | undefined {
   const referenceRoots: Array<{root: string; routeBase: string}> = [
     {root: path.resolve(repoRoot, 'apps'), routeBase: 'reference/apps'},
@@ -328,14 +387,21 @@ const config: Config = {
     format: 'detect',
     mermaid: true,
     preprocessor: ({filePath, fileContent}) => {
-      if (path.basename(filePath) !== 'REPOSITORY-STRUCTURE.md') {
-        return fileContent;
+      let content = fileContent;
+
+      if (path.basename(filePath) === 'REPOSITORY-STRUCTURE.md') {
+        content = content.replace(
+          /```mermaid[\s\S]*?```/,
+          '![Repository structure dependency diagram](/img/repository-structure.svg)',
+        );
       }
 
-      return fileContent.replace(
-        /```mermaid[\s\S]*?```/,
-        '![Repository structure dependency diagram](/img/repository-structure.svg)',
+      content = injectContractsVersionBanner(
+        filePath ? path.resolve(filePath) : '',
+        content,
       );
+
+      return content;
     },
     hooks: {
       onBrokenMarkdownLinks: 'ignore',
@@ -401,7 +467,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `© ${new Date().getFullYear()} Umbraculum contributors. Documentation is AGPLv3-aligned with the monorepo core.`,
+      copyright: `Public alpha (target <time datetime="2026-07-01">1&nbsp;July&nbsp;2026</time>) · docs track <code>master</code><br />© ${new Date().getFullYear()} Umbraculum contributors. Documentation is AGPLv3-aligned with the monorepo core.`,
     },
     prism: {
       theme: prismThemes.github,
