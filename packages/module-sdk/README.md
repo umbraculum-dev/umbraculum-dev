@@ -89,6 +89,22 @@ registerModule(app, {
 
 Registry helpers: `collectModulePromptOverlayTexts()`, `collectModuleKnowledgeSnippets()`, `resolveRoutePromptOverlay(routeId)`.
 
+## Tier-limit registration — `registerModule({ tierLimits })`
+
+Modules contribute per-tier limit slices; the platform merges them at runtime via `composeModuleTierLimitSlices(tier)` (alphabetical module-code order). Platform-owned keys (`aiEnabled` today) are reserved — modules must not claim them (`ReservedTierLimitKeyError`). Duplicate keys across modules fail at boot (`TierLimitKeyCollisionError`).
+
+```typescript
+registerModule(app, {
+  code: "brewery",
+  tierLimits: (tier) => ({
+    maxRecipesPerWorkspace: tier === "free" ? 5 : 25,
+    maxVersionsPerRecipe: tier === "free" ? 2 : 3,
+  }),
+});
+```
+
+The API's `getTierLimits(tier)` in `services/api/src/services/tierLimitsService.ts` returns `{ ...platformSlice, ...composeModuleTierLimitSlices(tier) }` after module boot.
+
 ## Document-template registration — `registerModule({ documentTemplates })`
 
 [RFC-0007](../../docs/rfcs/0007-canonical-document-rendering.md) adds document / file rendering to the platform consumption contract. Modules contribute typed templates through the SDK; the platform-owned `@umbraculum/rendering` package owns the engines and job runner.

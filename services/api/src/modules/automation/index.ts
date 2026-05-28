@@ -5,6 +5,7 @@ import {
 } from "@umbraculum/module-sdk";
 
 import { automationVesselsRoutes } from "./routes/automationVesselsRoutes.js";
+import { automationTierLimits } from "./tierLimits.js";
 import { registerAutomationTools } from "../../services/ai/tools/automation/index.js";
 import {
   AUTOMATION_MODULE_OVERLAY,
@@ -28,8 +29,8 @@ const MODULE_CODE = "automation";
  *     source-of-truth for any nav-from-registry refactor.
  *   - AI-tool registration is declared on the module metadata and invoked
  *     by the platform's single AI registry during the AI plugin boot block.
- *   - No tier-limits contributor yet — added with the first vessel-create
- *     route in Phase C (`maxVessels`, `maxAdaptersConnected` per design §8.2).
+ *   - Tier-limit contributor registered now (`maxVessels`, `maxAdaptersConnected`,
+ *     `automationAiToolsEnabled` per design §8.2); route enforcement deferred to Phase C.
  *   - No adapter supervisor loop yet — the mock adapter
  *     (`adapters/mockAdapter.ts`) exists for tests + Phase C development, but
  *     no background snapshot reconciliation runs.
@@ -72,6 +73,7 @@ export function registerAutomationModule(app: FastifyInstance): void {
       code: MODULE_CODE,
       prismaSchema: "automation",
       addonCodes: ["automation_module"],
+      tierLimits: automationTierLimits,
       registerAiTools(registry, instance) {
         registerAutomationTools(registry, instance.prisma);
       },

@@ -59,7 +59,7 @@ export interface RegisterModuleOptions<TApp = unknown> {
   prismaSchema?: string;
   /** Stripe / RevenueCat addon codes this module owns. */
   addonCodes?: readonly string[];
-  /** Per-tier limit slice merged by the platform billing layer (future). */
+  /** Per-tier limit slice merged by the platform billing layer at runtime. */
   tierLimits?: TierLimitsContributor;
   /** Register AI tools into the platform orchestrator registry at API boot. */
   registerAiTools?: ModuleAiToolRegistrar<TApp>;

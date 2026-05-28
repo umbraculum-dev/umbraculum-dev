@@ -11,6 +11,99 @@ function isCanonicalModuleCode(code) {
   return RESERVED_CANONICAL_MODULE_CODES.includes(code);
 }
 
+// src/tierLimits.ts
+var PLATFORM_RESERVED_TIER_LIMIT_KEYS = ["aiEnabled"];
+var TIER_LIMIT_KEY_PATTERN = /^[a-z][a-zA-Z0-9]*$/;
+var tierLimitKeyOwnerByKey = /* @__PURE__ */ new Map();
+var tierLimitKeysByModule = /* @__PURE__ */ new Map();
+var TierLimitKeyCollisionError = class extends Error {
+  key;
+  attemptingModuleCode;
+  existingOwnerModuleCode;
+  constructor(key, attemptingModuleCode, existingOwnerModuleCode) {
+    super(
+      `registerModule(${attemptingModuleCode}): tierLimits key "${key}" is already owned by module "${existingOwnerModuleCode}"`
+    );
+    this.name = "TierLimitKeyCollisionError";
+    this.key = key;
+    this.attemptingModuleCode = attemptingModuleCode;
+    this.existingOwnerModuleCode = existingOwnerModuleCode;
+  }
+};
+var ReservedTierLimitKeyError = class extends Error {
+  key;
+  moduleCode;
+  constructor(key, moduleCode) {
+    super(
+      `registerModule(${moduleCode}): tierLimits key "${key}" is reserved for the platform (${PLATFORM_RESERVED_TIER_LIMIT_KEYS.join(", ")})`
+    );
+    this.name = "ReservedTierLimitKeyError";
+    this.key = key;
+    this.moduleCode = moduleCode;
+  }
+};
+var InvalidTierLimitKeyError = class extends Error {
+  key;
+  moduleCode;
+  constructor(key, moduleCode) {
+    super(
+      `registerModule(${moduleCode}): invalid tierLimits key "${key}" (expected camelCase starting with a lowercase letter)`
+    );
+    this.name = "InvalidTierLimitKeyError";
+    this.key = key;
+    this.moduleCode = moduleCode;
+  }
+};
+var InvalidTierLimitValueError = class extends Error {
+  key;
+  moduleCode;
+  constructor(key, moduleCode, value) {
+    super(
+      `registerModule(${moduleCode}): tierLimits["${key}"] must be number or boolean (got ${typeof value})`
+    );
+    this.name = "InvalidTierLimitValueError";
+    this.key = key;
+    this.moduleCode = moduleCode;
+  }
+};
+function isReservedPlatformTierLimitKey(key) {
+  return PLATFORM_RESERVED_TIER_LIMIT_KEYS.includes(key);
+}
+function assertValidTierLimitSlice(moduleCode, slice) {
+  const keys = [];
+  for (const [key, value] of Object.entries(slice)) {
+    if (!TIER_LIMIT_KEY_PATTERN.test(key)) {
+      throw new InvalidTierLimitKeyError(key, moduleCode);
+    }
+    if (typeof value !== "number" && typeof value !== "boolean") {
+      throw new InvalidTierLimitValueError(key, moduleCode, value);
+    }
+    if (isReservedPlatformTierLimitKey(key)) {
+      throw new ReservedTierLimitKeyError(key, moduleCode);
+    }
+    const existingOwner = tierLimitKeyOwnerByKey.get(key);
+    if (existingOwner !== void 0) {
+      throw new TierLimitKeyCollisionError(key, moduleCode, existingOwner);
+    }
+    keys.push(key);
+  }
+  return keys;
+}
+function validateAndIndexTierLimits(moduleCode, tierLimits) {
+  const keys = assertValidTierLimitSlice(moduleCode, tierLimits("free"));
+  for (const key of keys) {
+    tierLimitKeyOwnerByKey.set(key, moduleCode);
+  }
+  tierLimitKeysByModule.set(moduleCode, keys);
+}
+function clearTierLimitRegistryForTests() {
+  tierLimitKeyOwnerByKey.clear();
+  tierLimitKeysByModule.clear();
+}
+function listRegisteredTierLimitKeys(moduleCode) {
+  return tierLimitKeysByModule.get(moduleCode) ?? [];
+}
+
 // src/moduleRegistry.ts
 var modulesByCode = /* @__PURE__ */ new Map();
 var documentTemplatesByRef = /* @__PURE__ */ new Map();
@@ -136,6 +229,9 @@ function recordModuleRegistration(options) {
   assertModuleCodeAvailable(options.code);
   const documentTemplates = validateDocumentTemplates(options.code, options.documentTemplates ?? []);
   validateAndIndexAiPrompts(options.code, options.aiPrompts);
+  if (options.tierLimits !== void 0) {
+    validateAndIndexTierLimits(options.code, options.tierLimits);
+  }
   modulesByCode.set(options.code, options);
   for (const template of documentTemplates) {
     documentTemplatesByRef.set(template.ref, {
@@ -190,6 +286,17 @@ function clearModuleRegistryForTests() {
   modulesByCode.clear();
   documentTemplatesByRef.clear();
   routePromptOverlayByRouteId.clear();
+  clearTierLimitRegistryForTests();
+}
+function composeModuleTierLimitSlices(tier) {
+  const merged = {};
+  for (const [, entry] of Array.from(modulesByCode.entries()).sort(
+    ([a], [b]) => a.localeCompare(b)
+  )) {
+    if (entry.tierLimits === void 0) continue;
+    Object.assign(merged, entry.tierLimits(tier));
+  }
+  return merged;
 }
 function collectRegisteredModulePromptOverlays() {
   return Array.from(modulesByCode.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([code, entry]) => {
@@ -531,11 +638,16 @@ export {
   InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
   InvalidModuleCodeError,
+  InvalidTierLimitKeyError,
+  InvalidTierLimitValueError,
   InvalidUrlSegmentError,
   ModuleCodeAlreadyRegisteredError,
   NavEntryPrimarySegmentNotOwnedError,
+  PLATFORM_RESERVED_TIER_LIMIT_KEYS,
   PLATFORM_WEB_SHELL_NAV_ENTRIES,
   RESERVED_CANONICAL_MODULE_CODES,
+  ReservedTierLimitKeyError,
+  TierLimitKeyCollisionError,
   UrlSegmentAlreadyOwnedError,
   aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable,
@@ -546,6 +658,7 @@ export {
   collectModuleKnowledgeSnippets,
   collectModulePromptOverlayTexts,
   collectRegisteredModulePromptOverlays,
+  composeModuleTierLimitSlices,
   composeWebShellNavItems,
   fromParser,
   getRegisteredDocumentTemplate,
@@ -555,6 +668,7 @@ export {
   listRegisteredDocumentTemplates,
   listRegisteredModules,
   listRegisteredNativeModules,
+  listRegisteredTierLimitKeys,
   listRegisteredWebModules,
   recordModuleRegistration,
   registerBuiltinWebModulesIfAbsent,

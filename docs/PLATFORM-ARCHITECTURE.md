@@ -163,9 +163,9 @@ Honest inventory of what is already platform-shaped versus what is brewery-coupl
 - Brewing-device integrations: `integrationsTilt.ts`, `integrationsTiltIngest.ts`, `integrationsReveal.ts`, `integrationsGeneric.ts`.
 - Ads: `ads.ts`, `platformAds.ts` (the framework is reusable, the placements are brewery-flavored).
 
-**Cross-cutting today, but brewery-shaped:**
+**Cross-cutting today (module-aware tier limits — scaffold shipped):**
 
-- [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts) defines brewery limits and the `aiEnabled` feature flag. That is correct for the completed H2 AI unlock, but the shape is still not module-aware (WMS will want `maxWarehouses`, CRM will want `maxContacts`, and future managed AI may want credit allowances).
+- [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts) owns the platform slice (`aiEnabled` only). Brewery and automation contribute `tierLimits(tier)` slices via `registerModule()`; the SDK merges them at boot through `composeModuleTierLimitSlices()`. Future modules (WMS, CRM, …) add their own keys; collision with platform-reserved keys or another module's keys is a boot error. Route enforcement for automation caps remains Phase C; recipe/version caps still gate in `recipesService`.
 
 **Registration shape:**
 
@@ -238,7 +238,7 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 ### 3.6 Billing + tier model
 
 - `WorkspaceBilling` + `BillingTier` (`free | premium | pro | pro_plus`) + `BillingPurchaseIntent` + `WorkspaceBillingService` is **workspace-scoped** — exactly the right shape for a multi-module suite, since each module's value applies to a workspace.
-- Tier limits live in [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts). The current shape includes recipe/version limits plus `aiEnabled`, where `free=false` and `premium | pro | pro_plus=true`.
+- Tier limits live in [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts). The platform owns `aiEnabled` (`free=false`, `premium | pro | pro_plus=true`); modules contribute slices merged at runtime (`maxRecipesPerWorkspace` / `maxVersionsPerRecipe` from brewery; `maxVessels` / `maxAdaptersConnected` / `automationAiToolsEnabled` from automation). Billing returns the composed object as opaque `limits`.
 - The H2 AI backbone intentionally reuses existing `WorkspaceBilling` infrastructure. A free workspace upgrades through the existing billing-intent flow; after Stripe webhook processing moves the workspace to `premium` or above, AI is unlocked.
 - **Add-on shape is still missing.** There is no `WorkspaceBillingAddon` model, so future per-module entitlements (e.g. "this workspace has the WMS module installed") and optional managed-AI credits have no home today.
 
@@ -253,13 +253,13 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 - Fastify is plugin-composed and `registerModule()` now records module metadata/routes/tool hooks → adding the next module is an extension of the existing pattern, not a core rewrite.
 - Web routes are wrapped in `(brewery)` / `(automation)` / `(pim)` route groups with URL-segment ownership checks; future modules follow the same collision-checked route-shape discipline.
 - Postgres supports multiple schemas; Prisma `multiSchema` preview is stable.
-- Tier-limits service is small enough that making it module-aware is a contained change.
+- **DONE (scaffold):** tier limits are module-aware — platform `aiEnabled` + `composeModuleTierLimitSlices()` at boot; see [`packages/module-sdk/README.md`](../packages/module-sdk/README.md) §"Tier-limit registration".
 
 **Real gaps to plan for (catalog, not commit):**
 
 - Flat Prisma namespace will hurt around 80–100 models.
-- Brewery-shaped `tierLimitsService` needs a module-aware shape before any second module's limits can be expressed.
-- Module registration exists for routes, URL segments, document templates, add-on codes, and AI-tool hooks; remaining registry gaps are richer prompt overlays, knowledge-source registration, tier-limit composition, install/entitlement semantics, and external third-party module loading.
+- ~~Brewery-shaped `tierLimitsService` needs a module-aware shape before any second module's limits can be expressed.~~ **Shipped (scaffold):** platform owns `aiEnabled`; modules contribute `tierLimits` slices merged at runtime via `composeModuleTierLimitSlices()` — see [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts).
+- Module registration exists for routes, URL segments, document templates, add-on codes, and AI-tool hooks; remaining registry gaps are richer prompt overlays, knowledge-source registration, ~~tier-limit composition~~, install/entitlement semantics, and external third-party module loading.
 - AI platform v0 exists and has expanded beyond brewery: paid-tier unlock, usage ledger, workspace memory, module-owned tools for brewery / automation / PIM / MRP / CRP, platform-owned `render_document`, **propose-write** (preview apply), **reporting DSL MVP** (Layer B), **RAG D1** (Layer C over public product docs via pgvector), and **multi-provider BYOK routing** (Anthropic + OpenAI) are shipped post-α H2. Remaining gaps: managed-AI credits, RAG D2–D3 (per-workspace activity timelines + memory unification), richer module knowledge-source registration, and future WMS/CRM tool surfaces.
 - No `WorkspaceBillingAddon` → cannot sell managed-AI credits or per-module entitlements.
 - **Postgres runtime for AI:** dev and CI use `pgvector/pgvector:pg16` (not stock `postgres:16`) so the `vector` extension is available for `ai.doc_chunks`. See [`docs/design/canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md) §2 and [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](POSTGRES-REPLICATION-ARCHITECTURE.md) §"pgvector image".
@@ -432,7 +432,7 @@ Physical directory layout for canonical modules and tier-6 vertical configuratio
 - `@brewery/*` scope split: **DONE under sub-plan #9 (closed 2026-05-19, 14 slots)** — horizontal packages now live under the neutral platform scope `@umbraculum/*`; brewery-vertical packages re-scoped under `@umbraculum/brewery-*` per the §1.3 TRAP-avoidance discipline. See [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) (L1 plan + slot-by-slot recaps + risk register) and [`docs/design/brewery-scope-migration-per-package-handoff.md`](design/brewery-scope-migration-per-package-handoff.md) (per-slot execution log).
 - **DONE (RFC-0006 Week 1 of late-H1-2026):** Web routes wrapped in `(brewery)` Next.js route group (no URL change). Six segments — `recipes/`, `inventory/`, `equipment/`, `water-profiles/`, `brewday-steps-settings/`, `ferm-data-integration/` — moved under `apps/web/app/[locale]/(brewery)/`. The `(brewery)/` group registers all six segments via `registerWebModule({ ownedUrlSegments })`.
 - **DEFERRED:** Brewery-vertical Postgres tables stay in `public`; RFC-0006 §4 explicitly excluded the Prisma `brewery.*` schema split from the Week 1 acceleration (separate, higher-risk migration). New canonical modules (`automation`, `pim`) already get their own Postgres schemas via Prisma `multiSchema`.
-- **STILL OPEN:** `tierLimitsService` becomes module-aware — each module contributes a `tierLimits(tier)` slice; the platform composes them. Not part of the Week-1 audit; tracked for a separate sub-plan.
+- **DONE:** `tierLimitsService` is module-aware — each module contributes a `tierLimits(tier)` slice; the platform composes them via `composeModuleTierLimitSlices()` in `@umbraculum/module-sdk`. Brewery recipe caps and automation §8.2 caps are registered; route enforcement for automation remains Phase C.
 - **DONE (RFC-0006 Week 1):** `app.ts` flat `register` calls for brewery routes consolidated into `registerBreweryModule(app)` (`services/api/src/modules/brewery/index.ts`). 14 brewery API route files moved from `services/api/src/routes/*.ts` to `services/api/src/modules/brewery/routes/*.ts`.
 
 ### 5.3 Net-new before 2nd module ships

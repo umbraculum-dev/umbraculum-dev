@@ -193,6 +193,8 @@ Write/propose flows follow human-in-the-loop per [`PLATFORM-ARCHITECTURE.md`](..
 
 ### 8.2 Tier limits (`tierLimits(tier)` slice)
 
+**Status:** registered at API boot (2026-05-28 scaffold) in [`services/api/src/modules/automation/tierLimits.ts`](../../services/api/src/modules/automation/tierLimits.ts); values appear in billing `limits` JSON. Route enforcement (`maxVessels` on vessel create, `maxAdaptersConnected` on adapter connect) remains Phase C.
+
 | Field | Meaning | Illustrative |
 |---|---|---|
 | `maxVessels` | Vessels per workspace | free 2 / premium 8 / pro 24 / pro_plus 100 |

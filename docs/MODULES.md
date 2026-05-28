@@ -120,6 +120,8 @@ The full set of contributor guides lives under [`modules/contribute/`](modules/c
 
 These attach *to a module*. They are not standalone artifacts. Find the right module's `registerModule({ ... })` call and add the entry there — see §5 for what that looks like for `automation`.
 
+**Tier-limit fields:** add a `tierLimits.ts` helper next to the module's `index.ts` and wire `tierLimits: myModuleTierLimits` on `registerModule()`. Keys must be camelCase; values are `number | boolean`. The platform reserves `aiEnabled` — modules must not claim it. Duplicate keys across modules fail at boot. Runtime merge is `getTierLimits(tier)` in [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts) after module boot. SDK contract: [`packages/module-sdk/README.md`](../packages/module-sdk/README.md) §"Tier-limit registration".
+
 ---
 
 ## 5. Worked example — the `automation` canonical module
@@ -157,6 +159,7 @@ export function registerAutomationModule(app: FastifyInstance): void {
       code: MODULE_CODE,
       prismaSchema: "automation",
       addonCodes: ["automation_module"],
+      tierLimits: automationTierLimits,
       registerAiTools(registry, instance) {
         registerAutomationTools(registry, instance.prisma);
       },
@@ -180,8 +183,9 @@ Three things to notice for your own module:
 1. **`code`** is the canonical code from `RESERVED_CANONICAL_MODULE_CODES` (or your vertical code for Tier 6). Collision is a boot error.
 2. **`prismaSchema`** matches the code by convention. For Tier 6 verticals migrating from `public`, this may be the vertical code or stay as `public` until a dedicated migration ([RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3 Prisma alignment).
 3. **`addonCodes`** is the list of Stripe / RevenueCat addon SKUs your module's paid features unlock through. The platform owns billing — modules declare addon codes, they do not integrate Stripe directly ([RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2).
+4. **`tierLimits`** (optional) contributes per-tier caps merged into billing and enforcement. See [`services/api/src/modules/automation/tierLimits.ts`](../services/api/src/modules/automation/tierLimits.ts) and brewery's [`tierLimits.ts`](../services/api/src/modules/brewery/tierLimits.ts).
 
-The full SDK options surface (route registrars, `tierLimits`, `registerAiTools`, `documentTemplates`) is documented in [`packages/module-sdk/src/types.ts`](../packages/module-sdk/src/types.ts).
+The full SDK options surface (route registrars, `tierLimits`, `registerAiTools`, `documentTemplates`) is documented in [`packages/module-sdk/src/types.ts`](../packages/module-sdk/src/types.ts) and [`packages/module-sdk/README.md`](../packages/module-sdk/README.md).
 
 ### 5.3 The contracts package — what third parties pin
 

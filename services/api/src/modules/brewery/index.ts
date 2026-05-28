@@ -19,6 +19,7 @@ import { stylesRoutes } from "./routes/styles.js";
 import { waterCalcRoutes } from "./routes/waterCalc.js";
 import { waterProfilesRoutes } from "./routes/waterProfiles.js";
 import { breweryDocumentTemplates } from "./documentTemplates.js";
+import { breweryTierLimits } from "./tierLimits.js";
 import { registerBreweryTools } from "../../services/ai/tools/brewery/index.js";
 import {
   BREWERY_KNOWLEDGE,
@@ -71,6 +72,7 @@ export function registerBreweryModule(app: FastifyInstance): void {
     registerModule(app, {
       code: MODULE_CODE,
       addonCodes: ["brewery_module"],
+      tierLimits: breweryTierLimits,
       registerAiTools(registry, instance) {
         registerBreweryTools(registry, instance.prisma);
       },
