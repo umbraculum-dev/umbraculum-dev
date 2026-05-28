@@ -1,0 +1,74 @@
+/**
+ * Brochure-site announcement banner (static HTML).
+ * Visual tokens align with apps/website/public/styles.css — not Tamagui; the
+ * product apps use @umbraculum/ui. Swap copy in ../announcement.config.json.
+ */
+
+.umb-announcement {
+  --umb-announcement-bg: #1e3a5f;
+  --umb-announcement-border: #3d6ea8;
+  --umb-announcement-text: #e8e8e8;
+  --umb-announcement-muted: #b8c9dc;
+  margin: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--umb-announcement-text);
+  background: var(--umb-announcement-bg);
+  border-bottom: 1px solid var(--umb-announcement-border);
+}
+
+.umb-announcement--warning {
+  --umb-announcement-bg: #4a3a12;
+  --umb-announcement-border: #8a7028;
+}
+
+.umb-announcement--critical {
+  --umb-announcement-bg: #4a1a1a;
+  --umb-announcement-border: #a04040;
+}
+
+.umb-announcement__inner {
+  max-width: 52rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.umb-announcement__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.umb-announcement__body a {
+  color: #9fd0ff;
+}
+
+.umb-announcement__body strong {
+  font-weight: 650;
+}
+
+.umb-announcement__dismiss {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--umb-announcement-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--umb-announcement-muted);
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.umb-announcement__dismiss:hover {
+  color: var(--umb-announcement-text);
+  border-color: var(--umb-announcement-text);
+}
+
+.umb-announcement__dismiss:focus-visible {
+  outline: 2px solid #6cb6ff;
+  outline-offset: 2px;
+}

@@ -45,3 +45,18 @@
 .hero {
   background-color: var(--umbraculum-brand-surface);
 }
+
+/* Shared site announcement (copy from apps/website/announcement.config.json) */
+div[class*='announcementBar'] {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+div[class*='announcementBar'] strong {
+  font-weight: 650;
+}
+
+div[class*='announcementBar'] a {
+  color: inherit;
+  text-decoration: underline;
+}

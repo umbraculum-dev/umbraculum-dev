@@ -125,7 +125,7 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 | Channel | Action |
 |---------|--------|
 | GitHub Release | Publish `v0.0.1-alpha` body from announcement draft |
-| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening per [`community-forum-runbook.md`](community-forum-runbook.md) |
+| [Community forum](https://forum.umbraculum.dev) | Cross-post announcement; confirm **Proposals** category + §7 hardening + pinned **How we communicate** (§6 item 5 / §6.1) per [`community-forum-runbook.md`](community-forum-runbook.md) |
 | Brochure / social | Optional short post linking docs + clone URL |
 | Support page | Confirm Liberapay + Buy Me a Coffee links (completed in **2d** before flip) |
 
@@ -135,6 +135,7 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 
 - [ ] `GETTING-STARTED` clone + `docker compose up` path (or document known gaps)
 - [ ] `https://forum.umbraculum.dev/` live (or tracked in [`community-forum-runbook.md`](community-forum-runbook.md) §12 sign-off)
+- [ ] Pinned **How we communicate** topic in **Community policy** (§6.1 — runbook §6 item 5, §7.5)
 - [ ] `docs-readmes` + `docs-site-build` + `website-build` green on `master`
 - [ ] [`AGENTS.md`](../../AGENTS.md) apparatus path: marketplace-first install documented
 - [ ] Update [`ROADMAP.md`](../ROADMAP.md) Week 3 / Phase 2 rows with flip date

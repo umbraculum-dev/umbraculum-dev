@@ -121,7 +121,7 @@ Create categories in **Admin → Categories** (order matters for navigation):
 
 **Pinned topics to create:**
 
-1. **Community policy** — link [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), §6 anti-verticality summary.
+1. **Community policy** — link [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), §6 anti-verticality summary, §6.1 authentic representation.
 2. **How to write a proposal** — template:
 
    ```markdown
@@ -143,6 +143,27 @@ Create categories in **Admin → Categories** (order matters for navigation):
 
 3. **Meeting cadence** — monthly; N + T vote thresholds published before each meeting (§4.2).
 4. **Sponsorship channels (Phase 0)** — link [`donation-channels.md`](donation-channels.md): Liberapay (recurring), Buy Me a Coffee (one-time), in-kind compute §4, escalation triggers §5.
+
+5. **How we communicate** — short human-readable summary + links (required before first public proposal cycle; tracked on [`ROADMAP.md`](../ROADMAP.md) Phase 2 **2d** / **2c** and [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md) §8–§9). Use this body (edit only if policy text changes):
+
+   ```markdown
+   ## How we communicate on this forum
+
+   Umbraculum community spaces are for **real people talking to real people**.
+
+   - You represent **only yourself** (or someone who explicitly asked you to post for them).
+   - **Do not** use AI or automation to post, reply, or vote as another person or as an unnamed “member.”
+   - **Do not** run AI-generated replies in threads (Proposals, Meetings, Help, Introductions) as if a human wrote them.
+   - If a post is **automated** (release bot, meeting reminder), say so at the top: `Automated post — not written by a human`.
+   - If **AI helped you draft** a post you publish, say so briefly (e.g. “Drafted with AI assistance; reviewed and posted by me”).
+
+   The in-app **AI consultant** is a product feature inside workspaces — not a forum participant.
+
+   Full policy: [CORE-DEVELOPMENT-AND-COMMUNITY.md §6.1](https://github.com/umbraculum-dev/umbraculum-dev/blob/master/docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) (link will work after public flip; until then use the doc in your clone).
+   Code of Conduct: [CODE_OF_CONDUCT.md](https://github.com/umbraculum-dev/umbraculum-dev/blob/master/CODE_OF_CONDUCT.md).
+
+   Questions about conduct: conduct@umbraculum.dev
+   ```
 
 **Voting (§4.2):** For each proposal cycle, staff publishes whether that cycle uses **topic likes (reactions)** or a **single-choice poll** (Discourse built-in poll). Record the choice in the meeting-prep topic so thresholds are auditable.
 
@@ -200,8 +221,9 @@ The §6 commitment is: the only **system-initiated** outreach beyond account/sec
 - [ ] Badges off; trust badges off; user directory off
 - [ ] New user digest default = never (or equivalent)
 - [ ] Categories + pinned proposal template live
+- [ ] Pinned **How we communicate** topic live in **Community policy** (§6 item 5 — §6.1 authentic representation)
 - [ ] Test registration + password reset email delivers
-- [ ] CoC and §4.6 policy links visible without login (or in a pinned **Community policy** topic readable by all)
+- [ ] CoC, §6.1, and §4.6 policy links visible without login (or in pinned **Community policy** / **How we communicate** topics readable by all)
 
 ---
 

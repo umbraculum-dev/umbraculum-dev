@@ -265,6 +265,25 @@ Communities that accrete "seniors", "super-starred" profiles, karma scores, or v
 
 **Open at v0.1 — anti-Sybil mitigation for the community-voting mechanism.** With visual anonymity (above) and no reputation, the §4.2 one-vote-per-participant property is gameable by one person opening multiple accounts. We do not consider this resolved at v0.1. One real candidate under consideration is binding voting eligibility to a verified GitHub account, since [DCO](../CONTRIBUTING.md) already grounds commit-layer identity there and reusing that identity layer would be cheap to implement; the tradeoff is that GitHub literacy is unevenly distributed — non-developer community members (operators, brewers, evaluators) may not have or want a GitHub account, and making it the voting prerequisite would re-introduce a form of verticality favoring developers over non-developers, which is at odds with the [`MANIFESTO.md`](../MANIFESTO.md) §2.2 horizontal-accessibility commitment in spirit. Lightweight alternatives (verified email + minimum-account-age-before-voting + manual review on suspicious patterns) are also on the table. This is explicitly open; resolution before the first contested community vote runs in anger; tracked under §9 (revisit cycle).
 
+### 6.1 Authentic representation in community discourse
+
+On Umbraculum **community surfaces** (forum, public meetings, governance threads, official community email), trust attaches to **real people**. A participant is represented only by themselves — or by a **human delegate they have explicitly authorized**. Automated or AI-generated messages must not create the impression that a specific person wrote something they did not.
+
+This is separate from the **in-product AI consultant** ([`AI-CONSULTANT.md`](AI-CONSULTANT.md)) and from **AI-orchestrated code authoring** ([`MANIFESTO.md`](../MANIFESTO.md) §1.2). Those are product and engineering disciplines. This section governs **human-to-human community trust**.
+
+**Rules**
+
+1. **No impersonation.** Do not use AI, scripts, or third-party tools to post, reply, vote, or message **as** another person or as an unnamed “community member.”
+2. **No undisclosed automation.** If a message is sent by a bot, scheduler, or automation on behalf of a role (release notifier, meeting reminder), it must **state that clearly** at the top (e.g. `Automated post — not written by a human`).
+3. **No AI as a faux thread participant (Umbraculum-owned forums).** **Not allowed:** AI-generated replies inside discussion threads (proposals, meetings, Help, Introductions) presented as ordinary human participation. Humans may use AI privately to draft text; what they publish is **their** message and they remain accountable for it.
+4. **Disclosure when AI helped you write.** If you used AI substantially to draft a community post, say so briefly (e.g. “Drafted with AI assistance; reviewed and posted by me”). Light editing of your own words does not require a disclaimer.
+5. **Maintainers and employment.** Official replies from the project (security, conduct, vetoes) come from **identified humans** in maintainer/mod roles — not from AI pretending to be “the team” or a named individual. If the project ever has paid community-facing roles, **representation stays human**; AI will not simulate staff or volunteers in community spaces ([`MANIFESTO.md`](../MANIFESTO.md) §5.2 fair-consideration note).
+6. **Product AI stays in the product.** The workspace AI consultant must not be pointed at community forums or used to answer on behalf of the project or a member in community spaces.
+
+**Enforcement.** Undisclosed AI impersonation and undisclosed bots in threads are [**Code of Conduct**](../CODE_OF_CONDUCT.md) issues (deception / misrepresentation), not preferences.
+
+**Forum bootstrap (do not forget).** When `forum.umbraculum.dev` goes live, pin the **How we communicate** topic in **Community policy** per [`community-forum-runbook.md`](design/community-forum-runbook.md) §6 (pinned topic 5) and §7.5. Tracked on the public-alpha path in [`ROADMAP.md`](ROADMAP.md) Phase 2 **2d** / **2c** and [`public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) §8–§9.
+
 ---
 
 ## 7. Why this is community-first, and the specific failure mode it avoids
@@ -316,7 +335,7 @@ If the mechanism is found to be **destabilized** — e.g. a recurring failure mo
 
 ### 9.3 Hard rule on changes during the provisional period
 
-Until promotion to RFC, changes to this document are made under the same discipline as [`MANIFESTO.md`](../MANIFESTO.md) — **the commitments are durable, the language is not**. The §4.4 bounded-veto property, the §6 anti-verticality commitments (fixed avatar, no stars / no master profiles, no system-pings beyond the monthly policy email, tenure-does-not-buy-attention), the §5.3 "sponsorship does not buy" list, and the §7 community-first reading are the commitments; their exact phrasing is editorial. A change to any of those commitments is not an editorial change — it is treated as if it were an RFC-grade change even though this document is not yet an RFC, meaning: the change is proposed publicly, given a 30-day comment window before landing, and recorded with the rationale. This is stricter than the document's own provisional status would technically require, and deliberately so: the commitments are the substance, and the substance does not get to migrate quietly.
+Until promotion to RFC, changes to this document are made under the same discipline as [`MANIFESTO.md`](../MANIFESTO.md) — **the commitments are durable, the language is not**. The §4.4 bounded-veto property, the §6 anti-verticality commitments (fixed avatar, no stars / no master profiles, no system-pings beyond the monthly policy email, tenure-does-not-buy-attention), the §6.1 authentic-representation commitments (no AI impersonation of members, no undisclosed bots in threads, labeled automation only), the §5.3 "sponsorship does not buy" list, and the §7 community-first reading are the commitments; their exact phrasing is editorial. A change to any of those commitments is not an editorial change — it is treated as if it were an RFC-grade change even though this document is not yet an RFC, meaning: the change is proposed publicly, given a 30-day comment window before landing, and recorded with the rationale. This is stricter than the document's own provisional status would technically require, and deliberately so: the commitments are the substance, and the substance does not get to migrate quietly.
 
 ---
 
