@@ -22,6 +22,8 @@ Run when **any** of these is true:
 
 RFC-0005 limits versioned snapshots to **`packages/*-contracts/`** READMEs and contract-facing prose — not the full monorepo docs tree.
 
+**Pre-P6 (current):** the docs-site markdown preprocessor injects a **Contract version** INFO banner on each `*-contracts` reference page, reading `CONTRACT_VERSION` from that package's `src/version.ts` at build time (`docs-site/docusaurus.config.ts` → `injectContractsVersionBanner`). The page still tracks `master`; the banner is the pin hint until `docusaurus docs:version` snapshots land.
+
 | Package | README path | `CONTRACT_VERSION` source |
 |---------|-------------|---------------------------|
 | `@umbraculum/automation-contracts` | `packages/automation-contracts/README.md` | `packages/automation-contracts/src/version.ts` |

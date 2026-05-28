@@ -44,6 +44,8 @@ Shared libraries consumed by apps and services. Package index with tier notes: [
 
 Browse the **Packages** category in the sidebar for the full list (`@umbraculum/ui`, `@umbraculum/contracts`, `@umbraculum/i18n`, canonical module contract packages, and others).
 
+`*-contracts` package pages show an auto-injected **Contract version** banner (read from each package's `src/version.ts`). Pin the npm package at the same semver; frozen per-release docs snapshots (Docusaurus versioning, RFC-0005 P6) start with the first post-alpha contracts publish batch.
+
 ---
 
 ## Edit on GitHub
