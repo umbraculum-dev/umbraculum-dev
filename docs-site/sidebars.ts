@@ -38,6 +38,7 @@ const sidebars: SidebarsConfig = {
         'LICENSING',
         'TIER-PRICING-ANALYSIS',
         'CORE-DEVELOPMENT-AND-COMMUNITY',
+        'design/ecosystem-case-study-omnis',
       ],
     },
     {

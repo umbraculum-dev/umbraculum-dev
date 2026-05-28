@@ -38,7 +38,7 @@ The spatial map of the monorepo — what every workspace is, which layer it sits
 
 The high-level direction, business model, and license posture.
 
-- [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — Platform vision, AI consultant, distribution model.
+- [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — Platform vision, AI consultant, distribution model; §2.1 *From practice, not theory* (open backbone — practitioner rationale, cites Omnis case study).
 - [`ROADMAP.md`](ROADMAP.md) — Living roadmap with 12–30 month trajectory.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
 - [`TIER-PRICING-ANALYSIS.md`](TIER-PRICING-ANALYSIS.md) — Base subscription tiers and pricing analysis (the current AI tier unlock and future managed-AI overlay are described in `PLATFORM-ARCHITECTURE.md` §7).

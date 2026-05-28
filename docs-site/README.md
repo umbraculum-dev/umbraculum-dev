@@ -12,7 +12,7 @@ A **build-only** npm workspace: configuration, theme CSS, and sidebar wiring for
 
 ## Scope
 
-- **Contains**: `docusaurus.config.ts` (v4 future flags, Mermaid, i18n scaffold), `sidebars.ts`, `src/css/custom.css`, `V4-UPGRADE.md` (flag tracker), build output under `build/`.
+- **Contains**: `docusaurus.config.ts` (v4 future flags, Mermaid, i18n scaffold), `sidebars.ts`, `src/css/custom.css`, `src/theme/` (swizzled theme components — see below), `V4-UPGRADE.md` (flag tracker), build output under `build/`.
 - **Does not contain**: Authoritative prose (that lives in `docs/`), production Algolia DocSearch credentials (Phase 2 submit — see [`docsearch-application-draft.md`](../docs/design/docsearch-application-draft.md)). **Local search** uses `@easyops-cn/docusaurus-search-local` (lunr.js) until DocSearch approval. Navbar/favicon use **Umbi** from [`docs/media/umbi.png`](../docs/media/umbi.png), copied into `static/img/umbi.png` by `scripts/copy-brand-assets.mjs` on `prestart` / `prebuild` (generated file; not committed).
 
 ## Build / test / lint (local)
@@ -31,6 +31,16 @@ docker run --rm \
 - **Production build**: `npm run build` → `build/`.
 - **CI note:** `docs-site-build` uses `cancel-in-progress` — rapid pushes cancel older runs with `The operation was canceled` (not a build failure). Check the latest run for `master`; use **workflow_dispatch** to re-run.
 - **Typecheck**: `npm run typecheck`.
+
+## Theme customization (swizzle over CSS fights)
+
+Docusaurus `@docusaurus/theme-classic` ships CSS modules with hashed classes and selectors that often **beat** `custom.css` on load order and specificity. For **layout/structure** changes (announcement bar, navbar chrome), **swizzle the React component** under `src/theme/<Name>/index.tsx` and use **owned class names** (e.g. `.umb-doc-announcement*`) in `custom.css`.
+
+Do **not** override hashed `announcementBar_*` classes or put `display: flex` on announcement content wrappers — HTML children layout as columns and desktop height stays at 30px until swizzled.
+
+**Announcement bar (2026-05):** swizzled `AnnouncementBar`; copy from [`apps/website/announcement.config.json`](../apps/website/announcement.config.json) via [`announcement-theme.mjs`](../apps/website/scripts/announcement-theme.mjs). Cursor rule: `74-docusaurus-swizzle-over-css-fights.mdc` in `umbraculum-node-react-cursor-assistant` (umbraculum-toolset).
+
+After swizzle changes: `docker compose restart docs-site`.
 
 ## How it fits in
 
