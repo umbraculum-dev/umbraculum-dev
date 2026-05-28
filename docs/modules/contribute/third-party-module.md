@@ -159,7 +159,89 @@ This is the same trajectory the Drupal ecosystem's most successful contributed m
 
 ---
 
-## 8. Cross-references
+## 8. Worked example — minimal external adapter repo
+
+The steps in §4 describe the contract; this section shows the **shape of a standalone repo** a hardware vendor or community contributor would maintain outside `umbraculum-dev`. The in-monorepo analog for development and tests is [`services/api/src/modules/automation/adapters/mockAdapter.ts`](../../../services/api/src/modules/automation/adapters/mockAdapter.ts) (`automation.mock.v0`); your external package follows the same `AutomationAdapterDefinition` surface.
+
+### 8.1 Repository layout
+
+```
+acme-modbus-adapter/                 # your GitHub org's repo
+├── package.json
+├── README.md
+├── LICENSE                          # MIT recommended for Tier 3
+└── src/
+    ├── index.ts                     # re-exports the adapter
+    └── acmeFermenterAdapter.ts      # implements AutomationAdapterDefinition
+```
+
+### 8.2 `package.json` (peer-deps only for platform packages)
+
+```json
+{
+  "name": "@acme/automation-modbus-adapter",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@umbraculum/module-sdk": "^0.0.1",
+    "@umbraculum/automation-contracts": "^2.0.0"
+  }
+}
+```
+
+Until the July 2026 npm publish batch ([`LICENSING.md`](../../LICENSING.md) §6.2.1), consumers install SDK + contracts via `file:` paths or a git dependency on the Umbraculum monorepo checkout — the **peer dependency names and semver ranges** above are still the compatibility contract.
+
+### 8.3 Adapter implementation (illustrative)
+
+```typescript
+import type { AutomationAdapterDefinition } from "@umbraculum/automation-contracts";
+import { CONTRACT_VERSION } from "@umbraculum/automation-contracts";
+
+export const acmeFermenterAdapter: AutomationAdapterDefinition = {
+  kind: "acme.fermenter-modbus.v1",
+  protocol: "modbus-tcp",
+  capabilities: { read: true, write: false },
+  contractVersion: CONTRACT_VERSION,
+  async connect(_config) {
+    /* open TCP socket to PLC */
+  },
+  async disconnect() {
+    /* close socket */
+  },
+  async readSnapshot() {
+    /* map holding registers → VesselSnapshot[] */
+    return [];
+  },
+};
+```
+
+### 8.4 How a workspace operator wires it in
+
+Third-party module **installation UX** is still evolving ([RFC-0002 §11.4](../../rfcs/0002-canonical-module-physical-layout.md)). Today the integration path is:
+
+1. Operator (or self-hoster) adds your npm package to the API service dependency graph.
+2. Platform code registers the adapter kind with the `automation` module's adapter supervisor (Phase C — see [`modules/canonical/automation.md`](../canonical/automation.md)).
+3. Workspace admin creates an `AdapterConnection` row pointing at your `kind` and supplies connection config (host, port, secrets ref).
+
+Document steps 2–3 in **your** README as "platform version X.Y required" so operators know which Umbraculum release exposes the registration hook you target.
+
+### 8.5 README checklist (your repo)
+
+Your `README.md` should state explicitly:
+
+- Canonical extended: `automation`.
+- Adapter kind string: `acme.fermenter-modbus.v1`.
+- `@umbraculum/automation-contracts` version built against (including `CONTRACT_VERSION`).
+- `@umbraculum/module-sdk` peer range.
+- License and support contact.
+
+---
+
+## 9. Cross-references
 
 - [`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md) — the SDK's own README.
 - [`packages/ai-tool-sdk/README.md`](../../../packages/ai-tool-sdk/README.md) — the AI-tool SDK contract.

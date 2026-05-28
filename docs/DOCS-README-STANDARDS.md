@@ -48,6 +48,7 @@ This standard governs the `README.md` at the root of every published workspace:
 | `packages/navigation/README.md` | Package |
 | `packages/rendering/README.md` | Package (document / file rendering scaffold) |
 | `packages/recipes-ui/README.md` | Package |
+| `packages/core/README.md` | Package (brewery-vertical, `@umbraculum/brewery-core`) |
 | `packages/test-mcp/README.md` | Package (developer-tooling, runtime tools server) |
 | `packages/ui/README.md` | Package |
 

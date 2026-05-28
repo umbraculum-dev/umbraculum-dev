@@ -21,10 +21,11 @@ This directory holds **per-artifact pages** linked from `MODULES.md`. It is inte
 | Path | Coverage |
 |---|---|
 | [`canonical/automation.md`](canonical/automation.md) | **Shipped** — read path + L2 isolation tests; Phase C pending. Use this as the template for the next canonical module. |
-| [`canonical/mrp.md`](canonical/mrp.md) | **Open door** stub — code reserved, β layout pre-committed, no implementation yet. |
-| [`canonical/wms.md`](canonical/wms.md) | **Open door** stub — same. Native-mandatory when shipped. |
+| [`canonical/mrp.md`](canonical/mrp.md) | **H2 2026 alpha shipped** (Waves 1–6 + demo closure) — read-only API, web UX, brewery projections, AI advisor, RFC-0007 exports; mature write scope deferred to [ROADMAP § H1 2027](../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027). |
+| [`canonical/wms.md`](canonical/wms.md) | **Open door** stub — code reserved, β layout pre-committed, no implementation yet. Native-mandatory when shipped. |
 | [`canonical/crm.md`](canonical/crm.md) | **Open door** stub — same. No firm horizon. |
-| [`canonical/crp.md`](canonical/crp.md) | **Open door** stub — same. Co-designed with `mrp`. |
+| [`canonical/crp.md`](canonical/crp.md) | **H2 2026 alpha shipped** (Waves 1–6 + demo closure) — read-only API + web + AI + rendering proof; paired with `mrp`; mature scope H1 2027. |
+| [`packages/README.md`](packages/README.md) | **Shipped** — index of horizontal + contracts + vertical-flavored packages; each row links to the workspace `README.md`. |
 | [`canonical/pim.md`](canonical/pim.md) | **Shipped — Phase A + B + C + D-integration-test-Option-B + RFC-0007 PR7 channel-feed proof** (read path, web admin, 4 AI tools, cross-module composition proof, vendor-neutral product-catalog CSV render job); Phase E write paths + vendor-specific feeds + Option-A real-FK queued per [surface doc](../design/canonical-pim-module-surface.md) §"Open work". Build record at [`design/canonical-pim-build-log.md`](../design/canonical-pim-build-log.md). |
 | [`verticals/brewery/README.md`](verticals/brewery/README.md) | **Shipped — reference vertical** (β file relocation landed via RFC-0006; brewery-specific domain docs live beside the overview). |
 | [`contribute/README.md`](contribute/README.md) | Contributor entry — picks one of four paths below. |

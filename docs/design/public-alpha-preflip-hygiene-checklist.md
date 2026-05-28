@@ -44,7 +44,7 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 
 | # | Check | Command / action | Pass? |
 |---|--------|------------------|-------|
-| 4.1 | Module README structure | `python3 scripts/docs/check-readmes.py` (or CI `docs-readmes` workflow) | ☑ (20/20) |
+| 4.1 | Module README structure | `python3 scripts/docs/check-readmes.py` (or CI `docs-readmes` workflow) | ☑ (21/21) |
 | 4.2 | RFC companion links (optional) | `python3 scripts/docs/check-rfc-companion-links.py` | ☑ (10/10) |
 | 4.3 | Docs site build | `npm run build -w @umbraculum/docs-site` in Node 20 container | ☑ |
 | 4.4 | Brochure build | `npm run build -w @umbraculum/website` | ☑ |

@@ -77,6 +77,7 @@ FULL_SCOPE_README_PATHS = [
     "packages/media/README.md",
     "packages/navigation/README.md",
     "packages/recipes-ui/README.md",
+    "packages/core/README.md",
     "packages/test-mcp/README.md",
     "packages/ui/README.md",
     "docs-site/README.md",

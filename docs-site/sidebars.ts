@@ -87,6 +87,7 @@ const sidebars: SidebarsConfig = {
             'modules/contribute/third-party-module',
           ],
         },
+        'modules/packages/README',
       ],
     },
     {
@@ -143,6 +144,7 @@ const sidebars: SidebarsConfig = {
       label: 'Architecture — platform-wide',
       items: [
         'CROSS-PLATFORM-BOUNDARIES',
+        'design/canonical-native-platform-surface',
         'NATIVE-STRATEGY-AND-CI',
         'REACT-NATIVE-KICKOFF-READINESS',
       ],
@@ -271,6 +273,46 @@ const sidebars: SidebarsConfig = {
           type: 'link',
           label: 'packages/test-mcp',
           href: '/reference/packages/test-mcp/',
+        },
+        {
+          type: 'link',
+          label: 'packages/automation-contracts',
+          href: '/reference/packages/automation-contracts/',
+        },
+        {
+          type: 'link',
+          label: 'packages/core (brewery-core)',
+          href: '/reference/packages/core/',
+        },
+        {
+          type: 'link',
+          label: 'packages/crp-contracts',
+          href: '/reference/packages/crp-contracts/',
+        },
+        {
+          type: 'link',
+          label: 'packages/i18n-keys',
+          href: '/reference/packages/i18n-keys/',
+        },
+        {
+          type: 'link',
+          label: 'packages/module-sdk',
+          href: '/reference/packages/module-sdk/',
+        },
+        {
+          type: 'link',
+          label: 'packages/mrp-contracts',
+          href: '/reference/packages/mrp-contracts/',
+        },
+        {
+          type: 'link',
+          label: 'packages/pim-contracts',
+          href: '/reference/packages/pim-contracts/',
+        },
+        {
+          type: 'link',
+          label: 'packages/rendering',
+          href: '/reference/packages/rendering/',
         },
         {
           type: 'link',

@@ -372,6 +372,26 @@ npm run seed:e2e        # runs `docker compose exec -T api npm run seed:e2e`
 
 This is not required for most first PRs.
 
+### 2.5 (Optional) Native app — Expo Go primer
+
+The web stack from §2.2 is enough for most first contributions. If you need the **brewery native shell** (brew-day screens on a phone or simulator), add this after the stack is healthy:
+
+1. **Build shared packages** (required after any `packages/**` change):
+
+   ```bash
+   ./scripts/build-packages-in-docker.sh
+   ```
+
+2. **Start Metro** (containerized; auto-detects your LAN IP):
+
+   ```bash
+   ./scripts/start-metro-dev.sh
+   ```
+
+3. **Open Expo Go** on a physical device (same Wi‑Fi as the laptop) or an iOS/Android simulator. Enter the URL the script prints (`exp://<LAN-IP>:8081`) or scan from Expo Go recents.
+
+The native app auto-derives the API base URL from Metro's host — you usually do **not** edit `apps/native/app.json` for local LAN dev. Platform obligations, route matrix, and troubleshooting live in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) and [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md). Cross-platform package boundaries: [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md).
+
 ---
 
 ## Part 3 — Install the apparatus
@@ -541,8 +561,7 @@ You now have a working environment and one merged PR. From here:
   configurations, and contributor paths.
 - For **platform vision + trajectory**:
   [`docs/PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md).
-- For **architectural decisions**: [`docs/rfcs/`](rfcs/) — start with
-  RFC-0001 (canonical modules / tiers / governance).
+- For **local native development**: [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) — full Expo runbook (also summarized in GETTING-STARTED §2.5).
 - For **how the apparatus is constructed**:
   [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) + the
   `umbraculum-toolset` sister-repo (see the install section).
