@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { getSharedMessages } from "@umbraculum/i18n";
 import { LocaleProvider } from "@umbraculum/i18n-react";
+import { composeWebShellNavItems } from "@umbraculum/module-sdk";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -24,13 +25,14 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = getSharedMessages(locale);
+  const shellNavItems = composeWebShellNavItems();
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleProvider locale={locale} messages={messages}>
         <TamaguiProviderWrapper>
           <div className="brew-app-shell">
-            <PrimaryNav />
+            <PrimaryNav shellNavItems={shellNavItems} />
             <AdSlot placement="global_top" />
             <main id="main" className="brew-main-margin">
               {children}

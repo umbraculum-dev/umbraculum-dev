@@ -1,9 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   listRegisteredModules,
-  listRegisteredWebModules,
   registerModule,
-  registerWebModule,
 } from "@umbraculum/module-sdk";
 
 import { mrpDocumentTemplates } from "./documentTemplates.js";
@@ -43,17 +41,6 @@ export function registerMrpModule(app: FastifyInstance): void {
         knowledge: MRP_KNOWLEDGE,
         routes: { ...MRP_ROUTE_OVERLAYS },
       },
-    });
-  }
-
-  const alreadyRegisteredWeb = listRegisteredWebModules().some(
-    (m) => m.code === MODULE_CODE,
-  );
-
-  if (!alreadyRegisteredWeb) {
-    registerWebModule({
-      code: MODULE_CODE,
-      ownedUrlSegments: ["production-orders", "work-orders", "material-requirements"],
     });
   }
 

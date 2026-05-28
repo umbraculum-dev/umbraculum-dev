@@ -309,6 +309,7 @@ describe("registerWebModule", () => {
     const web = registerWebModule({ code: "automation" });
     expect(web.code).toBe("automation");
     expect(web.ownedUrlSegments).toEqual([]);
+    expect(web.navEntries).toEqual([]);
     expect(web.navEntry).toBeUndefined();
   });
 
@@ -320,6 +321,9 @@ describe("registerWebModule", () => {
     });
 
     expect(web.ownedUrlSegments).toEqual(["products", "categories", "attribute-sets"]);
+    expect(web.navEntries).toEqual([
+      { primarySegment: "products", labelKey: "nav.pim", order: 5 },
+    ]);
     expect(web.navEntry).toEqual({ primarySegment: "products", labelKey: "nav.pim", order: 5 });
     expect(listOwnedUrlSegments("pim")).toEqual([
       "products",
@@ -390,6 +394,35 @@ describe("registerWebModule", () => {
         navEntry: { primarySegment: "categories", labelKey: "nav.pim" },
       }),
     ).toThrow(NavEntryPrimarySegmentNotOwnedError);
+  });
+
+  it("records multiple nav entries via navEntries", () => {
+    const web = registerWebModule({
+      code: "brewery",
+      ownedUrlSegments: ["recipes", "equipment"],
+      navEntries: [
+        { primarySegment: "recipes", labelKey: "nav.recipes", order: 1 },
+        { primarySegment: "equipment", labelKey: "nav.equipment", order: 2 },
+      ],
+    });
+
+    expect(web.navEntries).toHaveLength(2);
+    expect(web.navEntry).toEqual({
+      primarySegment: "recipes",
+      labelKey: "nav.recipes",
+      order: 1,
+    });
+  });
+
+  it("rejects specifying navEntry and navEntries together", () => {
+    expect(() =>
+      registerWebModule({
+        code: "pim",
+        ownedUrlSegments: ["products"],
+        navEntry: { primarySegment: "products", labelKey: "nav.pim" },
+        navEntries: [{ primarySegment: "products", labelKey: "nav.pim" }],
+      }),
+    ).toThrow(/not both/);
   });
 
   it("rolls back segment ownership on registration failure (no partial state)", () => {

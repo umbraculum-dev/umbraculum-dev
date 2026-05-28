@@ -2,10 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { AuthMeResponse } from "@umbraculum/contracts";
 import { parseAuthMeResponse } from "@umbraculum/contracts";
+import type { WebShellNavItem } from "@umbraculum/module-sdk";
 import { SizableText, XStack } from "tamagui";
 
 import { apiFetch } from "../_lib/apiClient";
@@ -22,6 +23,13 @@ import { SwitchAccountLink } from "./SwitchAccountLink";
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 const BRAND_COOKIE = "UI_BRAND";
+const NAV_MESSAGE_PREFIX = "nav.";
+
+function navLabelSuffix(labelKey: WebShellNavItem["labelKey"]): string {
+  return labelKey.startsWith(NAV_MESSAGE_PREFIX)
+    ? labelKey.slice(NAV_MESSAGE_PREFIX.length)
+    : labelKey;
+}
 
 function writeCookie(name: string, value: string) {
   const maxAgeSeconds = 60 * 60 * 24 * 365; // 1 year
@@ -33,7 +41,7 @@ function setBrand(brandKey: string) {
   document.documentElement.dataset['brand'] = brandKey;
 }
 
-export function PrimaryNav() {
+export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShellNavItem[] }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
 
@@ -118,25 +126,15 @@ export function PrimaryNav() {
 
   const showMainNav = authKnown && Boolean(me);
 
-  // Nav entries match the Week-1 audit URL contract
-  // (docs/design/web-route-group-audit.md §3.4): brewery URLs are preserved,
-  // automation moved from `/automation` (the pre-audit group-root URL that
-  // collided with `[locale]/page.tsx` and shadowed every non-static URL) to
-  // `/vessels` (the canonical owned-segment), and PIM gained a primary nav
-  // entry at `/products` (its previous URL `/pim/*` was an RFC-0002 Decision B
-  // violation corrected by RFC-0006). Wave 3 adds read-only planning entries
-  // through the MRP/CRP owned segments without creating a grouped shell.
-  const mainNavItems = [
-    { href: "/", label: t("dashboard"), isActive: isActive("/") },
-    { href: "/recipes", label: t("recipes"), isActive: isActive("/recipes") },
-    { href: "/equipment", label: t("equipment"), isActive: isActive("/equipment") },
-    { href: "/vessels", label: t("automation"), isActive: isActive("/vessels") },
-    { href: "/products", label: t("pim"), isActive: isActive("/products") },
-    { href: "/production-orders", label: t("mrp"), isActive: isActive("/production-orders") },
-    { href: "/capacity", label: t("crp"), isActive: isActive("/capacity") },
-    { href: "/ai", label: t("ai"), isActive: isActive("/ai") },
-    { href: "/about", label: t("about"), isActive: isActive("/about") },
-  ];
+  const mainNavItems = useMemo(
+    () =>
+      shellNavItems.map((item) => ({
+        href: item.href,
+        label: t(navLabelSuffix(item.labelKey)),
+        isActive: isActive(item.href),
+      })),
+    [shellNavItems, t, pathnameNoLocale],
+  );
 
   return (
     <nav aria-label={t("ariaPrimary")}>

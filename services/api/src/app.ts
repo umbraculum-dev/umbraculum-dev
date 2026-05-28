@@ -6,7 +6,7 @@ import Fastify, {
   type RawServerDefault,
 } from "fastify";
 import cors, { type OriginFunction } from "@fastify/cors";
-import { registerRegisteredModuleAiTools } from "@umbraculum/module-sdk";
+import { registerRegisteredModuleAiTools, registerBuiltinWebModulesIfAbsent } from "@umbraculum/module-sdk";
 import {
   serializerCompiler,
   validatorCompiler,
@@ -106,7 +106,11 @@ export function buildApp() {
   app.register(renderingRoutes);
 
   // Canonical-module bootstraps — Week 1 audit (RFC-0006).
-  // Each `register<Code>Module` records module metadata with
+  // Built-in web URL segments + nav metadata are centralized in
+  // `@umbraculum/module-sdk` (`registerBuiltinWebModulesIfAbsent`) so
+  // `apps/web` and `services/api` share one source of truth.
+  registerBuiltinWebModulesIfAbsent();
+  // Each `register<Code>Module` records API module metadata with
   // `@umbraculum/module-sdk` and registers its API route registrars +
   // owned web URL segments. The order is alphabetical for stability of
   // any registry-snapshot debug dumps; runtime order doesn't matter

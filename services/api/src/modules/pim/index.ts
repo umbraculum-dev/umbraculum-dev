@@ -1,9 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   listRegisteredModules,
-  listRegisteredWebModules,
   registerModule,
-  registerWebModule,
 } from "@umbraculum/module-sdk";
 
 import { pimDocumentTemplates } from "./documentTemplates.js";
@@ -61,18 +59,6 @@ export function registerPimModule(app: FastifyInstance): void {
       },
       documentTemplates: pimDocumentTemplates,
       routes: [],
-    });
-  }
-
-  const alreadyRegisteredWeb = listRegisteredWebModules().some(
-    (m) => m.code === MODULE_CODE,
-  );
-
-  if (!alreadyRegisteredWeb) {
-    registerWebModule({
-      code: MODULE_CODE,
-      ownedUrlSegments: ["products", "categories", "attribute-sets"],
-      navEntry: { primarySegment: "products", labelKey: "nav.pim" },
     });
   }
 

@@ -24,11 +24,20 @@ export interface RegisterWebModuleOptions {
    */
   ownedUrlSegments?: readonly string[];
   /**
-   * Optional primary navigation entry. The web shell's `PrimaryNav` may read
-   * the registry to compose nav items. `primarySegment` MUST be one of
-   * `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale bundles
-   * (see `@umbraculum/i18n-keys`; default pattern `nav.<code>`).
-   * `order` is a sort key (lower is earlier; defaults to insertion order if omitted).
+   * Optional primary navigation entries. The web shell's `PrimaryNav` reads
+   * the registry via `composeWebShellNavItems()`. Each `primarySegment` MUST
+   * appear in `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale
+   * bundles (see `@umbraculum/i18n-keys`). `order` is a sort key (lower is
+   * earlier; defaults to 50 if omitted).
+   */
+  navEntries?: readonly {
+    primarySegment: string;
+    labelKey: ModuleNavLabelKey;
+    order?: number;
+  }[];
+  /**
+   * @deprecated Prefer `navEntries`. When only one primary nav link is needed,
+   * `navEntry` is equivalent to a single-element `navEntries` array.
    */
   navEntry?: {
     primarySegment: string;
@@ -40,6 +49,12 @@ export interface RegisterWebModuleOptions {
 export interface RegisteredWebModuleSnapshot {
   code: string;
   ownedUrlSegments: readonly string[];
+  navEntries: readonly {
+    primarySegment: string;
+    labelKey: ModuleNavLabelKey;
+    order?: number;
+  }[];
+  /** First element of `navEntries` when present — convenience for single-link modules. */
   navEntry?: {
     primarySegment: string;
     labelKey: ModuleNavLabelKey;
@@ -88,12 +103,39 @@ export class NavEntryPrimarySegmentNotOwnedError extends Error {
 
   constructor(code: string, primarySegment: string) {
     super(
-      `registerWebModule(${code}): navEntry.primarySegment "${primarySegment}" must appear in ownedUrlSegments`,
+      `registerWebModule(${code}): nav entry primarySegment "${primarySegment}" must appear in ownedUrlSegments`,
     );
     this.name = "NavEntryPrimarySegmentNotOwnedError";
     this.code = code;
     this.primarySegment = primarySegment;
   }
+}
+
+function normalizeNavEntries(
+  options: RegisterWebModuleOptions,
+): RegisteredWebModuleSnapshot["navEntries"] {
+  if (options.navEntries !== undefined && options.navEntry !== undefined) {
+    throw new Error(
+      `registerWebModule(${options.code}): specify navEntries or navEntry, not both`,
+    );
+  }
+  if (options.navEntries !== undefined) {
+    return options.navEntries.map((entry) => ({
+      primarySegment: entry.primarySegment,
+      labelKey: entry.labelKey,
+      ...(entry.order !== undefined ? { order: entry.order } : {}),
+    }));
+  }
+  if (options.navEntry !== undefined) {
+    return [
+      {
+        primarySegment: options.navEntry.primarySegment,
+        labelKey: options.navEntry.labelKey,
+        ...(options.navEntry.order !== undefined ? { order: options.navEntry.order } : {}),
+      },
+    ];
+  }
+  return [];
 }
 
 const URL_SEGMENT_PATTERN = /^[a-z][a-z0-9-]*$/;
@@ -122,6 +164,7 @@ export function registerWebModule(
   }
 
   const ownedUrlSegments = options.ownedUrlSegments ?? [];
+  const navEntries = normalizeNavEntries(options);
 
   for (const segment of ownedUrlSegments) {
     if (!URL_SEGMENT_PATTERN.test(segment)) {
@@ -133,13 +176,10 @@ export function registerWebModule(
     }
   }
 
-  if (options.navEntry !== undefined) {
-    const owned = new Set(ownedUrlSegments);
-    if (!owned.has(options.navEntry.primarySegment)) {
-      throw new NavEntryPrimarySegmentNotOwnedError(
-        options.code,
-        options.navEntry.primarySegment,
-      );
+  const owned = new Set(ownedUrlSegments);
+  for (const entry of navEntries) {
+    if (!owned.has(entry.primarySegment)) {
+      throw new NavEntryPrimarySegmentNotOwnedError(options.code, entry.primarySegment);
     }
   }
 
@@ -150,15 +190,8 @@ export function registerWebModule(
   const snapshot: RegisteredWebModuleSnapshot = {
     code: options.code,
     ownedUrlSegments: [...ownedUrlSegments],
-    ...(options.navEntry !== undefined
-      ? {
-          navEntry: {
-            primarySegment: options.navEntry.primarySegment,
-            labelKey: options.navEntry.labelKey,
-            ...(options.navEntry.order !== undefined ? { order: options.navEntry.order } : {}),
-          },
-        }
-      : {}),
+    navEntries,
+    ...(navEntries[0] !== undefined ? { navEntry: navEntries[0] } : {}),
   };
 
   webModulesByCode.set(options.code, snapshot);

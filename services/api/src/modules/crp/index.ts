@@ -1,9 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   listRegisteredModules,
-  listRegisteredWebModules,
   registerModule,
-  registerWebModule,
 } from "@umbraculum/module-sdk";
 
 import { crpDocumentTemplates } from "./documentTemplates.js";
@@ -43,17 +41,6 @@ export function registerCrpModule(app: FastifyInstance): void {
         knowledge: CRP_KNOWLEDGE,
         routes: { ...CRP_ROUTE_OVERLAYS },
       },
-    });
-  }
-
-  const alreadyRegisteredWeb = listRegisteredWebModules().some(
-    (m) => m.code === MODULE_CODE,
-  );
-
-  if (!alreadyRegisteredWeb) {
-    registerWebModule({
-      code: MODULE_CODE,
-      ownedUrlSegments: ["capacity", "schedule", "resources"],
     });
   }
 

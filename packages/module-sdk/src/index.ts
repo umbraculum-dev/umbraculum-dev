@@ -83,4 +83,15 @@ export {
 
 export { fromParser, type ValidatedSchema } from "./validatedSchema.js";
 
+export {
+  BUILTIN_WEB_MODULE_REGISTRATIONS,
+  PLATFORM_WEB_SHELL_NAV_ENTRIES,
+  registerBuiltinWebModulesIfAbsent,
+} from "./builtinWebModules.js";
+
+export {
+  composeWebShellNavItems,
+  type WebShellNavItem,
+} from "./composeWebShellNav.js";
+
 export type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";

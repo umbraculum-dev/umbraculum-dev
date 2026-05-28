@@ -296,13 +296,37 @@ var NavEntryPrimarySegmentNotOwnedError = class extends Error {
   primarySegment;
   constructor(code, primarySegment) {
     super(
-      `registerWebModule(${code}): navEntry.primarySegment "${primarySegment}" must appear in ownedUrlSegments`
+      `registerWebModule(${code}): nav entry primarySegment "${primarySegment}" must appear in ownedUrlSegments`
     );
     this.name = "NavEntryPrimarySegmentNotOwnedError";
     this.code = code;
     this.primarySegment = primarySegment;
   }
 };
+function normalizeNavEntries(options) {
+  if (options.navEntries !== void 0 && options.navEntry !== void 0) {
+    throw new Error(
+      `registerWebModule(${options.code}): specify navEntries or navEntry, not both`
+    );
+  }
+  if (options.navEntries !== void 0) {
+    return options.navEntries.map((entry) => ({
+      primarySegment: entry.primarySegment,
+      labelKey: entry.labelKey,
+      ...entry.order !== void 0 ? { order: entry.order } : {}
+    }));
+  }
+  if (options.navEntry !== void 0) {
+    return [
+      {
+        primarySegment: options.navEntry.primarySegment,
+        labelKey: options.navEntry.labelKey,
+        ...options.navEntry.order !== void 0 ? { order: options.navEntry.order } : {}
+      }
+    ];
+  }
+  return [];
+}
 var URL_SEGMENT_PATTERN = /^[a-z][a-z0-9-]*$/;
 var webModulesByCode = /* @__PURE__ */ new Map();
 var segmentOwnership = /* @__PURE__ */ new Map();
@@ -312,6 +336,7 @@ function registerWebModule(options) {
     throw new Error(`registerWebModule: module code "${options.code}" is already registered`);
   }
   const ownedUrlSegments = options.ownedUrlSegments ?? [];
+  const navEntries = normalizeNavEntries(options);
   for (const segment of ownedUrlSegments) {
     if (!URL_SEGMENT_PATTERN.test(segment)) {
       throw new InvalidUrlSegmentError(segment, options.code);
@@ -321,13 +346,10 @@ function registerWebModule(options) {
       throw new UrlSegmentAlreadyOwnedError(segment, options.code, existingOwner);
     }
   }
-  if (options.navEntry !== void 0) {
-    const owned = new Set(ownedUrlSegments);
-    if (!owned.has(options.navEntry.primarySegment)) {
-      throw new NavEntryPrimarySegmentNotOwnedError(
-        options.code,
-        options.navEntry.primarySegment
-      );
+  const owned = new Set(ownedUrlSegments);
+  for (const entry of navEntries) {
+    if (!owned.has(entry.primarySegment)) {
+      throw new NavEntryPrimarySegmentNotOwnedError(options.code, entry.primarySegment);
     }
   }
   for (const segment of ownedUrlSegments) {
@@ -336,13 +358,8 @@ function registerWebModule(options) {
   const snapshot = {
     code: options.code,
     ownedUrlSegments: [...ownedUrlSegments],
-    ...options.navEntry !== void 0 ? {
-      navEntry: {
-        primarySegment: options.navEntry.primarySegment,
-        labelKey: options.navEntry.labelKey,
-        ...options.navEntry.order !== void 0 ? { order: options.navEntry.order } : {}
-      }
-    } : {}
+    navEntries,
+    ...navEntries[0] !== void 0 ? { navEntry: navEntries[0] } : {}
   };
   webModulesByCode.set(options.code, snapshot);
   return snapshot;
@@ -421,11 +438,95 @@ function fromParser(parser) {
     }
   };
 }
+
+// src/builtinWebModules.ts
+var BUILTIN_WEB_MODULE_REGISTRATIONS = [
+  {
+    code: "automation",
+    ownedUrlSegments: ["vessels"],
+    navEntries: [
+      { primarySegment: "vessels", labelKey: "nav.automation", order: 4 }
+    ]
+  },
+  {
+    code: "brewery",
+    ownedUrlSegments: [
+      "recipes",
+      "inventory",
+      "equipment",
+      "water-profiles",
+      "brewday-steps-settings",
+      "ferm-data-integration"
+    ],
+    navEntries: [
+      { primarySegment: "recipes", labelKey: "nav.recipes", order: 1 },
+      { primarySegment: "equipment", labelKey: "nav.equipment", order: 2 }
+    ]
+  },
+  {
+    code: "crp",
+    ownedUrlSegments: ["capacity", "schedule", "resources"],
+    navEntries: [
+      { primarySegment: "capacity", labelKey: "nav.crp", order: 7 }
+    ]
+  },
+  {
+    code: "mrp",
+    ownedUrlSegments: ["production-orders", "work-orders", "material-requirements"],
+    navEntries: [
+      { primarySegment: "production-orders", labelKey: "nav.mrp", order: 6 }
+    ]
+  },
+  {
+    code: "pim",
+    ownedUrlSegments: ["products", "categories", "attribute-sets"],
+    navEntries: [{ primarySegment: "products", labelKey: "nav.pim", order: 5 }]
+  }
+];
+var PLATFORM_WEB_SHELL_NAV_ENTRIES = [
+  { href: "/", labelKey: "nav.dashboard", order: 0 },
+  { href: "/ai", labelKey: "nav.ai", order: 80 },
+  { href: "/about", labelKey: "nav.about", order: 90 }
+];
+function registerBuiltinWebModulesIfAbsent() {
+  const registered = new Set(listRegisteredWebModules().map((m) => m.code));
+  for (const options of BUILTIN_WEB_MODULE_REGISTRATIONS) {
+    if (!registered.has(options.code)) {
+      registerWebModule(options);
+    }
+  }
+}
+
+// src/composeWebShellNav.ts
+function composeWebShellNavItems() {
+  const moduleItems = [];
+  for (const snapshot of listRegisteredWebModules()) {
+    if (snapshot.code === "platform") continue;
+    for (const entry of snapshot.navEntries) {
+      moduleItems.push({
+        href: `/${entry.primarySegment}`,
+        labelKey: entry.labelKey,
+        order: entry.order ?? 50
+      });
+    }
+  }
+  const platformItems = PLATFORM_WEB_SHELL_NAV_ENTRIES.map(
+    (entry) => ({
+      href: entry.href,
+      labelKey: entry.labelKey,
+      order: entry.order
+    })
+  );
+  return [...platformItems, ...moduleItems].sort(
+    (a, b) => a.order - b.order || a.href.localeCompare(b.href)
+  );
+}
 export {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
   AI_PROMPT_MODULE_MAX_LENGTH,
   AI_PROMPT_ROUTE_MAX_LENGTH,
   AiPromptRouteKeyAlreadyRegisteredError,
+  BUILTIN_WEB_MODULE_REGISTRATIONS,
   DocumentTemplateRefAlreadyRegisteredError,
   InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
@@ -433,6 +534,7 @@ export {
   InvalidUrlSegmentError,
   ModuleCodeAlreadyRegisteredError,
   NavEntryPrimarySegmentNotOwnedError,
+  PLATFORM_WEB_SHELL_NAV_ENTRIES,
   RESERVED_CANONICAL_MODULE_CODES,
   UrlSegmentAlreadyOwnedError,
   aggregateNativeAvailableRouteIds,
@@ -444,6 +546,7 @@ export {
   collectModuleKnowledgeSnippets,
   collectModulePromptOverlayTexts,
   collectRegisteredModulePromptOverlays,
+  composeWebShellNavItems,
   fromParser,
   getRegisteredDocumentTemplate,
   getSegmentOwner,
@@ -454,6 +557,7 @@ export {
   listRegisteredNativeModules,
   listRegisteredWebModules,
   recordModuleRegistration,
+  registerBuiltinWebModulesIfAbsent,
   registerModule,
   registerNativeModule,
   registerRegisteredModuleAiTools,

@@ -300,11 +300,20 @@ interface RegisterWebModuleOptions {
      */
     ownedUrlSegments?: readonly string[];
     /**
-     * Optional primary navigation entry. The web shell's `PrimaryNav` may read
-     * the registry to compose nav items. `primarySegment` MUST be one of
-     * `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale bundles
-     * (see `@umbraculum/i18n-keys`; default pattern `nav.<code>`).
-     * `order` is a sort key (lower is earlier; defaults to insertion order if omitted).
+     * Optional primary navigation entries. The web shell's `PrimaryNav` reads
+     * the registry via `composeWebShellNavItems()`. Each `primarySegment` MUST
+     * appear in `ownedUrlSegments`. `labelKey` is a `nav.*` message key in locale
+     * bundles (see `@umbraculum/i18n-keys`). `order` is a sort key (lower is
+     * earlier; defaults to 50 if omitted).
+     */
+    navEntries?: readonly {
+        primarySegment: string;
+        labelKey: ModuleNavLabelKey;
+        order?: number;
+    }[];
+    /**
+     * @deprecated Prefer `navEntries`. When only one primary nav link is needed,
+     * `navEntry` is equivalent to a single-element `navEntries` array.
      */
     navEntry?: {
         primarySegment: string;
@@ -315,6 +324,12 @@ interface RegisterWebModuleOptions {
 interface RegisteredWebModuleSnapshot {
     code: string;
     ownedUrlSegments: readonly string[];
+    navEntries: readonly {
+        primarySegment: string;
+        labelKey: ModuleNavLabelKey;
+        order?: number;
+    }[];
+    /** First element of `navEntries` when present — convenience for single-link modules. */
     navEntry?: {
         primarySegment: string;
         labelKey: ModuleNavLabelKey;
@@ -406,4 +421,41 @@ declare function aggregateNativeAvailableRouteIds(): readonly NativeRouteId[];
 /** Test-only reset. */
 declare function clearNativeModuleRegistryForTests(): void;
 
-export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AiPromptRouteKeyAlreadyRegisteredError, type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredWebModules, recordModuleRegistration, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveRoutePromptOverlay, snapshotModule, snapshotSegmentOwnership };
+/**
+ * Canonical web-module registrations for first-party modules shipped in the
+ * monorepo. Single source of truth for URL-segment ownership and primary-nav
+ * metadata — consumed by `services/api` (tests/CI parity) and `apps/web`
+ * (registry-driven shell nav).
+ *
+ * Third-party modules register their own slices at runtime; they are not listed
+ * here.
+ */
+declare const BUILTIN_WEB_MODULE_REGISTRATIONS: readonly RegisterWebModuleOptions[];
+/** Platform-owned primary nav entries (not tied to a canonical module code). */
+declare const PLATFORM_WEB_SHELL_NAV_ENTRIES: readonly {
+    href: string;
+    labelKey: ModuleNavLabelKey;
+    order: number;
+}[];
+/**
+ * Idempotently registers every built-in web module. Safe to call from both
+ * `services/api` boot and `apps/web` layout bootstrap.
+ */
+declare function registerBuiltinWebModulesIfAbsent(): void;
+
+interface WebShellNavItem {
+    href: string;
+    labelKey: ModuleNavLabelKey;
+    order: number;
+}
+/**
+ * Compose primary-shell navigation items from the web-module registry plus
+ * platform-owned entries.
+ *
+ * Caller must ensure built-in modules and platform segments are registered
+ * first (`registerBuiltinWebModulesIfAbsent()` + `registerPlatformSegments()`
+ * on web; API boot calls the built-in registrar before reading).
+ */
+declare function composeWebShellNavItems(): WebShellNavItem[];
+
+export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_WEB_SHELL_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, type WebShellNavItem, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeWebShellNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredWebModules, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveRoutePromptOverlay, snapshotModule, snapshotSegmentOwnership };
