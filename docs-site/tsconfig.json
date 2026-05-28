@@ -4,5 +4,5 @@
     "strict": true,
     "baseUrl": "."
   },
-  "include": ["./*.ts", "./src/**/*.ts", "./src/**/*.tsx"]
+  "include": ["./*.ts", "./reference-sidebar-items.ts", "./src/**/*.ts", "./src/**/*.tsx"]
 }

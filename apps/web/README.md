@@ -5,6 +5,9 @@ Next.js + React + Tamagui web application — the desktop-first surface of Umbra
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
+> [!TIP]
+> **Looking for the mobile app?** See [`apps/native`](../native/README.md) — React Native + Expo brew-day surface on iOS/Android. Web and native share UI through `@umbraculum/ui`; see [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md).
+
 ## What this is
 
 The web application — the primary user-facing surface of the brewery vertical today. Built on Next.js 15 (App Router) + React 19 + Tamagui (with `react-native-web` so platform-neutral components from `@umbraculum/ui` and `@umbraculum/brewery-recipes-ui` render identically here and in `apps/native`). Authentication rides cookie sessions (`sid` httpOnly) with the API service at `services/api`; localization runs through `next-intl` reading from `@umbraculum/i18n`; charts use Victory; chat surfaces and the AI consultant are integrated as first-class panels.
