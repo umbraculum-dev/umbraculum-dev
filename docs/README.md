@@ -51,6 +51,7 @@ The high-level direction, business model, and license posture.
 
 - [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example.
 - [`modules/`](modules/) — per-module pages linked from `MODULES.md` (one page per canonical module / vertical configuration as each ships; today: `modules/canonical/automation.md`, `modules/canonical/pim.md`, and the `modules/verticals/brewery/` reference vertical docs).
+- [`modules/packages/README.md`](modules/packages/README.md) — **package primer** — horizontal infrastructure, canonical contracts, and vertical-flavored workspaces with links to each `README.md`.
 
 ## AI consultant
 

@@ -36,7 +36,7 @@ If you can't answer "yes" to (1) and "no" to (2) and (3), this is the wrong path
 
 ## 3. The current horizontal-package set
 
-For reference, the packages currently in the horizontal set (as catalogued in [`docs/MODULES.md`](../../MODULES.md) §3.3):
+For reference, the packages currently in the horizontal set (as catalogued in [`docs/MODULES.md`](../../MODULES.md) §3.3 and [`docs/modules/packages/README.md`](../packages/README.md)):
 
 | Package | Role |
 |---|---|

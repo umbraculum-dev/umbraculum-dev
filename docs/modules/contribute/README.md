@@ -14,7 +14,7 @@ Find your "I want to add a ___" goal in the left column; the right column tells 
 | **A new canonical module** (a new reserved code like `quality`, `maintenance`, `hr`) | [`canonical-module.md`](canonical-module.md) | **High** — mini-RFC + consumption-contract checklist + core team approval. The only gated path in the ecosystem. |
 | **A vertical configuration** (a new vertical like `distillery`, `kombucha`, `cosmetics`) | [`vertical-configuration.md`](vertical-configuration.md) | **None** (Tier 6, permissionless). Use brewery as the worked example. |
 | **A third-party / community module** against an existing canonical (e.g. a Salesforce connector for the future `crm`) | [`third-party-module.md`](third-party-module.md) | **None** (Tier 3 / Tier 4, permissionless). Pin the SDK, ship from your own repo. |
-| **A horizontal package** (cross-cutting infrastructure consumed by every module) | [`horizontal-package.md`](horizontal-package.md) | **Low** — regular PR with reviewer agreement that the concern is genuinely cross-cutting. |
+| **A horizontal package** (cross-cutting infrastructure consumed by every module) | [`horizontal-package.md`](horizontal-package.md) | **Low** — regular PR with reviewer agreement that the concern is genuinely cross-cutting. Package index: [`../packages/README.md`](../packages/README.md). |
 
 ## Common to all four paths — the consumption contract
 
@@ -31,4 +31,5 @@ Before you start writing code, run a one-minute sanity check against the per-ser
 - [`docs/MODULES.md`](../../MODULES.md) — ecosystem entry page (vocabulary + catalog).
 - [RFC-0001](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) — governance, tier model, consumption contract.
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) — β physical layout, naming conventions.
+- [`docs/modules/packages/README.md`](../packages/README.md) — package workspace index (horizontal + contracts + vertical-flavored).
 - [`docs/LICENSING.md`](../../LICENSING.md) — per-tier license obligations.
