@@ -11,6 +11,23 @@ A **build-only** workspace: HTML + CSS in `public/`, copied to `dist/` on build.
 
 Every page header must include the shared **`brand-row`** block (Umbi logo + title) and `<link rel="icon" href="/img/umbi.png" />` — copy from `public/index.html` or `public/support/index.html`.
 
+New pages should also include the **site announcement** mount (`announcement.css`, `announcement.js`, `#umb-announcement-root`) — see **Site announcement banner** below.
+
+## Site announcement banner
+
+Reusable top-of-page banner for immediate news (public-alpha countdown, outages, deadlines). **Not Tamagui** — the brochure is static HTML/CSS; product apps use `@umbraculum/ui`.
+
+| File | Role |
+|------|------|
+| [`announcement.config.json`](announcement.config.json) | **Single source of truth** — `enabled`, `id`, `variant` (`info` \| `warning` \| `critical`), `dismissible`, `html` |
+| [`public/announcement.css`](public/announcement.css) | `.umb-announcement` layout + variant colors (matches brochure dark tokens) |
+| [`public/announcement.js`](public/announcement.js) | Loads config at runtime; dismiss persists in `localStorage` per `id` |
+| [`scripts/announcement-theme.mjs`](scripts/announcement-theme.mjs) | Maps config → Docusaurus `themeConfig.announcementBar` |
+
+**Docs site:** [`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts) reads the same JSON — Docusaurus built-in announcement bar (closeable, localStorage by `id`).
+
+To change the message, edit `announcement.config.json`, rebuild brochure (`npm run build -w @umbraculum/website` or `docker compose restart website`), restart or rebuild docs-site. Set `"enabled": false` to hide on both surfaces.
+
 ## Design and tone
 
 **Less ego, more facts.** The brochure is a modest orientation surface for developers and technicians — not a growth-marketing landing page. Primary objective: **sustain ordinary work** (groceries, running costs), not jackpot or “once in a lifetime” deal theatre — sponsorship is welcome but not the headline. Avoid startup tropes (rockets, neon heroes, super-impactful colors, motion-for-attention). Keep copy precise and link to docs for depth.

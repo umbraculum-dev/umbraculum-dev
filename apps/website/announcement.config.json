@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "id": "public-alpha-july-2026",
+  "variant": "info",
+  "dismissible": true,
+  "html": "<strong>Going public soon.</strong> Umbraculum is preparing its public alpha — target date <time datetime=\"2026-07-01\">1&nbsp;July&nbsp;2026</time>. We are updating documentation, publishing the repository, and releasing packages. You may browse, fork, and download what is available today, but expect gaps until the flip is complete. Thank you for your patience."
+}

@@ -248,6 +248,14 @@ discussion**: use the canonical forum at
 [`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](./docs/CORE-DEVELOPMENT-AND-COMMUNITY.md)
 §4.6).
 
+**Community participation — authentic representation.** On forum and
+other community surfaces, you speak for yourself only. Do not use AI or
+automation to post as another person or as an unnamed member; label any
+automated announcements clearly; do not run AI-generated replies in
+threads as ordinary human participation. If AI helped you draft a post,
+say so briefly. Full rules: [`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](./docs/CORE-DEVELOPMENT-AND-COMMUNITY.md)
+§6.1; enforcement via [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
+
 For **code-shaped questions** (when the repo is public): open a GitHub
 Discussion or an issue with the `question` label.
 

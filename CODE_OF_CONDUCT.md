@@ -25,6 +25,7 @@ Examples of unacceptable behavior include:
 * Trolling, insulting or derogatory comments, and personal or political attacks
 * Public or private harassment
 * Publishing others' private information, such as a physical or email address, without their explicit permission
+* Misrepresenting who wrote or sent a message — including using AI, automation, or scripts to post or reply **as** another person, or presenting AI-generated thread participation as ordinary human participation without clear labeling (see [`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) §6.1)
 * Other conduct which could reasonably be considered inappropriate in a professional setting
 
 ## Enforcement Responsibilities

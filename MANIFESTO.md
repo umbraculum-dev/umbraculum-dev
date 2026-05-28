@@ -244,6 +244,12 @@ The implicit version — "of course we are inclusive, why wouldn't we be?" — i
 
 Inclusivity is not the absence of exclusion. It is the **active commitment** to a contribution surface where the people who would have been excluded by an absent commitment are first-class participants. We commit to that.
 
+### 3.4 Authentic presence in community spaces
+
+Community trust requires that **people are represented only by themselves** in discourse — not by AI or automation pretending to be a member, a maintainer, or a named individual. Undisclosed “person messages you” that turn out to be generated text are a form of deception; we treat them as incompatible with the empathy and anti-prestige commitments in §3.1 and with [`docs/CORE-DEVELOPMENT-AND-COMMUNITY.md`](docs/CORE-DEVELOPMENT-AND-COMMUNITY.md) §6.1.
+
+AI belongs in the **authoring apparatus** (§1.2) and in the **in-product consultant** ([`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)), clearly labeled as platform AI — not in synthetic personas on the forum or in meeting threads. If the project ever employs people, community-facing voices stay human.
+
 ---
 
 ## Appendix: Letter to fellow practitioners

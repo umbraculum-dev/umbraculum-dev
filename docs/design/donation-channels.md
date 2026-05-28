@@ -136,7 +136,7 @@ Stay on Phase 0 until a **Proposals** forum topic passes (§4) to add or replace
 - [ ] Liberapay **Umbraculum** team live; GitHub linked
 - [ ] Buy Me a Coffee **Umbraculum** live; tiers/shop off
 - [ ] `/support` buttons point to live URLs
-- [ ] Forum **Community policy** pin: Phase 0 channels + §5 triggers
+- [ ] Forum **Community policy** pins: Phase 0 channels + §5 triggers ([`donation-channels.md`](donation-channels.md) §3); **How we communicate** (§6.1 — [`community-forum-runbook.md`](community-forum-runbook.md) §6 item 5)
 - [ ] [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) mentions `/support`
 
 ---
