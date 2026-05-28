@@ -1,8 +1,5 @@
 import type { BillingTier } from "@prisma/client";
-import {
-  composeModuleTierLimitSlices,
-  type TierLimitsSlice,
-} from "@umbraculum/module-sdk";
+import { composeModuleTierLimitSlices } from "@umbraculum/module-sdk";
 
 type PlatformTierLimits = {
   /**
@@ -16,7 +13,16 @@ type PlatformTierLimits = {
   aiEnabled: boolean;
 };
 
-export type TierLimits = PlatformTierLimits & TierLimitsSlice;
+/** Keys contributed by brewery + automation modules after boot (see module tierLimits.ts). */
+type ModuleTierLimits = {
+  maxRecipesPerWorkspace: number;
+  maxVersionsPerRecipe: number;
+  maxVessels: number;
+  maxAdaptersConnected: number;
+  automationAiToolsEnabled: boolean;
+};
+
+export type TierLimits = PlatformTierLimits & ModuleTierLimits;
 
 const PLATFORM_LIMITS_BY_TIER: Record<BillingTier, PlatformTierLimits> = {
   free: { aiEnabled: false },
@@ -31,5 +37,7 @@ const PLATFORM_LIMITS_BY_TIER: Record<BillingTier, PlatformTierLimits> = {
  */
 export function getTierLimits(tier: BillingTier): TierLimits {
   const platform = PLATFORM_LIMITS_BY_TIER[tier] ?? PLATFORM_LIMITS_BY_TIER.free;
-  return { ...platform, ...composeModuleTierLimitSlices(tier) };
+  // Module slices are Record<string, number | boolean> in the SDK; after boot the
+  // brewery + automation modules supply the keys in ModuleTierLimits (verified in tests).
+  return { ...platform, ...composeModuleTierLimitSlices(tier) } as TierLimits;
 }
