@@ -53,11 +53,6 @@ export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShell
     return rebuilt === "" ? "/" : rebuilt;
   })();
 
-  const isActive = (href: string) => {
-    if (href === "/") return pathnameNoLocale === "/" || pathnameNoLocale === "";
-    return pathnameNoLocale === href || pathnameNoLocale.startsWith(`${href}/`);
-  };
-
   const [me, setMe] = useState<AuthMeResponse | null>(null);
   const [authKnown, setAuthKnown] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -127,12 +122,17 @@ export function PrimaryNav({ shellNavItems }: { shellNavItems: readonly WebShell
   const showMainNav = authKnown && Boolean(me);
 
   const mainNavItems = useMemo(
-    () =>
-      shellNavItems.map((item) => ({
+    () => {
+      const checkActive = (href: string) => {
+        if (href === "/") return pathnameNoLocale === "/" || pathnameNoLocale === "";
+        return pathnameNoLocale === href || pathnameNoLocale.startsWith(`${href}/`);
+      };
+      return shellNavItems.map((item) => ({
         href: item.href,
         label: t(navLabelSuffix(item.labelKey)),
-        isActive: isActive(item.href),
-      })),
+        isActive: checkActive(item.href),
+      }));
+    },
     [shellNavItems, t, pathnameNoLocale],
   );
 

@@ -31,7 +31,7 @@
       dismiss.addEventListener("click", function () {
         try {
           localStorage.setItem(storageKey(config.id), "1");
-        } catch (_err) {
+        } catch {
           /* ignore */
         }
         region.remove();
@@ -58,7 +58,7 @@
         if (localStorage.getItem(storageKey(config.id)) === "1") {
           return;
         }
-      } catch (_err) {
+      } catch {
         /* ignore */
       }
 
