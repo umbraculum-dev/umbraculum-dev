@@ -40,13 +40,21 @@ const referenceServicesReadmes = [
 const referencePackagesReadmes = [
   'ai-tool-sdk/README.md',
   'api-client/README.md',
+  'automation-contracts/README.md',
   'beerjson/README.md',
   'contracts/README.md',
+  'core/README.md',
+  'crp-contracts/README.md',
   'i18n/README.md',
+  'i18n-keys/README.md',
   'i18n-react/README.md',
   'media/README.md',
+  'module-sdk/README.md',
+  'mrp-contracts/README.md',
   'navigation/README.md',
+  'pim-contracts/README.md',
   'recipes-ui/README.md',
+  'rendering/README.md',
   'test-mcp/README.md',
   'ui/README.md',
 ];
@@ -284,6 +292,10 @@ const config: Config = {
   },
 
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      respectPrefersColorScheme: false,
+    },
     ...(announcementBar !== undefined ? {announcementBar} : {}),
     navbar: {
       title: 'Umbraculum',

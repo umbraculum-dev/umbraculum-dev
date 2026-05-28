@@ -46,17 +46,68 @@
   background-color: var(--umbraculum-brand-surface);
 }
 
-/* Shared site announcement (copy from apps/website/announcement.config.json) */
-div[class*='announcementBar'] {
+/* Site announcement (rendered by the swizzled AnnouncementBar component
+   in src/theme/AnnouncementBar/index.tsx — content from
+   apps/website/announcement.config.json). Owns its own class names so the
+   theme's announcementBar_* CSS doesn't apply. */
+
+.umb-doc-announcement {
+  margin: 0;
+  padding: 0.85rem 1.25rem;
   font-size: 0.9375rem;
-  line-height: 1.45;
+  line-height: 1.55;
+  background: #1e3a5f;
+  color: #e8e8e8;
+  border-bottom: 1px solid #3d6ea8;
 }
 
-div[class*='announcementBar'] strong {
+.umb-doc-announcement__inner {
+  max-width: 64rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.umb-doc-announcement__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.umb-doc-announcement__body strong {
   font-weight: 650;
 }
 
-div[class*='announcementBar'] a {
+.umb-doc-announcement__body a {
   color: inherit;
   text-decoration: underline;
+}
+
+.umb-doc-announcement__body time {
+  white-space: nowrap;
+}
+
+.umb-doc-announcement__dismiss {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.05rem 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+.umb-doc-announcement__dismiss:hover,
+.umb-doc-announcement__dismiss:focus-visible {
+  opacity: 1;
+}
+
+.umb-doc-announcement__dismiss:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
