@@ -264,7 +264,7 @@ Each of `mrp`, `crm`, `crp`, `automation` (RFC-0001 Decision B) lands directly i
 
 ### 11.4 What stays deferred after H1 2027
 
-- Full `brewery` Postgres schema split from `public` (PLATFORM-ARCHITECTURE.md §4.5 option 3).
+- ~~Full `brewery` Postgres schema split from `public`~~ → **DONE (RFC-0010, 2026-05-28).** Horizontal models in `platform.*`; brewery domain tables in `brewery.*`. As-built runbook: [`platform-brewery-postgres-schema-split.md`](../design/platform-brewery-postgres-schema-split.md).
 - Lint import boundaries (RFC-0001 §8.3).
 - External-repo packaging format for installable third-party modules.
 
@@ -274,7 +274,7 @@ Each of `mrp`, `crm`, `crp`, `automation` (RFC-0001 Decision B) lands directly i
 
 **Status: Accepted 2026-05-19.** Decision D AMENDED 2026-05-21 by RFC-0006.
 
-Decisions A, B, C are committed; Decision D is committed as amended by [RFC-0006](0006-amend-rfc-0002-brewery-file-move-acceleration.md). Implementers MUST treat β as the authoritative layout for new design docs, and MUST follow the two β disciplines added by the Week-1 audit (no `(<code>)/page.tsx`, no `(<code>)/[<dynamic>]/page.tsx` at the route-group root — see §3 as amended). Brewery's file-move is no longer deferred (RFC-0006 acceleration); the Prisma schema split remains deferred (RFC-0006 §4).
+Decisions A, B, C are committed; Decision D is committed as amended by [RFC-0006](0006-amend-rfc-0002-brewery-file-move-acceleration.md). Implementers MUST treat β as the authoritative layout for new design docs, and MUST follow the two β disciplines added by the Week-1 audit (no `(<code>)/page.tsx`, no `(<code>)/[<dynamic>]/page.tsx` at the route-group root — see §3 as amended). Brewery's file-move is no longer deferred (RFC-0006 acceleration). The Prisma `platform.*` + `brewery.*` schema split is **shipped** ([RFC-0010](0010-platform-brewery-postgres-schema-split.md), 2026-05-28). Remaining §11.4 deferrals: ESLint import boundaries and external-repo packaging.
 
 The 30-day public-comment period in [`docs/LICENSING.md`](../LICENSING.md) §10 applies post-public-alpha (target: July 2026 per [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Until then, solo author drafts → core team reviews → core team approves; this RFC was written as if it WILL be public-readable so the public alpha re-publishes without rewrite.
 

@@ -9,11 +9,11 @@ import { createSessionForTestUser } from "./helpers/session.js";
  * (RFC-0004 §7 step 1).
  *
  * Architectural claim under test: PIM composes cleanly alongside brewery
- * (pre-RFC-0002 flat-route layout) and the canonical β-layout siblings
- * (`automation`, `pim`) in the same Fastify app instance, and PIM reads
- * exhibit **reference-not-copy** semantics — a mutation through the data
- * layer is reflected by a subsequent read on the public HTTP surface
- * without any cached projection blocking it.
+ * (β-layout vertical with domain tables in `brewery.*` per RFC-0010) and the
+ * canonical β-layout siblings (`automation`, `pim`) in the same Fastify app
+ * instance, and PIM reads exhibit **reference-not-copy** semantics — a mutation
+ * through the data layer is reflected by a subsequent read on the public HTTP
+ * surface without any cached projection blocking it.
  *
  * Why this is "Option B" rather than the originally-planned Option A
  * (brewery `Recipe.pimProductId` FK, brewery-side join view reflecting the
@@ -21,7 +21,7 @@ import { createSessionForTestUser } from "./helpers/session.js";
  * different module's surface (brewery Recipe) purely to demonstrate a
  * claim that PIM's own public surface already supports. Option B proves
  * the same architectural claim — module composition + reference semantics
- * — without touching the brewery schema.
+ * — without adding a brewery↔PIM FK (still queued as tech debt).
  *
  * Option A is queued as tech debt: see
  * [`docs/design/canonical-pim-module-surface.md`](../../../../docs/design/canonical-pim-module-surface.md)

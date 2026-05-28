@@ -1,7 +1,7 @@
 # `brewery` — vertical configuration (reference)
 
 **Tier:** Public
-**Status:** **Shipped — reference vertical.** β file relocation accelerated by [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md): API, web, and native brewery slices now live under module-shaped paths; the dedicated `brewery.*` Prisma schema split remains deferred.
+**Status:** **Shipped — reference vertical.** β file relocation accelerated by [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md): API, web, and native brewery slices now live under module-shaped paths. Prisma `brewery.*` schema split shipped under [RFC-0010](../../../rfcs/0010-platform-brewery-postgres-schema-split.md) (2026-05-28); horizontal platform tables live in `platform.*`.
 **Code:** `brewery`
 **Module tier:** 6 (vertical configuration — permissionless, but this bundle is core-team-maintained alongside the canonical set).
 **License:** AGPLv3 (this bundle, alongside the core; third-party brewery-shaped verticals follow the author's choice — see [LICENSING.md](../../../LICENSING.md)).
@@ -38,7 +38,7 @@ For brewery: the brewery is the vertical; production planning (`mrp`), inventory
 
 ---
 
-## 3. Today's surface (β file layout, brewery schema deferred)
+## 3. Today's surface (β file layout, `brewery.*` schema shipped)
 
 ### 3.1 API — brewery-vertical routes ([`services/api/src/modules/brewery/`](../../../../services/api/src/modules/brewery/))
 
@@ -53,7 +53,7 @@ For brewery: the brewery is the vertical; production planning (`mrp`), inventory
 | `ingredients.ts` / `styles.ts` / `inventory.ts` | Brewery ingredient catalogs, BJCP styles, on-hand inventory. |
 | `integrationsTilt.ts` / `integrationsTiltIngest.ts` / `integrationsReveal.ts` | Brewing-device integrations through the platform integrations framework. |
 
-Routes are registered from [`services/api/src/modules/brewery/index.ts`](../../../../services/api/src/modules/brewery/index.ts). Brewery tables still live in the Prisma `public` schema for now; the future `brewery.*` schema split is a separate data migration.
+Routes are registered from [`services/api/src/modules/brewery/index.ts`](../../../../services/api/src/modules/brewery/index.ts). Brewery domain tables live in the Prisma `brewery` schema (`registerModule({ code: "brewery", prismaSchema: "brewery" })` per [RFC-0010](../../../rfcs/0010-platform-brewery-postgres-schema-split.md)).
 
 ### 3.2 Web — brewery-vertical route group ([`apps/web/app/[locale]/(brewery)/`](../../../../apps/web/app/[locale]/(brewery)/))
 
@@ -171,9 +171,9 @@ Per [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.
 | Module registration | **Moved** behind `registerBreweryModule()` / `registerModule({ code: "brewery", ... })` via `@umbraculum/module-sdk`. |
 | Workspace package names | **Moved** to `@umbraculum/*` for horizontal packages and `@umbraculum/brewery-*` for vertical-flavored packages per [sub-plan #9](../../../design/brewery-scope-migration-plan.md). |
 | Brewery domain docs | **Moved in this docs pass** to `docs/modules/verticals/brewery/` so the docs site renders them under the reference vertical. |
-| Prisma schema | **Deferred** — brewery tables still live in `public`; a separate follow-on migration may eventually split a `brewery` schema ([RFC-0002 §11.4](../../../rfcs/0002-canonical-module-physical-layout.md)). |
+| Prisma schema | **Shipped** — brewery domain tables in `brewery.*`; horizontal tenancy/auth/billing/integrations in `platform.*` ([RFC-0010](../../../rfcs/0010-platform-brewery-postgres-schema-split.md); runbook [`platform-brewery-postgres-schema-split.md`](../../../design/platform-brewery-postgres-schema-split.md)). |
 
-This split is deliberate: filesystem and docs relocation clarify ownership without taking on the higher-risk data migration before the `mrp` / `wms` / `crp` extraction work needs it.
+The file-move and schema split were sequenced separately on purpose: RFC-0006 accelerated filesystem relocation; RFC-0010 landed the data-layer split before the July 2026 public seed.
 
 ---
 

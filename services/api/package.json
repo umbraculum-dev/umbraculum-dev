@@ -19,7 +19,7 @@
     "db:backfill:integration-tokens": "tsx src/cli/backfillIntegrationTokenHashes.ts",
     "db:restore:equipment-profile": "tsx src/cli/restoreEquipmentProfileFromRecipe.ts",
     "seed:e2e": "tsx src/cli/seedE2eFixture.ts",
-    "test:db:prepare": "DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma migrate reset --force --skip-seed && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma db seed",
+    "test:db:prepare": "echo 'DROP SCHEMA IF EXISTS reporting CASCADE;' | DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma db execute --stdin --schema prisma/schema.prisma && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma migrate reset --force --skip-seed && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx prisma db seed",
     "test": "npm run test:db:prepare && vitest run",
     "contracts:check": "npm run test:db:prepare && vitest run src/tests/contracts",
     "contracts:update": "npm run test:db:prepare && UPDATE_CONTRACTS=1 vitest run src/tests/contracts",

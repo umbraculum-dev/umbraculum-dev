@@ -43,15 +43,11 @@ const MODULE_CODE = "brewery";
  * [`docs/design/web-route-group-audit.md`](../../../../../docs/design/web-route-group-audit.md)
  * §3.4 + [RFC-0006](../../../../../docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md).
  *
- * ## Prisma schema scope (deferred)
+ * ## Prisma schema scope
  *
- * Brewery models stay in the Prisma `public` schema for now — RFC-0002
- * Decision D explicitly defers the `brewery` Prisma-schema split. The
- * Week-1 audit/RFC-0006 acceleration only moves the TypeScript files
- * (API routes, web pages, native screens); the Prisma schema-name move
- * is a separate, higher-risk migration. `prismaSchema: undefined` is
- * therefore intentional — `registerModule` accepts a missing schema for
- * modules whose models live in `public`.
+ * Brewery domain models live in the Postgres `brewery` schema per
+ * [RFC-0010](../../../../../docs/rfcs/0010-platform-brewery-postgres-schema-split.md).
+ * Horizontal tenancy (`platform.*`) is owned by the platform layer.
  *
  * ## Repeat-call safety (idempotent metadata recording)
  *
@@ -71,6 +67,7 @@ export function registerBreweryModule(app: FastifyInstance): void {
   if (!alreadyRecorded) {
     registerModule(app, {
       code: MODULE_CODE,
+      prismaSchema: "brewery",
       addonCodes: ["brewery_module"],
       tierLimits: breweryTierLimits,
       registerAiTools(registry, instance) {

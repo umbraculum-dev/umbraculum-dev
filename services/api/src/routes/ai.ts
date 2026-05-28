@@ -208,7 +208,7 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
                     COALESCE(SUM(l.tokens_in), 0) AS tokens_in,
                     COALESCE(SUM(l.tokens_out), 0) AS tokens_out,
                     COUNT(l.id)::bigint AS calls
-             FROM ai_usage_ledger l
+             FROM platform.ai_usage_ledger l
              WHERE l.workspace_id = $1 AND l.created_at >= $2
              GROUP BY 1
              ORDER BY 1 ASC`,
@@ -218,8 +218,8 @@ export function aiRoutes(toolRegistry: AiToolRegistry) {
           app.prisma.$queryRawUnsafe<{ role: string; total: bigint }[]>(
             `SELECT wm.role::text AS role,
                     COALESCE(SUM(l.tokens_in + l.tokens_out), 0) AS total
-             FROM ai_usage_ledger l
-             INNER JOIN workspace_members wm
+             FROM platform.ai_usage_ledger l
+             INNER JOIN platform.workspace_members wm
                ON wm.workspace_id = l.workspace_id AND wm.user_id = l.user_id
              WHERE l.workspace_id = $1 AND l.created_at >= $2
              GROUP BY wm.role`,
