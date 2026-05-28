@@ -345,4 +345,6 @@ The shape of this document — *community-proposes-and-votes + bounded-core-team
 
 The "sponsorship does not buy X" disciplines in §5.3 are calibrated against the failure-mode pattern documented in [`LICENSING.md`](LICENSING.md) §3 (Adobe → Magento, HashiCorp → Terraform / OpenTofu, Redis → Valkey) — projects whose community sustainability eroded when commercial / sponsor influence quietly replaced community influence on direction. The structural protections here are the upstream-of-license version of what AGPLv3 protects downstream-of-license: both are written to keep the project's agenda the community's.
 
+A complementary practitioner lesson — **capable product, ecosystem never formed** (documentation, community, tryability absent; locked code did not retain customers who switched products) — is in [`design/ecosystem-case-study-omnis.md`](design/ecosystem-case-study-omnis.md); see also [`LICENSING.md`](LICENSING.md) §5.3 lesson 6 and [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §2.1.
+
 This document is itself a v0.1 working agreement, written by the founding maintainer; it expects to be challenged in good faith by the community that shows up post-flip, and to be sharpened (or replaced) by that conversation. The §9 promotion path is the structural commitment to that openness.

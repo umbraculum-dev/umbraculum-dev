@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1 (living)  
 **Audience:** maintainers, contributors, and agents editing `apps/website/` or reviewing brochure deploys  
-**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §1 guardrails, [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) §6, [`apps/website/README.md`](../../apps/website/README.md)
+**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §1 guardrails, [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) §6, [`apps/website/README.md`](../../apps/website/README.md), [`docs-site/README.md`](../../docs-site/README.md) § Theme customization (swizzled docs announcement bar; shared `announcement.config.json`)
 
 ---
 

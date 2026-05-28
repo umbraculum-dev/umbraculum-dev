@@ -259,6 +259,8 @@ Zod v4 runtime validation, ESLint flat-config hygiene, React accessibility,
 Playwright/E2E conventions, monorepo package boundaries, container-only
 Node/npm execution, and frontend known-issues patterns.
 
+**Docs-site rules (umbraculum-dev):** `73-website-static-build-before-preview.mdc` (rebuild brochure `dist/` before preview); `74-docusaurus-swizzle-over-css-fights.mdc` (swizzle theme components instead of fighting `custom.css` — see [`docs-site/README.md`](../docs-site/README.md) § Theme customization).
+
 ### `umbraculum-platform-tsjs-cursor-assistant`
 
 Umbraculum-platform-specific layer on top of

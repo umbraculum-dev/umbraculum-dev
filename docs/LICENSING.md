@@ -208,13 +208,12 @@ License choices are easier to reason about with the benefit of hindsight from pr
 
 ### 5.3 What we learn
 
-Five lessons drawn from these case studies:
-
-1. **License + governance is a single decision.** Magento Open Source had a fine license and a broken governance model; ecosystem fled. AGPLv3 with hostile governance would fare equally badly.
+Six lessons drawn from these case studies: **License + governance is a single decision.** Magento Open Source had a fine license and a broken governance model; ecosystem fled. AGPLv3 with hostile governance would fare equally badly.
 2. **Source-available is not a stable equilibrium.** The community treats it as closed-source with a window dressing, and a Linux-Foundation fork follows within months once enough infrastructure depends on the project.
 3. **AGPLv3 is the modern correct answer for SaaS-shaped projects.** The pattern has been ratified by Plausible, Cal.com, Mautic, Nextcloud, Mastodon, and (in 2024-2025) by Elastic's partial return and Redis's full return.
 4. **Brand and trademark matter as much as code license.** WordPress, Linux, and Plausible all defend their trademarks separately from their source license. The trademark is the durable economic asset.
 5. **Enterprise legal teams' AGPL aversion is real but manageable.** The standard answer is dual licensing — same source, two license offers, customer picks. This was developed by MySQL in the early 2000s and refined by hundreds of projects since.
+6. **A good product without an ecosystem still fails as a platform.** Proprietary vertical stacks can earn a living inside partner channels yet never build public community, documentation, or tryability — customers still leave for *other products* (not just other resellers), and locked code does not travel with them. Practitioner narrative: [`design/ecosystem-case-study-omnis.md`](design/ecosystem-case-study-omnis.md); architectural summary: [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §2.1 (*From practice, not theory*). Complements lesson 1 (Magento): *community lost through stewardship* vs *ecosystem never formed*.
 
 ---
 
