@@ -121,6 +121,36 @@ function toGithubUrl(targetPath: string, suffix: string): string {
   return `${githubBase}/${kind}/master/${encodeURI(relativePath)}${suffix}`;
 }
 
+function toReferenceDocsUrl(sourcePath: string, targetPath: string): string | undefined {
+  const referenceRoots: Array<{root: string; routeBase: string}> = [
+    {root: path.resolve(repoRoot, 'apps'), routeBase: 'reference/apps'},
+    {root: path.resolve(repoRoot, 'services'), routeBase: 'reference/services'},
+    {root: path.resolve(repoRoot, 'packages'), routeBase: 'reference/packages'},
+  ];
+
+  for (const {root, routeBase} of referenceRoots) {
+    if (
+      !sourcePath.startsWith(`${root}${path.sep}`) ||
+      !targetPath.startsWith(`${root}${path.sep}`)
+    ) {
+      continue;
+    }
+
+    const relativeTarget = path.relative(root, targetPath);
+    if (!relativeTarget.endsWith('README.md')) {
+      continue;
+    }
+
+    const routeSegment = relativeTarget
+      .slice(0, -'/README.md'.length)
+      .replace(/\\/g, '/');
+
+    return `/${routeBase}/${routeSegment ? `${routeSegment}/` : ''}`;
+  }
+
+  return undefined;
+}
+
 function rewriteRepoRelativeLinks() {
   return (tree: {children?: unknown[]}, file: {path?: string}) => {
     const sourcePath = file.path ? path.resolve(file.path) : docsRoot;
@@ -141,7 +171,14 @@ function rewriteRepoRelativeLinks() {
         const {pathname, suffix} = splitUrl(maybeLink.url);
         const targetPath = path.resolve(sourceDir, pathname);
 
-        if (!sourceIsMainDocs || !isPublishableDocsMarkdown(targetPath)) {
+        if (sourceIsMainDocs && isPublishableDocsMarkdown(targetPath)) {
+          // Keep relative links inside publishable docs/ as in-site routes.
+        } else if (!sourceIsMainDocs) {
+          const referenceUrl = toReferenceDocsUrl(sourcePath, targetPath);
+          maybeLink.url = referenceUrl
+            ? `${referenceUrl}${suffix}`
+            : toGithubUrl(targetPath, suffix);
+        } else {
           maybeLink.url = toGithubUrl(targetPath, suffix);
         }
       }
@@ -217,11 +254,24 @@ const config: Config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: 'reference-index',
+        path: 'reference-index',
+        routeBasePath: 'reference',
+        include: ['README.md'],
+        sidebarPath: './sidebars-reference.ts',
+        editUrl:
+          'https://github.com/umbraculum-dev/umbraculum-dev/tree/master/docs-site/reference-index/',
+        beforeDefaultRemarkPlugins: [rewriteRepoRelativeLinks],
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: 'reference-apps',
         path: '../apps',
         routeBasePath: 'reference/apps',
         include: referenceAppsReadmes,
-        sidebarPath: false,
+        sidebarPath: './sidebars-reference.ts',
         editUrl:
           'https://github.com/umbraculum-dev/umbraculum-dev/tree/master/apps/',
         beforeDefaultRemarkPlugins: [rewriteRepoRelativeLinks],
@@ -234,7 +284,7 @@ const config: Config = {
         path: '../services',
         routeBasePath: 'reference/services',
         include: referenceServicesReadmes,
-        sidebarPath: false,
+        sidebarPath: './sidebars-reference.ts',
         editUrl:
           'https://github.com/umbraculum-dev/umbraculum-dev/tree/master/services/',
         beforeDefaultRemarkPlugins: [rewriteRepoRelativeLinks],
@@ -247,7 +297,7 @@ const config: Config = {
         path: '../packages',
         routeBasePath: 'reference/packages',
         include: referencePackagesReadmes,
-        sidebarPath: false,
+        sidebarPath: './sidebars-reference.ts',
         editUrl:
           'https://github.com/umbraculum-dev/umbraculum-dev/tree/master/packages/',
         beforeDefaultRemarkPlugins: [rewriteRepoRelativeLinks],
@@ -265,6 +315,7 @@ const config: Config = {
         indexDocs: true,
         docsRouteBasePath: [
           '/',
+          'reference',
           'reference/apps',
           'reference/services',
           'reference/packages',
@@ -312,7 +363,7 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        {to: '/reference/apps/web/', label: 'Reference', position: 'left'},
+        {to: '/reference/', label: 'Reference', position: 'left'},
         {
           href: 'https://github.com/umbraculum-dev/umbraculum-dev',
           label: 'GitHub',
@@ -329,7 +380,7 @@ const config: Config = {
             {label: 'Documentation home', to: '/'},
             {label: 'RFC index', to: '/rfcs/'},
             {label: 'Open-source stack', to: '/OPEN-SOURCE-STACK'},
-            {label: 'Reference READMEs', to: '/reference/apps/web/'},
+            {label: 'Module reference', to: '/reference/'},
           ],
         },
         {

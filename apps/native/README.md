@@ -5,6 +5,9 @@ React Native + Expo + Tamagui mobile application — the on-the-go brew-day surf
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
+> [!TIP]
+> **Looking for the web app?** See [`apps/web`](../web/README.md) — Next.js + Tamagui desktop-first operational UI. Web and native share UI through `@umbraculum/ui`; see [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md).
+
 ## What this is
 
 The native (iOS + Android) application for brewers who need brew-day reliability tooling on a phone or tablet during a brew session. Built on React Native 0.81 + Expo 54 + Tamagui, sharing the bulk of its UI surface with `apps/web` through the `@umbraculum/ui` (primitives) and `@umbraculum/brewery-recipes-ui` (domain UI) packages — the platform-neutral components render identically on both surfaces. Authentication uses bearer tokens stored in `expo-secure-store` and refreshed against `services/api` via `@umbraculum/api-client`; localization runs through `@umbraculum/i18n-react` reading from `@umbraculum/i18n`; charts use `victory-native` + `react-native-svg`.
