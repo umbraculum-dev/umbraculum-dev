@@ -125,6 +125,6 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 ## npm package
 
-Published as **`@umbraculum/ci-parity`** (MIT). Publish runbook: [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md).
+Published as **`@umbraculum/ci-parity`** (MIT). Publish runbook: [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). **OIDC (no token rotation):** [`docs/design/ci-parity-npm-trusted-publishing.md`](design/ci-parity-npm-trusted-publishing.md).
 
 Interim escape hatch if npm is unavailable: `npx github:umbraculum-dev/umbraculum-toolset#ci-parity-v1.0.0 -- packages/ci-parity` (not for CI — publish first).

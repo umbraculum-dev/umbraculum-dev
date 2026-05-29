@@ -1,9 +1,9 @@
 # Publishing `@umbraculum/ci-parity`
 
 **Tier:** Public  
-**Status:** v1 — first publish pending `NPM_TOKEN` on umbraculum-toolset (2026-05-29)  
+**Status:** v1 — `1.0.0` on npm (2026-05-29); **migrate publish auth to OIDC** per [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)  
 **Audience:** maintainers  
-**Related:** [`docs/CI-PARITY.md`](../CI-PARITY.md), [`docs/LICENSING.md`](../LICENSING.md) §6.2.1
+**Related:** [`docs/CI-PARITY.md`](../CI-PARITY.md), [`docs/LICENSING.md`](../LICENSING.md) §6.2.1, [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)
 
 **Package source:** `umbraculum-toolset/packages/ci-parity`  
 **npm name:** `@umbraculum/ci-parity`  
@@ -70,75 +70,30 @@ After `npm view @umbraculum/ci-parity version` returns `1.0.0`, commit migrated 
 
 ---
 
-## 4. Automated publish via GHA (preferred)
+## 4. Automated publish via GHA
 
 **Trigger:** push a tag matching `ci-parity-v*` (e.g. `ci-parity-v1.0.0`).
 
 **Workflow file:** `umbraculum-toolset/.github/workflows/publish-ci-parity.yml`
 
-**Steps it runs:**
+### Preferred auth: Trusted Publishing (OIDC)
 
-1. `npm ci`
-2. `npm run typecheck -w @umbraculum/ci-parity`
-3. `npm test -w @umbraculum/ci-parity`
-4. `npm run build -w @umbraculum/ci-parity`
-5. `npm publish -w @umbraculum/ci-parity --access public` with `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`
+No long-lived `NPM_TOKEN`. See **[`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)** for one-time npm + GitHub setup and `1.0.1` smoke verification.
 
-### Expected first-run failure (2026-05-29)
+Workflow requirements:
 
-`publish-ci-parity` run #1 on tag `ci-parity-v1.0.0` **failed at step 5** with:
+- `permissions.id-token: write`
+- `registry-url: https://registry.npmjs.org` in `setup-node`
+- npm CLI **≥ 11.5.1** (`npm install -g npm@latest` in CI)
+- `npm publish` **without** `NODE_AUTH_TOKEN`
 
-```text
-npm error code ENEEDAUTH
-npm error need auth This command requires you to be logged in to https://registry.npmjs.org/
-```
+### Legacy auth: granular `NPM_TOKEN` (used for `1.0.0` only)
 
-**This is expected** when the `NPM_TOKEN` repository secret is not configured yet. Steps 1–4 (build + tests) passed — the package is publish-ready; only registry auth is missing.
+Used for the initial publish before OIDC was configured. Steps 1–4 (build + tests) then:
 
-### Fix: add `NPM_TOKEN` once
+`npm publish` with `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`
 
-1. **npm** — [npmjs.com](https://www.npmjs.com) → avatar → **Access Tokens** → **Generate New Token** → **Granular Access Token**
-   - Packages and scopes: **Read and write**, scope **`@umbraculum`** only (not local path scopes)
-   - Organizations: **Read and write** for org **umbraculum**
-   - **Bypass 2FA:** enabled (required for non-interactive CI publish)
-   - **Expiration:** max **90 days** for read-write granular tokens (npm enforced)
-   - **IP ranges:** leave empty (GitHub Actions runner IPs are not fixed)
-   - **Never paste the token in chat, tickets, or commits** — only into GitHub Secrets
-2. **GitHub** — repo **umbraculum-toolset** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
-   - Name: `NPM_TOKEN` (exact spelling — workflow references this name)
-   - Value: paste the npm token
-3. **Re-run** — Actions → failed `publish-ci-parity` run → **Re-run all jobs**  
-   (Do not need a new tag; `1.0.0` is not on npm yet.)
-
-### Token rotation (required — 90-day max)
-
-npm **read-write granular tokens expire after at most 90 days**. The `NPM_TOKEN` secret does not auto-refresh; when the token expires, `publish-ci-parity` will fail with auth errors on the next tag push or re-run.
-
-| When | Action |
-|------|--------|
-| **At creation** | Note expiry date (e.g. in team calendar / password manager) |
-| **~2 weeks before expiry** | Generate a **new** granular token (same settings as above) |
-| **Rotate** | umbraculum-toolset → Settings → Secrets → Actions → `NPM_TOKEN` → **Update** with the new value |
-| **Revoke old token** | npm → Access Tokens → revoke the superseded token |
-| **If token was leaked** | Revoke immediately on npm, generate new, update `NPM_TOKEN`, re-run publish workflow |
-
-**Rotation checklist (copy per cycle):**
-
-1. npm: new granular token, 90-day expiry, `@umbraculum` read-write + org read-write, bypass 2FA
-2. GitHub: update repository secret `NPM_TOKEN` on **umbraculum-toolset**
-3. npm: revoke previous token
-4. Optional smoke: re-run latest `publish-ci-parity` (will no-op if version already published) or wait until next `ci-parity-v*` tag
-
-**Security:** If a token appears in chat, logs, or a commit, **revoke it on npm before doing anything else** — rotation is not optional in that case.
-
-### Verify success
-
-```bash
-npm view @umbraculum/ci-parity version
-# expect: 1.0.0
-```
-
-Or open: `https://www.npmjs.com/package/@umbraculum/ci-parity`
+After OIDC is verified, **delete** `NPM_TOKEN` on GitHub and revoke the granular publish token on npm — see trusted-publishing doc § Step 4.
 
 ---
 
@@ -161,7 +116,7 @@ npm publish -w @umbraculum/ci-parity --access public
 | Requirement | Notes |
 |-------------|--------|
 | npm org `@umbraculum` | Create at npm if missing; add publish-capable members |
-| `NPM_TOKEN` on umbraculum-toolset | Automation token; not needed for manual publish from laptop |
+| `NPM_TOKEN` on umbraculum-toolset | **Legacy** — remove after OIDC verified ([trusted publishing doc](ci-parity-npm-trusted-publishing.md)) |
 | Version not already published | `npm view @umbraculum/ci-parity` → 404 until first publish |
 | Tag `ci-parity-v1.0.0` on toolset | Already pushed (reusable workflow pin) |
 
@@ -197,4 +152,6 @@ Do not use git/npm install shortcuts in umbraculum-dev GHA — publish to npm fi
 | 2026-05-29 | `ci-parity-package` on toolset `master` (`e4fca59`) | ✅ pass |
 | 2026-05-29 | Tag `ci-parity-v1.0.0` pushed | ✅ |
 | 2026-05-29 | `publish-ci-parity` #1 on `ci-parity-v1.0.0` | ❌ `ENEEDAUTH` — `NPM_TOKEN` not set (expected) |
-| 2026-05-29 | After `NPM_TOKEN` + re-run or manual publish | ✅ `1.0.0` on npm |
+| 2026-05-29 | After `NPM_TOKEN` + re-run | ✅ `1.0.0` on npm |
+| — | OIDC workflow + trusted-publisher docs | shipped on toolset `master` |
+| — | Trusted publisher configured on npm + `1.0.1` OIDC publish | pending |
