@@ -1,7 +1,7 @@
 # Ecosystem case study — Omnis Studio and the Omnis ecosystem
 
 **Tier:** Public  
-**Status:** v1.3 — maintainer experience; §3.5–§3.7 Core/vertical dynamics, 2016 docs revamp, long-run outcomes (2026-05-29)  
+**Status:** v1.3 — maintainer experience; §3.4–§3.6 Core/vertical dynamics, 2016 docs revamp, long-run outcomes (2026-05-29)  
 **Audience:** contributors, platform evaluators, future maintainers reasoning about why documentation, community, and tryability are non-optional  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.1–§2.2, [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md), [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.2–§5.3 (Adobe → Magento — a *different* failure mode; lesson 6 pairs with this doc)
 
@@ -24,7 +24,7 @@ We are **not** reviewing Omnis the product here. We are recording **our experien
 |-----------|------------------------------------------------------|
 | **Product** | Omnis Studio — rapid-application / ERP-building stack (4D-family lineage); deployed widely in Western Europe, Canada, and beyond for vertical business software |
 | **What worked** | Livelihood for developers inside reseller/house channels; kickoff of many successful ERPs; strong backend and data-model skills; built-in debugger in the IDE |
-| **What failed the ecosystem** | No real developer community; poor documentation; no Linux desktop for development; unclear free trial; reseller/software-house gatekeeping → product used only to maintain existing verticals, not to attract builders of *new* platforms; **Core vs verticals** governance with no independent developer chair (§3.5–§3.7) |
+| **What failed the ecosystem** | No real developer community; poor documentation; no Linux desktop for development; unclear free trial; reseller/software-house gatekeeping → product used only to maintain existing verticals, not to attract builders of *new* platforms; **Core vs verticals** governance with no independent developer chair (§3.4–§3.6) |
 | **Umbraculum lesson** | Documentation, community, open backbone repos, and free try are **structural commitments**, not nice-to-haves — see §4 |
 
 **Pair with Adobe → Magento** ([`MANIFESTO.md`](../../MANIFESTO.md) §2.1, [`LICENSING.md`](../LICENSING.md) §5.2): Adobe inherited a thriving OSS community and lost it through stewardship. Omnis had a capable proprietary product and **never built** the community-and-on-ramp layer that turns a tool into a platform newcomers can join.
@@ -81,9 +81,9 @@ Together, these sent a signal: *this is for people already committed to a vertic
 
 The **remaining** problem is structural: how Git behaves when the vendor and vertical partners **do not want the product versioned as text**. Omnis libraries are **binary** `.lbs` containers — Git cannot merge them like source. The community pattern is JSON/`src/` text alongside binary `lib/` (with line-ending and lock-file caveats Omnis documents). Meanwhile the built-in **Omnis VCS** — a separate system that checks whole libraries into a project database — is **not available in Community Edition** ([Omnis VCS manual](https://www.omnis.net/developers/resources/onlinedocs/Programming/15vcs.html)). Community Edition and Professional libraries **do not open in each other's editions** ([libraries and classes](https://www.omnis.net/developers/resources/onlinedocs/Programming/02libsandclasses.html)). Proprietary verticals could go further: **irreversible** build flags such as *Disable Class Data Notation* and *Disable Method Text Notation* **turn off JSON export** and strip introspection from shipped libraries ([VCS manual — build options](https://www.omnis.net/developers/resources/onlinedocs/Programming/15vcs.html)). That is **dreadful by design** — enormous effort spent hiding code instead of widening adoption. No widespread community, no public screaming, and every reseller vertical incentivised to stay opaque.
 
-Umbraculum's counter-commitment is blunt: **keep platform code in Git as text** — AGPLv3 core, MIT SDK, public PRs — so diffs, forks, and improvement discussions do not require an employer's permission. We cannot forbid proprietary Tier 4 vertical modules ([`MODULES.md`](../MODULES.md)), but we refuse to make *platform* code hide-by-default or whole-package-only the way Omnis verticals often did. Open source on the backbone is how we avoid that scenario — the *business* case for why hiding code was never the moat is in §3.8.
+Umbraculum's counter-commitment is blunt: **keep platform code in Git as text** — AGPLv3 core, MIT SDK, public PRs — so diffs, forks, and improvement discussions do not require an employer's permission. We cannot forbid proprietary Tier 4 vertical modules ([`MODULES.md`](../MODULES.md)), but we refuse to make *platform* code hide-by-default or whole-package-only the way Omnis verticals often did. Open source on the backbone is how we avoid that scenario — the *business* case for why hiding code was never the moat is in §3.7.
 
-### 3.5 Core modernizing Studio — verticals controlling the room (post-2010, our view)
+### 3.4 Core modernizing Studio — verticals controlling the room (post-2010, our view)
 
 After roughly 2010, Omnis was **willing to improve Studio** — the IDE foundation of the whole environment. The direction many of us with cross-stack experience recognised as needed: a **more robust IDE**, less "pure RAD," closer to what had become normal elsewhere. Omnis **core** appeared to be pushing toward that modernity, and we respected that effort. **This was not, in our reading, core employees failing the product.**
 
@@ -99,7 +99,7 @@ That is **understandable as vertical business defence** and **destructive as pla
 
 We have since heard that an **Omnis association** formed some years later and that **some verticals became stakeholders in Studio**. We are not inside that process today; we note only that **at the time, this felt like a foreseeable consequence** of a ecosystem that never gave independent developers standing.
 
-### 3.6 When the only doc site goes dark — the 2016 website revamp (our view)
+### 3.5 When the only doc site goes dark — the 2016 website revamp (our view)
 
 For a long period, Omnis's **official website was the only durable place** core documentation lived for many of us. There was **no Stack Overflow corpus**, no searchable public thread archive, no parallel doc mirror — a **closed documentation surface** in a world that had already moved on.
 
@@ -111,9 +111,11 @@ That revamp was a moment many of us **swore to leave** — not because Studio ha
 
 Umbraculum's counter-commitment: docs in the **public monorepo**, published through a **versioned docs site** ([RFC-0005](rfcs/0005-docs-site.md)), structural checks in CI — and [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) treating link rot as a merge blocker, not an ops surprise.
 
-### 3.7 Outcomes we were already seeing — and reportedly still see (our view)
+**Non-negotiable:** when a published doc **moves** or is **removed**, the change must ship with **either** a **permanent redirect** to the replacement URL **or** a deliberate stub that **explains why the page no longer exists** and where to go instead. Silent 404s — bookmarks, forum posts, and "send this link to a colleague" paths that die without explanation — are **not acceptable**. See [`docs/README.md`](../README.md) §"Contributing to the documentation".
 
-The pattern §3.5 describes had predictable results **in our network**:
+### 3.6 Outcomes we were already seeing — and reportedly still see (our view)
+
+The pattern §3.4 describes had predictable results **in our network**:
 
 - **Developers scared away** from treating Omnis as a career bet outside one employer.  
 - **No new adoption** at city scale for greenfield teams — despite a capable runtime.  
@@ -125,7 +127,7 @@ We also hear that **resellers have already opened doors to Odoo** — not from i
 
 **Our lesson, stated without blame:** when ecosystem design is **Core + verticals only**, outcomes drift toward **consolidation, fear, and stack migration** — even when the underlying technology remains good. Umbraculum designs differently: **open backbone**, **tryability**, **public expertise discovery**, **no certification theatre** — so vertical builders and employed developers are not hostage to a single owner's M&A timeline.
 
-### 3.8 Reseller jealousy and the "only our products" trap
+### 3.7 Reseller jealousy and the "only our products" trap
 
 Software houses and senior developers on proprietary Omnis verticals often **guarded their code and knowledge** — understandable from a business perspective, destructive from a platform perspective. Products are sold by marketing and relationships, not by whether a outsider can read the repo; yet the default posture treated the stack as a trade secret. The result: Omnis became a tool to **maintain specific existing products**, not a magnet for developers building the *next* ERP, WMS, or MRP. Anyone not **forced** to use it had easier on-ramps elsewhere, despite Omnis being technically strong for the problem domain.
 
@@ -147,7 +149,7 @@ Each Omnis failure mode — or **lesson carried forward** where Omnis did someth
 | Reseller-only knowledge | Public contribution from day one | [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.2; public PRs; tier-3/tier-6 permissionless module paths in [`MODULES.md`](../MODULES.md) |
 | Career tied to one employer / non-portable stack | Portable skills on an open platform | MIT [`module-sdk`](../MODULES.md); public docs and repos; permissionless modules; [`GETTING-STARTED.md`](../GETTING-STARTED.md) path usable without a reseller relationship |
 | Core vs verticals only — no third chair | **Public community + forum** as governance counterweight | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4; `forum.umbraculum.dev` |
-| Single closed doc channel (2016-style breakage) | Docs in git; versioned site; structural link checks | [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md); [RFC-0005](rfcs/0005-docs-site.md); CI docs gates |
+| Single closed doc channel (2016-style breakage) | Docs in git; versioned site; **redirect or explained removal** — no silent 404s | [`docs/README.md`](../README.md) §"Contributing to the documentation"; [RFC-0005](rfcs/0005-docs-site.md); CI docs gates |
 | Vertical M&A fear → forced migration | Open backbone + fork rights; expertise portable | [`LICENSING.md`](../LICENSING.md) §9; AGPLv3; public contribution |
 | **Lesson (Omnis strength):** debugging and inspectability were default in Studio; often **optional** in PHP/Magento-scale stacks developers moved to | Keep inspectability cheap — tests and CI by default; similar code shape across teams | [`TESTING.md`](../TESTING.md); **GitHub Actions workflows** in `.github/workflows/` (lint, types, tests, docs gates on every PR); typed contracts + validation slice — [`FOUNDATION-HARDENING.md`](../FOUNDATION-HARDENING.md); **umbraculum-toolset** Cursor plugins (rules/skills/agents) so contributors produce **structurally similar** code even across unrelated teams — [`CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md), [`MANIFESTO.md`](../../MANIFESTO.md) §1.3; §2.3 |
 
