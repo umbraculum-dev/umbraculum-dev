@@ -278,12 +278,26 @@ Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
 Before pushing changes that touch TypeScript, ESLint, module READMEs, lockfiles,
 or CI workflows:
 
-1. Run `npx @umbraculum/ci-parity` from the repo root (or `./scripts/ci-parity-check.sh`).
-2. Do **not** treat `docker compose exec … npm run typecheck` as CI parity.
-3. Manifest source of truth: `.umbraculum/ci-parity.json` — see [`docs/CI-PARITY.md`](docs/CI-PARITY.md).
+1. Run **`npx @umbraculum/ci-parity`** from the repo root (cross-platform;
+   see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)). Optional thin wrapper on
+   Unix: `./scripts/ci-parity-check.sh` (same behavior — **not** a substitute
+   on Windows; use `npx` there).
+2. Do **not** treat `docker compose exec … npm run typecheck`, host `python3
+   scripts/docs/…`, host `npm run build:packages`, or ad-hoc `docker run …
+   bash -lc` on the live workspace as pre-push proof — those are fast iteration
+   or Linux-biased debug only.
+3. Manifest source of truth: `.umbraculum/ci-parity.json` — when adding or
+   changing a GHA workflow's verify steps, **add the same commands as a ci-parity
+   job** in the manifest; do not invent host-only verification scripts.
+4. GHA minutes are for integration steps that truly need GitHub (OIDC publish,
+   EAS, etc.) — not for discovering failures ci-parity can catch locally.
 
-Host prerequisites: `git`, `bash`, Docker. Jobs execute inside the manifest's
-container image, not on the host Node runtime.
+Host prerequisites for ci-parity: **git**, **Docker**, and **Node** (to launch
+`npx @umbraculum/ci-parity` only). Job commands execute inside the manifest's
+container image (`node:20-slim`), not on the host shell/OS.
+
+Witness rule: `72-ci-parity-local-vs-ci-divergence.mdc` (agent anti-patterns
+for pre-push verification).
 
 ## Release/version notation guardrail
 
