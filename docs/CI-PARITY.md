@@ -82,7 +82,7 @@ docs/CI-PARITY.md
 | Where does `publish-ci-parity` run? | **umbraculum-toolset** → Actions (npm publish on `ci-parity-v*` tags only) |
 | Did we break Cursor plugins? | No — `packages/ci-parity/` is a **sibling** of `cursor-plugins/`, not inside it |
 
-Full publish runbook (GHA, `NPM_TOKEN`, expected `ENEEDAUTH` on first run): [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md).
+Full publish runbook: [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). OIDC trusted publishing setup, troubleshooting, and execution log: [`docs/design/ci-parity-npm-trusted-publishing.md`](design/ci-parity-npm-trusted-publishing.md).
 
 ## Manifest (source of truth)
 
