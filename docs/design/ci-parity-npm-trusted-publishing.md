@@ -49,9 +49,10 @@ npm does **not** validate these fields at save time — errors appear only on th
 
 File: `umbraculum-toolset/.github/workflows/publish-ci-parity.yml`
 
-- `permissions.id-token: write`
-- `actions/setup-node` with `registry-url: https://registry.npmjs.org`
-- `npm install -g npm@latest` (requires npm CLI **≥ 11.5.1**)
+- `permissions.id-token: write` on the **publish job**
+- **No** `registry-url` on `setup-node` (writes empty `_authToken` → blocks OIDC)
+- `npm install -g npm@11.6.2` (requires npm CLI **≥ 11.5.1**)
+- Explicit GitHub OIDC fetch → `NPM_ID_TOKEN` with audience `npm:registry.npmjs.org`
 - `npm publish` with **no** `NODE_AUTH_TOKEN`
 
 ---
@@ -91,7 +92,8 @@ npm view @umbraculum/ci-parity version
 
 | Symptom | Likely cause |
 |---------|----------------|
-| `ENEEDAUTH` / `404` on publish with OIDC | Workflow filename mismatch; npm CLI &lt; 11.5.1; **`setup-node` `registry-url` without token** writes `_authToken=${NODE_AUTH_TOKEN}` to `$NPM_CONFIG_USERCONFIG` — **strip only `_authToken`** (keep `registry=`); do **not** delete the whole `.npmrc` or omit `registry-url` (that causes `ENEEDAUTH`); `unset NODE_AUTH_TOKEN` before publish; publish from `packages/ci-parity/` not `npm publish -w`; `repository` must point at `umbraculum-dev/umbraculum-toolset` |
+| `ENEEDAUTH` | npm `oidc()` failed before publish — run with `--loglevel verbose` and look for `oidc` lines; common causes: missing `id-token: write`; `setup-node` `registry-url` without token; trusted publisher fields mismatch on npm `/access` page; token exchange rejected for wrong GitHub owner/repo/workflow filename |
+| `404` on PUT | Often empty `_authToken` from `setup-node` `registry-url` (same fix: omit `registry-url` or strip `_authToken` only) |
 | Publish still uses token | `NODE_AUTH_TOKEN` still set on publish step — remove it |
 | `npm ci` fails on private deps | OIDC does not help install — use a **read-only** token only on `npm ci` (not needed for `@umbraculum/ci-parity` today; deps are public) |
 
