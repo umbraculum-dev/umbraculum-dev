@@ -47,6 +47,41 @@ A **fifth** plugin in the umbraculum-toolset family —
 Python industrial-automation **sister-repo**, not to umbraculum-dev. Do
 **not** install it here.
 
+## Strongly recommended — Prisma (official Cursor marketplace plugin)
+
+Umbraculum-dev uses **Prisma** for Postgres (`services/api/prisma/schema.prisma`,
+forward migrations, multiSchema module ownership). We **warmly advise**
+installing Cursor's **official Prisma plugin** in addition to the
+umbraculum-toolset pack.
+
+| Item | Detail |
+|------|--------|
+| **Marketplace name** | **Prisma** (publisher: Prisma — the official plugin) |
+| **Required?** | **No** — not part of the apparatus witness gate in [`../AGENTS.md`](../AGENTS.md). Missing it does not block agent sessions. |
+| **Why** | MCP integration (Prisma Local / Prisma Remote), migration + schema rules, CLI skills — faster, safer schema/migration work for agents and humans. |
+| **Pairs with** | Platform rule `47-prisma-multischema-module-schemas.mdc` (`umbraculum-platform-tsjs-cursor-assistant`) — Umbraculum-specific multiSchema + `registerModule({ prismaSchema })` discipline; the Prisma plugin covers generic Prisma CLI/schema conventions. |
+
+### Install
+
+1. **Cursor → Settings → Plugins → Browse Marketplace**
+2. Search **Prisma** and install the **official** plugin (description: *MCP server integration, rules, skills, and automation for database development*).
+3. **Developer: Reload Window** after install.
+4. Optional: **Settings → Features → MCP** — enable **Prisma Local** and/or **Prisma Remote** for schema introspection from the agent.
+
+The umbraculum-toolset installer (`install-local.sh`) does **not** install
+this plugin; it comes from the Cursor marketplace only.
+
+### Verify (optional)
+
+- **Settings → Plugins** — **Prisma** shows installed and enabled.
+- Open `services/api/prisma/schema.prisma` (or a migration file) and start an
+  agent session — requestable rules such as `migration-best-practices.mdc` and
+  `schema-conventions.mdc` should be available.
+- **Settings → Features → MCP** — Prisma MCP servers listed when enabled.
+
+Agents may remind contributors to install Prisma when a task touches schema
+or migrations; that reminder is advisory, not a hard gate.
+
 ## Install
 
 The four umbraculum-toolset plugins are **submitted to the Cursor
