@@ -45,13 +45,13 @@ This plan converts [`npm-sdk-publish-preflight.md`](npm-sdk-publish-preflight.md
 
 | Order | Package | Path | Initial version |
 |-------|---------|------|-----------------|
-| 1 | `@umbraculum/ai-tool-sdk` | `REPO_ROOT/umbraculum-dev/packages/ai-tool-sdk/` | `0.1.0` (already in manifest) |
-| 2 | `@umbraculum/i18n-keys` | `REPO_ROOT/umbraculum-dev/packages/i18n-keys/` | `0.1.0` |
-| 3 | `@umbraculum/module-sdk` | `REPO_ROOT/umbraculum-dev/packages/module-sdk/` | `0.0.1` |
-| 4 | `@umbraculum/automation-contracts` | `REPO_ROOT/umbraculum-dev/packages/automation-contracts/` | `0.0.1` |
-| 5 | `@umbraculum/pim-contracts` | `REPO_ROOT/umbraculum-dev/packages/pim-contracts/` | `0.0.1` |
-| 6 | `@umbraculum/mrp-contracts` | `REPO_ROOT/umbraculum-dev/packages/mrp-contracts/` | `0.0.1` |
-| 7 | `@umbraculum/crp-contracts` | `REPO_ROOT/umbraculum-dev/packages/crp-contracts/` | `0.0.1` |
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `0.1.0` (already in manifest) |
+| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | `0.1.0` |
+| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `0.0.1` |
+| 4 | `@umbraculum/automation-contracts` | `packages/automation-contracts/` | `0.0.1` |
+| 5 | `@umbraculum/pim-contracts` | `packages/pim-contracts/` | `0.0.1` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.1` |
+| 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.1` |
 
 **Publish tag (proposed):** `sdk-batch-v0.1.0` — one tag drives the ordered batch workflow.
 
@@ -169,13 +169,13 @@ Only maintainers push `sdk-batch-v*` tags. Executor must not tag without maintai
 
 Copy standard MIT license text into each package directory:
 
-- `REPO_ROOT/umbraculum-dev/packages/ai-tool-sdk/LICENSE`
-- `REPO_ROOT/umbraculum-dev/packages/i18n-keys/LICENSE`
-- `REPO_ROOT/umbraculum-dev/packages/module-sdk/LICENSE`
-- `REPO_ROOT/umbraculum-dev/packages/automation-contracts/LICENSE`
-- `REPO_ROOT/umbraculum-dev/packages/pim-contracts/LICENSE`
-- `REPO_ROOT/umbraculum-dev/packages/mrp-contracts/LICENSE`
-- `REPO_ROOT/umbraculum-dev/packages/crp-contracts/LICENSE`
+- `packages/ai-tool-sdk/LICENSE`
+- `packages/i18n-keys/LICENSE`
+- `packages/module-sdk/LICENSE`
+- `packages/automation-contracts/LICENSE`
+- `packages/pim-contracts/LICENSE`
+- `packages/mrp-contracts/LICENSE`
+- `packages/crp-contracts/LICENSE`
 
 Copyright holder: **Umbraculum contributors** (or legal name maintainer confirms).
 
@@ -225,7 +225,7 @@ Adjust relative link depth per package README location.
 
 ### 7.1 New file
 
-**Path:** `REPO_ROOT/umbraculum-dev/.github/workflows/publish-sdk-batch.yml`
+**Path:** `.github/workflows/publish-sdk-batch.yml`
 
 **Trigger:**
 
@@ -264,7 +264,7 @@ on:
 
 ### 7.2 New design doc (short)
 
-**Path:** `REPO_ROOT/umbraculum-dev/docs/design/npm-sdk-trusted-publishing.md`
+**Path:** `docs/design/npm-sdk-trusted-publishing.md`
 
 Content: clone structure of [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md) with repo = `umbraculum-dev`, workflow = `publish-sdk-batch.yml`, table of seven package exchange URLs, troubleshooting (404 = trusted publisher not saved).
 
