@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1 working checklist for Phase 2 **2b**  
 **Audience:** maintainer running Stage 1 before the atomic public flip (**2c**)  
-**Related:** [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1, [`ROADMAP.md`](../ROADMAP.md) Week 3 Stage 1
+**Related:** [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1, [`ROADMAP.md`](../ROADMAP.md) Week 1 tail + Week 3 Stage 1, [RFC-0010](../rfcs/0010-platform-brewery-postgres-schema-split.md) runbook [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres-schema-split.md)
 
 ---
 
@@ -37,6 +37,17 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 | 3.1 | `package.json` `repository` / `bugs` | `github.com/umbraculum-dev/umbraculum-dev` | ☑ |
 | 3.2 | Clone URLs in [`GETTING-STARTED.md`](../GETTING-STARTED.md) | `git@github.com:umbraculum-dev/umbraculum-dev.git` | ☑ |
 | 3.3 | `internal/**` not linked from public docs | `python3 scripts/docs/check-public-docs-no-internal-links.py` | ☑ (2026-05-27 agent) |
+
+### 3.5 Postgres schema split (RFC-0010)
+
+Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres-schema-split.md) (backup §3, migrate deploy §4, test DB §5).
+
+| # | Check | How | Pass? |
+|---|--------|-----|-------|
+| 3.5.1 | Dev DB migration current | `docker compose exec -T api sh -c 'DATABASE_URL=$DATABASE_URL_DIRECT npx prisma migrate deploy --schema prisma/schema.prisma'` exits 0 | ☐ |
+| 3.5.2 | Test DB bootstrap (CI parity) | `docker compose exec -T api npm run test:db:prepare` — drops `reporting` schema before `migrate reset` (see runbook §5) | ☐ |
+| 3.5.3 | Pre-DDL backup on maintainer machine | Confirm gitignored `backups/*_pre_schema_split_*.dump` exists OR re-run runbook §3 before any future DDL on shared dev DB | ☐ |
+| 3.5.4 | Self-host / fresh-clone path documented | [`DEVELOPMENT.md`](../../DEVELOPMENT.md) (upgrade path: `prisma migrate deploy`) + runbook §4 | ☐ |
 
 ---
 

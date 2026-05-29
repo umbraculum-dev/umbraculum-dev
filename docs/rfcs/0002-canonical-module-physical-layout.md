@@ -72,7 +72,9 @@ Named precedents for β-shaped distribution (not identical, but directionally al
 
 Both disciplines are enforced at build time by `scripts/check-web-url-segments.ts` (wired in `.github/workflows/check-web-url-segments.yml`). The canonical β shape is therefore: route group `(<code>)/` contains ONLY static sub-segment folders (`(<code>)/<segment>/page.tsx`), each registered via `@umbraculum/module-sdk`'s `registerWebModule({ ownedUrlSegments })`. The `(auth)/` platform-grouping route group is the canonical good example (sub-segments only: `login/`, `signup/`, `select-workspace/`, `select-account/`).
 
-**Prisma alignment.** New canonical modules get a dedicated Postgres schema via Prisma `multiSchema` preview when the second module ships ([`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.5 option 2, §5.2). The schema name equals the canonical code (`wms`, `automation`, …). Legacy brewery tables remain in `public` until a separate migration RFC authorizes `brewery.*` schema split (RFC-0006 deferred the Prisma split independently of the file-move acceleration).
+**Prisma alignment.** New canonical modules get a dedicated Postgres schema via Prisma `multiSchema` when they ship ([`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §4.5, §5.2). The schema name equals the canonical code (`wms`, `automation`, …). Tier-6 brewery domain tables live in `brewery.*`; horizontal platform models live in `platform.*` per [RFC-0010](0010-platform-brewery-postgres-schema-split.md) (2026-05-28). Legacy `public` holds only `_prisma_migrations` for Prisma-managed objects.
+
+> **Forward amendment (RFC-0010):** Pre-2026-05-28 text in this RFC sometimes said brewery tables "remain in `public` until a separate migration RFC." That deferral is **closed** — see §11.4 and §12.
 
 ---
 
@@ -86,7 +88,7 @@ Four conventions, applied consistently across all β slices:
 
 3. **Contracts package = `@umbraculum/<code>-contracts`.** Monorepo path `packages/<code>-contracts/`. The package exports stable DTOs, route ID constants, and module-registration type slices third parties may pin. It does NOT export server-only implementations or Prisma client wrappers.
 
-4. **Postgres schema namespace = canonical code** (new modules only). Prisma `@@schema("wms")` (or equivalent `multiSchema` configuration) matches the folder code. Existing `public` brewery tables are exempt until a dedicated migration.
+4. **Postgres schema namespace = canonical code** (modules and tier-6 verticals). Prisma `@@schema("wms")` (or equivalent `multiSchema` configuration) matches the folder code. Tier-6 brewery uses `@@schema("brewery")`; horizontal platform models use `@@schema("platform")` ([RFC-0010](0010-platform-brewery-postgres-schema-split.md)). Legacy `public` holds only `_prisma_migrations` for Prisma-managed objects.
 
 **Module README.** Each `services/api/src/modules/<code>/README.md` (and optional sibling under `packages/<code>-contracts/`) follows [`docs/DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) — overview, config surfaces, logging, API entrypoints. This is documentation discipline, not a fifth naming convention.
 
@@ -116,7 +118,7 @@ Rationale:
 
 > **Amendment status (2026-05-21):** This decision was AMENDED by [RFC-0006](0006-amend-rfc-0002-brewery-file-move-acceleration.md). The original text is preserved below as a historical record per [`docs/LICENSING.md`](../LICENSING.md) §10 forward-only amendment principle; RFC-0006 is the authoritative interpretation going forward.
 >
-> **Summary of the amendment:** brewery's file-move from the flat `services/api/src/routes/*.ts` + `apps/web/app/[locale]/<segment>/` layout to the β shape (`services/api/src/modules/brewery/` + `apps/web/app/[locale]/(brewery)/`) was pulled forward from H1 2027 to Week 1 of the late-H1-2026 tranche (2026-05-20 → 2026-05-26), bundled with the web-route-shape audit ([`docs/design/web-route-group-audit.md`](../design/web-route-group-audit.md)). The acceleration trigger was the second canonical module landing (`automation` Phase B-1 in early 2026, `pim` Phase A in mid-2026) PLUS the web-route audit's need for a uniform layout across all three modules to exercise the new URL-segment-collision CI gate. The Prisma `brewery.*` schema split remains deferred (RFC-0006 §4 — only the TypeScript file-move was accelerated; the schema move is a separate, higher-risk migration).
+> **Summary of the amendment:** brewery's file-move from the flat `services/api/src/routes/*.ts` + `apps/web/app/[locale]/<segment>/` layout to the β shape (`services/api/src/modules/brewery/` + `apps/web/app/[locale]/(brewery)/`) was pulled forward from H1 2027 to Week 1 of the late-H1-2026 tranche (2026-05-20 → 2026-05-26), bundled with the web-route-shape audit ([`docs/design/web-route-group-audit.md`](../design/web-route-group-audit.md)). The acceleration trigger was the second canonical module landing (`automation` Phase B-1 in early 2026, `pim` Phase A in mid-2026) PLUS the web-route audit's need for a uniform layout across all three modules to exercise the new URL-segment-collision CI gate. At RFC-0006 acceptance the Prisma split was still deferred; [RFC-0010](0010-platform-brewery-postgres-schema-split.md) (2026-05-28) subsequently shipped `platform.*` + `brewery.*` — see §11.4 and §12.
 >
 > The original-text Rationale block below remains useful as historical context — it captures the trade-off the amendment had to revisit and explains why the original "wait for 2nd canonical module" position was correct for the pre-audit world.
 
@@ -222,7 +224,7 @@ Enterprises auditing codebase structure for acquisitions or compliance reviews g
 
 ## 11. Migration plan
 
-> **Amendment note (RFC-0006):** The TypeScript/API/web/native brewery file move described in this section has already landed under the RFC-0006 acceleration. The historical rows below remain useful to understand the before/after mapping; they are not a current-state inventory. The Prisma `brewery.*` schema split remains deferred.
+> **Amendment note (RFC-0006 + RFC-0010):** The TypeScript/API/web/native brewery file move described in this section landed under the RFC-0006 acceleration. The historical rows below remain useful to understand the before/after mapping; they are not a current-state inventory. The Prisma `platform.*` + `brewery.*` schema split shipped under [RFC-0010](0010-platform-brewery-postgres-schema-split.md) (2026-05-28).
 
 ### 11.1 Historical flat brewery surface (pre-RFC-0006)
 
@@ -254,7 +256,9 @@ When the second canonical module shipped and the web-route audit landed, RFC-000
 | `services/api/src/app.ts` flat `register` calls | `registerModule()` per installed module |
 | `@umbraculum/i18n`, `@umbraculum/ui`, … | `@umbraculum/*` horizontal; `@umbraculum/brewery-*` or equivalent for vertical packages (sub-plan #9) |
 
-**Prisma:** new module schema `wms` (example); brewery tables remain `public` until a follow-on migration authorizes `brewery` schema.
+**Prisma (current state, RFC-0010):** new module schema `wms` (example) uses `@@schema("wms")`; brewery domain tables live in `brewery.*`; horizontal platform tables in `platform.*`. The row below records the pre-RFC-0010 planning assumption only.
+
+**Prisma (historical planning row):** ~~brewery tables remain `public` until a follow-on migration authorizes `brewery` schema~~ → superseded by RFC-0010.
 
 **`registerModule()`:** create `packages/module-sdk/` and wire `services/api/src/app.ts` to register `brewery` and `wms` (and any other installed modules).
 
@@ -262,7 +266,7 @@ When the second canonical module shipped and the web-route audit landed, RFC-000
 
 Each of `mrp`, `crm`, `crp`, `automation` (RFC-0001 Decision B) lands directly in β paths from its first PR — no flat interim. Surface design for each module remains its own RFC or design artifact; RFC-0002 only supplies the folder convention.
 
-### 11.4 What stays deferred after H1 2027
+### 11.4 RFC-0002 §11.4 deferrals (status after RFC-0010)
 
 - ~~Full `brewery` Postgres schema split from `public`~~ → **DONE (RFC-0010, 2026-05-28).** Horizontal models in `platform.*`; brewery domain tables in `brewery.*`. As-built runbook: [`platform-brewery-postgres-schema-split.md`](../design/platform-brewery-postgres-schema-split.md).
 - Lint import boundaries (RFC-0001 §8.3).
@@ -275,6 +279,8 @@ Each of `mrp`, `crm`, `crp`, `automation` (RFC-0001 Decision B) lands directly i
 **Status: Accepted 2026-05-19.** Decision D AMENDED 2026-05-21 by RFC-0006.
 
 Decisions A, B, C are committed; Decision D is committed as amended by [RFC-0006](0006-amend-rfc-0002-brewery-file-move-acceleration.md). Implementers MUST treat β as the authoritative layout for new design docs, and MUST follow the two β disciplines added by the Week-1 audit (no `(<code>)/page.tsx`, no `(<code>)/[<dynamic>]/page.tsx` at the route-group root — see §3 as amended). Brewery's file-move is no longer deferred (RFC-0006 acceleration). The Prisma `platform.*` + `brewery.*` schema split is **shipped** ([RFC-0010](0010-platform-brewery-postgres-schema-split.md), 2026-05-28). Remaining §11.4 deferrals: ESLint import boundaries and external-repo packaging.
+
+**Forward amendment (RFC-0010).** Any pre-2026-05-28 passage in this RFC that says brewery or platform tables "remain in `public`" or that the Prisma split is "deferred" records the acceptance-time calendar unless explicitly marked historical (§6 blockquote, RFC-0006 preserved text). Current Postgres layout: [`docs/design/platform-brewery-postgres-schema-split.md`](../design/platform-brewery-postgres-schema-split.md).
 
 The 30-day public-comment period in [`docs/LICENSING.md`](../LICENSING.md) §10 applies post-public-alpha (target: July 2026 per [`docs/PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1). Until then, solo author drafts → core team reviews → core team approves; this RFC was written as if it WILL be public-readable so the public alpha re-publishes without rewrite.
 
