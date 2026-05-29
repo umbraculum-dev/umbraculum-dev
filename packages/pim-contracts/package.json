@@ -1,9 +1,29 @@
 {
   "name": "@umbraculum/pim-contracts",
-  "private": true,
   "version": "0.0.1",
   "description": "Canonical PIM module contract types: products, variants, attribute sets, attributes, categories, media asset refs, and contract-version handshake. Phase A surface per RFC-0004 and docs/design/canonical-pim-module-surface.md (post-implementation).",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/pim-contracts"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/pim-contracts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

@@ -385,8 +385,8 @@ From repo root per [`CI-PARITY.md`](../CI-PARITY.md).
 
 | Date | Sub-plan | Maintainer | Published versions | Notes |
 |------|----------|------------|-------------------|-------|
-| — | SP-1 | — | — | Prep not started |
-| — | SP-2 | — | — | Workflow not started |
+| 2026-05-29 | SP-1 | agent | — | Manifests, LICENSE, README install sections |
+| 2026-05-29 | SP-2 | agent | — | `publish-sdk-batch.yml` + trusted-publishing doc |
 | — | SP-3 | — | — | Tag not pushed |
 
 ---

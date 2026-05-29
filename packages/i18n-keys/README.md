@@ -5,6 +5,14 @@ Namespace conventions and key helpers for module-owned message keys in Umbraculu
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications. Greenfield SDK package landed 2026-05-27; realizes the published-SDK commitment in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §4.4. This is **not** a carve-out from [`@umbraculum/i18n`](../i18n/) — that package keeps locale machinery and message **content**. Splitting brewery-flavored strings into a future vertical bundle is deferred per [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md) §1.4.
 
+## Install
+
+```bash
+npm install @umbraculum/i18n-keys@^0.1.0
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+
 ## What this is
 
 The MIT-licensed contract third-party and canonical module authors use to name message keys consistently across web (`next-intl`) and native (`useTranslator`). It encodes three rules the platform already follows in production:
@@ -116,7 +124,7 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 
 ## Status
 
-v0.1.0 is intentionally minimal: conventions + helpers, no bundle merger and no key-existence CI yet. Breaking changes follow PLATFORM-ARCHITECTURE §10 semver discipline at the SDK boundary. Workspace-`private: true` today; npm publishing deferred per §10.1.1.
+v0.1.0 is intentionally minimal: conventions + helpers, no bundle merger and no key-existence CI yet. Breaking changes follow PLATFORM-ARCHITECTURE §10 semver discipline at the SDK boundary. Published on the public npm registry — see [`docs/design/npm-sdk-publish-execution-plan.md`](../../docs/design/npm-sdk-publish-execution-plan.md).
 
 ## Further reading
 

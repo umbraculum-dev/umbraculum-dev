@@ -5,6 +5,14 @@ Module registration contract for the Umbraculum platform (`registerModule`, `reg
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
+## Install
+
+```bash
+npm install @umbraculum/module-sdk@^0.0.1
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md). Peer packages: `@umbraculum/ai-tool-sdk`, `@umbraculum/i18n-keys`.
+
 ## What this is
 
 MIT-licensed SDK surface (per [`docs/LICENSING.md`](../../docs/LICENSING.md) §6.2) for third-party and first-party modules. Exposes `registerModule()` for Fastify route registration, module-owned AI-tool registration, and document-template registration, canonical-code validation aligned with [RFC-0001](../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) Decision B, and a parallel `registerWebModule()` (with URL-segment registration + nav-entry contributions) for the App Router route-group convention committed in [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision B and refined by [`docs/design/web-route-group-audit.md`](../../docs/design/web-route-group-audit.md).
