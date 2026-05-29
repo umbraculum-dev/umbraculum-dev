@@ -21,6 +21,8 @@ async function generateSpec(): Promise<object> {
 
   const app = buildApp();
   await app.ready();
+  // Fastify swagger() is typed loosely on the default provider; output is validated below.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const rawSpec = app.swagger();
   await app.close();
 
