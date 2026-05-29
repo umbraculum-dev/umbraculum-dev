@@ -36,7 +36,7 @@ The toolset repo is **not** “plugins only.” Its README documents `packages/`
 | App CI (`typecheck`, `lint`, `docs-readmes` on PRs) | **umbraculum-dev** | `typecheck`, `web-lint`, `docs-readmes` (after step 3 lands) |
 | Package unit tests on toolset `master` | **umbraculum-toolset** | `ci-parity-package` |
 | **npm publish** on version tag | **umbraculum-toolset** | `publish-ci-parity` |
-| Reusable workflow definition (not a standalone run) | **umbraculum-toolset** | `ci-parity-reusable` (invoked *from* umbraculum-dev workflows) |
+| Reusable workflow definition | **umbraculum-toolset** (canonical); **umbraculum-dev** vendors a copy at `.github/workflows/ci-parity-reusable.yml` |
 
 URL for publish runs:
 
@@ -54,9 +54,11 @@ git tag ci-parity-v1.0.0 e4fca59
 git push origin ci-parity-v1.0.0
 ```
 
-This pins the reusable workflow ref consumer workflows use:
+This pins the npm package and documents the reusable-workflow snapshot. umbraculum-dev callers use a **local** vendored copy:
 
-`uses: umbraculum-dev/umbraculum-toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v1.0.0`
+`uses: ./.github/workflows/ci-parity-reusable.yml` with `ci_parity_version: "1.0.0"`
+
+Sister repos with org Actions sharing enabled may instead pin `uses: umbraculum-dev/umbraculum-toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v1.0.0`.
 
 **Tag convention:** Git tag `ci-parity-v1.0.0`; `package.json` version `1.0.0` (no `v` in package.json).
 

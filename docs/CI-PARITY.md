@@ -69,7 +69,8 @@ CI for **this** monorepo is still **owned by umbraculum-dev**. The toolset repo 
 umbraculum-dev                          umbraculum-toolset
 ─────────────────                       ────────────────────
 .umbraculum/ci-parity.json    ───────►  packages/ci-parity (npm CLI)
-.github/workflows/*.yml       ───────►  ci-parity-reusable.yml
+.github/workflows/ci-parity-reusable.yml  (vendored copy; canonical in toolset)
+.github/workflows/{typecheck,web-lint,docs-readmes}.yml
 scripts/ci-parity-check.sh              cursor-plugins/ (rules/skills only)
 docs/CI-PARITY.md
 ```
@@ -120,8 +121,9 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 ## Sister-repo adoption (sketch)
 
 1. Add `.umbraculum/ci-parity.json` with appropriate `profile` (`ts-npm-monorepo` today; `python` etc. later).
-2. Pin reusable workflow: `umbraculum-dev/umbraculum-toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v1.0.0`
-3. Document the one-liner in that repo's `DEVELOPMENT.md`.
+2. Vendor or call reusable workflow: copy `ci-parity-reusable.yml` from toolset into `.github/workflows/` (umbraculum-dev uses a local copy to avoid cross-repo GHA access policy), or pin `uses: org/toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v*` if org Actions sharing is enabled.
+3. Pin `@umbraculum/ci-parity` via `ci_parity_version` on callers (today `1.0.0`).
+4. Document the one-liner in that repo's `DEVELOPMENT.md`.
 
 ## npm package
 

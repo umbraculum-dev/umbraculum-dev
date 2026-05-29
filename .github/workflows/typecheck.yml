@@ -16,6 +16,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-reusable.yml"
       - ".github/workflows/typecheck.yml"
   pull_request:
     branches: [master]
@@ -28,6 +29,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-reusable.yml"
       - ".github/workflows/typecheck.yml"
   workflow_dispatch:
 
@@ -38,7 +40,7 @@ concurrency:
 jobs:
   typecheck:
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
-    uses: umbraculum-dev/umbraculum-toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v1.0.0
+    uses: ./.github/workflows/ci-parity-reusable.yml
     with:
       jobs: typecheck
       ci_parity_version: "1.0.0"
