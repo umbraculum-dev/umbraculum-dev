@@ -29,6 +29,7 @@ export function crpResourcesRoutes(app: FastifyInstance): void {
     "/crp/resources",
     {
       schema: {
+        tags: ["crp"],
         querystring: ResourceListQuerySchema,
         response: {
           200: ResourceListResponseSchema,
@@ -48,6 +49,7 @@ export function crpResourcesRoutes(app: FastifyInstance): void {
     "/crp/resources/:resourceId",
     {
       schema: {
+        tags: ["crp"],
         params: ResourceIdParamsSchema,
         response: {
           200: ResourceGetResponseSchema,

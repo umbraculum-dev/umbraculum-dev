@@ -135,6 +135,10 @@ jobs:
         working-directory: services/api
         run: npm test
 
+      - name: Verify OpenAPI artifact is up to date
+        working-directory: services/api
+        run: npm run openapi:check
+
       - name: Upload vitest output on failure
         if: failure()
         uses: actions/upload-artifact@v5

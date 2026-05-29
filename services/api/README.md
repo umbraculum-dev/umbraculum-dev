@@ -35,6 +35,7 @@ Per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor
 - **Test (full suite)**: `docker compose exec api npm test` (resets the test DB, runs vitest including contract-snapshot tests).
 - **Test (single filter)**: `docker compose exec api npm test -- -t "<vitest filter>"`.
 - **Contract snapshot check**: `docker compose exec api npm run contracts:check` (fails CI if the API's serialized response shape diverges from the snapshots; refresh with `npm run contracts:update`).
+- **OpenAPI artifact**: `docker compose exec api npm run openapi:generate` (regenerate committed spec); `docker compose exec api npm run openapi:check` (CI parity). See [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace carries all 6 candidate strict flags after Phase 6f + 6g + 6h).
 - **DB migrations**: `docker compose exec api npm run db:migrate`.
 - **Backfills**: `npm run db:backfill:recipe-styles`, `npm run db:backfill:recipe-beerjson`, `npm run db:backfill:integration-tokens` — all `tsx`-driven CLI entrypoints in `src/cli/`.
@@ -59,6 +60,7 @@ Shipping. AI orchestrator + per-workspace operational memory + admin dashboard l
 - [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md) — primary + replica + pgpool + pgvector image rationale
 - [`docs/design/canonical-ai-rag-surface.md`](../../docs/design/canonical-ai-rag-surface.md) — Layer C RAG (`ai.doc_chunks`, ingest, `platform.searchProductDocs`)
 - [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../../docs/CONTRACTS-VALIDATION-STRATEGY.md) — why the API uses hand-rolled runtime validators
+- [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md) — alpha partial OpenAPI catalog and maintainer runbook
 - [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](../../docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md) — billing source-of-truth design
 - [`docs/TESTING.md`](../../docs/TESTING.md) — platform-wide test layer map
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

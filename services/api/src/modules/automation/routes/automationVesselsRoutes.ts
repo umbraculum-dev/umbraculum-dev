@@ -1,5 +1,7 @@
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { ErrorResponseSchema } from "@umbraculum/contracts";
 import {
   VesselListResponseSchema,
   VesselStateResponseSchema,
@@ -35,28 +37,56 @@ const VesselCodeParamsSchema = z.object({
  * supervisor's snapshot-to-vessel reconciliation loop.
  */
 export function automationVesselsRoutes(app: FastifyInstance): void {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new VesselsService(app.prisma);
 
-  app.get("/automation/vessels", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const vessels = await svc.listVessels(ctx.userId, ctx.activeWorkspaceId);
-    return VesselListResponseSchema.parse({
-      ok: true,
-      vessels,
-    });
-  });
+  zodApp.get(
+    "/automation/vessels",
+    {
+      schema: {
+        tags: ["automation"],
+        response: {
+          200: VesselListResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const vessels = await svc.listVessels(ctx.userId, ctx.activeWorkspaceId);
+      return VesselListResponseSchema.parse({
+        ok: true,
+        vessels,
+      });
+    },
+  );
 
-  app.get("/automation/vessels/:code", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = VesselCodeParamsSchema.parse(req.params);
-    const vessel = await svc.getVesselByCode(
-      ctx.userId,
-      ctx.activeWorkspaceId,
-      params.code,
-    );
-    return VesselStateResponseSchema.parse({
-      ok: true,
-      vessel,
-    });
-  });
+  zodApp.get(
+    "/automation/vessels/:code",
+    {
+      schema: {
+        tags: ["automation"],
+        params: VesselCodeParamsSchema,
+        response: {
+          200: VesselStateResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const vessel = await svc.getVesselByCode(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.code,
+      );
+      return VesselStateResponseSchema.parse({
+        ok: true,
+        vessel,
+      });
+    },
+  );
 }

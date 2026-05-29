@@ -21,27 +21,53 @@ export function pimProductsRoutes(app: FastifyInstance): void {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new ProductsService(app.prisma);
 
-  app.get("/pim/products", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const items = await svc.listProducts(ctx.userId, ctx.activeWorkspaceId);
-    return ProductListResponseSchema.parse({ ok: true, items });
-  });
+  zodApp.get(
+    "/pim/products",
+    {
+      schema: {
+        tags: ["pim"],
+        response: {
+          200: ProductListResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const items = await svc.listProducts(ctx.userId, ctx.activeWorkspaceId);
+      return ProductListResponseSchema.parse({ ok: true, items });
+    },
+  );
 
-  app.get("/pim/products/:productId", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = ProductIdParamsSchema.parse(req.params);
-    const item = await svc.getProductById(
-      ctx.userId,
-      ctx.activeWorkspaceId,
-      params.productId,
-    );
-    return ProductGetResponseSchema.parse({ ok: true, item });
-  });
+  zodApp.get(
+    "/pim/products/:productId",
+    {
+      schema: {
+        tags: ["pim"],
+        params: ProductIdParamsSchema,
+        response: {
+          200: ProductGetResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const item = await svc.getProductById(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.productId,
+      );
+      return ProductGetResponseSchema.parse({ ok: true, item });
+    },
+  );
 
   zodApp.post(
     "/pim/products",
     {
       schema: {
+        tags: ["pim"],
         body: ProductCreateRequestSchema,
         response: {
           201: ProductGetResponseSchema,
@@ -62,6 +88,7 @@ export function pimProductsRoutes(app: FastifyInstance): void {
     "/pim/products/:productId",
     {
       schema: {
+        tags: ["pim"],
         params: ProductIdParamsSchema,
         body: ProductUpdateRequestSchema,
         response: {
@@ -88,6 +115,7 @@ export function pimProductsRoutes(app: FastifyInstance): void {
     "/pim/products/:productId",
     {
       schema: {
+        tags: ["pim"],
         params: ProductIdParamsSchema,
         response: {
           200: PimDeleteResponseSchema,

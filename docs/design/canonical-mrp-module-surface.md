@@ -155,7 +155,7 @@ Internal Umbraculum code uses Zod v4 schemas per [`RFC-0003`](../rfcs/0003-valid
 
 ## 6. API surface
 
-Wave 1 read-only API routes:
+Wave 1 read-only API routes (also in OpenAPI tag `mrp` — [`API-OPENAPI.md`](../API-OPENAPI.md)):
 
 | Route | Method | Purpose |
 |---|---|---|

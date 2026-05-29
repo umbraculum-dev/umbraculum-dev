@@ -85,6 +85,7 @@ export function mrpWorkOrdersRoutes(app: FastifyInstance): void {
     "/mrp/work-orders/:orderId/preview",
     {
       schema: {
+        tags: ["mrp"],
         params: ProductionOrderIdParamsSchema,
         response: {
           200: WorkOrderPreviewResponseSchema,
@@ -109,6 +110,7 @@ export function mrpWorkOrdersRoutes(app: FastifyInstance): void {
     "/mrp/work-orders/:orderId/render-jobs",
     {
       schema: {
+        tags: ["mrp"],
         params: ProductionOrderIdParamsSchema,
         body: WorkOrderRenderJobBodySchema,
         response: {
@@ -156,6 +158,7 @@ export function mrpWorkOrdersRoutes(app: FastifyInstance): void {
     "/mrp/production-orders/:orderId/material-requirements/render-jobs",
     {
       schema: {
+        tags: ["mrp"],
         params: ProductionOrderIdParamsSchema,
         body: MaterialRequirementsRenderJobBodySchema,
         response: {
@@ -196,6 +199,7 @@ export function mrpWorkOrdersRoutes(app: FastifyInstance): void {
     "/mrp/production-orders/render-jobs",
     {
       schema: {
+        tags: ["mrp"],
         body: ProductionOrderListRenderJobBodySchema,
         response: {
           202: RenderJobSubmitResponseSchema,

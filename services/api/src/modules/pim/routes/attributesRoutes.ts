@@ -25,6 +25,7 @@ export function pimAttributesRoutes(app: FastifyInstance): void {
     "/pim/attributes",
     {
       schema: {
+        tags: ["pim"],
         response: {
           200: AttributeListResponseSchema,
           401: ErrorResponseSchema,
@@ -42,6 +43,7 @@ export function pimAttributesRoutes(app: FastifyInstance): void {
     "/pim/attributes/:attributeId",
     {
       schema: {
+        tags: ["pim"],
         params: AttributeIdParamsSchema,
         response: {
           200: AttributeGetResponseSchema,
@@ -65,6 +67,7 @@ export function pimAttributesRoutes(app: FastifyInstance): void {
     "/pim/attributes",
     {
       schema: {
+        tags: ["pim"],
         body: AttributeCreateRequestSchema,
         response: {
           201: AttributeGetResponseSchema,
@@ -84,6 +87,7 @@ export function pimAttributesRoutes(app: FastifyInstance): void {
     "/pim/attributes/:attributeId",
     {
       schema: {
+        tags: ["pim"],
         params: AttributeIdParamsSchema,
         body: AttributeUpdateRequestSchema,
         response: {
@@ -110,6 +114,7 @@ export function pimAttributesRoutes(app: FastifyInstance): void {
     "/pim/attributes/:attributeId",
     {
       schema: {
+        tags: ["pim"],
         params: AttributeIdParamsSchema,
         response: {
           200: PimDeleteResponseSchema,

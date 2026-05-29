@@ -21,27 +21,53 @@ export function pimAttributeSetsRoutes(app: FastifyInstance): void {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new AttributeSetsService(app.prisma);
 
-  app.get("/pim/attribute-sets", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const items = await svc.listAttributeSets(ctx.userId, ctx.activeWorkspaceId);
-    return AttributeSetListResponseSchema.parse({ ok: true, items });
-  });
+  zodApp.get(
+    "/pim/attribute-sets",
+    {
+      schema: {
+        tags: ["pim"],
+        response: {
+          200: AttributeSetListResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const items = await svc.listAttributeSets(ctx.userId, ctx.activeWorkspaceId);
+      return AttributeSetListResponseSchema.parse({ ok: true, items });
+    },
+  );
 
-  app.get("/pim/attribute-sets/:setId", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = SetIdParamsSchema.parse(req.params);
-    const item = await svc.getAttributeSetById(
-      ctx.userId,
-      ctx.activeWorkspaceId,
-      params.setId,
-    );
-    return AttributeSetGetResponseSchema.parse({ ok: true, item });
-  });
+  zodApp.get(
+    "/pim/attribute-sets/:setId",
+    {
+      schema: {
+        tags: ["pim"],
+        params: SetIdParamsSchema,
+        response: {
+          200: AttributeSetGetResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const item = await svc.getAttributeSetById(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.setId,
+      );
+      return AttributeSetGetResponseSchema.parse({ ok: true, item });
+    },
+  );
 
   zodApp.post(
     "/pim/attribute-sets",
     {
       schema: {
+        tags: ["pim"],
         body: AttributeSetCreateRequestSchema,
         response: {
           201: AttributeSetGetResponseSchema,
@@ -65,6 +91,7 @@ export function pimAttributeSetsRoutes(app: FastifyInstance): void {
     "/pim/attribute-sets/:setId",
     {
       schema: {
+        tags: ["pim"],
         params: SetIdParamsSchema,
         body: AttributeSetUpdateRequestSchema,
         response: {
@@ -91,6 +118,7 @@ export function pimAttributeSetsRoutes(app: FastifyInstance): void {
     "/pim/attribute-sets/:setId",
     {
       schema: {
+        tags: ["pim"],
         params: SetIdParamsSchema,
         response: {
           200: PimDeleteResponseSchema,

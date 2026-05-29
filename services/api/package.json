@@ -26,7 +26,9 @@
     "seed:import": "tsx src/cli/seed-import.ts",
     "job:beerproto-sync": "tsx src/jobs/beerprotoSync.ts",
     "job:session-cleanup": "tsx src/jobs/sessionCleanup.ts",
-    "rag:ingest": "tsx src/cli/ragIngestPublicDocs.ts"
+    "rag:ingest": "tsx src/cli/ragIngestPublicDocs.ts",
+    "openapi:generate": "tsx src/scripts/openapi-generate.ts",
+    "openapi:check": "tsx src/scripts/openapi-generate.ts --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
@@ -36,7 +38,10 @@
     "@fastify/cookie": "^10.0.0",
     "@fastify/cors": "^10.0.0",
     "@fastify/rate-limit": "^10.0.0",
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^5.2.6",
     "@prisma/client": "^6.0.0",
+    "@readme/openapi-parser": "^5.5.0",
     "@umbraculum/ai-tool-sdk": "file:../../packages/ai-tool-sdk",
     "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",

@@ -21,27 +21,53 @@ export function pimCategoriesRoutes(app: FastifyInstance): void {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new CategoriesService(app.prisma);
 
-  app.get("/pim/categories", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const { items, tree } = await svc.listCategories(ctx.userId, ctx.activeWorkspaceId);
-    return CategoryListResponseSchema.parse({ ok: true, items, tree });
-  });
+  zodApp.get(
+    "/pim/categories",
+    {
+      schema: {
+        tags: ["pim"],
+        response: {
+          200: CategoryListResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const { items, tree } = await svc.listCategories(ctx.userId, ctx.activeWorkspaceId);
+      return CategoryListResponseSchema.parse({ ok: true, items, tree });
+    },
+  );
 
-  app.get("/pim/categories/:categoryId", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = CategoryIdParamsSchema.parse(req.params);
-    const item = await svc.getCategoryById(
-      ctx.userId,
-      ctx.activeWorkspaceId,
-      params.categoryId,
-    );
-    return CategoryGetResponseSchema.parse({ ok: true, item });
-  });
+  zodApp.get(
+    "/pim/categories/:categoryId",
+    {
+      schema: {
+        tags: ["pim"],
+        params: CategoryIdParamsSchema,
+        response: {
+          200: CategoryGetResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const item = await svc.getCategoryById(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.categoryId,
+      );
+      return CategoryGetResponseSchema.parse({ ok: true, item });
+    },
+  );
 
   zodApp.post(
     "/pim/categories",
     {
       schema: {
+        tags: ["pim"],
         body: CategoryCreateRequestSchema,
         response: {
           201: CategoryGetResponseSchema,
@@ -62,6 +88,7 @@ export function pimCategoriesRoutes(app: FastifyInstance): void {
     "/pim/categories/:categoryId",
     {
       schema: {
+        tags: ["pim"],
         params: CategoryIdParamsSchema,
         body: CategoryUpdateRequestSchema,
         response: {
@@ -88,6 +115,7 @@ export function pimCategoriesRoutes(app: FastifyInstance): void {
     "/pim/categories/:categoryId",
     {
       schema: {
+        tags: ["pim"],
         params: CategoryIdParamsSchema,
         response: {
           200: PimDeleteResponseSchema,

@@ -19,6 +19,7 @@ export function mrpBomsRoutes(app: FastifyInstance): void {
     "/mrp/boms",
     {
       schema: {
+        tags: ["mrp"],
         response: {
           200: BomListResponseSchema,
           401: ErrorResponseSchema,
@@ -36,6 +37,7 @@ export function mrpBomsRoutes(app: FastifyInstance): void {
     "/mrp/boms/:bomId",
     {
       schema: {
+        tags: ["mrp"],
         params: BomIdParamsSchema,
         response: {
           200: BomGetResponseSchema,

@@ -29,6 +29,7 @@ export function pimChannelFeedsRoutes(app: FastifyInstance): void {
     "/pim/channel-feeds/product-catalog-csv/jobs",
     {
       schema: {
+        tags: ["pim"],
         body: ProductCatalogFeedSubmitRequestSchema,
         response: {
           202: RenderJobSubmitResponseSchema,
