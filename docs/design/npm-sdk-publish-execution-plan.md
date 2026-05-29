@@ -296,7 +296,8 @@ Document this split in [`third-party-module.md`](../modules/contribute/third-par
 
 ### 9.1 Pre-tag checklist
 
-- [ ] `master` green (typecheck, test:packages, docs-readmes).
+- [ ] `npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep` green (or full ci-parity).
+- [ ] `master` green (typecheck, test:packages, docs-readmes on GHA).
 - [ ] SP-1 + SP-2 merged.
 - [ ] Trusted publishers configured (§5.2).
 - [ ] No unintended version bumps in the seven manifests.

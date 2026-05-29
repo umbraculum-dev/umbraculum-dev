@@ -128,8 +128,11 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 | `docs-readmes` | `.github/workflows/docs-readmes.yml` | Three Python doc checkers |
 | `lint` | `.github/workflows/web-lint.yml` | `npm run lint` after root `npm ci` |
 | `typecheck` | `.github/workflows/typecheck.yml` | 15 workspaces + nested `apps/web/e2e` install |
+| `sdk-publish-prep` | `.github/workflows/publish-sdk-batch.yml` (verify steps only; OIDC publish is GHA-only) | `build:packages`, `test:packages`, batch workspace tests, `npm pack --dry-run` for seven MIT SDK packages |
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
+
+**Before `sdk-batch-v*` tag push:** `npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep` (or full `npx @umbraculum/ci-parity`).
 
 ## Adding a typecheck-gated workspace
 
@@ -143,11 +146,11 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 1. Add `.umbraculum/ci-parity.json` with appropriate `profile` (`ts-npm-monorepo` today; `python` etc. later).
 2. Vendor or call reusable workflow: copy `ci-parity-reusable.yml` from toolset into `.github/workflows/` (umbraculum-dev uses a local copy to avoid cross-repo GHA access policy), or pin `uses: org/toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v*` if org Actions sharing is enabled.
-3. Pin `@umbraculum/ci-parity` via `ci_parity_version` on callers (today `1.0.6`).
+3. Pin `@umbraculum/ci-parity` via `ci_parity_version` on callers (today `1.0.7`).
 4. Document the one-liner in that repo's `DEVELOPMENT.md`.
 
 ## npm package
 
 Published as **`@umbraculum/ci-parity`** (MIT). Publish runbook: [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). **OIDC (no token rotation):** [`docs/design/ci-parity-npm-trusted-publishing.md`](design/ci-parity-npm-trusted-publishing.md).
 
-Interim escape hatch if npm is unavailable: `npx github:umbraculum-dev/umbraculum-toolset#ci-parity-v1.0.6 -- packages/ci-parity` (not for CI — publish first).
+Interim escape hatch if npm is unavailable: `npx github:umbraculum-dev/umbraculum-toolset#ci-parity-v1.0.7 -- packages/ci-parity` (not for CI — publish first).

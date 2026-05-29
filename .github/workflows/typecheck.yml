@@ -43,5 +43,5 @@ jobs:
     uses: ./.github/workflows/ci-parity-reusable.yml
     with:
       jobs: typecheck
-      ci_parity_version: "1.0.6"
+      ci_parity_version: "1.0.7"
       manifest_path: .umbraculum/ci-parity.json

@@ -13,6 +13,7 @@ on:
       - ".github/workflows/typecheck.yml"
       - ".github/workflows/web-lint.yml"
       - ".github/workflows/docs-readmes.yml"
+      - ".github/workflows/publish-sdk-batch.yml"
   pull_request:
     branches: [master]
     paths:
@@ -22,6 +23,7 @@ on:
       - ".github/workflows/typecheck.yml"
       - ".github/workflows/web-lint.yml"
       - ".github/workflows/docs-readmes.yml"
+      - ".github/workflows/publish-sdk-batch.yml"
   workflow_dispatch:
 
 concurrency:
@@ -44,6 +46,6 @@ jobs:
 
       - name: Validate ci-parity manifest (strict)
         run: |
-          npx @umbraculum/ci-parity@1.0.6 validate --strict \
+          npx @umbraculum/ci-parity@1.0.7 validate --strict \
             --manifest .umbraculum/ci-parity.json \
             --repo "${{ github.workspace }}"

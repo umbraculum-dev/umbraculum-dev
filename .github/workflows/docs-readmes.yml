@@ -35,5 +35,5 @@ jobs:
     uses: ./.github/workflows/ci-parity-reusable.yml
     with:
       jobs: docs-readmes
-      ci_parity_version: "1.0.6"
+      ci_parity_version: "1.0.7"
       manifest_path: .umbraculum/ci-parity.json
