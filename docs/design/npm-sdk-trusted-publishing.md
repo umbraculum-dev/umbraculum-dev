@@ -72,6 +72,12 @@ File: `umbraculum-dev/.github/workflows/publish-sdk-batch.yml`
 
 ## Step 3 — Publish (maintainer)
 
+**Pre-tag (local, cross-platform):**
+
+```bash
+npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep
+```
+
 ```bash
 git checkout master && git pull
 # confirm versions in packages/*/package.json

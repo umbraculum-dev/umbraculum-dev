@@ -59,6 +59,23 @@
         { "path": "packages/recipes-ui", "mode": "npm" },
         { "path": "packages/test-mcp", "mode": "npm" }
       ]
+    },
+    {
+      "id": "sdk-publish-prep",
+      "needsRootInstall": true,
+      "commands": [
+        "npm run build:packages",
+        "npm run test:packages",
+        "npm test -w @umbraculum/automation-contracts",
+        "npm test -w @umbraculum/i18n-keys",
+        "npm pack -w @umbraculum/ai-tool-sdk --dry-run",
+        "npm pack -w @umbraculum/i18n-keys --dry-run",
+        "npm pack -w @umbraculum/module-sdk --dry-run",
+        "npm pack -w @umbraculum/automation-contracts --dry-run",
+        "npm pack -w @umbraculum/pim-contracts --dry-run",
+        "npm pack -w @umbraculum/mrp-contracts --dry-run",
+        "npm pack -w @umbraculum/crp-contracts --dry-run"
+      ]
     }
   ]
 }

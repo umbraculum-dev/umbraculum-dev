@@ -6,6 +6,7 @@ name: publish-sdk-batch
 #
 # See docs/design/npm-sdk-trusted-publishing.md and
 # docs/design/npm-sdk-publish-execution-plan.md (SP-2/SP-3).
+# Verify steps mirror ci-parity job `sdk-publish-prep` in .umbraculum/ci-parity.json
 
 on:
   push:
