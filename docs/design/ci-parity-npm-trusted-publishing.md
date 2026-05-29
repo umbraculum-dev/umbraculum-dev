@@ -91,7 +91,7 @@ npm view @umbraculum/ci-parity version
 
 | Symptom | Likely cause |
 |---------|----------------|
-| `ENEEDAUTH` / `404` on publish with OIDC | Workflow filename mismatch; npm CLI &lt; 11.5.1; **`setup-node` `registry-url` without token** writes `_authToken` to `$NPM_CONFIG_USERCONFIG` (often `$RUNNER_TEMP/.npmrc`) — strip `_authToken` / `always-auth` before publish or omit `registry-url`; publish from `packages/ci-parity/` not `npm publish -w`; use `https://github.com/owner/repo` in `package.json#repository.url` (no `git+` prefix) |
+| `ENEEDAUTH` / `404` on publish with OIDC | Workflow filename mismatch; npm CLI &lt; 11.5.1; **`setup-node` `registry-url` without token** writes `_authToken=${NODE_AUTH_TOKEN}` to `$NPM_CONFIG_USERCONFIG` — **strip only `_authToken`** (keep `registry=`); do **not** delete the whole `.npmrc` or omit `registry-url` (that causes `ENEEDAUTH`); `unset NODE_AUTH_TOKEN` before publish; publish from `packages/ci-parity/` not `npm publish -w`; `repository` must point at `umbraculum-dev/umbraculum-toolset` |
 | Publish still uses token | `NODE_AUTH_TOKEN` still set on publish step — remove it |
 | `npm ci` fails on private deps | OIDC does not help install — use a **read-only** token only on `npm ci` (not needed for `@umbraculum/ci-parity` today; deps are public) |
 
