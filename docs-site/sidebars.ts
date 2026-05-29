@@ -39,6 +39,7 @@ const sidebars: SidebarsConfig = {
         'TIER-PRICING-ANALYSIS',
         'CORE-DEVELOPMENT-AND-COMMUNITY',
         'design/ecosystem-case-study-omnis',
+        'design/ecosystem-case-study-business-central',
       ],
     },
     {
@@ -134,6 +135,8 @@ const sidebars: SidebarsConfig = {
         'design/brewery-scope-migration-plan',
         'design/brewery-scope-migration-per-package-handoff',
         'design/rfc-0005-execution-plan',
+        'design/ecosystem-case-study-omnis',
+        'design/ecosystem-case-study-business-central',
       ],
     },
     {
