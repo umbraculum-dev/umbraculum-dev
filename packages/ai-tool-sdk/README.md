@@ -5,6 +5,14 @@ The library-agnostic AI-tool contract every callable tool the Umbraculum AI cons
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
+## Install
+
+```bash
+npm install @umbraculum/ai-tool-sdk@^0.1.0
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+
 ## What this is
 
 The five interface types that define what an AI tool is, on the SDK side of the boundary: `AiTool<Input, Output>` (the tool itself — `name`, `description`, `scope`, `inputSchema`, `handler`), `AiToolContext` (per-invocation context: workspaceId, userId, requestId, AbortSignal), `AiToolScope` (`"read" | "write" | "propose"`), `AiToolRegistry` (the boot-time registry surface), and `AiToolDefinition` (the serializable descriptor — no `handler`, safe to send to clients). Zero runtime code, zero schema library dependencies. Third-party module authors and platform-internal tool authors both depend on this package; the platform orchestrator at [`services/api/src/services/ai/orchestrator.ts`](../../services/api/src/services/ai/orchestrator.ts) consumes it via the registry interface.
@@ -72,7 +80,7 @@ Commands run from the repo root, container-friendly per the plugin-shipped `00-s
 
 ## Status
 
-The interface surface is stable and intentionally minimal. Breaking changes follow the semver-discipline-at-SDK-boundary process committed in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §10 (RFC + deprecation window + major-version bump). The package is `private: true` workspace-only today; npm publishing is deferred to the public-flip milestone per [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §10.1.1.
+The interface surface is stable and intentionally minimal. Breaking changes follow the semver-discipline-at-SDK-boundary process committed in [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) §10 (RFC + deprecation window + major-version bump). Published on the public npm registry as part of the MIT SDK batch — see [`docs/design/npm-sdk-publish-execution-plan.md`](../../docs/design/npm-sdk-publish-execution-plan.md).
 
 ## Further reading
 

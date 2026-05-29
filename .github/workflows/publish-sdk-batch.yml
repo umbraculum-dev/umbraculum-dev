@@ -1,0 +1,136 @@
+name: publish-sdk-batch
+
+# Publishes the MIT SDK npm batch on sdk-batch-v* tags.
+# Packages: ai-tool-sdk, i18n-keys, module-sdk, automation/pim/mrp/crp-contracts.
+# Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN.
+#
+# See docs/design/npm-sdk-trusted-publishing.md and
+# docs/design/npm-sdk-publish-execution-plan.md (SP-2/SP-3).
+
+on:
+  push:
+    tags:
+      - "sdk-batch-v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Install npm with OIDC trusted publishing support (>= 11.5.1)
+        run: npm install -g npm@11.6.2 && npm --version
+
+      - run: npm ci
+      - run: npm run build:packages
+      - run: npm run test:packages
+
+      - name: Publish MIT SDK batch to npm (OIDC)
+        env:
+          AI_TOOL_SDK_ESCAPED: "@umbraculum%2fai-tool-sdk"
+          I18N_KEYS_ESCAPED: "@umbraculum%2fi18n-keys"
+          MODULE_SDK_ESCAPED: "@umbraculum%2fmodule-sdk"
+          AUTOMATION_CONTRACTS_ESCAPED: "@umbraculum%2fautomation-contracts"
+          PIM_CONTRACTS_ESCAPED: "@umbraculum%2fpim-contracts"
+          MRP_CONTRACTS_ESCAPED: "@umbraculum%2fmrp-contracts"
+          CRP_CONTRACTS_ESCAPED: "@umbraculum%2fcrp-contracts"
+        run: |
+          set -euo pipefail
+
+          publish_npm_oidc() {
+            local PKG_DIR="$1"
+            local PKG_ESCAPED="$2"
+            local PKG_LABEL="$3"
+
+            echo "::group::Publish ${PKG_LABEL} from ${PKG_DIR}"
+
+            if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
+              echo "::error::Missing ACTIONS_ID_TOKEN_* env — job needs permissions.id-token: write"
+              exit 1
+            fi
+
+            OIDC_URL="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm:registry.npmjs.org"
+            ID_TOKEN=$(curl -fsSL \
+              -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+              -H "Accept: application/json" \
+              "${OIDC_URL}" | jq -r .value)
+            if [ -z "${ID_TOKEN}" ] || [ "${ID_TOKEN}" = "null" ]; then
+              echo "::error::GitHub OIDC response missing .value for ${PKG_LABEL}"
+              exit 1
+            fi
+
+            echo "OIDC payload claims for ${PKG_LABEL}:"
+            echo "${ID_TOKEN}" | cut -d. -f2 | tr '_-' '/+' | base64 -d 2>/dev/null \
+              | jq '{sub, repository, repository_owner, workflow, workflow_ref, ref, environment, job_workflow_ref}' \
+              || true
+
+            EXCHANGE_URL="https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/${PKG_ESCAPED}"
+            HTTP_CODE=$(curl -sS -o /tmp/exchange.json -w '%{http_code}' \
+              -X POST \
+              -H "Authorization: Bearer ${ID_TOKEN}" \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              "${EXCHANGE_URL}")
+            echo "Exchange HTTP ${HTTP_CODE} for ${PKG_LABEL}"
+            cat /tmp/exchange.json || true
+            echo
+            if [ "${HTTP_CODE}" != "200" ] && [ "${HTTP_CODE}" != "201" ]; then
+              echo "::error::npm OIDC token exchange failed for ${PKG_LABEL} (HTTP ${HTTP_CODE}) — verify trusted publisher at https://www.npmjs.com/package/${PKG_LABEL}/access"
+              exit 1
+            fi
+
+            NPM_TOKEN=$(jq -r .token < /tmp/exchange.json)
+            if [ -z "${NPM_TOKEN}" ] || [ "${NPM_TOKEN}" = "null" ]; then
+              echo "::error::npm exchange response missing .token for ${PKG_LABEL}"
+              exit 1
+            fi
+
+            cat > "$HOME/.npmrc" <<EOF
+          registry=https://registry.npmjs.org/
+          //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+          EOF
+
+            unset NODE_AUTH_TOKEN
+            (cd "${PKG_DIR}" && npm publish --access public)
+            echo "::endgroup::"
+          }
+
+          publish_npm_oidc packages/ai-tool-sdk "${AI_TOOL_SDK_ESCAPED}" "@umbraculum/ai-tool-sdk"
+          publish_npm_oidc packages/i18n-keys "${I18N_KEYS_ESCAPED}" "@umbraculum/i18n-keys"
+
+          echo "Rewriting module-sdk dependencies to registry semver for publish tarball only"
+          jq '.dependencies["@umbraculum/ai-tool-sdk"] = "^0.1.0" | .dependencies["@umbraculum/i18n-keys"] = "^0.1.0"' \
+            packages/module-sdk/package.json > /tmp/module-sdk-package.json
+          mv /tmp/module-sdk-package.json packages/module-sdk/package.json
+
+          publish_npm_oidc packages/module-sdk "${MODULE_SDK_ESCAPED}" "@umbraculum/module-sdk"
+
+          publish_npm_oidc packages/automation-contracts "${AUTOMATION_CONTRACTS_ESCAPED}" "@umbraculum/automation-contracts"
+          publish_npm_oidc packages/pim-contracts "${PIM_CONTRACTS_ESCAPED}" "@umbraculum/pim-contracts"
+          publish_npm_oidc packages/mrp-contracts "${MRP_CONTRACTS_ESCAPED}" "@umbraculum/mrp-contracts"
+          publish_npm_oidc packages/crp-contracts "${CRP_CONTRACTS_ESCAPED}" "@umbraculum/crp-contracts"
+
+      - name: Published versions summary
+        run: |
+          set -euo pipefail
+          for PKG in \
+            ai-tool-sdk \
+            i18n-keys \
+            module-sdk \
+            automation-contracts \
+            pim-contracts \
+            mrp-contracts \
+            crp-contracts
+          do
+            echo "@umbraculum/${PKG}@$(npm view "@umbraculum/${PKG}" version)"
+          done

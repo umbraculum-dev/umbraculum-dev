@@ -5,6 +5,14 @@ Phase A surface of the canonical `automation` module: typed Modbus mailbox spec,
 > [!NOTE]
 > Part of [Umbraculum](../../README.md). This package landed under the new `@umbraculum/*` scope as sub-plan #9 slot 4 (2026-05-19) per [RFC-0002](../../docs/rfcs/0002-canonical-module-physical-layout.md) Decision C; see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md). The sister repo (`brewery-alarms-tanks-supervisor`) emits JSON-only mailbox artifacts and does not import this package, so the rename was doc-only on the sister side.
 
+## Install
+
+```bash
+npm install @umbraculum/automation-contracts@^0.0.1
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+
 ## What this is
 
 MIT-licensed contract types for the canonical `automation` module ([`docs/design/canonical-automation-module-surface.md`](../../docs/design/canonical-automation-module-surface.md), Accepted 2026-05-19).

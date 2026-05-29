@@ -5,6 +5,14 @@ Canonical `crp` module contract package: resource, work-center, calendar, schedu
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications. `crp` is a canonical extensible domain kernel, not a finished vertical CRP suite or equipment-control layer.
 
+## Install
+
+```bash
+npm install @umbraculum/crp-contracts@^0.0.1
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+
 ## What this is
 
 Public contract types for the canonical `crp` module ([`docs/design/canonical-crp-module-surface.md`](../../docs/design/canonical-crp-module-surface.md)). Wave 1 adds schema-bound contracts so the API skeleton can expose read-only, workspace-scoped capacity data without claiming finite scheduling, automation control, or public-alpha completion.

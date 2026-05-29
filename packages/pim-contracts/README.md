@@ -5,6 +5,14 @@ Canonical `pim` module contract package: product / variant / attribute / categor
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications. Sixth canonical module ([RFC-0001](../../docs/rfcs/0001-modules-tiers-governance-and-automation-placement.md) Decision B + [RFC-0004](../../docs/rfcs/0004-canonical-pim.md)); first allocation under the post-`automation` "open-door" precedent — RFC-0001 §4.2 YAGNI explicitly stretched (rationale: platform-owner-driven implementation, not speculative reservation; see RFC-0004 §3.1). Package landed under the `@umbraculum/*` scope from the start, so no rename history applies.
 
+## Install
+
+```bash
+npm install @umbraculum/pim-contracts@^0.0.1
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+
 ## What this is
 
 MIT-licensed contract types for the canonical `pim` module ([`docs/design/canonical-pim-module-surface.md`](../../docs/design/canonical-pim-module-surface.md), authored alongside Phase B+C delivery).

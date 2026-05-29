@@ -1,9 +1,29 @@
 {
   "name": "@umbraculum/automation-contracts",
-  "private": true,
   "version": "0.0.1",
   "description": "Canonical automation module contract types: Modbus mailbox shape, adapter SDK types, contract-version handshake. Vessel-agnostic platform contract; sister-repo emits JSON-only mailbox artifacts that this package mirrors at build time. Phase A surface per docs/design/canonical-automation-module-surface.md §9.",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/automation-contracts"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/automation-contracts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

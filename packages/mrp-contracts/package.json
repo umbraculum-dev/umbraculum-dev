@@ -1,9 +1,29 @@
 {
   "name": "@umbraculum/mrp-contracts",
-  "private": true,
   "version": "0.0.1",
   "description": "Canonical MRP module contract types: production orders, BOMs, operations, material requirements, work-order payloads, and planned AI/rendering schemas.",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/mrp-contracts"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/mrp-contracts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

@@ -1,9 +1,29 @@
 {
   "name": "@umbraculum/module-sdk",
-  "private": true,
   "version": "0.0.1",
   "description": "Umbraculum module registration contract (registerModule + registerWebModule + library-agnostic ValidatedSchema<T> interface) for canonical and third-party modules. Platform-classified per sub-plan #9 §1.1; placement per RFC-0002 Decision C.",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/module-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/module-sdk#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

@@ -5,6 +5,14 @@ Canonical `mrp` module contract package: production-order, bill-of-material, ope
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications. `mrp` is a canonical extensible domain kernel, not a finished vertical MRP suite.
 
+## Install
+
+```bash
+npm install @umbraculum/mrp-contracts@^0.0.1
+```
+
+Public alpha — see [third-party-module.md](../../docs/modules/contribute/third-party-module.md).
+
 ## What this is
 
 AGPL-adjacent public contract types for the canonical `mrp` module ([`docs/design/canonical-mrp-module-surface.md`](../../docs/design/canonical-mrp-module-surface.md)). Wave 1 adds schema-bound contracts so the API skeleton can expose read-only, workspace-scoped data without pretending that the August 2026 public-alpha proof is complete.
