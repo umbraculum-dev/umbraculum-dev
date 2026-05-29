@@ -92,7 +92,7 @@ npm view @umbraculum/ci-parity version
 
 | Symptom | Likely cause |
 |---------|----------------|
-| `ENEEDAUTH` | npm `oidc()` failed before publish — run with `--loglevel verbose` and look for `oidc` lines; common causes: missing `id-token: write`; `setup-node` `registry-url` without token; trusted publisher fields mismatch on npm `/access` page; token exchange rejected for wrong GitHub owner/repo/workflow filename |
+| `ENEEDAUTH` with HTTP 404 `OIDC token exchange error - package not found` | Trusted-publisher entry on the package's npm `/access` page is missing or one field doesn't match the OIDC JWT claims. Capture the JWT claims block from the publish workflow, open https://www.npmjs.com/package/@umbraculum/ci-parity/access, delete any existing entry, and re-add: org `umbraculum-dev`, repo `umbraculum-toolset`, workflow filename `publish-ci-parity.yml` (no path, **`.yml` not `.yaml`**), env empty, allowed action `npm publish`. Save (2FA required); page must reload showing the entry. |
 | `404` on PUT | Often empty `_authToken` from `setup-node` `registry-url` (same fix: omit `registry-url` or strip `_authToken` only) |
 | Publish still uses token | `NODE_AUTH_TOKEN` still set on publish step — remove it |
 | `npm ci` fails on private deps | OIDC does not help install — use a **read-only** token only on `npm ci` (not needed for `@umbraculum/ci-parity` today; deps are public) |
@@ -103,8 +103,9 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 
 ## Execution log
 
-| Date | Event |
-|------|--------|
-| 2026-05-29 | `1.0.0` published via granular `NPM_TOKEN` |
+| Date | Event | Status |
+|------|-------|--------|
+| 2026-05-29 | `1.0.0` published via granular `NPM_TOKEN` | ✅ |
 | 2026-05-29 | Trusted publisher configured on npm (Chrome) | ✅ |
-| — | `1.0.1` OIDC publish via tag `ci-parity-v1.0.1` | in progress |
+| 2026-05-29 | `1.0.1`–`1.0.5` OIDC attempts → `E404` / `ENEEDAUTH` (setup-node `registry-url` empty `_authToken`; first trusted-publisher save did not persist) | ❌ |
+| 2026-05-29 | `1.0.6` OIDC publish green after explicit `NPM_ID_TOKEN` fetch + `/-/npm/v1/oidc/token/exchange` POST in workflow, and re-saving trusted-publisher entry on npm `/access` | ✅ |
