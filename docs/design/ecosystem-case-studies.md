@@ -30,7 +30,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | [Business Central](ecosystem-case-study-business-central.md) | Microsoft Dynamics 365 BC | Huge partner channel; **opaque external API surface** | `@umbraculum/<code>-contracts`, route tables, OpenAPI alpha |
 | [SAP](ecosystem-case-study-sap.md) | SAP ABAP / S/4 / BTP | **One language**, many verticals — but **trials ≠ safe boat** for repositioning | One try path; no cert gate |
 | [TeamSystem](ecosystem-case-study-teamsystem.md) | TeamSystem / Polyedro (Europe) | **Partner-only experiment path** — ecosystem is the vertical for outsiders | `docker compose up`; public modules |
-| [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder | Copy ladder, not badges |
+| [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder; **§4.1** platform-shape comparison (not feature scorecard) | Copy ladder, not badges |
 
 **Pairings that help:**
 
