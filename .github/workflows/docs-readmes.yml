@@ -12,6 +12,7 @@ on:
       - "docs/**"
       - "scripts/docs/**"
       - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-reusable.yml"
       - ".github/workflows/docs-readmes.yml"
   pull_request:
     branches: [master]
@@ -20,6 +21,7 @@ on:
       - "docs/**"
       - "scripts/docs/**"
       - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-reusable.yml"
       - ".github/workflows/docs-readmes.yml"
   workflow_dispatch:
 
@@ -30,7 +32,7 @@ concurrency:
 jobs:
   check-module-readmes:
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
-    uses: umbraculum-dev/umbraculum-toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v1.0.0
+    uses: ./.github/workflows/ci-parity-reusable.yml
     with:
       jobs: docs-readmes
       ci_parity_version: "1.0.0"

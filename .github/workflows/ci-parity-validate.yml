@@ -8,6 +8,7 @@ on:
     branches: [master]
     paths:
       - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-reusable.yml"
       - ".github/workflows/ci-parity-validate.yml"
       - ".github/workflows/typecheck.yml"
       - ".github/workflows/web-lint.yml"
@@ -16,6 +17,7 @@ on:
     branches: [master]
     paths:
       - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-reusable.yml"
       - ".github/workflows/ci-parity-validate.yml"
       - ".github/workflows/typecheck.yml"
       - ".github/workflows/web-lint.yml"
