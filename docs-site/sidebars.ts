@@ -40,6 +40,9 @@ const sidebars: SidebarsConfig = {
         'CORE-DEVELOPMENT-AND-COMMUNITY',
         'design/ecosystem-case-study-omnis',
         'design/ecosystem-case-study-business-central',
+        'design/ecosystem-case-study-sap',
+        'design/ecosystem-case-study-teamsystem',
+        'design/ecosystem-case-study-odoo',
       ],
     },
     {
@@ -137,6 +140,9 @@ const sidebars: SidebarsConfig = {
         'design/rfc-0005-execution-plan',
         'design/ecosystem-case-study-omnis',
         'design/ecosystem-case-study-business-central',
+        'design/ecosystem-case-study-sap',
+        'design/ecosystem-case-study-teamsystem',
+        'design/ecosystem-case-study-odoo',
       ],
     },
     {

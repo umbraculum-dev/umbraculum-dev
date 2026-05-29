@@ -20,6 +20,27 @@ quick reminder, jump straight to [`DEVELOPMENT.md`](../DEVELOPMENT.md).
 - A consultant evaluating whether to bet a project on this codebase and
   wants to know what the contributor experience actually looks like.
 - A maintainer setting up a fresh machine.
+- A developer **repositioning in hard times** — learning on spare time,
+  often without joy, because the stack must remain a viable path to
+  employment. You do not need a customer's vertical to start; you need the
+  platform. See [`MANIFESTO.md`](../MANIFESTO.md) §2.2 and the ecosystem
+  case studies under [`docs/design/`](design/) (especially
+  [`ecosystem-case-study-sap.md`](design/ecosystem-case-study-sap.md) and
+  [`ecosystem-case-study-odoo.md`](design/ecosystem-case-study-odoo.md)).
+
+## No certification track
+
+Umbraculum does **not** offer a certification program. Other ecosystems
+use exams and partner badges so implementation firms can **sell** credentialed
+teams; that is their choice. Ours is different: **this is the stack, try it**
+— `docker compose up`, public repo, public docs. Skill is shown by what you
+build and what you can explain in conversation, not by a badge we would
+administer.
+
+If you ship a vertical module or domain configuration, the same openness helps
+**you**: people who taught themselves on the public stack can find you and
+offer real expertise — which, in our experience, matters more than a
+certificate when matching builders to domain work.
 
 ## What you will have at the end
 
