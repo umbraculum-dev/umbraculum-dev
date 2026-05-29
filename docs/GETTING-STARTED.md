@@ -392,6 +392,18 @@ The web stack from §2.2 is enough for most first contributions. If you need the
 
 The native app auto-derives the API base URL from Metro's host — you usually do **not** edit `apps/native/app.json` for local LAN dev. Platform obligations, route matrix, and troubleshooting live in [`docs/DEVELOPMENT-NATIVE-LOCAL.md`](DEVELOPMENT-NATIVE-LOCAL.md) and [`docs/design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md). Cross-platform package boundaries: [`docs/CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md).
 
+### 2.6 External integrators — OpenAPI and contracts
+
+If you integrate against the HTTP API (outside the monorepo):
+
+1. **Module route tables** — [`MODULES.md`](MODULES.md) + per-module pages under [`modules/`](modules/).
+2. **Type pins** — `@umbraculum/<code>-contracts` packages ([`modules/packages/README.md`](modules/packages/README.md)).
+3. **Machine-readable catalog** — alpha partial OpenAPI at [`API-OPENAPI.md`](API-OPENAPI.md) (`services/api/openapi/openapi.json`; filter by tag `pim`, `mrp`, etc.). Platform/auth/brewery paths are not fully schema-documented yet.
+4. **Auth** — [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) (cookie `sid` for web, bearer for native).
+5. **Try a path** — after §2.3, `curl -fsSL http://localhost/healthz` then authenticated module routes per module docs.
+
+Local Swagger UI (maintainers): `http://localhost:18080/api/documentation` when the API runs in dev.
+
 ---
 
 ## Part 3 — Install the apparatus

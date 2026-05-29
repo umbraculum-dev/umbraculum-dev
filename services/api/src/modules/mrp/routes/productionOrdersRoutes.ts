@@ -32,6 +32,7 @@ export function mrpProductionOrdersRoutes(app: FastifyInstance): void {
     "/mrp/production-orders",
     {
       schema: {
+        tags: ["mrp"],
         querystring: ProductionOrderListQuerySchema,
         response: {
           200: ProductionOrderListResponseSchema,
@@ -55,6 +56,7 @@ export function mrpProductionOrdersRoutes(app: FastifyInstance): void {
     "/mrp/production-orders/:orderId",
     {
       schema: {
+        tags: ["mrp"],
         params: ProductionOrderIdParamsSchema,
         response: {
           200: ProductionOrderGetResponseSchema,
@@ -79,6 +81,7 @@ export function mrpProductionOrdersRoutes(app: FastifyInstance): void {
     "/mrp/production-orders/:orderId/material-requirements",
     {
       schema: {
+        tags: ["mrp"],
         params: ProductionOrderIdParamsSchema,
         response: {
           200: MaterialRequirementListResponseSchema,

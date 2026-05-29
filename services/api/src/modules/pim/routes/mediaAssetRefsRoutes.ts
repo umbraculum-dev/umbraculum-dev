@@ -29,6 +29,7 @@ export function pimMediaAssetRefsRoutes(app: FastifyInstance): void {
     "/pim/products/:productId/media-asset-refs",
     {
       schema: {
+        tags: ["pim"],
         params: ProductIdParamsSchema,
         response: {
           200: MediaAssetRefListResponseSchema,
@@ -52,6 +53,7 @@ export function pimMediaAssetRefsRoutes(app: FastifyInstance): void {
     "/pim/media-asset-refs/:mediaAssetRefId",
     {
       schema: {
+        tags: ["pim"],
         params: MediaAssetRefIdParamsSchema,
         response: {
           200: MediaAssetRefGetResponseSchema,
@@ -75,6 +77,7 @@ export function pimMediaAssetRefsRoutes(app: FastifyInstance): void {
     "/pim/products/:productId/media-asset-refs",
     {
       schema: {
+        tags: ["pim"],
         params: ProductIdParamsSchema,
         body: MediaAssetRefCreateRequestSchema,
         response: {
@@ -101,6 +104,7 @@ export function pimMediaAssetRefsRoutes(app: FastifyInstance): void {
     "/pim/media-asset-refs/:mediaAssetRefId",
     {
       schema: {
+        tags: ["pim"],
         params: MediaAssetRefIdParamsSchema,
         body: MediaAssetRefUpdateRequestSchema,
         response: {
@@ -127,6 +131,7 @@ export function pimMediaAssetRefsRoutes(app: FastifyInstance): void {
     "/pim/media-asset-refs/:mediaAssetRefId",
     {
       schema: {
+        tags: ["pim"],
         params: MediaAssetRefIdParamsSchema,
         response: {
           200: PimDeleteResponseSchema,

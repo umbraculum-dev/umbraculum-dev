@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1.0 — practitioner experience; informs API + documentation commitments (2026-05-28)  
 **Audience:** contributors, integrators, platform evaluators, future maintainers reasoning about why **public API contracts and navigable docs** are non-optional  
-**Related:** [`design/ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md) (ecosystem never formed — different failure mode), [`MODULES.md`](../MODULES.md) §5 (worked `automation` example), [`modules/packages/README.md`](../modules/packages/README.md), [`rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md), [`CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) §Follow-ups (OpenAPI / F1)
+**Related:** [`design/ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md) (ecosystem never formed — different failure mode), [`MODULES.md`](../MODULES.md) §5 (worked `automation` example), [`modules/packages/README.md`](../modules/packages/README.md), [`rfcs/0003-validation-library-adoption.md`](../rfcs/0003-validation-library-adoption.md), [`CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) §Follow-ups (OpenAPI / F1), [`API-OPENAPI.md`](../API-OPENAPI.md)
 
 > [!NOTE]
 > This document is **gratitude and lesson**, not a product review. Business Central is a serious ERP with a massive partner channel and real customer deployments. The case study exists because **integration from outside the fence** — warehouse systems, ecommerce, MES, custom portals, AI agents — repeatedly hits the same wall: **which API, which version, which auth model, and where is the doc that answers that in one page?** Umbraculum must do better for anyone who is not already a BC partner developer.
@@ -25,7 +25,7 @@ We are **not** claiming BC has no APIs. Microsoft ships OData and REST surfaces,
 | **Product** | Microsoft Dynamics 365 Business Central — cloud and on-prem ERP; AL extension model; deep partner/reseller channel |
 | **What works (inside the fence)** | Mature ERP domains; partner-led implementations; AL for in-tenant customization; Microsoft-published **API v2.0** entity sets for common entities; Azure AD OAuth for SaaS |
 | **What fails external builders** | **Multiple overlapping integration models** (OData web services vs REST API vs custom API pages vs automation APIs); **version and tenant coupling**; docs spread across Learn paths and release waves; **consultants who cannot answer API questions**; high time-to-first-successful-`GET` for newcomers |
-| **Umbraculum lesson** | One **pin-able contracts package per module**, **route tables in public docs**, **version handshake**, **worked examples**, and a **planned OpenAPI path** are structural — see §4 |
+| **Umbraculum lesson** | One **pin-able contracts package per module**, **route tables in public docs**, **version handshake**, **worked examples**, and an **alpha partial OpenAPI catalog** — see §4 |
 
 Official starting points (useful once you already know *which* surface you need):
 
@@ -107,7 +107,7 @@ That pattern teaches a product lesson: **API availability without API legibility
 
 ## 4. Umbraculum structural response
 
-Each BC integration failure mode maps to a **concrete** commitment in this project. Several are already landed; OpenAPI generation is explicitly tracked, not yet shipped.
+Each BC integration failure mode maps to a **concrete** commitment in this project. Several are already landed; OpenAPI alpha partial spec shipped 2026-05-28 (F1 partial closure).
 
 | BC pain | Umbraculum commitment | Mechanism (starting points) |
 |---------|----------------------|-----------------------------|
@@ -116,11 +116,11 @@ Each BC integration failure mode maps to a **concrete** commitment in this proje
 | Version skew silent at runtime | **Explicit `CONTRACT_VERSION` handshake** where adapters apply | [`packages/automation-contracts`](../../packages/automation-contracts/README.md); [`canonical-automation-module-surface.md`](canonical-automation-module-surface.md) §12 |
 | Docs scattered by topic, not by integrator job | **Route tables + registration snippets in public module docs**; contributor primers | [`docs/modules/README.md`](../modules/README.md); [`GETTING-STARTED.md`](../GETTING-STARTED.md); pre-flip package index |
 | Schema only in prose | **Zod schemas in contracts**; types derived at boundaries | [RFC-0003](../rfcs/0003-validation-library-adoption.md); [`CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) |
-| No machine-readable API catalog yet | **OpenAPI generation tracked (F1)** — activate when public SDK/npm publish batch lands | [`CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) §Follow-ups; [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §10.1.1 item 6 |
+| No machine-readable API catalog yet | **OpenAPI alpha partial (F1)** — committed spec for canonical modules + rendering; grows with PR3 | [`API-OPENAPI.md`](../API-OPENAPI.md); [`CONTRACTS-VALIDATION-STRATEGY.md`](../CONTRACTS-VALIDATION-STRATEGY.md) §Follow-ups |
 | Try before partner relationship | **`docker compose up` + documented curl paths** | [`GETTING-STARTED.md`](../GETTING-STARTED.md) §2.3 |
 | Consultant-only knowledge | **Public repo + public docs + permissionless Tier 3/6 paths** | [`MODULES.md`](../MODULES.md) §4; [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) |
 
-**Honest gap (2026-05-28):** Umbraculum does **not** yet publish a single OpenAPI document for the whole API. The commitment is **schema-first contracts in git**, **human-readable route tables today**, and **OpenAPI as a follow-on when F1 closes** — not "we already beat Microsoft on docs," but "we know what 'beat' means and we are building toward it without hiding the backlog."
+**Honest gap (2026-05-28):** Umbraculum publishes an **alpha partial** OpenAPI document (`services/api/openapi/openapi.json`) covering canonical modules and rendering (~40 paths / 58 operations). Platform, auth, brewery, webhooks, and AI routes remain on human route tables until PR3 adds Zod route schemas. The commitment is **schema-first contracts in git**, **route tables for every module**, **partial OpenAPI today**, and **full catalog when F1 closes** — not "we already beat Microsoft on docs," but "we know what 'beat' means and we are building toward it without hiding the backlog."
 
 **What we still do not copy from BC:** multiple incompatible integration stories for the same entity; integration knowledge trapped in partner oral tradition; version ambiguity without a handshake.
 

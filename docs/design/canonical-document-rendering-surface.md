@@ -23,9 +23,7 @@
 
 Modules MUST NOT bundle parallel PDF/XLSX/DOCX/CSV/barcode libraries or a private job queue (RFC-0007 §8).
 
----
-
-## 2. Registered template registry
+**OpenAPI:** `/rendering/*` job routes appear under tag `rendering` in the alpha partial spec — [`API-OPENAPI.md`](../API-OPENAPI.md).
 
 Refs use `<module>:<name>@v<major>`. Collision across modules is forbidden; collision within a module is caught at `registerModule()` boot.
 

@@ -11,6 +11,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from "fastify-type-provider-zod";
+import { openapiPlugin } from "./plugins/openapiPlugin.js";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { redisClientPlugin } from "./plugins/redisClient.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
@@ -59,6 +60,8 @@ function installZodCompilers(app: AppInstance): void {
 export function buildApp() {
   const app = Fastify({ logger: true }) as AppInstance;
 
+  installZodCompilers(app);
+
   app.register(errorHandlerPlugin);
   app.register(webhookRawBodyPlugin);
   // Dev-only CORS to allow Expo web preview (Metro) to call the API directly.
@@ -89,6 +92,8 @@ export function buildApp() {
   app.register(renderingRuntimePlugin);
   app.register(sessionAuthPlugin);
   app.register(requestContextPlugin);
+
+  app.register(openapiPlugin);
 
   app.register(healthRoutes);
   app.register(authRoutes);
@@ -133,8 +138,6 @@ export function buildApp() {
     aiRoutes(registry)(instance);
     done();
   });
-
-  installZodCompilers(app);
 
   app.addHook("onReady", async () => {
     if (process.env["AI_RAG_INGEST_ON_BOOT"] !== "1") return;

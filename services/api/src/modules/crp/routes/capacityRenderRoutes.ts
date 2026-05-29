@@ -66,6 +66,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
     "/crp/capacity-load/render-jobs",
     {
       schema: {
+        tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
         body: RenderJobBodySchema,
         response: {
@@ -105,6 +106,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
     "/crp/schedule/render-jobs",
     {
       schema: {
+        tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
         body: RenderJobBodySchema,
         response: {
@@ -144,6 +146,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
     "/crp/resources/calendar/render-jobs",
     {
       schema: {
+        tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
         body: RenderJobBodySchema,
         response: {
@@ -183,6 +186,7 @@ export function crpCapacityRenderRoutes(app: FastifyInstance): void {
     "/crp/conflicts/render-jobs",
     {
       schema: {
+        tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
         body: RenderJobBodySchema,
         response: {

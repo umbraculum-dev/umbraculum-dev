@@ -55,6 +55,8 @@ These are the **stable npm surfaces** third-party adapters and integrators pin. 
 
 Open-door canonicals (`wms`, `crm`) will gain `<code>-contracts` packages when their read paths ship.
 
+**Integrator triangle:** pin **`@umbraculum/<code>-contracts`** (types) + read the **module route table** (human) + filter the **OpenAPI spec** by tag (machine-readable) — see [`API-OPENAPI.md`](../../API-OPENAPI.md).
+
 ---
 
 ## 4. Vertical-flavored (brewery reference vertical)

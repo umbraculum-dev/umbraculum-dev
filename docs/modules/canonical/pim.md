@@ -50,9 +50,7 @@ The Akeneo / Pimcore comparison set is the structural reference: those systems a
 
 Postgres schema name: `pim` (per [RFC-0002 §4](../../rfcs/0002-canonical-module-physical-layout.md) convention 4).
 
----
-
-## 4. Expected dependencies on other canonical modules
+**OpenAPI:** PIM HTTP routes with Zod schemas appear under tag `pim` in the alpha partial spec — [`API-OPENAPI.md`](../../API-OPENAPI.md); route tables in [`canonical-pim-module-surface.md`](../../design/canonical-pim-module-surface.md).
 
 | Module | Relationship |
 |---|---|

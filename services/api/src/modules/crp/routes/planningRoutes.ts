@@ -20,6 +20,7 @@ export function crpPlanningRoutes(app: FastifyInstance): void {
     "/crp/work-centers",
     {
       schema: {
+        tags: ["crp"],
         response: {
           200: WorkCenterListResponseSchema,
           401: ErrorResponseSchema,
@@ -37,6 +38,7 @@ export function crpPlanningRoutes(app: FastifyInstance): void {
     "/crp/capacity-load",
     {
       schema: {
+        tags: ["crp"],
         querystring: CapacityLoadQuerySchema,
         response: {
           200: CapacityLoadResponseSchema,
@@ -60,6 +62,7 @@ export function crpPlanningRoutes(app: FastifyInstance): void {
     "/crp/scheduled-operations",
     {
       schema: {
+        tags: ["crp"],
         response: {
           200: ScheduledOperationListResponseSchema,
           401: ErrorResponseSchema,
@@ -77,6 +80,7 @@ export function crpPlanningRoutes(app: FastifyInstance): void {
     "/crp/conflicts",
     {
       schema: {
+        tags: ["crp"],
         response: {
           200: CapacityConflictListResponseSchema,
           401: ErrorResponseSchema,

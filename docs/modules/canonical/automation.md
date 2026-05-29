@@ -84,6 +84,8 @@ export function registerAutomationModule(app: FastifyInstance): void {
 
 The route source: [`automationVesselsRoutes.ts`](../../../services/api/src/modules/automation/routes/automationVesselsRoutes.ts). Both shipped routes follow the canonical L2 cross-workspace isolation pattern from the PR3 handoff — service-layer `assertMembership` plus response parsing through Zod schemas at the boundary ([RFC-0003](../../rfcs/0003-validation-library-adoption.md)).
 
+**OpenAPI:** shipped routes appear under tag `automation` in the committed alpha partial spec — [`API-OPENAPI.md`](../../API-OPENAPI.md); artifact [`openapi.json`](../../../services/api/openapi/openapi.json).
+
 ---
 
 ## 5. AI tools

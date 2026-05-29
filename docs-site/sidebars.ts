@@ -149,6 +149,7 @@ const sidebars: SidebarsConfig = {
       label: 'Architecture — platform-wide',
       items: [
         'CROSS-PLATFORM-BOUNDARIES',
+        'API-OPENAPI',
         'design/canonical-native-platform-surface',
         'NATIVE-STRATEGY-AND-CI',
         'REACT-NATIVE-KICKOFF-READINESS',

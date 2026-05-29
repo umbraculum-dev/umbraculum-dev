@@ -25,32 +25,59 @@ export function pimVariantsRoutes(app: FastifyInstance): void {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new VariantsService(app.prisma);
 
-  app.get("/pim/products/:productId/variants", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = ProductIdParamsSchema.parse(req.params);
-    const items = await svc.listVariantsForProduct(
-      ctx.userId,
-      ctx.activeWorkspaceId,
-      params.productId,
-    );
-    return VariantListResponseSchema.parse({ ok: true, items });
-  });
+  zodApp.get(
+    "/pim/products/:productId/variants",
+    {
+      schema: {
+        tags: ["pim"],
+        params: ProductIdParamsSchema,
+        response: {
+          200: VariantListResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const items = await svc.listVariantsForProduct(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.productId,
+      );
+      return VariantListResponseSchema.parse({ ok: true, items });
+    },
+  );
 
-  app.get("/pim/variants/:variantId", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = VariantIdParamsSchema.parse(req.params);
-    const item = await svc.getVariantById(
-      ctx.userId,
-      ctx.activeWorkspaceId,
-      params.variantId,
-    );
-    return VariantGetResponseSchema.parse({ ok: true, item });
-  });
+  zodApp.get(
+    "/pim/variants/:variantId",
+    {
+      schema: {
+        tags: ["pim"],
+        params: VariantIdParamsSchema,
+        response: {
+          200: VariantGetResponseSchema,
+          401: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const item = await svc.getVariantById(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.variantId,
+      );
+      return VariantGetResponseSchema.parse({ ok: true, item });
+    },
+  );
 
   zodApp.post(
     "/pim/products/:productId/variants",
     {
       schema: {
+        tags: ["pim"],
         params: ProductIdParamsSchema,
         body: VariantCreateRequestSchema,
         response: {
@@ -77,6 +104,7 @@ export function pimVariantsRoutes(app: FastifyInstance): void {
     "/pim/variants/:variantId",
     {
       schema: {
+        tags: ["pim"],
         params: VariantIdParamsSchema,
         body: VariantUpdateRequestSchema,
         response: {
@@ -103,6 +131,7 @@ export function pimVariantsRoutes(app: FastifyInstance): void {
     "/pim/variants/:variantId",
     {
       schema: {
+        tags: ["pim"],
         params: VariantIdParamsSchema,
         response: {
           200: PimDeleteResponseSchema,

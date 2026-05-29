@@ -221,7 +221,7 @@ Concrete changes to the foundation-hardening doc, scheduled for Phase 4 of the m
 
 Three clusters of work are explicitly out-of-scope of RFC-0003 and tracked as follow-ups (F1, F2, F3 in the migration plan):
 
-**1. OpenAPI generation.** Now achievable via `zod-to-openapi` or Zod v4 first-party OpenAPI. Tracked for activation when the public module-SDK ships (H1 2027 working assumption per [`docs/ROADMAP.md`](../ROADMAP.md)). Adoption requires a follow-on sub-plan.
+**1. OpenAPI generation.** **Alpha partial landed 2026-05-28** via `@fastify/swagger` + `fastify-type-provider-zod` (see [`API-OPENAPI.md`](../API-OPENAPI.md)). Full closure when PR3 brings platform/brewery routes onto Zod route schemas (~80% HTTP coverage). Originally tracked for activation at public module-SDK/npm publish; alpha partial ships ahead of full PR3.
 
 **2. Zod major-version migration tracker.** Zod v3 → v4 was a non-trivial migration. When Zod v5 alpha is announced, open a sub-plan for proactive evaluation + scheduled migration. This RFC does not commit to perpetual upgrade.
 

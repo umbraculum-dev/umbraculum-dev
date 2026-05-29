@@ -50,6 +50,7 @@ export function renderingRoutes(app: FastifyInstance): void {
     "/rendering/jobs",
     {
       schema: {
+        tags: ["rendering"],
         body: RenderJobSubmitRequestSchema,
         response: {
           202: RenderJobSubmitResponseSchema,
@@ -91,6 +92,7 @@ export function renderingRoutes(app: FastifyInstance): void {
     "/rendering/jobs/:jobId",
     {
       schema: {
+        tags: ["rendering"],
         params: JobIdParamsSchema,
         response: {
           200: RenderJobStatusResponseSchema,
@@ -113,6 +115,7 @@ export function renderingRoutes(app: FastifyInstance): void {
     "/rendering/jobs/:jobId/cancel",
     {
       schema: {
+        tags: ["rendering"],
         params: JobIdParamsSchema,
         response: {
           200: RenderJobCancelResponseSchema,
@@ -137,6 +140,7 @@ export function renderingRoutes(app: FastifyInstance): void {
     "/rendering/jobs/:jobId/result",
     {
       schema: {
+        tags: ["rendering"],
         params: JobIdParamsSchema,
         response: {
           200: RenderJobResultResponseSchema,
@@ -166,6 +170,7 @@ export function renderingRoutes(app: FastifyInstance): void {
     "/rendering/artifacts/:artifactId",
     {
       schema: {
+        tags: ["rendering"],
         params: ArtifactParamsSchema,
         querystring: ArtifactQuerySchema,
         response: {
