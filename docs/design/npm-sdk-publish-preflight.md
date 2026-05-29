@@ -106,4 +106,5 @@ node --input-type=module -e "import('@umbraculum/module-sdk').then(m => console.
 | 2026-05-29 | `@umbraculum/mrp-contracts` | `0.0.1` | Maintainer laptop publish |
 | 2026-05-29 | `@umbraculum/crp-contracts` | `0.0.1` | Maintainer laptop publish |
 | 2026-05-29 | *(all seven)* | — | OIDC trusted publishing via `npx npm@11.16.0 trust github …` |
-| — | — | — | `sdk-batch-v0.1.0` tag **not** pushed (versions already on registry) |
+| 2026-05-29 | *(all seven)* | patch bump | `sdk-batch-v0.1.1` GHA OIDC publish — **green** |
+| — | — | — | `sdk-batch-v0.1.0` tag **not** pushed (versions already published manually) |

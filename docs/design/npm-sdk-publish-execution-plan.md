@@ -388,7 +388,7 @@ From repo root per [`CI-PARITY.md`](../CI-PARITY.md).
 |------|----------|------------|-------------------|-------|
 | 2026-05-29 | SP-1 | agent | — | Manifests, LICENSE, README install sections |
 | 2026-05-29 | SP-2 | agent | — | `publish-sdk-batch.yml` + trusted-publishing doc |
-| 2026-05-29 | SP-3 | umbraculum-dev | `ai-tool-sdk@0.1.0`, `i18n-keys@0.1.0`, `module-sdk@0.0.1`, four `*-contracts@0.0.1` | Laptop first publish + OIDC trust; `sdk-batch-v0.1.0` tag skipped (403) |
+| 2026-05-29 | SP-3 | umbraculum-dev | `ai-tool-sdk@0.1.0`→`0.1.1`, `i18n-keys@0.1.0`→`0.1.1`, `module-sdk@0.0.1`→`0.0.2`, four `*-contracts@0.0.1`→`0.0.2` | Laptop first publish; OIDC trust; `sdk-batch-v0.1.1` GHA green |
 
 ---
 

@@ -136,4 +136,5 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 |------|-------|--------|
 | 2026-05-29 | SP-2 workflow + manifests merged | Done |
 | 2026-05-29 | First publish (laptop) + OIDC trust (CLI) | Done — seven packages on registry |
-| — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published |
+| 2026-05-29 | `sdk-batch-v0.1.1` GHA OIDC publish | **Green** — patch bump to `0.1.1` / `0.0.2` |
+| — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published manually |
