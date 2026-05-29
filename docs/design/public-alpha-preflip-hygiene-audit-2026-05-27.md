@@ -1,7 +1,7 @@
 # Public alpha — pre-flip hygiene audit (automated pass)
 
 **Tier:** Public  
-**Status:** Agent-run 2026-05-27 — **not** maintainer sign-off (Stage 1 **2b** incomplete)  
+**Status:** Agent-run 2026-05-27 — Stage 1 automated prep **complete** 2026-05-29 (maintainer flip gates: toolset CoC/SECURITY, live mailboxes, Cloudflare — see checklist §7)  
 **Repo:** `umbraculum-dev/umbraculum-dev` only (toolset sister repo not scanned)  
 **Related:** [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md)
 

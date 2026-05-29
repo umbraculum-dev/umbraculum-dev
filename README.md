@@ -225,6 +225,6 @@ translations, and security reports.
 | AI consultant — workspace-scoped chat over recipes, inventory, vessels, PIM products, MRP/CRP planning (read-only), and document export; module-aware prompts; BYOK + paid-tier unlock (see [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md)) | Shipping |
 | Second vertical module (WMS/CRM/MRP/CRP) | Not started — platform shape supports it |
 | Project identity                  | **Umbraculum** (namespace `umbraculum`, primary domain `umbraculum.dev`, GitHub org `umbraculum-dev`) |
-| GitHub org hosting                | **Done 2026-05-27** — `github.com/umbraculum-dev/umbraculum-dev` (private); sister-repo `umbraculum-toolset` also under org (private). Commits, tags, and Actions workflows preserved on transfer; `docs-readmes` CI verified green post-transfer. |
-| Public release                    | Not flipped — target **July 2026 public alpha** (see `docs/PLATFORM-ARCHITECTURE.md` §10.1.1) |
-| MIT npm SDK packages              | In-repo ready; **not on public npm registry yet** — publish batch paired with public-alpha cutover ([`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1) |
+| GitHub org hosting                | **Done 2026-05-27** — `github.com/umbraculum-dev/umbraculum-dev` (private); sister-repo `umbraculum-toolset` also under org (private). Commits, tags, and Actions workflows preserved; full CI matrix green post-transfer. |
+| MIT npm SDK packages              | **On public npm registry** (2026-05-29) — `@umbraculum/module-sdk` and batch per [`docs/LICENSING.md`](docs/LICENSING.md) §6.2.1 |
+| Public release                    | Not flipped — target **July 2026 public alpha**; flip-day runbook [`docs/design/public-alpha-flip-day-runbook.md`](docs/design/public-alpha-flip-day-runbook.md) |

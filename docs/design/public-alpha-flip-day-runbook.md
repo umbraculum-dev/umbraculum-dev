@@ -12,6 +12,8 @@
 
 ## 0. Before you start
 
+**Automated prep status (2026-05-29):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅. **Remaining before §1:** toolset `CODE_OF_CONDUCT.md` + `SECURITY.md`, live `security@` / `conduct@` mailboxes, Cloudflare Pages projects, donation channel accounts (2d).
+
 | Gate | Doc |
 |------|-----|
 | Stage 1 hygiene signed off | [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §7 |
@@ -146,4 +148,5 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 
 | Date | Maintainer | Notes |
 |------|------------|-------|
-| — | — | Checklist not executed yet |
+| 2026-05-29 | Agent prep | Automated Stage 2 prep complete — npm SDK on registry, brochure/docs-site/workflows in repo. **Flip not executed** — maintainer runs §1–§9 when manual gates close. |
+| — | — | Flip-day execution pending |

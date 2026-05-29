@@ -116,6 +116,7 @@ Public architectural and governance commitments. Process: [`LICENSING.md`](LICEN
 User-facing product surfaces and operational concerns at the product level.
 
 - [`ROLLOUT.md`](ROLLOUT.md) — Rollout plan and staged-launch notes.
+- [`WEBSITE.md`](WEBSITE.md) — Public web surfaces: brochure (`umbraculum.dev`) vs docs (`docs.umbraculum.dev`), Cloudflare Pages deploy, flip-day coordination.
 - [`SEO.md`](SEO.md) — SEO posture for the marketing/public surfaces.
 - [`AGENTIC-JOBS.md`](AGENTIC-JOBS.md) — Agentic / scheduled-job notes.
 
