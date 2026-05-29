@@ -12,6 +12,10 @@ import type {
 } from "./renderingTypes.js";
 import { isCanonicalModuleCode } from "./reservedCodes.js";
 import {
+  clearAddonCodeRegistryForTests,
+  validateAndIndexAddonCodes,
+} from "./addonCodes.js";
+import {
   clearTierLimitRegistryForTests,
   validateAndIndexTierLimits,
 } from "./tierLimits.js";
@@ -182,6 +186,7 @@ export function recordModuleRegistration(
   if (options.tierLimits !== undefined) {
     validateAndIndexTierLimits(options.code, options.tierLimits);
   }
+  validateAndIndexAddonCodes(options.code, options.addonCodes);
 
   modulesByCode.set(options.code, options);
   for (const template of documentTemplates) {
@@ -249,6 +254,7 @@ export function clearModuleRegistryForTests(): void {
   documentTemplatesByRef.clear();
   routePromptOverlayByRouteId.clear();
   clearTierLimitRegistryForTests();
+  clearAddonCodeRegistryForTests();
 }
 
 /**

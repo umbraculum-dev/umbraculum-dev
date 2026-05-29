@@ -106,6 +106,19 @@ registerModule(app, {
 
 The API's `getTierLimits(tier)` in `services/api/src/services/tierLimitsService.ts` returns `{ ...platformSlice, ...composeModuleTierLimitSlices(tier) }` after module boot.
 
+## Add-on code registration — `registerModule({ addonCodes })`
+
+[RFC-0009](../../docs/rfcs/0009-workspace-billing-addons-and-entitlements.md) commits the entitlement contract; **purchase enforcement** is deferred H1 2027. Modules declare Stripe/RevenueCat SKU vocabulary (convention: `<code>_module`). Duplicate codes across modules fail at boot (`AddonCodeAlreadyRegisteredError`). The `managed_ai_credits_*` prefix is platform-reserved for future managed-AI packs.
+
+```typescript
+registerModule(app, {
+  code: "automation",
+  addonCodes: ["automation_module"],
+});
+```
+
+Hosted public α runs `EntitlementsService` in `tier_only` mode — tier limits remain the enforcement surface until `WorkspaceBillingAddon` lands. See [`canonical-workspace-billing-addons-surface.md`](../../docs/design/canonical-workspace-billing-addons-surface.md).
+
 ## Document-template registration — `registerModule({ documentTemplates })`
 
 [RFC-0007](../../docs/rfcs/0007-canonical-document-rendering.md) adds document / file rendering to the platform consumption contract. Modules contribute typed templates through the SDK; the platform-owned `@umbraculum/rendering` package owns the engines and job runner.

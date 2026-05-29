@@ -240,7 +240,7 @@ These boundaries mean: a new vertical module (WMS, CRM, …) can be added withou
 - `WorkspaceBilling` + `BillingTier` (`free | premium | pro | pro_plus`) + `BillingPurchaseIntent` + `WorkspaceBillingService` is **workspace-scoped** — exactly the right shape for a multi-module suite, since each module's value applies to a workspace.
 - Tier limits live in [`services/api/src/services/tierLimitsService.ts`](../services/api/src/services/tierLimitsService.ts). The platform owns `aiEnabled` (`free=false`, `premium | pro | pro_plus=true`); modules contribute slices merged at runtime (`maxRecipesPerWorkspace` / `maxVersionsPerRecipe` from brewery; `maxVessels` / `maxAdaptersConnected` / `automationAiToolsEnabled` from automation). Billing returns the composed object as opaque `limits`.
 - The H2 AI backbone intentionally reuses existing `WorkspaceBilling` infrastructure. A free workspace upgrades through the existing billing-intent flow; after Stripe webhook processing moves the workspace to `premium` or above, AI is unlocked.
-- **Add-on shape is still missing.** There is no `WorkspaceBillingAddon` model, so future per-module entitlements (e.g. "this workspace has the WMS module installed") and optional managed-AI credits have no home today.
+- **Add-on shape is still missing in persistence.** There is no `WorkspaceBillingAddon` model yet ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md) commits the shape; H1 2027 implementation). Modules already declare `addonCodes`; `EntitlementsService` runs in `tier_only` mode for public α.
 
 ### 3.7 Verdict
 
@@ -659,7 +659,7 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 
 ### 8.2 Still open / deferred
 
-1. **Managed-AI credits:** whether and when to add the optional hosted one-bill mode.
+1. **Managed-AI credits:** whether and when to add the optional hosted one-bill mode — model reserved by [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md); implementation H1 2027 (ROADMAP E-full).
 2. **Refund policy for managed-AI credits:** non-refundable / pro-rata / case-by-case.
 3. **EU VAT / sales-tax handling for managed-AI credits:** Stripe Tax vs separate handling.
 4. **Postgres multi-schema timing:** adopt at second-module ship, or earlier as preparation.

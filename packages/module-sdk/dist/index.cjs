@@ -23,9 +23,11 @@ __export(index_exports, {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH: () => AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
   AI_PROMPT_MODULE_MAX_LENGTH: () => AI_PROMPT_MODULE_MAX_LENGTH,
   AI_PROMPT_ROUTE_MAX_LENGTH: () => AI_PROMPT_ROUTE_MAX_LENGTH,
+  AddonCodeAlreadyRegisteredError: () => AddonCodeAlreadyRegisteredError,
   AiPromptRouteKeyAlreadyRegisteredError: () => AiPromptRouteKeyAlreadyRegisteredError,
   BUILTIN_WEB_MODULE_REGISTRATIONS: () => BUILTIN_WEB_MODULE_REGISTRATIONS,
   DocumentTemplateRefAlreadyRegisteredError: () => DocumentTemplateRefAlreadyRegisteredError,
+  InvalidAddonCodeError: () => InvalidAddonCodeError,
   InvalidAiPromptOverlayError: () => InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError: () => InvalidDocumentTemplateRefError,
   InvalidModuleCodeError: () => InvalidModuleCodeError,
@@ -34,6 +36,7 @@ __export(index_exports, {
   InvalidUrlSegmentError: () => InvalidUrlSegmentError,
   ModuleCodeAlreadyRegisteredError: () => ModuleCodeAlreadyRegisteredError,
   NavEntryPrimarySegmentNotOwnedError: () => NavEntryPrimarySegmentNotOwnedError,
+  PLATFORM_RESERVED_ADDON_CODE_PREFIX: () => PLATFORM_RESERVED_ADDON_CODE_PREFIX,
   PLATFORM_RESERVED_TIER_LIMIT_KEYS: () => PLATFORM_RESERVED_TIER_LIMIT_KEYS,
   PLATFORM_WEB_SHELL_NAV_ENTRIES: () => PLATFORM_WEB_SHELL_NAV_ENTRIES,
   RESERVED_CANONICAL_MODULE_CODES: () => RESERVED_CANONICAL_MODULE_CODES,
@@ -43,6 +46,7 @@ __export(index_exports, {
   aggregateNativeAvailableRouteIds: () => aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable: () => assertModuleCodeAvailable,
   assertValidModuleCode: () => assertValidModuleCode,
+  clearAddonCodeRegistryForTests: () => clearAddonCodeRegistryForTests,
   clearModuleRegistryForTests: () => clearModuleRegistryForTests,
   clearNativeModuleRegistryForTests: () => clearNativeModuleRegistryForTests,
   clearWebModuleRegistryForTests: () => clearWebModuleRegistryForTests,
@@ -56,6 +60,7 @@ __export(index_exports, {
   getSegmentOwner: () => getSegmentOwner,
   isCanonicalModuleCode: () => isCanonicalModuleCode,
   listOwnedUrlSegments: () => listOwnedUrlSegments,
+  listRegisteredAddonCodes: () => listRegisteredAddonCodes,
   listRegisteredDocumentTemplates: () => listRegisteredDocumentTemplates,
   listRegisteredModules: () => listRegisteredModules,
   listRegisteredNativeModules: () => listRegisteredNativeModules,
@@ -68,6 +73,7 @@ __export(index_exports, {
   registerRegisteredModuleAiTools: () => registerRegisteredModuleAiTools,
   registerWebModule: () => registerWebModule,
   resolveRoutePromptOverlay: () => resolveRoutePromptOverlay,
+  snapshotAddonCodeOwnership: () => snapshotAddonCodeOwnership,
   snapshotModule: () => snapshotModule,
   snapshotSegmentOwnership: () => snapshotSegmentOwnership
 });
@@ -84,6 +90,80 @@ var RESERVED_CANONICAL_MODULE_CODES = [
 ];
 function isCanonicalModuleCode(code) {
   return RESERVED_CANONICAL_MODULE_CODES.includes(code);
+}
+
+// src/addonCodes.ts
+var PLATFORM_RESERVED_ADDON_CODE_PREFIX = "managed_ai_credits_";
+var ADDON_CODE_PATTERN = /^[a-z][a-z0-9_]*$/;
+var addonCodeOwnerByCode = /* @__PURE__ */ new Map();
+var AddonCodeAlreadyRegisteredError = class extends Error {
+  addonCode;
+  attemptingModuleCode;
+  existingOwnerModuleCode;
+  constructor(addonCode, attemptingModuleCode, existingOwnerModuleCode) {
+    super(
+      `registerModule(${attemptingModuleCode}): addonCode "${addonCode}" is already owned by module "${existingOwnerModuleCode}"`
+    );
+    this.name = "AddonCodeAlreadyRegisteredError";
+    this.addonCode = addonCode;
+    this.attemptingModuleCode = attemptingModuleCode;
+    this.existingOwnerModuleCode = existingOwnerModuleCode;
+  }
+};
+var InvalidAddonCodeError = class extends Error {
+  addonCode;
+  moduleCode;
+  constructor(addonCode, moduleCode, reason) {
+    super(`registerModule(${moduleCode}): invalid addonCode "${addonCode}" (${reason})`);
+    this.name = "InvalidAddonCodeError";
+    this.addonCode = addonCode;
+    this.moduleCode = moduleCode;
+  }
+};
+function assertValidAddonCode(moduleCode, addonCode) {
+  if (!ADDON_CODE_PATTERN.test(addonCode)) {
+    throw new InvalidAddonCodeError(
+      addonCode,
+      moduleCode,
+      "expected lowercase alphanumeric with optional underscores"
+    );
+  }
+  if (addonCode.startsWith(PLATFORM_RESERVED_ADDON_CODE_PREFIX)) {
+    throw new InvalidAddonCodeError(
+      addonCode,
+      moduleCode,
+      `prefix "${PLATFORM_RESERVED_ADDON_CODE_PREFIX}" is platform-reserved (RFC-0009 managed-AI credits)`
+    );
+  }
+}
+function validateAndIndexAddonCodes(moduleCode, addonCodes) {
+  if (!addonCodes?.length) return;
+  const seenInModule = /* @__PURE__ */ new Set();
+  for (const addonCode of addonCodes) {
+    assertValidAddonCode(moduleCode, addonCode);
+    if (seenInModule.has(addonCode)) {
+      throw new AddonCodeAlreadyRegisteredError(addonCode, moduleCode, moduleCode);
+    }
+    seenInModule.add(addonCode);
+    const existingOwner = addonCodeOwnerByCode.get(addonCode);
+    if (existingOwner !== void 0) {
+      throw new AddonCodeAlreadyRegisteredError(addonCode, moduleCode, existingOwner);
+    }
+    addonCodeOwnerByCode.set(addonCode, moduleCode);
+  }
+}
+function clearAddonCodeRegistryForTests() {
+  addonCodeOwnerByCode.clear();
+}
+function snapshotAddonCodeOwnership() {
+  return new Map(addonCodeOwnerByCode);
+}
+function listRegisteredAddonCodes(moduleCode) {
+  const codes = [];
+  for (const [addonCode, owner] of addonCodeOwnerByCode.entries()) {
+    if (owner === moduleCode) codes.push(addonCode);
+  }
+  return codes.sort();
 }
 
 // src/tierLimits.ts
@@ -307,6 +387,7 @@ function recordModuleRegistration(options) {
   if (options.tierLimits !== void 0) {
     validateAndIndexTierLimits(options.code, options.tierLimits);
   }
+  validateAndIndexAddonCodes(options.code, options.addonCodes);
   modulesByCode.set(options.code, options);
   for (const template of documentTemplates) {
     documentTemplatesByRef.set(template.ref, {
@@ -362,6 +443,7 @@ function clearModuleRegistryForTests() {
   documentTemplatesByRef.clear();
   routePromptOverlayByRouteId.clear();
   clearTierLimitRegistryForTests();
+  clearAddonCodeRegistryForTests();
 }
 function composeModuleTierLimitSlices(tier) {
   const merged = {};
@@ -708,9 +790,11 @@ function composeWebShellNavItems() {
   AI_PROMPT_KNOWLEDGE_MAX_LENGTH,
   AI_PROMPT_MODULE_MAX_LENGTH,
   AI_PROMPT_ROUTE_MAX_LENGTH,
+  AddonCodeAlreadyRegisteredError,
   AiPromptRouteKeyAlreadyRegisteredError,
   BUILTIN_WEB_MODULE_REGISTRATIONS,
   DocumentTemplateRefAlreadyRegisteredError,
+  InvalidAddonCodeError,
   InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
   InvalidModuleCodeError,
@@ -719,6 +803,7 @@ function composeWebShellNavItems() {
   InvalidUrlSegmentError,
   ModuleCodeAlreadyRegisteredError,
   NavEntryPrimarySegmentNotOwnedError,
+  PLATFORM_RESERVED_ADDON_CODE_PREFIX,
   PLATFORM_RESERVED_TIER_LIMIT_KEYS,
   PLATFORM_WEB_SHELL_NAV_ENTRIES,
   RESERVED_CANONICAL_MODULE_CODES,
@@ -728,6 +813,7 @@ function composeWebShellNavItems() {
   aggregateNativeAvailableRouteIds,
   assertModuleCodeAvailable,
   assertValidModuleCode,
+  clearAddonCodeRegistryForTests,
   clearModuleRegistryForTests,
   clearNativeModuleRegistryForTests,
   clearWebModuleRegistryForTests,
@@ -741,6 +827,7 @@ function composeWebShellNavItems() {
   getSegmentOwner,
   isCanonicalModuleCode,
   listOwnedUrlSegments,
+  listRegisteredAddonCodes,
   listRegisteredDocumentTemplates,
   listRegisteredModules,
   listRegisteredNativeModules,
@@ -753,6 +840,7 @@ function composeWebShellNavItems() {
   registerRegisteredModuleAiTools,
   registerWebModule,
   resolveRoutePromptOverlay,
+  snapshotAddonCodeOwnership,
   snapshotModule,
   snapshotSegmentOwnership
 });
