@@ -84,7 +84,7 @@ File: `umbraculum-dev/.github/workflows/publish-sdk-batch.yml`
 - **No** `registry-url` on `setup-node`
 - `npm install -g npm@11.6.2`
 - `npm ci` → `build:packages` → `test:packages`
-- Ordered OIDC publish: leaves → `module-sdk` (deps rewritten to `^0.1.0` registry semver **in workflow only**) → four contracts packages
+- Ordered OIDC publish: leaves → `module-sdk` (deps rewritten to `^0.1.1` registry semver **in workflow only** — match current leaf version) → four contracts packages
 - Explicit GitHub OIDC fetch + npm exchange per package (diagnostic logging)
 
 `module-sdk` committed `package.json` keeps `file:../…` for monorepo CI; only the publish tarball gets registry deps.
@@ -104,8 +104,8 @@ npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep
 ```bash
 git checkout master && git pull
 # bump version(s) in packages/*/package.json
-git tag sdk-batch-v0.1.1   # example — never reuse a published semver
-git push origin sdk-batch-v0.1.1
+git tag sdk-batch-v0.1.2   # example — never reuse a published semver (`sdk-batch-v0.1.1` already published)
+git push origin sdk-batch-v0.1.2
 ```
 
 Watch **umbraculum-dev** → Actions → `publish-sdk-batch` → green.

@@ -9,17 +9,17 @@
 
 ## 1. Scope
 
-**July 2026 alpha batch (published 2026-05-29):**
+**July 2026 alpha batch (published 2026-05-29; current registry versions):**
 
-| Order | Package | Path | Published |
-|-------|---------|------|-----------|
-| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `0.1.0` |
-| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | `0.1.0` |
-| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `0.0.1` |
-| 4 | `@umbraculum/automation-contracts` | `packages/automation-contracts/` | `0.0.1` |
-| 5 | `@umbraculum/pim-contracts` | `packages/pim-contracts/` | `0.0.1` |
-| 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.1` |
-| 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.1` |
+| Order | Package | Path | On npm (latest) |
+|-------|---------|------|-----------------|
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `0.1.1` |
+| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | `0.1.1` |
+| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `0.0.2` |
+| 4 | `@umbraculum/automation-contracts` | `packages/automation-contracts/` | `0.0.2` |
+| 5 | `@umbraculum/pim-contracts` | `packages/pim-contracts/` | `0.0.2` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.2` |
+| 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.2` |
 
 **Deferred post-α:** `@umbraculum/api-client` (contracts coupling — see LICENSING table).
 
@@ -58,8 +58,8 @@ module-sdk → file:../ai-tool-sdk, file:../i18n-keys
 
 ```json
 "dependencies": {
-  "@umbraculum/ai-tool-sdk": "^0.1.0",
-  "@umbraculum/i18n-keys": "^0.1.0"
+  "@umbraculum/ai-tool-sdk": "^0.1.1",
+  "@umbraculum/i18n-keys": "^0.1.1"
 }
 ```
 
@@ -80,7 +80,7 @@ In a **clean temp directory**:
 
 ```bash
 npm init -y
-npm install @umbraculum/ai-tool-sdk@0.1.0 @umbraculum/module-sdk@0.0.1
+npm install @umbraculum/ai-tool-sdk@0.1.1 @umbraculum/module-sdk@0.0.2
 node --input-type=module -e "import('@umbraculum/module-sdk').then(m => console.log(Object.keys(m).slice(0,6)))"
 ```
 

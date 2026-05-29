@@ -47,10 +47,10 @@ You do **not** import from `services/api/src/modules/<code>/` directly. That tre
 
 ```bash
 npm install \
-  @umbraculum/module-sdk@0.0.1 \
-  @umbraculum/ai-tool-sdk@0.1.0 \
-  @umbraculum/i18n-keys@0.1.0
-# plus @umbraculum/<code>-contracts@0.0.1 for each canonical you target
+  @umbraculum/module-sdk@0.0.2 \
+  @umbraculum/ai-tool-sdk@0.1.1 \
+  @umbraculum/i18n-keys@0.1.1
+# plus @umbraculum/<code>-contracts@0.0.2 for each canonical you target
 ```
 
 Pin `peerDependencies` to `^` those versions (or newer patch/minor within range). See [`LICENSING.md`](../../LICENSING.md) §6.2.1 for the full version table.
@@ -199,7 +199,7 @@ acme-modbus-adapter/                 # your GitHub org's repo
     ".": "./src/index.ts"
   },
   "peerDependencies": {
-    "@umbraculum/module-sdk": "^0.0.1",
+    "@umbraculum/module-sdk": "^0.0.2",
     "@umbraculum/automation-contracts": "^2.0.0"
   }
 }

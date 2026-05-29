@@ -40,13 +40,13 @@ If Week 1 overruns, Weeks 2–3 slide one-for-one rather than the cadence breaki
 
 | Package | Landed in repo | On npm registry |
 |---------|----------------|-----------------|
-| `@umbraculum/ai-tool-sdk` | ✅ 2026-05-21 | ✅ `0.1.0` (2026-05-29) |
-| `@umbraculum/i18n-keys` | ✅ 2026-05-27 | ✅ `0.1.0` (2026-05-29) |
-| `@umbraculum/module-sdk` | ✅ | ✅ `0.0.1` (2026-05-29) |
-| `@umbraculum/automation-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
-| `@umbraculum/pim-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
-| `@umbraculum/mrp-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
-| `@umbraculum/crp-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
+| `@umbraculum/ai-tool-sdk` | ✅ 2026-05-21 | ✅ `0.1.1` (2026-05-29) |
+| `@umbraculum/i18n-keys` | ✅ 2026-05-27 | ✅ `0.1.1` (2026-05-29) |
+| `@umbraculum/module-sdk` | ✅ | ✅ `0.0.2` (2026-05-29) |
+| `@umbraculum/automation-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
+| `@umbraculum/pim-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
+| `@umbraculum/mrp-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
+| `@umbraculum/crp-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
 | `@umbraculum/api-client` | ✅ in monorepo | ❌ deferred post-α (subset split TBD) |
 
 **Ready for external module authors via `npm install`?** **Yes** — pin versions per [`third-party-module.md`](modules/contribute/third-party-module.md). Monorepo contributors still use workspace `file:` links. See [`LICENSING.md`](LICENSING.md) §6.2.1 and [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md) SP-3.
@@ -111,8 +111,8 @@ Already shipped in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8):
 - **Alpha demo closure (2026-05-27)** — browser async export buttons, full render-job API matrix, Playwright export smoke ([closure log](design/mrp-crp-alpha-demo-closure-build-log.md)).
 - **`@brewery/*` → `@umbraculum/*` scope migration** — ✅ 2026-05-19 ([`brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)).
 - **RFC-0002 canonical module layout** — Accepted 2026-05-19; brewery β file-move scheduled in Late H1 2026 Week 1 (see tranche above).
-- **`@umbraculum/ai-tool-sdk` carve-out** — ✅ 2026-05-21 in repo; **npm `0.1.0`** 2026-05-29.
-- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 in repo; **npm `0.1.0`** 2026-05-29 (`ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred).
+- **`@umbraculum/ai-tool-sdk` carve-out** — ✅ 2026-05-21 in repo; **npm `0.1.1`** 2026-05-29.
+- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 in repo; **npm `0.1.1`** 2026-05-29 (`ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred).
 - **Foundation hardening (lint, types, tests, docs)** — ✅ feature-complete May 2026 ([`FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md); phase logs in [`LINTING.md`](LINTING.md), [`TYPING.md`](TYPING.md), [`TESTING.md`](TESTING.md)).
 
 #### TODO — what to do next (pair with an agent)

@@ -28,7 +28,7 @@ quick reminder, jump straight to [`DEVELOPMENT.md`](../DEVELOPMENT.md).
   [`ecosystem-case-study-sap.md`](design/ecosystem-case-study-sap.md) and
   [`ecosystem-case-study-odoo.md`](design/ecosystem-case-study-odoo.md)).
 
-**Third-party module authors:** MIT SDK packages are on npm — `@umbraculum/ai-tool-sdk@0.1.0`, `@umbraculum/i18n-keys@0.1.0`, `@umbraculum/module-sdk@0.0.1`, and `@umbraculum/*-contracts@0.0.1` (automation, pim, mrp, crp). See [`third-party-module.md`](modules/contribute/third-party-module.md).
+**Third-party module authors:** MIT SDK packages are on npm — `@umbraculum/ai-tool-sdk@0.1.1`, `@umbraculum/i18n-keys@0.1.1`, `@umbraculum/module-sdk@0.0.2`, and `@umbraculum/*-contracts@0.0.2` (automation, pim, mrp, crp). See [`third-party-module.md`](modules/contribute/third-party-module.md).
 
 ## No certification track
 

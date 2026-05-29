@@ -267,13 +267,13 @@ A specific subset of packages — the ones third-party module developers must de
 | Package | In-repo status | On npm registry | Published version | Notes |
 |---------|----------------|-----------------|-------------------|-------|
 | `@umbraculum/ci-parity` | ✅ | **Published** (OIDC) | `1.0.7` | MIT CLI + GHA reusable workflow; not an SDK package. See [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). |
-| `@umbraculum/ai-tool-sdk` | ✅ | **Published** | `0.1.0` | Leaf package (zero deps). OIDC via `publish-sdk-batch.yml`. |
-| `@umbraculum/i18n-keys` | ✅ | **Published** | `0.1.0` | Leaf package (zero deps). |
-| `@umbraculum/module-sdk` | ✅ | **Published** | `0.0.1` | Registry `dependencies` on `^0.1.0` leaves; monorepo dev keeps `file:../…`. |
-| `@umbraculum/automation-contracts` | ✅ | **Published** | `0.0.1` | Third-party modules pin per [`third-party-module.md`](modules/contribute/third-party-module.md). |
-| `@umbraculum/pim-contracts` | ✅ | **Published** | `0.0.1` | Same batch. |
-| `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.0.1` | Same batch. |
-| `@umbraculum/crp-contracts` | ✅ | **Published** | `0.0.1` | Same batch. |
+| `@umbraculum/ai-tool-sdk` | ✅ | **Published** | `0.1.1` | Leaf package (zero deps). OIDC via `publish-sdk-batch.yml`. |
+| `@umbraculum/i18n-keys` | ✅ | **Published** | `0.1.1` | Leaf package (zero deps). |
+| `@umbraculum/module-sdk` | ✅ | **Published** | `0.0.2` | Registry `dependencies` on `^0.1.1` leaves; monorepo dev keeps `file:../…`. |
+| `@umbraculum/automation-contracts` | ✅ | **Published** | `0.0.2` | Third-party modules pin per [`third-party-module.md`](modules/contribute/third-party-module.md). |
+| `@umbraculum/pim-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
+| `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
+| `@umbraculum/crp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/api-client` | ✅ in monorepo | **Deferred** | — | Post-α or subset split; depends on full `@umbraculum/contracts` via `file:`. Not on the module-author critical path. |
 
 **Monorepo contributors** still use npm workspaces + `file:` links (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
