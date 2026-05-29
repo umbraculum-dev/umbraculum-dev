@@ -28,5 +28,7 @@
 
 ## Canonical paths
 
-- umbraculum-dev: `/home/rf/dkprojects/rfapps/umbraculum-dev`
-- umbraculum-toolset: `/home/rf/dkprojects/rfapps/umbraculum-toolset`
+Executors should use their local clone root; on disk that is environment-specific. Repo identities:
+
+- umbraculum-dev: `https://github.com/umbraculum-dev/umbraculum-dev`
+- umbraculum-toolset: `https://github.com/umbraculum-dev/umbraculum-toolset`
