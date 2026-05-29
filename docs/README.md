@@ -176,6 +176,7 @@ Day-to-day engineering conventions and runbooks.
 - [`GETTING-STARTED.md`](GETTING-STARTED.md) — **First-time contributor tutorial.** Linear walkthrough from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running". Targets the [`MANIFESTO.md`](../MANIFESTO.md) §1.4 gap directly. Read this if you have never opened the repo before.
 - [`FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md) — Synthesis layer for the four-slice foundation-hardening pass (lint + types + tests + docs) plus the orthogonal validation axis. Single entry point for the bird's-eye narrative; per-slice docs below remain the sources of truth. Includes the plugin-pack handoff manifest (slice → rule/skill/subagent mapping).
 - [`CODING-STANDARDS.md`](CODING-STANDARDS.md) — Coding standards (TypeScript, conventions, file layout).
+- [`CI-PARITY.md`](CI-PARITY.md) — Pre-push static-analysis gate (`npx @umbraculum/ci-parity`); manifest at `.umbraculum/ci-parity.json`; four local-vs-CI divergence mechanisms.
 - [`LINTING.md`](LINTING.md) — ESLint setup, scope tiers (HIGH-light → HIGH-staged → HIGH-full), value/cost analysis, and how to extend the strict gate.
 - [`TYPING.md`](TYPING.md) — TypeScript strict-flag rollout, per-workspace `tsc --noEmit` baseline + canonical measurement methodology, the 6 candidate stricter flags + their rollout state, and the per-workspace CI typecheck gate.
 - [`TAMAGUI.md`](TAMAGUI.md) — Tamagui type-system caveats, our adaptation strategy, and what to watch upstream.

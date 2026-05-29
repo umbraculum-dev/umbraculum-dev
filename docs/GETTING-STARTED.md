@@ -114,7 +114,20 @@ docker compose version     # Expect: Docker Compose version v2.x or newer
 git --version              # Expect: 2.30+
 ```
 
-### 1.2 macOS / Windows (alternative paths)
+### 1.2.1 Pre-push CI parity (after your first code change)
+
+Docker is required not only for the dev stack but also for the **pre-push
+static-analysis gate**. Before pushing TypeScript, lint, README, or lockfile
+changes, run:
+
+```bash
+npx @umbraculum/ci-parity
+```
+
+See [`docs/CI-PARITY.md`](CI-PARITY.md). Host needs `git`, `bash`, and Docker —
+not host Node for job execution.
+
+### 1.3 macOS / Windows (alternative paths)
 
 - **macOS**: install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/);
   install [Git](https://git-scm.com/download/mac) via Homebrew
@@ -128,7 +141,7 @@ The rest of the tutorial assumes `docker`, `docker compose`, and `git`
 are on your `PATH`. If they are, the OS underneath does not matter for
 the remaining steps.
 
-### 1.3 Install Cursor
+### 1.4 Install Cursor
 
 Cursor is the recommended IDE because the project's discipline ships as
 **Cursor plugins** (see [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md)).
@@ -147,7 +160,7 @@ doc — but Cursor is the primary supported path.
 > rules / skills / agents integration exists today. If that changes, the
 > project's posture is to track it openly (this paragraph would change).
 
-### 1.4 Git config + DCO sign-off
+### 1.5 Git config + DCO sign-off
 
 Set your identity:
 

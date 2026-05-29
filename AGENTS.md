@@ -273,6 +273,18 @@ horizontal services in [RFC-0001](docs/rfcs/0001-modules-tiers-governance-and-au
 Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
 `49-plan-documentation-context.mdc`.
 
+## Pre-push CI parity
+
+Before pushing changes that touch TypeScript, ESLint, module READMEs, lockfiles,
+or CI workflows:
+
+1. Run `npx @umbraculum/ci-parity` from the repo root (or `./scripts/ci-parity-check.sh`).
+2. Do **not** treat `docker compose exec … npm run typecheck` as CI parity.
+3. Manifest source of truth: `.umbraculum/ci-parity.json` — see [`docs/CI-PARITY.md`](docs/CI-PARITY.md).
+
+Host prerequisites: `git`, `bash`, Docker. Jobs execute inside the manifest's
+container image, not on the host Node runtime.
+
 ## Release/version notation guardrail
 
 When touching release metadata, preserve the repo convention from

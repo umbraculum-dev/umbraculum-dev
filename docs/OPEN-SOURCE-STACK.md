@@ -428,6 +428,19 @@ brevity is the gate that keeps the page maintainable.
   apparatus rules that read the boundary rule set as ground
   truth.
 
+### @umbraculum/ci-parity
+
+- **Role.** Published MIT npm CLI + reusable GHA workflow
+  (umbraculum-toolset `packages/ci-parity`) that runs docs,
+  lint, and typecheck jobs from `.umbraculum/ci-parity.json`.
+- **Why this and not ad-hoc bash per repo.** Single manifest
+  source of truth shared by local pre-push and CI; eliminates
+  triplicated install topology knowledge.
+- **Closed-source-swap impact.** Low — manifest is JSON; runner
+  is Node + Docker. Sister repos can fork the package or
+  vendor the manifest schema.
+- *Specifics:* [`CI-PARITY.md`](CI-PARITY.md).
+
 ### No Prettier (deliberate)
 
 The repo does not use Prettier. Formatting is handled by

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "profile": "ts-npm-monorepo",
+  "runtime": {
+    "image": "node:20-slim",
+    "nodeOptions": "--max-old-space-size=6144"
+  },
+  "snapshot": {
+    "local": "git-archive",
+    "ci": "checkout"
+  },
+  "install": {
+    "root": "npm ci --no-audit --no-fund --workspaces --include-workspace-root",
+    "nested": [
+      {
+        "path": "apps/web/e2e",
+        "command": "npm ci --no-audit --no-fund",
+        "afterJob": "lint",
+        "beforeJob": "typecheck"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "id": "docs-readmes",
+      "containerSetup": [
+        "apt-get update -qq >/dev/null 2>&1",
+        "apt-get install -y -qq python3 >/dev/null 2>&1"
+      ],
+      "commands": [
+        "python3 scripts/docs/check-readmes.py",
+        "python3 scripts/docs/check-public-docs-no-internal-links.py",
+        "python3 scripts/docs/check-public-docs-no-personal-paths.py"
+      ]
+    },
+    {
+      "id": "lint",
+      "command": "npm run lint",
+      "needsRootInstall": true
+    },
+    {
+      "id": "typecheck",
+      "needsRootInstall": true,
+      "needsNestedInstall": true,
+      "workspaces": [
+        { "path": "services/api", "mode": "npm" },
+        { "path": "services/api/prisma", "mode": "tsc" },
+        { "path": "apps/native", "mode": "npm" },
+        { "path": "apps/web/e2e", "mode": "npm" },
+        { "path": "packages/api-client", "mode": "npm" },
+        { "path": "packages/automation-contracts", "mode": "npm" },
+        { "path": "packages/beerjson", "mode": "npm" },
+        { "path": "packages/contracts", "mode": "npm" },
+        { "path": "packages/module-sdk", "mode": "npm" },
+        { "path": "packages/i18n", "mode": "npm" },
+        { "path": "packages/i18n-react", "mode": "npm" },
+        { "path": "packages/media", "mode": "npm" },
+        { "path": "packages/navigation", "mode": "npm" },
+        { "path": "packages/recipes-ui", "mode": "npm" },
+        { "path": "packages/test-mcp", "mode": "npm" }
+      ]
+    }
+  ]
+}
