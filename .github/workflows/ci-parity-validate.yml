@@ -1,0 +1,47 @@
+name: ci-parity-validate
+
+# Fails PRs that break .umbraculum/ci-parity.json or drift from documented layout.
+# See docs/CI-PARITY.md
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-validate.yml"
+      - ".github/workflows/typecheck.yml"
+      - ".github/workflows/web-lint.yml"
+      - ".github/workflows/docs-readmes.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - ".umbraculum/ci-parity.json"
+      - ".github/workflows/ci-parity-validate.yml"
+      - ".github/workflows/typecheck.yml"
+      - ".github/workflows/web-lint.yml"
+      - ".github/workflows/docs-readmes.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-parity-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-manifest:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate ci-parity manifest (strict)
+        run: |
+          npx @umbraculum/ci-parity@1.0.0 validate --strict \
+            --manifest .umbraculum/ci-parity.json \
+            --repo "${{ github.workspace }}"

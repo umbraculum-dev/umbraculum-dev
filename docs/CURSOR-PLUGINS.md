@@ -277,6 +277,15 @@ toolset-level
 
 ## Plugin descriptions
 
+### `@umbraculum/ci-parity` (npm — sibling to plugins)
+
+Not a Cursor plugin. Published MIT package in
+[`umbraculum-toolset` `packages/ci-parity`](https://github.com/umbraculum-dev/umbraculum-toolset/tree/master/packages/ci-parity)
+that runs docs / lint / typecheck jobs from `.umbraculum/ci-parity.json`.
+The apparatus references it via rule `72-ci-parity-local-vs-ci-divergence`
+and skill `ci-parity-local-reproduction`. Install: `npx @umbraculum/ci-parity`.
+See [`docs/CI-PARITY.md`](CI-PARITY.md).
+
 ### `umbraculum-toolset-common`
 
 Common meta-framework rules + skills shared by the four umbraculum-toolset

@@ -129,6 +129,9 @@ addresses) cannot be accepted.
 
 ### Keep PRs small and focused
 
+- Before pushing changes that touch TypeScript, ESLint, module READMEs,
+  lockfiles, or CI workflows, run `npx @umbraculum/ci-parity` (see
+  [`docs/CI-PARITY.md`](docs/CI-PARITY.md)).
 - Aim for **≤ 400 changed lines** per PR where reasonable. Large
   refactors should be broken into a chain of reviewable steps.
 - One *intent* per PR. Mixed-intent PRs (e.g. "refactor + new feature +

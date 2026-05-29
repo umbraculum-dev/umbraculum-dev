@@ -22,6 +22,8 @@
 
 **Not in npm batch (monorepo-only):** `@umbraculum/contracts`, `@umbraculum/ui`, `@umbraculum/i18n`, `@umbraculum/navigation`, `@umbraculum/rendering`, brewery packages, etc.
 
+**Published outside the July α SDK batch (tooling):** `@umbraculum/ci-parity` — see [`docs/design/ci-parity-npm-publish.md`](ci-parity-npm-publish.md) and [`docs/CI-PARITY.md`](../CI-PARITY.md).
+
 ---
 
 ## 2. Prerequisites

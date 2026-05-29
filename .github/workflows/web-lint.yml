@@ -1,23 +1,8 @@
 name: web-lint
 
 # Gates ESLint on every PR that could affect web app, shared UI packages, or
-# the ESLint config itself. Runs in a node:20-slim container so the
-# "no npm on host" policy is honored end-to-end (see the plugin-shipped
-# `00-shared-node-npm-container-only.mdc` rule, `docs/TESTING.md`, and
-# `docs/LINTING.md`).
-#
-# Scope is currently HIGH-FULL (per `docs/LINTING.md`):
-#   - `npm run lint` (full repo): all 12 type-aware rules
-#     (Phase 2 promise correctness + Phases 3-4 `no-unsafe-*`) at
-#     `error`. `no-explicit-any` and `no-unused-vars` also at `error`.
-#     Errors block CI; the repo is at zero warnings, zero errors.
-#   - The previously-separate `npm run lint:packages-strict` gate
-#     (`--max-warnings 0` on `packages/**`) was dropped in Phase 5d
-#     because it became redundant: with rules at `error` repo-wide,
-#     any new violation fails the main `lint` step.
-#   - The canonical guardrail is `no-restricted-imports` on cross-platform
-#     UI (`packages/ui/src/{ai,charts}/**`) to forbid raw `tamagui`
-#     Button/Input/Checkbox imports (see docs/LINTING.md, "Why Medium").
+# the ESLint config itself. Job body delegated to @umbraculum/ci-parity.
+# See docs/CI-PARITY.md and docs/LINTING.md.
 
 on:
   push:
@@ -30,6 +15,7 @@ on:
       - "eslint.config.mjs"
       - "package.json"
       - "package-lock.json"
+      - ".umbraculum/ci-parity.json"
       - ".github/workflows/web-lint.yml"
   pull_request:
     branches: [master]
@@ -41,6 +27,7 @@ on:
       - "eslint.config.mjs"
       - "package.json"
       - "package-lock.json"
+      - ".umbraculum/ci-parity.json"
       - ".github/workflows/web-lint.yml"
   workflow_dispatch:
 
@@ -51,36 +38,8 @@ concurrency:
 jobs:
   lint:
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Run ESLint inside node:20-slim
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}:/repo" \
-            -w /repo \
-            -e NODE_OPTIONS='--max-old-space-size=6144' \
-            node:20-slim \
-            bash -lc "
-              set -e
-              npm install --no-audit --no-fund --workspaces --include-workspace-root
-              echo '--- full lint (HIGH-full: errors block; repo at zero warnings) ---'
-              npm run lint
-            "
-          # NODE_OPTIONS=--max-old-space-size=6144 surfaced 2026-05-19 after the
-          # sub-plan #9 slot-4 push (commit bd7d147) produced the first CI run
-          # to OOM the type-aware ESLint parser. Root cause is monotonic monorepo
-          # growth: eslint.config.mjs runs the type-aware parser (parserOptions.
-          # projectService with tsconfigRootDir = repo root) across the whole
-          # monorepo (services/api + apps/web + apps/native + packages/*), which
-          # loads the entire TS project graph plus rule contexts for the 12
-          # type-aware rules (promise correctness Tier A + no-unsafe-* Tiers
-          # C-narrow/wide) into a single node process. Default v8 heap (~4 GB)
-          # exceeded → SIGABRT (exit 134). ubuntu-latest runners ship with 7 GB
-          # RAM, so 6 GB v8 heap is safe. Re-evaluate if the lint surface keeps
-          # growing past 100 type-checked files per package average. See
-          # docs/LINTING.md "CI heap budget" subsection for rationale + bump
-          # guidance.
+    uses: umbraculum-dev/umbraculum-toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v1.0.0
+    with:
+      jobs: lint
+      ci_parity_version: "1.0.0"
+      manifest_path: .umbraculum/ci-parity.json

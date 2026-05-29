@@ -248,10 +248,11 @@ Mirroring the test-coverage and lint phase logs: one PR per sub-phase, single-pu
 From the repo root, on committed work (stash or commit WIP first — `git archive` only sees tracked files):
 
 ```bash
-./scripts/ci-parity-check.sh
+npx @umbraculum/ci-parity
+# or: ./scripts/ci-parity-check.sh
 ```
 
-The host only archives and launches Docker. All three jobs run **inside `node:20-slim`** on the archived snapshot (same image and install layout as CI):
+The host only archives and launches Docker. All jobs run **inside `node:20-slim`** on the archived snapshot per [`.umbraculum/ci-parity.json`](../.umbraculum/ci-parity.json) (same image and install layout as CI). See [`docs/CI-PARITY.md`](CI-PARITY.md) for the full index.
 
 | Job | CI workflow |
 |---|---|
@@ -265,7 +266,7 @@ Flags: `--sha <rev>` (check a specific revision), `--keep` (retain `/tmp/ci-pari
 
 ### When local typecheck lies (documented divergence)
 
-Three mechanisms are documented in `scripts/ci-parity-check.sh` and [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) §6.7:
+Three mechanisms are documented in [`docs/CI-PARITY.md`](CI-PARITY.md) and [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) §6.7 (plus hoisting splits — mechanism 4):
 
 1. **Gitignored cross-references** — tracked README links to a gitignored file; local resolves, CI does not.
 2. **Nested-workspace install drift** — `apps/web/e2e` is not installed by root `npm ci --workspaces`; stale local `apps/web/e2e/node_modules` masks missing `@playwright/test`.
@@ -290,7 +291,7 @@ SNAP=/tmp/typecheck-parity && rm -rf "$SNAP" && \
   '
 ```
 
-Replace the final `cd` + `npm run typecheck` with the workspace you changed, or run `./scripts/ci-parity-check.sh` to exercise all 15 gated workspaces.
+Replace the final `cd` + `npm run typecheck` with the workspace you changed, or run `npx @umbraculum/ci-parity run --jobs typecheck` to exercise all 15 gated workspaces.
 
 ---
 
@@ -300,7 +301,7 @@ Per the plugin-shipped container-only Node/npm rule (`00-shared-node-npm-contain
 
 ### Single workspace (fast iteration — not CI parity)
 
-Per-workspace checks below are fine for tight edit loops. **Before pushing**, run [CI parity](#before-pushing--ci-parity-required) (`./scripts/ci-parity-check.sh`).
+Per-workspace checks below are fine for tight edit loops. **Before pushing**, run [CI parity](CI-PARITY.md) (`npx @umbraculum/ci-parity`).
 
 ```bash
 # services/api (running api container has node_modules bind-mounted)

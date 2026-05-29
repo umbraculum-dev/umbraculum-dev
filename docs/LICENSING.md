@@ -266,6 +266,7 @@ A specific subset of packages — the ones third-party module developers must de
 
 | Package | In-repo status | npm-ready? | Target window | Notes |
 |---------|----------------|------------|---------------|-------|
+| `@umbraculum/ci-parity` | ✅ v1.0.0 in umbraculum-toolset | **Publish on tag** | **Now** (tooling) | MIT CLI + GHA reusable workflow; not an SDK package. See [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). |
 | `@umbraculum/ai-tool-sdk` | ✅ v0.1.0 landed 2026-05-21 | **Prep only** | July 2026 α | Leaf package (zero deps). `private: true`; no `"license": "MIT"` in `package.json` yet. |
 | `@umbraculum/i18n-keys` | ✅ v0.1.0 landed 2026-05-27 | **Prep only** | July 2026 α | Leaf package (zero deps). Same publish-metadata gap as `ai-tool-sdk`. |
 | `@umbraculum/module-sdk` | ✅ v0.0.1 + wired to both leaves | **Prep only** | July 2026 α | Depends on published `ai-tool-sdk` + `i18n-keys` (today: `file:../…` workspace links). Publish **after** the two leaves. |
