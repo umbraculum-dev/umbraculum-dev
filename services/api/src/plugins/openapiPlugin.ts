@@ -14,6 +14,8 @@ import {
 } from "../openapi/metadata.js";
 
 export const openapiPlugin = fp(async (app: FastifyInstance) => {
+  // @fastify/swagger uses export= merged with namespace; same pattern as @fastify/cors in app.ts.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   await app.register(fastifySwagger, {
     openapi: {
       openapi: "3.0.3",
@@ -32,6 +34,7 @@ export const openapiPlugin = fp(async (app: FastifyInstance) => {
   });
 
   if (process.env["NODE_ENV"] !== "production") {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await app.register(fastifySwaggerUi, {
       routePrefix: "/documentation",
       staticCSP: true,

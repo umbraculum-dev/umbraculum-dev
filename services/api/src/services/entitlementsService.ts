@@ -26,13 +26,13 @@ export class EntitlementsService {
    * In tier_only mode (public α), returns true without a DB lookup so call sites
    * can be wired before WorkspaceBillingAddon lands.
    */
-  async hasActiveAddon(_workspaceId: string, _addonCode: string): Promise<boolean> {
+  hasActiveAddon(_workspaceId: string, _addonCode: string): Promise<boolean> {
     if (this.enforcementMode === "tier_only") {
-      return true;
+      return Promise.resolve(true);
     }
 
     // H1 2027: query platform.workspace_billing_addons when the model ships.
     void this.prisma;
-    return false;
+    return Promise.resolve(false);
   }
 }
