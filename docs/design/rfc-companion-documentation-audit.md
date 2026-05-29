@@ -14,7 +14,7 @@
 
 | Verdict | RFCs |
 |---------|------|
-| **Documentation-complete** | 0003, 0006, 0010 |
+| **Documentation-complete** | 0003, 0006, 0009, 0010 |
 | **Adequate with known gaps** | 0001, 0004, 0005 |
 | **Drift-risk — P0 remediation shipped 2026-05-27** | 0007, 0008 |
 | **Medium follow-up** | 0002 |
@@ -34,6 +34,7 @@
 | [0006](../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) | Shipped | Bundled audit | [`web-route-group-audit.md`](web-route-group-audit.md) | — | **Met** | — |
 | [0007](../rfcs/0007-canonical-document-rendering.md) | PR1–7 closed 2026-05-25 | Rationale + horizontal surface + consumer index | Rationale; PIM §8.3; **horizontal surface added 2026-05-27** | Registry must stay updated per new templates | Was **High** | P0 **closed** |
 | [0008](../rfcs/0008-notifications-outbound-delivery.md) | Contract only | Boundary surface (pre-impl) | RFC text; **surface added 2026-05-27** | Transport service not built | Was **High** | P0 **closed** |
+| [0009](../rfcs/0009-workspace-billing-addons-and-entitlements.md) | Contract only | Boundary surface (pre-impl) | [`canonical-workspace-billing-addons-surface.md`](canonical-workspace-billing-addons-surface.md) | `WorkspaceBillingAddon` + enforcement H1 2027 | **Met** | — |
 | [0010](../rfcs/0010-platform-brewery-postgres-schema-split.md) | Shipped 2026-05-28 | As-built runbook + migration | [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres-schema-split.md) | — | **Met** | — |
 
 **Implementation closure references:** RFC-0007 §12 / §15.1; PIM PR7 [`pimChannelFeeds.test.ts`](../../services/api/src/tests/pimChannelFeeds.test.ts); MRP/CRP Wave 6 [`mrp-crp-wave-6-rendering-templates-build-log.md`](mrp-crp-wave-6-rendering-templates-build-log.md). RFC-0010 migration: `services/api/prisma/migrations/20260528170000_split_platform_brewery_schemas/migration.sql`.

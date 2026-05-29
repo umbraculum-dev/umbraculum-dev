@@ -58,7 +58,10 @@ export interface RegisterModuleOptions<TApp = unknown> {
    * Horizontal platform models live in the `platform` schema (no module registration).
    */
   prismaSchema?: string;
-  /** Stripe / RevenueCat addon codes this module owns. */
+  /**
+   * Stripe / RevenueCat add-on SKU keys this module owns (e.g. `automation_module`).
+   * Declared vocabulary only until RFC-0009 H1 2027 implementation; boot rejects duplicates.
+   */
   addonCodes?: readonly string[];
   /** Per-tier limit slice merged by the platform billing layer at runtime. */
   tierLimits?: TierLimitsContributor;

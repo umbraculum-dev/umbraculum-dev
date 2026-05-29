@@ -79,7 +79,7 @@ Goal: harden the shipped v0 AI consultant into the platform's cross-module conne
 | **D1** | RAG product docs + pgvector | Wave A; compose pgvector | Nov–Dec 2026 | `platform.searchProductDocs` over public help | **Shipped** |
 | **D2–D3** | Timeline RAG + memory unify | D1 | H1 2027 | — | **Deferred** |
 | **E** | Multi-provider BYOK router | BYOK demand signal | Dec 2026 | Anthropic + OpenAI BYOK selectable | **Shipped** |
-| **E-full** | Managed-AI credits + pricebook | `WorkspaceBillingAddon` (priority **7**) | H1 2027 | Credits + Stripe top-up | **Deferred** |
+| **E-full** | Managed-AI credits + pricebook | `WorkspaceBillingAddon` (priority **7**); [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md) contract | H1 2027 | Credits + Stripe top-up | **Deferred** |
 | **—** | WMS/CRM AI tool bundles | WMS/CRM modules | H2 2027+ | — | **Blocked** |
 
 Surface docs: [`canonical-ai-propose-write-surface.md`](design/canonical-ai-propose-write-surface.md), [`canonical-ai-reporting-dsl-surface.md`](design/canonical-ai-reporting-dsl-surface.md), [`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md). Build log: [`ai-consultant-post-alpha-h2-build-log.md`](design/ai-consultant-post-alpha-h2-build-log.md).
@@ -146,7 +146,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **2e** | **Launch comms** — publish announcement; cross-post forum; optional sponsors list seed | After **2c** + **2d** | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md), flip-day runbook §8 |
 | **2f** | **MIT npm SDK publish batch** | Registry install for third-party module authors | [`npm-sdk-publish-preflight.md`](design/npm-sdk-publish-preflight.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |
 | **2g** | **DocSearch application submit** (Algolia) | Replaces lunr fallback on docs site | RFC-0005 P5 |
-| **2h** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 |
+| **2h** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 — **contract ✅ [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)**; implementation deferred |
 | **2i** | **Tamagui intra-RC bump** | Hygiene | [`TAMAGUI.md`](TAMAGUI.md) |
 
 **Not in this H2 alpha slice:** WMS, native MRP/CRP operator screens, irreversible brewery→MRP schema migration, scheduling optimizer, ready-to-sell commercial MRP/CRP — see [§ H1 2027 mature](#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) below.

@@ -73,6 +73,15 @@ export {
 } from "./registerWebModule.js";
 
 export {
+  PLATFORM_RESERVED_ADDON_CODE_PREFIX,
+  AddonCodeAlreadyRegisteredError,
+  InvalidAddonCodeError,
+  clearAddonCodeRegistryForTests,
+  listRegisteredAddonCodes,
+  snapshotAddonCodeOwnership,
+} from "./addonCodes.js";
+
+export {
   PLATFORM_RESERVED_TIER_LIMIT_KEYS,
   ReservedTierLimitKeyError,
   TierLimitKeyCollisionError,

@@ -201,7 +201,7 @@ Write/propose flows follow human-in-the-loop per [`PLATFORM-ARCHITECTURE.md`](..
 | `maxAdaptersConnected` | Connections in `connected` | free 0 / premium 1 / pro 2 / pro_plus 10 |
 | `automationAiToolsEnabled` | Gate tool family | free false / paid true |
 
-`addonCodes: ["automation_module"]`. Enforce on vessel create and adapter connect.
+`addonCodes: ["automation_module"]`. **Add-on enforcement deferred H1 2027** ([RFC-0009](../../rfcs/0009-workspace-billing-addons-and-entitlements.md)); α uses tier limits only on vessel create and adapter connect.
 
 ### 8.3 `registerModule()` (shape per §4.4)
 
