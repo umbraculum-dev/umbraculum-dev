@@ -43,7 +43,19 @@ The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party m
 
 You do **not** import from `services/api/src/modules/<code>/` directly. That tree is platform internals and not version-stable. If something you need is not exported from a contracts package, that's a feature request against the contracts package, not a license to reach inside.
 
-**npm registry vs monorepo (2026-05-27).** The four packages above are **MIT-licensed and source-complete in the Umbraculum monorepo**, but **`private: true` until the July 2026 public-alpha cutover** — they are **not** installable from the public npm registry yet. Until publish, depend via git submodule / workspace / `file:` against a checkout of `packages/*`, or wait for the batch in [`LICENSING.md`](../../LICENSING.md) §6.2.1. The `peerDependencies` versions in Step 2 below are the **compatibility contract** to pin once registry versions exist.
+**npm registry (primary).** The four packages above are on the public npm registry as of **2026-05-29**:
+
+```bash
+npm install \
+  @umbraculum/module-sdk@0.0.1 \
+  @umbraculum/ai-tool-sdk@0.1.0 \
+  @umbraculum/i18n-keys@0.1.0
+# plus @umbraculum/<code>-contracts@0.0.1 for each canonical you target
+```
+
+Pin `peerDependencies` to `^` those versions (or newer patch/minor within range). See [`LICENSING.md`](../../LICENSING.md) §6.2.1 for the full version table.
+
+**Monorepo fallback.** Umbraculum contributors and forks still use npm workspaces + `file:` links against `packages/*` (see [`DEVELOPMENT.md`](../../../DEVELOPMENT.md)). Git dependencies on the monorepo checkout remain valid when you need unreleased pins.
 
 ---
 
@@ -193,7 +205,7 @@ acme-modbus-adapter/                 # your GitHub org's repo
 }
 ```
 
-Until the July 2026 npm publish batch ([`LICENSING.md`](../../LICENSING.md) §6.2.1), consumers install SDK + contracts via `file:` paths or a git dependency on the Umbraculum monorepo checkout — the **peer dependency names and semver ranges** above are still the compatibility contract.
+Install SDK + contracts from npm (see §3). The **peer dependency names and semver ranges** below match the published registry versions.
 
 ### 8.3 Adapter implementation (illustrative)
 

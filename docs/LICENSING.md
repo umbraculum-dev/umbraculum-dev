@@ -260,30 +260,25 @@ A specific subset of packages — the ones third-party module developers must de
 
 **Concrete example.** A brewery consultancy wants to ship a closed-source module that does specialized water-chemistry calculations for distillers. They depend on Umbraculum's MIT-licensed SDK packages for the types and registration. Their module's own source code can be MIT, Apache 2.0, or fully proprietary. When the module runs inside a Umbraculum host, the *host* is AGPLv3 — the consultancy's source code is not.
 
-#### 6.2.1 npm publication status (living — last reviewed 2026-05-27)
+#### 6.2.1 npm publication status (living — last reviewed 2026-05-29)
 
-**Are we ready to publish today?** **No** — not as a registry install for external module authors. The MIT SDK **source and types are ready inside the monorepo** (built `dist/`, tests, docs, `@umbraculum/*` scope); **npm registry publication is a deliberate July 2026 public-alpha cutover step**, not done at extraction/landing time.
+**Are we ready to publish today?** **Yes** for the MIT SDK batch — external module authors can `npm install` the seven packages below from the public registry. First versions landed **2026-05-29** (maintainer laptop publish + OIDC trusted publishing configured for future bumps via `publish-sdk-batch.yml`). See [`docs/design/npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md) SP-3 sign-off.
 
-| Package | In-repo status | npm-ready? | Target window | Notes |
-|---------|----------------|------------|---------------|-------|
-| `@umbraculum/ci-parity` | ✅ v1.0.6 published (OIDC) | **Published** | **Now** (tooling) | MIT CLI + GHA reusable workflow; not an SDK package. See [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). |
-| `@umbraculum/ai-tool-sdk` | ✅ v0.1.0 landed 2026-05-21 | **Prep only** | July 2026 α | Leaf package (zero deps). `private: true`; no `"license": "MIT"` in `package.json` yet. |
-| `@umbraculum/i18n-keys` | ✅ v0.1.0 landed 2026-05-27 | **Prep only** | July 2026 α | Leaf package (zero deps). Same publish-metadata gap as `ai-tool-sdk`. |
-| `@umbraculum/module-sdk` | ✅ v0.0.1 + wired to both leaves | **Prep only** | July 2026 α | Depends on published `ai-tool-sdk` + `i18n-keys` (today: `file:../…` workspace links). Publish **after** the two leaves. |
-| `@umbraculum/<code>-contracts` | ✅ per canonical module | **Prep only** | July 2026 α (batch) | Third-party modules pin these per [`third-party-module.md`](modules/contribute/third-party-module.md). Same `private: true` posture; not part of the H2 2026 extraction tranche but part of the same MIT publish batch. |
-| `@umbraculum/api-client` | ✅ in monorepo | **Deferred** | Post-α or subset split | Listed in [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.4 as a public types surface; today depends on full `@umbraculum/contracts` via `file:`. A publishable subset (route IDs + public DTO types only) is not split yet — not on the July α critical path for module authors. |
+| Package | In-repo status | On npm registry | Published version | Notes |
+|---------|----------------|-----------------|-------------------|-------|
+| `@umbraculum/ci-parity` | ✅ | **Published** (OIDC) | `1.0.7` | MIT CLI + GHA reusable workflow; not an SDK package. See [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). |
+| `@umbraculum/ai-tool-sdk` | ✅ | **Published** | `0.1.0` | Leaf package (zero deps). OIDC via `publish-sdk-batch.yml`. |
+| `@umbraculum/i18n-keys` | ✅ | **Published** | `0.1.0` | Leaf package (zero deps). |
+| `@umbraculum/module-sdk` | ✅ | **Published** | `0.0.1` | Registry `dependencies` on `^0.1.0` leaves; monorepo dev keeps `file:../…`. |
+| `@umbraculum/automation-contracts` | ✅ | **Published** | `0.0.1` | Third-party modules pin per [`third-party-module.md`](modules/contribute/third-party-module.md). |
+| `@umbraculum/pim-contracts` | ✅ | **Published** | `0.0.1` | Same batch. |
+| `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.0.1` | Same batch. |
+| `@umbraculum/crp-contracts` | ✅ | **Published** | `0.0.1` | Same batch. |
+| `@umbraculum/api-client` | ✅ in monorepo | **Deferred** | — | Post-α or subset split; depends on full `@umbraculum/contracts` via `file:`. Not on the module-author critical path. |
 
-**What “ready” means at cutover (checklist — not started):**
+**Monorepo contributors** still use npm workspaces + `file:` links (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
 
-1. Create/claim the `@umbraculum` npm organization (or documented scoped-publish equivalent).
-2. Per package above: remove `"private": true`, add `"license": "MIT"` (+ per-package `LICENSE` or root MIT pointer), add `repository` / `publishConfig` as needed.
-3. Replace workspace `file:../…` dependencies between published packages with semver `peerDependencies` / `dependencies` on registry versions.
-4. Publish order: **`ai-tool-sdk` → `i18n-keys` → `module-sdk` → `<code>-contracts` packages** (leaves before spine).
-5. Tag monorepo release aligned with published versions; document minimum compatible platform version in [`third-party-module.md`](modules/contribute/third-party-module.md).
-
-**Until publish:** in-repo and fork contributors use npm workspaces + `file:` links (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)); external repos should treat `^X.Y.Z` peer pins in third-party-module docs as **the contract to target**, installing from git/workspace until the registry batch lands.
-
-**Go-public docs cross-refs:** [`ROADMAP.md`](ROADMAP.md) (Late H1 / July 2026 tranche + priority **6**), [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §4.4 + §10.1.1 pre-flip checklist.
+**Go-public docs cross-refs:** [`ROADMAP.md`](ROADMAP.md), [`third-party-module.md`](modules/contribute/third-party-module.md), [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md).
 
 ### 6.3 Available alternative: commercial dual license
 
