@@ -201,7 +201,7 @@ Adjust relative link depth per package README location.
 - [ ] `npm run test:packages` succeeds.
 - [ ] For each package: `npm pack -w @umbraculum/<name> --dry-run` lists only `dist/`, `README.md`, `LICENSE`, `package.json`.
 - [ ] No secrets or `src/` in pack list.
-- [ ] `npx @umbraculum/ci-parity` or `./scripts/ci-parity-check.sh` docs/typecheck jobs still pass after merge.
+- [ ] `npx @umbraculum/ci-parity` (or `run --jobs docs-readmes` if docs-only) passes — **not** host `python3` scripts; see [`CI-PARITY.md`](../CI-PARITY.md) cross-platform contract.
 
 ### 6.5 SP-1 file inventory (executor may touch only these)
 

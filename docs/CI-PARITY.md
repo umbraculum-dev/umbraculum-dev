@@ -8,7 +8,7 @@
 
 ## One-command contract
 
-From the repo root (host needs `git`, `bash`, and Docker — **not** host Node for job execution):
+From the repo root (host needs `git`, Docker, and Node to launch the CLI — **not** host Node/npm for job execution):
 
 ```bash
 npx @umbraculum/ci-parity
@@ -45,6 +45,27 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 | **Parity gate** | Before every push with non-trivial CI surface | `npx @umbraculum/ci-parity` |
 
 Dev-container checks use a different `node_modules` layout than CI (hoisting splits). **Never treat dev-container green as proof CI will pass.**
+
+## Cross-platform contract (agents and contributors)
+
+`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI archives tracked files and runs manifest jobs inside `node:20-slim` — the same shape as GHA static-analysis jobs.
+
+| Layer | Role |
+|-------|------|
+| **Host** | `git`, Docker, Node (launch `npx @umbraculum/ci-parity` only) |
+| **Container** | `npm ci`, `npm run lint`, `python3 scripts/docs/…`, per `.umbraculum/ci-parity.json` |
+
+**Not pre-push proof (debug / fast loop only):**
+
+- Host `python3`, host `npm`, host `bash ./scripts/…` (Unix-only; skips clean snapshot)
+- `docker compose exec …` on the live bind-mounted tree
+- Ad-hoc `docker run -v $PWD:/repo …` mounting the **live** workspace (mechanism 3)
+
+**When adding a GHA workflow:** register its verify commands as a **ci-parity job** in `.umbraculum/ci-parity.json`. One command list for local + CI; no parallel host-only bash scripts.
+
+**When GHA is still required:** OIDC npm publish, tag-only deploys, secrets, first-time trusted-publisher setup — run ci-parity first, then trigger GHA.
+
+Agent rule (toolset): `72-ci-parity-local-vs-ci-divergence.mdc` § Agent anti-patterns.
 
 ## Four divergence mechanisms
 
