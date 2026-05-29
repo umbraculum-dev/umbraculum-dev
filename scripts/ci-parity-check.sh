@@ -69,6 +69,12 @@
 #   ./scripts/ci-parity-check.sh --sha <rev>     # check a specific revision
 #   ./scripts/ci-parity-check.sh --keep          # keep /tmp snapshot for inspection
 #
+# PREREQUISITES (host)
+# --------------------
+#   git, bash, Docker (Docker Desktop on macOS/Windows; WSL2 on Windows).
+#   Host Node.js is NOT used — all npm/tsc/lint/python run inside node:20-slim
+#   on a git-archive snapshot (cross-platform parity with GitHub Actions).
+#
 # EXIT CODES
 # ----------
 #   0 — all three CI-parity jobs green
