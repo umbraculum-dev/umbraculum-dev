@@ -1,7 +1,7 @@
 # Ecosystem case study — Odoo Community and the learnability ladder
 
 **Tier:** Public  
-**Status:** v1.0 — practitioner experience; informs horizontal-accessibility commitments (2026-05-29)  
+**Status:** v1.1 — practitioner experience; §4.1 Umbraculum vs Odoo platform-shape comparison (2026-05-29)  
 **Audience:** contributors, platform evaluators, vertical builders, future maintainers reasoning about what Umbraculum copies — and what it deliberately does not (certifications)  
 **Related:** [`design/ecosystem-case-study-sap.md`](ecosystem-case-study-sap.md) (trials without safe boat), [`design/ecosystem-case-study-teamsystem.md`](ecosystem-case-study-teamsystem.md) (partner-only experiment path), [`design/ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md), [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md)
 
@@ -70,6 +70,28 @@ Umbraculum takes the **Odoo Community learnability shape** without the **certifi
 | Mainstream languages | **TypeScript, SQL, open stack** | [`OPEN-SOURCE-STACK.md`](../OPEN-SOURCE-STACK.md) |
 | Skip cert economy | **No certification program** | [`MANIFESTO.md`](../../MANIFESTO.md) §2.2 |
 | Expertise discovery for vertical builders | **Public modules + conversation** | [`MODULES.md`](../MODULES.md); forum at `forum.umbraculum.dev` ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6) |
+
+### 4.1 Umbraculum vs Odoo — platform shape (not a feature scorecard)
+
+We are **not** claiming Umbraculum ships more business apps than Odoo today. Odoo is a mature **modular ERP suite** (accounting, CRM, inventory, website, POS, HR, …). Umbraculum is a **horizontal toolset** for workspace-shaped operational applications — canonical modules plus permissionless vertical configurations. Manufacturing (brewery) is a stress test, not the product identity ([`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)).
+
+The comparison that matters for evaluators:
+
+| Dimension | Odoo (our reading) | Umbraculum (our bet) |
+|-----------|-------------------|----------------------|
+| **Product shape** | Install the suite; extend in Python modules | Compose canonical domains + vertical configs on a shared platform |
+| **Language** | Python + XML views + PostgreSQL ORM | **TypeScript** end-to-end — API, web, native, contracts ([`OPEN-SOURCE-STACK.md`](../OPEN-SOURCE-STACK.md)) |
+| **Integrator surface** | In-process ORM; partner implementations | Pin-able **`@umbraculum/<code>-contracts`** (Zod/MIT); public route tables + partial OpenAPI ([`API-OPENAPI.md`](../API-OPENAPI.md)) |
+| **Native** | Web-first; official mobile apps exist | **Native slice mandatory** per module (RFC-0002 β layout); Tamagui cross-platform ([`TAMAGUI.md`](../TAMAGUI.md), [`NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md)) — early in market, committed in architecture |
+| **Breadth today** | Many shipped apps (Community + OCA) | Six reserved canonical codes; uneven alpha depth — **not** full-suite ERP yet ([`MODULES.md`](../MODULES.md) §3.1) |
+| **Beyond MRP/CRM** | More apps in one Python world | **Horizontal platform** (auth, AI, rendering, i18n) + Tier 6 verticals — build industry configs without reimplementing CRM as "HotelCRM" |
+| **AI** | Bolt-ons and partner offerings | **Workspace-scope AI consultant** as architectural cornerstone ([`AI-CONSULTANT.md`](../AI-CONSULTANT.md)) |
+| **Learnability** | Community Edition — proven ladder | Same philosophy: `docker compose up`, no certification gate |
+| **Commercial layer** | CE/EE split; partner certifications | AGPL core + MIT SDK; **no Umbraculum certification program** ([`LICENSING.md`](../LICENSING.md) §9) |
+
+**Where we respect Odoo plainly:** if you need accounting, payroll, website, and POS **next quarter**, Odoo Community (plus OCA) is the more complete choice. **Where we differ by design:** composable, AI-native, web+native operational platforms — especially when the job is *not* "install forty ERP apps" but *build one workspace-shaped product* that crosses automation, PIM, planning, and a vertical domain.
+
+**One-line shorthand (experience, not polemic):** Odoo — *install the suite, extend in Python.* Umbraculum — *this is the stack, try it; compose modules; ship web and native from one shape; AI sees the whole workspace.*
 
 **Bright side for vertical builders:** Odoo proved that when the platform is tryable, **experts find you**. Umbraculum wants the same dynamic without asking domain specialists to become certificate collectors first.
 
