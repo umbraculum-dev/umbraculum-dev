@@ -1,11 +1,11 @@
 # npm Trusted Publishing (OIDC) for `@umbraculum/ci-parity`
 
 **Tier:** Public  
-**Status:** v1 — adopt after `1.0.0` token publish (2026-05-29)  
+**Status:** v1 — live since `1.0.6` on 2026-05-29 (token-based publish retired)  
 **Audience:** maintainers  
 **Related:** [`ci-parity-npm-publish.md`](ci-parity-npm-publish.md), [`CI-PARITY.md`](../CI-PARITY.md)
 
-Replaces the **90-day granular `NPM_TOKEN`** rotation cycle for `publish-ci-parity` with short-lived OIDC credentials from GitHub Actions. See [npm trusted publishers docs](https://docs.npmjs.com/trusted-publishers/).
+Replaced the granular `NPM_TOKEN` rotation cycle for `publish-ci-parity` with short-lived OIDC credentials from GitHub Actions. See [npm trusted publishers docs](https://docs.npmjs.com/trusted-publishers/).
 
 ---
 
@@ -49,11 +49,14 @@ npm does **not** validate these fields at save time — errors appear only on th
 
 File: `umbraculum-toolset/.github/workflows/publish-ci-parity.yml`
 
-- `permissions.id-token: write` on the **publish job**
-- **No** `registry-url` on `setup-node` (writes empty `_authToken` → blocks OIDC)
+- `permissions.id-token: write` on the publish job
+- **No** `registry-url` on `setup-node` (writes empty `_authToken` placeholder → blocks OIDC)
 - `npm install -g npm@11.6.2` (requires npm CLI **≥ 11.5.1**)
-- Explicit GitHub OIDC fetch → `NPM_ID_TOKEN` with audience `npm:registry.npmjs.org`
-- `npm publish` with **no** `NODE_AUTH_TOKEN`
+- Explicit GitHub OIDC fetch with audience `npm:registry.npmjs.org` → `NPM_ID_TOKEN`
+- Explicit `POST /-/npm/v1/oidc/token/exchange/package/<escaped>` → short-lived registry token
+- Publish from `packages/ci-parity/` with the exchanged token in `~/.npmrc`; **no** `NODE_AUTH_TOKEN`
+
+We use the explicit two-call flow rather than npm's built-in `oidc()` helper because npm 11.x silently swallows OIDC errors and surfaces them as `ENEEDAUTH`, which makes diagnosis impossible. The explicit flow prints the OIDC JWT claims and the npm exchange HTTP status, so any future failure points at the offending field on the npm `/access` page.
 
 ---
 

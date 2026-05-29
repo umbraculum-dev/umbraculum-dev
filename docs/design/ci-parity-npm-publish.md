@@ -1,7 +1,7 @@
 # Publishing `@umbraculum/ci-parity`
 
 **Tier:** Public  
-**Status:** v1 — `1.0.0` on npm (2026-05-29); **migrate publish auth to OIDC** per [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)  
+**Status:** v1 — `1.0.0` published via granular `NPM_TOKEN` (2026-05-29); **`1.0.1`+ via OIDC trusted publishing** (current of `1.0.6`)  
 **Audience:** maintainers  
 **Related:** [`docs/CI-PARITY.md`](../CI-PARITY.md), [`docs/LICENSING.md`](../LICENSING.md) §6.2.1, [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)
 
@@ -78,24 +78,22 @@ After `npm view @umbraculum/ci-parity version` returns `1.0.0`, commit migrated 
 
 **Workflow file:** `umbraculum-toolset/.github/workflows/publish-ci-parity.yml`
 
-### Preferred auth: Trusted Publishing (OIDC)
+### Preferred auth: Trusted Publishing (OIDC) — current
 
-No long-lived `NPM_TOKEN`. See **[`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)** for one-time npm + GitHub setup and `1.0.1` smoke verification.
+No long-lived `NPM_TOKEN`. Live since `1.0.6` on 2026-05-29. See **[`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)** for one-time npm + GitHub setup, the explicit token-exchange workflow, and the troubleshooting matrix.
 
-Workflow requirements:
+Workflow requirements (as deployed):
 
-- `permissions.id-token: write`
-- `registry-url: https://registry.npmjs.org` in `setup-node`
-- npm CLI **≥ 11.5.1** (`npm install -g npm@latest` in CI)
-- `npm publish` **without** `NODE_AUTH_TOKEN`
+- `permissions.id-token: write` on the publish job
+- **No** `registry-url` on `setup-node` (avoids `_authToken=${NODE_AUTH_TOKEN}` short-circuit; see actions/setup-node#1551)
+- npm CLI ≥ 11.5.1 — pinned `npm install -g npm@11.6.2`
+- Explicit GitHub OIDC fetch (audience `npm:registry.npmjs.org`) → `POST /-/npm/v1/oidc/token/exchange/package/<name>` → publish with the short-lived exchanged token
+- `npm publish` runs from `packages/ci-parity/` (not `npm publish -w`)
+- Trusted publisher saved on https://www.npmjs.com/package/@umbraculum/ci-parity/access (org `umbraculum-dev`, repo `umbraculum-toolset`, workflow filename `publish-ci-parity.yml`, env empty)
 
-### Legacy auth: granular `NPM_TOKEN` (used for `1.0.0` only)
+### Legacy auth: granular `NPM_TOKEN` (retired 2026-05-29)
 
-Used for the initial publish before OIDC was configured. Steps 1–4 (build + tests) then:
-
-`npm publish` with `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`
-
-After OIDC is verified, **delete** `NPM_TOKEN` on GitHub and revoke the granular publish token on npm — see trusted-publishing doc § Step 4.
+Used for the initial `1.0.0` publish only. After OIDC was verified at `1.0.6`, the GitHub Actions secret `NPM_TOKEN` and the granular npm publish token were removed. Token-based publish from CI is no longer supported.
 
 ---
 
@@ -117,10 +115,10 @@ npm publish -w @umbraculum/ci-parity --access public
 
 | Requirement | Notes |
 |-------------|--------|
-| npm org `@umbraculum` | Create at npm if missing; add publish-capable members |
-| `NPM_TOKEN` on umbraculum-toolset | **Legacy** — remove after OIDC verified ([trusted publishing doc](ci-parity-npm-trusted-publishing.md)) |
-| Version not already published | `npm view @umbraculum/ci-parity` → 404 until first publish |
-| Tag `ci-parity-v1.0.0` on toolset | Already pushed (reusable workflow pin) |
+| npm org `@umbraculum` | Created (`umbraculum-dev` is publishing user) |
+| Trusted publisher entry on `@umbraculum/ci-parity` | Saved on npm `/access` page; verified at `1.0.6` |
+| Version not already published | `npm view @umbraculum/ci-parity` returns the latest published version |
+| Tag `ci-parity-vX.Y.Z` on toolset | Triggers `publish-ci-parity` workflow |
 
 ---
 
@@ -155,5 +153,7 @@ Do not use git/npm install shortcuts in umbraculum-dev GHA — publish to npm fi
 | 2026-05-29 | Tag `ci-parity-v1.0.0` pushed | ✅ |
 | 2026-05-29 | `publish-ci-parity` #1 on `ci-parity-v1.0.0` | ❌ `ENEEDAUTH` — `NPM_TOKEN` not set (expected) |
 | 2026-05-29 | After `NPM_TOKEN` + re-run | ✅ `1.0.0` on npm |
-| — | OIDC workflow + trusted-publisher docs | shipped on toolset `master` |
-| — | Trusted publisher configured on npm + `1.0.1` OIDC publish | pending |
+| 2026-05-29 | OIDC workflow + trusted-publisher docs shipped on toolset `master` | ✅ |
+| 2026-05-29 | `1.0.1`–`1.0.5` OIDC iterations failing on `setup-node` `_authToken` and an unsaved npm trusted-publisher entry | ❌ |
+| 2026-05-29 | `1.0.6` published via OIDC after explicit token-exchange workflow + re-saved trusted publisher | ✅ |
+| 2026-05-29 | `NPM_TOKEN` GitHub secret deleted; granular npm publish token revoked | ✅ |
