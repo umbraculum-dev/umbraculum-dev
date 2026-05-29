@@ -243,13 +243,15 @@ Mirroring the test-coverage and lint phase logs: one PR per sub-phase, single-pu
 
 ### Canonical pre-push gate
 
+**Prerequisites:** `git`, `bash`, and Docker on PATH (not host Node.js). Works on Linux, macOS, and WSL2 + Docker Desktop.
+
 From the repo root, on committed work (stash or commit WIP first — `git archive` only sees tracked files):
 
 ```bash
 ./scripts/ci-parity-check.sh
 ```
 
-This script reproduces all three static-analysis CI jobs against a clean `git archive HEAD` snapshot (~2 minutes):
+The host only archives and launches Docker. All three jobs run **inside `node:20-slim`** on the archived snapshot (same image and install layout as CI):
 
 | Job | CI workflow |
 |---|---|
@@ -273,16 +275,19 @@ A fourth pattern surfaced **2026-05-28** during the OpenAPI alpha land: **worksp
 
 ### Typecheck-only quick repro (when you are not touching lint/docs)
 
-Mirrors `.github/workflows/typecheck.yml` without the full three-job script:
+Still **in-container** on a clean archive (do not mount the live workspace — that reintroduces mechanism 3):
 
 ```bash
-docker run --rm -v "$PWD:/repo" -w /repo node:20-slim bash -lc '
-  set -eu
-  npm ci --no-audit --no-fund --workspaces --include-workspace-root
-  (cd apps/web/e2e && npm ci --no-audit --no-fund)
-  export PATH="/repo/node_modules/.bin:$PATH"
-  cd /repo/services/api && npm run typecheck --silent
-'
+SNAP=/tmp/typecheck-parity && rm -rf "$SNAP" && \
+  git archive HEAD -o /tmp/typecheck-parity.tar && mkdir -p "$SNAP" && \
+  tar -xf /tmp/typecheck-parity.tar -C "$SNAP" && rm -f /tmp/typecheck-parity.tar && \
+  docker run --rm -v "$SNAP:/repo" -w /repo node:20-slim bash -lc '
+    set -eu
+    npm ci --no-audit --no-fund --workspaces --include-workspace-root
+    (cd apps/web/e2e && npm ci --no-audit --no-fund)
+    export PATH="/repo/node_modules/.bin:$PATH"
+    cd /repo/services/api && npm run typecheck --silent
+  '
 ```
 
 Replace the final `cd` + `npm run typecheck` with the workspace you changed, or run `./scripts/ci-parity-check.sh` to exercise all 15 gated workspaces.
