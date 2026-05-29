@@ -1,6 +1,6 @@
 # CI Parity Platform — execution plan
 
-**Status:** In progress (see checklist below)  
+**Status:** Complete (2026-05-29)  
 **Governing design:** [`docs/CI-PARITY.md`](../CI-PARITY.md)  
 **Plan source:** Cursor plan `ci_parity_platform` (not checked into this repo)
 
@@ -9,11 +9,13 @@
 | Sub-plan | Repo | Scope | Status |
 |----------|------|-------|--------|
 | SP-1 | umbraculum-toolset | `@umbraculum/ci-parity` package + toolset CI | Done |
-| SP-2 | umbraculum-toolset | npm publish `1.0.0` + reusable GHA | Done — `1.0.0` on npm, tag `ci-parity-v1.0.0` |
-| SP-3 | umbraculum-dev | Manifest + `docs/CI-PARITY.md` + thin wrapper | In commit |
-| SP-4 | umbraculum-dev | Migrate 3 workflows + validate job | In commit |
+| SP-2 | umbraculum-toolset | npm publish + reusable GHA | Done — `1.0.6` on npm (OIDC), tag `ci-parity-v1.0.6` |
+| SP-3 | umbraculum-dev | Manifest + `docs/CI-PARITY.md` + thin wrapper | Done |
+| SP-4 | umbraculum-dev | Migrate 3 workflows + validate job | Done |
 | SP-5 | umbraculum-toolset | Plugin rule/skill/README updates | Done |
 | SP-6 | umbraculum-dev | AGENTS.md, DEVELOPMENT.md, cross-refs | Done |
+
+**Outcome:** OIDC trusted publishing live; `NPM_TOKEN` retired; umbraculum-dev vendors `ci-parity-reusable.yml` locally (cross-repo `uses:` blocked without org Actions sharing).
 
 ## Verification matrix
 

@@ -126,9 +126,9 @@ npm publish -w @umbraculum/ci-parity --access public
 
 | Consumer | Pin |
 |----------|-----|
-| umbraculum-dev reusable workflow input | `ci_parity_version: "1.0.0"` |
+| umbraculum-dev reusable workflow input | `ci_parity_version: "1.0.6"` |
 | Local / docs | `npx @umbraculum/ci-parity@^1` |
-| Reusable workflow ref | `@ci-parity-v1.0.0` on umbraculum-toolset |
+| Reusable workflow ref (vendored) | `./.github/workflows/ci-parity-reusable.yml` in umbraculum-dev |
 
 Patch releases: bump `packages/ci-parity/package.json`, tag `ci-parity-v1.0.1`, push tag → GHA publishes.
 
