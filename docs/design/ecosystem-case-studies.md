@@ -26,7 +26,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 
 | Study | Ecosystem | Primary failure mode (for Umbraculum) | Umbraculum response (starting points) |
 |-------|-----------|--------------------------------------|--------------------------------------|
-| [Omnis](ecosystem-case-study-omnis.md) | Omnis Studio | Good product; **ecosystem never formed** — Core vs verticals only, doc-site fragility (§3.5–§3.7) | Open backbone, forum, `GETTING-STARTED` |
+| [Omnis](ecosystem-case-study-omnis.md) | Omnis Studio | Good product; **ecosystem never formed** — Core vs verticals only, doc-site fragility (§3.4–§3.6) | Open backbone, forum, `GETTING-STARTED` |
 | [Business Central](ecosystem-case-study-business-central.md) | Microsoft Dynamics 365 BC | Huge partner channel; **opaque external API surface** | `@umbraculum/<code>-contracts`, route tables, OpenAPI alpha |
 | [SAP](ecosystem-case-study-sap.md) | SAP ABAP / S/4 / BTP | **One language**, many verticals — but **trials ≠ safe boat** for repositioning | One try path; no cert gate |
 | [TeamSystem](ecosystem-case-study-teamsystem.md) | TeamSystem / Polyedro (Europe) | **Partner-only experiment path** — ecosystem is the vertical for outsiders | `docker compose up`; public modules |
@@ -46,8 +46,8 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | Failure mode | Where we saw it | Umbraculum commitment | Mechanism |
 |--------------|-----------------|----------------------|-----------|
 | Community never formed | Omnis, TeamSystem | Community first-class | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4 |
-| Core vs verticals only (no independent developers) | Omnis (§3.5–§3.7) | Public forum + permissionless modules as **third chair** | [`ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md) §4 |
-| Single closed doc channel breaks | Omnis 2016 revamp (§3.6) | Docs in git; versioned site; CI link gates | [RFC-0005](rfcs/0005-docs-site.md); [`DOCS-README-STANDARDS.md`](../DOCS-README-STANDARDS.md) |
+| Core vs verticals only (no independent developers) | Omnis (§3.4–§3.6) | Public forum + permissionless modules as **third chair** | [`ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md) §4 |
+| Single closed doc channel breaks | Omnis 2016 revamp (§3.5) | **Redirect or explained removal** — no silent 404s | [`docs/README.md`](../README.md); [RFC-0005](rfcs/0005-docs-site.md) |
 | Integration docs by topic, not by job | Business Central | Integrator-first module docs + contracts | [`MODULES.md`](../MODULES.md) §5, [`API-OPENAPI.md`](../API-OPENAPI.md) |
 | Trials without repositioning ladder | SAP | **This is the stack, try it** | [`GETTING-STARTED.md`](../GETTING-STARTED.md) |
 | Partner-only platform access | TeamSystem, Omnis (historical) | Free local evaluation | `docker compose up` |
