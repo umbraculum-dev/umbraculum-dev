@@ -36,17 +36,20 @@ If Week 1 overruns, Weeks 2–3 slide one-for-one rather than the cadence breaki
 
 **Public-alpha outbound-delivery clarity.** The public alpha is not blocked on a general email-delivery implementation, but it is blocked on a clear contract that prevents modules and vertical configurations from filling the gap privately. [RFC-0008](rfcs/0008-notifications-outbound-delivery.md) is that contract: email-ready rendering from [RFC-0007](rfcs/0007-canonical-document-rendering.md) means composition only, while SMTP/provider transport, recipient policy, unsubscribe/compliance handling, audit logs, abuse/rate limits, and delivery billing belong to a future horizontal notifications / outbound-delivery service. Until that service lands, `delivery.mode: "email"` remains intentionally disabled and modules may only prepare templates/intents.
 
-**MIT npm SDK packages — publication status (2026-05-27).** The third-party module spine is **source-ready in the monorepo** but **not npm-registry-ready**:
+**MIT npm SDK packages — publication status (2026-05-29).** The third-party module spine is **on the public npm registry** (batch landed pre–public-alpha flip):
 
 | Package | Landed in repo | On npm registry |
 |---------|----------------|-----------------|
-| `@umbraculum/ai-tool-sdk` | ✅ 2026-05-21 | ❌ deferred → July 2026 α |
-| `@umbraculum/i18n-keys` | ✅ 2026-05-27 | ❌ deferred → July 2026 α |
-| `@umbraculum/module-sdk` | ✅ (depends on both leaves via workspace `file:`) | ❌ deferred → July 2026 α |
-| `@umbraculum/<code>-contracts` | ✅ per canonical | ❌ same batch |
+| `@umbraculum/ai-tool-sdk` | ✅ 2026-05-21 | ✅ `0.1.0` (2026-05-29) |
+| `@umbraculum/i18n-keys` | ✅ 2026-05-27 | ✅ `0.1.0` (2026-05-29) |
+| `@umbraculum/module-sdk` | ✅ | ✅ `0.0.1` (2026-05-29) |
+| `@umbraculum/automation-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
+| `@umbraculum/pim-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
+| `@umbraculum/mrp-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
+| `@umbraculum/crp-contracts` | ✅ | ✅ `0.0.1` (2026-05-29) |
 | `@umbraculum/api-client` | ✅ in monorepo | ❌ deferred post-α (subset split TBD) |
 
-**Ready for external module authors via `npm install`?** **Not yet** — use monorepo workspaces / `file:` until the cutover checklist in [`LICENSING.md`](LICENSING.md) §6.2.1 completes. **Ready for in-repo and public-source contributors?** **Yes** — packages build, test, and document the MIT contract. Publish is tracked as roadmap priority **6** and pre-flip checklist item **6** in [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §10.1.1.
+**Ready for external module authors via `npm install`?** **Yes** — pin versions per [`third-party-module.md`](modules/contribute/third-party-module.md). Monorepo contributors still use workspace `file:` links. See [`LICENSING.md`](LICENSING.md) §6.2.1 and [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md) SP-3.
 
 ### H2 2026 — AI consultant hardening and module-pluggable expansion
 
@@ -108,8 +111,8 @@ Already shipped in this phase (recorded in `docs/PLATFORM-ARCHITECTURE.md` §8):
 - **Alpha demo closure (2026-05-27)** — browser async export buttons, full render-job API matrix, Playwright export smoke ([closure log](design/mrp-crp-alpha-demo-closure-build-log.md)).
 - **`@brewery/*` → `@umbraculum/*` scope migration** — ✅ 2026-05-19 ([`brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md)).
 - **RFC-0002 canonical module layout** — Accepted 2026-05-19; brewery β file-move scheduled in Late H1 2026 Week 1 (see tranche above).
-- **`@umbraculum/ai-tool-sdk` carve-out** — ✅ 2026-05-21 (workspace-only; npm publish deferred to July public alpha).
-- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 (greenfield conventions package; `ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred; **npm publish deferred to July public alpha** — see [`LICENSING.md`](LICENSING.md) §6.2.1 and the tranche table above).
+- **`@umbraculum/ai-tool-sdk` carve-out** — ✅ 2026-05-21 in repo; **npm `0.1.0`** 2026-05-29.
+- **`@umbraculum/i18n-keys` SDK surface** — ✅ 2026-05-27 in repo; **npm `0.1.0`** 2026-05-29 (`ModuleNavLabelKey` wired into `module-sdk` nav/tab entries; locale content remains in `@umbraculum/i18n`; brewery content split still deferred).
 - **Foundation hardening (lint, types, tests, docs)** — ✅ feature-complete May 2026 ([`FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md); phase logs in [`LINTING.md`](LINTING.md), [`TYPING.md`](TYPING.md), [`TESTING.md`](TESTING.md)).
 
 #### TODO — what to do next (pair with an agent)
@@ -145,7 +148,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **2c** | **Stage 2 atomic flip** — repos public, `v0.0.1-alpha`, toolset marketplace submit, **Cloudflare deploy** (remove `noindex`) | July public α; **gate:** **2d** complete so `/support` donation URLs resolve | [`public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md), [`public-alpha-cloudflare-pages-runbook.md`](design/public-alpha-cloudflare-pages-runbook.md) |
 | **2d** | **Donation channel accounts (before flip)** — Liberapay **`Umbraculum`** team + Buy Me a Coffee **`Umbraculum`**; verify live URLs; forum pins: **Community policy**, **Sponsorship channels (Phase 0)**, **How we communicate** (§6.1 — [`community-forum-runbook.md`](design/community-forum-runbook.md) §6 item 5); sign-off §9 | **Priority:** blocks credible `/support` + announcement at flip; ~30–60 min maintainer | [`donation-channels.md`](design/donation-channels.md) §3, §8–§9 |
 | **2e** | **Launch comms** — publish announcement; cross-post forum; optional sponsors list seed | After **2c** + **2d** | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md), flip-day runbook §8 |
-| **2f** | **MIT npm SDK publish batch** | Registry install for third-party module authors | [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md), [`npm-sdk-publish-preflight.md`](design/npm-sdk-publish-preflight.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |
+| **2f** | **MIT npm SDK publish batch** | **Pre-completed 2026-05-29** (before Stage 2 flip) — registry install live | [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |
 | **2g** | **DocSearch application submit** (Algolia) | Replaces lunr fallback on docs site | RFC-0005 P5 |
 | **2h** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 — **contract ✅ [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)**; implementation deferred |
 | **2i** | **Tamagui intra-RC bump** | Hygiene | [`TAMAGUI.md`](TAMAGUI.md) |

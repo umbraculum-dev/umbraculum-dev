@@ -110,7 +110,7 @@ jobs:
           publish_npm_oidc packages/i18n-keys "${I18N_KEYS_ESCAPED}" "@umbraculum/i18n-keys"
 
           echo "Rewriting module-sdk dependencies to registry semver for publish tarball only"
-          jq '.dependencies["@umbraculum/ai-tool-sdk"] = "^0.1.0" | .dependencies["@umbraculum/i18n-keys"] = "^0.1.0"' \
+          jq '.dependencies["@umbraculum/ai-tool-sdk"] = "^0.1.1" | .dependencies["@umbraculum/i18n-keys"] = "^0.1.1"' \
             packages/module-sdk/package.json > /tmp/module-sdk-package.json
           mv /tmp/module-sdk-package.json packages/module-sdk/package.json
 
