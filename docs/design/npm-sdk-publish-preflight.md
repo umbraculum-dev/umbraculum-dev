@@ -1,7 +1,7 @@
 # MIT npm SDK publish preflight (ROADMAP 2e)
 
 **Tier:** Public  
-**Status:** v1 checklist — **SP-1 + SP-2 in progress** — see [`npm-sdk-publish-execution-plan.md`](npm-sdk-publish-execution-plan.md)  
+**Status:** v1 checklist — **complete (SP-3, 2026-05-29)** — see [`npm-sdk-publish-execution-plan.md`](npm-sdk-publish-execution-plan.md)  
 **Audience:** maintainer publishing `@umbraculum/*` MIT packages  
 **Authority:** [`docs/LICENSING.md`](../LICENSING.md) §6.2.1
 
@@ -9,14 +9,17 @@
 
 ## 1. Scope
 
-**In the July 2026 alpha batch:**
+**July 2026 alpha batch (published 2026-05-29):**
 
-| Order | Package | Path | Today |
-|-------|---------|------|-------|
-| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `private: true`, no `"license"` |
-| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | same |
-| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `file:` deps on leaves |
-| 4+ | `@umbraculum/<code>-contracts` | `packages/automation-contracts/`, `pim-contracts/`, `mrp-contracts/`, `crp-contracts/` | same |
+| Order | Package | Path | Published |
+|-------|---------|------|-----------|
+| 1 | `@umbraculum/ai-tool-sdk` | `packages/ai-tool-sdk/` | `0.1.0` |
+| 2 | `@umbraculum/i18n-keys` | `packages/i18n-keys/` | `0.1.0` |
+| 3 | `@umbraculum/module-sdk` | `packages/module-sdk/` | `0.0.1` |
+| 4 | `@umbraculum/automation-contracts` | `packages/automation-contracts/` | `0.0.1` |
+| 5 | `@umbraculum/pim-contracts` | `packages/pim-contracts/` | `0.0.1` |
+| 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.1` |
+| 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.1` |
 
 **Deferred post-α:** `@umbraculum/api-client` (contracts coupling — see LICENSING table).
 
@@ -28,37 +31,30 @@
 
 ## 2. Prerequisites
 
-- [ ] `@umbraculum` npm org created (or documented scoped-publish alternative).
-- [ ] Maintainer npm account with publish rights to the org.
-- [ ] `npm whoami` from a trusted machine (not committed to repo).
-- [ ] Monorepo `master` green: `npm run build:packages`, `npm run test:packages`.
-- [ ] Public flip complete (or imminent) — published versions align with `v0.0.1-alpha` tag narrative.
+- [x] `@umbraculum` npm org created.
+- [x] Maintainer npm account with publish rights to the org.
+- [x] Monorepo `master` green: `build:packages`, `test:packages` (GHA); `sdk-publish-prep` ci-parity job.
+- [x] SP-1 manifest prep + SP-2 `publish-sdk-batch.yml` merged.
+- [x] OIDC trusted publishing configured per [`npm-sdk-trusted-publishing.md`](npm-sdk-trusted-publishing.md).
+- [ ] Public flip complete — batch intentionally **pre-dated** flip (2026-05-29).
 
 ---
 
 ## 3. Per-package manifest changes (before publish)
 
-For each package in §1, in `package.json`:
-
-1. Remove `"private": true`.
-2. Add `"license": "MIT"`.
-3. Add `"repository"` / `"bugs"` / `"homepage"` pointing at `umbraculum-dev/umbraculum-dev` (subpath if npm supports `directory` field for monorepo — prefer standard npm monorepo publish pattern your org uses).
-4. Add `"publishConfig": { "access": "public" }` for scoped packages.
-5. Ensure `files` or `.npmignore` includes only `dist/` + README (no `src/` leakage unless intentional).
-
-Add or verify **MIT** text: root [`LICENSE`](../../LICENSE) is AGPL for core; each published MIT package should ship MIT license text per npm convention (copy MIT snippet or `LICENSE` file in package dir — legal review at publish time).
+Completed in SP-1: `private` removed, MIT `LICENSE`, `repository`, `publishConfig`, `files`, `engines`, README install sections.
 
 ---
 
 ## 4. Dependency graph migration
 
-**Today (workspace):**
+**Monorepo dev (unchanged):**
 
 ```
 module-sdk → file:../ai-tool-sdk, file:../i18n-keys
 ```
 
-**After publish (example — pin to published versions):**
+**Published `module-sdk` tarball (workflow / manual publish only):**
 
 ```json
 "dependencies": {
@@ -69,12 +65,7 @@ module-sdk → file:../ai-tool-sdk, file:../i18n-keys
 
 **Publish order (strict):**
 
-1. `npm publish -w @umbraculum/ai-tool-sdk`
-2. `npm publish -w @umbraculum/i18n-keys`
-3. Update `module-sdk` deps to registry versions → build → `npm publish -w @umbraculum/module-sdk`
-4. Each `*-contracts` package (no inter-contract `file:` deps expected) → publish
-
-After step 3, monorepo can keep `file:` for dev **or** switch to registry deps — document the chosen policy in [`third-party-module.md`](../modules/contribute/third-party-module.md).
+1. `ai-tool-sdk` → `i18n-keys` → `module-sdk` (deps rewritten at publish time) → four `*-contracts` packages.
 
 ---
 
@@ -89,25 +80,30 @@ In a **clean temp directory**:
 
 ```bash
 npm init -y
-npm install @umbraculum/ai-tool-sdk@<version>
-node -e "import('@umbraculum/ai-tool-sdk').then(m => console.log(Object.keys(m).slice(0,5)))"
+npm install @umbraculum/ai-tool-sdk@0.1.0 @umbraculum/module-sdk@0.0.1
+node --input-type=module -e "import('@umbraculum/module-sdk').then(m => console.log(Object.keys(m).slice(0,6)))"
 ```
-
-Repeat for `i18n-keys`, `module-sdk`, one contracts package.
 
 ---
 
 ## 6. Monorepo follow-up
 
-- [ ] Bump workspace `package.json` deps from `file:` to published semver where appropriate.
-- [ ] Run full CI (`typecheck`, `test:packages`, affected workspaces).
-- [ ] Update [`ROADMAP.md`](../ROADMAP.md) MIT npm table → **On npm registry**.
-- [ ] Update [`GETTING-STARTED.md`](../GETTING-STARTED.md) / [`third-party-module.md`](../modules/contribute/third-party-module.md) install instructions to `npm install` first, git/workspace as fallback.
+- [ ] Bump workspace `package.json` deps from `file:` to published semver where appropriate (optional post-α dogfooding).
+- [x] Update [`ROADMAP.md`](../ROADMAP.md) MIT npm table → **On npm registry**.
+- [x] Update [`GETTING-STARTED.md`](../GETTING-STARTED.md) / [`third-party-module.md`](../modules/contribute/third-party-module.md) install instructions to `npm install` first, git/workspace as fallback.
 
 ---
 
 ## 7. Execution log
 
-| Date | Package | Version | npm sha / note |
-|------|---------|---------|----------------|
-| — | — | — | Not published yet |
+| Date | Package | Version | Note |
+|------|---------|---------|------|
+| 2026-05-29 | `@umbraculum/ai-tool-sdk` | `0.1.0` | Maintainer laptop publish |
+| 2026-05-29 | `@umbraculum/i18n-keys` | `0.1.0` | Maintainer laptop publish |
+| 2026-05-29 | `@umbraculum/module-sdk` | `0.0.1` | Laptop; deps rewritten to `^0.1.0` leaves at publish time |
+| 2026-05-29 | `@umbraculum/automation-contracts` | `0.0.1` | Maintainer laptop publish |
+| 2026-05-29 | `@umbraculum/pim-contracts` | `0.0.1` | Maintainer laptop publish |
+| 2026-05-29 | `@umbraculum/mrp-contracts` | `0.0.1` | Maintainer laptop publish |
+| 2026-05-29 | `@umbraculum/crp-contracts` | `0.0.1` | Maintainer laptop publish |
+| 2026-05-29 | *(all seven)* | — | OIDC trusted publishing via `npx npm@11.16.0 trust github …` |
+| — | — | — | `sdk-batch-v0.1.0` tag **not** pushed (versions already on registry) |

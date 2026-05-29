@@ -108,9 +108,9 @@ Submit four plugins per [`docs/CURSOR-PLUGINS.md`](../CURSOR-PLUGINS.md) — sou
 
 ---
 
-## 6. npm MIT SDK batch (can trail flip by days)
+## 6. npm MIT SDK batch
 
-Not required for repo visibility. When ready, execute [`npm-sdk-publish-preflight.md`](npm-sdk-publish-preflight.md).
+**Pre-completed 2026-05-29** (before Stage 2 repo visibility flip). All seven MIT SDK packages are on the public registry; OIDC trusted publishing is configured for future bumps via `publish-sdk-batch.yml`. First versions were published from a maintainer laptop; do **not** push `sdk-batch-v0.1.0` (versions already exist). Details: [`npm-sdk-publish-execution-plan.md`](npm-sdk-publish-execution-plan.md) SP-3, [`LICENSING.md`](../LICENSING.md) §6.2.1.
 
 ---
 

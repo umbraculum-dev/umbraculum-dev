@@ -1,7 +1,7 @@
 # npm Trusted Publishing (OIDC) for MIT SDK batch
 
 **Tier:** Public  
-**Status:** v1 — workflow landed SP-2; first publish pending `sdk-batch-v*` tag  
+**Status:** v1 — **SP-3 complete (2026-05-29)** — first versions on npm; OIDC for future bumps  
 **Audience:** maintainers  
 **Related:** [`npm-sdk-publish-execution-plan.md`](npm-sdk-publish-execution-plan.md), [`npm-sdk-publish-preflight.md`](npm-sdk-publish-preflight.md), [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)
 
@@ -45,12 +45,33 @@ For **each** package above, after the package exists on npm (or via org-level sc
 
 3. Save (2FA required). Confirm the entry persists after page reload.
 
-**First-time packages:** npm has no `/access` page until the first version is published. Options:
+**First-time packages:** npm requires a package record before OIDC trust can attach. For this batch, **first versions were published from a maintainer laptop** (`npm login` + `npm publish -w …`), then trusted publishers were configured via `npx npm@11.16.0 trust github …` (see Step 1b below). **Do not** push `sdk-batch-v0.1.0` — those versions already exist. Future bumps: increment semver in `packages/*/package.json`, push `sdk-batch-v*` tag, GHA publishes via OIDC.
 
-1. **Org-level** trusted publishing for `@umbraculum` scope (preferred if available on the org account).
-2. **Manual first publish** of each package from a maintainer laptop (`npm login` + `npm publish -w …`), then per-package trusted publisher entries before using GHA for the batch tag.
+**Alternative (not used here):** org-level scope trusted publishing if enabled on the org account.
 
-**Chicken-and-egg for batch tag:** If no packages exist yet, run leaves manually once, configure trusted publishers, then use `sdk-batch-v0.1.0` for the full automated batch — or rely on org-level scope trust for all seven on first GHA run.
+### Step 1b — Bulk CLI (what we used for SP-3)
+
+Requires npm ≥ 11.10 (`npx npm@11.16.0` if global npm is older). On the **host** (not Docker):
+
+```bash
+REPO="umbraculum-dev/umbraculum-dev"
+WF="publish-sdk-batch.yml"
+
+for pkg in \
+  @umbraculum/ai-tool-sdk \
+  @umbraculum/i18n-keys \
+  @umbraculum/module-sdk \
+  @umbraculum/automation-contracts \
+  @umbraculum/pim-contracts \
+  @umbraculum/mrp-contracts \
+  @umbraculum/crp-contracts
+do
+  npx npm@11.16.0 trust github "$pkg" --repo "$REPO" --file "$WF" --allow-publish -y
+  sleep 2
+done
+```
+
+Enable **skip 2FA for 5 minutes** on the first browser prompt. Verify: `npx npm@11.16.0 trust list @umbraculum/module-sdk`.
 
 ---
 
@@ -72,7 +93,9 @@ File: `umbraculum-dev/.github/workflows/publish-sdk-batch.yml`
 
 ## Step 3 — Publish (maintainer)
 
-**Pre-tag (local, cross-platform):**
+**First batch (2026-05-29):** published from maintainer laptop — see [`npm-sdk-publish-preflight.md`](npm-sdk-publish-preflight.md) §7. `sdk-batch-v0.1.0` was **not** pushed.
+
+**Future bumps:**
 
 ```bash
 npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep
@@ -80,9 +103,9 @@ npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep
 
 ```bash
 git checkout master && git pull
-# confirm versions in packages/*/package.json
-git tag sdk-batch-v0.1.0
-git push origin sdk-batch-v0.1.0
+# bump version(s) in packages/*/package.json
+git tag sdk-batch-v0.1.1   # example — never reuse a published semver
+git push origin sdk-batch-v0.1.1
 ```
 
 Watch **umbraculum-dev** → Actions → `publish-sdk-batch` → green.
@@ -111,5 +134,6 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 
 | Date | Event | Status |
 |------|-------|--------|
-| — | SP-2 workflow + manifests merged | Pending tag push |
-| — | `sdk-batch-v0.1.0` GHA publish | Not run yet |
+| 2026-05-29 | SP-2 workflow + manifests merged | Done |
+| 2026-05-29 | First publish (laptop) + OIDC trust (CLI) | Done — seven packages on registry |
+| — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published |
