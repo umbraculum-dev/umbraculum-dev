@@ -79,6 +79,38 @@ A fifth plugin in the umbraculum-toolset — `umbraculum-openplc-python-cursor-a
 — applies to the OpenPLC + Python industrial-automation **sister-repo**, not
 to this repo. Do **not** require it here.
 
+### Strongly recommended — Prisma (official Cursor marketplace plugin)
+
+Umbraculum-dev is a **Prisma** monorepo (`services/api/prisma/`, multiSchema
+module ownership per RFC-0010). We **warmly advise** installing Cursor's
+**official Prisma plugin** (marketplace name: **Prisma**, publisher: Prisma)
+**alongside** the umbraculum-toolset pack.
+
+It is **not** part of the apparatus witness gate above and **not** shipped
+from [`umbraculum-toolset`](https://github.com/umbraculum-dev/umbraculum-toolset).
+Missing it does **not** trigger the soft-block or `apparatus: override` path.
+
+**Why install it:** MCP servers (local/remote schema tooling), migration and
+schema-convention rules, and CLI-oriented skills for Prisma workflows. These
+complement — do not replace — the platform rule
+`47-prisma-multischema-module-schemas.mdc` in
+`umbraculum-platform-tsjs-cursor-assistant` (module `prismaSchema` registration,
+forward-only migrations, `@@schema("…")` discipline).
+
+**Install:** Cursor → Settings → Plugins → Browse Marketplace → **Prisma**
+(official). Enable **Prisma Local** / **Prisma Remote** under Settings →
+Features → MCP when you want schema introspection from the agent.
+
+**Verify (optional, not session-blocking):** Settings → Plugins shows
+**Prisma** installed and enabled; when `schema.prisma` or migration SQL is
+in context, Prisma rules such as `migration-best-practices.mdc` and
+`schema-conventions.mdc` appear in the agent's requestable rules; MCP panel
+lists the Prisma servers when enabled.
+
+Full contributor-facing detail:
+[`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md) §"Strongly recommended —
+Prisma".
+
 ### Fail-mode (soft block — recommended workflow)
 
 If any of plugins 1–3 is missing (or 4 is missing on a Magento-touching task),
@@ -176,6 +208,11 @@ user's explicit choice.
   edits) are the standard override case. The user-issued
   `apparatus: override` covers them; the apparatus is not required for prose
   changes that touch no code.
+
+- **Prisma plugin (recommended, not gated).** The official Cursor **Prisma**
+  marketplace plugin is warmly advised for this repo but is **not** checked
+  in the apparatus self-check above. See the subsection *Strongly recommended
+  — Prisma* and [`docs/CURSOR-PLUGINS.md`](docs/CURSOR-PLUGINS.md).
 
 ## What this file is NOT
 
