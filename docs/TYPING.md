@@ -237,11 +237,65 @@ Mirroring the test-coverage and lint phase logs: one PR per sub-phase, single-pu
 
 ---
 
+## Before pushing — CI parity (required)
+
+**Do not rely on `docker compose exec api npm run typecheck` (or any other long-running dev-container check) as your only pre-push signal.** Those commands use a different `node_modules` layout than CI (see [Methodology](#methodology) trees #1/#2 vs #3). CI runs root `npm ci --workspaces` inside a clean `node:20-slim` container (`.github/workflows/typecheck.yml`) — the hoisted `/repo/node_modules` tree.
+
+### Canonical pre-push gate
+
+From the repo root, on committed work (stash or commit WIP first — `git archive` only sees tracked files):
+
+```bash
+./scripts/ci-parity-check.sh
+```
+
+This script reproduces all three static-analysis CI jobs against a clean `git archive HEAD` snapshot (~2 minutes):
+
+| Job | CI workflow |
+|---|---|
+| docs-readmes | `.github/workflows/docs-readmes.yml` |
+| typecheck (15 workspaces) | `.github/workflows/typecheck.yml` |
+| lint | `.github/workflows/web-lint.yml` |
+
+Flags: `--sha <rev>` (check a specific revision), `--keep` (retain `/tmp/ci-parity-<sha>/` + logs for post-mortem). Per-job logs land in `/tmp/ci-parity-<sha>.logs/`.
+
+**Run it before every push** whose CI footprint is non-trivial: TypeScript or `tsconfig` changes, new workspace dependencies (root `package-lock.json` updates), ESLint config, module READMEs, or workflow edits. The `ci-parity-local-reproduction` skill and rule `72-ci-parity-local-vs-ci-divergence` encode the same requirement for agent-assisted work.
+
+### When local typecheck lies (documented divergence)
+
+Three mechanisms are documented in `scripts/ci-parity-check.sh` and [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) §6.7:
+
+1. **Gitignored cross-references** — tracked README links to a gitignored file; local resolves, CI does not.
+2. **Nested-workspace install drift** — `apps/web/e2e` is not installed by root `npm ci --workspaces`; stale local `apps/web/e2e/node_modules` masks missing `@playwright/test`.
+3. **Stale `node_modules` shadowing** — host or container bind-mounts accumulate dependency state that differs from a fresh CI install.
+
+A fourth pattern surfaced **2026-05-28** during the OpenAPI alpha land: **workspace hoisting splits**. Root `npm ci --workspaces` hoists `@fastify/swagger` to `/repo/node_modules` while `fastify` stays in `services/api/node_modules`. TypeScript module augmentation from `@fastify/swagger` then fails to merge onto `AppInstance`, so `app.swagger()` type-checks in the API dev container (flat `/app/node_modules`) but fails in CI. Fix: local augmentation in `services/api/src/types/fastify-swagger.d.ts`. **Lesson:** any code that depends on plugin `declare module 'fastify'` augmentations must be verified under the hoisted install, not only inside the API container.
+
+### Typecheck-only quick repro (when you are not touching lint/docs)
+
+Mirrors `.github/workflows/typecheck.yml` without the full three-job script:
+
+```bash
+docker run --rm -v "$PWD:/repo" -w /repo node:20-slim bash -lc '
+  set -eu
+  npm ci --no-audit --no-fund --workspaces --include-workspace-root
+  (cd apps/web/e2e && npm ci --no-audit --no-fund)
+  export PATH="/repo/node_modules/.bin:$PATH"
+  cd /repo/services/api && npm run typecheck --silent
+'
+```
+
+Replace the final `cd` + `npm run typecheck` with the workspace you changed, or run `./scripts/ci-parity-check.sh` to exercise all 15 gated workspaces.
+
+---
+
 ## How to run locally
 
 Per the plugin-shipped container-only Node/npm rule (`00-shared-node-npm-container-only.mdc`), all typecheck commands run inside Docker.
 
-### Single workspace (the common case)
+### Single workspace (fast iteration — not CI parity)
+
+Per-workspace checks below are fine for tight edit loops. **Before pushing**, run [CI parity](#before-pushing--ci-parity-required) (`./scripts/ci-parity-check.sh`).
 
 ```bash
 # services/api (running api container has node_modules bind-mounted)
