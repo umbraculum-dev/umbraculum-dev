@@ -91,7 +91,7 @@ npm view @umbraculum/ci-parity version
 
 | Symptom | Likely cause |
 |---------|----------------|
-| `ENEEDAUTH` / `404` on publish with OIDC | Workflow filename mismatch; npm CLI &lt; 11.5.1; trusted publisher not saved; wrong repo owner/name |
+| `ENEEDAUTH` / `404` on publish with OIDC | Workflow filename mismatch; npm CLI &lt; 11.5.1; **`setup-node` `registry-url` without token** writes `always-auth` + empty `_authToken` to `~/.npmrc` — remove `registry-url` and delete `.npmrc` before `npm publish`; publish from `packages/ci-parity/` not `npm publish -w` |
 | Publish still uses token | `NODE_AUTH_TOKEN` still set on publish step — remove it |
 | `npm ci` fails on private deps | OIDC does not help install — use a **read-only** token only on `npm ci` (not needed for `@umbraculum/ci-parity` today; deps are public) |
 
