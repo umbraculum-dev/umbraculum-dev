@@ -28,5 +28,7 @@
 
 ## Canonical paths
 
-- umbraculum-dev: `REPO_ROOT/umbraculum-dev`
-- umbraculum-toolset: `REPO_ROOT/umbraculum-toolset`
+Executors should use their local clone root; on disk that is environment-specific. Repo identities:
+
+- umbraculum-dev: `https://github.com/umbraculum-dev/umbraculum-dev`
+- umbraculum-toolset: `https://github.com/umbraculum-dev/umbraculum-toolset`
