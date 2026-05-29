@@ -23,21 +23,21 @@ Replaces the **90-day granular `NPM_TOKEN`** rotation cycle for `publish-ci-pari
 
 ## Step 1 — Configure trusted publisher on npm (one-time)
 
-1. Open: https://www.npmjs.com/package/@umbraculum/ci-parity  
-2. **Settings** (package settings, not org settings)  
-3. Find **Trusted publishing** (or **Trusted Publisher**)  
-4. Choose **GitHub Actions**  
-5. Enter **exactly** (case-sensitive):
+1. Open: https://www.npmjs.com/package/@umbraculum/ci-parity/access  
+   *(not `/admins` — Trusted publishing lives on the **access** page)*
+2. **Trusted publishing** → **GitHub Actions** → fill **exactly** (case-sensitive):
 
 | Field | Value |
 |-------|--------|
-| Repository owner | `umbraculum-dev` |
-| Repository name | `umbraculum-toolset` |
+| Organization or user | `umbraculum-dev` |
+| Repository | `umbraculum-toolset` |
 | Workflow filename | `publish-ci-parity.yml` |
-| Environment | *(leave empty unless you add a GitHub Environment later)* |
+| Environment name | *(empty)* |
+| Allowed actions | `npm publish` |
 
-6. **Allowed actions:** select **`npm publish`** (required for configs created after 2026-05-20 on npm)  
-7. Save
+3. **Set up connection** / Save
+
+**Account 2FA:** npm requires passkey/security-key 2FA on your user before editing package settings (no authenticator app for new setups). Use Chrome; phone passkey via QR if no USB key.
 
 npm does **not** validate these fields at save time — errors appear only on the next publish if something is wrong.
 
@@ -104,5 +104,5 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 | Date | Event |
 |------|--------|
 | 2026-05-29 | `1.0.0` published via granular `NPM_TOKEN` |
-| — | Trusted publisher configured on npm |
-| — | `1.0.1` published via OIDC; `NPM_TOKEN` removed |
+| 2026-05-29 | Trusted publisher configured on npm (Chrome) | ✅ |
+| — | `1.0.1` OIDC publish via tag `ci-parity-v1.0.1` | in progress |
