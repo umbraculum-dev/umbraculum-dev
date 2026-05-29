@@ -1,0 +1,71 @@
+# Ecosystem case studies — index
+
+**Tier:** Public  
+**Status:** v1.0 — index for practitioner learnability narratives (2026-05-29)  
+**Audience:** contributors, platform evaluators, vertical builders, learners repositioning in hard times  
+**Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.3, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.1–§2.2
+
+> [!NOTE]
+> These documents are **gratitude and lesson**, not product reviews. They record what our reference network **felt and observed** building on or adjacent to other ecosystems — so Umbraculum can name structural commitments (free try, public docs, no certification gate) without polemic.
+
+## What this series is about
+
+We are **not** scoring ERPs. We are asking one question:
+
+> When a developer must **reposition** — at twenty-five or forty-five, willingly or because the market forced them — can they learn on spare time because **the stack is clear, upstream tools are free, and the community is visible**?
+
+The positive anchor in our network is **Magento** (especially 1.x / Open Source): PHP, MySQL, Community Edition, forums. Most developers who earned a living on it were **hired** at agencies or product companies — not instant agency founders. Learning was often unpleasant; it was still **possible**.
+
+Umbraculum's line: **this makes learning possible for the ones who are willing to do so** — *this is the stack, try it.* You do not need a customer's vertical to grasp the platform.
+
+**Bright side for vertical builders:** public try paths let **domain experts knock on your door** with real expertise. In our experience, five minutes of technical conversation beats a certification wall. Umbraculum does **not** operate a certification program ([`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md) §"No certification track").
+
+---
+
+## Case study map
+
+| Study | Ecosystem | Primary failure mode (for Umbraculum) | Umbraculum response (starting points) |
+|-------|-----------|--------------------------------------|--------------------------------------|
+| [Omnis](ecosystem-case-study-omnis.md) | Omnis Studio | Good product; **ecosystem never formed** — no community, docs, tryability | Open backbone, forum, `GETTING-STARTED` |
+| [Business Central](ecosystem-case-study-business-central.md) | Microsoft Dynamics 365 BC | Huge partner channel; **opaque external API surface** | `@umbraculum/<code>-contracts`, route tables, OpenAPI alpha |
+| [SAP](ecosystem-case-study-sap.md) | SAP ABAP / S/4 / BTP | **One language**, many verticals — but **trials ≠ safe boat** for repositioning | One try path; no cert gate |
+| [TeamSystem](ecosystem-case-study-teamsystem.md) | TeamSystem / Polyedro (Europe) | **Partner-only experiment path** — ecosystem is the vertical for outsiders | `docker compose up`; public modules |
+| [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder | Copy ladder, not badges |
+
+**Pairings that help:**
+
+- **Omnis + TeamSystem** — capable product, fence around builders.  
+- **Business Central + SAP** — big ecosystems, hard entry (API maze vs trial maze).  
+- **Magento (MANIFESTO §2.2) + Odoo** — learnability ladders we respect.  
+- **Adobe → Magento (LICENSING §5.2)** — community *lost* through stewardship (different shape from Omnis).
+
+---
+
+## Failure modes → commitments
+
+| Failure mode | Where we saw it | Umbraculum commitment | Mechanism |
+|--------------|-----------------|----------------------|-----------|
+| Community never formed | Omnis, TeamSystem | Community first-class | [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4 |
+| Integration docs by topic, not by job | Business Central | Integrator-first module docs + contracts | [`MODULES.md`](../MODULES.md) §5, [`API-OPENAPI.md`](../API-OPENAPI.md) |
+| Trials without repositioning ladder | SAP | **This is the stack, try it** | [`GETTING-STARTED.md`](../GETTING-STARTED.md) |
+| Partner-only platform access | TeamSystem, Omnis (historical) | Free local evaluation | `docker compose up` |
+| Certification as sales proxy | SAP, Odoo partners, BC badges | **No Umbraculum certification program** | [`MANIFESTO.md`](../../MANIFESTO.md) §2.2 |
+| Expertise hidden in partner tenure | TeamSystem, Omnis | **Expertise offers visible** — learners can find vertical builders | Public repo, Tier 3/6 modules, forum |
+| Community lost after acquisition | Adobe → Magento | AGPL + governance + no CLA | [`LICENSING.md`](../LICENSING.md) §9 |
+
+---
+
+## How to read these docs
+
+1. Start here if you want the **map**.  
+2. Read [`MANIFESTO.md`](../../MANIFESTO.md) §2.2 for the **policy** in manifesto voice.  
+3. Read [`GETTING-STARTED.md`](../GETTING-STARTED.md) if you want to **try the stack**.  
+4. Open individual case studies for **experience and lesson** — each ends with rewrite caution where relevant.
+
+We respect other ecosystems' commercial choices (certifications, partner programs, trial strategies). We document why Umbraculum chooses differently — **by experience**, not to declare winners.
+
+---
+
+## Acknowledgement
+
+These case studies exist because maintainers in this network **repositioned on open stacks** when proprietary fences made that harder elsewhere — and because vertical builders deserve **learners and experts who can find them** without a badge economy in the middle.
