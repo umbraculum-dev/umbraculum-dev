@@ -26,6 +26,8 @@ If your idea requires owning one of those concerns yourself, you're not contribu
 
 Before you start writing code, run a one-minute sanity check against the per-service obligation table in [RFC-0001 §8.2](../../rfcs/0001-modules-tiers-governance-and-automation-placement.md). If your design implies "we'll add our own X" for any X in that table, stop and reconsider — either you missed an extension point, or you're misclassifying what you're building.
 
+**Contributor cheat sheet:** [`horizontal-services-consumption.md`](horizontal-services-consumption.md) — one-page obligation table, pre-flight questions, and in-repo vs third-party checklists (with links to [`TENANCY-AND-ACL.md`](../../TENANCY-AND-ACL.md) and [`DATA-ACCESS-BOUNDARIES.md`](../../DATA-ACCESS-BOUNDARIES.md)).
+
 ## Cross-references
 
 - [`docs/MODULES.md`](../../MODULES.md) — ecosystem entry page (vocabulary + catalog).
@@ -33,3 +35,6 @@ Before you start writing code, run a one-minute sanity check against the per-ser
 - [RFC-0002](../../rfcs/0002-canonical-module-physical-layout.md) — β physical layout, naming conventions.
 - [`docs/modules/packages/README.md`](../packages/README.md) — package workspace index (horizontal + contracts + vertical-flavored).
 - [`docs/LICENSING.md`](../../LICENSING.md) — per-tier license obligations.
+- [`horizontal-services-consumption.md`](horizontal-services-consumption.md) — RFC-0001 §8 quick reference.
+- [`TENANCY-AND-ACL.md`](../../TENANCY-AND-ACL.md) — workspace tenancy and ACL (as-built).
+- [`DATA-ACCESS-BOUNDARIES.md`](../../DATA-ACCESS-BOUNDARIES.md) — Prisma vs API client boundary.

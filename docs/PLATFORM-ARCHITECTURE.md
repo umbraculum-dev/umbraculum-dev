@@ -295,7 +295,7 @@ A worked illustration: when a brewery operator's AI is asked *"do I have stock f
 The horizontal layer owns everything that does not change when a new vertical is added:
 
 - **Identity & sessions**: auth, magic-link / email verification, webview bridge, role-based access at the workspace boundary.
-- **Tenancy**: Workspace + WorkspaceMember + role enforcement.
+- **Tenancy**: Workspace + WorkspaceMember + role enforcement. Contributor guide: [`TENANCY-AND-ACL.md`](TENANCY-AND-ACL.md). Data-access boundary (Prisma vs API): [`DATA-ACCESS-BOUNDARIES.md`](DATA-ACCESS-BOUNDARIES.md).
 - **Billing & entitlements**: tier subscription, **add-ons**, Stripe + RevenueCat adapters, source-of-truth in Postgres.
 - **AI platform**: orchestrator, tool registry, usage ledger, encrypted BYOK settings, workspace memory, provider adapters (Anthropic / OpenAI / …), router, managed-AI pricebook, RAG store.
 - **Internationalization**: locales, messages, ICU formatting, locale-prefixed routing.

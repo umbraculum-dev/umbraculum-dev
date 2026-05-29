@@ -1,7 +1,7 @@
 # MIT npm SDK publish preflight (ROADMAP 2e)
 
 **Tier:** Public  
-**Status:** v1 executor checklist — **do not publish** until flip decision + npm org access  
+**Status:** v1 checklist — **superseded operationally by** [`npm-sdk-publish-execution-plan.md`](npm-sdk-publish-execution-plan.md) (ASAP batch, ~3–5 days before flip)  
 **Audience:** maintainer publishing `@umbraculum/*` MIT packages  
 **Authority:** [`docs/LICENSING.md`](../LICENSING.md) §6.2.1
 

@@ -134,7 +134,7 @@ Domain tables are scoped by `workspace_id` (or equivalent FK). Every read/write 
 
 Support-only “login as workspace” / impersonation must be **audited** and restricted to privileged roles. Not shipped in v0; keep as a design constraint.
 
-See [`AUTH-STRATEGY.md`](../../../AUTH-STRATEGY.md).
+See [`TENANCY-AND-ACL.md`](../../../TENANCY-AND-ACL.md) (authorization) and [`AUTH-STRATEGY.md`](../../../AUTH-STRATEGY.md) (authentication only).
 
 ---
 

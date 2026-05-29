@@ -125,7 +125,8 @@ User-facing product surfaces and operational concerns at the product level.
 
 Cross-cutting architectural decisions that apply to every module.
 
-- [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md) — As-built contract for shared web/native packages (i18n, navigation, api-client auth, webview bridge, DB routing entrypoint).
+- [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md) — As-built contract for shared web/native packages (i18n, navigation, api-client auth, webview bridge, pgpool/replication entrypoint).
+- [`DATA-ACCESS-BOUNDARIES.md`](DATA-ACCESS-BOUNDARIES.md) — Prisma-on-server vs HTTP+contracts on clients; why the API is the integration boundary.
 - [`API-OPENAPI.md`](API-OPENAPI.md) — **Alpha partial OpenAPI catalog** — committed spec, coverage matrix, integrator workflow, maintainer runbook (F1 partial closure).
 - Historical architecture revisions: [`archive/architecture-Rev00.md`](archive/architecture-Rev00.md), [`archive/architecture-Rev01.md`](archive/architecture-Rev01.md), [`archive/architecture-Rev02-2026-05-snapshot.md`](archive/architecture-Rev02-2026-05-snapshot.md) (frozen copy of the former `ARCHITECTURE-REV02.md`, split 2026-05-27).
 - [`NATIVE-STRATEGY-AND-CI.md`](NATIVE-STRATEGY-AND-CI.md) — Native strategy and CI pipeline notes.
@@ -136,6 +137,7 @@ Cross-cutting architectural decisions that apply to every module.
 *Audience: contributors, self-hosting operators, module developers.*
 
 - [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) — Authentication strategy (cookie web + bearer native + webview bridge).
+- [`TENANCY-AND-ACL.md`](TENANCY-AND-ACL.md) — Workspace tenancy, membership, workspace roles, platform admin; `assertMembership` vs `AclService.requireRole`.
 - [`AUTH-HARDENING-ASSESSMENT.md`](AUTH-HARDENING-ASSESSMENT.md) — Hardening review and findings.
 - [`AUTH-QA.md`](AUTH-QA.md) — Auth QA notes.
 
@@ -143,6 +145,7 @@ Cross-cutting architectural decisions that apply to every module.
 
 *Audience: contributors, self-hosting operators, module developers.*
 
+- [`DATA-ACCESS-BOUNDARIES.md`](DATA-ACCESS-BOUNDARIES.md) — Prisma-on-server vs HTTP+contracts on clients; API as integration boundary.
 - [`POSTGRES-REPLICATION-ARCHITECTURE.md`](POSTGRES-REPLICATION-ARCHITECTURE.md) — Postgres primary + replica architecture.
 - [`DB-REPLICATION-AND-ROUTING-VERIFICATION.md`](DB-REPLICATION-AND-ROUTING-VERIFICATION.md) — Replication and read-routing verification.
 - [`PGPOOL-VERIFICATION.md`](PGPOOL-VERIFICATION.md) — pgpool-II verification steps.
