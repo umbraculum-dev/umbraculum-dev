@@ -3,7 +3,7 @@
 Static marketing brochure for **umbraculum.dev** — workspace-shaped positioning for the July 2026 public alpha.
 
 > [!NOTE]
-> Part of [Umbraculum](../../README.md). Deploy target: **Cloudflare Pages** (same pattern as [`docs-site`](../../docs-site/README.md)); see [`docs/design/public-alpha-cloudflare-pages-runbook.md`](../../docs/design/public-alpha-cloudflare-pages-runbook.md).
+> Part of [Umbraculum](../../README.md). Deploy target: **Cloudflare Workers** (static assets via Wrangler; Git-connected Builds). See [`docs/design/public-alpha-cloudflare-pages-runbook.md`](../../docs/design/public-alpha-cloudflare-pages-runbook.md).
 
 ## What this is
 
@@ -59,7 +59,17 @@ npm run preview -w @umbraculum/website
 
 ## Deploy (maintainer, Phase 2)
 
-Cloudflare Pages project — build command `npm ci && npm run build -w @umbraculum/website`, output `apps/website/dist`. Remove `robots.txt` disallow when declaring public alpha.
+Cloudflare **Workers Builds** (Git-connected) — see [`docs/design/public-alpha-cloudflare-pages-runbook.md`](../../docs/design/public-alpha-cloudflare-pages-runbook.md).
+
+| Dashboard field | Value |
+|-----------------|--------|
+| Project name | `umbraculum-dev-website` (must match [`wrangler.toml`](wrangler.toml) `name`) |
+| Build command | `npm ci && npm run build -w @umbraculum/website` |
+| Deploy command | `npx wrangler deploy --config apps/website/wrangler.toml` |
+| Non-production deploy | `npx wrangler versions upload --config apps/website/wrangler.toml` |
+| Path | `/` (repo root) |
+
+Static assets are declared in [`wrangler.toml`](wrangler.toml) (`[assets] directory = "./dist"`). Remove `robots.txt` disallow when declaring public alpha.
 
 ## Scope
 
