@@ -172,7 +172,7 @@ A complementary lesson — different failure mode, same stakes — is the **Omni
 
 **No Umbraculum certification program.** Other ecosystems — SAP, Odoo partners, Microsoft partner badges — use certifications to help firms **sell** implementations. That is a valid choice; we respect it and do not adopt it. Umbraculum is developer-centric: we reduce gatekeeping, not add badge bureaucracy. Skill is judged by work in the public repo, by modules shipped, and by conversation — not by exams we would administer.
 
-Umbraculum makes the inverse commitment. The toolset (Cursor + plugins + rules + skills + agents + the foundation docs trio) **is** the low bar. It does not require the contributor to assemble five pieces of infrastructure first; the apparatus carries the knowledge. This is the same idea as §1.3, applied to people instead of tasks.
+**The shared lesson from the cases above is the same:** ecosystems die or never form when the bar to enter rises — through complexity, missing docs, partner-only discovery, or badge walls. Umbraculum treats a **low entry bar as a design constraint**, not a phase we outgrow. The toolset (Cursor + plugins + rules + skills + agents + the foundation docs trio) **is** that bar kept deliberately low: it does not require the contributor to assemble five pieces of infrastructure first; the apparatus carries the knowledge. This is the same idea as §1.3, applied to people instead of tasks.
 
 **Concretely:**
 
@@ -183,7 +183,7 @@ Umbraculum makes the inverse commitment. The toolset (Cursor + plugins + rules +
 - We will keep the cross-platform infrastructure part of that same low bar. Tamagui as the cross-platform UI primitive layer (one component tree → real DOM on web + real React Native on device; see [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1 and [`docs/TAMAGUI.md`](docs/TAMAGUI.md)), React Native + Expo on the device side, and the cross-platform packages that abstract the web-vs-native split mean a contributor does not have to choose between *"build a web app"* and *"build a native app"*, and does not have to maintain two parallel UI codebases to reach both. The horizontal-accessibility promise covers reaching both surfaces, not just the web one — and the per-module β layout in [RFC-0002](docs/rfcs/0002-canonical-module-physical-layout.md) makes the native slice (`apps/native/src/modules/<code>/`) one of four mandatory slices of any module, not a separate effort grafted on later.
 - We will not operate a **certification program** or partner-badge ladder as a proxy for skill. Learners and domain experts meet through public try paths ([`docs/GETTING-STARTED.md`](docs/GETTING-STARTED.md)), public modules, and the community forum — expertise offers count more than credentials (case studies: [`docs/design/ecosystem-case-study-sap.md`](docs/design/ecosystem-case-study-sap.md) §4, [`docs/design/ecosystem-case-study-odoo.md`](docs/design/ecosystem-case-study-odoo.md) §3).
 
-The inverse commitment, stated plainly: **the project will not narrow over time**. If you can ship to it today, you can ship to it in five years. If you can learn from it today, your kids can learn from it in fifteen.
+**Stated plainly:** the project will not narrow over time. If you can ship to it today, you can ship to it in five years. If you can learn from it today, your kids can learn from it in fifteen.
 
 ### 2.3 Open by license, open by foundation
 
