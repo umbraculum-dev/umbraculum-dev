@@ -179,7 +179,7 @@ Definitions used throughout this section:
 
 ## 5. What real OSS B2B projects chose, and what happened
 
-License choices are easier to reason about with the benefit of hindsight from projects similar in shape to Umbraculum.
+License choices are easier to reason about with the benefit of hindsight from projects similar in shape to Umbraculum — primarily **operator- and agency-serving** open platforms (ERP, analytics, scheduling). **WordPress** and **Drupal** are **CMS platforms whose default product is public-facing sites (B2C-shaped)**; they appear in §5.1 for **governance and hosting-economy** lessons, not because their core SKU is B2B commerce or operations software.
 
 ### 5.1 Sustained successes
 

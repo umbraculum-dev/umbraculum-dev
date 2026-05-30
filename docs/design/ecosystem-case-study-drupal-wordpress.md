@@ -98,7 +98,7 @@ We record the Drupal-era debate as **evidence that governance culture matters as
 
 ### 4.1 What Umbraculum copies — governance separation
 
-WordPress's **Foundation / Automattic** split is a **positive precedent** for long-term OSS B2B ([`LICENSING.md`](../LICENSING.md) §5.1, §445 patterns): community trust, commercial hosting, trademark discipline, **without** the Adobe → Magento stewardship collapse.
+WordPress's **Foundation / Automattic** split is a **positive precedent** for separating community-owned core from a commercial services layer ([`LICENSING.md`](../LICENSING.md) §5.1): community trust, hosting, trademark discipline, **without** the Adobe → Magento stewardship collapse. WordPress's **product** is **B2C-first** — public sites, blogs, publishing — not a B2B operations or commerce core; Umbraculum borrows the **governance shape**, not the product category.
 
 Umbraculum's deferred foundation question ([`MANIFESTO.md`](../../MANIFESTO.md) §2.3) is informed by this shape — not by copying WordPress's PHP runtime choices.
 
