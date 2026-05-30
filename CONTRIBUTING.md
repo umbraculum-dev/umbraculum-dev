@@ -186,6 +186,13 @@ Pull requests must have a green CI run before merge. The required
 checks are visible in the PR UI. If a check is failing for unrelated
 reasons, leave a comment and a maintainer will help unblock you.
 
+- **No tolerated failures.** There is no case where "it's OK if CI
+  fails" on merge — tolerated red hides unrelated regressions. If a
+  scenario is hard to test, change fixtures, scope, or test design until
+  the layer is reliable again (see [`docs/design/ecosystem-case-study-adobe-magento.md`](docs/design/ecosystem-case-study-adobe-magento.md) §3.5 for the Adobe cloud counter-lesson).
+- **Third-party / module-shaped stacks are the normal case**, not an
+  excuse to skip CI (same §3.5).
+
 ### Reviews
 
 - Address review feedback or push back with a reasoned counterargument;
