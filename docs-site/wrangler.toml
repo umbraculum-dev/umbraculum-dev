@@ -1,0 +1,9 @@
+# Cloudflare Workers static assets — Docusaurus docs (docs.umbraculum.dev).
+# Project name in the dashboard MUST match `name` below.
+# Deploy: npx wrangler deploy --config docs-site/wrangler.toml
+
+name = "umbraculum-dev-docs"
+compatibility_date = "2026-05-30"
+
+[assets]
+directory = "./build"

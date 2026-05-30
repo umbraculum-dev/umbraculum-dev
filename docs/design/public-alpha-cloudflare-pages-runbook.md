@@ -81,7 +81,7 @@ RFC-0005 chose Cloudflare for docs (free tier, fast CNAME, no Actions deploy tok
 **Before connecting Cloudflare (Phase 1 done in repo):**
 
 - [x] `apps/website/wrangler.toml` committed (brochure)
-- [ ] `docs-site/wrangler.toml` committed (docs — before second Worker)
+- [x] `docs-site/wrangler.toml` committed (docs — before second Worker)
 - [ ] `npm run build -w @umbraculum/website` green locally / in CI
 - [ ] `npm run build -w @umbraculum/docs-site` green in CI
 - [ ] Brochure copy reviewed (workspace-shaped positioning, not brewery-only)

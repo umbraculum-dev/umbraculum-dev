@@ -42,6 +42,20 @@ Do **not** override hashed `announcementBar_*` classes or put `display: flex` on
 
 After swizzle changes: `docker compose restart docs-site`.
 
+## Deploy (maintainer, Phase 2)
+
+Cloudflare **Workers Builds** — second Worker project (after brochure is green). See [`docs/design/public-alpha-cloudflare-pages-runbook.md`](../docs/design/public-alpha-cloudflare-pages-runbook.md) §3.
+
+| Dashboard field | Value |
+|-----------------|--------|
+| Project name | `umbraculum-dev-docs` (must match [`wrangler.toml`](wrangler.toml) `name`) |
+| Build command | `npm ci && npm run build -w @umbraculum/docs-site` |
+| Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
+| Non-production deploy | `npx wrangler versions upload --config docs-site/wrangler.toml` |
+| Path | `/` (repo root) |
+
+Keep `noIndex: true` and `static/robots.txt` until public-alpha flip (RFC-0005 P7).
+
 ## How it fits in
 
 - **Consumed by**: maintainers and CI validating docs publication; Cloudflare Pages (or equivalent) at deploy time.
