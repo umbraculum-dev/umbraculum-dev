@@ -31,7 +31,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | [SAP](ecosystem-case-study-sap.md) | SAP ABAP / S/4 / BTP | **One language**, many verticals — but **trials ≠ safe boat** for repositioning | One try path; no cert gate |
 | [TeamSystem](ecosystem-case-study-teamsystem.md) | TeamSystem / Polyedro (Europe) | **Partner-only experiment path** — ecosystem is the vertical for outsiders | `docker compose up`; public modules |
 | [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder; **§4.1** platform-shape comparison (not feature scorecard) | Copy ladder, not badges |
-| [Adobe → Magento](ecosystem-case-study-adobe-magento.md) | Magento Open Source / Adobe stewardship | **Community lost through stewardship** — dev docs scattered/404, cert churn, trademark; **Mage-OS** as fork counter-case | AGPL + DCO; fork rights; no cert gate; doc redirects |
+| [Adobe → Magento](ecosystem-case-study-adobe-magento.md) | Magento Open Source / Adobe stewardship | **Community lost through stewardship** — dev docs scattered/404, cert churn, **cloud integration pipelines failing**, trademark; **Mage-OS** as fork counter-case | AGPL + DCO; fork rights; no cert gate; **CI by default**; doc redirects |
 
 **Pairings that help:**
 
@@ -59,6 +59,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | Dev docs deprioritized / scattered URLs | Adobe → Magento (Experience League era) | Developer docs first-class; **redirect or explained removal** | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.2; [`MANIFESTO.md`](../../MANIFESTO.md) §2.2 |
 | Certification renewal while ladder narrows | Adobe Commerce / Magento certs | **No Umbraculum certification program** | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.3 |
 | Trademark enclosure after fork | Adobe → Magento → Mage-OS rename | Transparent trademark policy; AGPL fork rights | [`LICENSING.md`](../LICENSING.md) §8–§9 |
+| Cloud pipelines broken; official guidance to avoid integration | Adobe Commerce Cloud era | **CI embedded by default** in public repo | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.5; [`TESTING.md`](../TESTING.md); [`CI-PARITY.md`](../CI-PARITY.md) |
 
 ---
 
