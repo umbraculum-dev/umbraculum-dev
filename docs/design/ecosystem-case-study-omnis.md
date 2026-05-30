@@ -27,7 +27,7 @@ We are **not** reviewing Omnis the product here. We are recording **our experien
 | **What failed the ecosystem** | No real developer community; poor documentation; no Linux desktop for development; unclear free trial; reseller/software-house gatekeeping → product used only to maintain existing verticals, not to attract builders of *new* platforms; **Core vs verticals** governance with no independent developer chair (§3.4–§3.6) |
 | **Umbraculum lesson** | Documentation, community, open backbone repos, and free try are **structural commitments**, not nice-to-haves — see §4 |
 
-**Pair with Adobe → Magento** ([`MANIFESTO.md`](../../MANIFESTO.md) §2.1, [`LICENSING.md`](../LICENSING.md) §5.2): Adobe inherited a thriving OSS community and lost it through stewardship. Omnis had a capable proprietary product and **never built** the community-and-on-ramp layer that turns a tool into a platform newcomers can join.
+**Pair with Adobe → Magento** ([`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md), [`MANIFESTO.md`](../../MANIFESTO.md) §2.1, [`LICENSING.md`](../LICENSING.md) §5.2): Adobe inherited a thriving OSS community and lost it through stewardship. Omnis had a capable proprietary product and **never built** the community-and-on-ramp layer that turns a tool into a platform newcomers can join.
 
 ---
 
