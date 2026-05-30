@@ -59,8 +59,8 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | Dev docs deprioritized / scattered URLs | Adobe → Magento (Experience League era) | Developer docs first-class; **redirect or explained removal** | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.2; [`MANIFESTO.md`](../../MANIFESTO.md) §2.2 |
 | Certification renewal while ladder narrows | Adobe Commerce / Magento certs | **No Umbraculum certification program** | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.3 |
 | Trademark enclosure after fork | Adobe → Magento → Mage-OS rename | Transparent trademark policy; AGPL fork rights | [`LICENSING.md`](../LICENSING.md) §8–§9 |
-| Cloud pipelines broken; official guidance to avoid integration | Adobe Commerce Cloud / ece-tools era | **CI always green**; no tolerated failures | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.5; [`CONTRIBUTING.md`](../CONTRIBUTING.md) |
-| Cloud CI vs third-party modules ("unsupported") | Adobe ece-tools stance | **CI reflects real module stacks** | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.5; [`MODULES.md`](../MODULES.md) |
+| Cloud pipelines broken; official guidance to avoid integration | Adobe ece-tools deploy integration | **Public-repo CI by default** — not broken vendor deploy gate | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.5; [`TESTING.md`](../TESTING.md) |
+| Agency hidden integration cost vs Shopify | Adobe cloud commercial trap | **Integrator sustainability** (§2.1) | [`MANIFESTO.md`](../../MANIFESTO.md) §2.1 |
 
 ---
 
