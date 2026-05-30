@@ -14,20 +14,20 @@
 | `LICENSE` (MIT) | **PASS** — present at repo root |
 | `README.md` | **PASS** — describes four Cursor plugins + layout |
 | `CONTRIBUTING.md` | **PASS** — present (DCO + hooks documented in README) |
-| `CODE_OF_CONDUCT.md` | **GAP** — not present at toolset root |
-| `SECURITY.md` | **GAP** — not present at toolset root |
+| `CODE_OF_CONDUCT.md` | **PASS** — added 2026-05-30 (Contributor Covenant 2.1; `conduct@umbraculum.dev`) |
+| `SECURITY.md` | **PASS** — added 2026-05-30 (toolset-scoped scope; `security@umbraculum.dev`) |
 | Quick secret patterns in tracked tree | **PASS** — none found in sample scan |
 | Maintainer-specific paths in `*.md` | **PASS** — none found |
-| Parity with monorepo AGPL + MIT posture | **PARTIAL** — toolset is MIT plugin source; monorepo has full legal set |
+| Parity with monorepo AGPL + MIT posture | **PASS** — toolset is MIT plugin source; root legal set now matches monorepo contacts |
 
 ---
 
 ## Gaps to close before flip (maintainer)
 
-1. **Add `CODE_OF_CONDUCT.md`** — can mirror monorepo [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md) with same enforcement contacts once mailboxes exist.
-2. **Add `SECURITY.md`** — can mirror or shorten monorepo [`SECURITY.md`](../../SECURITY.md); plugin repos still need a reporting path.
+1. ~~**Add `CODE_OF_CONDUCT.md`**~~ — **DONE** 2026-05-30 in toolset root.
+2. ~~**Add `SECURITY.md`**~~ — **DONE** 2026-05-30 in toolset root (toolset-scoped in/out of scope).
 3. **Confirm `repository` URL** in any future `package.json` at toolset root (none today — acceptable for a non-npm meta-repo).
-4. **Marketplace submission** — verify `cursor-plugins/.cursor-plugin/marketplace.json` points at public URLs only after visibility flip.
+4. **Marketplace submission** — verify `cursor-plugins/.cursor-plugin/marketplace.json` points at public URLs only after visibility flip (flip-day gate — not a pre-flip blocker for adding the files).
 
 ---
 
@@ -49,4 +49,4 @@ Commands equivalent to monorepo Stage 1:
 
 | Date | Maintainer | Result |
 |------|------------|--------|
-| — | — | Gaps § “Gaps to close” open |
+| 2026-05-30 | Agent + maintainer | CoC + SECURITY closed; items 3–4 remain flip-day / optional |

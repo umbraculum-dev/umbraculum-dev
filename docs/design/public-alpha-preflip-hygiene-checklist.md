@@ -69,7 +69,7 @@ Runbook: [`platform-brewery-postgres-schema-split.md`](platform-brewery-postgres
 |---|--------|-------|
 | 5.1 | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` present and aligned | ☐ |
 | 5.2 | Contact emails in CoC / SECURITY are real monitored addresses on `umbraculum.dev` (not placeholders) | ☑ (2026-05-30 — `security@` + `conduct@` via Cloudflare Email Routing) |
-| 5.3 | Toolset repo README / LICENSE parity with monorepo posture | Partial — see [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) (CoC + SECURITY gaps) |
+| 5.3 | Toolset repo README / LICENSE parity with monorepo posture | ☑ (2026-05-30 — CoC + SECURITY added; see [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md)) |
 
 ---
 

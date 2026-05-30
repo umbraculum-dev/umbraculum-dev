@@ -19,7 +19,7 @@
 | `@brewery/*` migration (slots 1–14) | **PASS** (closed 2026-05-19) | No |
 | MIT npm SDK batch | **PASS** (published 2026-05-29) | No |
 | Git history secret scan (gitleaks) | **NOT RUN** (tool absent on scan host) | Maintainer optional deep pass |
-| Toolset CoC + SECURITY | **GAP** | Yes — close before flip |
+| Toolset CoC + SECURITY | **PASS** (2026-05-30) | No — added in umbraculum-toolset |
 | Live contact mailboxes | **PASS** (2026-05-30) | No — `security@` + `conduct@` via Cloudflare Email Routing |
 | Cloudflare Pages + DNS | **MANUAL** | Yes — maintainer |
 | Repo visibility → public | **PENDING** | Yes — maintainer (atomic with toolset) |
