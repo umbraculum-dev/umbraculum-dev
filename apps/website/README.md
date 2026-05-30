@@ -64,10 +64,12 @@ Cloudflare **Workers Builds** (Git-connected) — see [`docs/design/public-alpha
 | Dashboard field | Value |
 |-----------------|--------|
 | Project name | `umbraculum-dev-website` (must match [`wrangler.toml`](wrangler.toml) `name`) |
-| Build command | `npm ci && npm run build -w @umbraculum/website` |
+| Build command | `npm run build -w @umbraculum/website` |
 | Deploy command | `npx wrangler deploy --config apps/website/wrangler.toml` |
 | Non-production deploy | `npx wrangler versions upload --config apps/website/wrangler.toml` |
 | Path | `/` (repo root) |
+| `NODE_VERSION` | `20.19.4` (Cloudflare env var) |
+| Preview | https://umbraculum-dev-website.umbraculum-dev.workers.dev |
 
 Static assets are declared in [`wrangler.toml`](wrangler.toml) (`[assets] directory = "./dist"`). Remove `robots.txt` disallow when declaring public alpha.
 

@@ -18,10 +18,12 @@ Both public static surfaces use the same hosting pattern as RFC-0005:
 - **Custom domains + HTTPS** — attach `umbraculum.dev` / `docs.umbraculum.dev` on each Worker; TLS at Cloudflare edge.
 - **`noindex` until flip** — brochure ships with `robots.txt` disallow + meta `noindex`; docs-site uses `noIndex: true` + `static/robots.txt`. Remove or replace in Phase 2 when announcing α.
 
-| Site | Domain (target) | Workspace | Build command | Assets directory (in wrangler.toml) |
-|------|-------------------|-----------|---------------|-------------------------------------|
-| **Brochure** | `umbraculum.dev` (apex) | `@umbraculum/website` | `npm ci && npm run build -w @umbraculum/website` | `apps/website/dist` |
-| **Docs** | `docs.umbraculum.dev` | `@umbraculum/docs-site` | `npm ci && npm run build -w @umbraculum/docs-site` | `docs-site/build` |
+| Site | Domain (target) | Preview URL (pre-flip) | Build command (tuned) |
+|------|-----------------|------------------------|------------------------|
+| **Brochure** | `umbraculum.dev` | `https://umbraculum-dev-website.umbraculum-dev.workers.dev` | `npm run build -w @umbraculum/website` |
+| **Docs** | `docs.umbraculum.dev` | `https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev` | `npm run build -w @umbraculum/docs-site` |
+
+Cloudflare runs `npm clean-install` before your build command — **do not** repeat `npm ci` in the build command (saves ~3 min per deploy).
 
 Use **two Cloudflare Worker projects** (one per site). Same account, same repo, separate Wrangler configs — avoids coupling marketing deploys to doc edits.
 
@@ -35,11 +37,12 @@ Use **two Cloudflare Worker projects** (one per site). Same account, same repo, 
    | Field | Value |
    |-------|--------|
    | Project name | `umbraculum-dev-website` — **must match** [`apps/website/wrangler.toml`](../../apps/website/wrangler.toml) `name` |
-   | Build command | `npm ci && npm run build -w @umbraculum/website` |
+   | Build command | `npm run build -w @umbraculum/website` |
    | Deploy command | `npx wrangler deploy --config apps/website/wrangler.toml` |
    | Non-production branch deploy command | `npx wrangler versions upload --config apps/website/wrangler.toml` |
    | Path | `/` (repo root — required for workspace `npm ci`) |
-   | API token / env vars | defaults (auto token); none required for static v1 |
+   | Environment variables | **`NODE_VERSION`** = `20.19.4` (silences `EBADENGINE` from React Native / Vite in lockfile) |
+   | API token | default (auto token) |
 
 3. **Repo file (required before Deploy):** [`apps/website/wrangler.toml`](../../apps/website/wrangler.toml) — `[assets] directory = "./dist"` (relative to that file).
 4. **Custom domains** — add `umbraculum.dev` and `www.umbraculum.dev` after first green deploy (www → apex redirect in Cloudflare DNS rules). Can wait until flip day.
@@ -62,21 +65,43 @@ Repeat **Create application** with the same repo; different project name and Wra
 | Field | Value |
 |-------|--------|
 | Project name | `umbraculum-dev-docs-docusaurus` |
-| Build command | `npm ci && npm run build -w @umbraculum/docs-site` |
+| Build command | `npm run build -w @umbraculum/docs-site` |
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production branch deploy command | `npx wrangler versions upload --config docs-site/wrangler.toml` |
+| Path | `/` |
+| Environment variables | **`NODE_VERSION`** = `20.19.4` |
 
 Custom domain: `docs.umbraculum.dev`. Remove docs-site `noindex` / `robots.txt` gating per RFC-0005 P7 in the same flip window as brochure.
 
 ---
 
-## 4. Why not GitHub Pages for brochure?
+## 4. Post-deploy tuning (maintainer, both Workers)
+
+Apply in each Worker → **Settings → Builds** after first green deploy:
+
+| Tuning | Action |
+|--------|--------|
+| **Node version** | Environment variable **`NODE_VERSION`** = **`20.19.4`** — avoids `npm warn EBADENGINE` (RN/Metro/Vite want ≥20.19.4; Cloudflare default was 20.18.1). |
+| **Build command** | Drop redundant **`npm ci &&`** — Cloudflare already runs `npm clean-install` before your command. Use workspace build only (see table §1). |
+| **Branch previews** | Optional: uncheck **Builds for non-production branches** to halve build count on feature-branch pushes (~500 builds/month free-tier budget). Keep on if you want preview URLs per branch. |
+| **Deploy triggers** | Every **`master` push** rebuilds **both** Workers (no path filter). GitHub Actions remain path-scoped; Cloudflare is hosting-only. |
+
+**Smoke-tested preview URLs (2026-05-30):**
+
+- Brochure: https://umbraculum-dev-website.umbraculum-dev.workers.dev
+- Docs: https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev
+
+Custom domains (`umbraculum.dev`, `docs.umbraculum.dev`) wait until flip day.
+
+---
+
+## 5. Why not GitHub Pages for brochure?
 
 RFC-0005 chose Cloudflare for docs (free tier, fast CNAME, no Actions deploy token). The brochure uses the **same pattern** so one maintainer mental model covers both surfaces. GitHub Pages remains a fallback (copy `apps/website/dist` to `gh-pages` branch) but is not the canonical path.
 
 ---
 
-## 5. Phase checklist (maintainer)
+## 6. Phase checklist (maintainer)
 
 **Before connecting Cloudflare (Phase 1 done in repo):**
 
@@ -89,7 +114,8 @@ RFC-0005 chose Cloudflare for docs (free tier, fast CNAME, no Actions deploy tok
 
 **At flip (Phase 2c):**
 
-- [x] Both Workers created; verify preview URLs (2026-05-30 — maintainer smoke)
+- [x] Both Workers created; preview URLs smoke-tested (2026-05-30)
+- [ ] Post-deploy tuning applied (§4): `NODE_VERSION`, build commands without duplicate `npm ci`
 - [ ] Point DNS / custom domains; wait for TLS active
 - [ ] Remove `noindex` / open `robots.txt` on both sites
-- [ ] Smoke: home → docs → GitHub → `GETTING-STARTED` on rendered docs
+- [x] Smoke: home → docs → GitHub → `GETTING-STARTED` on rendered docs (workers.dev previews, 2026-05-30)

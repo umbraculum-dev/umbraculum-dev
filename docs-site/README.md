@@ -49,10 +49,12 @@ Cloudflare **Workers Builds** — second Worker project (after brochure is green
 | Dashboard field | Value |
 |-----------------|--------|
 | Project name | `umbraculum-dev-docs-docusaurus` (must match [`wrangler.toml`](wrangler.toml) `name`) |
-| Build command | `npm ci && npm run build -w @umbraculum/docs-site` |
+| Build command | `npm run build -w @umbraculum/docs-site` |
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production deploy | `npx wrangler versions upload --config docs-site/wrangler.toml` |
 | Path | `/` (repo root) |
+| `NODE_VERSION` | `20.19.4` (Cloudflare env var) |
+| Preview | https://umbraculum-dev-docs-docusaurus.umbraculum-dev.workers.dev |
 
 Keep `noIndex: true` and `static/robots.txt` until public-alpha flip (RFC-0005 P7).
 
