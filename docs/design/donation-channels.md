@@ -30,7 +30,7 @@ Umbraculum is a **solo-maintained** project at public alpha. **Adding or replaci
 |------|-----------|-----------------|
 | **Recurring support** | **Yes** — designed for weekly/monthly/yearly | Optional memberships exist; not primary here |
 | **One-time tip** | **No** — recurring only; one-off workaround (start then cancel) is poor UX | **Yes** — one-tap tips, no supporter account required |
-| **Platform fee** | **0%** (+ Stripe/PayPal ~3% processing) | **~5%** (+ Stripe processing) |
+| **Platform fee** | **0%** (+ Stripe ~3% processing) | **~5%** (+ Stripe processing) |
 | **OSS alignment** | Non-profit, open-source platform | Commercial; acceptable as **secondary** one-time rail |
 | **§5.3 / §6** | Donations only; no perk tiers | Use **single “support” tier** with identical thank-you text only |
 
@@ -40,23 +40,39 @@ Umbraculum is a **solo-maintained** project at public alpha. **Adding or replaci
 
 ## 3. Account setup (maintainer, before flip)
 
-### 3.1 Liberapay — `Umbraculum` team
+### 3.0 Email — `finance@umbraculum.dev`
 
-1. Create a [Liberapay](https://liberapay.com) account for the founding maintainer.
-2. Create a **Team** named **`Umbraculum`** (Liberapay Teams split payouts among members without a legal entity).
-3. Link the team to the [`umbraculum-dev`](https://github.com/umbraculum-dev) GitHub org on the profile for credibility.
-4. Team description (short):
+Use **`finance@umbraculum.dev`** for Stripe signup and payment-processor mail — **not** `security@` or `conduct@` (those are vuln-report and CoC enforcement only).
+
+Route via **Cloudflare Email Routing** on `umbraculum.dev` to the maintainer inbox (same pattern as `security@` / `conduct@`). To fix a typo in the custom address, **Edit** the routing rule in the dashboard — no need to delete and recreate.
+
+**Phase 0 payout rail:** **Stripe only** on Liberapay (and on Buy Me a Coffee when offered). PayPal is **not** used at alpha — signup friction, poor donor/recipient privacy on Liberapay ([payment processors](https://liberapay.com/about/payment-processors)), and no mature legal entity for PayPal Business.
+
+**Stripe verification email not arriving at `finance@`?** Manual mail to `finance@` from another address proves Cloudflare routing works; missing Stripe mail is usually **not** DNS cache on Stripe’s side. Check, in order:
+
+1. **Proton spam / quarantine / filters** — automated mail from `stripe.com` is often filtered when forwarded.
+2. **Wait + resend** — Stripe dashboard → resend verification (can take several minutes).
+3. **Cloudflare Email Routing → Activity** — confirm Stripe’s message was received and forwarded (or rejected).
+4. **Workaround:** complete Stripe signup with the **destination inbox directly** (e.g. `umbraculum-dev@proton.me`); after verification, change the Stripe account email to `finance@umbraculum.dev` in Stripe settings (or keep Proton for Stripe login and use `finance@` only on Liberapay profile copy).
+
+### 3.1 Liberapay — `@Umbraculum`
+
+1. Create a [Liberapay](https://liberapay.com) account for the founding maintainer (GitHub OAuth uses your **personal** account; Liberapay does not attach a GitHub **org** as recipient).
+2. Public page **`Umbraculum`** at `https://liberapay.com/Umbraculum/` — a Liberapay **Team** is optional for solo maintainers; an individual account named after the project is acceptable at alpha ([Teams](https://liberapay.com/about/teams)).
+3. Team / profile description (short):
    - Funds **AI inference**, **maintainer time**, and **infrastructure** (e.g. community forum ~€3.60/mo).
    - **Does not** buy votes, priority, or paywalled features — link to `/support` and §5.3.
-5. Verify payout method (Stripe or PayPal per Liberapay).
-6. Confirm live URL matches `https://liberapay.com/Umbraculum/` (adjust `/support` if Liberapay assigns a different team slug).
+   - Link **https://github.com/umbraculum-dev** and **https://umbraculum.dev/support/** in prose (credibility; not a GitHub-org OAuth hook).
+4. Connect **Stripe only** as payout processor — account email **`finance@umbraculum.dev`** when forwarding is reliable (§3.0); link bank for payouts.
+5. Confirm live URL matches `https://liberapay.com/Umbraculum/` (adjust `/support` if Liberapay assigns a different slug).
 
 ### 3.2 Buy Me a Coffee — `Umbraculum`
 
 1. Register [Buy Me a Coffee](https://www.buymeacoffee.com/) page slug **`Umbraculum`** (or nearest available; update links if taken).
 2. **Disable** membership tiers and shop at alpha — **one-time tips only** to avoid Patreon-style tier optics (§6).
 3. Profile copy: same §5.3 disclaimer as Liberapay; “one-time contribution.”
-4. Optional: embed button on `/support` (link-out is enough at v1).
+4. Payout: **Stripe** when offered (same project identity as Liberapay); PayPal not required at alpha.
+5. Optional: embed button on `/support` (link-out is enough at v1).
 
 ### 3.3 Wire `/support`
 
@@ -124,7 +140,7 @@ Stay on Phase 0 until a **Proposals** forum topic passes (§4) to add or replace
 
 | Channel | Platform fee | Processing (typical) | Best for |
 |---------|--------------|----------------------|----------|
-| Liberapay | **0%** | ~3% Stripe/PayPal | Recurring |
+| Liberapay | **0%** | ~3% Stripe | Recurring |
 | Buy Me a Coffee | **~5%** | Stripe ~2.9% + fixed | One-time |
 | GitHub Sponsors (deferred) | **~6%** | included in platform cut | Dev discoverability — **community vote** |
 | Open Collective (deferred) | **~10%** | varies | Org invoices, public budget — **community vote** |
@@ -133,7 +149,7 @@ Stay on Phase 0 until a **Proposals** forum topic passes (§4) to add or replace
 
 ## 8. Flip-day checklist
 
-- [ ] Liberapay **Umbraculum** team live; GitHub linked
+- [ ] Liberapay **Umbraculum** live; Stripe connected; GitHub linked in profile copy
 - [ ] Buy Me a Coffee **Umbraculum** live; tiers/shop off
 - [ ] `/support` buttons point to live URLs
 - [ ] Forum **Community policy** pins: Phase 0 channels + §5 triggers ([`donation-channels.md`](donation-channels.md) §3); **How we communicate** (§6.1 — [`community-forum-runbook.md`](community-forum-runbook.md) §6 item 5)

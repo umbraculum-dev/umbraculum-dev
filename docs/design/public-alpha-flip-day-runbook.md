@@ -18,7 +18,7 @@
 |------|-----|
 | Stage 1 hygiene signed off | [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §7 |
 | **Donation channel accounts live** | [`donation-channels.md`](donation-channels.md) §3 + §8 — **roadmap Phase 2 `2d`** (before removing `noindex`) |
-| Contact mailboxes live | `security@umbraculum.dev`, `conduct@umbraculum.dev` — ✅ 2026-05-30 ([`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md)) |
+| Contact mailboxes live | `security@`, `conduct@`, `finance@` on `umbraculum.dev` — ✅ 2026-05-30 ([`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), [`donation-channels.md`](donation-channels.md) §3.0) |
 | Toolset parity | [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) — ✅ CoC + SECURITY (2026-05-30) |
 | Cloudflare projects created (can be pre-flip while repos still private — use preview URLs first) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) — ✅ Workers Builds (2026-05-30) |
 | Community forum ready (or scheduled same week as flip) | [`community-forum-runbook.md`](community-forum-runbook.md) |
