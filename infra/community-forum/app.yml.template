@@ -1,0 +1,59 @@
+## Umbraculum community forum — redacted Discourse app.yml template
+##
+## Live file on VPS: /var/discourse/containers/app.yml
+## NEVER commit live secrets. Replace placeholders before use on server only.
+##
+## After editing on VPS: cd /var/discourse && ./launcher rebuild app
+## Validate YAML: http://www.yamllint.com/
+
+templates:
+  - "templates/postgres.template.yml"
+  - "templates/redis.template.yml"
+  - "templates/web.template.yml"
+  - "templates/web.ratelimited.template.yml"
+  - "templates/web.ssl.template.yml"
+  - "templates/web.letsencrypt.ssl.template.yml"
+
+expose:
+  - "80:80"
+  - "443:443"
+
+params:
+  db_default_text_search_config: "pg_catalog.english"
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+
+  DISCOURSE_HOSTNAME: forum.umbraculum.dev
+
+  DISCOURSE_DEVELOPER_EMAILS: "forum@umbraculum.dev"
+
+  DISCOURSE_SMTP_ADDRESS: smtp-relay.brevo.com
+  DISCOURSE_SMTP_PORT: 587
+  DISCOURSE_SMTP_USER_NAME: "<BREVO_SMTP_LOGIN>"
+  DISCOURSE_SMTP_PASSWORD: "<BREVO_SMTP_KEY>"
+  DISCOURSE_SMTP_ENABLE_START_TLS: true
+  DISCOURSE_SMTP_DOMAIN: umbraculum.dev
+  DISCOURSE_NOTIFICATION_EMAIL: forum@umbraculum.dev
+
+  LETSENCRYPT_ACCOUNT_EMAIL: "<LETSENCRYPT_EMAIL>"
+
+volumes:
+  - volume:
+      host: /var/discourse/shared/standalone
+      guest: /shared
+  - volume:
+      host: /var/discourse/shared/standalone/log/var-log
+      guest: /var/log
+
+hooks:
+  after_code:
+    - exec:
+        cd: $home/plugins
+        cmd:
+          - git clone https://github.com/discourse/docker_manager.git
+
+run:
+  - exec: echo "Umbraculum forum — initialized from infra/community-forum/app.yml.template"

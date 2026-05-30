@@ -125,12 +125,12 @@ This section names the **operational surfaces** the §4 mechanism runs on. It is
 
 #### 4.6.1 DNS and domain layout (Cloudflare)
 
-The apex domain **`umbraculum.dev`** is already registered; DNS stays on **Cloudflare** (same zone as `umbraculum.dev` / `docs.umbraculum.dev` Pages CNAMEs).
+The apex domain **`umbraculum.dev`** is already registered; DNS stays on **Cloudflare** (same zone as brochure and docs **Workers**).
 
 | Hostname | Target | Pattern |
 |----------|--------|---------|
-| `umbraculum.dev`, `www` | Cloudflare Pages (brochure) | CNAME → `*.pages.dev` (existing) |
-| `docs.umbraculum.dev` | Cloudflare Pages (Docusaurus) | CNAME → `*.pages.dev` (existing) |
+| `umbraculum.dev`, `www` | Cloudflare Workers (brochure) | Custom domain on Worker (existing) |
+| `docs.umbraculum.dev` | Cloudflare Workers (Docusaurus) | Custom domain on Worker (existing) |
 | **`forum.umbraculum.dev`** | Community VPS (Contabo) | **A record** → VPS public IPv4; **DNS only** (grey cloud) at bootstrap so Discourse's Let's Encrypt workflow stays straightforward |
 | `chat.umbraculum.dev` | Same VPS (Phase 1) | A record when chat lands |
 | `meet.umbraculum.dev` | Same or second VPS (Phase 2) | A record when self-hosted AV lands |
@@ -149,11 +149,11 @@ Run **one service** on **one VPS** until the community proves it needs more.
 | **Live meetings** | **Provisional external AV** (e.g. public Jitsi meeting link announced in the forum **Meetings** category) | link posted per meeting | Convenience only — **not** the canonical record. Recording and transcript (or detailed minutes) are **published on the forum** |
 | **Transactional email** | Free-tier SMTP (e.g. Brevo, Mailgun trial) | — | Required for Discourse invites/digests; free tier is sufficient at alpha scale |
 
-**Hosting (Phase 0):** Contabo **Cloud VPS 10** — **€3.60/month** (12-month term, auto backup enabled per Contabo checkout; list €4.50). Spec: 4 vCPU, **8 GB RAM**, 75 GB NVMe, 1 snapshot. Comfortable for Discourse alone with headroom for small upload growth.
+**Hosting (Phase 0):** Contabo **Cloud VPS 10** — Ubuntu 24.04 LTS, 75 GB NVMe, Auto Backup on. Spec: 4 vCPU, **8 GB RAM**, 1 manual snapshot slot.
 
-**Maintainer runbook:** [`community-forum-runbook.md`](design/community-forum-runbook.md) (install, DNS, §6 Discourse hardening, smoke tests).
+**Maintainer runbook:** [`community-forum-runbook.md`](design/community-forum-runbook.md) (install, DNS, §6 Discourse hardening, smoke tests). Supporting docs: [`community-forum-vps-security.md`](design/community-forum-vps-security.md), [`community-forum-ssl-strategy.md`](design/community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](design/community-forum-secrets-inventory.md), [`infra/community-forum/`](../../infra/community-forum/).
 
-**Phase 0 infra total:** **~€3.60/month (~€43/year)** + maintainer ops time (~2–4 h/month for forum patches/backups; ~2 h/meeting when a public meeting runs).
+**Phase 0 infra total (itemized):** **€7.60/month** — VPS €3.60 + Auto Backup €1.50 + Contabo Object Storage €2.50 (planned for Discourse off-site backups). **Published round figure for support/donations:** **~€10/month (~€120/year)**. Brevo SMTP stays on free tier at alpha scale. Plus maintainer ops time (~2–4 h/month for forum patches/backups; ~2 h/meeting when a public meeting runs).
 
 #### 4.6.3 Phase 1 — real-time chat (deferred)
 
@@ -180,13 +180,15 @@ Add **Jibri** (recording) only when published recordings become policy, not at f
 
 #### 4.6.5 Cost summary (published expectation)
 
-| Phase | Contabo plan | Infra / month | When |
-|-------|--------------|---------------|------|
-| **0 — Alpha** | Cloud VPS 10 | **€3.60** | Public-alpha flip |
-| **1 — Chat** | VPS 10 (same) or VPS 20 if tight | **€3.60–5.60** | Chat trigger (§4.6.3) |
-| **2 — Own AV** | VPS 20 upgrade or 2× VPS 10 | **€5.60–7.20** | Meeting trigger (§4.6.4) |
+| Phase | Contabo plan | Infra / month (itemized) | Public round figure | When |
+|-------|--------------|--------------------------|---------------------|------|
+| **0 — Alpha** | Cloud VPS 10 + Auto Backup + Object Storage (planned) | **€7.60** | **~€10** | Public-alpha flip |
+| **1 — Chat** | VPS 10 (same) or VPS 20 if tight | **€7.60–9.60** (VPS tier may change) | **~€10–12** | Chat trigger (§4.6.3) |
+| **2 — Own AV** | VPS 20 upgrade or 2× VPS 10 | **€9.60–14.40** | **~€12–18** | Meeting trigger (§4.6.4) |
 
-These figures assume the existing `umbraculum.dev` zone (no new domain purchase), free-tier SMTP, and Contabo auto backup (no separate off-site backup vendor at Phase 0). Sponsorship may expand capacity later; it does **not** change vote weight (§5.3).
+Phase 0 itemized breakdown: VPS €3.60 + Auto Backup €1.50 + Object Storage €2.50. Object Storage may be wired after bootstrap; it is still budgeted in the published ~€10 figure.
+
+These figures assume the existing `umbraculum.dev` zone (no new domain purchase) and free-tier Brevo SMTP. Sponsorship may expand capacity later; it does **not** change vote weight (§5.3).
 
 #### 4.6.6 Revisit
 

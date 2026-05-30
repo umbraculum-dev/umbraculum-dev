@@ -12,7 +12,7 @@
 
 ## 0. Before you start
 
-**Automated prep status (2026-05-30):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-dev-website`, `umbraculum-dev-docs-docusaurus`) ✅. **Remaining before §1:** donation channel accounts (2d).
+**Automated prep status (2026-05-30):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` / `finance@` mailboxes ✅; toolset `CODE_OF_CONDUCT.md` + `SECURITY.md` ✅; Cloudflare Workers (`umbraculum-dev-website`, `umbraculum-dev-docs-docusaurus`) ✅; forum infra docs + `infra/community-forum/` ✅; Contabo VPS 10 ordered ⏳ (awaiting activation). **Remaining before §1:** donation channel accounts (2d) ✅; forum live on VPS (maintainer).
 
 | Gate | Doc |
 |------|-----|
@@ -21,7 +21,7 @@
 | Contact mailboxes live | `security@`, `conduct@`, `finance@` on `umbraculum.dev` — ✅ 2026-05-30 ([`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md), [`donation-channels.md`](donation-channels.md) §3.0) |
 | Toolset parity | [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) — ✅ CoC + SECURITY (2026-05-30) |
 | Cloudflare projects created (can be pre-flip while repos still private — use preview URLs first) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) — ✅ Workers Builds (2026-05-30) |
-| Community forum ready (or scheduled same week as flip) | [`community-forum-runbook.md`](community-forum-runbook.md) |
+| Community forum ready (or scheduled same week as flip) | [`community-forum-runbook.md`](community-forum-runbook.md) — VPS ordered; complete §3.1 hardening → DNS → `./discourse-setup` → §7 before flip comms |
 
 ---
 
@@ -136,7 +136,7 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 ## 9. Post-flip smoke (15 min)
 
 - [ ] `GETTING-STARTED` clone + `docker compose up` path (or document known gaps)
-- [ ] `https://forum.umbraculum.dev/` live (or tracked in [`community-forum-runbook.md`](community-forum-runbook.md) §12 sign-off)
+- [ ] `https://forum.umbraculum.dev/` live — [`community-forum-runbook.md`](community-forum-runbook.md) §12 sign-off; §7 hardening complete
 - [ ] Pinned **How we communicate** topic in **Community policy** (§6.1 — runbook §6 item 5, §7.5)
 - [ ] `docs-readmes` + `docs-site-build` + `website-build` green on `master`
 - [ ] [`AGENTS.md`](../../AGENTS.md) apparatus path: marketplace-first install documented
