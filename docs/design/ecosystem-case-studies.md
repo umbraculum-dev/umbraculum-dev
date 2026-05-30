@@ -1,12 +1,20 @@
 # Ecosystem case studies — index
 
 **Tier:** Public  
-**Status:** v1.2 — Drupal + WordPress combined case study (2026-05-30)  
-**Audience:** contributors, platform evaluators, vertical builders, learners repositioning in hard times  
+**Status:** v1.3 — note for young community members (2026-05-30)  
+**Audience:** **young community members first**, then contributors, platform evaluators, vertical builders, learners repositioning in hard times  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.3, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.1–§2.2
 
 > [!NOTE]
 > These documents are **gratitude and lesson**, not product reviews. They record what our reference network **felt and observed** building on or adjacent to other ecosystems — so Umbraculum can name structural commitments (free try, public docs, no certification gate) without polemic.
+
+## For young community members
+
+**You are not supposed to already know why Umbraculum looks the way it does.** We wrote this series so you can see the **why** behind our initial structural choices — not from theory, but from **painful experience**: for some of us directly, for others watching friends and colleagues struggle when they should not have had to.
+
+We are not asking you to join a priesthood or wait three years before your questions count. We **are** asking you — also for your own good — to **try to understand us**: read the map below, open one or two studies that match your background, and meet us on **common ground**. The RFCs, public docs, and apparatus exist so you can ship **structurally similar** work without oral tradition ([`MANIFESTO.md`](../../MANIFESTO.md) §2.2).
+
+That is the strong point we keep coming back to: **horizontal accessibility** — no badge wall, no senior-contempt ritual. If something here does not land yet, say so in the forum; that feedback is part of the design ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4).
 
 ## What this series is about
 
