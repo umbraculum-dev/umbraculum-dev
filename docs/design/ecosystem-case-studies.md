@@ -1,7 +1,7 @@
 # Ecosystem case studies — index
 
 **Tier:** Public  
-**Status:** v1.1 — index for practitioner learnability narratives; Adobe → Magento case study (2026-05-29)  
+**Status:** v1.2 — Drupal + WordPress combined case study (2026-05-30)  
 **Audience:** contributors, platform evaluators, vertical builders, learners repositioning in hard times  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.3, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.1–§2.2
 
@@ -32,6 +32,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | [TeamSystem](ecosystem-case-study-teamsystem.md) | TeamSystem / Polyedro (Europe) | **Partner-only experiment path** — ecosystem is the vertical for outsiders | `docker compose up`; public modules |
 | [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder; **§4.1** platform-shape comparison (not feature scorecard) | Copy ladder, not badges |
 | [Adobe → Magento](ecosystem-case-study-adobe-magento.md) | Magento Open Source / Adobe stewardship | **Community lost through stewardship** — dev docs scattered/404, cert churn, **cloud integration pipelines failing**, trademark; **Mage-OS** as fork counter-case | AGPL + DCO; fork rights; no cert gate; **CI by default**; doc redirects |
+| [Drupal + WordPress](ecosystem-case-study-drupal-wordpress.md) | Drupal, WordPress | **Partial positive** — stewardship + community; **WordPress plugin hell** (auth); **Drupal core-scale debate unsettled** | RFC-0001 Decision F; canonical modules; community proposals; no junior contempt |
 
 **Pairings that help:**
 
@@ -39,7 +40,8 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 - **Business Central + SAP** — big ecosystems, hard entry (API maze vs trial maze).  
 - **Magento (MANIFESTO §2.2) + Odoo** — learnability ladders we respect.  
 - **Adobe → Magento + Omnis** — docs treated as disposable; Adobe also lost community through stewardship; Mage-OS proves fork path.  
-- **Adobe → Magento (LICENSING §5.2)** — community *lost* through stewardship (practitioner narrative: [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md)).
+- **Drupal + WordPress + Adobe → Magento** — stewardship contrast: WP/Drupal longevity vs Adobe collapse; shared PHP-era lessons.  
+- **Drupal + WordPress (RFC-0001)** — modularity yes; parallel auth hell no.
 
 ---
 
@@ -61,6 +63,8 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | Trademark enclosure after fork | Adobe → Magento → Mage-OS rename | Transparent trademark policy; AGPL fork rights | [`LICENSING.md`](../LICENSING.md) §8–§9 |
 | Cloud pipelines broken; official guidance to avoid integration | Adobe ece-tools deploy integration | **Public-repo CI by default** — not broken vendor deploy gate | [`ecosystem-case-study-adobe-magento.md`](ecosystem-case-study-adobe-magento.md) §3.5; [`TESTING.md`](../TESTING.md) |
 | Agency hidden integration cost vs Shopify | Adobe cloud commercial trap | **Integrator sustainability** (§2.1) | [`MANIFESTO.md`](../../MANIFESTO.md) §2.1 |
+| Parallel auth/session per module | WordPress plugin ecosystem | **Decision F consumption contract** | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2; [`ecosystem-case-study-drupal-wordpress.md`](ecosystem-case-study-drupal-wordpress.md) §4 |
+| Core PR volume vs small core dogma; senior contempt for juniors | Drupal-era PHP culture | **Open governance shape** — RFC canonical gate + permissionless modules + apparatus | [`ecosystem-case-study-drupal-wordpress.md`](ecosystem-case-study-drupal-wordpress.md) §3.2, §6; [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) |
 
 ---
 

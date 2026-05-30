@@ -185,8 +185,8 @@ License choices are easier to reason about with the benefit of hindsight from pr
 
 | Project | License | Revenue model | Team size | Lesson |
 |---|---|---|---|---|
-| **WordPress** | GPLv2 | Hosting (Automattic = WordPress.com), commercial themes/plugins, professional services | Foundation + Automattic large | A permissive *enough* copyleft that ecosystem flourished; brand and trademark held by the Foundation; community contribution > company control. |
-| **Drupal** | GPLv2+ | Hosting (Acquia), enterprise support, professional services | Foundation + Acquia | Similar shape to WordPress; commercial steward must continually re-earn community trust. |
+| **WordPress** | GPLv2 | Hosting (Automattic = WordPress.com), commercial themes/plugins, professional services | Foundation + Automattic large | A permissive *enough* copyleft that ecosystem flourished; brand and trademark held by the Foundation; community contribution > company control. Practitioner narrative: [`design/ecosystem-case-study-drupal-wordpress.md`](design/ecosystem-case-study-drupal-wordpress.md) §4. |
+| **Drupal** | GPLv2+ | Hosting (Acquia), enterprise support, professional services | Foundation + Acquia | Similar shape to WordPress; commercial steward must continually re-earn community trust. Modularity + core-contribution culture; **core-scale debate unsettled** — see [`design/ecosystem-case-study-drupal-wordpress.md`](design/ecosystem-case-study-drupal-wordpress.md) §3. |
 | **Plausible Analytics** | AGPLv3 | Hosting + self-host paid support | ≈4 people | **Bread-and-butter shape proven**: ~$3M ARR on AGPLv3 + cloud + no enterprise paywall on core. The clearest precedent for Umbraculum's economic target. |
 | **Cal.com** | AGPLv3 | Hosting + enterprise tier | ≈40 people, started smaller | AGPL did not deter enterprise adoption; the enterprise tier provides features that genuinely require operator support (SAML, audit logs, dedicated infrastructure). |
 | **Mautic** | GPLv3 | Hosting (Acquia after acquisition), services | Foundation + Acquia | Community survived ownership change; GPLv3 + governance held the line. |
