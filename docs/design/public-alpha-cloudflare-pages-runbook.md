@@ -89,7 +89,7 @@ RFC-0005 chose Cloudflare for docs (free tier, fast CNAME, no Actions deploy tok
 
 **At flip (Phase 2c):**
 
-- [ ] Both Workers created; verify preview URLs
+- [x] Both Workers created; verify preview URLs (2026-05-30 — maintainer smoke)
 - [ ] Point DNS / custom domains; wait for TLS active
 - [ ] Remove `noindex` / open `robots.txt` on both sites
 - [ ] Smoke: home → docs → GitHub → `GETTING-STARTED` on rendered docs
