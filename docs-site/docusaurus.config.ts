@@ -1,14 +1,9 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import {createRequire} from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
-
-const require = createRequire(import.meta.url);
-const {toDocusaurusAnnouncementBar} = require(
-  path.resolve(__dirname, '../apps/website/scripts/announcement-theme.mjs'),
-) as typeof import('../apps/website/scripts/announcement-theme.mjs');
+import {toDocusaurusAnnouncementBar} from '../apps/website/scripts/announcement-theme.mjs';
 
 const announcementConfig = JSON.parse(
   fs.readFileSync(
