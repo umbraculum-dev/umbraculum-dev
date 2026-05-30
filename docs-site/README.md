@@ -48,7 +48,7 @@ Cloudflare **Workers Builds** — second Worker project (after brochure is green
 
 | Dashboard field | Value |
 |-----------------|--------|
-| Project name | `umbraculum-dev-docs` (must match [`wrangler.toml`](wrangler.toml) `name`) |
+| Project name | `umbraculum-dev-docs-docusaurus` (must match [`wrangler.toml`](wrangler.toml) `name`) |
 | Build command | `npm ci && npm run build -w @umbraculum/docs-site` |
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production deploy | `npx wrangler versions upload --config docs-site/wrangler.toml` |

@@ -2,7 +2,7 @@
 # Project name in the dashboard MUST match `name` below.
 # Deploy: npx wrangler deploy --config docs-site/wrangler.toml
 
-name = "umbraculum-dev-docs"
+name = "umbraculum-dev-docs-docusaurus"
 compatibility_date = "2026-05-30"
 
 [assets]

@@ -61,7 +61,7 @@ Repeat **Create application** with the same repo; different project name and Wra
 
 | Field | Value |
 |-------|--------|
-| Project name | `umbraculum-dev-docs` |
+| Project name | `umbraculum-dev-docs-docusaurus` |
 | Build command | `npm ci && npm run build -w @umbraculum/docs-site` |
 | Deploy command | `npx wrangler deploy --config docs-site/wrangler.toml` |
 | Non-production branch deploy command | `npx wrangler versions upload --config docs-site/wrangler.toml` |
