@@ -1,7 +1,7 @@
 # Ecosystem case studies — index
 
 **Tier:** Public  
-**Status:** v1.3 — note for young community members (2026-05-30)  
+**Status:** v1.4 — modesty / hardship note for young community members (2026-05-30)  
 **Audience:** **young community members first**, then contributors, platform evaluators, vertical builders, learners repositioning in hard times  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.3, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.1–§2.2
 
@@ -15,6 +15,14 @@
 We are not asking you to join a priesthood or wait three years before your questions count. We **are** asking you — also for your own good — to **try to understand us**: read the map below, open one or two studies that match your background, and meet us on **common ground**. The RFCs, public docs, and apparatus exist so you can ship **structurally similar** work without oral tradition ([`MANIFESTO.md`](../../MANIFESTO.md) §2.2).
 
 That is the strong point we keep coming back to: **horizontal accessibility** — no badge wall, no senior-contempt ritual. If something here does not land yet, say so in the forum; that feedback is part of the design ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4).
+
+### Experience is not superiority — and we are not trying to recruit you
+
+The views in this series come from **years of striving** — wrong turns, repositioning when the market moved, spare-time learning when there was no spare time. That is why we write these lessons down. It does **not** mean we are smarter or better than peers who landed on paths that worked earlier. Some developers picked the right industry, stack, or employer on the **first or second try**. They have the houses, the cars, the family time. Many of us in this network do not. **Modesty is the point:** we are not asking you to admire that gap or to bet your life on closing it through Umbraculum.
+
+Umbraculum is **not** a lottery ticket. Projects like this that grow into something that funds the people who built them are **statistically scarce** — including ones with thoughtful manifestos and disciplined apparatuses. **We do not want to lure you here.** If you read on, contribute, or try the stack, do it with eyes open: **weigh time, money, and opportunity cost carefully.** **Do not let this project cause you hardship.** We say the same elsewhere on purpose ([`MANIFESTO.md`](../../MANIFESTO.md) addendum, 2026-05-20; [`GETTING-STARTED.md`](../GETTING-STARTED.md) §"Who this is for") — *we are offering a tool, not a future.*
+
+Even if Umbraculum succeeds beyond our current hopes, most of us will still pay the bills with **legacy projects and legacy code** — the work clients already fund, the stacks we already know. That is normal, not failure. Learn here if the work itself is worth it on its own terms; do not contribute on the strength of an upside that statistics say is scarce.
 
 ## What this series is about
 
