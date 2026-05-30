@@ -1,7 +1,7 @@
 # Ecosystem case study — Adobe stewardship of Magento Open Source and Mage-OS
 
 **Tier:** Public  
-**Status:** v1.1 — §3.5 cloud verticality, integration pipelines, CI-by-default counter-commitment (2026-05-29)  
+**Status:** v1.2 — §3.5 third-party modules vs cloud CI (ece-tools stance); always-green CI policy (2026-05-29)  
 **Audience:** contributors, platform evaluators, integrators, future maintainers reasoning about why **license + governance + docs + fork rights** are a single decision  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.1–§2.2, [`LICENSING.md`](../LICENSING.md) §5.2–§5.3, §9, [`design/ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md) §3.5 (doc-site fragility — different vendor, same felt outcome), [`design/ecosystem-case-studies.md`](ecosystem-case-studies.md)
 
@@ -29,7 +29,7 @@ We are **not** claiming Magento 1 was technically perfect. We **are** claiming:
 |-----------|----------------------------------------------------------------|
 | **Platform** | Magento Open Source (Community) + Adobe Commerce (Enterprise); PHP ecosystem; enormous extension and agency economy pre-acquisition |
 | **What worked (pre-Adobe / still true in memory)** | Livelihood for agencies and module vendors; **Magento 1 learnability ladder** ([`MANIFESTO.md`](../../MANIFESTO.md) §2.2); portable PHP/SQL skills; visible community |
-| **What failed under Adobe stewardship** | Developer relationship deprioritized; **dev docs scattered and broken**; merchant-first messaging; **Experience League** without a clear developer doc tree; **certification churn** (expiring credentials, renewal deadlines) while M2 raised the bar; **cloud verticality** — integrations and CI/CD pipelines failing on Adobe Commerce Cloud with **official guidance to avoid integration**; agencies **skipping pipeline work entirely**; ambiguous Open Source roadmap; contribution doors closed; trademark pressure on the **Magento** name |
+| **What failed under Adobe stewardship** | Developer relationship deprioritized; **dev docs scattered and broken**; merchant-first messaging; **Experience League** without a clear developer doc tree; **certification churn** (expiring credentials, renewal deadlines) while M2 raised the bar; **cloud verticality** — integrations and CI/CD pipelines failing on Adobe Commerce Cloud with **official guidance to avoid integration**; **ece-tools / cloud CI** breaking on real merchant stacks (third-party modules) while Adobe core maintains **"we do not support third-party modules"**; agencies **skipping pipeline work entirely**; ambiguous Open Source roadmap; contribution doors closed; trademark pressure on the **Magento** name |
 | **Positive counter-case** | **[Mage-OS](https://mage-os.org/)** (2022+) — community fork; safe boat preserved because **forking was legal** and leaders refused to accept developer extinction |
 | **Umbraculum lesson** | AGPL + DCO + **fork-friendly governance**; developer docs first-class; **no certification program**; **redirect or explained removal** on doc moves; **CI embedded by default** for integrators; livelihood sustainability for the whole ecosystem — see §5 |
 
@@ -117,15 +117,20 @@ What we watched:
 - **Cloud pipeline integrations failed in practice** — build/deploy hooks, extension packaging, environment promotion, and third-party tooling that agencies had relied on in self-hosted or simpler hosting models **did not behave reliably** on the cloud path Adobe was selling.  
 - **Failures persisted without credible vendor fixes** — not one bad quarter; a pattern where integrators filed tickets, reproduced issues, and waited while **official priority stayed on Commerce upsell**, not on making the integration path shippable.  
 - **Agencies stopped trying** — teams that had built careers on **repeatable integration and release discipline** began **skipping Adobe's pipeline story entirely**: manual deploys, alternative hosts, or walking away from cloud-shaped RFPs. That is rational when the **official path costs more than it saves**.  
-- **Official guidance crossed into "don't use it"** — in our experience, **product owners and support threads on official tickets** advised customers and partners **not to rely on integration features** that remained marketed on slides. When the steward tells you, in writing, to **avoid the integration surface**, the product is **faulty by design** for builders — not merely "immature."
+- **Official guidance crossed into "don't use it"** — in our experience, **product owners and support threads on official tickets** advised customers and partners **not to rely on integration features** that remained marketed on slides. When the steward tells you, in writing, to **avoid the integration surface**, the product is **faulty by design** for builders — not merely "immature."  
+- **Cloud CI vs the extension economy — the ece-tools stance** — Adobe Commerce Cloud deployment tooling (**ece-tools** and the surrounding pipeline story) **breaks in practice** when merchants run **third-party modules** — which is **every serious Magento site**. The community position, consistently, has been practical: *we must be able to configure cloud CI so pipelines run with the modules the merchant actually has*. Adobe's official answer from core engineering, in our experience, reduced to **"we do not support third-party modules"** on that path. Any developer who has shipped Magento knows that sentence is **untrue as a description of the product** and **nonsense as a delivery policy**: the platform's business model **is** extensions; agencies **live** on them; pretending CI can ignore them is **faulty by design**. When cloud CI is red on realistic stacks and the vendor normalises it with **unsupported third-party** hand-waving, integrators learn to **treat CI as theatre** — which **hides the next bug** behind noise you are told to ignore.
 
 This is a different angle from **Omnis** (ecosystem never formed) but the **livelihood rhyme** is the same: specialists who invested in **automated, testable delivery** were told the vendor's vertical stack mattered more than **their ability to ship safely for clients**.
 
 **Contrast with pre-Adobe Magento 1:** ugly, yes — but agencies could **own the pipeline** (rsync, Jenkins, Capistrano-era habits, later GitHub Actions on self-hosted PHP). The **integration contract** was imperfect yet **usable**. Adobe-era verticality **removed that ownership** without replacing it with something trustworthy.
 
-**Umbraculum's counter-commitment — CI embedded by default:**
+**Umbraculum's counter-commitment — CI embedded by default, and CI must stay green:**
 
-Integrators and module authors should not need a **partner badge** or a **vendor cloud subscription** to prove a change is safe. The repo ships **CI as infrastructure**, not as an optional professional-services upsell:
+Integrators and module authors should not need a **partner badge** or a **vendor cloud subscription** to prove a change is safe. The repo ships **CI as infrastructure**, not as an optional professional-services upsell.
+
+**There is no acceptable case where "testing not working" is fine.** If a scenario is hard to test, we **change the test design** — fixtures, boundaries, fakes, narrower scope — until the layer is reliable again. We do **not** leave jobs red with "it's OK if this fails" disclaimers: tolerated failure **masks unrelated regressions** and trains everyone to ignore the signal. [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §"CI must pass" is not decorative.
+
+**Third-party modules are not an edge case here.** Umbraculum's module tiers ([`MODULES.md`](../MODULES.md)) assume **permissionless Tier 3/6 work** alongside canonical modules. CI that only passes on a **vendor-pure** tree would be as absurd as Adobe's ece-tools stance — and as useless to agencies shipping real customer stacks.
 
 | Layer | What it guards | Where (starting points) |
 |-------|----------------|---------------------------|
@@ -137,7 +142,7 @@ Integrators and module authors should not need a **partner badge** or a **vendor
 
 See [`TESTING.md`](../TESTING.md) for the full layer model. **Tests follow changes** is workflow policy, not oral tradition ([`CONTRIBUTING.md`](../../CONTRIBUTING.md)). The **umbraculum-toolset** apparatus encodes the same shape for AI-assisted contributors — structurally similar code across teams, not hero debugging in production.
 
-We are not claiming Umbraculum's CI is finished or flawless. We claim **integrator-grade verification belongs in the public repo by default** — the opposite of a steward who markets pipelines, breaks them, and then advises you **not to integrate**.
+We are not claiming Umbraculum's CI is finished or flawless. We claim **integrator-grade verification belongs in the public repo by default**, **must pass on merge**, and **must reflect realistic module composition** — the opposite of a steward who markets pipelines, breaks them on extension-heavy merchants, and then advises you **not to integrate** or **not to support third-party modules**.
 
 [`MANIFESTO.md`](../../MANIFESTO.md) §2.2: the project will not narrow to "deep stack only" while treating **repeatable delivery** as someone else's problem.
 
@@ -177,9 +182,10 @@ Each Adobe → Magento failure mode maps to a **non-optional** commitment — wi
 | Trademark enclosure after fork | **Fork rights + transparent trademark policy** | AGPLv3; [`LICENSING.md`](../LICENSING.md) §8–§9; no hostile rename of community identity |
 | Livelihood uncertainty for integrators | **Sustainability for whole ecosystem** | [`MANIFESTO.md`](../../MANIFESTO.md) §2.1; MIT SDK for module businesses; no enterprise paywall on core ([`LICENSING.md`](../LICENSING.md) §9 #2) |
 | Open-core / CE hostage (Adobe Commerce shadow) | **No closed-source replacement of public modules** | [`LICENSING.md`](../LICENSING.md) §9 #1 |
-| Cloud pipeline integrations failing; official "don't use integration" guidance | **CI embedded by default** — integrator verification in public repo | [`TESTING.md`](../TESTING.md); [`.github/workflows/`](../../.github/workflows/); [`CI-PARITY.md`](../CI-PARITY.md) |
+| Cloud pipeline integrations failing; official "don't use integration" guidance | **CI embedded by default** — always green; no tolerated failures | [`TESTING.md`](../TESTING.md); [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §"CI must pass"; [`.github/workflows/`](../../.github/workflows/); [`CI-PARITY.md`](../CI-PARITY.md) |
+| Cloud CI red on third-party modules; "we do not support third-party modules" | **CI must reflect real module ecosystem** — fix tests/fixtures, not ignore red | [`MODULES.md`](../MODULES.md) Tier 3/6; permissionless modules; RFC-0001 canonical-domain discipline |
 
-**What we still do not copy from Adobe-era Magento:** ambiguous Open Source roadmap as a sales tool; certification as the primary trust signal; documentation reorganisation without migration discipline; **vertical cloud stacks that break integrator pipelines while official channels advise avoiding integration**.
+**What we still do not copy from Adobe-era Magento:** ambiguous Open Source roadmap as a sales tool; certification as the primary trust signal; documentation reorganisation without migration discipline; **vertical cloud stacks that break integrator pipelines while official channels advise avoiding integration**; **cloud CI that fails on third-party modules while core engineering disclaims the extension economy**.
 
 **What we do copy from pre-Adobe Magento:** the **safe boat** shape — tryable stack, visible community, employment path for willing learners, **agency-owned delivery discipline** — combined with Omnis-grade ERP discipline where operational software demands it.
 
@@ -194,6 +200,7 @@ The lesson transferred to Umbraculum is **not** "avoid ecommerce." It is:
 - **Stewardship is part of the product** for anyone whose income depends on the stack.  
 - **Documentation and fork rights are livelihood infrastructure.**  
 - **Repeatable CI/CD for integrators is not optional marketing** — when official pipelines fail and support says "don't integrate," agencies cannot feed families on slide decks.  
+- **Red CI is never "fine"** — tolerated failures hide the next regression; third-party modules are the normal case, not an excuse.  
 - **Mage-OS is the proof** that communities can survive bad stewardship when the license allows it — but **preventing that crisis** is better than heroically surviving it.
 
 ---
