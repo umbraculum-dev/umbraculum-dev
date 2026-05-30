@@ -4,18 +4,11 @@ We take the security of this project seriously. This document explains
 how to responsibly disclose vulnerabilities, what is in scope, and what
 to expect from us in return.
 
-> [!NOTE]
-> The contact address below is a placeholder pending the project's
-> public domain rollout. This contact will be replaced with a real,
-> monitored mailbox at `umbraculum.dev` before this
-> repository is flipped to a public-facing release (see
-> `docs/PLATFORM-ARCHITECTURE.md` §10.1 for the go-public path).
-
 ## Reporting a vulnerability
 
 Please report security issues privately to:
 
-- **Email:** `security@umbraculum.dev` *(placeholder mailbox; to be created before the public flip — see [`docs/PLATFORM-ARCHITECTURE.md`](./docs/PLATFORM-ARCHITECTURE.md) §10.1.1 pre-flip checklist)*
+- **Email:** `security@umbraculum.dev` (monitored; routed via Cloudflare Email Routing on `umbraculum.dev`)
 
 If you prefer encrypted email, request our PGP key in your initial
 message and we will send it before any sensitive details are exchanged.
@@ -47,8 +40,7 @@ with you on a coordinated disclosure date.
   You may also choose to remain anonymous.
 
 If you do not hear back within the acknowledgement window above, please
-re-send your report — it is possible (especially during the placeholder
-phase) that the inbox was misconfigured.
+re-send your report in case it was filtered or misdelivered.
 
 ## Scope
 

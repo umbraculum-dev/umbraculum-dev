@@ -12,13 +12,13 @@
 
 ## 0. Before you start
 
-**Automated prep status (2026-05-29):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅. **Remaining before §1:** toolset `CODE_OF_CONDUCT.md` + `SECURITY.md`, live `security@` / `conduct@` mailboxes, Cloudflare Pages projects, donation channel accounts (2d).
+**Automated prep status (2026-05-30):** Stage 0 org transfer ✅; brochure + docs-site in-repo ✅; CI workflows green ✅; MIT npm SDK batch published ✅; hygiene automated checks ✅; live `security@` / `conduct@` mailboxes ✅ (Cloudflare Email Routing; [`SECURITY.md`](../../SECURITY.md) + [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md) updated). **Remaining before §1:** toolset `CODE_OF_CONDUCT.md` + `SECURITY.md`, Cloudflare Pages projects, donation channel accounts (2d).
 
 | Gate | Doc |
 |------|-----|
 | Stage 1 hygiene signed off | [`public-alpha-preflip-hygiene-checklist.md`](public-alpha-preflip-hygiene-checklist.md) §7 |
 | **Donation channel accounts live** | [`donation-channels.md`](donation-channels.md) §3 + §8 — **roadmap Phase 2 `2d`** (before removing `noindex`) |
-| Contact mailboxes live | `security@umbraculum.dev`, `conduct@umbraculum.dev` — update [`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md) |
+| Contact mailboxes live | `security@umbraculum.dev`, `conduct@umbraculum.dev` — ✅ 2026-05-30 ([`SECURITY.md`](../../SECURITY.md), [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md)) |
 | Toolset parity | [`toolset-preflip-hygiene-audit-2026-05-27.md`](toolset-preflip-hygiene-audit-2026-05-27.md) gaps closed |
 | Cloudflare projects created (can be pre-flip while repos still private — use preview URLs first) | [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md) |
 | Community forum ready (or scheduled same week as flip) | [`community-forum-runbook.md`](community-forum-runbook.md) |
