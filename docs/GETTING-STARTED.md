@@ -42,6 +42,13 @@ vertical, omit the brewery reference, and the Magento sample-data parallel.
   case studies under [`docs/design/`](design/) (especially
   [`ecosystem-case-study-sap.md`](design/ecosystem-case-study-sap.md) and
   [`ecosystem-case-study-odoo.md`](design/ecosystem-case-study-odoo.md)).
+- A **student, capstone team, or university lab** building a prototype or
+  portfolio app at **no cost for self-host experimentation** — capstones,
+  coursework, hackathons, research demos. Public alpha is aimed at this
+  audience as much as at production integrators; see
+  [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md) for
+  what free means, suggested project shapes, alpha expectations, and an
+  honest fit filter.
 
 **Third-party module authors:** MIT SDK packages are on npm — `@umbraculum/ai-tool-sdk@0.1.1`, `@umbraculum/i18n-keys@0.1.1`, `@umbraculum/module-sdk@0.0.2`, and `@umbraculum/*-contracts@0.0.2` (automation, pim, mrp, crp). See [`third-party-module.md`](modules/contribute/third-party-module.md).
 

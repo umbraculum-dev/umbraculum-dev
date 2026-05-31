@@ -34,6 +34,8 @@ The positive anchor in our network is **Magento** (especially 1.x / Open Source)
 
 Umbraculum's line: **this makes learning possible for the ones who are willing to do so** — *this is the stack, try it.* You do not need a customer's vertical to grasp the platform.
 
+**Students and university labs** — free self-host experimentation, capstone-friendly project shapes, and an honest fit filter vs production ERP: [`ACADEMIC-AND-EXPERIMENTATION.md`](../ACADEMIC-AND-EXPERIMENTATION.md) (also linked from the [brochure](https://umbraculum.dev/)).
+
 **Bright side for vertical builders:** public try paths let **domain experts knock on your door** with real expertise. In our experience, five minutes of technical conversation beats a certification wall. Umbraculum does **not** operate a certification program ([`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md) §"No certification track").
 
 ---

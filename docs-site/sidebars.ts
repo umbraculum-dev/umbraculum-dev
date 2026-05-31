@@ -17,6 +17,7 @@ const sidebars: SidebarsConfig = {
       label: 'Start here',
       collapsed: false,
       items: [
+        'ACADEMIC-AND-EXPERIMENTATION',
         'PLATFORM-ARCHITECTURE',
         'ROADMAP',
         'LICENSING',

@@ -27,6 +27,8 @@ Today we are opening the **Umbraculum** monorepo and the **umbraculum-toolset** 
 - **Is:** source visibility, contributor docs at [docs.umbraculum.dev](https://docs.umbraculum.dev), MIT SDK packages on npm ([`LICENSING.md`](LICENSING.md) §6.2.1), local-install or marketplace Cursor plugins, a self-build path (`docker compose up`), and a **committed partial OpenAPI catalog** — platform spec plus optional brewery add-on ([`API-OPENAPI.md`](API-OPENAPI.md)).
 - **Is not:** hosted-service GA, feature-complete ERP, or a promise that every module is production-ready. MRP/CRP ship as a **read-only alpha proof**; write workflows land in H1 2027.
 
+**Students and university experimentation.** Clone, self-host, and build Tier 6 vertical prototypes in your own repo at **no platform fee** for learning — capstones, labs, portfolio work. Alpha depth is acceptable when the goal is to learn the stack, not to replace production ERP next quarter. See [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md) for free-vs-paid boundaries, suggested projects, and a fit filter.
+
 **Licensing (read this before you fork).**
 
 - **AGPLv3** — monorepo core (API, web app, modules, database schemas).
@@ -54,6 +56,7 @@ No CLA. Contributions use **DCO sign-off** only ([`CONTRIBUTING.md`](../CONTRIBU
 | Brochure | `https://umbraculum.dev` |
 | Community forum | `https://forum.umbraculum.dev` |
 | Open-source stack recap | [`OPEN-SOURCE-STACK.md`](OPEN-SOURCE-STACK.md) |
+| Students & university labs | [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md) |
 | Security | [`SECURITY.md`](../SECURITY.md) |
 
 **Maintainer sign-off:** [Name] · [Date] · [Contact]

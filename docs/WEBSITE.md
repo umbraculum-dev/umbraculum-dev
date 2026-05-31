@@ -12,7 +12,7 @@ Umbraculum publishes **two static HTML surfaces**, both built from this monorepo
 
 | Surface | Domain | Workspace | Role |
 |---------|--------|-----------|------|
-| **Brochure** | `umbraculum.dev` | [`apps/website/`](../apps/website/) | Modest entry point — positioning, links to docs + GitHub + support |
+| **Brochure** | `umbraculum.dev` | [`apps/website/`](../apps/website/) | Modest entry point — positioning, student/lab experimentation, fit filter, links to docs + GitHub + support |
 | **Docs** | `docs.umbraculum.dev` | [`docs-site/`](../docs-site/) | Full `Tier: Public` doc set + module READMEs ([RFC-0005](rfcs/0005-docs-site.md)) |
 
 **Not in scope here:** the product app (`apps/web`), API (`services/api`), or forum (`forum.umbraculum.dev`).
@@ -26,6 +26,7 @@ Umbraculum publishes **two static HTML surfaces**, both built from this monorepo
 - **Workspace README:** [`apps/website/README.md`](../apps/website/README.md).
 - **CI:** [`.github/workflows/website-build.yml`](../.github/workflows/website-build.yml) — build validation only; deploy is Cloudflare-connected on merge after flip.
 - **Pre-flip SEO:** `noindex` meta + `robots.txt` disallow until public-alpha cutover ([`design/public-alpha-flip-day-runbook.md`](design/public-alpha-flip-day-runbook.md) §3.1).
+- **Audience entry:** [`public/index.html`](../apps/website/public/index.html) sections *Students & university labs* and *Is this for you?* filter visitors before docs; deep guide: [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md).
 
 ### Shared announcement bar
 

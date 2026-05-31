@@ -19,6 +19,8 @@ If you are new to the project, read these documents in order:
 2. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
 3. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
 
+**Student, capstone team, or university lab?** [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md) — free self-host experimentation, suggested project shapes, alpha expectations, and an honest fit filter (brochure entry point links here).
+
 **Building product X on Umbraculum (vertical ISV / integrator, not core contributor)?** [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) — start your vertical, omit brewery, Magento sample-data parallel.
 
 Cross-platform (web + native + Ubuntu Touch webapp shell) boundaries: [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md), [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md). The brewery reference vertical's product rules: [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md). Together they complement the platform-wide perspective above.
@@ -190,6 +192,7 @@ Brewery-specific modeling, data formats, and analytical models.
 
 Day-to-day engineering conventions and runbooks.
 
+- [`ACADEMIC-AND-EXPERIMENTATION.md`](ACADEMIC-AND-EXPERIMENTATION.md) — **Students and university labs.** Free self-host experimentation, capstone-friendly project shapes, alpha expectations, fit filter vs production ERP.
 - [`GETTING-STARTED.md`](GETTING-STARTED.md) — **First-time contributor tutorial.** Linear walkthrough from "Ubuntu laptop, nothing installed" to "first commit landing with the apparatus running". Targets the [`MANIFESTO.md`](../MANIFESTO.md) §1.4 gap directly. Read this if you have never opened the repo before.
 - [`FOUNDATION-HARDENING.md`](FOUNDATION-HARDENING.md) — Synthesis layer for the four-slice foundation-hardening pass (lint + types + tests + docs) plus the orthogonal validation axis. Single entry point for the bird's-eye narrative; per-slice docs below remain the sources of truth. Includes the plugin-pack handoff manifest (slice → rule/skill/subagent mapping).
 - [`CODING-STANDARDS.md`](CODING-STANDARDS.md) — Coding standards (TypeScript, conventions, file layout).
