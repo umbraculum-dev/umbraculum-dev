@@ -9,6 +9,7 @@ This roadmap captures the agreed “direction of travel” for the product so im
 - Platform vision (horizontal-platform-with-vertical-modules + AI consultant + add-on pricing): `docs/PLATFORM-ARCHITECTURE.md`
 - Licensing posture and rationale (AGPLv3 core + MIT SDK + commercial dual license): `docs/LICENSING.md`
 - Cross-platform boundaries: `docs/CROSS-PLATFORM-BOUNDARIES.md`
+- Ubuntu Touch operator shell: `docs/design/ubuntu-touch-shell-strategy.md`
 - Brewery-vertical implementation log: `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`
 - Accessibility hard constraint: `docs/DEVELOPMENT-ACCESSIBILITY.md`
 - Seed data sources + licensing notes: `docs/modules/verticals/brewery/RAW-MATERIALS-SEEDABLE-SOURCES.md`
@@ -187,6 +188,7 @@ Goal: validate the "modules expand by config and SDK, not by core rewrite" promi
 
 - **Project values are versioned alongside the architecture.** [`MANIFESTO.md`](../MANIFESTO.md) carries the explicit commitments — Total Quality with capital Q (§1.1), AI-orchestrated code as discipline (§1.2), sustainability for the *whole ecosystem* (§2.1), horizontal accessibility (§2.2), and the §3 human-values commitments (empathy, family-friendly schedules, welcomed unionism, explicit inclusivity). The roadmap milestones below are how those commitments land in calendar time; the manifesto is why the milestones are shaped the way they are. The public flip (§10.1.1) is the manifesto's first public-launch occasion.
 - **Web-first for the heavy desktop workflows.** Native apps exist only where workflows are intrinsically mobile (offline operation, BLE, scanning, push notifications, on-the-floor input).
+- **Ubuntu Touch via webapp shell, not Qt rewrite.** Operator UI on Lomiri reuses `apps/web` + Tamagui inside a Click webapp package; online-first on UT; store presence via OpenStore. Sacrifices native-slice offline on UT in exchange for fast cross-shell React delivery — [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md).
 - **One audience per app.** Workspace-member modules share one shell. Shopper-facing surfaces (if any) are separate apps.
 - **AI consultant is the cross-module connective tissue.** The architectural and economic case for one shell over a "myriad of apps" rests on the AI seeing all modules in one workspace context.
 - **No retroactive license changes.** Anything committed under AGPLv3 stays AGPLv3 (`docs/LICENSING.md` §9–10).

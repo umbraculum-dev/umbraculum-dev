@@ -5,7 +5,8 @@
 **Audience:** contributors working on the brewery reference vertical (recipes, brew-day, water, inventory-shaped routes).
 
 > **Not platform architecture.** Read [`PLATFORM-ARCHITECTURE.md`](../../../PLATFORM-ARCHITECTURE.md) for vision, canonical modules vs vertical configurations, AI consultant, and monetization.  
-> **Cross-platform boundaries** (route IDs, `useT`, api-client auth, webview bridge, DB routing): [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md).
+> **Cross-platform boundaries** (route IDs, `useT`, api-client auth, webview bridge, DB routing): [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md).  
+> **Ubuntu Touch** (webapp shell, online-first, no native brew-day offline): [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md).
 
 Brewery is a **tier-6 vertical configuration**, not a canonical module — see [`README.md`](README.md) and [RFC-0001](../../../rfcs/0001-modules-tiers-governance-and-automation-placement.md).
 
@@ -247,6 +248,7 @@ Add `data-testid` to workflow-critical controls (save/delete/sync, key fields, n
 | Topic | Doc |
 |-------|-----|
 | Vertical overview | [`README.md`](README.md) |
+| Ubuntu Touch (web workflows only; no offline brew-day) | [`../../../design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md) |
 | BeerJSON | [`BEERJSON-FIRST.md`](BEERJSON-FIRST.md) |
 | Water chemistry | [`WATER-CHEM-MASH-PH-MODEL.md`](WATER-CHEM-MASH-PH-MODEL.md) |
 | Equipment / gravity | [`EQUIPMENT-AND-GRAVITY-ANALYSIS.md`](EQUIPMENT-AND-GRAVITY-ANALYSIS.md) |

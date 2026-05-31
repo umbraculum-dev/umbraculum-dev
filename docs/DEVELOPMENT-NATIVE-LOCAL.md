@@ -2,7 +2,7 @@
 
 > **Path convention:** `$REPO_ROOT` is your monorepo clone (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)). Example: `export REPO_ROOT=~/src/umbraculum-dev`.
 
-For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`. The same dependency check runs in CI: `.github/workflows/native-deps.yml`.
+For **strategy** (risk posture, Expo Go vs long-term dev client, Mac-free constraints, optional CI philosophy): see `docs/NATIVE-STRATEGY-AND-CI.md`. **Ubuntu Touch** is not covered here — it uses the web app in a Lomiri Click webapp shell ([`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md)). The same dependency check runs in CI: `.github/workflows/native-deps.yml`.
 
 ## Prerequisites
 

@@ -73,6 +73,7 @@ Accepted RFCs are not self-contained implementation manuals. Each RFC commits *w
 | **Horizontal surface doc** | As-built for platform extension points spanning modules | Horizontal RFCs with `register*` slots | [`canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md), [`canonical-notifications-outbound-delivery-surface.md`](../design/canonical-notifications-outbound-delivery-surface.md) |
 | **Execution plan** | Composer/human operational breakdown | Large RFC execution (optional) | [`rfc-0005-execution-plan.md`](../design/rfc-0005-execution-plan.md) |
 | **Decision / audit record** | Narrow amendment + bundled work | Amendments, audits | [`web-route-group-audit.md`](../design/web-route-group-audit.md) |
+| **Operator shell strategy** | Cross-platform delivery decision (non-RFC) | Platform surfaces beyond web + Expo native | [`ubuntu-touch-shell-strategy.md`](../design/ubuntu-touch-shell-strategy.md); reference Click package [`umbraculum-reference/`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) |
 | **Build log** | Wave execution record | Multi-phase feature waves | `mrp-crp-wave-*-build-log.md` |
 | **Package README** | Workspace consumer surface | Every `packages/*` | Enforced by `scripts/docs/check-readmes.py` |
 
@@ -118,6 +119,7 @@ RFCs record **governance commitments**. Implementations and operators rely on a 
 | **Horizontal surface doc** | As-built for platform extension points spanning modules | Horizontal RFCs with `register*` slots | [`canonical-document-rendering-surface.md`](../design/canonical-document-rendering-surface.md), [`canonical-notifications-outbound-delivery-surface.md`](../design/canonical-notifications-outbound-delivery-surface.md) |
 | **Execution plan** | Composer/human operational breakdown | Large RFC execution (optional) | [`rfc-0005-execution-plan.md`](../design/rfc-0005-execution-plan.md) |
 | **Decision / audit record** | Narrow amendment + bundled work | Amendments, audits | [`web-route-group-audit.md`](../design/web-route-group-audit.md) |
+| **Operator shell strategy** | Cross-platform delivery decision (non-RFC) | Platform surfaces beyond web + Expo native | [`ubuntu-touch-shell-strategy.md`](../design/ubuntu-touch-shell-strategy.md); reference Click package [`umbraculum-reference/`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) |
 | **Build log** | Wave execution record | Multi-phase feature waves | `mrp-crp-wave-*-build-log.md` |
 | **Package README** | Workspace consumer surface | Every `packages/*` | Enforced by `scripts/docs/check-readmes.py` |
 

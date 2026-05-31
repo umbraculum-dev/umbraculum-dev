@@ -61,5 +61,6 @@ Stable for the brewery vertical's current route surface. Adding a new route is a
 ## Further reading
 
 - [`docs/CROSS-PLATFORM-BOUNDARIES.md`](../../docs/CROSS-PLATFORM-BOUNDARIES.md) — cross-platform navigation policy (route IDs, porting, webview whitelist)
+- [`docs/design/ubuntu-touch-shell-strategy.md`](../../docs/design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch uses web URLs / route IDs; `AppPlatform` is `"web" | "native"` today
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision and module boundaries
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

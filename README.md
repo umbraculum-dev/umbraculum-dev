@@ -112,6 +112,8 @@ docs/          Public-facing docs (this is what ships to consumers)
 internal/      Internal-only strategy + business docs (excluded from
                  the public mirror when the repo flips public)
 scripts/       One-shot maintenance + container build scripts
+packaging/     Distribution adapters (e.g. Ubuntu Touch Click webapp —
+                 see packaging/ubuntu-touch/umbraculum-reference/)
 .cursor/       AI agent rules + skills for in-repo coding workflows
 ```
 
@@ -184,6 +186,9 @@ entry points:
   integration / contract / E2E) and per-language conventions.
 - [`docs/NATIVE-STRATEGY-AND-CI.md`](docs/NATIVE-STRATEGY-AND-CI.md) —
   native app build + CI strategy.
+- [`docs/design/ubuntu-touch-shell-strategy.md`](docs/design/ubuntu-touch-shell-strategy.md) —
+  Ubuntu Touch webapp shell (reuses `apps/web`; reference Click package under
+  [`packaging/ubuntu-touch/umbraculum-reference/`](packaging/ubuntu-touch/umbraculum-reference/README.md)).
 
 ## License
 

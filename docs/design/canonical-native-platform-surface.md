@@ -4,7 +4,7 @@
 **Status:** As-built 2026-05-27; July 2026 brewery alpha scope committed  
 **Audience:** native app maintainers, vertical/module authors, mobile-first adopters, plan executors  
 **Resolves:** operational companion to [RFC-0002](../rfcs/0002-canonical-module-physical-layout.md) native slice, [PLATFORM-ARCHITECTURE.md](../PLATFORM-ARCHITECTURE.md) §1.1 cross-platform commitment  
-**Builds on:** [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md), [NATIVE-STRATEGY-AND-CI.md](../NATIVE-STRATEGY-AND-CI.md), [AUTH-STRATEGY.md](../AUTH-STRATEGY.md), [canonical-document-rendering-surface.md](canonical-document-rendering-surface.md)
+**Builds on:** [DEVELOPMENT-NATIVE-LOCAL.md](../DEVELOPMENT-NATIVE-LOCAL.md), [NATIVE-STRATEGY-AND-CI.md](../NATIVE-STRATEGY-AND-CI.md), [AUTH-STRATEGY.md](../AUTH-STRATEGY.md), [ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md), [canonical-document-rendering-surface.md](canonical-document-rendering-surface.md)
 
 > **Disclaimer.** This is the single source of truth for what native ships today, platform obligations for native consumers, route availability, July 2026 alpha boundaries, and post-alpha gates. RFC-0002 commits the β native slice shape; this doc tracks as-built behavior and known debt.
 
@@ -100,6 +100,10 @@ Extend via `WEBVIEW_WHITELIST_ROUTE_IDS` in navigation (product decision per rou
 | other | `quality`, `login` (native has own login stack) |
 
 Callers MUST check `getRouteAvailability` before `routeToNativeTarget` — web-only IDs throw if gated incorrectly.
+
+### 3.4 Ubuntu Touch (webapp shell — not this doc)
+
+iOS/Android obligations in §3–§4 apply to **`apps/native` (Expo)** only. **Ubuntu Touch** reuses the **web slice** in a Lomiri Click webapp (`webapp-container` + Morph); route availability follows **web**, not native. Native-only brew-day screens and offline SQLite do **not** ship on UT. Decision-of-record: [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md).
 
 ---
 
@@ -211,6 +215,7 @@ When WMS surface design lands: [`apps/native/src/modules/wms/README.md`](../../a
 - [demo-host-runbook.md](demo-host-runbook.md) — **`demo.umbraculum.dev`** policy and demo accounts  
 - [cloud-hosted-product-track.md](cloud-hosted-product-track.md) — future **`cloud.umbraculum.dev`** (not demo)  
 - [native-eas-demo-build-log.md](native-eas-demo-build-log.md) — EAS build + smoke status  
+- [ubuntu-touch-shell-strategy.md](ubuntu-touch-shell-strategy.md) — UT webapp shell (orthogonal to native slice)  
 - [canonical-mrp-module-surface.md](canonical-mrp-module-surface.md) / [canonical-crp-module-surface.md](canonical-crp-module-surface.md) — web-first planning  
 - [mrp-crp-alpha-demo-walkthrough.md](mrp-crp-alpha-demo-walkthrough.md) — browser walkthrough on demo host  
 - [modules/verticals/brewery/README.md](../modules/verticals/brewery/README.md) §3.3  

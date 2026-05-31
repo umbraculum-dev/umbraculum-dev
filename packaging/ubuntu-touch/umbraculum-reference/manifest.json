@@ -1,0 +1,12 @@
+{
+  "name": "umbraculum-operator",
+  "title": "Umbraculum",
+  "description": "Umbraculum operator shell — webapp wrapper for apps/web (Tamagui). Online-first; see docs/design/ubuntu-touch-shell-strategy.md.",
+  "version": "0.1.0",
+  "maintainer": "Umbraculum Contributors <https://umbraculum.dev>",
+  "architecture": ["all"],
+  "framework": "ubuntu-sdk-16.04",
+  "hooks": {
+    "apparmor": "umbraculum.apparmor.json"
+  }
+}

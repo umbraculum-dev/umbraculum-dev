@@ -6,6 +6,8 @@ This document captures **why** we accept certain trade-offs for native developme
 
 Operational commands remain in `docs/DEVELOPMENT-NATIVE-LOCAL.md`.
 
+**Ubuntu Touch** is **not** an Expo/React Native target. Operator UI on Lomiri uses the **web slice** in a Click webapp shell — see [`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md). Native strategy in this doc applies to **iOS/Android only**.
+
 ---
 
 ## 1. Context you confirmed

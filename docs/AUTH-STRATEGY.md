@@ -97,3 +97,11 @@ The job deletes `Session` rows where `expiresAt < now()`. The `expiresAt` column
 ## Session TTL
 
 Sessions expire after 14 days. The `sessionAuth` plugin rejects expired sessions on each request and deletes them best-effort.
+
+## Related docs
+
+| Topic | Doc |
+|---|---|
+| Cross-platform auth split + webview bridge | [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md) §5–§6 |
+| Native platform obligations | [`design/canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) |
+| Ubuntu Touch (cookie web session in Morph webview) | [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) |

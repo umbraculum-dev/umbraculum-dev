@@ -203,10 +203,27 @@ Rebuild after changes: see [`DEVELOPMENT.md`](../DEVELOPMENT.md) and the shared-
 
 ---
 
+## 9. Ubuntu Touch operator shell (webapp, not a UI fork)
+
+Umbraculum does **not** ship a Qt/QML UI for [Ubuntu Touch](https://ubuntu-touch.io/). Operator modules on Lomiri reuse the **web slice** unchanged: Tamagui pages in `apps/web`, cookie-session auth, and locale-prefixed routes from `@umbraculum/navigation`.
+
+**Distribution:** a UBports **Click webapp package** (`webapp-container` + Morph Qt WebEngine webview) pointing at the deployed `apps/web` base URL. Store presence via OpenStore; no duplicate screen tree.
+
+**Reference implementation:** [`packaging/ubuntu-touch/umbraculum-reference/README.md`](../packaging/ubuntu-touch/umbraculum-reference/README.md) — manifest, AppArmor, launcher template, [`scripts/ubuntu-touch/render-click-desktop.sh`](../scripts/ubuntu-touch/render-click-desktop.sh).
+
+**Platform typing today:** `@umbraculum/navigation` `AppPlatform` is `"web" | "native"`. Ubuntu Touch is treated as **web** for route availability — any web-shipped module route is UT-eligible when online.
+
+**Explicit non-parity:** iOS/Android native offline (SQLite brew-day, bearer auth, Expo push/BLE) does **not** apply to the UT shell. See [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) for the full discourse, module eligibility matrix, and verification checklist.
+
+---
+
 ## Related docs
 
 - [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) §3.5 — platform audit summary
+- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch delivery decision (Click webapp shell, online-first)
+- [`../packaging/ubuntu-touch/umbraculum-reference/README.md`](../packaging/ubuntu-touch/umbraculum-reference/README.md) — reference Click package + build steps
 - [`TAMAGUI.md`](TAMAGUI.md) — cross-platform UI primitive layer
+- [`canonical-native-platform-surface.md`](design/canonical-native-platform-surface.md) — iOS/Android native obligations (orthogonal to UT)
 - [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md) — brewery vertical product + stack notes
 
 **Former filename:** `ARCHITECTURE-REV02.md` (removed 2026-05-27; full text in [`archive/architecture-Rev02-2026-05-snapshot.md`](archive/architecture-Rev02-2026-05-snapshot.md)).

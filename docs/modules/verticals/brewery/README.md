@@ -74,6 +74,8 @@ Brewery screens live under `apps/native/src/modules/brewery/screens/` (`RecipesL
 
 **Brew-day only on native.** MRP/CRP read models, AI planning advisor tools, and RFC-0007 document exports are **web-first** (see §4 below and [`canonical-native-platform-surface.md`](../../../design/canonical-native-platform-surface.md)). Operators who need inventory or planning on a phone today use **Open on web** (whitelisted `inventory` route) or the web app in a browser—not native screens for `productionOrders`, `capacity`, etc.
 
+**Ubuntu Touch** uses the **web slice** in a Lomiri Click webapp (online-first). Brew-day offline logging remains **iOS/Android native only** — see [`ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md).
+
 ### 3.4 Brewery-vertical packages
 
 | Package | Sub-plan #9 slot | Role |
@@ -197,6 +199,7 @@ If your vertical wants to be **bundled** with the platform's hosted offering (th
 
 - [`IMPLEMENTATION-LOG.md`](IMPLEMENTATION-LOG.md) — brewery vertical product rules, offline/sync intent, water/recipe constraints, living engineering constraints.
 - [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md) — web/native as-built boundaries (route IDs, auth, webview bridge).
+- [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell (web workflows; no offline brew-day).
 - [RFC-0001](../../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6 row), §8 (consumption contract).
 - [RFC-0002](../../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §6 (Decision D — brewery sequencing), §11.2 (concrete migration table).
 - [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — accelerated brewery file relocation.

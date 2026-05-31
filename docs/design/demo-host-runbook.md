@@ -31,6 +31,7 @@ Required services (same as local dev): **api**, **web**, **nginx**, **postgres**
 - Browser — MRP/CRP walkthroughs, full web app ([`mrp-crp-alpha-demo-walkthrough.md`](mrp-crp-alpha-demo-walkthrough.md))
 - EAS `preview` APK — brewery native; `EXPO_PUBLIC_API_BASE_URL` = `https://demo.umbraculum.dev` ([`apps/native/eas.json`](../../apps/native/eas.json))
 - Native **Open on web** — must use the **same** origin ([`openWebFallback.ts`](../../apps/native/src/navigation/openWebFallback.ts))
+- **Ubuntu Touch** — Click webapp over the same web origin (cookie session, online-first); reference package [`packaging/ubuntu-touch/umbraculum-reference/`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) ([`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md))
 
 ---
 
@@ -103,5 +104,7 @@ Run from repo root:
 
 - [`native-eas-demo-build-log.md`](native-eas-demo-build-log.md) — EAS build IDs and device smoke status
 - [`canonical-native-platform-surface.md`](canonical-native-platform-surface.md) §5 — native demo scope and checklist
+- [`ubuntu-touch-shell-strategy.md`](ubuntu-touch-shell-strategy.md) — UT webapp shell strategy
+- [`packaging/ubuntu-touch/umbraculum-reference/README.md`](../../packaging/ubuntu-touch/umbraculum-reference/README.md) — reference Click package (demo origin default)
 - [`NATIVE-STRATEGY-AND-CI.md`](../NATIVE-STRATEGY-AND-CI.md) §5 — EAS profiles and CI workflow
 - [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) — future hosted product (not demo)

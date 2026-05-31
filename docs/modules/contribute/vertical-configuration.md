@@ -78,7 +78,7 @@ The native slice is required only if your vertical needs a native shell (per [RO
 | `wms` (future) | `apps/native/src/modules/wms/` | Native-mandatory per [wms.md](../canonical/wms.md) §4 — floor scanning, pick confirm, label PDF via RFC-0007. |
 | Web-only verticals | Omit `apps/native/src/modules/<code>/` | Consume canonical modules on web; no native registration. |
 
-Operational SoT: [`canonical-native-platform-surface.md`](../../design/canonical-native-platform-surface.md) (route matrix, alpha scope, render-job client, web fallback).
+Operational SoT: [`canonical-native-platform-surface.md`](../../design/canonical-native-platform-surface.md) (route matrix, alpha scope, render-job client, web fallback). **Ubuntu Touch:** web slice in Click webapp — [`ubuntu-touch-shell-strategy.md`](../../design/ubuntu-touch-shell-strategy.md).
 
 ### Step 4 — Vertical-flavored packages
 

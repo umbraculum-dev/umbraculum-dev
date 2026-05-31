@@ -13,7 +13,7 @@
 
 ## 1. Why this doc exists
 
-The Umbraculum monorepo is structurally simple — three workspace trees (`apps/`, `services/`, `packages/`), one `docs/` tree, one `internal/` tree, plus scripts and CI plumbing. But the answer to "where does X live?" today requires reasoning across five other docs to reconstruct. This page is the single artifact that answers it directly.
+The Umbraculum monorepo is structurally simple — three workspace trees (`apps/`, `services/`, `packages/`), one `docs/` tree, one `internal/` tree, plus **`packaging/`** (distribution adapters such as Ubuntu Touch Click webapps) and scripts/CI plumbing. But the answer to "where does X live?" today requires reasoning across five other docs to reconstruct. This page is the single artifact that answers it directly.
 
 It is intentionally a **complement**, not a duplicate, of three sibling docs:
 
@@ -61,6 +61,17 @@ Every workspace in the monorepo, grouped by layer. The npm name and the on-disk 
 | Path | npm name | What it is | Notable consumes |
 |---|---|---|---|
 | `services/api/` | `@umbraculum/api` | Fastify + Prisma API — auth, workspace, billing, AI consultant, brewery routes, canonical-module slices (`automation`, `pim`). | `@umbraculum/{module-sdk, contracts, automation-contracts, pim-contracts, brewery-core, brewery-beerjson}` |
+
+### 3.2.1 Distribution adapters (`packaging/*`)
+
+Not npm workspaces — **Click / store packaging** and similar shells. No TypeScript runtime; no `@umbraculum/*` imports.
+
+| Path | Role | Related doc |
+|---|---|---|
+| [`packaging/ubuntu-touch/`](../packaging/ubuntu-touch/README.md) | Ubuntu Touch Lomiri webapp Click packages | [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) |
+| [`packaging/ubuntu-touch/umbraculum-reference/`](../packaging/ubuntu-touch/umbraculum-reference/README.md) | Reference operator webapp → `apps/web` over HTTPS | Same + [`scripts/ubuntu-touch/render-click-desktop.sh`](../scripts/ubuntu-touch/render-click-desktop.sh) |
+
+UT adapters wrap **`apps/web`** unchanged (Tamagui). They do **not** add a fifth module slice or contracts package.
 
 ### 3.3 Horizontal infrastructure packages (layer 3)
 
@@ -246,6 +257,8 @@ This is a **canonical-for-now** decision — revisable when the marketing site l
 - [`DOCS-README-STANDARDS.md`](DOCS-README-STANDARDS.md) — the per-workspace module-README standard (Docs slice CI gate).
 - [`TAMAGUI.md`](TAMAGUI.md) — Tamagui as the choice that makes "one tree → both surfaces" possible.
 - [`NATIVE-STRATEGY-AND-CI.md`](NATIVE-STRATEGY-AND-CI.md) — native strategy + risk posture + CI.
+- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell decision.
+- [`../packaging/ubuntu-touch/umbraculum-reference/README.md`](../packaging/ubuntu-touch/umbraculum-reference/README.md) — reference Click package for Lomiri.
 - [`OPEN-SOURCE-STACK.md`](OPEN-SOURCE-STACK.md) — per-dependency rationale (what each load-bearing dep does + why this over the proprietary alternative).
 - [`../README.md`](../README.md) — repo entry point with the high-level repository layout and the "Native out of the box (why Tamagui)" framing.
 - [`../DEVELOPMENT.md`](../DEVELOPMENT.md) — day-to-day engineering conventions and the cross-platform reading list.

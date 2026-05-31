@@ -75,6 +75,8 @@ Brew-day reliability targets **write locally first**, sync when online ([`module
 - **Postgres remains authoritative** — sync pushes through the same API endpoints with the same ACL gates.
 - Native does **not** get a Prisma client or direct Postgres URL.
 
+**Ubuntu Touch** does not use the native offline path — it runs `apps/web` in a Morph webview (online-first). See [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md).
+
 ---
 
 ## 6. What each package may import
@@ -102,6 +104,7 @@ Brew-day reliability targets **write locally first**, sync when online ([`module
 ## 8. Cross-references
 
 - [`TENANCY-AND-ACL.md`](TENANCY-AND-ACL.md) — membership and role gates on API paths
+- [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md) — UT clients use HTTP only (no device SQLite)
 - [`OPEN-SOURCE-STACK.md`](OPEN-SOURCE-STACK.md) — Prisma rationale in the stack
 - [`services/api/README.md`](../services/api/README.md) — API service scope
 - [`modules/contribute/horizontal-services-consumption.md`](modules/contribute/horizontal-services-consumption.md) — consumption-contract quick reference

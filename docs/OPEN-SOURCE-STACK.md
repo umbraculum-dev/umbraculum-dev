@@ -311,7 +311,9 @@ brevity is the gate that keeps the page maintainable.
   separately.** React Native is what makes the apps/web ↔ apps/native
   cross-platform-package strategy feasible without two codebases.
   Flutter would require a Dart rewrite. Native-only would double the
-  maintenance surface.
+  maintenance surface. **Ubuntu Touch** is served by the **web slice**
+  in a Lomiri Click webapp — not by extending React Native to Linux
+  mobile ([`docs/design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md)).
 - **Closed-source-swap impact.** Closed cross-platform frameworks
   (effectively none exist at scale) would block the apparatus from
   reasoning about bridge semantics, which is occasionally important

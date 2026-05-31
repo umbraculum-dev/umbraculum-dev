@@ -1,0 +1,8 @@
+{
+  "clickable": {
+    "type": "custom",
+    "build": "bash scripts/render-desktop.sh && click build .",
+    "install": "click install build/*.click",
+    "clean": "rm -rf build"
+  }
+}

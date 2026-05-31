@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Umbraculum
+Comment=Umbraculum operator workspace (web)
+Exec=webapp-container --name=Umbraculum --icon=assets/icon.svg --store-session-cookies --enable-back-forward --webappUrlPatterns=@URL_PATTERNS@ @START_URL@
+Icon=assets/icon.svg
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
