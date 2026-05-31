@@ -801,11 +801,7 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
-                }
+                "schema": {}
               }
             }
           },
@@ -867,11 +863,7 @@
             "description": "Default Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
-                }
+                "schema": {}
               }
             }
           },
@@ -1515,8 +1507,8 @@
                       ]
                     },
                     "settings": {
-                      "type": "object",
                       "nullable": true,
+                      "type": "object",
                       "additionalProperties": {}
                     }
                   },
@@ -1606,8 +1598,8 @@
                       ]
                     },
                     "settings": {
-                      "type": "object",
                       "nullable": true,
+                      "type": "object",
                       "additionalProperties": {}
                     }
                   },
