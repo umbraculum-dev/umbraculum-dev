@@ -2,14 +2,46 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   clearModuleRegistryForTests,
   clearWebModuleRegistryForTests,
+  collectModulePromptOverlayTexts,
   listRegisteredModules,
   listRegisteredWebModules,
+  resolveRoutePromptOverlay,
 } from "@umbraculum/module-sdk";
 
 import { buildApp } from "../app.js";
 
+function saveEnv(key: string): string | undefined {
+  return process.env[key];
+}
+
+function restoreEnv(key: string, value: string | undefined): void {
+  if (value === undefined) delete process.env[key];
+  else process.env[key] = value;
+}
+
+/** Module-profile tests only need route registration — skip BullMQ/ioredis boot. */
+function disableRedisForProfileTests(): {
+  redisUrl: string | undefined;
+  workerDisabled: string | undefined;
+} {
+  const redisUrl = saveEnv("REDIS_URL");
+  const workerDisabled = saveEnv("RENDERING_WORKER_DISABLED");
+  delete process.env["REDIS_URL"];
+  process.env["RENDERING_WORKER_DISABLED"] = "1";
+  return { redisUrl, workerDisabled };
+}
+
+function restoreRedisAfterProfileTests(saved: {
+  redisUrl: string | undefined;
+  workerDisabled: string | undefined;
+}): void {
+  restoreEnv("REDIS_URL", saved.redisUrl);
+  restoreEnv("RENDERING_WORKER_DISABLED", saved.workerDisabled);
+}
+
 describe("module profile — platform SKU", () => {
   const previousProfile = process.env["UMBRACULUM_MODULE_PROFILE"];
+  const savedRedis = disableRedisForProfileTests();
   let app: ReturnType<typeof buildApp>;
 
   beforeAll(async () => {
@@ -22,11 +54,8 @@ describe("module profile — platform SKU", () => {
 
   afterAll(async () => {
     await app.close();
-    if (previousProfile === undefined) {
-      delete process.env["UMBRACULUM_MODULE_PROFILE"];
-    } else {
-      process.env["UMBRACULUM_MODULE_PROFILE"] = previousProfile;
-    }
+    restoreEnv("UMBRACULUM_MODULE_PROFILE", previousProfile);
+    restoreRedisAfterProfileTests(savedRedis);
   });
 
   it("does not register brewery module metadata", () => {
@@ -43,10 +72,8 @@ describe("module profile — platform SKU", () => {
   });
 
   it("platform profile excludes brewery AI overlays via module registration", () => {
-    const overlays = listRegisteredModules()
-      .filter((m) => m.aiPrompts?.module)
-      .map((m) => m.code);
-    expect(overlays).not.toContain("brewery");
+    expect(collectModulePromptOverlayTexts().join("\n")).not.toMatch(/beerjson/i);
+    expect(resolveRoutePromptOverlay("recipes")).toBeUndefined();
   });
 
   it("does not expose brewery inventory route", async () => {
@@ -57,6 +84,7 @@ describe("module profile — platform SKU", () => {
 
 describe("module profile — reference default", () => {
   const previousProfile = process.env["UMBRACULUM_MODULE_PROFILE"];
+  const savedRedis = disableRedisForProfileTests();
   let app: ReturnType<typeof buildApp>;
 
   beforeAll(async () => {
@@ -69,11 +97,8 @@ describe("module profile — reference default", () => {
 
   afterAll(async () => {
     await app.close();
-    if (previousProfile === undefined) {
-      delete process.env["UMBRACULUM_MODULE_PROFILE"];
-    } else {
-      process.env["UMBRACULUM_MODULE_PROFILE"] = previousProfile;
-    }
+    restoreEnv("UMBRACULUM_MODULE_PROFILE", previousProfile);
+    restoreRedisAfterProfileTests(savedRedis);
   });
 
   it("registers brewery module metadata by default", () => {
