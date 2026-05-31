@@ -19,7 +19,7 @@
     "db:backfill:integration-tokens": "tsx src/cli/backfillIntegrationTokenHashes.ts",
     "db:restore:equipment-profile": "tsx src/cli/restoreEquipmentProfileFromRecipe.ts",
     "seed:e2e": "tsx src/cli/seedE2eFixture.ts",
-    "test:db:prepare": "echo 'DROP SCHEMA IF EXISTS reporting CASCADE;' | DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST ./node_modules/.bin/prisma db execute --stdin --schema prisma/schema.prisma && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST ./node_modules/.bin/prisma migrate reset --force --skip-seed && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST ./node_modules/.bin/prisma db seed",
+    "test:db:prepare": "echo 'DROP SCHEMA IF EXISTS reporting CASCADE;' | DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx --no-install prisma db execute --stdin --schema prisma/schema.prisma && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx --no-install prisma migrate reset --force --skip-seed && DATABASE_URL=$DATABASE_URL_TEST DATABASE_URL_DIRECT=$DATABASE_URL_TEST npx --no-install prisma db seed",
     "test:unit": "./node_modules/.bin/vitest run --project unit",
     "test:integration": "npm run test:db:prepare && ./node_modules/.bin/vitest run --project integration",
     "test": "npm run test:integration",

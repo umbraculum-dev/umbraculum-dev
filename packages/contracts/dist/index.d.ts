@@ -393,7 +393,7 @@ declare const InventoryPatchRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown
 declare const BrewdaySettingsPayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 declare const BrewdaySettingsResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
-    settings: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    settings: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, z.core.$strip>;
 declare const BrewdaySettingsPatchRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 declare const RecipePayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;

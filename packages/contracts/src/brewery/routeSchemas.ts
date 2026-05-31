@@ -91,7 +91,7 @@ export const BrewdaySettingsPayloadSchema = z.record(z.string(), z.unknown());
 
 export const BrewdaySettingsResponseSchema = z.object({
   ok: z.literal(true),
-  settings: BrewdaySettingsPayloadSchema,
+  settings: BrewdaySettingsPayloadSchema.nullable(),
 });
 
 export const BrewdaySettingsPatchRequestSchema = z.record(z.string(), z.unknown());

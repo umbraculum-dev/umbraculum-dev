@@ -300,7 +300,7 @@ var InventoryPatchRequestSchema = z4.record(z4.string(), z4.unknown());
 var BrewdaySettingsPayloadSchema = z4.record(z4.string(), z4.unknown());
 var BrewdaySettingsResponseSchema = z4.object({
   ok: z4.literal(true),
-  settings: BrewdaySettingsPayloadSchema
+  settings: BrewdaySettingsPayloadSchema.nullable()
 });
 var BrewdaySettingsPatchRequestSchema = z4.record(z4.string(), z4.unknown());
 var RecipePayloadSchema = z4.record(z4.string(), z4.unknown());

@@ -61,14 +61,6 @@
       ]
     },
     {
-      "id": "openapi-check",
-      "needsRootInstall": true,
-      "commands": [
-        "npm run build -w @umbraculum/contracts",
-        "npm run openapi:check -w @umbraculum/api"
-      ]
-    },
-    {
       "id": "sdk-publish-prep",
       "needsRootInstall": true,
       "commands": [

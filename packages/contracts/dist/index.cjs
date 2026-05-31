@@ -419,7 +419,7 @@ var InventoryPatchRequestSchema = import_zod4.z.record(import_zod4.z.string(), i
 var BrewdaySettingsPayloadSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
 var BrewdaySettingsResponseSchema = import_zod4.z.object({
   ok: import_zod4.z.literal(true),
-  settings: BrewdaySettingsPayloadSchema
+  settings: BrewdaySettingsPayloadSchema.nullable()
 });
 var BrewdaySettingsPatchRequestSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
 var RecipePayloadSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
