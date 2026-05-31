@@ -46,6 +46,7 @@ const sidebars: SidebarsConfig = {
         'design/ecosystem-case-study-odoo',
         'design/ecosystem-case-study-adobe-magento',
         'design/ecosystem-case-study-drupal-wordpress',
+        'design/ecosystem-case-study-custom-vertical-code',
       ],
     },
     {
@@ -149,6 +150,7 @@ const sidebars: SidebarsConfig = {
         'design/ecosystem-case-study-odoo',
         'design/ecosystem-case-study-adobe-magento',
         'design/ecosystem-case-study-drupal-wordpress',
+        'design/ecosystem-case-study-custom-vertical-code',
       ],
     },
     {

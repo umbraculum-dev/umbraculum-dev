@@ -21,6 +21,8 @@ We are **not** claiming Magento 1 was technically perfect. We **are** claiming:
 
 **Pair with Omnis** ([`ecosystem-case-study-omnis.md`](ecosystem-case-study-omnis.md)): different field — proprietary ERP vs open ecommerce — but a **shared pattern**: documentation treated as **layout**, not **infrastructure**; developers not in the migration thought process; bookmarks and forum links dying without explanation. Omnis never built a public community; Adobe **dissolved the developer-facing layer** of one that existed.
 
+**Pair with custom vertical code** ([`ecosystem-case-study-custom-vertical-code.md`](ecosystem-case-study-custom-vertical-code.md)): **two independent causes** of rescue economics — steward failure on **docs, CI, and consistency** (**indirect**); **custom integrator code** on most estates (**direct**). Both matter; neither is a consequence of the other.
+
 ---
 
 ## 1. Summary

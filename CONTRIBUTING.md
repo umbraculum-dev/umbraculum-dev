@@ -195,7 +195,7 @@ reasons, leave a comment and a maintainer will help unblock you.
 - **No tolerated failures.** There is no case where "it's OK if CI
   fails" on merge — tolerated red hides unrelated regressions. If a
   scenario is hard to test, change fixtures, scope, or test design until
-  the layer is reliable again (see [`docs/design/ecosystem-case-study-adobe-magento.md`](docs/design/ecosystem-case-study-adobe-magento.md) §3.5 for the Adobe cloud counter-lesson).
+  the layer is reliable again (see [`docs/design/ecosystem-case-study-adobe-magento.md`](docs/design/ecosystem-case-study-adobe-magento.md) §3.5 for the Adobe cloud counter-lesson; [`docs/design/ecosystem-case-study-custom-vertical-code.md`](docs/design/ecosystem-case-study-custom-vertical-code.md) §6 for the custom-code solidarity lesson).
 - **Third-party / module-shaped stacks are the normal case**, not an
   excuse to skip CI (same §3.5).
 

@@ -116,6 +116,8 @@ services:
   docs-site:
     image: node:20-slim
     working_dir: /repo
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=8192
     command: sh -c "npm install --no-audit --no-fund --workspace=@umbraculum/docs-site --include-workspace-root=false && npm run start --workspace=@umbraculum/docs-site"
     ports:
       - "${DOCS_SITE_PORT:-3001}:3000"

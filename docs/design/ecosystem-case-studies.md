@@ -1,7 +1,7 @@
 # Ecosystem case studies — index
 
 **Tier:** Public  
-**Status:** v1.4 — modesty / hardship note for young community members (2026-05-30)  
+**Status:** v1.5 — custom vertical code case study (2026-05-30)  
 **Audience:** **young community members first**, then contributors, platform evaluators, vertical builders, learners repositioning in hard times  
 **Related:** [`MANIFESTO.md`](../../MANIFESTO.md) §2.2, [`GETTING-STARTED.md`](../GETTING-STARTED.md), [`LICENSING.md`](../LICENSING.md) §5.3, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §2.1–§2.2
 
@@ -49,6 +49,7 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | [Odoo](ecosystem-case-study-odoo.md) | Odoo Community | **Partial positive** — CE learnability; we skip cert/partner ladder; **§4.1** platform-shape comparison (not feature scorecard) | Copy ladder, not badges |
 | [Adobe → Magento](ecosystem-case-study-adobe-magento.md) | Magento Open Source / Adobe stewardship | **Community lost through stewardship** — dev docs scattered/404, cert churn, **cloud integration pipelines failing**, trademark; **Mage-OS** as fork counter-case | AGPL + DCO; fork rights; no cert gate; **CI by default**; doc redirects |
 | [Drupal + WordPress](ecosystem-case-study-drupal-wordpress.md) | Drupal, WordPress | **Partial positive** — stewardship + community; **WordPress plugin hell** (auth); **Drupal core-scale debate unsettled** | RFC-0001 Decision F; canonical modules; community proposals; no junior contempt |
+| [Custom vertical code](ecosystem-case-study-custom-vertical-code.md) | **Unnamed platforms** (agency delivery) | **Delivery vs craft split**; priesthood unmaintainability; **custom code ~90% of upgrade pain**; client quality blind spot | Apparatus + CI; ongoing public discussion; solidarity guardrail; supplier-quality questions |
 
 **Pairings that help:**
 
@@ -57,7 +58,9 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 - **Magento (MANIFESTO §2.2) + Odoo** — learnability ladders we respect.  
 - **Adobe → Magento + Omnis** — docs treated as disposable; Adobe also lost community through stewardship; Mage-OS proves fork path.  
 - **Drupal + WordPress + Adobe → Magento** — stewardship contrast: WP/Drupal longevity vs Adobe collapse; shared PHP-era lessons.  
-- **Drupal + WordPress (RFC-0001)** — modularity yes; parallel auth hell no.
+- **Drupal + WordPress (RFC-0001)** — modularity yes; parallel auth hell no.  
+- **Adobe → Magento + Custom vertical code** — **two independent causes**: stewardship/CI (**indirect**) and integrator custom code (**direct**); not one consequence of the other; Shopify contrast (§4.3).  
+- **Custom vertical code + Drupal §3.2** — priesthood contempt vs **common ground** via apparatus.
 
 ---
 
@@ -81,6 +84,11 @@ Umbraculum's line: **this makes learning possible for the ones who are willing t
 | Agency hidden integration cost vs Shopify | Adobe cloud commercial trap | **Integrator sustainability** (§2.1) | [`MANIFESTO.md`](../../MANIFESTO.md) §2.1 |
 | Parallel auth/session per module | WordPress plugin ecosystem | **Decision F consumption contract** | [RFC-0001](rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2; [`ecosystem-case-study-drupal-wordpress.md`](ecosystem-case-study-drupal-wordpress.md) §4 |
 | Core PR volume vs small core dogma; senior contempt for juniors | Drupal-era PHP culture | **Open governance shape** — RFC canonical gate + permissionless modules + apparatus | [`ecosystem-case-study-drupal-wordpress.md`](ecosystem-case-study-drupal-wordpress.md) §3.2, §6; [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) |
+| Delivery-first vs craft split; silent agency blame of platform | Many unnamed vertical stacks | **Common ground** — apparatus, docs, CI; **ongoing public discussion** | [`ecosystem-case-study-custom-vertical-code.md`](ecosystem-case-study-custom-vertical-code.md) §2–§3, §6 |
+| Unmaintainable mega-classes by senior leads | Rescue / handoff projects | **Structural similarity before merge**; empathy for next developer | [`ecosystem-case-study-custom-vertical-code.md`](ecosystem-case-study-custom-vertical-code.md) §3; [`CONTRIBUTING.md`](../../CONTRIBUTING.md) |
+| Upgrade pain blamed on core; custom code dominant cost | Agency estates (unnamed) | **Honest bottleneck naming**; vertical modules advised same discipline | [`ecosystem-case-study-custom-vertical-code.md`](ecosystem-case-study-custom-vertical-code.md) §4; [`MODULES.md`](../MODULES.md) |
+| Clients never evaluate supplier code quality | Software procurement norms | **Respectful quality questions documented** — Toyota supplier logic | [`ecosystem-case-study-custom-vertical-code.md`](ecosystem-case-study-custom-vertical-code.md) §5 |
+| Discarding unmaintainable work onto next developer | Handoff culture | **Solidarity guardrail** — tools were public; fix bill is fair | [`ecosystem-case-study-custom-vertical-code.md`](ecosystem-case-study-custom-vertical-code.md) §5–§6; [`MANIFESTO.md`](../../MANIFESTO.md) §3.x |
 
 ---
 
