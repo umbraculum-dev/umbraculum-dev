@@ -55,7 +55,7 @@ flowchart TB
 | Layer | Role | Examples in tree |
 |---|---|---|
 | **Platform backbone** | Cross-cutting services every module consumes ([RFC-0001 §8.2](../rfcs/0001-modules-tiers-governance-and-automation-placement.md)); single source of truth for tenancy and AI context | `services/api`, `@umbraculum/contracts`, `@umbraculum/module-sdk`, `@umbraculum/ui`, `@umbraculum/navigation`, `@umbraculum/rendering`, … |
-| **Canonical modules** | Peer operational domains (flat SAP-style decomposition, not nested under "manufacturing") | `pim`, `automation` (shipped); `mrp`, `wms`, `crm`, `crp` (open doors) |
+| **Canonical modules** | Peer operational domains (flat SAP-style decomposition, not nested under "manufacturing") | `automation`, `pim` (shipped); `mrp`, `crp` (alpha read-only shipped); `wms`, `crm` (open doors) |
 | **Vertical configuration** | Seed data, prompts, vertical UI — consumes canonicals, does not replace them | `brewery` (reference tier-6 configuration) |
 | **Application surfaces** | Deployable UIs or sites for a **specific audience** | `apps/web` + `apps/native` (operators); `apps/website` (public orientation); future storefront = separate `apps/*` |
 

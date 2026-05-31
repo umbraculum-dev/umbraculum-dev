@@ -1,4 +1,4 @@
-# `crp` — canonical module (open door)
+# `crp` — canonical module (alpha shipped)
 
 **Tier:** Public
 **Status:** **H2 2026 alpha track shipped** (Waves 1–6 + alpha demo closure 2026-05-27) — read-only API, web UX, brewery/automation projection, AI advisor, RFC-0007 exports, and automated demo proof exist. **TODO:** human walkthrough gap-log sign-off; propose/write tools and mature commercial scope remain [ROADMAP § H1 2027 mature](../../ROADMAP.md#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027). See [ROADMAP § H2 2026 MRP/CRP](../../ROADMAP.md#h2-2026--first-class-mrpcrp-alpha--platform-repositioning).

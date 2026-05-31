@@ -84,6 +84,7 @@ Apply in each Worker → **Settings → Builds** after first green deploy:
 | **Node version** | Environment variable **`NODE_VERSION`** = **`20.19.4`** — avoids `npm warn EBADENGINE` (RN/Metro/Vite want ≥20.19.4; Cloudflare default was 20.18.1). |
 | **Build command** | Drop redundant **`npm ci &&`** — Cloudflare already runs `npm clean-install` before your command. Use workspace build only (see table §1). |
 | **Branch previews** | Optional: uncheck **Builds for non-production branches** to halve build count on feature-branch pushes (~500 builds/month free-tier budget). Keep on if you want preview URLs per branch. |
+| **Chunk load after deploy** | Docs ship `docs-site/static/_headers` (`/assets/*` immutable; HTML `no-cache`) + a client chunk-reload guard. Symptom on mobile: `Loading chunk N failed` — usually stale HTML after a deploy; hard refresh or wait for edge cache to clear. |
 | **Deploy triggers** | Every **`master` push** rebuilds **both** Workers (no path filter). GitHub Actions remain path-scoped; Cloudflare is hosting-only. |
 
 **Smoke-tested preview URLs (2026-05-30):**

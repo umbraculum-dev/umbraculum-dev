@@ -255,6 +255,8 @@ const config: Config = {
   organizationName: 'umbraculum-dev',
   projectName: 'umbraculum-dev',
 
+  clientModules: [require.resolve('./src/clientModules/chunk-reload.ts')],
+
   // RFC-0005 P7 — flip to false when public alpha is declared (with robots.txt).
   noIndex: true,
 

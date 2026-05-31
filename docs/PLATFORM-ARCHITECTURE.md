@@ -31,12 +31,12 @@ The platform-level commitment is to the **toolset surface** itself: the canonica
 
 ### 1.1.1 Canonical modules are peer domains, not nested under one industry
 
-The canonical-module set (today: `mrp`, `wms`, `crm`, `crp`, `automation`, `pim`; future allocations via mini-RFC) is a **flat peer decomposition**, not a hierarchy with "manufacturing" or any other industry as a top-level umbrella that contains MRP / automation / QA / PIM / etc. as sub-modules.
+The **reserved canonical-module codes** (closed set today: `automation`, `pim`, `mrp`, `crp`, `wms`, `crm`; future allocations via mini-RFC) form a **flat peer decomposition**, not a hierarchy with "manufacturing" or any other industry as a top-level umbrella that contains MRP / automation / QA / PIM / etc. as sub-modules. **Shipping status** (shipped vs alpha vs open door) is catalogued in [`MODULES.md`](MODULES.md) §3.1 — the peer shape applies to the full reserved set regardless of maturity.
 
 This is a deliberate choice. The peer-module shape (sometimes called "SAP-style") matches how Drupal, SAP S/4HANA, Salesforce/Force.com, and Odoo decompose their domain coverage. The reasoning:
 
 - Domain-level concerns don't naturally subordinate to a single umbrella. Production planning (`mrp`), inventory (`wms`), capacity (`crp`), customer relationships (`crm`), and automation (`automation`) are peer operational concerns. Forcing them under a "manufacturing" parent creates an arbitrary dependency on a higher-level construct that doesn't exist in practice.
-- Vertical configurations consume an arbitrary subset of canonical modules. A brewery vertical needs MRP + WMS + automation + (later) CRM. A cosmetics vertical needs MRP + WMS + (compliance — future). A distillery vertical needs MRP + WMS + automation + (regulatory). Each vertical configuration picks its set; the canonical layer doesn't pre-commit a hierarchy that a vertical might not need.
+- Vertical configurations consume an arbitrary subset of canonical modules. A brewery vertical consumes `automation` (shipped), read-only alpha `mrp` + `crp`, and (planned) `wms` + `crm`. A cosmetics vertical might need MRP + WMS + (compliance — future). A distillery vertical might need MRP + WMS + automation + (regulatory). Each vertical configuration picks its set; the canonical layer doesn't pre-commit a hierarchy that a vertical might not need.
 - The AI consultant reasons across canonical modules at workspace scope (see §4.0). A flat peer decomposition gives the orchestrator one mental model — "what canonical modules are installed in this workspace" — instead of having to reason over both a hierarchy and a flat module-installation set.
 - The canonical Drupal lesson — "one module per functionality, no parallel modules competing for the same domain" — is structurally enforced by reserved-code allocation. Hierarchy is not needed for the discipline.
 
@@ -50,7 +50,7 @@ This framing is formalized in [RFC-0001](rfcs/0001-modules-tiers-governance-and-
 
 ## 2. Vision — horizontal platform + canonical modules + vertical configurations
 
-**Pattern.** Umbraculum is a **horizontal platform** (auth, workspace, billing, AI, i18n, navigation, observability, integrations, rendering) hosting **canonical modules** (today: `automation` and `pim`; open doors: `mrp`, `wms`, `crm`, `crp`) and **vertical configurations** (brewery first). A canonical module owns a peer operational domain; a vertical configuration consumes one or more canonical domains and adds vertical-specific seed data, prompts, UI flows, and tier-limit slices.
+**Pattern.** Umbraculum is a **horizontal platform** (auth, workspace, billing, AI, i18n, navigation, observability, integrations, rendering) hosting **canonical modules** (shipped: `automation`, `pim`; **alpha shipped** read-only: `mrp`, `crp`; **open doors**: `wms`, `crm`) and **vertical configurations** (brewery first). A canonical module owns a peer operational domain; a vertical configuration consumes one or more canonical domains and adds vertical-specific seed data, prompts, UI flows, and tier-limit slices.
 
 **Why this pattern.** Modern operational buyers expect AI-native, multi-domain suites; legacy ERPs (SAP, Oracle, NetSuite) are bolting AI onto crusty foundations. A greenfield horizontal-platform-with-canonical-modules shape lets us:
 
@@ -87,7 +87,7 @@ flowchart TB
   canonical --> horizontal
 ```
 
-Brewery is the **shipped reference vertical configuration**. `automation` and `pim` are shipped canonical modules; `mrp`, `wms`, `crm`, and `crp` are **open canonical doors** — explicitly anticipated in the architecture but not yet implemented.
+Brewery is the **shipped reference vertical configuration**. **`automation` and `pim`** are production canonical modules; **`mrp` and `crp`** are **alpha-shipped** read-only canonical modules (H2 2026 proof — API, web, AI tools, RFC-0007 exports); **`wms` and `crm`** remain **open canonical doors** — codes reserved and anticipated in the architecture, not yet implemented. Authoritative per-module status: [`MODULES.md`](MODULES.md) §3.1.
 
 ### 2.1 Distribution & business model
 

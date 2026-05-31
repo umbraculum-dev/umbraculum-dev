@@ -1,0 +1,9 @@
+# Cloudflare Workers static assets — cache discipline for Docusaurus.
+# Hashed /assets/* are immutable; HTML shells must not stay stale after deploy
+# (stale shells reference removed chunk hashes → "Loading chunk N failed" on mobile/CDN).
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  Cache-Control: no-cache, must-revalidate
