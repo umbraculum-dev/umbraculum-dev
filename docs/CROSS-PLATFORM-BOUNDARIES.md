@@ -5,7 +5,7 @@
 **Audience:** contributors working on shared packages, web, or native shells.
 
 > **Not platform vision.** For horizontal-platform shape, canonical modules, and the AI consultant, read [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md).  
-> **Not brewery product rules.** For the reference vertical's product constraints and domain rules, read [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md).
+> **Not brewery product rules.** For the reference vertical's product constraints and domain rules, read [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md). Terminology (*vertical*, *canonical*, citing brewery): [`GLOSSARY.md`](GLOSSARY.md).
 
 This document records **implemented** decisions for sharing code between **Next.js (web)** and **React Native + Expo (native)** without leaking platform routers into shared screens.
 

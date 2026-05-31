@@ -674,6 +674,8 @@ Industry-typical AI gross margin is roughly 50–75%. Targeting extreme margin o
 
 ## 9. Glossary
 
+> **Onboarding entry point.** Core taxonomy (*vertical configuration*, *canonical module*, *brewery reference vertical*, documentation convention): [`GLOSSARY.md`](GLOSSARY.md). This section indexes platform, AI, and billing terms used in architecture discussions.
+
 - **Add-on** — a billable extension to a workspace (e.g. a future managed-AI credit pack or module entitlement) that is independent of the base tier.
 - **ARPU (Average Revenue Per User)** — total revenue divided by paying entities per period.
 - **BYOK (Bring Your Own Key)** — workspace admin enters their own provider API key; the provider bills the workspace directly for tokens.

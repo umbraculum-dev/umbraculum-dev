@@ -27,14 +27,14 @@ keeps contributions aligned with the architecture. A framework gives you
 building blocks; Umbraculum aims to give you the whole toolbox and the
 quality discipline for using it.
 
-The **brewery vertical** is the first vertical configuration shipping
-on this platform. It is a fully working product on its own — brew-day
-logging, water chemistry, recipe management, brew sessions — and
-simultaneously a complex reference implementation for how vertical
-configurations can plug in via seed data, prompts, and configuration
-rather than by re-implementing the core. See
-[`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1 +
-§2 for the full reasoning.
+The **brewery reference vertical** (`code: brewery`) is the first vertical
+configuration shipping on this platform. It is a fully working product on
+its own — brew-day logging, water chemistry, recipe management, brew
+sessions — and simultaneously a complex **worked example** for how teams
+build a specific product on Umbraculum via seed data, prompts, and
+configuration rather than by re-implementing the core. Terminology:
+[`docs/GLOSSARY.md`](docs/GLOSSARY.md). Full reasoning:
+[`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §1.1 + §2.
 
 Manufacturing is not the platform boundary; it is the stress test. The
 same foundations that support process manufacturing — bills of
@@ -52,7 +52,7 @@ thing. See [`docs/AI-CONSULTANT.md`](docs/AI-CONSULTANT.md) for the
 feature surface and [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md)
 §4.0 for the cornerstone reasoning.
 
-### What ships with the brewery vertical today
+### What ships with the brewery reference vertical today
 
 - Brew-day reliability tooling — mash / sparge / boil step pages, water
   chemistry (mash + sparge + boil), recipe import/export (BeerJSON
@@ -68,8 +68,8 @@ feature surface and [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE
 
 ### What is intentionally not shipped yet
 
-- A second vertical module (WMS / CRM / MRP / CRP). The platform is
-  shaped to host them, but only the brewery vertical is live today.
+- A second vertical configuration (WMS / CRM / MRP / CRP as standalone products). The platform is
+  shaped to host them, but only the brewery reference vertical is live today.
 - A public release. The repository is currently developed privately;
   the go-public criteria and plan are in
   [`docs/PLATFORM-ARCHITECTURE.md`](docs/PLATFORM-ARCHITECTURE.md) §10.1.

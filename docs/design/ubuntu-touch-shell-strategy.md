@@ -9,6 +9,8 @@
 
 > **Disclaimer.** This document records a **delivery strategy**, not an implementation commitment with dates. It does not allocate a new canonical module, does not change licenses, and does not weaken the native-slice offline guarantees on iOS/Android. It explicitly accepts **online-first** behavior on Ubuntu Touch in exchange for **fast store presence** and **zero Tamagui duplication**.
 
+> **Terminology.** *Vertical* and *brewery* follow [`GLOSSARY.md`](../GLOSSARY.md): a **vertical configuration** is a specific product built on Umbraculum; **`brewery`** is the **reference vertical** shipped in this monorepo (Tier 6), not the platform's identity. Where this doc says *brewery vertical*, read *brewery (reference vertical)* unless a narrower brewery-domain rule is meant.
+
 ---
 
 ## 1. Summary — the decision
@@ -184,7 +186,7 @@ See also [`packaging/ubuntu-touch/README.md`](../../packaging/ubuntu-touch/READM
 
 | Capability | iOS/Android native | UT webapp (v1) | Why not in UT v1 webapp |
 |---|---|---|---|
-| Offline SQLite / brew-day logging | Planned / product guarantee ([brewery IMPLEMENTATION-LOG](../modules/verticals/brewery/IMPLEMENTATION-LOG.md)) | **Not supported** | Offline is owned by the **native slice** (device SQLite + sync queue — [`DATA-ACCESS-BOUNDARIES.md`](../DATA-ACCESS-BOUNDARIES.md) §5). v1 UT has **no native slice** and no second on-device store. Shipping offline in Morph would mean **new client persistence + conflict rules** beside the existing native plan — high cost, two offline stories, slow vs “wrap `apps/web` now.” **Accepted trade:** online-first on UT. |
+| Offline SQLite / brew-day logging | Planned / product guarantee for the **brewery reference vertical** on iOS/Android ([brewery IMPLEMENTATION-LOG](../modules/verticals/brewery/IMPLEMENTATION-LOG.md)) | **Not supported** | Offline is owned by the **native slice** (device SQLite + sync queue — [`DATA-ACCESS-BOUNDARIES.md`](../DATA-ACCESS-BOUNDARIES.md) §5). v1 UT has **no native slice** and no second on-device store. Shipping offline in Morph would mean **new client persistence + conflict rules** beside the existing native plan — high cost, two offline stories, slow vs “wrap `apps/web` now.” **Accepted trade:** online-first on UT. |
 | Bearer-only native auth transport | Yes (`POST /auth/login/native`, Secure Store) | Cookie web session (`sid` in Morph) | `apps/web` is already **cookie-session** ([`AUTH-STRATEGY.md`](../AUTH-STRATEGY.md)). Bearer-in-webview would need custom token injection + refresh handling in the Click shell with **no product win** over standard web login for v1. **Accepted trade:** UT behaves like web auth, not Expo auth. |
 | Push notifications (Expo) | Future native path (FCM / APNs via Expo) | **Not in v1 shell** | Push requires **native registration** (device token, OS notification channel). A Morph webapp is not an Expo app; Lomiri-visible push would need **UBports-specific glue** (Click lifecycle, system notifier, optional small Qt helper) — separate from Tamagui/web work. **Deferred:** possible v2+; **not** free with webapp packaging. |
 | BLE / device sensors via native modules | Native-only (`apps/native` + RN plugins) | **Not in v1 shell** | Sensor/BLE code lives in the **RN native slice**, not in Tamagui web. Web Bluetooth inside Morph is **unreliable or absent** for industrial use; a Lomiri-native BLE bridge would be a **new bounded client** (Option C in §2.4), not “no rewrite.” **Deferred:** integrator or v2; out of quick-delivery scope. |
@@ -235,7 +237,7 @@ Default rule: **if the route is available on web, it is UT-webapp-eligible when 
 | `pim` | Strong | Admin catalog — web-only on native today |
 | `mrp` / `crp` | Strong | Read-only alpha — web is primary |
 | `wms` / `crm` (future) | Strong | ROADMAP web-first bias |
-| `brewery` vertical | **Partial** | Web routes yes; **native-only brew-day offline flows no** |
+| `brewery` reference vertical | **Partial** | Web routes yes; **native-only brew-day offline flows no** (reference vertical product rules — not a platform-wide UT limitation) |
 | Document rendering (RFC-0007 jobs) | Strong | Async jobs + download — same as web |
 | Native-only screens (`getRouteAvailability(_, "native") === "available"`) | **Not in UT shell** | Use iOS/Android for those flows |
 
@@ -322,7 +324,8 @@ Before declaring a UT deployment "aligned with this doc":
 | [DATA-ACCESS-BOUNDARIES.md](../DATA-ACCESS-BOUNDARIES.md) §5 | Native offline vs UT (no SQLite on UT) |
 | [ROADMAP.md](../ROADMAP.md) | Standing principle — UT webapp shell |
 | [canonical-native-platform-surface.md](canonical-native-platform-surface.md) §3.4 | What stays iOS/Android-only |
-| [modules/verticals/brewery/IMPLEMENTATION-LOG.md](../modules/verticals/brewery/IMPLEMENTATION-LOG.md) | Brew-day offline — native only |
+| [modules/verticals/brewery/IMPLEMENTATION-LOG.md](../modules/verticals/brewery/IMPLEMENTATION-LOG.md) | Brew-day offline — native only (brewery reference vertical) |
+| [GLOSSARY.md](../GLOSSARY.md) | *Vertical*, *canonical*, brewery-as-example convention |
 | [TAMAGUI.md](../TAMAGUI.md) | UI primitive layer preserved on UT via web |
 | [NATIVE-STRATEGY-AND-CI.md](../NATIVE-STRATEGY-AND-CI.md) | Expo native — orthogonal to UT shell |
 | [OPEN-SOURCE-STACK.md](../OPEN-SOURCE-STACK.md) | RN vs Flutter rationale + UT note |

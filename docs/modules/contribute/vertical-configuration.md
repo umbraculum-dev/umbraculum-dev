@@ -5,7 +5,11 @@
 **Audience:** anyone building a new vertical (e.g. `distillery`, `kombucha`, `cosmetics`, `food-batch`, `fragrance`) on Umbraculum.
 
 > [!NOTE]
+> **Foundational ISV path.** If you are building **product X** (not contributing brewery to core), start with [`BUILDING-YOUR-VERTICAL.md`](../../BUILDING-YOUR-VERTICAL.md) — Magento sample-data parallel, omitting brewery, today vs target — then return here for scaffold steps.
+>
 > Vertical configurations consume canonical modules and add vertical-specific seed data, prompts, UI flows, i18n, and tier-limit slices. They do not own canonical-domain semantics. The reference example is [`brewery`](../verticals/brewery/README.md) — read that page first to see the worked shape, then come back here for the contribution mechanics.
+>
+> **Where your code lives:** you normally ship a vertical in **your own repository** (and deployment), pinned to `@umbraculum/module-sdk` — not as a PR into `umbraculum-dev`. Canonical modules and platform core stay shared in the Umbraculum monorepo; your industry product is **yours**. `brewery` lives in this repo only as the **reference vertical**. [`GLOSSARY.md`](../../GLOSSARY.md) §"Where code lives"; Odoo/Magento/Omnis analogies in the same section.
 
 ---
 

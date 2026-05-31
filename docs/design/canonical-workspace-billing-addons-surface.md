@@ -4,7 +4,7 @@
 **Status:** Contract documented; **implementation deferred H1 2027** (accepted 2026-05-28)  
 **Audience:** module authors, billing integrators, hosted-service operators  
 **Resolves:** [RFC-0009](../rfcs/0009-workspace-billing-addons-and-entitlements.md) — pre-implementation boundary  
-**Related:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §3.6–§7.4, [`ROADMAP.md`](../ROADMAP.md) Wave E-full / item 2h
+**Related:** [RFC-0001](../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §8.2, [`PLATFORM-ARCHITECTURE.md`](../PLATFORM-ARCHITECTURE.md) §3.6–§7.4, [`ROADMAP.md`](../ROADMAP.md) Wave **E-full** / **F-mod** / item **2h**; integrator gap doc [`BUILDING-YOUR-VERTICAL.md`](../BUILDING-YOUR-VERTICAL.md)
 
 > **Disclaimer.** No `WorkspaceBillingAddon` Prisma model, Stripe subscription-item flow, or add-on enforcement ships in the July 2026 public-alpha tranche. This document exists so modules do not add parallel entitlement stores or payment integrations while `registerModule({ addonCodes })` is already live.
 

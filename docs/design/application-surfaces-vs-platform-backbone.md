@@ -67,7 +67,7 @@ flowchart TB
 
 ## 3. Terminology glossary
 
-Use these terms in reviews and plans to avoid talking past each other.
+Use these terms in reviews and plans to avoid talking past each other. For onboarding terms (*vertical*, *canonical*, *brewery reference vertical*, module taxonomy): [`GLOSSARY.md`](../GLOSSARY.md).
 
 | Term | Meaning | Do not confuse with |
 |---|---|---|

@@ -77,6 +77,7 @@ When writing or auditing a module README, use these tokens and positioning state
 | **Platform name in prose** | **Umbraculum** |
 | **One-line positioning** | "an open-source toolset for building workspace-shaped operational applications" |
 | **Scope examples** | Simple organizational tools such as PIM and quality-assurance workflows through complex manufacturing and process systems |
+| **Brewery in prose** | On first mention in a non-brewery doc: **brewery (reference vertical)** or **the brewery reference vertical** — the Tier 6 example product in this monorepo, not the platform identity. Full convention: [`GLOSSARY.md`](GLOSSARY.md) §"Documentation convention — citing brewery". |
 | **Marketing short / CLI** | **UMB** |
 | **Primary domain** | `umbraculum.dev` |
 | **GitHub org** | `umbraculum-dev` |

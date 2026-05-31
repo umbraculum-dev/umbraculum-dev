@@ -23,6 +23,8 @@ This page does **not** relitigate the governance model — [RFC-0001](rfcs/0001-
 
 ## 2. Vocabulary — the five words that matter
 
+> **Broader glossary.** Plain-language definitions for *vertical*, *canonical*, *brewery (reference vertical)*, operator shell, and the doc convention for citing brewery: [`GLOSSARY.md`](GLOSSARY.md).
+
 These five terms are used precisely throughout Umbraculum's docs. They are *not* interchangeable; mixing them up is the single most common source of confusion when reading the codebase. Source-of-truth links are in the right-hand column.
 
 | Term | One-line meaning | Source of truth |
@@ -70,7 +72,10 @@ Vertical configurations use the same β shape as canonical modules but with a ve
 |---|---|---|---|---|
 | `brewery` | **Shipped — reference vertical** (β file-move landed Week 1 of late-H1-2026 per [RFC-0006](rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md), amending [RFC-0002](rfcs/0002-canonical-module-physical-layout.md) Decision D; Prisma `brewery.*` schema split shipped per [RFC-0010](rfcs/0010-platform-brewery-postgres-schema-split.md) 2026-05-28; brewery-domain docs now live under the vertical folder; MRP/CRP Wave 5–6 advisor + rendering consume brewery source rows through canonical read models) | `automation` (shipped), `mrp` (read-only web + AI + RFC-0007 rendering proof shipped), `wms` (planned), `crm` (planned), `crp` (read-only web + AI + RFC-0007 rendering proof shipped) | AGPLv3 (this bundle); third-party verticals are author's choice | [modules/verticals/brewery/README.md](modules/verticals/brewery/README.md) |
 
-Future verticals (distillery, kombucha, cosmetics, food-batch, fragrance) are explicitly anticipated by [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 but unimplemented. They can be community-built — the Tier 6 path is permissionless.
+Future verticals (distillery, kombucha, cosmetics, food-batch, fragrance) are explicitly anticipated by [PLATFORM-ARCHITECTURE.md](PLATFORM-ARCHITECTURE.md) §1.1 but unimplemented. They can be community-built — the Tier 6 path is permissionless. **Default expectation:** those verticals ship in **builder-owned repositories**, not in this monorepo — same β shape and SDK contract as `brewery`, composed on top of shared canonical modules. Terminology: [`GLOSSARY.md`](GLOSSARY.md) §"Where code lives".
+
+> [!NOTE]
+> **Why `brewery` is in this repo.** It is the **reference vertical** — a complete worked example and manufacturing stress test for contributors and evaluators. It is **not** proof that every vertical must land here. See [`GLOSSARY.md`](GLOSSARY.md) §"Where code lives — shared backbone vs your vertical".
 
 > [!NOTE]
 > **Vertical configurations may have sister repos.** A vertical's surface is not always exclusively TypeScript — verticals with safety-validated PLC code, embedded firmware, hardware drivers, or other runtime-asymmetric assets typically live in a separate repository coupled to this monorepo by a versioned interface contract. The brewery vertical is the worked example: its OpenPLC ladder logic lives in a sister repo joined here by the `PI_*` Modbus mailbox + `CONTRACT_VERSION` + `integrated_release_tag`. See [`modules/verticals/brewery/README.md §3.7`](modules/verticals/brewery/README.md) for the worked example, and [`modules/contribute/vertical-configuration.md §4`](modules/contribute/vertical-configuration.md) for the generalized "multi-runtime modules" pattern.
@@ -110,7 +115,7 @@ Quick map (full per-path guides linked below):
 | You want to add… | Read | Ceremony |
 |---|---|---|
 | A new canonical module (new reserved code) | [`modules/contribute/canonical-module.md`](modules/contribute/canonical-module.md) | **High** — mini-RFC + consumption-contract checklist + core team approval. |
-| A vertical configuration (e.g. `distillery`, `kombucha`) | [`modules/contribute/vertical-configuration.md`](modules/contribute/vertical-configuration.md) | **None** — Tier 6, permissionless. Use `brewery` as model. |
+| A vertical configuration (e.g. `distillery`, `kombucha`) | [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) then [`modules/contribute/vertical-configuration.md`](modules/contribute/vertical-configuration.md) | **None** — Tier 6, permissionless. Use `brewery` as model. |
 | A third-party / community module against an existing canonical | [`modules/contribute/third-party-module.md`](modules/contribute/third-party-module.md) | **None** — Tier 3 / Tier 4, permissionless. Pin the SDK. |
 | A horizontal package (cross-cutting infrastructure) | [`modules/contribute/horizontal-package.md`](modules/contribute/horizontal-package.md) | **Low** — regular PR; reviewer agreement on cross-cutting nature. |
 

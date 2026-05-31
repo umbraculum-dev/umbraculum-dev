@@ -12,13 +12,16 @@ Documents are grouped by **purpose**, not by physical location. Most files sit a
 
 ## Start here
 
-If you are new to the project, read these three documents in order:
+If you are new to the project, read these documents in order:
 
+0. [`GLOSSARY.md`](GLOSSARY.md) — **terminology first** (recommended if *vertical*, *canonical*, or *brewery* are unfamiliar): plain-language definitions, the brewery reference-vertical convention, and links to deeper docs.
 1. [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — the **vision and shape**: horizontal platform with vertical modules, AI consultant blueprint, BYOK + paid tier unlock, and the future managed-AI path.
 2. [`ROADMAP.md`](ROADMAP.md) — the **direction of travel**: what is shipped, what is next, the 12–30 month trajectory.
 3. [`LICENSING.md`](LICENSING.md) — the **licensing posture and reasoning**: AGPLv3 core + MIT SDK, commercial dual license, and what these choices imply for contributors, self-hosters, module developers, and enterprises.
 
-Cross-platform (web + native + Ubuntu Touch webapp shell) boundaries: [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md), [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md). The brewery-vertical implementation log: [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md). Together they complement the platform-wide perspective above.
+**Building product X on Umbraculum (vertical ISV / integrator, not core contributor)?** [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) — start your vertical, omit brewery, Magento sample-data parallel.
+
+Cross-platform (web + native + Ubuntu Touch webapp shell) boundaries: [`CROSS-PLATFORM-BOUNDARIES.md`](CROSS-PLATFORM-BOUNDARIES.md), [`design/ubuntu-touch-shell-strategy.md`](design/ubuntu-touch-shell-strategy.md). The brewery reference vertical's product rules: [`modules/verticals/brewery/IMPLEMENTATION-LOG.md`](modules/verticals/brewery/IMPLEMENTATION-LOG.md). Together they complement the platform-wide perspective above.
 
 ---
 
@@ -38,6 +41,7 @@ The spatial map of the monorepo — what every workspace is, which layer it sits
 
 The high-level direction, business model, and license posture.
 
+- [`GLOSSARY.md`](GLOSSARY.md) — **onboarding terminology** — *vertical*, *canonical*, *brewery (reference vertical)*, operator shell, and the doc convention for citing brewery.
 - [`PLATFORM-ARCHITECTURE.md`](PLATFORM-ARCHITECTURE.md) — Platform vision, AI consultant, distribution model; §2.1 *From practice, not theory* (open backbone — practitioner rationale, cites Omnis case study).
 - [`ROADMAP.md`](ROADMAP.md) — Living roadmap with 12–30 month trajectory.
 - [`LICENSING.md`](LICENSING.md) — Licensing rationale (AGPLv3 + MIT SDK, dual license, RFC change process).
@@ -57,7 +61,8 @@ The high-level direction, business model, and license posture.
 
 *Audience: anyone evaluating, contributing to, or building on top of the module set — the analog of `drupal.org/project/project_module` for Umbraculum.*
 
-- [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example.
+- [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) — **foundational ISV path** — "how do I build product X on Umbraculum?" and "how do I run without brewery?" (Magento sample-data parallel; today vs target).
+- [`MODULES.md`](MODULES.md) — **entry point for the module ecosystem.** Vocabulary (`package` vs `canonical module` vs `vertical configuration` vs `reserved canonical code` vs `module SDK`), the catalog (canonical modules + vertical configurations + horizontal packages), the "I want to build a ___" decision tree, and a worked example. See also [`GLOSSARY.md`](GLOSSARY.md) for plain-language onboarding definitions.
 - [`modules/`](modules/) — per-module pages linked from `MODULES.md` (one page per canonical module / vertical configuration as each ships; today: `modules/canonical/automation.md`, `modules/canonical/pim.md`, and the `modules/verticals/brewery/` reference vertical docs).
 - [`modules/packages/README.md`](modules/packages/README.md) — **package primer** — horizontal infrastructure, canonical contracts, and vertical-flavored workspaces with links to each `README.md`.
 

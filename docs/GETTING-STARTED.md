@@ -13,6 +13,21 @@
 If you have already contributed to this repo before and just need a
 quick reminder, jump straight to [`DEVELOPMENT.md`](../DEVELOPMENT.md).
 
+## Words you'll see first
+
+Umbraculum reuses a small vocabulary precisely — especially **vertical**,
+**canonical**, and **brewery**. Skim [`GLOSSARY.md`](GLOSSARY.md) before
+diving in if those words are new; it explains that a **vertical** is a
+specific product a team builds on the platform (usually in **your own repo**,
+not this monorepo), that **canonical** names shared operational domains
+(PIM, MRP, …) that **do** live here, and that **brewery** is the
+**reference vertical** shipped in-repo as a worked example — not proof that
+the platform is brewery-only.
+
+**Building product X on Umbraculum (vertical ISV / integrator)?** Read
+[`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) — how to start your
+vertical, omit the brewery reference, and the Magento sample-data parallel.
+
 ## Who this is for
 
 - A developer with a working laptop and a GitHub account who wants to

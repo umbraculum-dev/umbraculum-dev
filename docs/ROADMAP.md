@@ -10,7 +10,9 @@ This roadmap captures the agreed “direction of travel” for the product so im
 - Licensing posture and rationale (AGPLv3 core + MIT SDK + commercial dual license): `docs/LICENSING.md`
 - Cross-platform boundaries: `docs/CROSS-PLATFORM-BOUNDARIES.md`
 - Ubuntu Touch operator shell: `docs/design/ubuntu-touch-shell-strategy.md`
-- Brewery-vertical implementation log: `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`
+- Building your vertical (ISV path; Magento sample-data parallel): `docs/BUILDING-YOUR-VERTICAL.md`
+- Glossary (terminology + optional reference vertical): `docs/GLOSSARY.md`
+- Brewery reference vertical implementation log: `docs/modules/verticals/brewery/IMPLEMENTATION-LOG.md`
 - Accessibility hard constraint: `docs/DEVELOPMENT-ACCESSIBILITY.md`
 - Seed data sources + licensing notes: `docs/modules/verticals/brewery/RAW-MATERIALS-SEEDABLE-SOURCES.md`
 - Full doc index: `docs/README.md`
@@ -85,6 +87,7 @@ Goal: harden the shipped v0 AI consultant into the platform's cross-module conne
 | **D2–D3** | Timeline RAG + memory unify | D1 | H1 2027 | — | **Deferred** |
 | **E** | Multi-provider BYOK router | BYOK demand signal | Dec 2026 | Anthropic + OpenAI BYOK selectable | **Shipped** |
 | **E-full** | Managed-AI credits + pricebook | `WorkspaceBillingAddon` (priority **7**); [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md) contract | H1 2027 | Credits + Stripe top-up | **Deferred** |
+| **F-mod** | **Optional reference vertical / platform-without-brewery install** — decouple `brewery` from unconditional core boot | `WorkspaceBillingAddon` + module install model ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)); boot composition ([RFC-0002](rfcs/0002-canonical-module-physical-layout.md) §3 plugin-driven registration) | H1 2027 | Self-host **platform SKU** without brewery routes/schema/nav; workspace can omit reference vertical; AI + shell respect installed module set (Magento `SampleData*` equivalent) | **Deferred** — gap documented [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) |
 | **—** | WMS/CRM AI tool bundles | WMS/CRM modules | H2 2027+ | — | **Blocked** |
 
 Surface docs: [`canonical-ai-propose-write-surface.md`](design/canonical-ai-propose-write-surface.md), [`canonical-ai-reporting-dsl-surface.md`](design/canonical-ai-reporting-dsl-surface.md), [`canonical-ai-rag-surface.md`](design/canonical-ai-rag-surface.md). Build log: [`ai-consultant-post-alpha-h2-build-log.md`](design/ai-consultant-post-alpha-h2-build-log.md).
@@ -151,7 +154,7 @@ Two phases: **Phase 1** is safe for agents while a maintainer is away (code, doc
 | **2e** | **Launch comms** — publish announcement; cross-post forum; optional sponsors list seed | After **2c** + **2d** | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](PUBLIC-ALPHA-ANNOUNCEMENT.md), flip-day runbook §8 |
 | **2f** | **MIT npm SDK publish batch** | **Pre-completed 2026-05-29** (before Stage 2 flip) — registry install live | [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md), [`LICENSING.md`](LICENSING.md) §6.2.1 |
 | **2g** | **DocSearch application submit** (Algolia) | Replaces lunr fallback on docs site | RFC-0005 P5 |
-| **2h** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 — **contract ✅ [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)**; implementation deferred |
+| **2h** | **`WorkspaceBillingAddon` + managed-AI** | Not required for α flip | H1 2027 — **contract ✅ [RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)**; implementation deferred; pairs with **F-mod** (optional reference vertical / platform-without-brewery) |
 | **2i** | **Tamagui intra-RC bump** | Hygiene | [`TAMAGUI.md`](TAMAGUI.md) |
 
 **Not in this H2 alpha slice:** WMS, native MRP/CRP operator screens, irreversible brewery→MRP schema migration, scheduling optimizer, ready-to-sell commercial MRP/CRP — see [§ H1 2027 mature](#h1-2027--mature-mrp-crp--wms--commercial-scope-deferred-from-original-h1-2027) below.
@@ -163,7 +166,8 @@ Goal: move from **read-only alpha proof** to **production-ready** manufacturing 
 - MRP/CRP **write workflows** (UI + API + AI propose/confirm), not only read projections from brewery/automation.
 - **WMS** integration — stock-on-hand, receipts/issues reconciling MRP material requirements ([`H2 2027 — WMS`](#h2-2027--wms-as-second-native-mandatory-vertical-federation-decision) is the next native-mandatory vertical).
 - **Native** MRP/CRP screens where floor UX research demands them (default remains web-first per standing principles below).
-- **Entitlement billing** tied to module add-ons once `WorkspaceBillingAddon` ships.
+- **Entitlement billing** tied to module add-ons once `WorkspaceBillingAddon` ships ([`design/canonical-workspace-billing-addons-surface.md`](design/canonical-workspace-billing-addons-surface.md)).
+- **Decouple reference vertical from platform core (optional `brewery` / platform-without-brewery install SKU)** — H1 2027 **F-mod** in the post-α wave table above. Today `registerBreweryModule()` and `BUILTIN_WEB_MODULE_REGISTRATIONS` always include brewery (α gap). Target: (1) **deploy profile** or composable boot that installs platform + chosen canonical modules **without** brewery API/web/native slices or `brewery.*` migrations unless opted in — the Magento Open Source vs `Magento_SampleData*` split ([`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md)); (2) **workspace entitlements** so hosted/self-host runtimes hide brewery nav, AI tools, and `brewery_module` surfaces when not installed; (3) **AI + shell** filter to installed modules only (today all boot-registered modules contribute — [`canonical-ai-prompt-composition-surface.md`](design/canonical-ai-prompt-composition-surface.md) §5). Pairs with **2h** / Wave **E-full**; unblocks integrators building product X without fork-level surgery.
 - **Irreversible** promotion of brewery brew-session/recipe data into MRP-owned tables (alpha stays read-time projection; brewery remains source of truth today).
 - **Ready-to-sell** MRP/CRP product depth (optimizers, mature scheduling, multi-vertical configurations beyond brewery proof).
 
@@ -174,7 +178,7 @@ Goal: move from **read-only alpha proof** to **production-ready** manufacturing 
 Goal: validate the "modules expand by config and SDK, not by core rewrite" promise, and decide native packaging strategy with evidence.
 
 - Spike Re.Pack module federation against the platform shell (expecting roughly 30 months of post-MF-release tooling hardening by this point). Decision gate: if the Expo + Re.Pack story is genuinely smooth, federate WMS as the second native module in the same shell; if not, ship WMS as web + PWA + a thin native scanner companion. Either way, the AI consultant sees both modules.
-- Brewery + WMS overlap on tooling, packaging, and AI tool registry — the strongest test of whether the platform shape genuinely supports multi-module operation or whether brewery still leaks across boundaries.
+- Brewery + WMS overlap on tooling, packaging, and AI tool registry — the strongest test of whether the platform shape genuinely supports multi-module operation or whether brewery still leaks across boundaries (see H1 2027 **F-mod** — decouple reference vertical from core boot).
 - First third-party-built vertical configuration accepted (likely distillery or kombucha) — the proof that the SDK is a public contract, not a private convention.
 
 ### 2028 and beyond — CRM, additional vertical configurations, foundation question

@@ -12,7 +12,7 @@ Find your "I want to add a ___" goal in the left column; the right column tells 
 | You want to add… | Read | Ceremony |
 |---|---|---|
 | **A new canonical module** (a new reserved code like `quality`, `maintenance`, `hr`) | [`canonical-module.md`](canonical-module.md) | **High** — mini-RFC + consumption-contract checklist + core team approval. The only gated path in the ecosystem. |
-| **A vertical configuration** (a new vertical like `distillery`, `kombucha`, `cosmetics`) | [`vertical-configuration.md`](vertical-configuration.md) | **None** (Tier 6, permissionless). Use brewery as the worked example. |
+| **A vertical configuration** (a new vertical like `distillery`, `kombucha`, `cosmetics`) | [`BUILDING-YOUR-VERTICAL.md`](../../BUILDING-YOUR-VERTICAL.md) → [`vertical-configuration.md`](vertical-configuration.md) | **None** (Tier 6, permissionless). Use brewery as the worked example. |
 | **A third-party / community module** against an existing canonical (e.g. a Salesforce connector for the future `crm`) | [`third-party-module.md`](third-party-module.md) | **None** (Tier 3 / Tier 4, permissionless). Pin the SDK, ship from your own repo. |
 | **A horizontal package** (cross-cutting infrastructure consumed by every module) | [`horizontal-package.md`](horizontal-package.md) | **Low** — regular PR with reviewer agreement that the concern is genuinely cross-cutting. Package index: [`../packages/README.md`](../packages/README.md). |
 
