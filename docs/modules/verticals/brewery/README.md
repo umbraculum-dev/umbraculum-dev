@@ -195,6 +195,10 @@ If your vertical wants to be **bundled** with the platform's hosted offering (th
 
 **Omitting brewery when building product X:** deploy profile + workspace add-ons — [`BUILDING-YOUR-VERTICAL.md`](../../../BUILDING-YOUR-VERTICAL.md), [`design/platform-module-profile.md`](../../../design/platform-module-profile.md).
 
+### OpenAPI (brewery tag)
+
+Brewery HTTP routes migrated to `zodApp` + `schema.tags: ['brewery']` appear in the **optional add-on spec** [`services/api/openapi/brewery.json`](../../../../services/api/openapi/brewery.json) (12 paths / 21 operations as of 2026-05-31: styles, equipment, inventory, brewday settings, recipes, BeerJSON export). They are **not** in the platform catalog [`openapi.json`](../../../../services/api/openapi/openapi.json). Remaining brewery routes (water, brew sessions, import, ingredients) are PR3 backlog. Index: [`API-OPENAPI.md`](../../../API-OPENAPI.md).
+
 ---
 
 ## 7. Cross-references
@@ -203,7 +207,7 @@ If your vertical wants to be **bundled** with the platform's hosted offering (th
 - [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md) — web/native as-built boundaries (route IDs, auth, webview bridge).
 - [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell (web workflows; no offline brew-day).
 - [`design/platform-module-profile.md`](../../../design/platform-module-profile.md) — F-mod deploy profile (`reference` vs `platform`).
-- [`BUILDING-YOUR-VERTICAL.md`](../../../BUILDING-YOUR-VERTICAL.md) — integrator path; omitting reference vertical.
+- [`API-OPENAPI.md`](../../../API-OPENAPI.md) — platform catalog + brewery add-on OpenAPI specs
 - [RFC-0002](../../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §6 (Decision D — brewery sequencing), §11.2 (concrete migration table).
 - [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — accelerated brewery file relocation.
 - [PLATFORM-ARCHITECTURE.md](../../../PLATFORM-ARCHITECTURE.md) §1.1 (platform-not-brewery framing), §1.1.1 (peer-canonical decomposition), §5.2 (module/vertical restructure).

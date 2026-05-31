@@ -12,6 +12,7 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 import { openapiPlugin } from "./plugins/openapiPlugin.js";
+import { openapiStaticRoutesPlugin } from "./plugins/openapiStaticRoutes.js";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { redisClientPlugin } from "./plugins/redisClient.js";
 import { requestContextPlugin } from "./plugins/requestContext.js";
@@ -95,6 +96,7 @@ export function buildApp() {
   app.register(requestContextPlugin);
 
   app.register(openapiPlugin);
+  app.register(openapiStaticRoutesPlugin);
 
   app.register(healthRoutes);
   app.register(authRoutes);

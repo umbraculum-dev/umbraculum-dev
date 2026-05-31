@@ -51,7 +51,7 @@ Public docs use **`$REPO_ROOT`** for the monorepo clone directory (for example `
 - **Contract validation via Zod v4.** Schema-first declaration (`z.object/...`); type inference (`z.infer<typeof S>`); backward-compat via `z.preprocess()`; soft-tolerance via `z.transform()`; structured errors via `ZodError.issues[]`. Hand-rolled `is(): v is X` type guards are forbidden under `packages/*-contracts/src/**`. Verify via the `contracts-zod-auditor` subagent. See [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](docs/CONTRACTS-VALIDATION-STRATEGY.md), the `zod-schema-scaffold` skill, and the `22-typescript-contracts-runtime-validation` rule.
 - **Module READMEs follow the canonical template.** All `apps/*/README.md`, `services/*/README.md`, `packages/*/README.md` pass the structural + link checks. Verify via the `module-readme-checker` subagent. See [`docs/DOCS-README-STANDARDS.md`](docs/DOCS-README-STANDARDS.md) and the `module-readme-verification` skill.
 - **Workspace-scoped routes need L2 isolation tests.** Any new route under `services/api/src/routes/**` that is workspace-scoped requires the canonical 6-axis L2 cross-workspace isolation test. See the `l2-cross-workspace-isolation-test` skill.
-- **CI parity over local-only signals.** Local lint/typecheck can lie via documented divergence mechanisms (hoisted vs container `node_modules`, nested-workspace install gaps, gitignored cross-refs). **Before pushing**, run `npx @umbraculum/ci-parity` from the repo root (wrapper: `./scripts/ci-parity-check.sh`) — jobs run **inside Docker** on a clean `git archive HEAD` snapshot per `.umbraculum/ci-parity.json` (requires host Docker, not host Node). See [`docs/CI-PARITY.md`](docs/CI-PARITY.md) and the `ci-parity-local-reproduction` skill.
+- **CI parity over local-only signals.** Use **T1** slice verification while iterating (`npm run verify:from-diff` or a named `verify:*` script — see [`docs/VERIFICATION-TIERS.md`](docs/VERIFICATION-TIERS.md)). **Before pushing**, run **T2**: `npm run verify:pre-push` or `npx @umbraculum/ci-parity` from the repo root (wrapper: `./scripts/ci-parity-check.sh`) plus the **`api-integration-tests-pre-push`** skill when API paths changed. Jobs run **inside Docker** on a clean `git archive HEAD` snapshot per `.umbraculum/ci-parity.json`. See [`docs/CI-PARITY.md`](docs/CI-PARITY.md) and the `ci-parity-local-reproduction` skill.
 - **Public-endpoint verification gate.** After any non-doc change to a service with a reachable URL/API, verify against the running endpoint before declaring done. Passing tests are not sufficient evidence. See the `public-endpoint-verification` skill and the `45-public-endpoint-verification` rule.
 - **No hardcoded paths in E2E.** Playwright flows must avoid hardcoded navigation paths. See the `30-e2e-no-hardcoded-paths` rule.
 - **Prefer fixing regressions over weakening tests.** If a refactor breaks rendering or contracts, fix the app wiring/config first. Only adjust tests for determinism when the requirement itself did not change.
@@ -89,9 +89,12 @@ The full skill inventory is per-plugin (see each plugin's `skills/` folder, inde
 - **`l2-cross-workspace-isolation-test`** (platform-tsjs) — scaffold the 6-axis L2 test for new workspace-scoped routes.
 - **`package-scope-migration-preflight`** (platform-tsjs) — inventory + classification + hard-stop flags before any package-scope rename.
 - **`zod-schema-scaffold`** (node-react) — emit the canonical Zod schema + paired test template for a new contract file.
-- **`ci-parity-local-reproduction`** (node-react) — reproduce CI static-analysis in a clean `git archive HEAD` snapshot.
+- **`ci-parity-local-reproduction`** (node-react) — reproduce CI static-analysis in a clean `git archive HEAD` snapshot (T2).
+- **`verify-slice-runbook`** (node-react) — run T0/T1 verification for a named slice or git diff.
+- **`scoped-package-build-in-docker`** (node-react) — rebuild one workspace `dist/` without full `build:packages`.
+- **`api-integration-tests-pre-push`** (node-react) — T2 API vitest gate (separate from ci-parity).
 - **`public-endpoint-verification`** (node-react) — verify a TS/JS web app or API endpoint against the running service.
-- **`build-workspace-packages-dist-in-container`** (node-react) — build workspace package `dist/` outputs inside the correct container.
+- **`build-workspace-packages-dist-in-container`** (node-react) — full `build:packages` fallback inside Docker.
 - **`node-npm-container-only`** (node-react) — run Node / npm tasks inside the API or web container.
 - **`playwright-runner-docs-gate`** (node-react) — pre-flight before touching `e2e/playwright/**`.
 - **`docker-compose-debugging`** (node-react) — diagnose Docker Compose errors (interpolation, parse issues).

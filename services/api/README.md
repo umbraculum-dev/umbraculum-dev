@@ -32,10 +32,12 @@ The API binds at `:3001` inside the container; the dev nginx routes `/api/*` fro
 Per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`, every command runs inside the api container — never on host Node.
 
 - **Build (production)**: `docker compose exec api npm run build` (`tsc -p tsconfig.json`).
-- **Test (full suite)**: `docker compose exec api npm test` (resets the test DB, runs vitest including contract-snapshot tests).
+- **Test (unit — no DB reset)**: `docker compose exec api npm run test:unit` (openapi artifact, entitlements, promptComposer, … — T0 fast path).
+- **Test (integration — full suite)**: `docker compose exec api npm run test:integration` or `docker compose exec api npm test` (resets test DB once per run, all vitest specs including contract snapshots).
+- **Verification slices (T1)**: from repo root — `npm run verify:openapi`, `npm run verify:api-platform`, etc. See [`docs/VERIFICATION-TIERS.md`](../../docs/VERIFICATION-TIERS.md).
 - **Test (single filter)**: `docker compose exec api npm test -- -t "<vitest filter>"`.
 - **Contract snapshot check**: `docker compose exec api npm run contracts:check` (fails CI if the API's serialized response shape diverges from the snapshots; refresh with `npm run contracts:update`).
-- **OpenAPI artifact**: `docker compose exec api npm run openapi:generate` (regenerate committed spec); `docker compose exec api npm run openapi:check` (CI parity). See [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md).
+- **OpenAPI artifacts**: `docker compose exec api npm run openapi:generate` (writes `openapi/openapi.json` + `openapi/brewery.json`); `docker compose exec api npm run openapi:check` (CI parity). Platform catalog uses `UMBRACULUM_MODULE_PROFILE=platform` at generation. See [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md).
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate" (this workspace carries all 6 candidate strict flags after Phase 6f + 6g + 6h).
 - **DB migrations**: `docker compose exec api npm run db:migrate`.
 - **Backfills**: `npm run db:backfill:recipe-styles`, `npm run db:backfill:recipe-beerjson`, `npm run db:backfill:integration-tokens` — all `tsx`-driven CLI entrypoints in `src/cli/`.
@@ -60,7 +62,7 @@ Shipping. AI orchestrator + per-workspace operational memory + admin dashboard l
 - [`docs/POSTGRES-REPLICATION-ARCHITECTURE.md`](../../docs/POSTGRES-REPLICATION-ARCHITECTURE.md) — primary + replica + pgpool + pgvector image rationale
 - [`docs/design/canonical-ai-rag-surface.md`](../../docs/design/canonical-ai-rag-surface.md) — Layer C RAG (`ai.doc_chunks`, ingest, `platform.searchProductDocs`)
 - [`docs/CONTRACTS-VALIDATION-STRATEGY.md`](../../docs/CONTRACTS-VALIDATION-STRATEGY.md) — why the API uses hand-rolled runtime validators
-- [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md) — alpha partial OpenAPI catalog and maintainer runbook
+- [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md) — platform OpenAPI catalog + brewery add-on spec and maintainer runbook
 - [`docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md`](../../docs/ORG-BILLING-STRIPE-REVENUECAT-FASTIFY.md) — billing source-of-truth design
 - [`docs/TESTING.md`](../../docs/TESTING.md) — platform-wide test layer map
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to

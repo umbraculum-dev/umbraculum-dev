@@ -1,4 +1,7 @@
 export * from "./auth/meResponse";
+export * from "./auth/platformAuth";
+export * from "./workspaces/platformWorkspaces";
+export * from "./brewery/routeSchemas";
 export * from "./water/derivation";
 export * from "./water/ionProfile";
 export * from "./water/hubSummary";

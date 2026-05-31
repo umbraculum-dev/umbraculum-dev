@@ -400,7 +400,7 @@ All four SDK packages listed above are physically present in `packages/` today. 
 
 **npm publication readiness (2026-05-29):** External module repos can `npm install` `@umbraculum/module-sdk`, `@umbraculum/ai-tool-sdk`, `@umbraculum/i18n-keys`, and the four canonical `*-contracts` packages at the versions in [`docs/LICENSING.md`](LICENSING.md) §6.2.1. `@umbraculum/api-client` remains deferred.
 
-**Machine-readable API catalog (2026-05-28):** An **alpha partial** OpenAPI spec is committed at [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) and indexed in [`docs/API-OPENAPI.md`](API-OPENAPI.md). It documents canonical-module and rendering routes with Zod-backed schemas today; platform and brewery routes remain on human route tables until PR3 completes. Full F1 closure is tracked in [`CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md) §Follow-ups.
+**Machine-readable API catalog (2026-05-31):** A **split partial** OpenAPI catalog is committed: platform spec [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) (canonical modules, rendering, auth, workspaces) and optional brewery add-on [`services/api/openapi/brewery.json`](../services/api/openapi/brewery.json). Indexed in [`docs/API-OPENAPI.md`](API-OPENAPI.md). Billing, integrations, and remaining brewery routes stay on human route tables until PR3 completes. Full F1 closure is tracked in [`CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md) §Follow-ups.
 
 ### 4.5 Prisma schema strategy
 

@@ -88,6 +88,19 @@ Restore reference stack after contrast testing.
 
 ---
 
+## OpenAPI generation alignment
+
+Committed OpenAPI artifacts respect the same profile split:
+
+| Profile at `openapi:generate` | `openapi/openapi.json` | `openapi/brewery.json` |
+|-------------------------------|------------------------|-------------------------|
+| `platform` (default for CI) | Canonical + rendering + platform routes | Empty or stale — regenerate with `reference` |
+| `reference` | Not the CI source of truth | Brewery-tagged routes |
+
+ISVs building product X without brewery should read **only** the platform catalog — [`API-OPENAPI.md`](../API-OPENAPI.md).
+
+---
+
 ## Related docs
 
 - [`demo-host-runbook.md`](demo-host-runbook.md) — demo host bring-up  

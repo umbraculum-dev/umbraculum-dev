@@ -59,6 +59,8 @@ This repo implements a **system-browser-first** bridge to open a web-only flow f
 
 ## Logout (both)
 
+**OpenAPI:** Auth and session routes are documented under tag `platform` in [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json). See [`API-OPENAPI.md`](API-OPENAPI.md).
+
 `POST /auth/logout` accepts either:
 - Cookie: `sid` (web)
 - Header: `Authorization: Bearer <token>` (native)

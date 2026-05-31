@@ -20,20 +20,61 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  ActiveWorkspaceContextResponseSchema: () => ActiveWorkspaceContextResponseSchema,
   AiChatRequestBodySchema: () => AiChatRequestBodySchema,
   AiProposalActionResponseSchema: () => AiProposalActionResponseSchema,
   AiProposalDtoSchema: () => AiProposalDtoSchema,
   AiProposalListResponseSchema: () => AiProposalListResponseSchema,
   AiProposalStatusSchema: () => AiProposalStatusSchema,
+  AuthActiveWorkspaceRequestSchema: () => AuthActiveWorkspaceRequestSchema,
+  AuthActiveWorkspaceResponseSchema: () => AuthActiveWorkspaceResponseSchema,
+  AuthLoginNativeResponseSchema: () => AuthLoginNativeResponseSchema,
+  AuthLoginRequestSchema: () => AuthLoginRequestSchema,
+  AuthLoginResponseSchema: () => AuthLoginResponseSchema,
+  AuthLogoutResponseSchema: () => AuthLogoutResponseSchema,
   AuthMeResponseSchema: () => AuthMeResponseSchema,
   AuthMeResponseUserSchema: () => AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema: () => AuthMeResponseWorkspaceSchema,
+  AuthPreferencesPatchRequestSchema: () => AuthPreferencesPatchRequestSchema,
+  AuthPreferencesPatchResponseSchema: () => AuthPreferencesPatchResponseSchema,
+  AuthSessionUserSchema: () => AuthSessionUserSchema,
+  AuthSignupRequestSchema: () => AuthSignupRequestSchema,
+  AuthSignupResponseSchema: () => AuthSignupResponseSchema,
+  AuthWebviewBridgeQuerySchema: () => AuthWebviewBridgeQuerySchema,
+  AuthWebviewExchangeRequestSchema: () => AuthWebviewExchangeRequestSchema,
+  AuthWebviewExchangeResponseSchema: () => AuthWebviewExchangeResponseSchema,
+  BeerJsonExportResponseSchema: () => BeerJsonExportResponseSchema,
+  BeerStyleSchema: () => BeerStyleSchema,
   BrewSessionsListResponseSchema: () => BrewSessionsListResponseSchema,
+  BrewdaySettingsPatchRequestSchema: () => BrewdaySettingsPatchRequestSchema,
+  BrewdaySettingsPayloadSchema: () => BrewdaySettingsPayloadSchema,
+  BrewdaySettingsResponseSchema: () => BrewdaySettingsResponseSchema,
+  ContextMeResponseSchema: () => ContextMeResponseSchema,
   CrpProposeScheduleAdjustmentInputSchema: () => CrpProposeScheduleAdjustmentInputSchema,
   CrpProposeScheduleAdjustmentOutputSchema: () => CrpProposeScheduleAdjustmentOutputSchema,
+  EquipmentProfileCreateRequestSchema: () => EquipmentProfileCreateRequestSchema,
+  EquipmentProfilePatchRequestSchema: () => EquipmentProfilePatchRequestSchema,
+  EquipmentProfilePayloadSchema: () => EquipmentProfilePayloadSchema,
+  EquipmentProfileResponseSchema: () => EquipmentProfileResponseSchema,
+  EquipmentProfilesListResponseSchema: () => EquipmentProfilesListResponseSchema,
   ErrorResponseSchema: () => ErrorResponseSchema,
+  IdParamsSchema: () => IdParamsSchema,
+  InventoryCategoryQuerySchema: () => InventoryCategoryQuerySchema,
+  InventoryCreateRequestSchema: () => InventoryCreateRequestSchema,
+  InventoryItemPayloadSchema: () => InventoryItemPayloadSchema,
+  InventoryItemResponseSchema: () => InventoryItemResponseSchema,
+  InventoryListResponseSchema: () => InventoryListResponseSchema,
+  InventoryPatchRequestSchema: () => InventoryPatchRequestSchema,
   MrpProposeOrderAdjustmentInputSchema: () => MrpProposeOrderAdjustmentInputSchema,
   MrpProposeOrderAdjustmentOutputSchema: () => MrpProposeOrderAdjustmentOutputSchema,
+  OkResponseSchema: () => OkResponseSchema,
+  PreferredLocaleSchema: () => PreferredLocaleSchema,
+  RecipeCreateRequestSchema: () => RecipeCreateRequestSchema,
+  RecipeListResponseSchema: () => RecipeListResponseSchema,
+  RecipePatchRequestSchema: () => RecipePatchRequestSchema,
+  RecipePayloadSchema: () => RecipePayloadSchema,
+  RecipeResponseSchema: () => RecipeResponseSchema,
+  RecipeVersionsResponseSchema: () => RecipeVersionsResponseSchema,
   RecipesListResponseSchema: () => RecipesListResponseSchema,
   RenderDeliverySchema: () => RenderDeliverySchema,
   RenderErrorSchema: () => RenderErrorSchema,
@@ -46,6 +87,18 @@ __export(index_exports, {
   RenderKindSchema: () => RenderKindSchema,
   RenderStatusSchema: () => RenderStatusSchema,
   RenderVisibilitySchema: () => RenderVisibilitySchema,
+  SafeNextPathSchema: () => SafeNextPathSchema,
+  StylesListResponseSchema: () => StylesListResponseSchema,
+  UiDensitySchema: () => UiDensitySchema,
+  UiFontScaleSchema: () => UiFontScaleSchema,
+  UiThemeSchema: () => UiThemeSchema,
+  WorkspaceBrandPatchRequestSchema: () => WorkspaceBrandPatchRequestSchema,
+  WorkspaceBrandPatchResponseSchema: () => WorkspaceBrandPatchResponseSchema,
+  WorkspaceCreateRequestSchema: () => WorkspaceCreateRequestSchema,
+  WorkspaceCreateResponseSchema: () => WorkspaceCreateResponseSchema,
+  WorkspaceIdParamsSchema: () => WorkspaceIdParamsSchema,
+  WorkspaceRowSchema: () => WorkspaceRowSchema,
+  WorkspacesListResponseSchema: () => WorkspacesListResponseSchema,
   analysisFormatHints: () => analysisFormatHints,
   parseAuthMeResponse: () => parseAuthMeResponse,
   parseBoilComputeAndSaveResponse: () => parseBoilComputeAndSaveResponse,
@@ -129,6 +182,276 @@ var AuthMeResponseSchema = import_zod.z.preprocess(
 function parseAuthMeResponse(payload) {
   return AuthMeResponseSchema.parse(payload);
 }
+
+// src/auth/platformAuth.ts
+var import_zod2 = require("zod");
+var PreferredLocaleSchema = import_zod2.z.unknown().transform((v) => v === "en" || v === "it" ? v : "en");
+var UiThemeSchema = import_zod2.z.unknown().transform((v) => {
+  if (v === "default" || v === "hc_dark" || v === "hc_light") return v;
+  return "default";
+});
+var UiFontScaleSchema = import_zod2.z.unknown().transform((v) => {
+  if (v === "sm" || v === "md" || v === "lg" || v === "xl") return v;
+  return "md";
+});
+var UiDensitySchema = import_zod2.z.unknown().transform((v) => {
+  if (v === "comfortable" || v === "compact") return v;
+  return "comfortable";
+});
+var SafeNextPathSchema = import_zod2.z.preprocess(
+  (v) => typeof v === "string" ? v.trim() : v,
+  import_zod2.z.string().min(1, "next is required").refine((next) => next.startsWith("/"), "next must start with '/'").refine((next) => !next.startsWith("//"), "next must not start with '//'").refine((next) => !next.includes("://"), "next must be a relative path").refine(
+    (next) => next === "/en" || next.startsWith("/en/") || next === "/it" || next.startsWith("/it/"),
+    "next must start with '/en' or '/it'"
+  )
+);
+var AuthSessionUserSchema = import_zod2.z.object({
+  id: import_zod2.z.string().min(1),
+  email: import_zod2.z.string().min(1),
+  preferredLocale: PreferredLocaleSchema
+});
+var AuthSignupRequestSchema = import_zod2.z.preprocess(
+  (raw) => {
+    if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return raw;
+    const r = raw;
+    return {
+      email: r["email"],
+      password: r["password"],
+      preferredLocale: r["preferredLocale"],
+      workspaceName: typeof r["workspaceName"] === "string" ? r["workspaceName"] : r["accountName"]
+    };
+  },
+  import_zod2.z.object({
+    email: import_zod2.z.string().transform((v) => v.trim().toLowerCase()).pipe(import_zod2.z.string().min(1).includes("@", { message: "Email is required" })),
+    password: import_zod2.z.string().min(8, "Password must be at least 8 characters"),
+    preferredLocale: PreferredLocaleSchema.optional(),
+    workspaceName: import_zod2.z.string().optional()
+  })
+);
+var AuthSignupResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  user: AuthSessionUserSchema,
+  activeWorkspaceId: import_zod2.z.string().nullable()
+});
+var AuthLoginRequestSchema = import_zod2.z.object({
+  email: import_zod2.z.string().transform((v) => v.trim().toLowerCase()).pipe(import_zod2.z.string().min(1).includes("@", { message: "Email is required" })),
+  password: import_zod2.z.string().min(1, "Password is required"),
+  preferredLocale: PreferredLocaleSchema.optional()
+});
+var AuthLoginResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  user: AuthSessionUserSchema,
+  workspaces: import_zod2.z.array(AuthMeResponseWorkspaceSchema),
+  activeWorkspaceId: import_zod2.z.string().nullable()
+});
+var AuthLoginNativeResponseSchema = AuthLoginResponseSchema.extend({
+  token: import_zod2.z.string().min(1)
+});
+var AuthLogoutResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true)
+});
+var AuthWebviewExchangeRequestSchema = import_zod2.z.object({
+  next: SafeNextPathSchema
+});
+var AuthWebviewExchangeResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  code: import_zod2.z.string().min(1),
+  expiresAt: import_zod2.z.string().min(1),
+  bridgeUrl: import_zod2.z.string().min(1)
+});
+var AuthWebviewBridgeQuerySchema = import_zod2.z.object({
+  code: import_zod2.z.string().min(1, "Query.code is required"),
+  next: SafeNextPathSchema
+});
+var AuthPreferencesPatchRequestSchema = import_zod2.z.object({
+  preferredTheme: UiThemeSchema.optional(),
+  preferredFontScale: UiFontScaleSchema.optional(),
+  preferredDensity: UiDensitySchema.optional()
+});
+var AuthPreferencesPatchResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  preferences: import_zod2.z.object({
+    preferredTheme: import_zod2.z.string(),
+    preferredFontScale: import_zod2.z.string(),
+    preferredDensity: import_zod2.z.string()
+  })
+});
+var AuthActiveWorkspaceRequestSchema = import_zod2.z.preprocess(
+  (raw) => {
+    if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return raw;
+    const r = raw;
+    return {
+      workspaceId: typeof r["workspaceId"] === "string" ? r["workspaceId"] : r["accountId"]
+    };
+  },
+  import_zod2.z.object({
+    workspaceId: import_zod2.z.string().min(1, "Body.workspaceId is required")
+  })
+);
+var AuthActiveWorkspaceResponseSchema = import_zod2.z.object({
+  ok: import_zod2.z.literal(true),
+  activeWorkspaceId: import_zod2.z.string().nullable()
+});
+
+// src/workspaces/platformWorkspaces.ts
+var import_zod3 = require("zod");
+var ContextMeResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  userId: import_zod3.z.string().min(1),
+  activeWorkspaceId: import_zod3.z.string().nullable(),
+  role: import_zod3.z.string().nullable()
+});
+var WorkspacesListResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  workspaces: import_zod3.z.array(AuthMeResponseWorkspaceSchema)
+});
+var WorkspaceCreateRequestSchema = import_zod3.z.object({
+  name: import_zod3.z.string().trim().min(1, "Body.name is required")
+});
+var isoDateTime = import_zod3.z.preprocess((v) => {
+  if (v instanceof Date) return v.toISOString();
+  return v;
+}, import_zod3.z.string());
+var WorkspaceRowSchema = import_zod3.z.object({
+  id: import_zod3.z.string().min(1),
+  name: import_zod3.z.string(),
+  brandKey: import_zod3.z.string(),
+  adsDisabled: import_zod3.z.boolean(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime
+});
+var WorkspaceCreateResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  workspace: WorkspaceRowSchema
+});
+var WorkspaceIdParamsSchema = import_zod3.z.object({
+  id: import_zod3.z.string().min(1, "Params.id is required")
+});
+var WorkspaceBrandPatchRequestSchema = import_zod3.z.object({
+  brandKey: import_zod3.z.unknown().transform((v) => {
+    if (v === "default" || v === "acme" || v === "forest") return v;
+    return "default";
+  })
+});
+var WorkspaceBrandPatchResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  workspace: import_zod3.z.object({
+    id: import_zod3.z.string().min(1),
+    name: import_zod3.z.string(),
+    brandKey: import_zod3.z.string()
+  })
+});
+var ActiveWorkspaceContextResponseSchema = import_zod3.z.object({
+  ok: import_zod3.z.literal(true),
+  activeWorkspaceId: import_zod3.z.string().min(1),
+  role: import_zod3.z.string()
+});
+
+// src/brewery/routeSchemas.ts
+var import_zod4 = require("zod");
+var isoDateTime2 = import_zod4.z.preprocess((v) => {
+  if (v instanceof Date) return v.toISOString();
+  return v;
+}, import_zod4.z.string());
+var OkResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true)
+});
+var IdParamsSchema = import_zod4.z.object({
+  id: import_zod4.z.string().min(1, "id required")
+});
+var InventoryCategoryQuerySchema = import_zod4.z.object({
+  category: import_zod4.z.string().optional()
+});
+var BeerStyleSchema = import_zod4.z.object({
+  key: import_zod4.z.string(),
+  name: import_zod4.z.string(),
+  source: import_zod4.z.string(),
+  version: import_zod4.z.number(),
+  code: import_zod4.z.string().nullable(),
+  category: import_zod4.z.string().nullable(),
+  categoryId: import_zod4.z.string().nullable(),
+  sortOrder: import_zod4.z.number()
+});
+var StylesListResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  styles: import_zod4.z.array(BeerStyleSchema)
+});
+var EquipmentProfilePayloadSchema = import_zod4.z.object({
+  id: import_zod4.z.string(),
+  workspaceId: import_zod4.z.string(),
+  name: import_zod4.z.string(),
+  equipment: import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown()),
+  createdAt: isoDateTime2,
+  updatedAt: isoDateTime2
+});
+var EquipmentProfilesListResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  profiles: import_zod4.z.array(EquipmentProfilePayloadSchema)
+});
+var EquipmentProfileResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  profile: EquipmentProfilePayloadSchema
+});
+var EquipmentProfileCreateRequestSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var EquipmentProfilePatchRequestSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var InventoryItemPayloadSchema = import_zod4.z.object({
+  id: import_zod4.z.string(),
+  workspaceId: import_zod4.z.string(),
+  category: import_zod4.z.string(),
+  ingredientId: import_zod4.z.string().nullable(),
+  name: import_zod4.z.string(),
+  quantity: import_zod4.z.number(),
+  unit: import_zod4.z.string(),
+  metadataJson: import_zod4.z.unknown().nullable(),
+  createdAt: isoDateTime2,
+  updatedAt: isoDateTime2
+});
+var InventoryListResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  items: import_zod4.z.array(InventoryItemPayloadSchema)
+});
+var InventoryItemResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  item: InventoryItemPayloadSchema
+});
+var InventoryCreateRequestSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var InventoryPatchRequestSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var BrewdaySettingsPayloadSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var BrewdaySettingsResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  settings: BrewdaySettingsPayloadSchema
+});
+var BrewdaySettingsPatchRequestSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var RecipePayloadSchema = import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown());
+var RecipeListResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  recipes: import_zod4.z.array(import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown()))
+});
+var RecipeResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  recipe: RecipePayloadSchema
+});
+var RecipeCreateRequestSchema = import_zod4.z.object({
+  name: import_zod4.z.string(),
+  styleKey: import_zod4.z.string().optional(),
+  notes: import_zod4.z.string().nullable().optional(),
+  beerJsonRecipeJson: import_zod4.z.unknown().optional(),
+  recipeExtJson: import_zod4.z.unknown().optional()
+});
+var RecipePatchRequestSchema = import_zod4.z.object({
+  name: import_zod4.z.string().optional(),
+  styleKey: import_zod4.z.string().optional(),
+  notes: import_zod4.z.string().optional(),
+  beerJsonRecipeJson: import_zod4.z.unknown().optional(),
+  recipeExtJson: import_zod4.z.unknown().optional()
+});
+var RecipeVersionsResponseSchema = import_zod4.z.object({
+  ok: import_zod4.z.literal(true),
+  versions: import_zod4.z.array(import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown()))
+});
+var BeerJsonExportResponseSchema = import_zod4.z.object({
+  type: import_zod4.z.literal("Buffer")
+});
 
 // src/water/parseHubSummary.ts
 function isFiniteNumber(v) {
@@ -820,63 +1143,63 @@ function parseGravityAnalysisResponseV1(x) {
 }
 
 // src/ai/aiChat.ts
-var import_zod2 = require("zod");
-var AiChatRequestBodySchema = import_zod2.z.object({
-  message: import_zod2.z.string().trim().min(1).max(8e3),
-  sessionId: import_zod2.z.string().trim().min(1).max(200).optional(),
-  routeId: import_zod2.z.string().trim().min(1).max(128).optional()
+var import_zod5 = require("zod");
+var AiChatRequestBodySchema = import_zod5.z.object({
+  message: import_zod5.z.string().trim().min(1).max(8e3),
+  sessionId: import_zod5.z.string().trim().min(1).max(200).optional(),
+  routeId: import_zod5.z.string().trim().min(1).max(128).optional()
 }).strict();
 
 // src/ai/aiProposals.ts
-var import_zod3 = require("zod");
-var AiProposalStatusSchema = import_zod3.z.enum(["pending", "applied", "rejected"]);
-var AiProposalDtoSchema = import_zod3.z.object({
-  id: import_zod3.z.string().uuid(),
-  workspaceId: import_zod3.z.string().uuid(),
-  userId: import_zod3.z.string().uuid(),
-  moduleCode: import_zod3.z.string().min(1).max(32),
-  proposalType: import_zod3.z.string().min(1).max(64),
-  summary: import_zod3.z.string().min(1).max(2e3),
-  payloadJson: import_zod3.z.record(import_zod3.z.string(), import_zod3.z.unknown()),
+var import_zod6 = require("zod");
+var AiProposalStatusSchema = import_zod6.z.enum(["pending", "applied", "rejected"]);
+var AiProposalDtoSchema = import_zod6.z.object({
+  id: import_zod6.z.string().uuid(),
+  workspaceId: import_zod6.z.string().uuid(),
+  userId: import_zod6.z.string().uuid(),
+  moduleCode: import_zod6.z.string().min(1).max(32),
+  proposalType: import_zod6.z.string().min(1).max(64),
+  summary: import_zod6.z.string().min(1).max(2e3),
+  payloadJson: import_zod6.z.record(import_zod6.z.string(), import_zod6.z.unknown()),
   status: AiProposalStatusSchema,
-  createdAt: import_zod3.z.string(),
-  appliedAt: import_zod3.z.string().nullable(),
-  rejectedAt: import_zod3.z.string().nullable()
+  createdAt: import_zod6.z.string(),
+  appliedAt: import_zod6.z.string().nullable(),
+  rejectedAt: import_zod6.z.string().nullable()
 }).strict();
-var AiProposalListResponseSchema = import_zod3.z.object({
-  ok: import_zod3.z.literal(true),
-  items: import_zod3.z.array(AiProposalDtoSchema)
+var AiProposalListResponseSchema = import_zod6.z.object({
+  ok: import_zod6.z.literal(true),
+  items: import_zod6.z.array(AiProposalDtoSchema)
 }).strict();
-var AiProposalActionResponseSchema = import_zod3.z.object({
-  ok: import_zod3.z.literal(true),
+var AiProposalActionResponseSchema = import_zod6.z.object({
+  ok: import_zod6.z.literal(true),
   proposal: AiProposalDtoSchema,
-  appliedPreviewOnly: import_zod3.z.boolean().optional()
+  appliedPreviewOnly: import_zod6.z.boolean().optional()
 }).strict();
-var MrpProposeOrderAdjustmentInputSchema = import_zod3.z.object({
-  productionOrderId: import_zod3.z.string().uuid(),
-  suggestedStartDate: import_zod3.z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  suggestedQuantity: import_zod3.z.number().positive().optional(),
-  rationale: import_zod3.z.string().max(500).optional()
+var MrpProposeOrderAdjustmentInputSchema = import_zod6.z.object({
+  productionOrderId: import_zod6.z.string().uuid(),
+  suggestedStartDate: import_zod6.z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  suggestedQuantity: import_zod6.z.number().positive().optional(),
+  rationale: import_zod6.z.string().max(500).optional()
 }).strict();
-var MrpProposeOrderAdjustmentOutputSchema = import_zod3.z.object({
-  ok: import_zod3.z.literal(true),
-  proposalId: import_zod3.z.string().uuid(),
-  summary: import_zod3.z.string()
+var MrpProposeOrderAdjustmentOutputSchema = import_zod6.z.object({
+  ok: import_zod6.z.literal(true),
+  proposalId: import_zod6.z.string().uuid(),
+  summary: import_zod6.z.string()
 }).strict();
-var CrpProposeScheduleAdjustmentInputSchema = import_zod3.z.object({
-  resourceId: import_zod3.z.string().uuid().optional(),
-  suggestedDate: import_zod3.z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  rationale: import_zod3.z.string().max(500).optional()
+var CrpProposeScheduleAdjustmentInputSchema = import_zod6.z.object({
+  resourceId: import_zod6.z.string().uuid().optional(),
+  suggestedDate: import_zod6.z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  rationale: import_zod6.z.string().max(500).optional()
 }).strict();
-var CrpProposeScheduleAdjustmentOutputSchema = import_zod3.z.object({
-  ok: import_zod3.z.literal(true),
-  proposalId: import_zod3.z.string().uuid(),
-  summary: import_zod3.z.string()
+var CrpProposeScheduleAdjustmentOutputSchema = import_zod6.z.object({
+  ok: import_zod6.z.literal(true),
+  proposalId: import_zod6.z.string().uuid(),
+  summary: import_zod6.z.string()
 }).strict();
 
 // src/rendering/renderJobs.ts
-var import_zod4 = require("zod");
-var RenderKindSchema = import_zod4.z.enum([
+var import_zod7 = require("zod");
+var RenderKindSchema = import_zod7.z.enum([
   "pdf",
   "xlsx",
   "csv",
@@ -888,71 +1211,71 @@ var RenderKindSchema = import_zod4.z.enum([
   "barcode",
   "qr"
 ]);
-var RenderStatusSchema = import_zod4.z.enum([
+var RenderStatusSchema = import_zod7.z.enum([
   "queued",
   "running",
   "succeeded",
   "failed"
 ]);
-var RenderVisibilitySchema = import_zod4.z.enum(["workspace", "public"]);
-var RenderDeliverySchema = import_zod4.z.discriminatedUnion("mode", [
-  import_zod4.z.object({ mode: import_zod4.z.literal("stream-response") }).strict(),
-  import_zod4.z.object({
-    mode: import_zod4.z.literal("persist-to-media"),
+var RenderVisibilitySchema = import_zod7.z.enum(["workspace", "public"]);
+var RenderDeliverySchema = import_zod7.z.discriminatedUnion("mode", [
+  import_zod7.z.object({ mode: import_zod7.z.literal("stream-response") }).strict(),
+  import_zod7.z.object({
+    mode: import_zod7.z.literal("persist-to-media"),
     visibility: RenderVisibilitySchema
   }).strict(),
-  import_zod4.z.object({
-    mode: import_zod4.z.literal("email"),
-    to: import_zod4.z.array(import_zod4.z.string().email()).min(1, "email.to required"),
-    subject: import_zod4.z.string().min(1, "email.subject required")
+  import_zod7.z.object({
+    mode: import_zod7.z.literal("email"),
+    to: import_zod7.z.array(import_zod7.z.string().email()).min(1, "email.to required"),
+    subject: import_zod7.z.string().min(1, "email.subject required")
   }).strict()
 ]);
-var RenderErrorSchema = import_zod4.z.object({
-  code: import_zod4.z.string().min(1, "error.code required"),
-  message: import_zod4.z.string().min(1, "error.message required")
+var RenderErrorSchema = import_zod7.z.object({
+  code: import_zod7.z.string().min(1, "error.code required"),
+  message: import_zod7.z.string().min(1, "error.message required")
 }).strict();
-var RenderJobSubmitRequestSchema = import_zod4.z.object({
-  templateRef: import_zod4.z.string().min(1, "templateRef required"),
+var RenderJobSubmitRequestSchema = import_zod7.z.object({
+  templateRef: import_zod7.z.string().min(1, "templateRef required"),
   kind: RenderKindSchema.optional(),
-  data: import_zod4.z.unknown(),
+  data: import_zod7.z.unknown(),
   delivery: RenderDeliverySchema.optional()
 }).strict();
-var RenderJobStatusSchema = import_zod4.z.object({
-  id: import_zod4.z.string().min(1, "job.id required"),
-  templateRef: import_zod4.z.string().min(1, "job.templateRef required"),
+var RenderJobStatusSchema = import_zod7.z.object({
+  id: import_zod7.z.string().min(1, "job.id required"),
+  templateRef: import_zod7.z.string().min(1, "job.templateRef required"),
   kind: RenderKindSchema,
   status: RenderStatusSchema,
-  deliveryMode: import_zod4.z.string().min(1, "job.deliveryMode required"),
-  requestedAt: import_zod4.z.string().min(1, "job.requestedAt required"),
-  startedAt: import_zod4.z.string().nullable(),
-  completedAt: import_zod4.z.string().nullable(),
-  artifactId: import_zod4.z.string().nullable(),
-  mediaAssetId: import_zod4.z.string().nullable(),
+  deliveryMode: import_zod7.z.string().min(1, "job.deliveryMode required"),
+  requestedAt: import_zod7.z.string().min(1, "job.requestedAt required"),
+  startedAt: import_zod7.z.string().nullable(),
+  completedAt: import_zod7.z.string().nullable(),
+  artifactId: import_zod7.z.string().nullable(),
+  mediaAssetId: import_zod7.z.string().nullable(),
   error: RenderErrorSchema.nullable()
 }).strict();
-var RenderJobSubmitResponseSchema = import_zod4.z.object({
-  ok: import_zod4.z.literal(true),
-  mode: import_zod4.z.literal("async"),
+var RenderJobSubmitResponseSchema = import_zod7.z.object({
+  ok: import_zod7.z.literal(true),
+  mode: import_zod7.z.literal("async"),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobStatusResponseSchema = import_zod4.z.object({
-  ok: import_zod4.z.literal(true),
+var RenderJobStatusResponseSchema = import_zod7.z.object({
+  ok: import_zod7.z.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobCancelResponseSchema = import_zod4.z.object({
-  ok: import_zod4.z.literal(true),
+var RenderJobCancelResponseSchema = import_zod7.z.object({
+  ok: import_zod7.z.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobResultResponseSchema = import_zod4.z.object({
-  ok: import_zod4.z.literal(true),
+var RenderJobResultResponseSchema = import_zod7.z.object({
+  ok: import_zod7.z.literal(true),
   job: RenderJobStatusSchema,
-  signedUrl: import_zod4.z.string().min(1, "signedUrl required"),
-  expiresAt: import_zod4.z.string().min(1, "expiresAt required")
+  signedUrl: import_zod7.z.string().min(1, "signedUrl required"),
+  expiresAt: import_zod7.z.string().min(1, "expiresAt required")
 }).strict();
-var ErrorResponseSchema = import_zod4.z.object({
-  ok: import_zod4.z.literal(false),
+var ErrorResponseSchema = import_zod7.z.object({
+  ok: import_zod7.z.literal(false),
   error: RenderErrorSchema.extend({
-    details: import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown()).optional()
+    details: import_zod7.z.record(import_zod7.z.string(), import_zod7.z.unknown()).optional()
   }).strict()
 }).strict();
 function parseRenderJobSubmitRequest(payload) {
@@ -963,45 +1286,45 @@ function parseRenderJobStatusResponse(payload) {
 }
 
 // src/brewery/listResponses.ts
-var import_zod5 = require("zod");
-var RecipeListItemSchema = import_zod5.z.object({
-  id: import_zod5.z.string(),
-  accountId: import_zod5.z.string().optional(),
-  name: import_zod5.z.string(),
-  styleKey: import_zod5.z.string().optional(),
-  style: import_zod5.z.string().nullable().optional(),
-  version: import_zod5.z.number().optional()
+var import_zod8 = require("zod");
+var RecipeListItemSchema = import_zod8.z.object({
+  id: import_zod8.z.string(),
+  accountId: import_zod8.z.string().optional(),
+  name: import_zod8.z.string(),
+  styleKey: import_zod8.z.string().optional(),
+  style: import_zod8.z.string().nullable().optional(),
+  version: import_zod8.z.number().optional()
 });
-var RecipesListResponseSchema = import_zod5.z.object({
-  ok: import_zod5.z.literal(true),
-  recipes: import_zod5.z.array(RecipeListItemSchema)
+var RecipesListResponseSchema = import_zod8.z.object({
+  ok: import_zod8.z.literal(true),
+  recipes: import_zod8.z.array(RecipeListItemSchema)
 });
 function parseRecipesListResponse(payload) {
   return RecipesListResponseSchema.parse(payload);
 }
-var isoDateTime = import_zod5.z.preprocess((v) => {
+var isoDateTime3 = import_zod8.z.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, import_zod5.z.string());
-var BrewSessionListItemSchema = import_zod5.z.object({
-  id: import_zod5.z.string(),
-  code: import_zod5.z.string(),
-  status: import_zod5.z.string(),
-  createdAt: isoDateTime,
-  startedAt: import_zod5.z.preprocess((v) => v instanceof Date ? v.toISOString() : v, import_zod5.z.string().nullable()).optional(),
-  stoppedAt: import_zod5.z.preprocess((v) => v instanceof Date ? v.toISOString() : v, import_zod5.z.string().nullable()).optional()
+}, import_zod8.z.string());
+var BrewSessionListItemSchema = import_zod8.z.object({
+  id: import_zod8.z.string(),
+  code: import_zod8.z.string(),
+  status: import_zod8.z.string(),
+  createdAt: isoDateTime3,
+  startedAt: import_zod8.z.preprocess((v) => v instanceof Date ? v.toISOString() : v, import_zod8.z.string().nullable()).optional(),
+  stoppedAt: import_zod8.z.preprocess((v) => v instanceof Date ? v.toISOString() : v, import_zod8.z.string().nullable()).optional()
 });
-var BrewSessionsListResponseSchema = import_zod5.z.object({
-  ok: import_zod5.z.literal(true),
-  brewSessions: import_zod5.z.array(BrewSessionListItemSchema)
+var BrewSessionsListResponseSchema = import_zod8.z.object({
+  ok: import_zod8.z.literal(true),
+  brewSessions: import_zod8.z.array(BrewSessionListItemSchema)
 });
 function parseBrewSessionsListResponse(payload) {
   return BrewSessionsListResponseSchema.parse(payload);
 }
-var BrewSessionCreateResponseSchema = import_zod5.z.object({
-  ok: import_zod5.z.literal(true),
-  brewSession: import_zod5.z.object({
-    id: import_zod5.z.string()
+var BrewSessionCreateResponseSchema = import_zod8.z.object({
+  ok: import_zod8.z.literal(true),
+  brewSession: import_zod8.z.object({
+    id: import_zod8.z.string()
   })
 });
 function parseBrewSessionCreateResponse(payload) {
@@ -1010,20 +1333,61 @@ function parseBrewSessionCreateResponse(payload) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  ActiveWorkspaceContextResponseSchema,
   AiChatRequestBodySchema,
   AiProposalActionResponseSchema,
   AiProposalDtoSchema,
   AiProposalListResponseSchema,
   AiProposalStatusSchema,
+  AuthActiveWorkspaceRequestSchema,
+  AuthActiveWorkspaceResponseSchema,
+  AuthLoginNativeResponseSchema,
+  AuthLoginRequestSchema,
+  AuthLoginResponseSchema,
+  AuthLogoutResponseSchema,
   AuthMeResponseSchema,
   AuthMeResponseUserSchema,
   AuthMeResponseWorkspaceSchema,
+  AuthPreferencesPatchRequestSchema,
+  AuthPreferencesPatchResponseSchema,
+  AuthSessionUserSchema,
+  AuthSignupRequestSchema,
+  AuthSignupResponseSchema,
+  AuthWebviewBridgeQuerySchema,
+  AuthWebviewExchangeRequestSchema,
+  AuthWebviewExchangeResponseSchema,
+  BeerJsonExportResponseSchema,
+  BeerStyleSchema,
   BrewSessionsListResponseSchema,
+  BrewdaySettingsPatchRequestSchema,
+  BrewdaySettingsPayloadSchema,
+  BrewdaySettingsResponseSchema,
+  ContextMeResponseSchema,
   CrpProposeScheduleAdjustmentInputSchema,
   CrpProposeScheduleAdjustmentOutputSchema,
+  EquipmentProfileCreateRequestSchema,
+  EquipmentProfilePatchRequestSchema,
+  EquipmentProfilePayloadSchema,
+  EquipmentProfileResponseSchema,
+  EquipmentProfilesListResponseSchema,
   ErrorResponseSchema,
+  IdParamsSchema,
+  InventoryCategoryQuerySchema,
+  InventoryCreateRequestSchema,
+  InventoryItemPayloadSchema,
+  InventoryItemResponseSchema,
+  InventoryListResponseSchema,
+  InventoryPatchRequestSchema,
   MrpProposeOrderAdjustmentInputSchema,
   MrpProposeOrderAdjustmentOutputSchema,
+  OkResponseSchema,
+  PreferredLocaleSchema,
+  RecipeCreateRequestSchema,
+  RecipeListResponseSchema,
+  RecipePatchRequestSchema,
+  RecipePayloadSchema,
+  RecipeResponseSchema,
+  RecipeVersionsResponseSchema,
   RecipesListResponseSchema,
   RenderDeliverySchema,
   RenderErrorSchema,
@@ -1036,6 +1400,18 @@ function parseBrewSessionCreateResponse(payload) {
   RenderKindSchema,
   RenderStatusSchema,
   RenderVisibilitySchema,
+  SafeNextPathSchema,
+  StylesListResponseSchema,
+  UiDensitySchema,
+  UiFontScaleSchema,
+  UiThemeSchema,
+  WorkspaceBrandPatchRequestSchema,
+  WorkspaceBrandPatchResponseSchema,
+  WorkspaceCreateRequestSchema,
+  WorkspaceCreateResponseSchema,
+  WorkspaceIdParamsSchema,
+  WorkspaceRowSchema,
+  WorkspacesListResponseSchema,
   analysisFormatHints,
   parseAuthMeResponse,
   parseBoilComputeAndSaveResponse,

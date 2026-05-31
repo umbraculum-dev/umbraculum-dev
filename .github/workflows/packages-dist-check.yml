@@ -1,0 +1,30 @@
+name: packages-dist-check
+
+# Scoped dist drift check on package src/ changes — faster than full build-packages-in-docker.sh.
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "packages/**/src/**"
+      - ".umbraculum/package-build-graph.json"
+      - "scripts/build-package-in-docker.sh"
+      - "scripts/check-packages-dist-up-to-date.sh"
+      - "scripts/lib/package-build-graph.py"
+  workflow_dispatch:
+
+concurrency:
+  group: packages-dist-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scoped-dist-check:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Scoped packages dist up to date
+        run: ./scripts/check-packages-dist-up-to-date.sh --base origin/master

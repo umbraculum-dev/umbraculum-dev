@@ -1,5 +1,16 @@
 import type { EquipmentProfile } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import {
+  EquipmentProfileCreateRequestSchema,
+  EquipmentProfilePatchRequestSchema,
+  EquipmentProfileResponseSchema,
+  EquipmentProfilesListResponseSchema,
+  ErrorResponseSchema,
+  IdParamsSchema,
+  OkResponseSchema,
+} from "@umbraculum/contracts";
+
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { EquipmentProfilesService } from "../../../services/equipmentProfilesService.js";
 
@@ -36,65 +47,121 @@ function toEquipmentPayload(p: EquipmentProfile) {
 }
 
 export function equipmentProfilesRoutes(app: FastifyInstance) {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new EquipmentProfilesService(app.prisma);
 
-  app.get("/equipment-profiles", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const profiles = await svc.listProfiles(ctx.userId, ctx.activeWorkspaceId);
-    return { ok: true, profiles: profiles.map(toEquipmentPayload) };
-  });
+  zodApp.get(
+    "/equipment-profiles",
+    {
+      schema: {
+        tags: ["brewery"],
+        response: {
+          200: EquipmentProfilesListResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const profiles = await svc.listProfiles(ctx.userId, ctx.activeWorkspaceId);
+      return EquipmentProfilesListResponseSchema.parse({
+        ok: true,
+        profiles: profiles.map(toEquipmentPayload),
+      });
+    },
+  );
 
-  app.post("/equipment-profiles", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const body = (req.body ?? {}) as Record<string, unknown>;
-    const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
-      name: typeof body['name'] === "string" ? body['name'] : "",
-      kettleVolumeLiters: body['kettleVolumeLiters'],
-      kettleLossesLiters: body['kettleLossesLiters'],
-      kettleBoilEvaporationRatePercentPerHour: body['kettleBoilEvaporationRatePercentPerHour'],
-      kettleCoolingShrinkagePercent: body['kettleCoolingShrinkagePercent'],
-      kettleHopsAbsorptionLiters: body['kettleHopsAbsorptionLiters'],
-      mashVolumeLiters: body['mashVolumeLiters'],
-      mashEfficiencyPercent: body['mashEfficiencyPercent'],
-      mashLossesLiters: body['mashLossesLiters'],
-      mashThicknessLPerKg: body['mashThicknessLPerKg'],
-      mashGrainAbsorptionLPerKg: body['mashGrainAbsorptionLPerKg'],
-      mashWaterLeftoverLiters: body['mashWaterLeftoverLiters'],
-      otherLossesLiters: body['otherLossesLiters'],
-    });
-    return { ok: true, profile: toEquipmentPayload(created) };
-  });
+  zodApp.post(
+    "/equipment-profiles",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: EquipmentProfileCreateRequestSchema,
+        response: {
+          200: EquipmentProfileResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const body = req.body;
+      const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
+        name: typeof body["name"] === "string" ? body["name"] : "",
+        kettleVolumeLiters: body["kettleVolumeLiters"],
+        kettleLossesLiters: body["kettleLossesLiters"],
+        kettleBoilEvaporationRatePercentPerHour: body["kettleBoilEvaporationRatePercentPerHour"],
+        kettleCoolingShrinkagePercent: body["kettleCoolingShrinkagePercent"],
+        kettleHopsAbsorptionLiters: body["kettleHopsAbsorptionLiters"],
+        mashVolumeLiters: body["mashVolumeLiters"],
+        mashEfficiencyPercent: body["mashEfficiencyPercent"],
+        mashLossesLiters: body["mashLossesLiters"],
+        mashThicknessLPerKg: body["mashThicknessLPerKg"],
+        mashGrainAbsorptionLPerKg: body["mashGrainAbsorptionLPerKg"],
+        mashWaterLeftoverLiters: body["mashWaterLeftoverLiters"],
+        otherLossesLiters: body["otherLossesLiters"],
+      });
+      return EquipmentProfileResponseSchema.parse({
+        ok: true,
+        profile: toEquipmentPayload(created),
+      });
+    },
+  );
 
-  app.patch("/equipment-profiles/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-    const body = (req.body ?? {}) as Record<string, unknown>;
+  zodApp.patch(
+    "/equipment-profiles/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        body: EquipmentProfilePatchRequestSchema,
+        response: {
+          200: EquipmentProfileResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const body = req.body;
+      const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, req.params.id, {
+        name: typeof body["name"] === "string" ? body["name"] : undefined,
+        kettleVolumeLiters: body["kettleVolumeLiters"],
+        kettleLossesLiters: body["kettleLossesLiters"],
+        kettleBoilEvaporationRatePercentPerHour: body["kettleBoilEvaporationRatePercentPerHour"],
+        kettleCoolingShrinkagePercent: body["kettleCoolingShrinkagePercent"],
+        kettleHopsAbsorptionLiters: body["kettleHopsAbsorptionLiters"],
+        mashVolumeLiters: body["mashVolumeLiters"],
+        mashEfficiencyPercent: body["mashEfficiencyPercent"],
+        mashLossesLiters: body["mashLossesLiters"],
+        mashThicknessLPerKg: body["mashThicknessLPerKg"],
+        mashGrainAbsorptionLPerKg: body["mashGrainAbsorptionLPerKg"],
+        mashWaterLeftoverLiters: body["mashWaterLeftoverLiters"],
+        otherLossesLiters: body["otherLossesLiters"],
+      });
+      return EquipmentProfileResponseSchema.parse({
+        ok: true,
+        profile: toEquipmentPayload(updated),
+      });
+    },
+  );
 
-    const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
-      name: typeof body['name'] === "string" ? body['name'] : undefined,
-      kettleVolumeLiters: body['kettleVolumeLiters'],
-      kettleLossesLiters: body['kettleLossesLiters'],
-      kettleBoilEvaporationRatePercentPerHour: body['kettleBoilEvaporationRatePercentPerHour'],
-      kettleCoolingShrinkagePercent: body['kettleCoolingShrinkagePercent'],
-      kettleHopsAbsorptionLiters: body['kettleHopsAbsorptionLiters'],
-      mashVolumeLiters: body['mashVolumeLiters'],
-      mashEfficiencyPercent: body['mashEfficiencyPercent'],
-      mashLossesLiters: body['mashLossesLiters'],
-      mashThicknessLPerKg: body['mashThicknessLPerKg'],
-      mashGrainAbsorptionLPerKg: body['mashGrainAbsorptionLPerKg'],
-      mashWaterLeftoverLiters: body['mashWaterLeftoverLiters'],
-      otherLossesLiters: body['otherLossesLiters'],
-    });
-    return { ok: true, profile: toEquipmentPayload(updated) };
-  });
-
-  app.delete("/equipment-profiles/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-    await svc.deleteProfile(ctx.userId, ctx.activeWorkspaceId, id);
-    return { ok: true };
-  });
+  zodApp.delete(
+    "/equipment-profiles/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: OkResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      await svc.deleteProfile(ctx.userId, ctx.activeWorkspaceId, req.params.id);
+      return { ok: true as const };
+    },
+  );
 }
-

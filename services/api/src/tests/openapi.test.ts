@@ -8,29 +8,45 @@ import { describe, expect, it } from "vitest";
 
 import { OPENAPI_INFO } from "../openapi/metadata.js";
 
-const repoOpenApiPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../openapi/openapi.json",
-);
+const repoOpenApiDir = join(dirname(fileURLToPath(import.meta.url)), "../../openapi");
+const platformSpecPath = join(repoOpenApiDir, "openapi.json");
+const brewerySpecPath = join(repoOpenApiDir, "brewery.json");
 
 describe("openapi artifact", () => {
-  it("parses and validates committed openapi.json", async () => {
-    const raw = readFileSync(repoOpenApiPath, "utf8");
+  it("parses and validates committed platform openapi.json", async () => {
+    const raw = readFileSync(platformSpecPath, "utf8");
     const spec = JSON.parse(raw) as OpenAPI.Document;
     await validateOpenApi(spec);
     expect(spec.info?.title).toBe(OPENAPI_INFO.title);
-    expect(spec.info?.description).toContain("Alpha partial OpenAPI spec");
+    expect(spec.info?.description).toContain("Platform catalog");
   });
 
-  it("includes alpha module path prefixes", () => {
-    const spec = JSON.parse(readFileSync(repoOpenApiPath, "utf8")) as OpenAPI.Document;
+  it("parses and validates committed brewery openapi.json", async () => {
+    const raw = readFileSync(brewerySpecPath, "utf8");
+    const spec = JSON.parse(raw) as OpenAPI.Document;
+    await validateOpenApi(spec);
+    expect(spec.info?.description).toContain("brewery reference vertical");
+  });
+
+  it("includes platform catalog path prefixes", () => {
+    const spec = JSON.parse(readFileSync(platformSpecPath, "utf8")) as OpenAPI.Document;
     const paths = Object.keys(spec.paths ?? {});
     expect(paths.some((path) => path.startsWith("/mrp/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/pim/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/crp/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/automation/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/rendering/"))).toBe(true);
+    expect(paths.some((path) => path.startsWith("/auth/"))).toBe(true);
     expect(paths).toContain("/health");
+    expect(paths).toContain("/workspaces");
+    expect(paths.some((path) => path.startsWith("/recipes"))).toBe(false);
+  });
+
+  it("brewery spec contains brewery routes only", () => {
+    const spec = JSON.parse(readFileSync(brewerySpecPath, "utf8")) as OpenAPI.Document;
+    const paths = Object.keys(spec.paths ?? {});
+    expect(paths.some((path) => path.startsWith("/recipes"))).toBe(true);
+    expect(paths.some((path) => path.startsWith("/mrp/"))).toBe(false);
     expect(paths.some((path) => path.startsWith("/auth/"))).toBe(false);
   });
 });

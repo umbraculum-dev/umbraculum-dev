@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "slices": {
+    "contracts": {
+      "pathPrefixes": ["packages/contracts/"],
+      "tiers": {
+        "T0": [
+          {
+            "id": "contracts-test",
+            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/contracts --include-workspace-root && npm test -w @umbraculum/contracts\""
+          }
+        ],
+        "T1": [
+          {
+            "id": "contracts-build",
+            "cmd": "./scripts/build-package-in-docker.sh @umbraculum/contracts --include-dependents"
+          },
+          {
+            "id": "contracts-dist-check",
+            "cmd": "./scripts/check-packages-dist-up-to-date.sh --no-dependents"
+          },
+          {
+            "id": "contracts-test",
+            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/contracts --include-workspace-root && npm test -w @umbraculum/contracts\""
+          }
+        ]
+      }
+    },
+    "openapi": {
+      "pathPrefixes": [
+        "services/api/src/routes/",
+        "services/api/src/openapi/",
+        "packages/contracts/src/auth/",
+        "packages/contracts/src/workspaces/",
+        "packages/contracts/src/brewery/"
+      ],
+      "tiers": {
+        "T0": [
+          {
+            "id": "api-test-unit",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && npm run test:unit'"
+          }
+        ],
+        "T1": [
+          {
+            "id": "openapi-check",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && npm run openapi:check'"
+          },
+          {
+            "id": "openapi-vitest",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && npm run test:unit -- src/tests/openapi.test.ts && npm run test:integration -- src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
+          }
+        ]
+      }
+    },
+    "api-platform": {
+      "pathPrefixes": [
+        "services/api/src/routes/auth.ts",
+        "services/api/src/routes/workspaces.ts"
+      ],
+      "tiers": {
+        "T0": [
+          {
+            "id": "platform-vitest",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
+          }
+        ],
+        "T1": [
+          {
+            "id": "platform-vitest",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
+          },
+          {
+            "id": "health-endpoint",
+            "cmd": "curl -sf http://localhost:18080/api/health | grep -q '\"ok\":true'"
+          }
+        ]
+      }
+    },
+    "api-brewery-batch1": {
+      "pathPrefixes": [
+        "services/api/src/routes/styles.ts",
+        "services/api/src/routes/equipmentProfiles.ts",
+        "services/api/src/routes/inventory.ts",
+        "services/api/src/routes/brewdaySettings.ts",
+        "services/api/src/routes/recipes.ts",
+        "services/api/src/routes/recipesExport.ts"
+      ],
+      "tiers": {
+        "T0": [
+          {
+            "id": "brewery-vitest",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/equipmentProfiles.test.ts src/tests/inventory.test.ts src/tests/brewdaySettings.test.ts src/tests/recipes.test.ts src/tests/recipesExport.test.ts'"
+          }
+        ],
+        "T1": [
+          {
+            "id": "brewery-vitest",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/equipmentProfiles.test.ts src/tests/inventory.test.ts src/tests/brewdaySettings.test.ts src/tests/recipes.test.ts src/tests/recipesExport.test.ts'"
+          }
+        ]
+      }
+    },
+    "packages-pim": {
+      "pathPrefixes": ["packages/pim-contracts/"],
+      "tiers": {
+        "T0": [
+          {
+            "id": "pim-test",
+            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/pim-contracts --include-workspace-root && npm test -w @umbraculum/pim-contracts\""
+          }
+        ],
+        "T1": [
+          {
+            "id": "pim-build",
+            "cmd": "./scripts/build-package-in-docker.sh @umbraculum/pim-contracts"
+          },
+          {
+            "id": "pim-test",
+            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/pim-contracts --include-workspace-root && npm test -w @umbraculum/pim-contracts\""
+          },
+          {
+            "id": "pim-api-vitest",
+            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/pimProducts.test.ts src/tests/pimVariants.test.ts src/tests/pimAttributeSets.test.ts src/tests/pimCategories.test.ts'"
+          }
+        ]
+      }
+    },
+    "docs": {
+      "pathPrefixes": ["docs/", "README.md"],
+      "tiers": {
+        "T1": [
+          {
+            "id": "docs-readmes",
+            "cmd": "npx @umbraculum/ci-parity@^1 run --jobs docs-readmes"
+          }
+        ]
+      }
+    },
+    "sdk-dist": {
+      "pathPrefixes": ["packages/"],
+      "tiers": {
+        "T1": [
+          {
+            "id": "scoped-dist-check",
+            "cmd": "./scripts/check-packages-dist-up-to-date.sh"
+          }
+        ]
+      }
+    }
+  }
+}

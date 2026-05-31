@@ -111,6 +111,322 @@ type AuthMeResponse = z.infer<typeof AuthMeResponseSchema>;
  */
 declare function parseAuthMeResponse(payload: unknown): AuthMeResponse;
 
+/**
+ * Platform auth route contracts (PR3 / OpenAPI platform tag).
+ */
+
+declare const PreferredLocaleSchema: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>;
+declare const UiThemeSchema: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"default" | "hc_dark" | "hc_light", unknown>>;
+declare const UiFontScaleSchema: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"sm" | "md" | "lg" | "xl", unknown>>;
+declare const UiDensitySchema: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"comfortable" | "compact", unknown>>;
+declare const SafeNextPathSchema: z.ZodPreprocess<z.ZodString>;
+declare const AuthSessionUserSchema: z.ZodObject<{
+    id: z.ZodString;
+    email: z.ZodString;
+    preferredLocale: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>;
+}, z.core.$strip>;
+declare const AuthSignupRequestSchema: z.ZodPreprocess<z.ZodObject<{
+    email: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>, z.ZodString>;
+    password: z.ZodString;
+    preferredLocale: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>>;
+    workspaceName: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>>;
+declare const AuthSignupResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    user: z.ZodObject<{
+        id: z.ZodString;
+        email: z.ZodString;
+        preferredLocale: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>;
+    }, z.core.$strip>;
+    activeWorkspaceId: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+declare const AuthLoginRequestSchema: z.ZodObject<{
+    email: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>, z.ZodString>;
+    password: z.ZodString;
+    preferredLocale: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>>;
+}, z.core.$strip>;
+declare const AuthLoginResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    user: z.ZodObject<{
+        id: z.ZodString;
+        email: z.ZodString;
+        preferredLocale: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>;
+    }, z.core.$strip>;
+    workspaces: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        role: z.ZodString;
+        brandKey: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    }, z.core.$strip>>;
+    activeWorkspaceId: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+declare const AuthLoginNativeResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    user: z.ZodObject<{
+        id: z.ZodString;
+        email: z.ZodString;
+        preferredLocale: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"en" | "it", unknown>>;
+    }, z.core.$strip>;
+    workspaces: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        role: z.ZodString;
+        brandKey: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    }, z.core.$strip>>;
+    activeWorkspaceId: z.ZodNullable<z.ZodString>;
+    token: z.ZodString;
+}, z.core.$strip>;
+declare const AuthLogoutResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+declare const AuthWebviewExchangeRequestSchema: z.ZodObject<{
+    next: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const AuthWebviewExchangeResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    code: z.ZodString;
+    expiresAt: z.ZodString;
+    bridgeUrl: z.ZodString;
+}, z.core.$strip>;
+declare const AuthWebviewBridgeQuerySchema: z.ZodObject<{
+    code: z.ZodString;
+    next: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const AuthPreferencesPatchRequestSchema: z.ZodObject<{
+    preferredTheme: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"default" | "hc_dark" | "hc_light", unknown>>>;
+    preferredFontScale: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"sm" | "md" | "lg" | "xl", unknown>>>;
+    preferredDensity: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"comfortable" | "compact", unknown>>>;
+}, z.core.$strip>;
+declare const AuthPreferencesPatchResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    preferences: z.ZodObject<{
+        preferredTheme: z.ZodString;
+        preferredFontScale: z.ZodString;
+        preferredDensity: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const AuthActiveWorkspaceRequestSchema: z.ZodPreprocess<z.ZodObject<{
+    workspaceId: z.ZodString;
+}, z.core.$strip>>;
+declare const AuthActiveWorkspaceResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    activeWorkspaceId: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+type AuthSignupRequest = z.infer<typeof AuthSignupRequestSchema>;
+type AuthLoginRequest = z.infer<typeof AuthLoginRequestSchema>;
+
+/**
+ * Platform workspace route contracts (PR3 / OpenAPI platform tag).
+ */
+
+declare const ContextMeResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    userId: z.ZodString;
+    activeWorkspaceId: z.ZodNullable<z.ZodString>;
+    role: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+declare const WorkspacesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    workspaces: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        role: z.ZodString;
+        brandKey: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<string | null | undefined, unknown>>>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const WorkspaceCreateRequestSchema: z.ZodObject<{
+    name: z.ZodString;
+}, z.core.$strip>;
+declare const WorkspaceRowSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    brandKey: z.ZodString;
+    adsDisabled: z.ZodBoolean;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const WorkspaceCreateResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    workspace: z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        brandKey: z.ZodString;
+        adsDisabled: z.ZodBoolean;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const WorkspaceIdParamsSchema: z.ZodObject<{
+    id: z.ZodString;
+}, z.core.$strip>;
+declare const WorkspaceBrandPatchRequestSchema: z.ZodObject<{
+    brandKey: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"default" | "acme" | "forest", unknown>>;
+}, z.core.$strip>;
+declare const WorkspaceBrandPatchResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    workspace: z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        brandKey: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const ActiveWorkspaceContextResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    activeWorkspaceId: z.ZodString;
+    role: z.ZodString;
+}, z.core.$strip>;
+type WorkspaceCreateRequest = z.infer<typeof WorkspaceCreateRequestSchema>;
+
+/**
+ * Brewery vertical route contracts (OpenAPI brewery tag).
+ * Complex JSON fields use z.unknown() — contracts + route tables win on edge validation.
+ */
+
+declare const OkResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+declare const IdParamsSchema: z.ZodObject<{
+    id: z.ZodString;
+}, z.core.$strip>;
+declare const InventoryCategoryQuerySchema: z.ZodObject<{
+    category: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+declare const BeerStyleSchema: z.ZodObject<{
+    key: z.ZodString;
+    name: z.ZodString;
+    source: z.ZodString;
+    version: z.ZodNumber;
+    code: z.ZodNullable<z.ZodString>;
+    category: z.ZodNullable<z.ZodString>;
+    categoryId: z.ZodNullable<z.ZodString>;
+    sortOrder: z.ZodNumber;
+}, z.core.$strip>;
+declare const StylesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    styles: z.ZodArray<z.ZodObject<{
+        key: z.ZodString;
+        name: z.ZodString;
+        source: z.ZodString;
+        version: z.ZodNumber;
+        code: z.ZodNullable<z.ZodString>;
+        category: z.ZodNullable<z.ZodString>;
+        categoryId: z.ZodNullable<z.ZodString>;
+        sortOrder: z.ZodNumber;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const EquipmentProfilePayloadSchema: z.ZodObject<{
+    id: z.ZodString;
+    workspaceId: z.ZodString;
+    name: z.ZodString;
+    equipment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const EquipmentProfilesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    profiles: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        name: z.ZodString;
+        equipment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const EquipmentProfileResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    profile: z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        name: z.ZodString;
+        equipment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const EquipmentProfileCreateRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const EquipmentProfilePatchRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const InventoryItemPayloadSchema: z.ZodObject<{
+    id: z.ZodString;
+    workspaceId: z.ZodString;
+    category: z.ZodString;
+    ingredientId: z.ZodNullable<z.ZodString>;
+    name: z.ZodString;
+    quantity: z.ZodNumber;
+    unit: z.ZodString;
+    metadataJson: z.ZodNullable<z.ZodUnknown>;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const InventoryListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    items: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        category: z.ZodString;
+        ingredientId: z.ZodNullable<z.ZodString>;
+        name: z.ZodString;
+        quantity: z.ZodNumber;
+        unit: z.ZodString;
+        metadataJson: z.ZodNullable<z.ZodUnknown>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const InventoryItemResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    item: z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        category: z.ZodString;
+        ingredientId: z.ZodNullable<z.ZodString>;
+        name: z.ZodString;
+        quantity: z.ZodNumber;
+        unit: z.ZodString;
+        metadataJson: z.ZodNullable<z.ZodUnknown>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const InventoryCreateRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const InventoryPatchRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BrewdaySettingsPayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BrewdaySettingsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    settings: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const BrewdaySettingsPatchRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipePayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipeListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    recipes: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const RecipeResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    recipe: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const RecipeCreateRequestSchema: z.ZodObject<{
+    name: z.ZodString;
+    styleKey: z.ZodOptional<z.ZodString>;
+    notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    beerJsonRecipeJson: z.ZodOptional<z.ZodUnknown>;
+    recipeExtJson: z.ZodOptional<z.ZodUnknown>;
+}, z.core.$strip>;
+declare const RecipePatchRequestSchema: z.ZodObject<{
+    name: z.ZodOptional<z.ZodString>;
+    styleKey: z.ZodOptional<z.ZodString>;
+    notes: z.ZodOptional<z.ZodString>;
+    beerJsonRecipeJson: z.ZodOptional<z.ZodUnknown>;
+    recipeExtJson: z.ZodOptional<z.ZodUnknown>;
+}, z.core.$strip>;
+declare const RecipeVersionsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    versions: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const BeerJsonExportResponseSchema: z.ZodObject<{
+    type: z.ZodLiteral<"Buffer">;
+}, z.core.$strip>;
+
 type WaterCalcDerivationKind = "salt_additions" | "acidification" | "mash_overall" | "sparge_overall" | "boil_overall" | "analysis.abv" | "analysis.ibu_tinseth" | "analysis.ibu_rager" | "analysis.mcu" | "analysis.srm_morey" | "analysis.srm_daniels" | "analysis.kettle_volume" | "analysis.pre_boil_volume" | "analysis.og" | "analysis.fg" | "analysis.attenuation" | "analysis.pbg";
 type WaterCalcUnit = "L" | "g" | "mL" | "ppm" | "ppm_as_CaCO3" | "pH" | "percent" | "sg" | "ibu" | "srm" | "mcu" | "h" | "percent_per_hour" | "L_per_kg" | "mEq_per_L" | "mmol_per_L";
 type WaterCalcDerivationValue = {
@@ -769,16 +1085,16 @@ declare const RenderStatusSchema: z.ZodEnum<{
     failed: "failed";
 }>;
 declare const RenderVisibilitySchema: z.ZodEnum<{
-    public: "public";
     workspace: "workspace";
+    public: "public";
 }>;
 declare const RenderDeliverySchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
     mode: z.ZodLiteral<"stream-response">;
 }, z.core.$strict>, z.ZodObject<{
     mode: z.ZodLiteral<"persist-to-media">;
     visibility: z.ZodEnum<{
-        public: "public";
         workspace: "workspace";
+        public: "public";
     }>;
 }, z.core.$strict>, z.ZodObject<{
     mode: z.ZodLiteral<"email">;
@@ -809,8 +1125,8 @@ declare const RenderJobSubmitRequestSchema: z.ZodObject<{
     }, z.core.$strict>, z.ZodObject<{
         mode: z.ZodLiteral<"persist-to-media">;
         visibility: z.ZodEnum<{
-            public: "public";
             workspace: "workspace";
+            public: "public";
         }>;
     }, z.core.$strict>, z.ZodObject<{
         mode: z.ZodLiteral<"email">;
@@ -1070,4 +1386,4 @@ declare function parseBrewSessionCreateResponse(payload: unknown): {
     };
 };
 
-export { type AiChatRequestBody, AiChatRequestBodySchema, AiProposalActionResponseSchema, type AiProposalDto, AiProposalDtoSchema, AiProposalListResponseSchema, type AiProposalStatus, AiProposalStatusSchema, type AiProvider, type AiRoleLimits, type AiToolCallRecord, type AiUsageLedgerEntry, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type BrewSessionListItem, type BrewSessionsListResponse, BrewSessionsListResponseSchema, type CrpProposeScheduleAdjustmentInput, CrpProposeScheduleAdjustmentInputSchema, type CrpProposeScheduleAdjustmentOutput, CrpProposeScheduleAdjustmentOutputSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type MrpProposeOrderAdjustmentInput, MrpProposeOrderAdjustmentInputSchema, type MrpProposeOrderAdjustmentOutput, MrpProposeOrderAdjustmentOutputSchema, type NumberFormatHintV1, type NumberFormatUnit, type RecipeListItem, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };
+export { ActiveWorkspaceContextResponseSchema, type AiChatRequestBody, AiChatRequestBodySchema, AiProposalActionResponseSchema, type AiProposalDto, AiProposalDtoSchema, AiProposalListResponseSchema, type AiProposalStatus, AiProposalStatusSchema, type AiProvider, type AiRoleLimits, type AiToolCallRecord, type AiUsageLedgerEntry, AuthActiveWorkspaceRequestSchema, AuthActiveWorkspaceResponseSchema, AuthLoginNativeResponseSchema, type AuthLoginRequest, AuthLoginRequestSchema, AuthLoginResponseSchema, AuthLogoutResponseSchema, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, AuthPreferencesPatchRequestSchema, AuthPreferencesPatchResponseSchema, AuthSessionUserSchema, type AuthSignupRequest, AuthSignupRequestSchema, AuthSignupResponseSchema, AuthWebviewBridgeQuerySchema, AuthWebviewExchangeRequestSchema, AuthWebviewExchangeResponseSchema, BeerJsonExportResponseSchema, BeerStyleSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type BrewSessionListItem, type BrewSessionsListResponse, BrewSessionsListResponseSchema, BrewdaySettingsPatchRequestSchema, BrewdaySettingsPayloadSchema, BrewdaySettingsResponseSchema, ContextMeResponseSchema, type CrpProposeScheduleAdjustmentInput, CrpProposeScheduleAdjustmentInputSchema, type CrpProposeScheduleAdjustmentOutput, CrpProposeScheduleAdjustmentOutputSchema, EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfilePayloadSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, IdParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemPayloadSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type MrpProposeOrderAdjustmentInput, MrpProposeOrderAdjustmentInputSchema, type MrpProposeOrderAdjustmentOutput, MrpProposeOrderAdjustmentOutputSchema, type NumberFormatHintV1, type NumberFormatUnit, OkResponseSchema, PreferredLocaleSchema, RecipeCreateRequestSchema, type RecipeListItem, RecipeListResponseSchema, RecipePatchRequestSchema, RecipePayloadSchema, RecipeResponseSchema, RecipeVersionsResponseSchema, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, SafeNextPathSchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, StylesListResponseSchema, UiDensitySchema, UiFontScaleSchema, UiThemeSchema, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, WorkspaceBrandPatchRequestSchema, WorkspaceBrandPatchResponseSchema, type WorkspaceCreateRequest, WorkspaceCreateRequestSchema, WorkspaceCreateResponseSchema, WorkspaceIdParamsSchema, WorkspaceRowSchema, WorkspacesListResponseSchema, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };

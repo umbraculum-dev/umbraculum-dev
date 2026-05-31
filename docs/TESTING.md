@@ -17,6 +17,18 @@ This is the single source of truth for "what do I test, where, and how" in this 
 
 Each layer is a **gate** for the one above: don't reach for L6 until L1-L5 are green.
 
+## Verification tiers (T0 / T1 / T2)
+
+Layers describe **what** to test; [VERIFICATION-TIERS.md](VERIFICATION-TIERS.md) describes **how much** to run for a given change:
+
+| Tier | Maps to layers | Entry command |
+|------|----------------|---------------|
+| T0 | L1, quick API unit | `npm run verify:*` with `--tier T0`, or `docker compose exec api npm run test:unit` |
+| T1 | L1–L4 scoped | `npm run verify:from-diff`, `npm run verify:openapi`, etc. |
+| T2 | ci-parity + GHA `api.yml` | `npm run verify:pre-push` + **`api-integration-tests-pre-push`** skill |
+
+See [VERIFICATION-TIERS.md](VERIFICATION-TIERS.md) for the full change-surface matrix.
+
 ## What goes in each layer
 
 ### L1 - Unit (`packages/contracts`, `packages/core`)
@@ -60,7 +72,22 @@ Notes:
 
 Lives in [services/api/src/tests](../services/api/src/tests). Already has 20+ specs against a real `brewapp_test` Postgres. Use the existing `createSessionForTestUser` helper at [services/api/src/tests/helpers/session.ts](../services/api/src/tests/helpers/session.ts) for auth.
 
-Run:
+**Unit vs integration split** (T0 fast path — no DB migrate reset):
+
+```bash
+docker compose exec api npm run test:unit          # openapi artifact, entitlements, promptComposer, …
+docker compose exec api npm run test:integration  # full suite; runs test:db:prepare once via vitest globalSetup
+docker compose exec api npm test                  # alias for test:integration (CI-compatible)
+```
+
+Scoped integration (T1):
+
+```bash
+docker compose exec api ./node_modules/.bin/vitest run src/tests/authSessions.test.ts
+npm run verify:openapi
+```
+
+Full integration (T2 / CI):
 
 ```bash
 docker compose exec api npm test

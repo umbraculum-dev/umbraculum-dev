@@ -451,7 +451,7 @@ If you integrate against the HTTP API (outside the monorepo):
 
 1. **Module route tables** — [`MODULES.md`](MODULES.md) + per-module pages under [`modules/`](modules/).
 2. **Type pins** — `@umbraculum/<code>-contracts` packages ([`modules/packages/README.md`](modules/packages/README.md)).
-3. **Machine-readable catalog** — alpha partial OpenAPI at [`API-OPENAPI.md`](API-OPENAPI.md) (`services/api/openapi/openapi.json`; filter by tag `pim`, `mrp`, etc.). Platform/auth/brewery paths are not fully schema-documented yet.
+3. **Machine-readable catalog** — partial OpenAPI: platform catalog [`openapi.json`](../services/api/openapi/openapi.json) (canonical + rendering + auth/workspaces) and optional brewery add-on [`brewery.json`](../services/api/openapi/brewery.json). See [`API-OPENAPI.md`](API-OPENAPI.md).
 4. **Auth** — [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) (cookie `sid` for web, bearer for native).
 5. **Try a path** — after §2.3, `curl -fsSL http://localhost/healthz` then authenticated module routes per module docs.
 

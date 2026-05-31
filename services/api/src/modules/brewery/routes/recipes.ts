@@ -1,121 +1,207 @@
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import {
+  ErrorResponseSchema,
+  IdParamsSchema,
+  OkResponseSchema,
+  RecipeCreateRequestSchema,
+  RecipeListResponseSchema,
+  RecipePatchRequestSchema,
+  RecipeResponseSchema,
+  RecipeVersionsResponseSchema,
+} from "@umbraculum/contracts";
+
+import { computeRecipeGravityAnalysis } from "../../../domain/recipeAnalysis/gravityAnalysis.js";
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { RecipesService } from "../../../services/recipesService.js";
-import { computeRecipeGravityAnalysis } from "../../../domain/recipeAnalysis/gravityAnalysis.js";
 
 export function recipesRoutes(app: FastifyInstance) {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const recipes = new RecipesService(app.prisma);
 
-  app.get("/recipes", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const list = await recipes.listRecipes(ctx.userId, ctx.activeWorkspaceId);
-    return { ok: true, recipes: list };
-  });
+  zodApp.get(
+    "/recipes",
+    {
+      schema: {
+        tags: ["brewery"],
+        response: {
+          200: RecipeListResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const list = await recipes.listRecipes(ctx.userId, ctx.activeWorkspaceId);
+      return RecipeListResponseSchema.parse({ ok: true, recipes: list });
+    },
+  );
 
-  app.post("/recipes", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const body = (req.body ?? {}) as {
-      name?: unknown;
-      styleKey?: unknown;
-      notes?: unknown;
-      beerJsonRecipeJson?: unknown;
-      recipeExtJson?: unknown;
-    };
-    const name = typeof body.name === "string" ? body.name : "";
-    const styleKey = typeof body.styleKey === "string" ? body.styleKey : "";
-    const notes = typeof body.notes === "string" ? body.notes : null;
-    const beerJsonRecipeJson = body.beerJsonRecipeJson;
-    const recipeExtJson = body.recipeExtJson;
+  zodApp.post(
+    "/recipes",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: RecipeCreateRequestSchema,
+        response: {
+          200: RecipeResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const body = req.body;
+      const created = await recipes.createRecipe(ctx.userId, ctx.activeWorkspaceId, {
+        name: body.name,
+        styleKey: body.styleKey ?? "",
+        notes: body.notes ?? null,
+        beerJsonRecipeJson: body.beerJsonRecipeJson,
+        recipeExtJson: body.recipeExtJson,
+      });
+      return RecipeResponseSchema.parse({ ok: true, recipe: created });
+    },
+  );
 
-    const created = await recipes.createRecipe(ctx.userId, ctx.activeWorkspaceId, {
-      name,
-      styleKey,
-      notes,
-      beerJsonRecipeJson,
-      recipeExtJson,
-    });
-    return { ok: true, recipe: created };
-  });
+  zodApp.get(
+    "/recipes/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: RecipeResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const recipe = await recipes.getRecipe(ctx.userId, ctx.activeWorkspaceId, req.params.id);
+      const waterSettings = await app.prisma.recipeWaterSettings.findUnique({
+        where: { recipeId: recipe.id },
+      });
+      const analysis = computeRecipeGravityAnalysis({
+        beerJsonRecipeJson: recipe.beerJsonRecipeJson,
+        recipeExtJson: recipe.recipeExtJson,
+        recipeWaterSettings: waterSettings,
+      });
+      return RecipeResponseSchema.parse({ ok: true, recipe: { ...recipe, analysis } });
+    },
+  );
 
-  app.get("/recipes/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
+  zodApp.get(
+    "/recipes/:id/versions",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: RecipeVersionsResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const versions = await recipes.listRecipeVersions(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.id,
+      );
+      return RecipeVersionsResponseSchema.parse({ ok: true, versions });
+    },
+  );
 
-    const recipe = await recipes.getRecipe(ctx.userId, ctx.activeWorkspaceId, id);
-    const waterSettings = await app.prisma.recipeWaterSettings.findUnique({
-      where: { recipeId: recipe.id },
-    });
-    const analysis = computeRecipeGravityAnalysis({
-      beerJsonRecipeJson: recipe.beerJsonRecipeJson,
-      recipeExtJson: recipe.recipeExtJson,
-      recipeWaterSettings: waterSettings,
-    });
-    return { ok: true, recipe: { ...recipe, analysis } };
-  });
+  zodApp.post(
+    "/recipes/:id/versions",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: RecipeResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const created = await recipes.createRecipeVersionFromCurrent(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.id,
+      );
+      return RecipeResponseSchema.parse({ ok: true, recipe: created });
+    },
+  );
 
-  app.get("/recipes/:id/versions", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
+  zodApp.post(
+    "/recipes/:id/duplicate",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: RecipeResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const created = await recipes.duplicateRecipe(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.id,
+      );
+      return RecipeResponseSchema.parse({ ok: true, recipe: created });
+    },
+  );
 
-    const versions = await recipes.listRecipeVersions(ctx.userId, ctx.activeWorkspaceId, id);
-    return { ok: true, versions };
-  });
+  zodApp.patch(
+    "/recipes/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        body: RecipePatchRequestSchema,
+        response: {
+          200: RecipeResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const body = req.body;
+      const updated = await recipes.updateRecipe(ctx.userId, ctx.activeWorkspaceId, req.params.id, {
+        name: body.name,
+        styleKey: body.styleKey,
+        notes: body.notes,
+        beerJsonRecipeJson: body.beerJsonRecipeJson,
+        recipeExtJson: body.recipeExtJson,
+      });
+      return RecipeResponseSchema.parse({ ok: true, recipe: updated });
+    },
+  );
 
-  app.post("/recipes/:id/versions", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-
-    const created = await recipes.createRecipeVersionFromCurrent(ctx.userId, ctx.activeWorkspaceId, id);
-    return { ok: true, recipe: created };
-  });
-
-  app.post("/recipes/:id/duplicate", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-
-    const created = await recipes.duplicateRecipe(ctx.userId, ctx.activeWorkspaceId, id);
-    return { ok: true, recipe: created };
-  });
-
-  app.patch("/recipes/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-
-    const body = (req.body ?? {}) as {
-      name?: unknown;
-      styleKey?: unknown;
-      notes?: unknown;
-      beerJsonRecipeJson?: unknown;
-      recipeExtJson?: unknown;
-    };
-    const name = typeof body.name === "string" ? body.name : undefined;
-    const styleKey = typeof body.styleKey === "string" ? body.styleKey : undefined;
-    const notes = typeof body.notes === "string" ? body.notes : undefined;
-    const beerJsonRecipeJson = body.beerJsonRecipeJson;
-    const recipeExtJson = body.recipeExtJson;
-
-    const updated = await recipes.updateRecipe(ctx.userId, ctx.activeWorkspaceId, id, {
-      name,
-      styleKey,
-      notes,
-      beerJsonRecipeJson,
-      recipeExtJson,
-    });
-    return { ok: true, recipe: updated };
-  });
-
-  app.delete("/recipes/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-
-    await recipes.deleteRecipe(ctx.userId, ctx.activeWorkspaceId, id);
-    return { ok: true };
-  });
+  zodApp.delete(
+    "/recipes/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: OkResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      await recipes.deleteRecipe(ctx.userId, ctx.activeWorkspaceId, req.params.id);
+      return { ok: true as const };
+    },
+  );
 }
-

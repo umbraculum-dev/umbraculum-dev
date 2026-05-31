@@ -114,6 +114,8 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 
 **Integrator without brewery:** set `UMBRACULUM_MODULE_PROFILE=platform` in `.env` or `docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d`.
 
+**OpenAPI:** ISVs on the platform profile should consume [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) only — the brewery add-on spec (`openapi/brewery.json`) documents the reference vertical and is omitted from platform-profile generation. See [`API-OPENAPI.md`](API-OPENAPI.md).
+
 **Workspace-level omit (hosted):** seed `brewery_module` on demo workspaces; enable `ENTITLEMENTS_ENFORCEMENT_MODE=tier_and_addons` when testing omit semantics ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)).
 
 ### Roadmap hooks

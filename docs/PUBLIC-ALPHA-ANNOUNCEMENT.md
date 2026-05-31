@@ -24,7 +24,7 @@ Today we are opening the **Umbraculum** monorepo and the **umbraculum-toolset** 
 
 **What public alpha is — and is not.**
 
-- **Is:** source visibility, contributor docs at [docs.umbraculum.dev](https://docs.umbraculum.dev), MIT SDK packages on npm ([`LICENSING.md`](LICENSING.md) §6.2.1), local-install or marketplace Cursor plugins, a self-build path (`docker compose up`), and a **committed alpha partial OpenAPI spec** for canonical modules + rendering ([`API-OPENAPI.md`](API-OPENAPI.md)).
+- **Is:** source visibility, contributor docs at [docs.umbraculum.dev](https://docs.umbraculum.dev), MIT SDK packages on npm ([`LICENSING.md`](LICENSING.md) §6.2.1), local-install or marketplace Cursor plugins, a self-build path (`docker compose up`), and a **committed partial OpenAPI catalog** — platform spec plus optional brewery add-on ([`API-OPENAPI.md`](API-OPENAPI.md)).
 - **Is not:** hosted-service GA, feature-complete ERP, or a promise that every module is production-ready. MRP/CRP ship as a **read-only alpha proof**; write workflows land in H1 2027.
 
 **Licensing (read this before you fork).**

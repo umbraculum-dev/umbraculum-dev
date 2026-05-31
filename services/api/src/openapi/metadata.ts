@@ -1,18 +1,36 @@
-/** Shared OpenAPI document metadata for @fastify/swagger and committed artifact. */
+/** Shared OpenAPI document metadata for @fastify/swagger and committed artifacts. */
 export const OPENAPI_INFO = {
   title: "Umbraculum API",
   version: "0.0.1",
   description: [
-    "Alpha partial OpenAPI spec for the Umbraculum API.",
+    "Platform catalog — partial OpenAPI spec for the Umbraculum API.",
     "",
-    "Coverage at public alpha: canonical modules (automation, pim, mrp, crp) and horizontal rendering (RFC-0007).",
-    "Platform routes (auth, workspaces, billing), brewery vertical routes, webhooks, and AI orchestrator paths",
-    "are not yet schema-backed — see human route tables in docs/modules/ until PR3 completes.",
+    "Coverage: canonical modules (automation, pim, mrp, crp), horizontal rendering (RFC-0007),",
+    "and platform routes (health, auth, workspaces). Generated with UMBRACULUM_MODULE_PROFILE=platform.",
+    "",
+    "Brewery vertical routes are documented in the separate openapi/brewery.json add-on spec",
+    "(reference profile only). ISVs building without the brewery vertical should use this catalog only.",
+    "See docs/API-OPENAPI.md and docs/BUILDING-YOUR-VERTICAL.md.",
+    "",
+    "Billing, integrations, webhooks, and AI orchestrator paths remain on human route tables until PR3 completes.",
     "",
     "Authoritative contracts: @umbraculum/<code>-contracts packages in git.",
     "Automation adapters: CONTRACT_VERSION handshake remains authoritative over this spec.",
+    "BeerJSON and other complex JSON bodies may use loose OpenAPI schema shapes — contracts win on edge validation.",
+  ].join("\n"),
+} as const;
+
+export const OPENAPI_BREWERY_INFO = {
+  title: "Umbraculum Brewery API (reference vertical add-on)",
+  version: "0.0.1",
+  description: [
+    "Optional add-on OpenAPI spec for the brewery reference vertical.",
     "",
-    "Canonical doc index: docs/API-OPENAPI.md",
+    "Generated with UMBRACULUM_MODULE_PROFILE=reference and filtered to brewery-tagged routes only.",
+    "Not present when UMBRACULUM_MODULE_PROFILE=platform at runtime.",
+    "",
+    "Canonical platform catalog: services/api/openapi/openapi.json",
+    "Integrator index: docs/API-OPENAPI.md",
   ].join("\n"),
 } as const;
 
@@ -22,7 +40,8 @@ export const OPENAPI_TAGS = [
   { name: "mrp", description: "Canonical MRP module" },
   { name: "crp", description: "Canonical CRP module" },
   { name: "rendering", description: "Horizontal document rendering (RFC-0007)" },
-  { name: "platform", description: "Platform health and future platform routes" },
+  { name: "platform", description: "Platform health, auth, and workspaces" },
+  { name: "brewery", description: "Brewery reference vertical (optional add-on spec)" },
 ] as const;
 
 export const OPENAPI_SECURITY_SCHEMES = {

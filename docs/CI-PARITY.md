@@ -37,14 +37,17 @@ Stable agent output line:
 CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 ```
 
-## Fast loop vs parity gate (two tiers)
+## Fast loop vs parity gate (T0 / T1 / T2)
 
 | Tier | When | Command |
 |------|------|---------|
-| **Fast iteration** | Tight edit loop in a dev container | `docker compose exec api npm run typecheck`, per-workspace `npm run lint`, etc. |
-| **Parity gate** | Before every push with non-trivial CI surface | `npx @umbraculum/ci-parity` |
+| **T0 — scoped** | Tight edit loop | `docker compose exec api npm run test:unit`, scoped L1 installs — see [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md) |
+| **T1 — slice** | Before commit / agent handoff | `npm run verify:from-diff` or a named `npm run verify:*` script |
+| **T2 — parity** | Before every push with non-trivial CI surface | `npm run verify:pre-push` or `npx @umbraculum/ci-parity` |
 
 Dev-container checks use a different `node_modules` layout than CI (hoisting splits). **Never treat dev-container green as proof CI will pass.**
+
+Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 ## Cross-platform contract (agents and contributors)
 
