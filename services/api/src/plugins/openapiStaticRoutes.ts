@@ -14,12 +14,12 @@ function readSpec(path: string): string {
   return readFileSync(path, "utf8");
 }
 
-export const openapiStaticRoutesPlugin = fp(async (app: FastifyInstance) => {
-  app.get("/openapi.json", async (_req, reply) => {
+export const openapiStaticRoutesPlugin = fp((app: FastifyInstance) => {
+  app.get("/openapi.json", (_req, reply) => {
     reply.type("application/json").send(readSpec(platformSpecPath));
   });
 
-  app.get("/openapi/brewery.json", async (_req, reply) => {
+  app.get("/openapi/brewery.json", (_req, reply) => {
     if (!resolveEnabledModuleCodes().has("brewery")) {
       return reply.code(404).send({ ok: false, error: { code: "not_found", message: "Not found" } });
     }

@@ -449,9 +449,10 @@ var RecipeVersionsResponseSchema = import_zod4.z.object({
   ok: import_zod4.z.literal(true),
   versions: import_zod4.z.array(import_zod4.z.record(import_zod4.z.string(), import_zod4.z.unknown()))
 });
-var BeerJsonExportResponseSchema = import_zod4.z.object({
-  type: import_zod4.z.literal("Buffer")
-});
+var BeerJsonExportResponseSchema = import_zod4.z.custom(
+  (data) => data instanceof Buffer,
+  { message: "Expected binary export body" }
+);
 
 // src/water/parseHubSummary.ts
 function isFiniteNumber(v) {

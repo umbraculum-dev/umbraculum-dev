@@ -423,9 +423,8 @@ declare const RecipeVersionsResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     versions: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, z.core.$strip>;
-declare const BeerJsonExportResponseSchema: z.ZodObject<{
-    type: z.ZodLiteral<"Buffer">;
-}, z.core.$strip>;
+/** BeerJSON export routes stream raw bytes; OpenAPI documents a placeholder object. */
+declare const BeerJsonExportResponseSchema: z.ZodCustom<Buffer<ArrayBufferLike>, Buffer<ArrayBufferLike>>;
 
 type WaterCalcDerivationKind = "salt_additions" | "acidification" | "mash_overall" | "sparge_overall" | "boil_overall" | "analysis.abv" | "analysis.ibu_tinseth" | "analysis.ibu_rager" | "analysis.mcu" | "analysis.srm_morey" | "analysis.srm_daniels" | "analysis.kettle_volume" | "analysis.pre_boil_volume" | "analysis.og" | "analysis.fg" | "analysis.attenuation" | "analysis.pbg";
 type WaterCalcUnit = "L" | "g" | "mL" | "ppm" | "ppm_as_CaCO3" | "pH" | "percent" | "sg" | "ibu" | "srm" | "mcu" | "h" | "percent_per_hour" | "L_per_kg" | "mEq_per_L" | "mmol_per_L";

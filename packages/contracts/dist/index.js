@@ -330,9 +330,10 @@ var RecipeVersionsResponseSchema = z4.object({
   ok: z4.literal(true),
   versions: z4.array(z4.record(z4.string(), z4.unknown()))
 });
-var BeerJsonExportResponseSchema = z4.object({
-  type: z4.literal("Buffer")
-});
+var BeerJsonExportResponseSchema = z4.custom(
+  (data) => data instanceof Buffer,
+  { message: "Expected binary export body" }
+);
 
 // src/water/parseHubSummary.ts
 function isFiniteNumber(v) {

@@ -129,6 +129,8 @@ export const RecipeVersionsResponseSchema = z.object({
   versions: z.array(z.record(z.string(), z.unknown())),
 });
 
-export const BeerJsonExportResponseSchema = z.object({
-  type: z.literal("Buffer"),
-});
+/** BeerJSON export routes stream raw bytes; OpenAPI documents a placeholder object. */
+export const BeerJsonExportResponseSchema = z.custom<Buffer>(
+  (data) => data instanceof Buffer,
+  { message: "Expected binary export body" },
+);

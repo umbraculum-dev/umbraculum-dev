@@ -1,7 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { ErrorResponseSchema, IdParamsSchema } from "@umbraculum/contracts";
-import { z } from "zod";
+import {
+  BeerJsonExportResponseSchema,
+  ErrorResponseSchema,
+  IdParamsSchema,
+} from "@umbraculum/contracts";
 
 import { exportRecipeStrict } from "../../../beerjson/strictExport.js";
 import { BadRequestError } from "../../../errors.js";
@@ -18,9 +21,6 @@ function safeFilenamePart(v: string) {
     .replaceAll(/-+/g, "-")
     .replaceAll(/^-|-$/g, "");
 }
-
-/** Binary export responses — OpenAPI documents presence only. */
-const BinaryExportResponseSchema = z.object({});
 
 export function recipesExportRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
@@ -65,7 +65,7 @@ export function recipesExportRoutes(app: FastifyInstance) {
         tags: ["brewery"],
         params: IdParamsSchema,
         response: {
-          200: BinaryExportResponseSchema,
+          200: BeerJsonExportResponseSchema,
           401: ErrorResponseSchema,
         },
       },
@@ -98,7 +98,7 @@ export function recipesExportRoutes(app: FastifyInstance) {
       schema: {
         tags: ["brewery"],
         response: {
-          200: BinaryExportResponseSchema,
+          200: BeerJsonExportResponseSchema,
           401: ErrorResponseSchema,
         },
       },
