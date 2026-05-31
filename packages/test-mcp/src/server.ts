@@ -6,8 +6,7 @@
  *   1. HTTP POST /<toolName>   (body is JSON args)
  *   2. CLI:  tsx src/server.ts --cli <toolName> --json '{"...":"..."}'
  *
- * Modeled after the agentic MCP server in
- * ~/dkprojects/agentic-mcp-reference/e2e/e2e-app/playwright-suite/scripts/agentic/mcp-server.ts
+ * Modeled after the agentic browser-MCP one-call JSON endpoint pattern
  * but scoped to umbraculum-dev concerns.
  *
  * Output contract per the plugin-shipped agentic-browser-web-app skill

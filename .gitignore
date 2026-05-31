@@ -11,6 +11,10 @@ backups/
 # npm auth / registry config (often contains tokens)
 .npmrc
 
+# Pre-flip hygiene (maintainer-local; see scripts/docs/*.example.txt)
+scripts/docs/.personal-history-scrub-expressions.txt
+scripts/docs/.public-surface-denylist.txt
+
 # ------------------------------------------------------------
 # Secrets / environment
 # ------------------------------------------------------------

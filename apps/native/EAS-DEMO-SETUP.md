@@ -19,7 +19,7 @@
 From repo root:
 
 ```bash
-cd REPO_ROOT/umbraculum-dev/apps/native
+cd "$REPO_ROOT/apps/native"
 npx eas-cli login
 npx eas-cli init
 ```
@@ -41,7 +41,7 @@ The workflow uses `eas.json` `preview.env` (`EXPO_PUBLIC_API_BASE_URL=https://de
 ## Local build (optional)
 
 ```bash
-cd REPO_ROOT/umbraculum-dev
+cd "$REPO_ROOT"
 ./scripts/build-packages-in-docker.sh
 cd apps/native
 npx eas-cli build --platform android --profile preview

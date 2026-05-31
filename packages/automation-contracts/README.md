@@ -36,8 +36,8 @@ The address map at `data/mailbox.json` is **byte-for-byte identical** to `out/ma
 To refresh the mirror:
 
 ```bash
-# In the sister repo: regenerate the artifact (after editing LOCATED_VAR_BLOCK)
-cd openplc-sister-repo
+# In the OpenPLC sister repo: regenerate the artifact (after editing LOCATED_VAR_BLOCK)
+cd "$SISTER_REPO"
 make mailbox-artifact
 make test-tools
 
@@ -47,8 +47,8 @@ bash scripts/sync-automation-mailbox-mirror.sh
 # Drift check (CI-friendly)
 bash scripts/sync-automation-mailbox-mirror.sh --check
 
-# Override the sister-repo path if it lives elsewhere
-SISTER_REPO=/path/to/sister-repo bash scripts/sync-automation-mailbox-mirror.sh
+# Point at your sister-repo checkout (required if not already exported)
+SISTER_REPO=/path/to/openplc-sister-repo bash scripts/sync-automation-mailbox-mirror.sh
 ```
 
 Never hand-edit `data/mailbox.json`. Bump `CONTRACT_VERSION` in `src/version.ts` whenever the sister-repo `INTEGRATED_RELEASE_TAG` moves — both move together per the integrated-release-versioning baseline rule.

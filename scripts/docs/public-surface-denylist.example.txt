@@ -1,0 +1,6 @@
+# Optional local denylist for check-public-docs-no-personal-paths.py
+# Copy to scripts/docs/.public-surface-denylist.txt (gitignored), one substring per line.
+# CI uses path patterns only — legacy terms stay out of the versioned tree.
+#
+# legacy-employer-codename
+# legacy-demo-email@example.com

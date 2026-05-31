@@ -1,0 +1,11 @@
+# git-filter-repo --replace-text expressions (one per line: old==>new)
+# Copy to scripts/docs/.personal-history-scrub-expressions.txt (gitignored), fill in
+# your legacy identifiers, then run:
+#   bash scripts/docs/scrub-personal-identifiers-from-history.sh
+#
+# Example shape only — replace with your actual legacy strings before running:
+#
+# legacy-employer-codename==>agentic-mcp-reference
+# legacy-demo-email@example.com==>demo@umbraculum.dev
+# /home/youruser/your-workspace/==>REPO_ROOT/
+# ~/your-workspace/your-clone==>$REPO_ROOT

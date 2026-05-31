@@ -1,6 +1,6 @@
 # @umbraculum/test-mcp
 
-Small HTTP server exposing testing tools as JSON endpoints. Modeled on the agentic MCP server in `~/dkprojects/agentic-mcp-reference/e2e/e2e-app/playwright-suite/scripts/agentic/mcp-server.ts`, scoped to this repo's stack.
+Small HTTP server exposing testing tools as JSON endpoints. Modeled on the same one-call JSON endpoint pattern used by agentic browser-MCP tooling (HTTP POST per tool + optional CLI), scoped to this repo's stack.
 
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications. This package landed under the new `@umbraculum/*` scope as the worked-example slot of sub-plan #9 (2026-05-19); see [`docs/design/brewery-scope-migration-plan.md`](../../docs/design/brewery-scope-migration-plan.md) for the migration plan.

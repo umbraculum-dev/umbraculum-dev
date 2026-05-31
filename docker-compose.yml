@@ -48,8 +48,7 @@
 ## by yamamoto/cmp/etc. (see _proxy/README.md "Magento gotchas").
 ##
 ## Cross-references:
-##   - local-traefik-proxy/README.md     (Traefik architecture, hostname table)
-##   - local-traefik-proxy/ROADMAP.md    (migration status per stack)
+##   - local Traefik proxy stack docs (maintainer-specific; see DEVELOPMENT-LOCAL.md)
 ##   - DEVELOPMENT-LOCAL.md              (local-port + override notes)
 ##   - docs/DEVELOPMENT-NATIVE-LOCAL.md  (native/Expo workflow)
 ## ============================================================================

@@ -12,15 +12,11 @@
 #      vitest covers the same checks at CI time.
 #
 # Usage:
-#   bash scripts/sync-automation-mailbox-mirror.sh
-#       Default path: ../arduino-and-plc/openplc/brewery/
-#                       tanks-pump-priority-and-low-high-levels-sensors-alarms/
-#
-#   SISTER_REPO=/path/to/sister-repo \
+#   SISTER_REPO=/path/to/openplc-sister-repo \
 #     bash scripts/sync-automation-mailbox-mirror.sh
-#       Override path explicitly.
 #
-#   bash scripts/sync-automation-mailbox-mirror.sh --check
+#   SISTER_REPO=/path/to/openplc-sister-repo \
+#     bash scripts/sync-automation-mailbox-mirror.sh --check
 #       Diff-only mode: exits non-zero if the mirror is out of date.
 #       Useful from CI when the sister repo is checked out alongside.
 #
@@ -35,14 +31,19 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEFAULT_SISTER_REPO="${REPO_ROOT}/../openplc-sister-repo"
-SISTER_REPO="${SISTER_REPO:-${DEFAULT_SISTER_REPO}}"
+SISTER_REPO="${SISTER_REPO:-}"
 SISTER_ARTIFACT="${SISTER_REPO}/out/mailbox.json"
 MIRROR="${REPO_ROOT}/packages/automation-contracts/data/mailbox.json"
 
 mode="copy"
 if [[ "${1:-}" == "--check" ]]; then
   mode="check"
+fi
+
+if [[ -z "${SISTER_REPO}" ]]; then
+  echo "ERROR: set SISTER_REPO to your OpenPLC sister-repo checkout path." >&2
+  echo "  Example: SISTER_REPO=/path/to/openplc-sister-repo $0" >&2
+  exit 2
 fi
 
 if [[ ! -f "${SISTER_ARTIFACT}" ]]; then
