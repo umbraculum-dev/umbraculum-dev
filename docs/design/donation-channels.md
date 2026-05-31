@@ -1,9 +1,9 @@
 # Donation and sponsorship channels
 
 **Tier:** Public  
-**Status:** v1 — Phase 0 (solo project; Liberapay + Buy Me a Coffee; in-kind via forum)  
+**Status:** v1.1 — environmental accounting (Stripe Climate, forest stewardship) (2026-05-31)  
 **Audience:** maintainers wiring `/support`, prospective sponsors, community members reviewing payment infrastructure  
-**Related:** [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5, [`apps/website/public/support/index.html`](../../apps/website/public/support/index.html), [`community-forum-runbook.md`](community-forum-runbook.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)
+**Related:** [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §5, [`MANIFESTO.md`](../../MANIFESTO.md) §3.2, [`apps/website/public/support/index.html`](../../apps/website/public/support/index.html), [`community-forum-runbook.md`](community-forum-runbook.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md)
 
 > [!IMPORTANT]
 > **§5.3 is unchanged.** Money and in-kind support never buy vote weight, queue priority, veto immunity, private channels, or feature paywalls. Payment rails are operational detail; governance commitments live in §5.3.
@@ -61,6 +61,7 @@ Route via **Cloudflare Email Routing** on `umbraculum.dev` to the maintainer inb
 2. Public page **`Umbraculum`** at `https://liberapay.com/Umbraculum/` — a Liberapay **Team** is optional for solo maintainers; an individual account named after the project is acceptable at alpha ([Teams](https://liberapay.com/about/teams)).
 3. Team / profile description (short):
    - Funds **AI inference**, **maintainer time**, and **infrastructure** (e.g. community forum ~€10/mo fixed hosting — itemized €7.60: VPS, Auto Backup, off-site archive).
+   - **Environmental accounting:** **1%** of Stripe-processed payouts via **[Stripe Climate Commitments](https://docs.stripe.com/climate/commitments)**; **1 hectare of forest** under active maintenance; local reforestation scaled to capacity — see §9.
    - **Does not** buy votes, priority, or paywalled features — link to `/support` and §5.3.
    - Link **https://github.com/umbraculum-dev** and **https://umbraculum.dev/support/** in prose (credibility; not a GitHub-org OAuth hook).
 4. Connect **Stripe only** as payout processor — account email **`finance@umbraculum.dev`** when forwarding is reliable (§3.0); link bank for payouts.
@@ -70,7 +71,7 @@ Route via **Cloudflare Email Routing** on `umbraculum.dev` to the maintainer inb
 
 1. Register [Buy Me a Coffee](https://www.buymeacoffee.com/) page slug **`Umbraculum`** (or nearest available; update links if taken).
 2. **Disable** membership tiers and shop at alpha — **one-time tips only** to avoid Patreon-style tier optics (§6).
-3. Profile copy: same §5.3 disclaimer as Liberapay; “one-time contribution.”
+3. Profile copy: same §5.3 disclaimer as Liberapay; “one-time contribution.” Mention §9 environmental accounting (Stripe Climate 1%, forest stewardship) in one line if space allows.
 4. Payout: **Stripe** when offered (same project identity as Liberapay); PayPal not required at alpha.
 5. Optional: embed button on `/support` (link-out is enough at v1).
 
@@ -154,10 +155,60 @@ Stay on Phase 0 until a **Proposals** forum topic passes (§4) to add or replace
 - [ ] `/support` buttons point to live URLs
 - [ ] Forum **Community policy** pins: Phase 0 channels + §5 triggers ([`donation-channels.md`](donation-channels.md) §3); **How we communicate** (§6.1 — [`community-forum-runbook.md`](community-forum-runbook.md) §6 item 5)
 - [ ] [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) mentions `/support`
+- [ ] Stripe **Climate Commitments** at **1%** on payout account (§9.2)
 
 ---
 
-## 9. Sign-off log
+## 9. Environmental accounting — AI energy, Stripe Climate, forest stewardship
+
+Umbraculum is **human-directed and AI-orchestrated** ([`MANIFESTO.md`](../../MANIFESTO.md) §1.2). That choice has a real **energy cost** — inference, CI, and contributor tooling consume electricity and upstream compute. We are **not indifferent** to that cost because the project also commits to empathy, sustainability, and honest accounting ([`MANIFESTO.md`](../../MANIFESTO.md) §2.1, §3.2).
+
+This section is **not a political manifesto.** It records **admiration for forests** — North American landscapes and forest ecosystems worldwide — and a **consequent** attempt to offset some of what this work emits, without pretending the math is perfect.
+
+**Open discussion is welcome.** If you have better numbers, local knowledge, or disagreement with how we allocate, say so on the **forum** — this topic stays on the public agenda.
+
+### 9.1 What we worry about
+
+- **AI-assisted development and product AI** both draw on energy-intensive compute. Building on AI does not erase that footprint; it **raises the obligation to name it**.
+- **Greenhouse gases** and **forest loss** are connected stresses we take seriously as practitioners who spend our lives in front of machines — not as a badge, but as a **worry we act on modestly**.
+
+### 9.2 Stripe Climate Commitments — 1% on processed payouts
+
+On the **Stripe account** that receives Liberapay and Buy Me a Coffee payouts (`finance@umbraculum.dev` rail, §3.0), we enable **[Stripe Climate Commitments](https://docs.stripe.com/climate/commitments)** at **1%** of Stripe-processed volume.
+
+| Channel | Applies? | Notes |
+|---------|----------|-------|
+| **Liberapay** (recurring) | **Yes** | Payouts via Stripe; Commitments apply to processed volume on that account |
+| **Buy Me a Coffee** (one-time) | **Yes** | Same Stripe payout rail when used |
+| **In-kind / org billing** | **No automatic %** | Sponsor pays vendor directly — no Stripe Climate hook on our side; discuss openly if sponsor wants parallel giving |
+
+Stripe routes Climate Commitments toward **permanent carbon removal** projects in the **[Stripe Climate](https://stripe.com/climate)** / Frontier portfolio — not a generic “green badge.” Details and dashboard reporting live in Stripe’s docs; we do not duplicate their project-selection mechanics here.
+
+**Honest limit:** 1% of donation volume is **small** relative to total project energy use (maintainer inference bills, CI, hosting, contributors’ own machines). It is a **committed floor**, not a claim of carbon neutrality.
+
+### 9.3 Forest stewardship — 1 hectare today; local reforestation as capacity allows
+
+In parallel with Stripe Climate:
+
+- We maintain **one hectare of forest** under active care **today**.
+- **Local reforestation** — planting and tending near where maintainers work — will **increase with our means** (time, sponsorship, and land access). No fixed timeline; **scale honestly** or not at all.
+
+We do **not** frame this as offset marketing for the software product. It is **stewardship we chose** because forests matter to us aesthetically and ecologically.
+
+### 9.4 How this relates to sponsorship §5.3
+
+Environmental giving **does not** buy votes, priority, private channels, or features — same §5.3 wall as every other sponsorship use. Sponsors may **earmark** “environment” in a message; that is **information**, not governance weight.
+
+### 9.5 Maintainer checklist (Stripe Climate)
+
+- [ ] Stripe Dashboard → **Climate** → **Climate Commitments** enabled at **1%**
+- [ ] Confirm Liberapay + Buy Me a Coffee payouts land on the same Stripe account
+- [ ] Mention §9 briefly on `/support` and in Liberapay / Buy Me a Coffee profile copy (§3.1–§3.2)
+- [ ] Forum **Community policy**: welcome open threads on energy accounting and forest stewardship
+
+---
+
+## 10. Sign-off log
 
 | Date | Maintainer | Liberapay | Buy Me a Coffee | `/support` | Forum pin |
 |------|------------|-----------|-----------------|------------|-----------|
