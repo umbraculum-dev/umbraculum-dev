@@ -70,6 +70,7 @@ services:
     command: sh -c "mkdir -p /packages && ln -snf /app/node_modules /packages/node_modules && npm install && npm run dev"
     environment:
       - NEXT_PUBLIC_API_BASE_URL=/api
+      - UMBRACULUM_MODULE_PROFILE=${UMBRACULUM_MODULE_PROFILE:-reference}
       # NOTE: Previously required to bypass npm peer-dependency conflicts when React was pinned to 19.1.0.
       # With React aligned to 19.2.4 (react-native peer range), keep this disabled unless conflicts return.
       # - npm_config_legacy_peer_deps=true
@@ -149,6 +150,7 @@ services:
       - RENDERING_SIGNING_SECRET=dev-only-rendering-signing-secret
       - STRIPE_WEBHOOK_SECRET=...
       - UMBRACULUM_REPO_ROOT=/umbraculum
+      - UMBRACULUM_MODULE_PROFILE=${UMBRACULUM_MODULE_PROFILE:-reference}
     ports:
       - "4000:4000"
     depends_on:

@@ -1,0 +1,9 @@
+# Platform SKU — canonical modules only; no brewery reference vertical.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d
+services:
+  api:
+    environment:
+      UMBRACULUM_MODULE_PROFILE: platform
+  web:
+    environment:
+      UMBRACULUM_MODULE_PROFILE: platform

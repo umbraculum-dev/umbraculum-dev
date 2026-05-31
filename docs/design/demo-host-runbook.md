@@ -78,7 +78,7 @@ Run from repo root:
 
 1. **DNS** — `demo.umbraculum.dev` → A/AAAA or CNAME to the host running Docker Compose (must reach **your** Umbraculum nginx, not a registrar parking page).
 2. **TLS** — HTTPS at nginx (e.g. Let's Encrypt). Android EAS builds require HTTPS.
-3. **Deploy** — On the demo host: `docker compose up -d` (api, web, nginx, postgres, gotenberg, redis). Mount [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) (or equivalent `server_name demo.umbraculum.dev`).
+3. **Deploy** — On the demo host: `docker compose up -d` (api, web, nginx, postgres, gotenberg, redis). Default **`reference`** profile includes brewery; see [`platform-module-profile.md`](platform-module-profile.md). Mount [`infra/nginx/demo.conf`](../../infra/nginx/demo.conf) (or equivalent `server_name demo.umbraculum.dev`).
 4. **Env** — Production-like env for API/web: `DATABASE_URL`, session secrets, `E2E_*` passwords if overriding defaults. Enable **gotenberg** + **redis** for PDF export smoke.
 5. **Seed** — Ensure E2E/brewery seed has run (`docker compose` seed/migrate per [`DEVELOPMENT.md`](../../DEVELOPMENT.md)).
 6. **Verify**

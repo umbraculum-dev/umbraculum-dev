@@ -6,7 +6,7 @@ import Fastify, {
   type RawServerDefault,
 } from "fastify";
 import cors, { type OriginFunction } from "@fastify/cors";
-import { registerRegisteredModuleAiTools, registerBuiltinWebModulesIfAbsent } from "@umbraculum/module-sdk";
+import { registerRegisteredModuleAiTools, registerBuiltinWebModulesIfAbsent, resolveEnabledModuleCodes } from "@umbraculum/module-sdk";
 import {
   serializerCompiler,
   validatorCompiler,
@@ -59,6 +59,7 @@ function installZodCompilers(app: AppInstance): void {
 
 export function buildApp() {
   const app = Fastify({ logger: true }) as AppInstance;
+  const enabledModules = resolveEnabledModuleCodes();
 
   installZodCompilers(app);
 
@@ -100,7 +101,9 @@ export function buildApp() {
   app.register(workspacesRoutes);
   app.register(adsRoutes);
   app.register(platformAdsRoutes);
-  app.register(platformRecipesRoutes);
+  if (enabledModules.has("brewery")) {
+    app.register(platformRecipesRoutes);
+  }
   app.register(billingRoutes);
   app.register(integrationsTiltIngestRoutes);
   app.register(integrationsTiltRoutes);
@@ -114,7 +117,7 @@ export function buildApp() {
   // Built-in web URL segments + nav metadata are centralized in
   // `@umbraculum/module-sdk` (`registerBuiltinWebModulesIfAbsent`) so
   // `apps/web` and `services/api` share one source of truth.
-  registerBuiltinWebModulesIfAbsent();
+  registerBuiltinWebModulesIfAbsent({ enabledCodes: enabledModules });
   // Each `register<Code>Module` records API module metadata with
   // `@umbraculum/module-sdk` and registers its API route registrars +
   // owned web URL segments. The order is alphabetical for stability of
@@ -124,11 +127,11 @@ export function buildApp() {
   // also order-independent (it's a Set-keyed lookup).
   // See: docs/design/web-route-group-audit.md §3.4 +
   //      docs/rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md.
-  registerAutomationModule(app);
-  registerBreweryModule(app);
-  registerCrpModule(app);
-  registerMrpModule(app);
-  registerPimModule(app);
+  if (enabledModules.has("automation")) registerAutomationModule(app);
+  if (enabledModules.has("brewery")) registerBreweryModule(app);
+  if (enabledModules.has("crp")) registerCrpModule(app);
+  if (enabledModules.has("mrp")) registerMrpModule(app);
+  if (enabledModules.has("pim")) registerPimModule(app);
 
   app.register((instance, _opts, done) => {
     const registry = new InMemoryAiToolRegistry();

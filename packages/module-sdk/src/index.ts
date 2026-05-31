@@ -103,6 +103,16 @@ export {
 export { fromParser, type ValidatedSchema } from "./validatedSchema.js";
 
 export {
+  BUILTIN_MODULE_CODES,
+  InvalidModuleProfileError,
+  isModuleEnabled,
+  resolveEnabledModuleCodes,
+  resolveModuleProfile,
+  type BuiltinModuleCode,
+  type ModuleProfile,
+} from "./enabledModules.js";
+
+export {
   BUILTIN_WEB_MODULE_REGISTRATIONS,
   PLATFORM_WEB_SHELL_NAV_ENTRIES,
   registerBuiltinWebModulesIfAbsent,

@@ -3,9 +3,17 @@ import type { PrismaClient } from "@prisma/client";
 /**
  * RFC-0009 enforcement mode.
  * - tier_only (public α): tier limits only; hasActiveAddon is always true.
- * - tier_and_addons (H1 2027): query platform.WorkspaceBillingAddon rows.
+ * - tier_and_addons (F-mod slice + H1 2027): query platform.WorkspaceBillingAddon rows.
  */
 export type EntitlementEnforcementMode = "tier_only" | "tier_and_addons";
+
+export function resolveEntitlementEnforcementMode(
+  env: Record<string, string | undefined> = process.env,
+): EntitlementEnforcementMode {
+  const raw = env["ENTITLEMENTS_ENFORCEMENT_MODE"]?.trim();
+  if (raw === "tier_and_addons") return "tier_and_addons";
+  return "tier_only";
+}
 
 /**
  * Platform entitlement queries for module add-on codes declared via registerModule.
@@ -14,7 +22,7 @@ export type EntitlementEnforcementMode = "tier_only" | "tier_and_addons";
 export class EntitlementsService {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly enforcementMode: EntitlementEnforcementMode = "tier_only",
+    private readonly enforcementMode: EntitlementEnforcementMode = resolveEntitlementEnforcementMode(),
   ) {}
 
   getEnforcementMode(): EntitlementEnforcementMode {
@@ -26,13 +34,18 @@ export class EntitlementsService {
    * In tier_only mode (public α), returns true without a DB lookup so call sites
    * can be wired before WorkspaceBillingAddon lands.
    */
-  hasActiveAddon(_workspaceId: string, _addonCode: string): Promise<boolean> {
+  async hasActiveAddon(workspaceId: string, addonCode: string): Promise<boolean> {
+    if (process.env["UMBRACULUM_GRANT_ALL_ADDONS"] === "1") {
+      return true;
+    }
     if (this.enforcementMode === "tier_only") {
-      return Promise.resolve(true);
+      return true;
     }
 
-    // H1 2027: query platform.workspace_billing_addons when the model ships.
-    void this.prisma;
-    return Promise.resolve(false);
+    const row = await this.prisma.workspaceBillingAddon.findFirst({
+      where: { workspaceId, addonCode, status: "active" },
+      select: { id: true },
+    });
+    return row !== null;
   }
 }

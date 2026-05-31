@@ -17,8 +17,8 @@
 | **Base subscription** | `platform.WorkspaceBilling` + tiers | Shipped |
 | **Tier numeric caps** | `tierLimitsService` + module `tierLimits` slices | Shipped |
 | **Add-on declaration** | `registerModule({ addonCodes })` + boot collision check | Shipped (this RFC) |
-| **Add-on persistence** | `platform.WorkspaceBillingAddon` | **Not shipped** |
-| **Add-on enforcement** | `EntitlementsService` | Stub — `tier_only` mode |
+| **Add-on persistence** | `platform.WorkspaceBillingAddon` | **Partial (F-mod Phase 3, 2026-05-31)** — Prisma model + `EntitlementsService` query path; Stripe/RevenueCat wiring still H1 2027 |
+| **Add-on enforcement** | `EntitlementsService` | **`tier_only` default**; opt-in `ENTITLEMENTS_ENFORCEMENT_MODE=tier_and_addons` |
 | **Managed-AI credits** | `managed_ai_credits_*` add-ons + pricebook | **Deferred** (ROADMAP E-full) |
 
 Public alpha MAY ship without purchasable module add-ons; it MUST NOT ship without this boundary ([RFC-0009](../rfcs/0009-workspace-billing-addons-and-entitlements.md) Decision E).

@@ -391,6 +391,8 @@ convenience scripts:
 docker compose up --build      # equivalent to `npm run dev` at repo root
 ```
 
+**Module profile:** default compose boots the **`reference`** profile (brewery reference vertical on). Integrators omitting brewery: `UMBRACULUM_MODULE_PROFILE=platform` in `.env` or `-f docker-compose.platform.yml` — see [`design/platform-module-profile.md`](design/platform-module-profile.md) and [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md).
+
 First boot takes 5–10 minutes (image pull + build). Subsequent boots are
 under a minute.
 

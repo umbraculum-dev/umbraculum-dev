@@ -1,5 +1,6 @@
 import type { ModuleNavLabelKey } from "@umbraculum/i18n-keys";
 
+import { resolveEnabledModuleCodes } from "./enabledModules.js";
 import {
   listRegisteredWebModules,
   registerWebModule,
@@ -75,11 +76,15 @@ export const PLATFORM_WEB_SHELL_NAV_ENTRIES: readonly {
  * Idempotently registers every built-in web module. Safe to call from both
  * `services/api` boot and `apps/web` layout bootstrap.
  */
-export function registerBuiltinWebModulesIfAbsent(): void {
+export function registerBuiltinWebModulesIfAbsent(options?: {
+  enabledCodes?: ReadonlySet<string>;
+}): void {
+  const enabled = options?.enabledCodes ?? resolveEnabledModuleCodes();
   const registered = new Set(listRegisteredWebModules().map((m) => m.code));
-  for (const options of BUILTIN_WEB_MODULE_REGISTRATIONS) {
-    if (!registered.has(options.code)) {
-      registerWebModule(options);
+  for (const entry of BUILTIN_WEB_MODULE_REGISTRATIONS) {
+    if (!enabled.has(entry.code)) continue;
+    if (!registered.has(entry.code)) {
+      registerWebModule(entry);
     }
   }
 }

@@ -25,12 +25,14 @@ __export(index_exports, {
   AI_PROMPT_ROUTE_MAX_LENGTH: () => AI_PROMPT_ROUTE_MAX_LENGTH,
   AddonCodeAlreadyRegisteredError: () => AddonCodeAlreadyRegisteredError,
   AiPromptRouteKeyAlreadyRegisteredError: () => AiPromptRouteKeyAlreadyRegisteredError,
+  BUILTIN_MODULE_CODES: () => BUILTIN_MODULE_CODES,
   BUILTIN_WEB_MODULE_REGISTRATIONS: () => BUILTIN_WEB_MODULE_REGISTRATIONS,
   DocumentTemplateRefAlreadyRegisteredError: () => DocumentTemplateRefAlreadyRegisteredError,
   InvalidAddonCodeError: () => InvalidAddonCodeError,
   InvalidAiPromptOverlayError: () => InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError: () => InvalidDocumentTemplateRefError,
   InvalidModuleCodeError: () => InvalidModuleCodeError,
+  InvalidModuleProfileError: () => InvalidModuleProfileError,
   InvalidTierLimitKeyError: () => InvalidTierLimitKeyError,
   InvalidTierLimitValueError: () => InvalidTierLimitValueError,
   InvalidUrlSegmentError: () => InvalidUrlSegmentError,
@@ -59,6 +61,7 @@ __export(index_exports, {
   getRegisteredDocumentTemplate: () => getRegisteredDocumentTemplate,
   getSegmentOwner: () => getSegmentOwner,
   isCanonicalModuleCode: () => isCanonicalModuleCode,
+  isModuleEnabled: () => isModuleEnabled,
   listOwnedUrlSegments: () => listOwnedUrlSegments,
   listRegisteredAddonCodes: () => listRegisteredAddonCodes,
   listRegisteredDocumentTemplates: () => listRegisteredDocumentTemplates,
@@ -72,6 +75,8 @@ __export(index_exports, {
   registerNativeModule: () => registerNativeModule,
   registerRegisteredModuleAiTools: () => registerRegisteredModuleAiTools,
   registerWebModule: () => registerWebModule,
+  resolveEnabledModuleCodes: () => resolveEnabledModuleCodes,
+  resolveModuleProfile: () => resolveModuleProfile,
   resolveRoutePromptOverlay: () => resolveRoutePromptOverlay,
   snapshotAddonCodeOwnership: () => snapshotAddonCodeOwnership,
   snapshotModule: () => snapshotModule,
@@ -703,6 +708,44 @@ function fromParser(parser) {
   };
 }
 
+// src/enabledModules.ts
+var BUILTIN_MODULE_CODES = [
+  "automation",
+  "brewery",
+  "crp",
+  "mrp",
+  "pim"
+];
+var PLATFORM_PROFILE_MODULES = [
+  "automation",
+  "pim",
+  "mrp",
+  "crp"
+];
+var REFERENCE_PROFILE_MODULES = BUILTIN_MODULE_CODES;
+var InvalidModuleProfileError = class extends Error {
+  constructor(value) {
+    super(
+      `Invalid UMBRACULUM_MODULE_PROFILE: "${value}". Expected "platform" or "reference".`
+    );
+    this.name = "InvalidModuleProfileError";
+  }
+};
+function resolveModuleProfile(env = process.env) {
+  const raw = env["UMBRACULUM_MODULE_PROFILE"]?.trim();
+  if (!raw) return "reference";
+  if (raw === "platform" || raw === "reference") return raw;
+  throw new InvalidModuleProfileError(raw);
+}
+function resolveEnabledModuleCodes(env = process.env) {
+  const profile = resolveModuleProfile(env);
+  const codes = profile === "reference" ? REFERENCE_PROFILE_MODULES : PLATFORM_PROFILE_MODULES;
+  return new Set(codes);
+}
+function isModuleEnabled(code, env = process.env) {
+  return resolveEnabledModuleCodes(env).has(code);
+}
+
 // src/builtinWebModules.ts
 var BUILTIN_WEB_MODULE_REGISTRATIONS = [
   {
@@ -752,11 +795,13 @@ var PLATFORM_WEB_SHELL_NAV_ENTRIES = [
   { href: "/ai", labelKey: "nav.ai", order: 80 },
   { href: "/about", labelKey: "nav.about", order: 90 }
 ];
-function registerBuiltinWebModulesIfAbsent() {
+function registerBuiltinWebModulesIfAbsent(options) {
+  const enabled = options?.enabledCodes ?? resolveEnabledModuleCodes();
   const registered = new Set(listRegisteredWebModules().map((m) => m.code));
-  for (const options of BUILTIN_WEB_MODULE_REGISTRATIONS) {
-    if (!registered.has(options.code)) {
-      registerWebModule(options);
+  for (const entry of BUILTIN_WEB_MODULE_REGISTRATIONS) {
+    if (!enabled.has(entry.code)) continue;
+    if (!registered.has(entry.code)) {
+      registerWebModule(entry);
     }
   }
 }
@@ -792,12 +837,14 @@ function composeWebShellNavItems() {
   AI_PROMPT_ROUTE_MAX_LENGTH,
   AddonCodeAlreadyRegisteredError,
   AiPromptRouteKeyAlreadyRegisteredError,
+  BUILTIN_MODULE_CODES,
   BUILTIN_WEB_MODULE_REGISTRATIONS,
   DocumentTemplateRefAlreadyRegisteredError,
   InvalidAddonCodeError,
   InvalidAiPromptOverlayError,
   InvalidDocumentTemplateRefError,
   InvalidModuleCodeError,
+  InvalidModuleProfileError,
   InvalidTierLimitKeyError,
   InvalidTierLimitValueError,
   InvalidUrlSegmentError,
@@ -826,6 +873,7 @@ function composeWebShellNavItems() {
   getRegisteredDocumentTemplate,
   getSegmentOwner,
   isCanonicalModuleCode,
+  isModuleEnabled,
   listOwnedUrlSegments,
   listRegisteredAddonCodes,
   listRegisteredDocumentTemplates,
@@ -839,6 +887,8 @@ function composeWebShellNavItems() {
   registerNativeModule,
   registerRegisteredModuleAiTools,
   registerWebModule,
+  resolveEnabledModuleCodes,
+  resolveModuleProfile,
   resolveRoutePromptOverlay,
   snapshotAddonCodeOwnership,
   snapshotModule,

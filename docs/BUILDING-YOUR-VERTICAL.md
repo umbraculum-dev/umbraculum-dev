@@ -100,19 +100,21 @@ You are building **product X** (distillery, hotel ops, cosmetics batch, internal
 
 `brewery_module` is already declared as an add-on code; **enforcement is deferred** ([`design/canonical-workspace-billing-addons-surface.md`](design/canonical-workspace-billing-addons-surface.md)).
 
-### Today (public α — gap documented)
+### Today (F-mod Phase 1 shipped 2026-05-31)
 
-| Layer | Stock `umbraculum-dev` build | What integrators do now |
+| Layer | Default (`reference` profile) | Platform opt-out (`UMBRACULUM_MODULE_PROFILE=platform` or [`docker-compose.platform.yml`](../../docker-compose.platform.yml)) |
 |---|---|---|
-| **API** | `registerBreweryModule(app)` always called in [`services/api/src/app.ts`](../../services/api/src/app.ts) | Custom `buildApp()` / fork: omit brewery registration |
-| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts) | Fork web bootstrap or filter registrations |
-| **Native** | Brewery routes in [`registerPlatformNativeModules`](../../apps/native/src/navigation/registerPlatformNativeModules.ts) | Omit native brewery registration |
-| **Database** | `brewery.*` schema always migrated | Custom migration path or empty schema if unused |
-| **Workspace UI toggle** | **None** — no "uninstall brewery" button | N/A until entitlements ship |
+| **API** | `registerBreweryModule(app)` when profile is `reference` ([`services/api/src/app.ts`](../../services/api/src/app.ts)) | Brewery module + `/platform/recipes/*` not registered |
+| **Web nav** | `brewery` in [`BUILTIN_WEB_MODULE_REGISTRATIONS`](../../packages/module-sdk/src/builtinWebModules.ts) | Brewery segments omitted |
+| **Native** | Brewery routes in [`registerPlatformNativeModules`](../../apps/native/src/navigation/registerPlatformNativeModules.ts) | Brewery native module skipped |
+| **Database** | `brewery.*` schema always migrated | Same — runtime opt-out only; schema remains |
+| **Workspace UI toggle** | **None** — deploy profile + optional add-on rows | `WorkspaceBillingAddon` + `tier_and_addons` enforcement (Phase 3 slice); full purchase UI deferred H1 2027 |
 
-**Bottom line today:** there is **no** supported one-command equivalent of `composer remove magento/module-sample-data*`. Omitting brewery is **integrator/fork territory** — deliberate custom deployment, not a documented product SKU yet.
+**Fresh clone:** `docker compose up` → **`reference`** profile (brewery on) — see [`.env.sample`](../../.env.sample) and [`design/platform-module-profile.md`](design/platform-module-profile.md).
 
-**If you only need canonical modules (PIM, automation, …) and your own vertical elsewhere:** you can still run the monorepo for development while **ignoring** brewery routes — but they remain present in the stock build until the optional-module story lands.
+**Integrator without brewery:** set `UMBRACULUM_MODULE_PROFILE=platform` in `.env` or `docker compose -f docker-compose.yml -f docker-compose.platform.yml up -d`.
+
+**Workspace-level omit (hosted):** seed `brewery_module` on demo workspaces; enable `ENTITLEMENTS_ENFORCEMENT_MODE=tier_and_addons` when testing omit semantics ([RFC-0009](rfcs/0009-workspace-billing-addons-and-entitlements.md)).
 
 ### Roadmap hooks
 

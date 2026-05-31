@@ -1,6 +1,7 @@
 import {
   aggregateNativeAvailableRouteIds,
   clearNativeModuleRegistryForTests,
+  isModuleEnabled,
   registerNativeModule,
 } from "@umbraculum/module-sdk";
 import {
@@ -33,11 +34,13 @@ let bootstrapped = false;
 export function registerPlatformNativeModules(): void {
   if (bootstrapped) return;
 
-  registerNativeModule({
-    code: "brewery",
-    availableRouteIds: [...BREWERY_NATIVE_ROUTE_IDS],
-    tabEntry: { labelKey: "nav.recipes", order: 10 },
-  });
+  if (isModuleEnabled("brewery")) {
+    registerNativeModule({
+      code: "brewery",
+      availableRouteIds: [...BREWERY_NATIVE_ROUTE_IDS],
+      tabEntry: { labelKey: "nav.recipes", order: 10 },
+    });
+  }
 
   const available = aggregateNativeAvailableRouteIds() as RouteId[];
   configureNativeRoutePolicy({

@@ -2,21 +2,37 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { defaultLocale, isLocale } from "../src/i18n/routing";
-import { registerBuiltinWebModulesIfAbsent } from "@umbraculum/module-sdk";
+import {
+  registerBuiltinWebModulesIfAbsent,
+  resolveEnabledModuleCodes,
+  resolveModuleProfile,
+} from "@umbraculum/module-sdk";
 import { registerPlatformSegments } from "./_lib/registerPlatformSegments";
 import "./globals.css";
 import "../public/tamagui.generated.css";
 
-registerBuiltinWebModulesIfAbsent();
+const enabledModules = resolveEnabledModuleCodes(process.env);
+registerBuiltinWebModulesIfAbsent({ enabledCodes: enabledModules });
 registerPlatformSegments();
 
-export const metadata: Metadata = {
-  title: {
-    default: "Brewery App",
-    template: "%s · Brewery App",
-  },
-  description: "Brewery operations, recipes, and water chemistry tools.",
-};
+const moduleProfile = resolveModuleProfile(process.env);
+
+export const metadata: Metadata =
+  moduleProfile === "platform"
+    ? {
+        title: {
+          default: "Umbraculum",
+          template: "%s · Umbraculum",
+        },
+        description: "Operational workspace platform with canonical modules.",
+      }
+    : {
+        title: {
+          default: "Brewery App",
+          template: "%s · Brewery App",
+        },
+        description: "Brewery operations, recipes, and water chemistry tools.",
+      };
 
 function oneOf<T extends string>(v: string | undefined, allowed: readonly T[], fallback: T): T {
   return v && (allowed as readonly string[]).includes(v) ? (v as T) : fallback;

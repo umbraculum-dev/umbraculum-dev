@@ -193,6 +193,8 @@ The brewery vertical is the worked example for `distillery`, `kombucha`, `cosmet
 
 If your vertical wants to be **bundled** with the platform's hosted offering (the way `brewery` is bundled today), that's a separate conversation with the core team and is not part of the technical contribution path.
 
+**Omitting brewery when building product X:** deploy profile + workspace add-ons — [`BUILDING-YOUR-VERTICAL.md`](../../../BUILDING-YOUR-VERTICAL.md), [`design/platform-module-profile.md`](../../../design/platform-module-profile.md).
+
 ---
 
 ## 7. Cross-references
@@ -200,7 +202,8 @@ If your vertical wants to be **bundled** with the platform's hosted offering (th
 - [`IMPLEMENTATION-LOG.md`](IMPLEMENTATION-LOG.md) — brewery vertical product rules, offline/sync intent, water/recipe constraints, living engineering constraints.
 - [`CROSS-PLATFORM-BOUNDARIES.md`](../../../CROSS-PLATFORM-BOUNDARIES.md) — web/native as-built boundaries (route IDs, auth, webview bridge).
 - [`design/ubuntu-touch-shell-strategy.md`](../../../design/ubuntu-touch-shell-strategy.md) — Ubuntu Touch webapp shell (web workflows; no offline brew-day).
-- [RFC-0001](../../../rfcs/0001-modules-tiers-governance-and-automation-placement.md) §5 (Tier 6 row), §8 (consumption contract).
+- [`design/platform-module-profile.md`](../../../design/platform-module-profile.md) — F-mod deploy profile (`reference` vs `platform`).
+- [`BUILDING-YOUR-VERTICAL.md`](../../../BUILDING-YOUR-VERTICAL.md) — integrator path; omitting reference vertical.
 - [RFC-0002](../../../rfcs/0002-canonical-module-physical-layout.md) §3 (β layout), §6 (Decision D — brewery sequencing), §11.2 (concrete migration table).
 - [RFC-0006](../../../rfcs/0006-amend-rfc-0002-brewery-file-move-acceleration.md) — accelerated brewery file relocation.
 - [PLATFORM-ARCHITECTURE.md](../../../PLATFORM-ARCHITECTURE.md) §1.1 (platform-not-brewery framing), §1.1.1 (peer-canonical decomposition), §5.2 (module/vertical restructure).

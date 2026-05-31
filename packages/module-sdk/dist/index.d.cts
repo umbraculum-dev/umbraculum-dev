@@ -474,6 +474,21 @@ declare function aggregateNativeAvailableRouteIds(): readonly NativeRouteId[];
 declare function clearNativeModuleRegistryForTests(): void;
 
 /**
+ * Deploy-time module profile — F-mod optional reference vertical.
+ * @see docs/design/platform-module-profile.md
+ */
+type ModuleProfile = "platform" | "reference";
+/** First-party module codes registered by the monorepo stock build. */
+declare const BUILTIN_MODULE_CODES: readonly ["automation", "brewery", "crp", "mrp", "pim"];
+type BuiltinModuleCode = (typeof BUILTIN_MODULE_CODES)[number];
+declare class InvalidModuleProfileError extends Error {
+    constructor(value: string);
+}
+declare function resolveModuleProfile(env?: NodeJS.ProcessEnv): ModuleProfile;
+declare function resolveEnabledModuleCodes(env?: NodeJS.ProcessEnv): ReadonlySet<string>;
+declare function isModuleEnabled(code: string, env?: NodeJS.ProcessEnv): boolean;
+
+/**
  * Canonical web-module registrations for first-party modules shipped in the
  * monorepo. Single source of truth for URL-segment ownership and primary-nav
  * metadata — consumed by `services/api` (tests/CI parity) and `apps/web`
@@ -493,7 +508,9 @@ declare const PLATFORM_WEB_SHELL_NAV_ENTRIES: readonly {
  * Idempotently registers every built-in web module. Safe to call from both
  * `services/api` boot and `apps/web` layout bootstrap.
  */
-declare function registerBuiltinWebModulesIfAbsent(): void;
+declare function registerBuiltinWebModulesIfAbsent(options?: {
+    enabledCodes?: ReadonlySet<string>;
+}): void;
 
 interface WebShellNavItem {
     href: string;
@@ -510,4 +527,4 @@ interface WebShellNavItem {
  */
 declare function composeWebShellNavItems(): WebShellNavItem[];
 
-export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHELL_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, type WebShellNavItem, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebShellNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveRoutePromptOverlay, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };
+export { AI_PROMPT_KNOWLEDGE_MAX_LENGTH, AI_PROMPT_MODULE_MAX_LENGTH, AI_PROMPT_ROUTE_MAX_LENGTH, AddonCodeAlreadyRegisteredError, AiPromptRouteKeyAlreadyRegisteredError, BUILTIN_MODULE_CODES, BUILTIN_WEB_MODULE_REGISTRATIONS, type BillingTierSlug, type BuiltinModuleCode, type CanonicalModuleCode, type DocumentTemplate, DocumentTemplateRefAlreadyRegisteredError, InvalidAddonCodeError, InvalidAiPromptOverlayError, InvalidDocumentTemplateRefError, InvalidModuleCodeError, InvalidModuleProfileError, InvalidTierLimitKeyError, InvalidTierLimitValueError, InvalidUrlSegmentError, type ModuleAiPrompts, ModuleCodeAlreadyRegisteredError, type ModuleProfile, type ModuleRouteRegistrar, type NativeRouteId, NavEntryPrimarySegmentNotOwnedError, PLATFORM_RESERVED_ADDON_CODE_PREFIX, PLATFORM_RESERVED_TIER_LIMIT_KEYS, PLATFORM_WEB_SHELL_NAV_ENTRIES, RESERVED_CANONICAL_MODULE_CODES, type RegisterModuleOptions, type RegisterNativeModuleOptions, type RegisterWebModuleOptions, type RegisteredDocumentTemplateSnapshot, type RegisteredModulePromptSnapshot, type RegisteredModuleSnapshot, type RegisteredNativeModuleSnapshot, type RegisteredWebModuleSnapshot, type RenderContext, type RenderDelivery, type RenderError, type RenderJob, type RenderKind, type RenderLogger, type RenderOutput, type RenderResult, type RenderRetryPolicy, type RenderStatus, type RenderVisibility, ReservedTierLimitKeyError, TierLimitKeyCollisionError, type TierLimitsContributor, type TierLimitsSlice, UrlSegmentAlreadyOwnedError, type ValidatedSchema, type WebShellNavItem, aggregateNativeAvailableRouteIds, assertModuleCodeAvailable, assertValidModuleCode, clearAddonCodeRegistryForTests, clearModuleRegistryForTests, clearNativeModuleRegistryForTests, clearWebModuleRegistryForTests, collectModuleKnowledgeSnippets, collectModulePromptOverlayTexts, collectRegisteredModulePromptOverlays, composeModuleTierLimitSlices, composeWebShellNavItems, fromParser, getRegisteredDocumentTemplate, getSegmentOwner, isCanonicalModuleCode, isModuleEnabled, listOwnedUrlSegments, listRegisteredAddonCodes, listRegisteredDocumentTemplates, listRegisteredModules, listRegisteredNativeModules, listRegisteredTierLimitKeys, listRegisteredWebModules, recordModuleRegistration, registerBuiltinWebModulesIfAbsent, registerModule, registerNativeModule, registerRegisteredModuleAiTools, registerWebModule, resolveEnabledModuleCodes, resolveModuleProfile, resolveRoutePromptOverlay, snapshotAddonCodeOwnership, snapshotModule, snapshotSegmentOwnership };

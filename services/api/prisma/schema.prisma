@@ -190,6 +190,7 @@ model Workspace {
   brewSessions  BrewSession[]
   inventoryItems InventoryItem[]
   billing       WorkspaceBilling?
+  billingAddons WorkspaceBillingAddon[]
   billingPurchaseIntents BillingPurchaseIntent[]
   billingWorkspaceBindings BillingUserWorkspaceBinding[]
   billingEvents BillingEvent[]
@@ -1141,6 +1142,37 @@ model WorkspaceBilling {
   @@index([workspaceId])
   @@index([stripeSubscriptionId])
   @@map("workspace_billing")
+  @@schema("platform")
+}
+
+enum WorkspaceBillingAddonStatus {
+  active
+  canceled
+  past_due
+
+  @@map("workspace_billing_addon_status")
+  @@schema("platform")
+}
+
+model WorkspaceBillingAddon {
+  id          String                      @id @default(uuid())
+  workspaceId String                      @map("workspace_id")
+  addonCode   String                      @map("addon_code")
+  status      WorkspaceBillingAddonStatus @default(active)
+  periodStart DateTime?                   @map("period_start")
+  periodEnd   DateTime?                   @map("period_end")
+  monthlyAllowance Json?                  @map("monthly_allowance")
+  stripeSubscriptionItemId String?         @map("stripe_subscription_item_id")
+  revenueCatEntitlementId  String?         @map("revenue_cat_entitlement_id")
+  createdAt   DateTime                    @default(now()) @map("created_at")
+  updatedAt   DateTime                    @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, addonCode])
+  @@index([workspaceId])
+  @@index([addonCode])
+  @@map("workspace_billing_addons")
   @@schema("platform")
 }
 

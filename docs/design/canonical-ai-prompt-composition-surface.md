@@ -94,7 +94,7 @@ Web clients may pass `routeId` via query `?fromRoute=productionOrders` on `/ai`.
 - **Full RAG** — per-workspace activity timelines + memory unify (Layer C D2–D3).  
 - **Managed-AI credits** — Umbraculum-resold tokens (`WorkspaceBillingAddon`).  
 - **Autonomous domain writes** — only human-confirmed proposals + `render_document` job submit.  
-- **Per-workspace module entitlements** — all boot-registered modules contribute overlays until an install model exists.
+- **Per-workspace module entitlements** — deploy profile (`UMBRACULUM_MODULE_PROFILE`) filters boot-registered modules; workspace add-on rows (`WorkspaceBillingAddon`) gate per-workspace omit when `ENTITLEMENTS_ENFORCEMENT_MODE=tier_and_addons`. Full purchase UI still deferred.
 
 ---
 
