@@ -1,6 +1,23 @@
-# Optional local denylist for check-public-docs-no-personal-paths.py
-# Copy to scripts/docs/.public-surface-denylist.txt (gitignored), one substring per line.
-# CI uses path patterns only — legacy terms stay out of the versioned tree.
+# Optional personal / employer-specific substrings for check-public-docs-no-personal-paths.py
 #
-# legacy-employer-codename
-# legacy-demo-email@example.com
+# Prefer gitignored sources so terms never enter git:
+#
+#   A) .env (repo root, gitignored; auto-read when not exported in shell):
+#        PUBLIC_SURFACE_DENYLIST=MY/EMPLOYER/CODENAME,mypersonalemail@me.com
+#      Comma-separated; no spaces required around commas.
+#
+#   B) scripts/docs/.public-surface-denylist.txt (gitignored):
+#        Copy this file to that path; one substring per line.
+#
+# Committed scripts/docs/public-surface-denylist.txt holds shared project-wide
+# terms only (no personal names). All three sources are merged and deduped.
+#
+# Full procedure: docs/design/public-surface-personal-identifier-hygiene.md
+#
+# Example personal lines (do NOT commit these — use A or B locally):
+# MY/EMPLOYER/CODENAME
+# mypersonalemail@me.com
+# My Full Name
+#
+# Avoid very short tokens (e.g. three-letter words) — they match inside normal
+# English prose ("report", "important", …). Prefer emails, codenames, and phrases.

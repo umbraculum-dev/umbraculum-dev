@@ -1,0 +1,8 @@
+# Shared substring denylist (committed). No personal names or handles — those belong
+# in gitignored .public-surface-denylist.txt and/or PUBLIC_SURFACE_DENYLIST in .env.
+#
+# One case-insensitive substring per non-comment line. Extend when hygiene audits
+# find project-wide leaks that path regexes do not cover.
+#
+# Sister-repo path fragments (use SISTER_REPO env instead of hard-coded paths):
+arduino-and-plc/openplc

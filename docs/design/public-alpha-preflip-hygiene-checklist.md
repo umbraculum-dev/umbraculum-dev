@@ -26,7 +26,7 @@ Record pass/fail and remediation commit SHAs in §6 when complete.
 |---|--------|-----|-------|
 | 2.1 | No API keys, tokens, or passwords in **tracked** files | `git grep -E '(api[_-]?key|secret|password|BEGIN (RSA|OPENSSH)|sk-ant-|sk-proj-)' -- ':!*.md' ':!docs/design/*'` + manual review of `.env.example` only placeholders | ☐ |
 | 2.2 | Git history scan (optional deep pass) | `gitleaks detect` or `trufflehog git file://.` on both repos before flip | ☐ |
-| 2.3 | Personal identifiers | `python3 scripts/docs/check-public-docs-no-personal-paths.py` + manual email review | ☑ paths (2026-05-27); emails manual |
+| 2.3 | Personal identifiers | `python3 scripts/docs/check-public-docs-no-personal-paths.py` + per-developer gitignored denylist (see [`public-surface-personal-identifier-hygiene.md`](public-surface-personal-identifier-hygiene.md)) + manual email review | ☑ paths (2026-05-27); emails manual |
 
 ---
 

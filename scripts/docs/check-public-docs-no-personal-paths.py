@@ -3,16 +3,19 @@
 Fail if public-surface files embed maintainer-specific paths or legacy personal identifiers.
 
 Scans Tier: Public docs, module READMEs, selected root addenda, i18n source catalogs,
-and other paths listed in PUBLIC_SURFACE_GLOBS below.
+and other paths listed below.
 
-Path patterns (generic — not tied to one developer's layout):
+Path patterns (generic — always on, including CI):
   - absolute paths under /home/<username>/...
   - tilde-prefixed developer workspace trees
   - $HOME-based workspace trees
 
-Optional local denylist: scripts/docs/.public-surface-denylist.txt (gitignored;
-one case-insensitive substring per line). Not used in CI — keeps legacy terms
-out of the versioned tree while still allowing maintainer-local checks.
+Substring denylist (merged, case-insensitive; never prints matched terms in output):
+
+  1. scripts/docs/public-surface-denylist.txt — committed shared terms (no personal names)
+  2. scripts/docs/.public-surface-denylist.txt — gitignored per-machine file (optional)
+  3. PUBLIC_SURFACE_DENYLIST — comma-separated substrings in .env / shell (gitignored;
+     os.environ wins; when unset, repo-root .env is read for this key only)
 
 Usage:
   python3 scripts/docs/check-public-docs-no-personal-paths.py
@@ -22,6 +25,7 @@ Exits 0 when clean, 1 on violations.
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -35,7 +39,9 @@ PATH_PATTERNS = [
     re.compile(r"\$HOME/dkprojects/"),
 ]
 
+COMMITTED_DENYLIST_PATH = REPO_ROOT / "scripts/docs/public-surface-denylist.txt"
 LOCAL_DENYLIST_PATH = REPO_ROOT / "scripts/docs/.public-surface-denylist.txt"
+ENV_DENYLIST_KEY = "PUBLIC_SURFACE_DENYLIST"
 
 DOCS_EXCLUDE = {
     "design/public-alpha-preflip-hygiene-audit-2026-05-27.md",
@@ -64,15 +70,76 @@ TEST_MCP_SOURCE = (
     REPO_ROOT / "packages/test-mcp/src/server.ts",
 )
 
-def load_local_denylist() -> tuple[str, ...]:
-    if not LOCAL_DENYLIST_PATH.is_file():
-        return ()
-    lines = LOCAL_DENYLIST_PATH.read_text(encoding="utf-8").splitlines()
-    return tuple(
+DENYLIST_SOURCE_PATHS = (
+    COMMITTED_DENYLIST_PATH,
+    LOCAL_DENYLIST_PATH,
+)
+
+
+def parse_denylist_lines(text: str) -> list[str]:
+    return [
         stripped
-        for line in lines
+        for line in text.splitlines()
         if (stripped := line.strip()) and not stripped.startswith("#")
-    )
+    ]
+
+
+def load_denylist_file(path: Path) -> list[str]:
+    if not path.is_file():
+        return []
+    return parse_denylist_lines(path.read_text(encoding="utf-8"))
+
+
+def load_env_denylist() -> list[str]:
+    raw = os.environ.get(ENV_DENYLIST_KEY, "")
+    if not raw.strip():
+        raw = _read_repo_dotenv_value(ENV_DENYLIST_KEY)
+    if not raw.strip():
+        return []
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def _read_repo_dotenv_value(key: str) -> str:
+    """Read a single key from repo-root .env when not already in os.environ."""
+    env_path = REPO_ROOT / ".env"
+    if not env_path.is_file():
+        return ""
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("export "):
+            stripped = stripped[len("export ") :].lstrip()
+        if "=" not in stripped:
+            continue
+        name, _, value = stripped.partition("=")
+        if name.strip() != key:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        return value
+    return ""
+
+
+def load_merged_denylist() -> tuple[str, ...]:
+    seen_lower: set[str] = set()
+    merged: list[str] = []
+
+    for path in DENYLIST_SOURCE_PATHS:
+        for term in load_denylist_file(path):
+            key = term.lower()
+            if key not in seen_lower:
+                seen_lower.add(key)
+                merged.append(term)
+
+    for term in load_env_denylist():
+        key = term.lower()
+        if key not in seen_lower:
+            seen_lower.add(key)
+            merged.append(term)
+
+    return tuple(merged)
 
 
 def iter_public_surface_files() -> list[Path]:
@@ -113,7 +180,7 @@ def iter_public_surface_files() -> list[Path]:
     return files
 
 
-def line_violations(path: Path, line: str, local_denylist: tuple[str, ...]) -> list[str]:
+def line_violations(path: Path, line: str, denylist: tuple[str, ...]) -> list[str]:
     hits: list[str] = []
 
     for pattern in PATH_PATTERNS:
@@ -122,9 +189,9 @@ def line_violations(path: Path, line: str, local_denylist: tuple[str, ...]) -> l
             break
 
     lower = line.lower()
-    for literal in local_denylist:
+    for literal in denylist:
         if literal.lower() in lower:
-            hits.append("local denylist literal")
+            hits.append("denylist substring")
             break
 
     return hits
@@ -132,12 +199,12 @@ def line_violations(path: Path, line: str, local_denylist: tuple[str, ...]) -> l
 
 def main() -> int:
     violations: list[str] = []
-    local_denylist = load_local_denylist()
+    denylist = load_merged_denylist()
 
     for path in iter_public_surface_files():
         rel = path.relative_to(REPO_ROOT).as_posix()
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            for reason in line_violations(path, line, local_denylist):
+            for reason in line_violations(path, line, denylist):
                 violations.append(f"{rel}:{line_no} ({reason}): {line.strip()[:120]}")
                 break
 

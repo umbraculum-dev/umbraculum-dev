@@ -27,6 +27,12 @@ translations, and thoughtful issue triage.
   monorepo; selected SDK packages may be MIT — see the licensing doc).
 - Read [`DEVELOPMENT.md`](./DEVELOPMENT.md), and if it exists in your
   checkout, the project-local addendum `DEVELOPMENT-LOCAL.md`.
+- **Public-surface hygiene (pre-flip):** before editing docs or module
+  READMEs, read
+  [`docs/design/public-surface-personal-identifier-hygiene.md`](./docs/design/public-surface-personal-identifier-hygiene.md).
+  Use `$REPO_ROOT` instead of absolute clone paths. Personal denylist
+  terms belong in gitignored `.public-surface-denylist.txt` and/or
+  `PUBLIC_SURFACE_DENYLIST` in `.env` — never in committed files.
 - **Recommended path — contribute with the apparatus.** Umbraculum is an
   AI-orchestrated-code project ([`MANIFESTO.md`](./MANIFESTO.md) §1.2): the
   default authoring path is AI assistance under enforced discipline, where

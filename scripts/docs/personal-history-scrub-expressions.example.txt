@@ -5,7 +5,7 @@
 #
 # Example shape only — replace with your actual legacy strings before running:
 #
-# legacy-employer-codename==>agentic-mcp-reference
-# legacy-demo-email@example.com==>demo@umbraculum.dev
-# /home/youruser/your-workspace/==>REPO_ROOT/
-# ~/your-workspace/your-clone==>$REPO_ROOT
+# MY/EMPLOYER/CODENAME==>neutral-project-codename
+# mypersonalemail@me.com==>demo@umbraculum.dev
+# /home/<USERNAME>/MY/HOME/PATH/==>REPO_ROOT/
+# ~/MY/HOME/PATH/my-clone==>$REPO_ROOT

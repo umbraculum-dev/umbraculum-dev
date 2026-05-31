@@ -40,7 +40,7 @@ No live production API keys found in tracked TS/JS/YML. Expected dev-only values
 
 ## §3 Personal path examples
 
-Remediated 2026-05-27: public docs use `$REPO_ROOT` (documented in [`DEVELOPMENT.md`](../DEVELOPMENT.md)). Cursor plan paths in audit docs are plain text, not links. CI: `check-public-docs-no-personal-paths.py`.
+Remediated 2026-05-27: public docs use `$REPO_ROOT` (documented in [`DEVELOPMENT.md`](../DEVELOPMENT.md)). Denylist setup: [`public-surface-personal-identifier-hygiene.md`](public-surface-personal-identifier-hygiene.md). CI: `check-public-docs-no-personal-paths.py`.
 
 ---
 
