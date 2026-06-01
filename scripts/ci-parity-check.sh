@@ -9,8 +9,9 @@ cd "$REPO_ROOT"
 # Prefer system Node/npm over Cursor's bundled toolchain (its npx can fail on AppImage mounts).
 export PATH="/usr/local/bin:/usr/bin:/bin:${PATH}"
 
-# Local pre-push default: mount the working tree (--ci) so uncommitted edits are verified.
-# Override with --archive, CI_PARITY_SNAPSHOT=archive, or an explicit --sha <ref> (git-archive replay).
+# Default: --ci (working tree) for WIP iteration.
+# Pre-push gate (agents): commit first, then --archive or npm run verify:pre-push (auto-archive on clean tree).
+# Override: CI_PARITY_SNAPSHOT=archive, or --sha <ref> for replay.
 use_checkout=1
 extra_args=()
 forward_args=()

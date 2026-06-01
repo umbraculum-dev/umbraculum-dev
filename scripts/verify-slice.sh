@@ -75,8 +75,18 @@ export REPO_ROOT
 run_t2() {
   local summary_parts=()
   local rc=0
+  local parity_args=(run)
 
-  if "${REPO_ROOT}/scripts/ci-parity-check.sh" run; then
+  # Match GHA: cold npm ci on the committed tree you are about to push.
+  # --ci (working-tree mount + warm volumes) is for WIP iteration only.
+  if git -C "$REPO_ROOT" diff --quiet && git -C "$REPO_ROOT" diff --cached --quiet; then
+    parity_args=(--archive run)
+  else
+    echo "verify-slice T2: uncommitted edits — running --ci first; re-run after commit with a clean tree" >&2
+    parity_args=(run)
+  fi
+
+  if "${REPO_ROOT}/scripts/ci-parity-check.sh" "${parity_args[@]}"; then
     summary_parts+=("ci-parity=OK")
   else
     summary_parts+=("ci-parity=FAIL")

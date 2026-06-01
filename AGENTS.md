@@ -273,25 +273,42 @@ horizontal services in [RFC-0001](docs/rfcs/0001-modules-tiers-governance-and-au
 Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
 `49-plan-documentation-context.mdc`.
 
-## Pre-push CI parity
+## Pre-push CI parity (agent-owned — do not delegate to the operator)
 
-Before pushing changes that touch TypeScript, ESLint, module READMEs, lockfiles,
-or CI workflows:
+When **you** changed TypeScript, ESLint surface, module READMEs, lockfiles, or
+CI workflows and are about to **commit and push**, **you** run the parity gate —
+not the human contributor. Do not end a session with "before you push, run …".
 
-1. Run **`./scripts/ci-parity-check.sh run`** from the repo root (cross-platform via
-   `npx`; see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)). The wrapper passes **`--ci`**
-   by default so **uncommitted edits** are included. On Windows without bash, use
-   `npx @umbraculum/ci-parity run --ci`. Use **`--archive`** or **`--sha <ref>`**
-   only to replay a committed tree — not for ordinary pre-push checks.
-2. Do **not** treat `docker compose exec … npm run typecheck`, host `python3
-   scripts/docs/…`, host `npm run build:packages`, or ad-hoc `docker run …
-   bash -lc` on the live workspace as pre-push proof — those are fast iteration
-   or Linux-biased debug only.
-3. Manifest source of truth: `.umbraculum/ci-parity.json` — when adding or
-   changing a GHA workflow's verify steps, **add the same commands as a ci-parity
-   job** in the manifest; do not invent host-only verification scripts.
-4. GHA minutes are for integration steps that truly need GitHub (OIDC publish,
-   EAS, etc.) — not for discovering failures ci-parity can catch locally.
+**Mandatory sequence before push:**
+
+1. **Commit** all intended changes (ci-parity archive mode tests **committed**
+   tree only — uncommitted fixes can hide broken `HEAD`).
+2. With a **clean working tree**, run **`npm run verify:pre-push`** or
+   **`./scripts/ci-parity-check.sh --archive run`** (cross-platform via `npx`;
+   see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)). `verify:pre-push` selects
+   `--archive` automatically when the tree is clean; on Windows without bash use
+   `npx @umbraculum/ci-parity run --archive`.
+3. If the change set touches **`services/api/**`** (or other paths in
+   `.github/workflows/api.yml` filters), also run skill
+   **`api-integration-tests-pre-push`** before push.
+4. **Only after** step 2 (and 3 when applicable) is green, push.
+
+**During iteration (not the push gate):** `./scripts/ci-parity-check.sh run`
+(`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but
+**never** treat `--ci` green alone as push proof if you have not yet run archive
+mode on the commit you will push.
+
+Do **not** treat `docker compose exec … npm run typecheck`, host `python3
+scripts/docs/…`, host `npm run build:packages`, or ad-hoc `docker run …
+bash -lc` on the live workspace as pre-push proof — those are fast iteration
+or Linux-biased debug only.
+
+Manifest source of truth: `.umbraculum/ci-parity.json` — when adding or
+changing a GHA workflow's verify steps, **add the same commands as a ci-parity
+job** in the manifest; do not invent host-only verification scripts.
+
+GHA minutes are for integration steps that truly need GitHub (OIDC publish,
+EAS, etc.) — not for discovering failures ci-parity can catch locally.
 
 Host prerequisites for ci-parity: **git**, **Docker**, and **Node** (to launch
 `npx @umbraculum/ci-parity` only). Job commands execute inside the manifest's

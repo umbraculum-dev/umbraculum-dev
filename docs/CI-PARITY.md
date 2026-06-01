@@ -43,15 +43,20 @@ Other commands:
 | `--ci` | Mount the live checkout (includes uncommitted edits). **Default via `./scripts/ci-parity-check.sh`.** |
 | `--archive` | Wrapper-only: force `git archive` snapshot (omit `--ci`). Use when replaying a specific commit or debugging archive-only drift. |
 
-**Snapshot modes (read this before pre-push):**
+**Snapshot modes (agents: read before push):**
 
 | Mode | Command | What gets tested | When to use |
 |------|---------|------------------|-------------|
-| **Working tree (default)** | `./scripts/ci-parity-check.sh run` or `… run --ci` | Your checkout on disk — **includes uncommitted edits** | **Before commit/push** — proves your WIP will pass CI after you commit |
-| **Git archive (replay)** | `npx @umbraculum/ci-parity run --archive` or `… run --sha <ref>` | Tracked files at `<ref>` only — **excludes uncommitted edits** | Reproducing a historical CI failure; verifying what is already on `HEAD` after commit |
-| **GHA checkout** | `npx @umbraculum/ci-parity run --ci` in Actions | Same as working-tree mount | CI uses `--ci` on the checked-out PR branch |
+| **Git archive (pre-push gate)** | `npm run verify:pre-push` or `./scripts/ci-parity-check.sh --archive run` | Committed tree at `HEAD` — cold `npm ci`, no warm-volume drift | **Agent mandatory before push** — after commit, clean working tree |
+| **Working tree (WIP only)** | `./scripts/ci-parity-check.sh run` or `… run --ci` | Checkout on disk — **includes uncommitted edits** | Fast iteration during edits — **not** sufficient push proof alone |
+| **Replay a ref** | `… run --sha <ref>` or `--archive` at a specific SHA | Tracked files at `<ref>` | Reproducing a historical CI failure |
+| **GHA checkout** | `npx @umbraculum/ci-parity run --ci` in Actions | Checked-out branch (fresh runner, cold install) | CI job body |
 
-**Common mistake:** running bare `npx @umbraculum/ci-parity` (no `--ci`) before push. That archives **`git HEAD` only** and silently skips files you have edited but not committed — the exact gap that lets local “green” miss real failures.
+**Common agent mistakes:**
+
+- Pushing without running **`--archive`** (or `verify:pre-push` on a clean tree) after commit.
+- Treating `--ci` green as push proof while fixes are still uncommitted — GHA runs committed code.
+- Delegating pre-push to the operator ("run this before you push") — agents run T2 themselves per [`AGENTS.md`](../AGENTS.md) §Pre-push CI parity.
 
 **Ephemeral files:** `--ci` writes `.ci-parity-*.log` and `.ci-parity-run.sh` at the repo root (gitignored). Safe to delete after a run.
 
@@ -67,7 +72,7 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 |------|------|---------|
 | **T0 — scoped** | Tight edit loop | `docker compose exec api npm run test:unit`, scoped L1 installs — see [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md) |
 | **T1 — slice** | Before commit / agent handoff | `npm run verify:from-diff` or a named `npm run verify:*` script |
-| **T2 — parity** | Before every push with non-trivial CI surface | `npm run verify:pre-push` or `./scripts/ci-parity-check.sh run` |
+| **T2 — parity** | Agent runs before every push with non-trivial CI surface | `npm run verify:pre-push` (archive on clean tree) or `./scripts/ci-parity-check.sh --archive run` |
 
 Dev-container checks use a different `node_modules` layout than CI (hoisting splits). **Never treat dev-container green as proof CI will pass.**
 
@@ -75,7 +80,7 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 ## Cross-platform contract (agents and contributors)
 
-`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside `node:20-slim`. **Local pre-push uses `--ci`** (live checkout mount); **`git archive`** is for replaying a committed ref — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
+`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside `node:20-slim`. **Agent pre-push uses `--archive`** (committed tree, cold install); **`--ci`** is for WIP iteration only — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
 
 | Layer | Role |
 |-------|------|

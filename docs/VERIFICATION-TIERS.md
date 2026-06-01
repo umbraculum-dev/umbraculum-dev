@@ -25,7 +25,7 @@ From repo root:
 | `npm run verify:openapi` | T1 | OpenAPI artifact + scoped API tests |
 | `npm run verify:api-platform` | T1 | Auth/workspaces routes + health check |
 | `npm run verify:from-diff` | T1 | Auto-select slice(s) from diff vs `main` |
-| `npm run verify:pre-push` | T2 | Full ci-parity (`--ci` working tree) + API integration reminder |
+| `npm run verify:pre-push` | T2 | Full ci-parity (`--archive` when tree is clean) + API integration reminder — **agents run before push** |
 
 Lower-level drivers:
 
