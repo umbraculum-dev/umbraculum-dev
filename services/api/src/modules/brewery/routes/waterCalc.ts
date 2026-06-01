@@ -48,6 +48,14 @@ function mashPhModelKeyFromMaltClass(maltClass: string) {
   return "base_pale";
 }
 
+function waterCalcWithDerivationResponse(result: unknown, derivation: unknown) {
+  return WaterCalcWithDerivationResponseSchema.parse({ ok: true, result, derivation });
+}
+
+function waterCalcResultOnlyResponse(result: unknown) {
+  return WaterCalcResultOnlyResponseSchema.parse({ ok: true, result });
+}
+
 export function waterCalcRoutes(app: FastifyInstance) {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
 
@@ -114,10 +122,9 @@ export function waterCalcRoutes(app: FastifyInstance) {
       strength,
     });
 
-    return {
-      ok: true,
+    return waterCalcWithDerivationResponse(
       result,
-      derivation: buildAcidificationDerivation({
+      buildAcidificationDerivation({
         mode: "target",
         startingAlkalinityPpmCaCO3,
         startingPh,
@@ -128,7 +135,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         strengthValue: strength.kind === "solid" ? null : strength.value,
         result,
       }),
-    };
+    );
   },
   );
 
@@ -216,10 +223,9 @@ export function waterCalcRoutes(app: FastifyInstance) {
       );
     }
 
-    return {
-      ok: true,
+    return waterCalcWithDerivationResponse(
       result,
-      derivation: buildAcidificationDerivation({
+      buildAcidificationDerivation({
         mode: "manual",
         startingAlkalinityPpmCaCO3,
         startingPh,
@@ -230,7 +236,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         strengthValue: strength.kind === "solid" ? null : strength.value,
         result: result.predicted,
       }),
-    };
+    );
   },
   );
 
@@ -308,10 +314,9 @@ export function waterCalcRoutes(app: FastifyInstance) {
       strength,
     });
 
-    return {
-      ok: true,
+    return waterCalcWithDerivationResponse(
       result,
-      derivation: buildAcidificationDerivation({
+      buildAcidificationDerivation({
         mode: "target",
         startingAlkalinityPpmCaCO3,
         startingPh,
@@ -322,7 +327,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         strengthValue: strength.kind === "solid" ? null : strength.value,
         result,
       }),
-    };
+    );
   },
   );
 
@@ -412,10 +417,9 @@ export function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_manual_acid_input", (e as Error)?.message || "Invalid manual input");
     }
 
-    return {
-      ok: true,
+    return waterCalcWithDerivationResponse(
       result,
-      derivation: buildAcidificationDerivation({
+      buildAcidificationDerivation({
         mode: "manual",
         startingAlkalinityPpmCaCO3,
         startingPh,
@@ -426,7 +430,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         strengthValue: strength.kind === "solid" ? null : strength.value,
         result: result.predicted,
       }),
-    };
+    );
   },
   );
 
@@ -591,7 +595,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_mash_ph_estimate_input", (e as Error)?.message || "Invalid input");
     }
 
-    return { ok: true, result };
+    return waterCalcResultOnlyResponse(result);
   },
   );
 
@@ -747,7 +751,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       throw new BadRequestError("invalid_mash_target_ph_input", (e as Error)?.message || "Invalid input");
     }
 
-    return { ok: true, result };
+    return waterCalcResultOnlyResponse(result);
   },
   );
 
@@ -803,11 +807,10 @@ export function waterCalcRoutes(app: FastifyInstance) {
     });
 
     const result = applySaltAdditions(baseProfile, volumeLiters, additions);
-    return {
-      ok: true,
+    return waterCalcWithDerivationResponse(
       result,
-      derivation: buildSaltAdditionsDerivation({ volumeLiters, baseProfile, result }),
-    };
+      buildSaltAdditionsDerivation({ volumeLiters, baseProfile, result }),
+    );
   },
   );
 
@@ -1046,10 +1049,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       },
     };
 
-    return {
-      ok: true,
-      result,
-      derivation: {
+    return waterCalcWithDerivationResponse(result, {
         kind: "mash_overall",
         version: 1,
         formulaId: "water.mash_overall.v1",
@@ -1080,8 +1080,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
             })),
           },
         ],
-      },
-    };
+      });
   },
   );
 
@@ -1223,10 +1222,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       },
     };
 
-    return {
-      ok: true,
-      result,
-      derivation: {
+    return waterCalcWithDerivationResponse(result, {
         kind: "sparge_overall",
         version: 1,
         formulaId: "water.sparge_overall.v1",
@@ -1257,8 +1253,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
             })),
           },
         ],
-      },
-    };
+      });
   },
   );
 
@@ -1400,10 +1395,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
       },
     };
 
-    return {
-      ok: true,
-      result,
-      derivation: {
+    return waterCalcWithDerivationResponse(result, {
         kind: "boil_overall",
         version: 1,
         formulaId: "water.boil_overall.v1",
@@ -1434,8 +1426,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
             })),
           },
         ],
-      },
-    };
+      });
   },
   );
 }

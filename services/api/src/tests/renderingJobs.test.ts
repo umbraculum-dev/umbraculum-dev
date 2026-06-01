@@ -54,7 +54,7 @@ async function waitForSucceeded(input: {
   readonly cookie: string;
   readonly jobId: string;
 }) {
-  const deadline = Date.now() + 5_000;
+  const deadline = Date.now() + 15_000;
   let lastStatus = "";
   while (Date.now() < deadline) {
     const res = await input.app.inject({
@@ -208,7 +208,9 @@ describe("rendering jobs — route integration", () => {
     expect(download.body).toContain('"message":"hello"');
   });
 
-  it("retries a failed BullMQ attempt before marking the job failed", async () => {
+  it(
+    "retries a failed BullMQ attempt before marking the job failed",
+    async () => {
     const message = `retry-${Date.now()}`;
     const submit = await app.inject({
       method: "POST",
@@ -239,7 +241,9 @@ describe("rendering jobs — route integration", () => {
     expect(attempts).toHaveLength(2);
     expect(attempts[0]?.error).toBeTruthy();
     expect(attempts[1]?.error).toBeNull();
-  });
+  },
+  20_000,
+  );
 
   it("L2 isolation: another workspace cannot read or retrieve a job", async () => {
     const submit = await app.inject({

@@ -70,6 +70,22 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../app.js";
 import { createSessionForTestUser } from "./helpers/session.js";
 
+const AUTH_GATE_WORKSPACE_ID = "00000000-0000-0000-0000-000000000000";
+
+/** Minimal body that passes zodApp validation so auth gates (401/403) run before 400. */
+const MIN_PLATFORM_AD_CREATE = {
+  placement: "global_top" as const,
+  imageUrl: "https://example.com/ad.png",
+  linkUrl: "https://example.com",
+  altText: "Auth gate probe",
+};
+
+const MIN_PLATFORM_IMPORT = {
+  format: "beerjson" as const,
+  content: '{"beerjson":{"version":1,"recipes":[]}}',
+  workspaceId: AUTH_GATE_WORKSPACE_ID,
+};
+
 // All 12 platform-admin routes the audit identified. Each entry is the
 // HTTP method + URL + a minimal request body sufficient to reach the
 // `requirePlatformAdmin(app, s.userId)` call. The auth chain in every
@@ -87,7 +103,7 @@ const PLATFORM_ROUTES: Array<{
 }> = [
   // platformAds.ts (4 routes).
   { method: "GET", url: "/platform/ads", file: "platformAds.ts" },
-  { method: "POST", url: "/platform/ads", payload: {}, file: "platformAds.ts" },
+  { method: "POST", url: "/platform/ads", payload: MIN_PLATFORM_AD_CREATE, file: "platformAds.ts" },
   {
     method: "PATCH",
     url: "/platform/ads/00000000-0000-0000-0000-000000000000",
@@ -119,20 +135,20 @@ const PLATFORM_ROUTES: Array<{
   {
     method: "POST",
     url: "/platform/recipes/import/preview",
-    payload: {},
+    payload: MIN_PLATFORM_IMPORT,
     file: "platformRecipes.ts",
   },
-  { method: "POST", url: "/platform/recipes/import", payload: {}, file: "platformRecipes.ts" },
+  { method: "POST", url: "/platform/recipes/import", payload: MIN_PLATFORM_IMPORT, file: "platformRecipes.ts" },
   {
     method: "POST",
     url: "/platform/recipes/import/bulk/preview",
-    payload: {},
+    payload: MIN_PLATFORM_IMPORT,
     file: "platformRecipes.ts",
   },
   {
     method: "POST",
     url: "/platform/recipes/import/bulk",
-    payload: {},
+    payload: MIN_PLATFORM_IMPORT,
     file: "platformRecipes.ts",
   },
 ];

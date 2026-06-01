@@ -120,7 +120,7 @@ Each BC integration failure mode maps to a **concrete** commitment in this proje
 | Try before partner relationship | **`docker compose up` + documented curl paths** | [`GETTING-STARTED.md`](../GETTING-STARTED.md) §2.3 |
 | Consultant-only knowledge | **Public repo + public docs + permissionless Tier 3/6 paths** | [`MODULES.md`](../MODULES.md) §4; [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) |
 
-**Honest gap (2026-05-31):** Umbraculum publishes a **split partial** OpenAPI catalog: the **platform spec** (`services/api/openapi/openapi.json`, 53 paths / 72 operations — canonical modules, rendering, auth, workspaces) and an optional **brewery add-on** (`services/api/openapi/brewery.json`, 12 paths / 21 operations). Billing, integrations, webhooks, AI, and ~49 remaining brewery routes stay on human route tables until PR3 completes. Combined documented coverage is ~52% of the HTTP surface — F1 full closure remains at ~80%.
+**Honest gap (2026-06-01):** Umbraculum publishes a **split OpenAPI catalog**: the **platform spec** (`services/api/openapi/openapi.json`, **81 paths / 105 operations**) and an optional **brewery add-on** (`services/api/openapi/brewery.json`, **55 paths / 70 operations**). Combined **175 documented operations (~97%)** of the HTTP surface. The only intentional gap is `POST /ai/chat` (SSE stream), documented in [`API-OPENAPI.md`](../API-OPENAPI.md) §Streaming endpoints rather than in OpenAPI 3.0.
 
 **What we still do not copy from BC:** multiple incompatible integration stories for the same entity; integration knowledge trapped in partner oral tradition; version ambiguity without a handshake.
 

@@ -52,9 +52,69 @@ export function parseBrewSessionsListResponse(payload: unknown): BrewSessionsLis
   return BrewSessionsListResponseSchema.parse(payload);
 }
 
-export const BrewSessionPayloadSchema = z.record(z.string(), z.unknown());
+export const BrewSessionRecipeRefSchema = z.object({
+  id: z.string().min(1),
+  name: z.string(),
+  version: z.number().int(),
+});
 
-export const BrewSessionStepSchema = z.record(z.string(), z.unknown());
+export const BrewSessionLogSchema = z
+  .object({
+    id: z.string().min(1),
+    brewSessionId: z.string().min(1),
+    kind: z.string(),
+    message: z.string(),
+    createdAt: isoDateTime,
+    stepId: z.string().nullable(),
+    payloadJson: z.record(z.string(), z.unknown()).nullable().optional(),
+  })
+  .passthrough();
+
+/** Step/timer fields use passthrough for forward-compatible Prisma columns. */
+export const BrewSessionStepSchema = z
+  .object({
+    id: z.string().min(1),
+    brewSessionId: z.string().min(1),
+    name: z.string(),
+    status: z.string(),
+    sortOrder: z.number().int(),
+    sectionId: z.string(),
+    sectionName: z.string().nullable(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
+    isDisabled: z.boolean(),
+    customTimerEnabled: z.boolean(),
+    note: z.string().nullable(),
+    minutesPlanned: z.number().nullable(),
+    offsetMinutesFromEnd: z.number().nullable(),
+    relativeToStepId: z.string().nullable(),
+    timerAccumulatedSeconds: z.number(),
+    timerLastStartedAt: isoDateTime.nullable(),
+    timerPausedAt: isoDateTime.nullable(),
+    timerStartedAt: isoDateTime.nullable(),
+    timerState: z.string(),
+    timerStoppedAt: isoDateTime.nullable(),
+  })
+  .passthrough();
+
+export const BrewSessionPayloadSchema = z
+  .object({
+    id: z.string().min(1),
+    workspaceId: z.string().min(1),
+    recipeId: z.string().min(1),
+    code: z.string().nullable(),
+    status: z.string(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
+    startedAt: isoDateTime.nullable(),
+    pausedAt: isoDateTime.nullable(),
+    stoppedAt: isoDateTime.nullable(),
+    scheduledDate: isoDateTime.nullable(),
+    recipe: BrewSessionRecipeRefSchema.optional(),
+    steps: z.array(BrewSessionStepSchema).optional(),
+    logs: z.array(BrewSessionLogSchema).optional(),
+  })
+  .passthrough();
 
 export const BrewSessionDetailResponseSchema = z.object({
   ok: z.literal(true),
@@ -89,9 +149,12 @@ export const BrewSessionStepTimerPatchRequestSchema = z.object({
   customTimerEnabled: z.boolean(),
 });
 
-export const BrewSessionStopRequestSchema = z.object({
-  reason: z.enum(["auto", "manual"]).optional(),
-});
+export const BrewSessionStopRequestSchema = z.preprocess(
+  (raw) => (raw === null || raw === undefined ? {} : raw),
+  z.object({
+    reason: z.enum(["auto", "manual"]).optional(),
+  }),
+);
 
 export const BrewSessionStepLogRequestSchema = z.object({
   status: z.enum(["pending", "in_progress", "done", "skipped", "not_applicable"]),

@@ -11,6 +11,12 @@ backups/
 # npm auth / registry config (often contains tokens)
 .npmrc
 
+# ci-parity --ci mode writes ephemeral logs/scripts into the repo root
+.ci-parity-run.sh
+.ci-parity-status
+.ci-parity-*.log
+.ci-parity-install.log
+
 # Pre-flip hygiene (maintainer-local; see scripts/docs/*.example.txt)
 scripts/docs/.personal-history-scrub-expressions.txt
 scripts/docs/.public-surface-denylist.txt

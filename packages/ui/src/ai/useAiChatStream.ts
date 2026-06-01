@@ -54,8 +54,9 @@ export interface AiChatMessage {
 }
 
 /**
- * The wire-event union, matching the server-side `AiSseEvent` exactly.
- * Kept local so this hook can ship without depending on the API package.
+ * The wire-event union, matching the server-side `AiSseEvent` and
+ * `AiSseEventSchema` in `@umbraculum/contracts` (`packages/contracts/src/ai/aiChat.ts`).
+ * Kept local so this hook can ship without depending on contracts at runtime.
  */
 type IncomingEvent =
   | { type: "assistant_chunk"; text: string }

@@ -278,10 +278,11 @@ Toolset witnesses (when installed): `48-rfc-companion-documentation-gate.mdc`,
 Before pushing changes that touch TypeScript, ESLint, module READMEs, lockfiles,
 or CI workflows:
 
-1. Run **`npx @umbraculum/ci-parity`** from the repo root (cross-platform;
-   see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)). Optional thin wrapper on
-   Unix: `./scripts/ci-parity-check.sh` (same behavior — **not** a substitute
-   on Windows; use `npx` there).
+1. Run **`./scripts/ci-parity-check.sh run`** from the repo root (cross-platform via
+   `npx`; see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)). The wrapper passes **`--ci`**
+   by default so **uncommitted edits** are included. On Windows without bash, use
+   `npx @umbraculum/ci-parity run --ci`. Use **`--archive`** or **`--sha <ref>`**
+   only to replay a committed tree — not for ordinary pre-push checks.
 2. Do **not** treat `docker compose exec … npm run typecheck`, host `python3
    scripts/docs/…`, host `npm run build:packages`, or ad-hoc `docker run …
    bash -lc` on the live workspace as pre-push proof — those are fast iteration

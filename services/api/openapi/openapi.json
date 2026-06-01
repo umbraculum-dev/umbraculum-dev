@@ -3,7 +3,7 @@
   "info": {
     "title": "Umbraculum API",
     "version": "0.0.1",
-    "description": "Platform catalog — partial OpenAPI spec for the Umbraculum API.\n\nCoverage: canonical modules (automation, pim, mrp, crp), horizontal rendering (RFC-0007),\nand platform routes (health, auth, workspaces). Generated with UMBRACULUM_MODULE_PROFILE=platform.\n\nBrewery vertical routes are documented in the separate openapi/brewery.json add-on spec\n(reference profile only). ISVs building without the brewery vertical should use this catalog only.\nSee docs/API-OPENAPI.md and docs/BUILDING-YOUR-VERTICAL.md.\n\nBilling, ads, integrations, webhooks, AI, and platform-admin routes are documented in Phase C.\n\nAuthoritative contracts: @umbraculum/<code>-contracts packages in git.\nAutomation adapters: CONTRACT_VERSION handshake remains authoritative over this spec.\nBeerJSON and other complex JSON bodies may use loose OpenAPI schema shapes — contracts win on edge validation."
+    "description": "Platform catalog — machine-readable OpenAPI spec for the Umbraculum API.\n\nCoverage (Phase D, 2026-06): 81 paths / 105 operations — canonical modules, rendering (RFC-0007),\nplatform routes (health, auth, workspaces), billing, ads, AI (proposals/settings/usage), integrations,\nwebhooks, and platform-admin. Generated with UMBRACULUM_MODULE_PROFILE=platform.\n\nBrewery vertical routes are in the separate openapi/brewery.json add-on (reference profile).\nISVs without the brewery vertical should use this catalog only.\nSee docs/API-OPENAPI.md and docs/BUILDING-YOUR-VERTICAL.md.\n\nStreaming: POST /ai/chat (SSE) is documented in docs/API-OPENAPI.md §Streaming endpoints, not in this spec.\n\nAuthoritative contracts: @umbraculum/<code>-contracts packages in git.\nAutomation adapters: CONTRACT_VERSION handshake remains authoritative over this spec.\nBeerJSON and other complex JSON bodies may use loose OpenAPI schema shapes — contracts win on edge validation."
   },
   "components": {
     "securitySchemes": {
@@ -2710,12 +2710,19 @@
                       "google"
                     ]
                   },
-                  "mode": {}
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "purchase",
+                      "restore"
+                    ]
+                  }
                 },
                 "required": [
                   "planCode",
                   "provider"
-                ]
+                ],
+                "additionalProperties": false
               }
             }
           }
@@ -3072,7 +3079,8 @@
                 },
                 "required": [
                   "billingIntentId"
-                ]
+                ],
+                "additionalProperties": false
               }
             }
           }
@@ -4238,7 +4246,9 @@
                             "type": "string"
                           },
                           "metadataJson": {
-                            "nullable": true
+                            "nullable": true,
+                            "type": "object",
+                            "additionalProperties": {}
                           },
                           "lastSeenAt": {
                             "nullable": true,
@@ -4348,7 +4358,10 @@
                                 "nullable": true,
                                 "type": "number"
                               },
-                              "rawJson": {}
+                              "rawJson": {
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
                             },
                             "required": [
                               "id",
@@ -4389,7 +4402,10 @@
                                   "nullable": true,
                                   "type": "number"
                                 },
-                                "rawJson": {}
+                                "rawJson": {
+                                  "type": "object",
+                                  "additionalProperties": {}
+                                }
                               },
                               "required": [
                                 "id",
@@ -6329,7 +6345,9 @@
                             "type": "string"
                           },
                           "metadataJson": {
-                            "nullable": true
+                            "nullable": true,
+                            "type": "object",
+                            "additionalProperties": {}
                           },
                           "lastSeenAt": {
                             "nullable": true,
@@ -6439,7 +6457,10 @@
                                 "nullable": true,
                                 "type": "number"
                               },
-                              "rawJson": {}
+                              "rawJson": {
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
                             },
                             "required": [
                               "id",
@@ -6480,7 +6501,10 @@
                                   "nullable": true,
                                   "type": "number"
                                 },
-                                "rawJson": {}
+                                "rawJson": {
+                                  "type": "object",
+                                  "additionalProperties": {}
+                                }
                               },
                               "required": [
                                 "id",

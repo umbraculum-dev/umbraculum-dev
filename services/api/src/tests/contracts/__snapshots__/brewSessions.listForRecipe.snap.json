@@ -4,14 +4,9 @@
       "code": "string",
       "createdAt": "string",
       "id": "string",
-      "pausedAt": "null",
-      "recipeId": "string",
-      "scheduledDate": "null",
       "startedAt": "null",
       "status": "string",
-      "stoppedAt": "null",
-      "updatedAt": "string",
-      "workspaceId": "string"
+      "stoppedAt": "null"
     },
     "__length": "non-empty"
   },

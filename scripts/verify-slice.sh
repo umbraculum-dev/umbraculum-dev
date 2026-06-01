@@ -76,7 +76,7 @@ run_t2() {
   local summary_parts=()
   local rc=0
 
-  if npx @umbraculum/ci-parity@^1 run; then
+  if "${REPO_ROOT}/scripts/ci-parity-check.sh" run; then
     summary_parts+=("ci-parity=OK")
   else
     summary_parts+=("ci-parity=FAIL")

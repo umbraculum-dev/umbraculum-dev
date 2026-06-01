@@ -14,16 +14,20 @@ export const BillingWorkspaceIdParamsSchema = z.object({
 
 export const BillingPurchaseProviderSchema = z.enum(["stripe", "apple", "google"]);
 
-export const BillingPurchaseIntentModeSchema = z
-  .unknown()
-  .optional()
-  .transform((v): "purchase" | "restore" => (v === "restore" ? "restore" : "purchase"));
+export const BillingPurchaseIntentModeSchema = z.enum(["purchase", "restore"]);
 
-export const BillingIntentRequestSchema = z.object({
-  planCode: z.string().trim().min(1, "Body.planCode is required"),
-  provider: BillingPurchaseProviderSchema,
-  mode: BillingPurchaseIntentModeSchema.optional(),
-});
+export const BillingIntentRequestSchema = z
+  .object({
+    planCode: z.string().trim().min(1, "Body.planCode is required"),
+    provider: BillingPurchaseProviderSchema,
+    mode: z
+      .preprocess(
+        (v) => (v === "restore" ? "restore" : v === "purchase" ? "purchase" : v),
+        BillingPurchaseIntentModeSchema,
+      )
+      .optional(),
+  })
+  .strict();
 
 export const BillingIntentResponseSchema = z.object({
   ok: z.literal(true),
@@ -60,9 +64,11 @@ export const WorkspaceBillingResponseSchema = z.object({
   }),
 });
 
-export const BillingConfirmRequestSchema = z.object({
-  billingIntentId: z.string().trim().min(1, "Body.billingIntentId is required"),
-});
+export const BillingConfirmRequestSchema = z
+  .object({
+    billingIntentId: z.string().trim().min(1, "Body.billingIntentId is required"),
+  })
+  .strict();
 
 export const BillingConfirmResponseSchema = z.object({
   ok: z.literal(true),

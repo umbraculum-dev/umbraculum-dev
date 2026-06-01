@@ -165,6 +165,11 @@ const sidebars: SidebarsConfig = {
       items: [
         'CROSS-PLATFORM-BOUNDARIES',
         'API-OPENAPI',
+        {
+          type: 'link',
+          label: 'Brewery OpenAPI (Redoc)',
+          href: '/openapi-brewery',
+        },
         'design/canonical-native-platform-surface',
         'NATIVE-STRATEGY-AND-CI',
         'REACT-NATIVE-KICKOFF-READINESS',

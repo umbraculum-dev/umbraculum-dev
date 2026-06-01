@@ -11,7 +11,9 @@
 From the repo root (host needs `git`, Docker, and Node to launch the CLI — **not** host Node/npm for job execution):
 
 ```bash
-npx @umbraculum/ci-parity
+./scripts/ci-parity-check.sh run
+# or subset:
+./scripts/ci-parity-check.sh run --jobs lint,typecheck
 ```
 
 Backward-compatible wrapper (same behavior):
@@ -19,6 +21,14 @@ Backward-compatible wrapper (same behavior):
 ```bash
 ./scripts/ci-parity-check.sh
 ```
+
+Direct CLI (must pass `--ci` for working-tree verification; use `--` before `run` with `npm exec`):
+
+```bash
+npm exec --yes @umbraculum/ci-parity@^1 -- run --ci --jobs lint,typecheck
+```
+
+The repo wrapper sets `PATH` for system Node and passes `--ci` by default — prefer `./scripts/ci-parity-check.sh run`.
 
 Other commands:
 
@@ -29,7 +39,21 @@ Other commands:
 | `npx @umbraculum/ci-parity validate --strict` | Also fail on undocumented nested `package.json` dirs |
 | `npx @umbraculum/ci-parity run --jobs lint,typecheck` | Subset of jobs |
 
-Flags: `--sha <rev>`, `--keep` (retain `/tmp/ci-parity-*` snapshot + logs).
+| `--sha <ref>`, `--keep` | Retain logs; `--sha` selects a **git-archive** replay at `<ref>` (committed tree only) |
+| `--ci` | Mount the live checkout (includes uncommitted edits). **Default via `./scripts/ci-parity-check.sh`.** |
+| `--archive` | Wrapper-only: force `git archive` snapshot (omit `--ci`). Use when replaying a specific commit or debugging archive-only drift. |
+
+**Snapshot modes (read this before pre-push):**
+
+| Mode | Command | What gets tested | When to use |
+|------|---------|------------------|-------------|
+| **Working tree (default)** | `./scripts/ci-parity-check.sh run` or `… run --ci` | Your checkout on disk — **includes uncommitted edits** | **Before commit/push** — proves your WIP will pass CI after you commit |
+| **Git archive (replay)** | `npx @umbraculum/ci-parity run --archive` or `… run --sha <ref>` | Tracked files at `<ref>` only — **excludes uncommitted edits** | Reproducing a historical CI failure; verifying what is already on `HEAD` after commit |
+| **GHA checkout** | `npx @umbraculum/ci-parity run --ci` in Actions | Same as working-tree mount | CI uses `--ci` on the checked-out PR branch |
+
+**Common mistake:** running bare `npx @umbraculum/ci-parity` (no `--ci`) before push. That archives **`git HEAD` only** and silently skips files you have edited but not committed — the exact gap that lets local “green” miss real failures.
+
+**Ephemeral files:** `--ci` writes `.ci-parity-*.log` and `.ci-parity-run.sh` at the repo root (gitignored). Safe to delete after a run.
 
 Stable agent output line:
 
@@ -43,7 +67,7 @@ CI-PARITY-CHECK <short-sha>: docs-readmes=OK lint=OK typecheck=OK
 |------|------|---------|
 | **T0 — scoped** | Tight edit loop | `docker compose exec api npm run test:unit`, scoped L1 installs — see [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md) |
 | **T1 — slice** | Before commit / agent handoff | `npm run verify:from-diff` or a named `npm run verify:*` script |
-| **T2 — parity** | Before every push with non-trivial CI surface | `npm run verify:pre-push` or `npx @umbraculum/ci-parity` |
+| **T2 — parity** | Before every push with non-trivial CI surface | `npm run verify:pre-push` or `./scripts/ci-parity-check.sh run` |
 
 Dev-container checks use a different `node_modules` layout than CI (hoisting splits). **Never treat dev-container green as proof CI will pass.**
 
@@ -51,7 +75,7 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 ## Cross-platform contract (agents and contributors)
 
-`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI archives tracked files and runs manifest jobs inside `node:20-slim` — the same shape as GHA static-analysis jobs.
+`@umbraculum/ci-parity` exists so **pre-push verification is OS-neutral**: Linux, macOS, and Windows (Docker Desktop + `npx`). The CLI runs manifest jobs inside `node:20-slim`. **Local pre-push uses `--ci`** (live checkout mount); **`git archive`** is for replaying a committed ref — see [Snapshot modes](#snapshot-modes-read-this-before-pre-push) below.
 
 | Layer | Role |
 |-------|------|
@@ -81,7 +105,7 @@ Local static-analysis can lie in four documented ways:
 | 3 | Stale `node_modules` bind-mount | Rules/types differ when mounting live tree vs clean snapshot |
 | 4 | Workspace hoisting splits | Plugin augmentations missing under hoisted CI install |
 
-The parity runner uses a **`git archive` snapshot** locally (not the live workspace) and the same `node:20-slim` image + install commands as CI.
+The parity runner uses either a **live checkout mount (`--ci`)** for local pre-push or a **`git archive` snapshot** when replaying a specific ref. Both use the same `node:20-slim` image + install commands as CI. See [Snapshot modes](#snapshot-modes-read-this-before-pre-push).
 
 **Local install persistence (≥ `@umbraculum/ci-parity` 1.0.8):** the manifest may declare `docker.volumes` — umbraculum-dev mounts `umbraculum_npm_cache` and `umbraculum_root_node_modules` so repeat local parity runs reuse warm cache/trees on the same Docker host. See [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md). GitHub Actions runners remain cold per job.
 

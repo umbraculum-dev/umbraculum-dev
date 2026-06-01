@@ -25,7 +25,7 @@ From repo root:
 | `npm run verify:openapi` | T1 | OpenAPI artifact + scoped API tests |
 | `npm run verify:api-platform` | T1 | Auth/workspaces routes + health check |
 | `npm run verify:from-diff` | T1 | Auto-select slice(s) from diff vs `main` |
-| `npm run verify:pre-push` | T2 | Full ci-parity + API integration reminder |
+| `npm run verify:pre-push` | T2 | Full ci-parity (`--ci` working tree) + API integration reminder |
 
 Lower-level drivers:
 
@@ -43,11 +43,11 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 
 | You touched | T0 | T1 | T2 |
 |-------------|----|----|-----|
-| `packages/contracts/src/**` | `npm test -w @umbraculum/contracts` (scoped container) | `npm run verify:contracts` | `npx @umbraculum/ci-parity run --jobs typecheck` |
-| API routes + OpenAPI | `docker compose exec api npm run test:unit` | `npm run verify:openapi` | ci-parity + **`api-integration-tests-pre-push`** skill |
+| `packages/contracts/src/**` | `npm test -w @umbraculum/contracts` (scoped container) | `npm run verify:contracts` | `./scripts/ci-parity-check.sh run --jobs typecheck` |
+| API routes + OpenAPI | `docker compose exec api npm run test:unit` | `npm run verify:openapi` | ci-parity (`--ci`) + **`api-integration-tests-pre-push`** skill |
 | `services/api/src/routes/auth.ts`, `workspaces.ts` | scoped vitest | `npm run verify:api-platform` | T2 row above |
 | Brewery batch routes | scoped vitest files | `./scripts/verify-slice.sh --tier T1 --slice api-brewery-batch1` | T2 row above |
-| Docs / README only | — | `npx @umbraculum/ci-parity run --jobs docs-readmes` | `npm run verify:pre-push` |
+| Docs / README only | — | `./scripts/ci-parity-check.sh run --jobs docs-readmes` | `npm run verify:pre-push` |
 | SDK / multi-package dist | — | `./scripts/check-packages-dist-up-to-date.sh` | ci-parity `sdk-publish-prep` job |
 | Unknown mixed diff | — | `npm run verify:from-diff` | `npm run verify:pre-push` |
 
@@ -92,6 +92,7 @@ See [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) for install paths.
 
 ## Anti-patterns
 
+- Running bare `npx @umbraculum/ci-parity` before push without `--ci` — tests **committed HEAD only** and skips uncommitted edits. Use `./scripts/ci-parity-check.sh run` instead ([`CI-PARITY.md`](CI-PARITY.md) §Snapshot modes).
 - Running `./scripts/build-packages-in-docker.sh` for a single-package edit — use `./scripts/build-package-in-docker.sh @umbraculum/<name>` instead.
 - Treating `docker compose exec api npm run typecheck` as pre-push proof — use ci-parity (T2).
 - Skipping T2 before push because T1 passed — T1 is scoped; CI runs broader gates.

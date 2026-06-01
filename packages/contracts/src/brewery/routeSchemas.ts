@@ -202,6 +202,11 @@ export const IngredientSyncResponseSchema = z.object({
 
 export const RecipeImportFormatSchema = z.enum(["beerjson", "beerxml"]);
 
+export const RecipeImportWarningSchema = z.object({
+  code: z.string(),
+  message: z.string(),
+});
+
 export const RecipeImportRequestSchema = z.object({
   format: RecipeImportFormatSchema,
   content: z.string().min(1),
@@ -225,7 +230,7 @@ export const RecipeImportPreviewResponseSchema = z.object({
 export const RecipeImportResponseSchema = z.object({
   ok: z.literal(true),
   recipe: RecipePayloadSchema,
-  warnings: z.array(z.string()).optional(),
+  warnings: z.array(RecipeImportWarningSchema).optional(),
 });
 
 export const RecipeBulkImportPreviewItemSchema = z.record(z.string(), z.unknown());

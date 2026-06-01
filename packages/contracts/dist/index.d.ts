@@ -289,7 +289,10 @@ declare const BillingPurchaseProviderSchema: z.ZodEnum<{
     apple: "apple";
     google: "google";
 }>;
-declare const BillingPurchaseIntentModeSchema: z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<"purchase" | "restore", unknown>>;
+declare const BillingPurchaseIntentModeSchema: z.ZodEnum<{
+    purchase: "purchase";
+    restore: "restore";
+}>;
 declare const BillingIntentRequestSchema: z.ZodObject<{
     planCode: z.ZodString;
     provider: z.ZodEnum<{
@@ -297,8 +300,11 @@ declare const BillingIntentRequestSchema: z.ZodObject<{
         apple: "apple";
         google: "google";
     }>;
-    mode: z.ZodOptional<z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<"purchase" | "restore", unknown>>>;
-}, z.core.$strip>;
+    mode: z.ZodOptional<z.ZodPreprocess<z.ZodEnum<{
+        purchase: "purchase";
+        restore: "restore";
+    }>>>;
+}, z.core.$strict>;
 declare const BillingIntentResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     billingIntentId: z.ZodString;
@@ -356,7 +362,7 @@ declare const WorkspaceBillingResponseSchema: z.ZodObject<{
 }, z.core.$strip>;
 declare const BillingConfirmRequestSchema: z.ZodObject<{
     billingIntentId: z.ZodString;
-}, z.core.$strip>;
+}, z.core.$strict>;
 declare const BillingConfirmResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
 }, z.core.$strip>;
@@ -598,7 +604,7 @@ declare const IntegrationDeviceReadingSchema: z.ZodObject<{
     receivedAt: z.ZodPreprocess<z.ZodString>;
     temperatureC: z.ZodNullable<z.ZodNumber>;
     gravitySg: z.ZodNullable<z.ZodNumber>;
-    rawJson: z.ZodOptional<z.ZodUnknown>;
+    rawJson: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, z.core.$strip>;
 declare const IntegrationBrewSessionRefSchema: z.ZodObject<{
     id: z.ZodString;
@@ -632,7 +638,7 @@ declare const IntegrationDeviceSchema: z.ZodObject<{
     id: z.ZodString;
     deviceKey: z.ZodString;
     displayName: z.ZodNullable<z.ZodString>;
-    metadataJson: z.ZodNullable<z.ZodUnknown>;
+    metadataJson: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     lastSeenAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
     createdAt: z.ZodPreprocess<z.ZodString>;
     activeAttachment: z.ZodNullable<z.ZodObject<{
@@ -658,7 +664,7 @@ declare const IntegrationDeviceSchema: z.ZodObject<{
         receivedAt: z.ZodPreprocess<z.ZodString>;
         temperatureC: z.ZodNullable<z.ZodNumber>;
         gravitySg: z.ZodNullable<z.ZodNumber>;
-        rawJson: z.ZodOptional<z.ZodUnknown>;
+        rawJson: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, z.core.$strip>>;
     recentReadings: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
@@ -667,7 +673,7 @@ declare const IntegrationDeviceSchema: z.ZodObject<{
         receivedAt: z.ZodPreprocess<z.ZodString>;
         temperatureC: z.ZodNullable<z.ZodNumber>;
         gravitySg: z.ZodNullable<z.ZodNumber>;
-        rawJson: z.ZodOptional<z.ZodUnknown>;
+        rawJson: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, z.core.$strip>>>>;
 }, z.core.$strip>;
 declare const IntegrationDevicesListResponseSchema: z.ZodObject<{
@@ -676,7 +682,7 @@ declare const IntegrationDevicesListResponseSchema: z.ZodObject<{
         id: z.ZodString;
         deviceKey: z.ZodString;
         displayName: z.ZodNullable<z.ZodString>;
-        metadataJson: z.ZodNullable<z.ZodUnknown>;
+        metadataJson: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         lastSeenAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
         createdAt: z.ZodPreprocess<z.ZodString>;
         activeAttachment: z.ZodNullable<z.ZodObject<{
@@ -702,7 +708,7 @@ declare const IntegrationDevicesListResponseSchema: z.ZodObject<{
             receivedAt: z.ZodPreprocess<z.ZodString>;
             temperatureC: z.ZodNullable<z.ZodNumber>;
             gravitySg: z.ZodNullable<z.ZodNumber>;
-            rawJson: z.ZodOptional<z.ZodUnknown>;
+            rawJson: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         }, z.core.$strip>>;
         recentReadings: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
             id: z.ZodString;
@@ -711,7 +717,7 @@ declare const IntegrationDevicesListResponseSchema: z.ZodObject<{
             receivedAt: z.ZodPreprocess<z.ZodString>;
             temperatureC: z.ZodNullable<z.ZodNumber>;
             gravitySg: z.ZodNullable<z.ZodNumber>;
-            rawJson: z.ZodOptional<z.ZodUnknown>;
+            rawJson: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         }, z.core.$strip>>>>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
@@ -1135,6 +1141,10 @@ declare const RecipeImportFormatSchema: z.ZodEnum<{
     beerjson: "beerjson";
     beerxml: "beerxml";
 }>;
+declare const RecipeImportWarningSchema: z.ZodObject<{
+    code: z.ZodString;
+    message: z.ZodString;
+}, z.core.$strip>;
 declare const RecipeImportRequestSchema: z.ZodObject<{
     format: z.ZodEnum<{
         beerjson: "beerjson";
@@ -1163,7 +1173,10 @@ declare const RecipeImportPreviewResponseSchema: z.ZodObject<{
 declare const RecipeImportResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     recipe: z.ZodRecord<z.ZodString, z.ZodUnknown>;
-    warnings: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    warnings: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        code: z.ZodString;
+        message: z.ZodString;
+    }, z.core.$strip>>>;
 }, z.core.$strip>;
 declare const RecipeBulkImportPreviewItemSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 declare const RecipeBulkImportPreviewResponseSchema: z.ZodObject<{
@@ -1610,11 +1623,11 @@ declare const RecipeWaterSettingsPutResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     settings: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 }, z.core.$strip>;
-declare const MashComputeAndSaveRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const MashComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 declare const MashComputeAndSaveResponseSchema: z.ZodCustom<MashComputeAndSaveResponseV1, MashComputeAndSaveResponseV1>;
-declare const SpargeComputeAndSaveRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const SpargeComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 declare const SpargeComputeAndSaveResponseSchema: z.ZodCustom<SpargeComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1>;
-declare const BoilComputeAndSaveRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BoilComputeAndSaveRequestSchema: z.ZodPreprocess<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 declare const BoilComputeAndSaveResponseSchema: z.ZodCustom<BoilComputeAndSaveResponseV1, BoilComputeAndSaveResponseV1>;
 declare const WaterCalcRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
 declare const WaterCalcWithDerivationResponseSchema: z.ZodObject<{
@@ -1858,6 +1871,77 @@ declare const AiChatRequestBodySchema: z.ZodObject<{
     routeId: z.ZodOptional<z.ZodString>;
 }, z.core.$strict>;
 type AiChatRequestBody = z.infer<typeof AiChatRequestBodySchema>;
+/** SSE wire events from `services/api/src/services/ai/orchestrator.ts` `AiSseEvent`. */
+declare const AiSseAssistantChunkEventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"assistant_chunk">;
+    text: z.ZodString;
+}, z.core.$strip>;
+declare const AiSseToolCallEventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"tool_call">;
+    name: z.ZodString;
+    argsJson: z.ZodString;
+}, z.core.$strip>;
+declare const AiSseToolResultEventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"tool_result">;
+    name: z.ZodString;
+    resultJson: z.ZodString;
+    durationMs: z.ZodNumber;
+    errored: z.ZodBoolean;
+}, z.core.$strip>;
+declare const AiSseProposalEventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"proposal">;
+    proposalId: z.ZodString;
+    moduleCode: z.ZodString;
+    proposalType: z.ZodString;
+    summary: z.ZodString;
+}, z.core.$strip>;
+declare const AiSseCompleteEventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"complete">;
+    usage: z.ZodObject<{
+        tokensIn: z.ZodNumber;
+        tokensOut: z.ZodNumber;
+        durationMs: z.ZodNumber;
+        model: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const AiSseErrorEventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"error">;
+    code: z.ZodString;
+    message: z.ZodString;
+}, z.core.$strip>;
+declare const AiSseEventSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    type: z.ZodLiteral<"assistant_chunk">;
+    text: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"tool_call">;
+    name: z.ZodString;
+    argsJson: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"tool_result">;
+    name: z.ZodString;
+    resultJson: z.ZodString;
+    durationMs: z.ZodNumber;
+    errored: z.ZodBoolean;
+}, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"proposal">;
+    proposalId: z.ZodString;
+    moduleCode: z.ZodString;
+    proposalType: z.ZodString;
+    summary: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"complete">;
+    usage: z.ZodObject<{
+        tokensIn: z.ZodNumber;
+        tokensOut: z.ZodNumber;
+        durationMs: z.ZodNumber;
+        model: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>, z.ZodObject<{
+    type: z.ZodLiteral<"error">;
+    code: z.ZodString;
+    message: z.ZodString;
+}, z.core.$strip>], "type">;
+type AiSseEvent = z.infer<typeof AiSseEventSchema>;
 
 declare const AiProposalStatusSchema: z.ZodEnum<{
     pending: "pending";
@@ -2287,24 +2371,274 @@ declare const BrewSessionsListResponseSchema: z.ZodObject<{
 }, z.core.$strip>;
 type BrewSessionsListResponse = z.infer<typeof BrewSessionsListResponseSchema>;
 declare function parseBrewSessionsListResponse(payload: unknown): BrewSessionsListResponse;
-declare const BrewSessionPayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
-declare const BrewSessionStepSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BrewSessionRecipeRefSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    version: z.ZodNumber;
+}, z.core.$strip>;
+declare const BrewSessionLogSchema: z.ZodObject<{
+    id: z.ZodString;
+    brewSessionId: z.ZodString;
+    kind: z.ZodString;
+    message: z.ZodString;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    stepId: z.ZodNullable<z.ZodString>;
+    payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+}, z.core.$loose>;
+/** Step/timer fields use passthrough for forward-compatible Prisma columns. */
+declare const BrewSessionStepSchema: z.ZodObject<{
+    id: z.ZodString;
+    brewSessionId: z.ZodString;
+    name: z.ZodString;
+    status: z.ZodString;
+    sortOrder: z.ZodNumber;
+    sectionId: z.ZodString;
+    sectionName: z.ZodNullable<z.ZodString>;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+    isDisabled: z.ZodBoolean;
+    customTimerEnabled: z.ZodBoolean;
+    note: z.ZodNullable<z.ZodString>;
+    minutesPlanned: z.ZodNullable<z.ZodNumber>;
+    offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+    relativeToStepId: z.ZodNullable<z.ZodString>;
+    timerAccumulatedSeconds: z.ZodNumber;
+    timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    timerState: z.ZodString;
+    timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+}, z.core.$loose>;
+declare const BrewSessionPayloadSchema: z.ZodObject<{
+    id: z.ZodString;
+    workspaceId: z.ZodString;
+    recipeId: z.ZodString;
+    code: z.ZodNullable<z.ZodString>;
+    status: z.ZodString;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+    startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    recipe: z.ZodOptional<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        version: z.ZodNumber;
+    }, z.core.$strip>>;
+    steps: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodString;
+        name: z.ZodString;
+        status: z.ZodString;
+        sortOrder: z.ZodNumber;
+        sectionId: z.ZodString;
+        sectionName: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+        isDisabled: z.ZodBoolean;
+        customTimerEnabled: z.ZodBoolean;
+        note: z.ZodNullable<z.ZodString>;
+        minutesPlanned: z.ZodNullable<z.ZodNumber>;
+        offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+        relativeToStepId: z.ZodNullable<z.ZodString>;
+        timerAccumulatedSeconds: z.ZodNumber;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerState: z.ZodString;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    }, z.core.$loose>>>;
+    logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodString;
+        kind: z.ZodString;
+        message: z.ZodString;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        stepId: z.ZodNullable<z.ZodString>;
+        payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+    }, z.core.$loose>>>;
+}, z.core.$loose>;
 declare const BrewSessionDetailResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
-    brewSession: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    brewSession: z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        recipeId: z.ZodString;
+        code: z.ZodNullable<z.ZodString>;
+        status: z.ZodString;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        recipe: z.ZodOptional<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            version: z.ZodNumber;
+        }, z.core.$strip>>;
+        steps: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            brewSessionId: z.ZodString;
+            name: z.ZodString;
+            status: z.ZodString;
+            sortOrder: z.ZodNumber;
+            sectionId: z.ZodString;
+            sectionName: z.ZodNullable<z.ZodString>;
+            createdAt: z.ZodPreprocess<z.ZodString>;
+            updatedAt: z.ZodPreprocess<z.ZodString>;
+            isDisabled: z.ZodBoolean;
+            customTimerEnabled: z.ZodBoolean;
+            note: z.ZodNullable<z.ZodString>;
+            minutesPlanned: z.ZodNullable<z.ZodNumber>;
+            offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+            relativeToStepId: z.ZodNullable<z.ZodString>;
+            timerAccumulatedSeconds: z.ZodNumber;
+            timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerState: z.ZodString;
+            timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        }, z.core.$loose>>>;
+        logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            brewSessionId: z.ZodString;
+            kind: z.ZodString;
+            message: z.ZodString;
+            createdAt: z.ZodPreprocess<z.ZodString>;
+            stepId: z.ZodNullable<z.ZodString>;
+            payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>;
 }, z.core.$strip>;
 declare const BrewSessionCreateResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
-    brewSession: z.ZodRecord<z.ZodString, z.ZodUnknown>;
-    steps: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    brewSession: z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        recipeId: z.ZodString;
+        code: z.ZodNullable<z.ZodString>;
+        status: z.ZodString;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        recipe: z.ZodOptional<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            version: z.ZodNumber;
+        }, z.core.$strip>>;
+        steps: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            brewSessionId: z.ZodString;
+            name: z.ZodString;
+            status: z.ZodString;
+            sortOrder: z.ZodNumber;
+            sectionId: z.ZodString;
+            sectionName: z.ZodNullable<z.ZodString>;
+            createdAt: z.ZodPreprocess<z.ZodString>;
+            updatedAt: z.ZodPreprocess<z.ZodString>;
+            isDisabled: z.ZodBoolean;
+            customTimerEnabled: z.ZodBoolean;
+            note: z.ZodNullable<z.ZodString>;
+            minutesPlanned: z.ZodNullable<z.ZodNumber>;
+            offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+            relativeToStepId: z.ZodNullable<z.ZodString>;
+            timerAccumulatedSeconds: z.ZodNumber;
+            timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            timerState: z.ZodString;
+            timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        }, z.core.$loose>>>;
+        logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            brewSessionId: z.ZodString;
+            kind: z.ZodString;
+            message: z.ZodString;
+            createdAt: z.ZodPreprocess<z.ZodString>;
+            stepId: z.ZodNullable<z.ZodString>;
+            payloadJson: z.ZodOptional<z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
+        }, z.core.$loose>>>;
+    }, z.core.$loose>;
+    steps: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodString;
+        name: z.ZodString;
+        status: z.ZodString;
+        sortOrder: z.ZodNumber;
+        sectionId: z.ZodString;
+        sectionName: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+        isDisabled: z.ZodBoolean;
+        customTimerEnabled: z.ZodBoolean;
+        note: z.ZodNullable<z.ZodString>;
+        minutesPlanned: z.ZodNullable<z.ZodNumber>;
+        offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+        relativeToStepId: z.ZodNullable<z.ZodString>;
+        timerAccumulatedSeconds: z.ZodNumber;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerState: z.ZodString;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    }, z.core.$loose>>;
 }, z.core.$strip>;
 declare const BrewSessionStepResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
-    step: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    step: z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodString;
+        name: z.ZodString;
+        status: z.ZodString;
+        sortOrder: z.ZodNumber;
+        sectionId: z.ZodString;
+        sectionName: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+        isDisabled: z.ZodBoolean;
+        customTimerEnabled: z.ZodBoolean;
+        note: z.ZodNullable<z.ZodString>;
+        minutesPlanned: z.ZodNullable<z.ZodNumber>;
+        offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+        relativeToStepId: z.ZodNullable<z.ZodString>;
+        timerAccumulatedSeconds: z.ZodNumber;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerState: z.ZodString;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    }, z.core.$loose>;
 }, z.core.$strip>;
 declare const BrewSessionStepsResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
-    steps: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    steps: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodString;
+        name: z.ZodString;
+        status: z.ZodString;
+        sortOrder: z.ZodNumber;
+        sectionId: z.ZodString;
+        sectionName: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+        isDisabled: z.ZodBoolean;
+        customTimerEnabled: z.ZodBoolean;
+        note: z.ZodNullable<z.ZodString>;
+        minutesPlanned: z.ZodNullable<z.ZodNumber>;
+        offsetMinutesFromEnd: z.ZodNullable<z.ZodNumber>;
+        relativeToStepId: z.ZodNullable<z.ZodString>;
+        timerAccumulatedSeconds: z.ZodNumber;
+        timerLastStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerPausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerStartedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        timerState: z.ZodString;
+        timerStoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    }, z.core.$loose>>;
 }, z.core.$strip>;
 declare const BrewSessionPatchRequestSchema: z.ZodObject<{
     scheduledDate: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -2315,12 +2649,12 @@ declare const BrewSessionStepsPatchRequestSchema: z.ZodObject<{
 declare const BrewSessionStepTimerPatchRequestSchema: z.ZodObject<{
     customTimerEnabled: z.ZodBoolean;
 }, z.core.$strip>;
-declare const BrewSessionStopRequestSchema: z.ZodObject<{
+declare const BrewSessionStopRequestSchema: z.ZodPreprocess<z.ZodObject<{
     reason: z.ZodOptional<z.ZodEnum<{
         manual: "manual";
         auto: "auto";
     }>>;
-}, z.core.$strip>;
+}, z.core.$strip>>;
 declare const BrewSessionStepLogRequestSchema: z.ZodObject<{
     status: z.ZodEnum<{
         pending: "pending";
@@ -2377,4 +2711,4 @@ declare function parseBrewSessionCreateResponse(payload: unknown): {
     };
 };
 
-export { ActiveWorkspaceContextResponseSchema, AdPlacementSchema, AdPlatformSchema, AdSlotParamsSchema, AdSlotQuerySchema, type AdSlotResponse, AdSlotResponseSchema, type AiChatRequestBody, AiChatRequestBodySchema, AiProposalActionResponseSchema, type AiProposalDto, AiProposalDtoSchema, AiProposalGetResponseSchema, AiProposalIdParamsSchema, AiProposalListResponseSchema, type AiProposalStatus, AiProposalStatusSchema, type AiProvider, AiProviderSchema, type AiRoleLimits, AiRoleLimitsSchema, type AiToolCallRecord, AiToolCallRecordSchema, AiUsageByUserSchema, AiUsageDailyPointSchema, type AiUsageLedgerEntry, AiUsageLedgerEntrySchema, AiUsageMonthlySchema, AiUsageRoleAlertSchema, AiUsageUserAlertSchema, AuthActiveWorkspaceRequestSchema, AuthActiveWorkspaceResponseSchema, AuthLoginNativeResponseSchema, type AuthLoginRequest, AuthLoginRequestSchema, AuthLoginResponseSchema, AuthLogoutResponseSchema, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, AuthPreferencesPatchRequestSchema, AuthPreferencesPatchResponseSchema, AuthSessionUserSchema, type AuthSignupRequest, AuthSignupRequestSchema, AuthSignupResponseSchema, AuthWebviewBridgeQuerySchema, AuthWebviewExchangeRequestSchema, AuthWebviewExchangeResponseSchema, BeerJsonExportResponseSchema, BeerJsonLooseSchema, BeerStyleSchema, type BillingConfirmRequest, BillingConfirmRequestSchema, BillingConfirmResponseSchema, type BillingIntentRequest, BillingIntentRequestSchema, type BillingIntentResponse, BillingIntentResponseSchema, BillingPurchaseIntentModeSchema, BillingPurchaseProviderSchema, BillingTierSchema, BillingWorkspaceIdParamsSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, BoilComputeAndSaveRequestSchema, BoilComputeAndSaveResponseSchema, type BoilComputeAndSaveResponseV1, BrewSessionCreateResponseSchema, BrewSessionDetailResponseSchema, BrewSessionIdParamsSchema, type BrewSessionListItem, BrewSessionPatchRequestSchema, BrewSessionPayloadSchema, BrewSessionStepLogRequestSchema, BrewSessionStepParamsSchema, BrewSessionStepResponseSchema, BrewSessionStepSchema, BrewSessionStepTimerPatchRequestSchema, BrewSessionStepsPatchRequestSchema, BrewSessionStepsResponseSchema, BrewSessionStopRequestSchema, BrewSessionSummarySchema, type BrewSessionsListResponse, BrewSessionsListResponseSchema, BrewSessionsRecentQuerySchema, BrewSessionsRecentResponseSchema, BrewdaySettingsPatchRequestSchema, BrewdaySettingsPayloadSchema, BrewdaySettingsResponseSchema, ContextMeResponseSchema, type CrpProposeScheduleAdjustmentInput, CrpProposeScheduleAdjustmentInputSchema, type CrpProposeScheduleAdjustmentOutput, CrpProposeScheduleAdjustmentOutputSchema, EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfilePayloadSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, FermentableItemSchema, FermentablesListResponseSchema, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, HopItemSchema, HopsListResponseSchema, IdParamsSchema, IngredientSyncResponseSchema, IngredientSyncResultSchema, IngredientSyncRunSchema, IngredientSyncRunsResponseSchema, IngredientsSearchQuerySchema, IntegrationAttachRequestSchema, IntegrationAttachResponseSchema, IntegrationAttachmentDeviceSchema, IntegrationAttachmentSchema, IntegrationAttachmentsResponseSchema, IntegrationBrewSessionRefSchema, IntegrationCreateResponseSchema, IntegrationDetachRequestSchema, IntegrationDetachResponseSchema, IntegrationDeviceAttachRequestSchema, IntegrationDeviceAttachResponseSchema, IntegrationDeviceAttachmentSchema, IntegrationDeviceDetachResponseSchema, IntegrationDeviceIdParamsSchema, IntegrationDeviceReadingSchema, IntegrationDeviceSchema, IntegrationDevicesListResponseSchema, IntegrationDevicesQuerySchema, IntegrationGetResponseSchema, type IntegrationKind, IntegrationKindSchema, IntegrationOkResponseSchema, IntegrationReadingSchema, IntegrationReadingsQuerySchema, IntegrationReadingsResponseSchema, type IntegrationRevealResponse, IntegrationRevealResponseSchema, IntegrationSummarySchema, IntegrationTokenParamsSchema, IntegrationWorkspaceIdParamsSchema, IntegrationWorkspaceKindParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemPayloadSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, MashComputeAndSaveRequestSchema, MashComputeAndSaveResponseSchema, type MashComputeAndSaveResponseV1, type MrpProposeOrderAdjustmentInput, MrpProposeOrderAdjustmentInputSchema, type MrpProposeOrderAdjustmentOutput, MrpProposeOrderAdjustmentOutputSchema, type NumberFormatHintV1, type NumberFormatUnit, OkResponseSchema, PlatformAdCreateRequestSchema, PlatformAdCreateResponseSchema, PlatformAdIdParamsSchema, PlatformAdOkResponseSchema, PlatformAdPatchRequestSchema, type PlatformAdRow, PlatformAdRowSchema, PlatformAdminOkResponseSchema, PlatformAdsListResponseSchema, PlatformImportFormatSchema, PlatformRecipeBulkImportPreviewItemSchema, PlatformRecipeBulkImportPreviewRequestSchema, PlatformRecipeBulkImportPreviewResponseSchema, PlatformRecipeBulkImportRequestSchema, PlatformRecipeBulkImportResponseSchema, PlatformRecipeExportQuerySchema, PlatformRecipeIdParamsSchema, PlatformRecipeImportPreviewRequestSchema, PlatformRecipeImportPreviewResponseSchema, PlatformRecipeImportRequestSchema, PlatformRecipeImportResponseSchema, PlatformRecipeSummarySchema, PlatformRecipesListQuerySchema, PlatformRecipesListResponseSchema, PlatformWorkspaceRowSchema, PlatformWorkspacesListResponseSchema, PreferredLocaleSchema, RecipeBulkImportCreatedItemSchema, RecipeBulkImportFailedItemSchema, RecipeBulkImportPreviewItemSchema, RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, RecipeBulkImportResponseSchema, RecipeCreateRequestSchema, RecipeIdParamsSchema, RecipeImportFormatSchema, RecipeImportPreviewPayloadSchema, RecipeImportPreviewResponseSchema, RecipeImportRequestSchema, RecipeImportResponseSchema, type RecipeListItem, RecipeListResponseSchema, RecipePatchRequestSchema, RecipePayloadSchema, RecipeResponseSchema, RecipeVersionsResponseSchema, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, RecipeWaterHubSummaryResponseSchema, type RecipeWaterSettings, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPayloadSchema, RecipeWaterSettingsPutRequestSchema, RecipeWaterSettingsPutResponseSchema, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, ResolvedAdSchema, SafeNextPathSchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, SpargeComputeAndSaveRequestSchema, SpargeComputeAndSaveResponseSchema, type SpargeComputeAndSaveResponseV1, StylesListResponseSchema, TierLimitsSchema, TiltIngestBodySchema, TiltIngestResponseSchema, UiDensitySchema, UiFontScaleSchema, UiThemeSchema, type UpdateWorkspaceAiSettingsRequest, UpdateWorkspaceAiSettingsRequestSchema, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, WaterCalcRequestSchema, WaterCalcResultOnlyResponseSchema, type WaterCalcUnit, WaterCalcWithDerivationResponseSchema, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, WaterProfileCreateRequestSchema, WaterProfileItemSchema, WaterProfilePatchRequestSchema, WaterProfileResponseSchema, WaterProfilesListResponseSchema, type WaterProfilesResponse, type WaterSaltAdditionsResult, WebhookOkResponseSchema, WebhookRevenuecatBodySchema, WebhookStripeBodySchema, type WorkspaceAiSettings, WorkspaceAiSettingsParamsSchema, WorkspaceAiSettingsResponseSchema, WorkspaceAiSettingsSchema, type WorkspaceAiUsageResponse, WorkspaceAiUsageResponseSchema, type WorkspaceBillingResponse, WorkspaceBillingResponseSchema, WorkspaceBrandPatchRequestSchema, WorkspaceBrandPatchResponseSchema, type WorkspaceCreateRequest, WorkspaceCreateRequestSchema, WorkspaceCreateResponseSchema, WorkspaceIdParamsSchema, WorkspaceRowSchema, WorkspacesListResponseSchema, YeastItemSchema, YeastsListResponseSchema, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };
+export { ActiveWorkspaceContextResponseSchema, AdPlacementSchema, AdPlatformSchema, AdSlotParamsSchema, AdSlotQuerySchema, type AdSlotResponse, AdSlotResponseSchema, type AiChatRequestBody, AiChatRequestBodySchema, AiProposalActionResponseSchema, type AiProposalDto, AiProposalDtoSchema, AiProposalGetResponseSchema, AiProposalIdParamsSchema, AiProposalListResponseSchema, type AiProposalStatus, AiProposalStatusSchema, type AiProvider, AiProviderSchema, type AiRoleLimits, AiRoleLimitsSchema, AiSseAssistantChunkEventSchema, AiSseCompleteEventSchema, AiSseErrorEventSchema, type AiSseEvent, AiSseEventSchema, AiSseProposalEventSchema, AiSseToolCallEventSchema, AiSseToolResultEventSchema, type AiToolCallRecord, AiToolCallRecordSchema, AiUsageByUserSchema, AiUsageDailyPointSchema, type AiUsageLedgerEntry, AiUsageLedgerEntrySchema, AiUsageMonthlySchema, AiUsageRoleAlertSchema, AiUsageUserAlertSchema, AuthActiveWorkspaceRequestSchema, AuthActiveWorkspaceResponseSchema, AuthLoginNativeResponseSchema, type AuthLoginRequest, AuthLoginRequestSchema, AuthLoginResponseSchema, AuthLogoutResponseSchema, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, AuthPreferencesPatchRequestSchema, AuthPreferencesPatchResponseSchema, AuthSessionUserSchema, type AuthSignupRequest, AuthSignupRequestSchema, AuthSignupResponseSchema, AuthWebviewBridgeQuerySchema, AuthWebviewExchangeRequestSchema, AuthWebviewExchangeResponseSchema, BeerJsonExportResponseSchema, BeerJsonLooseSchema, BeerStyleSchema, type BillingConfirmRequest, BillingConfirmRequestSchema, BillingConfirmResponseSchema, type BillingIntentRequest, BillingIntentRequestSchema, type BillingIntentResponse, BillingIntentResponseSchema, BillingPurchaseIntentModeSchema, BillingPurchaseProviderSchema, BillingTierSchema, BillingWorkspaceIdParamsSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, BoilComputeAndSaveRequestSchema, BoilComputeAndSaveResponseSchema, type BoilComputeAndSaveResponseV1, BrewSessionCreateResponseSchema, BrewSessionDetailResponseSchema, BrewSessionIdParamsSchema, type BrewSessionListItem, BrewSessionLogSchema, BrewSessionPatchRequestSchema, BrewSessionPayloadSchema, BrewSessionRecipeRefSchema, BrewSessionStepLogRequestSchema, BrewSessionStepParamsSchema, BrewSessionStepResponseSchema, BrewSessionStepSchema, BrewSessionStepTimerPatchRequestSchema, BrewSessionStepsPatchRequestSchema, BrewSessionStepsResponseSchema, BrewSessionStopRequestSchema, BrewSessionSummarySchema, type BrewSessionsListResponse, BrewSessionsListResponseSchema, BrewSessionsRecentQuerySchema, BrewSessionsRecentResponseSchema, BrewdaySettingsPatchRequestSchema, BrewdaySettingsPayloadSchema, BrewdaySettingsResponseSchema, ContextMeResponseSchema, type CrpProposeScheduleAdjustmentInput, CrpProposeScheduleAdjustmentInputSchema, type CrpProposeScheduleAdjustmentOutput, CrpProposeScheduleAdjustmentOutputSchema, EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfilePayloadSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, FermentableItemSchema, FermentablesListResponseSchema, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, HopItemSchema, HopsListResponseSchema, IdParamsSchema, IngredientSyncResponseSchema, IngredientSyncResultSchema, IngredientSyncRunSchema, IngredientSyncRunsResponseSchema, IngredientsSearchQuerySchema, IntegrationAttachRequestSchema, IntegrationAttachResponseSchema, IntegrationAttachmentDeviceSchema, IntegrationAttachmentSchema, IntegrationAttachmentsResponseSchema, IntegrationBrewSessionRefSchema, IntegrationCreateResponseSchema, IntegrationDetachRequestSchema, IntegrationDetachResponseSchema, IntegrationDeviceAttachRequestSchema, IntegrationDeviceAttachResponseSchema, IntegrationDeviceAttachmentSchema, IntegrationDeviceDetachResponseSchema, IntegrationDeviceIdParamsSchema, IntegrationDeviceReadingSchema, IntegrationDeviceSchema, IntegrationDevicesListResponseSchema, IntegrationDevicesQuerySchema, IntegrationGetResponseSchema, type IntegrationKind, IntegrationKindSchema, IntegrationOkResponseSchema, IntegrationReadingSchema, IntegrationReadingsQuerySchema, IntegrationReadingsResponseSchema, type IntegrationRevealResponse, IntegrationRevealResponseSchema, IntegrationSummarySchema, IntegrationTokenParamsSchema, IntegrationWorkspaceIdParamsSchema, IntegrationWorkspaceKindParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemPayloadSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, MashComputeAndSaveRequestSchema, MashComputeAndSaveResponseSchema, type MashComputeAndSaveResponseV1, type MrpProposeOrderAdjustmentInput, MrpProposeOrderAdjustmentInputSchema, type MrpProposeOrderAdjustmentOutput, MrpProposeOrderAdjustmentOutputSchema, type NumberFormatHintV1, type NumberFormatUnit, OkResponseSchema, PlatformAdCreateRequestSchema, PlatformAdCreateResponseSchema, PlatformAdIdParamsSchema, PlatformAdOkResponseSchema, PlatformAdPatchRequestSchema, type PlatformAdRow, PlatformAdRowSchema, PlatformAdminOkResponseSchema, PlatformAdsListResponseSchema, PlatformImportFormatSchema, PlatformRecipeBulkImportPreviewItemSchema, PlatformRecipeBulkImportPreviewRequestSchema, PlatformRecipeBulkImportPreviewResponseSchema, PlatformRecipeBulkImportRequestSchema, PlatformRecipeBulkImportResponseSchema, PlatformRecipeExportQuerySchema, PlatformRecipeIdParamsSchema, PlatformRecipeImportPreviewRequestSchema, PlatformRecipeImportPreviewResponseSchema, PlatformRecipeImportRequestSchema, PlatformRecipeImportResponseSchema, PlatformRecipeSummarySchema, PlatformRecipesListQuerySchema, PlatformRecipesListResponseSchema, PlatformWorkspaceRowSchema, PlatformWorkspacesListResponseSchema, PreferredLocaleSchema, RecipeBulkImportCreatedItemSchema, RecipeBulkImportFailedItemSchema, RecipeBulkImportPreviewItemSchema, RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, RecipeBulkImportResponseSchema, RecipeCreateRequestSchema, RecipeIdParamsSchema, RecipeImportFormatSchema, RecipeImportPreviewPayloadSchema, RecipeImportPreviewResponseSchema, RecipeImportRequestSchema, RecipeImportResponseSchema, RecipeImportWarningSchema, type RecipeListItem, RecipeListResponseSchema, RecipePatchRequestSchema, RecipePayloadSchema, RecipeResponseSchema, RecipeVersionsResponseSchema, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, RecipeWaterHubSummaryResponseSchema, type RecipeWaterSettings, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPayloadSchema, RecipeWaterSettingsPutRequestSchema, RecipeWaterSettingsPutResponseSchema, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, ResolvedAdSchema, SafeNextPathSchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, SpargeComputeAndSaveRequestSchema, SpargeComputeAndSaveResponseSchema, type SpargeComputeAndSaveResponseV1, StylesListResponseSchema, TierLimitsSchema, TiltIngestBodySchema, TiltIngestResponseSchema, UiDensitySchema, UiFontScaleSchema, UiThemeSchema, type UpdateWorkspaceAiSettingsRequest, UpdateWorkspaceAiSettingsRequestSchema, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, WaterCalcRequestSchema, WaterCalcResultOnlyResponseSchema, type WaterCalcUnit, WaterCalcWithDerivationResponseSchema, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, WaterProfileCreateRequestSchema, WaterProfileItemSchema, WaterProfilePatchRequestSchema, WaterProfileResponseSchema, WaterProfilesListResponseSchema, type WaterProfilesResponse, type WaterSaltAdditionsResult, WebhookOkResponseSchema, WebhookRevenuecatBodySchema, WebhookStripeBodySchema, type WorkspaceAiSettings, WorkspaceAiSettingsParamsSchema, WorkspaceAiSettingsResponseSchema, WorkspaceAiSettingsSchema, type WorkspaceAiUsageResponse, WorkspaceAiUsageResponseSchema, type WorkspaceBillingResponse, WorkspaceBillingResponseSchema, WorkspaceBrandPatchRequestSchema, WorkspaceBrandPatchResponseSchema, type WorkspaceCreateRequest, WorkspaceCreateRequestSchema, WorkspaceCreateResponseSchema, WorkspaceIdParamsSchema, WorkspaceRowSchema, WorkspacesListResponseSchema, YeastItemSchema, YeastsListResponseSchema, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };

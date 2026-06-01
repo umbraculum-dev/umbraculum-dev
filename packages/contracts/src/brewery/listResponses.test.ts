@@ -44,7 +44,20 @@ describe("parseBrewSessionCreateResponse", () => {
   it("extracts brewSession id", () => {
     const parsed = parseBrewSessionCreateResponse({
       ok: true,
-      brewSession: { id: "s-new" },
+      brewSession: {
+        id: "s-new",
+        workspaceId: "ws-1",
+        recipeId: "r-1",
+        code: "BS-001",
+        status: "draft",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+        startedAt: null,
+        pausedAt: null,
+        stoppedAt: null,
+        scheduledDate: null,
+      },
+      steps: [],
     });
     expect(parsed.brewSession.id).toBe("s-new");
   });

@@ -35,6 +35,13 @@ __export(index_exports, {
   AiProposalStatusSchema: () => AiProposalStatusSchema,
   AiProviderSchema: () => AiProviderSchema,
   AiRoleLimitsSchema: () => AiRoleLimitsSchema,
+  AiSseAssistantChunkEventSchema: () => AiSseAssistantChunkEventSchema,
+  AiSseCompleteEventSchema: () => AiSseCompleteEventSchema,
+  AiSseErrorEventSchema: () => AiSseErrorEventSchema,
+  AiSseEventSchema: () => AiSseEventSchema,
+  AiSseProposalEventSchema: () => AiSseProposalEventSchema,
+  AiSseToolCallEventSchema: () => AiSseToolCallEventSchema,
+  AiSseToolResultEventSchema: () => AiSseToolResultEventSchema,
   AiToolCallRecordSchema: () => AiToolCallRecordSchema,
   AiUsageByUserSchema: () => AiUsageByUserSchema,
   AiUsageDailyPointSchema: () => AiUsageDailyPointSchema,
@@ -75,8 +82,10 @@ __export(index_exports, {
   BrewSessionCreateResponseSchema: () => BrewSessionCreateResponseSchema,
   BrewSessionDetailResponseSchema: () => BrewSessionDetailResponseSchema,
   BrewSessionIdParamsSchema: () => BrewSessionIdParamsSchema,
+  BrewSessionLogSchema: () => BrewSessionLogSchema,
   BrewSessionPatchRequestSchema: () => BrewSessionPatchRequestSchema,
   BrewSessionPayloadSchema: () => BrewSessionPayloadSchema,
+  BrewSessionRecipeRefSchema: () => BrewSessionRecipeRefSchema,
   BrewSessionStepLogRequestSchema: () => BrewSessionStepLogRequestSchema,
   BrewSessionStepParamsSchema: () => BrewSessionStepParamsSchema,
   BrewSessionStepResponseSchema: () => BrewSessionStepResponseSchema,
@@ -190,6 +199,7 @@ __export(index_exports, {
   RecipeImportPreviewResponseSchema: () => RecipeImportPreviewResponseSchema,
   RecipeImportRequestSchema: () => RecipeImportRequestSchema,
   RecipeImportResponseSchema: () => RecipeImportResponseSchema,
+  RecipeImportWarningSchema: () => RecipeImportWarningSchema,
   RecipeListResponseSchema: () => RecipeListResponseSchema,
   RecipePatchRequestSchema: () => RecipePatchRequestSchema,
   RecipePayloadSchema: () => RecipePayloadSchema,
@@ -507,12 +517,15 @@ var BillingWorkspaceIdParamsSchema = import_zod4.z.object({
   workspaceId: import_zod4.z.string().trim().min(1, "Params.workspaceId is required")
 });
 var BillingPurchaseProviderSchema = import_zod4.z.enum(["stripe", "apple", "google"]);
-var BillingPurchaseIntentModeSchema = import_zod4.z.unknown().optional().transform((v) => v === "restore" ? "restore" : "purchase");
+var BillingPurchaseIntentModeSchema = import_zod4.z.enum(["purchase", "restore"]);
 var BillingIntentRequestSchema = import_zod4.z.object({
   planCode: import_zod4.z.string().trim().min(1, "Body.planCode is required"),
   provider: BillingPurchaseProviderSchema,
-  mode: BillingPurchaseIntentModeSchema.optional()
-});
+  mode: import_zod4.z.preprocess(
+    (v) => v === "restore" ? "restore" : v === "purchase" ? "purchase" : v,
+    BillingPurchaseIntentModeSchema
+  ).optional()
+}).strict();
 var BillingIntentResponseSchema = import_zod4.z.object({
   ok: import_zod4.z.literal(true),
   billingIntentId: import_zod4.z.string().min(1),
@@ -546,7 +559,7 @@ var WorkspaceBillingResponseSchema = import_zod4.z.object({
 });
 var BillingConfirmRequestSchema = import_zod4.z.object({
   billingIntentId: import_zod4.z.string().trim().min(1, "Body.billingIntentId is required")
-});
+}).strict();
 var BillingConfirmResponseSchema = import_zod4.z.object({
   ok: import_zod4.z.literal(true)
 });
@@ -715,7 +728,7 @@ var IntegrationDeviceReadingSchema = import_zod6.z.object({
   receivedAt: isoDateTime4,
   temperatureC: import_zod6.z.number().nullable(),
   gravitySg: import_zod6.z.number().nullable(),
-  rawJson: import_zod6.z.unknown().optional()
+  rawJson: import_zod6.z.record(import_zod6.z.string(), import_zod6.z.unknown()).optional()
 });
 var IntegrationBrewSessionRefSchema = import_zod6.z.object({
   id: import_zod6.z.string().min(1),
@@ -738,7 +751,7 @@ var IntegrationDeviceSchema = import_zod6.z.object({
   id: import_zod6.z.string().min(1),
   deviceKey: import_zod6.z.string().min(1),
   displayName: import_zod6.z.string().nullable(),
-  metadataJson: import_zod6.z.unknown().nullable(),
+  metadataJson: import_zod6.z.record(import_zod6.z.string(), import_zod6.z.unknown()).nullable(),
   lastSeenAt: isoDateTime4.nullable(),
   createdAt: isoDateTime4,
   activeAttachment: IntegrationDeviceAttachmentSchema.nullable(),
@@ -842,7 +855,8 @@ var BeerJsonLooseSchema = import_zod7.z.unknown();
 var PlatformImportFormatSchema = import_zod7.z.enum(["beerjson", "beerxml"]);
 var workspaceIdPreprocess = import_zod7.z.preprocess(
   (raw) => {
-    if (raw === null || typeof raw !== "object") return raw;
+    if (raw === null || raw === void 0) return {};
+    if (typeof raw !== "object") return raw;
     const r = raw;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
@@ -866,7 +880,8 @@ var PlatformRecipeImportPreviewResponseSchema = import_zod7.z.object({
 });
 var PlatformRecipeImportRequestSchema = import_zod7.z.preprocess(
   (raw) => {
-    if (raw === null || typeof raw !== "object") return raw;
+    if (raw === null || raw === void 0) return {};
+    if (typeof raw !== "object") return raw;
     const r = raw;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
@@ -1089,6 +1104,10 @@ var IngredientSyncResponseSchema = import_zod9.z.object({
   result: IngredientSyncResultSchema
 });
 var RecipeImportFormatSchema = import_zod9.z.enum(["beerjson", "beerxml"]);
+var RecipeImportWarningSchema = import_zod9.z.object({
+  code: import_zod9.z.string(),
+  message: import_zod9.z.string()
+});
 var RecipeImportRequestSchema = import_zod9.z.object({
   format: RecipeImportFormatSchema,
   content: import_zod9.z.string().min(1),
@@ -1108,7 +1127,7 @@ var RecipeImportPreviewResponseSchema = import_zod9.z.object({
 var RecipeImportResponseSchema = import_zod9.z.object({
   ok: import_zod9.z.literal(true),
   recipe: RecipePayloadSchema,
-  warnings: import_zod9.z.array(import_zod9.z.string()).optional()
+  warnings: import_zod9.z.array(RecipeImportWarningSchema).optional()
 });
 var RecipeBulkImportPreviewItemSchema = import_zod9.z.record(import_zod9.z.string(), import_zod9.z.unknown());
 var RecipeBulkImportPreviewResponseSchema = import_zod9.z.object({
@@ -1736,7 +1755,8 @@ var RecipeWaterSettingsPutResponseSchema = import_zod10.z.object({
   ok: import_zod10.z.literal(true),
   settings: RecipeWaterSettingsPayloadSchema
 });
-var MashComputeAndSaveRequestSchema = import_zod10.z.record(import_zod10.z.string(), import_zod10.z.unknown());
+var emptyObjectBody = (schema) => import_zod10.z.preprocess((raw) => raw === null || raw === void 0 ? {} : raw, schema);
+var MashComputeAndSaveRequestSchema = emptyObjectBody(import_zod10.z.record(import_zod10.z.string(), import_zod10.z.unknown()));
 var MashComputeAndSaveResponseSchema = import_zod10.z.custom(
   (data) => {
     try {
@@ -1748,7 +1768,7 @@ var MashComputeAndSaveResponseSchema = import_zod10.z.custom(
   },
   { message: "Invalid mash compute-and-save response" }
 );
-var SpargeComputeAndSaveRequestSchema = import_zod10.z.record(import_zod10.z.string(), import_zod10.z.unknown());
+var SpargeComputeAndSaveRequestSchema = emptyObjectBody(import_zod10.z.record(import_zod10.z.string(), import_zod10.z.unknown()));
 var SpargeComputeAndSaveResponseSchema = import_zod10.z.custom(
   (data) => {
     try {
@@ -1760,7 +1780,7 @@ var SpargeComputeAndSaveResponseSchema = import_zod10.z.custom(
   },
   { message: "Invalid sparge compute-and-save response" }
 );
-var BoilComputeAndSaveRequestSchema = import_zod10.z.record(import_zod10.z.string(), import_zod10.z.unknown());
+var BoilComputeAndSaveRequestSchema = emptyObjectBody(import_zod10.z.record(import_zod10.z.string(), import_zod10.z.unknown()));
 var BoilComputeAndSaveResponseSchema = import_zod10.z.custom(
   (data) => {
     try {
@@ -2043,6 +2063,51 @@ var AiChatRequestBodySchema = import_zod13.z.object({
   sessionId: import_zod13.z.string().trim().min(1).max(200).optional(),
   routeId: import_zod13.z.string().trim().min(1).max(128).optional()
 }).strict();
+var AiSseAssistantChunkEventSchema = import_zod13.z.object({
+  type: import_zod13.z.literal("assistant_chunk"),
+  text: import_zod13.z.string()
+});
+var AiSseToolCallEventSchema = import_zod13.z.object({
+  type: import_zod13.z.literal("tool_call"),
+  name: import_zod13.z.string(),
+  argsJson: import_zod13.z.string()
+});
+var AiSseToolResultEventSchema = import_zod13.z.object({
+  type: import_zod13.z.literal("tool_result"),
+  name: import_zod13.z.string(),
+  resultJson: import_zod13.z.string(),
+  durationMs: import_zod13.z.number(),
+  errored: import_zod13.z.boolean()
+});
+var AiSseProposalEventSchema = import_zod13.z.object({
+  type: import_zod13.z.literal("proposal"),
+  proposalId: import_zod13.z.string(),
+  moduleCode: import_zod13.z.string(),
+  proposalType: import_zod13.z.string(),
+  summary: import_zod13.z.string()
+});
+var AiSseCompleteEventSchema = import_zod13.z.object({
+  type: import_zod13.z.literal("complete"),
+  usage: import_zod13.z.object({
+    tokensIn: import_zod13.z.number(),
+    tokensOut: import_zod13.z.number(),
+    durationMs: import_zod13.z.number(),
+    model: import_zod13.z.string()
+  })
+});
+var AiSseErrorEventSchema = import_zod13.z.object({
+  type: import_zod13.z.literal("error"),
+  code: import_zod13.z.string(),
+  message: import_zod13.z.string()
+});
+var AiSseEventSchema = import_zod13.z.discriminatedUnion("type", [
+  AiSseAssistantChunkEventSchema,
+  AiSseToolCallEventSchema,
+  AiSseToolResultEventSchema,
+  AiSseProposalEventSchema,
+  AiSseCompleteEventSchema,
+  AiSseErrorEventSchema
+]);
 
 // src/ai/aiProposals.ts
 var import_zod14 = require("zod");
@@ -2222,8 +2287,59 @@ var BrewSessionsListResponseSchema = import_zod16.z.object({
 function parseBrewSessionsListResponse(payload) {
   return BrewSessionsListResponseSchema.parse(payload);
 }
-var BrewSessionPayloadSchema = import_zod16.z.record(import_zod16.z.string(), import_zod16.z.unknown());
-var BrewSessionStepSchema = import_zod16.z.record(import_zod16.z.string(), import_zod16.z.unknown());
+var BrewSessionRecipeRefSchema = import_zod16.z.object({
+  id: import_zod16.z.string().min(1),
+  name: import_zod16.z.string(),
+  version: import_zod16.z.number().int()
+});
+var BrewSessionLogSchema = import_zod16.z.object({
+  id: import_zod16.z.string().min(1),
+  brewSessionId: import_zod16.z.string().min(1),
+  kind: import_zod16.z.string(),
+  message: import_zod16.z.string(),
+  createdAt: isoDateTime7,
+  stepId: import_zod16.z.string().nullable(),
+  payloadJson: import_zod16.z.record(import_zod16.z.string(), import_zod16.z.unknown()).nullable().optional()
+}).passthrough();
+var BrewSessionStepSchema = import_zod16.z.object({
+  id: import_zod16.z.string().min(1),
+  brewSessionId: import_zod16.z.string().min(1),
+  name: import_zod16.z.string(),
+  status: import_zod16.z.string(),
+  sortOrder: import_zod16.z.number().int(),
+  sectionId: import_zod16.z.string(),
+  sectionName: import_zod16.z.string().nullable(),
+  createdAt: isoDateTime7,
+  updatedAt: isoDateTime7,
+  isDisabled: import_zod16.z.boolean(),
+  customTimerEnabled: import_zod16.z.boolean(),
+  note: import_zod16.z.string().nullable(),
+  minutesPlanned: import_zod16.z.number().nullable(),
+  offsetMinutesFromEnd: import_zod16.z.number().nullable(),
+  relativeToStepId: import_zod16.z.string().nullable(),
+  timerAccumulatedSeconds: import_zod16.z.number(),
+  timerLastStartedAt: isoDateTime7.nullable(),
+  timerPausedAt: isoDateTime7.nullable(),
+  timerStartedAt: isoDateTime7.nullable(),
+  timerState: import_zod16.z.string(),
+  timerStoppedAt: isoDateTime7.nullable()
+}).passthrough();
+var BrewSessionPayloadSchema = import_zod16.z.object({
+  id: import_zod16.z.string().min(1),
+  workspaceId: import_zod16.z.string().min(1),
+  recipeId: import_zod16.z.string().min(1),
+  code: import_zod16.z.string().nullable(),
+  status: import_zod16.z.string(),
+  createdAt: isoDateTime7,
+  updatedAt: isoDateTime7,
+  startedAt: isoDateTime7.nullable(),
+  pausedAt: isoDateTime7.nullable(),
+  stoppedAt: isoDateTime7.nullable(),
+  scheduledDate: isoDateTime7.nullable(),
+  recipe: BrewSessionRecipeRefSchema.optional(),
+  steps: import_zod16.z.array(BrewSessionStepSchema).optional(),
+  logs: import_zod16.z.array(BrewSessionLogSchema).optional()
+}).passthrough();
 var BrewSessionDetailResponseSchema = import_zod16.z.object({
   ok: import_zod16.z.literal(true),
   brewSession: BrewSessionPayloadSchema
@@ -2250,9 +2366,12 @@ var BrewSessionStepsPatchRequestSchema = import_zod16.z.object({
 var BrewSessionStepTimerPatchRequestSchema = import_zod16.z.object({
   customTimerEnabled: import_zod16.z.boolean()
 });
-var BrewSessionStopRequestSchema = import_zod16.z.object({
-  reason: import_zod16.z.enum(["auto", "manual"]).optional()
-});
+var BrewSessionStopRequestSchema = import_zod16.z.preprocess(
+  (raw) => raw === null || raw === void 0 ? {} : raw,
+  import_zod16.z.object({
+    reason: import_zod16.z.enum(["auto", "manual"]).optional()
+  })
+);
 var BrewSessionStepLogRequestSchema = import_zod16.z.object({
   status: import_zod16.z.enum(["pending", "in_progress", "done", "skipped", "not_applicable"]),
   note: import_zod16.z.string().nullable().optional(),
@@ -2311,6 +2430,13 @@ function parseBrewSessionCreateResponse(payload) {
   AiProposalStatusSchema,
   AiProviderSchema,
   AiRoleLimitsSchema,
+  AiSseAssistantChunkEventSchema,
+  AiSseCompleteEventSchema,
+  AiSseErrorEventSchema,
+  AiSseEventSchema,
+  AiSseProposalEventSchema,
+  AiSseToolCallEventSchema,
+  AiSseToolResultEventSchema,
   AiToolCallRecordSchema,
   AiUsageByUserSchema,
   AiUsageDailyPointSchema,
@@ -2351,8 +2477,10 @@ function parseBrewSessionCreateResponse(payload) {
   BrewSessionCreateResponseSchema,
   BrewSessionDetailResponseSchema,
   BrewSessionIdParamsSchema,
+  BrewSessionLogSchema,
   BrewSessionPatchRequestSchema,
   BrewSessionPayloadSchema,
+  BrewSessionRecipeRefSchema,
   BrewSessionStepLogRequestSchema,
   BrewSessionStepParamsSchema,
   BrewSessionStepResponseSchema,
@@ -2466,6 +2594,7 @@ function parseBrewSessionCreateResponse(payload) {
   RecipeImportPreviewResponseSchema,
   RecipeImportRequestSchema,
   RecipeImportResponseSchema,
+  RecipeImportWarningSchema,
   RecipeListResponseSchema,
   RecipePatchRequestSchema,
   RecipePayloadSchema,

@@ -3,7 +3,7 @@
   "info": {
     "title": "Umbraculum Brewery API (reference vertical add-on)",
     "version": "0.0.1",
-    "description": "Optional add-on OpenAPI spec for the brewery reference vertical.\n\nGenerated with UMBRACULUM_MODULE_PROFILE=reference and filtered to brewery-tagged routes only.\nNot present when UMBRACULUM_MODULE_PROFILE=platform at runtime.\n\nCanonical platform catalog: services/api/openapi/openapi.json\nIntegrator index: docs/API-OPENAPI.md"
+    "description": "Brewery reference vertical add-on — 55 paths / 70 operations (Phase D, 2026-06).\n\nGenerated with UMBRACULUM_MODULE_PROFILE=reference and filtered to brewery-tagged routes only.\nNot present when UMBRACULUM_MODULE_PROFILE=platform at runtime.\n\nCanonical platform catalog: services/api/openapi/openapi.json\nIntegrator index: docs/API-OPENAPI.md\nBrowsable copy on docs site: /openapi/brewery (Redoc embed, Phase D)."
   },
   "components": {
     "securitySchemes": {
@@ -959,7 +959,20 @@
                     "warnings": {
                       "type": "array",
                       "items": {
-                        "type": "string"
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "message"
+                        ],
+                        "additionalProperties": false
                       }
                     }
                   },
@@ -5067,12 +5080,343 @@
                     },
                     "brewSession": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "workspaceId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "recipeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduledDate": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "version"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "sectionId": {
+                                "type": "string"
+                              },
+                              "sectionName": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              },
+                              "isDisabled": {
+                                "type": "boolean"
+                              },
+                              "customTimerEnabled": {
+                                "type": "boolean"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "minutesPlanned": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "offsetMinutesFromEnd": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "relativeToStepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerAccumulatedSeconds": {
+                                "type": "number"
+                              },
+                              "timerLastStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerPausedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerState": {
+                                "type": "string"
+                              },
+                              "timerStoppedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "name",
+                              "status",
+                              "sortOrder",
+                              "sectionId",
+                              "sectionName",
+                              "createdAt",
+                              "updatedAt",
+                              "isDisabled",
+                              "customTimerEnabled",
+                              "note",
+                              "minutesPlanned",
+                              "offsetMinutesFromEnd",
+                              "relativeToStepId",
+                              "timerAccumulatedSeconds",
+                              "timerLastStartedAt",
+                              "timerPausedAt",
+                              "timerStartedAt",
+                              "timerState",
+                              "timerStoppedAt"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "stepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "payloadJson": {
+                                "nullable": true,
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "kind",
+                              "message",
+                              "createdAt",
+                              "stepId"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "workspaceId",
+                        "recipeId",
+                        "code",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "startedAt",
+                        "pausedAt",
+                        "stoppedAt",
+                        "scheduledDate"
+                      ],
                       "additionalProperties": {}
                     },
                     "steps": {
                       "type": "array",
                       "items": {
                         "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "brewSessionId": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "sortOrder": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "sectionId": {
+                            "type": "string"
+                          },
+                          "sectionName": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "isDisabled": {
+                            "type": "boolean"
+                          },
+                          "customTimerEnabled": {
+                            "type": "boolean"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "minutesPlanned": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "offsetMinutesFromEnd": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "relativeToStepId": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerAccumulatedSeconds": {
+                            "type": "number"
+                          },
+                          "timerLastStartedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerPausedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerStartedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerState": {
+                            "type": "string"
+                          },
+                          "timerStoppedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "brewSessionId",
+                          "name",
+                          "status",
+                          "sortOrder",
+                          "sectionId",
+                          "sectionName",
+                          "createdAt",
+                          "updatedAt",
+                          "isDisabled",
+                          "customTimerEnabled",
+                          "note",
+                          "minutesPlanned",
+                          "offsetMinutesFromEnd",
+                          "relativeToStepId",
+                          "timerAccumulatedSeconds",
+                          "timerLastStartedAt",
+                          "timerPausedAt",
+                          "timerStartedAt",
+                          "timerState",
+                          "timerStoppedAt"
+                        ],
                         "additionalProperties": {}
                       }
                     }
@@ -5288,6 +5632,236 @@
                     },
                     "brewSession": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "workspaceId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "recipeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduledDate": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "version"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "sectionId": {
+                                "type": "string"
+                              },
+                              "sectionName": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              },
+                              "isDisabled": {
+                                "type": "boolean"
+                              },
+                              "customTimerEnabled": {
+                                "type": "boolean"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "minutesPlanned": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "offsetMinutesFromEnd": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "relativeToStepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerAccumulatedSeconds": {
+                                "type": "number"
+                              },
+                              "timerLastStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerPausedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerState": {
+                                "type": "string"
+                              },
+                              "timerStoppedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "name",
+                              "status",
+                              "sortOrder",
+                              "sectionId",
+                              "sectionName",
+                              "createdAt",
+                              "updatedAt",
+                              "isDisabled",
+                              "customTimerEnabled",
+                              "note",
+                              "minutesPlanned",
+                              "offsetMinutesFromEnd",
+                              "relativeToStepId",
+                              "timerAccumulatedSeconds",
+                              "timerLastStartedAt",
+                              "timerPausedAt",
+                              "timerStartedAt",
+                              "timerState",
+                              "timerStoppedAt"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "stepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "payloadJson": {
+                                "nullable": true,
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "kind",
+                              "message",
+                              "createdAt",
+                              "stepId"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "workspaceId",
+                        "recipeId",
+                        "code",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "startedAt",
+                        "pausedAt",
+                        "stoppedAt",
+                        "scheduledDate"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -5479,6 +6053,236 @@
                     },
                     "brewSession": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "workspaceId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "recipeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduledDate": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "version"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "sectionId": {
+                                "type": "string"
+                              },
+                              "sectionName": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              },
+                              "isDisabled": {
+                                "type": "boolean"
+                              },
+                              "customTimerEnabled": {
+                                "type": "boolean"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "minutesPlanned": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "offsetMinutesFromEnd": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "relativeToStepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerAccumulatedSeconds": {
+                                "type": "number"
+                              },
+                              "timerLastStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerPausedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerState": {
+                                "type": "string"
+                              },
+                              "timerStoppedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "name",
+                              "status",
+                              "sortOrder",
+                              "sectionId",
+                              "sectionName",
+                              "createdAt",
+                              "updatedAt",
+                              "isDisabled",
+                              "customTimerEnabled",
+                              "note",
+                              "minutesPlanned",
+                              "offsetMinutesFromEnd",
+                              "relativeToStepId",
+                              "timerAccumulatedSeconds",
+                              "timerLastStartedAt",
+                              "timerPausedAt",
+                              "timerStartedAt",
+                              "timerState",
+                              "timerStoppedAt"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "stepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "payloadJson": {
+                                "nullable": true,
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "kind",
+                              "message",
+                              "createdAt",
+                              "stepId"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "workspaceId",
+                        "recipeId",
+                        "code",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "startedAt",
+                        "pausedAt",
+                        "stoppedAt",
+                        "scheduledDate"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6056,6 +6860,107 @@
                       "type": "array",
                       "items": {
                         "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "brewSessionId": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "sortOrder": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "sectionId": {
+                            "type": "string"
+                          },
+                          "sectionName": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "isDisabled": {
+                            "type": "boolean"
+                          },
+                          "customTimerEnabled": {
+                            "type": "boolean"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "minutesPlanned": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "offsetMinutesFromEnd": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "relativeToStepId": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerAccumulatedSeconds": {
+                            "type": "number"
+                          },
+                          "timerLastStartedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerPausedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerStartedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timerState": {
+                            "type": "string"
+                          },
+                          "timerStoppedAt": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "brewSessionId",
+                          "name",
+                          "status",
+                          "sortOrder",
+                          "sectionId",
+                          "sectionName",
+                          "createdAt",
+                          "updatedAt",
+                          "isDisabled",
+                          "customTimerEnabled",
+                          "note",
+                          "minutesPlanned",
+                          "offsetMinutesFromEnd",
+                          "relativeToStepId",
+                          "timerAccumulatedSeconds",
+                          "timerLastStartedAt",
+                          "timerPausedAt",
+                          "timerStartedAt",
+                          "timerState",
+                          "timerStoppedAt"
+                        ],
                         "additionalProperties": {}
                       }
                     }
@@ -6176,6 +7081,107 @@
                     },
                     "step": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "brewSessionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "sectionId": {
+                          "type": "string"
+                        },
+                        "sectionName": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "isDisabled": {
+                          "type": "boolean"
+                        },
+                        "customTimerEnabled": {
+                          "type": "boolean"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "minutesPlanned": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "offsetMinutesFromEnd": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "relativeToStepId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerAccumulatedSeconds": {
+                          "type": "number"
+                        },
+                        "timerLastStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerPausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerState": {
+                          "type": "string"
+                        },
+                        "timerStoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brewSessionId",
+                        "name",
+                        "status",
+                        "sortOrder",
+                        "sectionId",
+                        "sectionName",
+                        "createdAt",
+                        "updatedAt",
+                        "isDisabled",
+                        "customTimerEnabled",
+                        "note",
+                        "minutesPlanned",
+                        "offsetMinutesFromEnd",
+                        "relativeToStepId",
+                        "timerAccumulatedSeconds",
+                        "timerLastStartedAt",
+                        "timerPausedAt",
+                        "timerStartedAt",
+                        "timerState",
+                        "timerStoppedAt"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6268,6 +7274,236 @@
                     },
                     "brewSession": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "workspaceId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "recipeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduledDate": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "version"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "sectionId": {
+                                "type": "string"
+                              },
+                              "sectionName": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              },
+                              "isDisabled": {
+                                "type": "boolean"
+                              },
+                              "customTimerEnabled": {
+                                "type": "boolean"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "minutesPlanned": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "offsetMinutesFromEnd": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "relativeToStepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerAccumulatedSeconds": {
+                                "type": "number"
+                              },
+                              "timerLastStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerPausedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerState": {
+                                "type": "string"
+                              },
+                              "timerStoppedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "name",
+                              "status",
+                              "sortOrder",
+                              "sectionId",
+                              "sectionName",
+                              "createdAt",
+                              "updatedAt",
+                              "isDisabled",
+                              "customTimerEnabled",
+                              "note",
+                              "minutesPlanned",
+                              "offsetMinutesFromEnd",
+                              "relativeToStepId",
+                              "timerAccumulatedSeconds",
+                              "timerLastStartedAt",
+                              "timerPausedAt",
+                              "timerStartedAt",
+                              "timerState",
+                              "timerStoppedAt"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "stepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "payloadJson": {
+                                "nullable": true,
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "kind",
+                              "message",
+                              "createdAt",
+                              "stepId"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "workspaceId",
+                        "recipeId",
+                        "code",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "startedAt",
+                        "pausedAt",
+                        "stoppedAt",
+                        "scheduledDate"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6360,6 +7596,236 @@
                     },
                     "brewSession": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "workspaceId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "recipeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduledDate": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "version"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "sectionId": {
+                                "type": "string"
+                              },
+                              "sectionName": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              },
+                              "isDisabled": {
+                                "type": "boolean"
+                              },
+                              "customTimerEnabled": {
+                                "type": "boolean"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "minutesPlanned": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "offsetMinutesFromEnd": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "relativeToStepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerAccumulatedSeconds": {
+                                "type": "number"
+                              },
+                              "timerLastStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerPausedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerState": {
+                                "type": "string"
+                              },
+                              "timerStoppedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "name",
+                              "status",
+                              "sortOrder",
+                              "sectionId",
+                              "sectionName",
+                              "createdAt",
+                              "updatedAt",
+                              "isDisabled",
+                              "customTimerEnabled",
+                              "note",
+                              "minutesPlanned",
+                              "offsetMinutesFromEnd",
+                              "relativeToStepId",
+                              "timerAccumulatedSeconds",
+                              "timerLastStartedAt",
+                              "timerPausedAt",
+                              "timerStartedAt",
+                              "timerState",
+                              "timerStoppedAt"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "stepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "payloadJson": {
+                                "nullable": true,
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "kind",
+                              "message",
+                              "createdAt",
+                              "stepId"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "workspaceId",
+                        "recipeId",
+                        "code",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "startedAt",
+                        "pausedAt",
+                        "stoppedAt",
+                        "scheduledDate"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6471,6 +7937,236 @@
                     },
                     "brewSession": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "workspaceId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "recipeId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduledDate": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "version"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "sectionId": {
+                                "type": "string"
+                              },
+                              "sectionName": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              },
+                              "isDisabled": {
+                                "type": "boolean"
+                              },
+                              "customTimerEnabled": {
+                                "type": "boolean"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "minutesPlanned": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "offsetMinutesFromEnd": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "relativeToStepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerAccumulatedSeconds": {
+                                "type": "number"
+                              },
+                              "timerLastStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerPausedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerStartedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timerState": {
+                                "type": "string"
+                              },
+                              "timerStoppedAt": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "name",
+                              "status",
+                              "sortOrder",
+                              "sectionId",
+                              "sectionName",
+                              "createdAt",
+                              "updatedAt",
+                              "isDisabled",
+                              "customTimerEnabled",
+                              "note",
+                              "minutesPlanned",
+                              "offsetMinutesFromEnd",
+                              "relativeToStepId",
+                              "timerAccumulatedSeconds",
+                              "timerLastStartedAt",
+                              "timerPausedAt",
+                              "timerStartedAt",
+                              "timerState",
+                              "timerStoppedAt"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "brewSessionId": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "stepId": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "payloadJson": {
+                                "nullable": true,
+                                "type": "object",
+                                "additionalProperties": {}
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "brewSessionId",
+                              "kind",
+                              "message",
+                              "createdAt",
+                              "stepId"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "workspaceId",
+                        "recipeId",
+                        "code",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "startedAt",
+                        "pausedAt",
+                        "stoppedAt",
+                        "scheduledDate"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6607,6 +8303,107 @@
                     },
                     "step": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "brewSessionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "sectionId": {
+                          "type": "string"
+                        },
+                        "sectionName": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "isDisabled": {
+                          "type": "boolean"
+                        },
+                        "customTimerEnabled": {
+                          "type": "boolean"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "minutesPlanned": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "offsetMinutesFromEnd": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "relativeToStepId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerAccumulatedSeconds": {
+                          "type": "number"
+                        },
+                        "timerLastStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerPausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerState": {
+                          "type": "string"
+                        },
+                        "timerStoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brewSessionId",
+                        "name",
+                        "status",
+                        "sortOrder",
+                        "sectionId",
+                        "sectionName",
+                        "createdAt",
+                        "updatedAt",
+                        "isDisabled",
+                        "customTimerEnabled",
+                        "note",
+                        "minutesPlanned",
+                        "offsetMinutesFromEnd",
+                        "relativeToStepId",
+                        "timerAccumulatedSeconds",
+                        "timerLastStartedAt",
+                        "timerPausedAt",
+                        "timerStartedAt",
+                        "timerState",
+                        "timerStoppedAt"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6708,6 +8505,107 @@
                     },
                     "step": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "brewSessionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "sectionId": {
+                          "type": "string"
+                        },
+                        "sectionName": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "isDisabled": {
+                          "type": "boolean"
+                        },
+                        "customTimerEnabled": {
+                          "type": "boolean"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "minutesPlanned": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "offsetMinutesFromEnd": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "relativeToStepId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerAccumulatedSeconds": {
+                          "type": "number"
+                        },
+                        "timerLastStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerPausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerState": {
+                          "type": "string"
+                        },
+                        "timerStoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brewSessionId",
+                        "name",
+                        "status",
+                        "sortOrder",
+                        "sectionId",
+                        "sectionName",
+                        "createdAt",
+                        "updatedAt",
+                        "isDisabled",
+                        "customTimerEnabled",
+                        "note",
+                        "minutesPlanned",
+                        "offsetMinutesFromEnd",
+                        "relativeToStepId",
+                        "timerAccumulatedSeconds",
+                        "timerLastStartedAt",
+                        "timerPausedAt",
+                        "timerStartedAt",
+                        "timerState",
+                        "timerStoppedAt"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6809,6 +8707,107 @@
                     },
                     "step": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "brewSessionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "sectionId": {
+                          "type": "string"
+                        },
+                        "sectionName": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "isDisabled": {
+                          "type": "boolean"
+                        },
+                        "customTimerEnabled": {
+                          "type": "boolean"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "minutesPlanned": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "offsetMinutesFromEnd": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "relativeToStepId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerAccumulatedSeconds": {
+                          "type": "number"
+                        },
+                        "timerLastStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerPausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerState": {
+                          "type": "string"
+                        },
+                        "timerStoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brewSessionId",
+                        "name",
+                        "status",
+                        "sortOrder",
+                        "sectionId",
+                        "sectionName",
+                        "createdAt",
+                        "updatedAt",
+                        "isDisabled",
+                        "customTimerEnabled",
+                        "note",
+                        "minutesPlanned",
+                        "offsetMinutesFromEnd",
+                        "relativeToStepId",
+                        "timerAccumulatedSeconds",
+                        "timerLastStartedAt",
+                        "timerPausedAt",
+                        "timerStartedAt",
+                        "timerState",
+                        "timerStoppedAt"
+                      ],
                       "additionalProperties": {}
                     }
                   },
@@ -6910,6 +8909,107 @@
                     },
                     "step": {
                       "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "brewSessionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "sectionId": {
+                          "type": "string"
+                        },
+                        "sectionName": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "isDisabled": {
+                          "type": "boolean"
+                        },
+                        "customTimerEnabled": {
+                          "type": "boolean"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "minutesPlanned": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "offsetMinutesFromEnd": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "relativeToStepId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerAccumulatedSeconds": {
+                          "type": "number"
+                        },
+                        "timerLastStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerPausedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerStartedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timerState": {
+                          "type": "string"
+                        },
+                        "timerStoppedAt": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brewSessionId",
+                        "name",
+                        "status",
+                        "sortOrder",
+                        "sectionId",
+                        "sectionName",
+                        "createdAt",
+                        "updatedAt",
+                        "isDisabled",
+                        "customTimerEnabled",
+                        "note",
+                        "minutesPlanned",
+                        "offsetMinutesFromEnd",
+                        "relativeToStepId",
+                        "timerAccumulatedSeconds",
+                        "timerLastStartedAt",
+                        "timerPausedAt",
+                        "timerStartedAt",
+                        "timerState",
+                        "timerStoppedAt"
+                      ],
                       "additionalProperties": {}
                     }
                   },

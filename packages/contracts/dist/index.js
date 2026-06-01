@@ -238,12 +238,15 @@ var BillingWorkspaceIdParamsSchema = z4.object({
   workspaceId: z4.string().trim().min(1, "Params.workspaceId is required")
 });
 var BillingPurchaseProviderSchema = z4.enum(["stripe", "apple", "google"]);
-var BillingPurchaseIntentModeSchema = z4.unknown().optional().transform((v) => v === "restore" ? "restore" : "purchase");
+var BillingPurchaseIntentModeSchema = z4.enum(["purchase", "restore"]);
 var BillingIntentRequestSchema = z4.object({
   planCode: z4.string().trim().min(1, "Body.planCode is required"),
   provider: BillingPurchaseProviderSchema,
-  mode: BillingPurchaseIntentModeSchema.optional()
-});
+  mode: z4.preprocess(
+    (v) => v === "restore" ? "restore" : v === "purchase" ? "purchase" : v,
+    BillingPurchaseIntentModeSchema
+  ).optional()
+}).strict();
 var BillingIntentResponseSchema = z4.object({
   ok: z4.literal(true),
   billingIntentId: z4.string().min(1),
@@ -277,7 +280,7 @@ var WorkspaceBillingResponseSchema = z4.object({
 });
 var BillingConfirmRequestSchema = z4.object({
   billingIntentId: z4.string().trim().min(1, "Body.billingIntentId is required")
-});
+}).strict();
 var BillingConfirmResponseSchema = z4.object({
   ok: z4.literal(true)
 });
@@ -446,7 +449,7 @@ var IntegrationDeviceReadingSchema = z6.object({
   receivedAt: isoDateTime4,
   temperatureC: z6.number().nullable(),
   gravitySg: z6.number().nullable(),
-  rawJson: z6.unknown().optional()
+  rawJson: z6.record(z6.string(), z6.unknown()).optional()
 });
 var IntegrationBrewSessionRefSchema = z6.object({
   id: z6.string().min(1),
@@ -469,7 +472,7 @@ var IntegrationDeviceSchema = z6.object({
   id: z6.string().min(1),
   deviceKey: z6.string().min(1),
   displayName: z6.string().nullable(),
-  metadataJson: z6.unknown().nullable(),
+  metadataJson: z6.record(z6.string(), z6.unknown()).nullable(),
   lastSeenAt: isoDateTime4.nullable(),
   createdAt: isoDateTime4,
   activeAttachment: IntegrationDeviceAttachmentSchema.nullable(),
@@ -573,7 +576,8 @@ var BeerJsonLooseSchema = z7.unknown();
 var PlatformImportFormatSchema = z7.enum(["beerjson", "beerxml"]);
 var workspaceIdPreprocess = z7.preprocess(
   (raw) => {
-    if (raw === null || typeof raw !== "object") return raw;
+    if (raw === null || raw === void 0) return {};
+    if (typeof raw !== "object") return raw;
     const r = raw;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
@@ -597,7 +601,8 @@ var PlatformRecipeImportPreviewResponseSchema = z7.object({
 });
 var PlatformRecipeImportRequestSchema = z7.preprocess(
   (raw) => {
-    if (raw === null || typeof raw !== "object") return raw;
+    if (raw === null || raw === void 0) return {};
+    if (typeof raw !== "object") return raw;
     const r = raw;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
@@ -820,6 +825,10 @@ var IngredientSyncResponseSchema = z9.object({
   result: IngredientSyncResultSchema
 });
 var RecipeImportFormatSchema = z9.enum(["beerjson", "beerxml"]);
+var RecipeImportWarningSchema = z9.object({
+  code: z9.string(),
+  message: z9.string()
+});
 var RecipeImportRequestSchema = z9.object({
   format: RecipeImportFormatSchema,
   content: z9.string().min(1),
@@ -839,7 +848,7 @@ var RecipeImportPreviewResponseSchema = z9.object({
 var RecipeImportResponseSchema = z9.object({
   ok: z9.literal(true),
   recipe: RecipePayloadSchema,
-  warnings: z9.array(z9.string()).optional()
+  warnings: z9.array(RecipeImportWarningSchema).optional()
 });
 var RecipeBulkImportPreviewItemSchema = z9.record(z9.string(), z9.unknown());
 var RecipeBulkImportPreviewResponseSchema = z9.object({
@@ -1467,7 +1476,8 @@ var RecipeWaterSettingsPutResponseSchema = z10.object({
   ok: z10.literal(true),
   settings: RecipeWaterSettingsPayloadSchema
 });
-var MashComputeAndSaveRequestSchema = z10.record(z10.string(), z10.unknown());
+var emptyObjectBody = (schema) => z10.preprocess((raw) => raw === null || raw === void 0 ? {} : raw, schema);
+var MashComputeAndSaveRequestSchema = emptyObjectBody(z10.record(z10.string(), z10.unknown()));
 var MashComputeAndSaveResponseSchema = z10.custom(
   (data) => {
     try {
@@ -1479,7 +1489,7 @@ var MashComputeAndSaveResponseSchema = z10.custom(
   },
   { message: "Invalid mash compute-and-save response" }
 );
-var SpargeComputeAndSaveRequestSchema = z10.record(z10.string(), z10.unknown());
+var SpargeComputeAndSaveRequestSchema = emptyObjectBody(z10.record(z10.string(), z10.unknown()));
 var SpargeComputeAndSaveResponseSchema = z10.custom(
   (data) => {
     try {
@@ -1491,7 +1501,7 @@ var SpargeComputeAndSaveResponseSchema = z10.custom(
   },
   { message: "Invalid sparge compute-and-save response" }
 );
-var BoilComputeAndSaveRequestSchema = z10.record(z10.string(), z10.unknown());
+var BoilComputeAndSaveRequestSchema = emptyObjectBody(z10.record(z10.string(), z10.unknown()));
 var BoilComputeAndSaveResponseSchema = z10.custom(
   (data) => {
     try {
@@ -1774,6 +1784,51 @@ var AiChatRequestBodySchema = z13.object({
   sessionId: z13.string().trim().min(1).max(200).optional(),
   routeId: z13.string().trim().min(1).max(128).optional()
 }).strict();
+var AiSseAssistantChunkEventSchema = z13.object({
+  type: z13.literal("assistant_chunk"),
+  text: z13.string()
+});
+var AiSseToolCallEventSchema = z13.object({
+  type: z13.literal("tool_call"),
+  name: z13.string(),
+  argsJson: z13.string()
+});
+var AiSseToolResultEventSchema = z13.object({
+  type: z13.literal("tool_result"),
+  name: z13.string(),
+  resultJson: z13.string(),
+  durationMs: z13.number(),
+  errored: z13.boolean()
+});
+var AiSseProposalEventSchema = z13.object({
+  type: z13.literal("proposal"),
+  proposalId: z13.string(),
+  moduleCode: z13.string(),
+  proposalType: z13.string(),
+  summary: z13.string()
+});
+var AiSseCompleteEventSchema = z13.object({
+  type: z13.literal("complete"),
+  usage: z13.object({
+    tokensIn: z13.number(),
+    tokensOut: z13.number(),
+    durationMs: z13.number(),
+    model: z13.string()
+  })
+});
+var AiSseErrorEventSchema = z13.object({
+  type: z13.literal("error"),
+  code: z13.string(),
+  message: z13.string()
+});
+var AiSseEventSchema = z13.discriminatedUnion("type", [
+  AiSseAssistantChunkEventSchema,
+  AiSseToolCallEventSchema,
+  AiSseToolResultEventSchema,
+  AiSseProposalEventSchema,
+  AiSseCompleteEventSchema,
+  AiSseErrorEventSchema
+]);
 
 // src/ai/aiProposals.ts
 import { z as z14 } from "zod";
@@ -1953,8 +2008,59 @@ var BrewSessionsListResponseSchema = z16.object({
 function parseBrewSessionsListResponse(payload) {
   return BrewSessionsListResponseSchema.parse(payload);
 }
-var BrewSessionPayloadSchema = z16.record(z16.string(), z16.unknown());
-var BrewSessionStepSchema = z16.record(z16.string(), z16.unknown());
+var BrewSessionRecipeRefSchema = z16.object({
+  id: z16.string().min(1),
+  name: z16.string(),
+  version: z16.number().int()
+});
+var BrewSessionLogSchema = z16.object({
+  id: z16.string().min(1),
+  brewSessionId: z16.string().min(1),
+  kind: z16.string(),
+  message: z16.string(),
+  createdAt: isoDateTime7,
+  stepId: z16.string().nullable(),
+  payloadJson: z16.record(z16.string(), z16.unknown()).nullable().optional()
+}).passthrough();
+var BrewSessionStepSchema = z16.object({
+  id: z16.string().min(1),
+  brewSessionId: z16.string().min(1),
+  name: z16.string(),
+  status: z16.string(),
+  sortOrder: z16.number().int(),
+  sectionId: z16.string(),
+  sectionName: z16.string().nullable(),
+  createdAt: isoDateTime7,
+  updatedAt: isoDateTime7,
+  isDisabled: z16.boolean(),
+  customTimerEnabled: z16.boolean(),
+  note: z16.string().nullable(),
+  minutesPlanned: z16.number().nullable(),
+  offsetMinutesFromEnd: z16.number().nullable(),
+  relativeToStepId: z16.string().nullable(),
+  timerAccumulatedSeconds: z16.number(),
+  timerLastStartedAt: isoDateTime7.nullable(),
+  timerPausedAt: isoDateTime7.nullable(),
+  timerStartedAt: isoDateTime7.nullable(),
+  timerState: z16.string(),
+  timerStoppedAt: isoDateTime7.nullable()
+}).passthrough();
+var BrewSessionPayloadSchema = z16.object({
+  id: z16.string().min(1),
+  workspaceId: z16.string().min(1),
+  recipeId: z16.string().min(1),
+  code: z16.string().nullable(),
+  status: z16.string(),
+  createdAt: isoDateTime7,
+  updatedAt: isoDateTime7,
+  startedAt: isoDateTime7.nullable(),
+  pausedAt: isoDateTime7.nullable(),
+  stoppedAt: isoDateTime7.nullable(),
+  scheduledDate: isoDateTime7.nullable(),
+  recipe: BrewSessionRecipeRefSchema.optional(),
+  steps: z16.array(BrewSessionStepSchema).optional(),
+  logs: z16.array(BrewSessionLogSchema).optional()
+}).passthrough();
 var BrewSessionDetailResponseSchema = z16.object({
   ok: z16.literal(true),
   brewSession: BrewSessionPayloadSchema
@@ -1981,9 +2087,12 @@ var BrewSessionStepsPatchRequestSchema = z16.object({
 var BrewSessionStepTimerPatchRequestSchema = z16.object({
   customTimerEnabled: z16.boolean()
 });
-var BrewSessionStopRequestSchema = z16.object({
-  reason: z16.enum(["auto", "manual"]).optional()
-});
+var BrewSessionStopRequestSchema = z16.preprocess(
+  (raw) => raw === null || raw === void 0 ? {} : raw,
+  z16.object({
+    reason: z16.enum(["auto", "manual"]).optional()
+  })
+);
 var BrewSessionStepLogRequestSchema = z16.object({
   status: z16.enum(["pending", "in_progress", "done", "skipped", "not_applicable"]),
   note: z16.string().nullable().optional(),
@@ -2041,6 +2150,13 @@ export {
   AiProposalStatusSchema,
   AiProviderSchema,
   AiRoleLimitsSchema,
+  AiSseAssistantChunkEventSchema,
+  AiSseCompleteEventSchema,
+  AiSseErrorEventSchema,
+  AiSseEventSchema,
+  AiSseProposalEventSchema,
+  AiSseToolCallEventSchema,
+  AiSseToolResultEventSchema,
   AiToolCallRecordSchema,
   AiUsageByUserSchema,
   AiUsageDailyPointSchema,
@@ -2081,8 +2197,10 @@ export {
   BrewSessionCreateResponseSchema,
   BrewSessionDetailResponseSchema,
   BrewSessionIdParamsSchema,
+  BrewSessionLogSchema,
   BrewSessionPatchRequestSchema,
   BrewSessionPayloadSchema,
+  BrewSessionRecipeRefSchema,
   BrewSessionStepLogRequestSchema,
   BrewSessionStepParamsSchema,
   BrewSessionStepResponseSchema,
@@ -2196,6 +2314,7 @@ export {
   RecipeImportPreviewResponseSchema,
   RecipeImportRequestSchema,
   RecipeImportResponseSchema,
+  RecipeImportWarningSchema,
   RecipeListResponseSchema,
   RecipePatchRequestSchema,
   RecipePayloadSchema,

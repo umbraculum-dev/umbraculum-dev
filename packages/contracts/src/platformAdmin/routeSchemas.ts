@@ -58,7 +58,8 @@ export const PlatformImportFormatSchema = z.enum(["beerjson", "beerxml"]);
 
 const workspaceIdPreprocess = z.preprocess(
   (raw) => {
-    if (raw === null || typeof raw !== "object") return raw;
+    if (raw === null || raw === undefined) return {};
+    if (typeof raw !== "object") return raw;
     const r = raw as Record<string, unknown>;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
@@ -85,7 +86,8 @@ export const PlatformRecipeImportPreviewResponseSchema = z.object({
 
 export const PlatformRecipeImportRequestSchema = z.preprocess(
   (raw) => {
-    if (raw === null || typeof raw !== "object") return raw;
+    if (raw === null || raw === undefined) return {};
+    if (typeof raw !== "object") return raw;
     const r = raw as Record<string, unknown>;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },

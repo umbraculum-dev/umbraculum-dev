@@ -93,7 +93,7 @@ export const IntegrationDeviceReadingSchema = z.object({
   receivedAt: isoDateTime,
   temperatureC: z.number().nullable(),
   gravitySg: z.number().nullable(),
-  rawJson: z.unknown().optional(),
+  rawJson: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const IntegrationBrewSessionRefSchema = z.object({
@@ -119,7 +119,7 @@ export const IntegrationDeviceSchema = z.object({
   id: z.string().min(1),
   deviceKey: z.string().min(1),
   displayName: z.string().nullable(),
-  metadataJson: z.unknown().nullable(),
+  metadataJson: z.record(z.string(), z.unknown()).nullable(),
   lastSeenAt: isoDateTime.nullable(),
   createdAt: isoDateTime,
   activeAttachment: IntegrationDeviceAttachmentSchema.nullable(),

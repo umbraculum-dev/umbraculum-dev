@@ -92,7 +92,10 @@ export const RecipeWaterSettingsPutResponseSchema = z.object({
   settings: RecipeWaterSettingsPayloadSchema,
 });
 
-export const MashComputeAndSaveRequestSchema = z.record(z.string(), z.unknown());
+const emptyObjectBody = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((raw) => (raw === null || raw === undefined ? {} : raw), schema);
+
+export const MashComputeAndSaveRequestSchema = emptyObjectBody(z.record(z.string(), z.unknown()));
 
 export const MashComputeAndSaveResponseSchema = z.custom<ReturnType<typeof parseMashComputeAndSaveResponse>>(
   (data) => {
@@ -106,7 +109,7 @@ export const MashComputeAndSaveResponseSchema = z.custom<ReturnType<typeof parse
   { message: "Invalid mash compute-and-save response" },
 );
 
-export const SpargeComputeAndSaveRequestSchema = z.record(z.string(), z.unknown());
+export const SpargeComputeAndSaveRequestSchema = emptyObjectBody(z.record(z.string(), z.unknown()));
 
 export const SpargeComputeAndSaveResponseSchema = z.custom<ReturnType<typeof parseSpargeComputeAndSaveResponse>>(
   (data) => {
@@ -120,7 +123,7 @@ export const SpargeComputeAndSaveResponseSchema = z.custom<ReturnType<typeof par
   { message: "Invalid sparge compute-and-save response" },
 );
 
-export const BoilComputeAndSaveRequestSchema = z.record(z.string(), z.unknown());
+export const BoilComputeAndSaveRequestSchema = emptyObjectBody(z.record(z.string(), z.unknown()));
 
 export const BoilComputeAndSaveResponseSchema = z.custom<ReturnType<typeof parseBoilComputeAndSaveResponse>>(
   (data) => {
