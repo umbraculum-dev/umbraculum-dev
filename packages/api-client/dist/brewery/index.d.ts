@@ -1,5 +1,5 @@
 import * as _umbraculum_contracts from '@umbraculum/contracts';
-import { BrewSessionsListResponse, RecipesListResponse, BoilComputeAndSaveResponseV1, MashComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from '@umbraculum/contracts';
+import { BrewSessionsListResponse, RecipesListResponse, WaterCalcResultOnlyResponseSchema, WaterCalcWithDerivationResponseSchema, BoilComputeAndSaveResponseV1, MashComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPutResponseSchema } from '@umbraculum/contracts';
 export { BoilComputeAndSaveResponseV1, BrewSessionListItem, MashComputeAndSaveResponseV1, RecipeListItem, SpargeComputeAndSaveResponseV1, WaterProfile, WaterProfilesResponse } from '@umbraculum/contracts';
 import { p as paths, a as ApiClient } from '../brewery.openapi-BgnnB0s0.js';
 
@@ -29,8 +29,42 @@ declare function patchRecipe(client: ApiClient, recipeId: string, patch: Record<
 type WaterHubSummaryPath = "/recipes/{id}/water-hub-summary";
 type WaterHubSummaryGet = paths[WaterHubSummaryPath]["get"];
 
-/** Thin wrapper — full water-calc facade family lands in a follow-on PR. */
+/** Recipe water hub summary for native/web water hub screens. */
 declare function getRecipeWaterHubSummary(client: ApiClient, recipeId: string): Promise<_umbraculum_contracts.RecipeWaterHubSummaryResponse>;
+
+type SaltAdditionsPath = "/water-calc/salt-additions";
+type SaltAdditionsPost = paths[SaltAdditionsPath]["post"];
+type MashPhEstimatePath = "/water-calc/mash-ph-estimate";
+type MashPhEstimatePost = paths[MashPhEstimatePath]["post"];
+type MashOverallPath = "/water-calc/mash-overall";
+type MashOverallPost = paths[MashOverallPath]["post"];
+type SpargeOverallPath = "/water-calc/sparge-overall";
+type SpargeOverallPost = paths[SpargeOverallPath]["post"];
+type BoilOverallPath = "/water-calc/boil-overall";
+type BoilOverallPost = paths[BoilOverallPath]["post"];
+type SpargeAcidificationPath = "/water-calc/sparge-acidification";
+type SpargeAcidificationPost = paths[SpargeAcidificationPath]["post"];
+type SpargeAcidificationManualPath = "/water-calc/sparge-acidification-manual";
+type SpargeAcidificationManualPost = paths[SpargeAcidificationManualPath]["post"];
+type MashAcidificationPath = "/water-calc/mash-acidification";
+type MashAcidificationPost = paths[MashAcidificationPath]["post"];
+type MashAcidificationManualPath = "/water-calc/mash-acidification-manual";
+type MashAcidificationManualPost = paths[MashAcidificationManualPath]["post"];
+type MashAcidificationTargetMashPhPath = "/water-calc/mash-acidification-target-mash-ph";
+type MashAcidificationTargetMashPhPost = paths[MashAcidificationTargetMashPhPath]["post"];
+type WaterCalcWithDerivationResponse = ReturnType<typeof WaterCalcWithDerivationResponseSchema.parse>;
+type WaterCalcResultOnlyResponse = ReturnType<typeof WaterCalcResultOnlyResponseSchema.parse>;
+
+declare function calcSaltAdditions(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function estimateMashPh(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcResultOnlyResponse>;
+declare function calcMashOverall(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcSpargeOverall(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcBoilOverall(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcSpargeAcidification(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcSpargeAcidificationManual(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcMashAcidification(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcMashAcidificationManual(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcWithDerivationResponse>;
+declare function calcMashAcidificationTargetMashPh(client: ApiClient, payload: Record<string, unknown>): Promise<WaterCalcResultOnlyResponse>;
 
 type MashComputeAndSavePath = "/recipes/{id}/water-settings/mash/compute-and-save";
 type MashComputeAndSavePost = paths[MashComputeAndSavePath]["post"];
@@ -76,4 +110,4 @@ type RecipeWaterSettingsPut = paths[RecipeWaterSettingsPath]["put"];
 declare function getRecipeWaterSettings(client: ApiClient, recipeId: string): Promise<ReturnType<typeof RecipeWaterSettingsGetResponseSchema.parse>>;
 declare function updateRecipeWaterSettings(client: ApiClient, recipeId: string, patch: Record<string, unknown>): Promise<ReturnType<typeof RecipeWaterSettingsPutResponseSchema.parse>>;
 
-export { type BoilComputeAndSavePost, type BrewSessionsListGet, type MashComputeAndSavePost, type RecipeDetailGet, type RecipeWaterSettingsGet, type RecipeWaterSettingsPut, type RecipesListGet, type SpargeComputeAndSavePost, type WaterHubSummaryGet, type WaterProfileDeleteDelete, type WaterProfileUnverifyPost, type WaterProfileVerifyPost, type WaterProfilesCreatePost, type WaterProfilesListGet, computeAndSaveBoil, computeAndSaveMash, computeAndSaveSparge, createBrewSession, createWaterProfile, deleteWaterProfile, getRecipe, getRecipeWaterHubSummary, getRecipeWaterSettings, listBrewSessionsForRecipe, listRecipes, listWaterProfiles, patchRecipe, unverifyWaterProfile, updateRecipeWaterSettings, verifyWaterProfile };
+export { type BoilComputeAndSavePost, type BoilOverallPost, type BrewSessionsListGet, type MashAcidificationManualPost, type MashAcidificationPost, type MashAcidificationTargetMashPhPost, type MashComputeAndSavePost, type MashOverallPost, type MashPhEstimatePost, type RecipeDetailGet, type RecipeWaterSettingsGet, type RecipeWaterSettingsPut, type RecipesListGet, type SaltAdditionsPost, type SpargeAcidificationManualPost, type SpargeAcidificationPost, type SpargeComputeAndSavePost, type SpargeOverallPost, type WaterCalcResultOnlyResponse, type WaterCalcWithDerivationResponse, type WaterHubSummaryGet, type WaterProfileDeleteDelete, type WaterProfileUnverifyPost, type WaterProfileVerifyPost, type WaterProfilesCreatePost, type WaterProfilesListGet, calcBoilOverall, calcMashAcidification, calcMashAcidificationManual, calcMashAcidificationTargetMashPh, calcMashOverall, calcSaltAdditions, calcSpargeAcidification, calcSpargeAcidificationManual, calcSpargeOverall, computeAndSaveBoil, computeAndSaveMash, computeAndSaveSparge, createBrewSession, createWaterProfile, deleteWaterProfile, estimateMashPh, getRecipe, getRecipeWaterHubSummary, getRecipeWaterSettings, listBrewSessionsForRecipe, listRecipes, listWaterProfiles, patchRecipe, unverifyWaterProfile, updateRecipeWaterSettings, verifyWaterProfile };

@@ -144,17 +144,23 @@ Phase E adds **hand-written facades** on `@umbraculum/api-client`: OpenAPI path 
 | Export | Scope |
 |--------|--------|
 | Main entry `@umbraculum/api-client` | Platform facades: auth, workspaces, health, billing, integrations list, rendering jobs |
-| Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water profiles/settings/compute-and-save, hub summary |
+| Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water profiles/settings/compute-and-save/calc preview, hub summary |
 
-**Pilot consumers:** `apps/native` (recipes/brew-sessions lists; all `Water*` screens), `apps/web` (`renderJobClient` → platform rendering facades).
+**Pilot consumers:** `apps/native` (recipes/brew-sessions lists; all `Water*` screens), `apps/web` (`renderJobClient` → platform rendering; `breweryWaterClient` → recipe water pages + water-profiles).
 
-**Plans:** OpenAPI Phase E + F10 (`openapi_phase_e_f10_7a3c2d91`); Phase E5 water facades (`openapi_phase_e5_water_10eb23aa`).
+**Plans:** OpenAPI Phase E + F10 (`openapi_phase_e_f10_7a3c2d91`); Phase E5 water facades (`openapi_phase_e5_water_10eb23aa`); Phase E6 web water + `/water-calc/*` (`openapi_phase_e6_web_5fd28069`).
 
 ---
 
 ## Phase E5 — brewery water facades (2026-06-01)
 
 Phase E5 completes deferred E2 PR2: typed `@umbraculum/api-client/brewery` facades for native water hot paths (`/water-profiles`, `/recipes/{id}/water-settings`, mash/sparge/boil compute-and-save). Standalone `/water-calc/*` (web interactive preview) remains Phase E6.
+
+---
+
+## Phase E6 — standalone water-calc facades + web migration (2026-06-01)
+
+Phase E6 adds all **10** `/water-calc/*` POST facades on `@umbraculum/api-client/brewery` (`waterCalc.ts`) and migrates web recipe water pages + standalone water-profiles page off raw `apiFetch` to typed facades via `apps/web/app/_lib/breweryWaterClient.ts` (`webBreweryApiClient()` + `cookieAuth()`). Completes the Phase E water family after E5 (native recipe-scoped paths).
 
 ---
 

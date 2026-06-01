@@ -10,17 +10,22 @@ import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../../../_components/recipe-edit";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
-import { parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { Button, H1, H2, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
 
+import {
+  calcBoilOverall,
+  calcSaltAdditions,
+  computeAndSaveBoil,
+  listWaterProfiles,
+} from "@umbraculum/api-client/brewery";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseBoilComputeAndSaveResponse } from "@umbraculum/contracts";
 import type { WaterCalcDerivation } from "@umbraculum/contracts";
 import { asRecord } from "../../../../_lib/typeGuards";
 import { formatWithHint } from "../../../../../src/i18n/format";
@@ -194,9 +199,8 @@ export default function BoilWaterPage() {
     setProfilesError(null);
     setLoadingProfiles(true);
     try {
-      const profRes = await apiFetch("/api/water-profiles");
-      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(parseWaterProfilesResponse(profRes.data));
+      const profilesRes = await listWaterProfiles(webBreweryApiClient());
+      setProfiles(profilesRes);
     } catch (err) {
       setProfilesError(String(err));
     } finally {
@@ -476,28 +480,21 @@ export default function BoilWaterPage() {
     setSaltDerivation(null);
     setSaltsSubmitting(true);
     try {
-      const res = await apiFetch("/api/water-calc/salt-additions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          volumeLiters: mixedSourceProfile.totalVolumeLiters,
-          baseProfile: {
-            calcium: mixedSourceProfile.calcium,
-            magnesium: mixedSourceProfile.magnesium,
-            sodium: mixedSourceProfile.sodium,
-            sulfate: mixedSourceProfile.sulfate,
-            chloride: mixedSourceProfile.chloride,
-            bicarbonate: mixedSourceProfile.bicarbonate,
-          },
-          additions: saltAdditions,
-        }),
+      const data = await calcSaltAdditions(webBreweryApiClient(), {
+        volumeLiters: mixedSourceProfile.totalVolumeLiters,
+        baseProfile: {
+          calcium: mixedSourceProfile.calcium,
+          magnesium: mixedSourceProfile.magnesium,
+          sodium: mixedSourceProfile.sodium,
+          sulfate: mixedSourceProfile.sulfate,
+          chloride: mixedSourceProfile.chloride,
+          bicarbonate: mixedSourceProfile.bicarbonate,
+        },
+        additions: saltAdditions,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const dataRec = asRecord(res.data) ?? {};
-      const result = dataRec['result'] as SaltAdditionsResult;
-      const derivationRec = asRecord(dataRec['derivation']);
+      const result = data.result as SaltAdditionsResult;
       setSaltsResult(result);
-      setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
+      setSaltDerivation(data.derivation as WaterCalcDerivation);
 
       await saveSettings({
         boilSaltAdditionsJson: saltAdditions,
@@ -599,13 +596,7 @@ export default function BoilWaterPage() {
       boilSaltAdditionsJson: saltAdditions,
     };
 
-    const res = await apiFetch(`/api/recipes/${recipeId}/water-settings/boil/compute-and-save`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(JSON.stringify(res.data));
-    return parseBoilComputeAndSaveResponse(res.data);
+    return computeAndSaveBoil(webBreweryApiClient(), recipeId, payload);
   };
 
   const onSubmitAcid = async (e: React.FormEvent) => {
@@ -694,16 +685,9 @@ export default function BoilWaterPage() {
       );
     }
 
-    const res = await apiFetch("/api/water-calc/boil-overall", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const bodyRec = asRecord(res.data) ?? {};
-    const derivationRec = asRecord(bodyRec['derivation']);
-    setOverallDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
-    return bodyRec['result'] as BoilOverallResultV0;
+    const data = await calcBoilOverall(webBreweryApiClient(), payload);
+    setOverallDerivation(data.derivation as WaterCalcDerivation);
+    return data.result as BoilOverallResultV0;
   };
 
   const onCalculateOverall = async (saveAlso: boolean) => {

@@ -9,7 +9,6 @@ import { BrewSelect } from "../../../../_components/BrewSelect";
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@umbraculum/brewery-recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
-import { parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { Accordion, Button, H3, Input, SizableText, View, XStack, YStack } from "tamagui";
@@ -19,12 +18,18 @@ import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta
 import { BrewAccordionHeader } from "../../../../_components/BrewAccordionHeader";
 import { asRecord } from "../../../../_lib/typeGuards";
 
+import {
+  calcSaltAdditions,
+  calcSpargeOverall,
+  computeAndSaveSparge,
+  listWaterProfiles,
+} from "@umbraculum/api-client/brewery";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseSpargeComputeAndSaveResponse } from "@umbraculum/contracts";
 import type { WaterCalcDerivation, WaterOverallResult } from "@umbraculum/contracts";
 import { formatFixed, formatWithHint } from "../../../../../src/i18n/format";
 import { fetchRecipeWaterSettings, saveRecipeWaterSettings } from "../_lib/waterSettings";
@@ -177,9 +182,8 @@ export default function SpargeWaterPage() {
     setProfilesError(null);
     setLoadingProfiles(true);
     try {
-      const profRes = await apiFetch("/api/water-profiles");
-      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(parseWaterProfilesResponse(profRes.data));
+      const profilesRes = await listWaterProfiles(webBreweryApiClient());
+      setProfiles(profilesRes);
     } catch (err) {
       setProfilesError(String(err));
     } finally {
@@ -415,13 +419,7 @@ export default function SpargeWaterPage() {
         spargeManualAcidAddedGrams: strengthKind === "solid" ? spargeManualAcidAdded : null,
       };
 
-      const res = await apiFetch(`/api/recipes/${recipeId}/water-settings/sparge/compute-and-save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const computed = parseSpargeComputeAndSaveResponse(res.data);
+      const computed = await computeAndSaveSparge(webBreweryApiClient(), recipeId, payload);
       setFormatHints(computed.formatHints as Record<string, { decimals?: number }> | undefined);
 
       setSpargeSaltsResult(computed.salts.result as unknown as SaltAdditionsResult);
@@ -517,20 +515,13 @@ export default function SpargeWaterPage() {
     }
 
     setSpargeSaltsStatus("Calculating salts for acidification…");
-    const res = await apiFetch("/api/water-calc/salt-additions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        volumeLiters,
-        baseProfile: base,
-        additions: spargeSaltAdditions,
-      }),
+    const data = await calcSaltAdditions(webBreweryApiClient(), {
+      volumeLiters,
+      baseProfile: base,
+      additions: spargeSaltAdditions,
     });
-    if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const dataRec = asRecord(res.data) ?? {};
-    const result = dataRec['result'] as SaltAdditionsResult;
-    const derivationRec = asRecord(dataRec['derivation']);
-    setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
+    const result = data.result as SaltAdditionsResult;
+    setSaltDerivation(data.derivation as WaterCalcDerivation);
 
     const nowIso = new Date().toISOString();
     setSpargeSaltsResult(result);
@@ -554,28 +545,21 @@ export default function SpargeWaterPage() {
       if (!Number.isFinite(volumeLiters) || !(volumeLiters > 0)) throw new Error("Sparge water volume must be > 0.");
 
       setSpargeSaltsInputsKey(buildSpargeSaltsInputsKey());
-      const res = await apiFetch("/api/water-calc/salt-additions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          volumeLiters,
-          baseProfile: {
-            calcium: selectedSpargeProfile.calcium,
-            magnesium: selectedSpargeProfile.magnesium,
-            sodium: selectedSpargeProfile.sodium,
-            sulfate: selectedSpargeProfile.sulfate,
-            chloride: selectedSpargeProfile.chloride,
-            bicarbonate: selectedSpargeProfile.bicarbonate,
-          },
-          additions: spargeSaltAdditions,
-        }),
+      const data = await calcSaltAdditions(webBreweryApiClient(), {
+        volumeLiters,
+        baseProfile: {
+          calcium: selectedSpargeProfile.calcium,
+          magnesium: selectedSpargeProfile.magnesium,
+          sodium: selectedSpargeProfile.sodium,
+          sulfate: selectedSpargeProfile.sulfate,
+          chloride: selectedSpargeProfile.chloride,
+          bicarbonate: selectedSpargeProfile.bicarbonate,
+        },
+        additions: spargeSaltAdditions,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const dataRec = asRecord(res.data) ?? {};
-      const result = dataRec['result'] as SaltAdditionsResult;
-      const derivationRec = asRecord(dataRec['derivation']);
+      const result = data.result as SaltAdditionsResult;
       setSpargeSaltsResult(result);
-      setSaltDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
+      setSaltDerivation(data.derivation as WaterCalcDerivation);
       await refreshSpargeOverallIfPossible().catch(() => null);
 
       await saveSettings({
@@ -625,21 +609,18 @@ export default function SpargeWaterPage() {
       );
     }
 
-    const res = await apiFetch("/api/water-calc/sparge-overall", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) return;
-    const dataRec = asRecord(res.data);
-    if (!dataRec) return;
-    const result = asRecord(dataRec['result']);
-    const derivation = asRecord(dataRec['derivation']);
-    if (!result || !derivation) return;
-    setSpargeOverall({
-      result: result as unknown as WaterOverallResult,
-      derivation: derivation as unknown as WaterCalcDerivation,
-    });
+    try {
+      const data = await calcSpargeOverall(webBreweryApiClient(), payload);
+      const result = asRecord(data.result);
+      const derivation = asRecord(data.derivation);
+      if (!result || !derivation) return;
+      setSpargeOverall({
+        result: result as unknown as WaterOverallResult,
+        derivation: derivation as unknown as WaterCalcDerivation,
+      });
+    } catch {
+      return;
+    }
   };
 
   const selectedSpargeProfileInfo = selectedSpargeProfile ? (

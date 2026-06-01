@@ -20,12 +20,22 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/brewery/index.ts
 var brewery_exports = {};
 __export(brewery_exports, {
+  calcBoilOverall: () => calcBoilOverall,
+  calcMashAcidification: () => calcMashAcidification,
+  calcMashAcidificationManual: () => calcMashAcidificationManual,
+  calcMashAcidificationTargetMashPh: () => calcMashAcidificationTargetMashPh,
+  calcMashOverall: () => calcMashOverall,
+  calcSaltAdditions: () => calcSaltAdditions,
+  calcSpargeAcidification: () => calcSpargeAcidification,
+  calcSpargeAcidificationManual: () => calcSpargeAcidificationManual,
+  calcSpargeOverall: () => calcSpargeOverall,
   computeAndSaveBoil: () => computeAndSaveBoil,
   computeAndSaveMash: () => computeAndSaveMash,
   computeAndSaveSparge: () => computeAndSaveSparge,
   createBrewSession: () => createBrewSession,
   createWaterProfile: () => createWaterProfile,
   deleteWaterProfile: () => deleteWaterProfile,
+  estimateMashPh: () => estimateMashPh,
   getRecipe: () => getRecipe,
   getRecipeWaterHubSummary: () => getRecipeWaterHubSummary,
   getRecipeWaterSettings: () => getRecipeWaterSettings,
@@ -138,14 +148,63 @@ async function getRecipeWaterHubSummary(client, recipeId) {
   );
 }
 
-// src/brewery/waterCompute.ts
+// src/brewery/waterCalc.ts
 var import_contracts3 = require("@umbraculum/contracts");
+function postWithDerivation(client, path, payload) {
+  return postParsed(
+    client,
+    toClientPath(path),
+    payload,
+    (data) => import_contracts3.WaterCalcWithDerivationResponseSchema.parse(data)
+  );
+}
+function postResultOnly(client, path, payload) {
+  return postParsed(
+    client,
+    toClientPath(path),
+    payload,
+    (data) => import_contracts3.WaterCalcResultOnlyResponseSchema.parse(data)
+  );
+}
+async function calcSaltAdditions(client, payload) {
+  return postWithDerivation(client, "/water-calc/salt-additions", payload);
+}
+async function estimateMashPh(client, payload) {
+  return postResultOnly(client, "/water-calc/mash-ph-estimate", payload);
+}
+async function calcMashOverall(client, payload) {
+  return postWithDerivation(client, "/water-calc/mash-overall", payload);
+}
+async function calcSpargeOverall(client, payload) {
+  return postWithDerivation(client, "/water-calc/sparge-overall", payload);
+}
+async function calcBoilOverall(client, payload) {
+  return postWithDerivation(client, "/water-calc/boil-overall", payload);
+}
+async function calcSpargeAcidification(client, payload) {
+  return postWithDerivation(client, "/water-calc/sparge-acidification", payload);
+}
+async function calcSpargeAcidificationManual(client, payload) {
+  return postWithDerivation(client, "/water-calc/sparge-acidification-manual", payload);
+}
+async function calcMashAcidification(client, payload) {
+  return postWithDerivation(client, "/water-calc/mash-acidification", payload);
+}
+async function calcMashAcidificationManual(client, payload) {
+  return postWithDerivation(client, "/water-calc/mash-acidification-manual", payload);
+}
+async function calcMashAcidificationTargetMashPh(client, payload) {
+  return postResultOnly(client, "/water-calc/mash-acidification-target-mash-ph", payload);
+}
+
+// src/brewery/waterCompute.ts
+var import_contracts4 = require("@umbraculum/contracts");
 async function computeAndSaveMash(client, recipeId, payload) {
   return postParsed(
     client,
     toClientPath(`/recipes/${encodeURIComponent(recipeId)}/water-settings/mash/compute-and-save`),
     payload,
-    import_contracts3.parseMashComputeAndSaveResponse
+    import_contracts4.parseMashComputeAndSaveResponse
   );
 }
 async function computeAndSaveSparge(client, recipeId, payload) {
@@ -153,7 +212,7 @@ async function computeAndSaveSparge(client, recipeId, payload) {
     client,
     toClientPath(`/recipes/${encodeURIComponent(recipeId)}/water-settings/sparge/compute-and-save`),
     payload,
-    import_contracts3.parseSpargeComputeAndSaveResponse
+    import_contracts4.parseSpargeComputeAndSaveResponse
   );
 }
 async function computeAndSaveBoil(client, recipeId, payload) {
@@ -161,22 +220,22 @@ async function computeAndSaveBoil(client, recipeId, payload) {
     client,
     toClientPath(`/recipes/${encodeURIComponent(recipeId)}/water-settings/boil/compute-and-save`),
     payload,
-    import_contracts3.parseBoilComputeAndSaveResponse
+    import_contracts4.parseBoilComputeAndSaveResponse
   );
 }
 
 // src/brewery/waterProfiles.ts
-var import_contracts4 = require("@umbraculum/contracts");
+var import_contracts5 = require("@umbraculum/contracts");
 async function listWaterProfiles(client) {
-  return getParsed(client, toClientPath("/water-profiles"), import_contracts4.parseWaterProfilesResponse);
+  return getParsed(client, toClientPath("/water-profiles"), import_contracts5.parseWaterProfilesResponse);
 }
 async function createWaterProfile(client, body) {
-  const parsedBody = import_contracts4.WaterProfileCreateRequestSchema.parse(body);
+  const parsedBody = import_contracts5.WaterProfileCreateRequestSchema.parse(body);
   return postParsed(
     client,
     toClientPath("/water-profiles"),
     parsedBody,
-    (data) => import_contracts4.WaterProfileResponseSchema.parse(data)
+    (data) => import_contracts5.WaterProfileResponseSchema.parse(data)
   );
 }
 async function verifyWaterProfile(client, profileId) {
@@ -184,7 +243,7 @@ async function verifyWaterProfile(client, profileId) {
     client,
     toClientPath(`/water-profiles/${encodeURIComponent(profileId)}/verify`),
     {},
-    (data) => import_contracts4.OkResponseSchema.parse(data)
+    (data) => import_contracts5.OkResponseSchema.parse(data)
   );
 }
 async function unverifyWaterProfile(client, profileId) {
@@ -192,24 +251,24 @@ async function unverifyWaterProfile(client, profileId) {
     client,
     toClientPath(`/water-profiles/${encodeURIComponent(profileId)}/unverify`),
     {},
-    (data) => import_contracts4.OkResponseSchema.parse(data)
+    (data) => import_contracts5.OkResponseSchema.parse(data)
   );
 }
 async function deleteWaterProfile(client, profileId) {
   return deleteParsed(
     client,
     toClientPath(`/water-profiles/${encodeURIComponent(profileId)}`),
-    (data) => import_contracts4.OkResponseSchema.parse(data)
+    (data) => import_contracts5.OkResponseSchema.parse(data)
   );
 }
 
 // src/brewery/waterSettings.ts
-var import_contracts5 = require("@umbraculum/contracts");
+var import_contracts6 = require("@umbraculum/contracts");
 async function getRecipeWaterSettings(client, recipeId) {
   return getParsed(
     client,
     toClientPath(`/recipes/${encodeURIComponent(recipeId)}/water-settings`),
-    (data) => import_contracts5.RecipeWaterSettingsGetResponseSchema.parse(data)
+    (data) => import_contracts6.RecipeWaterSettingsGetResponseSchema.parse(data)
   );
 }
 async function updateRecipeWaterSettings(client, recipeId, patch) {
@@ -217,17 +276,27 @@ async function updateRecipeWaterSettings(client, recipeId, patch) {
     client,
     toClientPath(`/recipes/${encodeURIComponent(recipeId)}/water-settings`),
     patch,
-    (data) => import_contracts5.RecipeWaterSettingsPutResponseSchema.parse(data)
+    (data) => import_contracts6.RecipeWaterSettingsPutResponseSchema.parse(data)
   );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  calcBoilOverall,
+  calcMashAcidification,
+  calcMashAcidificationManual,
+  calcMashAcidificationTargetMashPh,
+  calcMashOverall,
+  calcSaltAdditions,
+  calcSpargeAcidification,
+  calcSpargeAcidificationManual,
+  calcSpargeOverall,
   computeAndSaveBoil,
   computeAndSaveMash,
   computeAndSaveSparge,
   createBrewSession,
   createWaterProfile,
   deleteWaterProfile,
+  estimateMashPh,
   getRecipe,
   getRecipeWaterHubSummary,
   getRecipeWaterSettings,

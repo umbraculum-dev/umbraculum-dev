@@ -30,6 +30,7 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 | `brewery/waterProfiles` | `listWaterProfiles`, `createWaterProfile`, `verifyWaterProfile`, `unverifyWaterProfile`, `deleteWaterProfile` | `parseWaterProfilesResponse`, `WaterProfileResponseSchema`, `OkResponseSchema` |
 | `brewery/waterSettings` | `getRecipeWaterSettings`, `updateRecipeWaterSettings` | `RecipeWaterSettings*ResponseSchema` |
 | `brewery/waterCompute` | `computeAndSaveMash`, `computeAndSaveSparge`, `computeAndSaveBoil` | `parseMashComputeAndSaveResponse`, … |
+| `brewery/waterCalc` | `calcSaltAdditions`, `estimateMashPh`, `calcMashOverall`, `calcSpargeOverall`, `calcBoilOverall`, … (10 `/water-calc/*` POSTs) | `WaterCalcWithDerivationResponseSchema`, `WaterCalcResultOnlyResponseSchema` |
 | `brewery/water` | `getRecipeWaterHubSummary` | `parseRecipeWaterHubSummaryResponse` |
 
 Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts).

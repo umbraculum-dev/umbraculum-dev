@@ -59,6 +59,58 @@ async function getRecipeWaterHubSummary(client, recipeId) {
   );
 }
 
+// src/brewery/waterCalc.ts
+import {
+  WaterCalcResultOnlyResponseSchema,
+  WaterCalcWithDerivationResponseSchema
+} from "@umbraculum/contracts";
+function postWithDerivation(client, path, payload) {
+  return postParsed(
+    client,
+    toClientPath(path),
+    payload,
+    (data) => WaterCalcWithDerivationResponseSchema.parse(data)
+  );
+}
+function postResultOnly(client, path, payload) {
+  return postParsed(
+    client,
+    toClientPath(path),
+    payload,
+    (data) => WaterCalcResultOnlyResponseSchema.parse(data)
+  );
+}
+async function calcSaltAdditions(client, payload) {
+  return postWithDerivation(client, "/water-calc/salt-additions", payload);
+}
+async function estimateMashPh(client, payload) {
+  return postResultOnly(client, "/water-calc/mash-ph-estimate", payload);
+}
+async function calcMashOverall(client, payload) {
+  return postWithDerivation(client, "/water-calc/mash-overall", payload);
+}
+async function calcSpargeOverall(client, payload) {
+  return postWithDerivation(client, "/water-calc/sparge-overall", payload);
+}
+async function calcBoilOverall(client, payload) {
+  return postWithDerivation(client, "/water-calc/boil-overall", payload);
+}
+async function calcSpargeAcidification(client, payload) {
+  return postWithDerivation(client, "/water-calc/sparge-acidification", payload);
+}
+async function calcSpargeAcidificationManual(client, payload) {
+  return postWithDerivation(client, "/water-calc/sparge-acidification-manual", payload);
+}
+async function calcMashAcidification(client, payload) {
+  return postWithDerivation(client, "/water-calc/mash-acidification", payload);
+}
+async function calcMashAcidificationManual(client, payload) {
+  return postWithDerivation(client, "/water-calc/mash-acidification-manual", payload);
+}
+async function calcMashAcidificationTargetMashPh(client, payload) {
+  return postResultOnly(client, "/water-calc/mash-acidification-target-mash-ph", payload);
+}
+
 // src/brewery/waterCompute.ts
 import {
   parseBoilComputeAndSaveResponse,
@@ -154,12 +206,22 @@ async function updateRecipeWaterSettings(client, recipeId, patch) {
   );
 }
 export {
+  calcBoilOverall,
+  calcMashAcidification,
+  calcMashAcidificationManual,
+  calcMashAcidificationTargetMashPh,
+  calcMashOverall,
+  calcSaltAdditions,
+  calcSpargeAcidification,
+  calcSpargeAcidificationManual,
+  calcSpargeOverall,
   computeAndSaveBoil,
   computeAndSaveMash,
   computeAndSaveSparge,
   createBrewSession,
   createWaterProfile,
   deleteWaterProfile,
+  estimateMashPh,
   getRecipe,
   getRecipeWaterHubSummary,
   getRecipeWaterSettings,

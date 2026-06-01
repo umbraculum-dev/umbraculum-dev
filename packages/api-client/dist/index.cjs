@@ -162,7 +162,17 @@ var BREWERY_FACADE_PARSER_MAP = {
   "/recipes/{id}/water-settings": "RecipeWaterSettingsGetResponseSchema / RecipeWaterSettingsPutResponseSchema",
   "/recipes/{id}/water-settings/mash/compute-and-save": "parseMashComputeAndSaveResponse",
   "/recipes/{id}/water-settings/sparge/compute-and-save": "parseSpargeComputeAndSaveResponse",
-  "/recipes/{id}/water-settings/boil/compute-and-save": "parseBoilComputeAndSaveResponse"
+  "/recipes/{id}/water-settings/boil/compute-and-save": "parseBoilComputeAndSaveResponse",
+  "/water-calc/salt-additions": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/mash-ph-estimate": "WaterCalcResultOnlyResponseSchema",
+  "/water-calc/mash-overall": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/sparge-overall": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/boil-overall": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/sparge-acidification": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/sparge-acidification-manual": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/mash-acidification": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/mash-acidification-manual": "WaterCalcWithDerivationResponseSchema",
+  "/water-calc/mash-acidification-target-mash-ph": "WaterCalcResultOnlyResponseSchema"
 };
 
 // src/platform/auth.ts

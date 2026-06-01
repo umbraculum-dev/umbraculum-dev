@@ -7,8 +7,16 @@ import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } f
 import { Link } from "../../../../src/i18n/navigation";
 
 import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse } from "@umbraculum/contracts";
+import {
+  createWaterProfile,
+  deleteWaterProfile,
+  listWaterProfiles,
+  unverifyWaterProfile,
+  verifyWaterProfile,
+} from "@umbraculum/api-client/brewery";
 
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { apiFetch } from "../../../_lib/apiClient";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
@@ -56,9 +64,7 @@ export default function WaterProfilesPage() {
         setMe(null);
       }
 
-      const profRes = await apiFetch("/api/water-profiles");
-      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(parseWaterProfilesResponse(profRes.data));
+      setProfiles(await listWaterProfiles(webBreweryApiClient()));
     } catch (err) {
       setError(String(err));
     } finally {
@@ -85,18 +91,13 @@ export default function WaterProfilesPage() {
     setCreateError(null);
     setCreateSubmitting(true);
     try {
-      const res = await apiFetch("/api/water-profiles", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scope: createScope,
-          type: createType,
-          name: createName,
-          ph: createPh.trim() === "" ? null : Number(createPh),
-          ...createIon,
-        }),
+      await createWaterProfile(webBreweryApiClient(), {
+        scope: createScope,
+        type: createType,
+        name: createName,
+        ph: createPh.trim() === "" ? null : Number(createPh),
+        ...createIon,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setCreateName("");
       setCreatePh("");
       setCreateIon({
@@ -116,8 +117,12 @@ export default function WaterProfilesPage() {
   };
 
   const onToggleVerify = async (p: WaterProfile) => {
-    const action = p.verificationStatus === "verified" ? "unverify" : "verify";
-    await apiFetch(`/api/water-profiles/${p.id}/${action}`, { method: "POST" });
+    const client = webBreweryApiClient();
+    if (p.verificationStatus === "verified") {
+      await unverifyWaterProfile(client, p.id);
+    } else {
+      await verifyWaterProfile(client, p.id);
+    }
     await refresh();
   };
 
@@ -127,8 +132,7 @@ export default function WaterProfilesPage() {
     if (!ok) return;
     setError(null);
     try {
-      const res = await apiFetch(`/api/water-profiles/${p.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      await deleteWaterProfile(webBreweryApiClient(), p.id);
       await refresh();
     } catch (err) {
       setError(String(err));

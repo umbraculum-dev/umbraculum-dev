@@ -22,8 +22,16 @@ import { ErrorBox, FieldBadge, MessageBox, RecipeEditFieldLabel } from "../../..
 import { SaltAdditionsEditor, type SaltAdditionRow, type SaltKey } from "@umbraculum/brewery-recipes-ui";
 import { MathHelpPopover } from "../../../../_components/MathHelpPopover";
 import { SurfaceMathToggleRow } from "../../../../_components/SurfaceMathToggleRow";
+import {
+  calcMashOverall,
+  calcSaltAdditions,
+  computeAndSaveMash,
+  estimateMashPh,
+  listWaterProfiles,
+} from "@umbraculum/api-client/brewery";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
-import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
@@ -36,7 +44,7 @@ import {
 } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
 import { buildWaterMathBody } from "../_lib/mathBodies";
-import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse } from "@umbraculum/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
 import type { WaterCalcDerivation } from "@umbraculum/contracts";
 import { asRecord } from "../../../../_lib/typeGuards";
 import { DEFAULT_MASH_TARGET_PH } from "@umbraculum/brewery-core";
@@ -224,9 +232,8 @@ export default function MashWaterPage() {
       const meRes = await apiFetch("/api/auth/me");
       setMe(meRes.ok ? parseAuthMeResponse(meRes.data) : null);
 
-      const profRes = await apiFetch("/api/water-profiles");
-      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(parseWaterProfilesResponse(profRes.data));
+      const profilesRes = await listWaterProfiles(webBreweryApiClient());
+      setProfiles(profilesRes);
     } catch (err) {
       setProfilesError(String(err));
     } finally {
@@ -656,28 +663,21 @@ export default function MashWaterPage() {
     setSaltsResult(null);
     setSaltsSubmitting(true);
     try {
-      const res = await apiFetch("/api/water-calc/salt-additions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          volumeLiters: mixedSourceProfile.totalVolumeLiters,
-          baseProfile: {
-            calcium: mixedSourceProfile.calcium,
-            magnesium: mixedSourceProfile.magnesium,
-            sodium: mixedSourceProfile.sodium,
-            sulfate: mixedSourceProfile.sulfate,
-            chloride: mixedSourceProfile.chloride,
-            bicarbonate: mixedSourceProfile.bicarbonate,
-          },
-          additions: saltAdditions,
-        }),
+      const data = await calcSaltAdditions(webBreweryApiClient(), {
+        volumeLiters: mixedSourceProfile.totalVolumeLiters,
+        baseProfile: {
+          calcium: mixedSourceProfile.calcium,
+          magnesium: mixedSourceProfile.magnesium,
+          sodium: mixedSourceProfile.sodium,
+          sulfate: mixedSourceProfile.sulfate,
+          chloride: mixedSourceProfile.chloride,
+          bicarbonate: mixedSourceProfile.bicarbonate,
+        },
+        additions: saltAdditions,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const dataRec = asRecord(res.data) ?? {};
-      const result = dataRec['result'] as SaltAdditionsResult;
-      const derivationRec = asRecord(dataRec['derivation']);
+      const result = data.result as SaltAdditionsResult;
       setSaltsResult(result);
-      setSaltsDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
+      setSaltsDerivation(data.derivation as WaterCalcDerivation);
 
       await saveSettings({
         tapWaterVolumeLiters: tapVolumeLiters,
@@ -767,27 +767,21 @@ export default function MashWaterPage() {
     acidAdded_mEqPerL?: number;
   }) => {
     if (!canCall) return null;
-    const res = await apiFetch("/api/water-calc/mash-ph-estimate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        volumeLiters: args.volumeLiters,
-        alkalinityPpmCaCO3: args.alkalinityPpmCaCO3,
-        calciumPpm: args.calciumPpm,
-        magnesiumPpm: args.magnesiumPpm,
-        grist: args.grist.map((r) => ({
-          amountKg: r.amountKg,
-          colorLovibond: r.colorLovibond,
-          maltClass: r.maltClass,
-          mashDiPh: r.mashDiPh ?? null,
-          mashTaToPh57_mEqPerKg: r.mashTaToPh57_mEqPerKg ?? null,
-        })),
-        acidAdded_mEqPerL: args.acidAdded_mEqPerL,
-      }),
+    const data = await estimateMashPh(webBreweryApiClient(), {
+      volumeLiters: args.volumeLiters,
+      alkalinityPpmCaCO3: args.alkalinityPpmCaCO3,
+      calciumPpm: args.calciumPpm,
+      magnesiumPpm: args.magnesiumPpm,
+      grist: args.grist.map((r) => ({
+        amountKg: r.amountKg,
+        colorLovibond: r.colorLovibond,
+        maltClass: r.maltClass,
+        mashDiPh: r.mashDiPh ?? null,
+        mashTaToPh57_mEqPerKg: r.mashTaToPh57_mEqPerKg ?? null,
+      })),
+      acidAdded_mEqPerL: args.acidAdded_mEqPerL,
     });
-    if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const bodyRec = asRecord(res.data) ?? {};
-    const resultRec = asRecord(bodyRec['result']);
+    const resultRec = asRecord(data.result);
     return resultRec?.['estimatedMashPhRoomTemp'] as number;
   };
 
@@ -827,16 +821,9 @@ export default function MashWaterPage() {
       Object.assign(payload, mashStrengthKind === "solid" ? { acidAddedGrams: mashManualAcidAdded } : { acidAddedMl: mashManualAcidAdded });
     }
 
-    const res = await apiFetch("/api/water-calc/mash-overall", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(JSON.stringify(res.data));
-    const bodyRec = asRecord(res.data) ?? {};
-    const derivationRec = asRecord(bodyRec['derivation']);
-    setOverallDerivation((derivationRec as unknown as WaterCalcDerivation) ?? null);
-    return bodyRec['result'] as MashOverallResult;
+    const data = await calcMashOverall(webBreweryApiClient(), payload);
+    setOverallDerivation(data.derivation as WaterCalcDerivation);
+    return data.result as MashOverallResult;
   };
 
   const computeAndSaveMashSnapshots = async () => {
@@ -870,13 +857,7 @@ export default function MashWaterPage() {
       ...(gristRows.length ? { grist: gristRows } : {}),
     };
 
-    const res = await apiFetch(`/api/recipes/${recipeId}/water-settings/mash/compute-and-save`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(JSON.stringify(res.data));
-    return parseMashComputeAndSaveResponse(res.data);
+    return computeAndSaveMash(webBreweryApiClient(), recipeId, payload);
   };
 
   const onCalculateOverall = async (saveAlso: boolean) => {
