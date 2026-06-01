@@ -29,3 +29,38 @@ export async function postParsed<T>(
   assertOk(res, expectedStatus);
   return parse(res.data);
 }
+
+export async function putParsed<T>(
+  client: ApiClient,
+  path: string,
+  body: unknown,
+  parse: (data: unknown) => T,
+  expectedStatus = 200,
+): Promise<T> {
+  const res = await client.put(path, body);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+
+export async function patchParsed<T>(
+  client: ApiClient,
+  path: string,
+  body: unknown,
+  parse: (data: unknown) => T,
+  expectedStatus = 200,
+): Promise<T> {
+  const res = await client.patch(path, body);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+
+export async function deleteParsed<T>(
+  client: ApiClient,
+  path: string,
+  parse: (data: unknown) => T,
+  expectedStatus = 200,
+): Promise<T> {
+  const res = await client.delete(path);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}

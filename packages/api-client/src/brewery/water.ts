@@ -10,7 +10,7 @@ type WaterHubSummaryGet = BreweryOpenApiPaths[WaterHubSummaryPath]["get"];
 
 export type { WaterHubSummaryGet };
 
-/** Thin wrapper — full water-calc facade family lands in a follow-on PR. */
+/** Recipe water hub summary for native/web water hub screens. */
 export async function getRecipeWaterHubSummary(client: ApiClient, recipeId: string) {
   return getParsed(
     client,

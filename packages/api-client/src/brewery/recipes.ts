@@ -11,7 +11,7 @@ import {
 
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";
-import { getParsed, postParsed } from "../internal/httpJson.js";
+import { getParsed, patchParsed, postParsed } from "../internal/httpJson.js";
 import type { BreweryOpenApiPaths } from "../openapiTypes.js";
 
 type RecipesListPath = "/recipes";
@@ -58,6 +58,15 @@ export async function createBrewSession(
     {},
     parseBrewSessionCreateResponse,
     200,
+  );
+}
+
+export async function patchRecipe(client: ApiClient, recipeId: string, patch: Record<string, unknown>) {
+  return patchParsed(
+    client,
+    toClientPath(`/recipes/${encodeURIComponent(recipeId)}`),
+    patch,
+    (data) => RecipeResponseSchema.parse(data),
   );
 }
 

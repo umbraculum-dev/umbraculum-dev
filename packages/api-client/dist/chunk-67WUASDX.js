@@ -32,11 +32,29 @@ async function postParsed(client, path, body, parse, expectedStatus = 200) {
   assertOk(res, expectedStatus);
   return parse(res.data);
 }
+async function putParsed(client, path, body, parse, expectedStatus = 200) {
+  const res = await client.put(path, body);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+async function patchParsed(client, path, body, parse, expectedStatus = 200) {
+  const res = await client.patch(path, body);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+async function deleteParsed(client, path, parse, expectedStatus = 200) {
+  const res = await client.delete(path);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
 
 export {
   ApiClientError,
   toClientPath,
   assertOk,
   getParsed,
-  postParsed
+  postParsed,
+  putParsed,
+  patchParsed,
+  deleteParsed
 };

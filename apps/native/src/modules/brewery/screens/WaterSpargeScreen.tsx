@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
-import { parseSpargeComputeAndSaveResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import {
+  computeAndSaveSparge,
+  getRecipe,
+  getRecipeWaterSettings,
+  listWaterProfiles,
+  updateRecipeWaterSettings,
+} from "@umbraculum/api-client/brewery";
 import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
@@ -111,9 +117,12 @@ export function WaterSpargeScreen() {
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
     const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-    const res = await api.get(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(api, id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, [baseUrl, token]);
 
   const { t } = useT("recipes.water.sparge");
@@ -200,14 +209,13 @@ export function WaterSpargeScreen() {
     setError(null);
     try {
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const [profRes, settingsRes] = await Promise.all([
-        api.get("/api/water-profiles"),
-        api.get(`/api/recipes/${recipeId}/water-settings`),
+      const [profilesData, settingsData] = await Promise.all([
+        listWaterProfiles(api),
+        getRecipeWaterSettings(api, recipeId),
       ]);
-      if (profRes.ok) setProfiles(parseWaterProfilesResponse(profRes.data));
-      if (settingsRes.ok) {
-        const s = (settingsRes.data as { settings?: Record<string, unknown> })?.settings;
-        if (s) {
+      setProfiles(profilesData);
+      const s = settingsData.settings;
+      if (s) {
           setSettings(s);
           setSpargeWaterProfileId((s['spargeWaterProfileId'] as string) ?? "");
           const savedAlk = s['spargeStartingAlkalinityPpmCaCO3'];
@@ -256,7 +264,6 @@ export function WaterSpargeScreen() {
             });
           }
         }
-      }
     } catch (err) {
       setError(String(err));
     } finally {
@@ -272,10 +279,8 @@ export function WaterSpargeScreen() {
     async (patch: Record<string, unknown>) => {
       if (!canCall) return;
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const res = await api.put(`/api/recipes/${recipeId}/water-settings`, patch);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const d = res.data as { settings?: Record<string, unknown> };
-      if (d?.settings) setSettings(d.settings);
+      const d = await updateRecipeWaterSettings(api, recipeId, patch);
+      if (d.settings) setSettings(d.settings);
     },
     [canCall, recipeId, baseUrl, token],
   );
@@ -341,12 +346,7 @@ export function WaterSpargeScreen() {
         spargeManualAcidAddedMl: strengthKind === "solid" ? null : manualAcidAdded,
         spargeManualAcidAddedGrams: strengthKind === "solid" ? manualAcidAdded : null,
       };
-      const res = await api.post(
-        `/api/recipes/${recipeId}/water-settings/sparge/compute-and-save`,
-        payload,
-      );
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const computed = parseSpargeComputeAndSaveResponse(res.data);
+      const computed = await computeAndSaveSparge(api, recipeId, payload);
       setSpargeManualResult(null);
       setSpargeResult(null);
       if (computed.acid.kind === "sparge_acidification_manual") {
@@ -374,8 +374,7 @@ export function WaterSpargeScreen() {
         });
         setCalcSaveStatus("Calculated & saved snapshot.");
       }
-      const d = (res.data as { settings?: Record<string, unknown> })?.settings;
-      if (d) setSettings(d);
+      if (computed.settings) setSettings(computed.settings as unknown as Record<string, unknown>);
     } catch (err) {
       setError(String(err));
     } finally {

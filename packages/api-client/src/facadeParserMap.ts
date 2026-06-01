@@ -19,4 +19,12 @@ export const BREWERY_FACADE_PARSER_MAP = {
   "/recipes/{id}": "RecipeResponseSchema",
   "/recipes/{recipeId}/brew-sessions": "parseBrewSessionsListResponse",
   "/recipes/{id}/water-hub-summary": "parseRecipeWaterHubSummaryResponse",
+  "/water-profiles": "parseWaterProfilesResponse / WaterProfileResponseSchema",
+  "/water-profiles/{id}/verify": "OkResponseSchema",
+  "/water-profiles/{id}/unverify": "OkResponseSchema",
+  "/water-profiles/{id}": "OkResponseSchema (DELETE)",
+  "/recipes/{id}/water-settings": "RecipeWaterSettingsGetResponseSchema / RecipeWaterSettingsPutResponseSchema",
+  "/recipes/{id}/water-settings/mash/compute-and-save": "parseMashComputeAndSaveResponse",
+  "/recipes/{id}/water-settings/sparge/compute-and-save": "parseSpargeComputeAndSaveResponse",
+  "/recipes/{id}/water-settings/boil/compute-and-save": "parseBoilComputeAndSaveResponse",
 } as const;

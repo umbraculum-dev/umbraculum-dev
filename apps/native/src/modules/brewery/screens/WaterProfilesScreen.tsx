@@ -3,8 +3,15 @@ import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import {
+  createWaterProfile,
+  deleteWaterProfile,
+  listWaterProfiles,
+  unverifyWaterProfile,
+  verifyWaterProfile,
+} from "@umbraculum/api-client/brewery";
 import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import { parseAuthMeResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
@@ -137,9 +144,8 @@ export function WaterProfilesScreen() {
         setMe(null);
       }
 
-      const profRes = await api.get("/api/water-profiles");
-      if (!profRes.ok) throw new Error(JSON.stringify(profRes.data));
-      setProfiles(parseWaterProfilesResponse(profRes.data));
+      const profRes = await listWaterProfiles(api);
+      setProfiles(profRes);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -169,14 +175,13 @@ export function WaterProfilesScreen() {
     setCreateError(null);
     setCreateSubmitting(true);
     try {
-      const res = await api.post("/api/water-profiles", {
+      await createWaterProfile(api, {
         scope: createScope,
         type: createType,
         name: createName,
         ph: createPh.trim() === "" ? null : Number(createPh),
         ...createIon,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setCreateName("");
       setCreatePh("");
       setCreateIon({
@@ -197,8 +202,11 @@ export function WaterProfilesScreen() {
 
   const onToggleVerify = async (p: WaterProfile) => {
     if (!api) return;
-    const action = p.verificationStatus === "verified" ? "unverify" : "verify";
-    await api.post(`/api/water-profiles/${p.id}/${action}`, {});
+    if (p.verificationStatus === "verified") {
+      await unverifyWaterProfile(api, p.id);
+    } else {
+      await verifyWaterProfile(api, p.id);
+    }
     await refresh();
   };
 
@@ -216,8 +224,7 @@ export function WaterProfilesScreen() {
             void (async () => {
               setError(null);
               try {
-                const res = await api.delete(`/api/water-profiles/${p.id}`);
-                if (!res.ok) throw new Error(JSON.stringify(res.data));
+                await deleteWaterProfile(api, p.id);
                 await refresh();
               } catch (err) {
                 setError(String(err));

@@ -50,7 +50,7 @@ If Week 1 overruns, Weeks 2–3 slide one-for-one rather than the cadence breaki
 | `@umbraculum/pim-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
 | `@umbraculum/mrp-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
 | `@umbraculum/crp-contracts` | ✅ | ✅ `0.0.2` (2026-05-29) |
-| `@umbraculum/api-client` | ✅ in monorepo | ❌ deferred post-α (subset split TBD) |
+| `@umbraculum/api-client` | ✅ in monorepo | ✅ Phase E+E5 (typed facades; npm publish separate) |
 
 **Ready for external module authors via `npm install`?** **Yes** — pin versions per [`third-party-module.md`](modules/contribute/third-party-module.md). Monorepo contributors still use workspace `file:` links. See [`LICENSING.md`](LICENSING.md) §6.2.1 and [`npm-sdk-publish-execution-plan.md`](design/npm-sdk-publish-execution-plan.md) SP-3.
 

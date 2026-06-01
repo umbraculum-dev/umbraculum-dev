@@ -26,7 +26,11 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 | `platform/workspaces` | `listWorkspaces`, `createWorkspace`, `getHealth` | `WorkspacesListResponseSchema`, `HealthResponseSchema` |
 | `platform/modules` | `getWorkspaceBilling`, `listIntegrationDevices` | `WorkspaceBillingResponseSchema`, `IntegrationDevicesListResponseSchema` |
 | `platform/rendering` | `submitRenderJob`, `runAsyncRenderJobExport`, … | `RenderJob*ResponseSchema` |
-| `brewery` (subpath) | `listRecipes`, `getRecipe`, `listBrewSessionsForRecipe`, `createBrewSession` | `parseRecipesListResponse`, `RecipeResponseSchema`, … |
+| `brewery/recipes` | `listRecipes`, `getRecipe`, `patchRecipe`, `listBrewSessionsForRecipe`, `createBrewSession` | `parseRecipesListResponse`, `RecipeResponseSchema`, … |
+| `brewery/waterProfiles` | `listWaterProfiles`, `createWaterProfile`, `verifyWaterProfile`, `unverifyWaterProfile`, `deleteWaterProfile` | `parseWaterProfilesResponse`, `WaterProfileResponseSchema`, `OkResponseSchema` |
+| `brewery/waterSettings` | `getRecipeWaterSettings`, `updateRecipeWaterSettings` | `RecipeWaterSettings*ResponseSchema` |
+| `brewery/waterCompute` | `computeAndSaveMash`, `computeAndSaveSparge`, `computeAndSaveBoil` | `parseMashComputeAndSaveResponse`, … |
+| `brewery/water` | `getRecipeWaterHubSummary` | `parseRecipeWaterHubSummaryResponse` |
 
 Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts).
 
@@ -94,7 +98,7 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 
 ## Status
 
-**Phase E complete (2026-06-01).** Typed platform + brewery facades ship with vitest coverage; native pilot on recipes/brew-sessions lists. npm publish remains a separate LICENSING decision.
+**Phase E complete (2026-06-01). Phase E5 (2026-06-01):** brewery water facades (profiles, settings, compute-and-save, hub summary) + native water screen migration. npm publish remains a separate LICENSING decision.
 
 The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
 

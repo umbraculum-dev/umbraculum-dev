@@ -2,8 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import {
+  getRecipe,
+  getRecipeWaterHubSummary,
+  listWaterProfiles,
+} from "@umbraculum/api-client/brewery";
 import type { IonProfilePpm, RecipeWaterHubSummaryResponse } from "@umbraculum/contracts";
-import { parseRecipeWaterHubSummaryResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 import { RecipeMetaLine, parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
@@ -77,9 +81,12 @@ export function WaterHubScreen() {
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
     const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-    const res = await api.get(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(api, id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, [baseUrl, token]);
 
   const { t } = useT("waterHub");
@@ -98,15 +105,9 @@ export function WaterHubScreen() {
     setLoading(true);
     try {
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-      const summaryResRaw = await api.get(`/api/recipes/${recipeId}/water-hub-summary`);
-      if (!summaryResRaw.ok) throw new Error(JSON.stringify(summaryResRaw.data));
-      setSummaryRes(parseRecipeWaterHubSummaryResponse(summaryResRaw.data));
-
-      const profRes = await api.get("/api/water-profiles");
-      if (profRes.ok) {
-        parseWaterProfilesResponse(profRes.data);
-        setProfilesLoaded(true);
-      }
+      setSummaryRes(await getRecipeWaterHubSummary(api, recipeId));
+      await listWaterProfiles(api);
+      setProfilesLoaded(true);
     } catch (err) {
       setError(String(err));
     } finally {

@@ -144,11 +144,17 @@ Phase E adds **hand-written facades** on `@umbraculum/api-client`: OpenAPI path 
 | Export | Scope |
 |--------|--------|
 | Main entry `@umbraculum/api-client` | Platform facades: auth, workspaces, health, billing, integrations list, rendering jobs |
-| Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water hub-summary stub |
+| Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water profiles/settings/compute-and-save, hub summary |
 
-**Pilot consumers:** `apps/native` (`RecipesListScreen`, `BrewSessionsListScreen`), `apps/web` (`renderJobClient` → platform rendering facades).
+**Pilot consumers:** `apps/native` (recipes/brew-sessions lists; all `Water*` screens), `apps/web` (`renderJobClient` → platform rendering facades).
 
-**Plans:** OpenAPI Phase E + F10 (Cursor plan `openapi_phase_e_f10_7a3c2d91`) extends Phase D.
+**Plans:** OpenAPI Phase E + F10 (`openapi_phase_e_f10_7a3c2d91`); Phase E5 water facades (`openapi_phase_e5_water_10eb23aa`).
+
+---
+
+## Phase E5 — brewery water facades (2026-06-01)
+
+Phase E5 completes deferred E2 PR2: typed `@umbraculum/api-client/brewery` facades for native water hot paths (`/water-profiles`, `/recipes/{id}/water-settings`, mash/sparge/boil compute-and-save). Standalone `/water-calc/*` (web interactive preview) remains Phase E6.
 
 ---
 

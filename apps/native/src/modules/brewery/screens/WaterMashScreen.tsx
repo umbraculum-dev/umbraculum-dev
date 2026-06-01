@@ -3,6 +3,14 @@ import { Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import {
+  computeAndSaveMash,
+  getRecipe,
+  listWaterProfiles,
+  patchRecipe,
+  getRecipeWaterSettings,
+  updateRecipeWaterSettings,
+} from "@umbraculum/api-client/brewery";
+import {
   editorStateFromBeerJson,
   mergeMashDeduceFromExt,
   MASH_TEMPLATES,
@@ -11,7 +19,7 @@ import {
   validateMashBeforeSave,
   type EditorMashStep,
 } from "@umbraculum/brewery-beerjson";
-import { parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseWaterProfilesResponse } from "@umbraculum/contracts";
+import { parseGravityAnalysisResponseV1 } from "@umbraculum/contracts";
 import type { WaterAcidificationManualResult, WaterAcidificationResult, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
@@ -140,9 +148,12 @@ export function WaterMashScreen() {
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
     const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-    const res = await api.get(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(api, id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, [baseUrl, token]);
 
   const { t } = useT("recipes.water.mash");
@@ -306,64 +317,59 @@ export function WaterMashScreen() {
     setError(null);
     try {
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const [profRes, settingsRes, recipeRes] = await Promise.all([
-        api.get("/api/water-profiles"),
-        api.get(`/api/recipes/${recipeId}/water-settings`),
-        api.get(`/api/recipes/${recipeId}`),
+      const [profilesData, settingsData, recipeData] = await Promise.all([
+        listWaterProfiles(api),
+        getRecipeWaterSettings(api, recipeId),
+        getRecipe(api, recipeId),
       ]);
-      if (profRes.ok) setProfiles(parseWaterProfilesResponse(profRes.data));
-      if (settingsRes.ok) {
-        const d = settingsRes.data as { settings?: Record<string, unknown> };
-        if (d?.settings) {
-          setSettings(d.settings);
-          const s = d.settings;
-          setSourceProfileId((s['sourceWaterProfileId'] as string) ?? "");
-          setTargetProfileId((s['targetWaterProfileId'] as string) ?? s['sourceWaterProfileId'] ?? "");
-          setDilutionProfileId((s['dilutionWaterProfileId'] as string) ?? "");
-          setTapVolumeLiters(String(s['tapWaterVolumeLiters'] ?? 0));
-          setDilutionVolumeLiters(String(s['dilutionWaterVolumeLiters'] ?? 0));
-          // eslint-disable-next-line no-constant-binary-expression -- pre-existing semantic bug: Number(x) ?? default never short-circuits (Number always returns a number, possibly NaN). Intended pattern is likely Number(x ?? default). Not fixed here because changing the precedence changes runtime behavior (NaN vs default). Tracked separately. See docs/LINTING.md.
-          setMashStartingAlk(Number(s['mashStartingAlkalinityPpmCaCO3']) ?? 0);
-          // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
-          setMashStartingPh(Number(s['mashStartingPh']) ?? 7);
-          // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
-          setMashTargetPh(Number(s['mashTargetPh']) ?? 5.4);
-          setMashAcidType((s['mashAcidType'] as string) ?? "lactic");
-          setMashAcidificationMode((s['mashAcidificationMode'] as string) === "manual" ? "manual" : "targetPh");
-          setMashStrengthKind(((s['mashStrengthKind'] as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
-          // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
-          setMashStrengthValue(Number(s['mashStrengthValue']) ?? 88);
-          setMashManualAcidAdded(Number(s['mashManualAcidAddedMl'] ?? s['mashManualAcidAddedGrams'] ?? 0));
-          if (Array.isArray(s['mashSaltAdditionsJson'])) setSaltAdditions(s['mashSaltAdditionsJson'] as SaltAdditionRow[]);
-          if (Array.isArray(s['mashGristImportedJson'])) setGristImportedRows(s['mashGristImportedJson'] as Record<string, unknown>[]);
-          if (s['mashOverallLastResultJson'] && typeof s['mashOverallLastResultJson'] === "object") {
-            setOverallResult(s['mashOverallLastResultJson'] as Record<string, unknown>);
-          }
+      setProfiles(profilesData);
+      if (settingsData.settings) {
+        const s = settingsData.settings;
+        setSettings(s);
+        setSourceProfileId((s['sourceWaterProfileId'] as string) ?? "");
+        setTargetProfileId((s['targetWaterProfileId'] as string) ?? s['sourceWaterProfileId'] ?? "");
+        setDilutionProfileId((s['dilutionWaterProfileId'] as string) ?? "");
+        setTapVolumeLiters(String(s['tapWaterVolumeLiters'] ?? 0));
+        setDilutionVolumeLiters(String(s['dilutionWaterVolumeLiters'] ?? 0));
+        // eslint-disable-next-line no-constant-binary-expression -- pre-existing semantic bug: Number(x) ?? default never short-circuits (Number always returns a number, possibly NaN). Intended pattern is likely Number(x ?? default). Not fixed here because changing the precedence changes runtime behavior (NaN vs default). Tracked separately. See docs/LINTING.md.
+        setMashStartingAlk(Number(s['mashStartingAlkalinityPpmCaCO3']) ?? 0);
+        // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
+        setMashStartingPh(Number(s['mashStartingPh']) ?? 7);
+        // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
+        setMashTargetPh(Number(s['mashTargetPh']) ?? 5.4);
+        setMashAcidType((s['mashAcidType'] as string) ?? "lactic");
+        setMashAcidificationMode((s['mashAcidificationMode'] as string) === "manual" ? "manual" : "targetPh");
+        setMashStrengthKind(((s['mashStrengthKind'] as string) ?? "percent") as "percent" | "normality" | "molarity" | "solid");
+        // eslint-disable-next-line no-constant-binary-expression -- pre-existing: see above.
+        setMashStrengthValue(Number(s['mashStrengthValue']) ?? 88);
+        setMashManualAcidAdded(Number(s['mashManualAcidAddedMl'] ?? s['mashManualAcidAddedGrams'] ?? 0));
+        if (Array.isArray(s['mashSaltAdditionsJson'])) setSaltAdditions(s['mashSaltAdditionsJson'] as SaltAdditionRow[]);
+        if (Array.isArray(s['mashGristImportedJson'])) setGristImportedRows(s['mashGristImportedJson'] as Record<string, unknown>[]);
+        if (s['mashOverallLastResultJson'] && typeof s['mashOverallLastResultJson'] === "object") {
+          setOverallResult(s['mashOverallLastResultJson'] as Record<string, unknown>);
         }
       }
-      if (recipeRes.ok) {
-        const d = recipeRes.data as { recipe?: { beerJsonRecipeJson?: unknown; recipeExtJson?: unknown } };
-        if (d?.recipe) {
-          setRecipe(d.recipe);
-          if (d.recipe.beerJsonRecipeJson && !mashStepsDirty) {
-            const s = editorStateFromBeerJson(d.recipe.beerJsonRecipeJson);
-            const mashMerged = mergeMashDeduceFromExt(s.mash, d.recipe.recipeExtJson);
-            if (mashMerged?.steps?.length) {
-              setMashProcedure({ name: mashMerged.name, grainTemperatureC: mashMerged.grainTemperatureC });
-              setMashRows(mashMerged.steps);
-            } else if (derivedMashWaterVolumeLiters > 0) {
-              setMashProcedure({ name: "Mash", grainTemperatureC: 20 });
-              setMashRows([
-                {
-                  id: newMashRowId(),
-                  name: "Mash In",
-                  type: "infusion",
-                  stepTemperatureC: 67,
-                  stepTimeMin: 60,
-                  amountL: derivedMashWaterVolumeLiters,
-                },
-              ]);
-            }
+      const d = recipeData.recipe;
+      if (d) {
+        setRecipe(d);
+        if (d['beerJsonRecipeJson'] && !mashStepsDirty) {
+          const s = editorStateFromBeerJson(d['beerJsonRecipeJson']);
+          const mashMerged = mergeMashDeduceFromExt(s.mash, d['recipeExtJson']);
+          if (mashMerged?.steps?.length) {
+            setMashProcedure({ name: mashMerged.name, grainTemperatureC: mashMerged.grainTemperatureC });
+            setMashRows(mashMerged.steps);
+          } else if (derivedMashWaterVolumeLiters > 0) {
+            setMashProcedure({ name: "Mash", grainTemperatureC: 20 });
+            setMashRows([
+              {
+                id: newMashRowId(),
+                name: "Mash In",
+                type: "infusion",
+                stepTemperatureC: 67,
+                stepTimeMin: 60,
+                amountL: derivedMashWaterVolumeLiters,
+              },
+            ]);
           }
         }
       }
@@ -382,10 +388,8 @@ export function WaterMashScreen() {
     async (patch: Record<string, unknown>) => {
       if (!canCall) return;
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const res = await api.put(`/api/recipes/${recipeId}/water-settings`, patch);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const d = res.data as { settings?: Record<string, unknown> };
-      if (d?.settings) setSettings(d.settings);
+      const d = await updateRecipeWaterSettings(api, recipeId, patch);
+      if (d.settings) setSettings(d.settings);
     },
     [canCall, recipeId, baseUrl, token]
   );
@@ -412,10 +416,8 @@ export function WaterMashScreen() {
     setImportingGrist(true);
     try {
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const res = await api.get(`/api/recipes/${recipeId}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const data = res.data as { recipe?: { beerJsonRecipeJson?: unknown; recipeExtJson?: unknown; updatedAt?: string } };
-      const r = data?.recipe;
+      const data = await getRecipe(api, recipeId);
+      const r = data.recipe as { beerJsonRecipeJson?: unknown; recipeExtJson?: unknown; updatedAt?: string };
       if (!r?.beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
       const s = editorStateFromBeerJson(r.beerJsonRecipeJson);
       const mashOnlyRows = (s.gristRows as Record<string, unknown>[]).filter(
@@ -511,9 +513,7 @@ export function WaterMashScreen() {
         mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
         mashSaltAdditionsJson: saltAdditions,
       };
-      const res = await api.post(`/api/recipes/${recipeId}/water-settings/mash/compute-and-save`, payload);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const computed = parseMashComputeAndSaveResponse(res.data);
+      const computed = await computeAndSaveMash(api, recipeId, payload);
 
       if (computed.acid.kind === "mash_acidification_manual") {
         setMashManualResult(computed.acid.result);
@@ -559,9 +559,7 @@ export function WaterMashScreen() {
         mashManualAcidAddedGrams: mashStrengthKind === "solid" ? mashManualAcidAdded : null,
         mashSaltAdditionsJson: saltAdditions,
       };
-      const res = await api.post(`/api/recipes/${recipeId}/water-settings/mash/compute-and-save`, payload);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const computed = parseMashComputeAndSaveResponse(res.data);
+      const computed = await computeAndSaveMash(api, recipeId, payload);
       if (computed.acid.kind === "mash_acidification_manual") {
         setMashManualResult(computed.acid.result);
         setMashAcidResult(computed.acid.result.predicted ?? null);
@@ -749,11 +747,10 @@ export function WaterMashScreen() {
       );
       const recipeExtJson = { ...(extBase as Record<string, unknown>), mashStepDeduceFromMashIn };
       const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const res = await api.patch(`/api/recipes/${recipeId}`, {
+      await patchRecipe(api, recipeId, {
         beerJsonRecipeJson: newDoc,
         recipeExtJson,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setMashStepsDirty(false);
       void loadData();
     } catch (err) {
