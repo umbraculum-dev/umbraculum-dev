@@ -1,5 +1,6 @@
 export * from "./auth/meResponse";
 export * from "./auth/platformAuth";
+export * from "./health/routeSchemas";
 export * from "./workspaces/platformWorkspaces";
 export * from "./billing/routeSchemas";
 export * from "./ads/routeSchemas";

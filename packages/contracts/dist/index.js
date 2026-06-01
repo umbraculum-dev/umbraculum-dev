@@ -174,699 +174,705 @@ var AuthActiveWorkspaceResponseSchema = z2.object({
   activeWorkspaceId: z2.string().nullable()
 });
 
-// src/workspaces/platformWorkspaces.ts
+// src/health/routeSchemas.ts
 import { z as z3 } from "zod";
-var ContextMeResponseSchema = z3.object({
-  ok: z3.literal(true),
-  userId: z3.string().min(1),
-  activeWorkspaceId: z3.string().nullable(),
-  role: z3.string().nullable()
+var HealthResponseSchema = z3.object({
+  ok: z3.literal(true)
 });
-var WorkspacesListResponseSchema = z3.object({
-  ok: z3.literal(true),
-  workspaces: z3.array(AuthMeResponseWorkspaceSchema)
+
+// src/workspaces/platformWorkspaces.ts
+import { z as z4 } from "zod";
+var ContextMeResponseSchema = z4.object({
+  ok: z4.literal(true),
+  userId: z4.string().min(1),
+  activeWorkspaceId: z4.string().nullable(),
+  role: z4.string().nullable()
 });
-var WorkspaceCreateRequestSchema = z3.object({
-  name: z3.string().trim().min(1, "Body.name is required")
+var WorkspacesListResponseSchema = z4.object({
+  ok: z4.literal(true),
+  workspaces: z4.array(AuthMeResponseWorkspaceSchema)
 });
-var isoDateTime = z3.preprocess((v) => {
+var WorkspaceCreateRequestSchema = z4.object({
+  name: z4.string().trim().min(1, "Body.name is required")
+});
+var isoDateTime = z4.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z3.string());
-var WorkspaceRowSchema = z3.object({
-  id: z3.string().min(1),
-  name: z3.string(),
-  brandKey: z3.string(),
-  adsDisabled: z3.boolean(),
+}, z4.string());
+var WorkspaceRowSchema = z4.object({
+  id: z4.string().min(1),
+  name: z4.string(),
+  brandKey: z4.string(),
+  adsDisabled: z4.boolean(),
   createdAt: isoDateTime,
   updatedAt: isoDateTime
 });
-var WorkspaceCreateResponseSchema = z3.object({
-  ok: z3.literal(true),
+var WorkspaceCreateResponseSchema = z4.object({
+  ok: z4.literal(true),
   workspace: WorkspaceRowSchema
 });
-var WorkspaceIdParamsSchema = z3.object({
-  id: z3.string().min(1, "Params.id is required")
+var WorkspaceIdParamsSchema = z4.object({
+  id: z4.string().min(1, "Params.id is required")
 });
-var WorkspaceBrandPatchRequestSchema = z3.object({
-  brandKey: z3.unknown().transform((v) => {
+var WorkspaceBrandPatchRequestSchema = z4.object({
+  brandKey: z4.unknown().transform((v) => {
     if (v === "default" || v === "acme" || v === "forest") return v;
     return "default";
   })
 });
-var WorkspaceBrandPatchResponseSchema = z3.object({
-  ok: z3.literal(true),
-  workspace: z3.object({
-    id: z3.string().min(1),
-    name: z3.string(),
-    brandKey: z3.string()
+var WorkspaceBrandPatchResponseSchema = z4.object({
+  ok: z4.literal(true),
+  workspace: z4.object({
+    id: z4.string().min(1),
+    name: z4.string(),
+    brandKey: z4.string()
   })
 });
-var ActiveWorkspaceContextResponseSchema = z3.object({
-  ok: z3.literal(true),
-  activeWorkspaceId: z3.string().min(1),
-  role: z3.string()
+var ActiveWorkspaceContextResponseSchema = z4.object({
+  ok: z4.literal(true),
+  activeWorkspaceId: z4.string().min(1),
+  role: z4.string()
 });
 
 // src/billing/routeSchemas.ts
-import { z as z4 } from "zod";
-var isoDateTime2 = z4.preprocess((v) => {
+import { z as z5 } from "zod";
+var isoDateTime2 = z5.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z4.string());
-var BillingWorkspaceIdParamsSchema = z4.object({
-  workspaceId: z4.string().trim().min(1, "Params.workspaceId is required")
+}, z5.string());
+var BillingWorkspaceIdParamsSchema = z5.object({
+  workspaceId: z5.string().trim().min(1, "Params.workspaceId is required")
 });
-var BillingPurchaseProviderSchema = z4.enum(["stripe", "apple", "google"]);
-var BillingPurchaseIntentModeSchema = z4.enum(["purchase", "restore"]);
-var BillingIntentRequestSchema = z4.object({
-  planCode: z4.string().trim().min(1, "Body.planCode is required"),
+var BillingPurchaseProviderSchema = z5.enum(["stripe", "apple", "google"]);
+var BillingPurchaseIntentModeSchema = z5.enum(["purchase", "restore"]);
+var BillingIntentRequestSchema = z5.object({
+  planCode: z5.string().trim().min(1, "Body.planCode is required"),
   provider: BillingPurchaseProviderSchema,
-  mode: z4.preprocess(
+  mode: z5.preprocess(
     (v) => v === "restore" ? "restore" : v === "purchase" ? "purchase" : v,
     BillingPurchaseIntentModeSchema
   ).optional()
 }).strict();
-var BillingIntentResponseSchema = z4.object({
-  ok: z4.literal(true),
-  billingIntentId: z4.string().min(1),
-  workspaceId: z4.string().min(1),
-  planCode: z4.string().min(1),
+var BillingIntentResponseSchema = z5.object({
+  ok: z5.literal(true),
+  billingIntentId: z5.string().min(1),
+  workspaceId: z5.string().min(1),
+  planCode: z5.string().min(1),
   provider: BillingPurchaseProviderSchema,
-  mode: z4.enum(["purchase", "restore"]),
+  mode: z5.enum(["purchase", "restore"]),
   expiresAt: isoDateTime2,
-  clientReferenceId: z4.string().min(1),
-  stripePricingTableId: z4.string().nullable(),
-  stripePublishableKey: z4.string().nullable()
+  clientReferenceId: z5.string().min(1),
+  stripePricingTableId: z5.string().nullable(),
+  stripePublishableKey: z5.string().nullable()
 });
-var BillingTierSchema = z4.enum(["free", "premium", "pro", "pro_plus"]);
-var TierLimitsSchema = z4.object({
-  aiEnabled: z4.boolean(),
-  maxRecipesPerWorkspace: z4.number(),
-  maxVersionsPerRecipe: z4.number(),
-  maxVessels: z4.number(),
-  maxAdaptersConnected: z4.number(),
-  automationAiToolsEnabled: z4.boolean()
+var BillingTierSchema = z5.enum(["free", "premium", "pro", "pro_plus"]);
+var TierLimitsSchema = z5.object({
+  aiEnabled: z5.boolean(),
+  maxRecipesPerWorkspace: z5.number(),
+  maxVersionsPerRecipe: z5.number(),
+  maxVessels: z5.number(),
+  maxAdaptersConnected: z5.number(),
+  automationAiToolsEnabled: z5.boolean()
 });
-var WorkspaceBillingResponseSchema = z4.object({
-  ok: z4.literal(true),
-  workspaceId: z4.string().min(1),
+var WorkspaceBillingResponseSchema = z5.object({
+  ok: z5.literal(true),
+  workspaceId: z5.string().min(1),
   tier: BillingTierSchema,
   expiresAt: isoDateTime2.nullable(),
   limits: TierLimitsSchema,
-  usage: z4.object({
-    recipesCount: z4.number().int().nonnegative()
+  usage: z5.object({
+    recipesCount: z5.number().int().nonnegative()
   })
 });
-var BillingConfirmRequestSchema = z4.object({
-  billingIntentId: z4.string().trim().min(1, "Body.billingIntentId is required")
+var BillingConfirmRequestSchema = z5.object({
+  billingIntentId: z5.string().trim().min(1, "Body.billingIntentId is required")
 }).strict();
-var BillingConfirmResponseSchema = z4.object({
-  ok: z4.literal(true)
+var BillingConfirmResponseSchema = z5.object({
+  ok: z5.literal(true)
 });
 
 // src/ads/routeSchemas.ts
-import { z as z5 } from "zod";
-var isoDateTime3 = z5.preprocess((v) => {
+import { z as z6 } from "zod";
+var isoDateTime3 = z6.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z5.string());
-var optionalIsoDateTime = z5.preprocess((v) => {
+}, z6.string());
+var optionalIsoDateTime = z6.preprocess((v) => {
   if (v === null || v === void 0 || v === "") return null;
   if (v instanceof Date) return v.toISOString();
   return v;
 }, isoDateTime3.nullable());
-var AdPlacementSchema = z5.enum([
+var AdPlacementSchema = z6.enum([
   "global_top",
   "global_bottom",
   "recipe_edit_after_fermentables",
   "recipe_edit_after_hops",
   "recipe_edit_after_yeast"
 ]);
-var AdPlatformSchema = z5.unknown().transform((v) => v === "web" ? "web" : "web");
-var AdSlotParamsSchema = z5.object({
+var AdPlatformSchema = z6.unknown().transform((v) => v === "web" ? "web" : "web");
+var AdSlotParamsSchema = z6.object({
   placement: AdPlacementSchema
 });
-var AdSlotQuerySchema = z5.object({
+var AdSlotQuerySchema = z6.object({
   platform: AdPlatformSchema.optional()
 });
-var ResolvedAdSchema = z5.object({
-  id: z5.string().min(1),
-  imageUrl: z5.string().min(1),
-  linkUrl: z5.string().min(1),
-  altText: z5.string().min(1)
+var ResolvedAdSchema = z6.object({
+  id: z6.string().min(1),
+  imageUrl: z6.string().min(1),
+  linkUrl: z6.string().min(1),
+  altText: z6.string().min(1)
 });
-var AdSlotResponseSchema = z5.object({
-  ok: z5.literal(true),
+var AdSlotResponseSchema = z6.object({
+  ok: z6.literal(true),
   placement: AdPlacementSchema,
-  platform: z5.literal("web"),
-  disabled: z5.boolean(),
+  platform: z6.literal("web"),
+  disabled: z6.boolean(),
   ad: ResolvedAdSchema.nullable()
 });
-var PlatformAdRowSchema = z5.object({
-  id: z5.string().min(1),
+var PlatformAdRowSchema = z6.object({
+  id: z6.string().min(1),
   placement: AdPlacementSchema,
-  platform: z5.literal("web"),
-  imageUrl: z5.string(),
-  linkUrl: z5.string(),
-  altText: z5.string(),
-  isActive: z5.boolean(),
+  platform: z6.literal("web"),
+  imageUrl: z6.string(),
+  linkUrl: z6.string(),
+  altText: z6.string(),
+  isActive: z6.boolean(),
   startsAt: optionalIsoDateTime,
   endsAt: optionalIsoDateTime,
-  priority: z5.number().int(),
-  weight: z5.number().int(),
+  priority: z6.number().int(),
+  weight: z6.number().int(),
   createdAt: isoDateTime3,
   updatedAt: isoDateTime3
 });
-var PlatformAdsListResponseSchema = z5.object({
-  ok: z5.literal(true),
-  ads: z5.array(PlatformAdRowSchema)
+var PlatformAdsListResponseSchema = z6.object({
+  ok: z6.literal(true),
+  ads: z6.array(PlatformAdRowSchema)
 });
-var PlatformAdCreateRequestSchema = z5.object({
+var PlatformAdCreateRequestSchema = z6.object({
   placement: AdPlacementSchema,
   platform: AdPlatformSchema.optional(),
-  imageUrl: z5.string().trim().min(1, "Body.imageUrl is required"),
-  linkUrl: z5.string().trim().min(1, "Body.linkUrl is required"),
-  altText: z5.string().trim().min(1, "Body.altText is required"),
+  imageUrl: z6.string().trim().min(1, "Body.imageUrl is required"),
+  linkUrl: z6.string().trim().min(1, "Body.linkUrl is required"),
+  altText: z6.string().trim().min(1, "Body.altText is required"),
   startsAt: optionalIsoDateTime.optional(),
   endsAt: optionalIsoDateTime.optional(),
-  isActive: z5.boolean().optional(),
-  priority: z5.number().int().optional(),
-  weight: z5.number().int().optional()
+  isActive: z6.boolean().optional(),
+  priority: z6.number().int().optional(),
+  weight: z6.number().int().optional()
 });
-var PlatformAdCreateResponseSchema = z5.object({
-  ok: z5.literal(true),
-  id: z5.string().min(1)
+var PlatformAdCreateResponseSchema = z6.object({
+  ok: z6.literal(true),
+  id: z6.string().min(1)
 });
-var PlatformAdIdParamsSchema = z5.object({
-  id: z5.string().min(1, "Params.id is required")
+var PlatformAdIdParamsSchema = z6.object({
+  id: z6.string().min(1, "Params.id is required")
 });
-var PlatformAdPatchRequestSchema = z5.object({
+var PlatformAdPatchRequestSchema = z6.object({
   placement: AdPlacementSchema.optional(),
   platform: AdPlatformSchema.optional(),
-  imageUrl: z5.string().trim().optional(),
-  linkUrl: z5.string().trim().optional(),
-  altText: z5.string().trim().optional(),
-  isActive: z5.boolean().optional(),
+  imageUrl: z6.string().trim().optional(),
+  linkUrl: z6.string().trim().optional(),
+  altText: z6.string().trim().optional(),
+  isActive: z6.boolean().optional(),
   startsAt: optionalIsoDateTime.optional(),
   endsAt: optionalIsoDateTime.optional(),
-  priority: z5.number().int().optional(),
-  weight: z5.number().int().optional()
+  priority: z6.number().int().optional(),
+  weight: z6.number().int().optional()
 }).strict();
-var PlatformAdOkResponseSchema = z5.object({
-  ok: z5.literal(true)
+var PlatformAdOkResponseSchema = z6.object({
+  ok: z6.literal(true)
 });
 
 // src/integrations/routeSchemas.ts
-import { z as z6 } from "zod";
-var isoDateTime4 = z6.preprocess((v) => {
+import { z as z7 } from "zod";
+var isoDateTime4 = z7.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z6.string());
-var IntegrationKindSchema = z6.enum(["tilt", "ispindel", "rapt"]);
-var IntegrationWorkspaceIdParamsSchema = z6.object({
-  workspaceId: z6.string().trim().min(1, "Params.workspaceId is required")
+}, z7.string());
+var IntegrationKindSchema = z7.enum(["tilt", "ispindel", "rapt"]);
+var IntegrationWorkspaceIdParamsSchema = z7.object({
+  workspaceId: z7.string().trim().min(1, "Params.workspaceId is required")
 });
-var IntegrationWorkspaceKindParamsSchema = z6.object({
-  workspaceId: z6.string().trim().min(1, "Params.workspaceId is required"),
-  kind: z6.preprocess(
+var IntegrationWorkspaceKindParamsSchema = z7.object({
+  workspaceId: z7.string().trim().min(1, "Params.workspaceId is required"),
+  kind: z7.preprocess(
     (v) => typeof v === "string" ? v.trim().toLowerCase() : v,
     IntegrationKindSchema
   )
 });
-var IntegrationTokenParamsSchema = z6.object({
-  token: z6.string().trim().min(1, "Params.token is required")
+var IntegrationTokenParamsSchema = z7.object({
+  token: z7.string().trim().min(1, "Params.token is required")
 });
-var IntegrationSummarySchema = z6.object({
-  id: z6.string().min(1),
-  workspaceId: z6.string().min(1),
+var IntegrationSummarySchema = z7.object({
+  id: z7.string().min(1),
+  workspaceId: z7.string().min(1),
   kind: IntegrationKindSchema,
   revokedAt: isoDateTime4.nullable(),
   createdAt: isoDateTime4,
   updatedAt: isoDateTime4
 });
-var IntegrationRevealResponseSchema = z6.object({
-  ok: z6.literal(true),
-  integrationId: z6.string().min(1),
+var IntegrationRevealResponseSchema = z7.object({
+  ok: z7.literal(true),
+  integrationId: z7.string().min(1),
   kind: IntegrationKindSchema,
-  token: z6.string().min(1),
-  publicPath: z6.string().min(1)
+  token: z7.string().min(1),
+  publicPath: z7.string().min(1)
 });
-var IntegrationGetResponseSchema = z6.object({
-  ok: z6.literal(true),
+var IntegrationGetResponseSchema = z7.object({
+  ok: z7.literal(true),
   integration: IntegrationSummarySchema.nullable()
 });
-var IntegrationCreateResponseSchema = z6.object({
-  ok: z6.literal(true),
-  integrationId: z6.string().min(1),
-  token: z6.string().min(1),
-  publicPath: z6.string().min(1)
+var IntegrationCreateResponseSchema = z7.object({
+  ok: z7.literal(true),
+  integrationId: z7.string().min(1),
+  token: z7.string().min(1),
+  publicPath: z7.string().min(1)
 });
-var IntegrationOkResponseSchema = z6.object({
-  ok: z6.literal(true)
+var IntegrationOkResponseSchema = z7.object({
+  ok: z7.literal(true)
 });
-var TiltIngestBodySchema = z6.record(z6.string(), z6.unknown());
-var TiltIngestResponseSchema = z6.object({
-  ok: z6.literal(true),
-  integrationId: z6.string().min(1),
-  deviceId: z6.string().min(1),
-  readingId: z6.string().min(1),
-  brewSessionId: z6.string().nullable()
+var TiltIngestBodySchema = z7.record(z7.string(), z7.unknown());
+var TiltIngestResponseSchema = z7.object({
+  ok: z7.literal(true),
+  integrationId: z7.string().min(1),
+  deviceId: z7.string().min(1),
+  readingId: z7.string().min(1),
+  brewSessionId: z7.string().nullable()
 });
-var IntegrationDevicesQuerySchema = z6.object({
-  includeReadings: z6.unknown().optional().transform((v) => v === true || v === "true" || v === "1"),
-  readingsLimit: z6.unknown().optional().transform((v) => {
+var IntegrationDevicesQuerySchema = z7.object({
+  includeReadings: z7.unknown().optional().transform((v) => v === true || v === "true" || v === "1"),
+  readingsLimit: z7.unknown().optional().transform((v) => {
     const raw = typeof v === "string" ? v.trim() : "";
     const n = raw ? Number.parseInt(raw, 10) : 20;
     if (!Number.isFinite(n) || Number.isNaN(n)) return 20;
     return Math.max(1, Math.min(200, n));
   })
 });
-var IntegrationDeviceReadingSchema = z6.object({
-  id: z6.string().min(1),
-  brewSessionId: z6.string().nullable(),
+var IntegrationDeviceReadingSchema = z7.object({
+  id: z7.string().min(1),
+  brewSessionId: z7.string().nullable(),
   recordedAt: isoDateTime4.nullable(),
   receivedAt: isoDateTime4,
-  temperatureC: z6.number().nullable(),
-  gravitySg: z6.number().nullable(),
-  rawJson: z6.record(z6.string(), z6.unknown()).optional()
+  temperatureC: z7.number().nullable(),
+  gravitySg: z7.number().nullable(),
+  rawJson: z7.record(z7.string(), z7.unknown()).optional()
 });
-var IntegrationBrewSessionRefSchema = z6.object({
-  id: z6.string().min(1),
-  code: z6.string().nullable(),
-  status: z6.string(),
+var IntegrationBrewSessionRefSchema = z7.object({
+  id: z7.string().min(1),
+  code: z7.string().nullable(),
+  status: z7.string(),
   createdAt: isoDateTime4,
   startedAt: isoDateTime4.nullable(),
-  recipe: z6.object({
-    id: z6.string().min(1),
-    name: z6.string(),
-    version: z6.number().int()
+  recipe: z7.object({
+    id: z7.string().min(1),
+    name: z7.string(),
+    version: z7.number().int()
   })
 });
-var IntegrationDeviceAttachmentSchema = z6.object({
-  id: z6.string().min(1),
+var IntegrationDeviceAttachmentSchema = z7.object({
+  id: z7.string().min(1),
   attachedAt: isoDateTime4,
   brewSession: IntegrationBrewSessionRefSchema
 });
-var IntegrationDeviceSchema = z6.object({
-  id: z6.string().min(1),
-  deviceKey: z6.string().min(1),
-  displayName: z6.string().nullable(),
-  metadataJson: z6.record(z6.string(), z6.unknown()).nullable(),
+var IntegrationDeviceSchema = z7.object({
+  id: z7.string().min(1),
+  deviceKey: z7.string().min(1),
+  displayName: z7.string().nullable(),
+  metadataJson: z7.record(z7.string(), z7.unknown()).nullable(),
   lastSeenAt: isoDateTime4.nullable(),
   createdAt: isoDateTime4,
   activeAttachment: IntegrationDeviceAttachmentSchema.nullable(),
   lastReading: IntegrationDeviceReadingSchema.nullable(),
-  recentReadings: z6.array(IntegrationDeviceReadingSchema).nullable().optional()
+  recentReadings: z7.array(IntegrationDeviceReadingSchema).nullable().optional()
 });
-var IntegrationDevicesListResponseSchema = z6.object({
-  ok: z6.literal(true),
-  devices: z6.array(IntegrationDeviceSchema)
+var IntegrationDevicesListResponseSchema = z7.object({
+  ok: z7.literal(true),
+  devices: z7.array(IntegrationDeviceSchema)
 });
-var IntegrationDeviceIdParamsSchema = z6.object({
-  workspaceId: z6.string().trim().min(1, "Params.workspaceId is required"),
-  deviceId: z6.string().trim().min(1, "Params.deviceId is required")
+var IntegrationDeviceIdParamsSchema = z7.object({
+  workspaceId: z7.string().trim().min(1, "Params.workspaceId is required"),
+  deviceId: z7.string().trim().min(1, "Params.deviceId is required")
 });
-var IntegrationDeviceAttachRequestSchema = z6.object({
-  brewSessionId: z6.string().trim().min(1, "Body.brewSessionId is required")
+var IntegrationDeviceAttachRequestSchema = z7.object({
+  brewSessionId: z7.string().trim().min(1, "Body.brewSessionId is required")
 });
-var IntegrationDeviceAttachResponseSchema = z6.object({
-  ok: z6.literal(true),
-  attachment: z6.object({
-    id: z6.string().min(1),
+var IntegrationDeviceAttachResponseSchema = z7.object({
+  ok: z7.literal(true),
+  attachment: z7.object({
+    id: z7.string().min(1),
     attachedAt: isoDateTime4,
-    brewSessionId: z6.string().min(1)
+    brewSessionId: z7.string().min(1)
   })
 });
-var IntegrationDeviceDetachResponseSchema = z6.object({
-  ok: z6.literal(true),
-  detachedCount: z6.number().int().nonnegative()
+var IntegrationDeviceDetachResponseSchema = z7.object({
+  ok: z7.literal(true),
+  detachedCount: z7.number().int().nonnegative()
 });
-var BrewSessionsRecentQuerySchema = z6.object({
-  limit: z6.unknown().optional().transform((v) => {
+var BrewSessionsRecentQuerySchema = z7.object({
+  limit: z7.unknown().optional().transform((v) => {
     const raw = typeof v === "string" ? v.trim() : "";
     const n = raw ? Number.parseInt(raw, 10) : 20;
     if (!Number.isFinite(n) || Number.isNaN(n)) return 20;
     return Math.max(1, Math.min(100, n));
   })
 });
-var BrewSessionSummarySchema = z6.object({
-  id: z6.string().min(1),
-  recipeId: z6.string().min(1),
-  code: z6.string().nullable(),
-  status: z6.string(),
+var BrewSessionSummarySchema = z7.object({
+  id: z7.string().min(1),
+  recipeId: z7.string().min(1),
+  code: z7.string().nullable(),
+  status: z7.string(),
   startedAt: isoDateTime4.nullable(),
   pausedAt: isoDateTime4.nullable(),
   stoppedAt: isoDateTime4.nullable(),
   scheduledDate: isoDateTime4.nullable(),
   createdAt: isoDateTime4,
-  recipe: z6.object({
-    id: z6.string().min(1),
-    name: z6.string(),
-    version: z6.number().int()
+  recipe: z7.object({
+    id: z7.string().min(1),
+    name: z7.string(),
+    version: z7.number().int()
   })
 });
-var BrewSessionsRecentResponseSchema = z6.object({
-  ok: z6.literal(true),
-  brewSessions: z6.array(BrewSessionSummarySchema)
+var BrewSessionsRecentResponseSchema = z7.object({
+  ok: z7.literal(true),
+  brewSessions: z7.array(BrewSessionSummarySchema)
 });
 
 // src/platformAdmin/routeSchemas.ts
-import { z as z7 } from "zod";
-var isoDateTime5 = z7.preprocess((v) => {
+import { z as z8 } from "zod";
+var isoDateTime5 = z8.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z7.string());
-var PlatformWorkspaceRowSchema = z7.object({
-  id: z7.string().min(1),
-  name: z7.string()
+}, z8.string());
+var PlatformWorkspaceRowSchema = z8.object({
+  id: z8.string().min(1),
+  name: z8.string()
 });
-var PlatformWorkspacesListResponseSchema = z7.object({
-  ok: z7.literal(true),
-  workspaces: z7.array(PlatformWorkspaceRowSchema)
+var PlatformWorkspacesListResponseSchema = z8.object({
+  ok: z8.literal(true),
+  workspaces: z8.array(PlatformWorkspaceRowSchema)
 });
-var PlatformRecipesListQuerySchema = z7.preprocess(
+var PlatformRecipesListQuerySchema = z8.preprocess(
   (raw) => {
     if (raw === null || typeof raw !== "object") return raw;
     const r = raw;
     return { workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
-  z7.object({
-    workspaceId: z7.string().trim().min(1, "Query.workspaceId is required")
+  z8.object({
+    workspaceId: z8.string().trim().min(1, "Query.workspaceId is required")
   })
 );
-var PlatformRecipeSummarySchema = z7.object({
-  id: z7.string().min(1),
-  name: z7.string(),
-  version: z7.number().int(),
-  styleKey: z7.string().nullable().optional(),
-  style: z7.unknown().nullable().optional(),
+var PlatformRecipeSummarySchema = z8.object({
+  id: z8.string().min(1),
+  name: z8.string(),
+  version: z8.number().int(),
+  styleKey: z8.string().nullable().optional(),
+  style: z8.unknown().nullable().optional(),
   createdAt: isoDateTime5.optional(),
   updatedAt: isoDateTime5.optional()
 });
-var PlatformRecipesListResponseSchema = z7.object({
-  ok: z7.literal(true),
-  recipes: z7.array(z7.unknown())
+var PlatformRecipesListResponseSchema = z8.object({
+  ok: z8.literal(true),
+  recipes: z8.array(z8.unknown())
 });
-var PlatformRecipeIdParamsSchema = z7.object({
-  id: z7.string().trim().min(1, "Params.id is required")
+var PlatformRecipeIdParamsSchema = z8.object({
+  id: z8.string().trim().min(1, "Params.id is required")
 });
 var PlatformRecipeExportQuerySchema = PlatformRecipesListQuerySchema;
-var BeerJsonLooseSchema = z7.unknown();
-var PlatformImportFormatSchema = z7.enum(["beerjson", "beerxml"]);
-var workspaceIdPreprocess = z7.preprocess(
+var BeerJsonLooseSchema = z8.unknown();
+var PlatformImportFormatSchema = z8.enum(["beerjson", "beerxml"]);
+var workspaceIdPreprocess = z8.preprocess(
   (raw) => {
     if (raw === null || raw === void 0) return {};
     if (typeof raw !== "object") return raw;
     const r = raw;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
-  z7.object({
+  z8.object({
     format: PlatformImportFormatSchema,
-    content: z7.string().min(1, "Body.content is required"),
-    workspaceId: z7.string().trim().min(1, "Body.workspaceId is required")
+    content: z8.string().min(1, "Body.content is required"),
+    workspaceId: z8.string().trim().min(1, "Body.workspaceId is required")
   })
 );
 var PlatformRecipeImportPreviewRequestSchema = workspaceIdPreprocess;
-var PlatformRecipeImportPreviewResponseSchema = z7.object({
-  ok: z7.literal(true),
+var PlatformRecipeImportPreviewResponseSchema = z8.object({
+  ok: z8.literal(true),
   format: PlatformImportFormatSchema,
-  preview: z7.object({
-    name: z7.string(),
-    notes: z7.string().nullable(),
-    beerJsonRecipeJson: z7.unknown(),
-    warnings: z7.array(z7.string())
+  preview: z8.object({
+    name: z8.string(),
+    notes: z8.string().nullable(),
+    beerJsonRecipeJson: z8.unknown(),
+    warnings: z8.array(z8.string())
   }),
-  workspaceId: z7.string().min(1)
+  workspaceId: z8.string().min(1)
 });
-var PlatformRecipeImportRequestSchema = z7.preprocess(
+var PlatformRecipeImportRequestSchema = z8.preprocess(
   (raw) => {
     if (raw === null || raw === void 0) return {};
     if (typeof raw !== "object") return raw;
     const r = raw;
     return { ...r, workspaceId: r["workspaceId"] ?? r["accountId"] };
   },
-  z7.object({
+  z8.object({
     format: PlatformImportFormatSchema,
-    content: z7.string().min(1, "Body.content is required"),
-    styleKey: z7.string().optional(),
-    workspaceId: z7.string().trim().min(1, "Body.workspaceId is required"),
-    recipeExtJson: z7.unknown().optional()
+    content: z8.string().min(1, "Body.content is required"),
+    styleKey: z8.string().optional(),
+    workspaceId: z8.string().trim().min(1, "Body.workspaceId is required"),
+    recipeExtJson: z8.unknown().optional()
   })
 );
-var PlatformRecipeImportResponseSchema = z7.object({
-  ok: z7.literal(true),
-  recipe: z7.unknown(),
-  warnings: z7.array(z7.string())
+var PlatformRecipeImportResponseSchema = z8.object({
+  ok: z8.literal(true),
+  recipe: z8.unknown(),
+  warnings: z8.array(z8.string())
 });
 var PlatformRecipeBulkImportPreviewRequestSchema = workspaceIdPreprocess;
-var PlatformRecipeBulkImportPreviewItemSchema = z7.object({
-  index: z7.number().int(),
-  name: z7.string(),
-  notes: z7.string().nullable(),
-  resolvedStyleKey: z7.string(),
-  resolvedStyleName: z7.string().nullable(),
-  resolvedStyleCode: z7.string().nullable(),
-  warnings: z7.array(z7.string())
+var PlatformRecipeBulkImportPreviewItemSchema = z8.object({
+  index: z8.number().int(),
+  name: z8.string(),
+  notes: z8.string().nullable(),
+  resolvedStyleKey: z8.string(),
+  resolvedStyleName: z8.string().nullable(),
+  resolvedStyleCode: z8.string().nullable(),
+  warnings: z8.array(z8.string())
 });
-var PlatformRecipeBulkImportPreviewResponseSchema = z7.object({
-  ok: z7.literal(true),
+var PlatformRecipeBulkImportPreviewResponseSchema = z8.object({
+  ok: z8.literal(true),
   format: PlatformImportFormatSchema,
-  previewItems: z7.array(PlatformRecipeBulkImportPreviewItemSchema),
-  workspaceId: z7.string().min(1)
+  previewItems: z8.array(PlatformRecipeBulkImportPreviewItemSchema),
+  workspaceId: z8.string().min(1)
 });
 var PlatformRecipeBulkImportRequestSchema = workspaceIdPreprocess;
-var PlatformRecipeBulkImportResponseSchema = z7.object({
-  ok: z7.literal(true),
-  created: z7.array(
-    z7.object({
-      index: z7.number().int(),
-      recipeId: z7.string().min(1),
-      name: z7.string(),
-      styleKey: z7.string(),
-      style: z7.unknown().nullable(),
-      warnings: z7.array(z7.string())
+var PlatformRecipeBulkImportResponseSchema = z8.object({
+  ok: z8.literal(true),
+  created: z8.array(
+    z8.object({
+      index: z8.number().int(),
+      recipeId: z8.string().min(1),
+      name: z8.string(),
+      styleKey: z8.string(),
+      style: z8.unknown().nullable(),
+      warnings: z8.array(z8.string())
     })
   ),
-  failed: z7.array(
-    z7.object({
-      index: z7.number().int(),
-      name: z7.string(),
-      error: z7.string()
+  failed: z8.array(
+    z8.object({
+      index: z8.number().int(),
+      name: z8.string(),
+      error: z8.string()
     })
   )
 });
-var PlatformAdminOkResponseSchema = z7.object({
-  ok: z7.literal(true)
+var PlatformAdminOkResponseSchema = z8.object({
+  ok: z8.literal(true)
 });
 
 // src/webhooks/routeSchemas.ts
-import { z as z8 } from "zod";
-var WebhookOkResponseSchema = z8.object({
-  ok: z8.literal(true)
-});
-var WebhookStripeBodySchema = z8.record(z8.string(), z8.unknown());
-var WebhookRevenuecatBodySchema = z8.unknown();
-
-// src/brewery/routeSchemas.ts
 import { z as z9 } from "zod";
-var isoDateTime6 = z9.preprocess((v) => {
-  if (v instanceof Date) return v.toISOString();
-  return v;
-}, z9.string());
-var OkResponseSchema = z9.object({
+var WebhookOkResponseSchema = z9.object({
   ok: z9.literal(true)
 });
-var IdParamsSchema = z9.object({
-  id: z9.string().min(1, "id required")
+var WebhookStripeBodySchema = z9.record(z9.string(), z9.unknown());
+var WebhookRevenuecatBodySchema = z9.unknown();
+
+// src/brewery/routeSchemas.ts
+import { z as z10 } from "zod";
+var isoDateTime6 = z10.preprocess((v) => {
+  if (v instanceof Date) return v.toISOString();
+  return v;
+}, z10.string());
+var OkResponseSchema = z10.object({
+  ok: z10.literal(true)
 });
-var InventoryCategoryQuerySchema = z9.object({
-  category: z9.string().optional()
+var IdParamsSchema = z10.object({
+  id: z10.string().min(1, "id required")
 });
-var BeerStyleSchema = z9.object({
-  key: z9.string(),
-  name: z9.string(),
-  source: z9.string(),
-  version: z9.number(),
-  code: z9.string().nullable(),
-  category: z9.string().nullable(),
-  categoryId: z9.string().nullable(),
-  sortOrder: z9.number()
+var InventoryCategoryQuerySchema = z10.object({
+  category: z10.string().optional()
 });
-var StylesListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  styles: z9.array(BeerStyleSchema)
+var BeerStyleSchema = z10.object({
+  key: z10.string(),
+  name: z10.string(),
+  source: z10.string(),
+  version: z10.number(),
+  code: z10.string().nullable(),
+  category: z10.string().nullable(),
+  categoryId: z10.string().nullable(),
+  sortOrder: z10.number()
 });
-var EquipmentProfilePayloadSchema = z9.object({
-  id: z9.string(),
-  workspaceId: z9.string(),
-  name: z9.string(),
-  equipment: z9.record(z9.string(), z9.unknown()),
+var StylesListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  styles: z10.array(BeerStyleSchema)
+});
+var EquipmentProfilePayloadSchema = z10.object({
+  id: z10.string(),
+  workspaceId: z10.string(),
+  name: z10.string(),
+  equipment: z10.record(z10.string(), z10.unknown()),
   createdAt: isoDateTime6,
   updatedAt: isoDateTime6
 });
-var EquipmentProfilesListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  profiles: z9.array(EquipmentProfilePayloadSchema)
+var EquipmentProfilesListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  profiles: z10.array(EquipmentProfilePayloadSchema)
 });
-var EquipmentProfileResponseSchema = z9.object({
-  ok: z9.literal(true),
+var EquipmentProfileResponseSchema = z10.object({
+  ok: z10.literal(true),
   profile: EquipmentProfilePayloadSchema
 });
-var EquipmentProfileCreateRequestSchema = z9.record(z9.string(), z9.unknown());
-var EquipmentProfilePatchRequestSchema = z9.record(z9.string(), z9.unknown());
-var InventoryItemPayloadSchema = z9.object({
-  id: z9.string(),
-  workspaceId: z9.string(),
-  category: z9.string(),
-  ingredientId: z9.string().nullable(),
-  name: z9.string(),
-  quantity: z9.number(),
-  unit: z9.string(),
-  metadataJson: z9.unknown().nullable(),
+var EquipmentProfileCreateRequestSchema = z10.record(z10.string(), z10.unknown());
+var EquipmentProfilePatchRequestSchema = z10.record(z10.string(), z10.unknown());
+var InventoryItemPayloadSchema = z10.object({
+  id: z10.string(),
+  workspaceId: z10.string(),
+  category: z10.string(),
+  ingredientId: z10.string().nullable(),
+  name: z10.string(),
+  quantity: z10.number(),
+  unit: z10.string(),
+  metadataJson: z10.unknown().nullable(),
   createdAt: isoDateTime6,
   updatedAt: isoDateTime6
 });
-var InventoryListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  items: z9.array(InventoryItemPayloadSchema)
+var InventoryListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  items: z10.array(InventoryItemPayloadSchema)
 });
-var InventoryItemResponseSchema = z9.object({
-  ok: z9.literal(true),
+var InventoryItemResponseSchema = z10.object({
+  ok: z10.literal(true),
   item: InventoryItemPayloadSchema
 });
-var InventoryCreateRequestSchema = z9.record(z9.string(), z9.unknown());
-var InventoryPatchRequestSchema = z9.record(z9.string(), z9.unknown());
-var BrewdaySettingsPayloadSchema = z9.record(z9.string(), z9.unknown());
-var BrewdaySettingsResponseSchema = z9.object({
-  ok: z9.literal(true),
+var InventoryCreateRequestSchema = z10.record(z10.string(), z10.unknown());
+var InventoryPatchRequestSchema = z10.record(z10.string(), z10.unknown());
+var BrewdaySettingsPayloadSchema = z10.record(z10.string(), z10.unknown());
+var BrewdaySettingsResponseSchema = z10.object({
+  ok: z10.literal(true),
   settings: BrewdaySettingsPayloadSchema.nullable()
 });
-var BrewdaySettingsPatchRequestSchema = z9.record(z9.string(), z9.unknown());
-var RecipePayloadSchema = z9.record(z9.string(), z9.unknown());
-var RecipeListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  recipes: z9.array(z9.record(z9.string(), z9.unknown()))
+var BrewdaySettingsPatchRequestSchema = z10.record(z10.string(), z10.unknown());
+var RecipePayloadSchema = z10.record(z10.string(), z10.unknown());
+var RecipeListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  recipes: z10.array(z10.record(z10.string(), z10.unknown()))
 });
-var RecipeResponseSchema = z9.object({
-  ok: z9.literal(true),
+var RecipeResponseSchema = z10.object({
+  ok: z10.literal(true),
   recipe: RecipePayloadSchema
 });
-var RecipeCreateRequestSchema = z9.object({
-  name: z9.string(),
-  styleKey: z9.string().optional(),
-  notes: z9.string().nullable().optional(),
-  beerJsonRecipeJson: z9.unknown().optional(),
-  recipeExtJson: z9.unknown().optional()
+var RecipeCreateRequestSchema = z10.object({
+  name: z10.string(),
+  styleKey: z10.string().optional(),
+  notes: z10.string().nullable().optional(),
+  beerJsonRecipeJson: z10.unknown().optional(),
+  recipeExtJson: z10.unknown().optional()
 });
-var RecipePatchRequestSchema = z9.object({
-  name: z9.string().optional(),
-  styleKey: z9.string().optional(),
-  notes: z9.string().optional(),
-  beerJsonRecipeJson: z9.unknown().optional(),
-  recipeExtJson: z9.unknown().optional()
+var RecipePatchRequestSchema = z10.object({
+  name: z10.string().optional(),
+  styleKey: z10.string().optional(),
+  notes: z10.string().optional(),
+  beerJsonRecipeJson: z10.unknown().optional(),
+  recipeExtJson: z10.unknown().optional()
 });
-var RecipeVersionsResponseSchema = z9.object({
-  ok: z9.literal(true),
-  versions: z9.array(z9.record(z9.string(), z9.unknown()))
+var RecipeVersionsResponseSchema = z10.object({
+  ok: z10.literal(true),
+  versions: z10.array(z10.record(z10.string(), z10.unknown()))
 });
-var BeerJsonExportResponseSchema = z9.custom(
+var BeerJsonExportResponseSchema = z10.custom(
   (data) => data instanceof Buffer,
   { message: "Expected binary export body" }
 );
-var RecipeIdParamsSchema = z9.object({
-  recipeId: z9.string().min(1, "recipeId required")
+var RecipeIdParamsSchema = z10.object({
+  recipeId: z10.string().min(1, "recipeId required")
 });
-var BrewSessionIdParamsSchema = z9.object({
-  brewSessionId: z9.string().min(1, "brewSessionId required")
+var BrewSessionIdParamsSchema = z10.object({
+  brewSessionId: z10.string().min(1, "brewSessionId required")
 });
-var BrewSessionStepParamsSchema = z9.object({
-  brewSessionId: z9.string().min(1, "brewSessionId required"),
-  stepId: z9.string().min(1, "stepId required")
+var BrewSessionStepParamsSchema = z10.object({
+  brewSessionId: z10.string().min(1, "brewSessionId required"),
+  stepId: z10.string().min(1, "stepId required")
 });
-var IngredientsSearchQuerySchema = z9.object({
-  query: z9.string().optional(),
-  offset: z9.coerce.number().int().nonnegative().optional(),
-  limit: z9.coerce.number().int().positive().optional()
+var IngredientsSearchQuerySchema = z10.object({
+  query: z10.string().optional(),
+  offset: z10.coerce.number().int().nonnegative().optional(),
+  limit: z10.coerce.number().int().positive().optional()
 });
-var IntegrationReadingsQuerySchema = z9.object({
-  kind: z9.enum(["tilt", "ispindel", "rapt"]),
-  limit: z9.coerce.number().int().positive().optional()
+var IntegrationReadingsQuerySchema = z10.object({
+  kind: z10.enum(["tilt", "ispindel", "rapt"]),
+  limit: z10.coerce.number().int().positive().optional()
 });
-var FermentableItemSchema = z9.record(z9.string(), z9.unknown());
-var FermentablesListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  items: z9.array(FermentableItemSchema),
-  total: z9.number(),
-  offset: z9.number(),
-  limit: z9.number()
+var FermentableItemSchema = z10.record(z10.string(), z10.unknown());
+var FermentablesListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  items: z10.array(FermentableItemSchema),
+  total: z10.number(),
+  offset: z10.number(),
+  limit: z10.number()
 });
-var HopItemSchema = z9.record(z9.string(), z9.unknown());
-var HopsListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  items: z9.array(HopItemSchema),
-  total: z9.number(),
-  offset: z9.number(),
-  limit: z9.number()
+var HopItemSchema = z10.record(z10.string(), z10.unknown());
+var HopsListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  items: z10.array(HopItemSchema),
+  total: z10.number(),
+  offset: z10.number(),
+  limit: z10.number()
 });
-var YeastItemSchema = z9.record(z9.string(), z9.unknown());
-var YeastsListResponseSchema = z9.object({
-  ok: z9.literal(true),
-  items: z9.array(YeastItemSchema)
+var YeastItemSchema = z10.record(z10.string(), z10.unknown());
+var YeastsListResponseSchema = z10.object({
+  ok: z10.literal(true),
+  items: z10.array(YeastItemSchema)
 });
-var IngredientSyncRunSchema = z9.record(z9.string(), z9.unknown());
-var IngredientSyncRunsResponseSchema = z9.object({
-  ok: z9.literal(true),
-  runs: z9.array(IngredientSyncRunSchema)
+var IngredientSyncRunSchema = z10.record(z10.string(), z10.unknown());
+var IngredientSyncRunsResponseSchema = z10.object({
+  ok: z10.literal(true),
+  runs: z10.array(IngredientSyncRunSchema)
 });
-var IngredientSyncResultSchema = z9.record(z9.string(), z9.unknown());
-var IngredientSyncResponseSchema = z9.object({
-  ok: z9.literal(true),
+var IngredientSyncResultSchema = z10.record(z10.string(), z10.unknown());
+var IngredientSyncResponseSchema = z10.object({
+  ok: z10.literal(true),
   result: IngredientSyncResultSchema
 });
-var RecipeImportFormatSchema = z9.enum(["beerjson", "beerxml"]);
-var RecipeImportWarningSchema = z9.object({
-  code: z9.string(),
-  message: z9.string()
+var RecipeImportFormatSchema = z10.enum(["beerjson", "beerxml"]);
+var RecipeImportWarningSchema = z10.object({
+  code: z10.string(),
+  message: z10.string()
 });
-var RecipeImportRequestSchema = z9.object({
+var RecipeImportRequestSchema = z10.object({
   format: RecipeImportFormatSchema,
-  content: z9.string().min(1),
-  styleKey: z9.string().optional()
+  content: z10.string().min(1),
+  styleKey: z10.string().optional()
 });
-var RecipeBulkImportRequestSchema = z9.object({
+var RecipeBulkImportRequestSchema = z10.object({
   format: RecipeImportFormatSchema,
-  content: z9.string().min(1)
+  content: z10.string().min(1)
 });
-var RecipeImportPreviewPayloadSchema = z9.record(z9.string(), z9.unknown());
-var RecipeImportPreviewResponseSchema = z9.object({
-  ok: z9.literal(true),
+var RecipeImportPreviewPayloadSchema = z10.record(z10.string(), z10.unknown());
+var RecipeImportPreviewResponseSchema = z10.object({
+  ok: z10.literal(true),
   format: RecipeImportFormatSchema,
   preview: RecipeImportPreviewPayloadSchema,
-  workspaceId: z9.string()
+  workspaceId: z10.string()
 });
-var RecipeImportResponseSchema = z9.object({
-  ok: z9.literal(true),
+var RecipeImportResponseSchema = z10.object({
+  ok: z10.literal(true),
   recipe: RecipePayloadSchema,
-  warnings: z9.array(RecipeImportWarningSchema).optional()
+  warnings: z10.array(RecipeImportWarningSchema).optional()
 });
-var RecipeBulkImportPreviewItemSchema = z9.record(z9.string(), z9.unknown());
-var RecipeBulkImportPreviewResponseSchema = z9.object({
-  ok: z9.literal(true),
+var RecipeBulkImportPreviewItemSchema = z10.record(z10.string(), z10.unknown());
+var RecipeBulkImportPreviewResponseSchema = z10.object({
+  ok: z10.literal(true),
   format: RecipeImportFormatSchema,
-  previewItems: z9.array(RecipeBulkImportPreviewItemSchema),
-  workspaceId: z9.string()
+  previewItems: z10.array(RecipeBulkImportPreviewItemSchema),
+  workspaceId: z10.string()
 });
-var RecipeBulkImportCreatedItemSchema = z9.record(z9.string(), z9.unknown());
-var RecipeBulkImportFailedItemSchema = z9.object({
-  index: z9.number(),
-  name: z9.string(),
-  error: z9.string()
+var RecipeBulkImportCreatedItemSchema = z10.record(z10.string(), z10.unknown());
+var RecipeBulkImportFailedItemSchema = z10.object({
+  index: z10.number(),
+  name: z10.string(),
+  error: z10.string()
 });
-var RecipeBulkImportResponseSchema = z9.object({
-  ok: z9.literal(true),
-  created: z9.array(RecipeBulkImportCreatedItemSchema),
-  failed: z9.array(RecipeBulkImportFailedItemSchema)
+var RecipeBulkImportResponseSchema = z10.object({
+  ok: z10.literal(true),
+  created: z10.array(RecipeBulkImportCreatedItemSchema),
+  failed: z10.array(RecipeBulkImportFailedItemSchema)
 });
 
 // src/water/parseHubSummary.ts
@@ -1410,10 +1416,10 @@ function parseBoilComputeAndSaveResponse(x) {
 }
 
 // src/water/routeSchemas.ts
-import { z as z10 } from "zod";
-var recordBody = z10.record(z10.string(), z10.unknown());
-var recordResult = z10.record(z10.string(), z10.unknown());
-var RecipeWaterHubSummaryResponseSchema = z10.custom(
+import { z as z11 } from "zod";
+var recordBody = z11.record(z11.string(), z11.unknown());
+var recordResult = z11.record(z11.string(), z11.unknown());
+var RecipeWaterHubSummaryResponseSchema = z11.custom(
   (data) => {
     try {
       parseRecipeWaterHubSummaryResponse(data);
@@ -1424,7 +1430,7 @@ var RecipeWaterHubSummaryResponseSchema = z10.custom(
   },
   { message: "Invalid recipe water hub summary response" }
 );
-var WaterProfilesListResponseSchema = z10.custom(
+var WaterProfilesListResponseSchema = z11.custom(
   (data) => {
     try {
       parseWaterProfilesResponse(data);
@@ -1435,7 +1441,7 @@ var WaterProfilesListResponseSchema = z10.custom(
   },
   { message: "Invalid water profiles list response" }
 );
-var WaterProfileItemSchema = z10.custom(
+var WaterProfileItemSchema = z11.custom(
   (data) => {
     try {
       parseWaterProfileItem(data);
@@ -1446,15 +1452,15 @@ var WaterProfileItemSchema = z10.custom(
   },
   { message: "Invalid water profile" }
 );
-var WaterProfileResponseSchema = z10.object({
-  ok: z10.literal(true),
+var WaterProfileResponseSchema = z11.object({
+  ok: z11.literal(true),
   profile: WaterProfileItemSchema
 });
-var ionField = z10.union([z10.number(), z10.string(), z10.null()]).optional();
-var WaterProfileCreateRequestSchema = z10.object({
-  scope: z10.enum(["system", "account", "public"]).optional(),
-  type: z10.enum(["water", "dilution"]).optional(),
-  name: z10.string().optional(),
+var ionField = z11.union([z11.number(), z11.string(), z11.null()]).optional();
+var WaterProfileCreateRequestSchema = z11.object({
+  scope: z11.enum(["system", "account", "public"]).optional(),
+  type: z11.enum(["water", "dilution"]).optional(),
+  name: z11.string().optional(),
   ph: ionField,
   calcium: ionField,
   magnesium: ionField,
@@ -1464,21 +1470,21 @@ var WaterProfileCreateRequestSchema = z10.object({
   bicarbonate: ionField
 });
 var WaterProfilePatchRequestSchema = WaterProfileCreateRequestSchema.extend({
-  verificationStatus: z10.enum(["verified", "unverified"]).optional()
+  verificationStatus: z11.enum(["verified", "unverified"]).optional()
 });
-var RecipeWaterSettingsPayloadSchema = z10.record(z10.string(), z10.unknown());
-var RecipeWaterSettingsGetResponseSchema = z10.object({
-  ok: z10.literal(true),
+var RecipeWaterSettingsPayloadSchema = z11.record(z11.string(), z11.unknown());
+var RecipeWaterSettingsGetResponseSchema = z11.object({
+  ok: z11.literal(true),
   settings: RecipeWaterSettingsPayloadSchema.nullable()
 });
-var RecipeWaterSettingsPutRequestSchema = z10.record(z10.string(), z10.unknown());
-var RecipeWaterSettingsPutResponseSchema = z10.object({
-  ok: z10.literal(true),
+var RecipeWaterSettingsPutRequestSchema = z11.record(z11.string(), z11.unknown());
+var RecipeWaterSettingsPutResponseSchema = z11.object({
+  ok: z11.literal(true),
   settings: RecipeWaterSettingsPayloadSchema
 });
-var emptyObjectBody = (schema) => z10.preprocess((raw) => raw === null || raw === void 0 ? {} : raw, schema);
-var MashComputeAndSaveRequestSchema = emptyObjectBody(z10.record(z10.string(), z10.unknown()));
-var MashComputeAndSaveResponseSchema = z10.custom(
+var emptyObjectBody = (schema) => z11.preprocess((raw) => raw === null || raw === void 0 ? {} : raw, schema);
+var MashComputeAndSaveRequestSchema = emptyObjectBody(z11.record(z11.string(), z11.unknown()));
+var MashComputeAndSaveResponseSchema = z11.custom(
   (data) => {
     try {
       parseMashComputeAndSaveResponse(data);
@@ -1489,8 +1495,8 @@ var MashComputeAndSaveResponseSchema = z10.custom(
   },
   { message: "Invalid mash compute-and-save response" }
 );
-var SpargeComputeAndSaveRequestSchema = emptyObjectBody(z10.record(z10.string(), z10.unknown()));
-var SpargeComputeAndSaveResponseSchema = z10.custom(
+var SpargeComputeAndSaveRequestSchema = emptyObjectBody(z11.record(z11.string(), z11.unknown()));
+var SpargeComputeAndSaveResponseSchema = z11.custom(
   (data) => {
     try {
       parseSpargeComputeAndSaveResponse(data);
@@ -1501,8 +1507,8 @@ var SpargeComputeAndSaveResponseSchema = z10.custom(
   },
   { message: "Invalid sparge compute-and-save response" }
 );
-var BoilComputeAndSaveRequestSchema = emptyObjectBody(z10.record(z10.string(), z10.unknown()));
-var BoilComputeAndSaveResponseSchema = z10.custom(
+var BoilComputeAndSaveRequestSchema = emptyObjectBody(z11.record(z11.string(), z11.unknown()));
+var BoilComputeAndSaveResponseSchema = z11.custom(
   (data) => {
     try {
       parseBoilComputeAndSaveResponse(data);
@@ -1514,13 +1520,13 @@ var BoilComputeAndSaveResponseSchema = z10.custom(
   { message: "Invalid boil compute-and-save response" }
 );
 var WaterCalcRequestSchema = recordBody;
-var WaterCalcWithDerivationResponseSchema = z10.object({
-  ok: z10.literal(true),
+var WaterCalcWithDerivationResponseSchema = z11.object({
+  ok: z11.literal(true),
   result: recordResult,
   derivation: recordResult
 });
-var WaterCalcResultOnlyResponseSchema = z10.object({
-  ok: z10.literal(true),
+var WaterCalcResultOnlyResponseSchema = z11.object({
+  ok: z11.literal(true),
   result: recordResult
 });
 
@@ -1674,154 +1680,154 @@ function parseGravityAnalysisResponseV1(x) {
 }
 
 // src/ai/aiUsage.ts
-import { z as z11 } from "zod";
-var AiUsageMonthlySchema = z11.object({
-  tokensIn: z11.number().int().nonnegative(),
-  tokensOut: z11.number().int().nonnegative(),
-  costMicroUsd: z11.number().nonnegative(),
-  callCount: z11.number().int().nonnegative()
+import { z as z12 } from "zod";
+var AiUsageMonthlySchema = z12.object({
+  tokensIn: z12.number().int().nonnegative(),
+  tokensOut: z12.number().int().nonnegative(),
+  costMicroUsd: z12.number().nonnegative(),
+  callCount: z12.number().int().nonnegative()
 });
-var AiUsageDailyPointSchema = z11.object({
-  day: z11.string(),
-  tokensIn: z11.number().int().nonnegative(),
-  tokensOut: z11.number().int().nonnegative(),
-  calls: z11.number().int().nonnegative()
+var AiUsageDailyPointSchema = z12.object({
+  day: z12.string(),
+  tokensIn: z12.number().int().nonnegative(),
+  tokensOut: z12.number().int().nonnegative(),
+  calls: z12.number().int().nonnegative()
 });
-var AiUsageByUserSchema = z11.object({
-  userId: z11.string().min(1),
-  email: z11.string().nullable(),
-  role: z11.string().nullable(),
-  tokensInToday: z11.number().int().nonnegative(),
-  tokensOutToday: z11.number().int().nonnegative(),
-  tokensInMonth: z11.number().int().nonnegative(),
-  tokensOutMonth: z11.number().int().nonnegative(),
-  costMicroUsdMonth: z11.number().nonnegative(),
-  callCountMonth: z11.number().int().nonnegative()
+var AiUsageByUserSchema = z12.object({
+  userId: z12.string().min(1),
+  email: z12.string().nullable(),
+  role: z12.string().nullable(),
+  tokensInToday: z12.number().int().nonnegative(),
+  tokensOutToday: z12.number().int().nonnegative(),
+  tokensInMonth: z12.number().int().nonnegative(),
+  tokensOutMonth: z12.number().int().nonnegative(),
+  costMicroUsdMonth: z12.number().nonnegative(),
+  callCountMonth: z12.number().int().nonnegative()
 });
-var AiUsageRoleAlertSchema = z11.object({
-  role: z11.string(),
-  used: z11.number().nonnegative(),
-  limit: z11.number().nonnegative(),
-  percent: z11.number().nonnegative()
+var AiUsageRoleAlertSchema = z12.object({
+  role: z12.string(),
+  used: z12.number().nonnegative(),
+  limit: z12.number().nonnegative(),
+  percent: z12.number().nonnegative()
 });
-var AiUsageUserAlertSchema = z11.object({
-  userId: z11.string().min(1),
-  usedToday: z11.number().nonnegative(),
-  cap: z11.number().nonnegative(),
-  percent: z11.number().nonnegative()
+var AiUsageUserAlertSchema = z12.object({
+  userId: z12.string().min(1),
+  usedToday: z12.number().nonnegative(),
+  cap: z12.number().nonnegative(),
+  percent: z12.number().nonnegative()
 });
-var WorkspaceAiUsageResponseSchema = z11.object({
-  ok: z11.literal(true),
+var WorkspaceAiUsageResponseSchema = z12.object({
+  ok: z12.literal(true),
   monthly: AiUsageMonthlySchema,
-  dailySeries: z11.array(AiUsageDailyPointSchema),
-  roleLimits: z11.record(z11.string(), z11.number()),
-  roleUsage: z11.record(z11.string(), z11.number()),
-  perUserDailyCap: z11.number().int().nonnegative(),
-  byUser: z11.array(AiUsageByUserSchema),
-  alerts: z11.object({
-    roleAlerts: z11.array(AiUsageRoleAlertSchema),
-    userAlerts: z11.array(AiUsageUserAlertSchema)
+  dailySeries: z12.array(AiUsageDailyPointSchema),
+  roleLimits: z12.record(z12.string(), z12.number()),
+  roleUsage: z12.record(z12.string(), z12.number()),
+  perUserDailyCap: z12.number().int().nonnegative(),
+  byUser: z12.array(AiUsageByUserSchema),
+  alerts: z12.object({
+    roleAlerts: z12.array(AiUsageRoleAlertSchema),
+    userAlerts: z12.array(AiUsageUserAlertSchema)
   })
 });
-var AiToolCallRecordSchema = z11.object({
-  name: z11.string(),
-  argsJson: z11.string(),
-  resultJson: z11.string(),
-  durationMs: z11.number().nonnegative(),
-  errored: z11.boolean()
+var AiToolCallRecordSchema = z12.object({
+  name: z12.string(),
+  argsJson: z12.string(),
+  resultJson: z12.string(),
+  durationMs: z12.number().nonnegative(),
+  errored: z12.boolean()
 });
-var AiUsageLedgerEntrySchema = z11.object({
-  id: z11.string().min(1),
-  workspaceId: z11.string().min(1),
-  userId: z11.string().min(1),
-  sessionId: z11.string().nullable(),
-  model: z11.string(),
-  tokensIn: z11.number().int().nonnegative(),
-  tokensOut: z11.number().int().nonnegative(),
-  costMicroUsd: z11.number().nonnegative(),
-  durationMs: z11.number().nonnegative(),
-  providerRequestId: z11.string().nullable(),
-  toolCalls: z11.array(AiToolCallRecordSchema),
-  createdAt: z11.string()
+var AiUsageLedgerEntrySchema = z12.object({
+  id: z12.string().min(1),
+  workspaceId: z12.string().min(1),
+  userId: z12.string().min(1),
+  sessionId: z12.string().nullable(),
+  model: z12.string(),
+  tokensIn: z12.number().int().nonnegative(),
+  tokensOut: z12.number().int().nonnegative(),
+  costMicroUsd: z12.number().nonnegative(),
+  durationMs: z12.number().nonnegative(),
+  providerRequestId: z12.string().nullable(),
+  toolCalls: z12.array(AiToolCallRecordSchema),
+  createdAt: z12.string()
 });
 
 // src/ai/aiSettings.ts
-import { z as z12 } from "zod";
-var AiProviderSchema = z12.enum(["anthropic", "openai"]);
-var AiRoleLimitsSchema = z12.record(z12.string(), z12.number().nonnegative());
-var WorkspaceAiSettingsSchema = z12.object({
-  workspaceId: z12.string().min(1),
+import { z as z13 } from "zod";
+var AiProviderSchema = z13.enum(["anthropic", "openai"]);
+var AiRoleLimitsSchema = z13.record(z13.string(), z13.number().nonnegative());
+var WorkspaceAiSettingsSchema = z13.object({
+  workspaceId: z13.string().min(1),
   provider: AiProviderSchema,
-  hasKey: z12.boolean(),
-  enabled: z12.boolean(),
+  hasKey: z13.boolean(),
+  enabled: z13.boolean(),
   roleLimits: AiRoleLimitsSchema,
-  perUserDailyCap: z12.number().int().nonnegative(),
-  dataEgressAccepted: z12.boolean(),
-  dataEgressAcceptedAt: z12.string().nullable(),
-  createdAt: z12.string(),
-  updatedAt: z12.string()
+  perUserDailyCap: z13.number().int().nonnegative(),
+  dataEgressAccepted: z13.boolean(),
+  dataEgressAcceptedAt: z13.string().nullable(),
+  createdAt: z13.string(),
+  updatedAt: z13.string()
 });
-var UpdateWorkspaceAiSettingsRequestSchema = z12.object({
+var UpdateWorkspaceAiSettingsRequestSchema = z13.object({
   provider: AiProviderSchema.optional(),
-  apiKey: z12.string().optional(),
-  enabled: z12.boolean().optional(),
+  apiKey: z13.string().optional(),
+  enabled: z13.boolean().optional(),
   roleLimits: AiRoleLimitsSchema.optional(),
-  perUserDailyCap: z12.number().int().nonnegative().optional(),
-  dataEgressAccepted: z12.boolean().optional()
+  perUserDailyCap: z13.number().int().nonnegative().optional(),
+  dataEgressAccepted: z13.boolean().optional()
 }).strict();
-var WorkspaceAiSettingsResponseSchema = z12.object({
-  ok: z12.literal(true),
+var WorkspaceAiSettingsResponseSchema = z13.object({
+  ok: z13.literal(true),
   settings: WorkspaceAiSettingsSchema
 });
-var WorkspaceAiSettingsParamsSchema = z12.object({
-  workspaceId: z12.string().trim().min(1, "Params.workspaceId is required")
+var WorkspaceAiSettingsParamsSchema = z13.object({
+  workspaceId: z13.string().trim().min(1, "Params.workspaceId is required")
 });
 
 // src/ai/aiChat.ts
-import { z as z13 } from "zod";
-var AiChatRequestBodySchema = z13.object({
-  message: z13.string().trim().min(1).max(8e3),
-  sessionId: z13.string().trim().min(1).max(200).optional(),
-  routeId: z13.string().trim().min(1).max(128).optional()
+import { z as z14 } from "zod";
+var AiChatRequestBodySchema = z14.object({
+  message: z14.string().trim().min(1).max(8e3),
+  sessionId: z14.string().trim().min(1).max(200).optional(),
+  routeId: z14.string().trim().min(1).max(128).optional()
 }).strict();
-var AiSseAssistantChunkEventSchema = z13.object({
-  type: z13.literal("assistant_chunk"),
-  text: z13.string()
+var AiSseAssistantChunkEventSchema = z14.object({
+  type: z14.literal("assistant_chunk"),
+  text: z14.string()
 });
-var AiSseToolCallEventSchema = z13.object({
-  type: z13.literal("tool_call"),
-  name: z13.string(),
-  argsJson: z13.string()
+var AiSseToolCallEventSchema = z14.object({
+  type: z14.literal("tool_call"),
+  name: z14.string(),
+  argsJson: z14.string()
 });
-var AiSseToolResultEventSchema = z13.object({
-  type: z13.literal("tool_result"),
-  name: z13.string(),
-  resultJson: z13.string(),
-  durationMs: z13.number(),
-  errored: z13.boolean()
+var AiSseToolResultEventSchema = z14.object({
+  type: z14.literal("tool_result"),
+  name: z14.string(),
+  resultJson: z14.string(),
+  durationMs: z14.number(),
+  errored: z14.boolean()
 });
-var AiSseProposalEventSchema = z13.object({
-  type: z13.literal("proposal"),
-  proposalId: z13.string(),
-  moduleCode: z13.string(),
-  proposalType: z13.string(),
-  summary: z13.string()
+var AiSseProposalEventSchema = z14.object({
+  type: z14.literal("proposal"),
+  proposalId: z14.string(),
+  moduleCode: z14.string(),
+  proposalType: z14.string(),
+  summary: z14.string()
 });
-var AiSseCompleteEventSchema = z13.object({
-  type: z13.literal("complete"),
-  usage: z13.object({
-    tokensIn: z13.number(),
-    tokensOut: z13.number(),
-    durationMs: z13.number(),
-    model: z13.string()
+var AiSseCompleteEventSchema = z14.object({
+  type: z14.literal("complete"),
+  usage: z14.object({
+    tokensIn: z14.number(),
+    tokensOut: z14.number(),
+    durationMs: z14.number(),
+    model: z14.string()
   })
 });
-var AiSseErrorEventSchema = z13.object({
-  type: z13.literal("error"),
-  code: z13.string(),
-  message: z13.string()
+var AiSseErrorEventSchema = z14.object({
+  type: z14.literal("error"),
+  code: z14.string(),
+  message: z14.string()
 });
-var AiSseEventSchema = z13.discriminatedUnion("type", [
+var AiSseEventSchema = z14.discriminatedUnion("type", [
   AiSseAssistantChunkEventSchema,
   AiSseToolCallEventSchema,
   AiSseToolResultEventSchema,
@@ -1831,62 +1837,62 @@ var AiSseEventSchema = z13.discriminatedUnion("type", [
 ]);
 
 // src/ai/aiProposals.ts
-import { z as z14 } from "zod";
-var AiProposalStatusSchema = z14.enum(["pending", "applied", "rejected"]);
-var AiProposalDtoSchema = z14.object({
-  id: z14.string().uuid(),
-  workspaceId: z14.string().uuid(),
-  userId: z14.string().uuid(),
-  moduleCode: z14.string().min(1).max(32),
-  proposalType: z14.string().min(1).max(64),
-  summary: z14.string().min(1).max(2e3),
-  payloadJson: z14.record(z14.string(), z14.unknown()),
+import { z as z15 } from "zod";
+var AiProposalStatusSchema = z15.enum(["pending", "applied", "rejected"]);
+var AiProposalDtoSchema = z15.object({
+  id: z15.string().uuid(),
+  workspaceId: z15.string().uuid(),
+  userId: z15.string().uuid(),
+  moduleCode: z15.string().min(1).max(32),
+  proposalType: z15.string().min(1).max(64),
+  summary: z15.string().min(1).max(2e3),
+  payloadJson: z15.record(z15.string(), z15.unknown()),
   status: AiProposalStatusSchema,
-  createdAt: z14.string(),
-  appliedAt: z14.string().nullable(),
-  rejectedAt: z14.string().nullable()
+  createdAt: z15.string(),
+  appliedAt: z15.string().nullable(),
+  rejectedAt: z15.string().nullable()
 }).strict();
-var AiProposalListResponseSchema = z14.object({
-  ok: z14.literal(true),
-  items: z14.array(AiProposalDtoSchema)
+var AiProposalListResponseSchema = z15.object({
+  ok: z15.literal(true),
+  items: z15.array(AiProposalDtoSchema)
 }).strict();
-var AiProposalIdParamsSchema = z14.object({
-  id: z14.string().trim().min(1, "Params.id is required")
+var AiProposalIdParamsSchema = z15.object({
+  id: z15.string().trim().min(1, "Params.id is required")
 });
-var AiProposalGetResponseSchema = z14.object({
-  ok: z14.literal(true),
+var AiProposalGetResponseSchema = z15.object({
+  ok: z15.literal(true),
   proposal: AiProposalDtoSchema
 }).strict();
-var AiProposalActionResponseSchema = z14.object({
-  ok: z14.literal(true),
+var AiProposalActionResponseSchema = z15.object({
+  ok: z15.literal(true),
   proposal: AiProposalDtoSchema,
-  appliedPreviewOnly: z14.boolean().optional()
+  appliedPreviewOnly: z15.boolean().optional()
 }).strict();
-var MrpProposeOrderAdjustmentInputSchema = z14.object({
-  productionOrderId: z14.string().uuid(),
-  suggestedStartDate: z14.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  suggestedQuantity: z14.number().positive().optional(),
-  rationale: z14.string().max(500).optional()
+var MrpProposeOrderAdjustmentInputSchema = z15.object({
+  productionOrderId: z15.string().uuid(),
+  suggestedStartDate: z15.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  suggestedQuantity: z15.number().positive().optional(),
+  rationale: z15.string().max(500).optional()
 }).strict();
-var MrpProposeOrderAdjustmentOutputSchema = z14.object({
-  ok: z14.literal(true),
-  proposalId: z14.string().uuid(),
-  summary: z14.string()
+var MrpProposeOrderAdjustmentOutputSchema = z15.object({
+  ok: z15.literal(true),
+  proposalId: z15.string().uuid(),
+  summary: z15.string()
 }).strict();
-var CrpProposeScheduleAdjustmentInputSchema = z14.object({
-  resourceId: z14.string().uuid().optional(),
-  suggestedDate: z14.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  rationale: z14.string().max(500).optional()
+var CrpProposeScheduleAdjustmentInputSchema = z15.object({
+  resourceId: z15.string().uuid().optional(),
+  suggestedDate: z15.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  rationale: z15.string().max(500).optional()
 }).strict();
-var CrpProposeScheduleAdjustmentOutputSchema = z14.object({
-  ok: z14.literal(true),
-  proposalId: z14.string().uuid(),
-  summary: z14.string()
+var CrpProposeScheduleAdjustmentOutputSchema = z15.object({
+  ok: z15.literal(true),
+  proposalId: z15.string().uuid(),
+  summary: z15.string()
 }).strict();
 
 // src/rendering/renderJobs.ts
-import { z as z15 } from "zod";
-var RenderKindSchema = z15.enum([
+import { z as z16 } from "zod";
+var RenderKindSchema = z16.enum([
   "pdf",
   "xlsx",
   "csv",
@@ -1898,71 +1904,71 @@ var RenderKindSchema = z15.enum([
   "barcode",
   "qr"
 ]);
-var RenderStatusSchema = z15.enum([
+var RenderStatusSchema = z16.enum([
   "queued",
   "running",
   "succeeded",
   "failed"
 ]);
-var RenderVisibilitySchema = z15.enum(["workspace", "public"]);
-var RenderDeliverySchema = z15.discriminatedUnion("mode", [
-  z15.object({ mode: z15.literal("stream-response") }).strict(),
-  z15.object({
-    mode: z15.literal("persist-to-media"),
+var RenderVisibilitySchema = z16.enum(["workspace", "public"]);
+var RenderDeliverySchema = z16.discriminatedUnion("mode", [
+  z16.object({ mode: z16.literal("stream-response") }).strict(),
+  z16.object({
+    mode: z16.literal("persist-to-media"),
     visibility: RenderVisibilitySchema
   }).strict(),
-  z15.object({
-    mode: z15.literal("email"),
-    to: z15.array(z15.string().email()).min(1, "email.to required"),
-    subject: z15.string().min(1, "email.subject required")
+  z16.object({
+    mode: z16.literal("email"),
+    to: z16.array(z16.string().email()).min(1, "email.to required"),
+    subject: z16.string().min(1, "email.subject required")
   }).strict()
 ]);
-var RenderErrorSchema = z15.object({
-  code: z15.string().min(1, "error.code required"),
-  message: z15.string().min(1, "error.message required")
+var RenderErrorSchema = z16.object({
+  code: z16.string().min(1, "error.code required"),
+  message: z16.string().min(1, "error.message required")
 }).strict();
-var RenderJobSubmitRequestSchema = z15.object({
-  templateRef: z15.string().min(1, "templateRef required"),
+var RenderJobSubmitRequestSchema = z16.object({
+  templateRef: z16.string().min(1, "templateRef required"),
   kind: RenderKindSchema.optional(),
-  data: z15.unknown(),
+  data: z16.unknown(),
   delivery: RenderDeliverySchema.optional()
 }).strict();
-var RenderJobStatusSchema = z15.object({
-  id: z15.string().min(1, "job.id required"),
-  templateRef: z15.string().min(1, "job.templateRef required"),
+var RenderJobStatusSchema = z16.object({
+  id: z16.string().min(1, "job.id required"),
+  templateRef: z16.string().min(1, "job.templateRef required"),
   kind: RenderKindSchema,
   status: RenderStatusSchema,
-  deliveryMode: z15.string().min(1, "job.deliveryMode required"),
-  requestedAt: z15.string().min(1, "job.requestedAt required"),
-  startedAt: z15.string().nullable(),
-  completedAt: z15.string().nullable(),
-  artifactId: z15.string().nullable(),
-  mediaAssetId: z15.string().nullable(),
+  deliveryMode: z16.string().min(1, "job.deliveryMode required"),
+  requestedAt: z16.string().min(1, "job.requestedAt required"),
+  startedAt: z16.string().nullable(),
+  completedAt: z16.string().nullable(),
+  artifactId: z16.string().nullable(),
+  mediaAssetId: z16.string().nullable(),
   error: RenderErrorSchema.nullable()
 }).strict();
-var RenderJobSubmitResponseSchema = z15.object({
-  ok: z15.literal(true),
-  mode: z15.literal("async"),
+var RenderJobSubmitResponseSchema = z16.object({
+  ok: z16.literal(true),
+  mode: z16.literal("async"),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobStatusResponseSchema = z15.object({
-  ok: z15.literal(true),
+var RenderJobStatusResponseSchema = z16.object({
+  ok: z16.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobCancelResponseSchema = z15.object({
-  ok: z15.literal(true),
+var RenderJobCancelResponseSchema = z16.object({
+  ok: z16.literal(true),
   job: RenderJobStatusSchema
 }).strict();
-var RenderJobResultResponseSchema = z15.object({
-  ok: z15.literal(true),
+var RenderJobResultResponseSchema = z16.object({
+  ok: z16.literal(true),
   job: RenderJobStatusSchema,
-  signedUrl: z15.string().min(1, "signedUrl required"),
-  expiresAt: z15.string().min(1, "expiresAt required")
+  signedUrl: z16.string().min(1, "signedUrl required"),
+  expiresAt: z16.string().min(1, "expiresAt required")
 }).strict();
-var ErrorResponseSchema = z15.object({
-  ok: z15.literal(false),
+var ErrorResponseSchema = z16.object({
+  ok: z16.literal(false),
   error: RenderErrorSchema.extend({
-    details: z15.record(z15.string(), z15.unknown()).optional()
+    details: z16.record(z16.string(), z16.unknown()).optional()
   }).strict()
 }).strict();
 function parseRenderJobSubmitRequest(payload) {
@@ -1973,84 +1979,84 @@ function parseRenderJobStatusResponse(payload) {
 }
 
 // src/brewery/listResponses.ts
-import { z as z16 } from "zod";
-var RecipeListItemSchema = z16.object({
-  id: z16.string(),
-  accountId: z16.string().optional(),
-  name: z16.string(),
-  styleKey: z16.string().optional(),
-  style: z16.string().nullable().optional(),
-  version: z16.number().optional()
+import { z as z17 } from "zod";
+var RecipeListItemSchema = z17.object({
+  id: z17.string(),
+  accountId: z17.string().optional(),
+  name: z17.string(),
+  styleKey: z17.string().optional(),
+  style: z17.string().nullable().optional(),
+  version: z17.number().optional()
 });
-var RecipesListResponseSchema = z16.object({
-  ok: z16.literal(true),
-  recipes: z16.array(RecipeListItemSchema)
+var RecipesListResponseSchema = z17.object({
+  ok: z17.literal(true),
+  recipes: z17.array(RecipeListItemSchema)
 });
 function parseRecipesListResponse(payload) {
   return RecipesListResponseSchema.parse(payload);
 }
-var isoDateTime7 = z16.preprocess((v) => {
+var isoDateTime7 = z17.preprocess((v) => {
   if (v instanceof Date) return v.toISOString();
   return v;
-}, z16.string());
-var BrewSessionListItemSchema = z16.object({
-  id: z16.string(),
-  code: z16.string(),
-  status: z16.string(),
+}, z17.string());
+var BrewSessionListItemSchema = z17.object({
+  id: z17.string(),
+  code: z17.string(),
+  status: z17.string(),
   createdAt: isoDateTime7,
-  startedAt: z16.preprocess((v) => v instanceof Date ? v.toISOString() : v, z16.string().nullable()).optional(),
-  stoppedAt: z16.preprocess((v) => v instanceof Date ? v.toISOString() : v, z16.string().nullable()).optional()
+  startedAt: z17.preprocess((v) => v instanceof Date ? v.toISOString() : v, z17.string().nullable()).optional(),
+  stoppedAt: z17.preprocess((v) => v instanceof Date ? v.toISOString() : v, z17.string().nullable()).optional()
 });
-var BrewSessionsListResponseSchema = z16.object({
-  ok: z16.literal(true),
-  brewSessions: z16.array(BrewSessionListItemSchema)
+var BrewSessionsListResponseSchema = z17.object({
+  ok: z17.literal(true),
+  brewSessions: z17.array(BrewSessionListItemSchema)
 });
 function parseBrewSessionsListResponse(payload) {
   return BrewSessionsListResponseSchema.parse(payload);
 }
-var BrewSessionRecipeRefSchema = z16.object({
-  id: z16.string().min(1),
-  name: z16.string(),
-  version: z16.number().int()
+var BrewSessionRecipeRefSchema = z17.object({
+  id: z17.string().min(1),
+  name: z17.string(),
+  version: z17.number().int()
 });
-var BrewSessionLogSchema = z16.object({
-  id: z16.string().min(1),
-  brewSessionId: z16.string().min(1),
-  kind: z16.string(),
-  message: z16.string(),
+var BrewSessionLogSchema = z17.object({
+  id: z17.string().min(1),
+  brewSessionId: z17.string().min(1),
+  kind: z17.string(),
+  message: z17.string(),
   createdAt: isoDateTime7,
-  stepId: z16.string().nullable(),
-  payloadJson: z16.record(z16.string(), z16.unknown()).nullable().optional()
+  stepId: z17.string().nullable(),
+  payloadJson: z17.record(z17.string(), z17.unknown()).nullable().optional()
 }).passthrough();
-var BrewSessionStepSchema = z16.object({
-  id: z16.string().min(1),
-  brewSessionId: z16.string().min(1),
-  name: z16.string(),
-  status: z16.string(),
-  sortOrder: z16.number().int(),
-  sectionId: z16.string(),
-  sectionName: z16.string().nullable(),
+var BrewSessionStepSchema = z17.object({
+  id: z17.string().min(1),
+  brewSessionId: z17.string().min(1),
+  name: z17.string(),
+  status: z17.string(),
+  sortOrder: z17.number().int(),
+  sectionId: z17.string(),
+  sectionName: z17.string().nullable(),
   createdAt: isoDateTime7,
   updatedAt: isoDateTime7,
-  isDisabled: z16.boolean(),
-  customTimerEnabled: z16.boolean(),
-  note: z16.string().nullable(),
-  minutesPlanned: z16.number().nullable(),
-  offsetMinutesFromEnd: z16.number().nullable(),
-  relativeToStepId: z16.string().nullable(),
-  timerAccumulatedSeconds: z16.number(),
+  isDisabled: z17.boolean(),
+  customTimerEnabled: z17.boolean(),
+  note: z17.string().nullable(),
+  minutesPlanned: z17.number().nullable(),
+  offsetMinutesFromEnd: z17.number().nullable(),
+  relativeToStepId: z17.string().nullable(),
+  timerAccumulatedSeconds: z17.number(),
   timerLastStartedAt: isoDateTime7.nullable(),
   timerPausedAt: isoDateTime7.nullable(),
   timerStartedAt: isoDateTime7.nullable(),
-  timerState: z16.string(),
+  timerState: z17.string(),
   timerStoppedAt: isoDateTime7.nullable()
 }).passthrough();
-var BrewSessionPayloadSchema = z16.object({
-  id: z16.string().min(1),
-  workspaceId: z16.string().min(1),
-  recipeId: z16.string().min(1),
-  code: z16.string().nullable(),
-  status: z16.string(),
+var BrewSessionPayloadSchema = z17.object({
+  id: z17.string().min(1),
+  workspaceId: z17.string().min(1),
+  recipeId: z17.string().min(1),
+  code: z17.string().nullable(),
+  status: z17.string(),
   createdAt: isoDateTime7,
   updatedAt: isoDateTime7,
   startedAt: isoDateTime7.nullable(),
@@ -2058,76 +2064,76 @@ var BrewSessionPayloadSchema = z16.object({
   stoppedAt: isoDateTime7.nullable(),
   scheduledDate: isoDateTime7.nullable(),
   recipe: BrewSessionRecipeRefSchema.optional(),
-  steps: z16.array(BrewSessionStepSchema).optional(),
-  logs: z16.array(BrewSessionLogSchema).optional()
+  steps: z17.array(BrewSessionStepSchema).optional(),
+  logs: z17.array(BrewSessionLogSchema).optional()
 }).passthrough();
-var BrewSessionDetailResponseSchema = z16.object({
-  ok: z16.literal(true),
+var BrewSessionDetailResponseSchema = z17.object({
+  ok: z17.literal(true),
   brewSession: BrewSessionPayloadSchema
 });
-var BrewSessionCreateResponseSchema = z16.object({
-  ok: z16.literal(true),
+var BrewSessionCreateResponseSchema = z17.object({
+  ok: z17.literal(true),
   brewSession: BrewSessionPayloadSchema,
-  steps: z16.array(BrewSessionStepSchema)
+  steps: z17.array(BrewSessionStepSchema)
 });
-var BrewSessionStepResponseSchema = z16.object({
-  ok: z16.literal(true),
+var BrewSessionStepResponseSchema = z17.object({
+  ok: z17.literal(true),
   step: BrewSessionStepSchema
 });
-var BrewSessionStepsResponseSchema = z16.object({
-  ok: z16.literal(true),
-  steps: z16.array(BrewSessionStepSchema)
+var BrewSessionStepsResponseSchema = z17.object({
+  ok: z17.literal(true),
+  steps: z17.array(BrewSessionStepSchema)
 });
-var BrewSessionPatchRequestSchema = z16.object({
-  scheduledDate: z16.string().nullable().optional()
+var BrewSessionPatchRequestSchema = z17.object({
+  scheduledDate: z17.string().nullable().optional()
 });
-var BrewSessionStepsPatchRequestSchema = z16.object({
-  steps: z16.array(z16.record(z16.string(), z16.unknown()))
+var BrewSessionStepsPatchRequestSchema = z17.object({
+  steps: z17.array(z17.record(z17.string(), z17.unknown()))
 });
-var BrewSessionStepTimerPatchRequestSchema = z16.object({
-  customTimerEnabled: z16.boolean()
+var BrewSessionStepTimerPatchRequestSchema = z17.object({
+  customTimerEnabled: z17.boolean()
 });
-var BrewSessionStopRequestSchema = z16.preprocess(
+var BrewSessionStopRequestSchema = z17.preprocess(
   (raw) => raw === null || raw === void 0 ? {} : raw,
-  z16.object({
-    reason: z16.enum(["auto", "manual"]).optional()
+  z17.object({
+    reason: z17.enum(["auto", "manual"]).optional()
   })
 );
-var BrewSessionStepLogRequestSchema = z16.object({
-  status: z16.enum(["pending", "in_progress", "done", "skipped", "not_applicable"]),
-  note: z16.string().nullable().optional(),
-  name: z16.string().optional(),
-  isDisabled: z16.boolean().optional()
+var BrewSessionStepLogRequestSchema = z17.object({
+  status: z17.enum(["pending", "in_progress", "done", "skipped", "not_applicable"]),
+  note: z17.string().nullable().optional(),
+  name: z17.string().optional(),
+  isDisabled: z17.boolean().optional()
 });
-var IntegrationAttachmentDeviceSchema = z16.record(z16.string(), z16.unknown());
-var IntegrationAttachmentSchema = z16.object({
-  id: z16.string(),
+var IntegrationAttachmentDeviceSchema = z17.record(z17.string(), z17.unknown());
+var IntegrationAttachmentSchema = z17.object({
+  id: z17.string(),
   attachedAt: isoDateTime7,
   device: IntegrationAttachmentDeviceSchema
 });
-var IntegrationAttachmentsResponseSchema = z16.object({
-  ok: z16.literal(true),
-  attachments: z16.array(IntegrationAttachmentSchema)
+var IntegrationAttachmentsResponseSchema = z17.object({
+  ok: z17.literal(true),
+  attachments: z17.array(IntegrationAttachmentSchema)
 });
-var IntegrationAttachRequestSchema = z16.object({
-  kind: z16.enum(["tilt", "ispindel", "rapt"]),
-  deviceId: z16.string().min(1)
+var IntegrationAttachRequestSchema = z17.object({
+  kind: z17.enum(["tilt", "ispindel", "rapt"]),
+  deviceId: z17.string().min(1)
 });
-var IntegrationAttachResponseSchema = z16.object({
-  ok: z16.literal(true),
-  attachment: z16.record(z16.string(), z16.unknown())
+var IntegrationAttachResponseSchema = z17.object({
+  ok: z17.literal(true),
+  attachment: z17.record(z17.string(), z17.unknown())
 });
-var IntegrationDetachRequestSchema = z16.object({
-  deviceId: z16.string().min(1)
+var IntegrationDetachRequestSchema = z17.object({
+  deviceId: z17.string().min(1)
 });
-var IntegrationDetachResponseSchema = z16.object({
-  ok: z16.literal(true),
-  detachedCount: z16.number()
+var IntegrationDetachResponseSchema = z17.object({
+  ok: z17.literal(true),
+  detachedCount: z17.number()
 });
-var IntegrationReadingSchema = z16.record(z16.string(), z16.unknown());
-var IntegrationReadingsResponseSchema = z16.object({
-  ok: z16.literal(true),
-  readings: z16.array(IntegrationReadingSchema)
+var IntegrationReadingSchema = z17.record(z17.string(), z17.unknown());
+var IntegrationReadingsResponseSchema = z17.object({
+  ok: z17.literal(true),
+  readings: z17.array(IntegrationReadingSchema)
 });
 function parseBrewSessionCreateResponse(payload) {
   const parsed = BrewSessionCreateResponseSchema.parse(payload);
@@ -2227,6 +2233,7 @@ export {
   ErrorResponseSchema,
   FermentableItemSchema,
   FermentablesListResponseSchema,
+  HealthResponseSchema,
   HopItemSchema,
   HopsListResponseSchema,
   IdParamsSchema,

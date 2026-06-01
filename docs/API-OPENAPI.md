@@ -118,7 +118,7 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 - **F1 closure** — **175 documented operations** (~97%). One handler exempt: `POST /ai/chat` SSE (see §Streaming endpoints).
 - **BeerJSON / complex JSON** — OpenAPI may show loose object schemas; contracts + route tables win.
 - **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
-- **Codegen (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** from committed specs (`PlatformOpenApiPaths`, `BreweryOpenApiPaths`). Regenerate with `npm run openapi:codegen -w @umbraculum/api-client`; drift check: `npm run openapi:codegen:check -w @umbraculum/api-client` (wired into T1 OpenAPI slice). Runtime validation remains `@umbraculum/contracts` parsers — generated types are integrator ergonomics, not wire authority.
+- **Codegen + facades (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** plus typed **facades** (`listWorkspaces`, `listRecipes`, rendering helpers, …). Subpath `@umbraculum/api-client/brewery` for add-on SKU. Regenerate types: `npm run openapi:codegen -w @umbraculum/api-client`. Runtime validation remains `@umbraculum/contracts` parsers inside each facade.
 
 ---
 
@@ -134,6 +134,21 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 | Response | `Content-Type: text/event-stream` — each event: `event: <type>\ndata: <json>\n\n` |
 | Event union | `assistant_chunk`, `tool_call`, `tool_result`, `proposal`, `complete`, `error` — see `AiSseEventSchema` in contracts |
 | Client | [`packages/ui/src/ai/useAiChatStream.ts`](../packages/ui/src/ai/useAiChatStream.ts) mirrors the wire format |
+
+---
+
+## Phase E — typed integrator facades (2026-06-01)
+
+Phase E adds **hand-written facades** on `@umbraculum/api-client`: OpenAPI path types (compile-time) + `@umbraculum/contracts` parsers (runtime). Wire authority remains contracts — generated types are ergonomics only.
+
+| Export | Scope |
+|--------|--------|
+| Main entry `@umbraculum/api-client` | Platform facades: auth, workspaces, health, billing, integrations list, rendering jobs |
+| Subpath `@umbraculum/api-client/brewery` | Brewery add-on: recipes, brew sessions, water hub-summary stub |
+
+**Pilot consumers:** `apps/native` (`RecipesListScreen`, `BrewSessionsListScreen`), `apps/web` (`renderJobClient` → platform rendering facades).
+
+**Plans:** OpenAPI Phase E + F10 (Cursor plan `openapi_phase_e_f10_7a3c2d91`) extends Phase D.
 
 ---
 

@@ -2,7 +2,8 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
-import { parseRecipesListResponse, type RecipeListItem } from "@umbraculum/contracts";
+import { listRecipes } from "@umbraculum/api-client/brewery";
+import { type RecipeListItem } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navigation/native";
@@ -90,9 +91,7 @@ export function RecipesListScreen() {
     setError(null);
     setLoading(true);
     try {
-      const res = await api.get("/api/recipes");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const parsed = parseRecipesListResponse(res.data);
+      const parsed = await listRecipes(api);
       setRecipes(
         parsed.recipes.map((r) => ({
           ...r,

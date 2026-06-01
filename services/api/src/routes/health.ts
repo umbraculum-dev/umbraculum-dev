@@ -1,10 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod";
-
-const HealthResponseSchema = z.object({
-  ok: z.literal(true),
-});
+import { HealthResponseSchema } from "@umbraculum/contracts";
 
 export function healthRoutes(app: FastifyInstance): void {
   const zodApp = app.withTypeProvider<ZodTypeProvider>();
@@ -19,6 +15,6 @@ export function healthRoutes(app: FastifyInstance): void {
         },
       },
     },
-    () => ({ ok: true as const }),
+    () => HealthResponseSchema.parse({ ok: true as const }),
   );
 }

@@ -274,7 +274,7 @@ A specific subset of packages — the ones third-party module developers must de
 | `@umbraculum/pim-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/crp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
-| `@umbraculum/api-client` | ✅ in monorepo | **In progress (Phase E)** | — | OpenAPI-derived path types from committed specs; hand-written transport + `@umbraculum/contracts` parsers remain authoritative at runtime. |
+| `@umbraculum/api-client` | ✅ in monorepo | **Phase E complete** | — | OpenAPI-derived path types + typed facades; `@umbraculum/contracts` parsers remain wire authority. Subpath `/brewery` for add-on SKU. |
 
 **Monorepo contributors** still use npm workspaces + `file:` links (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
 

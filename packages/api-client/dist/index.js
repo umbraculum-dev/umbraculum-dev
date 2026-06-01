@@ -1,3 +1,11 @@
+import {
+  ApiClientError,
+  assertOk,
+  getParsed,
+  postParsed,
+  toClientPath
+} from "./chunk-WH3JLE2U.js";
+
 // src/auth.ts
 function cookieAuth() {
   return {
@@ -80,7 +88,104 @@ function createApiClient(baseUrl, auth, options) {
   };
 }
 
-// src/renderJob.ts
+// src/facadeParserMap.ts
+var PLATFORM_FACADE_PARSER_MAP = {
+  "/auth/me": "parseAuthMeResponse / AuthMeResponseSchema",
+  "/auth/login": "AuthLoginResponseSchema",
+  "/auth/login/native": "AuthLoginNativeResponseSchema",
+  "/workspaces": "WorkspacesListResponseSchema",
+  "/health": "HealthResponseSchema",
+  "/workspaces/{workspaceId}/billing": "WorkspaceBillingResponseSchema",
+  "/workspaces/{workspaceId}/integrations/{kind}/devices": "IntegrationDevicesListResponseSchema",
+  "/rendering/jobs/{jobId}": "RenderJobStatusResponseSchema",
+  "/rendering/jobs/{jobId}/result": "RenderJobResultResponseSchema"
+};
+var BREWERY_FACADE_PARSER_MAP = {
+  "/recipes": "parseRecipesListResponse",
+  "/recipes/{id}": "RecipeResponseSchema",
+  "/recipes/{recipeId}/brew-sessions": "parseBrewSessionsListResponse",
+  "/recipes/{id}/water-hub-summary": "parseRecipeWaterHubSummaryResponse"
+};
+
+// src/platform/auth.ts
+import {
+  AuthLoginNativeResponseSchema,
+  AuthLoginRequestSchema,
+  AuthLoginResponseSchema,
+  AuthMeResponseSchema
+} from "@umbraculum/contracts";
+async function getAuthMe(client) {
+  return getParsed(client, toClientPath("/auth/me"), (data) => AuthMeResponseSchema.parse(data));
+}
+async function login(client, body) {
+  const parsedBody = AuthLoginRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/login"),
+    parsedBody,
+    (data) => AuthLoginResponseSchema.parse(data)
+  );
+}
+async function loginNative(client, body) {
+  const parsedBody = AuthLoginRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/login/native"),
+    parsedBody,
+    (data) => AuthLoginNativeResponseSchema.parse(data)
+  );
+}
+
+// src/platform/workspaces.ts
+import {
+  HealthResponseSchema,
+  WorkspacesListResponseSchema,
+  WorkspaceCreateRequestSchema,
+  WorkspaceCreateResponseSchema
+} from "@umbraculum/contracts";
+async function listWorkspaces(client) {
+  return getParsed(
+    client,
+    toClientPath("/workspaces"),
+    (data) => WorkspacesListResponseSchema.parse(data)
+  );
+}
+async function createWorkspace(client, body) {
+  const parsedBody = WorkspaceCreateRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/workspaces"),
+    parsedBody,
+    (data) => WorkspaceCreateResponseSchema.parse(data)
+  );
+}
+async function getHealth(client) {
+  return getParsed(client, toClientPath("/health"), (data) => HealthResponseSchema.parse(data));
+}
+
+// src/platform/modules.ts
+import {
+  IntegrationDevicesListResponseSchema,
+  WorkspaceBillingResponseSchema
+} from "@umbraculum/contracts";
+async function getWorkspaceBilling(client, workspaceId) {
+  return getParsed(
+    client,
+    toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/billing`),
+    (data) => WorkspaceBillingResponseSchema.parse(data)
+  );
+}
+async function listIntegrationDevices(client, workspaceId, kind) {
+  return getParsed(
+    client,
+    toClientPath(
+      `/workspaces/${encodeURIComponent(workspaceId)}/integrations/${encodeURIComponent(kind)}/devices`
+    ),
+    (data) => IntegrationDevicesListResponseSchema.parse(data)
+  );
+}
+
+// src/platform/rendering.ts
 import {
   RenderJobResultResponseSchema,
   RenderJobStatusResponseSchema,
@@ -112,21 +217,17 @@ function resolveArtifactDownloadUrl(signedUrl, options) {
 }
 async function submitRenderJob(client, postUrl, body) {
   const res = await client.post(postUrl, body ?? {});
-  if (res.status !== 202) {
-    const detail = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
-    throw new Error(detail || `Render job submit failed (${res.status})`);
-  }
+  assertOk(res, 202);
   const parsed = RenderJobSubmitResponseSchema.parse(res.data);
   return { jobId: parsed.job.id };
 }
 async function pollRenderJobUntilSucceeded(client, jobId) {
   const deadline = Date.now() + POLL_TIMEOUT_MS;
   let lastStatus = "";
+  const statusPath = `/api/rendering/jobs/${encodeURIComponent(jobId)}`;
   while (Date.now() < deadline) {
-    const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}`);
-    if (res.status !== 200) {
-      throw new Error(`Render job status failed (${res.status})`);
-    }
+    const res = await client.get(statusPath);
+    assertOk(res, 200);
     const body = RenderJobStatusResponseSchema.parse(res.data);
     lastStatus = body.job.status;
     if (body.job.status === "succeeded") return;
@@ -139,9 +240,7 @@ async function pollRenderJobUntilSucceeded(client, jobId) {
 }
 async function fetchRenderJobDownloadUrl(client, jobId, options) {
   const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}/result`);
-  if (res.status !== 200) {
-    throw new Error(`Render job result failed (${res.status})`);
-  }
+  assertOk(res, 200);
   const body = RenderJobResultResponseSchema.parse(res.data);
   return resolveArtifactDownloadUrl(body.signedUrl, options);
 }
@@ -154,10 +253,21 @@ async function runAsyncRenderJobExport(client, postUrl, options) {
   return fetchRenderJobDownloadUrl(client, jobId, downloadOpts);
 }
 export {
+  ApiClientError,
+  BREWERY_FACADE_PARSER_MAP,
+  PLATFORM_FACADE_PARSER_MAP,
   bearerTokenAuth,
   cookieAuth,
   createApiClient,
+  createWorkspace,
   fetchRenderJobDownloadUrl,
+  getAuthMe,
+  getHealth,
+  getWorkspaceBilling,
+  listIntegrationDevices,
+  listWorkspaces,
+  login,
+  loginNative,
   pollRenderJobUntilSucceeded,
   resolveArtifactDownloadUrl,
   runAsyncRenderJobExport,

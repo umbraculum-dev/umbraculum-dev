@@ -20,10 +20,21 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  ApiClientError: () => ApiClientError,
+  BREWERY_FACADE_PARSER_MAP: () => BREWERY_FACADE_PARSER_MAP,
+  PLATFORM_FACADE_PARSER_MAP: () => PLATFORM_FACADE_PARSER_MAP,
   bearerTokenAuth: () => bearerTokenAuth,
   cookieAuth: () => cookieAuth,
   createApiClient: () => createApiClient,
+  createWorkspace: () => createWorkspace,
   fetchRenderJobDownloadUrl: () => fetchRenderJobDownloadUrl,
+  getAuthMe: () => getAuthMe,
+  getHealth: () => getHealth,
+  getWorkspaceBilling: () => getWorkspaceBilling,
+  listIntegrationDevices: () => listIntegrationDevices,
+  listWorkspaces: () => listWorkspaces,
+  login: () => login,
+  loginNative: () => loginNative,
   pollRenderJobUntilSucceeded: () => pollRenderJobUntilSucceeded,
   resolveArtifactDownloadUrl: () => resolveArtifactDownloadUrl,
   runAsyncRenderJobExport: () => runAsyncRenderJobExport,
@@ -114,8 +125,129 @@ function createApiClient(baseUrl, auth, options) {
   };
 }
 
-// src/renderJob.ts
+// src/errors.ts
+var ApiClientError = class extends Error {
+  status;
+  body;
+  constructor(res) {
+    const detail = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
+    super(detail || `API request failed (${res.status})`);
+    this.name = "ApiClientError";
+    this.status = res.status;
+    this.body = res.data;
+  }
+};
+
+// src/facadeParserMap.ts
+var PLATFORM_FACADE_PARSER_MAP = {
+  "/auth/me": "parseAuthMeResponse / AuthMeResponseSchema",
+  "/auth/login": "AuthLoginResponseSchema",
+  "/auth/login/native": "AuthLoginNativeResponseSchema",
+  "/workspaces": "WorkspacesListResponseSchema",
+  "/health": "HealthResponseSchema",
+  "/workspaces/{workspaceId}/billing": "WorkspaceBillingResponseSchema",
+  "/workspaces/{workspaceId}/integrations/{kind}/devices": "IntegrationDevicesListResponseSchema",
+  "/rendering/jobs/{jobId}": "RenderJobStatusResponseSchema",
+  "/rendering/jobs/{jobId}/result": "RenderJobResultResponseSchema"
+};
+var BREWERY_FACADE_PARSER_MAP = {
+  "/recipes": "parseRecipesListResponse",
+  "/recipes/{id}": "RecipeResponseSchema",
+  "/recipes/{recipeId}/brew-sessions": "parseBrewSessionsListResponse",
+  "/recipes/{id}/water-hub-summary": "parseRecipeWaterHubSummaryResponse"
+};
+
+// src/platform/auth.ts
 var import_contracts = require("@umbraculum/contracts");
+
+// src/internal/clientPath.ts
+function toClientPath(openApiPath) {
+  return `/api${openApiPath}`;
+}
+
+// src/internal/httpJson.ts
+function assertOk(res, expectedStatus = 200) {
+  if (res.status !== expectedStatus || !res.ok) {
+    throw new ApiClientError(res);
+  }
+}
+async function getParsed(client, path, parse, expectedStatus = 200) {
+  const res = await client.get(path);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+async function postParsed(client, path, body, parse, expectedStatus = 200) {
+  const res = await client.post(path, body);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+
+// src/platform/auth.ts
+async function getAuthMe(client) {
+  return getParsed(client, toClientPath("/auth/me"), (data) => import_contracts.AuthMeResponseSchema.parse(data));
+}
+async function login(client, body) {
+  const parsedBody = import_contracts.AuthLoginRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/login"),
+    parsedBody,
+    (data) => import_contracts.AuthLoginResponseSchema.parse(data)
+  );
+}
+async function loginNative(client, body) {
+  const parsedBody = import_contracts.AuthLoginRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/login/native"),
+    parsedBody,
+    (data) => import_contracts.AuthLoginNativeResponseSchema.parse(data)
+  );
+}
+
+// src/platform/workspaces.ts
+var import_contracts2 = require("@umbraculum/contracts");
+async function listWorkspaces(client) {
+  return getParsed(
+    client,
+    toClientPath("/workspaces"),
+    (data) => import_contracts2.WorkspacesListResponseSchema.parse(data)
+  );
+}
+async function createWorkspace(client, body) {
+  const parsedBody = import_contracts2.WorkspaceCreateRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/workspaces"),
+    parsedBody,
+    (data) => import_contracts2.WorkspaceCreateResponseSchema.parse(data)
+  );
+}
+async function getHealth(client) {
+  return getParsed(client, toClientPath("/health"), (data) => import_contracts2.HealthResponseSchema.parse(data));
+}
+
+// src/platform/modules.ts
+var import_contracts3 = require("@umbraculum/contracts");
+async function getWorkspaceBilling(client, workspaceId) {
+  return getParsed(
+    client,
+    toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/billing`),
+    (data) => import_contracts3.WorkspaceBillingResponseSchema.parse(data)
+  );
+}
+async function listIntegrationDevices(client, workspaceId, kind) {
+  return getParsed(
+    client,
+    toClientPath(
+      `/workspaces/${encodeURIComponent(workspaceId)}/integrations/${encodeURIComponent(kind)}/devices`
+    ),
+    (data) => import_contracts3.IntegrationDevicesListResponseSchema.parse(data)
+  );
+}
+
+// src/platform/rendering.ts
+var import_contracts4 = require("@umbraculum/contracts");
 var POLL_INTERVAL_MS = 50;
 var POLL_TIMEOUT_MS = 15e3;
 function toWebArtifactUrl(signedUrl, apiBaseUrl) {
@@ -142,22 +274,18 @@ function resolveArtifactDownloadUrl(signedUrl, options) {
 }
 async function submitRenderJob(client, postUrl, body) {
   const res = await client.post(postUrl, body ?? {});
-  if (res.status !== 202) {
-    const detail = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
-    throw new Error(detail || `Render job submit failed (${res.status})`);
-  }
-  const parsed = import_contracts.RenderJobSubmitResponseSchema.parse(res.data);
+  assertOk(res, 202);
+  const parsed = import_contracts4.RenderJobSubmitResponseSchema.parse(res.data);
   return { jobId: parsed.job.id };
 }
 async function pollRenderJobUntilSucceeded(client, jobId) {
   const deadline = Date.now() + POLL_TIMEOUT_MS;
   let lastStatus = "";
+  const statusPath = `/api/rendering/jobs/${encodeURIComponent(jobId)}`;
   while (Date.now() < deadline) {
-    const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}`);
-    if (res.status !== 200) {
-      throw new Error(`Render job status failed (${res.status})`);
-    }
-    const body = import_contracts.RenderJobStatusResponseSchema.parse(res.data);
+    const res = await client.get(statusPath);
+    assertOk(res, 200);
+    const body = import_contracts4.RenderJobStatusResponseSchema.parse(res.data);
     lastStatus = body.job.status;
     if (body.job.status === "succeeded") return;
     if (body.job.status === "failed") {
@@ -169,10 +297,8 @@ async function pollRenderJobUntilSucceeded(client, jobId) {
 }
 async function fetchRenderJobDownloadUrl(client, jobId, options) {
   const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}/result`);
-  if (res.status !== 200) {
-    throw new Error(`Render job result failed (${res.status})`);
-  }
-  const body = import_contracts.RenderJobResultResponseSchema.parse(res.data);
+  assertOk(res, 200);
+  const body = import_contracts4.RenderJobResultResponseSchema.parse(res.data);
   return resolveArtifactDownloadUrl(body.signedUrl, options);
 }
 async function runAsyncRenderJobExport(client, postUrl, options) {
@@ -185,10 +311,21 @@ async function runAsyncRenderJobExport(client, postUrl, options) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  ApiClientError,
+  BREWERY_FACADE_PARSER_MAP,
+  PLATFORM_FACADE_PARSER_MAP,
   bearerTokenAuth,
   cookieAuth,
   createApiClient,
+  createWorkspace,
   fetchRenderJobDownloadUrl,
+  getAuthMe,
+  getHealth,
+  getWorkspaceBilling,
+  listIntegrationDevices,
+  listWorkspaces,
+  login,
+  loginNative,
   pollRenderJobUntilSucceeded,
   resolveArtifactDownloadUrl,
   runAsyncRenderJobExport,

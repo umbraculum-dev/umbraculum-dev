@@ -3,11 +3,8 @@ import { ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
 import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
-import {
-  parseBrewSessionCreateResponse,
-  parseBrewSessionsListResponse,
-  type BrewSessionListItem,
-} from "@umbraculum/contracts";
+import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
+import { type BrewSessionListItem } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 
@@ -36,9 +33,7 @@ export function BrewSessionsListScreen() {
     setLoading(true);
     try {
       const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
-      const res = await api.get(`/api/recipes/${recipeId}/brew-sessions`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const parsed = parseBrewSessionsListResponse(res.data);
+      const parsed = await listBrewSessionsForRecipe(api, recipeId);
       setSessions(parsed.brewSessions);
     } catch (err) {
       setSessions([]);
@@ -54,11 +49,8 @@ export function BrewSessionsListScreen() {
     setCreating(true);
     try {
       const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
-      const res = await api.post(`/api/recipes/${recipeId}/brew-sessions`, {});
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const { brewSession } = parseBrewSessionCreateResponse(res.data);
-      const id = brewSession.id;
-      navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: id });
+      const { brewSession } = await createBrewSession(api, recipeId);
+      navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: brewSession.id });
     } catch (err) {
       setCreateError(String(err));
     } finally {

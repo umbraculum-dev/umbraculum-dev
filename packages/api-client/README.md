@@ -11,8 +11,35 @@ The transport layer between any client and `services/api`. Web (Next.js) and nat
 
 ## Scope
 
-- **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, the two auth-strategy factories (`cookieAuth()`, `bearerTokenAuth(getToken)`), RFC-0007 render-job helpers (`submitRenderJob`, `pollRenderJobUntilSucceeded`, `runAsyncRenderJobExport`), OpenAPI-derived path/component **types** (`PlatformOpenApiPaths`, `BreweryOpenApiPaths`, … — Phase E), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes).
+- **Contains**: the `createApiClient(baseUrl, auth, options?)` factory, auth strategies, **typed facades** (Phase E), RFC-0007 render-job helpers, OpenAPI-derived path/component **types** (`PlatformOpenApiPaths`, `BreweryOpenApiPaths`, …), and a `fetch` injection point for environments where the global `fetch` is not appropriate (Node tests, RN Hermes).
 - **Does not contain**: contract DTO/parser definitions (those live in `@umbraculum/contracts`); auth backend logic — token issuance, session creation (lives in `services/api/src/routes/auth/`); UI session-state management (lives in the consuming app).
+
+## Typed facades (Phase E)
+
+**Two-layer client:** OpenAPI types (compile-time) + contracts parsers (runtime). Never trust `JSON.parse` + type assertion alone.
+
+First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI path keys to client paths via `toClientPath()` internally.
+
+| Facade module | Example calls | Contracts parser |
+|---------------|---------------|------------------|
+| `platform/auth` | `getAuthMe`, `login`, `loginNative` | `AuthMeResponseSchema`, `AuthLogin*Schema` |
+| `platform/workspaces` | `listWorkspaces`, `createWorkspace`, `getHealth` | `WorkspacesListResponseSchema`, `HealthResponseSchema` |
+| `platform/modules` | `getWorkspaceBilling`, `listIntegrationDevices` | `WorkspaceBillingResponseSchema`, `IntegrationDevicesListResponseSchema` |
+| `platform/rendering` | `submitRenderJob`, `runAsyncRenderJobExport`, … | `RenderJob*ResponseSchema` |
+| `brewery` (subpath) | `listRecipes`, `getRecipe`, `listBrewSessionsForRecipe`, `createBrewSession` | `parseRecipesListResponse`, `RecipeResponseSchema`, … |
+
+Full path → parser map: [`src/facadeParserMap.ts`](src/facadeParserMap.ts).
+
+```typescript
+import { bearerTokenAuth, createApiClient, listWorkspaces } from "@umbraculum/api-client";
+import { listRecipes } from "@umbraculum/api-client/brewery";
+
+const client = createApiClient(baseUrl, bearerTokenAuth(() => token));
+const workspaces = await listWorkspaces(client);
+const recipes = await listRecipes(client);
+```
+
+Errors from non-2xx responses throw `ApiClientError` (status + body).
 
 ## Exports
 
@@ -20,6 +47,8 @@ The transport layer between any client and `services/api`. Web (Next.js) and nat
   - `options.fetch` (optional): inject a cross-platform `fetch` implementation
 - `cookieAuth()` (web)
 - `bearerTokenAuth(getToken)` (native + Node)
+- Platform facades — see `src/platform/*` (re-exported from main entry)
+- `@umbraculum/api-client/brewery` — brewery add-on facades only (tree-shaking friendly)
 - `PlatformOpenApiPaths`, `BreweryOpenApiPaths`, and related `components` / `operations` type exports (generated from committed OpenAPI JSON)
 
 ## OpenAPI codegen (Phase E)
@@ -49,12 +78,13 @@ This package ships runtime-safe JS + types:
 
 - Runtime entrypoint: `dist/index.js`
 - Type entrypoint: `dist/index.d.ts`
+- Brewery subpath: `dist/brewery/index.js`
 
 Commands (run from repo root, container-friendly per the `node-npm-container-only` skill shipped by `umbraculum-node-react-cursor-assistant`):
 
-- **Build**: `npm run build:packages`
-- **Test**: `npm run test --workspace=@umbraculum/api-client` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
-- **Lint**: `npm run lint --workspace=@umbraculum/api-client`.
+- **Build**: `npm run build -w @umbraculum/api-client` or `npm run build:packages`
+- **Test**: `npm test -w @umbraculum/api-client` (vitest in container; see [`docs/TESTING.md`](../../docs/TESTING.md)).
+- **Lint**: covered by root `npm run lint`.
 - **Typecheck**: handled by the per-workspace typecheck CI gate; see [`docs/TYPING.md`](../../docs/TYPING.md) §"Per-workspace CI gate".
 
 ## How it fits in
@@ -64,13 +94,15 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 
 ## Status
 
-Stable. The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
+**Phase E complete (2026-06-01).** Typed platform + brewery facades ship with vitest coverage; native pilot on recipes/brew-sessions lists. npm publish remains a separate LICENSING decision.
+
+The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
 
 ## Further reading
 
+- [`docs/API-OPENAPI.md`](../../docs/API-OPENAPI.md) — OpenAPI catalogs + Phase E roadmap
 - [`docs/AUTH-STRATEGY.md`](../../docs/AUTH-STRATEGY.md) — platform-wide auth direction (cookie web + bearer native + future webview bridge)
 - [`docs/AUTH-HARDENING-ASSESSMENT.md`](../../docs/AUTH-HARDENING-ASSESSMENT.md) — auth hardening review and findings
 - [`docs/PLATFORM-ARCHITECTURE.md`](../../docs/PLATFORM-ARCHITECTURE.md) — platform vision
 - [`docs/DOCS-README-STANDARDS.md`](../../docs/DOCS-README-STANDARDS.md) — module README standard this file conforms to
 - [`@umbraculum/contracts`](../contracts/README.md) — the typed response parsers this client returns
-

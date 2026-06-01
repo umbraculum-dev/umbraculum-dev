@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config";
 
 const unitTestFiles = [
   "src/tests/openapi.test.ts",
+  "src/tests/openapiRouteCoverage.test.ts",
   "src/tests/entitlementsService.test.ts",
   "src/tests/unitsCore.test.ts",
   "src/tests/ai/promptComposer.test.ts",
