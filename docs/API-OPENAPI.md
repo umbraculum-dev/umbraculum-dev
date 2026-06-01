@@ -104,7 +104,7 @@ CI fails if either committed file drifts from a fresh generate (`openapi:check`)
 
 1. **Pick your SKU** — platform-only integrators: `openapi.json` only; reference vertical evaluators: both files.
 2. **Pick the module** — [`MODULES.md`](MODULES.md) + per-module route tables.
-3. **Pin types** — `@umbraculum/<code>-contracts` and `@umbraculum/contracts` for platform auth/workspaces.
+3. **Pin types** — `@umbraculum/<code>-contracts` and `@umbraculum/contracts` for platform auth/workspaces; optional OpenAPI path types from `@umbraculum/api-client` (`PlatformOpenApiPaths`, `BreweryOpenApiPaths` — see §Known limitations).
 4. **Browse machine-readable paths** — filter by tag in Swagger UI or Redoc. Brewery add-on: [docs site Redoc embed](/openapi-brewery) (`/openapi/brewery.json` static copy).
 5. **Auth** — cookie `sid` (web) or bearer (native); auth paths are in the platform spec under tag `platform`.
 6. **Automation adapters** — `CONTRACT_VERSION` remains authoritative over OpenAPI for mailbox semantics.
@@ -118,7 +118,7 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 - **F1 closure** — **175 documented operations** (~97%). One handler exempt: `POST /ai/chat` SSE (see §Streaming endpoints).
 - **BeerJSON / complex JSON** — OpenAPI may show loose object schemas; contracts + route tables win.
 - **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
-- **No codegen yet** — `@umbraculum/api-client` OpenAPI-driven generation is a separate follow-on (Phase E+).
+- **Codegen (Phase E, 2026-06)** — `@umbraculum/api-client` exports OpenAPI-derived **types** from committed specs (`PlatformOpenApiPaths`, `BreweryOpenApiPaths`). Regenerate with `npm run openapi:codegen -w @umbraculum/api-client`; drift check: `npm run openapi:codegen:check -w @umbraculum/api-client` (wired into T1 OpenAPI slice). Runtime validation remains `@umbraculum/contracts` parsers — generated types are integrator ergonomics, not wire authority.
 
 ---
 

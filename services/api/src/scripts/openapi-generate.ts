@@ -7,6 +7,7 @@ import type { OpenAPI } from "openapi-types";
 
 import { buildApp } from "../app.js";
 import { filterOpenApiPaths } from "../openapi/filterOpenApiPaths.js";
+import { repairDanglingComponentRefs } from "../openapi/repairDanglingComponentRefs.js";
 import {
   OPENAPI_BREWERY_INFO,
   OPENAPI_INFO,
@@ -69,8 +70,9 @@ async function generatePlatformSpec(): Promise<OpenAPI.Document> {
     version: OPENAPI_INFO.version,
     description: OPENAPI_INFO.description,
   };
-  await validateOpenApi(spec);
-  return spec;
+  const repaired = repairDanglingComponentRefs(spec);
+  await validateOpenApi(repaired);
+  return repaired;
 }
 
 async function generateBrewerySpec(): Promise<OpenAPI.Document> {
@@ -84,8 +86,9 @@ async function generateBrewerySpec(): Promise<OpenAPI.Document> {
     version: OPENAPI_BREWERY_INFO.version,
     description: OPENAPI_BREWERY_INFO.description,
   };
-  await validateOpenApi(spec);
-  return spec;
+  const repaired = repairDanglingComponentRefs(spec);
+  await validateOpenApi(repaired);
+  return repaired;
 }
 
 async function main(): Promise<void> {

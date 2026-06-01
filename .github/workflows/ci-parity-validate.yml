@@ -46,6 +46,6 @@ jobs:
 
       - name: Validate ci-parity manifest (strict)
         run: |
-          npx @umbraculum/ci-parity@1.0.7 validate --strict \
+          npx @umbraculum/ci-parity@1.0.8 validate --strict \
             --manifest .umbraculum/ci-parity.json \
             --repo "${{ github.workspace }}"

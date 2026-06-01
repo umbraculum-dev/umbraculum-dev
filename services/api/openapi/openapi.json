@@ -20,7 +20,12 @@
         "description": "Native / SDK bearer token. See docs/AUTH-STRATEGY.md."
       }
     },
-    "schemas": {}
+    "schemas": {
+      "schema0": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
   },
   "paths": {
     "/health": {
@@ -19404,7 +19409,8 @@
                     "tree": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/schema0"
+                        "type": "object",
+                        "additionalProperties": true
                       }
                     }
                   },

@@ -48,6 +48,7 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 | `services/api/src/routes/auth.ts`, `workspaces.ts` | scoped vitest | `npm run verify:api-platform` | T2 row above |
 | Brewery batch routes | scoped vitest files | `./scripts/verify-slice.sh --tier T1 --slice api-brewery-batch1` | T2 row above |
 | Docs / README only | — | `./scripts/ci-parity-check.sh run --jobs docs-readmes` | `npm run verify:pre-push` |
+| `docs-site/**` (pages, sidebars, static OpenAPI mirror) | — | `./scripts/verify-slice.sh --tier T1 --slice docs-site` (`npm run build -w @umbraculum/docs-site`) | GHA `docs-site-build` (same command) |
 | SDK / multi-package dist | — | `./scripts/check-packages-dist-up-to-date.sh` | ci-parity `sdk-publish-prep` job |
 | Unknown mixed diff | — | `npm run verify:from-diff` | `npm run verify:pre-push` |
 
@@ -64,6 +65,7 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 | L4 contract snapshots | T1 when contracts change |
 | L3 smoke | T1 optional for route/UI work |
 | ci-parity (docs/lint/typecheck/openapi-check) | T2 |
+| GHA `docs-site-build` (`npm run build -w @umbraculum/docs-site`) | T1 when `docs-site/**` changes |
 | GHA `api.yml` (full vitest) | T2 via **`api-integration-tests-pre-push`** skill |
 | L5/L6 E2E | On demand only |
 
