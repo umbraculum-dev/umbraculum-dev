@@ -1,29 +1,19 @@
 import type { FastifyInstance } from "fastify";
-import type { AdPlacement, AdPlatform } from "@prisma/client";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { Prisma } from "@prisma/client";
+import {
+  ErrorResponseSchema,
+  PlatformAdCreateRequestSchema,
+  PlatformAdCreateResponseSchema,
+  PlatformAdIdParamsSchema,
+  PlatformAdOkResponseSchema,
+  PlatformAdPatchRequestSchema,
+  PlatformAdsListResponseSchema,
+} from "@umbraculum/contracts";
 
 import { BadRequestError } from "../errors.js";
 import { requireSession } from "../plugins/sessionAuth.js";
 import { requirePlatformAdmin } from "../plugins/requirePlatformAdmin.js";
-
-function assertPlacement(v: unknown): AdPlacement {
-  if (
-    v === "global_top" ||
-    v === "global_bottom" ||
-    v === "recipe_edit_after_fermentables" ||
-    v === "recipe_edit_after_hops" ||
-    v === "recipe_edit_after_yeast"
-  ) {
-    return v;
-  }
-
-  throw new BadRequestError("invalid_placement", "Invalid ad placement");
-}
-
-function assertPlatform(v: unknown): AdPlatform {
-  if (v === "web") return v;
-  return "web";
-}
 
 function parseDateOrNull(v: unknown): Date | null {
   if (v === null || v === undefined || v === "") return null;
@@ -34,98 +24,154 @@ function parseDateOrNull(v: unknown): Date | null {
 }
 
 export function platformAdsRoutes(app: FastifyInstance) {
-  app.get("/platform/ads", async (req) => {
-    const s = requireSession(req);
-    await requirePlatformAdmin(app, s.userId);
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
 
-    const list = await app.prisma.ad.findMany({
-      orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-      select: {
-        id: true,
-        placement: true,
-        platform: true,
-        imageUrl: true,
-        linkUrl: true,
-        altText: true,
-        isActive: true,
-        startsAt: true,
-        endsAt: true,
-        priority: true,
-        weight: true,
-        createdAt: true,
-        updatedAt: true,
+  zodApp.get(
+    "/platform/ads",
+    {
+      schema: {
+        tags: ["platform-admin"],
+        response: {
+          200: PlatformAdsListResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
       },
-      take: 200,
-    });
+    },
+    async (req) => {
+      const s = requireSession(req);
+      await requirePlatformAdmin(app, s.userId);
 
-    return { ok: true, ads: list };
-  });
+      const list = await app.prisma.ad.findMany({
+        orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+        select: {
+          id: true,
+          placement: true,
+          platform: true,
+          imageUrl: true,
+          linkUrl: true,
+          altText: true,
+          isActive: true,
+          startsAt: true,
+          endsAt: true,
+          priority: true,
+          weight: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        take: 200,
+      });
 
-  app.post("/platform/ads", async (req) => {
-    const s = requireSession(req);
-    await requirePlatformAdmin(app, s.userId);
+      return PlatformAdsListResponseSchema.parse({ ok: true, ads: list });
+    },
+  );
 
-    const body = (req.body ?? {}) as Record<string, unknown>;
-    const placement = assertPlacement(body['placement']);
-    const platform = assertPlatform(body['platform']);
-    const imageUrl = typeof body['imageUrl'] === "string" ? body['imageUrl'].trim() : "";
-    const linkUrl = typeof body['linkUrl'] === "string" ? body['linkUrl'].trim() : "";
-    const altText = typeof body['altText'] === "string" ? body['altText'].trim() : "";
+  zodApp.post(
+    "/platform/ads",
+    {
+      schema: {
+        tags: ["platform-admin"],
+        body: PlatformAdCreateRequestSchema,
+        response: {
+          200: PlatformAdCreateResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const s = requireSession(req);
+      await requirePlatformAdmin(app, s.userId);
 
-    if (!imageUrl) throw new BadRequestError("invalid_image_url", "Body.imageUrl is required");
-    if (!linkUrl) throw new BadRequestError("invalid_link_url", "Body.linkUrl is required");
-    if (!altText) throw new BadRequestError("invalid_alt_text", "Body.altText is required");
+      const body = req.body;
+      const placement = body.placement;
+      const platform = body.platform ?? "web";
+      const startsAt = body.startsAt !== undefined ? parseDateOrNull(body.startsAt) : null;
+      const endsAt = body.endsAt !== undefined ? parseDateOrNull(body.endsAt) : null;
+      const isActive = body.isActive ?? true;
+      const priority = body.priority ?? 0;
+      const weight = body.weight ?? 1;
 
-    const startsAt = parseDateOrNull(body['startsAt']);
-    const endsAt = parseDateOrNull(body['endsAt']);
-    const isActive = typeof body['isActive'] === "boolean" ? body['isActive'] : true;
-    const priority = typeof body['priority'] === "number" && Number.isFinite(body['priority']) ? Math.trunc(body['priority']) : 0;
-    const weight = typeof body['weight'] === "number" && Number.isFinite(body['weight']) ? Math.trunc(body['weight']) : 1;
+      const created = await app.prisma.ad.create({
+        data: {
+          placement,
+          platform,
+          imageUrl: body.imageUrl,
+          linkUrl: body.linkUrl,
+          altText: body.altText,
+          isActive,
+          startsAt,
+          endsAt,
+          priority,
+          weight,
+        },
+        select: { id: true },
+      });
 
-    const created = await app.prisma.ad.create({
-      data: { placement, platform, imageUrl, linkUrl, altText, isActive, startsAt, endsAt, priority, weight },
-      select: { id: true },
-    });
+      return PlatformAdCreateResponseSchema.parse({ ok: true, id: created.id });
+    },
+  );
 
-    return { ok: true, id: created.id };
-  });
+  zodApp.patch(
+    "/platform/ads/:id",
+    {
+      schema: {
+        tags: ["platform-admin"],
+        params: PlatformAdIdParamsSchema,
+        body: PlatformAdPatchRequestSchema,
+        response: {
+          200: PlatformAdOkResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const s = requireSession(req);
+      await requirePlatformAdmin(app, s.userId);
 
-  app.patch("/platform/ads/:id", async (req) => {
-    const s = requireSession(req);
-    await requirePlatformAdmin(app, s.userId);
+      const { id } = req.params;
+      const body = req.body;
 
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-    if (!id) throw new BadRequestError("invalid_id", "Params.id is required");
+      const data: Prisma.AdUncheckedUpdateInput = {};
+      if (body.placement !== undefined) data.placement = body.placement;
+      if (body.platform !== undefined) data.platform = body.platform ?? "web";
+      if (body.imageUrl !== undefined) data.imageUrl = body.imageUrl;
+      if (body.linkUrl !== undefined) data.linkUrl = body.linkUrl;
+      if (body.altText !== undefined) data.altText = body.altText;
+      if (body.isActive !== undefined) data.isActive = body.isActive;
+      if (body.startsAt !== undefined) data.startsAt = parseDateOrNull(body.startsAt);
+      if (body.endsAt !== undefined) data.endsAt = parseDateOrNull(body.endsAt);
+      if (body.priority !== undefined) data.priority = body.priority;
+      if (body.weight !== undefined) data.weight = body.weight;
 
-    const body = (req.body ?? {}) as Record<string, unknown>;
+      await app.prisma.ad.update({ where: { id }, data, select: { id: true } });
+      return PlatformAdOkResponseSchema.parse({ ok: true });
+    },
+  );
 
-    const data: Prisma.AdUncheckedUpdateInput = {};
-    if (body['placement'] !== undefined) data.placement = assertPlacement(body['placement']);
-    if (body['platform'] !== undefined) data.platform = assertPlatform(body['platform']);
-    if (body['imageUrl'] !== undefined) data.imageUrl = typeof body['imageUrl'] === "string" ? body['imageUrl'].trim() : "";
-    if (body['linkUrl'] !== undefined) data.linkUrl = typeof body['linkUrl'] === "string" ? body['linkUrl'].trim() : "";
-    if (body['altText'] !== undefined) data.altText = typeof body['altText'] === "string" ? body['altText'].trim() : "";
-    if (body['isActive'] !== undefined) data.isActive = Boolean(body['isActive']);
-    if (body['startsAt'] !== undefined) data.startsAt = parseDateOrNull(body['startsAt']);
-    if (body['endsAt'] !== undefined) data.endsAt = parseDateOrNull(body['endsAt']);
-    if (body['priority'] !== undefined && typeof body['priority'] === "number" && Number.isFinite(body['priority'])) data.priority = Math.trunc(body['priority']);
-    if (body['weight'] !== undefined && typeof body['weight'] === "number" && Number.isFinite(body['weight'])) data.weight = Math.trunc(body['weight']);
+  zodApp.delete(
+    "/platform/ads/:id",
+    {
+      schema: {
+        tags: ["platform-admin"],
+        params: PlatformAdIdParamsSchema,
+        response: {
+          200: PlatformAdOkResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const s = requireSession(req);
+      await requirePlatformAdmin(app, s.userId);
 
-    await app.prisma.ad.update({ where: { id }, data, select: { id: true } });
-    return { ok: true };
-  });
-
-  app.delete("/platform/ads/:id", async (req) => {
-    const s = requireSession(req);
-    await requirePlatformAdmin(app, s.userId);
-
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-    if (!id) throw new BadRequestError("invalid_id", "Params.id is required");
-
-    await app.prisma.ad.delete({ where: { id }, select: { id: true } });
-    return { ok: true };
-  });
+      const { id } = req.params;
+      await app.prisma.ad.delete({ where: { id }, select: { id: true } });
+      return PlatformAdOkResponseSchema.parse({ ok: true });
+    },
+  );
 }
-

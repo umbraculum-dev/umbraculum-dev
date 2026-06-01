@@ -7,7 +7,7 @@
         "T0": [
           {
             "id": "contracts-test",
-            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/contracts --include-workspace-root && npm test -w @umbraculum/contracts\""
+            "cmd": "./scripts/docker-npm-run.sh -r 'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/contracts --include-workspace-root && npm test -w @umbraculum/contracts'"
           }
         ],
         "T1": [
@@ -21,7 +21,7 @@
           },
           {
             "id": "contracts-test",
-            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/contracts --include-workspace-root && npm test -w @umbraculum/contracts\""
+            "cmd": "./scripts/docker-npm-run.sh -r 'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/contracts --include-workspace-root && npm test -w @umbraculum/contracts'"
           }
         ]
       }
@@ -29,10 +29,18 @@
     "openapi": {
       "pathPrefixes": [
         "services/api/src/routes/",
+        "services/api/src/modules/brewery/routes/",
         "services/api/src/openapi/",
         "packages/contracts/src/auth/",
         "packages/contracts/src/workspaces/",
-        "packages/contracts/src/brewery/"
+        "packages/contracts/src/brewery/",
+        "packages/contracts/src/water/",
+        "packages/contracts/src/billing/",
+        "packages/contracts/src/ads/",
+        "packages/contracts/src/ai/",
+        "packages/contracts/src/integrations/",
+        "packages/contracts/src/webhooks/",
+        "packages/contracts/src/platformAdmin/"
       ],
       "tiers": {
         "T0": [
@@ -62,13 +70,13 @@
         "T0": [
           {
             "id": "platform-vitest",
-            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
+            "cmd": "docker compose exec -T api sh -c 'cd /app && vitest run src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
           }
         ],
         "T1": [
           {
             "id": "platform-vitest",
-            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
+            "cmd": "docker compose exec -T api sh -c 'cd /app && vitest run src/tests/authSessions.test.ts src/tests/accounts.test.ts'"
           },
           {
             "id": "health-endpoint",
@@ -90,13 +98,13 @@
         "T0": [
           {
             "id": "brewery-vitest",
-            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/equipmentProfiles.test.ts src/tests/inventory.test.ts src/tests/brewdaySettings.test.ts src/tests/recipes.test.ts src/tests/recipesExport.test.ts'"
+            "cmd": "docker compose exec -T api sh -c 'cd /app && vitest run src/tests/equipmentProfiles.test.ts src/tests/inventory.test.ts src/tests/brewdaySettings.test.ts src/tests/recipes.test.ts src/tests/recipesExport.test.ts'"
           }
         ],
         "T1": [
           {
             "id": "brewery-vitest",
-            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/equipmentProfiles.test.ts src/tests/inventory.test.ts src/tests/brewdaySettings.test.ts src/tests/recipes.test.ts src/tests/recipesExport.test.ts'"
+            "cmd": "docker compose exec -T api sh -c 'cd /app && vitest run src/tests/equipmentProfiles.test.ts src/tests/inventory.test.ts src/tests/brewdaySettings.test.ts src/tests/recipes.test.ts src/tests/recipesExport.test.ts'"
           }
         ]
       }
@@ -107,7 +115,7 @@
         "T0": [
           {
             "id": "pim-test",
-            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/pim-contracts --include-workspace-root && npm test -w @umbraculum/pim-contracts\""
+            "cmd": "./scripts/docker-npm-run.sh -r 'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/pim-contracts --include-workspace-root && npm test -w @umbraculum/pim-contracts'"
           }
         ],
         "T1": [
@@ -117,11 +125,11 @@
           },
           {
             "id": "pim-test",
-            "cmd": "docker run --rm -v \"${REPO_ROOT}:/repo\" -w /repo node:20-slim bash -lc \"npm install --no-audit --no-fund -w @umbraculum/pim-contracts --include-workspace-root && npm test -w @umbraculum/pim-contracts\""
+            "cmd": "./scripts/docker-npm-run.sh -r 'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/pim-contracts --include-workspace-root && npm test -w @umbraculum/pim-contracts'"
           },
           {
             "id": "pim-api-vitest",
-            "cmd": "docker compose exec -T api sh -c 'cd /app && ./node_modules/.bin/vitest run src/tests/pimProducts.test.ts src/tests/pimVariants.test.ts src/tests/pimAttributeSets.test.ts src/tests/pimCategories.test.ts'"
+            "cmd": "docker compose exec -T api sh -c 'cd /app && vitest run src/tests/pimProducts.test.ts src/tests/pimVariants.test.ts src/tests/pimAttributeSets.test.ts src/tests/pimCategories.test.ts'"
           }
         ]
       }

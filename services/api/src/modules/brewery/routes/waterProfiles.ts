@@ -1,83 +1,176 @@
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import {
+  ErrorResponseSchema,
+  IdParamsSchema,
+  OkResponseSchema,
+  WaterProfileCreateRequestSchema,
+  WaterProfilePatchRequestSchema,
+  WaterProfileResponseSchema,
+  WaterProfilesListResponseSchema,
+} from "@umbraculum/contracts";
+
 import { requireActiveWorkspace, requireUser } from "../../../plugins/requestContext.js";
 import { WaterProfilesService } from "../../../services/waterProfilesService.js";
 
+function ionValue(v: unknown): unknown {
+  return v;
+}
+
 export function waterProfilesRoutes(app: FastifyInstance) {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new WaterProfilesService(app.prisma);
 
-  app.get("/water-profiles", async (req) => {
-    const ctx = requireUser(req);
-    const list = await svc.listProfiles(ctx.userId, ctx.activeWorkspaceId);
-    return { ok: true, ...list };
-  });
+  zodApp.get(
+    "/water-profiles",
+    {
+      schema: {
+        tags: ["brewery"],
+        response: {
+          200: WaterProfilesListResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireUser(req);
+      const list = await svc.listProfiles(ctx.userId, ctx.activeWorkspaceId);
+      return WaterProfilesListResponseSchema.parse({ ok: true, ...list });
+    },
+  );
 
-  app.post("/water-profiles", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const body = (req.body ?? {}) as Record<string, unknown>;
+  zodApp.post(
+    "/water-profiles",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterProfileCreateRequestSchema,
+        response: {
+          200: WaterProfileResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const body = req.body;
 
-    const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
-      scope: typeof body['scope'] === "string" ? body['scope'] : undefined,
-      type: typeof body['type'] === "string" ? body['type'] : "water",
-      name: typeof body['name'] === "string" ? body['name'] : "",
-      ph: body['ph'],
-      calcium: body['calcium'],
-      magnesium: body['magnesium'],
-      sodium: body['sodium'],
-      sulfate: body['sulfate'],
-      chloride: body['chloride'],
-      bicarbonate: body['bicarbonate'],
-    });
+      const created = await svc.createProfile(ctx.userId, ctx.activeWorkspaceId, {
+        scope: body.scope,
+        type: body.type ?? "water",
+        name: body.name ?? "",
+        ph: ionValue(body.ph),
+        calcium: ionValue(body.calcium),
+        magnesium: ionValue(body.magnesium),
+        sodium: ionValue(body.sodium),
+        sulfate: ionValue(body.sulfate),
+        chloride: ionValue(body.chloride),
+        bicarbonate: ionValue(body.bicarbonate),
+      });
 
-    return { ok: true, profile: created };
-  });
+      return WaterProfileResponseSchema.parse({ ok: true, profile: created });
+    },
+  );
 
-  app.patch("/water-profiles/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-    const body = (req.body ?? {}) as Record<string, unknown>;
+  zodApp.patch(
+    "/water-profiles/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        body: WaterProfilePatchRequestSchema,
+        response: {
+          200: WaterProfileResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const body = req.body;
 
-    const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, id, {
-      scope: typeof body['scope'] === "string" ? body['scope'] : undefined,
-      type: typeof body['type'] === "string" ? body['type'] : undefined,
-      name: typeof body['name'] === "string" ? body['name'] : undefined,
-      ph: body['ph'],
-      calcium: body['calcium'],
-      magnesium: body['magnesium'],
-      sodium: body['sodium'],
-      sulfate: body['sulfate'],
-      chloride: body['chloride'],
-      bicarbonate: body['bicarbonate'],
-      verificationStatus: typeof body['verificationStatus'] === "string" ? body['verificationStatus'] : undefined,
-    });
+      const updated = await svc.updateProfile(ctx.userId, ctx.activeWorkspaceId, req.params.id, {
+        scope: body.scope,
+        type: body.type,
+        name: body.name,
+        ph: ionValue(body.ph),
+        calcium: ionValue(body.calcium),
+        magnesium: ionValue(body.magnesium),
+        sodium: ionValue(body.sodium),
+        sulfate: ionValue(body.sulfate),
+        chloride: ionValue(body.chloride),
+        bicarbonate: ionValue(body.bicarbonate),
+        verificationStatus: body.verificationStatus,
+      });
 
-    return { ok: true, profile: updated };
-  });
+      return WaterProfileResponseSchema.parse({ ok: true, profile: updated });
+    },
+  );
 
-  app.post("/water-profiles/:id/verify", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
+  zodApp.post(
+    "/water-profiles/:id/verify",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: WaterProfileResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const updated = await svc.setVerificationStatus(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.id,
+        "verified",
+      );
+      return WaterProfileResponseSchema.parse({ ok: true, profile: updated });
+    },
+  );
 
-    const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeWorkspaceId, id, "verified");
-    return { ok: true, profile: updated };
-  });
+  zodApp.post(
+    "/water-profiles/:id/unverify",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: WaterProfileResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      const updated = await svc.setVerificationStatus(
+        ctx.userId,
+        ctx.activeWorkspaceId,
+        req.params.id,
+        "unverified",
+      );
+      return WaterProfileResponseSchema.parse({ ok: true, profile: updated });
+    },
+  );
 
-  app.post("/water-profiles/:id/unverify", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-
-    const updated = await svc.setVerificationStatus(ctx.userId, ctx.activeWorkspaceId, id, "unverified");
-    return { ok: true, profile: updated };
-  });
-
-  app.delete("/water-profiles/:id", async (req) => {
-    const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { id?: unknown };
-    const id = typeof params.id === "string" ? params.id : "";
-
-    await svc.deleteProfile(ctx.userId, ctx.activeWorkspaceId, id);
-    return { ok: true };
-  });
+  zodApp.delete(
+    "/water-profiles/:id",
+    {
+      schema: {
+        tags: ["brewery"],
+        params: IdParamsSchema,
+        response: {
+          200: OkResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const ctx = requireActiveWorkspace(req);
+      await svc.deleteProfile(ctx.userId, ctx.activeWorkspaceId, req.params.id);
+      return { ok: true as const };
+    },
+  );
 }

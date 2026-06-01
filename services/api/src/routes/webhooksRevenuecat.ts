@@ -1,4 +1,11 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import {
+  ErrorResponseSchema,
+  WebhookOkResponseSchema,
+  WebhookRevenuecatBodySchema,
+} from "@umbraculum/contracts";
+
 import { UnauthorizedError } from "../errors.js";
 import { RevenueCatWebhookService } from "../services/revenueCatWebhookService.js";
 
@@ -8,9 +15,8 @@ function getAuthHeader(req: FastifyRequest): string | null {
 }
 
 function requireRevenueCatAuth(req: FastifyRequest) {
-  // RevenueCat webhook security uses a configurable Authorization header value (not an HMAC signature).
-  const expected = (process.env['REVENUECAT_WEBHOOK_AUTH'] ?? process.env['REVENUECAT_WEBHOOK_SECRET'] ?? "").trim();
-  if (!expected) return; // dev/stub mode
+  const expected = (process.env["REVENUECAT_WEBHOOK_AUTH"] ?? process.env["REVENUECAT_WEBHOOK_SECRET"] ?? "").trim();
+  if (!expected) return;
 
   const actual = getAuthHeader(req);
   if (!actual) throw new UnauthorizedError("missing_revenuecat_auth", "Missing Authorization header");
@@ -18,12 +24,25 @@ function requireRevenueCatAuth(req: FastifyRequest) {
 }
 
 export function webhooksRevenuecatRoutes(app: FastifyInstance) {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new RevenueCatWebhookService(app.prisma);
 
-  app.post("/webhooks/revenuecat", async (req) => {
-    requireRevenueCatAuth(req);
-    await svc.handleEvent(req.body);
-    return { ok: true };
-  });
+  zodApp.post(
+    "/webhooks/revenuecat",
+    {
+      schema: {
+        tags: ["webhooks"],
+        body: WebhookRevenuecatBodySchema,
+        response: {
+          200: WebhookOkResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      requireRevenueCatAuth(req);
+      await svc.handleEvent(req.body);
+      return WebhookOkResponseSchema.parse({ ok: true });
+    },
+  );
 }
-

@@ -1,5 +1,12 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { createHmac, timingSafeEqual } from "node:crypto";
+import {
+  ErrorResponseSchema,
+  WebhookOkResponseSchema,
+  WebhookStripeBodySchema,
+} from "@umbraculum/contracts";
+
 import { BadRequestError, UnauthorizedError } from "../errors.js";
 import { StripeWebhookService } from "../services/stripeWebhookService.js";
 
@@ -50,28 +57,40 @@ function verifyStripeSignature(input: { rawBody: Buffer; header: string; secret:
 }
 
 export function webhooksStripeRoutes(app: FastifyInstance) {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const svc = new StripeWebhookService(app.prisma);
 
-  app.post("/webhooks/stripe", async (req) => {
-    const secretRaw = process.env['STRIPE_WEBHOOK_SECRET']?.trim() ?? "";
-    const secret = secretRaw && secretRaw !== "..." ? secretRaw : "";
+  zodApp.post(
+    "/webhooks/stripe",
+    {
+      schema: {
+        tags: ["webhooks"],
+        body: WebhookStripeBodySchema,
+        response: {
+          200: WebhookOkResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const secretRaw = process.env["STRIPE_WEBHOOK_SECRET"]?.trim() ?? "";
+      const secret = secretRaw && secretRaw !== "..." ? secretRaw : "";
 
-    if (secret) {
-      const sig = getHeader(req, "stripe-signature") ?? getHeader(req, "Stripe-Signature");
-      if (!sig) throw new UnauthorizedError("missing_stripe_signature", "Missing Stripe-Signature header");
-      if (!req.rawBody) throw new BadRequestError("missing_raw_body", "Missing raw body for signature verification");
-      verifyStripeSignature({ rawBody: req.rawBody, header: sig, secret });
-    }
+      if (secret) {
+        const sig = getHeader(req, "stripe-signature") ?? getHeader(req, "Stripe-Signature");
+        if (!sig) throw new UnauthorizedError("missing_stripe_signature", "Missing Stripe-Signature header");
+        if (!req.rawBody) throw new BadRequestError("missing_raw_body", "Missing raw body for signature verification");
+        verifyStripeSignature({ rawBody: req.rawBody, header: sig, secret });
+      }
 
-    // In strict mode, signature verification already happened. In dev mode, accept payload as-is.
-    const body = (req.body ?? {}) as Record<string, unknown>;
+      const body = req.body;
 
-    // Only handle checkout.session.completed for now; ignore others (still return 200).
-    if (body['type'] === "checkout.session.completed") {
-      await svc.handleCheckoutSessionCompleted(body);
-    }
+      if (body["type"] === "checkout.session.completed") {
+        await svc.handleCheckoutSessionCompleted(body);
+      }
 
-    return { ok: true };
-  });
+      return WebhookOkResponseSchema.parse({ ok: true });
+    },
+  );
 }
-

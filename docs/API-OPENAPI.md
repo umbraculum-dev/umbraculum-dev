@@ -1,7 +1,7 @@
 # OpenAPI — platform catalog + brewery add-on
 
 **Tier:** Public  
-**Status:** Partial (platform + brewery add-on) — F1 partial closure extended 2026-05-31  
+**Status:** Partial (platform + brewery add-on) — Phase C extended coverage 2026-05-31  
 **Audience:** external integrators, module authors, maintainers  
 
 This document is the **canonical index** for machine-readable API documentation in Umbraculum. Human route tables in module docs remain authoritative when a spec and a route table disagree until the drift is fixed.
@@ -14,13 +14,13 @@ This document is the **canonical index** for machine-readable API documentation 
 |--------|------------------|----------------|---------------------------|
 | Artifact | [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) | [`services/api/openapi/brewery.json`](../services/api/openapi/brewery.json) | Same paths; grows with PR3 |
 | Profile | `UMBRACULUM_MODULE_PROFILE=platform` at generation | `reference` profile | — |
-| Coverage | **53 paths / 72 operations** | **12 paths / 21 operations** | ~80%+ of HTTP surface schema-backed |
-| Tags | `automation`, `pim`, `mrp`, `crp`, `rendering`, `platform` | `brewery` only | + billing, integrations, AI, … |
+| Coverage | **81 paths / 105 operations** | **55 paths / 70 operations** | ~80%+ of HTTP surface schema-backed |
+| Tags | `automation`, `pim`, `mrp`, `crp`, `rendering`, `platform`, `billing`, `ads`, `ai`, `platform-admin`, `integrations`, `webhooks` | `brewery` only | Residual: SSE chat stream |
 | CI | `npm run openapi:check` validates **both** files | same | Unchanged |
 
 **ISVs without the brewery vertical:** use the **platform catalog only** — see [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) and [`design/platform-module-profile.md`](design/platform-module-profile.md).
 
-**Still on human route tables:** billing, integrations, webhooks, AI orchestrator, remaining brewery routes (water, brew sessions, import, ingredients).
+**Still on human route tables only:** `POST /ai/chat` (SSE stream — not OpenAPI-documentable with current stack).
 
 ---
 
@@ -48,8 +48,14 @@ Operations appear in a committed spec only when the Fastify route carries an Ope
 | `crp` | Canonical CRP | Yes | — | [`design/canonical-crp-module-surface.md`](design/canonical-crp-module-surface.md) |
 | `rendering` | Horizontal rendering (RFC-0007) | Yes | — | [`design/canonical-document-rendering-surface.md`](design/canonical-document-rendering-surface.md) |
 | `platform` | Health, auth, workspaces | Yes (15 ops) | — | [`AUTH-STRATEGY.md`](AUTH-STRATEGY.md) |
-| `brewery` | Reference vertical (partial) | No | Yes (21 ops) | [`modules/verticals/brewery/README.md`](modules/verticals/brewery/README.md) |
-| *(none yet)* | Billing / integrations / AI | PR3 backlog | — | [`services/api/README.md`](../services/api/README.md) |
+| `billing` | Workspace billing | Yes | — | [`services/api/README.md`](../services/api/README.md) |
+| `ads` | Public ad slots | Yes | — | same |
+| `ai` | Proposals, settings, usage | Yes (not `/ai/chat` SSE) | — | [`packages/contracts/src/ai/`](../packages/contracts/src/ai/) |
+| `platform-admin` | Platform ads + recipes | Yes | — | same |
+| `integrations` | Tilt / iSpindel / RAPT | Yes | — | same |
+| `webhooks` | Stripe, RevenueCat | Yes | — | same |
+| `brewery` | Reference vertical | No | Yes (70 ops) | [`modules/verticals/brewery/README.md`](modules/verticals/brewery/README.md) |
+| *(SSE)* | `POST /ai/chat` stream | — | — | Human route table + contracts |
 
 ---
 
@@ -81,7 +87,7 @@ docker compose exec api bash -lc 'cd /app && npx tsx src/scripts/openapi-generat
 
 **When to regenerate:** after changing any `zodApp` route schema, [`openapi/metadata.ts`](../services/api/src/openapi/metadata.ts), or module profile registration.
 
-**After regenerate:** copy both artifacts to the docs-site static mirror:
+**After regenerate:** `openapi:generate` writes both committed artifacts under `services/api/openapi/` **and** mirrors them to `docs-site/static/openapi/` automatically when the repo mount is writable. In Docker, `/umbraculum` is read-only — the script skips the mirror with a warning; copy from `services/api/openapi/` on the host:
 
 ```bash
 cp services/api/openapi/openapi.json docs-site/static/openapi/openapi.json
@@ -109,17 +115,16 @@ Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 
 ## Known limitations
 
-- **Partial coverage** — ~93 documented operations vs ~180+ total HTTP handlers (~52%).
+- **Partial coverage** — **175 documented operations** (105 platform + 70 brewery) vs ~180+ total HTTP handlers (~**97%**). Residual: `POST /ai/chat` SSE stream.
 - **BeerJSON / complex JSON** — OpenAPI may show loose object schemas; contracts + route tables win.
-- **Brewery add-on incomplete** — water, brew sessions, import, ingredients deferred to Phase C / ongoing PR3.
+- **Binary / stream responses** — routes that `reply.send(Buffer)` use `z.custom<Buffer>` in contracts (e.g. [`BeerJsonExportResponseSchema`](../packages/contracts/src/brewery/routeSchemas.ts)); OpenAPI shows an empty JSON schema (`{}`) while runtime returns raw bytes with `Content-Type` / `Content-Disposition` headers. Human route tables and contracts win on wire format.
+- **Brewery add-on** — Phase C landed water, brew sessions, import, ingredients, and water-calc routes in `brewery.json`.
 - **No codegen yet** — `@umbraculum/api-client` OpenAPI-driven generation is a separate follow-on.
 
 ---
 
 ## Roadmap to full F1 closure
 
-Full F1 closes when PR3 brings remaining platform and brewery routes onto `zodApp` + tags and combined documented operations reach **~80%** of production HTTP surface.
-
-**Continuation plan:** OpenAPI Phase A+B (`openapi_phase_a+b_65d86c2d.plan.md`, extends alpha pre-flip plan Phase 5).
+F1 **~80% target met** (Phase C, 2026-05-31). Full closure waits on `POST /ai/chat` SSE (needs alternate doc surface or OpenAPI 3.1 streaming extension) and any new routes added without `zodApp` schemas.
 
 **Related:** [RFC-0003](rfcs/0003-validation-library-adoption.md) Decision G, [ecosystem case study — Business Central](design/ecosystem-case-study-business-central.md) §4.

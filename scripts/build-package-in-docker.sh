@@ -3,6 +3,8 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GRAPH_HELPER="${REPO_ROOT}/scripts/lib/package-build-graph.py"
+# shellcheck source=lib/docker-npm-volumes.sh
+source "${REPO_ROOT}/scripts/lib/docker-npm-volumes.sh"
 
 usage() {
   cat <<'EOF'
@@ -26,8 +28,10 @@ Examples:
   ./scripts/build-package-in-docker.sh @umbraculum/contracts --fresh
 
 Scoped builds (default) install only the requested workspace(s) into the
-bind-mounted repo (no named node_modules volume) to avoid ENOTEMPTY drift.
-Full --all / --fresh uses brewery_app_root_node_modules + npm ci.
+bind-mounted repo with warm npm cache + optional root node_modules volume.
+Full --all / --fresh uses umbraculum_root_node_modules + npm ci.
+
+See docs/DEVELOPMENT-NPM-VOLUMES.md.
 EOF
 }
 
@@ -130,17 +134,19 @@ DOCKER_ARGS=(
   -w /repo
   -e HOST_UID="$(id -u)"
   -e HOST_GID="$(id -g)"
+  "${DOCKER_NPM_CACHE_MOUNT[@]}"
 )
 
 if [[ "$ALL" -eq 1 || "$FRESH" -eq 1 ]]; then
-  DOCKER_ARGS+=(-v brewery_app_root_node_modules:/repo/node_modules)
-  INSTALL_STEP="npm ci"
+  DOCKER_ARGS+=("${DOCKER_NPM_ROOT_NODE_MODULES_MOUNT[@]}")
+  INSTALL_STEP="npm ci --no-audit --no-fund --prefer-offline"
 else
+  DOCKER_ARGS+=("${DOCKER_NPM_ROOT_NODE_MODULES_MOUNT[@]}")
   INSTALL_WORKSPACES=(--include-workspace-root)
   for ws in "${BUILD_LIST[@]}"; do
     INSTALL_WORKSPACES+=(-w "$ws")
   done
-  INSTALL_STEP="npm install --no-audit --no-fund --prefer-offline ${INSTALL_WORKSPACES[*]}"
+  INSTALL_STEP="npm install ${UMBRACULUM_NPM_INSTALL_FLAGS} ${INSTALL_WORKSPACES[*]}"
 fi
 
 INNER=$(

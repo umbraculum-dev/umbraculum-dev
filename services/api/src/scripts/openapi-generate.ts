@@ -14,9 +14,18 @@ import {
 } from "../openapi/metadata.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const openapiDir = join(__dirname, "../../openapi");
+const apiRoot = join(__dirname, "../..");
+const repoRoot = process.env["UMBRACULUM_REPO_ROOT"] ?? join(apiRoot, "../..");
+const openapiDir = join(apiRoot, "openapi");
 const platformOutPath = join(openapiDir, "openapi.json");
 const breweryOutPath = join(openapiDir, "brewery.json");
+const docsSiteOpenApiDir = join(repoRoot, "docs-site/static/openapi");
+
+/** Mirror committed artifacts for docs-site static hosting. */
+const DOCS_SITE_MIRRORS: ReadonlyArray<{ source: string; target: string }> = [
+  { source: platformOutPath, target: join(docsSiteOpenApiDir, "openapi.json") },
+  { source: breweryOutPath, target: join(docsSiteOpenApiDir, "brewery.json") },
+];
 
 const BREWERY_TAG = "brewery";
 const PLATFORM_TAG_SET = new Set(
@@ -112,14 +121,45 @@ async function main(): Promise<void> {
       const pathCount = Object.keys(spec.paths ?? {}).length;
       console.log(`OpenAPI check OK (${label}: ${pathCount} paths)`);
     }
+    for (const { source, target } of DOCS_SITE_MIRRORS) {
+      const sourceJson = readFileSync(source, "utf8");
+      let targetJson: string;
+      try {
+        targetJson = readFileSync(target, "utf8");
+      } catch {
+        console.error(`${target} is missing — run npm run openapi:generate in services/api`);
+        process.exit(1);
+      }
+      if (sourceJson !== targetJson) {
+        console.error(`${target} is out of date — run npm run openapi:generate in services/api`);
+        process.exit(1);
+      }
+    }
     return;
   }
 
   mkdirSync(openapiDir, { recursive: true });
+  mkdirSync(docsSiteOpenApiDir, { recursive: true });
   for (const { path, spec, label } of outputs) {
-    writeFileSync(path, stableStringify(spec), "utf8");
+    const json = stableStringify(spec);
+    writeFileSync(path, json, "utf8");
     const pathCount = Object.keys(spec.paths ?? {}).length;
     console.log(`OpenAPI written to ${path} (${label}: ${pathCount} paths)`);
+  }
+  for (const { source, target } of DOCS_SITE_MIRRORS) {
+    try {
+      writeFileSync(target, readFileSync(source, "utf8"), "utf8");
+      console.log(`OpenAPI mirrored to ${target}`);
+    } catch (err: unknown) {
+      const code = (err as NodeJS.ErrnoException).code;
+      if (code === "EROFS") {
+        console.warn(
+          `Skipping docs-site mirror for ${target} (read-only repo mount). Copy from ${source} on the host.`,
+        );
+        continue;
+      }
+      throw err;
+    }
   }
 }
 

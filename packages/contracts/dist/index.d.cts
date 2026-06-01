@@ -278,6 +278,658 @@ declare const ActiveWorkspaceContextResponseSchema: z.ZodObject<{
 type WorkspaceCreateRequest = z.infer<typeof WorkspaceCreateRequestSchema>;
 
 /**
+ * Platform billing route contracts (OpenAPI billing tag).
+ */
+
+declare const BillingWorkspaceIdParamsSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+declare const BillingPurchaseProviderSchema: z.ZodEnum<{
+    stripe: "stripe";
+    apple: "apple";
+    google: "google";
+}>;
+declare const BillingPurchaseIntentModeSchema: z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<"purchase" | "restore", unknown>>;
+declare const BillingIntentRequestSchema: z.ZodObject<{
+    planCode: z.ZodString;
+    provider: z.ZodEnum<{
+        stripe: "stripe";
+        apple: "apple";
+        google: "google";
+    }>;
+    mode: z.ZodOptional<z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<"purchase" | "restore", unknown>>>;
+}, z.core.$strip>;
+declare const BillingIntentResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    billingIntentId: z.ZodString;
+    workspaceId: z.ZodString;
+    planCode: z.ZodString;
+    provider: z.ZodEnum<{
+        stripe: "stripe";
+        apple: "apple";
+        google: "google";
+    }>;
+    mode: z.ZodEnum<{
+        purchase: "purchase";
+        restore: "restore";
+    }>;
+    expiresAt: z.ZodPreprocess<z.ZodString>;
+    clientReferenceId: z.ZodString;
+    stripePricingTableId: z.ZodNullable<z.ZodString>;
+    stripePublishableKey: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+declare const BillingTierSchema: z.ZodEnum<{
+    free: "free";
+    premium: "premium";
+    pro: "pro";
+    pro_plus: "pro_plus";
+}>;
+declare const TierLimitsSchema: z.ZodObject<{
+    aiEnabled: z.ZodBoolean;
+    maxRecipesPerWorkspace: z.ZodNumber;
+    maxVersionsPerRecipe: z.ZodNumber;
+    maxVessels: z.ZodNumber;
+    maxAdaptersConnected: z.ZodNumber;
+    automationAiToolsEnabled: z.ZodBoolean;
+}, z.core.$strip>;
+declare const WorkspaceBillingResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    workspaceId: z.ZodString;
+    tier: z.ZodEnum<{
+        free: "free";
+        premium: "premium";
+        pro: "pro";
+        pro_plus: "pro_plus";
+    }>;
+    expiresAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    limits: z.ZodObject<{
+        aiEnabled: z.ZodBoolean;
+        maxRecipesPerWorkspace: z.ZodNumber;
+        maxVersionsPerRecipe: z.ZodNumber;
+        maxVessels: z.ZodNumber;
+        maxAdaptersConnected: z.ZodNumber;
+        automationAiToolsEnabled: z.ZodBoolean;
+    }, z.core.$strip>;
+    usage: z.ZodObject<{
+        recipesCount: z.ZodNumber;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const BillingConfirmRequestSchema: z.ZodObject<{
+    billingIntentId: z.ZodString;
+}, z.core.$strip>;
+declare const BillingConfirmResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+type BillingIntentRequest = z.infer<typeof BillingIntentRequestSchema>;
+type BillingIntentResponse = z.infer<typeof BillingIntentResponseSchema>;
+type WorkspaceBillingResponse = z.infer<typeof WorkspaceBillingResponseSchema>;
+type BillingConfirmRequest = z.infer<typeof BillingConfirmRequestSchema>;
+
+/**
+ * Platform ads route contracts (OpenAPI ads + platform-admin tags).
+ */
+
+declare const AdPlacementSchema: z.ZodEnum<{
+    global_top: "global_top";
+    global_bottom: "global_bottom";
+    recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+    recipe_edit_after_hops: "recipe_edit_after_hops";
+    recipe_edit_after_yeast: "recipe_edit_after_yeast";
+}>;
+declare const AdPlatformSchema: z.ZodPipe<z.ZodUnknown, z.ZodTransform<"web", unknown>>;
+declare const AdSlotParamsSchema: z.ZodObject<{
+    placement: z.ZodEnum<{
+        global_top: "global_top";
+        global_bottom: "global_bottom";
+        recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+        recipe_edit_after_hops: "recipe_edit_after_hops";
+        recipe_edit_after_yeast: "recipe_edit_after_yeast";
+    }>;
+}, z.core.$strip>;
+declare const AdSlotQuerySchema: z.ZodObject<{
+    platform: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"web", unknown>>>;
+}, z.core.$strip>;
+declare const ResolvedAdSchema: z.ZodObject<{
+    id: z.ZodString;
+    imageUrl: z.ZodString;
+    linkUrl: z.ZodString;
+    altText: z.ZodString;
+}, z.core.$strip>;
+declare const AdSlotResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    placement: z.ZodEnum<{
+        global_top: "global_top";
+        global_bottom: "global_bottom";
+        recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+        recipe_edit_after_hops: "recipe_edit_after_hops";
+        recipe_edit_after_yeast: "recipe_edit_after_yeast";
+    }>;
+    platform: z.ZodLiteral<"web">;
+    disabled: z.ZodBoolean;
+    ad: z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        imageUrl: z.ZodString;
+        linkUrl: z.ZodString;
+        altText: z.ZodString;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+/** platform-admin: GET /platform/ads */
+declare const PlatformAdRowSchema: z.ZodObject<{
+    id: z.ZodString;
+    placement: z.ZodEnum<{
+        global_top: "global_top";
+        global_bottom: "global_bottom";
+        recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+        recipe_edit_after_hops: "recipe_edit_after_hops";
+        recipe_edit_after_yeast: "recipe_edit_after_yeast";
+    }>;
+    platform: z.ZodLiteral<"web">;
+    imageUrl: z.ZodString;
+    linkUrl: z.ZodString;
+    altText: z.ZodString;
+    isActive: z.ZodBoolean;
+    startsAt: z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>;
+    endsAt: z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>;
+    priority: z.ZodNumber;
+    weight: z.ZodNumber;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const PlatformAdsListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    ads: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        placement: z.ZodEnum<{
+            global_top: "global_top";
+            global_bottom: "global_bottom";
+            recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+            recipe_edit_after_hops: "recipe_edit_after_hops";
+            recipe_edit_after_yeast: "recipe_edit_after_yeast";
+        }>;
+        platform: z.ZodLiteral<"web">;
+        imageUrl: z.ZodString;
+        linkUrl: z.ZodString;
+        altText: z.ZodString;
+        isActive: z.ZodBoolean;
+        startsAt: z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>;
+        endsAt: z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>;
+        priority: z.ZodNumber;
+        weight: z.ZodNumber;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const PlatformAdCreateRequestSchema: z.ZodObject<{
+    placement: z.ZodEnum<{
+        global_top: "global_top";
+        global_bottom: "global_bottom";
+        recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+        recipe_edit_after_hops: "recipe_edit_after_hops";
+        recipe_edit_after_yeast: "recipe_edit_after_yeast";
+    }>;
+    platform: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"web", unknown>>>;
+    imageUrl: z.ZodString;
+    linkUrl: z.ZodString;
+    altText: z.ZodString;
+    startsAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>>;
+    endsAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>>;
+    isActive: z.ZodOptional<z.ZodBoolean>;
+    priority: z.ZodOptional<z.ZodNumber>;
+    weight: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strip>;
+declare const PlatformAdCreateResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    id: z.ZodString;
+}, z.core.$strip>;
+declare const PlatformAdIdParamsSchema: z.ZodObject<{
+    id: z.ZodString;
+}, z.core.$strip>;
+declare const PlatformAdPatchRequestSchema: z.ZodObject<{
+    placement: z.ZodOptional<z.ZodEnum<{
+        global_top: "global_top";
+        global_bottom: "global_bottom";
+        recipe_edit_after_fermentables: "recipe_edit_after_fermentables";
+        recipe_edit_after_hops: "recipe_edit_after_hops";
+        recipe_edit_after_yeast: "recipe_edit_after_yeast";
+    }>>;
+    platform: z.ZodOptional<z.ZodPipe<z.ZodUnknown, z.ZodTransform<"web", unknown>>>;
+    imageUrl: z.ZodOptional<z.ZodString>;
+    linkUrl: z.ZodOptional<z.ZodString>;
+    altText: z.ZodOptional<z.ZodString>;
+    isActive: z.ZodOptional<z.ZodBoolean>;
+    startsAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>>;
+    endsAt: z.ZodOptional<z.ZodPreprocess<z.ZodNullable<z.ZodPreprocess<z.ZodString>>>>;
+    priority: z.ZodOptional<z.ZodNumber>;
+    weight: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strict>;
+declare const PlatformAdOkResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+type AdSlotResponse = z.infer<typeof AdSlotResponseSchema>;
+type PlatformAdRow = z.infer<typeof PlatformAdRowSchema>;
+
+/**
+ * Platform integrations route contracts (OpenAPI integrations tag).
+ */
+
+declare const IntegrationKindSchema: z.ZodEnum<{
+    tilt: "tilt";
+    ispindel: "ispindel";
+    rapt: "rapt";
+}>;
+declare const IntegrationWorkspaceIdParamsSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationWorkspaceKindParamsSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+    kind: z.ZodPreprocess<z.ZodEnum<{
+        tilt: "tilt";
+        ispindel: "ispindel";
+        rapt: "rapt";
+    }>>;
+}, z.core.$strip>;
+declare const IntegrationTokenParamsSchema: z.ZodObject<{
+    token: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationSummarySchema: z.ZodObject<{
+    id: z.ZodString;
+    workspaceId: z.ZodString;
+    kind: z.ZodEnum<{
+        tilt: "tilt";
+        ispindel: "ispindel";
+        rapt: "rapt";
+    }>;
+    revokedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    updatedAt: z.ZodPreprocess<z.ZodString>;
+}, z.core.$strip>;
+declare const IntegrationRevealResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    integrationId: z.ZodString;
+    kind: z.ZodEnum<{
+        tilt: "tilt";
+        ispindel: "ispindel";
+        rapt: "rapt";
+    }>;
+    token: z.ZodString;
+    publicPath: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationGetResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    integration: z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        kind: z.ZodEnum<{
+            tilt: "tilt";
+            ispindel: "ispindel";
+            rapt: "rapt";
+        }>;
+        revokedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        updatedAt: z.ZodPreprocess<z.ZodString>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const IntegrationCreateResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    integrationId: z.ZodString;
+    token: z.ZodString;
+    publicPath: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationOkResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+/** Tilt webhook ingest — body keys vary by firmware; validate structure loosely. */
+declare const TiltIngestBodySchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const TiltIngestResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    integrationId: z.ZodString;
+    deviceId: z.ZodString;
+    readingId: z.ZodString;
+    brewSessionId: z.ZodNullable<z.ZodString>;
+}, z.core.$strip>;
+declare const IntegrationDevicesQuerySchema: z.ZodObject<{
+    includeReadings: z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<boolean, unknown>>;
+    readingsLimit: z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<number, unknown>>;
+}, z.core.$strip>;
+declare const IntegrationDeviceReadingSchema: z.ZodObject<{
+    id: z.ZodString;
+    brewSessionId: z.ZodNullable<z.ZodString>;
+    recordedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    receivedAt: z.ZodPreprocess<z.ZodString>;
+    temperatureC: z.ZodNullable<z.ZodNumber>;
+    gravitySg: z.ZodNullable<z.ZodNumber>;
+    rawJson: z.ZodOptional<z.ZodUnknown>;
+}, z.core.$strip>;
+declare const IntegrationBrewSessionRefSchema: z.ZodObject<{
+    id: z.ZodString;
+    code: z.ZodNullable<z.ZodString>;
+    status: z.ZodString;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    recipe: z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        version: z.ZodNumber;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const IntegrationDeviceAttachmentSchema: z.ZodObject<{
+    id: z.ZodString;
+    attachedAt: z.ZodPreprocess<z.ZodString>;
+    brewSession: z.ZodObject<{
+        id: z.ZodString;
+        code: z.ZodNullable<z.ZodString>;
+        status: z.ZodString;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        recipe: z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            version: z.ZodNumber;
+        }, z.core.$strip>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const IntegrationDeviceSchema: z.ZodObject<{
+    id: z.ZodString;
+    deviceKey: z.ZodString;
+    displayName: z.ZodNullable<z.ZodString>;
+    metadataJson: z.ZodNullable<z.ZodUnknown>;
+    lastSeenAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    activeAttachment: z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        attachedAt: z.ZodPreprocess<z.ZodString>;
+        brewSession: z.ZodObject<{
+            id: z.ZodString;
+            code: z.ZodNullable<z.ZodString>;
+            status: z.ZodString;
+            createdAt: z.ZodPreprocess<z.ZodString>;
+            startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            recipe: z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodString;
+                version: z.ZodNumber;
+            }, z.core.$strip>;
+        }, z.core.$strip>;
+    }, z.core.$strip>>;
+    lastReading: z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodNullable<z.ZodString>;
+        recordedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        receivedAt: z.ZodPreprocess<z.ZodString>;
+        temperatureC: z.ZodNullable<z.ZodNumber>;
+        gravitySg: z.ZodNullable<z.ZodNumber>;
+        rawJson: z.ZodOptional<z.ZodUnknown>;
+    }, z.core.$strip>>;
+    recentReadings: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        brewSessionId: z.ZodNullable<z.ZodString>;
+        recordedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        receivedAt: z.ZodPreprocess<z.ZodString>;
+        temperatureC: z.ZodNullable<z.ZodNumber>;
+        gravitySg: z.ZodNullable<z.ZodNumber>;
+        rawJson: z.ZodOptional<z.ZodUnknown>;
+    }, z.core.$strip>>>>;
+}, z.core.$strip>;
+declare const IntegrationDevicesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    devices: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        deviceKey: z.ZodString;
+        displayName: z.ZodNullable<z.ZodString>;
+        metadataJson: z.ZodNullable<z.ZodUnknown>;
+        lastSeenAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        activeAttachment: z.ZodNullable<z.ZodObject<{
+            id: z.ZodString;
+            attachedAt: z.ZodPreprocess<z.ZodString>;
+            brewSession: z.ZodObject<{
+                id: z.ZodString;
+                code: z.ZodNullable<z.ZodString>;
+                status: z.ZodString;
+                createdAt: z.ZodPreprocess<z.ZodString>;
+                startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+                recipe: z.ZodObject<{
+                    id: z.ZodString;
+                    name: z.ZodString;
+                    version: z.ZodNumber;
+                }, z.core.$strip>;
+            }, z.core.$strip>;
+        }, z.core.$strip>>;
+        lastReading: z.ZodNullable<z.ZodObject<{
+            id: z.ZodString;
+            brewSessionId: z.ZodNullable<z.ZodString>;
+            recordedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            receivedAt: z.ZodPreprocess<z.ZodString>;
+            temperatureC: z.ZodNullable<z.ZodNumber>;
+            gravitySg: z.ZodNullable<z.ZodNumber>;
+            rawJson: z.ZodOptional<z.ZodUnknown>;
+        }, z.core.$strip>>;
+        recentReadings: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            brewSessionId: z.ZodNullable<z.ZodString>;
+            recordedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+            receivedAt: z.ZodPreprocess<z.ZodString>;
+            temperatureC: z.ZodNullable<z.ZodNumber>;
+            gravitySg: z.ZodNullable<z.ZodNumber>;
+            rawJson: z.ZodOptional<z.ZodUnknown>;
+        }, z.core.$strip>>>>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const IntegrationDeviceIdParamsSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+    deviceId: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationDeviceAttachRequestSchema: z.ZodObject<{
+    brewSessionId: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationDeviceAttachResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    attachment: z.ZodObject<{
+        id: z.ZodString;
+        attachedAt: z.ZodPreprocess<z.ZodString>;
+        brewSessionId: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const IntegrationDeviceDetachResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    detachedCount: z.ZodNumber;
+}, z.core.$strip>;
+declare const BrewSessionsRecentQuerySchema: z.ZodObject<{
+    limit: z.ZodPipe<z.ZodOptional<z.ZodUnknown>, z.ZodTransform<number, unknown>>;
+}, z.core.$strip>;
+declare const BrewSessionSummarySchema: z.ZodObject<{
+    id: z.ZodString;
+    recipeId: z.ZodString;
+    code: z.ZodNullable<z.ZodString>;
+    status: z.ZodString;
+    startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+    createdAt: z.ZodPreprocess<z.ZodString>;
+    recipe: z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        version: z.ZodNumber;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const BrewSessionsRecentResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    brewSessions: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        recipeId: z.ZodString;
+        code: z.ZodNullable<z.ZodString>;
+        status: z.ZodString;
+        startedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        pausedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        stoppedAt: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        scheduledDate: z.ZodNullable<z.ZodPreprocess<z.ZodString>>;
+        createdAt: z.ZodPreprocess<z.ZodString>;
+        recipe: z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            version: z.ZodNumber;
+        }, z.core.$strip>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+type IntegrationKind = z.infer<typeof IntegrationKindSchema>;
+type IntegrationRevealResponse = z.infer<typeof IntegrationRevealResponseSchema>;
+
+/**
+ * Platform-admin recipe route contracts (OpenAPI platform-admin tag).
+ * BeerJSON bodies use z.unknown() — strict validation happens in import services.
+ */
+
+declare const PlatformWorkspaceRowSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+}, z.core.$strip>;
+declare const PlatformWorkspacesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    workspaces: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const PlatformRecipesListQuerySchema: z.ZodPreprocess<z.ZodObject<{
+    workspaceId: z.ZodString;
+}, z.core.$strip>>;
+declare const PlatformRecipeSummarySchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    version: z.ZodNumber;
+    styleKey: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    style: z.ZodOptional<z.ZodNullable<z.ZodUnknown>>;
+    createdAt: z.ZodOptional<z.ZodPreprocess<z.ZodString>>;
+    updatedAt: z.ZodOptional<z.ZodPreprocess<z.ZodString>>;
+}, z.core.$strip>;
+declare const PlatformRecipesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    recipes: z.ZodArray<z.ZodUnknown>;
+}, z.core.$strip>;
+declare const PlatformRecipeIdParamsSchema: z.ZodObject<{
+    id: z.ZodString;
+}, z.core.$strip>;
+declare const PlatformRecipeExportQuerySchema: z.ZodPreprocess<z.ZodObject<{
+    workspaceId: z.ZodString;
+}, z.core.$strip>>;
+/** Loose BeerJSON export — edge validation in beerjson/strictExport. */
+declare const BeerJsonLooseSchema: z.ZodUnknown;
+declare const PlatformImportFormatSchema: z.ZodEnum<{
+    beerjson: "beerjson";
+    beerxml: "beerxml";
+}>;
+declare const PlatformRecipeImportPreviewRequestSchema: z.ZodPreprocess<z.ZodObject<{
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    content: z.ZodString;
+    workspaceId: z.ZodString;
+}, z.core.$strip>>;
+declare const PlatformRecipeImportPreviewResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    preview: z.ZodObject<{
+        name: z.ZodString;
+        notes: z.ZodNullable<z.ZodString>;
+        beerJsonRecipeJson: z.ZodUnknown;
+        warnings: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+declare const PlatformRecipeImportRequestSchema: z.ZodPreprocess<z.ZodObject<{
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    content: z.ZodString;
+    styleKey: z.ZodOptional<z.ZodString>;
+    workspaceId: z.ZodString;
+    recipeExtJson: z.ZodOptional<z.ZodUnknown>;
+}, z.core.$strip>>;
+declare const PlatformRecipeImportResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    recipe: z.ZodUnknown;
+    warnings: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+declare const PlatformRecipeBulkImportPreviewRequestSchema: z.ZodPreprocess<z.ZodObject<{
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    content: z.ZodString;
+    workspaceId: z.ZodString;
+}, z.core.$strip>>;
+declare const PlatformRecipeBulkImportPreviewItemSchema: z.ZodObject<{
+    index: z.ZodNumber;
+    name: z.ZodString;
+    notes: z.ZodNullable<z.ZodString>;
+    resolvedStyleKey: z.ZodString;
+    resolvedStyleName: z.ZodNullable<z.ZodString>;
+    resolvedStyleCode: z.ZodNullable<z.ZodString>;
+    warnings: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+declare const PlatformRecipeBulkImportPreviewResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    previewItems: z.ZodArray<z.ZodObject<{
+        index: z.ZodNumber;
+        name: z.ZodString;
+        notes: z.ZodNullable<z.ZodString>;
+        resolvedStyleKey: z.ZodString;
+        resolvedStyleName: z.ZodNullable<z.ZodString>;
+        resolvedStyleCode: z.ZodNullable<z.ZodString>;
+        warnings: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>>;
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+declare const PlatformRecipeBulkImportRequestSchema: z.ZodPreprocess<z.ZodObject<{
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    content: z.ZodString;
+    workspaceId: z.ZodString;
+}, z.core.$strip>>;
+declare const PlatformRecipeBulkImportResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    created: z.ZodArray<z.ZodObject<{
+        index: z.ZodNumber;
+        recipeId: z.ZodString;
+        name: z.ZodString;
+        styleKey: z.ZodString;
+        style: z.ZodNullable<z.ZodUnknown>;
+        warnings: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>>;
+    failed: z.ZodArray<z.ZodObject<{
+        index: z.ZodNumber;
+        name: z.ZodString;
+        error: z.ZodString;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const PlatformAdminOkResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+
+/**
+ * Webhook route contracts (OpenAPI webhooks tag).
+ * Provider payloads are validated loosely — signature verification is route-level.
+ */
+
+declare const WebhookOkResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+}, z.core.$strip>;
+declare const WebhookStripeBodySchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const WebhookRevenuecatBodySchema: z.ZodUnknown;
+
+/**
  * Brewery vertical route contracts (OpenAPI brewery tag).
  * Complex JSON fields use z.unknown() — contracts + route tables win on edge validation.
  */
@@ -425,6 +1077,119 @@ declare const RecipeVersionsResponseSchema: z.ZodObject<{
 }, z.core.$strip>;
 /** BeerJSON export routes stream raw bytes; OpenAPI documents a placeholder object. */
 declare const BeerJsonExportResponseSchema: z.ZodCustom<Buffer<ArrayBufferLike>, Buffer<ArrayBufferLike>>;
+declare const RecipeIdParamsSchema: z.ZodObject<{
+    recipeId: z.ZodString;
+}, z.core.$strip>;
+declare const BrewSessionIdParamsSchema: z.ZodObject<{
+    brewSessionId: z.ZodString;
+}, z.core.$strip>;
+declare const BrewSessionStepParamsSchema: z.ZodObject<{
+    brewSessionId: z.ZodString;
+    stepId: z.ZodString;
+}, z.core.$strip>;
+declare const IngredientsSearchQuerySchema: z.ZodObject<{
+    query: z.ZodOptional<z.ZodString>;
+    offset: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    limit: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+}, z.core.$strip>;
+declare const IntegrationReadingsQuerySchema: z.ZodObject<{
+    kind: z.ZodEnum<{
+        tilt: "tilt";
+        ispindel: "ispindel";
+        rapt: "rapt";
+    }>;
+    limit: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+}, z.core.$strip>;
+declare const FermentableItemSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const FermentablesListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    items: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    total: z.ZodNumber;
+    offset: z.ZodNumber;
+    limit: z.ZodNumber;
+}, z.core.$strip>;
+declare const HopItemSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const HopsListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    items: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    total: z.ZodNumber;
+    offset: z.ZodNumber;
+    limit: z.ZodNumber;
+}, z.core.$strip>;
+declare const YeastItemSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const YeastsListResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    items: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const IngredientSyncRunSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const IngredientSyncRunsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    runs: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const IngredientSyncResultSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const IngredientSyncResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    result: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const RecipeImportFormatSchema: z.ZodEnum<{
+    beerjson: "beerjson";
+    beerxml: "beerxml";
+}>;
+declare const RecipeImportRequestSchema: z.ZodObject<{
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    content: z.ZodString;
+    styleKey: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+declare const RecipeBulkImportRequestSchema: z.ZodObject<{
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    content: z.ZodString;
+}, z.core.$strip>;
+declare const RecipeImportPreviewPayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipeImportPreviewResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    preview: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+declare const RecipeImportResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    recipe: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    warnings: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
+declare const RecipeBulkImportPreviewItemSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipeBulkImportPreviewResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    format: z.ZodEnum<{
+        beerjson: "beerjson";
+        beerxml: "beerxml";
+    }>;
+    previewItems: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+declare const RecipeBulkImportCreatedItemSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipeBulkImportFailedItemSchema: z.ZodObject<{
+    index: z.ZodNumber;
+    name: z.ZodString;
+    error: z.ZodString;
+}, z.core.$strip>;
+declare const RecipeBulkImportResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    created: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    failed: z.ZodArray<z.ZodObject<{
+        index: z.ZodNumber;
+        name: z.ZodString;
+        error: z.ZodString;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
 
 type WaterCalcDerivationKind = "salt_additions" | "acidification" | "mash_overall" | "sparge_overall" | "boil_overall" | "analysis.abv" | "analysis.ibu_tinseth" | "analysis.ibu_rager" | "analysis.mcu" | "analysis.srm_morey" | "analysis.srm_daniels" | "analysis.kettle_volume" | "analysis.pre_boil_volume" | "analysis.og" | "analysis.fg" | "analysis.attenuation" | "analysis.pbg";
 type WaterCalcUnit = "L" | "g" | "mL" | "ppm" | "ppm_as_CaCO3" | "pH" | "percent" | "sg" | "ibu" | "srm" | "mcu" | "h" | "percent_per_hour" | "L_per_kg" | "mEq_per_L" | "mmol_per_L";
@@ -786,6 +1551,82 @@ interface RecipeWaterSettings {
     [key: string]: unknown;
 }
 
+declare const RecipeWaterHubSummaryResponseSchema: z.ZodCustom<RecipeWaterHubSummaryResponse, RecipeWaterHubSummaryResponse>;
+declare const WaterProfilesListResponseSchema: z.ZodCustom<WaterProfilesResponse, WaterProfilesResponse>;
+declare const WaterProfileItemSchema: z.ZodCustom<WaterProfile, WaterProfile>;
+declare const WaterProfileResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    profile: z.ZodCustom<WaterProfile, WaterProfile>;
+}, z.core.$strip>;
+declare const WaterProfileCreateRequestSchema: z.ZodObject<{
+    scope: z.ZodOptional<z.ZodEnum<{
+        system: "system";
+        account: "account";
+        public: "public";
+    }>>;
+    type: z.ZodOptional<z.ZodEnum<{
+        water: "water";
+        dilution: "dilution";
+    }>>;
+    name: z.ZodOptional<z.ZodString>;
+    ph: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    calcium: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    magnesium: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    sodium: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    sulfate: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    chloride: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    bicarbonate: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+}, z.core.$strip>;
+declare const WaterProfilePatchRequestSchema: z.ZodObject<{
+    scope: z.ZodOptional<z.ZodEnum<{
+        system: "system";
+        account: "account";
+        public: "public";
+    }>>;
+    type: z.ZodOptional<z.ZodEnum<{
+        water: "water";
+        dilution: "dilution";
+    }>>;
+    name: z.ZodOptional<z.ZodString>;
+    ph: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    calcium: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    magnesium: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    sodium: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    sulfate: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    chloride: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    bicarbonate: z.ZodOptional<z.ZodUnion<readonly [z.ZodNumber, z.ZodString, z.ZodNull]>>;
+    verificationStatus: z.ZodOptional<z.ZodEnum<{
+        verified: "verified";
+        unverified: "unverified";
+    }>>;
+}, z.core.$strip>;
+declare const RecipeWaterSettingsPayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipeWaterSettingsGetResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    settings: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const RecipeWaterSettingsPutRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const RecipeWaterSettingsPutResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    settings: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const MashComputeAndSaveRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const MashComputeAndSaveResponseSchema: z.ZodCustom<MashComputeAndSaveResponseV1, MashComputeAndSaveResponseV1>;
+declare const SpargeComputeAndSaveRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const SpargeComputeAndSaveResponseSchema: z.ZodCustom<SpargeComputeAndSaveResponseV1, SpargeComputeAndSaveResponseV1>;
+declare const BoilComputeAndSaveRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BoilComputeAndSaveResponseSchema: z.ZodCustom<BoilComputeAndSaveResponseV1, BoilComputeAndSaveResponseV1>;
+declare const WaterCalcRequestSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const WaterCalcWithDerivationResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    result: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    derivation: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const WaterCalcResultOnlyResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    result: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+
 declare const waterFormatHints: Record<string, NumberFormatHintV1>;
 declare const analysisFormatHints: Record<string, NumberFormatHintV1>;
 
@@ -828,138 +1669,182 @@ interface GravityAnalysisResponseV1 {
 declare function parseGravityAnalysisResponseV1(x: unknown): GravityAnalysisResponseV1;
 
 /**
- * AI usage ledger entry — the audit/analytics record written by the
- * orchestrator after every chat turn. Matches the schema in
- * docs/PLATFORM-ARCHITECTURE.md §4.3 / §6.4.
- *
- * In v0 the ledger is informational-only: it drives the workspace usage
- * dashboard (Sprint #2) and the per-user / per-role rate-limit checks; it
- * does NOT drive any Stripe charge. The paid-AI subscription is flat-rate
- * regardless of usage volume — see internal/AI-MONETIZATION-STRATEGY.md.
+ * AI usage dashboard — wire shape for `GET /workspaces/:id/ai/usage`.
  */
-/**
- * One recorded entry per AI chat turn (success or partial failure). Costs
- * are stored in micro-USD (1 USD = 1_000_000 micro-USD) to avoid floating
- * point precision loss on small per-call amounts.
- */
-interface AiUsageLedgerEntry {
-    id: string;
-    workspaceId: string;
-    userId: string;
-    /** Logical session/conversation identifier; nullable for one-shot calls. */
-    sessionId: string | null;
-    /** Provider-specific model identifier (e.g. `claude-sonnet-4-5`). */
-    model: string;
-    tokensIn: number;
-    tokensOut: number;
-    /** Provider-reported cost in micro-USD (1e-6 USD). 0 if not derivable. */
-    costMicroUsd: number;
-    /** Wall-clock duration of the chat turn in milliseconds. */
-    durationMs: number;
-    /** Provider request id for cross-system tracing (Anthropic `request_id`). */
-    providerRequestId: string | null;
-    /** Ordered list of tool calls the model made during this turn. */
-    toolCalls: AiToolCallRecord[];
-    /** ISO-8601 timestamp. */
-    createdAt: string;
-}
-/**
- * One tool invocation inside a single chat turn. `argsJson` and `resultJson`
- * are stored verbatim for debugging; orchestrators are encouraged to elide
- * large blobs (e.g. truncate `resultJson` to 8 KB) before persistence.
- */
-interface AiToolCallRecord {
-    name: string;
-    /** Stringified JSON input the model produced (or truncated thereof). */
-    argsJson: string;
-    /** Stringified JSON result returned to the model (or truncated thereof). */
-    resultJson: string;
-    /** Wall-clock duration of this tool call in milliseconds. */
-    durationMs: number;
-    /** `true` if the handler threw; the message is captured in `resultJson`. */
-    errored: boolean;
-}
+
+declare const AiUsageMonthlySchema: z.ZodObject<{
+    tokensIn: z.ZodNumber;
+    tokensOut: z.ZodNumber;
+    costMicroUsd: z.ZodNumber;
+    callCount: z.ZodNumber;
+}, z.core.$strip>;
+declare const AiUsageDailyPointSchema: z.ZodObject<{
+    day: z.ZodString;
+    tokensIn: z.ZodNumber;
+    tokensOut: z.ZodNumber;
+    calls: z.ZodNumber;
+}, z.core.$strip>;
+declare const AiUsageByUserSchema: z.ZodObject<{
+    userId: z.ZodString;
+    email: z.ZodNullable<z.ZodString>;
+    role: z.ZodNullable<z.ZodString>;
+    tokensInToday: z.ZodNumber;
+    tokensOutToday: z.ZodNumber;
+    tokensInMonth: z.ZodNumber;
+    tokensOutMonth: z.ZodNumber;
+    costMicroUsdMonth: z.ZodNumber;
+    callCountMonth: z.ZodNumber;
+}, z.core.$strip>;
+declare const AiUsageRoleAlertSchema: z.ZodObject<{
+    role: z.ZodString;
+    used: z.ZodNumber;
+    limit: z.ZodNumber;
+    percent: z.ZodNumber;
+}, z.core.$strip>;
+declare const AiUsageUserAlertSchema: z.ZodObject<{
+    userId: z.ZodString;
+    usedToday: z.ZodNumber;
+    cap: z.ZodNumber;
+    percent: z.ZodNumber;
+}, z.core.$strip>;
+declare const WorkspaceAiUsageResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    monthly: z.ZodObject<{
+        tokensIn: z.ZodNumber;
+        tokensOut: z.ZodNumber;
+        costMicroUsd: z.ZodNumber;
+        callCount: z.ZodNumber;
+    }, z.core.$strip>;
+    dailySeries: z.ZodArray<z.ZodObject<{
+        day: z.ZodString;
+        tokensIn: z.ZodNumber;
+        tokensOut: z.ZodNumber;
+        calls: z.ZodNumber;
+    }, z.core.$strip>>;
+    roleLimits: z.ZodRecord<z.ZodString, z.ZodNumber>;
+    roleUsage: z.ZodRecord<z.ZodString, z.ZodNumber>;
+    perUserDailyCap: z.ZodNumber;
+    byUser: z.ZodArray<z.ZodObject<{
+        userId: z.ZodString;
+        email: z.ZodNullable<z.ZodString>;
+        role: z.ZodNullable<z.ZodString>;
+        tokensInToday: z.ZodNumber;
+        tokensOutToday: z.ZodNumber;
+        tokensInMonth: z.ZodNumber;
+        tokensOutMonth: z.ZodNumber;
+        costMicroUsdMonth: z.ZodNumber;
+        callCountMonth: z.ZodNumber;
+    }, z.core.$strip>>;
+    alerts: z.ZodObject<{
+        roleAlerts: z.ZodArray<z.ZodObject<{
+            role: z.ZodString;
+            used: z.ZodNumber;
+            limit: z.ZodNumber;
+            percent: z.ZodNumber;
+        }, z.core.$strip>>;
+        userAlerts: z.ZodArray<z.ZodObject<{
+            userId: z.ZodString;
+            usedToday: z.ZodNumber;
+            cap: z.ZodNumber;
+            percent: z.ZodNumber;
+        }, z.core.$strip>>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+/** One recorded entry per AI chat turn (audit/analytics). */
+declare const AiToolCallRecordSchema: z.ZodObject<{
+    name: z.ZodString;
+    argsJson: z.ZodString;
+    resultJson: z.ZodString;
+    durationMs: z.ZodNumber;
+    errored: z.ZodBoolean;
+}, z.core.$strip>;
+declare const AiUsageLedgerEntrySchema: z.ZodObject<{
+    id: z.ZodString;
+    workspaceId: z.ZodString;
+    userId: z.ZodString;
+    sessionId: z.ZodNullable<z.ZodString>;
+    model: z.ZodString;
+    tokensIn: z.ZodNumber;
+    tokensOut: z.ZodNumber;
+    costMicroUsd: z.ZodNumber;
+    durationMs: z.ZodNumber;
+    providerRequestId: z.ZodNullable<z.ZodString>;
+    toolCalls: z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        argsJson: z.ZodString;
+        resultJson: z.ZodString;
+        durationMs: z.ZodNumber;
+        errored: z.ZodBoolean;
+    }, z.core.$strip>>;
+    createdAt: z.ZodString;
+}, z.core.$strip>;
+type AiUsageLedgerEntry = z.infer<typeof AiUsageLedgerEntrySchema>;
+type AiToolCallRecord = z.infer<typeof AiToolCallRecordSchema>;
+type WorkspaceAiUsageResponse = z.infer<typeof WorkspaceAiUsageResponseSchema>;
 
 /**
  * Workspace AI settings — wire shape for `GET/PUT /workspaces/:id/ai/settings`.
  *
  * Security invariant: the encrypted provider key MUST never be returned
- * to clients. The DTO exposes only `hasKey: boolean` so the admin UI can
- * render "Key configured: yes/no". `PUT` accepts a write-only `apiKey`
- * field; the server encrypts and stores it without ever echoing it back.
+ * to clients. The DTO exposes only `hasKey: boolean`.
  */
-/**
- * AI provider identifier. v0 ships Anthropic only; the union is reserved
- * for future provider adapters (OpenAI / Google / local).
- */
-type AiProvider = "anthropic" | "openai";
-/**
- * Per-role monthly token cap (sum of `tokensIn + tokensOut` over the trailing
- * 30 days). The map is keyed by `WorkspaceRole`. A missing role key or a
- * value of `0` means "no role-level cap".
- *
- * Example: `{ "brewery_admin": 0, "member": 500000, "viewer": 100000 }`.
- */
-type AiRoleLimits = Record<string, number>;
-interface WorkspaceAiSettings {
-    workspaceId: string;
-    provider: AiProvider;
-    /** `true` when a workspace key is stored (encrypted at rest). */
-    hasKey: boolean;
-    /** Master AI feature toggle; the orchestrator gates on this. */
-    enabled: boolean;
-    /** Per-role monthly token caps. */
-    roleLimits: AiRoleLimits;
-    /** Per-user daily token cap (sum of `tokensIn + tokensOut` for today). */
-    perUserDailyCap: number;
-    /** Whether the workspace admin acknowledged the data-egress notice. */
-    dataEgressAccepted: boolean;
-    /** ISO-8601 timestamp of acceptance; `null` if never accepted. */
-    dataEgressAcceptedAt: string | null;
-    /** ISO-8601 timestamp. */
-    createdAt: string;
-    /** ISO-8601 timestamp. */
-    updatedAt: string;
-}
-/**
- * `PUT /workspaces/:id/ai/settings` body. All fields are optional — the
- * server applies a partial update. `apiKey` is write-only and never echoed
- * back; pass an empty string to clear the stored key.
- */
-interface UpdateWorkspaceAiSettingsRequest {
-    provider?: AiProvider;
-    apiKey?: string;
-    enabled?: boolean;
-    roleLimits?: AiRoleLimits;
-    perUserDailyCap?: number;
-    dataEgressAccepted?: boolean;
-}
-interface WorkspaceAiSettingsResponse {
-    ok: true;
-    settings: WorkspaceAiSettings;
-}
-/**
- * Aggregated usage view used by the workspace admin dashboard (Sprint #2)
- * and surfaced from `GET /workspaces/:id/ai/usage`.
- */
-interface WorkspaceAiUsageResponse {
-    ok: true;
-    monthly: {
-        tokensIn: number;
-        tokensOut: number;
-        costMicroUsd: number;
-        callCount: number;
-    };
-    byUser: Array<{
-        userId: string;
-        tokensInToday: number;
-        tokensOutToday: number;
-        tokensInMonth: number;
-        tokensOutMonth: number;
-        costMicroUsdMonth: number;
-        callCountMonth: number;
+
+declare const AiProviderSchema: z.ZodEnum<{
+    anthropic: "anthropic";
+    openai: "openai";
+}>;
+declare const AiRoleLimitsSchema: z.ZodRecord<z.ZodString, z.ZodNumber>;
+declare const WorkspaceAiSettingsSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+    provider: z.ZodEnum<{
+        anthropic: "anthropic";
+        openai: "openai";
     }>;
-}
+    hasKey: z.ZodBoolean;
+    enabled: z.ZodBoolean;
+    roleLimits: z.ZodRecord<z.ZodString, z.ZodNumber>;
+    perUserDailyCap: z.ZodNumber;
+    dataEgressAccepted: z.ZodBoolean;
+    dataEgressAcceptedAt: z.ZodNullable<z.ZodString>;
+    createdAt: z.ZodString;
+    updatedAt: z.ZodString;
+}, z.core.$strip>;
+declare const UpdateWorkspaceAiSettingsRequestSchema: z.ZodObject<{
+    provider: z.ZodOptional<z.ZodEnum<{
+        anthropic: "anthropic";
+        openai: "openai";
+    }>>;
+    apiKey: z.ZodOptional<z.ZodString>;
+    enabled: z.ZodOptional<z.ZodBoolean>;
+    roleLimits: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
+    perUserDailyCap: z.ZodOptional<z.ZodNumber>;
+    dataEgressAccepted: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strict>;
+declare const WorkspaceAiSettingsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    settings: z.ZodObject<{
+        workspaceId: z.ZodString;
+        provider: z.ZodEnum<{
+            anthropic: "anthropic";
+            openai: "openai";
+        }>;
+        hasKey: z.ZodBoolean;
+        enabled: z.ZodBoolean;
+        roleLimits: z.ZodRecord<z.ZodString, z.ZodNumber>;
+        perUserDailyCap: z.ZodNumber;
+        dataEgressAccepted: z.ZodBoolean;
+        dataEgressAcceptedAt: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodString;
+        updatedAt: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+declare const WorkspaceAiSettingsParamsSchema: z.ZodObject<{
+    workspaceId: z.ZodString;
+}, z.core.$strip>;
+type AiProvider = z.infer<typeof AiProviderSchema>;
+type AiRoleLimits = z.infer<typeof AiRoleLimitsSchema>;
+type WorkspaceAiSettings = z.infer<typeof WorkspaceAiSettingsSchema>;
+type UpdateWorkspaceAiSettingsRequest = z.infer<typeof UpdateWorkspaceAiSettingsRequestSchema>;
 
 /**
  * `POST /ai/chat` request body.
@@ -1017,6 +1902,29 @@ declare const AiProposalListResponseSchema: z.ZodObject<{
         appliedAt: z.ZodNullable<z.ZodString>;
         rejectedAt: z.ZodNullable<z.ZodString>;
     }, z.core.$strict>>;
+}, z.core.$strict>;
+declare const AiProposalIdParamsSchema: z.ZodObject<{
+    id: z.ZodString;
+}, z.core.$strip>;
+declare const AiProposalGetResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    proposal: z.ZodObject<{
+        id: z.ZodString;
+        workspaceId: z.ZodString;
+        userId: z.ZodString;
+        moduleCode: z.ZodString;
+        proposalType: z.ZodString;
+        summary: z.ZodString;
+        payloadJson: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+        status: z.ZodEnum<{
+            pending: "pending";
+            applied: "applied";
+            rejected: "rejected";
+        }>;
+        createdAt: z.ZodString;
+        appliedAt: z.ZodNullable<z.ZodString>;
+        rejectedAt: z.ZodNullable<z.ZodString>;
+    }, z.core.$strict>;
 }, z.core.$strict>;
 declare const AiProposalActionResponseSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
@@ -1078,10 +1986,10 @@ declare const RenderKindSchema: z.ZodEnum<{
     qr: "qr";
 }>;
 declare const RenderStatusSchema: z.ZodEnum<{
+    failed: "failed";
     queued: "queued";
     running: "running";
     succeeded: "succeeded";
-    failed: "failed";
 }>;
 declare const RenderVisibilitySchema: z.ZodEnum<{
     workspace: "workspace";
@@ -1149,10 +2057,10 @@ declare const RenderJobStatusSchema: z.ZodObject<{
         qr: "qr";
     }>;
     status: z.ZodEnum<{
+        failed: "failed";
         queued: "queued";
         running: "running";
         succeeded: "succeeded";
-        failed: "failed";
     }>;
     deliveryMode: z.ZodString;
     requestedAt: z.ZodString;
@@ -1184,10 +2092,10 @@ declare const RenderJobSubmitResponseSchema: z.ZodObject<{
             qr: "qr";
         }>;
         status: z.ZodEnum<{
+            failed: "failed";
             queued: "queued";
             running: "running";
             succeeded: "succeeded";
-            failed: "failed";
         }>;
         deliveryMode: z.ZodString;
         requestedAt: z.ZodString;
@@ -1219,10 +2127,10 @@ declare const RenderJobStatusResponseSchema: z.ZodObject<{
             qr: "qr";
         }>;
         status: z.ZodEnum<{
+            failed: "failed";
             queued: "queued";
             running: "running";
             succeeded: "succeeded";
-            failed: "failed";
         }>;
         deliveryMode: z.ZodString;
         requestedAt: z.ZodString;
@@ -1254,10 +2162,10 @@ declare const RenderJobCancelResponseSchema: z.ZodObject<{
             qr: "qr";
         }>;
         status: z.ZodEnum<{
+            failed: "failed";
             queued: "queued";
             running: "running";
             succeeded: "succeeded";
-            failed: "failed";
         }>;
         deliveryMode: z.ZodString;
         requestedAt: z.ZodString;
@@ -1289,10 +2197,10 @@ declare const RenderJobResultResponseSchema: z.ZodObject<{
             qr: "qr";
         }>;
         status: z.ZodEnum<{
+            failed: "failed";
             queued: "queued";
             running: "running";
             succeeded: "succeeded";
-            failed: "failed";
         }>;
         deliveryMode: z.ZodString;
         requestedAt: z.ZodString;
@@ -1379,10 +2287,94 @@ declare const BrewSessionsListResponseSchema: z.ZodObject<{
 }, z.core.$strip>;
 type BrewSessionsListResponse = z.infer<typeof BrewSessionsListResponseSchema>;
 declare function parseBrewSessionsListResponse(payload: unknown): BrewSessionsListResponse;
+declare const BrewSessionPayloadSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BrewSessionStepSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const BrewSessionDetailResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    brewSession: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const BrewSessionCreateResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    brewSession: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    steps: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const BrewSessionStepResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    step: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const BrewSessionStepsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    steps: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const BrewSessionPatchRequestSchema: z.ZodObject<{
+    scheduledDate: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, z.core.$strip>;
+declare const BrewSessionStepsPatchRequestSchema: z.ZodObject<{
+    steps: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
+declare const BrewSessionStepTimerPatchRequestSchema: z.ZodObject<{
+    customTimerEnabled: z.ZodBoolean;
+}, z.core.$strip>;
+declare const BrewSessionStopRequestSchema: z.ZodObject<{
+    reason: z.ZodOptional<z.ZodEnum<{
+        manual: "manual";
+        auto: "auto";
+    }>>;
+}, z.core.$strip>;
+declare const BrewSessionStepLogRequestSchema: z.ZodObject<{
+    status: z.ZodEnum<{
+        pending: "pending";
+        in_progress: "in_progress";
+        done: "done";
+        skipped: "skipped";
+        not_applicable: "not_applicable";
+    }>;
+    note: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    name: z.ZodOptional<z.ZodString>;
+    isDisabled: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strip>;
+declare const IntegrationAttachmentDeviceSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const IntegrationAttachmentSchema: z.ZodObject<{
+    id: z.ZodString;
+    attachedAt: z.ZodPreprocess<z.ZodString>;
+    device: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const IntegrationAttachmentsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    attachments: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        attachedAt: z.ZodPreprocess<z.ZodString>;
+        device: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+declare const IntegrationAttachRequestSchema: z.ZodObject<{
+    kind: z.ZodEnum<{
+        tilt: "tilt";
+        ispindel: "ispindel";
+        rapt: "rapt";
+    }>;
+    deviceId: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationAttachResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    attachment: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+}, z.core.$strip>;
+declare const IntegrationDetachRequestSchema: z.ZodObject<{
+    deviceId: z.ZodString;
+}, z.core.$strip>;
+declare const IntegrationDetachResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    detachedCount: z.ZodNumber;
+}, z.core.$strip>;
+declare const IntegrationReadingSchema: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+declare const IntegrationReadingsResponseSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    readings: z.ZodArray<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strip>;
 declare function parseBrewSessionCreateResponse(payload: unknown): {
     brewSession: {
         id: string;
     };
 };
 
-export { ActiveWorkspaceContextResponseSchema, type AiChatRequestBody, AiChatRequestBodySchema, AiProposalActionResponseSchema, type AiProposalDto, AiProposalDtoSchema, AiProposalListResponseSchema, type AiProposalStatus, AiProposalStatusSchema, type AiProvider, type AiRoleLimits, type AiToolCallRecord, type AiUsageLedgerEntry, AuthActiveWorkspaceRequestSchema, AuthActiveWorkspaceResponseSchema, AuthLoginNativeResponseSchema, type AuthLoginRequest, AuthLoginRequestSchema, AuthLoginResponseSchema, AuthLogoutResponseSchema, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, AuthPreferencesPatchRequestSchema, AuthPreferencesPatchResponseSchema, AuthSessionUserSchema, type AuthSignupRequest, AuthSignupRequestSchema, AuthSignupResponseSchema, AuthWebviewBridgeQuerySchema, AuthWebviewExchangeRequestSchema, AuthWebviewExchangeResponseSchema, BeerJsonExportResponseSchema, BeerStyleSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, type BoilComputeAndSaveResponseV1, type BrewSessionListItem, type BrewSessionsListResponse, BrewSessionsListResponseSchema, BrewdaySettingsPatchRequestSchema, BrewdaySettingsPayloadSchema, BrewdaySettingsResponseSchema, ContextMeResponseSchema, type CrpProposeScheduleAdjustmentInput, CrpProposeScheduleAdjustmentInputSchema, type CrpProposeScheduleAdjustmentOutput, CrpProposeScheduleAdjustmentOutputSchema, EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfilePayloadSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, IdParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemPayloadSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, type MashComputeAndSaveResponseV1, type MrpProposeOrderAdjustmentInput, MrpProposeOrderAdjustmentInputSchema, type MrpProposeOrderAdjustmentOutput, MrpProposeOrderAdjustmentOutputSchema, type NumberFormatHintV1, type NumberFormatUnit, OkResponseSchema, PreferredLocaleSchema, RecipeCreateRequestSchema, type RecipeListItem, RecipeListResponseSchema, RecipePatchRequestSchema, RecipePayloadSchema, RecipeResponseSchema, RecipeVersionsResponseSchema, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, type RecipeWaterSettings, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, SafeNextPathSchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, type SpargeComputeAndSaveResponseV1, StylesListResponseSchema, UiDensitySchema, UiFontScaleSchema, UiThemeSchema, type UpdateWorkspaceAiSettingsRequest, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, type WaterCalcUnit, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, type WaterProfilesResponse, type WaterSaltAdditionsResult, type WorkspaceAiSettings, type WorkspaceAiSettingsResponse, type WorkspaceAiUsageResponse, WorkspaceBrandPatchRequestSchema, WorkspaceBrandPatchResponseSchema, type WorkspaceCreateRequest, WorkspaceCreateRequestSchema, WorkspaceCreateResponseSchema, WorkspaceIdParamsSchema, WorkspaceRowSchema, WorkspacesListResponseSchema, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };
+export { ActiveWorkspaceContextResponseSchema, AdPlacementSchema, AdPlatformSchema, AdSlotParamsSchema, AdSlotQuerySchema, type AdSlotResponse, AdSlotResponseSchema, type AiChatRequestBody, AiChatRequestBodySchema, AiProposalActionResponseSchema, type AiProposalDto, AiProposalDtoSchema, AiProposalGetResponseSchema, AiProposalIdParamsSchema, AiProposalListResponseSchema, type AiProposalStatus, AiProposalStatusSchema, type AiProvider, AiProviderSchema, type AiRoleLimits, AiRoleLimitsSchema, type AiToolCallRecord, AiToolCallRecordSchema, AiUsageByUserSchema, AiUsageDailyPointSchema, type AiUsageLedgerEntry, AiUsageLedgerEntrySchema, AiUsageMonthlySchema, AiUsageRoleAlertSchema, AiUsageUserAlertSchema, AuthActiveWorkspaceRequestSchema, AuthActiveWorkspaceResponseSchema, AuthLoginNativeResponseSchema, type AuthLoginRequest, AuthLoginRequestSchema, AuthLoginResponseSchema, AuthLogoutResponseSchema, type AuthMeResponse, AuthMeResponseSchema, type AuthMeResponseUser, AuthMeResponseUserSchema, type AuthMeResponseWorkspace, AuthMeResponseWorkspaceSchema, AuthPreferencesPatchRequestSchema, AuthPreferencesPatchResponseSchema, AuthSessionUserSchema, type AuthSignupRequest, AuthSignupRequestSchema, AuthSignupResponseSchema, AuthWebviewBridgeQuerySchema, AuthWebviewExchangeRequestSchema, AuthWebviewExchangeResponseSchema, BeerJsonExportResponseSchema, BeerJsonLooseSchema, BeerStyleSchema, type BillingConfirmRequest, BillingConfirmRequestSchema, BillingConfirmResponseSchema, type BillingIntentRequest, BillingIntentRequestSchema, type BillingIntentResponse, BillingIntentResponseSchema, BillingPurchaseIntentModeSchema, BillingPurchaseProviderSchema, BillingTierSchema, BillingWorkspaceIdParamsSchema, type BoilAcidComputeBlock, type BoilComputeAndSaveRequest, BoilComputeAndSaveRequestSchema, BoilComputeAndSaveResponseSchema, type BoilComputeAndSaveResponseV1, BrewSessionCreateResponseSchema, BrewSessionDetailResponseSchema, BrewSessionIdParamsSchema, type BrewSessionListItem, BrewSessionPatchRequestSchema, BrewSessionPayloadSchema, BrewSessionStepLogRequestSchema, BrewSessionStepParamsSchema, BrewSessionStepResponseSchema, BrewSessionStepSchema, BrewSessionStepTimerPatchRequestSchema, BrewSessionStepsPatchRequestSchema, BrewSessionStepsResponseSchema, BrewSessionStopRequestSchema, BrewSessionSummarySchema, type BrewSessionsListResponse, BrewSessionsListResponseSchema, BrewSessionsRecentQuerySchema, BrewSessionsRecentResponseSchema, BrewdaySettingsPatchRequestSchema, BrewdaySettingsPayloadSchema, BrewdaySettingsResponseSchema, ContextMeResponseSchema, type CrpProposeScheduleAdjustmentInput, CrpProposeScheduleAdjustmentInputSchema, type CrpProposeScheduleAdjustmentOutput, CrpProposeScheduleAdjustmentOutputSchema, EquipmentProfileCreateRequestSchema, EquipmentProfilePatchRequestSchema, EquipmentProfilePayloadSchema, EquipmentProfileResponseSchema, EquipmentProfilesListResponseSchema, type ErrorResponse, ErrorResponseSchema, type ExpectedRaRange, FermentableItemSchema, FermentablesListResponseSchema, type GravityAnalysisCanonicalModelsV1, type GravityAnalysisDerivationKind, type GravityAnalysisIbuModelV1, type GravityAnalysisResponseV1, type GravityAnalysisResultV1, type GravityAnalysisSrmModelV1, type GravityAnalysisWarningCode, type GravityAnalysisWarningV1, HopItemSchema, HopsListResponseSchema, IdParamsSchema, IngredientSyncResponseSchema, IngredientSyncResultSchema, IngredientSyncRunSchema, IngredientSyncRunsResponseSchema, IngredientsSearchQuerySchema, IntegrationAttachRequestSchema, IntegrationAttachResponseSchema, IntegrationAttachmentDeviceSchema, IntegrationAttachmentSchema, IntegrationAttachmentsResponseSchema, IntegrationBrewSessionRefSchema, IntegrationCreateResponseSchema, IntegrationDetachRequestSchema, IntegrationDetachResponseSchema, IntegrationDeviceAttachRequestSchema, IntegrationDeviceAttachResponseSchema, IntegrationDeviceAttachmentSchema, IntegrationDeviceDetachResponseSchema, IntegrationDeviceIdParamsSchema, IntegrationDeviceReadingSchema, IntegrationDeviceSchema, IntegrationDevicesListResponseSchema, IntegrationDevicesQuerySchema, IntegrationGetResponseSchema, type IntegrationKind, IntegrationKindSchema, IntegrationOkResponseSchema, IntegrationReadingSchema, IntegrationReadingsQuerySchema, IntegrationReadingsResponseSchema, type IntegrationRevealResponse, IntegrationRevealResponseSchema, IntegrationSummarySchema, IntegrationTokenParamsSchema, IntegrationWorkspaceIdParamsSchema, IntegrationWorkspaceKindParamsSchema, InventoryCategoryQuerySchema, InventoryCreateRequestSchema, InventoryItemPayloadSchema, InventoryItemResponseSchema, InventoryListResponseSchema, InventoryPatchRequestSchema, type IonProfilePpm, type MashAcidComputeBlock, type MashAcidificationTargetMashPhResult, type MashComputeAndSaveRequest, MashComputeAndSaveRequestSchema, MashComputeAndSaveResponseSchema, type MashComputeAndSaveResponseV1, type MrpProposeOrderAdjustmentInput, MrpProposeOrderAdjustmentInputSchema, type MrpProposeOrderAdjustmentOutput, MrpProposeOrderAdjustmentOutputSchema, type NumberFormatHintV1, type NumberFormatUnit, OkResponseSchema, PlatformAdCreateRequestSchema, PlatformAdCreateResponseSchema, PlatformAdIdParamsSchema, PlatformAdOkResponseSchema, PlatformAdPatchRequestSchema, type PlatformAdRow, PlatformAdRowSchema, PlatformAdminOkResponseSchema, PlatformAdsListResponseSchema, PlatformImportFormatSchema, PlatformRecipeBulkImportPreviewItemSchema, PlatformRecipeBulkImportPreviewRequestSchema, PlatformRecipeBulkImportPreviewResponseSchema, PlatformRecipeBulkImportRequestSchema, PlatformRecipeBulkImportResponseSchema, PlatformRecipeExportQuerySchema, PlatformRecipeIdParamsSchema, PlatformRecipeImportPreviewRequestSchema, PlatformRecipeImportPreviewResponseSchema, PlatformRecipeImportRequestSchema, PlatformRecipeImportResponseSchema, PlatformRecipeSummarySchema, PlatformRecipesListQuerySchema, PlatformRecipesListResponseSchema, PlatformWorkspaceRowSchema, PlatformWorkspacesListResponseSchema, PreferredLocaleSchema, RecipeBulkImportCreatedItemSchema, RecipeBulkImportFailedItemSchema, RecipeBulkImportPreviewItemSchema, RecipeBulkImportPreviewResponseSchema, RecipeBulkImportRequestSchema, RecipeBulkImportResponseSchema, RecipeCreateRequestSchema, RecipeIdParamsSchema, RecipeImportFormatSchema, RecipeImportPreviewPayloadSchema, RecipeImportPreviewResponseSchema, RecipeImportRequestSchema, RecipeImportResponseSchema, type RecipeListItem, RecipeListResponseSchema, RecipePatchRequestSchema, RecipePayloadSchema, RecipeResponseSchema, RecipeVersionsResponseSchema, type RecipeWaterHubStreamSummary, type RecipeWaterHubSummary, type RecipeWaterHubSummaryResponse, RecipeWaterHubSummaryResponseSchema, type RecipeWaterSettings, RecipeWaterSettingsGetResponseSchema, RecipeWaterSettingsPayloadSchema, RecipeWaterSettingsPutRequestSchema, RecipeWaterSettingsPutResponseSchema, type RecipeWaterSettingsResponse, type RecipeWaterSettingsSavedRef, type RecipesListResponse, RecipesListResponseSchema, type RenderDelivery, RenderDeliverySchema, type RenderError, RenderErrorSchema, type RenderJobCancelResponse, RenderJobCancelResponseSchema, type RenderJobResultResponse, RenderJobResultResponseSchema, type RenderJobStatus, type RenderJobStatusResponse, RenderJobStatusResponseSchema, RenderJobStatusSchema, type RenderJobSubmitRequest, RenderJobSubmitRequestSchema, type RenderJobSubmitResponse, RenderJobSubmitResponseSchema, type RenderKind, RenderKindSchema, type RenderStatus, RenderStatusSchema, type RenderVisibility, RenderVisibilitySchema, ResolvedAdSchema, SafeNextPathSchema, type SpargeAcidComputeBlock, type SpargeComputeAndSaveRequest, SpargeComputeAndSaveRequestSchema, SpargeComputeAndSaveResponseSchema, type SpargeComputeAndSaveResponseV1, StylesListResponseSchema, TierLimitsSchema, TiltIngestBodySchema, TiltIngestResponseSchema, UiDensitySchema, UiFontScaleSchema, UiThemeSchema, type UpdateWorkspaceAiSettingsRequest, UpdateWorkspaceAiSettingsRequestSchema, type WaterAcidificationManualResult, type WaterAcidificationResult, type WaterCalcDerivation, type WaterCalcDerivationKind, type WaterCalcDerivationLine, type WaterCalcDerivationValue, type WaterCalcNoteCode, WaterCalcRequestSchema, WaterCalcResultOnlyResponseSchema, type WaterCalcUnit, WaterCalcWithDerivationResponseSchema, type WaterHubFormatHintKeys, type WaterOverallResult, type WaterProfile, WaterProfileCreateRequestSchema, WaterProfileItemSchema, WaterProfilePatchRequestSchema, WaterProfileResponseSchema, WaterProfilesListResponseSchema, type WaterProfilesResponse, type WaterSaltAdditionsResult, WebhookOkResponseSchema, WebhookRevenuecatBodySchema, WebhookStripeBodySchema, type WorkspaceAiSettings, WorkspaceAiSettingsParamsSchema, WorkspaceAiSettingsResponseSchema, WorkspaceAiSettingsSchema, type WorkspaceAiUsageResponse, WorkspaceAiUsageResponseSchema, type WorkspaceBillingResponse, WorkspaceBillingResponseSchema, WorkspaceBrandPatchRequestSchema, WorkspaceBrandPatchResponseSchema, type WorkspaceCreateRequest, WorkspaceCreateRequestSchema, WorkspaceCreateResponseSchema, WorkspaceIdParamsSchema, WorkspaceRowSchema, WorkspacesListResponseSchema, YeastItemSchema, YeastsListResponseSchema, analysisFormatHints, parseAuthMeResponse, parseBoilComputeAndSaveResponse, parseBrewSessionCreateResponse, parseBrewSessionsListResponse, parseGravityAnalysisResponseV1, parseMashComputeAndSaveResponse, parseRecipeWaterHubSummaryResponse, parseRecipesListResponse, parseRenderJobStatusResponse, parseRenderJobSubmitRequest, parseSpargeComputeAndSaveResponse, parseWaterProfileItem, parseWaterProfilesResponse, waterFormatHints };

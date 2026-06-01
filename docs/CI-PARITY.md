@@ -83,6 +83,8 @@ Local static-analysis can lie in four documented ways:
 
 The parity runner uses a **`git archive` snapshot** locally (not the live workspace) and the same `node:20-slim` image + install commands as CI.
 
+**Local install persistence (≥ `@umbraculum/ci-parity` 1.0.8):** the manifest may declare `docker.volumes` — umbraculum-dev mounts `umbraculum_npm_cache` and `umbraculum_root_node_modules` so repeat local parity runs reuse warm cache/trees on the same Docker host. See [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md). GitHub Actions runners remain cold per job.
+
 Historical detail: [`docs/design/brewery-scope-migration-plan.md`](design/brewery-scope-migration-plan.md) §6.7.
 
 ## Repository split (why toolset vs umbraculum-dev)

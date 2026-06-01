@@ -47,15 +47,13 @@ Run inside Docker (no host npm — see the plugin-shipped `00-shared-node-npm-co
 **Use scoped installs** for L1 (do **not** run a repo-wide
 `--workspaces` install from a one-shot `node:20-slim` container): the
 default `--workspaces` install reuses the root `package-lock.json` and
-will prune `services/api/node_modules` to its lockfile baseline, which
-breaks the long-running api container until you `docker compose exec
-api npm install` again. Install only the packages you actually want to
+will prune a **bind-mounted** api `node_modules` tree. The api service now uses a **named volume** (`umbraculum_api_node_modules`); scoped one-shots should use `./scripts/docker-npm-run.sh -r` so root hoist lands in `umbraculum_root_node_modules`. See [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md). Install only the packages you actually want to
 test:
 
 ```bash
-docker run --rm -v "$PWD:/repo" -w /repo node:20-slim \
-  bash -lc "npm install --no-audit --no-fund -w @umbraculum/contracts -w @umbraculum/brewery-core --include-workspace-root && \
-            npm test -w @umbraculum/contracts && npm test -w @umbraculum/brewery-core"
+./scripts/docker-npm-run.sh -r \
+  'npm install --no-audit --no-fund --prefer-offline -w @umbraculum/contracts -w @umbraculum/brewery-core --include-workspace-root && \
+   npm test -w @umbraculum/contracts && npm test -w @umbraculum/brewery-core'
 ```
 
 Notes:

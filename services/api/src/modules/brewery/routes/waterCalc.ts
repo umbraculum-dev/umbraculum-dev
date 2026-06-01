@@ -1,4 +1,12 @@
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import {
+  ErrorResponseSchema,
+  WaterCalcRequestSchema,
+  WaterCalcResultOnlyResponseSchema,
+  WaterCalcWithDerivationResponseSchema,
+} from "@umbraculum/contracts";
+
 import { requireActiveWorkspace } from "../../../plugins/requestContext.js";
 import { BadRequestError } from "../../../errors.js";
 import {
@@ -41,7 +49,21 @@ function mashPhModelKeyFromMaltClass(maltClass: string) {
 }
 
 export function waterCalcRoutes(app: FastifyInstance) {
-  app.post("/water-calc/sparge-acidification", (req) => {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
+
+  zodApp.post(
+    "/water-calc/sparge-acidification",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -107,10 +129,23 @@ export function waterCalcRoutes(app: FastifyInstance) {
         result,
       }),
     };
-  });
+  },
+  );
 
   // Sparge acidification manual-entry mode (Sheet 2, v0): user enters acid amount; we estimate achieved pH.
-  app.post("/water-calc/sparge-acidification-manual", (req) => {
+  zodApp.post(
+    "/water-calc/sparge-acidification-manual",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -196,10 +231,23 @@ export function waterCalcRoutes(app: FastifyInstance) {
         result: result.predicted,
       }),
     };
-  });
+  },
+  );
 
   // Mash water acidification (Sheet 4, v0): same math as sparge acidification, but stored/displayed separately.
-  app.post("/water-calc/mash-acidification", (req) => {
+  zodApp.post(
+    "/water-calc/mash-acidification",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -275,10 +323,23 @@ export function waterCalcRoutes(app: FastifyInstance) {
         result,
       }),
     };
-  });
+  },
+  );
 
   // Mash water acidification manual-entry mode (Sheet 4, v0): user enters acid amount; we estimate achieved pH.
-  app.post("/water-calc/mash-acidification-manual", (req) => {
+  zodApp.post(
+    "/water-calc/mash-acidification-manual",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -366,9 +427,22 @@ export function waterCalcRoutes(app: FastifyInstance) {
         result: result.predicted,
       }),
     };
-  });
+  },
+  );
 
-  app.post("/water-calc/mash-ph-estimate", (req) => {
+  zodApp.post(
+    "/water-calc/mash-ph-estimate",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcResultOnlyResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -518,12 +592,25 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }
 
     return { ok: true, result };
-  });
+  },
+  );
 
   // v1 is now canonical: the unversioned endpoint handles both the new v1 per-row inputs and
   // the older maltClass/color inputs (it derives v1 defaults when needed).
 
-  app.post("/water-calc/mash-acidification-target-mash-ph", (req) => {
+  zodApp.post(
+    "/water-calc/mash-acidification-target-mash-ph",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcResultOnlyResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -661,9 +748,22 @@ export function waterCalcRoutes(app: FastifyInstance) {
     }
 
     return { ok: true, result };
-  });
+  },
+  );
 
-  app.post("/water-calc/salt-additions", (req) => {
+  zodApp.post(
+    "/water-calc/salt-additions",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -708,9 +808,22 @@ export function waterCalcRoutes(app: FastifyInstance) {
       result,
       derivation: buildSaltAdditionsDerivation({ volumeLiters, baseProfile, result }),
     };
-  });
+  },
+  );
 
-  app.post("/water-calc/mash-overall", (req) => {
+  zodApp.post(
+    "/water-calc/mash-overall",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -969,9 +1082,22 @@ export function waterCalcRoutes(app: FastifyInstance) {
         ],
       },
     };
-  });
+  },
+  );
 
-  app.post("/water-calc/sparge-overall", (req) => {
+  zodApp.post(
+    "/water-calc/sparge-overall",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -1133,9 +1259,22 @@ export function waterCalcRoutes(app: FastifyInstance) {
         ],
       },
     };
-  });
+  },
+  );
 
-  app.post("/water-calc/boil-overall", (req) => {
+  zodApp.post(
+    "/water-calc/boil-overall",
+    {
+      schema: {
+        tags: ["brewery"],
+        body: WaterCalcRequestSchema,
+        response: {
+          200: WaterCalcWithDerivationResponseSchema,
+          401: ErrorResponseSchema,
+        },
+      },
+    },
+    (req) => {
     requireActiveWorkspace(req);
     const body = (req.body ?? {}) as Record<string, unknown>;
 
@@ -1297,6 +1436,7 @@ export function waterCalcRoutes(app: FastifyInstance) {
         ],
       },
     };
-  });
+  },
+  );
 }
 

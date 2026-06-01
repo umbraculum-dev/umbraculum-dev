@@ -197,7 +197,7 @@ If your vertical wants to be **bundled** with the platform's hosted offering (th
 
 ### OpenAPI (brewery tag)
 
-Brewery HTTP routes migrated to `zodApp` + `schema.tags: ['brewery']` appear in the **optional add-on spec** [`services/api/openapi/brewery.json`](../../../../services/api/openapi/brewery.json) (12 paths / 21 operations as of 2026-05-31: styles, equipment, inventory, brewday settings, recipes, BeerJSON export). They are **not** in the platform catalog [`openapi.json`](../../../../services/api/openapi/openapi.json). Remaining brewery routes (water, brew sessions, import, ingredients) are PR3 backlog. Index: [`API-OPENAPI.md`](../../../API-OPENAPI.md).
+Brewery HTTP routes migrated to `zodApp` + `schema.tags: ['brewery']` appear in the **optional add-on spec** [`services/api/openapi/brewery.json`](../../../../services/api/openapi/brewery.json) (**55 paths / 70 operations** as of 2026-05-31 Phase C: styles, equipment, inventory, brewday settings, recipes, BeerJSON export/import, ingredients, brew sessions, water profiles/settings/calc). They are **not** in the platform catalog [`openapi.json`](../../../../services/api/openapi/openapi.json). Index: [`API-OPENAPI.md`](../../../API-OPENAPI.md).
 
 ---
 

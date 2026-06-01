@@ -1,36 +1,37 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
+import {
+  BrewSessionsRecentQuerySchema,
+  BrewSessionsRecentResponseSchema,
+  ErrorResponseSchema,
+  IntegrationCreateResponseSchema,
+  IntegrationDeviceAttachRequestSchema,
+  IntegrationDeviceAttachResponseSchema,
+  IntegrationDeviceDetachResponseSchema,
+  IntegrationDeviceIdParamsSchema,
+  IntegrationDevicesListResponseSchema,
+  IntegrationGetResponseSchema,
+  IntegrationOkResponseSchema,
+  IntegrationWorkspaceIdParamsSchema,
+} from "@umbraculum/contracts";
 
-import { BadRequestError, ForbiddenError, NotFoundError } from "../errors.js";
+import { ForbiddenError, NotFoundError } from "../errors.js";
 import { requireActiveWorkspace } from "../plugins/requestContext.js";
 import { IntegrationsService } from "../services/integrationsService.js";
 import { WorkspacesService } from "../services/workspacesService.js";
 
-function assertWorkspaceId(v: unknown): string {
-  const s = typeof v === "string" ? v.trim() : "";
-  if (!s) throw new BadRequestError("invalid_workspace_id", "Params.workspaceId is required");
-  return s;
-}
-
-function assertLimit(v: unknown): number {
-  const raw = typeof v === "string" ? v.trim() : "";
-  const n = raw ? Number.parseInt(raw, 10) : 20;
-  if (!Number.isFinite(n) || Number.isNaN(n)) return 20;
-  return Math.max(1, Math.min(100, n));
-}
-
 function integrationPublicPath(token: string): string {
-  // Nginx exposes the API at /api/* and rewrites to the Fastify root.
   return `/api/integrations/tilt/${encodeURIComponent(token)}`;
 }
 
 export function integrationsTiltRoutes(app: FastifyInstance) {
+  const zodApp = app.withTypeProvider<ZodTypeProvider>();
   const integrations = new IntegrationsService(app.prisma);
   const workspaces = new WorkspacesService(app.prisma);
 
   async function requireActiveWorkspaceParam(req: FastifyRequest): Promise<{ userId: string; workspaceId: string }> {
     const ctx = requireActiveWorkspace(req);
-    const params = (req.params ?? {}) as { workspaceId?: unknown };
-    const workspaceId = assertWorkspaceId(params.workspaceId);
+    const { workspaceId } = IntegrationWorkspaceIdParamsSchema.parse(req.params ?? {});
     if (workspaceId !== ctx.activeWorkspaceId) {
       throw new ForbiddenError("workspace_mismatch", "Active workspace does not match requested workspace");
     }
@@ -53,231 +54,353 @@ export function integrationsTiltRoutes(app: FastifyInstance) {
     });
   }
 
-  app.get("/workspaces/:workspaceId/integrations/tilt", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
+  zodApp.get(
+    "/workspaces/:workspaceId/integrations/tilt",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationWorkspaceIdParamsSchema,
+        response: {
+          200: IntegrationGetResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
 
-    const integration = await findTiltIntegrationForWorkspace(workspaceId);
-    return {
-      ok: true,
-      integration: integration
-        ? {
-            id: integration.id,
-            workspaceId: integration.workspaceId,
-            kind: integration.kind,
-            revokedAt: integration.revokedAt,
-            createdAt: integration.createdAt,
-            updatedAt: integration.updatedAt,
-          }
-        : null,
-    };
-  });
-
-  app.post("/workspaces/:workspaceId/integrations/tilt", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-
-    const existing = await findTiltIntegrationForWorkspace(workspaceId);
-    if (existing && !existing.revokedAt) {
-      const rotated = await integrations.rotateIntegrationToken(existing.id);
-      return {
+      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      return IntegrationGetResponseSchema.parse({
         ok: true,
-        integrationId: existing.id,
+        integration: integration
+          ? {
+              id: integration.id,
+              workspaceId: integration.workspaceId,
+              kind: integration.kind,
+              revokedAt: integration.revokedAt,
+              createdAt: integration.createdAt,
+              updatedAt: integration.updatedAt,
+            }
+          : null,
+      });
+    },
+  );
+
+  zodApp.post(
+    "/workspaces/:workspaceId/integrations/tilt",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationWorkspaceIdParamsSchema,
+        response: {
+          200: IntegrationCreateResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+
+      const existing = await findTiltIntegrationForWorkspace(workspaceId);
+      if (existing && !existing.revokedAt) {
+        const rotated = await integrations.rotateIntegrationToken(existing.id);
+        return IntegrationCreateResponseSchema.parse({
+          ok: true,
+          integrationId: existing.id,
+          token: rotated.token,
+          publicPath: integrationPublicPath(rotated.token),
+        });
+      }
+
+      const created = await integrations.createIntegration(workspaceId, "tilt");
+      return IntegrationCreateResponseSchema.parse({
+        ok: true,
+        integrationId: created.integration.id,
+        token: created.token,
+        publicPath: integrationPublicPath(created.token),
+      });
+    },
+  );
+
+  zodApp.post(
+    "/workspaces/:workspaceId/integrations/tilt/rotate-token",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationWorkspaceIdParamsSchema,
+        response: {
+          200: IntegrationCreateResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      if (!integration || integration.revokedAt) {
+        throw new NotFoundError("missing_integration", "Tilt integration not configured");
+      }
+      const rotated = await integrations.rotateIntegrationToken(integration.id);
+      return IntegrationCreateResponseSchema.parse({
+        ok: true,
+        integrationId: integration.id,
         token: rotated.token,
         publicPath: integrationPublicPath(rotated.token),
-      };
-    }
+      });
+    },
+  );
 
-    const created = await integrations.createIntegration(workspaceId, "tilt");
-    return {
-      ok: true,
-      integrationId: created.integration.id,
-      token: created.token,
-      publicPath: integrationPublicPath(created.token),
-    };
-  });
+  zodApp.post(
+    "/workspaces/:workspaceId/integrations/tilt/revoke",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationWorkspaceIdParamsSchema,
+        response: {
+          200: IntegrationOkResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      if (!integration || integration.revokedAt) {
+        throw new NotFoundError("missing_integration", "Tilt integration not configured");
+      }
+      await integrations.revokeIntegration(integration.id);
+      return IntegrationOkResponseSchema.parse({ ok: true });
+    },
+  );
 
-  app.post("/workspaces/:workspaceId/integrations/tilt/rotate-token", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-    const integration = await findTiltIntegrationForWorkspace(workspaceId);
-    if (!integration || integration.revokedAt) {
-      throw new NotFoundError("missing_integration", "Tilt integration not configured");
-    }
-    const rotated = await integrations.rotateIntegrationToken(integration.id);
-    return { ok: true, integrationId: integration.id, token: rotated.token, publicPath: integrationPublicPath(rotated.token) };
-  });
+  zodApp.get(
+    "/workspaces/:workspaceId/integrations/tilt/devices",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationWorkspaceIdParamsSchema,
+        response: {
+          200: IntegrationDevicesListResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      if (!integration || integration.revokedAt) {
+        return IntegrationDevicesListResponseSchema.parse({ ok: true, devices: [] });
+      }
 
-  app.post("/workspaces/:workspaceId/integrations/tilt/revoke", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-    const integration = await findTiltIntegrationForWorkspace(workspaceId);
-    if (!integration || integration.revokedAt) {
-      throw new NotFoundError("missing_integration", "Tilt integration not configured");
-    }
-    await integrations.revokeIntegration(integration.id);
-    return { ok: true };
-  });
-
-  app.get("/workspaces/:workspaceId/integrations/tilt/devices", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-    const integration = await findTiltIntegrationForWorkspace(workspaceId);
-    if (!integration || integration.revokedAt) {
-      return { ok: true, devices: [] };
-    }
-
-    const devices = await app.prisma.integrationDevice.findMany({
-      where: { integrationId: integration.id },
-      orderBy: [{ lastSeenAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-      select: {
-        id: true,
-        deviceKey: true,
-        displayName: true,
-        metadataJson: true,
-        lastSeenAt: true,
-        createdAt: true,
-        attachments: {
-          where: { detachedAt: null },
-          orderBy: [{ attachedAt: "desc" }, { id: "desc" }],
-          take: 1,
-          select: {
-            id: true,
-            attachedAt: true,
-            brewSession: {
-              select: {
-                id: true,
-                code: true,
-                status: true,
-                createdAt: true,
-                startedAt: true,
-                recipe: { select: { id: true, name: true, version: true } },
+      const devices = await app.prisma.integrationDevice.findMany({
+        where: { integrationId: integration.id },
+        orderBy: [{ lastSeenAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+        select: {
+          id: true,
+          deviceKey: true,
+          displayName: true,
+          metadataJson: true,
+          lastSeenAt: true,
+          createdAt: true,
+          attachments: {
+            where: { detachedAt: null },
+            orderBy: [{ attachedAt: "desc" }, { id: "desc" }],
+            take: 1,
+            select: {
+              id: true,
+              attachedAt: true,
+              brewSession: {
+                select: {
+                  id: true,
+                  code: true,
+                  status: true,
+                  createdAt: true,
+                  startedAt: true,
+                  recipe: { select: { id: true, name: true, version: true } },
+                },
               },
             },
           },
-        },
-        readings: {
-          orderBy: [{ receivedAt: "desc" }, { id: "desc" }],
-          take: 1,
-          select: {
-            id: true,
-            brewSessionId: true,
-            recordedAt: true,
-            receivedAt: true,
-            temperatureC: true,
-            gravitySg: true,
-            rawJson: true,
+          readings: {
+            orderBy: [{ receivedAt: "desc" }, { id: "desc" }],
+            take: 1,
+            select: {
+              id: true,
+              brewSessionId: true,
+              recordedAt: true,
+              receivedAt: true,
+              temperatureC: true,
+              gravitySg: true,
+              rawJson: true,
+            },
           },
         },
+      });
+
+      return IntegrationDevicesListResponseSchema.parse({
+        ok: true,
+        devices: devices.map((d) => ({
+          id: d.id,
+          deviceKey: d.deviceKey,
+          displayName: d.displayName,
+          metadataJson: d.metadataJson ?? null,
+          lastSeenAt: d.lastSeenAt,
+          createdAt: d.createdAt,
+          activeAttachment: d.attachments?.[0]
+            ? {
+                id: d.attachments[0].id,
+                attachedAt: d.attachments[0].attachedAt,
+                brewSession: d.attachments[0].brewSession,
+              }
+            : null,
+          lastReading: d.readings?.[0] ?? null,
+        })),
+      });
+    },
+  );
+
+  zodApp.post(
+    "/workspaces/:workspaceId/integrations/tilt/devices/:deviceId/attach",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationDeviceIdParamsSchema,
+        body: IntegrationDeviceAttachRequestSchema,
+        response: {
+          200: IntegrationDeviceAttachResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
       },
-    });
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const { deviceId } = req.params;
+      const { brewSessionId } = req.body;
 
-    return {
-      ok: true,
-      devices: devices.map((d) => ({
-        id: d.id,
-        deviceKey: d.deviceKey,
-        displayName: d.displayName,
-        metadataJson: d.metadataJson ?? null,
-        lastSeenAt: d.lastSeenAt,
-        createdAt: d.createdAt,
-        activeAttachment: d.attachments?.[0]
-          ? {
-              id: d.attachments[0].id,
-              attachedAt: d.attachments[0].attachedAt,
-              brewSession: d.attachments[0].brewSession,
-            }
-          : null,
-        lastReading: d.readings?.[0] ?? null,
-      })),
-    };
-  });
+      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      if (!integration || integration.revokedAt) {
+        throw new NotFoundError("missing_integration", "Tilt integration not configured");
+      }
 
-  app.post("/workspaces/:workspaceId/integrations/tilt/devices/:deviceId/attach", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-    const params = (req.params ?? {}) as { deviceId?: unknown };
-    const deviceId = typeof params.deviceId === "string" ? params.deviceId : "";
-    if (!deviceId) throw new BadRequestError("invalid_device_id", "Params.deviceId is required");
+      const device = await app.prisma.integrationDevice.findFirst({
+        where: { id: deviceId, integrationId: integration.id },
+        select: { id: true },
+      });
+      if (!device) throw new NotFoundError("missing_device", "Device not found");
 
-    const integration = await findTiltIntegrationForWorkspace(workspaceId);
-    if (!integration || integration.revokedAt) {
-      throw new NotFoundError("missing_integration", "Tilt integration not configured");
-    }
+      const session = await app.prisma.brewSession.findFirst({
+        where: { id: brewSessionId, workspaceId },
+        select: { id: true },
+      });
+      if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
 
-    const device = await app.prisma.integrationDevice.findFirst({
-      where: { id: deviceId, integrationId: integration.id },
-      select: { id: true },
-    });
-    if (!device) throw new NotFoundError("missing_device", "Device not found");
+      const now = new Date();
+      await app.prisma.integrationDeviceAttachment.updateMany({
+        where: { deviceId, detachedAt: null },
+        data: { detachedAt: now },
+      });
+      const created = await app.prisma.integrationDeviceAttachment.create({
+        data: { deviceId, brewSessionId, attachedAt: now },
+        select: { id: true, attachedAt: true, brewSessionId: true },
+      });
 
-    const body = (req.body ?? {}) as { brewSessionId?: unknown };
-    const brewSessionId = typeof body.brewSessionId === "string" ? body.brewSessionId.trim() : "";
-    if (!brewSessionId) throw new BadRequestError("invalid_brew_session_id", "Body.brewSessionId is required");
+      return IntegrationDeviceAttachResponseSchema.parse({ ok: true, attachment: created });
+    },
+  );
 
-    const session = await app.prisma.brewSession.findFirst({
-      where: { id: brewSessionId, workspaceId },
-      select: { id: true },
-    });
-    if (!session) throw new NotFoundError("missing_brew_session", "Brew session not found");
-
-    const now = new Date();
-    await app.prisma.integrationDeviceAttachment.updateMany({
-      where: { deviceId, detachedAt: null },
-      data: { detachedAt: now },
-    });
-    const created = await app.prisma.integrationDeviceAttachment.create({
-      data: { deviceId, brewSessionId, attachedAt: now },
-      select: { id: true, attachedAt: true, brewSessionId: true },
-    });
-
-    return { ok: true, attachment: created };
-  });
-
-  app.post("/workspaces/:workspaceId/integrations/tilt/devices/:deviceId/detach", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-    const params = (req.params ?? {}) as { deviceId?: unknown };
-    const deviceId = typeof params.deviceId === "string" ? params.deviceId : "";
-    if (!deviceId) throw new BadRequestError("invalid_device_id", "Params.deviceId is required");
-
-    const integration = await findTiltIntegrationForWorkspace(workspaceId);
-    if (!integration || integration.revokedAt) {
-      throw new NotFoundError("missing_integration", "Tilt integration not configured");
-    }
-
-    const device = await app.prisma.integrationDevice.findFirst({
-      where: { id: deviceId, integrationId: integration.id },
-      select: { id: true },
-    });
-    if (!device) throw new NotFoundError("missing_device", "Device not found");
-
-    const now = new Date();
-    const res = await app.prisma.integrationDeviceAttachment.updateMany({
-      where: { deviceId, detachedAt: null },
-      data: { detachedAt: now },
-    });
-
-    return { ok: true, detachedCount: res.count };
-  });
-
-  app.get("/workspaces/:workspaceId/brew-sessions/recent", async (req) => {
-    const { workspaceId } = await requireActiveWorkspaceParam(req);
-    const query = (req.query ?? {}) as { limit?: unknown };
-    const limit = assertLimit(query.limit);
-
-    const sessions = await app.prisma.brewSession.findMany({
-      where: { workspaceId },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      take: limit,
-      select: {
-        id: true,
-        recipeId: true,
-        code: true,
-        status: true,
-        startedAt: true,
-        pausedAt: true,
-        stoppedAt: true,
-        scheduledDate: true,
-        createdAt: true,
-        recipe: { select: { id: true, name: true, version: true } },
+  zodApp.post(
+    "/workspaces/:workspaceId/integrations/tilt/devices/:deviceId/detach",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationDeviceIdParamsSchema,
+        response: {
+          200: IntegrationDeviceDetachResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+          404: ErrorResponseSchema,
+        },
       },
-    });
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const { deviceId } = req.params;
 
-    return { ok: true, brewSessions: sessions };
-  });
+      const integration = await findTiltIntegrationForWorkspace(workspaceId);
+      if (!integration || integration.revokedAt) {
+        throw new NotFoundError("missing_integration", "Tilt integration not configured");
+      }
+
+      const device = await app.prisma.integrationDevice.findFirst({
+        where: { id: deviceId, integrationId: integration.id },
+        select: { id: true },
+      });
+      if (!device) throw new NotFoundError("missing_device", "Device not found");
+
+      const now = new Date();
+      const res = await app.prisma.integrationDeviceAttachment.updateMany({
+        where: { deviceId, detachedAt: null },
+        data: { detachedAt: now },
+      });
+
+      return IntegrationDeviceDetachResponseSchema.parse({ ok: true, detachedCount: res.count });
+    },
+  );
+
+  zodApp.get(
+    "/workspaces/:workspaceId/brew-sessions/recent",
+    {
+      schema: {
+        tags: ["integrations"],
+        params: IntegrationWorkspaceIdParamsSchema,
+        querystring: BrewSessionsRecentQuerySchema,
+        response: {
+          200: BrewSessionsRecentResponseSchema,
+          400: ErrorResponseSchema,
+          401: ErrorResponseSchema,
+          403: ErrorResponseSchema,
+        },
+      },
+    },
+    async (req) => {
+      const { workspaceId } = await requireActiveWorkspaceParam(req);
+      const limit = req.query.limit ?? 20;
+
+      const sessions = await app.prisma.brewSession.findMany({
+        where: { workspaceId },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: limit,
+        select: {
+          id: true,
+          recipeId: true,
+          code: true,
+          status: true,
+          startedAt: true,
+          pausedAt: true,
+          stoppedAt: true,
+          scheduledDate: true,
+          createdAt: true,
+          recipe: { select: { id: true, name: true, version: true } },
+        },
+      });
+
+      return BrewSessionsRecentResponseSchema.parse({ ok: true, brewSessions: sessions });
+    },
+  );
 }
-

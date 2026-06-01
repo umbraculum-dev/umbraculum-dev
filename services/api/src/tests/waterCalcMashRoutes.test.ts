@@ -267,5 +267,71 @@ describe("water calc: mash acidification + salt additions", () => {
     // Grist should pull estimated mash pH downward vs water-only manual estimate.
     expect(phWithGrist).toBeLessThan(phNoGrist);
   });
+
+  it("sparge-overall returns combined salts + acid result", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/sparge-overall",
+      headers: { cookie: cookieWithAccount },
+      payload: {
+        spargeMode: "targetPh",
+        startingAlkalinityPpmCaCO3: 100,
+        startingPh: 7.0,
+        targetPh: 5.6,
+        volumeLiters: 10,
+        acidType: "phosphoric",
+        strengthKind: "percent",
+        strengthValue: 10,
+        baseProfile: {
+          calcium: 0,
+          magnesium: 0,
+          sodium: 0,
+          sulfate: 0,
+          chloride: 0,
+          bicarbonate: 0,
+        },
+        additions: [{ saltKey: "gypsum", grams: 2 }],
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.ok).toBe(true);
+    expect(body.result.ionsPpm).toBeTruthy();
+    expect(body.result.ph.value).toBeGreaterThan(0);
+    expect(body.derivation.kind).toBe("sparge_overall");
+  });
+
+  it("boil-overall returns combined salts + acid result", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/water-calc/boil-overall",
+      headers: { cookie: cookieWithAccount },
+      payload: {
+        boilMode: "targetPh",
+        startingAlkalinityPpmCaCO3: 80,
+        startingPh: 7.0,
+        targetPh: 5.4,
+        volumeLiters: 15,
+        acidType: "lactic",
+        strengthKind: "percent",
+        strengthValue: 88,
+        baseProfile: {
+          calcium: 20,
+          magnesium: 5,
+          sodium: 10,
+          sulfate: 30,
+          chloride: 20,
+          bicarbonate: 50,
+        },
+        additions: [{ saltKey: "calcium_chloride", grams: 3 }],
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.ok).toBe(true);
+    expect(body.result.ionsPpm).toBeTruthy();
+    expect(body.result.ph.value).toBeGreaterThan(0);
+    expect(body.derivation.kind).toBe("boil_overall");
+  });
 });
 

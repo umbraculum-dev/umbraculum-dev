@@ -37,6 +37,8 @@ describe("openapi artifact", () => {
     expect(paths.some((path) => path.startsWith("/automation/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/rendering/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/auth/"))).toBe(true);
+    expect(paths.some((path) => path.includes("/billing"))).toBe(true);
+    expect(paths.some((path) => path.startsWith("/integrations/"))).toBe(true);
     expect(paths).toContain("/health");
     expect(paths).toContain("/workspaces");
     expect(paths.some((path) => path.startsWith("/recipes"))).toBe(false);
@@ -46,6 +48,8 @@ describe("openapi artifact", () => {
     const spec = JSON.parse(readFileSync(brewerySpecPath, "utf8")) as OpenAPI.Document;
     const paths = Object.keys(spec.paths ?? {});
     expect(paths.some((path) => path.startsWith("/recipes"))).toBe(true);
+    expect(paths.some((path) => path.startsWith("/water-profiles"))).toBe(true);
+    expect(paths.some((path) => path.startsWith("/water-calc/"))).toBe(true);
     expect(paths.some((path) => path.startsWith("/mrp/"))).toBe(false);
     expect(paths.some((path) => path.startsWith("/auth/"))).toBe(false);
   });

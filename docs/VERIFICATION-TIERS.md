@@ -53,6 +53,8 @@ Slice definitions live in [`.umbraculum/verification-slices.json`](../.umbraculu
 
 **Hard rule:** T0/T1 never run root `npm ci` unless the lockfile changed or you pass `--fresh` to `build-package-in-docker.sh`.
 
+**Install persistence:** Named Docker volumes (`umbraculum_npm_cache`, `umbraculum_root_node_modules`, service-specific `node_modules` volumes) keep warm trees between runs — Composer-`vendor/` analogue. See [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md). L1 one-shots use `./scripts/docker-npm-run.sh -r`, not bare `docker run … npm install`.
+
 ## Relationship to TESTING.md layers
 
 | Layer | Typical tier |
@@ -80,6 +82,7 @@ docker compose exec api npm test                  # alias for test:integration
 | Skill | Tier |
 |-------|------|
 | `verify-slice-runbook` | T0/T1 driver |
+| `docker-npm-volumes-runbook` | Warm cache + named volumes for one-shots |
 | `scoped-package-build-in-docker` | Package `dist/` rebuild |
 | `build-workspace-packages-dist-in-container` | Legacy full build fallback |
 | `ci-parity-local-reproduction` | T2 static analysis |
@@ -92,4 +95,4 @@ See [`docs/CURSOR-PLUGINS.md`](CURSOR-PLUGINS.md) for install paths.
 - Running `./scripts/build-packages-in-docker.sh` for a single-package edit — use `./scripts/build-package-in-docker.sh @umbraculum/<name>` instead.
 - Treating `docker compose exec api npm run typecheck` as pre-push proof — use ci-parity (T2).
 - Skipping T2 before push because T1 passed — T1 is scoped; CI runs broader gates.
-- Running host `npm` in this repo — container only (see `00-shared-node-npm-container-only` rule).
+- Running bare `docker run … npm install` without cache/root volumes — use [`./scripts/docker-npm-run.sh`](../scripts/docker-npm-run.sh) (see [`DEVELOPMENT-NPM-VOLUMES.md`](DEVELOPMENT-NPM-VOLUMES.md)).

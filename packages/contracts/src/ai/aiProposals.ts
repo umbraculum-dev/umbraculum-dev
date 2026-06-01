@@ -28,6 +28,17 @@ export const AiProposalListResponseSchema = z
   })
   .strict();
 
+export const AiProposalIdParamsSchema = z.object({
+  id: z.string().trim().min(1, "Params.id is required"),
+});
+
+export const AiProposalGetResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    proposal: AiProposalDtoSchema,
+  })
+  .strict();
+
 export const AiProposalActionResponseSchema = z
   .object({
     ok: z.literal(true),

@@ -12,7 +12,7 @@ export const OPENAPI_INFO = {
     "(reference profile only). ISVs building without the brewery vertical should use this catalog only.",
     "See docs/API-OPENAPI.md and docs/BUILDING-YOUR-VERTICAL.md.",
     "",
-    "Billing, integrations, webhooks, and AI orchestrator paths remain on human route tables until PR3 completes.",
+    "Billing, ads, integrations, webhooks, AI, and platform-admin routes are documented in Phase C.",
     "",
     "Authoritative contracts: @umbraculum/<code>-contracts packages in git.",
     "Automation adapters: CONTRACT_VERSION handshake remains authoritative over this spec.",
@@ -41,6 +41,12 @@ export const OPENAPI_TAGS = [
   { name: "crp", description: "Canonical CRP module" },
   { name: "rendering", description: "Horizontal document rendering (RFC-0007)" },
   { name: "platform", description: "Platform health, auth, and workspaces" },
+  { name: "billing", description: "Workspace billing intents, tier, and usage" },
+  { name: "ads", description: "Public ad slot resolution" },
+  { name: "ai", description: "AI orchestrator — proposals, settings, usage" },
+  { name: "platform-admin", description: "Platform administrator routes (ads, recipes)" },
+  { name: "integrations", description: "Fermentation monitor integrations (Tilt, iSpindel, RAPT)" },
+  { name: "webhooks", description: "Billing provider webhooks (Stripe, RevenueCat)" },
   { name: "brewery", description: "Brewery reference vertical (optional add-on spec)" },
 ] as const;
 
