@@ -40,6 +40,16 @@ git clone git@github.com:umbraculum-dev/umbraculum-hosting-demo.git
 
 Forum and demo clones include `common/` after `git clone --recurse-submodules` (or `bin/pull` on the VPS).
 
+### Fresh VPS (forum or demo)
+
+On the server, **git is not preinstalled**. Maintainers run once as root:
+
+1. `apt-get update && apt-get install -y git`
+2. `git clone --recurse-submodules` the hosting-forum or hosting-demo repo to `/opt/…`
+3. `bin/bootstrap` (Docker CE, Compose plugin, UFW, fail2ban — see hosting-common README)
+
+Host-specific steps (Discourse, demo compose) follow each repo’s `docs/OPERATOR.md`.
+
 ---
 
 ## Volunteer routing
@@ -63,7 +73,7 @@ Forum and demo clones include `common/` after `git clone --recurse-submodules` (
 
 ## Submodule discipline
 
-`hosting-forum` and `hosting-demo` pin `common/` to a commit in **hosting-common**. On the VPS use **`bin/pull`** (`git pull --recurse-submodules`). When hardening changes, see [hosting-common SYNC.md](https://github.com/umbraculum-dev/umbraculum-hosting-common/blob/main/SYNC.md).
+`hosting-forum` and `hosting-demo` pin `common/` to a commit in **hosting-common**. On the VPS use **`bin/pull`** (`git pull --recurse-submodules`). Fresh or recreated VPS: **`bin/bootstrap`**. Security-only re-run: **`bin/harden`**. When scripts change, see [hosting-common SYNC.md](https://github.com/umbraculum-dev/umbraculum-hosting-common/blob/main/SYNC.md).
 
 ---
 
