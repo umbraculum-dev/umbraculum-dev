@@ -168,6 +168,8 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 
+**Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** publish from **toolset** via `ci-parity-v*` tag first, then bump `ci_parity_version` here. Do not local-publish — see [`AGENTS.md`](../AGENTS.md) § "npm publish discipline".
+
 **Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 
 ## Adding a typecheck-gated workspace
