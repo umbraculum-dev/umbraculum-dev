@@ -3,8 +3,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@umbraculum/ui";
+import { logout as logoutApi } from "@umbraculum/api-client";
 
-import { apiFetch } from "../_lib/apiClient";
+import { webPlatformApiClient } from "../_lib/webApiClient";
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
 
@@ -33,7 +34,7 @@ export function LogoutButton({ disabled, onLogoutStart, onLogout }: LogoutButton
       disabled={disabled}
       onPress={() => {
         onLogoutStart();
-        apiFetch("/api/auth/logout", { method: "POST" })
+        logoutApi(webPlatformApiClient())
           .catch(() => {})
           .finally(() => {
             onLogout();

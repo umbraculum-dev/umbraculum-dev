@@ -189,6 +189,22 @@ Render-job POST URLs on module pages remain on `renderJobClient` (unchanged). Fu
 
 ---
 
+## Phase E7-follow-up — canonical-module catalog facades (2026-06-02)
+
+E7-follow-up completes deferred catalog facades for canonical modules (MRP, PIM, CRP) without migrating additional web pages:
+
+| Subpath | Facades | Contracts package |
+|---------|---------|-------------------|
+| `@umbraculum/api-client/mrp` | `listBoms`, `createBom`, `getBom`, `patchBom`, `deleteBom`; `getWorkOrderPreview`; `submitWorkOrderRenderJob`, `submitMaterialRequirementsRenderJob`, `submitProductionOrdersListRenderJob` (+ `run*RenderJobExport` helpers) | `@umbraculum/mrp-contracts` |
+| `@umbraculum/api-client/pim` | `listAttributes`, `createAttribute`, `getAttribute`, `patchAttribute`, `deleteAttribute`; `listProductMediaAssetRefs`, `createProductMediaAssetRef`, `getMediaAssetRef`, `patchMediaAssetRef`, `deleteMediaAssetRef` | `@umbraculum/pim-contracts` |
+| `@umbraculum/api-client/crp` | `submitCapacityLoadRenderJob`, `submitScheduleRenderJob`, `submitResourcesCalendarRenderJob`, `submitConflictsRenderJob` (+ `run*RenderJobExport` helpers on `planning.ts`) | `@umbraculum/contracts` (`RenderJobSubmitResponseSchema`) + `@umbraculum/crp-contracts` for GET planning |
+
+Module render-job POSTs delegate to `platform/rendering` (`submitRenderJob` / `runAsyncRenderJobExport`) with `toClientPath()`-resolved URLs. Parser map: `MRP_FACADE_PARSER_MAP`, `PIM_FACADE_PARSER_MAP`, `CRP_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/api-client/src/facadeParserMap.ts).
+
+**Note:** MRP BOM mutate routes (`POST`/`PATCH`/`DELETE` `/mrp/boms`) are facaded for catalog completeness; the API currently exposes `GET` only on those paths until server routes land.
+
+---
+
 ## Phase E8 — brewery web tranche (2026-06-02)
 
 Phase E8 extends `@umbraculum/api-client/brewery` with recipes catalog (create/delete/versions/duplicate/import), styles, ingredients search, brew sessions (full lifecycle + integration attach/readings), inventory, equipment profiles, and brewday settings. Platform integration facades (`getWorkspaceIntegration`, `listIntegrationDevices` with query options, tilt attach/detach, recent brew sessions) live in `platform/integrations.ts`.
@@ -206,6 +222,49 @@ All brewery-vertical web pages under `(brewery)/` and `app/recipes/**` (except B
 | `brewery/equipmentProfiles` | list/create/patch/delete |
 | `brewery/brewdaySettings` | get/patch |
 | `platform/integrations` | workspace integration CRUD, devices list, tilt attach/detach, recent brew sessions |
+
+---
+
+## Phase E6d-native — brewery native migration (2026-06-02)
+
+Phase E6d-native migrates all brewery-domain screens under `apps/native/src/modules/brewery/` off raw `api.get/post/patch/delete` to E8 brewery facades + platform auth/integration facades. Shared client: `nativePlatformApiClient(token)` in `apps/native/src/auth/nativeApiClient.ts` (`bearerTokenAuth` + `getApiBaseUrl()`).
+
+| Slice | Native screens | Facades |
+|-------|----------------|---------|
+| E6d-PR1 | `AuthProvider`, `DashboardScreen`, `SelectWorkspaceScreen` | `getAuthMe`, `loginNative`, `logout`, `setActiveWorkspace`, `getHealth` |
+| E6d-PR2 | `RecipesListScreen`, `RecipeEditScreen`, `YeastScreen`, `EquipmentScreen`, `BrewdayStepsSettingsScreen`, `WaterProfilesScreen` | `@umbraculum/api-client/brewery` recipes/styles/ingredients/equipment/brewday/water-settings |
+| E6d-PR3 | `BrewSessionDetailScreen`, `FermDataIntegrationScreen` | `brewSessions` + `platform/integrations` |
+
+Out of scope (E9): `AdSlot.tsx`, `openWebFallback.ts` (`/api/ads/*`, `/api/auth/webview-exchange`).
+
+**Grep gate:** zero raw `api.(get|post|patch|delete)(…'/api/(recipes|brew-sessions|…)` under `apps/native/src/modules/brewery/`.
+
+---
+
+## Phase E9 — platform web tranche (2026-06-02)
+
+Phase E9 completes the web `apiFetch` → typed-facade migration for remaining platform surfaces. All call sites use `webPlatformApiClient()` (`apps/web/app/_lib/webApiClient.ts`) + `@umbraculum/api-client` platform facades with `ApiClientError` UX mapping.
+
+| PR | Facade module | Web pages migrated |
+|----|---------------|-------------------|
+| E9-PR1 | `platform/auth` — `signup`, `patchAuthPreferences`, `exchangeWebviewToken` (+ existing `login`, `logout`, `setActiveWorkspace`) | `(auth)/login`, `(auth)/signup`, `LogoutButton`, `(auth)/select-workspace`, `accessibility` |
+| E9-PR2 | `platform/ai` — `getWorkspaceAiSettings`, `patchWorkspaceAiSettings`, `getWorkspaceAiUsage`, `createAiUpgradeBillingIntent` | `ai/settings`, `ai/usage`, `ai/upgrade` |
+| E9-PR3 | `platform/ads` — `getAdSlot`; `platform/platformAdmin` — workspaces/recipes list, recipe import, ads CRUD | `AdSlot`, `platform/recipes`, `platform/ads`, `RecipeImportForm` (platform path) |
+
+BeerJSON export download links on `platform/recipes` remain plain `<a href="/api/platform/recipes/...">` anchors (binary/stream responses — same pattern as E8 brewery exports).
+
+---
+
+## Phase E8-follow-up — brewery catalog facades (2026-06-02)
+
+E8-follow-up adds brewery catalog facades deferred from E8 (BeerJSON export download links and ingredient admin):
+
+| Facade module | Hot paths |
+|---------------|-----------|
+| `brewery/recipeExport` | `exportRecipeBeerJson`, `exportAllRecipesBeerJson`, `recipeBeerJsonExportPath`, `allRecipesBeerJsonExportPath` (GET binary via `BeerJsonExportResponseSchema`) |
+| `brewery/ingredientAdmin` | `listIngredientSyncRuns`, `runIngredientSync` |
+
+Parser map entries live in `BREWERY_FACADE_PARSER_MAP` in [`facadeParserMap.ts`](../packages/api-client/src/facadeParserMap.ts).
 
 ---
 

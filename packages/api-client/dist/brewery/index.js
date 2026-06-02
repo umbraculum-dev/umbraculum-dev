@@ -1,11 +1,12 @@
 import {
   deleteParsed,
+  getBytesParsed,
   getParsed,
   patchParsed,
   postParsed,
   putParsed,
   toClientPath
-} from "../chunk-67WUASDX.js";
+} from "../chunk-EHQ6NO7O.js";
 
 // src/brewery/recipes.ts
 import {
@@ -88,6 +89,47 @@ async function duplicateRecipe(client, recipeId) {
     toClientPath(`/recipes/${encodeURIComponent(recipeId)}/duplicate`),
     {},
     (data) => RecipeResponseSchema.parse(data)
+  );
+}
+
+// src/brewery/recipeExport.ts
+import { BeerJsonExportResponseSchema } from "@umbraculum/contracts";
+function recipeBeerJsonExportPath(recipeId) {
+  return toClientPath(`/recipes/${encodeURIComponent(recipeId)}/export/beerjson`);
+}
+function allRecipesBeerJsonExportPath() {
+  return toClientPath("/recipes/export/beerjson");
+}
+function parseBeerJsonExportBody(data) {
+  if (data instanceof Buffer) return data;
+  if (typeof data === "string") return Buffer.from(data, "latin1");
+  return BeerJsonExportResponseSchema.parse(data);
+}
+async function exportRecipeBeerJson(client, recipeId) {
+  return getBytesParsed(client, recipeBeerJsonExportPath(recipeId), parseBeerJsonExportBody);
+}
+async function exportAllRecipesBeerJson(client) {
+  return getBytesParsed(client, allRecipesBeerJsonExportPath(), parseBeerJsonExportBody);
+}
+
+// src/brewery/ingredientAdmin.ts
+import {
+  IngredientSyncResponseSchema,
+  IngredientSyncRunsResponseSchema
+} from "@umbraculum/contracts";
+async function listIngredientSyncRuns(client) {
+  return getParsed(
+    client,
+    toClientPath("/admin/ingredients/sync-runs"),
+    (data) => IngredientSyncRunsResponseSchema.parse(data)
+  );
+}
+async function runIngredientSync(client) {
+  return postParsed(
+    client,
+    toClientPath("/admin/ingredients/sync"),
+    {},
+    (data) => IngredientSyncResponseSchema.parse(data)
   );
 }
 
@@ -585,6 +627,7 @@ async function updateRecipeWaterSettings(client, recipeId, patch) {
   );
 }
 export {
+  allRecipesBeerJsonExportPath,
   attachBrewSessionIntegration,
   calcBoilOverall,
   calcMashAcidification,
@@ -612,6 +655,8 @@ export {
   detachBrewSessionIntegration,
   duplicateRecipe,
   estimateMashPh,
+  exportAllRecipesBeerJson,
+  exportRecipeBeerJson,
   getBrewSession,
   getBrewdaySettings,
   getRecipe,
@@ -623,6 +668,7 @@ export {
   listBrewSessionIntegrationReadings,
   listBrewSessionsForRecipe,
   listEquipmentProfiles,
+  listIngredientSyncRuns,
   listInventory,
   listRecipeVersions,
   listRecipes,
@@ -641,6 +687,8 @@ export {
   postBrewSessionSteps,
   previewBulkRecipeImport,
   previewRecipeImport,
+  recipeBeerJsonExportPath,
+  runIngredientSync,
   searchFermentables,
   searchHops,
   searchYeasts,

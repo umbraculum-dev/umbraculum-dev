@@ -13,10 +13,13 @@ import {
   type WorkCenterListResponse,
 } from "@umbraculum/crp-contracts";
 
+import type { RenderVisibility } from "@umbraculum/contracts";
+
 import type { ApiClient } from "../client.js";
 import { toClientPath } from "../internal/clientPath.js";
 import { getParsed } from "../internal/httpJson.js";
 import type { PlatformOpenApiPaths } from "../openapiTypes.js";
+import { runAsyncRenderJobExport, submitRenderJob } from "../platform/rendering.js";
 
 type CrpResourcesListPath = "/crp/resources";
 type CrpResourcesListGet = PlatformOpenApiPaths[CrpResourcesListPath]["get"];
@@ -85,4 +88,120 @@ export async function getCapacityLoad(client: ApiClient): Promise<CapacityLoadRe
   return getParsed(client, toClientPath("/crp/capacity-load"), (data) =>
     CapacityLoadResponseSchema.parse(data),
   );
+}
+
+type CrpCapacityLoadRenderJobsPath = "/crp/capacity-load/render-jobs";
+type CrpScheduleRenderJobsPath = "/crp/schedule/render-jobs";
+type CrpResourcesCalendarRenderJobsPath = "/crp/resources/calendar/render-jobs";
+type CrpConflictsRenderJobsPath = "/crp/conflicts/render-jobs";
+
+export type RenderJobBody = { visibility?: RenderVisibility };
+
+export function capacityLoadRenderJobsPath(resourceId?: string): string {
+  const base = toClientPath("/crp/capacity-load/render-jobs");
+  if (!resourceId) return base;
+  return `${base}?resourceId=${encodeURIComponent(resourceId)}`;
+}
+
+export function scheduleRenderJobsPath(): string {
+  return toClientPath("/crp/schedule/render-jobs");
+}
+
+export function resourcesCalendarRenderJobsPath(): string {
+  return toClientPath("/crp/resources/calendar/render-jobs");
+}
+
+export function conflictsRenderJobsPath(): string {
+  return toClientPath("/crp/conflicts/render-jobs");
+}
+
+export async function submitCapacityLoadRenderJob(
+  client: ApiClient,
+  options?: { resourceId?: string; visibility?: RenderVisibility },
+): Promise<{ jobId: string }> {
+  const body: RenderJobBody = {};
+  if (options?.visibility !== undefined) body.visibility = options.visibility;
+  return submitRenderJob(client, capacityLoadRenderJobsPath(options?.resourceId), body);
+}
+
+export async function submitScheduleRenderJob(
+  client: ApiClient,
+  body?: RenderJobBody,
+): Promise<{ jobId: string }> {
+  return submitRenderJob(client, scheduleRenderJobsPath(), body ?? {});
+}
+
+export async function submitResourcesCalendarRenderJob(
+  client: ApiClient,
+  body?: RenderJobBody,
+): Promise<{ jobId: string }> {
+  return submitRenderJob(client, resourcesCalendarRenderJobsPath(), body ?? {});
+}
+
+export async function submitConflictsRenderJob(
+  client: ApiClient,
+  body?: RenderJobBody,
+): Promise<{ jobId: string }> {
+  return submitRenderJob(client, conflictsRenderJobsPath(), body ?? {});
+}
+
+function renderJobExportOpts(
+  body: RenderJobBody,
+  options?: { platform?: "web" | "native"; apiBaseUrl?: string },
+): { body: RenderJobBody; platform?: "web" | "native"; apiBaseUrl?: string } {
+  const exportOpts: { body: RenderJobBody; platform?: "web" | "native"; apiBaseUrl?: string } = {
+    body,
+  };
+  if (options?.platform !== undefined) exportOpts.platform = options.platform;
+  if (options?.apiBaseUrl !== undefined) exportOpts.apiBaseUrl = options.apiBaseUrl;
+  return exportOpts;
+}
+
+export async function runCapacityLoadRenderJobExport(
+  client: ApiClient,
+  options?: {
+    resourceId?: string;
+    visibility?: RenderVisibility;
+    platform?: "web" | "native";
+    apiBaseUrl?: string;
+  },
+): Promise<string> {
+  const body: RenderJobBody = {};
+  if (options?.visibility !== undefined) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(
+    client,
+    capacityLoadRenderJobsPath(options?.resourceId),
+    renderJobExportOpts(body, options),
+  );
+}
+
+export async function runScheduleRenderJobExport(
+  client: ApiClient,
+  options?: { visibility?: RenderVisibility; platform?: "web" | "native"; apiBaseUrl?: string },
+): Promise<string> {
+  const body: RenderJobBody = {};
+  if (options?.visibility !== undefined) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(client, scheduleRenderJobsPath(), renderJobExportOpts(body, options));
+}
+
+export async function runResourcesCalendarRenderJobExport(
+  client: ApiClient,
+  options?: { visibility?: RenderVisibility; platform?: "web" | "native"; apiBaseUrl?: string },
+): Promise<string> {
+  const body: RenderJobBody = {};
+  if (options?.visibility !== undefined) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(
+    client,
+    resourcesCalendarRenderJobsPath(),
+    renderJobExportOpts(body, options),
+  );
+}
+
+export async function runConflictsRenderJobExport(
+  client: ApiClient,
+  options?: { visibility?: RenderVisibility; platform?: "web" | "native"; apiBaseUrl?: string },
+): Promise<string> {
+  const body: RenderJobBody = {};
+  if (options?.visibility !== undefined) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(client, conflictsRenderJobsPath(), renderJobExportOpts(body, options));
 }

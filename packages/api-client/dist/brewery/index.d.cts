@@ -50,6 +50,32 @@ declare function duplicateRecipe(client: ApiClient, recipeId: string): Promise<{
     recipe: Record<string, unknown>;
 }>;
 
+type RecipeBeerJsonExportPath = "/recipes/{id}/export/beerjson";
+type RecipeBeerJsonExportGet = paths[RecipeBeerJsonExportPath]["get"];
+type RecipesBeerJsonExportPath = "/recipes/export/beerjson";
+type RecipesBeerJsonExportGet = paths[RecipesBeerJsonExportPath]["get"];
+
+/** Client path for a single-recipe BeerJSON download (use with browser navigation or `exportRecipeBeerJson`). */
+declare function recipeBeerJsonExportPath(recipeId: string): string;
+/** Client path for bulk BeerJSON download. */
+declare function allRecipesBeerJsonExportPath(): string;
+declare function exportRecipeBeerJson(client: ApiClient, recipeId: string): Promise<Buffer>;
+declare function exportAllRecipesBeerJson(client: ApiClient): Promise<Buffer>;
+
+type IngredientSyncRunsPath = "/admin/ingredients/sync-runs";
+type IngredientSyncRunsGet = paths[IngredientSyncRunsPath]["get"];
+type IngredientSyncPath = "/admin/ingredients/sync";
+type IngredientSyncPost = paths[IngredientSyncPath]["post"];
+
+declare function listIngredientSyncRuns(client: ApiClient): Promise<{
+    ok: true;
+    runs: Record<string, unknown>[];
+}>;
+declare function runIngredientSync(client: ApiClient): Promise<{
+    ok: true;
+    result: Record<string, unknown>;
+}>;
+
 type StylesListPath = "/styles";
 type StylesListGet = paths[StylesListPath]["get"];
 
@@ -771,4 +797,4 @@ type RecipeWaterSettingsPut = paths[RecipeWaterSettingsPath]["put"];
 declare function getRecipeWaterSettings(client: ApiClient, recipeId: string): Promise<ReturnType<typeof RecipeWaterSettingsGetResponseSchema.parse>>;
 declare function updateRecipeWaterSettings(client: ApiClient, recipeId: string, patch: Record<string, unknown>): Promise<ReturnType<typeof RecipeWaterSettingsPutResponseSchema.parse>>;
 
-export { type BoilComputeAndSavePost, type BoilOverallPost, type BrewSessionDetailGet, type BrewSessionsListGet, type BrewdaySettingsGet, type EquipmentProfilesListGet, type FermentablesGet, type HopsGet, type IngredientsSearchParams, type InventoryListGet, type MashAcidificationManualPost, type MashAcidificationPost, type MashAcidificationTargetMashPhPost, type MashComputeAndSavePost, type MashOverallPost, type MashPhEstimatePost, type RecipeBulkImportPost, type RecipeBulkImportPreviewPost, type RecipeDetailGet, type RecipeDuplicatePost, type RecipeImportPost, type RecipeImportPreviewPost, type RecipeVersionsGet, type RecipeWaterSettingsGet, type RecipeWaterSettingsPut, type RecipesListGet, type SaltAdditionsPost, type SpargeAcidificationManualPost, type SpargeAcidificationPost, type SpargeComputeAndSavePost, type SpargeOverallPost, type StylesListGet, type WaterCalcResultOnlyResponse, type WaterCalcWithDerivationResponse, type WaterHubSummaryGet, type WaterProfileDeleteDelete, type WaterProfileUnverifyPost, type WaterProfileVerifyPost, type WaterProfilesCreatePost, type WaterProfilesListGet, type YeastsGet, attachBrewSessionIntegration, calcBoilOverall, calcMashAcidification, calcMashAcidificationManual, calcMashAcidificationTargetMashPh, calcMashOverall, calcSaltAdditions, calcSpargeAcidification, calcSpargeAcidificationManual, calcSpargeOverall, computeAndSaveBoil, computeAndSaveMash, computeAndSaveSparge, createBrewSession, createEquipmentProfile, createInventoryItem, createRecipe, createRecipeVersion, createWaterProfile, deleteBrewSession, deleteEquipmentProfile, deleteInventoryItem, deleteRecipe, deleteWaterProfile, detachBrewSessionIntegration, duplicateRecipe, estimateMashPh, getBrewSession, getBrewdaySettings, getRecipe, getRecipeWaterHubSummary, getRecipeWaterSettings, importRecipe, importRecipesBulk, listBrewSessionIntegrationAttachments, listBrewSessionIntegrationReadings, listBrewSessionsForRecipe, listEquipmentProfiles, listInventory, listRecipeVersions, listRecipes, listStyles, listWaterProfiles, patchBrewSession, patchBrewSessionStep, patchBrewSessionSteps, patchBrewdaySettings, patchEquipmentProfile, patchInventoryItem, patchRecipe, pauseBrewSession, postBrewSessionStepLog, postBrewSessionStepTimerAction, postBrewSessionSteps, previewBulkRecipeImport, previewRecipeImport, searchFermentables, searchHops, searchYeasts, startBrewSession, stopBrewSession, unverifyWaterProfile, updateRecipeWaterSettings, verifyWaterProfile };
+export { type BoilComputeAndSavePost, type BoilOverallPost, type BrewSessionDetailGet, type BrewSessionsListGet, type BrewdaySettingsGet, type EquipmentProfilesListGet, type FermentablesGet, type HopsGet, type IngredientSyncPost, type IngredientSyncRunsGet, type IngredientsSearchParams, type InventoryListGet, type MashAcidificationManualPost, type MashAcidificationPost, type MashAcidificationTargetMashPhPost, type MashComputeAndSavePost, type MashOverallPost, type MashPhEstimatePost, type RecipeBeerJsonExportGet, type RecipeBulkImportPost, type RecipeBulkImportPreviewPost, type RecipeDetailGet, type RecipeDuplicatePost, type RecipeImportPost, type RecipeImportPreviewPost, type RecipeVersionsGet, type RecipeWaterSettingsGet, type RecipeWaterSettingsPut, type RecipesBeerJsonExportGet, type RecipesListGet, type SaltAdditionsPost, type SpargeAcidificationManualPost, type SpargeAcidificationPost, type SpargeComputeAndSavePost, type SpargeOverallPost, type StylesListGet, type WaterCalcResultOnlyResponse, type WaterCalcWithDerivationResponse, type WaterHubSummaryGet, type WaterProfileDeleteDelete, type WaterProfileUnverifyPost, type WaterProfileVerifyPost, type WaterProfilesCreatePost, type WaterProfilesListGet, type YeastsGet, allRecipesBeerJsonExportPath, attachBrewSessionIntegration, calcBoilOverall, calcMashAcidification, calcMashAcidificationManual, calcMashAcidificationTargetMashPh, calcMashOverall, calcSaltAdditions, calcSpargeAcidification, calcSpargeAcidificationManual, calcSpargeOverall, computeAndSaveBoil, computeAndSaveMash, computeAndSaveSparge, createBrewSession, createEquipmentProfile, createInventoryItem, createRecipe, createRecipeVersion, createWaterProfile, deleteBrewSession, deleteEquipmentProfile, deleteInventoryItem, deleteRecipe, deleteWaterProfile, detachBrewSessionIntegration, duplicateRecipe, estimateMashPh, exportAllRecipesBeerJson, exportRecipeBeerJson, getBrewSession, getBrewdaySettings, getRecipe, getRecipeWaterHubSummary, getRecipeWaterSettings, importRecipe, importRecipesBulk, listBrewSessionIntegrationAttachments, listBrewSessionIntegrationReadings, listBrewSessionsForRecipe, listEquipmentProfiles, listIngredientSyncRuns, listInventory, listRecipeVersions, listRecipes, listStyles, listWaterProfiles, patchBrewSession, patchBrewSessionStep, patchBrewSessionSteps, patchBrewdaySettings, patchEquipmentProfile, patchInventoryItem, patchRecipe, pauseBrewSession, postBrewSessionStepLog, postBrewSessionStepTimerAction, postBrewSessionSteps, previewBulkRecipeImport, previewRecipeImport, recipeBeerJsonExportPath, runIngredientSync, searchFermentables, searchHops, searchYeasts, startBrewSession, stopBrewSession, unverifyWaterProfile, updateRecipeWaterSettings, verifyWaterProfile };

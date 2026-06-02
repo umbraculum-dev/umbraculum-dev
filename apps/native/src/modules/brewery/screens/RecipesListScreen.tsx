@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
-import { listRecipes } from "@umbraculum/api-client/brewery";
+import { listRecipes, listStyles, createRecipe, deleteRecipe } from "@umbraculum/api-client/brewery";
 import { type RecipeListItem } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
@@ -11,6 +10,7 @@ import { useFocusEffect, useNavigation, type NavigationProp } from "@react-navig
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import type { RootStackParamList } from "../../../navigation/types";
 
 type StyleListItem = { key: string; name: string; code: string; sortOrder: number };
@@ -66,7 +66,7 @@ export function RecipesListScreen() {
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
+    return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
   const loadStyles = useCallback(async () => {
@@ -74,9 +74,8 @@ export function RecipesListScreen() {
     setStylesError(null);
     setStylesLoading(true);
     try {
-      const res = await api.get("/api/styles");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { styles?: unknown })?.styles;
+      const parsed = await listStyles(api);
+      const items = parsed.styles;
       setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
     } catch (err) {
       setStyles([]);
@@ -125,12 +124,11 @@ export function RecipesListScreen() {
     setCreating(true);
     setError(null);
     try {
-      const res = await api.post("/api/recipes", {
+      await createRecipe(api, {
         name,
         styleKey,
         beerJsonRecipeJson: buildMinimalBeerJson(name),
       });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       setNewName("");
       setNewStyleKey("");
       await refresh();
@@ -152,8 +150,7 @@ export function RecipesListScreen() {
       setError(null);
       setDeletingId(id);
       try {
-        const res = await api.delete(`/api/recipes/${id}`);
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+        await deleteRecipe(api, id);
         await refresh();
       } catch (err) {
         setError(String(err));

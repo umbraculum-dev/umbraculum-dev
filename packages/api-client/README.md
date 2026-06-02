@@ -22,9 +22,12 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 
 | Facade module | Example calls | Contracts parser |
 |---------------|---------------|------------------|
-| `platform/auth` | `getAuthMe`, `login`, `loginNative` | `AuthMeResponseSchema`, `AuthLogin*Schema` |
+| `platform/auth` | `getAuthMe`, `login`, `loginNative`, `signup`, `logout`, `setActiveWorkspace`, `patchAuthPreferences`, `exchangeWebviewToken` | `AuthMeResponseSchema`, `AuthLogin*Schema`, `AuthSignup*Schema`, … |
 | `platform/workspaces` | `listWorkspaces`, `createWorkspace`, `getHealth` | `WorkspacesListResponseSchema`, `HealthResponseSchema` |
 | `platform/modules` | `getWorkspaceBilling`, `listIntegrationDevices` | `WorkspaceBillingResponseSchema`, `IntegrationDevicesListResponseSchema` |
+| `platform/ai` | `getWorkspaceAiSettings`, `patchWorkspaceAiSettings`, `getWorkspaceAiUsage`, `createAiUpgradeBillingIntent` | `WorkspaceAiSettingsResponseSchema`, `WorkspaceAiUsageResponseSchema`, `BillingIntentResponseSchema` |
+| `platform/ads` | `getAdSlot` | `AdSlotResponseSchema` |
+| `platform/platformAdmin` | `listPlatformWorkspaces`, `listPlatformRecipes`, platform recipe import, platform ads CRUD | `PlatformWorkspacesListResponseSchema`, `PlatformAdsListResponseSchema`, … |
 | `platform/rendering` | `submitRenderJob`, `runAsyncRenderJobExport`, … | `RenderJob*ResponseSchema` |
 | `brewery/recipes` | `listRecipes`, `getRecipe`, `patchRecipe`, `listBrewSessionsForRecipe`, `createBrewSession` | `parseRecipesListResponse`, `RecipeResponseSchema`, … |
 | `brewery/waterProfiles` | `listWaterProfiles`, `createWaterProfile`, `verifyWaterProfile`, `unverifyWaterProfile`, `deleteWaterProfile` | `parseWaterProfilesResponse`, `WaterProfileResponseSchema`, `OkResponseSchema` |
@@ -119,7 +122,7 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 
 ## Status
 
-**Phase E complete (2026-06-01). Phase E5–E8 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration; **E8** brewery web tranche (recipes, brew sessions, inventory, equipment, integrations). npm publish remains a separate LICENSING decision.
+**Phase E complete (2026-06-01). Phase E5–E9 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration; **E8** brewery web tranche; **E9** platform web tranche (auth signup/preferences, AI settings/usage/upgrade, ads slot, platform-admin recipes/ads). npm publish remains a separate LICENSING decision.
 
 The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
 

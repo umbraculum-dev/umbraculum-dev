@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getAuthMe } from "@umbraculum/api-client";
 import {
   createWaterProfile,
   deleteWaterProfile,
@@ -11,7 +11,6 @@ import {
   verifyWaterProfile,
 } from "@umbraculum/api-client/brewery";
 import type { AuthMeResponse, WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
@@ -19,6 +18,7 @@ import { Accordion } from "tamagui";
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 
 function isAdmin(role: string | null): boolean {
   return role === "brewery_admin" || role === "owner";
@@ -129,7 +129,7 @@ export function WaterProfilesScreen() {
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
+    return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
   const refresh = useCallback(async () => {
@@ -137,12 +137,8 @@ export function WaterProfilesScreen() {
     setError(null);
     setLoading(true);
     try {
-      const meRes = await api.get("/api/auth/me");
-      if (meRes.ok && meRes.data) {
-        setMe(parseAuthMeResponse(meRes.data));
-      } else {
-        setMe(null);
-      }
+      const me = await getAuthMe(api);
+      setMe(me);
 
       const profRes = await listWaterProfiles(api);
       setProfiles(profRes);

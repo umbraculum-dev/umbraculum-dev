@@ -1,10 +1,20 @@
 import {
+  fetchRenderJobDownloadUrl,
+  pollRenderJobUntilSucceeded,
+  resolveArtifactDownloadUrl,
+  runAsyncRenderJobExport,
+  submitRenderJob,
+  toWebArtifactUrl
+} from "./chunk-PU7ET74O.js";
+import {
   ApiClientError,
-  assertOk,
+  deleteParsed,
   getParsed,
+  patchParsed,
   postParsed,
+  putParsed,
   toClientPath
-} from "./chunk-67WUASDX.js";
+} from "./chunk-EHQ6NO7O.js";
 
 // src/auth.ts
 function cookieAuth() {
@@ -93,9 +103,26 @@ var PLATFORM_FACADE_PARSER_MAP = {
   "/auth/me": "parseAuthMeResponse / AuthMeResponseSchema",
   "/auth/login": "AuthLoginResponseSchema",
   "/auth/login/native": "AuthLoginNativeResponseSchema",
+  "/auth/logout": "AuthLogoutResponseSchema",
+  "/auth/signup": "AuthSignupResponseSchema",
+  "/auth/preferences": "AuthPreferencesPatchResponseSchema",
+  "/auth/webview-exchange": "AuthWebviewExchangeResponseSchema",
+  "/auth/active-workspace": "AuthActiveWorkspaceResponseSchema",
   "/workspaces": "WorkspacesListResponseSchema",
   "/health": "HealthResponseSchema",
   "/workspaces/{workspaceId}/billing": "WorkspaceBillingResponseSchema",
+  "/workspaces/{workspaceId}/billing/intent": "BillingIntentResponseSchema",
+  "/workspaces/{workspaceId}/ai/settings": "WorkspaceAiSettingsResponseSchema",
+  "/workspaces/{workspaceId}/ai/usage": "WorkspaceAiUsageResponseSchema",
+  "/ads/slot/{placement}": "AdSlotResponseSchema",
+  "/platform/workspaces": "PlatformWorkspacesListResponseSchema",
+  "/platform/recipes/list": "PlatformRecipesListResponseSchema",
+  "/platform/recipes/import/preview": "PlatformRecipeImportPreviewResponseSchema",
+  "/platform/recipes/import": "PlatformRecipeImportResponseSchema",
+  "/platform/recipes/import/bulk/preview": "PlatformRecipeBulkImportPreviewResponseSchema",
+  "/platform/recipes/import/bulk": "PlatformRecipeBulkImportResponseSchema",
+  "/platform/ads": "PlatformAdsListResponseSchema / PlatformAdCreateResponseSchema",
+  "/platform/ads/{id}": "PlatformAdOkResponseSchema (PATCH/DELETE)",
   "/workspaces/{workspaceId}/integrations/{kind}": "IntegrationGetResponseSchema / IntegrationCreateResponseSchema",
   "/workspaces/{workspaceId}/integrations/{kind}/reveal": "IntegrationRevealResponseSchema",
   "/workspaces/{workspaceId}/integrations/{kind}/rotate-token": "IntegrationCreateResponseSchema",
@@ -108,6 +135,10 @@ var PLATFORM_FACADE_PARSER_MAP = {
   "/rendering/jobs/{jobId}/result": "RenderJobResultResponseSchema"
 };
 var BREWERY_FACADE_PARSER_MAP = {
+  "/recipes/{id}/export/beerjson": "BeerJsonExportResponseSchema",
+  "/recipes/export/beerjson": "BeerJsonExportResponseSchema",
+  "/admin/ingredients/sync-runs": "IngredientSyncRunsResponseSchema",
+  "/admin/ingredients/sync": "IngredientSyncResponseSchema",
   "/recipes": "parseRecipesListResponse / RecipeResponseSchema (POST)",
   "/recipes/{id}": "RecipeResponseSchema / OkResponseSchema (DELETE)",
   "/recipes/{id}/versions": "RecipeVersionsResponseSchema / RecipeResponseSchema (POST)",
@@ -153,10 +184,19 @@ var BREWERY_FACADE_PARSER_MAP = {
 
 // src/platform/auth.ts
 import {
+  AuthActiveWorkspaceRequestSchema,
+  AuthActiveWorkspaceResponseSchema,
   AuthLoginNativeResponseSchema,
   AuthLoginRequestSchema,
   AuthLoginResponseSchema,
-  AuthMeResponseSchema
+  AuthLogoutResponseSchema,
+  AuthMeResponseSchema,
+  AuthPreferencesPatchRequestSchema,
+  AuthPreferencesPatchResponseSchema,
+  AuthSignupRequestSchema,
+  AuthSignupResponseSchema,
+  AuthWebviewExchangeRequestSchema,
+  AuthWebviewExchangeResponseSchema
 } from "@umbraculum/contracts";
 async function getAuthMe(client) {
   return getParsed(client, toClientPath("/auth/me"), (data) => AuthMeResponseSchema.parse(data));
@@ -177,6 +217,50 @@ async function loginNative(client, body) {
     toClientPath("/auth/login/native"),
     parsedBody,
     (data) => AuthLoginNativeResponseSchema.parse(data)
+  );
+}
+async function logout(client) {
+  return postParsed(
+    client,
+    toClientPath("/auth/logout"),
+    {},
+    (data) => AuthLogoutResponseSchema.parse(data)
+  );
+}
+async function setActiveWorkspace(client, body) {
+  const parsedBody = AuthActiveWorkspaceRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/active-workspace"),
+    parsedBody,
+    (data) => AuthActiveWorkspaceResponseSchema.parse(data)
+  );
+}
+async function signup(client, body) {
+  const parsedBody = AuthSignupRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/signup"),
+    parsedBody,
+    (data) => AuthSignupResponseSchema.parse(data)
+  );
+}
+async function patchAuthPreferences(client, body) {
+  const parsedBody = AuthPreferencesPatchRequestSchema.parse(body);
+  return patchParsed(
+    client,
+    toClientPath("/auth/preferences"),
+    parsedBody,
+    (data) => AuthPreferencesPatchResponseSchema.parse(data)
+  );
+}
+async function exchangeWebviewToken(client, body) {
+  const parsedBody = AuthWebviewExchangeRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/auth/webview-exchange"),
+    parsedBody,
+    (data) => AuthWebviewExchangeResponseSchema.parse(data)
   );
 }
 
@@ -318,72 +402,175 @@ async function getWorkspaceBilling(client, workspaceId) {
   );
 }
 
-// src/platform/rendering.ts
+// src/platform/ai.ts
 import {
-  RenderJobResultResponseSchema,
-  RenderJobStatusResponseSchema,
-  RenderJobSubmitResponseSchema
+  BillingIntentRequestSchema,
+  BillingIntentResponseSchema,
+  UpdateWorkspaceAiSettingsRequestSchema,
+  WorkspaceAiSettingsResponseSchema,
+  WorkspaceAiUsageResponseSchema
 } from "@umbraculum/contracts";
-var POLL_INTERVAL_MS = 50;
-var POLL_TIMEOUT_MS = 15e3;
-function toWebArtifactUrl(signedUrl, apiBaseUrl) {
-  if (signedUrl.startsWith("/api/")) return signedUrl;
-  if (signedUrl.startsWith("/rendering/")) return `/api${signedUrl}`;
-  if (signedUrl.startsWith("/") && apiBaseUrl) {
-    const base = apiBaseUrl.replace(/\/+$/, "");
-    return `${base}${signedUrl.startsWith("/api") ? signedUrl : `/api${signedUrl}`}`;
-  }
-  return signedUrl;
+function workspaceAiSettingsPath(workspaceId) {
+  return toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/ai/settings`);
 }
-function resolveArtifactDownloadUrl(signedUrl, options) {
-  if (options?.platform === "web") {
-    return toWebArtifactUrl(signedUrl);
-  }
-  if (signedUrl.startsWith("http://") || signedUrl.startsWith("https://")) {
-    return signedUrl;
-  }
-  const base = options?.apiBaseUrl?.replace(/\/+$/, "") ?? "";
-  if (!base) return signedUrl;
-  if (signedUrl.startsWith("/api/")) return `${base}${signedUrl.slice(4)}`;
-  if (signedUrl.startsWith("/")) return `${base}${signedUrl}`;
-  return signedUrl;
+function workspaceAiUsagePath(workspaceId) {
+  return toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/ai/usage`);
 }
-async function submitRenderJob(client, postUrl, body) {
-  const res = await client.post(postUrl, body ?? {});
-  assertOk(res, 202);
-  const parsed = RenderJobSubmitResponseSchema.parse(res.data);
-  return { jobId: parsed.job.id };
+function workspaceBillingIntentPath(workspaceId) {
+  return toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/billing/intent`);
 }
-async function pollRenderJobUntilSucceeded(client, jobId) {
-  const deadline = Date.now() + POLL_TIMEOUT_MS;
-  let lastStatus = "";
-  const statusPath = `/api/rendering/jobs/${encodeURIComponent(jobId)}`;
-  while (Date.now() < deadline) {
-    const res = await client.get(statusPath);
-    assertOk(res, 200);
-    const body = RenderJobStatusResponseSchema.parse(res.data);
-    lastStatus = body.job.status;
-    if (body.job.status === "succeeded") return;
-    if (body.job.status === "failed") {
-      throw new Error(body.job.error?.code ?? "render_job_failed");
-    }
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-  }
-  throw new Error(`Render job timed out (last status=${lastStatus})`);
+async function getWorkspaceAiSettings(client, workspaceId) {
+  return getParsed(
+    client,
+    workspaceAiSettingsPath(workspaceId),
+    (data) => WorkspaceAiSettingsResponseSchema.parse(data)
+  );
 }
-async function fetchRenderJobDownloadUrl(client, jobId, options) {
-  const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}/result`);
-  assertOk(res, 200);
-  const body = RenderJobResultResponseSchema.parse(res.data);
-  return resolveArtifactDownloadUrl(body.signedUrl, options);
+async function patchWorkspaceAiSettings(client, workspaceId, body) {
+  const parsedBody = UpdateWorkspaceAiSettingsRequestSchema.parse(body);
+  return putParsed(
+    client,
+    workspaceAiSettingsPath(workspaceId),
+    parsedBody,
+    (data) => WorkspaceAiSettingsResponseSchema.parse(data)
+  );
 }
-async function runAsyncRenderJobExport(client, postUrl, options) {
-  const { jobId } = await submitRenderJob(client, postUrl, options?.body);
-  await pollRenderJobUntilSucceeded(client, jobId);
-  const downloadOpts = {};
-  if (options?.platform !== void 0) downloadOpts.platform = options.platform;
-  if (options?.apiBaseUrl !== void 0) downloadOpts.apiBaseUrl = options.apiBaseUrl;
-  return fetchRenderJobDownloadUrl(client, jobId, downloadOpts);
+async function getWorkspaceAiUsage(client, workspaceId) {
+  return getParsed(
+    client,
+    workspaceAiUsagePath(workspaceId),
+    (data) => WorkspaceAiUsageResponseSchema.parse(data)
+  );
+}
+async function createAiUpgradeBillingIntent(client, workspaceId, body) {
+  const parsedBody = BillingIntentRequestSchema.parse(body);
+  return postParsed(
+    client,
+    workspaceBillingIntentPath(workspaceId),
+    parsedBody,
+    (data) => BillingIntentResponseSchema.parse(data)
+  );
+}
+
+// src/platform/ads.ts
+import {
+  AdSlotParamsSchema,
+  AdSlotQuerySchema,
+  AdSlotResponseSchema
+} from "@umbraculum/contracts";
+async function getAdSlot(client, placement, options = {}) {
+  const parsedPlacement = AdSlotParamsSchema.parse({ placement }).placement;
+  const query = AdSlotQuerySchema.parse(options);
+  const qs = query.platform ? `?platform=${encodeURIComponent(query.platform)}` : "";
+  return getParsed(
+    client,
+    `${toClientPath(`/ads/slot/${encodeURIComponent(parsedPlacement)}`)}${qs}`,
+    (data) => AdSlotResponseSchema.parse(data)
+  );
+}
+
+// src/platform/platformAdmin.ts
+import {
+  PlatformAdCreateRequestSchema,
+  PlatformAdCreateResponseSchema,
+  PlatformAdOkResponseSchema,
+  PlatformAdPatchRequestSchema,
+  PlatformAdsListResponseSchema,
+  PlatformRecipeBulkImportPreviewRequestSchema,
+  PlatformRecipeBulkImportPreviewResponseSchema,
+  PlatformRecipeBulkImportRequestSchema,
+  PlatformRecipeBulkImportResponseSchema,
+  PlatformRecipeImportPreviewRequestSchema,
+  PlatformRecipeImportPreviewResponseSchema,
+  PlatformRecipeImportRequestSchema,
+  PlatformRecipeImportResponseSchema,
+  PlatformRecipesListQuerySchema,
+  PlatformRecipesListResponseSchema,
+  PlatformWorkspacesListResponseSchema
+} from "@umbraculum/contracts";
+async function listPlatformWorkspaces(client) {
+  return getParsed(
+    client,
+    toClientPath("/platform/workspaces"),
+    (data) => PlatformWorkspacesListResponseSchema.parse(data)
+  );
+}
+async function listPlatformRecipes(client, workspaceId) {
+  const query = PlatformRecipesListQuerySchema.parse({ workspaceId });
+  const qs = `?workspaceId=${encodeURIComponent(query.workspaceId)}`;
+  return getParsed(
+    client,
+    `${toClientPath("/platform/recipes/list")}${qs}`,
+    (data) => PlatformRecipesListResponseSchema.parse(data)
+  );
+}
+async function previewPlatformRecipeImport(client, body) {
+  const parsedBody = PlatformRecipeImportPreviewRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/platform/recipes/import/preview"),
+    parsedBody,
+    (data) => PlatformRecipeImportPreviewResponseSchema.parse(data)
+  );
+}
+async function importPlatformRecipe(client, body) {
+  const parsedBody = PlatformRecipeImportRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/platform/recipes/import"),
+    parsedBody,
+    (data) => PlatformRecipeImportResponseSchema.parse(data)
+  );
+}
+async function previewPlatformBulkRecipeImport(client, body) {
+  const parsedBody = PlatformRecipeBulkImportPreviewRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/platform/recipes/import/bulk/preview"),
+    parsedBody,
+    (data) => PlatformRecipeBulkImportPreviewResponseSchema.parse(data)
+  );
+}
+async function importPlatformRecipesBulk(client, body) {
+  const parsedBody = PlatformRecipeBulkImportRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/platform/recipes/import/bulk"),
+    parsedBody,
+    (data) => PlatformRecipeBulkImportResponseSchema.parse(data)
+  );
+}
+async function listPlatformAds(client) {
+  return getParsed(
+    client,
+    toClientPath("/platform/ads"),
+    (data) => PlatformAdsListResponseSchema.parse(data)
+  );
+}
+async function createPlatformAd(client, body) {
+  const parsedBody = PlatformAdCreateRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/platform/ads"),
+    parsedBody,
+    (data) => PlatformAdCreateResponseSchema.parse(data)
+  );
+}
+async function patchPlatformAd(client, adId, body) {
+  const parsedBody = PlatformAdPatchRequestSchema.parse(body);
+  return patchParsed(
+    client,
+    toClientPath(`/platform/ads/${encodeURIComponent(adId)}`),
+    parsedBody,
+    (data) => PlatformAdOkResponseSchema.parse(data)
+  );
+}
+async function deletePlatformAd(client, adId) {
+  return deleteParsed(
+    client,
+    toClientPath(`/platform/ads/${encodeURIComponent(adId)}`),
+    (data) => PlatformAdOkResponseSchema.parse(data)
+  );
 }
 export {
   ApiClientError,
@@ -392,26 +579,46 @@ export {
   attachTiltDevice,
   bearerTokenAuth,
   cookieAuth,
+  createAiUpgradeBillingIntent,
   createApiClient,
+  createPlatformAd,
   createWorkspace,
   createWorkspaceIntegration,
+  deletePlatformAd,
   detachTiltDevice,
+  exchangeWebviewToken,
   fetchRenderJobDownloadUrl,
+  getAdSlot,
   getAuthMe,
   getHealth,
+  getWorkspaceAiSettings,
+  getWorkspaceAiUsage,
   getWorkspaceBilling,
   getWorkspaceIntegration,
+  importPlatformRecipe,
+  importPlatformRecipesBulk,
   listIntegrationDevices,
+  listPlatformAds,
+  listPlatformRecipes,
+  listPlatformWorkspaces,
   listRecentBrewSessions,
   listWorkspaces,
   login,
   loginNative,
+  logout,
+  patchAuthPreferences,
+  patchPlatformAd,
+  patchWorkspaceAiSettings,
   pollRenderJobUntilSucceeded,
+  previewPlatformBulkRecipeImport,
+  previewPlatformRecipeImport,
   resolveArtifactDownloadUrl,
   revealIntegrationToken,
   revokeIntegration,
   rotateIntegrationToken,
   runAsyncRenderJobExport,
+  setActiveWorkspace,
+  signup,
   submitRenderJob,
   toWebArtifactUrl
 };

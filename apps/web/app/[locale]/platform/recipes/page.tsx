@@ -4,11 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import {
+  ApiClientError,
+  listPlatformRecipes,
+  listPlatformWorkspaces,
+} from "@umbraculum/api-client";
+
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { RecipeImportForm } from "../../../_components/RecipeImportForm";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 
 type WorkspaceItem = { id: string; name: string };
 type RecipeItem = { id: string; name: string };
@@ -37,13 +43,18 @@ export default function PlatformRecipesPage() {
       setWorkspacesError(null);
       setWorkspacesLoading(true);
       try {
-        const res = await apiFetch("/api/platform/workspaces");
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-        const body = res.data as { workspaces?: unknown; accounts?: unknown } | null | undefined;
-        const list = body?.workspaces ?? body?.accounts;
-        if (!cancelled) setWorkspaces(Array.isArray(list) ? (list as WorkspaceItem[]) : []);
+        const data = await listPlatformWorkspaces(webPlatformApiClient());
+        if (!cancelled) setWorkspaces(data.workspaces);
       } catch (err) {
-        if (!cancelled) setWorkspacesError(String(err));
+        if (!cancelled) {
+          setWorkspacesError(
+            err instanceof ApiClientError
+              ? typeof err.body === "string"
+                ? err.body
+                : JSON.stringify(err.body)
+              : String(err),
+          );
+        }
       } finally {
         if (!cancelled) setWorkspacesLoading(false);
       }
@@ -63,10 +74,10 @@ export default function PlatformRecipesPage() {
     void (async () => {
       setRecipesLoading(true);
       try {
-        const res = await apiFetch(`/api/platform/recipes/list?workspaceId=${encodeURIComponent(workspaceId)}`);
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-        const list = (res.data as { recipes?: RecipeItem[] })?.recipes;
-        const items = Array.isArray(list) ? list : [];
+        const data = await listPlatformRecipes(webPlatformApiClient(), workspaceId);
+        const items = Array.isArray(data.recipes)
+          ? (data.recipes as RecipeItem[])
+          : [];
         if (!cancelled) {
           setRecipes(items);
           setExportRecipeId((prev) => (items.some((r) => r.id === prev) ? prev : items[0]?.id ?? ""));

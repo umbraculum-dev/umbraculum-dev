@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getAuthMe, getHealth } from "@umbraculum/api-client";
 import type { RouteRef } from "@umbraculum/navigation";
 import { useT } from "@umbraculum/i18n-react";
 import { locales, type SupportedLocale } from "@umbraculum/i18n";
@@ -13,6 +13,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AdSlot } from "../components/AdSlot";
 import { useAuth } from "../auth/AuthProvider";
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../auth/nativeApiClient";
 import { useLocaleController } from "../i18n/I18nProvider";
 import { openWebFallbackRoute } from "../navigation/openWebFallback";
 import type { RootStackParamList, TabParamList } from "../navigation/types";
@@ -87,13 +88,11 @@ export function DashboardScreen() {
     let cancelled = false;
     setHealthState({ status: "loading" });
 
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-    withTimeout(Promise.all([api.get("/api/health"), api.get("/api/auth/me")]), 15000)
-      .then(([healthRes, meRes]) => {
+    const client = nativePlatformApiClient(token);
+    withTimeout(Promise.all([getHealth(client), getAuthMe(client)]), 15000)
+      .then(([health, me]) => {
         if (cancelled) return;
-        if (!healthRes.ok) throw new Error(`health failed with status ${healthRes.status}`);
-        if (!meRes.ok) throw new Error(`me failed with status ${meRes.status}`);
-        setHealthState({ status: "ok", health: healthRes.data, me: meRes.data });
+        setHealthState({ status: "ok", health, me });
       })
       .catch((err) => {
         if (!cancelled) setHealthState({ status: "error", error: String(err) });

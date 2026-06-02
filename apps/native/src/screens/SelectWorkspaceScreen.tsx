@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getAuthMe, setActiveWorkspace } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 
 import { useAuth } from "../auth/AuthProvider";
-import { getApiBaseUrl } from "../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../auth/nativeApiClient";
 
 type WorkspaceListItem = { id: string; name: string; role: string; brandKey?: string | null };
 
@@ -19,38 +19,28 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
   const auth = useAuth();
   const { t } = useT("auth");
 
-  const baseUrl = getApiBaseUrl();
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
 
   const [state, setState] = useState<State>({ status: "loading" });
   const [submittingId, setSubmittingId] = useState<string | null>(null);
 
-  const api = useMemo(() => {
-    if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
-  }, [baseUrl, token]);
-
   const load = useCallback(async () => {
     try {
-      if (!api) throw new Error("Not authenticated");
+      if (!token) throw new Error("Not authenticated");
       setState({ status: "loading" });
 
-      const res = await api.get("/api/auth/me");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-
-      const raw = res.data as {
-        workspaces?: unknown;
-        accounts?: unknown;
-        activeWorkspaceId?: unknown;
-      } | null | undefined;
-      const list = raw?.workspaces ?? raw?.accounts;
-      const workspaces: WorkspaceListItem[] = Array.isArray(list) ? (list as WorkspaceListItem[]) : [];
-      const activeWorkspaceId = typeof raw?.activeWorkspaceId === "string" ? raw.activeWorkspaceId : null;
-      setState({ status: "ready", workspaces, activeWorkspaceId });
+      const me = await getAuthMe(nativePlatformApiClient(token));
+      const workspaces: WorkspaceListItem[] = me.workspaces.map((w) => ({
+        id: w.id,
+        name: w.name,
+        role: w.role,
+        brandKey: w.brandKey ?? null,
+      }));
+      setState({ status: "ready", workspaces, activeWorkspaceId: me.activeWorkspaceId });
     } catch (err) {
       setState({ status: "error", error: String(err) });
     }
-  }, [api]);
+  }, [token]);
 
   useEffect(() => {
     void load();
@@ -59,11 +49,10 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
   const pick = useCallback(
     async (workspaceId: string) => {
       try {
-        if (!api) throw new Error("Not authenticated");
+        if (!token) throw new Error("Not authenticated");
         setSubmittingId(workspaceId);
 
-        const res = await api.post("/api/auth/active-workspace", { workspaceId });
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+        await setActiveWorkspace(nativePlatformApiClient(token), { workspaceId });
 
         onDone?.();
       } catch (err) {
@@ -72,7 +61,7 @@ export function SelectWorkspaceScreen({ onDone }: { onDone?: () => void }) {
         setSubmittingId(null);
       }
     },
-    [api, onDone, t],
+    [token, onDone, t],
   );
 
   return (

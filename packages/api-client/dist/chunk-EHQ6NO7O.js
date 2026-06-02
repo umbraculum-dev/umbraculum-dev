@@ -47,6 +47,11 @@ async function deleteParsed(client, path, parse, expectedStatus = 200) {
   assertOk(res, expectedStatus);
   return parse(res.data);
 }
+async function getBytesParsed(client, path, parse, expectedStatus = 200) {
+  const res = await client.get(path);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
 
 export {
   ApiClientError,
@@ -56,5 +61,6 @@ export {
   postParsed,
   putParsed,
   patchParsed,
-  deleteParsed
+  deleteParsed,
+  getBytesParsed
 };

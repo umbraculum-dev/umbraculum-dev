@@ -64,3 +64,15 @@ export async function deleteParsed<T>(
   assertOk(res, expectedStatus);
   return parse(res.data);
 }
+
+/** GET whose body is raw bytes (BeerJSON export, etc.) — not JSON. */
+export async function getBytesParsed(
+  client: ApiClient,
+  path: string,
+  parse: (data: unknown) => Buffer,
+  expectedStatus = 200,
+): Promise<Buffer> {
+  const res = await client.get(path);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}

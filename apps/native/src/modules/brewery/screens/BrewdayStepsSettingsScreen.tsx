@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getBrewdaySettings, patchBrewdaySettings } from "@umbraculum/api-client/brewery";
 import { useT } from "@umbraculum/i18n-react";
 import type { RootStackParamList } from "../../../navigation/types";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
@@ -32,6 +32,7 @@ const NotesTextArea = TextArea as unknown as React.ComponentType<
 >;
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 
 const PRESET_KEYS = [
   "preparation",
@@ -248,35 +249,18 @@ export function BrewdayStepsSettingsScreen() {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-    api
-      .get("/api/brewday-settings")
+    const client = nativePlatformApiClient(token!);
+    getBrewdaySettings(client)
       .then((res) => {
         if (cancelled) return;
-        if (!res.ok) {
-          const errVal = (res.data as { error?: unknown })?.error;
-          const errObj = errVal && typeof errVal === "object" ? (errVal as { message?: unknown }) : null;
-          const msg = typeof errVal === "string" ? errVal : (typeof errObj?.message === "string" ? errObj.message : "Failed to load");
-          setLoadError(msg);
-          setLoading(false);
-          return;
-        }
-        const s = (res.data as {
-          settings?: {
-            brewingType?: unknown;
-            sections?: BrewdaySectionConfig;
-            defaultSteps?: unknown;
-            customSteps?: BrewdayStep[];
-            notes?: unknown;
-          } | null;
-        })?.settings;
+        const s = res.settings;
         if (s) {
-          if (s.brewingType != null) setBrewingType(String(s.brewingType));
-          setSections(s.sections ?? { presetExcludes: {}, customSections: [], customBrewingMethods: [] });
-          const loadedDefault: BrewdayStep[] = Array.isArray(s.defaultSteps) ? (s.defaultSteps as BrewdayStep[]) : [];
+          if (s['brewingType'] != null) setBrewingType(String(s['brewingType']));
+          setSections((s['sections'] as BrewdaySectionConfig | undefined) ?? { presetExcludes: {}, customSections: [], customBrewingMethods: [] });
+          const loadedDefault: BrewdayStep[] = Array.isArray(s['defaultSteps']) ? (s['defaultSteps'] as BrewdayStep[]) : [];
           setDefaultSteps(loadedDefault.length > 0 ? loadedDefault : DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
-          setCustomSteps(Array.isArray(s.customSteps) ? s.customSteps : []);
-          setBrewdayNotes(typeof s.notes === "string" ? s.notes : "");
+          setCustomSteps(Array.isArray(s['customSteps']) ? (s['customSteps'] as BrewdayStep[]) : []);
+          setBrewdayNotes(typeof s['notes'] === "string" ? s['notes'] : "");
         } else {
           setSections({ presetExcludes: {}, customSections: [], customBrewingMethods: [] });
           setDefaultSteps(DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
@@ -302,21 +286,14 @@ export function BrewdayStepsSettingsScreen() {
     setSaveError(null);
     setSaveStatus(null);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
-      const res = await api.patch("/api/brewday-settings", {
+      const client = nativePlatformApiClient(token!);
+      await patchBrewdaySettings(client, {
         brewingType,
         sections,
         defaultSteps,
         customSteps,
         notes: brewdayNotes || null,
       });
-      if (!res.ok) {
-        const errVal = (res.data as { error?: unknown })?.error;
-        const errObj = errVal && typeof errVal === "object" ? (errVal as { message?: unknown }) : null;
-        const msg = typeof errVal === "string" ? errVal : (typeof errObj?.message === "string" ? errObj.message : "Save failed");
-        setSaveError(msg);
-        return;
-      }
       setSaveStatus(t("saveSuccess"));
     } catch (err) {
       setSaveError(String(err));

@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, H1, H2, SizableText, View, XStack, YStack } from "tamagui";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import { ApiClientError, createAiUpgradeBillingIntent } from "@umbraculum/api-client";
+
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 
@@ -28,27 +30,25 @@ export default function AiUpgradePage() {
     setLoading(true);
     setError(null);
     setIntentInfo(null);
-    const res = await apiFetch(`/api/workspaces/${auth.me.activeWorkspaceId}/billing/intent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ planCode: "premium", provider: "stripe", mode: "purchase" }),
-    });
-    setLoading(false);
-    if (res.ok && (res.data as { ok?: boolean })?.ok) {
-      const data = res.data as {
-        billingIntentId: string;
-        stripePricingTableId: string | null;
-        stripePublishableKey: string | null;
-      };
+    try {
+      const data = await createAiUpgradeBillingIntent(
+        webPlatformApiClient(),
+        auth.me.activeWorkspaceId,
+        { planCode: "premium", provider: "stripe", mode: "purchase" },
+      );
       setIntentInfo({
         billingIntentId: data.billingIntentId,
         stripePricingTableId: data.stripePricingTableId,
         stripePublishableKey: data.stripePublishableKey,
       });
-    } else {
+    } catch (err) {
       const message =
-        (res.data as { error?: { message?: string } })?.error?.message ?? "Unknown error";
+        err instanceof ApiClientError
+          ? ((err.body as { error?: { message?: string } })?.error?.message ?? "Unknown error")
+          : "Unknown error";
       setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 

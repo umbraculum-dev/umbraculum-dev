@@ -3,7 +3,16 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, View } fr
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import {
+  getRecipe,
+  listEquipmentProfiles,
+  listStyles,
+  patchRecipe,
+  searchFermentables as apiSearchFermentables,
+  searchHops as apiSearchHops,
+  searchYeasts as apiSearchYeasts,
+  getRecipeWaterSettings,
+} from "@umbraculum/api-client/brewery";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
@@ -34,6 +43,7 @@ import { MashStepsEditor, SpargeStepReadOnlyRow, type WaterVolumes } from "@umbr
 import { ReadOnlyField } from "../../../components/ReadOnlyField";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import { asRecord } from "../../../lib/typeGuards";
 import type { RootStackParamList } from "../../../navigation/types";
@@ -295,7 +305,7 @@ export function RecipeEditScreen() {
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
+    return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
   const analysis = (recipe as { analysis?: unknown })?.analysis;
@@ -333,9 +343,8 @@ export function RecipeEditScreen() {
     setLoading(true);
     setLoadError(null);
     try {
-      const res = await api.get(`/api/recipes/${recipeId}`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const r = (res.data as { recipe?: Recipe })?.recipe;
+      const res = await getRecipe(api, recipeId);
+      const r = (res.recipe ?? null) as Recipe | null;
       if (!r) throw new Error("Recipe not found");
       setRecipe(r);
       setName(typeof r.name === "string" ? r.name : "");
@@ -467,9 +476,8 @@ export function RecipeEditScreen() {
     if (!api) return;
     setStylesLoading(true);
     try {
-      const res = await api.get("/api/styles");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { styles?: unknown })?.styles;
+      const parsed = await listStyles(api);
+      const items = parsed.styles;
       setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
     } catch {
       setStyles([]);
@@ -483,10 +491,9 @@ export function RecipeEditScreen() {
     setEquipmentProfilesLoading(true);
     setEquipmentProfilesError(null);
     try {
-      const res = await api.get("/api/equipment-profiles");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { profiles?: unknown })?.profiles;
-      setEquipmentProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
+      const parsed = await listEquipmentProfiles(api);
+      const items = parsed.profiles;
+      setEquipmentProfiles(Array.isArray(items) ? (items as unknown as EquipmentProfile[]) : []);
     } catch (err) {
       setEquipmentProfilesError(String(err));
       setEquipmentProfiles([]);
@@ -508,9 +515,9 @@ export function RecipeEditScreen() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await api.get(`/api/recipes/${recipeId}/water-settings`);
+        const res = await getRecipeWaterSettings(api, recipeId);
         if (cancelled) return;
-        const data = (res.data as { settings?: Record<string, unknown> })?.settings;
+        const data = res.settings as Record<string, unknown> | null | undefined;
         setWaterSettings(data ?? null);
       } catch {
         if (!cancelled) setWaterSettings(null);
@@ -534,10 +541,11 @@ export function RecipeEditScreen() {
     setFermentableSearching(true);
     setFermentableSearchError(null);
     try {
-      const q = fermentableQuery.trim() ? `?query=${encodeURIComponent(fermentableQuery.trim())}&limit=20` : "?limit=20";
-      const res = await api.get(`/api/ingredients/fermentables${q}`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
+      const parsed = await apiSearchFermentables(
+        api,
+        fermentableQuery.trim() ? { query: fermentableQuery.trim(), limit: 20 } : { limit: 20 },
+      );
+      const items = parsed.items;
       setFermentableResults(Array.isArray(items) ? (items as FermentableSearchItem[]) : []);
     } catch (err) {
       setFermentableSearchError(String(err));
@@ -552,10 +560,11 @@ export function RecipeEditScreen() {
     setHopSearching(true);
     setHopSearchError(null);
     try {
-      const q = hopQuery.trim() ? `?query=${encodeURIComponent(hopQuery.trim())}&limit=20` : "?limit=20";
-      const res = await api.get(`/api/ingredients/hops${q}`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
+      const parsed = await apiSearchHops(
+        api,
+        hopQuery.trim() ? { query: hopQuery.trim(), limit: 20 } : { limit: 20 },
+      );
+      const items = parsed.items;
       setHopResults(Array.isArray(items) ? (items as HopSearchItem[]) : []);
     } catch (err) {
       setHopSearchError(String(err));
@@ -569,10 +578,8 @@ export function RecipeEditScreen() {
     if (!api) return;
     setYeastSearching(true);
     try {
-      const q = yeastQuery.trim() ? `?query=${encodeURIComponent(yeastQuery.trim())}` : "";
-      const res = await api.get(`/api/ingredients/yeasts${q}`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
+      const parsed = await apiSearchYeasts(api, yeastQuery.trim() ? { query: yeastQuery.trim() } : undefined);
+      const items = parsed.items;
       setYeastResults(Array.isArray(items) ? (items as YeastSearchItem[]) : []);
     } catch {
       setYeastResults([]);
@@ -738,8 +745,7 @@ export function RecipeEditScreen() {
         base['equipment'] = selected.equipment;
         base['equipmentSource'] = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
 
-        const res = await api.patch(`/api/recipes/${recipeId}`, { recipeExtJson: base });
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+        await patchRecipe(api, recipeId, { recipeExtJson: base });
 
         await loadRecipe();
         setSaveStatus(mode === "reload" ? t("status.equipmentReloaded") : t("status.equipmentApplied"));
@@ -865,8 +871,7 @@ export function RecipeEditScreen() {
         recipeExtJson,
       };
 
-      const res = await api.patch(`/api/recipes/${recipeId}`, payload);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await patchRecipe(api, recipeId, payload);
       setSaveStatus(t("status.saved"));
       await loadRecipe();
     } catch (err) {

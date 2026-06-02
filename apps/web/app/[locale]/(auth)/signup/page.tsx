@@ -7,7 +7,8 @@ import { Button, H1, Input, SizableText, View, YStack } from "tamagui";
 
 import { Link } from "../../../../src/i18n/navigation";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { ApiClientError, signup } from "@umbraculum/api-client";
 import { LocaleSelect } from "../_components/LocaleSelect";
 
 const AUTH_CHANGED_EVENT = "brewery:auth-changed";
@@ -49,30 +50,16 @@ export default function SignupPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await apiFetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password,
-          preferredLocale: locale,
-          workspaceName: workspaceName.trim() ? workspaceName.trim() : undefined,
-        }),
+      const body = await signup(webPlatformApiClient(), {
+        email,
+        password,
+        preferredLocale: locale,
+        workspaceName: workspaceName.trim() ? workspaceName.trim() : undefined,
       });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
 
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 
-      const activeWorkspaceId = (() => {
-        const body = res.data as { activeWorkspaceId?: unknown; activeAccountId?: unknown } | null | undefined;
-        if (body && typeof body === "object" && "activeWorkspaceId" in body) {
-          return (body.activeWorkspaceId as string | null) ?? null;
-        }
-        if (body && typeof body === "object" && "activeAccountId" in body) {
-          return (body.activeAccountId as string | null) ?? null;
-        }
-        return null;
-      })();
+      const activeWorkspaceId = body.activeWorkspaceId ?? null;
 
       if (!activeWorkspaceId) {
         router.replace(`/${locale}/select-workspace`);
@@ -80,7 +67,11 @@ export default function SignupPage() {
       }
       router.replace(`/${locale}`);
     } catch (err) {
-      setError(String(err));
+      if (err instanceof ApiClientError) {
+        setError(typeof err.body === "string" ? err.body : JSON.stringify(err.body));
+      } else {
+        setError(String(err));
+      }
     } finally {
       setSubmitting(false);
     }

@@ -2,13 +2,22 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import {
+  createWorkspaceIntegration,
+  getAuthMe,
+  getWorkspaceIntegration,
+  listIntegrationDevices,
+  revealIntegrationToken,
+  revokeIntegration,
+  rotateIntegrationToken,
+} from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Input, Screen, Spinner, Text } from "@umbraculum/ui";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 
 type IntegrationKind = "tilt" | "ispindel" | "rapt";
 const INTEGRATION_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
@@ -80,7 +89,7 @@ export function FermDataIntegrationScreen() {
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
+    return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
   const buildPublicUrl = useCallback(
@@ -98,27 +107,18 @@ export function FermDataIntegrationScreen() {
       if (!api) throw new Error("Not authenticated");
       setState((prev) => ({ ...prev, status: "loading", error: undefined }));
 
-      const meRes = await api.get("/api/auth/me");
-      if (!meRes.ok) throw new Error(typeof meRes.data === "string" ? meRes.data : JSON.stringify(meRes.data));
-      const me = meRes.data as { activeWorkspaceId?: unknown } | undefined;
-      const workspaceId = typeof me?.activeWorkspaceId === "string" ? me.activeWorkspaceId : null;
+      const me = await getAuthMe(api);
+      const workspaceId = typeof me.activeWorkspaceId === "string" ? me.activeWorkspaceId : null;
       if (!workspaceId) throw new Error("No active workspace selected");
 
       const integrationsRes = await Promise.all(
-        INTEGRATION_KINDS.map((kind) => api.get(`/api/workspaces/${workspaceId}/integrations/${kind}`)),
+        INTEGRATION_KINDS.map((kind) => getWorkspaceIntegration(api, workspaceId, kind)),
       );
       const devicesRes = await Promise.all(
         INTEGRATION_KINDS.map((kind) =>
-          api.get(`/api/workspaces/${workspaceId}/integrations/${kind}/devices?includeReadings=true&readingsLimit=200`)
-        )
+          listIntegrationDevices(api, workspaceId, kind, { includeReadings: true, readingsLimit: 200 }),
+        ),
       );
-
-      integrationsRes.forEach((res) => {
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      });
-      devicesRes.forEach((res) => {
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      });
 
       const nextIntegrations = { tilt: null, ispindel: null, rapt: null } as Record<
         IntegrationKind,
@@ -129,9 +129,8 @@ export function FermDataIntegrationScreen() {
         const intRes = integrationsRes[idx];
         const devRes = devicesRes[idx];
         if (!intRes || !devRes) return;
-        const integration = (intRes.data as { integration?: unknown })?.integration;
-        nextIntegrations[kind] = (integration ?? null) as IntegrationSummary | null;
-        const devices = (devRes.data as { devices?: unknown })?.devices;
+        nextIntegrations[kind] = (intRes.integration ?? null) as IntegrationSummary | null;
+        const devices = devRes.devices;
         nextDevices[kind] = Array.isArray(devices) ? (devices as IntegrationDevice[]) : [];
       });
 
@@ -174,10 +173,8 @@ export function FermDataIntegrationScreen() {
       if (!api) throw new Error("Not authenticated");
       if (!state.workspaceId) throw new Error("No active workspace selected");
       setWorking(kind, "reveal");
-      const res = await api.get(`/api/workspaces/${state.workspaceId}/integrations/${kind}/reveal`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const body = res.data as { token?: unknown; publicPath?: unknown } | undefined;
-      updateTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
+      const body = await revealIntegrationToken(api, state.workspaceId, kind);
+      updateTokens(kind, String(body.token ?? ""), String(body.publicPath ?? ""));
     } catch (err) {
       Alert.alert(t("sections.integration.title"), String(err));
     } finally {
@@ -190,10 +187,8 @@ export function FermDataIntegrationScreen() {
       if (!api) throw new Error("Not authenticated");
       if (!state.workspaceId) throw new Error("No active workspace selected");
       setWorking(kind, "create");
-      const res = await api.post(`/api/workspaces/${state.workspaceId}/integrations/${kind}`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const body = res.data as { token?: unknown; publicPath?: unknown } | undefined;
-      updateTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
+      const body = await createWorkspaceIntegration(api, state.workspaceId, kind);
+      updateTokens(kind, String(body.token ?? ""), String(body.publicPath ?? ""));
       await refresh();
     } catch (err) {
       Alert.alert(t("sections.integration.title"), String(err));
@@ -207,10 +202,8 @@ export function FermDataIntegrationScreen() {
       if (!api) throw new Error("Not authenticated");
       if (!state.workspaceId) throw new Error("No active workspace selected");
       setWorking(kind, "rotate");
-      const res = await api.post(`/api/workspaces/${state.workspaceId}/integrations/${kind}/rotate-token`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const body = res.data as { token?: unknown; publicPath?: unknown } | undefined;
-      updateTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
+      const body = await rotateIntegrationToken(api, state.workspaceId, kind);
+      updateTokens(kind, String(body.token ?? ""), String(body.publicPath ?? ""));
       await refresh();
     } catch (err) {
       Alert.alert(t("sections.integration.title"), String(err));
@@ -224,8 +217,7 @@ export function FermDataIntegrationScreen() {
       if (!api) throw new Error("Not authenticated");
       if (!state.workspaceId) throw new Error("No active workspace selected");
       setWorking(kind, "revoke");
-      const res = await api.post(`/api/workspaces/${state.workspaceId}/integrations/${kind}/revoke`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await revokeIntegration(api, state.workspaceId, kind);
       updateTokens(kind, "", "");
       await refresh();
     } catch (err) {

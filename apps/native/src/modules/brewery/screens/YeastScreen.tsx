@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getRecipe, patchRecipe, searchYeasts as apiSearchYeasts } from "@umbraculum/api-client/brewery";
 import {
   buildBeerJsonRecipeDocument,
   buildRecipeExtJsonFromEditorState,
@@ -32,6 +32,7 @@ import { ReadOnlyField } from "../../../components/ReadOnlyField";
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import { asRecord } from "../../../lib/typeGuards";
 import type { RootStackParamList } from "../../../navigation/types";
@@ -157,10 +158,13 @@ export function YeastScreen() {
 
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-    const res = await api.get(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    const client = nativePlatformApiClient(token);
+    try {
+      const res = await getRecipe(client, id);
+      return parseRecipeMetaFromGetRecipeResponse(res);
+    } catch {
+      return null;
+    }
   }, [baseUrl, token]);
 
   const { t } = useT("recipes.edit");
@@ -191,7 +195,7 @@ export function YeastScreen() {
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
+    return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
   useEffect(() => {
@@ -214,9 +218,8 @@ export function YeastScreen() {
     setLoading(true);
     setLoadError(null);
     try {
-      const res = await api.get(`/api/recipes/${recipeId}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const r = (res.data as { recipe: Recipe }).recipe;
+      const res = await getRecipe(api, recipeId);
+      const r = res.recipe as Recipe;
       setRecipe(r);
 
       const extRec = asRecord(r.recipeExtJson);
@@ -296,11 +299,20 @@ export function YeastScreen() {
     if (!api) return;
     setYeastSearching(true);
     try {
-      const q = yeastQuery.trim() ? `?query=${encodeURIComponent(yeastQuery.trim())}` : "";
-      const res = await api.get(`/api/ingredients/yeasts${q}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
-      setYeastResults(Array.isArray(items) ? items : []);
+      const parsed = await apiSearchYeasts(
+        api,
+        yeastQuery.trim() ? { query: yeastQuery.trim() } : undefined,
+      );
+      type YeastSearchResult = {
+        id: string;
+        name: string;
+        lab?: string | null;
+        productId?: string | null;
+        attenuationMin?: number;
+        attenuationMax?: number;
+      };
+      const items = parsed.items;
+      setYeastResults(Array.isArray(items) ? (items as YeastSearchResult[]) : []);
     } catch {
       setYeastResults([]);
     } finally {
@@ -424,18 +436,16 @@ export function YeastScreen() {
         extBase: extBaseForSave,
       });
 
-      const res = await api.patch(`/api/recipes/${recipeId}`, {
+      await patchRecipe(api, recipeId, {
         name: recipe.name,
         styleKey: recipe.styleKey,
         notes: recipe.notes ?? null,
         beerJsonRecipeJson,
         recipeExtJson,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
 
-      const reload = await api.get(`/api/recipes/${recipeId}`);
-      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as { recipe: Recipe }).recipe;
+      const reload = await getRecipe(api, recipeId);
+      const r = reload.recipe as Recipe;
       setRecipe(r);
       setSaveStatus(t("status.saved"));
 

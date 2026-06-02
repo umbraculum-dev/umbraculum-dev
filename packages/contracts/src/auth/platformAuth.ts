@@ -161,3 +161,4 @@ export const AuthActiveWorkspaceResponseSchema = z.object({
 
 export type AuthSignupRequest = z.infer<typeof AuthSignupRequestSchema>;
 export type AuthLoginRequest = z.infer<typeof AuthLoginRequestSchema>;
+export type AuthActiveWorkspaceRequest = z.infer<typeof AuthActiveWorkspaceRequestSchema>;

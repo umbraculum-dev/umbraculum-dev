@@ -20,13 +20,23 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/pim/index.ts
 var pim_exports = {};
 __export(pim_exports, {
+  createAttribute: () => createAttribute,
   createProduct: () => createProduct,
+  createProductMediaAssetRef: () => createProductMediaAssetRef,
+  deleteAttribute: () => deleteAttribute,
+  deleteMediaAssetRef: () => deleteMediaAssetRef,
+  getAttribute: () => getAttribute,
   getAttributeSet: () => getAttributeSet,
+  getMediaAssetRef: () => getMediaAssetRef,
   getProduct: () => getProduct,
   listAttributeSets: () => listAttributeSets,
+  listAttributes: () => listAttributes,
   listCategories: () => listCategories,
+  listProductMediaAssetRefs: () => listProductMediaAssetRefs,
   listProductVariants: () => listProductVariants,
-  listProducts: () => listProducts
+  listProducts: () => listProducts,
+  patchAttribute: () => patchAttribute,
+  patchMediaAssetRef: () => patchMediaAssetRef
 });
 module.exports = __toCommonJS(pim_exports);
 
@@ -67,6 +77,16 @@ async function postParsed(client, path, body, parse, expectedStatus = 200) {
   assertOk(res, expectedStatus);
   return parse(res.data);
 }
+async function patchParsed(client, path, body, parse, expectedStatus = 200) {
+  const res = await client.patch(path, body);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
+async function deleteParsed(client, path, parse, expectedStatus = 200) {
+  const res = await client.delete(path);
+  assertOk(res, expectedStatus);
+  return parse(res.data);
+}
 
 // src/pim/products.ts
 async function listProducts(client) {
@@ -100,39 +120,135 @@ async function listProductVariants(client, productId) {
   );
 }
 
-// src/pim/attributeSets.ts
+// src/pim/attributes.ts
 var import_pim_contracts2 = require("@umbraculum/pim-contracts");
+async function listAttributes(client) {
+  return getParsed(
+    client,
+    toClientPath("/pim/attributes"),
+    (data) => import_pim_contracts2.AttributeListResponseSchema.parse(data)
+  );
+}
+async function createAttribute(client, body) {
+  const parsedBody = import_pim_contracts2.AttributeCreateRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath("/pim/attributes"),
+    parsedBody,
+    (data) => import_pim_contracts2.AttributeGetResponseSchema.parse(data),
+    201
+  );
+}
+async function getAttribute(client, attributeId) {
+  return getParsed(
+    client,
+    toClientPath(`/pim/attributes/${encodeURIComponent(attributeId)}`),
+    (data) => import_pim_contracts2.AttributeGetResponseSchema.parse(data)
+  );
+}
+async function patchAttribute(client, attributeId, body) {
+  const parsedBody = import_pim_contracts2.AttributeUpdateRequestSchema.parse(body);
+  return patchParsed(
+    client,
+    toClientPath(`/pim/attributes/${encodeURIComponent(attributeId)}`),
+    parsedBody,
+    (data) => import_pim_contracts2.AttributeGetResponseSchema.parse(data)
+  );
+}
+async function deleteAttribute(client, attributeId) {
+  return deleteParsed(
+    client,
+    toClientPath(`/pim/attributes/${encodeURIComponent(attributeId)}`),
+    (data) => import_pim_contracts2.PimDeleteResponseSchema.parse(data)
+  );
+}
+
+// src/pim/attributeSets.ts
+var import_pim_contracts3 = require("@umbraculum/pim-contracts");
 async function listAttributeSets(client) {
   return getParsed(
     client,
     toClientPath("/pim/attribute-sets"),
-    (data) => import_pim_contracts2.AttributeSetListResponseSchema.parse(data)
+    (data) => import_pim_contracts3.AttributeSetListResponseSchema.parse(data)
   );
 }
 async function getAttributeSet(client, setId) {
   return getParsed(
     client,
     toClientPath(`/pim/attribute-sets/${encodeURIComponent(setId)}`),
-    (data) => import_pim_contracts2.AttributeSetGetResponseSchema.parse(data)
+    (data) => import_pim_contracts3.AttributeSetGetResponseSchema.parse(data)
   );
 }
 
 // src/pim/categories.ts
-var import_pim_contracts3 = require("@umbraculum/pim-contracts");
+var import_pim_contracts4 = require("@umbraculum/pim-contracts");
 async function listCategories(client) {
   return getParsed(
     client,
     toClientPath("/pim/categories"),
-    (data) => import_pim_contracts3.CategoryListResponseSchema.parse(data)
+    (data) => import_pim_contracts4.CategoryListResponseSchema.parse(data)
+  );
+}
+
+// src/pim/mediaAssetRefs.ts
+var import_pim_contracts5 = require("@umbraculum/pim-contracts");
+async function listProductMediaAssetRefs(client, productId) {
+  return getParsed(
+    client,
+    toClientPath(`/pim/products/${encodeURIComponent(productId)}/media-asset-refs`),
+    (data) => import_pim_contracts5.MediaAssetRefListResponseSchema.parse(data)
+  );
+}
+async function createProductMediaAssetRef(client, productId, body) {
+  const parsedBody = import_pim_contracts5.MediaAssetRefCreateRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath(`/pim/products/${encodeURIComponent(productId)}/media-asset-refs`),
+    parsedBody,
+    (data) => import_pim_contracts5.MediaAssetRefGetResponseSchema.parse(data),
+    201
+  );
+}
+async function getMediaAssetRef(client, mediaAssetRefId) {
+  return getParsed(
+    client,
+    toClientPath(`/pim/media-asset-refs/${encodeURIComponent(mediaAssetRefId)}`),
+    (data) => import_pim_contracts5.MediaAssetRefGetResponseSchema.parse(data)
+  );
+}
+async function patchMediaAssetRef(client, mediaAssetRefId, body) {
+  const parsedBody = import_pim_contracts5.MediaAssetRefUpdateRequestSchema.parse(body);
+  return patchParsed(
+    client,
+    toClientPath(`/pim/media-asset-refs/${encodeURIComponent(mediaAssetRefId)}`),
+    parsedBody,
+    (data) => import_pim_contracts5.MediaAssetRefGetResponseSchema.parse(data)
+  );
+}
+async function deleteMediaAssetRef(client, mediaAssetRefId) {
+  return deleteParsed(
+    client,
+    toClientPath(`/pim/media-asset-refs/${encodeURIComponent(mediaAssetRefId)}`),
+    (data) => import_pim_contracts5.PimDeleteResponseSchema.parse(data)
   );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  createAttribute,
   createProduct,
+  createProductMediaAssetRef,
+  deleteAttribute,
+  deleteMediaAssetRef,
+  getAttribute,
   getAttributeSet,
+  getMediaAssetRef,
   getProduct,
   listAttributeSets,
+  listAttributes,
   listCategories,
+  listProductMediaAssetRefs,
   listProductVariants,
-  listProducts
+  listProducts,
+  patchAttribute,
+  patchMediaAssetRef
 });

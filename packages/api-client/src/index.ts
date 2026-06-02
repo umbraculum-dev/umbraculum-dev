@@ -14,6 +14,9 @@ export type { ApiClientCredentials, ApiRequestInit, FetchLike, FetchResponseLike
 export * from "./platform/auth.js";
 export * from "./platform/workspaces.js";
 export * from "./platform/modules.js";
+export * from "./platform/ai.js";
+export * from "./platform/ads.js";
+export * from "./platform/platformAdmin.js";
 export {
   fetchRenderJobDownloadUrl,
   pollRenderJobUntilSucceeded,

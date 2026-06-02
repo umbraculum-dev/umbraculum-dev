@@ -8,7 +8,8 @@ import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox } from "../../../_components/recipe-edit";
 import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
-import { apiFetch } from "../../../_lib/apiClient";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
+import { ApiClientError, setActiveWorkspace } from "@umbraculum/api-client";
 import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";
 import type { AuthMeResponseWorkspace } from "@umbraculum/contracts";
 
@@ -72,16 +73,15 @@ export default function SelectWorkspacePage() {
       const brandKey = (picked?.brandKey && typeof picked.brandKey === "string" ? picked.brandKey : "default") ?? "default";
       setBrand(brandKey);
 
-      const res = await apiFetch("/api/auth/active-workspace", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workspaceId }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await setActiveWorkspace(webPlatformApiClient(), { workspaceId });
       window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
       router.replace(`/${locale}`);
     } catch (err) {
-      setError(String(err));
+      if (err instanceof ApiClientError) {
+        setError(typeof err.body === "string" ? err.body : JSON.stringify(err.body));
+      } else {
+        setError(String(err));
+      }
     } finally {
       setSubmittingId(null);
     }

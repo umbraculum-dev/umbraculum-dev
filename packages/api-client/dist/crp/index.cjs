@@ -20,12 +20,24 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/crp/index.ts
 var crp_exports = {};
 __export(crp_exports, {
+  capacityLoadRenderJobsPath: () => capacityLoadRenderJobsPath,
+  conflictsRenderJobsPath: () => conflictsRenderJobsPath,
   getCapacityLoad: () => getCapacityLoad,
   getResource: () => getResource,
   listCapacityConflicts: () => listCapacityConflicts,
   listResources: () => listResources,
   listScheduledOperations: () => listScheduledOperations,
-  listWorkCenters: () => listWorkCenters
+  listWorkCenters: () => listWorkCenters,
+  resourcesCalendarRenderJobsPath: () => resourcesCalendarRenderJobsPath,
+  runCapacityLoadRenderJobExport: () => runCapacityLoadRenderJobExport,
+  runConflictsRenderJobExport: () => runConflictsRenderJobExport,
+  runResourcesCalendarRenderJobExport: () => runResourcesCalendarRenderJobExport,
+  runScheduleRenderJobExport: () => runScheduleRenderJobExport,
+  scheduleRenderJobsPath: () => scheduleRenderJobsPath,
+  submitCapacityLoadRenderJob: () => submitCapacityLoadRenderJob,
+  submitConflictsRenderJob: () => submitConflictsRenderJob,
+  submitResourcesCalendarRenderJob: () => submitResourcesCalendarRenderJob,
+  submitScheduleRenderJob: () => submitScheduleRenderJob
 });
 module.exports = __toCommonJS(crp_exports);
 
@@ -60,6 +72,70 @@ async function getParsed(client, path, parse, expectedStatus = 200) {
   const res = await client.get(path);
   assertOk(res, expectedStatus);
   return parse(res.data);
+}
+
+// src/platform/rendering.ts
+var import_contracts = require("@umbraculum/contracts");
+var POLL_INTERVAL_MS = 50;
+var POLL_TIMEOUT_MS = 15e3;
+function toWebArtifactUrl(signedUrl, apiBaseUrl) {
+  if (signedUrl.startsWith("/api/")) return signedUrl;
+  if (signedUrl.startsWith("/rendering/")) return `/api${signedUrl}`;
+  if (signedUrl.startsWith("/") && apiBaseUrl) {
+    const base = apiBaseUrl.replace(/\/+$/, "");
+    return `${base}${signedUrl.startsWith("/api") ? signedUrl : `/api${signedUrl}`}`;
+  }
+  return signedUrl;
+}
+function resolveArtifactDownloadUrl(signedUrl, options) {
+  if (options?.platform === "web") {
+    return toWebArtifactUrl(signedUrl);
+  }
+  if (signedUrl.startsWith("http://") || signedUrl.startsWith("https://")) {
+    return signedUrl;
+  }
+  const base = options?.apiBaseUrl?.replace(/\/+$/, "") ?? "";
+  if (!base) return signedUrl;
+  if (signedUrl.startsWith("/api/")) return `${base}${signedUrl.slice(4)}`;
+  if (signedUrl.startsWith("/")) return `${base}${signedUrl}`;
+  return signedUrl;
+}
+async function submitRenderJob(client, postUrl, body) {
+  const res = await client.post(postUrl, body ?? {});
+  assertOk(res, 202);
+  const parsed = import_contracts.RenderJobSubmitResponseSchema.parse(res.data);
+  return { jobId: parsed.job.id };
+}
+async function pollRenderJobUntilSucceeded(client, jobId) {
+  const deadline = Date.now() + POLL_TIMEOUT_MS;
+  let lastStatus = "";
+  const statusPath = `/api/rendering/jobs/${encodeURIComponent(jobId)}`;
+  while (Date.now() < deadline) {
+    const res = await client.get(statusPath);
+    assertOk(res, 200);
+    const body = import_contracts.RenderJobStatusResponseSchema.parse(res.data);
+    lastStatus = body.job.status;
+    if (body.job.status === "succeeded") return;
+    if (body.job.status === "failed") {
+      throw new Error(body.job.error?.code ?? "render_job_failed");
+    }
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+  }
+  throw new Error(`Render job timed out (last status=${lastStatus})`);
+}
+async function fetchRenderJobDownloadUrl(client, jobId, options) {
+  const res = await client.get(`/api/rendering/jobs/${encodeURIComponent(jobId)}/result`);
+  assertOk(res, 200);
+  const body = import_contracts.RenderJobResultResponseSchema.parse(res.data);
+  return resolveArtifactDownloadUrl(body.signedUrl, options);
+}
+async function runAsyncRenderJobExport(client, postUrl, options) {
+  const { jobId } = await submitRenderJob(client, postUrl, options?.body);
+  await pollRenderJobUntilSucceeded(client, jobId);
+  const downloadOpts = {};
+  if (options?.platform !== void 0) downloadOpts.platform = options.platform;
+  if (options?.apiBaseUrl !== void 0) downloadOpts.apiBaseUrl = options.apiBaseUrl;
+  return fetchRenderJobDownloadUrl(client, jobId, downloadOpts);
 }
 
 // src/crp/planning.ts
@@ -105,12 +181,88 @@ async function getCapacityLoad(client) {
     (data) => import_crp_contracts.CapacityLoadResponseSchema.parse(data)
   );
 }
+function capacityLoadRenderJobsPath(resourceId) {
+  const base = toClientPath("/crp/capacity-load/render-jobs");
+  if (!resourceId) return base;
+  return `${base}?resourceId=${encodeURIComponent(resourceId)}`;
+}
+function scheduleRenderJobsPath() {
+  return toClientPath("/crp/schedule/render-jobs");
+}
+function resourcesCalendarRenderJobsPath() {
+  return toClientPath("/crp/resources/calendar/render-jobs");
+}
+function conflictsRenderJobsPath() {
+  return toClientPath("/crp/conflicts/render-jobs");
+}
+async function submitCapacityLoadRenderJob(client, options) {
+  const body = {};
+  if (options?.visibility !== void 0) body.visibility = options.visibility;
+  return submitRenderJob(client, capacityLoadRenderJobsPath(options?.resourceId), body);
+}
+async function submitScheduleRenderJob(client, body) {
+  return submitRenderJob(client, scheduleRenderJobsPath(), body ?? {});
+}
+async function submitResourcesCalendarRenderJob(client, body) {
+  return submitRenderJob(client, resourcesCalendarRenderJobsPath(), body ?? {});
+}
+async function submitConflictsRenderJob(client, body) {
+  return submitRenderJob(client, conflictsRenderJobsPath(), body ?? {});
+}
+function renderJobExportOpts(body, options) {
+  const exportOpts = {
+    body
+  };
+  if (options?.platform !== void 0) exportOpts.platform = options.platform;
+  if (options?.apiBaseUrl !== void 0) exportOpts.apiBaseUrl = options.apiBaseUrl;
+  return exportOpts;
+}
+async function runCapacityLoadRenderJobExport(client, options) {
+  const body = {};
+  if (options?.visibility !== void 0) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(
+    client,
+    capacityLoadRenderJobsPath(options?.resourceId),
+    renderJobExportOpts(body, options)
+  );
+}
+async function runScheduleRenderJobExport(client, options) {
+  const body = {};
+  if (options?.visibility !== void 0) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(client, scheduleRenderJobsPath(), renderJobExportOpts(body, options));
+}
+async function runResourcesCalendarRenderJobExport(client, options) {
+  const body = {};
+  if (options?.visibility !== void 0) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(
+    client,
+    resourcesCalendarRenderJobsPath(),
+    renderJobExportOpts(body, options)
+  );
+}
+async function runConflictsRenderJobExport(client, options) {
+  const body = {};
+  if (options?.visibility !== void 0) body.visibility = options.visibility;
+  return runAsyncRenderJobExport(client, conflictsRenderJobsPath(), renderJobExportOpts(body, options));
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  capacityLoadRenderJobsPath,
+  conflictsRenderJobsPath,
   getCapacityLoad,
   getResource,
   listCapacityConflicts,
   listResources,
   listScheduledOperations,
-  listWorkCenters
+  listWorkCenters,
+  resourcesCalendarRenderJobsPath,
+  runCapacityLoadRenderJobExport,
+  runConflictsRenderJobExport,
+  runResourcesCalendarRenderJobExport,
+  runScheduleRenderJobExport,
+  scheduleRenderJobsPath,
+  submitCapacityLoadRenderJob,
+  submitConflictsRenderJob,
+  submitResourcesCalendarRenderJob,
+  submitScheduleRenderJob
 });

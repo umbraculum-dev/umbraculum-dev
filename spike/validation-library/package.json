@@ -6,7 +6,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "bundle:zod": "esbuild zod/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/zod.bundle.js && gzip -kf dist/zod.bundle.js && ls -la dist/zod.bundle.js.gz",
-    "bundle:valibot": "esbuild valibot/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/valibot.bundle.js && gzip -kf dist/valibot.bundle.js && ls -la dist/valibot.bundle.js.gz"
+    "bundle:valibot": "esbuild valibot/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/valibot.bundle.js && gzip -kf dist/valibot.bundle.js && ls -la dist/valibot.bundle.js.gz",
+    "bundle:native-e6d": "esbuild native-e6d-facades/e6d-native.ts --bundle --minify --platform=browser --format=esm --outfile=dist/native-e6d-native.bundle.js && gzip -kf dist/native-e6d-native.bundle.js && ls -la dist/native-e6d-native.bundle.js.gz"
   },
   "dependencies": {
     "zod": "^4.3.6",

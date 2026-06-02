@@ -5,8 +5,13 @@ import { useTranslations } from "next-intl";
 import { Button, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
 import type { WorkspaceAiSettings } from "@umbraculum/contracts";
+import {
+  ApiClientError,
+  getWorkspaceAiSettings,
+  patchWorkspaceAiSettings,
+} from "@umbraculum/api-client";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 
@@ -40,6 +45,11 @@ function settingsToForm(s: WorkspaceAiSettings): FormState {
 
 const CONCIERGE_URL = process.env['NEXT_PUBLIC_CONCIERGE_BOOKING_URL'] ?? "";
 
+function apiErrorMessage(body: unknown): string {
+  const errData = body as { error?: { message?: string } } | undefined;
+  return errData?.error?.message ?? (typeof body === "string" ? body : JSON.stringify(body));
+}
+
 export default function AiSettingsPage() {
   const tCommon = useTranslations("common");
   const tSettings = useTranslations("ai.settings");
@@ -59,13 +69,15 @@ export default function AiSettingsPage() {
   const loadSettings = useCallback(async () => {
     if (!workspaceId) return;
     setLoading(true);
-    const res = await apiFetch(`/api/workspaces/${workspaceId}/ai/settings`);
-    if (res.ok && (res.data as { ok?: boolean })?.ok) {
-      const next = (res.data as { settings: WorkspaceAiSettings }).settings;
-      setSettings(next);
-      setForm(settingsToForm(next));
+    try {
+      const res = await getWorkspaceAiSettings(webPlatformApiClient(), workspaceId);
+      setSettings(res.settings);
+      setForm(settingsToForm(res.settings));
+    } catch {
+      // keep prior state on load failure
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [workspaceId]);
 
   useEffect(() => {
@@ -77,32 +89,28 @@ export default function AiSettingsPage() {
     setSaving(true);
     setSaved(false);
     setSaveError(null);
-    const body: Record<string, unknown> = {
-      enabled: form.enabled,
-      roleLimits: form.roleLimits,
-      perUserDailyCap: form.perUserDailyCap,
-      dataEgressAccepted: form.dataEgressAccepted,
-    };
-    if (form.clearKey) {
-      body['apiKey'] = "";
-    } else if (form.apiKey.length > 0) {
-      body['apiKey'] = form.apiKey;
-    }
-    const res = await apiFetch(`/api/workspaces/${workspaceId}/ai/settings`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    setSaving(false);
-    if (res.ok && (res.data as { ok?: boolean })?.ok) {
-      const next = (res.data as { settings: WorkspaceAiSettings }).settings;
-      setSettings(next);
-      setForm(settingsToForm(next));
+    try {
+      const payload: Record<string, unknown> = {
+        enabled: form.enabled,
+        roleLimits: form.roleLimits,
+        perUserDailyCap: form.perUserDailyCap,
+        dataEgressAccepted: form.dataEgressAccepted,
+      };
+      if (form.clearKey) {
+        payload['apiKey'] = "";
+      } else if (form.apiKey.length > 0) {
+        payload['apiKey'] = form.apiKey;
+      }
+      const res = await patchWorkspaceAiSettings(webPlatformApiClient(), workspaceId, payload);
+      setSettings(res.settings);
+      setForm(settingsToForm(res.settings));
       setSaved(true);
-    } else {
+    } catch (err) {
       const message =
-        (res.data as { error?: { message?: string } })?.error?.message ?? "Save failed";
+        err instanceof ApiClientError ? apiErrorMessage(err.body) : String(err);
       setSaveError(message);
+    } finally {
+      setSaving(false);
     }
   };
 

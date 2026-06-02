@@ -2,13 +2,25 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Linking, ScrollView, View } from "react-native";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient, runAsyncRenderJobExport } from "@umbraculum/api-client";
+import {
+  getAuthMe,
+  listIntegrationDevices,
+  runAsyncRenderJobExport,
+} from "@umbraculum/api-client";
+import {
+  attachBrewSessionIntegration,
+  detachBrewSessionIntegration,
+  getBrewSession,
+  listBrewSessionIntegrationAttachments,
+  listBrewSessionIntegrationReadings,
+} from "@umbraculum/api-client/brewery";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, SelectField, Text } from "@umbraculum/ui";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 
 type IntegrationKind = "tilt" | "ispindel" | "rapt";
 const _INTEGRATION_KINDS: IntegrationKind[] = ["tilt", "ispindel", "rapt"];
@@ -63,8 +75,8 @@ export function BrewSessionDetailScreen() {
   const [exportingPdf, setExportingPdf] = useState(false);
 
   const api = useMemo(() => {
-    if (!canCall) return null;
-    return createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
+    if (!canCall || state.status !== "logged_in") return null;
+    return nativePlatformApiClient(state.token);
   }, [canCall, state]);
 
   const refreshSession = useCallback(async () => {
@@ -72,11 +84,9 @@ export function BrewSessionDetailScreen() {
     setError(null);
     setLoading(true);
     try {
-      const [meRes, sessionRes] = await Promise.all([api.get("/api/auth/me"), api.get(`/api/brew-sessions/${brewSessionId}`)]);
-      if (!meRes.ok) throw new Error(typeof meRes.data === "string" ? meRes.data : JSON.stringify(meRes.data));
-      if (!sessionRes.ok) throw new Error(typeof sessionRes.data === "string" ? sessionRes.data : JSON.stringify(sessionRes.data));
-      const workspace = (meRes.data as { activeWorkspaceId?: unknown })?.activeWorkspaceId ?? null;
-      const s = (sessionRes.data as { brewSession?: BrewSessionDetail | null })?.brewSession ?? null;
+      const [me, sessionRes] = await Promise.all([getAuthMe(api), getBrewSession(api, brewSessionId)]);
+      const workspace = me.activeWorkspaceId ?? null;
+      const s = (sessionRes.brewSession ?? null) as BrewSessionDetail | null;
       setWorkspaceId(typeof workspace === "string" ? workspace : null);
       setSession(s);
     } catch (err) {
@@ -93,18 +103,14 @@ export function BrewSessionDetailScreen() {
       setWorking("refresh");
       try {
         const [devicesRes, attachmentsRes, readingsRes] = await Promise.all([
-          api.get(`/api/workspaces/${workspaceId}/integrations/${kind}/devices`),
-          api.get(`/api/brew-sessions/${brewSessionId}/integrations/attachments`),
-          api.get(`/api/brew-sessions/${brewSessionId}/integrations/readings?kind=${kind}&limit=200`),
+          listIntegrationDevices(api, workspaceId, kind),
+          listBrewSessionIntegrationAttachments(api, brewSessionId),
+          listBrewSessionIntegrationReadings(api, brewSessionId, { kind, limit: 200 }),
         ]);
-        if (!devicesRes.ok) throw new Error(typeof devicesRes.data === "string" ? devicesRes.data : JSON.stringify(devicesRes.data));
-        if (!attachmentsRes.ok)
-          throw new Error(typeof attachmentsRes.data === "string" ? attachmentsRes.data : JSON.stringify(attachmentsRes.data));
-        if (!readingsRes.ok) throw new Error(typeof readingsRes.data === "string" ? readingsRes.data : JSON.stringify(readingsRes.data));
 
-        const rawDevices = (devicesRes.data as { devices?: unknown })?.devices;
-        const rawAttachments = (attachmentsRes.data as { attachments?: unknown })?.attachments;
-        const rawReadings = (readingsRes.data as { readings?: unknown })?.readings;
+        const rawDevices = devicesRes.devices;
+        const rawAttachments = attachmentsRes.attachments;
+        const rawReadings = readingsRes.readings;
         const nextDevices: HydrometerDevice[] = Array.isArray(rawDevices) ? (rawDevices as HydrometerDevice[]) : [];
         const nextAttachments: HydrometerAttachment[] = Array.isArray(rawAttachments)
           ? (rawAttachments as HydrometerAttachment[])
@@ -138,11 +144,10 @@ export function BrewSessionDetailScreen() {
     setHydrometerError(null);
     setWorking("attach");
     try {
-      const res = await api.post(`/api/brew-sessions/${brewSessionId}/integrations/attach`, {
+      await attachBrewSessionIntegration(api, brewSessionId, {
         kind: hydrometerKind,
         deviceId: selectedDeviceId,
       });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       await refreshHydrometers(hydrometerKind);
     } catch (err) {
       setHydrometerError(String(err));
@@ -158,10 +163,9 @@ export function BrewSessionDetailScreen() {
     setHydrometerError(null);
     setWorking("detach");
     try {
-      const res = await api.post(`/api/brew-sessions/${brewSessionId}/integrations/detach`, {
+      await detachBrewSessionIntegration(api, brewSessionId, {
         deviceId: attached.device.id,
       });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       await refreshHydrometers(hydrometerKind);
     } catch (err) {
       setHydrometerError(String(err));

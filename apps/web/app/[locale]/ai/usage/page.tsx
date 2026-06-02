@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { H1, H2, SizableText, Spinner, View, XStack, YStack } from "tamagui";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import { ApiClientError, getWorkspaceAiUsage } from "@umbraculum/api-client";
+import type { WorkspaceAiUsageResponse } from "@umbraculum/contracts";
+
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 
@@ -43,16 +46,7 @@ interface UserAlert {
   percent: number;
 }
 
-interface UsageResponse {
-  ok: true;
-  monthly: { tokensIn: number; tokensOut: number; costMicroUsd: number; callCount: number };
-  dailySeries: DailyPoint[];
-  roleLimits: Record<string, number>;
-  roleUsage: Record<string, number>;
-  perUserDailyCap: number;
-  byUser: ByUserRow[];
-  alerts: { roleAlerts: RoleAlert[]; userAlerts: UserAlert[] };
-}
+interface UsageResponse extends WorkspaceAiUsageResponse {}
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat().format(n);
@@ -82,15 +76,16 @@ export default function AiUsagePage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/ai/usage`);
-      if (!res.ok) {
-        const body = (res.data ?? {}) as { error?: { message?: string } };
-        throw new Error(body.error?.message ?? `HTTP ${res.status}`);
-      }
-      const body = res.data as UsageResponse;
+      const body = await getWorkspaceAiUsage(webPlatformApiClient(), workspaceId);
       setData(body);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      const message =
+        err instanceof ApiClientError
+          ? ((err.body as { error?: { message?: string } })?.error?.message ?? err.message)
+          : err instanceof Error
+            ? err.message
+            : String(err);
+      setError(message);
     } finally {
       setLoading(false);
     }

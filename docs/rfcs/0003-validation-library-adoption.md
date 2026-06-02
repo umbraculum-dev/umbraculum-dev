@@ -1,7 +1,7 @@
 # RFC-0003 — Validation-library adoption
 
 **Tier:** Public
-**Status:** Accepted 2026-05-19 (Phase 1 spike landed paper-design with PASS verdict on all three falsifiable tests; container-side bundle measurement pending as follow-up F7. This is a living RFC — see §15 Resolution for the change procedure.)
+**Status:** Accepted 2026-05-19 (Phase 1 spike landed paper-design with PASS verdict on all three falsifiable tests; container-side bundle measurement closed as F7 on 2026-06-02 — see §16. This is a living RFC — see §15 Resolution for the change procedure.)
 **Audience:** prospective contributors, self-hosters, third-party module developers, hosted-service customers, and anyone evaluating Umbraculum as a long-term operational dependency.
 **Document role:** canonical runtime-validation decision for contracts packages and schema-bound API routes.
 
@@ -376,7 +376,7 @@ Spike scaffold at [`spike/validation-library/`](../../spike/validation-library/)
 | Falsifiable test (audit §5.6) | Zod v4 result | Valibot result | Pass / Fail |
 |---|---|---|---|
 | (1) Ergonomics vs hand-rolled | LOC schema-only: 56 (mailbox), 67 (acid-block), 7 (signup body). Reduction vs hand-rolled: -67% / -48% / -70%. Type inference: byte-equivalent to hand-rolled interfaces under all 6 strict flags. Error shape: structured `path` arrays + machine-readable `code` (richer than hand-rolled string format) | LOC schema-only: 75 / 84 / 9. Reduction vs hand-rolled: -55% / -35% / -61%. Type inference: byte-equivalent. Error shape: structured paths (richer than hand-rolled) | **PASS** for both. Zod wins on ergonomics by ~12% smaller schema-only LOC + chained-method API |
-| (2) Bundle delta on `apps/native` ≤ 10 KB gzipped | Paper estimate: 6–8 KB gzipped (Zod v4 standard, contracts-surface tree-shaken). Container-side measurement deferred to F7 follow-up | Paper estimate: 3–5 KB gzipped (Valibot, modular). Container-side measurement deferred to F7 follow-up | **PASS (paper-design)**, **PENDING (container)**. Both libraries' paper estimates are well under the 10 KB stop condition |
+| (2) Bundle delta on `apps/native` ≤ 10 KB gzipped | Paper estimate: 6–8 KB gzipped (Zod v4 standard, contracts-surface tree-shaken). **Container measurement (F7, 2026-06-02):** marginal E6d-native facade import graph +867 bytes gzipped over transport-only baseline via esbuild (`spike/validation-library/native-e6d-facades/`). | Paper estimate: 3–5 KB gzipped (Valibot, modular). Container-side measurement deferred to F7 follow-up | **PASS**. Zod marginal facade cost **867 bytes gzipped** — well under 10 KB stop condition |
 | (3) Fastify type-provider compatibility | `fastify-type-provider-zod` mature, well-documented, no known incompatibilities with `@fastify/cookie` or `@fastify/rate-limit`. Spike route file compiles cleanly | Valibot Fastify integration via `@valibot/to-json-schema` + custom validator-compiler. More verbose than Zod (no first-class type provider). Spike route file compiles | **PASS (paper-design)** for both; Zod wins on ergonomics. Full plugin-compat testing deferred to PR 3 of migration |
 
 **Library choice locked: Zod v4.** Deciding factors:

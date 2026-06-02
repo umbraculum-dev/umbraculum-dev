@@ -4,10 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button, Checkbox, H1, H2, Input, SizableText, View, XStack, YStack } from "tamagui";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import {
+  ApiClientError,
+  createPlatformAd,
+  deletePlatformAd,
+  listPlatformAds,
+  patchPlatformAd,
+} from "@umbraculum/api-client";
+import type { PlatformAdRow } from "@umbraculum/contracts";
+
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 
 type Placement =
   | "global_top"
@@ -16,21 +25,7 @@ type Placement =
   | "recipe_edit_after_hops"
   | "recipe_edit_after_yeast";
 
-type PlatformAd = {
-  id: string;
-  placement: Placement;
-  platform: "web";
-  imageUrl: string;
-  linkUrl: string;
-  altText: string;
-  isActive: boolean;
-  startsAt: string | null;
-  endsAt: string | null;
-  priority: number;
-  weight: number;
-  createdAt: string;
-  updatedAt: string;
-};
+type PlatformAd = PlatformAdRow;
 
 const placements: Array<{ value: Placement; labelKey: string }> = [
   { value: "global_top", labelKey: "placements.globalTop" },
@@ -64,12 +59,16 @@ export default function PlatformAdsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch("/api/platform/ads");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const ads = (res.data as { ads?: unknown })?.ads;
-      setItems(Array.isArray(ads) ? (ads as PlatformAd[]) : []);
+      const data = await listPlatformAds(webPlatformApiClient());
+      setItems(data.ads);
     } catch (err) {
-      setError(String(err));
+      setError(
+        err instanceof ApiClientError
+          ? typeof err.body === "string"
+            ? err.body
+            : JSON.stringify(err.body)
+          : String(err),
+      );
     } finally {
       setLoading(false);
     }
@@ -85,30 +84,31 @@ export default function PlatformAdsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch("/api/platform/ads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          placement,
-          platform: "web",
-          imageUrl,
-          linkUrl,
-          altText,
-          isActive,
-          priority,
-          weight: 1,
-          startsAt: null,
-          endsAt: null,
-        }),
+      await createPlatformAd(webPlatformApiClient(), {
+        placement,
+        platform: "web",
+        imageUrl,
+        linkUrl,
+        altText,
+        isActive,
+        priority,
+        weight: 1,
+        startsAt: null,
+        endsAt: null,
       });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       setImageUrl("");
       setLinkUrl("");
       setAltText("");
       setPriority(0);
       await refresh();
     } catch (err) {
-      setError(String(err));
+      setError(
+        err instanceof ApiClientError
+          ? typeof err.body === "string"
+            ? err.body
+            : JSON.stringify(err.body)
+          : String(err),
+      );
     } finally {
       setLoading(false);
     }
@@ -118,15 +118,16 @@ export default function PlatformAdsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/api/platform/ads/${encodeURIComponent(id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: next }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await patchPlatformAd(webPlatformApiClient(), id, { isActive: next });
       await refresh();
     } catch (err) {
-      setError(String(err));
+      setError(
+        err instanceof ApiClientError
+          ? typeof err.body === "string"
+            ? err.body
+            : JSON.stringify(err.body)
+          : String(err),
+      );
     } finally {
       setLoading(false);
     }
@@ -136,11 +137,16 @@ export default function PlatformAdsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/api/platform/ads/${encodeURIComponent(id)}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await deletePlatformAd(webPlatformApiClient(), id);
       await refresh();
     } catch (err) {
-      setError(String(err));
+      setError(
+        err instanceof ApiClientError
+          ? typeof err.body === "string"
+            ? err.body
+            : JSON.stringify(err.body)
+          : String(err),
+      );
     } finally {
       setLoading(false);
     }

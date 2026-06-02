@@ -8,7 +8,8 @@ import { H1, SizableText, View, YStack } from "tamagui";
 import { BrewSelect } from "../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
 import { fetchAuthMe } from "../../_lib/fetchAuthMe.js";
-import { apiFetch } from "../../_lib/apiClient";
+import { webPlatformApiClient } from "../../_lib/webApiClient";
+import { ApiClientError, patchAuthPreferences } from "@umbraculum/api-client";
 
 type UiThemeKey = "default" | "hc_dark" | "hc_light";
 type UiFontScaleKey = "sm" | "md" | "lg" | "xl";
@@ -129,19 +130,13 @@ export default function AccessibilityPage() {
     // If logged in, also persist to DB. (If logged out, PATCH will 401 and we ignore.)
     setSaving(true);
     try {
-      const res = await apiFetch("/api/auth/preferences", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          preferredTheme: next.theme,
-          preferredFontScale: next.fontScale,
-          preferredDensity: next.density,
-        }),
+      await patchAuthPreferences(webPlatformApiClient(), {
+        preferredTheme: next.theme,
+        preferredFontScale: next.fontScale,
+        preferredDensity: next.density,
       });
-      if (res.ok) return;
-      // Ignore not-authenticated errors; surface other failures.
-      if (res.status !== 401) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
     } catch (e) {
+      if (e instanceof ApiClientError && e.status === 401) return;
       setError(String(e));
     } finally {
       setSaving(false);

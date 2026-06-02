@@ -6,7 +6,8 @@ import { useTranslations } from "next-intl";
 import { Image } from "tamagui";
 
 import { Link } from "../../src/i18n/navigation";
-import { apiFetch } from "../_lib/apiClient";
+import { getAdSlot } from "@umbraculum/api-client";
+import { webPlatformApiClient } from "../_lib/webApiClient";
 import { AdSlotCard, Text } from "@umbraculum/ui";
 
 export type AdPlacementV1 =
@@ -16,37 +17,30 @@ export type AdPlacementV1 =
   | "recipe_edit_after_hops"
   | "recipe_edit_after_yeast";
 
-type SlotResponse = {
-  ok: boolean;
-  disabled: boolean;
-  ad: null | {
-    id: string;
-    imageUrl: string;
-    linkUrl: string;
-    altText: string;
-  };
-};
-
 export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   const t = useTranslations("ads");
 
   const [disabled, setDisabled] = useState(false);
-  const [ad, setAd] = useState<SlotResponse["ad"]>(null);
+  const [ad, setAd] = useState<{
+    id: string;
+    imageUrl: string;
+    linkUrl: string;
+    altText: string;
+  } | null>(null);
   const mediaHeightPx = placement === "global_top" ? 120 : 160;
 
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
-      const res = await apiFetch(`/api/ads/slot/${placement}?platform=web`);
-      const data = res.ok && res.data && typeof res.data === "object" ? (res.data as Partial<SlotResponse>) : null;
-
-      const nextDisabled = Boolean(data?.disabled);
-      const nextAd = data?.ad ?? null;
-
-      if (!cancelled) {
-        setDisabled(nextDisabled);
-        setAd(nextAd);
+      try {
+        const data = await getAdSlot(webPlatformApiClient(), placement, { platform: "web" });
+        if (!cancelled) {
+          setDisabled(data.disabled);
+          setAd(data.ad);
+        }
+      } catch {
+        // non-fatal — slot stays empty
       }
     })().catch(() => {});
 

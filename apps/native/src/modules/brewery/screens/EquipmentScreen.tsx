@@ -2,9 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getAuthMe } from "@umbraculum/api-client";
+import {
+  createEquipmentProfile,
+  deleteEquipmentProfile,
+  listEquipmentProfiles,
+  patchEquipmentProfile,
+} from "@umbraculum/api-client/brewery";
 import type { AuthMeResponse } from "@umbraculum/contracts";
-import { parseAuthMeResponse } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Spinner, Text } from "@umbraculum/ui";
 import { Accordion } from "tamagui";
@@ -12,6 +17,7 @@ import { Accordion } from "tamagui";
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 
 type EquipmentProfile = {
   id: string;
@@ -108,7 +114,7 @@ export function EquipmentScreen() {
 
   const api = useMemo(() => {
     if (!baseUrl || !token) return null;
-    return createApiClient(baseUrl, bearerTokenAuth(() => token));
+    return nativePlatformApiClient(token);
   }, [baseUrl, token]);
 
   const canWrite = authMe != null;
@@ -118,16 +124,11 @@ export function EquipmentScreen() {
     setError(null);
     setLoading(true);
     try {
-      const meRes = await api.get("/api/auth/me");
-      if (meRes.ok && meRes.data) {
-        setAuthMe(parseAuthMeResponse(meRes.data));
-      } else {
-        setAuthMe(null);
-      }
-      const listRes = await api.get("/api/equipment-profiles");
-      if (!listRes.ok) throw new Error(JSON.stringify(listRes.data));
-      const items = (listRes.data as { profiles?: EquipmentProfile[] })?.profiles;
-      setProfiles(Array.isArray(items) ? items : []);
+      const me = await getAuthMe(api);
+      setAuthMe(me);
+      const listRes = await listEquipmentProfiles(api);
+      const items = listRes.profiles;
+      setProfiles(Array.isArray(items) ? (items as unknown as EquipmentProfile[]) : []);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -186,7 +187,7 @@ export function EquipmentScreen() {
       if (mashEfficiencyPercent != null && (mashEfficiencyPercent < 0 || mashEfficiencyPercent > 100)) {
         throw new Error(t("errors.mashEfficiencyRange"));
       }
-      const res = await api.post("/api/equipment-profiles", {
+      await createEquipmentProfile(api, {
         name,
         kettleVolumeLiters: parseNullableNumber(createKettleVolumeLiters),
         kettleLossesLiters: parseNullableNumber(createKettleLossesLiters),
@@ -201,7 +202,6 @@ export function EquipmentScreen() {
         mashWaterLeftoverLiters: parseNullableNumber(createMashWaterLeftoverLiters),
         otherLossesLiters: parseNullableNumber(createOtherLossesLiters),
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setCreateName("");
       setCreateKettleVolumeLiters("");
       setCreateKettleLossesLiters("");
@@ -237,7 +237,7 @@ export function EquipmentScreen() {
       if (mashEfficiencyPercent != null && (mashEfficiencyPercent < 0 || mashEfficiencyPercent > 100)) {
         throw new Error(t("errors.mashEfficiencyRange"));
       }
-      const res = await api.patch(`/api/equipment-profiles/${editingId}`, {
+      await patchEquipmentProfile(api, editingId, {
         name,
         kettleVolumeLiters: parseNullableNumber(editDraft['kettleVolumeLiters'] ?? ""),
         kettleLossesLiters: parseNullableNumber(editDraft['kettleLossesLiters'] ?? ""),
@@ -252,7 +252,6 @@ export function EquipmentScreen() {
         mashWaterLeftoverLiters: parseNullableNumber(editDraft['mashWaterLeftoverLiters'] ?? ""),
         otherLossesLiters: parseNullableNumber(editDraft['otherLossesLiters'] ?? ""),
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setEditingId(null);
       setEditDraft({});
       await refresh();
@@ -277,8 +276,7 @@ export function EquipmentScreen() {
             void (async () => {
             setError(null);
             try {
-              const res = await api.delete(`/api/equipment-profiles/${p.id}`);
-              if (!res.ok) throw new Error(JSON.stringify(res.data));
+              await deleteEquipmentProfile(api, p.id);
               if (editingId === p.id) {
                 setEditingId(null);
                 setEditDraft({});

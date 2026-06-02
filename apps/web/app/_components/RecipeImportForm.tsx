@@ -11,11 +11,17 @@ import {
   previewBulkRecipeImport,
   previewRecipeImport,
 } from "@umbraculum/api-client/brewery";
-import { ApiClientError } from "@umbraculum/api-client";
+import {
+  ApiClientError,
+  importPlatformRecipe,
+  importPlatformRecipesBulk,
+  previewPlatformBulkRecipeImport,
+  previewPlatformRecipeImport,
+} from "@umbraculum/api-client";
 
 import { Link } from "../../src/i18n/navigation";
-import { apiFetch } from "../_lib/apiClient";
 import { webBreweryApiClient } from "../_lib/breweryWaterClient";
+import { webPlatformApiClient } from "../_lib/webApiClient";
 import { BrewSelect } from "./BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "./recipe-edit";
 import { ImportExportPanel } from "./ImportExportPanel";
@@ -144,14 +150,11 @@ export function RecipeImportForm({
       setStylesError(null);
       setStylesLoading(true);
       try {
-        if (apiBasePath === BREWERY_RECIPES_API_BASE) {
+        if (apiBasePath === BREWERY_RECIPES_API_BASE || apiBasePath.includes("platform")) {
           const data = await listStyles(webBreweryApiClient());
           if (!cancelled) setStyles(data.styles as StyleListItem[]);
         } else {
-          const res = await apiFetch("/api/styles");
-          if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-          const items = (res.data as { styles?: unknown })?.styles;
-          if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+          throw new Error(`Unsupported apiBasePath for styles: ${apiBasePath}`);
         }
       } catch (err) {
         if (!cancelled) {
@@ -242,22 +245,17 @@ export function RecipeImportForm({
         const warningsRaw = p["warnings"];
         const warnings = Array.isArray(warningsRaw) ? (warningsRaw as ImportWarning[]) : [];
         setPreview({ name, notes, warnings });
-      } else {
-        const res = await apiFetch(`${apiBasePath}/import/preview`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error(apiErrorMessage(res.data));
-        const p = (res.data as { preview?: unknown })?.preview ?? null;
-        if (!p || typeof p !== "object") throw new Error(t("errors.previewMissing"));
-        const pRec = p as { name?: unknown; notes?: unknown; warnings?: unknown };
-        const name = typeof pRec.name === "string" ? pRec.name : "";
-        const notesRaw = pRec.notes;
+      } else if (apiBasePath.includes("platform")) {
+        const data = await previewPlatformRecipeImport(webPlatformApiClient(), body);
+        const p = data.preview;
+        const name = typeof p["name"] === "string" ? p["name"] : "";
+        const notesRaw = p["notes"];
         const notes = typeof notesRaw === "string" ? notesRaw : notesRaw === null ? null : null;
-        const warningsRaw = pRec.warnings;
+        const warningsRaw = p["warnings"];
         const warnings = Array.isArray(warningsRaw) ? (warningsRaw as ImportWarning[]) : [];
         setPreview({ name, notes, warnings });
+      } else {
+        throw new Error(`Unsupported apiBasePath for preview: ${apiBasePath}`);
       }
     } catch (err) {
       setPreviewError(facadeErrorMessage(err));
@@ -282,16 +280,11 @@ export function RecipeImportForm({
       if (apiBasePath === BREWERY_RECIPES_API_BASE) {
         const data = await previewBulkRecipeImport(webBreweryApiClient(), body);
         setBulkPreviewItems(data.previewItems as BulkPreviewItem[]);
+      } else if (apiBasePath.includes("platform")) {
+        const data = await previewPlatformBulkRecipeImport(webPlatformApiClient(), body);
+        setBulkPreviewItems(data.previewItems as BulkPreviewItem[]);
       } else {
-        const res = await apiFetch(`${apiBasePath}/import/bulk/preview`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error(apiErrorMessage(res.data));
-        const items = (res.data as { previewItems?: unknown })?.previewItems;
-        if (!Array.isArray(items)) throw new Error(t("errors.previewMissing"));
-        setBulkPreviewItems(items as BulkPreviewItem[]);
+        throw new Error(`Unsupported apiBasePath for bulk preview: ${apiBasePath}`);
       }
     } catch (err) {
       setBulkPreviewError(facadeErrorMessage(err));
@@ -317,18 +310,14 @@ export function RecipeImportForm({
         const id = typeof recipe["id"] === "string" ? recipe["id"] : "";
         if (!id) throw new Error(t("errors.importMissingId"));
         onSingleImportSuccess?.(id);
-      } else {
-        const res = await apiFetch(`${apiBasePath}/import`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error(apiErrorMessage(res.data));
-        const recipe = (res.data as { recipe?: unknown })?.recipe ?? null;
-        const recipeRec = recipe && typeof recipe === "object" ? (recipe as { id?: unknown }) : null;
-        const id = typeof recipeRec?.id === "string" ? recipeRec.id : "";
+      } else if (apiBasePath.includes("platform")) {
+        const data = await importPlatformRecipe(webPlatformApiClient(), body);
+        const recipe = data.recipe as Record<string, unknown>;
+        const id = typeof recipe["id"] === "string" ? recipe["id"] : "";
         if (!id) throw new Error(t("errors.importMissingId"));
         onSingleImportSuccess?.(id);
+      } else {
+        throw new Error(`Unsupported apiBasePath for import: ${apiBasePath}`);
       }
     } catch (err) {
       setImportError(facadeErrorMessage(err));
@@ -353,17 +342,14 @@ export function RecipeImportForm({
           created: data.created as BulkCreatedItem[],
           failed: data.failed as BulkFailedItem[],
         });
-      } else {
-        const res = await apiFetch(`${apiBasePath}/import/bulk`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+      } else if (apiBasePath.includes("platform")) {
+        const data = await importPlatformRecipesBulk(webPlatformApiClient(), body);
+        setBulkResult({
+          created: data.created as BulkCreatedItem[],
+          failed: data.failed as BulkFailedItem[],
         });
-        if (!res.ok) throw new Error(apiErrorMessage(res.data));
-        const resBody = res.data as { created?: unknown; failed?: unknown };
-        const created: BulkCreatedItem[] = Array.isArray(resBody?.created) ? (resBody.created as BulkCreatedItem[]) : [];
-        const failed: BulkFailedItem[] = Array.isArray(resBody?.failed) ? (resBody.failed as BulkFailedItem[]) : [];
-        setBulkResult({ created, failed });
+      } else {
+        throw new Error(`Unsupported apiBasePath for bulk import: ${apiBasePath}`);
       }
     } catch (err) {
       setBulkImportError(facadeErrorMessage(err));

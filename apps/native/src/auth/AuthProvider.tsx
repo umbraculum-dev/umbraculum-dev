@@ -1,9 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getAuthMe, loginNative, logout as logoutApi, ApiClientError } from "@umbraculum/api-client";
 import type { SupportedLocale } from "@umbraculum/i18n";
 
 import { getApiBaseUrl } from "./apiBaseUrl";
+import { nativePlatformApiClient } from "./nativeApiClient";
 import { clearToken, readToken, writeToken } from "./tokenStorage";
 
 export type AuthState =
@@ -26,8 +27,8 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
-function parseToken(data: unknown): string | null {
-  const token = (data as { token?: unknown } | null | undefined)?.token;
+function parseToken(data: { token?: string }): string | null {
+  const token = data.token;
   if (typeof token === "string" && token.trim()) return token.trim();
   return null;
 }
@@ -51,9 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Optional quick validation: if token is invalid, drop it.
       try {
         if (!baseUrl) throw new Error("Missing EXPO_PUBLIC_API_BASE_URL");
-        const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-        const res = await api.get("/api/auth/me");
-        if (!res.ok) throw new Error("Not authenticated");
+        await getAuthMe(nativePlatformApiClient(token));
         setState({ status: "logged_in", token });
       } catch {
         await clearToken();
@@ -72,16 +71,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!baseUrl) return { ok: false, error: "Missing EXPO_PUBLIC_API_BASE_URL" };
 
         const api = createApiClient(baseUrl, bearerTokenAuth(() => null));
-        const res = await api.post("/api/auth/login/native", input);
-        if (!res.ok) return { ok: false, error: typeof res.data === "string" ? res.data : JSON.stringify(res.data) };
-
-        const token = parseToken(res.data);
+        const res = await loginNative(api, input);
+        const token = parseToken(res);
         if (!token) return { ok: false, error: "Login response missing token" };
 
         await writeToken(token);
         setState({ status: "logged_in", token });
         return { ok: true };
       } catch (err) {
+        if (err instanceof ApiClientError) {
+          return { ok: false, error: err.message };
+        }
         return { ok: false, error: String(err) };
       }
     },
@@ -92,8 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = state.status === "logged_in" ? state.token : null;
     try {
       if (token && baseUrl) {
-        const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-        await api.post("/api/auth/logout");
+        await logoutApi(nativePlatformApiClient(token));
       }
     } finally {
       await clearToken();
