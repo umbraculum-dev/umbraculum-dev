@@ -93,7 +93,8 @@ node --input-type=module -e "import('@umbraculum/module-sdk').then(m => console.
 
 ## 6. Monorepo follow-up
 
-- [ ] Bump workspace `package.json` deps from `file:` to published semver where appropriate (optional post-α dogfooding).
+- [x] Bump consumer workspace deps from `file:` to published semver for `@umbraculum/contracts` + `@umbraculum/api-client` (2026-06-02) — see [`npm-sdk-monorepo-dogfood.md`](npm-sdk-monorepo-dogfood.md).
+- [ ] Bump remaining workspace `package.json` deps from `file:` to published semver where appropriate (module-sdk batch still `file:` for active co-dev).
 - [x] Update [`ROADMAP.md`](../ROADMAP.md) MIT npm table → **On npm registry**.
 - [x] Update [`GETTING-STARTED.md`](../GETTING-STARTED.md) / [`third-party-module.md`](../modules/contribute/third-party-module.md) install instructions to `npm install` first, git/workspace as fallback.
 

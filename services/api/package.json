@@ -47,7 +47,7 @@
     "@umbraculum/ai-tool-sdk": "file:../../packages/ai-tool-sdk",
     "@umbraculum/automation-contracts": "file:../../packages/automation-contracts",
     "@umbraculum/brewery-core": "file:../../packages/core",
-    "@umbraculum/contracts": "file:../../packages/contracts",
+    "@umbraculum/contracts": "^0.0.1",
     "@umbraculum/crp-contracts": "file:../../packages/crp-contracts",
     "@umbraculum/module-sdk": "file:../../packages/module-sdk",
     "@umbraculum/mrp-contracts": "file:../../packages/mrp-contracts",

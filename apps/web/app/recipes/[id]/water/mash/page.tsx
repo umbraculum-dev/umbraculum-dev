@@ -33,7 +33,7 @@ import {
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_lib/fetchAuthMe";
-import type { AuthMeResponse, WaterProfilesResponse } from "../_lib/api";
+import type { AuthMeResponse, WaterProfilesResponse } from "@umbraculum/contracts";
 import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";

@@ -23,7 +23,7 @@ import {
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_lib/fetchAuthMe";
-import type { WaterProfile, WaterProfilesResponse } from "../_lib/api";
+import type { WaterProfile, WaterProfilesResponse } from "@umbraculum/contracts";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";

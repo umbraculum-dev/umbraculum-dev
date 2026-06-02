@@ -14,10 +14,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@umbraculum/api-client": "file:../../packages/api-client",
+    "@umbraculum/api-client": "^0.0.1",
     "@umbraculum/module-sdk": "file:../../packages/module-sdk",
     "@umbraculum/brewery-beerjson": "file:../../packages/beerjson",
-    "@umbraculum/contracts": "file:../../packages/contracts",
+    "@umbraculum/contracts": "^0.0.1",
     "@umbraculum/i18n": "file:../../packages/i18n",
     "@umbraculum/i18n-react": "file:../../packages/i18n-react",
     "@umbraculum/media": "file:../../packages/media",

@@ -6,9 +6,19 @@ import { describe, expect, it } from "vitest";
 import { ZodError } from "zod";
 
 import {
+  BrewdaySettingsResponseSchema,
   EquipmentProfilesListResponseSchema,
+  FermentablesListResponseSchema,
+  HopsListResponseSchema,
+  IngredientsSearchQuerySchema,
+  IntegrationReadingsQuerySchema,
+  InventoryItemResponseSchema,
   InventoryListResponseSchema,
+  RecipeBulkImportFailedItemSchema,
+  RecipeBulkImportResponseSchema,
+  RecipeImportPreviewResponseSchema,
   StylesListResponseSchema,
+  YeastsListResponseSchema,
 } from "./routeSchemas";
 
 function expectFirstIssuePathStartsWith(
@@ -72,25 +82,187 @@ describe("StylesListResponseSchema", () => {
 });
 
 describe("InventoryListResponseSchema", () => {
+  const validItem = {
+    id: "inv-1",
+    workspaceId: "ws-1",
+    category: "hop",
+    ingredientId: "ing-1",
+    name: "Cascade",
+    quantity: 100,
+    unit: "g",
+    metadataJson: null,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-02T00:00:00.000Z",
+  };
+
   it("parses ISO date strings on list items", () => {
     const parsed = InventoryListResponseSchema.parse({
       ok: true,
-      items: [
-        {
-          id: "inv-1",
-          workspaceId: "ws-1",
-          category: "hop",
-          ingredientId: "ing-1",
-          name: "Cascade",
-          quantity: 100,
-          unit: "g",
-          metadataJson: null,
-          createdAt: "2026-01-01T00:00:00.000Z",
-          updatedAt: "2026-01-02T00:00:00.000Z",
-        },
-      ],
+      items: [validItem],
     });
     expect(parsed.items[0]?.name).toBe("Cascade");
+  });
+
+  it("rejects string quantity (Prisma Decimal must serialize to number)", () => {
+    expectFirstIssuePathStartsWith(
+      InventoryListResponseSchema,
+      {
+        ok: true,
+        items: [{ ...validItem, quantity: "100" }],
+      },
+      ["items", 0, "quantity"],
+    );
+  });
+});
+
+describe("InventoryItemResponseSchema", () => {
+  it("parses single-item envelope", () => {
+    const parsed = InventoryItemResponseSchema.parse({
+      ok: true,
+      item: {
+        id: "inv-1",
+        workspaceId: "ws-1",
+        category: "fermentable",
+        ingredientId: null,
+        name: "Pale malt",
+        quantity: 5,
+        unit: "kg",
+        metadataJson: { lot: "A1" },
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    });
+    expect(parsed.item.quantity).toBe(5);
+  });
+});
+
+describe("BrewdaySettingsResponseSchema", () => {
+  it("accepts null settings when workspace has no row yet", () => {
+    const parsed = BrewdaySettingsResponseSchema.parse({ ok: true, settings: null });
+    expect(parsed.settings).toBeNull();
+  });
+
+  it("accepts opaque settings record from brewdaySettingsService", () => {
+    const parsed = BrewdaySettingsResponseSchema.parse({
+      ok: true,
+      settings: { presetExcludes: {}, customSections: [] },
+    });
+    expect(parsed.settings).toMatchObject({ presetExcludes: {} });
+  });
+});
+
+describe("FermentablesListResponseSchema", () => {
+  it("parses paginated fermentables list", () => {
+    const parsed = FermentablesListResponseSchema.parse({
+      ok: true,
+      items: [{ id: "f1", name: "Pilsner malt" }],
+      total: 1,
+      offset: 0,
+      limit: 50,
+    });
+    expect(parsed.total).toBe(1);
+    expect(parsed.limit).toBe(50);
+  });
+
+  it("rejects string pagination totals", () => {
+    expectFirstIssuePathStartsWith(
+      FermentablesListResponseSchema,
+      {
+        ok: true,
+        items: [],
+        total: "0",
+        offset: 0,
+        limit: 50,
+      },
+      ["total"],
+    );
+  });
+});
+
+describe("HopsListResponseSchema", () => {
+  it("parses paginated hops list", () => {
+    const parsed = HopsListResponseSchema.parse({
+      ok: true,
+      items: [{ id: "h1", name: "Cascade" }],
+      total: 42,
+      offset: 10,
+      limit: 25,
+    });
+    expect(parsed.offset).toBe(10);
+  });
+});
+
+describe("YeastsListResponseSchema", () => {
+  it("parses yeasts list without pagination fields", () => {
+    const parsed = YeastsListResponseSchema.parse({
+      ok: true,
+      items: [{ id: "y1", name: "US-05" }],
+    });
+    expect(parsed.items).toHaveLength(1);
+  });
+});
+
+describe("RecipeImportPreviewResponseSchema", () => {
+  it("accepts beerjson format enum", () => {
+    const parsed = RecipeImportPreviewResponseSchema.parse({
+      ok: true,
+      format: "beerjson",
+      preview: { name: "Test IPA" },
+      workspaceId: "ws-1",
+    });
+    expect(parsed.format).toBe("beerjson");
+  });
+
+  it("rejects unknown import format", () => {
+    expectFirstIssuePathStartsWith(
+      RecipeImportPreviewResponseSchema,
+      {
+        ok: true,
+        format: "pdf",
+        preview: {},
+        workspaceId: "ws-1",
+      },
+      ["format"],
+    );
+  });
+});
+
+describe("RecipeBulkImportResponseSchema", () => {
+  it("parses created and failed arrays with strict failed.index", () => {
+    const parsed = RecipeBulkImportResponseSchema.parse({
+      ok: true,
+      created: [{ id: "r1", name: "OK" }],
+      failed: [{ index: 1, name: "Bad", error: "parse error" }],
+    });
+    expect(parsed.failed[0]?.index).toBe(1);
+  });
+
+  it("rejects string failed.index", () => {
+    expectFirstIssuePathStartsWith(
+      RecipeBulkImportFailedItemSchema,
+      { index: "1", name: "Bad", error: "parse error" },
+      ["index"],
+    );
+  });
+});
+
+describe("IngredientsSearchQuerySchema", () => {
+  it("coerces offset and limit from query strings", () => {
+    const parsed = IngredientsSearchQuerySchema.parse({ query: "cascade", offset: "10", limit: "25" });
+    expect(parsed.offset).toBe(10);
+    expect(parsed.limit).toBe(25);
+  });
+});
+
+describe("IntegrationReadingsQuerySchema", () => {
+  it("accepts tilt integration kind", () => {
+    const parsed = IntegrationReadingsQuerySchema.parse({ kind: "tilt", limit: "20" });
+    expect(parsed.kind).toBe("tilt");
+    expect(parsed.limit).toBe(20);
+  });
+
+  it("rejects unknown integration kind", () => {
+    expectFirstIssuePathStartsWith(IntegrationReadingsQuerySchema, { kind: "hydrometer" }, ["kind"]);
   });
 });
 

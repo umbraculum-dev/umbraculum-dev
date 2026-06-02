@@ -169,7 +169,6 @@ export default function WaterHubPage() {
     }));
 
     return streams;
-     
   }, [summary, formatHints, locale, t, tUnits, tsalts]);
 
   return (
