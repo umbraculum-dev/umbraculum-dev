@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import {
   computeAndSaveSparge,
   getRecipe,
@@ -20,6 +19,7 @@ import { SaltAdditionsEditor, type SaltAdditionRow } from "@umbraculum/brewery-r
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
 
@@ -116,7 +116,7 @@ export function WaterSpargeScreen() {
 
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    const api = nativePlatformApiClient(token, baseUrl);
     try {
       const data = await getRecipe(api, id);
       return parseRecipeMetaFromGetRecipeResponse(data);
@@ -208,7 +208,7 @@ export function WaterSpargeScreen() {
     setLoading(true);
     setError(null);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const [profilesData, settingsData] = await Promise.all([
         listWaterProfiles(api),
         getRecipeWaterSettings(api, recipeId),
@@ -278,7 +278,7 @@ export function WaterSpargeScreen() {
   const saveSettings = useCallback(
     async (patch: Record<string, unknown>) => {
       if (!canCall) return;
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const d = await updateRecipeWaterSettings(api, recipeId, patch);
       if (d.settings) setSettings(d.settings);
     },
@@ -331,7 +331,7 @@ export function WaterSpargeScreen() {
     setSpargeManualResult(null);
     setSubmitting(true);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const payload: Record<string, unknown> = {
         spargeWaterProfileId: spargeWaterProfileId,
         spargeSaltAdditionsJson: saltAdditions,

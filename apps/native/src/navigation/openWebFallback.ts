@@ -3,7 +3,9 @@ import { Linking } from "react-native";
 import type { SupportedLocale } from "@umbraculum/i18n";
 import type { RouteRef } from "@umbraculum/navigation";
 import { routeToLocalePath } from "@umbraculum/navigation";
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { ApiClientError, exchangeWebviewToken } from "@umbraculum/api-client";
+
+import { nativePlatformApiClient } from "../auth/nativeApiClient";
 
 export interface OpenWebFallbackOptions {
   baseUrl: string;
@@ -21,25 +23,25 @@ export interface OpenWebFallbackResult {
 export async function openWebFallbackRoute(options: OpenWebFallbackOptions): Promise<OpenWebFallbackResult> {
   const next = routeToLocalePath(options.route, options.locale);
 
-  const api = createApiClient(
-    options.baseUrl,
-    bearerTokenAuth(() => options.token),
-  );
+  try {
+    const res = await exchangeWebviewToken(nativePlatformApiClient(options.token, options.baseUrl), { next });
+    const bridgeUrl = res.bridgeUrl;
+    if (typeof bridgeUrl !== "string" || !bridgeUrl.startsWith("/")) {
+      return { ok: false, error: "webview-exchange returned invalid bridgeUrl" };
+    }
 
-  const res = await api.post("/api/auth/webview-exchange", { next });
-  if (!res.ok) {
-    return { ok: false, error: `webview-exchange failed with status ${res.status}` };
+    const base = options.baseUrl.replace(/\/+$/, "");
+    const url = `${base}${bridgeUrl}`;
+
+    await Linking.openURL(url);
+    return { ok: true, url };
+  } catch (err) {
+    if (err instanceof ApiClientError) {
+      return { ok: false, error: `webview-exchange failed with status ${err.status}` };
+    }
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "webview-exchange failed",
+    };
   }
-
-  const bridgeUrl = (res.data as { bridgeUrl?: unknown })?.bridgeUrl;
-  if (typeof bridgeUrl !== "string" || !bridgeUrl.startsWith("/")) {
-    return { ok: false, error: "webview-exchange returned invalid bridgeUrl" };
-  }
-
-  const base = options.baseUrl.replace(/\/+$/, "");
-  const url = `${base}${bridgeUrl}`;
-
-  await Linking.openURL(url);
-  return { ok: true, url };
 }
-

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import {
   getRecipe,
   getRecipeWaterHubSummary,
@@ -15,6 +14,7 @@ import { Accordion } from "tamagui";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
 
@@ -80,7 +80,7 @@ export function WaterHubScreen() {
 
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    const api = nativePlatformApiClient(token, baseUrl);
     try {
       const data = await getRecipe(api, id);
       return parseRecipeMetaFromGetRecipeResponse(data);
@@ -104,7 +104,7 @@ export function WaterHubScreen() {
     setError(null);
     setLoading(true);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+      const api = nativePlatformApiClient(token, baseUrl);
       setSummaryRes(await getRecipeWaterHubSummary(api, recipeId));
       await listWaterProfiles(api);
       setProfilesLoaded(true);

@@ -2,7 +2,15 @@ import { describe, expect, it, vi } from "vitest";
 
 import { bearerTokenAuth } from "../auth.js";
 import { createApiClient } from "../client.js";
-import { getAuthMe, loginNative, logout, patchAuthPreferences, setActiveWorkspace, signup } from "../platform/auth.js";
+import {
+  exchangeWebviewToken,
+  getAuthMe,
+  loginNative,
+  logout,
+  patchAuthPreferences,
+  setActiveWorkspace,
+  signup,
+} from "../platform/auth.js";
 import { getHealth, listWorkspaces } from "../platform/workspaces.js";
 
 describe("platform auth facades", () => {
@@ -102,6 +110,31 @@ describe("platform auth facades", () => {
     expect(res["activeWorkspaceId"]).toBe("w1");
     expect(fetch).toHaveBeenCalledWith(
       "http://test/api/auth/signup",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("exchangeWebviewToken posts next path and parses bridgeUrl", async () => {
+    const fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        text: () =>
+          Promise.resolve(
+            JSON.stringify({
+              ok: true,
+              code: "wv-code",
+              expiresAt: "2026-06-02T12:00:00.000Z",
+              bridgeUrl: "/en/auth/webview-bridge?token=abc",
+            }),
+          ),
+      }),
+    );
+    const client = createApiClient("http://test", bearerTokenAuth(() => "tok"), { fetch });
+    const res = await exchangeWebviewToken(client, { next: "/en/recipes" });
+    expect(res["bridgeUrl"]).toBe("/en/auth/webview-bridge?token=abc");
+    expect(fetch).toHaveBeenCalledWith(
+      "http://test/api/auth/webview-exchange",
       expect.objectContaining({ method: "POST" }),
     );
   });

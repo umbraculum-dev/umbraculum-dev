@@ -1,9 +1,29 @@
 {
   "name": "@umbraculum/contracts",
-  "private": true,
   "version": "0.0.1",
+  "description": "Shared DTOs, types, and runtime parsers — auth payloads, water-chemistry compute responses, gravity-analysis results, AI settings/usage DTOs, format hints, rendering job wire shapes. The contract layer between the API and every client. Platform-classified per sub-plan #9 §1.1.",
+  "license": "MIT",
   "type": "module",
-  "description": "Shared DTOs, types, and runtime parsers — auth payloads, water-chemistry compute responses, gravity-analysis results, AI-tool I/O shapes, format hints. The contract layer between the API and every client. Platform-classified per sub-plan #9 §1.1 — no brewery-domain types.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraculum-dev/umbraculum-dev.git",
+    "directory": "packages/contracts"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraculum-dev/umbraculum-dev/issues"
+  },
+  "homepage": "https://github.com/umbraculum-dev/umbraculum-dev/tree/main/packages/contracts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

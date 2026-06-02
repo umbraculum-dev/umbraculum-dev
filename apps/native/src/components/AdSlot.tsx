@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Linking, Pressable } from "react-native";
 import { Image } from "expo-image";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
+import { getAdSlot } from "@umbraculum/api-client";
 import { useT } from "@umbraculum/i18n-react";
 
 import { AdSlotCard, Text } from "@umbraculum/ui";
 
 import { getApiBaseUrl } from "../auth/apiBaseUrl";
 import { useAuth } from "../auth/AuthProvider";
+import { nativePlatformApiClient } from "../auth/nativeApiClient";
 
 export type AdPlacementV1 =
   | "global_top"
@@ -17,17 +18,6 @@ export type AdPlacementV1 =
   | "recipe_edit_after_hops"
   | "recipe_edit_after_yeast";
 
-type SlotResponse = {
-  ok: boolean;
-  disabled: boolean;
-  ad: null | {
-    id: string;
-    imageUrl: string;
-    linkUrl: string;
-    altText: string;
-  };
-};
-
 export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   const { t } = useT("ads");
   const auth = useAuth();
@@ -35,7 +25,12 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
   const token = auth.state.status === "logged_in" ? auth.state.token : null;
 
   const [disabled, setDisabled] = useState(false);
-  const [ad, setAd] = useState<SlotResponse["ad"]>(null);
+  const [ad, setAd] = useState<{
+    id: string;
+    imageUrl: string;
+    linkUrl: string;
+    altText: string;
+  } | null>(null);
 
   const mediaHeightPx = placement === "global_top" ? 120 : 160;
 
@@ -43,18 +38,15 @@ export function AdSlot({ placement }: { placement: AdPlacementV1 }) {
     if (!baseUrl) return;
     let cancelled = false;
 
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
-
     (async () => {
-      const res = await api.get(`/api/ads/slot/${placement}?platform=native`);
-      const data = res.ok && res.data && typeof res.data === "object" ? (res.data as SlotResponse) : null;
-
-      const nextDisabled = Boolean(data?.disabled);
-      const nextAd = data?.ad ?? null;
-
-      if (!cancelled) {
-        setDisabled(nextDisabled);
-        setAd(nextAd);
+      try {
+        const data = await getAdSlot(nativePlatformApiClient(token, baseUrl), placement);
+        if (!cancelled) {
+          setDisabled(data.disabled);
+          setAd(data.ad);
+        }
+      } catch {
+        // non-fatal — slot stays empty
       }
     })().catch(() => {});
 

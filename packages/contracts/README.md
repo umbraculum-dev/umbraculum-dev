@@ -5,6 +5,16 @@ Shared DTOs, types, and runtime parsers. The wire-shape contract layer between t
 > [!NOTE]
 > Part of [Umbraculum](../../README.md) — an open-source toolset for building workspace-shaped operational applications.
 
+**npm (external integrators):**
+
+```bash
+npm install @umbraculum/contracts@0.0.1
+```
+
+Monorepo contributors use workspace `file:` links — see [`DEVELOPMENT.md`](../../DEVELOPMENT.md).
+
+**Relationship to `@umbraculum/*-contracts`:** This package holds **platform** wire parsers (auth, workspaces, rendering jobs, ads, AI settings/usage) plus **reference-vertical** brewery DTOs used by the in-repo brewery module. Canonical domain modules (`automation`, `pim`, `mrp`, `crp`) ship separate `@umbraculum/<code>-contracts` packages — pin those for adapter/integration work against a canonical module.
+
 ## What this is
 
 The single source of truth for every wire-shape type in the platform — auth payloads, water-chemistry compute responses, gravity-analysis results, AI-settings + AI-usage-ledger DTOs, format hints. Both the API (`services/api`) and the clients (`apps/web`, `apps/native`, `@umbraculum/api-client`) import the same `ResponseV1` / `RequestV1` types and the same runtime parsers, which guarantees that what the API serializes is exactly what the client deserializes — type-checked at compile time and shape-validated at runtime. The AI-tool SDK contract (`AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`) was extracted to [`@umbraculum/ai-tool-sdk`](../ai-tool-sdk/) on 2026-05-21 — that surface is library-agnostic SDK contract, not wire shape, and lives there now.

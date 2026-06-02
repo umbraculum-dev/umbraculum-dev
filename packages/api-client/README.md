@@ -65,6 +65,42 @@ const vessels = await listVessels(client);
 
 Errors from non-2xx responses throw `ApiClientError` (status + body).
 
+## External consumer quickstart
+
+Install from npm (monorepo contributors use workspace `file:` links instead — see [`DEVELOPMENT.md`](../../DEVELOPMENT.md)):
+
+```bash
+npm install @umbraculum/api-client@0.0.1 @umbraculum/contracts@0.0.1
+# plus @umbraculum/<code>-contracts@0.0.2 for each canonical domain you integrate with
+```
+
+Browse OpenAPI paths on the docs site before wiring calls:
+
+- Platform catalog: [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform)
+- Brewery add-on (reference vertical): [docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery)
+
+**Subpath imports** (tree-shaking friendly):
+
+| Import | Use when |
+|--------|----------|
+| `@umbraculum/api-client` | Platform: auth, workspaces, health, billing, AI, ads, integrations, rendering |
+| `@umbraculum/api-client/brewery` | Reference vertical add-on |
+| `@umbraculum/api-client/automation` | Canonical automation hot paths |
+| `@umbraculum/api-client/pim` | Canonical PIM hot paths |
+| `@umbraculum/api-client/mrp` | Canonical MRP hot paths |
+| `@umbraculum/api-client/crp` | Canonical CRP hot paths |
+
+```typescript
+import { bearerTokenAuth, createApiClient, listWorkspaces } from "@umbraculum/api-client";
+import { listVessels } from "@umbraculum/api-client/automation";
+
+const client = createApiClient("https://your-host.example", bearerTokenAuth(() => process.env.API_TOKEN!));
+const { workspaces } = await listWorkspaces(client);
+const vessels = await listVessels(client);
+```
+
+Wire authority remains `@umbraculum/contracts` parsers inside each facade — see [`@umbraculum/contracts`](../contracts/README.md).
+
 ## Exports
 
 - `createApiClient(baseUrl, auth, options?)`
@@ -122,7 +158,7 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 
 ## Status
 
-**Phase E complete (2026-06-01). Phase E5–E9 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration; **E8** brewery web tranche; **E9** platform web tranche (auth signup/preferences, AI settings/usage/upgrade, ads slot, platform-admin recipes/ads). npm publish remains a separate LICENSING decision.
+**Phase E complete (2026-06-01). Phase E5–E10 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration; **E8** brewery web tranche; **E9** platform web tranche; **E10** native platform tail (`AdSlot`, `openWebFallback`). Published on npm at **`0.0.1`** — see [External consumer quickstart](#external-consumer-quickstart).
 
 The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
 

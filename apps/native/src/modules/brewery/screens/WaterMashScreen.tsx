@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import {
   computeAndSaveMash,
   getRecipe,
@@ -32,6 +31,7 @@ import { MashStepsEditor, type WaterVolumes } from "@umbraculum/brewery-recipes-
 import { Input } from "../../../components/AppInput";
 import { useAuth } from "../../../auth/AuthProvider";
 import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import { useLocaleController } from "../../../i18n/I18nProvider";
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native";
 
@@ -147,7 +147,7 @@ export function WaterMashScreen() {
 
   const loadRecipeMeta = useCallback(async (id: string) => {
     if (!baseUrl || !token) return null;
-    const api = createApiClient(baseUrl, bearerTokenAuth(() => token));
+    const api = nativePlatformApiClient(token, baseUrl);
     try {
       const data = await getRecipe(api, id);
       return parseRecipeMetaFromGetRecipeResponse(data);
@@ -316,7 +316,7 @@ export function WaterMashScreen() {
     setLoading(true);
     setError(null);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const [profilesData, settingsData, recipeData] = await Promise.all([
         listWaterProfiles(api),
         getRecipeWaterSettings(api, recipeId),
@@ -387,7 +387,7 @@ export function WaterMashScreen() {
   const saveSettings = useCallback(
     async (patch: Record<string, unknown>) => {
       if (!canCall) return;
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const d = await updateRecipeWaterSettings(api, recipeId, patch);
       if (d.settings) setSettings(d.settings);
     },
@@ -415,7 +415,7 @@ export function WaterMashScreen() {
     setGristImportStatus(null);
     setImportingGrist(true);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const data = await getRecipe(api, recipeId);
       const r = data.recipe as { beerJsonRecipeJson?: unknown; recipeExtJson?: unknown; updatedAt?: string };
       if (!r?.beerJsonRecipeJson) throw new Error("Recipe is missing BeerJSON");
@@ -496,7 +496,7 @@ export function WaterMashScreen() {
     setMashCalcSaveStatus(null);
     setMashSubmitting(true);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const payload: Record<string, unknown> = {
         sourceWaterProfileId: sourceProfileId,
         dilutionWaterProfileId: dilutionProfileId || null,
@@ -542,7 +542,7 @@ export function WaterMashScreen() {
     setError(null);
     setSavingOverall(true);
     try {
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       const payload: Record<string, unknown> = {
         sourceWaterProfileId: sourceProfileId,
         dilutionWaterProfileId: dilutionProfileId || null,
@@ -746,7 +746,7 @@ export function WaterMashScreen() {
           .filter(([k, v]) => k !== "0" && v === true)
       );
       const recipeExtJson = { ...(extBase as Record<string, unknown>), mashStepDeduceFromMashIn };
-      const api = createApiClient(baseUrl, bearerTokenAuth(() => token!));
+      const api = nativePlatformApiClient(token!, baseUrl);
       await patchRecipe(api, recipeId, {
         beerJsonRecipeJson: newDoc,
         recipeExtJson,

@@ -1,7 +1,8 @@
 name: publish-sdk-batch
 
 # Publishes the MIT SDK npm batch on sdk-batch-v* tags.
-# Packages: ai-tool-sdk, i18n-keys, module-sdk, automation/pim/mrp/crp-contracts.
+# Packages: ai-tool-sdk, i18n-keys, module-sdk, automation/pim/mrp/crp-contracts,
+#           contracts, api-client (P1+P2 extension).
 # Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN.
 #
 # See docs/design/npm-sdk-trusted-publishing.md and
@@ -45,6 +46,8 @@ jobs:
           PIM_CONTRACTS_ESCAPED: "@umbraculum%2fpim-contracts"
           MRP_CONTRACTS_ESCAPED: "@umbraculum%2fmrp-contracts"
           CRP_CONTRACTS_ESCAPED: "@umbraculum%2fcrp-contracts"
+          CONTRACTS_ESCAPED: "@umbraculum%2fcontracts"
+          API_CLIENT_ESCAPED: "@umbraculum%2fapi-client"
         run: |
           set -euo pipefail
 
@@ -121,6 +124,15 @@ jobs:
           publish_npm_oidc packages/mrp-contracts "${MRP_CONTRACTS_ESCAPED}" "@umbraculum/mrp-contracts"
           publish_npm_oidc packages/crp-contracts "${CRP_CONTRACTS_ESCAPED}" "@umbraculum/crp-contracts"
 
+          publish_npm_oidc packages/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
+
+          echo "Rewriting api-client dependencies to registry semver for publish tarball only"
+          jq '.dependencies["@umbraculum/contracts"] = "^0.0.1" | .dependencies["@umbraculum/automation-contracts"] = "^0.0.2" | .dependencies["@umbraculum/pim-contracts"] = "^0.0.2" | .dependencies["@umbraculum/mrp-contracts"] = "^0.0.2" | .dependencies["@umbraculum/crp-contracts"] = "^0.0.2"' \
+            packages/api-client/package.json > /tmp/api-client-package.json
+          mv /tmp/api-client-package.json packages/api-client/package.json
+
+          publish_npm_oidc packages/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
+
       - name: Published versions summary
         run: |
           set -euo pipefail
@@ -131,7 +143,9 @@ jobs:
             automation-contracts \
             pim-contracts \
             mrp-contracts \
-            crp-contracts
+            crp-contracts \
+            contracts \
+            api-client
           do
             echo "@umbraculum/${PKG}@$(npm view "@umbraculum/${PKG}" version)"
           done

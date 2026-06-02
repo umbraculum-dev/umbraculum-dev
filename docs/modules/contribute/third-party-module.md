@@ -34,16 +34,18 @@ If you want to ship the *one* canonical implementation of a new domain, you want
 
 ## 3. The stable surfaces you pin
 
-The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party module depends on. Four packages: three unconditional plus one per canonical you target:
+The MIT-licensed SDK contract is the **only** Umbraculum surface a third-party module depends on. Core packages: three unconditional plus one per canonical you target. Optional HTTP client packages when your module calls the platform API from Node or a custom client:
 
 - **`@umbraculum/module-sdk`** ([`packages/module-sdk/README.md`](../../../packages/module-sdk/README.md)) — `registerModule()`, `RESERVED_CANONICAL_MODULE_CODES`, `ValidatedSchema<T>`, `RegisterModuleOptions`, `registerWebModule()`, `registerNativeModule()`. The module SDK proper.
 - **`@umbraculum/ai-tool-sdk`** ([`packages/ai-tool-sdk/README.md`](../../../packages/ai-tool-sdk/README.md)) — `AiTool<I, O>`, `AiToolContext`, `AiToolScope`, `AiToolRegistry`, `AiToolDefinition`. The AI-tool contract every module's tool implementations satisfy. Library-agnostic — third-party authors pick their own validation library for `inputSchema`. Pin if your module contributes AI tools (which most modules do via `registerAiTools` on `RegisterModuleOptions`).
 - **`@umbraculum/i18n-keys`** ([`packages/i18n-keys/README.md`](../../../packages/i18n-keys/README.md)) — `ModuleNavLabelKey`, `moduleMessageRoot`, `defaultModuleNavLabelKey`, `RESERVED_PLATFORM_MESSAGE_ROOTS`. Namespace conventions for module-owned message keys in locale bundles. Pin for any module that ships UI copy or registers `navEntry` / `tabEntry` label keys (typical for all modules with a web or native surface).
 - **`@umbraculum/<code>-contracts`** — the specific canonical's contracts package (e.g. `@umbraculum/automation-contracts` exports `AutomationAdapterDefinition`, `MAILBOX_SPEC`, `CONTRACT_VERSION`). One per canonical module you target.
+- **`@umbraculum/contracts`** ([`packages/contracts/README.md`](../../../packages/contracts/README.md)) — platform wire parsers (auth, workspaces, rendering jobs, ads, AI settings/usage). Pin when validating platform HTTP payloads outside `@umbraculum/api-client`.
+- **`@umbraculum/api-client`** ([`packages/api-client/README.md`](../../../packages/api-client/README.md)) — optional typed HTTP facades (`listWorkspaces`, canonical subpaths `/automation`, `/pim`, …). Prefer over raw `fetch` when calling Umbraculum APIs from Node scripts or external apps. Browse paths on [docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform).
 
 You do **not** import from `services/api/src/modules/<code>/` directly. That tree is platform internals and not version-stable. If something you need is not exported from a contracts package, that's a feature request against the contracts package, not a license to reach inside.
 
-**npm registry (primary).** The four packages above are on the public npm registry as of **2026-05-29**:
+**npm registry (primary).** Core SDK packages on the public npm registry as of **2026-05-29**; `@umbraculum/contracts` and `@umbraculum/api-client` at **`0.0.1`** (2026-06):
 
 ```bash
 npm install \
@@ -51,6 +53,8 @@ npm install \
   @umbraculum/ai-tool-sdk@0.1.1 \
   @umbraculum/i18n-keys@0.1.1
 # plus @umbraculum/<code>-contracts@0.0.2 for each canonical you target
+# optional HTTP client stack:
+npm install @umbraculum/contracts@0.0.1 @umbraculum/api-client@0.0.1
 ```
 
 Pin `peerDependencies` to `^` those versions (or newer patch/minor within range). See [`LICENSING.md`](../../LICENSING.md) §6.2.1 for the full version table.

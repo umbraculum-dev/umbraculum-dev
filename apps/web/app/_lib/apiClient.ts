@@ -1,9 +1,14 @@
 /**
- * Shared API fetch helper for the web app.
+ * Legacy cookie-session fetch helper for the web app.
  *
- * - Cookie-based auth: browser sends the session cookie automatically.
- * - Parses JSON when possible, but safely falls back to raw text to avoid
- *   `SyntaxError: Unexpected token '<'` masking the real server response.
+ * Phase E9 migrated all API call sites to `@umbraculum/api-client` typed facades via
+ * `webPlatformApiClient()`. This module remains for:
+ * - cookie transport (`credentials: "same-origin"`)
+ * - session UX side effects (auth expiry redirect, logout/login markers)
+ *
+ * Do not add new `apiFetch` consumers — use facades from `webApiClient.ts` instead.
+ * See [`docs/AUTH-STRATEGY.md`](../../../docs/AUTH-STRATEGY.md) and
+ * [`packages/api-client/README.md`](../../../packages/api-client/README.md).
  */
 import {
   emitAuthExpiredIfNeeded,

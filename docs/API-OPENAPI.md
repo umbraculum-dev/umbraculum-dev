@@ -30,7 +30,8 @@ This document is the **canonical index** for machine-readable API documentation 
 |----------|----------|
 | Platform catalog (git) | [`services/api/openapi/openapi.json`](../services/api/openapi/openapi.json) |
 | Brewery add-on (git) | [`services/api/openapi/brewery.json`](../services/api/openapi/brewery.json) |
-| Docs site static copies | [`/openapi/openapi.json`](/openapi/openapi.json), [`/openapi/brewery.json`](/openapi/brewery.json) |
+| Docs site static copies | [`docs-site/static/openapi/openapi.json`](../docs-site/static/openapi/openapi.json), [`docs-site/static/openapi/brewery.json`](../docs-site/static/openapi/brewery.json) |
+| **Browsable specs (docs site)** | Platform: [https://docs.umbraculum.dev/openapi-platform](https://docs.umbraculum.dev/openapi-platform) (Redoc embed of platform catalog). Brewery add-on: [https://docs.umbraculum.dev/openapi-brewery](https://docs.umbraculum.dev/openapi-brewery). |
 | Runtime (API) | `GET /api/openapi.json` (platform); `GET /api/openapi/brewery.json` when brewery module enabled |
 | Local Swagger UI (dev) | `http://localhost:18080/api/documentation` when `NODE_ENV` ≠ `production` |
 
@@ -109,11 +110,12 @@ Browsable specs on **docs.umbraculum.dev** are **Redoc standalone** inside Docus
 ## Integrator workflow
 
 1. **Pick your SKU** — platform-only integrators: `openapi.json` only; reference vertical evaluators: both files.
-2. **Pick the module** — [`MODULES.md`](MODULES.md) + per-module route tables.
-3. **Pin types** — `@umbraculum/<code>-contracts` and `@umbraculum/contracts` for platform auth/workspaces; optional OpenAPI path types from `@umbraculum/api-client` (`PlatformOpenApiPaths`, `BreweryOpenApiPaths` — see §Known limitations).
-4. **Browse machine-readable paths** — filter by tag in Swagger UI or Redoc. Platform catalog: [docs site Redoc embed](/openapi-platform) (`/openapi/openapi.json` static copy). Brewery add-on: [docs site Redoc embed](/openapi-brewery) (`/openapi/brewery.json` static copy).
-5. **Auth** — cookie `sid` (web) or bearer (native); auth paths are in the platform spec under tag `platform`.
-6. **Automation adapters** — `CONTRACT_VERSION` remains authoritative over OpenAPI for mailbox semantics.
+2. **Browse machine-readable paths** — [platform Redoc on docs.umbraculum.dev](https://docs.umbraculum.dev/openapi-platform) or [brewery add-on Redoc](https://docs.umbraculum.dev/openapi-brewery); filter by tag in Swagger UI locally (`http://localhost:18080/api/documentation`).
+3. **Pick the module** — [`MODULES.md`](MODULES.md) + per-module route tables.
+4. **Pin types** — `@umbraculum/<code>-contracts` for canonical domains; `@umbraculum/contracts` for platform auth/workspaces/rendering parsers.
+5. **Call the API (optional)** — `@umbraculum/api-client` typed facades over raw `fetch` (OpenAPI path types + contracts parsers). Subpaths: `/brewery`, `/automation`, `/pim`, `/mrp`, `/crp`. See [`packages/api-client/README.md`](../packages/api-client/README.md).
+6. **Auth** — cookie `sid` (web) or bearer (native); auth paths are in the platform spec under tag `platform`.
+7. **Automation adapters** — `CONTRACT_VERSION` remains authoritative over OpenAPI for mailbox semantics.
 
 Try locally: [`GETTING-STARTED.md`](GETTING-STARTED.md) §2.3.
 
@@ -241,7 +243,7 @@ Phase E6d-native migrates all brewery-domain screens under `apps/native/src/modu
 | E6d-PR2 | `RecipesListScreen`, `RecipeEditScreen`, `YeastScreen`, `EquipmentScreen`, `BrewdayStepsSettingsScreen`, `WaterProfilesScreen` | `@umbraculum/api-client/brewery` recipes/styles/ingredients/equipment/brewday/water-settings |
 | E6d-PR3 | `BrewSessionDetailScreen`, `FermDataIntegrationScreen` | `brewSessions` + `platform/integrations` |
 
-Out of scope (E9): `AdSlot.tsx`, `openWebFallback.ts` (`/api/ads/*`, `/api/auth/webview-exchange`).
+Completed in E10: `AdSlot.tsx`, `openWebFallback.ts` — see [Phase E10-native-tail](#phase-e10-native-tail-2026-06-02) below.
 
 **Grep gate:** zero raw `api.(get|post|patch|delete)(…'/api/(recipes|brew-sessions|…)` under `apps/native/src/modules/brewery/`.
 
@@ -258,6 +260,21 @@ Phase E9 completes the web `apiFetch` → typed-facade migration for remaining p
 | E9-PR3 | `platform/ads` — `getAdSlot`; `platform/platformAdmin` — workspaces/recipes list, recipe import, ads CRUD | `AdSlot`, `platform/recipes`, `platform/ads`, `RecipeImportForm` (platform path) |
 
 BeerJSON export download links on `platform/recipes` remain plain `<a href="/api/platform/recipes/...">` anchors (binary/stream responses — same pattern as E8 brewery exports).
+
+---
+
+## Phase E10-native-tail — native platform migration (2026-06-02)
+
+Phase E10 completes the native app migration off raw HTTP for the last two platform call sites deferred from E6d/E9. Shared client: `nativePlatformApiClient(token, baseUrl?)` in `apps/native/src/auth/nativeApiClient.ts`.
+
+| Native file | Facade |
+|-------------|--------|
+| `apps/native/src/components/AdSlot.tsx` | `getAdSlot` (`platform/ads`) |
+| `apps/native/src/navigation/openWebFallback.ts` | `exchangeWebviewToken` (`platform/auth`) |
+
+**Ads platform note:** Native previously sent `?platform=native`, but [`AdPlatformSchema`](../packages/contracts/src/ads/routeSchemas.ts) and the Prisma `AdPlatform` enum coerce to `web` only. E10 calls `getAdSlot` without a platform override — same effective server behavior. A future product tranche can add `native` to Prisma + contracts if native-specific ad inventory is needed.
+
+**Grep gate:** zero raw `api.(get|post|patch|delete|put)(` under `apps/native/src/`.
 
 ---
 

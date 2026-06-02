@@ -2,14 +2,13 @@ import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native";
 
-import { bearerTokenAuth, createApiClient } from "@umbraculum/api-client";
 import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
 import { type BrewSessionListItem } from "@umbraculum/contracts";
 import { useT } from "@umbraculum/i18n-react";
 import { Button, Card, Heading, Screen, Text } from "@umbraculum/ui";
 
 import { useAuth } from "../../../auth/AuthProvider";
-import { getApiBaseUrl } from "../../../auth/apiBaseUrl";
+import { nativePlatformApiClient } from "../../../auth/nativeApiClient";
 import type { RootStackParamList } from "../../../navigation/types";
 
 export function BrewSessionsListScreen() {
@@ -32,7 +31,7 @@ export function BrewSessionsListScreen() {
     setError(null);
     setLoading(true);
     try {
-      const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
+      const api = nativePlatformApiClient(state.status === "logged_in" ? state.token : null);
       const parsed = await listBrewSessionsForRecipe(api, recipeId);
       setSessions(parsed.brewSessions);
     } catch (err) {
@@ -48,7 +47,7 @@ export function BrewSessionsListScreen() {
     setCreateError(null);
     setCreating(true);
     try {
-      const api = createApiClient(getApiBaseUrl(), bearerTokenAuth(() => (state.status === "logged_in" ? state.token : null)));
+      const api = nativePlatformApiClient(state.status === "logged_in" ? state.token : null);
       const { brewSession } = await createBrewSession(api, recipeId);
       navigation.navigate("BrewSessionDetail", { recipeId, brewSessionId: brewSession.id });
     } catch (err) {
