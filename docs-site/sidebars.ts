@@ -167,6 +167,11 @@ const sidebars: SidebarsConfig = {
         'API-OPENAPI',
         {
           type: 'link',
+          label: 'Platform OpenAPI (Redoc)',
+          href: '/openapi-platform',
+        },
+        {
+          type: 'link',
           label: 'Brewery OpenAPI (Redoc)',
           href: '/openapi-brewery',
         },

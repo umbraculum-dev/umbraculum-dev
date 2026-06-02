@@ -111,3 +111,20 @@
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+/* Redoc OpenAPI embed — keep Docusaurus theme variables from overriding Redoc text */
+.openapi-redoc-page {
+  min-height: calc(100vh - var(--ifm-navbar-height));
+}
+
+.openapi-redoc-host .redoc-wrap {
+  background-color: var(--ifm-background-color);
+}
+
+[data-theme='dark'] .openapi-redoc-host .redoc-wrap h1,
+[data-theme='dark'] .openapi-redoc-host .redoc-wrap h2,
+[data-theme='dark'] .openapi-redoc-host .redoc-wrap h3,
+[data-theme='dark'] .openapi-redoc-host .redoc-wrap p,
+[data-theme='dark'] .openapi-redoc-host .redoc-wrap li {
+  color: unset;
+}

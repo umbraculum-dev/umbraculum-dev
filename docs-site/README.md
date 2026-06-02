@@ -42,6 +42,51 @@ Do **not** override hashed `announcementBar_*` classes or put `display: flex` on
 
 After swizzle changes: `docker compose restart docs-site`.
 
+## OpenAPI / Redoc embed pages
+
+Browsable OpenAPI on the docs site uses **Redoc standalone** inside a Docusaurus **custom page** — not MDX, not the Docusaurus OpenAPI plugin.
+
+| File | Role |
+|------|------|
+| [`src/components/OpenApiRedocEmbed.tsx`](src/components/OpenApiRedocEmbed.tsx) | **Reuse this** — loads Redoc CDN script, calls `Redoc.init`, re-inits on theme toggle |
+| [`src/openapi/redocTheme.ts`](src/openapi/redocTheme.ts) | Light/dark theme presets synced with Docusaurus `useColorMode()` |
+| [`src/css/custom.css`](src/css/custom.css) | `.openapi-redoc-host` / `.openapi-redoc-page` — stops IFM dark-mode typography from overriding Redoc text |
+| [`static/openapi/*.json`](static/openapi/) | Static copies of committed specs (mirrored from `services/api/openapi/` on generate) |
+| [`src/pages/openapi-platform.tsx`](src/pages/openapi-platform.tsx) | Platform catalog page — `/openapi-platform` |
+| [`src/pages/openapi-brewery.tsx`](src/pages/openapi-brewery.tsx) | Brewery add-on page — `/openapi-brewery` |
+
+### Do not (common agent trap)
+
+- **Do not** call `Redoc.init(specUrl, {}, container)` with an empty options object inside Docusaurus. Redoc defaults to a **light** palette; Docusaurus **dark mode** applies global `[data-theme='dark']` CSS on top → white sidebar, invisible body text, broken layout.
+- **Do not** copy the Redoc loader into each page — extend `OpenApiRedocEmbed` or `getRedocTheme()` instead.
+- **Do not** assume green **docs-site-build** CI deploys Redoc pages differently — same Docusaurus build; the pitfall is **theme sync at runtime**, not the spec JSON.
+
+### Adding another browsable spec (checklist)
+
+1. Ensure a static copy exists: `docs-site/static/openapi/<name>.json` (via `openapi:generate` mirror or manual `cp` from `services/api/openapi/`).
+2. Add `src/pages/openapi-<name>.tsx`:
+
+   ```tsx
+   import Layout from '@theme/Layout';
+   import {OpenApiRedocEmbed} from '../components/OpenApiRedocEmbed';
+
+   export default function OpenApiNamePage() {
+     return (
+       <Layout title="…" description="…">
+         <main className="openapi-redoc-page">
+           <OpenApiRedocEmbed specPath="/openapi/<name>.json" />
+         </main>
+       </Layout>
+     );
+   }
+   ```
+
+3. Wire sidebar or navbar link in [`sidebars.ts`](sidebars.ts) (type `link`, `href: '/openapi-<name>'`).
+4. Toggle **light and dark** in the docs dev server (`http://127.0.0.1:3001/...`) before declaring done.
+5. Cross-link from [`docs/API-OPENAPI.md`](../docs/API-OPENAPI.md) integrator workflow if the spec is public-facing.
+
+Canonical API index: [`docs/API-OPENAPI.md`](../docs/API-OPENAPI.md). Local Swagger UI (dev API only): `http://localhost:18080/api/documentation`.
+
 ## Deploy (maintainer, Phase 2)
 
 Cloudflare **Workers Builds** — second Worker project (after brochure is green). See [`docs/design/public-alpha-cloudflare-pages-runbook.md`](../docs/design/public-alpha-cloudflare-pages-runbook.md) §3.

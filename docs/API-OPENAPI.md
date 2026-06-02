@@ -98,6 +98,12 @@ Rebuild `@umbraculum/contracts` dist when adding route schemas under `packages/c
 
 CI fails if either committed file drifts from a fresh generate (`openapi:check`).
 
+### Docs site Redoc embed (maintainer)
+
+Browsable specs on **docs.umbraculum.dev** are **Redoc standalone** inside Docusaurus custom pages — not part of the OpenAPI generator. Examples: [platform catalog Redoc](/openapi-platform) → `docs-site/static/openapi/openapi.json`; [brewery add-on Redoc](/openapi-brewery) → `docs-site/static/openapi/brewery.json`.
+
+**Adding or changing an embed:** follow [`docs-site/README.md`](../docs-site/README.md) § "OpenAPI / Redoc embed pages". Critical rule for agents: never `Redoc.init(..., {}, ...)` without `getRedocTheme(colorMode)` — Docusaurus dark mode breaks Redoc's default light styling (white sidebar, unreadable body text). Reuse [`OpenApiRedocEmbed`](../docs-site/src/components/OpenApiRedocEmbed.tsx).
+
 ---
 
 ## Integrator workflow
@@ -105,7 +111,7 @@ CI fails if either committed file drifts from a fresh generate (`openapi:check`)
 1. **Pick your SKU** — platform-only integrators: `openapi.json` only; reference vertical evaluators: both files.
 2. **Pick the module** — [`MODULES.md`](MODULES.md) + per-module route tables.
 3. **Pin types** — `@umbraculum/<code>-contracts` and `@umbraculum/contracts` for platform auth/workspaces; optional OpenAPI path types from `@umbraculum/api-client` (`PlatformOpenApiPaths`, `BreweryOpenApiPaths` — see §Known limitations).
-4. **Browse machine-readable paths** — filter by tag in Swagger UI or Redoc. Brewery add-on: [docs site Redoc embed](/openapi-brewery) (`/openapi/brewery.json` static copy).
+4. **Browse machine-readable paths** — filter by tag in Swagger UI or Redoc. Platform catalog: [docs site Redoc embed](/openapi-platform) (`/openapi/openapi.json` static copy). Brewery add-on: [docs site Redoc embed](/openapi-brewery) (`/openapi/brewery.json` static copy).
 5. **Auth** — cookie `sid` (web) or bearer (native); auth paths are in the platform spec under tag `platform`.
 6. **Automation adapters** — `CONTRACT_VERSION` remains authoritative over OpenAPI for mailbox semantics.
 
