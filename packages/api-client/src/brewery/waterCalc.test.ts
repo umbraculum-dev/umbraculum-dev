@@ -24,7 +24,7 @@ describe("waterCalc facades", () => {
     const client = createApiClient("http://test", bearerTokenAuth(() => "tok"), { fetch });
     const res = await calcSaltAdditions(client, { volumeLiters: 20, additions: [] });
     expect(res.ok).toBe(true);
-    expect(res.derivation.kind).toBe("salt_additions");
+    expect(res.derivation["kind"]).toBe("salt_additions");
     expect(fetch).toHaveBeenCalledWith(
       "http://test/api/water-calc/salt-additions",
       expect.objectContaining({ method: "POST" }),
