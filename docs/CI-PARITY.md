@@ -170,7 +170,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 | Workflow | Purpose |
 |----------|---------|
-| [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | Docker Compose + `seed:e2e` + cookie (`integrator-api-smoke.sh`) + bearer npm (`integrator-bearer-npm-smoke.sh`) |
+| [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | Docker Compose + `migrate deploy` + `db:seed` + `seed:e2e` + cookie (`integrator-api-smoke.sh`) + bearer npm (`integrator-bearer-npm-smoke.sh`) |
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 

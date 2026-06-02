@@ -1,7 +1,7 @@
 name: integrator-live-smoke
 
 # Live integrator smoke: cookie (curl) + bearer (published npm + api-client facades).
-# Requires docker compose stack + seed:e2e. Not a ci-parity job (needs full stack).
+# Requires docker compose stack + migrate deploy + db:seed + seed:e2e. Not a ci-parity job (needs full stack).
 
 on:
   push:
@@ -50,6 +50,9 @@ jobs:
         run: |
           set -euo pipefail
           docker compose up -d --wait nginx api postgres redis pgpool gotenberg postgres-replica
+          # Fresh CI volumes have empty Postgres — apply schema + reference seed before E2E fixture.
+          docker compose exec -T api sh -c 'DATABASE_URL=$DATABASE_URL_DIRECT npx prisma migrate deploy'
+          docker compose exec -T api npm run db:seed
           docker compose exec -T api npm run seed:e2e
           ./scripts/integrator-api-smoke.sh "${UMBRACULUM_BASE_URL}"
           ./scripts/integrator-bearer-npm-smoke.sh
