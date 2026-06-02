@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import type { AuthMeResponse } from "@umbraculum/contracts";
 
-import { fetchAuthMe } from "./fetchAuthMe.js";
+import { fetchAuthMe } from "./fetchAuthMe";
 
 export type { AuthMeResponse };
 

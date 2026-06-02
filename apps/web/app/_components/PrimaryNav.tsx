@@ -8,7 +8,7 @@ import type { AuthMeResponse } from "@umbraculum/contracts";
 import type { WebShellNavItem } from "@umbraculum/module-sdk";
 import { SizableText, XStack } from "tamagui";
 
-import { fetchAuthMe } from "../_lib/fetchAuthMe.js";
+import { fetchAuthMe } from "../_lib/fetchAuthMe";
 import { AccessibilityLink } from "./AccessibilityLink";
 import { AuthExpiredNotice } from "./AuthExpiredNotice";
 import { AppMainNav } from "./AppMainNav";

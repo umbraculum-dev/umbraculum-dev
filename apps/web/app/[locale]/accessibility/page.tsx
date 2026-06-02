@@ -7,7 +7,7 @@ import { H1, SizableText, View, YStack } from "tamagui";
 
 import { BrewSelect } from "../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../_components/recipe-edit";
-import { fetchAuthMe } from "../../_lib/fetchAuthMe.js";
+import { fetchAuthMe } from "../../_lib/fetchAuthMe";
 import { webPlatformApiClient } from "../../_lib/webApiClient";
 import { ApiClientError, patchAuthPreferences } from "@umbraculum/api-client";
 

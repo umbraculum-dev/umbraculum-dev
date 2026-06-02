@@ -17,7 +17,7 @@ import {
 import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
-import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
+import { fetchAuthMe } from "../../../_lib/fetchAuthMe";
 
 type EquipmentProfile = {
   id: string;

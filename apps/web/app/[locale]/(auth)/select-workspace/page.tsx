@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
 import { ErrorBox } from "../../../_components/recipe-edit";
-import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
+import { fetchAuthMe } from "../../../_lib/fetchAuthMe";
 import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { ApiClientError, setActiveWorkspace } from "@umbraculum/api-client";
 import { AuthExpiredNotice } from "../../../_components/AuthExpiredNotice";

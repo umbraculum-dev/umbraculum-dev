@@ -16,7 +16,7 @@ import {
 } from "@umbraculum/api-client/brewery";
 
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
-import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
+import { fetchAuthMe } from "../../../_lib/fetchAuthMe";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 

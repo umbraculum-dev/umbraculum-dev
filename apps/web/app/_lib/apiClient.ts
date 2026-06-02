@@ -14,7 +14,7 @@ import {
   emitAuthExpiredIfNeeded,
   markSessionLoggedOut,
   markSessionValidFromAuthEndpoint,
-} from "./sessionAuthUx.js";
+} from "./sessionAuthUx";
 
 export async function apiFetch(path: string, init?: RequestInit) {
   const res = await fetch(path, { ...init, credentials: "same-origin" });

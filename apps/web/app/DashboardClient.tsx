@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import { SizableText } from "tamagui";
 
-import { fetchAuthMe } from "./_lib/fetchAuthMe.js";
+import { fetchAuthMe } from "./_lib/fetchAuthMe";
 
 /**
  * Props for `DashboardClient`.

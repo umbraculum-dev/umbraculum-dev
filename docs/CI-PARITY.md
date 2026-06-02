@@ -28,7 +28,7 @@ Direct CLI (must pass `--ci` for working-tree verification; use `--` before `run
 npm exec --yes @umbraculum/ci-parity@^1 -- run --ci --jobs lint,typecheck
 ```
 
-The repo wrapper sets `PATH` for system Node and passes `--ci` by default — prefer `./scripts/ci-parity-check.sh run`.
+The repo wrapper sets `PATH` for system Node and passes `--ci` by default — **agents must use `./scripts/ci-parity-check.sh`**, not bare `npx @umbraculum/ci-parity` (Cursor AppImage `npx` can ENOENT before jobs run). Prefer `./scripts/ci-parity-check.sh run`.
 
 Other commands:
 
@@ -57,6 +57,7 @@ Other commands:
 - Pushing without running **`--archive`** (or `verify:pre-push` on a clean tree) after commit.
 - Treating `--ci` green as push proof while fixes are still uncommitted — GHA runs committed code.
 - Delegating pre-push to the operator ("run this before you push") — agents run T2 themselves per [`AGENTS.md`](../AGENTS.md) §Pre-push CI parity.
+- Invoking bare **`npx @umbraculum/ci-parity`** from Cursor/agent shells on Linux — use **`./scripts/ci-parity-check.sh`** (wrapper fixes `PATH`; bare `npx` often fails with ENOENT and gives a false "can't verify" signal).
 
 **Ephemeral files:** `--ci` writes `.ci-parity-*.log` and `.ci-parity-run.sh` at the repo root (gitignored). Safe to delete after a run.
 
@@ -84,7 +85,7 @@ Full tier matrix: [`docs/VERIFICATION-TIERS.md`](VERIFICATION-TIERS.md).
 
 | Layer | Role |
 |-------|------|
-| **Host** | `git`, Docker, Node (launch `npx @umbraculum/ci-parity` only) |
+| **Host** | `git`, Docker, Node — launch via **`./scripts/ci-parity-check.sh`** or **`npm run verify:pre-push`** (not bare `npx` in Cursor agent shells) |
 | **Container** | `npm ci`, `npm run lint`, `python3 scripts/docs/…`, per `.umbraculum/ci-parity.json` |
 
 **Not pre-push proof (debug / fast loop only):**

@@ -284,10 +284,9 @@ not the human contributor. Do not end a session with "before you push, run …".
 1. **Commit** all intended changes (ci-parity archive mode tests **committed**
    tree only — uncommitted fixes can hide broken `HEAD`).
 2. With a **clean working tree**, run **`npm run verify:pre-push`** or
-   **`./scripts/ci-parity-check.sh --archive run`** (cross-platform via `npx`;
-   see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)). `verify:pre-push` selects
-   `--archive` automatically when the tree is clean; on Windows without bash use
-   `npx @umbraculum/ci-parity run --archive`.
+   **`./scripts/ci-parity-check.sh --archive run`** (see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)).
+   `verify:pre-push` selects `--archive` automatically when the tree is clean.
+   On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@^1 -- run --archive`.
 3. If the change set touches **`services/api/**`** (or other paths in
    `.github/workflows/api.yml` filters), also run skill
    **`api-integration-tests-pre-push`** before push.
@@ -297,6 +296,13 @@ not the human contributor. Do not end a session with "before you push, run …".
 (`--ci`, working tree + warm volumes) is fine for fast WIP feedback — but
 **never** treat `--ci` green alone as push proof if you have not yet run archive
 mode on the commit you will push.
+
+**Agent invocation (Cursor / agentic shells on Linux):** run
+**`./scripts/ci-parity-check.sh`** — not bare **`npx @umbraculum/ci-parity`**.
+The wrapper prepends system `PATH` so Node/npm are not resolved through Cursor's
+AppImage mount (bare `npx` can fail with ENOENT before any job runs). This is an
+**agent execution requirement**, not something to delegate to the human
+contributor.
 
 Do **not** treat `docker compose exec … npm run typecheck`, host `python3
 scripts/docs/…`, host `npm run build:packages`, or ad-hoc `docker run …
@@ -311,8 +317,9 @@ GHA minutes are for integration steps that truly need GitHub (OIDC publish,
 EAS, etc.) — not for discovering failures ci-parity can catch locally.
 
 Host prerequisites for ci-parity: **git**, **Docker**, and **Node** (to launch
-`npx @umbraculum/ci-parity` only). Job commands execute inside the manifest's
-container image (`node:20-slim`), not on the host shell/OS.
+the CLI via `./scripts/ci-parity-check.sh` or `npm run verify:pre-push`). Job
+commands execute inside the manifest's container image (`node:20-slim`), not
+on the host shell/OS.
 
 Witness rule: `72-ci-parity-local-vs-ci-divergence.mdc` (agent anti-patterns
 for pre-push verification).

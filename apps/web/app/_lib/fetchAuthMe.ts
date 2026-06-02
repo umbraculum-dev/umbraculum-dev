@@ -5,8 +5,8 @@ import { ApiClientError, getAuthMe } from "@umbraculum/api-client";
 import {
   emitAuthExpiredIfNeeded,
   markSessionValidFromAuthEndpoint,
-} from "./sessionAuthUx.js";
-import { webPlatformApiClient } from "./webApiClient.js";
+} from "./sessionAuthUx";
+import { webPlatformApiClient } from "./webApiClient";
 
 const AUTH_ME_PATH = "/api/auth/me";
 

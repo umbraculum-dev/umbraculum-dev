@@ -7,7 +7,7 @@ import {
   type RenderJobPhase,
 } from "@umbraculum/api-client";
 
-import { webPlatformApiClient } from "./webApiClient.js";
+import { webPlatformApiClient } from "./webApiClient";
 
 export type { RenderJobPhase };
 export { toWebArtifactUrl };

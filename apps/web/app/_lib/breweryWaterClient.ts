@@ -1,4 +1,4 @@
-import { webPlatformApiClient } from "./webApiClient.js";
+import { webPlatformApiClient } from "./webApiClient";
 
 /** Cookie-session client for brewery add-on facades (same transport as platform). */
 export function webBreweryApiClient() {
