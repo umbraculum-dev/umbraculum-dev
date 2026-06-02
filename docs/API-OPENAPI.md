@@ -178,7 +178,7 @@ Phase E6 adds all **10** `/water-calc/*` POST facades on `@umbraculum/api-client
 
 ## Phase E6d-platform — web auth/me migration (2026-06-02)
 
-Phase E6d-platform migrates all remaining web `GET /api/auth/me` call sites to the existing `getAuthMe` facade while preserving centralized session-expired UX (`brewery:auth-expired`, `brewery:auth-changed`). Web apps use `fetchAuthMe()` in `apps/web/app/_lib/fetchAuthMe.ts`, which wraps `getAuthMe(webPlatformApiClient())` and shares session tracking with `apiFetch` via `sessionAuthUx.ts`. Shared cookie client factory: `webPlatformApiClient()` in `apps/web/app/_lib/webApiClient.ts` (also used by `renderJobClient`, `breweryWaterClient`, and E7 canonical module pages).
+Phase E6d-platform migrates all remaining web `GET /api/auth/me` call sites to the existing `getAuthMe` facade while preserving centralized session-expired UX (`brewery:auth-expired`, `brewery:auth-changed`). Web apps use `fetchAuthMe()` in `apps/web/app/_lib/fetchAuthMe.ts`, which wraps `getAuthMe(webPlatformApiClient())`. Session hooks were centralized on the shared client factory in **Phase E13** (`sessionAuthUx.ts` via custom fetch in `webPlatformApiClient()`). Shared cookie client factory: `webPlatformApiClient()` in `apps/web/app/_lib/webApiClient.ts` (also used by `renderJobClient`, `breweryWaterClient`, and E7 canonical module pages).
 
 ---
 
@@ -275,6 +275,22 @@ Phase E10 completes the native app migration off raw HTTP for the last two platf
 **Ads platform note:** Native previously sent `?platform=native`, but [`AdPlatformSchema`](../packages/contracts/src/ads/routeSchemas.ts) and the Prisma `AdPlatform` enum coerce to `web` only. E10 calls `getAdSlot` without a platform override — same effective server behavior. A future product tranche can add `native` to Prisma + contracts if native-specific ad inventory is needed.
 
 **Grep gate:** zero raw `api.(get|post|patch|delete|put)(` under `apps/native/src/`.
+
+---
+
+## Phase E13 — web apiFetch retirement (2026-06-02)
+
+Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and centralizing session UX on the shared client factory.
+
+| Change | Detail |
+|--------|--------|
+| Deleted | `apps/web/app/_lib/apiClient.ts` (`apiFetch`), `apps/web/app/recipes/[id]/water/_lib/api.ts` (dead re-export barrel) |
+| Session UX | `sessionAuthUx.ts` hooks run inside `webPlatformApiClient()` custom `fetch` — all typed facades emit `brewery:auth-expired` / `brewery:auth-changed` on 401 when the tab had a prior valid session |
+| `fetchAuthMe()` | Remains the typed `/auth/me` helper for components that need `{ ok, status, data }`; no duplicate session hooks |
+
+**Grep gate:** zero `apiFetch` under `apps/web/`.
+
+**Phase E closure:** first-party web HTTP is 100% `@umbraculum/api-client` facades via `webPlatformApiClient()` / `webBreweryApiClient()`.
 
 ---
 

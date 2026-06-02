@@ -1,5 +1,5 @@
 /**
- * Centralized session-expired UX state shared by apiFetch and fetchAuthMe.
+ * Centralized session-expired UX state shared by webPlatformApiClient session fetch.
  */
 
 let hadValidSessionInThisTab = false;

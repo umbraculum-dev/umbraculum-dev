@@ -5,12 +5,11 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import type { IonProfilePpm } from "@umbraculum/contracts";
+import type { IonProfilePpm, WaterProfilesResponse } from "@umbraculum/contracts";
 
 import { getRecipe, listWaterProfiles } from "@umbraculum/api-client/brewery";
 import { Accordion, Button, H1, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
-import type { WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
 import { formatWithHint } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
