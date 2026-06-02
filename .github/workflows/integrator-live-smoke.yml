@@ -1,0 +1,59 @@
+name: integrator-live-smoke
+
+# Live integrator smoke: cookie (curl) + bearer (published npm + api-client facades).
+# Requires docker compose stack + seed:e2e. Not a ci-parity job (needs full stack).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "packages/contracts/**"
+      - "packages/api-client/**"
+      - "scripts/integrator-*"
+      - "scripts/dogfood-npm-smoke.sh"
+      - ".github/workflows/integrator-live-smoke.yml"
+      - "docker-compose.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "packages/contracts/**"
+      - "packages/api-client/**"
+      - "scripts/integrator-*"
+      - "scripts/dogfood-npm-smoke.sh"
+      - ".github/workflows/integrator-live-smoke.yml"
+      - "docker-compose.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * 1"
+
+concurrency:
+  group: integrator-live-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integrator-live-smoke:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Start stack and run integrator smoke
+        env:
+          UMBRACULUM_BASE_URL: http://localhost:18080
+        run: |
+          set -euo pipefail
+          docker compose up -d --wait nginx api postgres redis pgpool gotenberg postgres-replica
+          docker compose exec -T api npm run seed:e2e
+          ./scripts/integrator-api-smoke.sh "${UMBRACULUM_BASE_URL}"
+          ./scripts/integrator-bearer-npm-smoke.sh
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose down --remove-orphans

@@ -166,6 +166,12 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 | `sdk-publish-prep` | `.github/workflows/publish-sdk-batch.yml` (verify steps only; OIDC publish is GHA-only) | `build:packages`, `test:packages`, batch workspace tests, `npm pack --dry-run` for seven MIT SDK packages |
 | `dogfood-npm-smoke` | `.github/workflows/dogfood-npm-smoke.yml` | Registry install of `@umbraculum/contracts` + `@umbraculum/api-client` outside monorepo (`scripts/dogfood-npm-smoke.sh`) |
 
+**Outside ci-parity (needs live stack):**
+
+| Workflow | Purpose |
+|----------|---------|
+| [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | Docker Compose + `seed:e2e` + cookie (`integrator-api-smoke.sh`) + bearer npm (`integrator-bearer-npm-smoke.sh`) |
+
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 
 **Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** follow **[`AGENTS.md`](../AGENTS.md) § ci-parity manifest / version changes** (agent-owned checklist — not optional). Summary: toolset tag publish first → bump **every** `ci_parity_version` + `CI_PARITY_PKG_VERSION` in one commit → `./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck` before push.

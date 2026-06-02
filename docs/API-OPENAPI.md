@@ -299,9 +299,12 @@ Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and 
 | Artifact | Purpose |
 |----------|---------|
 | [`docs/INTEGRATOR-QUICKSTART.md`](INTEGRATOR-QUICKSTART.md) | External npm install + bearer/cookie examples (no monorepo clone) |
-| [`scripts/integrator-api-smoke.sh`](../scripts/integrator-api-smoke.sh) | Cookie-session login → `/api/auth/me` → `/api/workspaces` → `/api/styles` (web integrator path) |
-| [`packages/contracts/src/brewery/routeSchemas.test.ts`](../packages/contracts/src/brewery/routeSchemas.test.ts) | Strict brewery list schema regression (e.g. `BeerStyle.version` string wire shape) |
+| [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) | Public minimal sample repo — platform-only bearer quickstart |
+| [`scripts/integrator-bearer-smoke.mjs`](../scripts/integrator-bearer-smoke.mjs) | Platform bearer smoke (`loginNative` + facades); synced to sample repo |
+| [`scripts/integrator-bearer-npm-smoke.sh`](../scripts/integrator-bearer-npm-smoke.sh) | Registry npm install + bearer smoke |
+| [`scripts/integrator-api-smoke.sh`](../scripts/integrator-api-smoke.sh) | Cookie-session login → `/api/auth/me` → `/api/workspaces` → `/api/styles` (reference stack) |
 | [`scripts/dogfood-npm-smoke.sh`](../scripts/dogfood-npm-smoke.sh) | Registry-only npm install smoke (CI job `dogfood-npm-smoke`) |
+| [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | Live cookie + bearer npm smoke (docker compose; not ci-parity) |
 | [`publish-contracts-api-client.yml`](../.github/workflows/publish-contracts-api-client.yml) | OIDC publish for `@umbraculum/contracts` + `@umbraculum/api-client` on `sdk-contracts-v*` tags |
 
 **npm publish:** `@umbraculum/contracts@0.0.1` and `@umbraculum/api-client@0.0.1` on the public registry (2026-06-02). Monorepo consumers dogfood registry semver — see [`npm-sdk-monorepo-dogfood.md`](design/npm-sdk-monorepo-dogfood.md). Future bumps: [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md) § "Contracts + api-client extension" (`sdk-contracts-v*` tags).
@@ -310,7 +313,8 @@ Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and 
 
 ```bash
 ./scripts/integrator-api-smoke.sh
-# or: BASE_URL=http://localhost:18080 ./scripts/integrator-api-smoke.sh
+./scripts/integrator-bearer-npm-smoke.sh
+# or: UMBRACULUM_BASE_URL=http://localhost:18080 ./scripts/integrator-bearer-npm-smoke.sh
 ```
 
 ---

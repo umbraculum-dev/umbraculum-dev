@@ -9,6 +9,9 @@
 #   CONTRACTS_VERSION=0.0.1 API_CLIENT_VERSION=0.0.1
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 CONTRACTS_VERSION="${CONTRACTS_VERSION:-0.0.1}"
 API_CLIENT_VERSION="${API_CLIENT_VERSION:-0.0.1}"
 TMPDIR="${TMPDIR:-/tmp}/umbraculum-dogfood-npm-smoke-$$"
@@ -34,5 +37,7 @@ import('@umbraculum/api-client/brewery').then((m) => {
   if (!keys.length) throw new Error('no brewery exports');
 });
 "
+
+node --check "${REPO_ROOT}/scripts/integrator-bearer-smoke.mjs"
 
 echo "OK: registry dogfood smoke passed"

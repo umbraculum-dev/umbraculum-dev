@@ -22,7 +22,16 @@ Wire-shape authority stays in **`@umbraculum/contracts`** parsers — facades ca
 
 ## 2. Install (outside the monorepo)
 
-Use a **temp directory** or your own repo — not inside `umbraculum-dev`:
+**Sample repo (recommended):** clone [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) — public, platform-only, no monorepo required.
+
+```bash
+git clone https://github.com/umbraculum-dev/umbraculum-integrator-sample.git
+cd umbraculum-integrator-sample
+npm install
+UMBRACULUM_BASE_URL=http://localhost:18080 node quickstart.mjs
+```
+
+Or use a **temp directory** — not inside `umbraculum-dev`:
 
 ```bash
 mkdir -p /tmp/my-umbraculum-integrator && cd /tmp/my-umbraculum-integrator
@@ -59,52 +68,25 @@ https://demo.umbraculum.dev     # public demo (when available)
 
 ---
 
-## 4. Node example — bearer + brewery catalog
+## 4. Node example — bearer + platform API (no vertical required)
 
-Minimal script: login → workspaces → beer styles. Requires a running stack with a seeded user (local: `docker compose exec api npm run seed:e2e`).
+Canonical script: [`scripts/integrator-bearer-smoke.mjs`](../scripts/integrator-bearer-smoke.mjs) (synced to [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) as `quickstart.mjs`).
 
-```javascript
-// quickstart.mjs — run: node quickstart.mjs
-import {
-  bearerTokenAuth,
-  createApiClient,
-  getAuthMe,
-  listWorkspaces,
-  loginNative,
-} from "@umbraculum/api-client";
-import { listStyles } from "@umbraculum/api-client/brewery";
+Flow: health wait → `loginNative` → `getAuthMe` → `listWorkspaces` → `getHealth`. Requires a running stack with a seeded user (local: `docker compose exec api npm run seed:e2e`).
 
-const BASE_URL = process.env.UMBRACULUM_BASE_URL ?? "http://localhost:18080";
-const EMAIL = process.env.UMBRACULUM_EMAIL ?? "e2e-admin@brewery.local";
-const PASSWORD = process.env.UMBRACULUM_PASSWORD ?? "e2e-admin-pw!";
+```bash
+# From umbraculum-dev (workspace deps):
+./scripts/integrator-bearer-smoke.sh
 
-let token = "";
-
-const client = createApiClient(
-  BASE_URL,
-  bearerTokenAuth(() => token),
-);
-
-const login = await loginNative(client, {
-  email: EMAIL,
-  password: PASSWORD,
-  preferredLocale: "en",
-});
-token = login.token;
-
-const me = await getAuthMe(client);
-console.log("auth/me workspaces:", me.workspaces.length);
-
-const { workspaces } = await listWorkspaces(client);
-console.log("workspaces:", workspaces.map((w) => w.name).join(", "));
-
-const { styles } = await listStyles(client);
-console.log("styles:", styles.length, "first.version=", styles[0]?.version);
-
-console.log("OK: integrator quickstart passed");
+# From npm registry only (external integrator path):
+./scripts/integrator-bearer-npm-smoke.sh
 ```
 
-Expected: `first.version` is a **string** (e.g. `"2021"`) — contracts enforce wire shape; numeric version throws at parse time.
+See the script source for env vars (`UMBRACULUM_BASE_URL`, `UMBRACULUM_EMAIL`, `UMBRACULUM_PASSWORD`).
+
+### Optional — brewery add-on (reference vertical only)
+
+If your deployment includes the brewery module, add `@umbraculum/api-client/brewery` and call `listStyles` — see [openapi-brewery](https://docs.umbraculum.dev/openapi-brewery). Platform-only integrators can skip this ([`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md)).
 
 Errors on non-2xx responses surface as `ApiClientError` (status + parsed body).
 
@@ -120,11 +102,31 @@ cd umbraculum-dev
 ./scripts/integrator-api-smoke.sh http://localhost:18080
 ```
 
-Steps exercised: `POST /api/auth/login` (cookie) → `/api/auth/me` → `/api/workspaces` → `/api/styles`.
+Steps exercised: `POST /api/auth/login` (cookie) → `/api/auth/me` → `/api/workspaces` → `/api/styles` (brewery route — reference stack only).
 
 ---
 
-## 6. What to read next
+## 6. Maintainer verification
+
+Bearer (published npm + `@umbraculum/api-client` facades):
+
+```bash
+./scripts/integrator-bearer-npm-smoke.sh
+```
+
+Live stack (cookie + bearer): GHA [`.github/workflows/integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml).
+
+After changing publish metadata:
+
+```bash
+./scripts/ci-parity-check.sh run --jobs docs-readmes,typecheck,dogfood-npm-smoke
+```
+
+See [`CI-PARITY.md`](CI-PARITY.md) job `dogfood-npm-smoke`.
+
+---
+
+## 7. What to read next
 
 | Topic | Document |
 |-------|----------|
@@ -133,15 +135,4 @@ Steps exercised: `POST /api/auth/login` (cookie) → `/api/auth/me` → `/api/wo
 | Module registration (not HTTP) | [`third-party-module.md`](modules/contribute/third-party-module.md) |
 | OpenAPI maintainer runbook | [`API-OPENAPI.md`](API-OPENAPI.md) |
 | Building a non-brewery vertical | [`BUILDING-YOUR-VERTICAL.md`](BUILDING-YOUR-VERTICAL.md) |
-
----
-
-## Maintainer verification
-
-After changing `@umbraculum/contracts` or `@umbraculum/api-client` publish metadata:
-
-```bash
-./scripts/ci-parity-check.sh run --jobs docs-readmes,typecheck,dogfood-npm-smoke
-```
-
-See [`CI-PARITY.md`](CI-PARITY.md) job `dogfood-npm-smoke`.
+| Minimal external sample repo | [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) |

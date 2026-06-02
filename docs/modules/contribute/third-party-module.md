@@ -59,7 +59,7 @@ npm install @umbraculum/contracts@0.0.1 @umbraculum/api-client@0.0.1
 
 Pin `peerDependencies` to `^` those versions (or newer patch/minor within range). See [`LICENSING.md`](../../LICENSING.md) §6.2.1 for the full version table.
 
-**HTTP integrator walkthrough (no module registration):** [`INTEGRATOR-QUICKSTART.md`](../../INTEGRATOR-QUICKSTART.md) — install from npm, bearer login, brewery catalog reads.
+**HTTP integrator walkthrough (no module registration):** [`INTEGRATOR-QUICKSTART.md`](../../INTEGRATOR-QUICKSTART.md) — install from npm, bearer login, platform API reads. **Sample repo:** [`umbraculum-integrator-sample`](https://github.com/umbraculum-dev/umbraculum-integrator-sample) (public, no monorepo clone).
 
 **Monorepo fallback.** Umbraculum contributors and forks still use npm workspaces + `file:` links against `packages/*` (see [`DEVELOPMENT.md`](../../../DEVELOPMENT.md)). Git dependencies on the monorepo checkout remain valid when you need unreleased pins.
 
