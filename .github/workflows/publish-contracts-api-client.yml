@@ -1,24 +1,22 @@
-name: publish-sdk-batch
+name: publish-contracts-api-client
 
-# Publishes the seven-package MIT SDK α batch on sdk-batch-v* tags.
-# Packages: ai-tool-sdk, i18n-keys, module-sdk, automation/pim/mrp/crp-contracts.
-# @umbraculum/contracts + @umbraculum/api-client use publish-contracts-api-client.yml
-# (sdk-contracts-v* tags) — see docs/design/npm-sdk-trusted-publishing.md.
-# Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN.
+# Publishes @umbraculum/contracts + @umbraculum/api-client on sdk-contracts-v* tags.
+# Separate from publish-sdk-batch.yml so first-time publish does not republish the
+# seven-package α batch (403 on unchanged semver).
 #
-# See docs/design/npm-sdk-trusted-publishing.md and
-# docs/design/npm-sdk-publish-execution-plan.md (SP-2/SP-3).
-# Verify steps mirror ci-parity job `sdk-publish-prep` in .umbraculum/ci-parity.json
+# Auth: npm Trusted Publishing (OIDC) — no NPM_TOKEN.
+# First-time: maintainer laptop publish + npm trust CLI — see
+# docs/design/npm-sdk-trusted-publishing.md § "Contracts + api-client extension".
 
 on:
   push:
     tags:
-      - "sdk-batch-v*"
+      - "sdk-contracts-v*"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     permissions:
       contents: read
       id-token: write
@@ -38,15 +36,10 @@ jobs:
       - run: npm run build:packages
       - run: npm run test:packages
 
-      - name: Publish MIT SDK batch to npm (OIDC)
+      - name: Publish contracts + api-client to npm (OIDC)
         env:
-          AI_TOOL_SDK_ESCAPED: "@umbraculum%2fai-tool-sdk"
-          I18N_KEYS_ESCAPED: "@umbraculum%2fi18n-keys"
-          MODULE_SDK_ESCAPED: "@umbraculum%2fmodule-sdk"
-          AUTOMATION_CONTRACTS_ESCAPED: "@umbraculum%2fautomation-contracts"
-          PIM_CONTRACTS_ESCAPED: "@umbraculum%2fpim-contracts"
-          MRP_CONTRACTS_ESCAPED: "@umbraculum%2fmrp-contracts"
-          CRP_CONTRACTS_ESCAPED: "@umbraculum%2fcrp-contracts"
+          CONTRACTS_ESCAPED: "@umbraculum%2fcontracts"
+          API_CLIENT_ESCAPED: "@umbraculum%2fapi-client"
         run: |
           set -euo pipefail
 
@@ -108,32 +101,18 @@ jobs:
             echo "::endgroup::"
           }
 
-          publish_npm_oidc packages/ai-tool-sdk "${AI_TOOL_SDK_ESCAPED}" "@umbraculum/ai-tool-sdk"
-          publish_npm_oidc packages/i18n-keys "${I18N_KEYS_ESCAPED}" "@umbraculum/i18n-keys"
+          publish_npm_oidc packages/contracts "${CONTRACTS_ESCAPED}" "@umbraculum/contracts"
 
-          echo "Rewriting module-sdk dependencies to registry semver for publish tarball only"
-          jq '.dependencies["@umbraculum/ai-tool-sdk"] = "^0.1.1" | .dependencies["@umbraculum/i18n-keys"] = "^0.1.1"' \
-            packages/module-sdk/package.json > /tmp/module-sdk-package.json
-          mv /tmp/module-sdk-package.json packages/module-sdk/package.json
+          echo "Rewriting api-client dependencies to registry semver for publish tarball only"
+          jq '.dependencies["@umbraculum/contracts"] = "^0.0.1" | .dependencies["@umbraculum/automation-contracts"] = "^0.0.2" | .dependencies["@umbraculum/pim-contracts"] = "^0.0.2" | .dependencies["@umbraculum/mrp-contracts"] = "^0.0.2" | .dependencies["@umbraculum/crp-contracts"] = "^0.0.2"' \
+            packages/api-client/package.json > /tmp/api-client-package.json
+          mv /tmp/api-client-package.json packages/api-client/package.json
 
-          publish_npm_oidc packages/module-sdk "${MODULE_SDK_ESCAPED}" "@umbraculum/module-sdk"
-
-          publish_npm_oidc packages/automation-contracts "${AUTOMATION_CONTRACTS_ESCAPED}" "@umbraculum/automation-contracts"
-          publish_npm_oidc packages/pim-contracts "${PIM_CONTRACTS_ESCAPED}" "@umbraculum/pim-contracts"
-          publish_npm_oidc packages/mrp-contracts "${MRP_CONTRACTS_ESCAPED}" "@umbraculum/mrp-contracts"
-          publish_npm_oidc packages/crp-contracts "${CRP_CONTRACTS_ESCAPED}" "@umbraculum/crp-contracts"
+          publish_npm_oidc packages/api-client "${API_CLIENT_ESCAPED}" "@umbraculum/api-client"
 
       - name: Published versions summary
         run: |
           set -euo pipefail
-          for PKG in \
-            ai-tool-sdk \
-            i18n-keys \
-            module-sdk \
-            automation-contracts \
-            pim-contracts \
-            mrp-contracts \
-            crp-contracts
-          do
+          for PKG in contracts api-client; do
             echo "@umbraculum/${PKG}@$(npm view "@umbraculum/${PKG}" version)"
           done

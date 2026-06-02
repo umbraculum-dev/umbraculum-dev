@@ -21,9 +21,16 @@
 | 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.2` |
 | 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.2` |
 
-**Deferred post-α:** `@umbraculum/api-client` (contracts coupling — see LICENSING table).
+**Phase E extension (prep complete; first publish pending maintainer):**
 
-**Not in npm batch (monorepo-only):** `@umbraculum/contracts`, `@umbraculum/ui`, `@umbraculum/i18n`, `@umbraculum/navigation`, `@umbraculum/rendering`, brewery packages, etc.
+| Order | Package | Path | Workflow / tag |
+|-------|---------|------|----------------|
+| 8 | `@umbraculum/contracts` | `packages/contracts/` | `publish-contracts-api-client.yml` → `sdk-contracts-v*` |
+| 9 | `@umbraculum/api-client` | `packages/api-client/` | same (after contracts; deps rewritten at publish time) |
+
+First publish: `./scripts/publish-contracts-api-client-laptop.sh` then OIDC trust — see [`npm-sdk-trusted-publishing.md`](npm-sdk-trusted-publishing.md) § "Contracts + api-client extension".
+
+**Not in npm batch (monorepo-only):** `@umbraculum/ui`, `@umbraculum/i18n`, `@umbraculum/navigation`, `@umbraculum/rendering`, brewery packages, etc.
 
 **Published outside the July α SDK batch (tooling):** `@umbraculum/ci-parity` — see [`docs/design/ci-parity-npm-publish.md`](ci-parity-npm-publish.md) and [`docs/CI-PARITY.md`](../CI-PARITY.md).
 

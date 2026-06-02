@@ -294,6 +294,25 @@ Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and 
 
 ---
 
+## Post-E13 — integrator verification (2026-06-02)
+
+| Artifact | Purpose |
+|----------|---------|
+| [`scripts/integrator-api-smoke.sh`](../scripts/integrator-api-smoke.sh) | Cookie-session login → `/api/auth/me` → `/api/workspaces` → `/api/styles` (web integrator path) |
+| [`packages/contracts/src/brewery/routeSchemas.test.ts`](../packages/contracts/src/brewery/routeSchemas.test.ts) | Strict brewery list schema regression (e.g. `BeerStyle.version` string wire shape) |
+| [`publish-contracts-api-client.yml`](../.github/workflows/publish-contracts-api-client.yml) | OIDC publish for `@umbraculum/contracts` + `@umbraculum/api-client` on `sdk-contracts-v*` tags |
+
+**npm publish:** packages are prep-complete but not yet on the registry. Maintainer runbook: [`npm-sdk-publish-preflight.md`](design/npm-sdk-publish-preflight.md) § Phase E extension + [`scripts/publish-contracts-api-client-laptop.sh`](../scripts/publish-contracts-api-client-laptop.sh).
+
+**Local smoke:**
+
+```bash
+./scripts/integrator-api-smoke.sh
+# or: BASE_URL=http://localhost:18080 ./scripts/integrator-api-smoke.sh
+```
+
+---
+
 ## Phase E8-follow-up — brewery catalog facades (2026-06-02)
 
 E8-follow-up adds brewery catalog facades deferred from E8 (BeerJSON export download links and ingredient admin):

@@ -23,6 +23,34 @@ Publishes the seven-package MIT SDK batch from **umbraculum-dev** via GitHub Act
 
 Full URL prefix: `https://registry.npmjs.org`
 
+### Contracts + api-client extension (Phase E post-α)
+
+| Package | Workflow | Tag pattern |
+|---------|----------|-------------|
+| `@umbraculum/contracts` | `publish-contracts-api-client.yml` | `sdk-contracts-v*` |
+| `@umbraculum/api-client` | `publish-contracts-api-client.yml` | `sdk-contracts-v*` |
+
+**First-time:** npm requires a package record before OIDC trust attaches. Publish `0.0.1` from a maintainer laptop:
+
+```bash
+npx @umbraculum/ci-parity run --jobs sdk-publish-prep
+./scripts/publish-contracts-api-client-laptop.sh
+```
+
+Then configure trusted publishers (workflow filename **`publish-contracts-api-client.yml`**, not `publish-sdk-batch.yml`):
+
+```bash
+REPO="umbraculum-dev/umbraculum-dev"
+WF="publish-contracts-api-client.yml"
+
+for pkg in @umbraculum/contracts @umbraculum/api-client; do
+  npx npm@11.16.0 trust github "$pkg" --repo "$REPO" --file "$WF" --allow-publish -y
+  sleep 2
+done
+```
+
+**Future bumps:** increment semver in `packages/contracts/package.json` and/or `packages/api-client/package.json`, push a **new** tag (e.g. `sdk-contracts-v0.0.2`). Do **not** push `sdk-contracts-v0.0.1` after a successful laptop first publish — that semver is already on the registry.
+
 ---
 
 ## Step 1 — Configure trusted publishers on npm
@@ -138,3 +166,4 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 | 2026-05-29 | First publish (laptop) + OIDC trust (CLI) | Done — seven packages on registry |
 | 2026-05-29 | `sdk-batch-v0.1.1` GHA OIDC publish | **Green** — patch bump to `0.1.1` / `0.0.2` |
 | — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published manually |
+| 2026-06-02 | `publish-contracts-api-client.yml` + laptop script | Prep — first `@umbraculum/contracts` / `@umbraculum/api-client` publish pending maintainer |
