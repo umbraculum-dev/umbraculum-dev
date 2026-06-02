@@ -59,11 +59,14 @@ else
   echo "ci-parity-check: git-archive replay (committed tree only)" >&2
 fi
 
+# Keep in sync with ci_parity_version on every .github/workflows/* caller of ci-parity-reusable.yml
+CI_PARITY_PKG_VERSION="${CI_PARITY_PKG_VERSION:-1.0.9}"
+
 run_ci_parity() {
   if [[ -x "$REPO_ROOT/node_modules/.bin/ci-parity" ]]; then
     exec "$REPO_ROOT/node_modules/.bin/ci-parity" "${extra_args[@]}" "${forward_args[@]}"
   fi
-  exec npx @umbraculum/ci-parity@^1 "${extra_args[@]}" "${forward_args[@]}"
+  exec npx @umbraculum/ci-parity@"${CI_PARITY_PKG_VERSION}" "${extra_args[@]}" "${forward_args[@]}"
 }
 
 run_ci_parity

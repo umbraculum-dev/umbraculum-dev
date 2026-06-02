@@ -168,7 +168,9 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 
-**Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** publish from **toolset** via `ci-parity-v*` tag first, then bump `ci_parity_version` here. Do not local-publish — see [`AGENTS.md`](../AGENTS.md) § "npm publish discipline".
+**Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** publish from **toolset** via `ci-parity-v*` tag first, then bump **`ci_parity_version` on every workflow** that calls `ci-parity-reusable.yml` (not only the workflow for the new job). Do not local-publish — see [`AGENTS.md`](../AGENTS.md) § "npm publish discipline".
+
+**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.9`) — do not use bare `@^1` (stale npx cache can leave you on 1.0.8 while the manifest needs 1.0.9). When you publish a new `@umbraculum/ci-parity`, bump **every** `ci_parity_version` in `.github/workflows/` **and** `CI_PARITY_PKG_VERSION` in `scripts/ci-parity-check.sh` in one commit with manifest job-id changes.
 
 **Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 

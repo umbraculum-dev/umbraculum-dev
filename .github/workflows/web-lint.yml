@@ -43,5 +43,5 @@ jobs:
     uses: ./.github/workflows/ci-parity-reusable.yml
     with:
       jobs: lint
-      ci_parity_version: "1.0.8"
+      ci_parity_version: "1.0.9"
       manifest_path: .umbraculum/ci-parity.json

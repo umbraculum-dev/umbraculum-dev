@@ -122,7 +122,7 @@ Verification slices in [`.umbraculum/verification-slices.json`](../.umbraculum/v
 
 **GitHub Actions:** runner volumes are **ephemeral per job** — parity still runs full `npm ci` each workflow run. GHA `setup-node` cache on non-parity workflows (`api.yml`, etc.) is separate. Future improvement: GHA cache export into parity Docker (toolset issue).
 
-Pin in workflows: `ci_parity_version: "1.0.8"` (after `@umbraculum/ci-parity@1.0.8` is published from umbraculum-toolset).
+Pin in workflows: `ci_parity_version: "1.0.9"` (must match npm when manifest adds new job ids — see [`CI-PARITY.md`](CI-PARITY.md) § manifest job ids).
 
 ---
 
