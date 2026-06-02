@@ -1,0 +1,41 @@
+name: dogfood-npm-smoke
+
+# Registry-only install smoke for @umbraculum/contracts + @umbraculum/api-client.
+# Manifest job: .umbraculum/ci-parity.json → dogfood-npm-smoke
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "packages/contracts/**"
+      - "packages/api-client/**"
+      - "scripts/dogfood-npm-smoke.sh"
+      - ".umbraculum/ci-parity.json"
+      - ".github/workflows/dogfood-npm-smoke.yml"
+      - ".github/workflows/ci-parity-reusable.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "packages/contracts/**"
+      - "packages/api-client/**"
+      - "scripts/dogfood-npm-smoke.sh"
+      - ".umbraculum/ci-parity.json"
+      - ".github/workflows/dogfood-npm-smoke.yml"
+      - ".github/workflows/ci-parity-reusable.yml"
+  workflow_dispatch:
+  schedule:
+    # Weekly registry drift signal (published semver still installs)
+    - cron: "0 6 * * 1"
+
+concurrency:
+  group: dogfood-npm-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dogfood-npm-smoke:
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    uses: ./.github/workflows/ci-parity-reusable.yml
+    with:
+      jobs: dogfood-npm-smoke
+      ci_parity_version: "1.0.9"
+      manifest_path: .umbraculum/ci-parity.json

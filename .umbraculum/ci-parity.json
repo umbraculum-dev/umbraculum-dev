@@ -83,6 +83,10 @@
         "npm pack -w @umbraculum/crp-contracts --dry-run",
         "npm pack -w @umbraculum/api-client --dry-run"
       ]
+    },
+    {
+      "id": "dogfood-npm-smoke",
+      "commands": ["./scripts/dogfood-npm-smoke.sh"]
     }
   ]
 }

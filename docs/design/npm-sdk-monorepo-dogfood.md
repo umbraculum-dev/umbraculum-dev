@@ -42,7 +42,17 @@ From repo root:
 
 ```bash
 ./scripts/dogfood-npm-smoke.sh
+# CI equivalent:
+./scripts/ci-parity-check.sh run --jobs dogfood-npm-smoke
 ```
+
+**Also run before push** when touching contracts/api-client publish surfaces:
+
+```bash
+./scripts/ci-parity-check.sh run --jobs docs-readmes,typecheck,dogfood-npm-smoke
+```
+
+See [`docs/INTEGRATOR-QUICKSTART.md`](../INTEGRATOR-QUICKSTART.md) for the external-author walkthrough.
 
 Or manually in a **temp directory outside the monorepo** (see script). Passing that check is the proof external integrators can install.
 
@@ -58,10 +68,25 @@ Do **not** switch publisher `packages/api-client` to registry `file:` → `^` �
 
 ---
 
-## Tooling / CI follow-up (not daily)
+## Tooling / CI
 
-- **ci-parity:** optional future job `dogfood-npm-smoke` mirroring [`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) in `.umbraculum/ci-parity.json` (network to registry).
-- **umbraculum-toolset:** optional cross-link from `umbraculum-toolset-common` publish checklist — track in sister-repo; not duplicated as a Cursor rule in this repo unless enforcement gap is observed.
+- **ci-parity job `dogfood-npm-smoke`:** runs [`scripts/dogfood-npm-smoke.sh`](../../scripts/dogfood-npm-smoke.sh) (npm registry network). GHA: [`.github/workflows/dogfood-npm-smoke.yml`](../../.github/workflows/dogfood-npm-smoke.yml) — on SDK path changes + weekly schedule.
+- **umbraculum-toolset:** optional cross-link from publish checklist in sister-repo; not a daily Cursor rule in this repo.
+
+---
+
+## Why not dogfood the module-sdk α batch (yet)?
+
+The **seven-package July α batch** (`ai-tool-sdk`, `i18n-keys`, `module-sdk`, four `*-contracts`) is on npm at **`0.1.1` / `0.0.2`**, but monorepo consumers (`apps/web`, `apps/native`, `packages/rendering`, `services/api`) still use **`file:../../packages/...`** links.
+
+| Factor | contracts + api-client (dogfooded) | module-sdk batch (still `file:`) |
+|--------|-----------------------------------|----------------------------------|
+| **Change frequency** | Hot path — OpenAPI facades, web/native HTTP, route parsers co-evolve | Stable spine; fewer cross-cutting edits per week |
+| **Coupling** | `api-client` tarball must prove registry deps resolve | `module-sdk` pulls two leaves; publish workflow already rewrites deps at OIDC time |
+| **Blast radius** | External integrators **just** started installing `@0.0.1` — registry proof is highest ROI | Third-party modules already pin published semver per [`third-party-module.md`](../modules/contribute/third-party-module.md); monorepo symlink does not block them |
+| **Contributor ergonomics** | Workspace symlink + semver manifest = hybrid (documented above) | Module registration + AI tool work touches `module-sdk` daily; forced registry-only would slow iteration unless paired with `npm link` discipline |
+
+**When to dogfood module-sdk batch:** after a quiet period or before a **major** module-sdk semver — run the same playbook (consumer `^` pins + optional ci-parity job extension). Not required for OpenAPI Phase E closure.
 
 ---
 

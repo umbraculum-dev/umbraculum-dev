@@ -164,10 +164,11 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 | `lint` | `.github/workflows/web-lint.yml` | `npm run lint` after root `npm ci` |
 | `typecheck` | `.github/workflows/typecheck.yml` | 15 workspaces + nested `apps/web/e2e` install |
 | `sdk-publish-prep` | `.github/workflows/publish-sdk-batch.yml` (verify steps only; OIDC publish is GHA-only) | `build:packages`, `test:packages`, batch workspace tests, `npm pack --dry-run` for seven MIT SDK packages |
+| `dogfood-npm-smoke` | `.github/workflows/dogfood-npm-smoke.yml` | Registry install of `@umbraculum/contracts` + `@umbraculum/api-client` outside monorepo (`scripts/dogfood-npm-smoke.sh`) |
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 
-**Before `sdk-batch-v*` tag push:** `npx @umbraculum/ci-parity run --jobs docs-readmes,sdk-publish-prep` (or full `npx @umbraculum/ci-parity`).
+**Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 
 ## Adding a typecheck-gated workspace
 
@@ -181,7 +182,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 1. Add `.umbraculum/ci-parity.json` with appropriate `profile` (`ts-npm-monorepo` today; `python` etc. later).
 2. Vendor or call reusable workflow: copy `ci-parity-reusable.yml` from toolset into `.github/workflows/` (umbraculum-dev uses a local copy to avoid cross-repo GHA access policy), or pin `uses: org/toolset/.github/workflows/ci-parity-reusable.yml@ci-parity-v*` if org Actions sharing is enabled.
-3. Pin `@umbraculum/ci-parity` via `ci_parity_version` on callers (today `1.0.8`).
+3. Pin `@umbraculum/ci-parity` via `ci_parity_version` on callers (today `1.0.9`).
 4. Document the one-liner in that repo's `DEVELOPMENT.md`.
 
 ## npm package
