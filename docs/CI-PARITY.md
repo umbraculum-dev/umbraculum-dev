@@ -168,9 +168,9 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 
-**Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** publish from **toolset** via `ci-parity-v*` tag first, then bump **`ci_parity_version` on every workflow** that calls `ci-parity-reusable.yml` (not only the workflow for the new job). Do not local-publish — see [`AGENTS.md`](../AGENTS.md) § "npm publish discipline".
+**Before adding a manifest job id that requires a new `@umbraculum/ci-parity` release:** follow **[`AGENTS.md`](../AGENTS.md) § ci-parity manifest / version changes** (agent-owned checklist — not optional). Summary: toolset tag publish first → bump **every** `ci_parity_version` + `CI_PARITY_PKG_VERSION` in one commit → `./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck` before push.
 
-**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.9`) — do not use bare `@^1` (stale npx cache can leave you on 1.0.8 while the manifest needs 1.0.9). When you publish a new `@umbraculum/ci-parity`, bump **every** `ci_parity_version` in `.github/workflows/` **and** `CI_PARITY_PKG_VERSION` in `scripts/ci-parity-check.sh` in one commit with manifest job-id changes.
+**Local vs GHA version skew (2026-06-02 lesson):** GHA uses an **exact** `ci_parity_version` per workflow. `scripts/ci-parity-check.sh` pins the same version (`CI_PARITY_PKG_VERSION`, default `1.0.9`) — do not use bare `@^1` or a built toolset `dist/cli.js` as pre-push proof. When you publish a new `@umbraculum/ci-parity`, bump **every** pin in the AGENTS.md table **and** `CI_PARITY_PKG_VERSION` in the **same commit** as manifest job-id changes.
 
 **Before `sdk-batch-v*` or `sdk-contracts-v*` tag push:** `./scripts/ci-parity-check.sh run --jobs docs-readmes,sdk-publish-prep,dogfood-npm-smoke` (or full ci-parity).
 
@@ -179,8 +179,8 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 1. Ensure the workspace typechecks clean under hoisted root `npm ci --workspaces`.
 2. Add an entry to `jobs[].workspaces` in `.umbraculum/ci-parity.json` (`mode`: `npm` or `tsc` for tsconfig-only dirs).
 3. Update `.github/workflows/typecheck.yml` path filters if needed (workflow delegates to `@umbraculum/ci-parity` but keeps path triggers).
-4. Run `npx @umbraculum/ci-parity run --jobs typecheck`.
-5. Run `npx @umbraculum/ci-parity validate --strict`.
+4. Run `./scripts/ci-parity-check.sh run --jobs typecheck` (not bare `npx`).
+5. Run `./scripts/ci-parity-check.sh validate --strict` or `npx @umbraculum/ci-parity@<CI_PARITY_PKG_VERSION> validate --strict`.
 
 ## Sister-repo adoption (sketch)
 

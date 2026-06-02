@@ -286,7 +286,7 @@ not the human contributor. Do not end a session with "before you push, run …".
 2. With a **clean working tree**, run **`npm run verify:pre-push`** or
    **`./scripts/ci-parity-check.sh --archive run`** (see [`docs/CI-PARITY.md`](docs/CI-PARITY.md)).
    `verify:pre-push` selects `--archive` automatically when the tree is clean.
-   On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@^1 -- run --archive`.
+   On Windows without bash, use `npm exec --yes @umbraculum/ci-parity@<same-version-as-CI_PARITY_PKG_VERSION> -- run --archive` (read `CI_PARITY_PKG_VERSION` from [`scripts/ci-parity-check.sh`](scripts/ci-parity-check.sh)).
 3. If the change set touches **`services/api/**`** (or other paths in
    `.github/workflows/api.yml` filters), also run skill
    **`api-integration-tests-pre-push`** before push.
@@ -312,6 +312,68 @@ or Linux-biased debug only.
 Manifest source of truth: `.umbraculum/ci-parity.json` — when adding or
 changing a GHA workflow's verify steps, **add the same commands as a ci-parity
 job** in the manifest; do not invent host-only verification scripts.
+
+## ci-parity manifest / version changes (agent mandatory — do not skip)
+
+**You** own this sequence when editing `.umbraculum/ci-parity.json` or adding a
+new manifest job `id`. Do **not** tell the operator to fix red `typecheck` /
+`web-lint` after a version skew — prevent it before push.
+
+### Why this matters
+
+`@umbraculum/ci-parity` validates the **entire manifest** before running **any**
+job. If the manifest contains a job `id` the installed package version does not
+know (e.g. `dogfood-npm-smoke` on `@1.0.8`), **every** workflow fails at Zod
+parse — including `lint` and `typecheck` on unrelated PRs. Symptom:
+
+`Invalid discriminator value … path ["jobs", N, "id"]`.
+
+### When a new job `id` needs a new `@umbraculum/ci-parity` release
+
+1. **umbraculum-toolset:** add job schema + runner branch in
+   `packages/ci-parity/`, bump `package.json` version, commit, push, tag
+   `ci-parity-vX.Y.Z`, wait for **`publish-ci-parity`** green (OIDC — no laptop
+   `npm publish`; see § npm publish discipline below).
+2. Confirm: `npm view @umbraculum/ci-parity version` matches the tag.
+3. **umbraculum-dev — one commit** with manifest + **all** version pins (never
+   bump only the workflow for the new job):
+
+| File | Field |
+|------|--------|
+| `.umbraculum/ci-parity.json` | new/updated job |
+| `.github/workflows/typecheck.yml` | `ci_parity_version` |
+| `.github/workflows/web-lint.yml` | `ci_parity_version` |
+| `.github/workflows/docs-readmes.yml` | `ci_parity_version` |
+| `.github/workflows/dogfood-npm-smoke.yml` | `ci_parity_version` (if present) |
+| `.github/workflows/ci-parity-validate.yml` | `npx @umbraculum/ci-parity@X.Y.Z` |
+| `scripts/ci-parity-check.sh` | `CI_PARITY_PKG_VERSION` default |
+
+4. **Pre-push proof that matches GHA** (mandatory — not optional):
+
+```bash
+./scripts/ci-parity-check.sh --archive run --jobs lint,typecheck
+# or: npm run verify:pre-push
+```
+
+Use **`./scripts/ci-parity-check.sh`** only — it pins the same npm version as
+GHA. Do **not** use:
+
+| Anti-pattern | Why it lies |
+|--------------|-------------|
+| `node …/umbraculum-toolset/packages/ci-parity/dist/cli.js` | Built from source; skips npm version GHA installs |
+| `npx @umbraculum/ci-parity@^1` | Stale npx cache can stay on old patch (1.0.8 vs 1.0.9) |
+| `--jobs docs-readmes,dogfood-npm-smoke` only | Never exercises `lint`/`typecheck` path at the GHA pin |
+| Pushing manifest before npm has the new package | All reusable callers fail at manifest parse |
+
+Historical incident: **2026-06-02** — `dogfood-npm-smoke` merged with pins on
+2/5 workflows only; `typecheck` + `web-lint` stayed on `@1.0.8` until
+`f869918`. Details: [`docs/CI-PARITY.md`](docs/CI-PARITY.md) § manifest job ids.
+
+### When manifest changes do **not** need a new ci-parity release
+
+Editing commands/workspaces inside **existing** job ids (`lint`, `typecheck`,
+`docs-readmes`, `sdk-publish-prep`, `dogfood-npm-smoke`) — no toolset publish;
+still run `./scripts/ci-parity-check.sh --archive run` before push.
 
 GHA minutes are for integration steps that truly need GitHub (OIDC publish,
 EAS, etc.) — not for discovering failures ci-parity can catch locally.
@@ -346,14 +408,17 @@ prompts and is **not** how this project ships routine bumps.
 2. Commit in the **source repo** (toolset for ci-parity; umbraculum-dev for SDK).
 3. Push branch, then push the matching **Git tag** (e.g. `ci-parity-v1.0.9`).
 4. Wait for the GHA workflow to go green; confirm with `npm view <pkg> version`.
-5. **Then** bump `ci_parity_version` / consumer `^` pins in umbraculum-dev if needed.
+5. **Then** bump **`ci_parity_version` on every row in the table above** +
+   `CI_PARITY_PKG_VERSION` in `scripts/ci-parity-check.sh` (same commit as
+   manifest changes when possible). See § ci-parity manifest / version changes.
 
 Auth is **npm Trusted Publishing (OIDC)** from GitHub Actions — no `NPM_TOKEN`,
 no laptop OTP. Runbooks: [`docs/design/ci-parity-npm-trusted-publishing.md`](docs/design/ci-parity-npm-trusted-publishing.md), [`docs/design/npm-sdk-trusted-publishing.md`](docs/design/npm-sdk-trusted-publishing.md).
 
 **If a manifest job needs a newer `@umbraculum/ci-parity` on npm** (e.g. new job
-id in `.umbraculum/ci-parity.json`), publish from **toolset** via tag first —
-do **not** block on local `npm publish`.
+id in `.umbraculum/ci-parity.json`), follow § **ci-parity manifest / version
+changes** — toolset tag first, then bump **all** workflow pins in one commit.
+Do **not** block on local `npm publish`.
 
 ## Release/version notation guardrail
 
