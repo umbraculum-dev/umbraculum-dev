@@ -372,6 +372,14 @@ If your organization's open-source policy prohibits AGPLv3 adoption:
 - Many enterprise legal teams that initially reject AGPL accept it after reviewing the obligations in detail — AGPL's network use clause typically applies only to operations the legal team would have wanted disclosed anyway (modifications to externally-network-served software).
 - We are happy to engage with your legal team to clarify any specific concern.
 
+### 7.6 Community forum and demo host (operational custody — not a license term)
+
+The **AGPLv3 license governs source code**. It does **not** govern who pays for or operates **`forum.umbraculum.dev`** or **`demo.umbraculum.dev`**.
+
+At bootstrap, those surfaces may run on **maintainer-operated provisional VPS infrastructure** (for example a personal hosting account). The project commits that when the **community votes** to do so ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7), hosting may migrate to infrastructure **contracted under the Umbraculum legal entity** via **Discourse/demo backup + restore and DNS cutover** — **not** by transferring the existing VPS contract, disk image, or provider account from the maintainer's account to the project entity's account.
+
+This subsection is a **public operational commitment** paired with the community working agreement. It is **not legal advice** and does not by itself create a separate contractual relationship with forum or demo users beyond what those surfaces' own disclaimers and the Discourse/demo policies already state.
+
 ---
 
 ## 8. Trademark and brand

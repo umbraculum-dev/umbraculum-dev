@@ -10,6 +10,8 @@
 > **`demo.umbraculum.dev` is a demonstration environment only.**  
 > Seed data (recipes, brew sessions, E2E fixtures) exists to build and show Umbraculum—not as a production brewery ledger inside this repository. The database may be wiped or re-seeded without notice. There is no SLA, no backup promise, and no multi-tenant production posture.
 >
+> **Infrastructure custody (bootstrap).** At Phase 0 the demo host may run on **maintainer-operated provisional VPS** infrastructure (personal billing account). When the community votes for entity-owned hosting ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7; [`LICENSING.md`](../LICENSING.md) §7.6), migration is **redeploy + restore on a new VPS + DNS cutover** — **not** transfer of the existing VPS subscription or provider account between legal entities.
+>
 > **Future customer-facing hosted product** is tracked separately at [`cloud-hosted-product-track.md`](cloud-hosted-product-track.md) (`cloud.umbraculum.dev`) — not this host.
 
 ---

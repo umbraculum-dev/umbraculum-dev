@@ -60,7 +60,7 @@ Route via **Cloudflare Email Routing** on `umbraculum.dev` to the maintainer inb
 1. Create a [Liberapay](https://liberapay.com) account for the founding maintainer (GitHub OAuth uses your **personal** account; Liberapay does not attach a GitHub **org** as recipient).
 2. Public page **`Umbraculum`** at `https://liberapay.com/Umbraculum/` — a Liberapay **Team** is optional for solo maintainers; an individual account named after the project is acceptable at alpha ([Teams](https://liberapay.com/about/teams)).
 3. Team / profile description (short):
-   - Funds **AI inference**, **maintainer time**, and **infrastructure** (e.g. community forum ~€10/mo fixed hosting — itemized €7.60: VPS, Auto Backup, off-site archive).
+   - Funds **AI inference**, **maintainer time**, and **infrastructure** (e.g. community forum **~€4/mo** bootstrap VPS-only → **~€10/mo** when backup layers fully enabled).
    - **Environmental accounting:** **1%** of Stripe-processed payouts via **[Stripe Climate Commitments](https://docs.stripe.com/climate/commitments)**; **1 hectare of forest** under active maintenance; local reforestation scaled to capacity — see §9.
    - **Does not** buy votes, priority, or paywalled features — link to `/support` and §5.3.
    - Link **https://github.com/umbraculum-dev** and **https://umbraculum.dev/support/** in prose (credibility; not a GitHub-org OAuth hook).
@@ -96,7 +96,7 @@ In **Community policy** on `forum.umbraculum.dev`, pin a short **Sponsorship cha
 | **Cash → maintainer buys inference** | Liberapay / Buy Me a Coffee; maintainer spends on Cursor/API bills | Individuals |
 | **Organizational billing** | Sponsor org adds maintainer to **Cursor Team**, **Anthropic/OpenAI org billing**, or similar — sponsor pays vendor directly | Agencies, employers |
 | **Cloud credit programs** | Maintainer applies to **AWS/Azure/GCP** OSS credit programs on behalf of the project; sponsor may help with application or customer reference | Vendors, cloud partners |
-| **Infrastructure in-kind** | Sponsor pays Contabo/hosting invoice or provides VPS — earmark “forum host” (~€120/year public figure; itemized ~€91/year at €7.60/mo) | Hosters, consultancies |
+| **Infrastructure in-kind** | Sponsor pays hosting invoice or provides VPS — earmark “forum host” / “demo host” (~€48/year forum bootstrap VPS-only; ~€120/year public full-target figure). Entity-owned custody follows community vote ([`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7); migration is backup + restore + DNS, not VPS account transfer | Hosters, consultancies |
 | **Public coordination** | Open a **Help** or **Community policy** forum topic: “In-kind compute offer — &lt;vendor&gt;” so the offer is visible (§5.3: no private channel for *decisions*; initial offer can be public) | Anyone |
 
 ### 4.2 What we do **not** accept

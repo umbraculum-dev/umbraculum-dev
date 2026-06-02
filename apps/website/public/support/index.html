@@ -66,20 +66,34 @@
         <p>
           At public alpha, <strong>operational maintainability</strong> — keeping the forum, demo
           host, and public surfaces reachable — runs on very modest fixed infrastructure: about
-          <strong>€15/month</strong> today. The lights-on burden stays small; keeping the project
+          <strong>€9–15/month</strong> depending on forum backup phase (forum bootstrap is
+          <strong>~€4/month</strong> VPS-only). The lights-on burden stays small; keeping the project
           running is realistically affordable without jackpot-scale funding. Developer tooling and
           maintainer time are separate from that figure and are not itemized here yet.
         </p>
         <p><strong>Fixed infrastructure costs today:</strong></p>
         <ul class="plain-list">
           <li>
-            <strong>Community forum</strong> (<code>forum.umbraculum.dev</code>) — ~€10/month (VPS,
-            backups, off-site archive)
+            <strong>Community forum</strong> (<code>forum.umbraculum.dev</code>) —
+            <strong>~€4/month</strong> at bootstrap (VPS only); enable Contabo Auto Backup (+€1.50)
+            at public flip when the forum becomes the governance home →
+            <strong>~€10/month</strong> when off-site archive is also enabled
           </li>
           <li>
             <strong>Demo host</strong> (<code>demo.umbraculum.dev</code>) — €5/month
           </li>
         </ul>
+        <p>
+          At bootstrap, forum and demo may run on <strong>maintainer-operated provisional VPS</strong>
+          infrastructure. When the community votes to move to
+          <strong>Umbraculum entity-owned</strong> hosting, migration is
+          <strong>backup + restore and DNS cutover</strong> — not transfer of the existing VPS
+          between accounts. See
+          <a
+            href="https://github.com/umbraculum-dev/umbraculum-dev/blob/master/docs/CORE-DEVELOPMENT-AND-COMMUNITY.md#467-infrastructure-custody-and-host-migration-bootstrap"
+            >CORE-DEVELOPMENT-AND-COMMUNITY.md §4.6.7</a
+          >.
+        </p>
         <p class="cta-row">
           <a class="btn primary" href="https://liberapay.com/Umbraculum/">Recurring — Liberapay</a>
           <a class="btn" href="https://buymeacoffee.com/Umbraculum">One-time — Buy Me a Coffee</a>

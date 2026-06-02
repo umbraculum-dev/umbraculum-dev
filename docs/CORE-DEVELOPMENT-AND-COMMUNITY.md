@@ -149,11 +149,11 @@ Run **one service** on **one VPS** until the community proves it needs more.
 | **Live meetings** | **Provisional external AV** (e.g. public Jitsi meeting link announced in the forum **Meetings** category) | link posted per meeting | Convenience only — **not** the canonical record. Recording and transcript (or detailed minutes) are **published on the forum** |
 | **Transactional email** | Free-tier SMTP (e.g. Brevo, Mailgun trial) | — | Required for Discourse invites/digests; free tier is sufficient at alpha scale |
 
-**Hosting (Phase 0):** Contabo **Cloud VPS 10** — Ubuntu 24.04 LTS, 75 GB NVMe, Auto Backup on. Spec: 4 vCPU, **8 GB RAM**, 1 manual snapshot slot.
+**Hosting (Phase 0):** Contabo **Cloud VPS 10** (or equivalent spec) — Ubuntu 24.04 LTS, 75 GB NVMe class, backups on. Spec: 4 vCPU, **8 GB RAM**. At bootstrap the VPS may be **maintainer-operated provisional infrastructure** (personal billing account) until §4.6.7 migration to entity-owned hosting.
 
 **Maintainer runbook:** [`community-forum-runbook.md`](design/community-forum-runbook.md) (install, DNS, §6 Discourse hardening, smoke tests). Supporting docs: [`community-forum-vps-security.md`](design/community-forum-vps-security.md), [`community-forum-ssl-strategy.md`](design/community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](design/community-forum-secrets-inventory.md), [`infra/community-forum/`](../../infra/community-forum/).
 
-**Phase 0 infra total (itemized):** **€7.60/month** — VPS €3.60 + Auto Backup €1.50 + Contabo Object Storage €2.50 (planned for Discourse off-site backups). **Published round figure for support/donations:** **~€10/month (~€120/year)**. Brevo SMTP stays on free tier at alpha scale. Plus maintainer ops time (~2–4 h/month for forum patches/backups; ~2 h/meeting when a public meeting runs).
+**Phase 0 infra total (itemized):** **€3.60/month** at bootstrap (VPS only) → **€5.10** when kick-off enables Auto Backup (+€1.50) → **€7.60** full target (+ Object Storage €2.50 planned). **Published round figure:** **~€4/month** at bootstrap, **~€10/month** when backup layers are fully enabled. Brevo SMTP stays on free tier at alpha scale. Plus maintainer ops time (~2–4 h/month for forum patches/backups; ~2 h/meeting when a public meeting runs).
 
 #### 4.6.3 Phase 1 — real-time chat (deferred)
 
@@ -182,17 +182,44 @@ Add **Jibri** (recording) only when published recordings become policy, not at f
 
 | Phase | Contabo plan | Infra / month (itemized) | Public round figure | When |
 |-------|--------------|--------------------------|---------------------|------|
-| **0 — Alpha** | Cloud VPS 10 + Auto Backup + Object Storage (planned) | **€7.60** | **~€10** | Public-alpha flip |
+| **0 — Bootstrap** | Cloud VPS 10 (Auto Backup **off** until kick-off) | **€3.60** | **~€4** | Provision + install |
+| **0 — Kick-off** | VPS 10 + Auto Backup | **€5.10** | **~€5–10** | Public-alpha flip (forum canonical) |
+| **0 — Full backup target** | + Object Storage (planned) | **€7.60** | **~€10** | Post-flip or first governance vote |
 | **1 — Chat** | VPS 10 (same) or VPS 20 if tight | **€7.60–9.60** (VPS tier may change) | **~€10–12** | Chat trigger (§4.6.3) |
 | **2 — Own AV** | VPS 20 upgrade or 2× VPS 10 | **€9.60–14.40** | **~€12–18** | Meeting trigger (§4.6.4) |
 
-Phase 0 itemized breakdown: VPS €3.60 + Auto Backup €1.50 + Object Storage €2.50. Object Storage may be wired after bootstrap; it is still budgeted in the published ~€10 figure.
+Phase 0 itemized breakdown: VPS €3.60; Auto Backup €1.50 from **kick-off** (forum announced as governance home — not a visitor-count gate); Object Storage €2.50 when wired. Object Storage may lag kick-off; it is still budgeted in the published ~€10 full-target figure.
 
 These figures assume the existing `umbraculum.dev` zone (no new domain purchase) and free-tier Brevo SMTP. Sponsorship may expand capacity later; it does **not** change vote weight (§5.3).
 
 #### 4.6.6 Revisit
 
 Channel choices, vote tooling on Discourse, Sybil mitigation (§6), and Phase 1/2 triggers are **revisited** on the §9 schedule (first comprehensive revisit within six months after the July 2026 public alpha). Upgrades are **additive** — the forum URL remains the canonical governance home across phases.
+
+#### 4.6.7 Infrastructure custody and host migration (bootstrap)
+
+At public alpha, **`forum.umbraculum.dev`** and **`demo.umbraculum.dev`** may run on **maintainer-operated provisional infrastructure** — typically a VPS billed to the maintainer's personal account or another account that is **not yet** contracted under the **Umbraculum legal entity** ([`LICENSING.md`](LICENSING.md) §10). This keeps bootstrap cost and signup friction low while the project is solo-maintained.
+
+**This is operational custody, not a software-license term.** See [`LICENSING.md`](LICENSING.md) §7.6.
+
+**What we commit**
+
+| Commitment | Detail |
+|------------|--------|
+| **Stable URLs** | `forum.umbraculum.dev` and `demo.umbraculum.dev` remain the canonical surfaces; governance role of the forum is unchanged regardless of which server backs it. |
+| **Entity-owned hosting when the community asks** | When the community **votes** (§4) to move forum and/or demo hosting to infrastructure **contracted under the Umbraculum legal entity** (or a community-approved successor entity), the core team executes that migration. |
+| **Backup + restore, not VPS transfer** | Migration uses **application-level backup and restore** (Discourse Admin backups for the forum; redeploy and data restore for the demo stack) plus **DNS cutover**. We do **not** transfer an existing VPS subscription, disk image, or hosting-provider account from the maintainer's personal account to the project entity's account. Provider account transfers often trigger duplicate identity verification, co-signatures, and cross-entity paperwork — that path is **explicitly out of scope**. |
+| **Notice** | A **planned maintenance window** with advance notice on the forum (and on demo status comms if applicable) is expected before cutover. |
+
+**Triggers (any one is enough to open a §4.1 proposal)**
+
+- A **Proposals** topic that passes §4.3 asking for entity-owned community infrastructure (forum, demo, or both).
+- Sustained sponsorship earmarked for entity-owned hosting **together with** a §4 vote to spend it that way.
+- A community-voted amendment to this §4.6.7 trigger list (same §4 process).
+
+Until a trigger fires and a migration completes, bootstrap custody on maintainer-operated VPS is **explicitly provisional**, documented publicly here, and **does not** grant the maintainer extra vote weight or veto immunity (§5.3).
+
+**Operator runbooks:** forum backup/restore and DNS — [`community-forum-runbook.md`](design/community-forum-runbook.md), [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) §7; demo redeploy — [`demo-host-runbook.md`](design/demo-host-runbook.md).
 
 ---
 

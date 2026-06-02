@@ -137,6 +137,7 @@ Submit using [`docsearch-application-draft.md`](docsearch-application-draft.md) 
 
 - [ ] `GETTING-STARTED` clone + `docker compose up` path (or document known gaps)
 - [ ] `https://forum.umbraculum.dev/` live — [`community-forum-runbook.md`](community-forum-runbook.md) §12 sign-off; §7 hardening complete
+- [ ] Contabo **Auto Backup** enabled on forum VPS (kick-off — [`community-forum-runbook.md`](community-forum-runbook.md) §10; [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) §2)
 - [ ] Pinned **How we communicate** topic in **Community policy** (§6.1 — runbook §6 item 5, §7.5)
 - [ ] `docs-readmes` + `docs-site-build` + `website-build` green on `master`
 - [ ] [`AGENTS.md`](../../AGENTS.md) apparatus path: marketplace-first install documented
