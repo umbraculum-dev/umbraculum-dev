@@ -32,6 +32,14 @@ First-party apps reach the API through nginx at `/api/*`. Facades map OpenAPI pa
 | `brewery/waterCompute` | `computeAndSaveMash`, `computeAndSaveSparge`, `computeAndSaveBoil` | `parseMashComputeAndSaveResponse`, … |
 | `brewery/waterCalc` | `calcSaltAdditions`, `estimateMashPh`, `calcMashOverall`, `calcSpargeOverall`, `calcBoilOverall`, … (10 `/water-calc/*` POSTs) | `WaterCalcWithDerivationResponseSchema`, `WaterCalcResultOnlyResponseSchema` |
 | `brewery/water` | `getRecipeWaterHubSummary` | `parseRecipeWaterHubSummaryResponse` |
+| `brewery/styles` | `listStyles` | `StylesListResponseSchema` |
+| `brewery/ingredients` | `searchFermentables`, `searchHops`, `searchYeasts` | `FermentablesListResponseSchema`, … |
+| `brewery/recipeImport` | `previewRecipeImport`, `importRecipe`, bulk preview/import | `RecipeImport*ResponseSchema` |
+| `brewery/brewSessions` | `getBrewSession`, session lifecycle, steps, integration attach/readings | `BrewSession*ResponseSchema`, `Integration*ResponseSchema` |
+| `brewery/inventory` | `listInventory`, `createInventoryItem`, `patchInventoryItem`, `deleteInventoryItem` | `Inventory*ResponseSchema` |
+| `brewery/equipmentProfiles` | list/create/patch/delete | `EquipmentProfile*ResponseSchema` |
+| `brewery/brewdaySettings` | `getBrewdaySettings`, `patchBrewdaySettings` | `BrewdaySettingsResponseSchema` |
+| `platform/integrations` | workspace integration CRUD, devices, tilt attach/detach, recent sessions | `@umbraculum/contracts` integrations schemas |
 | `automation/vessels` | `listVessels`, `getVessel` | `VesselListResponseSchema`, `VesselStateResponseSchema` |
 | `pim/products` | `listProducts`, `createProduct`, `getProduct`, `listProductVariants` | `Product*ResponseSchema`, `VariantListResponseSchema` |
 | `pim/attributeSets` | `listAttributeSets`, `getAttributeSet` | `AttributeSet*ResponseSchema` |
@@ -111,7 +119,7 @@ Commands (run from repo root, container-friendly per the `node-npm-container-onl
 
 ## Status
 
-**Phase E complete (2026-06-01). Phase E5–E7 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration. npm publish remains a separate LICENSING decision.
+**Phase E complete (2026-06-01). Phase E5–E8 (2026-06):** brewery water facades + native migration; web auth/me via `fetchAuthMe`; canonical module facade subpaths + web `(automation|pim|mrp|crp)/` page migration; **E8** brewery web tranche (recipes, brew sessions, inventory, equipment, integrations). npm publish remains a separate LICENSING decision.
 
 The "webview caveat" above is the one explicitly-flagged limitation: bearer-only native auth does not automatically give a webview an authenticated session — that requires a future bridging mechanism (cookie/session handoff or token-to-session exchange), which is on the trajectory but not yet implemented.
 

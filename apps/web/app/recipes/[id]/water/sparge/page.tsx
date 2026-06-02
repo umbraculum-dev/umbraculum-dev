@@ -22,11 +22,12 @@ import {
   calcSaltAdditions,
   calcSpargeOverall,
   computeAndSaveSparge,
+  getRecipe,
   listWaterProfiles,
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_lib/fetchAuthMe.js";
-import { apiFetch, type WaterProfilesResponse } from "../_lib/api";
+import type { WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, combineAfterSaltsAndAcid } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
@@ -72,9 +73,12 @@ export default function SpargeWaterPage() {
   const recipeId = params?.id ?? "";
 
   const loadRecipeMeta = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(webBreweryApiClient(), id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, []);
 
   const [authChecked, setAuthChecked] = useState(false);

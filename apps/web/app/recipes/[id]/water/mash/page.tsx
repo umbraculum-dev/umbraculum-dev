@@ -27,11 +27,13 @@ import {
   calcSaltAdditions,
   computeAndSaveMash,
   estimateMashPh,
+  getRecipe,
   listWaterProfiles,
+  patchRecipe,
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_lib/fetchAuthMe.js";
-import { apiFetch, type AuthMeResponse, type WaterProfilesResponse } from "../_lib/api";
+import type { AuthMeResponse, WaterProfilesResponse } from "../_lib/api";
 import { ModeFieldset } from "@umbraculum/ui";
 import { parseRecipeMetaFromGetRecipeResponse } from "@umbraculum/brewery-recipes-ui";
 import { RecipeTitleWithMeta } from "../../../../_components/RecipeTitleWithMeta";
@@ -118,9 +120,12 @@ export default function MashWaterPage() {
   const recipeId = params?.id ?? "";
 
   const loadRecipeMeta = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(webBreweryApiClient(), id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, []);
 
   const [me, setMe] = useState<AuthMeResponse | null>(null);
@@ -375,11 +380,9 @@ export default function MashWaterPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await apiFetch(`/api/recipes/${recipeId}`);
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const data = res.data as { recipe: RecipeResponse["recipe"] };
+        const data = await getRecipe(webBreweryApiClient(), recipeId);
         if (cancelled) return;
-        setRecipe(data.recipe);
+        setRecipe(data.recipe as RecipeResponse["recipe"]);
         setMashStepsDirty(false);
       } catch (err) {
         if (!cancelled) setMashStepsSaveError(String(err));
@@ -1105,16 +1108,9 @@ export default function MashWaterPage() {
           .filter(([k, v]) => k !== "0" && v === true),
       );
       const recipeExtJson = { ...extBase, mashStepDeduceFromMashIn };
-      const patchRes = await apiFetch(`/api/recipes/${recipeId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beerJsonRecipeJson: newDoc, recipeExtJson }),
-      });
-      if (!patchRes.ok) throw new Error(JSON.stringify(patchRes.data));
-      const reload = await apiFetch(`/api/recipes/${recipeId}`);
-      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const reloadData = reload.data as { recipe: RecipeResponse["recipe"] };
-      setRecipe(reloadData.recipe);
+      await patchRecipe(webBreweryApiClient(), recipeId, { beerJsonRecipeJson: newDoc, recipeExtJson });
+      const reload = await getRecipe(webBreweryApiClient(), recipeId);
+      setRecipe(reload.recipe as RecipeResponse["recipe"]);
       setMashStepsDirty(false);
       setMashStepsSaveStatus("Saved.");
     } catch (err) {
@@ -1130,9 +1126,7 @@ export default function MashWaterPage() {
     setGristImportStatus(null);
     setImportingGrist(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const data = res.data as RecipeResponse;
+      const data = await getRecipe(webBreweryApiClient(), recipeId);
       const extRec = asRecord(data.recipe.recipeExtJson);
       const mashPhModelRec = asRecord(extRec?.['mashPhModel']);
 

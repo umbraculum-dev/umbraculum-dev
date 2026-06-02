@@ -4,8 +4,18 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { Accordion, Button, H3, SizableText, View, XStack, YStack } from "tamagui";
 
+import {
+  importRecipe,
+  importRecipesBulk,
+  listStyles,
+  previewBulkRecipeImport,
+  previewRecipeImport,
+} from "@umbraculum/api-client/brewery";
+import { ApiClientError } from "@umbraculum/api-client";
+
 import { Link } from "../../src/i18n/navigation";
 import { apiFetch } from "../_lib/apiClient";
+import { webBreweryApiClient } from "../_lib/breweryWaterClient";
 import { BrewSelect } from "./BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "./recipe-edit";
 import { ImportExportPanel } from "./ImportExportPanel";
@@ -47,6 +57,13 @@ function apiErrorMessage(resData: unknown): string {
     (typeof resData === "string" ? resData : JSON.stringify(resData))
   );
 }
+
+function facadeErrorMessage(err: unknown): string {
+  if (err instanceof ApiClientError) return apiErrorMessage(err.body);
+  return String(err);
+}
+
+const BREWERY_RECIPES_API_BASE = "/api/recipes";
 
 function isFileTooLargeError(msg: string | null): boolean {
   if (!msg) return false;
@@ -127,10 +144,15 @@ export function RecipeImportForm({
       setStylesError(null);
       setStylesLoading(true);
       try {
-        const res = await apiFetch("/api/styles");
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-        const items = (res.data as { styles?: unknown })?.styles;
-        if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+        if (apiBasePath === BREWERY_RECIPES_API_BASE) {
+          const data = await listStyles(webBreweryApiClient());
+          if (!cancelled) setStyles(data.styles as StyleListItem[]);
+        } else {
+          const res = await apiFetch("/api/styles");
+          if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+          const items = (res.data as { styles?: unknown })?.styles;
+          if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+        }
       } catch (err) {
         if (!cancelled) {
           setStyles([]);
@@ -143,7 +165,7 @@ export function RecipeImportForm({
     return () => {
       cancelled = true;
     };
-  }, [canCall]);
+  }, [canCall, apiBasePath]);
 
   const buildBody = (payload: Record<string, unknown>) => {
     const body = { ...payload };
@@ -210,23 +232,35 @@ export function RecipeImportForm({
 
     setPreviewLoading(true);
     try {
-      const res = await apiFetch(`${apiBasePath}/import/preview`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildBody({ format, content })),
-      });
-      if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const p = (res.data as { preview?: unknown })?.preview ?? null;
-      if (!p || typeof p !== "object") throw new Error(t("errors.previewMissing"));
-      const pRec = p as { name?: unknown; notes?: unknown; warnings?: unknown };
-      const name = typeof pRec.name === "string" ? pRec.name : "";
-      const notesRaw = pRec.notes;
-      const notes = typeof notesRaw === "string" ? notesRaw : notesRaw === null ? null : null;
-      const warningsRaw = pRec.warnings;
-      const warnings = Array.isArray(warningsRaw) ? (warningsRaw as ImportWarning[]) : [];
-      setPreview({ name, notes, warnings });
+      const body = buildBody({ format, content });
+      if (apiBasePath === BREWERY_RECIPES_API_BASE) {
+        const data = await previewRecipeImport(webBreweryApiClient(), body);
+        const p = data.preview;
+        const name = typeof p["name"] === "string" ? p["name"] : "";
+        const notesRaw = p["notes"];
+        const notes = typeof notesRaw === "string" ? notesRaw : notesRaw === null ? null : null;
+        const warningsRaw = p["warnings"];
+        const warnings = Array.isArray(warningsRaw) ? (warningsRaw as ImportWarning[]) : [];
+        setPreview({ name, notes, warnings });
+      } else {
+        const res = await apiFetch(`${apiBasePath}/import/preview`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(apiErrorMessage(res.data));
+        const p = (res.data as { preview?: unknown })?.preview ?? null;
+        if (!p || typeof p !== "object") throw new Error(t("errors.previewMissing"));
+        const pRec = p as { name?: unknown; notes?: unknown; warnings?: unknown };
+        const name = typeof pRec.name === "string" ? pRec.name : "";
+        const notesRaw = pRec.notes;
+        const notes = typeof notesRaw === "string" ? notesRaw : notesRaw === null ? null : null;
+        const warningsRaw = pRec.warnings;
+        const warnings = Array.isArray(warningsRaw) ? (warningsRaw as ImportWarning[]) : [];
+        setPreview({ name, notes, warnings });
+      }
     } catch (err) {
-      setPreviewError(String(err));
+      setPreviewError(facadeErrorMessage(err));
     } finally {
       setPreviewLoading(false);
     }
@@ -244,17 +278,23 @@ export function RecipeImportForm({
 
     setBulkPreviewLoading(true);
     try {
-      const res = await apiFetch(`${apiBasePath}/import/bulk/preview`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildBody({ format: bulkFormat, content: bulkContent })),
-      });
-      if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const items = (res.data as { previewItems?: unknown })?.previewItems;
-      if (!Array.isArray(items)) throw new Error(t("errors.previewMissing"));
-      setBulkPreviewItems(items as BulkPreviewItem[]);
+      const body = buildBody({ format: bulkFormat, content: bulkContent });
+      if (apiBasePath === BREWERY_RECIPES_API_BASE) {
+        const data = await previewBulkRecipeImport(webBreweryApiClient(), body);
+        setBulkPreviewItems(data.previewItems as BulkPreviewItem[]);
+      } else {
+        const res = await apiFetch(`${apiBasePath}/import/bulk/preview`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(apiErrorMessage(res.data));
+        const items = (res.data as { previewItems?: unknown })?.previewItems;
+        if (!Array.isArray(items)) throw new Error(t("errors.previewMissing"));
+        setBulkPreviewItems(items as BulkPreviewItem[]);
+      }
     } catch (err) {
-      setBulkPreviewError(String(err));
+      setBulkPreviewError(facadeErrorMessage(err));
     } finally {
       setBulkPreviewLoading(false);
     }
@@ -270,19 +310,28 @@ export function RecipeImportForm({
 
     setImporting(true);
     try {
-      const res = await apiFetch(`${apiBasePath}/import`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildBody({ format, content, styleKey })),
-      });
-      if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const recipe = (res.data as { recipe?: unknown })?.recipe ?? null;
-      const recipeRec = recipe && typeof recipe === "object" ? (recipe as { id?: unknown }) : null;
-      const id = typeof recipeRec?.id === "string" ? recipeRec.id : "";
-      if (!id) throw new Error(t("errors.importMissingId"));
-      onSingleImportSuccess?.(id);
+      const body = buildBody({ format, content, styleKey });
+      if (apiBasePath === BREWERY_RECIPES_API_BASE) {
+        const data = await importRecipe(webBreweryApiClient(), body);
+        const recipe = data.recipe as Record<string, unknown>;
+        const id = typeof recipe["id"] === "string" ? recipe["id"] : "";
+        if (!id) throw new Error(t("errors.importMissingId"));
+        onSingleImportSuccess?.(id);
+      } else {
+        const res = await apiFetch(`${apiBasePath}/import`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(apiErrorMessage(res.data));
+        const recipe = (res.data as { recipe?: unknown })?.recipe ?? null;
+        const recipeRec = recipe && typeof recipe === "object" ? (recipe as { id?: unknown }) : null;
+        const id = typeof recipeRec?.id === "string" ? recipeRec.id : "";
+        if (!id) throw new Error(t("errors.importMissingId"));
+        onSingleImportSuccess?.(id);
+      }
     } catch (err) {
-      setImportError(String(err));
+      setImportError(facadeErrorMessage(err));
     } finally {
       setImporting(false);
     }
@@ -297,18 +346,27 @@ export function RecipeImportForm({
 
     setBulkImporting(true);
     try {
-      const res = await apiFetch(`${apiBasePath}/import/bulk`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildBody({ format: bulkFormat, content: bulkContent })),
-      });
-      if (!res.ok) throw new Error(apiErrorMessage(res.data));
-      const body = res.data as { created?: unknown; failed?: unknown };
-      const created: BulkCreatedItem[] = Array.isArray(body?.created) ? (body.created as BulkCreatedItem[]) : [];
-      const failed: BulkFailedItem[] = Array.isArray(body?.failed) ? (body.failed as BulkFailedItem[]) : [];
-      setBulkResult({ created, failed });
+      const body = buildBody({ format: bulkFormat, content: bulkContent });
+      if (apiBasePath === BREWERY_RECIPES_API_BASE) {
+        const data = await importRecipesBulk(webBreweryApiClient(), body);
+        setBulkResult({
+          created: data.created as BulkCreatedItem[],
+          failed: data.failed as BulkFailedItem[],
+        });
+      } else {
+        const res = await apiFetch(`${apiBasePath}/import/bulk`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(apiErrorMessage(res.data));
+        const resBody = res.data as { created?: unknown; failed?: unknown };
+        const created: BulkCreatedItem[] = Array.isArray(resBody?.created) ? (resBody.created as BulkCreatedItem[]) : [];
+        const failed: BulkFailedItem[] = Array.isArray(resBody?.failed) ? (resBody.failed as BulkFailedItem[]) : [];
+        setBulkResult({ created, failed });
+      }
     } catch (err) {
-      setBulkImportError(String(err));
+      setBulkImportError(facadeErrorMessage(err));
     } finally {
       setBulkImporting(false);
     }

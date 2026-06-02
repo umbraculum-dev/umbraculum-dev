@@ -6,9 +6,11 @@ import { Link } from "../../../src/i18n/navigation";
 import { Button, Input, View, XStack, YStack } from "tamagui";
 import { SizableText } from "tamagui";
 
+import { searchYeasts } from "@umbraculum/api-client/brewery";
+
 import { BrewSelect } from "../../_components/BrewSelect";
 import { MathHelpPopover } from "../../_components/MathHelpPopover";
-import { apiFetch } from "../../_lib/apiClient";
+import { webBreweryApiClient } from "../../_lib/breweryWaterClient";
 import {
   ErrorBox,
   MessageBox,
@@ -393,10 +395,8 @@ function YeastEditorEditable({
     setYeastSearchError(null);
     setYeastSearching(true);
     try {
-      const res = await apiFetch(`/api/ingredients/yeasts?query=${encodeURIComponent(yeastQuery)}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
-      setYeastResults(Array.isArray(items) ? (items as YeastSearchItem[]) : []);
+      const data = await searchYeasts(webBreweryApiClient(), { query: yeastQuery });
+      setYeastResults(data.items as YeastSearchItem[]);
     } catch (err) {
       setYeastSearchError(String(err));
       setYeastResults([]);

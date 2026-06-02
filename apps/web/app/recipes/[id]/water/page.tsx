@@ -7,11 +7,10 @@ import { useLocale, useTranslations } from "next-intl";
 
 import type { IonProfilePpm } from "@umbraculum/contracts";
 
-import { listWaterProfiles } from "@umbraculum/api-client/brewery";
+import { getRecipe, listWaterProfiles } from "@umbraculum/api-client/brewery";
 import { Accordion, Button, H1, H3, H4, SizableText, View, XStack, YStack } from "tamagui";
-
 import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
-import { apiFetch, type WaterProfilesResponse } from "./_lib/api";
+import type { WaterProfilesResponse } from "./_lib/api";
 import { fetchRecipeWaterHubSummary, type RecipeWaterHubSummaryResponse } from "./_lib/waterHubSummary";
 import { formatWithHint } from "../../../../src/i18n/format";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
@@ -47,9 +46,12 @@ export default function WaterHubPage() {
   const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const loadRecipeMeta = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(webBreweryApiClient(), id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, []);
 
   const [profiles, setProfiles] = useState<WaterProfilesResponse | null>(null);

@@ -4,12 +4,14 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { Accordion, Button, H1, Input, SizableText, View, XStack, YStack } from "tamagui";
 
+import { createRecipe, deleteRecipe, listRecipes, listStyles } from "@umbraculum/api-client/brewery";
+
 import { AskAiLink } from "../../../_components/AskAiLink";
 import { Link } from "../../../../src/i18n/navigation";
 import { BrewSelect } from "../../../_components/BrewSelect";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
 import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
-import { apiFetch } from "../../../_lib/apiClient";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
 type RecipeListItem = {
@@ -56,10 +58,8 @@ export default function RecipesPage() {
     setStylesError(null);
     setStylesLoading(true);
     try {
-      const res = await apiFetch("/api/styles");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { styles?: unknown })?.styles;
-      setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+      const data = await listStyles(webBreweryApiClient());
+      setStyles(data.styles as StyleListItem[]);
     } catch (err) {
       setStyles([]);
       setStylesError(String(err));
@@ -73,10 +73,8 @@ export default function RecipesPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/recipes");
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const items = (res.data as { recipes?: unknown })?.recipes;
-      setRecipes(Array.isArray(items) ? (items as RecipeListItem[]) : []);
+      const data = await listRecipes(webBreweryApiClient());
+      setRecipes(data.recipes as RecipeListItem[]);
       setDeleteConfirmId(null);
     } catch (err) {
       setError(String(err));
@@ -114,12 +112,7 @@ export default function RecipesPage() {
     setCreating(true);
     setError(null);
     try {
-      const res = await apiFetch("/api/recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, styleKey }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await createRecipe(webBreweryApiClient(), { name, styleKey });
       setNewName("");
       setNewStyleKey("");
       await refresh();
@@ -140,8 +133,7 @@ export default function RecipesPage() {
     setError(null);
     setDeletingId(id);
     try {
-      const res = await apiFetch(`/api/recipes/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await deleteRecipe(webBreweryApiClient(), id);
       await refresh();
       if (exportRecipeId === id) setExportRecipeId("");
     } catch (err) {

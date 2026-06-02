@@ -96,13 +96,39 @@ var PLATFORM_FACADE_PARSER_MAP = {
   "/workspaces": "WorkspacesListResponseSchema",
   "/health": "HealthResponseSchema",
   "/workspaces/{workspaceId}/billing": "WorkspaceBillingResponseSchema",
+  "/workspaces/{workspaceId}/integrations/{kind}": "IntegrationGetResponseSchema / IntegrationCreateResponseSchema",
+  "/workspaces/{workspaceId}/integrations/{kind}/reveal": "IntegrationRevealResponseSchema",
+  "/workspaces/{workspaceId}/integrations/{kind}/rotate-token": "IntegrationCreateResponseSchema",
+  "/workspaces/{workspaceId}/integrations/{kind}/revoke": "IntegrationOkResponseSchema",
   "/workspaces/{workspaceId}/integrations/{kind}/devices": "IntegrationDevicesListResponseSchema",
+  "/workspaces/{workspaceId}/integrations/tilt/devices/{deviceId}/attach": "IntegrationDeviceAttachResponseSchema",
+  "/workspaces/{workspaceId}/integrations/tilt/devices/{deviceId}/detach": "IntegrationDeviceDetachResponseSchema",
+  "/workspaces/{workspaceId}/brew-sessions/recent": "BrewSessionsRecentResponseSchema",
   "/rendering/jobs/{jobId}": "RenderJobStatusResponseSchema",
   "/rendering/jobs/{jobId}/result": "RenderJobResultResponseSchema"
 };
 var BREWERY_FACADE_PARSER_MAP = {
-  "/recipes": "parseRecipesListResponse",
-  "/recipes/{id}": "RecipeResponseSchema",
+  "/recipes": "parseRecipesListResponse / RecipeResponseSchema (POST)",
+  "/recipes/{id}": "RecipeResponseSchema / OkResponseSchema (DELETE)",
+  "/recipes/{id}/versions": "RecipeVersionsResponseSchema / RecipeResponseSchema (POST)",
+  "/recipes/{id}/duplicate": "RecipeResponseSchema",
+  "/recipes/import/preview": "RecipeImportPreviewResponseSchema",
+  "/recipes/import": "RecipeImportResponseSchema",
+  "/recipes/import/bulk/preview": "RecipeBulkImportPreviewResponseSchema",
+  "/recipes/import/bulk": "RecipeBulkImportResponseSchema",
+  "/styles": "StylesListResponseSchema",
+  "/ingredients/fermentables": "FermentablesListResponseSchema",
+  "/ingredients/hops": "HopsListResponseSchema",
+  "/ingredients/yeasts": "YeastsListResponseSchema",
+  "/brew-sessions/{brewSessionId}": "BrewSessionDetailResponseSchema",
+  "/brew-sessions/{brewSessionId}/steps": "BrewSessionStepsResponseSchema",
+  "/brew-sessions/{brewSessionId}/integrations/attachments": "IntegrationAttachmentsResponseSchema",
+  "/brew-sessions/{brewSessionId}/integrations/readings": "IntegrationReadingsResponseSchema",
+  "/inventory": "InventoryListResponseSchema / InventoryItemResponseSchema",
+  "/inventory/{id}": "InventoryItemResponseSchema / OkResponseSchema (DELETE)",
+  "/equipment-profiles": "EquipmentProfilesListResponseSchema / EquipmentProfileResponseSchema",
+  "/equipment-profiles/{id}": "EquipmentProfileResponseSchema / OkResponseSchema (DELETE)",
+  "/brewday-settings": "BrewdaySettingsResponseSchema",
   "/recipes/{recipeId}/brew-sessions": "parseBrewSessionsListResponse",
   "/recipes/{id}/water-hub-summary": "parseRecipeWaterHubSummaryResponse",
   "/water-profiles": "parseWaterProfilesResponse / WaterProfileResponseSchema",
@@ -182,24 +208,113 @@ async function getHealth(client) {
 }
 
 // src/platform/modules.ts
+import { WorkspaceBillingResponseSchema } from "@umbraculum/contracts";
+
+// src/platform/integrations.ts
 import {
+  BrewSessionsRecentQuerySchema,
+  BrewSessionsRecentResponseSchema,
+  IntegrationCreateResponseSchema,
+  IntegrationDeviceAttachRequestSchema,
+  IntegrationDeviceAttachResponseSchema,
+  IntegrationDeviceDetachResponseSchema,
   IntegrationDevicesListResponseSchema,
-  WorkspaceBillingResponseSchema
+  IntegrationGetResponseSchema,
+  IntegrationKindSchema,
+  IntegrationOkResponseSchema,
+  IntegrationRevealResponseSchema
 } from "@umbraculum/contracts";
+function workspaceIntegrationPath(workspaceId, kind) {
+  const parsedKind = IntegrationKindSchema.parse(kind);
+  return toClientPath(
+    `/workspaces/${encodeURIComponent(workspaceId)}/integrations/${encodeURIComponent(parsedKind)}`
+  );
+}
+async function getWorkspaceIntegration(client, workspaceId, kind) {
+  return getParsed(
+    client,
+    workspaceIntegrationPath(workspaceId, kind),
+    (data) => IntegrationGetResponseSchema.parse(data)
+  );
+}
+async function createWorkspaceIntegration(client, workspaceId, kind) {
+  return postParsed(
+    client,
+    workspaceIntegrationPath(workspaceId, kind),
+    {},
+    (data) => IntegrationCreateResponseSchema.parse(data)
+  );
+}
+async function revealIntegrationToken(client, workspaceId, kind) {
+  return getParsed(
+    client,
+    `${workspaceIntegrationPath(workspaceId, kind)}/reveal`,
+    (data) => IntegrationRevealResponseSchema.parse(data)
+  );
+}
+async function rotateIntegrationToken(client, workspaceId, kind) {
+  return postParsed(
+    client,
+    `${workspaceIntegrationPath(workspaceId, kind)}/rotate-token`,
+    {},
+    (data) => IntegrationCreateResponseSchema.parse(data)
+  );
+}
+async function revokeIntegration(client, workspaceId, kind) {
+  return postParsed(
+    client,
+    `${workspaceIntegrationPath(workspaceId, kind)}/revoke`,
+    {},
+    (data) => IntegrationOkResponseSchema.parse(data)
+  );
+}
+async function listIntegrationDevices(client, workspaceId, kind, options) {
+  const sp = new URLSearchParams();
+  if (options?.includeReadings) sp.set("includeReadings", "true");
+  if (options?.readingsLimit !== void 0) sp.set("readingsLimit", String(options.readingsLimit));
+  const query = sp.toString();
+  const path = `${workspaceIntegrationPath(workspaceId, kind)}/devices${query ? `?${query}` : ""}`;
+  return getParsed(client, path, (data) => IntegrationDevicesListResponseSchema.parse(data));
+}
+async function attachTiltDevice(client, workspaceId, deviceId, body) {
+  const parsedBody = IntegrationDeviceAttachRequestSchema.parse(body);
+  return postParsed(
+    client,
+    toClientPath(
+      `/workspaces/${encodeURIComponent(workspaceId)}/integrations/tilt/devices/${encodeURIComponent(deviceId)}/attach`
+    ),
+    parsedBody,
+    (data) => IntegrationDeviceAttachResponseSchema.parse(data)
+  );
+}
+async function detachTiltDevice(client, workspaceId, deviceId) {
+  return postParsed(
+    client,
+    toClientPath(
+      `/workspaces/${encodeURIComponent(workspaceId)}/integrations/tilt/devices/${encodeURIComponent(deviceId)}/detach`
+    ),
+    {},
+    (data) => IntegrationDeviceDetachResponseSchema.parse(data)
+  );
+}
+async function listRecentBrewSessions(client, workspaceId, params) {
+  const parsed = BrewSessionsRecentQuerySchema.parse(params ?? {});
+  const sp = new URLSearchParams();
+  if (parsed.limit !== void 0) sp.set("limit", String(parsed.limit));
+  const query = sp.toString();
+  return getParsed(
+    client,
+    `${toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/brew-sessions/recent`)}${query ? `?${query}` : ""}`,
+    (data) => BrewSessionsRecentResponseSchema.parse(data)
+  );
+}
+
+// src/platform/modules.ts
 async function getWorkspaceBilling(client, workspaceId) {
   return getParsed(
     client,
     toClientPath(`/workspaces/${encodeURIComponent(workspaceId)}/billing`),
     (data) => WorkspaceBillingResponseSchema.parse(data)
-  );
-}
-async function listIntegrationDevices(client, workspaceId, kind) {
-  return getParsed(
-    client,
-    toClientPath(
-      `/workspaces/${encodeURIComponent(workspaceId)}/integrations/${encodeURIComponent(kind)}/devices`
-    ),
-    (data) => IntegrationDevicesListResponseSchema.parse(data)
   );
 }
 
@@ -274,20 +389,28 @@ export {
   ApiClientError,
   BREWERY_FACADE_PARSER_MAP,
   PLATFORM_FACADE_PARSER_MAP,
+  attachTiltDevice,
   bearerTokenAuth,
   cookieAuth,
   createApiClient,
   createWorkspace,
+  createWorkspaceIntegration,
+  detachTiltDevice,
   fetchRenderJobDownloadUrl,
   getAuthMe,
   getHealth,
   getWorkspaceBilling,
+  getWorkspaceIntegration,
   listIntegrationDevices,
+  listRecentBrewSessions,
   listWorkspaces,
   login,
   loginNative,
   pollRenderJobUntilSucceeded,
   resolveArtifactDownloadUrl,
+  revealIntegrationToken,
+  revokeIntegration,
+  rotateIntegrationToken,
   runAsyncRenderJobExport,
   submitRenderJob,
   toWebArtifactUrl

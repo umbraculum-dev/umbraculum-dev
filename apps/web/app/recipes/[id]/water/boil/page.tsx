@@ -18,11 +18,12 @@ import {
   calcBoilOverall,
   calcSaltAdditions,
   computeAndSaveBoil,
+  getRecipe,
   listWaterProfiles,
 } from "@umbraculum/api-client/brewery";
 import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../../_lib/fetchAuthMe.js";
-import { apiFetch, type WaterProfile, type WaterProfilesResponse } from "../_lib/api";
+import type { WaterProfile, WaterProfilesResponse } from "../_lib/api";
 import type { IonProfilePpm } from "../_lib/waterChem";
 import { bicarbonatePpmToAlkalinityPpmCaCO3, mixIonProfilesByVolume } from "../_lib/waterChem";
 import { mathExplain } from "../_lib/mathExplain";
@@ -83,9 +84,12 @@ export default function BoilWaterPage() {
   const recipeId = params?.id ?? "";
 
   const loadRecipeMeta = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(webBreweryApiClient(), id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, []);
 
   const [authChecked, setAuthChecked] = useState(false);

@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
+import { listRecipeVersions } from "@umbraculum/api-client/brewery";
+
 import { Link } from "../../../../../../src/i18n/navigation";
 import { ErrorBox } from "../../../../../_components/recipe-edit";
-import { apiFetch } from "../../../../../_lib/apiClient";
+import { webBreweryApiClient } from "../../../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../../../_lib/useRequireAuth";
 
 type VersionListItem = {
@@ -40,10 +42,8 @@ export default function RecipeVersionsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}/versions`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as { versions?: unknown })?.versions;
-      setVersions(Array.isArray(items) ? (items as VersionListItem[]) : []);
+      const data = await listRecipeVersions(webBreweryApiClient(), recipeId);
+      setVersions(data.versions as VersionListItem[]);
     } catch (err) {
       setVersions([]);
       setError(String(err));

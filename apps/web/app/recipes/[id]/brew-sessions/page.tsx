@@ -7,7 +7,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button, H1, SizableText, View, XStack, YStack } from "tamagui";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import { createBrewSession, listBrewSessionsForRecipe } from "@umbraculum/api-client/brewery";
+
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { ErrorBox, MessageBox } from "../../../_components/recipe-edit";
 
@@ -41,10 +43,8 @@ export default function RecipeBrewSessionsPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const list = (res.data as { brewSessions?: unknown })?.brewSessions;
-      setSessions(Array.isArray(list) ? (list as BrewSessionListItem[]) : []);
+      const data = await listBrewSessionsForRecipe(webBreweryApiClient(), recipeId);
+      setSessions(data.brewSessions as BrewSessionListItem[]);
     } catch (err) {
       setSessions([]);
       setError(String(err));
@@ -63,14 +63,9 @@ export default function RecipeBrewSessionsPage() {
     setCreateError(null);
     setCreating(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const id = (res.data as { brewSession?: { id?: unknown } })?.brewSession?.id;
-      if (typeof id !== "string" || !id) throw new Error("Create brew session response is missing brewSession.id");
+      const data = await createBrewSession(webBreweryApiClient(), recipeId);
+      const id = data.brewSession.id;
+      if (!id) throw new Error("Create brew session response is missing brewSession.id");
       router.push(`/recipes/${recipeId}/brew-sessions/${id}`);
     } catch (err) {
       setCreateError(String(err));

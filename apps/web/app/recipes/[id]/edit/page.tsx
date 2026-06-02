@@ -7,7 +7,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import {
+  createBrewSession,
+  createRecipeVersion,
+  duplicateRecipe,
+  getRecipe,
+  listBrewSessionsForRecipe,
+  listEquipmentProfiles,
+  listRecipeVersions,
+  listStyles,
+  patchRecipe,
+  searchFermentables,
+  searchHops,
+} from "@umbraculum/api-client/brewery";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { asRecord } from "../../../_lib/typeGuards";
 import { formatFixed } from "../../../../src/i18n/format";
@@ -257,9 +270,12 @@ export default function RecipeEditPage() {
   const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const loadRecipeMeta = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(webBreweryApiClient(), id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, []);
 
   const [layoutMetrics, setLayoutMetrics] = useState<{
@@ -481,10 +497,9 @@ export default function RecipeEditPage() {
     setBrewSessionsLoading(true);
     void (async () => {
       try {
-        const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`);
+        const data = await listBrewSessionsForRecipe(webBreweryApiClient(), recipeId);
         if (cancelled) return;
-        const list = (res.data as { brewSessions?: unknown[] })?.brewSessions;
-        const sessions = Array.isArray(list) ? list.slice(0, 20) : [];
+        const sessions = data.brewSessions.slice(0, 20);
         setBrewSessions(
           sessions.map((entry) => {
             const s = asRecord(entry) ?? {};
@@ -568,9 +583,8 @@ export default function RecipeEditPage() {
       setLoadError(null);
       setSaveStatus(null);
       try {
-        const res = await apiFetch(`/api/recipes/${recipeId}`);
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const r = (res.data as { recipe: Recipe }).recipe;
+        const data = await getRecipe(webBreweryApiClient(), recipeId);
+        const r = data.recipe as Recipe;
         if (cancelled) return;
         setRecipe(r);
         setAnalysis(r.analysis ?? null);
@@ -793,10 +807,8 @@ export default function RecipeEditPage() {
       setVersionsLoading(true);
       setVersionsError(null);
       try {
-        const res = await apiFetch(`/api/recipes/${recipeId}/versions`);
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const items = (res.data as { versions?: unknown })?.versions;
-        if (!cancelled) setVersions(Array.isArray(items) ? (items as RecipeVersionListItem[]) : []);
+        const data = await listRecipeVersions(webBreweryApiClient(), recipeId);
+        if (!cancelled) setVersions(data.versions as RecipeVersionListItem[]);
       } catch (err) {
         if (!cancelled) {
           setVersions(null);
@@ -819,10 +831,8 @@ export default function RecipeEditPage() {
       setStylesLoading(true);
       setStylesError(null);
       try {
-        const res = await apiFetch("/api/styles");
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const items = (res.data as { styles?: unknown })?.styles;
-        if (!cancelled) setStyles(Array.isArray(items) ? (items as StyleListItem[]) : []);
+        const data = await listStyles(webBreweryApiClient());
+        if (!cancelled) setStyles(data.styles as StyleListItem[]);
       } catch (err) {
         if (!cancelled) setStylesError(String(err));
       } finally {
@@ -841,10 +851,8 @@ export default function RecipeEditPage() {
       setEquipmentProfilesLoading(true);
       setEquipmentProfilesError(null);
       try {
-        const res = await apiFetch("/api/equipment-profiles");
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const items = (res.data as { profiles?: unknown })?.profiles;
-        if (!cancelled) setEquipmentProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
+        const data = await listEquipmentProfiles(webBreweryApiClient());
+        if (!cancelled) setEquipmentProfiles(data.profiles as EquipmentProfile[]);
       } catch (err) {
         if (!cancelled) setEquipmentProfilesError(String(err));
       } finally {
@@ -871,17 +879,10 @@ export default function RecipeEditPage() {
       base['equipment'] = selected.equipment;
       base['equipmentSource'] = { equipmentProfileId: selected.id, copiedAt: new Date().toISOString() };
 
-      const patchRes = await apiFetch(`/api/recipes/${recipeId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipeExtJson: base }),
-      });
-      if (!patchRes.ok) throw new Error(JSON.stringify(patchRes.data));
+      await patchRecipe(webBreweryApiClient(), recipeId, { recipeExtJson: base });
 
-      // Re-fetch to refresh derived analysis.
-      const reload = await apiFetch(`/api/recipes/${recipeId}`);
-      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as { recipe: Recipe }).recipe;
+      const reload = await getRecipe(webBreweryApiClient(), recipeId);
+      const r = reload.recipe as Recipe;
       setRecipe(r);
       setAnalysis(r.analysis ?? null);
       setSaveStatus(mode === "reload" ? t("status.equipmentReloaded") : t("status.equipmentApplied"));
@@ -1104,23 +1105,16 @@ export default function RecipeEditPage() {
         extBase: extBaseForSave,
       });
 
-      const res = await apiFetch(`/api/recipes/${recipeId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          styleKey,
-          notes: notes || null,
-          beerJsonRecipeJson,
-          recipeExtJson,
-        }),
+      await patchRecipe(webBreweryApiClient(), recipeId, {
+        name,
+        styleKey,
+        notes: notes || null,
+        beerJsonRecipeJson,
+        recipeExtJson,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
 
-      // Re-fetch to refresh derived analysis (PATCH response does not include it).
-      const reload = await apiFetch(`/api/recipes/${recipeId}`);
-      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as { recipe: Recipe }).recipe;
+      const reload = await getRecipe(webBreweryApiClient(), recipeId);
+      const r = reload.recipe as Recipe;
       setRecipe(r);
       setAnalysis(r.analysis ?? null);
       setStyleKey(r.styleKey ?? styleKey);
@@ -1138,12 +1132,8 @@ export default function RecipeEditPage() {
     setCreateVersionError(null);
     setCreatingVersion(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}/versions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const newId = (res.data as { recipe?: { id?: unknown } })?.recipe?.id;
+      const data = await createRecipeVersion(webBreweryApiClient(), recipeId);
+      const newId = data.recipe?.id;
       if (typeof newId !== "string" || !newId) {
         throw new Error("Version create response is missing recipe.id");
       }
@@ -1161,12 +1151,8 @@ export default function RecipeEditPage() {
     setDuplicateRecipeError(null);
     setDuplicatingRecipe(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}/duplicate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const newId = (res.data as { recipe?: { id?: unknown } })?.recipe?.id;
+      const data = await duplicateRecipe(webBreweryApiClient(), recipeId);
+      const newId = data.recipe?.id;
       if (typeof newId !== "string" || !newId) {
         throw new Error("Duplicate response is missing recipe.id");
       }
@@ -1184,13 +1170,8 @@ export default function RecipeEditPage() {
     setBrewSessionError(null);
     setCreatingBrewSession(true);
     try {
-      const res = await apiFetch(`/api/recipes/${recipeId}/brew-sessions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const id = (res.data as { brewSession?: { id?: unknown } })?.brewSession?.id;
+      const data = await createBrewSession(webBreweryApiClient(), recipeId);
+      const id = data.brewSession.id;
       if (typeof id !== "string" || !id) {
         throw new Error("Create brew session response is missing brewSession.id");
       }
@@ -1430,10 +1411,8 @@ export default function RecipeEditPage() {
     setFermentableSearchError(null);
     setFermentableSearching(true);
     try {
-      const res = await apiFetch(`/api/ingredients/fermentables?query=${encodeURIComponent(fermentableQuery)}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
-      setFermentableResults(Array.isArray(items) ? (items as FermentableSearchResult[]) : []);
+      const data = await searchFermentables(webBreweryApiClient(), { query: fermentableQuery });
+      setFermentableResults(data.items as FermentableSearchResult[]);
     } catch (err) {
       setFermentableSearchError(String(err));
       setFermentableResults([]);
@@ -1452,10 +1431,8 @@ export default function RecipeEditPage() {
     setHopSearchError(null);
     setHopSearching(true);
     try {
-      const res = await apiFetch(`/api/ingredients/hops?query=${encodeURIComponent(hopQuery)}`);
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const items = (res.data as { items?: unknown })?.items;
-      setHopResults(Array.isArray(items) ? (items as HopSearchResult[]) : []);
+      const data = await searchHops(webBreweryApiClient(), { query: hopQuery });
+      setHopResults(data.items as HopSearchResult[]);
     } catch (err) {
       setHopSearchError(String(err));
       setHopResults([]);

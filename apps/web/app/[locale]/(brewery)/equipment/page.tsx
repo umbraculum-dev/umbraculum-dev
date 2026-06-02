@@ -7,10 +7,17 @@ import { Accordion, Button, H1, H2, Input, SizableText, View, XStack, YStack } f
 import { Link } from "../../../../src/i18n/navigation";
 import type { AuthMeResponse } from "@umbraculum/contracts";
 
+import {
+  createEquipmentProfile,
+  deleteEquipmentProfile,
+  listEquipmentProfiles,
+  patchEquipmentProfile,
+} from "@umbraculum/api-client/brewery";
+
 import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
 import { ErrorBox, RecipeEditFieldLabel } from "../../../_components/recipe-edit";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { fetchAuthMe } from "../../../_lib/fetchAuthMe.js";
-import { apiFetch } from "../../../_lib/apiClient";
 
 type EquipmentProfile = {
   id: string;
@@ -85,10 +92,8 @@ export default function EquipmentPage() {
       }
       setAuth(meRes.data);
 
-      const listRes = await apiFetch("/api/equipment-profiles");
-      if (!listRes.ok) throw new Error(JSON.stringify(listRes.data));
-      const items = (listRes.data as { profiles?: unknown })?.profiles;
-      setProfiles(Array.isArray(items) ? (items as EquipmentProfile[]) : []);
+      const listData = await listEquipmentProfiles(webBreweryApiClient());
+      setProfiles(Array.isArray(listData.profiles) ? (listData.profiles as EquipmentProfile[]) : []);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -153,26 +158,21 @@ export default function EquipmentPage() {
       const otherLossesLiters = parseNullableNumber(createOtherLossesLiters);
       if (otherLossesLiters != null && otherLossesLiters < 0) throw new Error(t("errors.lossesMustBeNonNegative"));
 
-      const res = await apiFetch("/api/equipment-profiles", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          kettleVolumeLiters,
-          kettleLossesLiters,
-          kettleBoilEvaporationRatePercentPerHour,
-          kettleCoolingShrinkagePercent,
-          kettleHopsAbsorptionLiters,
-          mashVolumeLiters,
-          mashEfficiencyPercent,
-          mashLossesLiters,
-          mashThicknessLPerKg,
-          mashGrainAbsorptionLPerKg,
-          mashWaterLeftoverLiters,
-          otherLossesLiters,
-        }),
+      await createEquipmentProfile(webBreweryApiClient(), {
+        name,
+        kettleVolumeLiters,
+        kettleLossesLiters,
+        kettleBoilEvaporationRatePercentPerHour,
+        kettleCoolingShrinkagePercent,
+        kettleHopsAbsorptionLiters,
+        mashVolumeLiters,
+        mashEfficiencyPercent,
+        mashLossesLiters,
+        mashThicknessLPerKg,
+        mashGrainAbsorptionLPerKg,
+        mashWaterLeftoverLiters,
+        otherLossesLiters,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
 
       setCreateName("");
       setCreateKettleVolumeLiters("");
@@ -247,26 +247,21 @@ export default function EquipmentPage() {
         throw new Error(t("errors.mashEfficiencyRange"));
       }
 
-      const res = await apiFetch(`/api/equipment-profiles/${editingId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          kettleVolumeLiters,
-          kettleLossesLiters: parseNullableNumber(editDraft['kettleLossesLiters'] ?? ""),
-          kettleBoilEvaporationRatePercentPerHour: parseNullableNumber(editDraft['kettleBoilEvaporationRatePercentPerHour'] ?? ""),
-          kettleCoolingShrinkagePercent: parseNullableNumber(editDraft['kettleCoolingShrinkagePercent'] ?? ""),
-          kettleHopsAbsorptionLiters: parseNullableNumber(editDraft['kettleHopsAbsorptionLiters'] ?? ""),
-          mashVolumeLiters: parseNullableNumber(editDraft['mashVolumeLiters'] ?? ""),
-          mashEfficiencyPercent,
-          mashLossesLiters: parseNullableNumber(editDraft['mashLossesLiters'] ?? ""),
-          mashThicknessLPerKg: parseNullableNumber(editDraft['mashThicknessLPerKg'] ?? ""),
-          mashGrainAbsorptionLPerKg: parseNullableNumber(editDraft['mashGrainAbsorptionLPerKg'] ?? ""),
-          mashWaterLeftoverLiters: parseNullableNumber(editDraft['mashWaterLeftoverLiters'] ?? ""),
-          otherLossesLiters: parseNullableNumber(editDraft['otherLossesLiters'] ?? ""),
-        }),
+      await patchEquipmentProfile(webBreweryApiClient(), editingId, {
+        name,
+        kettleVolumeLiters,
+        kettleLossesLiters: parseNullableNumber(editDraft['kettleLossesLiters'] ?? ""),
+        kettleBoilEvaporationRatePercentPerHour: parseNullableNumber(editDraft['kettleBoilEvaporationRatePercentPerHour'] ?? ""),
+        kettleCoolingShrinkagePercent: parseNullableNumber(editDraft['kettleCoolingShrinkagePercent'] ?? ""),
+        kettleHopsAbsorptionLiters: parseNullableNumber(editDraft['kettleHopsAbsorptionLiters'] ?? ""),
+        mashVolumeLiters: parseNullableNumber(editDraft['mashVolumeLiters'] ?? ""),
+        mashEfficiencyPercent,
+        mashLossesLiters: parseNullableNumber(editDraft['mashLossesLiters'] ?? ""),
+        mashThicknessLPerKg: parseNullableNumber(editDraft['mashThicknessLPerKg'] ?? ""),
+        mashGrainAbsorptionLPerKg: parseNullableNumber(editDraft['mashGrainAbsorptionLPerKg'] ?? ""),
+        mashWaterLeftoverLiters: parseNullableNumber(editDraft['mashWaterLeftoverLiters'] ?? ""),
+        otherLossesLiters: parseNullableNumber(editDraft['otherLossesLiters'] ?? ""),
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
 
       setEditingId(null);
       setEditDraft({});
@@ -283,8 +278,7 @@ export default function EquipmentPage() {
     setEditError(null);
     setEditSubmitting(true);
     try {
-      const res = await apiFetch(`/api/equipment-profiles/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      await deleteEquipmentProfile(webBreweryApiClient(), id);
       if (editingId === id) {
         setEditingId(null);
         setEditDraft({});

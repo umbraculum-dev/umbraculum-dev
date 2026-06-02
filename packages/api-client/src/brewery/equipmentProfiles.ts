@@ -1,0 +1,48 @@
+import {
+  EquipmentProfileCreateRequestSchema,
+  EquipmentProfilePatchRequestSchema,
+  EquipmentProfileResponseSchema,
+  EquipmentProfilesListResponseSchema,
+  OkResponseSchema,
+} from "@umbraculum/contracts";
+
+import type { ApiClient } from "../client.js";
+import { toClientPath } from "../internal/clientPath.js";
+import { deleteParsed, getParsed, patchParsed, postParsed } from "../internal/httpJson.js";
+import type { BreweryOpenApiPaths } from "../openapiTypes.js";
+
+type EquipmentProfilesListPath = "/equipment-profiles";
+type EquipmentProfilesListGet = BreweryOpenApiPaths[EquipmentProfilesListPath]["get"];
+
+export type { EquipmentProfilesListGet };
+
+export async function listEquipmentProfiles(client: ApiClient) {
+  return getParsed(client, toClientPath("/equipment-profiles"), (data) =>
+    EquipmentProfilesListResponseSchema.parse(data),
+  );
+}
+
+export async function createEquipmentProfile(client: ApiClient, body: unknown) {
+  const parsedBody = EquipmentProfileCreateRequestSchema.parse(body);
+  return postParsed(client, toClientPath("/equipment-profiles"), parsedBody, (data) =>
+    EquipmentProfileResponseSchema.parse(data),
+  );
+}
+
+export async function patchEquipmentProfile(client: ApiClient, profileId: string, body: unknown) {
+  const parsedBody = EquipmentProfilePatchRequestSchema.parse(body);
+  return patchParsed(
+    client,
+    toClientPath(`/equipment-profiles/${encodeURIComponent(profileId)}`),
+    parsedBody,
+    (data) => EquipmentProfileResponseSchema.parse(data),
+  );
+}
+
+export async function deleteEquipmentProfile(client: ApiClient, profileId: string) {
+  return deleteParsed(
+    client,
+    toClientPath(`/equipment-profiles/${encodeURIComponent(profileId)}`),
+    (data) => OkResponseSchema.parse(data),
+  );
+}

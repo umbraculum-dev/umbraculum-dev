@@ -11,7 +11,15 @@ import {
   RecipeEditIngredientCard,
   RecipeEditSection,
 } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
+import {
+  createInventoryItem,
+  deleteInventoryItem,
+  listInventory,
+  patchInventoryItem,
+  searchFermentables,
+  searchHops,
+} from "@umbraculum/api-client/brewery";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 import { Link } from "../../../../src/i18n/navigation";
@@ -139,10 +147,8 @@ export default function InventoryPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch("/api/inventory");
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
-      const data = res.data as { ok: boolean; items: InventoryItem[] };
-      setItems(Array.isArray(data.items) ? data.items : []);
+      const data = await listInventory(webBreweryApiClient());
+      setItems(Array.isArray(data.items) ? (data.items as InventoryItem[]) : []);
     } catch (err) {
       setError(String(err));
     } finally {
@@ -194,12 +200,13 @@ export default function InventoryPage() {
       return undefined;
     })();
     try {
-      const res = await apiFetch("/api/inventory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, name, quantity: Number.isFinite(qty) ? qty : 0, unit, metadata }),
+      await createInventoryItem(webBreweryApiClient(), {
+        category,
+        name,
+        quantity: Number.isFinite(qty) ? qty : 0,
+        unit,
+        metadata,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setCustomName((prev) => ({ ...prev, [category]: "" }));
       setCustomQty((prev) => ({ ...prev, [category]: "" }));
       if (category === "fermentable") {
@@ -227,19 +234,14 @@ export default function InventoryPage() {
         ...(typeof item?.yieldPercent === "number" && Number.isFinite(item.yieldPercent) ? { yieldPercent: item.yieldPercent } : {}),
         ...(typeof item?.ppg === "number" && Number.isFinite(item.ppg) ? { ppg: item.ppg } : {}),
       };
-      const res = await apiFetch("/api/inventory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: "fermentable",
-          ingredientId: item.id,
-          name: item.name,
-          quantity: 0,
-          unit: "kg",
-          metadata,
-        }),
+      await createInventoryItem(webBreweryApiClient(), {
+        category: "fermentable",
+        ingredientId: item.id,
+        name: item.name,
+        quantity: 0,
+        unit: "kg",
+        metadata,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setFermentableQuery("");
       setFermentableResults([]);
       await refresh();
@@ -255,19 +257,14 @@ export default function InventoryPage() {
         ...(typeof item?.alphaMin === "number" && Number.isFinite(item.alphaMin) ? { alphaMin: item.alphaMin } : {}),
         ...(typeof item?.alphaMax === "number" && Number.isFinite(item.alphaMax) ? { alphaMax: item.alphaMax } : {}),
       };
-      const res = await apiFetch("/api/inventory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: "hop",
-          ingredientId: item.id,
-          name: item.name,
-          quantity: 0,
-          unit: "kg",
-          metadata,
-        }),
+      await createInventoryItem(webBreweryApiClient(), {
+        category: "hop",
+        ingredientId: item.id,
+        name: item.name,
+        quantity: 0,
+        unit: "kg",
+        metadata,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       setHopQuery("");
       setHopResults([]);
       await refresh();
@@ -279,17 +276,12 @@ export default function InventoryPage() {
   const addFromAcidSalt = async (opt: (typeof ACID_SALT_OPTIONS)[number]) => {
     if (!canCall) return;
     try {
-      const res = await apiFetch("/api/inventory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: "acid_salt",
-          name: opt.label,
-          quantity: 0,
-          unit: opt.unit,
-        }),
+      await createInventoryItem(webBreweryApiClient(), {
+        category: "acid_salt",
+        name: opt.label,
+        quantity: 0,
+        unit: opt.unit,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
       await refresh();
     } catch (err) {
       setError(String(err));
@@ -299,12 +291,7 @@ export default function InventoryPage() {
   const updateQuantity = async (id: string, quantity: number) => {
     if (!canCall) return;
     try {
-      const res = await apiFetch(`/api/inventory/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity }),
-      });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      await patchInventoryItem(webBreweryApiClient(), id, { quantity });
       setQtyDraft((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -319,8 +306,7 @@ export default function InventoryPage() {
   const removeItem = async (id: string) => {
     if (!canCall) return;
     try {
-      const res = await apiFetch(`/api/inventory/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
+      await deleteInventoryItem(webBreweryApiClient(), id);
       await refresh();
     } catch (err) {
       setError(String(err));
@@ -351,12 +337,14 @@ export default function InventoryPage() {
       setFermentableSearching(true);
       setFermentableSearched(false);
       try {
-        const res = await apiFetch(
-          `/api/ingredients/fermentables?query=${encodeURIComponent(query)}&limit=${PUBLIC_DB_PAGE_SIZE}&offset=${offset}`
-        );
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const data = res.data as { ok: boolean; items?: unknown; total?: number };
-        const items: FermentableSearchItem[] = Array.isArray(data.items) ? (data.items as FermentableSearchItem[]) : [];
+        const data = await searchFermentables(webBreweryApiClient(), {
+          query,
+          limit: PUBLIC_DB_PAGE_SIZE,
+          offset,
+        });
+        const items: FermentableSearchItem[] = Array.isArray(data.items)
+          ? (data.items as FermentableSearchItem[])
+          : [];
         setFermentableResults(items);
         setFermentableTotal(typeof data.total === "number" && Number.isFinite(data.total) ? data.total : null);
         setFermentablePage(safePage);
@@ -415,11 +403,11 @@ export default function InventoryPage() {
       setHopSearching(true);
       setHopSearched(false);
       try {
-        const res = await apiFetch(
-          `/api/ingredients/hops?query=${encodeURIComponent(query)}&limit=${PUBLIC_DB_PAGE_SIZE}&offset=${offset}`
-        );
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const data = res.data as { ok: boolean; items?: unknown; total?: number };
+        const data = await searchHops(webBreweryApiClient(), {
+          query,
+          limit: PUBLIC_DB_PAGE_SIZE,
+          offset,
+        });
         const items: HopSearchItem[] = Array.isArray(data.items) ? (data.items as HopSearchItem[]) : [];
         setHopResults(items);
         setHopTotal(typeof data.total === "number" && Number.isFinite(data.total) ? data.total : null);

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Checkbox, H1, Input, SizableText, TextArea, View, XStack, YStack } from "tamagui";
 
+import { getBrewdaySettings, patchBrewdaySettings } from "@umbraculum/api-client/brewery";
+
 import { BrewSelect } from "../../../_components/BrewSelect";
 import {
   ErrorBox,
@@ -13,7 +15,7 @@ import {
   RecipeEditIngredientCard,
   RecipeEditSection,
 } from "../../../_components/recipe-edit";
-import { apiFetch } from "../../../_lib/apiClient";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { DashboardClient } from "../../../DashboardClient";
 import { Link } from "../../../../src/i18n/navigation";
@@ -158,26 +160,17 @@ export default function BrewdayStepsSettingsPage() {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    apiFetch("/api/brewday-settings")
-      .then((res) => {
+    void (async () => {
+      try {
+        const data = await getBrewdaySettings(webBreweryApiClient());
         if (cancelled) return;
-        if (!res.ok) {
-          const err = (res.data as { error?: { message?: string } | string })?.error;
-          const msg = typeof err === "string" ? err : err?.message ?? "Failed to load";
-          setLoadError(msg);
-          setLoading(false);
-          return;
-        }
-        const data = res.data as {
-          settings?: {
-            brewingType?: string;
-            sections?: BrewdaySectionConfig;
-            defaultSteps?: BrewdayStep[];
-            customSteps?: BrewdayStep[];
-            notes?: string | null;
-          };
-        };
-        const s = data?.settings;
+        const s = data?.settings as {
+          brewingType?: string;
+          sections?: BrewdaySectionConfig;
+          defaultSteps?: BrewdayStep[];
+          customSteps?: BrewdayStep[];
+          notes?: string | null;
+        } | null | undefined;
         if (s) {
           if (s.brewingType != null) setBrewingType(s.brewingType);
           setSections(
@@ -192,15 +185,15 @@ export default function BrewdayStepsSettingsPage() {
           setDefaultSteps(DEFAULT_STEPS_SEED.map((st) => ({ ...st, id: newId() })));
         }
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!cancelled) {
           const msg =
             err instanceof Error ? err.message : typeof err === "string" ? err : "Failed to load";
           setLoadError(msg);
           setLoading(false);
         }
-      });
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -211,23 +204,13 @@ export default function BrewdayStepsSettingsPage() {
     setSaving(true);
     setSaveError(null);
     try {
-      const res = await apiFetch("/api/brewday-settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brewingType,
-          sections,
-          defaultSteps,
-          customSteps,
-          notes: brewdayNotes || null,
-        }),
+      await patchBrewdaySettings(webBreweryApiClient(), {
+        brewingType,
+        sections,
+        defaultSteps,
+        customSteps,
+        notes: brewdayNotes || null,
       });
-      if (!res.ok) {
-        const err = (res.data as { error?: { message?: string } | string })?.error;
-        const msg = typeof err === "string" ? err : err?.message ?? "Save failed";
-        setSaveError(msg);
-        return;
-      }
       setSaveStatus(t("saveSuccess"));
     } catch (err) {
       const msg =

@@ -189,6 +189,26 @@ Render-job POST URLs on module pages remain on `renderJobClient` (unchanged). Fu
 
 ---
 
+## Phase E8 — brewery web tranche (2026-06-02)
+
+Phase E8 extends `@umbraculum/api-client/brewery` with recipes catalog (create/delete/versions/duplicate/import), styles, ingredients search, brew sessions (full lifecycle + integration attach/readings), inventory, equipment profiles, and brewday settings. Platform integration facades (`getWorkspaceIntegration`, `listIntegrationDevices` with query options, tilt attach/detach, recent brew sessions) live in `platform/integrations.ts`.
+
+All brewery-vertical web pages under `(brewery)/` and `app/recipes/**` (except BeerJSON export download links) migrate off raw `apiFetch` to `webBreweryApiClient()` + typed facades. Auth, platform-admin, AI, and ads `apiFetch` call sites remain for E9.
+
+| Facade module | Hot paths |
+|---------------|-----------|
+| `brewery/recipes` | `createRecipe`, `deleteRecipe`, `listRecipeVersions`, `createRecipeVersion`, `duplicateRecipe` (+ existing list/get/patch/brew-session create) |
+| `brewery/styles` | `listStyles` |
+| `brewery/ingredients` | `searchFermentables`, `searchHops`, `searchYeasts` |
+| `brewery/recipeImport` | `previewRecipeImport`, `importRecipe`, bulk preview/import |
+| `brewery/brewSessions` | session CRUD, start/pause/stop, steps, timers, integration attach/readings |
+| `brewery/inventory` | list/create/patch/delete |
+| `brewery/equipmentProfiles` | list/create/patch/delete |
+| `brewery/brewdaySettings` | get/patch |
+| `platform/integrations` | workspace integration CRUD, devices list, tilt attach/detach, recent brew sessions |
+
+---
+
 ## F1 closure (Phase D, 2026-06-01)
 
 F1 tracker row in [`CONTRACTS-VALIDATION-STRATEGY.md`](CONTRACTS-VALIDATION-STRATEGY.md) is **Done**. Platform + brewery add-on specs cover all JSON HTTP handlers except the SSE chat stream above. Regression guards: `openapi.test.ts` minimum path/op floors + `OPENAPI_DOCUMENTATION_EXEMPT_ROUTES` in [`exemptRoutes.ts`](../services/api/src/openapi/exemptRoutes.ts).

@@ -4,6 +4,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Accordion, Button, H1, Input, SizableText, XStack, YStack } from "tamagui";
 
+import {
+  attachTiltDevice,
+  createWorkspaceIntegration,
+  detachTiltDevice,
+  getWorkspaceIntegration,
+  listIntegrationDevices,
+  listRecentBrewSessions,
+  revealIntegrationToken,
+  revokeIntegration,
+  rotateIntegrationToken,
+} from "@umbraculum/api-client";
+
 import { DashboardClient } from "../../../DashboardClient";
 import { Link } from "../../../../src/i18n/navigation";
 import { BrewAccordionSection } from "../../../_components/BrewAccordionSection";
@@ -11,7 +23,7 @@ import { BrewSelect } from "../../../_components/BrewSelect";
 import { CodeInline } from "../../../_components/CodeInline";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
 import { MessageBox } from "../../../_components/recipe-edit/MessageBox";
-import { apiFetch } from "../../../_lib/apiClient";
+import { webPlatformApiClient } from "../../../_lib/webApiClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 
 type IntegrationKind = "tilt" | "ispindel" | "rapt";
@@ -114,40 +126,30 @@ export default function FermDataIntegrationPage() {
     setError(null);
     setLoading(true);
     try {
+      const client = webPlatformApiClient();
       const integrationRequests = INTEGRATION_KINDS.map((kind) =>
-        apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}`)
+        getWorkspaceIntegration(client, workspaceId, kind)
       );
       const deviceRequests = INTEGRATION_KINDS.map((kind) =>
-        apiFetch(
-          `/api/workspaces/${workspaceId}/integrations/${kind}/devices?includeReadings=1&readingsLimit=50`
-        )
+        listIntegrationDevices(client, workspaceId, kind, { includeReadings: true, readingsLimit: 50 })
       );
-      const [integrationResponses, deviceResponses, sRes] = await Promise.all([
+      const [integrationResponses, deviceResponses, sessionsData] = await Promise.all([
         Promise.all(integrationRequests),
         Promise.all(deviceRequests),
-        apiFetch(`/api/workspaces/${workspaceId}/brew-sessions/recent?limit=25`),
+        listRecentBrewSessions(client, workspaceId, { limit: 25 }),
       ]);
-
-      integrationResponses.forEach((res) => {
-        if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
-      });
-      deviceResponses.forEach((res) => {
-        if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
-      });
-      if (!sRes.ok) throw new Error(String((sRes.data as { message?: unknown })?.message ?? sRes.status));
 
       const nextIntegrations = createKindRecord<IntegrationSummary | null>(null);
       const nextDevices = createKindRecord<IntegrationDevice[]>([]);
       INTEGRATION_KINDS.forEach((kind, idx) => {
-        const integration = (integrationResponses[idx].data as { integration?: unknown })?.integration;
-        nextIntegrations[kind] = (integration ?? null) as IntegrationSummary | null;
-        const devices = (deviceResponses[idx].data as { devices?: unknown })?.devices;
+        nextIntegrations[kind] = (integrationResponses[idx]?.integration ?? null) as IntegrationSummary | null;
+        const devices = deviceResponses[idx]?.devices;
         nextDevices[kind] = Array.isArray(devices) ? (devices as IntegrationDevice[]) : [];
       });
 
       setIntegrations(nextIntegrations);
       setDevicesByKind(nextDevices);
-      const sessions = (sRes.data as { brewSessions?: unknown })?.brewSessions;
+      const sessions = sessionsData?.brewSessions;
       setRecentBrewSessions(Array.isArray(sessions) ? (sessions as RecentBrewSession[]) : []);
     } catch (e) {
       setError(String(e));
@@ -186,9 +188,7 @@ export default function FermDataIntegrationPage() {
     setIntegrationWorking({ kind, action: "reveal" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/reveal`);
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
-      const body = res.data as { token?: unknown; publicPath?: unknown };
+      const body = await revealIntegrationToken(webPlatformApiClient(), workspaceId, kind);
       updateKindTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
     } catch (e) {
       setError(String(e));
@@ -202,9 +202,7 @@ export default function FermDataIntegrationPage() {
     setIntegrationWorking({ kind, action: "create" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}`, { method: "POST" });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
-      const body = res.data as { token?: unknown; publicPath?: unknown };
+      const body = await createWorkspaceIntegration(webPlatformApiClient(), workspaceId, kind);
       updateKindTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
       await refresh();
     } catch (e) {
@@ -219,9 +217,7 @@ export default function FermDataIntegrationPage() {
     setIntegrationWorking({ kind, action: "rotate" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/rotate-token`, { method: "POST" });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
-      const body = res.data as { token?: unknown; publicPath?: unknown };
+      const body = await rotateIntegrationToken(webPlatformApiClient(), workspaceId, kind);
       updateKindTokens(kind, String(body?.token ?? ""), String(body?.publicPath ?? ""));
       await refresh();
     } catch (e) {
@@ -236,8 +232,7 @@ export default function FermDataIntegrationPage() {
     setIntegrationWorking({ kind, action: "revoke" });
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/revoke`, { method: "POST" });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
+      await revokeIntegration(webPlatformApiClient(), workspaceId, kind);
       updateKindTokens(kind, "", "");
       await refresh();
     } catch (e) {
@@ -254,12 +249,7 @@ export default function FermDataIntegrationPage() {
     setDeviceWorkingId(deviceId);
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/devices/${deviceId}/attach`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brewSessionId }),
-      });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
+      await attachTiltDevice(webPlatformApiClient(), workspaceId, deviceId, { brewSessionId });
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -273,10 +263,7 @@ export default function FermDataIntegrationPage() {
     setDeviceWorkingId(deviceId);
     setError(null);
     try {
-      const res = await apiFetch(`/api/workspaces/${workspaceId}/integrations/tilt/devices/${deviceId}/detach`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
+      await detachTiltDevice(webPlatformApiClient(), workspaceId, deviceId);
       await refresh();
     } catch (e) {
       setError(String(e));

@@ -10,7 +10,25 @@ import { Button, Checkbox, H1, H2, Input, SizableText, TextArea, View, XStack, Y
 import { BrewSelect } from "../../../../_components/BrewSelect";
 import { PageWideActionBar } from "../../../../_components/PageWideActionBar";
 import { HydrometerChart } from "@umbraculum/ui/charts/HydrometerChart";
-import { apiFetch } from "../../../../_lib/apiClient";
+import {
+  attachBrewSessionIntegration,
+  deleteBrewSession,
+  detachBrewSessionIntegration,
+  getBrewSession,
+  listBrewSessionIntegrationAttachments,
+  listBrewSessionIntegrationReadings,
+  patchBrewSession,
+  patchBrewSessionStep,
+  patchBrewSessionSteps,
+  pauseBrewSession,
+  postBrewSessionStepLog,
+  postBrewSessionStepTimerAction,
+  startBrewSession,
+  stopBrewSession,
+} from "@umbraculum/api-client/brewery";
+import { listIntegrationDevices } from "@umbraculum/api-client";
+import { webBreweryApiClient } from "../../../../_lib/breweryWaterClient";
+import { webPlatformApiClient } from "../../../../_lib/webApiClient";
 import { useRequireAuth } from "../../../../_lib/useRequireAuth";
 import { asRecord } from "../../../../_lib/typeGuards";
 import { CodeInline } from "../../../../_components/CodeInline";
@@ -93,15 +111,6 @@ type HydrometerReading = {
   temperatureC: number | null;
   gravitySg: number | null;
 };
-
-type BrewSessionDetailResponse = {
-  brewSession: BrewSession & {
-    recipe: { id: string; name: string; version: number };
-    steps: BrewSessionStep[];
-    logs: BrewSessionLog[];
-  };
-};
-
 
 const PRESET_SECTION_ORDER = [
   "preparation",
@@ -256,9 +265,7 @@ export default function BrewSessionDetailPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`);
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const data = res.data as unknown as BrewSessionDetailResponse;
+      const data = await getBrewSession(webBreweryApiClient(), brewSessionId);
       const s = data?.brewSession;
       setSession(s ?? null);
       setRecipe(s?.recipe ?? null);
@@ -325,21 +332,16 @@ export default function BrewSessionDetailPage() {
     setHydrometerError(null);
     setHydrometerWorking("refresh");
     try {
-      const [devicesRes, attachmentsRes, readingsRes] = await Promise.all([
-        apiFetch(`/api/workspaces/${workspaceId}/integrations/${kind}/devices`),
-        apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/attachments`),
-        apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/readings?kind=${kind}&limit=200`),
+      const client = webBreweryApiClient();
+      const [devicesData, attachmentsData, readingsData] = await Promise.all([
+        listIntegrationDevices(webPlatformApiClient(), workspaceId, kind),
+        listBrewSessionIntegrationAttachments(client, brewSessionId),
+        listBrewSessionIntegrationReadings(client, brewSessionId, { kind, limit: 200 }),
       ]);
-      if (!devicesRes.ok) throw new Error(String((devicesRes.data as { message?: unknown })?.message ?? devicesRes.status));
-      if (!attachmentsRes.ok) throw new Error(String((attachmentsRes.data as { message?: unknown })?.message ?? attachmentsRes.status));
-      if (!readingsRes.ok) throw new Error(String((readingsRes.data as { message?: unknown })?.message ?? readingsRes.status));
 
-      const devicesRaw = (devicesRes.data as { devices?: unknown })?.devices;
-      const attachmentsRaw = (attachmentsRes.data as { attachments?: unknown })?.attachments;
-      const readingsRaw = (readingsRes.data as { readings?: unknown })?.readings;
-      const devices = (Array.isArray(devicesRaw) ? devicesRaw : []) as HydrometerDevice[];
-      const attachments = (Array.isArray(attachmentsRaw) ? attachmentsRaw : []) as HydrometerAttachment[];
-      const readings = (Array.isArray(readingsRaw) ? readingsRaw : []) as HydrometerReading[];
+      const devices = (Array.isArray(devicesData.devices) ? devicesData.devices : []) as HydrometerDevice[];
+      const attachments = (Array.isArray(attachmentsData.attachments) ? attachmentsData.attachments : []) as HydrometerAttachment[];
+      const readings = (Array.isArray(readingsData.readings) ? readingsData.readings : []) as HydrometerReading[];
       setHydrometerDevices(devices);
       setHydrometerAttachments(attachments);
       setHydrometerReadings(readings);
@@ -376,12 +378,10 @@ export default function BrewSessionDetailPage() {
     setHydrometerError(null);
     setHydrometerWorking("attach");
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/attach`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: hydrometerKind, deviceId: hydrometerSelectedDeviceId }),
+      await attachBrewSessionIntegration(webBreweryApiClient(), brewSessionId, {
+        kind: hydrometerKind,
+        deviceId: hydrometerSelectedDeviceId,
       });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       await refreshHydrometers(hydrometerKind);
     } catch (err) {
       setHydrometerError(String(err));
@@ -397,12 +397,9 @@ export default function BrewSessionDetailPage() {
     setHydrometerError(null);
     setHydrometerWorking("detach");
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/integrations/detach`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId: attached.device.id }),
+      await detachBrewSessionIntegration(webBreweryApiClient(), brewSessionId, {
+        deviceId: attached.device.id,
       });
-      if (!res.ok) throw new Error(String((res.data as { message?: unknown })?.message ?? res.status));
       await refreshHydrometers(hydrometerKind);
     } catch (err) {
       setHydrometerError(String(err));
@@ -637,30 +634,19 @@ export default function BrewSessionDetailPage() {
         offsetMinutesFromEnd: s.offsetMinutesFromEnd,
         customTimerEnabled: s.customTimerEnabled ?? false,
       }));
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ steps: payload }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const nextSteps = (res.data as { steps?: unknown })?.steps;
-      setSteps(Array.isArray(nextSteps) ? (nextSteps as BrewSessionStep[]) : steps);
+      const stepsData = await patchBrewSessionSteps(webBreweryApiClient(), brewSessionId, { steps: payload });
+      setSteps(Array.isArray(stepsData.steps) ? (stepsData.steps as BrewSessionStep[]) : steps);
 
       // Persist log-relevant edits (status/note/name/isDisabled) too, so "Save brewing session"
       // matches user expectations during brewing.
       for (const st of dirtyForLogs) {
       const derivedStatus = st.isDisabled ? "skipped" : st.status ?? "pending";
-        const r = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${st.id}/log`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: derivedStatus,
-            note: st.note ?? null,
-            name: st.name,
-            isDisabled: st.isDisabled,
-          }),
+        await postBrewSessionStepLog(webBreweryApiClient(), brewSessionId, st.id, {
+          status: derivedStatus,
+          note: st.note ?? null,
+          name: st.name,
+          isDisabled: st.isDisabled,
         });
-        if (!r.ok) throw new Error(typeof r.data === "string" ? r.data : JSON.stringify(r.data));
       }
 
       await refresh();
@@ -677,14 +663,12 @@ export default function BrewSessionDetailPage() {
     setSessionActionError(null);
     setSessionActionWorking(action);
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/${action}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as { brewSession?: unknown })?.brewSession;
-      if (next) setSession(next as BrewSession);
+      const client = webBreweryApiClient();
+      const data =
+        action === "start"
+          ? await startBrewSession(client, brewSessionId)
+          : await pauseBrewSession(client, brewSessionId);
+      if (data.brewSession) setSession(data.brewSession as BrewSession);
       await refresh();
     } catch (err) {
       setSessionActionError(String(err));
@@ -698,14 +682,8 @@ export default function BrewSessionDetailPage() {
     setSessionActionError(null);
     setSessionActionWorking("stop");
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/stop`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as { brewSession?: unknown })?.brewSession;
-      if (next) setSession(next as BrewSession);
+      const data = await stopBrewSession(webBreweryApiClient(), brewSessionId, { reason });
+      if (data.brewSession) setSession(data.brewSession as BrewSession);
       await refresh();
     } catch (err) {
       setSessionActionError(String(err));
@@ -727,10 +705,7 @@ export default function BrewSessionDetailPage() {
     setDeleteError(null);
     setDeleting(true);
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
+      await deleteBrewSession(webBreweryApiClient(), brewSessionId);
       router.push(`/recipes/${recipeId}/brew-sessions`);
     } catch (err) {
       setDeleteError(String(err));
@@ -765,17 +740,12 @@ export default function BrewSessionDetailPage() {
       setSaveSectionLogsWorkingSectionId(sectionId);
       for (const st of toSave) {
         const derivedStatus = st.isDisabled ? "skipped" : st.status ?? "pending";
-        const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${st.id}/log`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: derivedStatus,
-            note: st.note ?? null,
-            name: st.name,
-            isDisabled: st.isDisabled,
-          }),
+        await postBrewSessionStepLog(webBreweryApiClient(), brewSessionId, st.id, {
+          status: derivedStatus,
+          note: st.note ?? null,
+          name: st.name,
+          isDisabled: st.isDisabled,
         });
-        if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
       }
 
       await refresh();
@@ -792,13 +762,10 @@ export default function BrewSessionDetailPage() {
     setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, customTimerEnabled: enabled } : s)));
     if (!canCall || !brewSessionId) return;
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${stepId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customTimerEnabled: enabled }),
+      const data = await patchBrewSessionStep(webBreweryApiClient(), brewSessionId, stepId, {
+        customTimerEnabled: enabled,
       });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const updated = (res.data as { step?: Partial<BrewSessionStep> })?.step;
+      const updated = data.step;
       if (updated) {
         setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...updated } : s)));
       }
@@ -826,14 +793,8 @@ export default function BrewSessionDetailPage() {
         offsetMinutesFromEnd: s.offsetMinutesFromEnd,
         customTimerEnabled: s.customTimerEnabled ?? false,
       }));
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ steps: payload }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const nextSteps = (res.data as { steps?: BrewSessionStep[] })?.steps;
-      setSteps(Array.isArray(nextSteps) ? (nextSteps as BrewSessionStep[]) : remaining);
+      const stepsData = await patchBrewSessionSteps(webBreweryApiClient(), brewSessionId, { steps: payload });
+      setSteps(Array.isArray(stepsData.steps) ? (stepsData.steps as BrewSessionStep[]) : remaining);
       setRemoveStepSuccess(t("removeStepSuccess"));
     } catch (err) {
       setStepActionError(String(err));
@@ -876,14 +837,8 @@ export default function BrewSessionDetailPage() {
 
       const scheduledDate = buildScheduledDateIsoUtc();
       const payload = scheduledDate ? { scheduledDate } : { scheduledDate: null };
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as { brewSession?: unknown })?.brewSession;
-      if (next) setSession(next as BrewSession);
+      const data = await patchBrewSession(webBreweryApiClient(), brewSessionId, payload);
+      if (data.brewSession) setSession(data.brewSession as BrewSession);
       setDateEditing(false);
     } catch (err) {
       setDateError(String(err));
@@ -897,14 +852,8 @@ export default function BrewSessionDetailPage() {
     setDateError(null);
     setDateSaving(true);
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scheduledDate: null }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const next = (res.data as { brewSession?: unknown })?.brewSession;
-      if (next) setSession(next as BrewSession);
+      const data = await patchBrewSession(webBreweryApiClient(), brewSessionId, { scheduledDate: null });
+      if (data.brewSession) setSession(data.brewSession as BrewSession);
       setDateInputValue("");
       setTimeInputValue("");
       setDateEditing(false);
@@ -919,13 +868,13 @@ export default function BrewSessionDetailPage() {
     if (!canCall || !brewSessionId) return;
     setStepActionError(null);
     try {
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps/${stepId}/timer/${action}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const updated = (res.data as { step?: BrewSessionStep })?.step;
+      const data = await postBrewSessionStepTimerAction(
+        webBreweryApiClient(),
+        brewSessionId,
+        stepId,
+        action,
+      );
+      const updated = data.step;
       if (updated) {
         setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...updated } : s)));
       }
@@ -998,15 +947,9 @@ export default function BrewSessionDetailPage() {
         offsetMinutesFromEnd: s.offsetMinutesFromEnd,
         customTimerEnabled: s.customTimerEnabled ?? false,
       }));
-      const res = await apiFetch(`/api/brew-sessions/${brewSessionId}/steps`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ steps: payload }),
-      });
-      if (!res.ok) throw new Error(typeof res.data === "string" ? res.data : JSON.stringify(res.data));
-      const nextSaved = (res.data as { steps?: unknown })?.steps;
-      if (Array.isArray(nextSaved)) {
-        setSteps(nextSaved as BrewSessionStep[]);
+      const stepsData = await patchBrewSessionSteps(webBreweryApiClient(), brewSessionId, { steps: payload });
+      if (Array.isArray(stepsData.steps)) {
+        setSteps(stepsData.steps as BrewSessionStep[]);
       }
       await refresh();
     } catch (err) {

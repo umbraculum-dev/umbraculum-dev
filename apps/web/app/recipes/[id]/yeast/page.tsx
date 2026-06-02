@@ -8,7 +8,8 @@ import { useCallback, useEffect, useState } from "react";
 import { H1, H2, SizableText, View } from "tamagui";
 import { SurfaceMathToggleRow } from "../../../_components/SurfaceMathToggleRow";
 
-import { apiFetch } from "../../../_lib/apiClient";
+import { getRecipe, patchRecipe } from "@umbraculum/api-client/brewery";
+import { webBreweryApiClient } from "../../../_lib/breweryWaterClient";
 import { useRequireAuth } from "../../../_lib/useRequireAuth";
 import { asRecord } from "../../../_lib/typeGuards";
 import {
@@ -58,9 +59,12 @@ export default function YeastPage() {
   const authState = useRequireAuth({ requireActiveWorkspace: true });
 
   const loadRecipeMeta = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/recipes/${id}`);
-    if (!res.ok) return null;
-    return parseRecipeMetaFromGetRecipeResponse(res.data);
+    try {
+      const data = await getRecipe(webBreweryApiClient(), id);
+      return parseRecipeMetaFromGetRecipeResponse(data);
+    } catch {
+      return null;
+    }
   }, []);
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -104,9 +108,8 @@ export default function YeastPage() {
       setLoading(true);
       setLoadError(null);
       try {
-        const res = await apiFetch(`/api/recipes/${recipeId}`);
-        if (!res.ok) throw new Error(JSON.stringify(res.data));
-        const r = (res.data as { recipe: Recipe }).recipe;
+        const data = await getRecipe(webBreweryApiClient(), recipeId);
+        const r = data.recipe as Recipe;
         if (cancelled) return;
         setRecipe(r);
 
@@ -486,22 +489,16 @@ export default function YeastPage() {
         extBase: extBaseForSave,
       });
 
-      const res = await apiFetch(`/api/recipes/${recipeId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: recipe.name,
-          styleKey: recipe.styleKey,
-          notes: recipe.notes ?? null,
-          beerJsonRecipeJson,
-          recipeExtJson,
-        }),
+      await patchRecipe(webBreweryApiClient(), recipeId, {
+        name: recipe.name,
+        styleKey: recipe.styleKey,
+        notes: recipe.notes ?? null,
+        beerJsonRecipeJson,
+        recipeExtJson,
       });
-      if (!res.ok) throw new Error(JSON.stringify(res.data));
 
-      const reload = await apiFetch(`/api/recipes/${recipeId}`);
-      if (!reload.ok) throw new Error(JSON.stringify(reload.data));
-      const r = (reload.data as { recipe: Recipe }).recipe;
+      const reload = await getRecipe(webBreweryApiClient(), recipeId);
+      const r = reload.recipe as Recipe;
       setRecipe(r);
       setSaveStatus(t("status.saved"));
       let minViability: number | null = null;

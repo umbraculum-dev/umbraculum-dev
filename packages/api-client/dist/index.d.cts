@@ -3,7 +3,7 @@ export { b as ApiClientCredentials, c as ApiRequestInit, d as AuthStrategy, F as
 import { p as paths } from './platform.openapi-DFK6FUu2.cjs';
 export { c as PlatformOpenApiComponents, o as PlatformOpenApiOperations } from './platform.openapi-DFK6FUu2.cjs';
 export { c as BreweryOpenApiComponents, o as BreweryOpenApiOperations, p as BreweryOpenApiPaths } from './brewery.openapi-CXYEPddO.cjs';
-import { AuthMeResponse, AuthLoginRequest, AuthLoginResponseSchema, AuthLoginNativeResponseSchema, WorkspaceCreateRequest, WorkspaceCreateResponseSchema, HealthResponseSchema, WorkspacesListResponseSchema, WorkspaceBillingResponseSchema, IntegrationKind, IntegrationDevicesListResponseSchema } from '@umbraculum/contracts';
+import { AuthMeResponse, AuthLoginRequest, AuthLoginResponseSchema, AuthLoginNativeResponseSchema, WorkspaceCreateRequest, WorkspaceCreateResponseSchema, HealthResponseSchema, WorkspacesListResponseSchema, IntegrationKind, WorkspaceBillingResponseSchema } from '@umbraculum/contracts';
 
 /** Non-2xx API response from a typed facade call. */
 declare class ApiClientError extends Error {
@@ -23,13 +23,39 @@ declare const PLATFORM_FACADE_PARSER_MAP: {
     readonly "/workspaces": "WorkspacesListResponseSchema";
     readonly "/health": "HealthResponseSchema";
     readonly "/workspaces/{workspaceId}/billing": "WorkspaceBillingResponseSchema";
+    readonly "/workspaces/{workspaceId}/integrations/{kind}": "IntegrationGetResponseSchema / IntegrationCreateResponseSchema";
+    readonly "/workspaces/{workspaceId}/integrations/{kind}/reveal": "IntegrationRevealResponseSchema";
+    readonly "/workspaces/{workspaceId}/integrations/{kind}/rotate-token": "IntegrationCreateResponseSchema";
+    readonly "/workspaces/{workspaceId}/integrations/{kind}/revoke": "IntegrationOkResponseSchema";
     readonly "/workspaces/{workspaceId}/integrations/{kind}/devices": "IntegrationDevicesListResponseSchema";
+    readonly "/workspaces/{workspaceId}/integrations/tilt/devices/{deviceId}/attach": "IntegrationDeviceAttachResponseSchema";
+    readonly "/workspaces/{workspaceId}/integrations/tilt/devices/{deviceId}/detach": "IntegrationDeviceDetachResponseSchema";
+    readonly "/workspaces/{workspaceId}/brew-sessions/recent": "BrewSessionsRecentResponseSchema";
     readonly "/rendering/jobs/{jobId}": "RenderJobStatusResponseSchema";
     readonly "/rendering/jobs/{jobId}/result": "RenderJobResultResponseSchema";
 };
 declare const BREWERY_FACADE_PARSER_MAP: {
-    readonly "/recipes": "parseRecipesListResponse";
-    readonly "/recipes/{id}": "RecipeResponseSchema";
+    readonly "/recipes": "parseRecipesListResponse / RecipeResponseSchema (POST)";
+    readonly "/recipes/{id}": "RecipeResponseSchema / OkResponseSchema (DELETE)";
+    readonly "/recipes/{id}/versions": "RecipeVersionsResponseSchema / RecipeResponseSchema (POST)";
+    readonly "/recipes/{id}/duplicate": "RecipeResponseSchema";
+    readonly "/recipes/import/preview": "RecipeImportPreviewResponseSchema";
+    readonly "/recipes/import": "RecipeImportResponseSchema";
+    readonly "/recipes/import/bulk/preview": "RecipeBulkImportPreviewResponseSchema";
+    readonly "/recipes/import/bulk": "RecipeBulkImportResponseSchema";
+    readonly "/styles": "StylesListResponseSchema";
+    readonly "/ingredients/fermentables": "FermentablesListResponseSchema";
+    readonly "/ingredients/hops": "HopsListResponseSchema";
+    readonly "/ingredients/yeasts": "YeastsListResponseSchema";
+    readonly "/brew-sessions/{brewSessionId}": "BrewSessionDetailResponseSchema";
+    readonly "/brew-sessions/{brewSessionId}/steps": "BrewSessionStepsResponseSchema";
+    readonly "/brew-sessions/{brewSessionId}/integrations/attachments": "IntegrationAttachmentsResponseSchema";
+    readonly "/brew-sessions/{brewSessionId}/integrations/readings": "IntegrationReadingsResponseSchema";
+    readonly "/inventory": "InventoryListResponseSchema / InventoryItemResponseSchema";
+    readonly "/inventory/{id}": "InventoryItemResponseSchema / OkResponseSchema (DELETE)";
+    readonly "/equipment-profiles": "EquipmentProfilesListResponseSchema / EquipmentProfileResponseSchema";
+    readonly "/equipment-profiles/{id}": "EquipmentProfileResponseSchema / OkResponseSchema (DELETE)";
+    readonly "/brewday-settings": "BrewdaySettingsResponseSchema";
     readonly "/recipes/{recipeId}/brew-sessions": "parseBrewSessionsListResponse";
     readonly "/recipes/{id}/water-hub-summary": "parseRecipeWaterHubSummaryResponse";
     readonly "/water-profiles": "parseWaterProfilesResponse / WaterProfileResponseSchema";
@@ -78,15 +104,134 @@ declare function listWorkspaces(client: ApiClient): Promise<WorkspacesListRespon
 declare function createWorkspace(client: ApiClient, body: WorkspaceCreateRequest): Promise<WorkspaceCreateResponse>;
 declare function getHealth(client: ApiClient): Promise<HealthResponse>;
 
-type WorkspaceBillingResponse = ReturnType<typeof WorkspaceBillingResponseSchema.parse>;
-type IntegrationDevicesListResponse = ReturnType<typeof IntegrationDevicesListResponseSchema.parse>;
-type BillingStatusPath = "/workspaces/{workspaceId}/billing";
-type BillingStatusGet = paths[BillingStatusPath]["get"];
+type IntegrationGetPath = "/workspaces/{workspaceId}/integrations/{kind}";
+type IntegrationGetGet = paths[IntegrationGetPath]["get"];
 type IntegrationDevicesPath = "/workspaces/{workspaceId}/integrations/{kind}/devices";
 type IntegrationDevicesGet = paths[IntegrationDevicesPath]["get"];
+type BrewSessionsRecentPath = "/workspaces/{workspaceId}/brew-sessions/recent";
+type BrewSessionsRecentGet = paths[BrewSessionsRecentPath]["get"];
+
+type ListIntegrationDevicesOptions = {
+    includeReadings?: boolean;
+    readingsLimit?: number;
+};
+declare function getWorkspaceIntegration(client: ApiClient, workspaceId: string, kind: IntegrationKind): Promise<{
+    ok: true;
+    integration: {
+        id: string;
+        workspaceId: string;
+        kind: "tilt" | "ispindel" | "rapt";
+        revokedAt: string | null;
+        createdAt: string;
+        updatedAt: string;
+    } | null;
+}>;
+declare function createWorkspaceIntegration(client: ApiClient, workspaceId: string, kind: IntegrationKind): Promise<{
+    ok: true;
+    integrationId: string;
+    token: string;
+    publicPath: string;
+}>;
+declare function revealIntegrationToken(client: ApiClient, workspaceId: string, kind: IntegrationKind): Promise<{
+    ok: true;
+    integrationId: string;
+    kind: "tilt" | "ispindel" | "rapt";
+    token: string;
+    publicPath: string;
+}>;
+declare function rotateIntegrationToken(client: ApiClient, workspaceId: string, kind: IntegrationKind): Promise<{
+    ok: true;
+    integrationId: string;
+    token: string;
+    publicPath: string;
+}>;
+declare function revokeIntegration(client: ApiClient, workspaceId: string, kind: IntegrationKind): Promise<{
+    ok: true;
+}>;
+declare function listIntegrationDevices(client: ApiClient, workspaceId: string, kind: IntegrationKind, options?: ListIntegrationDevicesOptions): Promise<{
+    ok: true;
+    devices: {
+        id: string;
+        deviceKey: string;
+        displayName: string | null;
+        metadataJson: Record<string, unknown> | null;
+        lastSeenAt: string | null;
+        createdAt: string;
+        activeAttachment: {
+            id: string;
+            attachedAt: string;
+            brewSession: {
+                id: string;
+                code: string | null;
+                status: string;
+                createdAt: string;
+                startedAt: string | null;
+                recipe: {
+                    id: string;
+                    name: string;
+                    version: number;
+                };
+            };
+        } | null;
+        lastReading: {
+            id: string;
+            brewSessionId: string | null;
+            recordedAt: string | null;
+            receivedAt: string;
+            temperatureC: number | null;
+            gravitySg: number | null;
+            rawJson?: Record<string, unknown> | undefined;
+        } | null;
+        recentReadings?: {
+            id: string;
+            brewSessionId: string | null;
+            recordedAt: string | null;
+            receivedAt: string;
+            temperatureC: number | null;
+            gravitySg: number | null;
+            rawJson?: Record<string, unknown> | undefined;
+        }[] | null | undefined;
+    }[];
+}>;
+declare function attachTiltDevice(client: ApiClient, workspaceId: string, deviceId: string, body: unknown): Promise<{
+    ok: true;
+    attachment: {
+        id: string;
+        attachedAt: string;
+        brewSessionId: string;
+    };
+}>;
+declare function detachTiltDevice(client: ApiClient, workspaceId: string, deviceId: string): Promise<{
+    ok: true;
+    detachedCount: number;
+}>;
+declare function listRecentBrewSessions(client: ApiClient, workspaceId: string, params?: {
+    limit?: number;
+}): Promise<{
+    ok: true;
+    brewSessions: {
+        id: string;
+        recipeId: string;
+        code: string | null;
+        status: string;
+        startedAt: string | null;
+        pausedAt: string | null;
+        stoppedAt: string | null;
+        scheduledDate: string | null;
+        createdAt: string;
+        recipe: {
+            id: string;
+            name: string;
+            version: number;
+        };
+    }[];
+}>;
+
+type WorkspaceBillingResponse = ReturnType<typeof WorkspaceBillingResponseSchema.parse>;
+type BillingStatusPath = "/workspaces/{workspaceId}/billing";
+type BillingStatusGet = paths[BillingStatusPath]["get"];
 
 declare function getWorkspaceBilling(client: ApiClient, workspaceId: string): Promise<WorkspaceBillingResponse>;
-declare function listIntegrationDevices(client: ApiClient, workspaceId: string, kind: IntegrationKind): Promise<IntegrationDevicesListResponse>;
 
 type RenderJobStatusPath = "/rendering/jobs/{jobId}";
 type RenderJobResultPath = "/rendering/jobs/{jobId}/result";
@@ -115,4 +260,4 @@ declare function runAsyncRenderJobExport(client: ApiClient, postUrl: string, opt
 type RenderJobStatusGet = paths[RenderJobStatusPath]["get"];
 type RenderJobResultGet = paths[RenderJobResultPath]["get"];
 
-export { ApiClient, ApiClientError, ApiResponse, type AuthLoginNativePost, type AuthLoginPost, type AuthMeGet, BREWERY_FACADE_PARSER_MAP, type BillingStatusGet, type HealthGet, type IntegrationDevicesGet, PLATFORM_FACADE_PARSER_MAP, paths as PlatformOpenApiPaths, type RenderJobPhase, type RenderJobResultGet, type RenderJobStatusGet, type WorkspacesCreatePost, type WorkspacesListGet, createWorkspace, fetchRenderJobDownloadUrl, getAuthMe, getHealth, getWorkspaceBilling, listIntegrationDevices, listWorkspaces, login, loginNative, pollRenderJobUntilSucceeded, resolveArtifactDownloadUrl, runAsyncRenderJobExport, submitRenderJob, toWebArtifactUrl };
+export { ApiClient, ApiClientError, ApiResponse, type AuthLoginNativePost, type AuthLoginPost, type AuthMeGet, BREWERY_FACADE_PARSER_MAP, type BillingStatusGet, type BrewSessionsRecentGet, type HealthGet, type IntegrationDevicesGet, type IntegrationGetGet, type ListIntegrationDevicesOptions, PLATFORM_FACADE_PARSER_MAP, paths as PlatformOpenApiPaths, type RenderJobPhase, type RenderJobResultGet, type RenderJobStatusGet, type WorkspacesCreatePost, type WorkspacesListGet, attachTiltDevice, createWorkspace, createWorkspaceIntegration, detachTiltDevice, fetchRenderJobDownloadUrl, getAuthMe, getHealth, getWorkspaceBilling, getWorkspaceIntegration, listIntegrationDevices, listRecentBrewSessions, listWorkspaces, login, loginNative, pollRenderJobUntilSucceeded, resolveArtifactDownloadUrl, revealIntegrationToken, revokeIntegration, rotateIntegrationToken, runAsyncRenderJobExport, submitRenderJob, toWebArtifactUrl };
