@@ -3,7 +3,7 @@
 **Tier:** Public  
 **Status:** v1 — Phase 0 bootstrap (Discourse on Contabo); execute before or during public-alpha flip comms  
 **Audience:** maintainer standing up the canonical community surface per [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6  
-**Related:** [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-vps-security.md`](community-forum-vps-security.md), [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](community-forum-secrets-inventory.md), [`../../infra/community-forum/README.md`](../../infra/community-forum/README.md), [`donation-channels.md`](donation-channels.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)
+**Related:** [`production-hosts.md`](production-hosts.md), [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) (`docs/OPERATOR.md` — VPS steps), [`public-alpha-cloudflare-pages-runbook.md`](public-alpha-cloudflare-pages-runbook.md), [`community-forum-vps-security.md`](community-forum-vps-security.md), [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](community-forum-secrets-inventory.md), [`donation-channels.md`](donation-channels.md), [`public-alpha-flip-day-runbook.md`](public-alpha-flip-day-runbook.md), [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md)
 
 > [!IMPORTANT]
 > **Governance record lives here.** Proposals, vote threads, meeting minutes, and vetoes (§4.4) are canonical on the forum. GitHub Issues track implementation; external Jitsi links are provisional until Phase 2 (§4.6.4).
@@ -49,146 +49,21 @@
 
 ## 3. Contabo VPS
 
+> **Operator steps (VPS install, DNS, `./discourse-setup`, smoke tests)** are canonical in **[umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum)** — [`docs/OPERATOR.md`](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/docs/OPERATOR.md). Hardening: `bin/harden` (scripts from [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common)). Index: [`production-hosts.md`](production-hosts.md).
+
 > **Custody.** At bootstrap the forum may run on a **maintainer-operated** VPS (personal Contabo or equivalent). Migration to **Umbraculum entity-owned** hosting is by **Discourse backup + restore + DNS cutover**, not VPS/account transfer — see [`CORE-DEVELOPMENT-AND-COMMUNITY.md`](../CORE-DEVELOPMENT-AND-COMMUNITY.md) §4.6.7.
 
-1. Order **Cloud VPS 10** (12-month term, **75 GB NVMe**). **Auto Backup (€1.50/mo)** is **optional until forum kick-off** — see §10.
-2. Choose **Ubuntu 24.04 LTS** (Noble).
-3. Note the **public IPv4** — needed for Cloudflare DNS.
-4. SSH as root; apply security baseline per **[§3.1 VPS security](#31-vps-security)**.
-5. Confirm **8 GB RAM** free: `free -h`.
-
-**Do not** co-locate the demo stack ([`demo-host-runbook.md`](demo-host-runbook.md)) on this VPS at Phase 0 — keep the community forum isolated from demo resets.
+**Do not** co-locate the demo stack ([`demo-host-runbook.md`](demo-host-runbook.md)) on this VPS at Phase 0.
 
 ### 3.1 VPS security
 
-Apply **[`community-forum-vps-security.md`](community-forum-vps-security.md)** **before** `./discourse-setup`: SSH key-only, UFW (22/80/443), fail2ban, unattended-upgrades. Enable **Auto Backup** in the Contabo panel at **kick-off** (§10), not necessarily before first install.
+Apply hardening **before** `./discourse-setup` — see hosting-forum [`docs/VPS-SECURITY.md`](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/docs/VPS-SECURITY.md) and [`community-forum-vps-security.md`](community-forum-vps-security.md). Enable **Auto Backup** at **kick-off** (§10).
 
 ---
 
-## 4. Cloudflare DNS
+## 4–5. DNS, Discourse install, smoke tests
 
-In the **`umbraculum.dev`** zone:
-
-| Type | Name | Content | Proxy |
-|------|------|---------|-------|
-| **A** | `forum` | Contabo VPS IPv4 | **DNS only** (grey cloud) |
-
-Wait for propagation; verify:
-
-```bash
-dig +short forum.umbraculum.dev A
-```
-
-**Why grey cloud at bootstrap:** Discourse's `./discourse-setup` obtains Let's Encrypt certificates directly against the origin. See **[§4.1 SSL/TLS](#41-ssltls)** and [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md).
-
-**Existing records (unchanged):**
-
-| Host | Target |
-|------|--------|
-| `umbraculum.dev`, `www` | Cloudflare Workers (brochure) |
-| `docs.umbraculum.dev` | Cloudflare Workers (docs) |
-
-### 4.1 SSL/TLS
-
-Phase 0: **grey cloud** + **Let's Encrypt on the VPS** (Discourse nginx). Full decision record: [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md). Orange-cloud proxy is optional later only.
-
----
-
-## 5. Discourse install (official launcher)
-
-### 5.1 Brevo SMTP (Phase 0 — before `./discourse-setup`)
-
-| Role | Address | Notes |
-|------|---------|--------|
-| **Brevo account login** | `umbraculum-dev@proton.me` (or maintainer Proton) | Dashboard, billing, alerts from `brevo.com` — **not** a sender |
-| **Verified sender (From)** | **`forum@umbraculum.dev`** | Only sender needed; delete any accidental `@proton.me` senders in Brevo |
-| **Domain** | `umbraculum.dev` | Authenticated in Brevo; DNS records **DNS only** (grey cloud) in Cloudflare |
-
-Create an **SMTP key** in Brevo → **Transactional** → **SMTP & API** ([keys page](https://app.brevo.com/settings/keys/smtp)).
-
-| Brevo field | Value for Discourse |
-|-------------|---------------------|
-| SMTP server | `smtp-relay.brevo.com` |
-| Port | `587` (STARTTLS). If the VPS blocks 587, try `2525` |
-| SMTP login (username) | Brevo **SMTP login** (usually your **Proton** account email — not `forum@`) |
-| SMTP password | Brevo **SMTP key** (not your Brevo account password) |
-| **From / notification address** | **`forum@umbraculum.dev`** (must be a verified sender in Brevo) |
-
-Official Discourse + Brevo template: [INSTALL-email.md — Brevo](https://github.com/discourse/discourse/blob/main/docs/INSTALL-email.md).
-
-### 5.2 `./discourse-setup` on the VPS
-
-On the VPS as root:
-
-```bash
-apt-get update
-apt-get install -y git
-
-git clone https://github.com/discourse/discourse_docker.git /var/discourse
-cd /var/discourse
-./discourse-setup
-```
-
-Interactive prompts — use:
-
-| Prompt | Value |
-|--------|--------|
-| Hostname | `forum.umbraculum.dev` |
-| Admin email | **`forum@umbraculum.dev`** |
-| SMTP server | `smtp-relay.brevo.com` |
-| SMTP port | `587` |
-| SMTP username | Brevo SMTP login (Proton email) |
-| SMTP password | Brevo SMTP key |
-| Let's Encrypt | **Yes** (requires DNS A record already pointing here) |
-
-After `./discourse-setup`, confirm **`containers/app.yml`** includes (add or verify if missing):
-
-```yaml
-  DISCOURSE_NOTIFICATION_EMAIL: forum@umbraculum.dev
-  DISCOURSE_SMTP_ADDRESS: smtp-relay.brevo.com
-  DISCOURSE_SMTP_PORT: 587
-  DISCOURSE_SMTP_USER_NAME: '<brevo-smtp-login>'
-  DISCOURSE_SMTP_PASSWORD: '<brevo-smtp-key>'
-  DISCOURSE_SMTP_ENABLE_START_TLS: true
-  DISCOURSE_SMTP_DOMAIN: umbraculum.dev
-```
-
-Then rebuild if you edited `app.yml` manually:
-
-```bash
-cd /var/discourse
-./launcher rebuild app
-```
-
-### 5.3 Discourse Admin → Email (after first login)
-
-**Admin → Settings → Email** — search and set:
-
-| Setting | Value |
-|---------|--------|
-| `notification email` | **`forum@umbraculum.dev`** |
-| `site contact email` | **`forum@umbraculum.dev`** (or `conduct@umbraculum.dev` if you prefer CoC contact separate) |
-| `email posting and replying` | **disabled** (per §7.3) |
-
-Send **Test email** from Admin → Email; confirm From shows **Umbraculum Forum** / `forum@umbraculum.dev` and delivery to Proton.
-
-After setup completes, browse to `https://forum.umbraculum.dev`, complete admin registration, and confirm email delivery (invite yourself as a second user).
-
-**Rebuild reference** (after other `containers/app.yml` edits):
-
-```bash
-cd /var/discourse
-./launcher rebuild app
-```
-
-Official docs: [Discourse self-host install](https://github.com/discourse/discourse_docker/blob/main/README.md).
-
-### 5.4 Sync `app.yml.template` after material changes
-
-When hostname, SMTP, or other `env:` keys change on the VPS:
-
-1. Update `/var/discourse/containers/app.yml` and `./launcher rebuild app`.
-2. Sync **non-secret** structure to [`infra/community-forum/app.yml.template`](../../infra/community-forum/app.yml.template) (placeholders only — see [`community-forum-secrets-inventory.md`](community-forum-secrets-inventory.md)).
+Moved to **[umbraculum-hosting-forum `docs/OPERATOR.md`](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/docs/OPERATOR.md)** (sections 3–5). SSL decision record remains [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md). Template sync: hosting-forum `templates/app.yml.template`.
 
 ---
 
@@ -355,7 +230,7 @@ Manual:
 |------|---------|
 | `./launcher rebuild app` when **Admin → Dashboard → Updates** shows a stable upgrade | Monthly or when security advisory lands |
 | Contabo Auto Backup verification in panel | After kick-off and after major upgrade |
-| **Discourse → Contabo Object Storage** (€2.50/mo) | Enable post-flip — deferred at bootstrap; see [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) |
+| **Discourse → Contabo Object Storage** (€2.50/mo) | Enable post-flip — deferred at bootstrap; see [hosting-forum MAINTENANCE.md](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/docs/MAINTENANCE.md) |
 | Review `./launcher logs app` after rebuild | Per upgrade |
 | Spam / CoC moderation | As needed |
 | Publish meeting minutes to **Meetings** | Per §4.3 cadence |

@@ -333,6 +333,26 @@ Git release tags carry a leading `v` (for example `v0.0.1`), while
 (for example `0.0.1`). Do not create paired `vX.Y.Z` and `X.Y.Z` Git tags for
 the same release, and never write a `v` prefix into package manifest versions.
 
+## Production hosting sister repos
+
+Forum and demo **VPS operator** scripts live in separate public repos — **not** under `infra/community-forum/` in this monorepo.
+
+| Repo | Purpose |
+|------|---------|
+| `github.com/umbraculum-dev/umbraculum-hosting-common` | Shared VPS hardening (`vps-hardening-baseline.sh`) |
+| `github.com/umbraculum-dev/umbraculum-hosting-forum` | `forum.umbraculum.dev` — Discourse ops, `bin/pull`, `bin/harden` |
+| `github.com/umbraculum-dev/umbraculum-hosting-demo` | `demo.umbraculum.dev` — Traefik/compose (scaffold; product build still here) |
+
+Local maintainer layout: `/home/rf/dkprojects/rfapps/umbraculum-hosting/{common,forum,demo}/` — see [`docs/design/production-hosts.md`](docs/design/production-hosts.md).
+
+**Agent rules:**
+
+- Do **not** add new forum/demo VPS automation under `umbraculum-dev/infra/community-forum/` (stub only).
+- Forum **governance** (categories, §7 Discourse settings, flip-day) stays in **this repo** (`docs/design/community-forum-runbook.md` §6–§7).
+- Forum/demo **install, hardening, launcher** → edit **hosting-forum** or **hosting-demo**; bump `common/` submodule when hardening changes.
+- Tasks scoped to "forum VPS" may target the **hosting-forum** workspace, not umbraculum-dev.
+- Full apparatus / ci-parity gate applies to **this repo**; hosting repos are bash-only unless explicitly opened.
+
 ## Forward
 
 If the apparatus check passes (or the user explicitly overrides it),

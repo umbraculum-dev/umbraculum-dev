@@ -3,10 +3,19 @@
 **Tier:** Public  
 **Status:** v1 — Phase 0 (Contabo Cloud VPS 10, Ubuntu 24.04)  
 **Audience:** maintainer hardening the forum VPS **before** `./discourse-setup`  
-**Related:** [`community-forum-runbook.md`](community-forum-runbook.md) §3.1, [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](community-forum-secrets-inventory.md), [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md)
+**Related:** [`production-hosts.md`](production-hosts.md), [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum), [umbraculum-hosting-common](https://github.com/umbraculum-dev/umbraculum-hosting-common), [`community-forum-runbook.md`](community-forum-runbook.md) §3.1, [`community-forum-ssl-strategy.md`](community-forum-ssl-strategy.md), [`community-forum-secrets-inventory.md`](community-forum-secrets-inventory.md)
 
 > [!IMPORTANT]
 > Apply this baseline on a **fresh** Contabo VPS with **no** other web services on ports 80/443. Do **not** co-locate the demo stack ([`demo-host-runbook.md`](demo-host-runbook.md)) on this host at Phase 0.
+
+### Automated baseline (preferred)
+
+Idempotent script: [umbraculum-hosting-common `scripts/vps-hardening-baseline.sh`](https://github.com/umbraculum-dev/umbraculum-hosting-common/blob/main/scripts/vps-hardening-baseline.sh). On the forum VPS: clone [umbraculum-hosting-forum](https://github.com/umbraculum-dev/umbraculum-hosting-forum) and run **`bin/harden`** (wraps the submodule).
+
+| Script default | Manual § below |
+|----------------|----------------|
+| UFW, fail2ban, unattended-upgrades, UTC | Same |
+| **Skips** SSH password lockout | §4 — use script `--ssh-hardening` when keys are proven from two terminals |
 
 ---
 
@@ -42,7 +51,7 @@ ss -tlnp | grep -E ':80|:443' || true
 
 - [ ] Ubuntu **24.04 LTS** (Noble)
 - [ ] ~8 GB RAM available
-- [ ] Contabo **Auto Backup** enabled at **forum kick-off** (optional pre-kick-off — see [`community-forum-runbook.md`](community-forum-runbook.md) §10, [`MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) §2)
+- [ ] Contabo **Auto Backup** enabled at **forum kick-off** (optional pre-kick-off — see [`community-forum-runbook.md`](community-forum-runbook.md) §10, [hosting-forum MAINTENANCE.md](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/docs/MAINTENANCE.md) §2)
 - [ ] SSH public key works; password login will be disabled in §4
 
 ---
@@ -133,7 +142,7 @@ Document a different TZ in the runbook §12 sign-off if you choose maintainer-lo
 
 Take a **manual snapshot** in the Contabo panel before risky `./launcher rebuild app` operations (VPS 10 includes one snapshot slot). **Required** pre-kick-off when Auto Backup is still off.
 
-Auto Backup is **layer 1** — see [`infra/community-forum/MAINTENANCE.md`](../../infra/community-forum/MAINTENANCE.md) for kick-off timing and Discourse → Object Storage backups (layer 2).
+Auto Backup is **layer 1** — see [hosting-forum `docs/MAINTENANCE.md`](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/docs/MAINTENANCE.md) for kick-off timing and Discourse → Object Storage backups (layer 2).
 
 ---
 

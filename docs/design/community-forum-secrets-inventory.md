@@ -3,10 +3,10 @@
 **Tier:** Public (labels only — **no secret values in git**)  
 **Status:** v1 — Phase 0  
 **Audience:** maintainers; future second admin after org keyring migration  
-**Related:** [`community-forum-runbook.md`](community-forum-runbook.md), [`community-forum-vps-security.md`](community-forum-vps-security.md), [`donation-channels.md`](donation-channels.md), [`infra/community-forum/app.yml.template`](../../infra/community-forum/app.yml.template)
+**Related:** [`production-hosts.md`](production-hosts.md), [`community-forum-runbook.md`](community-forum-runbook.md), [`community-forum-vps-security.md`](community-forum-vps-security.md), [`donation-channels.md`](donation-channels.md), [hosting-forum `templates/app.yml.template`](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/templates/app.yml.template)
 
 > [!CAUTION]
-> **Never commit** vault exports, SMTP keys, SSH private keys, or Discourse admin passwords. The live `containers/app.yml` on the VPS contains secrets — sync structure to [`app.yml.template`](../../infra/community-forum/app.yml.template) only with placeholders.
+> **Never commit** vault exports, SMTP keys, SSH private keys, or Discourse admin passwords. The live `containers/app.yml` on the VPS contains secrets — sync structure to [hosting-forum `app.yml.template`](https://github.com/umbraculum-dev/umbraculum-hosting-forum/blob/main/templates/app.yml.template) only with placeholders.
 
 ---
 
