@@ -1,30 +1,18 @@
 name: integrator-live-smoke
 
 # Live integrator smoke: cookie (curl) + bearer (published npm + api-client facades).
-# Requires docker compose stack + migrate deploy + db:seed + seed:e2e. Not a ci-parity job (needs full stack).
+# Requires docker compose stack + migrate deploy + db:seed + seed:e2e. Not a ci-parity job (~4.5 min).
+# Opt-in only: PR label run-integrator-smoke (paths: scripts/integrator-*) or workflow_dispatch.
+# No automatic push, pull_request-without-label, or schedule triggers.
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - "packages/contracts/**"
-      - "packages/api-client/**"
-      - "scripts/integrator-*"
-      - "scripts/dogfood-npm-smoke.sh"
-      - ".github/workflows/integrator-live-smoke.yml"
-      - "docker-compose.yml"
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches: [master]
     paths:
-      - "packages/contracts/**"
-      - "packages/api-client/**"
       - "scripts/integrator-*"
-      - "scripts/dogfood-npm-smoke.sh"
       - ".github/workflows/integrator-live-smoke.yml"
-      - "docker-compose.yml"
   workflow_dispatch:
-  schedule:
-    - cron: "0 7 * * 1"
 
 concurrency:
   group: integrator-live-smoke-${{ github.ref }}
@@ -32,7 +20,18 @@ concurrency:
 
 jobs:
   integrator-live-smoke:
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
+    if: |
+      (
+        github.event_name == 'workflow_dispatch' ||
+        contains(toJSON(github.event.pull_request.labels.*.name), 'run-integrator-smoke')
+      ) &&
+      (
+        github.event_name != 'pull_request' ||
+        (
+          !contains(github.event.pull_request.title, '[skip ci]') &&
+          !contains(github.event.pull_request.title, '[ci skip]')
+        )
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:

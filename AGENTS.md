@@ -313,6 +313,20 @@ Manifest source of truth: `.umbraculum/ci-parity.json` — when adding or
 changing a GHA workflow's verify steps, **add the same commands as a ci-parity
 job** in the manifest; do not invent host-only verification scripts.
 
+## GHA workflow authoring
+
+When adding or editing `.github/workflows/*.yml`:
+
+- **No cron by default.** Do not add `on.schedule` / `cron:` unless the user or
+  task **explicitly** requests scheduled runs. Existing scheduled workflows
+  (e.g. `dogfood-npm-smoke.yml`) are documented exceptions — do not copy that
+  pattern into new workflows without instruction.
+- **Heavy workflows.** Prefer `workflow_dispatch` + PR label opt-in over
+  automatic `push` / ungated `pull_request` for jobs that need full Docker
+  stacks or multi-minute runtime (see `integrator-live-smoke.yml`).
+- **Path discipline.** Match path filters to the smallest surface that actually
+  requires the job.
+
 ## ci-parity manifest / version changes (agent mandatory — do not skip)
 
 **You** own this sequence when editing `.umbraculum/ci-parity.json` or adding a

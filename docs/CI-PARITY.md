@@ -170,7 +170,7 @@ Implementation package: [`umbraculum-toolset` `packages/ci-parity`](https://gith
 
 | Workflow | Purpose |
 |----------|---------|
-| [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | [`scripts/integrator-live-bootstrap.sh`](../scripts/integrator-live-bootstrap.sh) (infra → `npm ci` + migrate + seeds) + cookie/bearer smokes |
+| [`integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml) | [`scripts/integrator-live-bootstrap.sh`](../scripts/integrator-live-bootstrap.sh) (infra → `npm ci` + migrate + seeds) + cookie/bearer smokes. **Opt-in only** (~4.5 min; GHA budget not allocated for automatic runs yet — may revisit): add PR label `run-integrator-smoke` when the PR touches `scripts/integrator-*`, or run manually via Actions → **Run workflow** after merge. No automatic push or schedule triggers. |
 
 **Excluded from typecheck gate (explicit):** `apps/web`, `packages/ui` (Tamagui accepted-cost class — see [`docs/TAMAGUI.md`](TAMAGUI.md)).
 

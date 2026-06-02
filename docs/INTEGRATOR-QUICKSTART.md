@@ -114,7 +114,7 @@ Bearer (published npm + `@umbraculum/api-client` facades):
 ./scripts/integrator-bearer-npm-smoke.sh
 ```
 
-Live stack (cookie + bearer): GHA [`.github/workflows/integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml).
+Live stack (cookie + bearer) in CI (~4.5 min, opt-in while GHA budget is constrained): [`.github/workflows/integrator-live-smoke.yml`](../.github/workflows/integrator-live-smoke.yml). On a PR that touches `scripts/integrator-*`, add label **`run-integrator-smoke`**. After merge, use Actions → **Run workflow** (no automatic push trigger).
 
 After changing publish metadata:
 
