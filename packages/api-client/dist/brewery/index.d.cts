@@ -85,7 +85,7 @@ declare function listStyles(client: ApiClient): Promise<{
         key: string;
         name: string;
         source: string;
-        version: number;
+        version: string;
         code: string | null;
         category: string | null;
         categoryId: string | null;

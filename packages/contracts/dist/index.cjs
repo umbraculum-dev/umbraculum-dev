@@ -973,7 +973,8 @@ var BeerStyleSchema = import_zod10.z.object({
   key: import_zod10.z.string(),
   name: import_zod10.z.string(),
   source: import_zod10.z.string(),
-  version: import_zod10.z.number(),
+  /** Style guide revision label (e.g. `"2021"`, `"v1"`) — stored as text in `beer_styles.version`. */
+  version: import_zod10.z.string(),
   code: import_zod10.z.string().nullable(),
   category: import_zod10.z.string().nullable(),
   categoryId: import_zod10.z.string().nullable(),

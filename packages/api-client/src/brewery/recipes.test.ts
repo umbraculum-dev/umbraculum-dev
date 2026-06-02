@@ -89,7 +89,7 @@ describe("brewery styles facades", () => {
                 key: "custom",
                 name: "Custom",
                 source: "bjcp",
-                version: 2021,
+                version: "2021",
                 code: null,
                 category: null,
                 categoryId: null,

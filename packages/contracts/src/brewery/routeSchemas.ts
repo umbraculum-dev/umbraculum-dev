@@ -25,7 +25,8 @@ export const BeerStyleSchema = z.object({
   key: z.string(),
   name: z.string(),
   source: z.string(),
-  version: z.number(),
+  /** Style guide revision label (e.g. `"2021"`, `"v1"`) — stored as text in `beer_styles.version`. */
+  version: z.string(),
   code: z.string().nullable(),
   category: z.string().nullable(),
   categoryId: z.string().nullable(),
