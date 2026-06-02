@@ -324,6 +324,37 @@ on the host shell/OS.
 Witness rule: `72-ci-parity-local-vs-ci-divergence.mdc` (agent anti-patterns
 for pre-push verification).
 
+## npm publish discipline (agents — do not local-publish)
+
+**Maintainers authenticate to npm in the browser** for account/package settings.
+That is **not** the publish path agents should use.
+
+**Do not run `npm publish` (or `npm publish --otp=…`) from a laptop/container
+to ship `@umbraculum/*` packages** unless the human maintainer **explicitly**
+asks for a one-off manual publish. Local publish often fails with OTP/2FA
+prompts and is **not** how this project ships routine bumps.
+
+| Package(s) | Repo | Publish trigger (preferred) | Workflow |
+|------------|------|----------------------------|----------|
+| `@umbraculum/ci-parity` | **umbraculum-toolset** | Git tag `ci-parity-vX.Y.Z` | `publish-ci-parity.yml` |
+| MIT SDK batch (7 packages) | **umbraculum-dev** | Git tag `sdk-batch-vX.Y.Z` | `publish-sdk-batch.yml` |
+| `@umbraculum/contracts` + `@umbraculum/api-client` | **umbraculum-dev** | Git tag `sdk-contracts-vX.Y.Z` | `publish-contracts-api-client.yml` |
+
+**Agent sequence after changing a publishable package:**
+
+1. Bump `package.json` `version` (no `v` prefix in the file).
+2. Commit in the **source repo** (toolset for ci-parity; umbraculum-dev for SDK).
+3. Push branch, then push the matching **Git tag** (e.g. `ci-parity-v1.0.9`).
+4. Wait for the GHA workflow to go green; confirm with `npm view <pkg> version`.
+5. **Then** bump `ci_parity_version` / consumer `^` pins in umbraculum-dev if needed.
+
+Auth is **npm Trusted Publishing (OIDC)** from GitHub Actions — no `NPM_TOKEN`,
+no laptop OTP. Runbooks: [`docs/design/ci-parity-npm-trusted-publishing.md`](docs/design/ci-parity-npm-trusted-publishing.md), [`docs/design/npm-sdk-trusted-publishing.md`](docs/design/npm-sdk-trusted-publishing.md).
+
+**If a manifest job needs a newer `@umbraculum/ci-parity` on npm** (e.g. new job
+id in `.umbraculum/ci-parity.json`), publish from **toolset** via tag first —
+do **not** block on local `npm publish`.
+
 ## Release/version notation guardrail
 
 When touching release metadata, preserve the repo convention from

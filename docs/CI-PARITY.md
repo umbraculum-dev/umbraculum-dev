@@ -135,7 +135,7 @@ docs/CI-PARITY.md
 |----------|--------|
 | Where do I edit which jobs run? | `.umbraculum/ci-parity.json` in **umbraculum-dev** |
 | Where do I see `typecheck` / `lint` CI on PRs? | **umbraculum-dev** → Actions tab |
-| Where does `publish-ci-parity` run? | **umbraculum-toolset** → Actions (npm publish on `ci-parity-v*` tags only) |
+| Where does `publish-ci-parity` run? | **umbraculum-toolset** → Actions (npm publish on `ci-parity-v*` tags only — **not** laptop `npm publish`; agents: [`AGENTS.md`](../AGENTS.md) § "npm publish discipline") |
 | Did we break Cursor plugins? | No — `packages/ci-parity/` is a **sibling** of `cursor-plugins/`, not inside it |
 
 Full publish runbook: [`docs/design/ci-parity-npm-publish.md`](design/ci-parity-npm-publish.md). OIDC trusted publishing setup, troubleshooting, and execution log: [`docs/design/ci-parity-npm-trusted-publishing.md`](design/ci-parity-npm-trusted-publishing.md).

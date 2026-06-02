@@ -1,7 +1,7 @@
 # Publishing `@umbraculum/ci-parity`
 
 **Tier:** Public  
-**Status:** v1 — `1.0.0` published via granular `NPM_TOKEN` (2026-05-29); **`1.0.1`+ via OIDC trusted publishing** (current of `1.0.6`)  
+**Status:** v1 — `1.0.0` published via granular `NPM_TOKEN` (2026-05-29); **`1.0.1`+ via OIDC trusted publishing** (current: `1.0.9` pending tag publish)  
 **Audience:** maintainers  
 **Related:** [`docs/CI-PARITY.md`](../CI-PARITY.md), [`docs/LICENSING.md`](../LICENSING.md) §6.2.1, [`ci-parity-npm-trusted-publishing.md`](ci-parity-npm-trusted-publishing.md)
 
@@ -97,17 +97,24 @@ Used for the initial `1.0.0` publish only. After OIDC was verified at `1.0.6`, t
 
 ---
 
-## 5. Manual publish (fallback)
+## 5. Manual publish (maintainer-only — not for agents)
 
-If you cannot set GitHub secrets or need a one-off publish:
+> **Agents:** do **not** run this section. Routine releases use **§4 GHA + OIDC**
+> (tag push). Browser login on npmjs.com is for humans managing trusted
+> publishers — not CLI publish. Local `npm publish` will prompt for OTP/2FA and
+> is the wrong default; see [`AGENTS.md`](../../AGENTS.md) § "npm publish discipline".
+
+If a maintainer **explicitly** requests a one-off laptop publish (OIDC unavailable):
 
 ```bash
 cd umbraculum-toolset
-npm login                    # user with @umbraculum publish rights
+npm login                    # maintainer only — may require OTP from authenticator app
 npm run build -w @umbraculum/ci-parity
 npm test -w @umbraculum/ci-parity
-npm publish -w @umbraculum/ci-parity --access public
+npm publish -w @umbraculum/ci-parity --access public --otp=<code-if-prompted>
 ```
+
+**Default for every agent-driven bump:** bump version → commit → `git tag ci-parity-vX.Y.Z` → `git push origin <tag>` → verify GHA `publish-ci-parity` green.
 
 ---
 
@@ -126,7 +133,7 @@ npm publish -w @umbraculum/ci-parity --access public
 
 | Consumer | Pin |
 |----------|-----|
-| umbraculum-dev reusable workflow input | `ci_parity_version: "1.0.6"` |
+| umbraculum-dev reusable workflow input | `ci_parity_version: "1.0.9"` |
 | Local / docs | `npx @umbraculum/ci-parity@^1` |
 | Reusable workflow ref (vendored) | `./.github/workflows/ci-parity-reusable.yml` in umbraculum-dev |
 

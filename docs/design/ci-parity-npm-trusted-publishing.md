@@ -17,7 +17,21 @@ Replaced the granular `NPM_TOKEN` rotation cycle for `publish-ci-parity` with sh
 | Rotate npm granular token every 90 days | No publish-token rotation |
 | Manual secret paste into GitHub | Trust link configured once on npmjs.com |
 
-**Manual publish from a laptop** still uses `npm login` / a personal token — OIDC only applies to the GHA workflow.
+**Manual publish from a laptop** still uses `npm login` / OTP if 2FA-on-publish is enabled — **maintainers only, not agents**. OIDC via GHA is the routine path.
+
+---
+
+## Agent anti-pattern (read first)
+
+**Do not** run `npm publish` from a terminal to ship `@umbraculum/ci-parity` (or suggest OTP codes to the user as the normal fix).
+
+| Wrong (agent default) | Right |
+|----------------------|--------|
+| `npm publish` on laptop after changing `packages/ci-parity` | Push **`ci-parity-vX.Y.Z`** tag on **umbraculum-toolset** → **`publish-ci-parity`** GHA |
+| "Enter OTP from authenticator" as the publish step | Browser npm login is for **humans** configuring trusted publishers on `/access` |
+| Bump `ci_parity_version` in umbraculum-dev before npm has the version | Tag publish first → `npm view @umbraculum/ci-parity version` → then pin consumers |
+
+Full agent gate: [`AGENTS.md`](../../AGENTS.md) § "npm publish discipline".
 
 ---
 
