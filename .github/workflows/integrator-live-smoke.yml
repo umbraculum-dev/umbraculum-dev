@@ -49,11 +49,7 @@ jobs:
           UMBRACULUM_BASE_URL: http://localhost:18080
         run: |
           set -euo pipefail
-          docker compose up -d --wait nginx api postgres redis pgpool gotenberg postgres-replica
-          # Fresh CI volumes have empty Postgres — apply schema + reference seed before E2E fixture.
-          docker compose exec -T api sh -c 'DATABASE_URL=$DATABASE_URL_DIRECT npx prisma migrate deploy'
-          docker compose exec -T api npm run db:seed
-          docker compose exec -T api npm run seed:e2e
+          ./scripts/integrator-live-bootstrap.sh
           ./scripts/integrator-api-smoke.sh "${UMBRACULUM_BASE_URL}"
           ./scripts/integrator-bearer-npm-smoke.sh
 
