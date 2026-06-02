@@ -20,19 +20,22 @@
 
 ## Local laptop layout (maintainer convention)
 
-Parent folder is **not** a git repository — only organizes sibling clones:
+Parent folder is **not** a git repository — only organizes sibling clones. Use environment variables (see [`DEVELOPMENT.md`](../DEVELOPMENT.md) `$REPO_ROOT` convention) — do not commit machine-specific absolute paths.
+
+Example layout:
 
 ```text
-/home/rf/dkprojects/rfapps/umbraculum-hosting/
+$HOSTING_ROOT/
   umbraculum-hosting-common/
   umbraculum-hosting-forum/
   umbraculum-hosting-demo/
-/home/rf/dkprojects/rfapps/umbraculum-dev/
+$REPO_ROOT/                    # this repo (umbraculum-dev)
 ```
 
 ```bash
-mkdir -p /home/rf/dkprojects/rfapps/umbraculum-hosting
-cd /home/rf/dkprojects/rfapps/umbraculum-hosting
+export HOSTING_ROOT="${HOSTING_ROOT:-$REPO_ROOT/../umbraculum-hosting}"
+mkdir -p "$HOSTING_ROOT"
+cd "$HOSTING_ROOT"
 git clone git@github.com:umbraculum-dev/umbraculum-hosting-common.git
 git clone git@github.com:umbraculum-dev/umbraculum-hosting-forum.git
 git clone git@github.com:umbraculum-dev/umbraculum-hosting-demo.git

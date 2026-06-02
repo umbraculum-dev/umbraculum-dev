@@ -285,6 +285,6 @@ describe("EquipmentProfilesListResponseSchema", () => {
         },
       ],
     });
-    expect(parsed.profiles[0]?.equipment.kettle).toMatchObject({ kettleVolumeLiters: 30 });
+    expect(parsed.profiles[0]?.equipment["kettle"]).toMatchObject({ kettleVolumeLiters: 30 });
   });
 });
