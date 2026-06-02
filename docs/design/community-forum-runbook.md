@@ -195,7 +195,7 @@ After the forum is live, wire links from existing surfaces:
 |---------|--------|
 | [`PUBLIC-ALPHA-ANNOUNCEMENT.md`](../PUBLIC-ALPHA-ANNOUNCEMENT.md) | Cross-post; add forum URL to release notes |
 | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) | Already points to forum for governance questions |
-| Brochure / docs nav | Optional footer link: **Community forum** → `https://forum.umbraculum.dev` |
+| Brochure / docs nav | **Done** — brochure [`index.html`](../../apps/website/public/index.html) header + footer; docs site navbar + footer in [`docs-site/docusaurus.config.ts`](../../docs-site/docusaurus.config.ts) |
 | GitHub org README | Link forum alongside docs |
 
 Each **Proposal** topic should link to its GitHub Issue; each Issue should link back to the forum topic.

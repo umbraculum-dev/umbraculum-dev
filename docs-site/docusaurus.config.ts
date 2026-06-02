@@ -428,6 +428,11 @@ const config: Config = {
         },
         {to: '/reference/', label: 'Reference', position: 'left'},
         {
+          href: 'https://forum.umbraculum.dev',
+          label: 'Community forum',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/umbraculum-dev/umbraculum-dev',
           label: 'GitHub',
           position: 'right',
@@ -460,6 +465,10 @@ const config: Config = {
             {
               label: 'Support & sponsorship',
               href: 'https://umbraculum.dev/support/',
+            },
+            {
+              label: 'Community forum',
+              href: 'https://forum.umbraculum.dev',
             },
           ],
         },
