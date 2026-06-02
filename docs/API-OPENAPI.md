@@ -302,7 +302,7 @@ Phase E13 completes the web Phase E migration by retiring legacy `apiFetch` and 
 | [`packages/contracts/src/brewery/routeSchemas.test.ts`](../packages/contracts/src/brewery/routeSchemas.test.ts) | Strict brewery list schema regression (e.g. `BeerStyle.version` string wire shape) |
 | [`publish-contracts-api-client.yml`](../.github/workflows/publish-contracts-api-client.yml) | OIDC publish for `@umbraculum/contracts` + `@umbraculum/api-client` on `sdk-contracts-v*` tags |
 
-**npm publish:** packages are prep-complete but not yet on the registry. Maintainer runbook: [`npm-sdk-publish-preflight.md`](design/npm-sdk-publish-preflight.md) § Phase E extension + [`scripts/publish-contracts-api-client-laptop.sh`](../scripts/publish-contracts-api-client-laptop.sh).
+**npm publish:** `@umbraculum/contracts@0.0.1` and `@umbraculum/api-client@0.0.1` on the public registry (2026-06-02). Future bumps: [`npm-sdk-trusted-publishing.md`](design/npm-sdk-trusted-publishing.md) § "Contracts + api-client extension" (`sdk-contracts-v*` tags).
 
 **Local smoke:**
 
