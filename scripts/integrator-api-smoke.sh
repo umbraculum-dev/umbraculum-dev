@@ -13,6 +13,8 @@ set -o pipefail
 BASE_URL="${1:-http://localhost:18080}"
 PERSONA_EMAIL="${E2E_ADMIN_EMAIL:-e2e-admin@brewery.local}"
 PERSONA_PASSWORD="${E2E_ADMIN_PASSWORD:-e2e-admin-pw!}"
+COLD_START_RETRIES=15
+COLD_START_DELAY_SECONDS=2
 COOKIE_JAR="$(mktemp)"
 trap 'rm -f "${COOKIE_JAR}"' EXIT
 
@@ -47,12 +49,22 @@ assert_ok_field() {
 
 echo "[integrator-smoke] BASE_URL=${BASE_URL}"
 
-HEALTH_BODY="$(curl -fsS "${BASE_URL}/api/health" 2>/dev/null || true)"
-if [ -z "${HEALTH_BODY}" ]; then
-  red "[integrator-smoke] stack not reachable at ${BASE_URL}"
-  yellow "[integrator-smoke] hint: docker compose ps && docker compose logs --tail=40 api nginx"
-  exit 2
-fi
+HEALTH_BODY=""
+i=0
+while true; do
+  HEALTH_BODY="$(curl -fsS "${BASE_URL}/api/health" 2>/dev/null || true)"
+  if [ -n "${HEALTH_BODY}" ]; then
+    break
+  fi
+  i=$((i + 1))
+  if [ "$i" -ge "$COLD_START_RETRIES" ]; then
+    red "[integrator-smoke] stack not reachable at ${BASE_URL} after $((COLD_START_RETRIES * COLD_START_DELAY_SECONDS))s"
+    yellow "[integrator-smoke] hint: docker compose ps && docker compose logs --tail=40 api nginx"
+    yellow "[integrator-smoke] hint: after 'docker compose restart api', wait for 'Server listening' in api logs"
+    exit 2
+  fi
+  sleep "$COLD_START_DELAY_SECONDS"
+done
 assert_ok_field "/api/health" "${HEALTH_BODY}"
 
 LOGIN_BODY="$(curl -fsS -X POST "${BASE_URL}/api/auth/login" \

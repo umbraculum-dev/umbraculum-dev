@@ -166,4 +166,4 @@ Official guide: https://docs.npmjs.com/trusted-publishers/
 | 2026-05-29 | First publish (laptop) + OIDC trust (CLI) | Done — seven packages on registry |
 | 2026-05-29 | `sdk-batch-v0.1.1` GHA OIDC publish | **Green** — patch bump to `0.1.1` / `0.0.2` |
 | — | `sdk-batch-v0.1.0` GHA publish | Skipped — versions already published manually |
-| 2026-06-02 | `publish-contracts-api-client.yml` + laptop script | Prep — first `@umbraculum/contracts` / `@umbraculum/api-client` publish pending maintainer |
+| 2026-06-02 | `publish-contracts-api-client.yml` + laptop script | Done — `@umbraculum/contracts` / `@umbraculum/api-client` `0.0.1` on registry + OIDC trust |

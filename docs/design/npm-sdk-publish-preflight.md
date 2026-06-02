@@ -21,14 +21,12 @@
 | 6 | `@umbraculum/mrp-contracts` | `packages/mrp-contracts/` | `0.0.2` |
 | 7 | `@umbraculum/crp-contracts` | `packages/crp-contracts/` | `0.0.2` |
 
-**Phase E extension (prep complete; first publish pending maintainer):**
+**Phase E extension (published 2026-06-02):**
 
-| Order | Package | Path | Workflow / tag |
-|-------|---------|------|----------------|
-| 8 | `@umbraculum/contracts` | `packages/contracts/` | `publish-contracts-api-client.yml` → `sdk-contracts-v*` |
-| 9 | `@umbraculum/api-client` | `packages/api-client/` | same (after contracts; deps rewritten at publish time) |
-
-First publish: `./scripts/publish-contracts-api-client-laptop.sh` then OIDC trust — see [`npm-sdk-trusted-publishing.md`](npm-sdk-trusted-publishing.md) § "Contracts + api-client extension".
+| Order | Package | Path | On npm (latest) |
+|-------|---------|------|-----------------|
+| 8 | `@umbraculum/contracts` | `packages/contracts/` | `0.0.1` — OIDC via `publish-contracts-api-client.yml` → `sdk-contracts-v*` |
+| 9 | `@umbraculum/api-client` | `packages/api-client/` | `0.0.1` — same workflow (deps rewritten at publish time) |
 
 **Not in npm batch (monorepo-only):** `@umbraculum/ui`, `@umbraculum/i18n`, `@umbraculum/navigation`, `@umbraculum/rendering`, brewery packages, etc.
 
@@ -115,3 +113,7 @@ node --input-type=module -e "import('@umbraculum/module-sdk').then(m => console.
 | 2026-05-29 | *(all seven)* | — | OIDC trusted publishing via `npx npm@11.16.0 trust github …` |
 | 2026-05-29 | *(all seven)* | patch bump | `sdk-batch-v0.1.1` GHA OIDC publish — **green** |
 | — | — | — | `sdk-batch-v0.1.0` tag **not** pushed (versions already published manually) |
+| 2026-06-02 | `@umbraculum/contracts` | `0.0.1` | Maintainer laptop publish |
+| 2026-06-02 | `@umbraculum/api-client` | `0.0.1` | Laptop; deps rewritten to registry semver at publish time |
+| 2026-06-02 | *(contracts + api-client)* | — | OIDC trusted publishing via `publish-contracts-api-client.yml` |
+| — | — | — | `sdk-contracts-v0.0.1` tag **not** pushed (versions already published manually) |

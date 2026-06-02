@@ -274,8 +274,8 @@ A specific subset of packages — the ones third-party module developers must de
 | `@umbraculum/pim-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/mrp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
 | `@umbraculum/crp-contracts` | ✅ | **Published** | `0.0.2` | Same batch. |
-| `@umbraculum/contracts` | ✅ | **Published** (prep in tree) | `0.0.1` | Platform + reference-vertical wire parsers; prerequisite for `@umbraculum/api-client`. Monorepo dev keeps `file:../contracts`. |
-| `@umbraculum/api-client` | ✅ | **Published** (prep in tree) | `0.0.1` | OpenAPI-derived path types + typed facades; `@umbraculum/contracts` parsers remain wire authority. Subpath `/brewery` for add-on SKU. Maintainer: tag `sdk-batch-v*` after trusted-publisher config. |
+| `@umbraculum/contracts` | ✅ | **Published** | `0.0.1` | Platform + reference-vertical wire parsers; prerequisite for `@umbraculum/api-client`. Monorepo dev keeps `file:../contracts`. OIDC via `publish-contracts-api-client.yml`. |
+| `@umbraculum/api-client` | ✅ | **Published** | `0.0.1` | OpenAPI-derived path types + typed facades; `@umbraculum/contracts` parsers remain wire authority. Subpath `/brewery` for add-on SKU. Future bumps: tag `sdk-contracts-v*` (not `sdk-batch-v*`). |
 
 **Monorepo contributors** still use npm workspaces + `file:` links (see [`DEVELOPMENT.md`](../DEVELOPMENT.md)). **External module repos** install from npm first; git/workspace is a fallback for unreleased pins.
 
